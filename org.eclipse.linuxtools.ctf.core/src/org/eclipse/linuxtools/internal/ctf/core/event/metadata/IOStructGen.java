@@ -29,6 +29,7 @@ import java.util.UUID;
 
 import org.antlr.runtime.tree.CommonTree;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.ctf.core.event.CTFClock;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
@@ -562,9 +563,9 @@ public class IOStructGen {
             final DeclarationScope parentScope, String name,
             IntegerDeclaration decl) throws ParseException {
 
-        if (decl.getByteOrder() == null) {
+        if (decl.getByteOrder() != byteOrder) {
             IntegerDeclaration newI;
-            newI = new IntegerDeclaration(decl.getLength(), decl.isSigned(),
+            newI = IntegerDeclaration.createDeclaration(decl.getLength(), decl.isSigned(),
                     decl.getBase(), byteOrder, decl.getEncoding(),
                     decl.getClock(), decl.getAlignment());
             parentScope.replaceType(name, newI);
@@ -585,9 +586,9 @@ public class IOStructGen {
 
             } else if (d instanceof IntegerDeclaration) {
                 IntegerDeclaration decl = (IntegerDeclaration) d;
-                if (decl.getByteOrder() == null) {
+                if (decl.getByteOrder() != byteOrder) {
                     IntegerDeclaration newI;
-                    newI = new IntegerDeclaration(decl.getLength(),
+                    newI = IntegerDeclaration.createDeclaration(decl.getLength(),
                             decl.isSigned(), decl.getBase(), byteOrder,
                             decl.getEncoding(), decl.getClock(),
                             decl.getAlignment());
@@ -609,7 +610,7 @@ public class IOStructGen {
             } else if (d instanceof IntegerDeclaration) {
                 IntegerDeclaration decl = (IntegerDeclaration) d;
                 IntegerDeclaration newI;
-                newI = new IntegerDeclaration(decl.getLength(),
+                newI = IntegerDeclaration.createDeclaration(decl.getLength(),
                         decl.isSigned(), decl.getBase(), byteOrder,
                         decl.getEncoding(), decl.getClock(),
                         decl.getAlignment());
@@ -1455,7 +1456,8 @@ public class IOStructGen {
         long size = 0;
         long alignment = 0;
         int base = 10;
-        String clock = null;
+        @NonNull
+        String clock = ""; //$NON-NLS-1$
 
         Encoding encoding = Encoding.NONE;
 
@@ -1514,14 +1516,16 @@ public class IOStructGen {
             }
         }
 
-        integerDeclaration = new IntegerDeclaration((int) size, signed, base,
+        integerDeclaration = IntegerDeclaration.createDeclaration((int) size, signed, base,
                 byteOrder, encoding, clock, alignment);
 
         return integerDeclaration;
     }
 
+    @NonNull
     private static String getClock(CommonTree rightNode) {
-        return rightNode.getChild(1).getChild(0).getChild(0).getText();
+        String clock = rightNode.getChild(1).getChild(0).getChild(0).getText();
+        return clock == null ? "" : clock; //$NON-NLS-1$
     }
 
     private static StringDeclaration parseString(CommonTree string)
@@ -2694,6 +2698,7 @@ public class IOStructGen {
      * @return The "encoding" value.
      * @throws ParseException
      */
+    @NonNull
     private static Encoding getEncoding(CommonTree rightNode)
             throws ParseException {
 

@@ -20,6 +20,10 @@ import java.nio.channels.FileChannel;
 import java.util.Set;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
+import org.eclipse.linuxtools.ctf.core.event.types.Definition;
+import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.types.StringDefinition;
+import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
@@ -31,6 +35,8 @@ import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
 import org.eclipse.linuxtools.internal.ctf.core.event.EventDeclaration;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * The class <code>StreamInputReaderTest</code> contains tests for the class
@@ -46,6 +52,10 @@ public class StreamInputReaderTest {
 
     private StreamInputReader fixture;
 
+    private static ImmutableList<String> wrap(String s) {
+        return ImmutableList.<String> builder().add(s).build();
+    }
+
     /**
      * Perform pre-test initialization.
      *
@@ -56,7 +66,15 @@ public class StreamInputReaderTest {
         fixture = getStreamInputReader();
         fixture.setName(1);
         fixture.setCurrentEvent(new EventDefinition(new EventDeclaration(),
-                getStreamInputReader()));
+                getStreamInputReader(), 0, null, null,
+                new StructDefinition(
+                        new StructDeclaration(0),
+                        null,
+                        "packet",
+                        wrap( "field" ),
+                        new Definition[] { new StringDefinition(new StringDeclaration(), null, "field", "test") }),
+                null)
+                );
     }
 
     private static StreamInputReader getStreamInputReader() throws CTFReaderException {
@@ -125,7 +143,7 @@ public class StreamInputReaderTest {
      */
     @Test
     public void testGetCurrentPacketContext() {
-        StructDefinition result = fixture.getCurrentPacketContext();
+        StructDefinition result = fixture.getCurrentEvent().getPacketContext();
         assertNotNull(result);
     }
 
@@ -140,27 +158,31 @@ public class StreamInputReaderTest {
 
     /**
      * Run the void goToLastEvent() method test.
-     * @throws CTFReaderException error
+     *
+     * @throws CTFReaderException
+     *             error
      */
     @Test
     public void testGoToLastEvent1() throws CTFReaderException {
         final long endTimestamp = goToEnd();
         final long endTime = 4287422460315L;
-        assertEquals(endTime , endTimestamp  );
+        assertEquals(endTime, endTimestamp);
     }
 
     /**
      * Run the void goToLastEvent() method test.
-     * @throws CTFReaderException error
+     *
+     * @throws CTFReaderException
+     *             error
      */
     @Test
     public void testGoToLastEvent2() throws CTFReaderException {
         long timestamp = -1;
-        while(fixture.readNextEvent().equals(CTFResponse.OK)) {
+        while (fixture.readNextEvent().equals(CTFResponse.OK)) {
             timestamp = fixture.getCurrentEvent().getTimestamp();
         }
         long endTimestamp = goToEnd();
-        assertEquals(0 , timestamp- endTimestamp );
+        assertEquals(0, timestamp - endTimestamp);
     }
 
     private long goToEnd() throws CTFReaderException {
@@ -170,7 +192,9 @@ public class StreamInputReaderTest {
 
     /**
      * Run the boolean readNextEvent() method test.
-     * @throws CTFReaderException error
+     *
+     * @throws CTFReaderException
+     *             error
      */
     @Test
     public void testReadNextEvent() throws CTFReaderException {
@@ -179,7 +203,9 @@ public class StreamInputReaderTest {
 
     /**
      * Run the void seek(long) method test. Seek by direct timestamp
-     * @throws CTFReaderException error
+     *
+     * @throws CTFReaderException
+     *             error
      */
     @Test
     public void testSeek_timestamp() throws CTFReaderException {
@@ -196,8 +222,7 @@ public class StreamInputReaderTest {
     @Test
     public void testSeek_eventDefinition() throws CTFReaderException {
         EventDefinition eventDefinition = new EventDefinition(
-                new EventDeclaration(), getStreamInputReader());
-        eventDefinition.setTimestamp(1L);
+                new EventDeclaration(), getStreamInputReader(), 1L, null, null, null, null);
         fixture.setCurrentEvent(eventDefinition);
     }
 }

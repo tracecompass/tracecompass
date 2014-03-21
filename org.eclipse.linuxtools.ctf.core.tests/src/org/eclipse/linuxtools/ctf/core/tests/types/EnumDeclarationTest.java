@@ -16,13 +16,16 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDefinition;
-import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,8 +45,8 @@ public class EnumDeclarationTest {
      */
     @Before
     public void setUp() {
-        fixture = new EnumDeclaration(new IntegerDeclaration(1, false, 1,
-                ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 8));
+        fixture = new EnumDeclaration(IntegerDeclaration.createDeclaration(1, false, 1,
+                ByteOrder.BIG_ENDIAN, Encoding.ASCII, "", 8));
     }
 
     /**
@@ -51,8 +54,8 @@ public class EnumDeclarationTest {
      */
     @Test
     public void testEnumDeclaration() {
-        IntegerDeclaration containerType = new IntegerDeclaration(1, false, 1,
-                ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 8);
+        IntegerDeclaration containerType = IntegerDeclaration.createDeclaration(1, false, 1,
+                ByteOrder.BIG_ENDIAN, Encoding.ASCII, "", 8);
 
         EnumDeclaration result = new EnumDeclaration(containerType);
 
@@ -78,14 +81,20 @@ public class EnumDeclarationTest {
     /**
      * Run the EnumDefinition createDefinition(DefinitionScope,String) method
      * test.
+     *
+     * @throws CTFReaderException
+     *             out of bounds error, won't happen
      */
     @Test
-    public void testCreateDefinition() {
+    public void testCreateDefinition() throws CTFReaderException {
         IDefinitionScope definitionScope = null;
         String fieldName = "";
+        byte[] array = { 't', 'e', 's', 't', '\0', 't', 'h', 'i', 's', '\0' };
+        ByteBuffer byb = ByteBuffer.wrap(array);
+        BitBuffer bb = new BitBuffer(byb);
 
         EnumDefinition result = fixture.createDefinition(definitionScope,
-                fieldName);
+                fieldName, bb);
 
         assertNotNull(result);
     }

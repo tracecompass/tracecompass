@@ -82,7 +82,7 @@ public class StreamInputTest {
      */
     @Test
     public void testGetPath() {
-        String result = fixture.getPath();
+        String result = fixture.getScopePath().toString();
         assertNotNull(result);
     }
 

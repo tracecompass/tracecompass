@@ -13,45 +13,46 @@ package org.eclipse.linuxtools.ctf.core.tests.types;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
-import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
+import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.junit.Test;
 
 /**
  * The class <code>DefinitionTest</code> contains tests for the class
  * <code>{@link Definition}</code>.
  *
- * @author ematkho
+ * @author Matthew Khouzam
  * @version $Revision: 1.0 $
  */
-@SuppressWarnings("javadoc")
 public class DefinitionTest {
 
     /**
      * Since Definition is abstract, we'll minimally extend it here to
      * instantiate it.
      */
-    class DefTest extends Definition {
+    static class DefTest extends Definition {
 
-        public DefTest(IDefinitionScope definitionScope, String fieldName) {
-            super(definitionScope, fieldName);
+        @NonNull
+        private static final StringDeclaration STRINGDEF = new StringDeclaration();
+
+        public DefTest(IDefinitionScope definitionScope, @NonNull String fieldName) {
+            super(DefTest.STRINGDEF, definitionScope, fieldName);
         }
 
         @Override
-        public void read(BitBuffer input) {
-            /* Just a test, no need to implement anything */
-        }
-
-        @Override
+        @NonNull
         public IDeclaration getDeclaration() {
-            // TODO Auto-generated method stub
-            return null;
+            return DefTest.STRINGDEF;
         }
 
     }
 
+    /**
+     * Test a definition
+     */
     @Test
     public void testToString() {
         Definition fixture = new DefTest(null, "Hello");

@@ -11,8 +11,8 @@
 
 package org.eclipse.linuxtools.ctf.core.event.types;
 
-import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
-import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
 
 /**
  * A CTF float definition.
@@ -24,13 +24,12 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
  * @author Matthew Khouzam
  * @author Simon Marchi
  */
-public class FloatDefinition extends Definition {
+public final class FloatDefinition extends Definition {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final FloatDeclaration declaration;
-    private double value;
+    private final double fValue;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -45,11 +44,14 @@ public class FloatDefinition extends Definition {
      *            the parent scope
      * @param fieldName
      *            the field name
+     * @param value
+     *            field value
+     * @since 3.0
      */
-    public FloatDefinition(FloatDeclaration declaration,
-            IDefinitionScope definitionScope, String fieldName) {
-        super(definitionScope, fieldName);
-        this.declaration = declaration;
+    public FloatDefinition(@NonNull FloatDeclaration declaration,
+            IDefinitionScope definitionScope, @NonNull String fieldName, double value) {
+        super(declaration, definitionScope, fieldName);
+        fValue = value;
     }
 
     // ------------------------------------------------------------------------
@@ -63,22 +65,12 @@ public class FloatDefinition extends Definition {
      * @return the value of the float field fit into a double.
      */
     public double getValue() {
-        return value;
-    }
-
-    /**
-     * Sets the value of the float
-     *
-     * @param val
-     *            the value of the float
-     */
-    public void setValue(double val) {
-        value = val;
+        return fValue;
     }
 
     @Override
     public FloatDeclaration getDeclaration() {
-        return declaration;
+        return (FloatDeclaration) super.getDeclaration();
     }
 
     // ------------------------------------------------------------------------
@@ -86,57 +78,7 @@ public class FloatDefinition extends Definition {
     // ------------------------------------------------------------------------
 
     @Override
-    public void read(BitBuffer input) throws CTFReaderException {
-        /* Offset the buffer position wrt the current alignment */
-        alignRead(input, this.declaration);
-        final int exp = declaration.getExponent();
-        final int mant = declaration.getMantissa();
-
-        if ((exp + mant) == 32) {
-            value = readRawFloat32(input, mant, exp);
-        } else if ((exp + mant) == 64) {
-            value = readRawFloat64(input, mant, exp);
-        } else {
-            value = Double.NaN;
-        }
-    }
-
-    private static double readRawFloat64(BitBuffer input, final int manBits,
-            final int expBits) throws CTFReaderException {
-        long temp = input.get(64, false);
-        return createFloat(temp, manBits - 1, expBits);
-    }
-
-    /**
-     * @param rawValue
-     * @param manBits
-     * @param expBits
-     */
-    private static double createFloat(long rawValue, final int manBits,
-            final int expBits) {
-        long manShift = 1L << (manBits);
-        long manMask = manShift - 1;
-        long expMask = (1L << expBits) - 1;
-
-        int exp = (int) ((rawValue >> (manBits)) & expMask) + 1;
-        long man = (rawValue & manMask);
-        final int offsetExponent = exp - (1 << (expBits - 1));
-        double expPow = Math.pow(2.0, offsetExponent);
-        double ret = man * 1.0f;
-        ret /= manShift;
-        ret += 1.0;
-        ret *= expPow;
-        return ret;
-    }
-
-    private static double readRawFloat32(BitBuffer input, final int manBits,
-            final int expBits) throws CTFReaderException {
-        long temp = input.get(32, false);
-        return createFloat(temp, manBits - 1, expBits);
-    }
-
-    @Override
     public String toString() {
-        return String.valueOf(value);
+        return String.valueOf(fValue);
     }
 }

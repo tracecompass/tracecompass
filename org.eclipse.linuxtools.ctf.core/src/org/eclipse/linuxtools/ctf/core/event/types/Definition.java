@@ -12,8 +12,9 @@
 
 package org.eclipse.linuxtools.ctf.core.event.types;
 
-import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
-import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
+import org.eclipse.linuxtools.ctf.core.event.scope.LexicalScope;
 
 /**
  * A CTF definition
@@ -36,12 +37,15 @@ public abstract class Definition {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final String fieldName;
+    private final String fFieldName;
 
     /** The complete path of this field */
-    private final String path;
+    private final LexicalScope fPath;
 
-    private final IDefinitionScope definitionScope;
+    private final IDefinitionScope fDefinitionScope;
+
+    @NonNull
+    private final IDeclaration fDeclaration;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -50,25 +54,21 @@ public abstract class Definition {
     /**
      * Constructor
      *
+     * @param declaration
+     *            the event declaration
+     *
      * @param definitionScope
      *            the definition is in a scope, (normally a struct) what is it?
      * @param fieldName
      *            the name of the definition. (it is a field in the parent
      *            scope)
+     * @since 3.0
      */
-    public Definition(IDefinitionScope definitionScope, String fieldName) {
-        this.definitionScope = definitionScope;
-        this.fieldName = fieldName;
-        if (definitionScope != null) {
-            String parentPath = definitionScope.getPath();
-            if (parentPath.length() > 0) {
-                path = parentPath + "." + fieldName; //$NON-NLS-1$
-            } else {
-                path = fieldName;
-            }
-        } else {
-            path = fieldName;
-        }
+    public Definition(@NonNull IDeclaration declaration, IDefinitionScope definitionScope, @NonNull String fieldName) {
+        fDeclaration = declaration;
+        fDefinitionScope = definitionScope;
+        fFieldName = fieldName;
+        fPath = fDeclaration.getPath(definitionScope, fieldName);
     }
 
     // ------------------------------------------------------------------------
@@ -82,17 +82,17 @@ public abstract class Definition {
      * @since 2.0
      */
     protected String getFieldName() {
-        return fieldName;
+        return fFieldName;
     }
 
     /**
      * Get the complete path of this field.
      *
      * @return The path
-     * @since 2.0
+     * @since 3.0
      */
-    public String getPath() {
-        return path;
+    public LexicalScope getScopePath() {
+        return fPath;
     }
 
     /**
@@ -102,10 +102,10 @@ public abstract class Definition {
      * scope DOT the name of the definition (name of the field in its container)
      *
      * @return The definition scope
-     * @since 2.0
+     * @since 3.0
      */
     protected IDefinitionScope getDefinitionScope() {
-        return definitionScope;
+        return fDefinitionScope;
     }
 
     // ------------------------------------------------------------------------
@@ -117,46 +117,13 @@ public abstract class Definition {
      * @return gets the declaration of a datatype
      *
      */
-    public abstract IDeclaration getDeclaration();
-
-    /**
-     * Read the definition from a bitbuffer
-     *
-     * @param input
-     *            the bitbuffer containing the data to read.
-     * @throws CTFReaderException
-     *             An error occurred reading the data. If the buffer is reading
-     *             beyond its end, this exception will be raised.
-     * @since 2.0
-     */
-    public abstract void read(BitBuffer input) throws CTFReaderException;
-
-    /**
-     * Offset the buffer position wrt the current alignment.
-     *
-     * @param input
-     *            The bitbuffer that is being read
-     * @param declaration
-     *            The declaration which has an alignment
-     * @throws CTFReaderException
-     *            Happens when there is an out of bounds exception
-     * @since 2.2
-     */
-    protected static void alignRead(BitBuffer input, IDeclaration declaration) throws CTFReaderException{
-        long mask = declaration.getAlignment() -1;
-        /*
-         * The alignment is a power of 2
-         */
-        long pos = input.position();
-        if ((pos & mask) == 0) {
-            return;
-        }
-        pos = (pos + mask) & ~mask;
-        input.position(pos);
+    @NonNull
+    public IDeclaration getDeclaration() {
+        return fDeclaration;
     }
 
     @Override
     public String toString() {
-        return path + '[' + Integer.toHexString(hashCode()) + ']';
+        return fPath.toString() + '[' + Integer.toHexString(hashCode()) + ']';
     }
 }

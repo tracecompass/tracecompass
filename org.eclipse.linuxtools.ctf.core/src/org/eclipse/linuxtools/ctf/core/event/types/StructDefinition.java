@@ -12,13 +12,18 @@
 
 package org.eclipse.linuxtools.ctf.core.event.types;
 
-import java.util.LinkedHashMap;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
-import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
-import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 
 /**
  * A CTF structure definition (similar to a C structure).
@@ -31,14 +36,15 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
  * @author Matthew Khouzam
  * @author Simon Marchi
  */
-public class StructDefinition extends Definition implements IDefinitionScope {
+public final class StructDefinition extends Definition implements IDefinitionScope {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final StructDeclaration declaration;
-    private final Map<String, Definition> definitions = new LinkedHashMap<>();
+    private final ImmutableList<String> fFieldNames;
+    private final Definition[] fDefinitions;
+    private Map<String, Definition> fDefinitionsMap = null;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -53,19 +59,19 @@ public class StructDefinition extends Definition implements IDefinitionScope {
      *            the parent scope
      * @param structFieldName
      *            the field name
+     * @param fieldNames
+     *            the list of fields
+     * @param definitions
+     *            the definitions
+     * @since 3.0
      */
-    public StructDefinition(StructDeclaration declaration,
-            IDefinitionScope definitionScope, String structFieldName) {
-        super(definitionScope, structFieldName);
-
-        this.declaration = declaration;
-
-        for (String fName : declaration.getFieldsList()) {
-            IDeclaration fieldDecl = declaration.getFields().get(fName);
-            assert (fieldDecl != null);
-
-            Definition def = fieldDecl.createDefinition(this, fName);
-            definitions.put(fName, def);
+    public StructDefinition(@NonNull StructDeclaration declaration,
+            IDefinitionScope definitionScope, @NonNull String structFieldName, List<String> fieldNames, Definition[] definitions) {
+        super(declaration, definitionScope, structFieldName);
+        fFieldNames = ImmutableList.copyOf(fieldNames);
+        fDefinitions = definitions;
+        if (fFieldNames == null) {
+            fDefinitionsMap = Collections.EMPTY_MAP;
         }
     }
 
@@ -74,32 +80,48 @@ public class StructDefinition extends Definition implements IDefinitionScope {
     // ------------------------------------------------------------------------
 
     /**
+     * Gets the definition of the field
+     *
+     * @param fieldName
+     *            the fieldname
      * @return The definitions of all the fields
-     * @since 2.0
+     * @since 3.0
      */
-    public Map<String, Definition> getDefinitions() {
-        return definitions;
+    public Definition getDefinition(String fieldName) {
+        if (fDefinitionsMap == null) {
+            buildFieldsMap();
+        }
+        return fDefinitionsMap.get(fieldName);
+    }
+
+    private void buildFieldsMap() {
+        Builder<String, Definition> mapBuilder = new ImmutableMap.Builder<>();
+        for (int i = 0; i < fFieldNames.size(); i++) {
+            if (fDefinitions[i] != null) {
+                mapBuilder.put(fFieldNames.get(i), fDefinitions[i]);
+            }
+        }
+        fDefinitionsMap = mapBuilder.build();
+    }
+
+    /**
+     * Gets an array of the field names
+     *
+     * @return the field names array
+     * @since 3.0
+     */
+    public List<String> getFieldNames() {
+        return fFieldNames;
     }
 
     @Override
     public StructDeclaration getDeclaration() {
-        return declaration;
+        return (StructDeclaration) super.getDeclaration();
     }
 
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-
-    @Override
-    public void read(BitBuffer input) throws CTFReaderException {
-        alignRead(input, this.declaration);
-        final List<String> fieldList = declaration.getFieldsList();
-        for (String fName : fieldList) {
-            Definition def = definitions.get(fName);
-            assert (def != null);
-            def.read(input);
-        }
-    }
 
     @Override
     public Definition lookupDefinition(String lookupPath) {
@@ -108,11 +130,16 @@ public class StructDefinition extends Definition implements IDefinitionScope {
          * sequence refers to a field that is after it, the field's definition
          * will not be there yet in the hashmap.
          */
-        Definition retVal = definitions.get(lookupPath);
-        if (retVal == null) {
-            retVal = definitions.get("_" + lookupPath); //$NON-NLS-1$
+        int val = fFieldNames.indexOf(lookupPath);
+        if (val != -1) {
+            return fDefinitions[val];
         }
-        return retVal;
+        String lookupUnderscored = "_" + lookupPath; //$NON-NLS-1$
+        val = fFieldNames.indexOf(lookupUnderscored);
+        if (val != -1) {
+            return fDefinitions[val];
+        }
+        return null;
     }
 
     /**
@@ -170,8 +197,8 @@ public class StructDefinition extends Definition implements IDefinitionScope {
     }
 
     /**
-     * Lookup a string in a struct. If the name returns a non-string (like
-     * an int) than the method returns null
+     * Lookup a string in a struct. If the name returns a non-string (like an
+     * int) than the method returns null
      *
      * @param name
      *            the name of the string
@@ -184,8 +211,8 @@ public class StructDefinition extends Definition implements IDefinitionScope {
     }
 
     /**
-     * Lookup a struct in a struct. If the name returns a non-struct (like
-     * an int) than the method returns null
+     * Lookup a struct in a struct. If the name returns a non-struct (like an
+     * int) than the method returns null
      *
      * @param name
      *            the name of the struct
@@ -198,8 +225,8 @@ public class StructDefinition extends Definition implements IDefinitionScope {
     }
 
     /**
-     * Lookup a variant in a struct. If the name returns a non-variant (like
-     * an int) than the method returns null
+     * Lookup a variant in a struct. If the name returns a non-variant (like an
+     * int) than the method returns null
      *
      * @param name
      *            the name of the variant
@@ -217,23 +244,19 @@ public class StructDefinition extends Definition implements IDefinitionScope {
 
         builder.append("{ "); //$NON-NLS-1$
 
-        ListIterator<String> listIterator = this.declaration.getFieldsList()
-                .listIterator();
-
-        while (listIterator.hasNext()) {
-            String field = listIterator.next();
-
-            builder.append(field);
-            builder.append(" = "); //$NON-NLS-1$
-            builder.append(lookupDefinition(field).toString());
-
-            if (listIterator.hasNext()) {
-                builder.append(", "); //$NON-NLS-1$
+        if (fFieldNames != null) {
+            List<String> fields = new LinkedList<>();
+            for (String field : fFieldNames) {
+                String appendee = field + " = " + lookupDefinition(field).toString(); //$NON-NLS-1$
+                fields.add(appendee);
             }
+            Joiner joiner = Joiner.on(", ").skipNulls(); //$NON-NLS-1$
+            builder.append(joiner.join(fields));
         }
 
         builder.append(" }"); //$NON-NLS-1$
 
         return builder.toString();
     }
+
 }

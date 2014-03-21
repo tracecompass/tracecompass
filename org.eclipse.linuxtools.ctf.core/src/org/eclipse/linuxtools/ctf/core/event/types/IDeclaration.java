@@ -12,6 +12,12 @@
 
 package org.eclipse.linuxtools.ctf.core.event.types;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
+import org.eclipse.linuxtools.ctf.core.event.scope.LexicalScope;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
+
 /**
  * A CTF data type declaration.
  *
@@ -35,9 +41,26 @@ public interface IDeclaration {
      *            placed
      * @param fieldName
      *            the name of the definition
+     * @param input
+     *            a bitbuffer to read from
      * @return a reference to the definition
+     * @throws CTFReaderException
+     *             error in reading
+     * @since 3.0
      */
-    Definition createDefinition(IDefinitionScope definitionScope, String fieldName);
+    Definition createDefinition(IDefinitionScope definitionScope, @NonNull String fieldName, @NonNull BitBuffer input) throws CTFReaderException;
+
+    /**
+     * Get the path of a definition
+     *
+     * @param definitionScope
+     *            the scope of the definition
+     * @param fieldName
+     *            the name of the definition
+     * @return the path of the definition
+     * @since 3.0
+     */
+    public LexicalScope getPath(IDefinitionScope definitionScope, @NonNull String fieldName);
 
     /**
      * The minimum alignment. if the field is 32 bits, the definition will pad
@@ -46,4 +69,13 @@ public interface IDeclaration {
      * @return the alignment in bits
      */
     long getAlignment();
+
+    /**
+     * The MAXIMUM size of this declaration
+     *
+     * @return the maximum size
+     * @since 3.0
+     */
+    int getMaximumSize();
+
 }

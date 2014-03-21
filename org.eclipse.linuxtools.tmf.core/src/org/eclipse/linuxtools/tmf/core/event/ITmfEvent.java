@@ -19,12 +19,12 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 /**
  * The generic event structure in TMF. In its canonical form, an event has:
  * <ul>
- * <li> a parent trace
- * <li> a rank (order within the trace)
- * <li> a timestamp
- * <li> a source (reporting component)
- * <li> a type
- * <li> a content (payload)
+ * <li>a parent trace
+ * <li>a rank (order within the trace)
+ * <li>a timestamp
+ * <li>a source (reporting component)
+ * <li>a type
+ * <li>a content (payload)
  * </ul>
  * For convenience, a free-form reference field is also provided. It could be
  * used as e.g. a location marker (filename:lineno) to indicate where the event

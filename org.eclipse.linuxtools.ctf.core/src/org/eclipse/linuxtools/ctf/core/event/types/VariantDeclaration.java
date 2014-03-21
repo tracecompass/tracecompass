@@ -12,8 +12,14 @@
 
 package org.eclipse.linuxtools.ctf.core.event.types;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 
 /**
  * A CTFC variant declaration.
@@ -26,15 +32,18 @@ import java.util.Map;
  * @author Matthew Khouzam
  * @author Simon Marchi
  */
-public class VariantDeclaration implements IDeclaration {
+public class VariantDeclaration extends Declaration {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    private String tag = null;
-    private static final long alignment = 1;
-    private final Map<String, IDeclaration> fields = new HashMap<>();
+    private String fTag = null;
+    private static final long ALIGNMENT = 1;
+    private final Map<String, IDeclaration> fFields = Collections.synchronizedMap(new HashMap<String, IDeclaration>());
+    private EnumDefinition fTagDef;
+    private IDeclaration fDeclarationToPopulate;
+    private IDefinitionScope fPrevDefinitionScope;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -54,57 +63,87 @@ public class VariantDeclaration implements IDeclaration {
      * @return Does the variant have a tag
      */
     public boolean isTagged() {
-        return tag != null;
+        return fTag != null;
     }
 
     /**
      * Lookup if a field exists in the variant
-     * @param fieldTag the field tag name
+     *
+     * @param fieldTag
+     *            the field tag name
      * @return true = field tag exists
      */
     public boolean hasField(String fieldTag) {
-        return fields.containsKey(fieldTag);
+        return fFields.containsKey(fieldTag);
     }
 
     /**
      * Sets the tag in a variant
-     * @param tag the tag
+     *
+     * @param tag
+     *            the tag
      */
     public void setTag(String tag) {
-        this.tag = tag;
+        fTag = tag;
+        fTagDef = null;
     }
 
     /**
      * Gets current variant tag
+     *
      * @return the variant tag.
      */
     public String getTag() {
-        return this.tag;
+        return fTag;
     }
 
     /**
      * Gets the fields of the variant
+     *
      * @return the fields of the variant
      * @since 2.0
      */
     public Map<String, IDeclaration> getFields() {
-        return this.fields;
+        return this.fFields;
     }
 
     @Override
     public long getAlignment() {
-        return alignment;
+        return ALIGNMENT;
     }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
 
+    /**
+     * @since 3.0
+     */
     @Override
     public VariantDefinition createDefinition(IDefinitionScope definitionScope,
-            String fieldName) {
-        return new VariantDefinition(this, definitionScope, fieldName);
+            String fieldName, BitBuffer input) throws CTFReaderException {
+        alignRead(input);
+        if (fPrevDefinitionScope != definitionScope) {
+            fTagDef = null;
+            fPrevDefinitionScope = definitionScope;
+        }
+        EnumDefinition tagDef = fTagDef;
+        if (tagDef == null) {
+            Definition def = definitionScope.lookupDefinition(fTag);
+            tagDef = (EnumDefinition) ((def instanceof EnumDefinition) ? def : null);
+        }
+        if (tagDef == null) {
+            throw new CTFReaderException("Tag is not defined " + fTag); //$NON-NLS-1$
+        }
+        String varFieldName = tagDef.getStringValue();
+        fDeclarationToPopulate = fFields.get(varFieldName);
+        if (fDeclarationToPopulate == null) {
+            throw new CTFReaderException("Unknown enum selector for variant " + //$NON-NLS-1$
+                    definitionScope.getScopePath().toString());
+        }
+        Definition fieldValue = fDeclarationToPopulate.createDefinition(definitionScope, fieldName, input);
+        return new VariantDefinition(this, definitionScope, varFieldName, fieldName, fieldValue);
     }
-
 
     /**
      * Add a field to this CTF Variant
@@ -115,7 +154,30 @@ public class VariantDeclaration implements IDeclaration {
      *            The Declaration of this new field
      */
     public void addField(String fieldTag, IDeclaration declaration) {
-        fields.put(fieldTag, declaration);
+        fFields.put(fieldTag, declaration);
+    }
+
+    /**
+     * gets the tag definition
+     *
+     * @return the fTagDef
+     * @since 3.0
+     */
+    public EnumDefinition getTagDef() {
+        return fTagDef;
+    }
+
+    /**
+     * @since 3.0
+     */
+    @Override
+    public int getMaximumSize() {
+        Collection<IDeclaration> values = fFields.values();
+        int maxSize = 0;
+        for (IDeclaration field : values) {
+            maxSize = Math.max(maxSize, field.getMaximumSize());
+        }
+        return maxSize;
     }
 
     @Override

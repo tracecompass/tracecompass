@@ -13,10 +13,9 @@
 package org.eclipse.linuxtools.ctf.core.event.types;
 
 import java.math.BigInteger;
-import java.nio.ByteOrder;
 
-import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
-import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
 
 /**
  * A CTF integer definition.
@@ -28,14 +27,13 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
  * @author Matthew Khouzam
  * @author Simon Marchi
  */
-public class IntegerDefinition extends SimpleDatatypeDefinition {
+public final class IntegerDefinition extends SimpleDatatypeDefinition {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final IntegerDeclaration declaration;
-    private long value;
+    private final long fValue;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -50,11 +48,14 @@ public class IntegerDefinition extends SimpleDatatypeDefinition {
      *            the parent scope
      * @param fieldName
      *            the field name
+     * @param value
+     *            integer value
+     * @since 3.0
      */
-    public IntegerDefinition(IntegerDeclaration declaration,
-            IDefinitionScope definitionScope, String fieldName) {
-        super(definitionScope, fieldName);
-        this.declaration = declaration;
+    public IntegerDefinition(@NonNull IntegerDeclaration declaration,
+            IDefinitionScope definitionScope, @NonNull String fieldName, long value) {
+        super(declaration, definitionScope, fieldName);
+        fValue = value;
     }
 
     // ------------------------------------------------------------------------
@@ -67,22 +68,12 @@ public class IntegerDefinition extends SimpleDatatypeDefinition {
      * @return the value of the integer (in long)
      */
     public long getValue() {
-        return value;
-    }
-
-    /**
-     * Sets the value of an integer
-     *
-     * @param val
-     *            the value
-     */
-    public void setValue(long val) {
-        value = val;
+        return fValue;
     }
 
     @Override
     public IntegerDeclaration getDeclaration() {
-        return declaration;
+        return (IntegerDeclaration) super.getDeclaration();
     }
 
     // ------------------------------------------------------------------------
@@ -100,48 +91,12 @@ public class IntegerDefinition extends SimpleDatatypeDefinition {
     }
 
     @Override
-    public void read(BitBuffer input) throws CTFReaderException {
-        /* Offset the buffer position wrt the current alignment */
-        alignRead(input, this.declaration);
-
-        boolean signed = declaration.isSigned();
-        int length = declaration.getLength();
-        long bits = 0;
-
-        /*
-         * Is the endianness of this field the same as the endianness of the
-         * input buffer? If not, then temporarily set the buffer's endianness to
-         * this field's just to read the data
-         */
-        ByteOrder previousByteOrder = input.getByteOrder();
-        if ((this.declaration.getByteOrder() != null) &&
-                (this.declaration.getByteOrder() != input.getByteOrder())) {
-            input.setByteOrder(this.declaration.getByteOrder());
-        }
-
-        if (length > 64) {
-            throw new CTFReaderException("Cannot read an integer with over 64 bits. Length given: " + length); //$NON-NLS-1$
-        }
-
-        bits = input.get(length, signed);
-
-        /*
-         * Put the input buffer's endianness back to original if it was changed
-         */
-        if (previousByteOrder != input.getByteOrder()) {
-            input.setByteOrder(previousByteOrder);
-        }
-
-        value = bits;
-    }
-
-    @Override
     public String toString() {
-        if (declaration.isCharacter()) {
-            char c = (char) value;
+        if (getDeclaration().isCharacter()) {
+            char c = (char) fValue;
             return Character.toString(c);
         }
-        return formatNumber(value, declaration.getBase(), declaration.isSigned());
+        return formatNumber(fValue, getDeclaration().getBase(), getDeclaration().isSigned());
     }
 
     /**

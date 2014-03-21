@@ -15,13 +15,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.List;
+import java.nio.ByteBuffer;
 import java.util.Map;
 
+import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -69,11 +71,15 @@ public class StructDeclarationTest {
     /**
      * Run the StructDefinition createDefinition(DefinitionScope,String) method
      * test.
+     *
+     * @throws CTFReaderException
+     *             out of bounds
      */
     @Test
-    public void testCreateDefinition() {
+    public void testCreateDefinition() throws CTFReaderException {
         String fieldName = "";
-        StructDefinition result = fixture.createDefinition(null, fieldName);
+        BitBuffer bb = new BitBuffer(ByteBuffer.allocate(100));
+        StructDefinition result = fixture.createDefinition(null, fieldName, bb);
         assertNotNull(result);
     }
 
@@ -93,10 +99,10 @@ public class StructDeclarationTest {
      */
     @Test
     public void testGetFieldsList() {
-        List<String> result = fixture.getFieldsList();
+        Iterable<String> result = fixture.getFieldsList();
 
         assertNotNull(result);
-        assertEquals(0, result.size());
+        assertEquals(false, result.iterator().hasNext());
     }
 
     /**

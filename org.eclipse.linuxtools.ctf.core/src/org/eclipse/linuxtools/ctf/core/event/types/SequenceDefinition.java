@@ -12,8 +12,13 @@
 
 package org.eclipse.linuxtools.ctf.core.event.types;
 
-import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
-import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
+import java.util.List;
+
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 
 /**
  * A CTF sequence definition (a fixed-size array).
@@ -25,16 +30,15 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
  * @author Matthew Khouzam
  * @author Simon Marchi
  */
-public class SequenceDefinition extends Definition {
+public final class SequenceDefinition extends Definition {
+
+    // TODO: investigate merging with arraydefinition
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final SequenceDeclaration declaration;
-    private final IntegerDefinition lengthDefinition;
-    private Definition definitions[];
-    private int currentLength;
+    private final ImmutableList<Definition> fDefinitions;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -49,35 +53,13 @@ public class SequenceDefinition extends Definition {
      *            the parent scope
      * @param fieldName
      *            the field name
-     * @throws CTFReaderException
-     *             If the sequence field was malformatted
+     * @param definitions
+     *            Definitions
+     * @since 3.0
      */
-    public SequenceDefinition(SequenceDeclaration declaration,
-            IDefinitionScope definitionScope, String fieldName)
-            throws CTFReaderException {
-        super(definitionScope, fieldName);
-        Definition lenDef = null;
-
-        this.declaration = declaration;
-
-        if (definitionScope != null) {
-            lenDef = definitionScope.lookupDefinition(declaration
-                    .getLengthName());
-        }
-
-        if (lenDef == null) {
-            throw new CTFReaderException("Sequence length field not found"); //$NON-NLS-1$
-        }
-
-        if (!(lenDef instanceof IntegerDefinition)) {
-            throw new CTFReaderException("Sequence length field not integer"); //$NON-NLS-1$
-        }
-
-        lengthDefinition = (IntegerDefinition) lenDef;
-
-        if (this.lengthDefinition.getDeclaration().isSigned()) {
-            throw new CTFReaderException("Sequence length must not be signed"); //$NON-NLS-1$
-        }
+    public SequenceDefinition(@NonNull SequenceDeclaration declaration, IDefinitionScope definitionScope, @NonNull String fieldName, List<Definition> definitions) {
+        super(declaration, definitionScope, fieldName);
+        fDefinitions = ImmutableList.copyOf(definitions);
     }
 
     // ------------------------------------------------------------------------
@@ -86,7 +68,7 @@ public class SequenceDefinition extends Definition {
 
     @Override
     public SequenceDeclaration getDeclaration() {
-        return declaration;
+        return (SequenceDeclaration) super.getDeclaration();
     }
 
     /**
@@ -96,7 +78,7 @@ public class SequenceDefinition extends Definition {
      * @return the length of the sequence
      */
     public int getLength() {
-        return currentLength;
+        return fDefinitions.size();
     }
 
     /**
@@ -108,27 +90,10 @@ public class SequenceDefinition extends Definition {
      *         throws an out of bounds exception
      */
     public Definition getElem(int i) {
-        if (i > definitions.length) {
+        if (i > fDefinitions.size()) {
             return null;
         }
-
-        return definitions[i];
-    }
-
-    /**
-     * Is the sequence a null terminated string?
-     * @return true == is a string, false == is not a string
-     */
-    public boolean isString() {
-        IntegerDeclaration elemInt;
-
-        if (declaration.getElementType() instanceof IntegerDeclaration) {
-            elemInt = (IntegerDeclaration) declaration.getElementType();
-            if (elemInt.isCharacter()) {
-                return true;
-            }
-        }
-        return false;
+        return fDefinitions.get(i);
     }
 
     // ------------------------------------------------------------------------
@@ -136,39 +101,12 @@ public class SequenceDefinition extends Definition {
     // ------------------------------------------------------------------------
 
     @Override
-    public void read(BitBuffer input) throws CTFReaderException {
-        currentLength = (int) lengthDefinition.getValue();
-
-        if ((definitions == null) || (definitions.length < currentLength)) {
-            Definition newDefinitions[] = new Definition[currentLength];
-
-            int i = 0;
-
-            if (definitions != null) {
-                System.arraycopy(definitions, 0, newDefinitions, 0, definitions.length);
-            }
-
-            for (; i < currentLength; i++) {
-                newDefinitions[i] = declaration.getElementType()
-                        .createDefinition(getDefinitionScope(),
-                                getFieldName() + "[" + i + "]"); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-
-            definitions = newDefinitions;
-        }
-
-        for (int i = 0; i < currentLength; i++) {
-            definitions[i].read(input);
-        }
-    }
-
-    @Override
     public String toString() {
         StringBuilder b = new StringBuilder();
 
-        if (this.isString()) {
-            for (int i = 0; i < currentLength; i++) {
-                IntegerDefinition character = (IntegerDefinition) definitions[i];
+        if (getDeclaration().isString()) {
+            for (Definition def : fDefinitions) {
+                IntegerDefinition character = (IntegerDefinition) def;
 
                 if (character.getValue() == 0) {
                     break;
@@ -178,17 +116,9 @@ public class SequenceDefinition extends Definition {
             }
         } else {
             b.append('[');
-            if (currentLength > 0) {
-                for (int i = 0; i < (currentLength - 1); i++) {
-                    b.append(' ');
-                    b.append(definitions[i].toString());
-                    b.append(',');
-                }
-                b.append(' ');
-                b.append(definitions[currentLength - 1].toString());
-            }
-            b.append(" ]"); //$NON-NLS-1$
-
+            Joiner joiner = Joiner.on(", ").skipNulls(); //$NON-NLS-1$
+            b.append(joiner.join(fDefinitions));
+            b.append(']');
         }
 
         return b.toString();

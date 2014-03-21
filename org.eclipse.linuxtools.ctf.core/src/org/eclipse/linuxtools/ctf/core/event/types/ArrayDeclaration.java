@@ -12,6 +12,18 @@
 
 package org.eclipse.linuxtools.ctf.core.event.types;
 
+import java.util.List;
+
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
+import com.google.common.collect.Multimap;
+
 /**
  * A CTF array declaration
  *
@@ -24,14 +36,26 @@ package org.eclipse.linuxtools.ctf.core.event.types;
  * @author Matthew Khouzam
  * @author Simon Marchi
  */
-public class ArrayDeclaration implements IDeclaration {
+public class ArrayDeclaration extends Declaration {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final int length;
-    private final IDeclaration elemType;
+    private final int fLength;
+    private final IDeclaration fElemType;
+
+    /**
+     * <pre>
+     * Cache where we can pre-generate the children names
+     * Key&colon; parent name
+     * Value&colon; children names
+     * ex: field &#8594; &lbrace;field&lbrack;0&rbrack;, field&lbrack;1&rbrack;, &hellip; field&lbrack;n&rbrack;&rbrace;
+     * </pre>
+     *
+     * TODO: investigate performance
+     */
+    private final Multimap<String, String> fChildrenNames = ArrayListMultimap.<String, String> create();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -46,8 +70,8 @@ public class ArrayDeclaration implements IDeclaration {
      *            what type of element is in the array
      */
     public ArrayDeclaration(int length, IDeclaration elemType) {
-        this.length = length;
-        this.elemType = elemType;
+        fLength = length;
+        fElemType = elemType;
     }
 
     // ------------------------------------------------------------------------
@@ -59,7 +83,7 @@ public class ArrayDeclaration implements IDeclaration {
      * @return the type of element in the array
      */
     public IDeclaration getElementType() {
-        return elemType;
+        return fElemType;
     }
 
     /**
@@ -67,7 +91,7 @@ public class ArrayDeclaration implements IDeclaration {
      * @return how many elements in the array
      */
     public int getLength() {
-        return length;
+        return fLength;
     }
 
     /**
@@ -79,12 +103,12 @@ public class ArrayDeclaration implements IDeclaration {
      * @since 3.0
      */
     public boolean isString() {
-        if (elemType instanceof IntegerDeclaration) {
+        if (fElemType instanceof IntegerDeclaration) {
             /*
              * If the first byte is a "character", we'll consider the whole
              * array a character string.
              */
-            IntegerDeclaration elemInt = (IntegerDeclaration) elemType;
+            IntegerDeclaration elemInt = (IntegerDeclaration) fElemType;
             if (elemInt.isCharacter()) {
                 return true;
             }
@@ -101,16 +125,51 @@ public class ArrayDeclaration implements IDeclaration {
     // Operations
     // ------------------------------------------------------------------------
 
+    /**
+     * @since 3.0
+     */
     @Override
     public ArrayDefinition createDefinition(IDefinitionScope definitionScope,
-            String fieldName) {
-        return new ArrayDefinition(this, definitionScope, fieldName);
+            @NonNull String fieldName, BitBuffer input) throws CTFReaderException {
+        alignRead(input);
+        List<Definition> definitions = read(input, definitionScope, fieldName);
+        return new ArrayDefinition(this, definitionScope, fieldName, definitions);
     }
 
     @Override
     public String toString() {
         /* Only used for debugging */
         return "[declaration] array[" + Integer.toHexString(hashCode()) + ']'; //$NON-NLS-1$
+    }
+
+    @NonNull
+    private List<Definition> read(@NonNull BitBuffer input, IDefinitionScope definitionScope, String fieldName) throws CTFReaderException {
+        Builder<Definition> definitions = new ImmutableList.Builder<>();
+        if (!fChildrenNames.containsKey(fieldName)) {
+            for (int i = 0; i < fLength; i++) {
+                fChildrenNames.put(fieldName, fieldName + '[' + i + ']');
+            }
+        }
+        List<String> elemNames = (List<String>) fChildrenNames.get(fieldName);
+        for (int i = 0; i < fLength; i++) {
+            String name = elemNames.get(i);
+            if (name == null) {
+                throw new IllegalStateException();
+            }
+            definitions.add(fElemType.createDefinition(definitionScope, name, input));
+        }
+        @SuppressWarnings("null")
+        @NonNull ImmutableList<Definition> ret = definitions.build();
+        return ret;
+    }
+
+    /**
+     * @since 3.0
+     */
+    @Override
+    public int getMaximumSize() {
+        long val = (long) fLength * fElemType.getMaximumSize();
+        return (int) Math.min(Integer.MAX_VALUE, val);
     }
 
 }

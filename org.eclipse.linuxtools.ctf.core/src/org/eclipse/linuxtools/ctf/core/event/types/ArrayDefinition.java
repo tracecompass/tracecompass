@@ -12,32 +12,36 @@
 
 package org.eclipse.linuxtools.ctf.core.event.types;
 
-import java.util.Arrays;
+import java.util.List;
 
-import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
-import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 
 /**
  * A CTF array definition
  *
- * Arrays are fixed-length. Their length is declared in the type
- * declaration within the meta-data. They contain an array of "inner type"
- * elements, which can refer to any type not containing the type of the
- * array being declared (no circular dependency). The length is the number
- * of elements in an array.
+ * Arrays are fixed-length. Their length is declared in the type declaration
+ * within the meta-data. They contain an array of "inner type" elements, which
+ * can refer to any type not containing the type of the array being declared (no
+ * circular dependency). The length is the number of elements in an array.
  *
  * @version 1.0
  * @author Matthew Khouzam
  * @author Simon Marchi
  */
-public class ArrayDefinition extends Definition {
+@NonNullByDefault
+public final class ArrayDefinition extends Definition {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final ArrayDeclaration declaration;
-    private Definition definitions[];
+    private final ImmutableList<Definition> fDefinitions;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -45,22 +49,26 @@ public class ArrayDefinition extends Definition {
 
     /**
      * Constructor
-     * @param declaration the parent declaration
-     * @param definitionScope the parent scope
-     * @param fieldName the field name
+     *
+     * @param declaration
+     *            the parent declaration
+     * @param definitionScope
+     *            the parent scope
+     * @param fieldName
+     *            the field name
+     * @param definitions
+     *            the content of the array
+     * @since 3.0
      */
     public ArrayDefinition(ArrayDeclaration declaration,
-            IDefinitionScope definitionScope, String fieldName) {
-        super(definitionScope, fieldName);
+            @Nullable IDefinitionScope definitionScope,
+            String fieldName,
+            List<Definition> definitions) {
+        super(declaration, definitionScope, fieldName);
+        @SuppressWarnings("null")
+        @NonNull ImmutableList<Definition> list = ImmutableList.copyOf(definitions);
+        fDefinitions = list;
 
-        this.declaration = declaration;
-
-        definitions = new Definition[declaration.getLength()];
-
-        for (int i = 0; i < declaration.getLength(); i++) {
-            definitions[i] = declaration.getElementType().createDefinition(
-                    definitionScope, fieldName + "[" + i + "]"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
     }
 
     // ------------------------------------------------------------------------
@@ -69,35 +77,30 @@ public class ArrayDefinition extends Definition {
 
     /**
      * @return the definitions
+     * @since 3.0
      */
-    public Definition[] getDefinitions() {
-        return Arrays.copyOf(definitions, definitions.length);
-    }
-
-    /**
-     * @param definitions
-     *            the definitions to set
-     */
-    public void setDefinitions(Definition[] definitions) {
-        this.definitions = Arrays.copyOf(definitions, definitions.length);
+    public List<Definition> getDefinitions() {
+        return fDefinitions;
     }
 
     /**
      * Get the element at i
+     *
      * @param i the index (cannot be negative)
      * @return The element at I, if I &gt; length, null, if I &lt; 0, the method throws an out of bounds exception
      */
+    @Nullable
     public Definition getElem(int i) {
-        if (i > definitions.length) {
+        if (i > fDefinitions.size()) {
             return null;
         }
 
-        return definitions[i];
+        return fDefinitions.get(i);
     }
 
     @Override
     public ArrayDeclaration getDeclaration() {
-        return declaration;
+        return (ArrayDeclaration) super.getDeclaration();
     }
 
     // ------------------------------------------------------------------------
@@ -105,18 +108,11 @@ public class ArrayDefinition extends Definition {
     // ------------------------------------------------------------------------
 
     @Override
-    public void read(BitBuffer input) throws CTFReaderException {
-        for (Definition definition : definitions) {
-            definition.read(input);
-        }
-    }
-
-    @Override
     public String toString() {
         StringBuilder b = new StringBuilder();
 
-        if (declaration.isString()) {
-            for (Definition def : definitions) {
+        if (getDeclaration().isString()) {
+            for (Definition def : fDefinitions) {
                 IntegerDefinition character = (IntegerDefinition) def;
 
                 if (character.getValue() == 0) {
@@ -125,20 +121,15 @@ public class ArrayDefinition extends Definition {
 
                 b.append(character.toString());
             }
-        } else if (definitions == null) {
-            b.append("[ ]"); //$NON-NLS-1$
         } else {
             b.append('[');
-            for (int i = 0; i < (definitions.length - 1); i++) {
-                b.append(' ');
-                b.append(definitions[i].toString());
-                b.append(',');
-            }
-            b.append(' ');
-            b.append(definitions[definitions.length - 1].toString());
-            b.append(" ]"); //$NON-NLS-1$
+            Joiner joiner = Joiner.on(", ").skipNulls(); //$NON-NLS-1$
+            b.append(joiner.join(fDefinitions));
+            b.append(']');
         }
 
-        return b.toString();
+        @SuppressWarnings("null")
+        @NonNull String ret = b.toString();
+        return ret;
     }
 }

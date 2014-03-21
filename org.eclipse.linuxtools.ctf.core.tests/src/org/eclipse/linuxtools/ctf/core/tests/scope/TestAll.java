@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Ericsson
+ * Copyright (c) 2014 Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,7 @@
  *     Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.ctf.core.tests;
+package org.eclipse.linuxtools.ctf.core.tests.scope;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -19,18 +19,13 @@ import org.junit.runners.Suite;
  * the tests within its package as well as within any subpackages of its
  * package.
  *
- * @author ematkho
- * @version 1.0
+ * @author Matthew Khouzam
+ * @version $Revision: 1.0 $
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        CtfCorePluginTest.class,
-        org.eclipse.linuxtools.ctf.core.tests.ctftestsuite.TestAll.class,
-        org.eclipse.linuxtools.ctf.core.tests.event.TestAll.class,
-        org.eclipse.linuxtools.ctf.core.tests.io.TestAll.class,
-        org.eclipse.linuxtools.ctf.core.tests.scope.TestAll.class,
-        org.eclipse.linuxtools.ctf.core.tests.trace.TestAll.class,
-        org.eclipse.linuxtools.ctf.core.tests.types.TestAll.class
+    LexicalScopeTest.class
 })
-public class AllCtfCoreTests {
+public class TestAll {
+
 }

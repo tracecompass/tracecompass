@@ -20,7 +20,6 @@ package org.eclipse.linuxtools.tmf.ctf.core;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map.Entry;
 
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
@@ -111,13 +110,13 @@ public abstract class CtfTmfEventField extends TmfEventField {
 
             } else {
                 /* Arrays of elements of any other type */
-                Definition[] definitions = arrayDef.getDefinitions();
-                CtfTmfEventField[] elements = new CtfTmfEventField[definitions.length];
+                List<Definition> definitions = arrayDef.getDefinitions();
+                CtfTmfEventField[] elements = new CtfTmfEventField[definitions.size()];
 
                 /* Parse the elements of the array. */
-                for (int i = 0; i < definitions.length; i++) {
+                for (int i = 0; i < definitions.size(); i++) {
                     CtfTmfEventField curField = CtfTmfEventField.parseField(
-                            definitions[i], fieldName + '[' + i + ']');
+                            definitions.get(i), fieldName + '[' + i + ']');
                     elements[i] = curField;
                 }
 
@@ -130,7 +129,7 @@ public abstract class CtfTmfEventField extends TmfEventField {
             if (seqDef.getLength() == 0) {
                 /* Some sequences have length = 0. Simply use an empty string */
                 field = new CTFStringField(fieldName, ""); //$NON-NLS-1$
-            } else if (seqDef.isString()) {
+            } else if (seqDecl.isString()) {
                 /* Interpret this sequence as a String */
                 field = new CTFStringField(fieldName, seqDef.toString());
             } else if (seqDecl.getElementType() instanceof IntegerDeclaration) {
@@ -149,16 +148,10 @@ public abstract class CtfTmfEventField extends TmfEventField {
         } else if (fieldDef instanceof StructDefinition) {
             StructDefinition strDef = (StructDefinition) fieldDef;
 
-            String curFieldName = null;
-            Definition curFieldDef;
-            CtfTmfEventField curField;
             List<ITmfEventField> list = new ArrayList<>();
             /* Recursively parse the fields */
-            for (Entry<String, Definition> entry : strDef.getDefinitions().entrySet()) {
-                curFieldName = entry.getKey();
-                curFieldDef = entry.getValue();
-                curField = CtfTmfEventField.parseField(curFieldDef, curFieldName);
-                list.add(curField);
+            for (String curFieldName : strDef.getFieldNames()) {
+                list.add(CtfTmfEventField.parseField(strDef.getDefinition(curFieldName), curFieldName));
             }
             field = new CTFStructField(fieldName, list.toArray(new CtfTmfEventField[list.size()]));
 
@@ -166,7 +159,7 @@ public abstract class CtfTmfEventField extends TmfEventField {
             VariantDefinition varDef = (VariantDefinition) fieldDef;
 
             String curFieldName = varDef.getCurrentFieldName();
-            Definition curFieldDef = varDef.getDefinitions().get(curFieldName);
+            Definition curFieldDef = varDef.getCurrentField();
             if (curFieldDef != null) {
                 CtfTmfEventField subField = CtfTmfEventField.parseField(curFieldDef, curFieldName);
                 field = new CTFVariantField(fieldName, subField);

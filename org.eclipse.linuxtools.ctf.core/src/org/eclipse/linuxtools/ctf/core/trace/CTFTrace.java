@@ -40,9 +40,10 @@ import org.eclipse.linuxtools.ctf.core.event.CTFCallsite;
 import org.eclipse.linuxtools.ctf.core.event.CTFClock;
 import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
+import org.eclipse.linuxtools.ctf.core.event.scope.LexicalScope;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
-import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
@@ -62,12 +63,11 @@ import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseE
  */
 public class CTFTrace implements IDefinitionScope, AutoCloseable {
 
-    @SuppressWarnings("nls")
     @Override
     public String toString() {
         /* Only for debugging, shouldn't be externalized */
-        return "CTFTrace [path=" + fPath + ", major=" + fMajor + ", minor="
-                + fMinor + ", uuid=" + fUuid + "]";
+        return "CTFTrace [path=" + fPath + ", major=" + fMajor + ", minor=" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                + fMinor + ", uuid=" + fUuid + "]"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /**
@@ -194,19 +194,9 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
      */
     public CTFTrace() {
         fPath = null;
-        init();
-    }
-
-    private void init() {
-        /* Create the definitions needed to read things from the files */
-        if (fPacketHeaderDecl != null) {
-            fPacketHeaderDef = fPacketHeaderDecl.createDefinition(this, "packet.header"); //$NON-NLS-1$
-        }
     }
 
     private void init(File path) throws CTFReaderException {
-
-        init();
 
         /* Open all the trace files */
 
@@ -464,9 +454,16 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
      * @return String the path of the trace directory, in string format.
      * @see java.io.File#getPath()
      */
-    @Override
     public String getPath() {
         return (fPath != null) ? fPath.getPath() : ""; //$NON-NLS-1$
+    }
+
+    /**
+     * @since 3.0
+     */
+    @Override
+    public LexicalScope getScopePath() {
+        return LexicalScope.TRACE;
     }
 
     // ------------------------------------------------------------------------
@@ -536,31 +533,22 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
         /* Create a BitBuffer with this mapping and the trace byte order */
         streamBitBuffer = new BitBuffer(byteBuffer, this.getByteOrder());
 
-        if (fPacketHeaderDef != null) {
+        if (fPacketHeaderDecl != null) {
             /* Read the packet header */
-            fPacketHeaderDef.read(streamBitBuffer);
+            fPacketHeaderDef = fPacketHeaderDecl.createDefinition(null, LexicalScope.PACKET_HEADER.getName(), streamBitBuffer);
 
             /* Check the magic number */
-            IntegerDefinition magicDef = (IntegerDefinition) fPacketHeaderDef
-                    .lookupDefinition("magic"); //$NON-NLS-1$
+            IntegerDefinition magicDef = (IntegerDefinition) fPacketHeaderDef.lookupDefinition("magic"); //$NON-NLS-1$
             int magic = (int) magicDef.getValue();
             if (magic != Utils.CTF_MAGIC) {
                 throw new CTFReaderException("CTF magic mismatch"); //$NON-NLS-1$
             }
 
             /* Check UUID */
-            ArrayDefinition uuidDef = (ArrayDefinition) fPacketHeaderDef
-                    .lookupDefinition("uuid"); //$NON-NLS-1$
+            Definition lookupDefinition = fPacketHeaderDef.lookupDefinition("uuid"); //$NON-NLS-1$
+            ArrayDefinition uuidDef = (ArrayDefinition) lookupDefinition;
             if (uuidDef != null) {
-                byte[] uuidArray = new byte[Utils.UUID_LEN];
-
-                for (int i = 0; i < Utils.UUID_LEN; i++) {
-                    IntegerDefinition uuidByteDef = (IntegerDefinition) uuidDef
-                            .getElem(i);
-                    uuidArray[i] = (byte) uuidByteDef.getValue();
-                }
-
-                UUID otheruuid = Utils.makeUUID(uuidArray);
+                UUID otheruuid = Utils.getUUIDfromDefinition(uuidDef);
 
                 if (!fUuid.equals(otheruuid)) {
                     throw new CTFReaderException("UUID mismatch"); //$NON-NLS-1$
@@ -603,7 +591,7 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
      * @param lookupPath
      *            String
      * @return Definition
-     * @see org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope#lookupDefinition(String)
+     * @see org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope#lookupDefinition(String)
      */
     @Override
     public Definition lookupDefinition(String lookupPath) {
@@ -637,12 +625,6 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
      * @since 2.0
      */
     public void addStream(Stream stream) throws ParseException {
-
-        /*
-         * Init if not done before
-         */
-        init();
-
         /*
          * If there is already a stream without id (the null key), it must be
          * the only one

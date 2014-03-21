@@ -39,8 +39,8 @@ public class IntegerDeclarationTest {
      */
     @Before
     public void setUp() {
-        fixture = new IntegerDeclaration(1, false, 1, ByteOrder.BIG_ENDIAN,
-                Encoding.ASCII, null, 32);
+        fixture = IntegerDeclaration.createDeclaration(1, false, 1, ByteOrder.BIG_ENDIAN,
+                Encoding.ASCII, "", 32);
     }
 
     /**
@@ -55,8 +55,8 @@ public class IntegerDeclarationTest {
         ByteOrder byteOrder = ByteOrder.BIG_ENDIAN;
         Encoding encoding = Encoding.ASCII;
 
-        IntegerDeclaration result = new IntegerDeclaration(len, signed, base,
-                byteOrder, encoding, null, 16);
+        IntegerDeclaration result = IntegerDeclaration.createDeclaration(len, signed, base,
+                byteOrder, encoding, "", 16);
 
         assertNotNull(result);
         assertEquals(1, result.getBase());
@@ -78,7 +78,7 @@ public class IntegerDeclarationTest {
         int base = 1;
         ByteOrder byteOrder = ByteOrder.BIG_ENDIAN;
         Encoding encoding = Encoding.ASCII;
-        new IntegerDeclaration(len, signed, base, byteOrder, encoding, null, 16);
+        IntegerDeclaration.createDeclaration(len, signed, base, byteOrder, encoding, "", 16);
     }
 
     /**
@@ -91,7 +91,7 @@ public class IntegerDeclarationTest {
         int base = 1;
         ByteOrder byteOrder = ByteOrder.BIG_ENDIAN;
         Encoding encoding = Encoding.ASCII;
-        new IntegerDeclaration(len, signed, base, byteOrder, encoding, null, 16);
+        IntegerDeclaration.createDeclaration(len, signed, base, byteOrder, encoding, "", 16);
     }
 
     /**
@@ -148,8 +148,8 @@ public class IntegerDeclarationTest {
      */
     @Test
     public void testIsCharacter_8bytes() {
-        IntegerDeclaration fixture8 = new IntegerDeclaration(8, true, 1,
-                ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 8);
+        IntegerDeclaration fixture8 = IntegerDeclaration.createDeclaration(8, true, 1,
+                ByteOrder.BIG_ENDIAN, Encoding.ASCII, "", 8);
 
         boolean result = fixture8.isCharacter();
         assertEquals(true, result);
@@ -160,8 +160,8 @@ public class IntegerDeclarationTest {
      */
     @Test
     public void testIsSigned_signed() {
-        IntegerDeclaration fixtureSigned = new IntegerDeclaration(2, true,
-                1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 8);
+        IntegerDeclaration fixtureSigned = IntegerDeclaration.createDeclaration(2, true,
+                1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, "", 8);
         boolean result = fixtureSigned.isSigned();
         assertEquals(true, result);
     }
@@ -193,22 +193,22 @@ public class IntegerDeclarationTest {
     public void testMaxValue() {
         assertEquals(BigInteger.ONE, fixture.getMaxValue());
 
-        IntegerDeclaration signed8bit = new IntegerDeclaration(8, true, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 32);
+        IntegerDeclaration signed8bit = IntegerDeclaration.createDeclaration(8, true, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, "", 32);
         assertEquals(BigInteger.valueOf(127), signed8bit.getMaxValue());
 
-        IntegerDeclaration unsigned8bit = new IntegerDeclaration(8, false, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 32);
+        IntegerDeclaration unsigned8bit = IntegerDeclaration.createDeclaration(8, false, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, "", 32);
         assertEquals(BigInteger.valueOf(255), unsigned8bit.getMaxValue());
 
-        IntegerDeclaration signed32bit = new IntegerDeclaration(32, true, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 32);
+        IntegerDeclaration signed32bit = IntegerDeclaration.createDeclaration(32, true, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, "", 32);
         assertEquals(BigInteger.valueOf(2147483647), signed32bit.getMaxValue());
 
-        IntegerDeclaration unsigned32bit = new IntegerDeclaration(32, false, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 32);
+        IntegerDeclaration unsigned32bit = IntegerDeclaration.createDeclaration(32, false, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, "", 32);
         assertEquals(BigInteger.valueOf(4294967295l), unsigned32bit.getMaxValue());
 
-        IntegerDeclaration signed64bit = new IntegerDeclaration(64, true, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 32);
+        IntegerDeclaration signed64bit = IntegerDeclaration.createDeclaration(64, true, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, "", 32);
         assertEquals(BigInteger.valueOf(9223372036854775807L), signed64bit.getMaxValue());
 
-        IntegerDeclaration unsigned64bit = new IntegerDeclaration(64, false, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 32);
+        IntegerDeclaration unsigned64bit = IntegerDeclaration.createDeclaration(64, false, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, "", 32);
         assertEquals(BigInteger.valueOf(2).pow(64).subtract(BigInteger.ONE), unsigned64bit.getMaxValue());
     }
 
@@ -219,22 +219,22 @@ public class IntegerDeclarationTest {
     public void testMinValue() {
         assertEquals(BigInteger.ZERO, fixture.getMinValue());
 
-        IntegerDeclaration signed8bit = new IntegerDeclaration(8, true, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 32);
+        IntegerDeclaration signed8bit = IntegerDeclaration.createDeclaration(8, true, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, "", 32);
         assertEquals(BigInteger.valueOf(-128), signed8bit.getMinValue());
 
-        IntegerDeclaration unsigned8bit = new IntegerDeclaration(8, false, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 32);
+        IntegerDeclaration unsigned8bit = IntegerDeclaration.createDeclaration(8, false, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, "", 32);
         assertEquals(BigInteger.ZERO, unsigned8bit.getMinValue());
 
-        IntegerDeclaration signed32bit = new IntegerDeclaration(32, true, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 32);
+        IntegerDeclaration signed32bit = IntegerDeclaration.createDeclaration(32, true, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, "", 32);
         assertEquals(BigInteger.valueOf(-2147483648), signed32bit.getMinValue());
 
-        IntegerDeclaration unsigned32bit = new IntegerDeclaration(32, false, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 32);
+        IntegerDeclaration unsigned32bit = IntegerDeclaration.createDeclaration(32, false, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, "", 32);
         assertEquals(BigInteger.ZERO, unsigned32bit.getMinValue());
 
-        IntegerDeclaration signed64bit = new IntegerDeclaration(64, true, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 32);
+        IntegerDeclaration signed64bit = IntegerDeclaration.createDeclaration(64, true, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, "", 32);
         assertEquals(BigInteger.valueOf(-9223372036854775808L), signed64bit.getMinValue());
 
-        IntegerDeclaration unsigned64bit = new IntegerDeclaration(64, false, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 32);
+        IntegerDeclaration unsigned64bit = IntegerDeclaration.createDeclaration(64, false, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, "", 32);
         assertEquals(BigInteger.ZERO, unsigned64bit.getMinValue());
     }
 }

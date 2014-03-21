@@ -12,8 +12,9 @@
 
 package org.eclipse.linuxtools.tmf.ctf.core;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfLostEvent;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 
@@ -50,17 +51,17 @@ public class CtfTmfLostEvent extends CtfTmfEvent implements ITmfLostEvent {
      */
     CtfTmfLostEvent(CtfTmfTrace trace,
             long rank,
-            ITmfEventField content,
             String fileName,
             int cpu,
             IEventDeclaration declaration,
             TmfTimeRange timeRange,
-            long nbLost) {
+            long nbLost,
+            @NonNull EventDefinition def) {
         /*
          * Only the factory should call this method, the case to
          * (CtfTmfTimestamp) should be safe.
          */
-        super(trace, rank, (CtfTmfTimestamp) timeRange.getStartTime(), content, fileName, cpu, declaration);
+        super(trace, rank, (CtfTmfTimestamp) timeRange.getStartTime(), fileName, cpu, declaration, def);
         fTimeRange = timeRange;
         fNbLost = nbLost;
     }

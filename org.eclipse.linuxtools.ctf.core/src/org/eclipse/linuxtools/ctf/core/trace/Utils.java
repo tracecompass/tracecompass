@@ -14,6 +14,9 @@ package org.eclipse.linuxtools.ctf.core.trace;
 
 import java.util.UUID;
 
+import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
+import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
+
 /**
  * Various utilities.
  *
@@ -21,9 +24,10 @@ import java.util.UUID;
  * @author Matthew Khouzam
  * @author Simon Marchi
  */
-public class Utils {
+public final class Utils {
 
-    private Utils() {}
+    private Utils() {
+    }
 
     // ------------------------------------------------------------------------
     // Constants
@@ -73,9 +77,9 @@ public class Utils {
      */
     public static int unsignedCompare(long left, long right) {
         /*
-         * This method assumes that the arithmetic overflow on signed
-         * integer wrap on a circular domain (modulo arithmetic in
-         * two-complement), which is the defined behavior in Java.
+         * This method assumes that the arithmetic overflow on signed integer
+         * wrap on a circular domain (modulo arithmetic in two-complement),
+         * which is the defined behavior in Java.
          *
          * This idea is to rotate the domain by the length of the negative
          * space, and then use the signed operator.
@@ -88,6 +92,31 @@ public class Utils {
             return 1;
         }
         return 0;
+    }
+
+    /**
+     * Gets a UUID from an array defintion
+     *
+     * @param uuidDef
+     *            the array defintions, must contain integer bytes
+     * @return the UUID
+     * @throws CTFReaderException
+     *             if the definition contains less than 16 elements
+     * @since 3.0
+     */
+    public static UUID getUUIDfromDefinition(ArrayDefinition uuidDef) throws CTFReaderException {
+        byte[] uuidArray = new byte[16];
+
+        for (int i = 0; i < uuidArray.length; i++) {
+            IntegerDefinition uuidByteDef = (IntegerDefinition) uuidDef.getElem(i);
+            if (uuidByteDef == null) {
+                throw new CTFReaderException("UUID incomplete, only " + i + " bytes available"); //$NON-NLS-1$ //$NON-NLS-2$
+            }
+            uuidArray[i] = (byte) uuidByteDef.getValue();
+        }
+
+        UUID uuid = Utils.makeUUID(uuidArray);
+        return uuid;
     }
 
     /**

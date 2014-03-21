@@ -15,14 +15,19 @@ import static org.junit.Assert.assertNotNull;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
+import org.eclipse.linuxtools.ctf.core.event.scope.LexicalScope;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
-import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
@@ -41,7 +46,7 @@ import org.junit.Test;
  */
 public class ArrayDefinitionTest {
 
-    private CTFTrace trace;
+    @NonNull private CTFTrace trace = new CTFTrace();
     private ArrayDefinition charArrayFixture;
     private ArrayDefinition stringArrayFixture;
     private ArrayDefinition longArrayFixture;
@@ -60,56 +65,52 @@ public class ArrayDefinitionTest {
     }
 
     private ArrayDefinition createLongArray() {
-        IntegerDeclaration decl = new IntegerDeclaration(32, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "none",8);
-        IntegerDefinition[] defs = createIntDefs(10, 32);
+        IntegerDeclaration decl = IntegerDeclaration.createDeclaration(32, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "none", 8);
+        List<Definition> defs = createIntDefs(10, 32);
         ArrayDefinition temp = setUpDeclaration(decl, defs);
         return temp;
     }
 
     private ArrayDefinition createCharArray() {
-        IntegerDeclaration decl = new IntegerDeclaration(8, false, 10, ByteOrder.BIG_ENDIAN, Encoding.UTF8, "none",8);
-        IntegerDefinition[] defs = createIntDefs(4,8);
+        IntegerDeclaration decl = IntegerDeclaration.createDeclaration(8, false, 10, ByteOrder.BIG_ENDIAN, Encoding.UTF8, "none", 8);
+        List<Definition> defs = createIntDefs(4, 8);
         ArrayDefinition temp = setUpDeclaration(decl, defs);
         return temp;
     }
 
     private ArrayDefinition createStringArray() {
         StringDeclaration strDecl = new StringDeclaration();
-        StringDefinition[] defs = createDefs();
+        List<Definition> defs = createDefs();
         ArrayDefinition temp = setUpDeclaration(strDecl, defs);
         return temp;
     }
 
     private ArrayDefinition setUpDeclaration(IDeclaration decl,
-            Definition[] defs) {
+            @NonNull List<Definition> defs) {
         ArrayDeclaration ad = new ArrayDeclaration(0, decl);
-        ArrayDefinition temp = new ArrayDefinition(ad , this.trace , "Testx");
-        temp.setDefinitions(defs);
+        ArrayDefinition temp = new ArrayDefinition(ad, this.trace, "Testx", defs);
         return temp;
     }
 
-
-    private static IntegerDefinition[] createIntDefs(int size, int bits) {
-        IntegerDefinition[] defs = new IntegerDefinition[size];
+    private @NonNull
+    static List<Definition> createIntDefs(int size, int bits) {
+        List<Definition> defs = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-
             String content = "test" + i;
-            defs[i] = new IntegerDefinition(new IntegerDeclaration(bits, false,
-                    16, ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, content, 24), null, content);
-            defs[i].setValue(i);
+            defs.add(new IntegerDefinition(IntegerDeclaration.createDeclaration(bits, false,
+                    16, ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, content, 24), null, content, i));
         }
         return defs;
     }
 
-    private static StringDefinition[] createDefs() {
+    private @NonNull
+    static List<Definition> createDefs() {
         int size = 4;
-        StringDefinition[] defs = new StringDefinition[size];
+        List<Definition> defs = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-
             String content = "test" + i;
-            defs[i] = new StringDefinition(
-                    new StringDeclaration(Encoding.UTF8), null, content);
-            defs[i].setValue(content);
+            defs.add(new StringDefinition(
+                    new StringDeclaration(Encoding.UTF8), null, content, content));
         }
         return defs;
     }
@@ -123,7 +124,8 @@ public class ArrayDefinitionTest {
         ArrayDeclaration declaration = charArrayFixture.getDeclaration();
         String fieldName = "";
 
-        ArrayDefinition result = new ArrayDefinition(declaration, this.trace, fieldName);
+        @SuppressWarnings("null")
+        ArrayDefinition result = new ArrayDefinition(declaration, this.trace, fieldName, Arrays.asList(new Definition[0]));
         assertNotNull(result);
     }
 
@@ -135,10 +137,11 @@ public class ArrayDefinitionTest {
     public void testArrayDefinition_newDeclaration() {
         ArrayDeclaration declaration = new ArrayDeclaration(0,
                 new StringDeclaration());
-        IDefinitionScope definitionScope = null;
-        String fieldName = "";
+        IDefinitionScope definitionScope = getDefinitionScope();
 
-        ArrayDefinition result = new ArrayDefinition(declaration, definitionScope, fieldName);
+        String fieldName = "";
+        @SuppressWarnings("null")
+        ArrayDefinition result = new ArrayDefinition(declaration, definitionScope, fieldName , Arrays.asList(new Definition[0]));
         assertNotNull(result);
     }
 
@@ -147,7 +150,6 @@ public class ArrayDefinitionTest {
      */
     @Test
     public void testGetDeclaration() {
-        charArrayFixture.setDefinitions(new Definition[] {});
         ArrayDeclaration result = charArrayFixture.getDeclaration();
 
         assertNotNull(result);
@@ -169,36 +171,41 @@ public class ArrayDefinitionTest {
      */
     @Test
     public void testGetElem_withDefs() {
-        Definition defs[] = createDefs();
-        charArrayFixture.setDefinitions(defs);
+        List<Definition> defs = createDefs();
+        IDefinitionScope definitionScope = getDefinitionScope();
+        ArrayDefinition ad = new ArrayDefinition(charArrayFixture.getDeclaration(), definitionScope, "test", defs);
         int j = 1;
 
-        Definition result = charArrayFixture.getElem(j);
+        Definition result = ad.getElem(j);
 
         assertNotNull(result);
     }
 
-    /**
-     * Run the void read(BitBuffer) method test.
-     * @throws CTFReaderException error
-     */
-    @Test
-    public void testRead_noDefs() throws CTFReaderException {
-        BitBuffer input = new BitBuffer(ByteBuffer.allocateDirect(128));
+    @NonNull private static IDefinitionScope getDefinitionScope() {
+        return new IDefinitionScope() {
 
-        charArrayFixture.read(input);
+            @Override
+            public Definition lookupDefinition(String lookupPath) {
+                return null;
+            }
+
+            @Override
+            public LexicalScope getScopePath() {
+                return null;
+            }
+        };
     }
 
     /**
      * Run the void read(BitBuffer) method test.
-     * @throws CTFReaderException error
+     *
+     * @throws CTFReaderException
+     *             error
      */
     @Test
-    public void testRead_withDefs() throws CTFReaderException {
-        charArrayFixture.setDefinitions(new Definition[] {});
-        BitBuffer input = new BitBuffer(java.nio.ByteBuffer.allocateDirect(128));
-
-        charArrayFixture.read(input);
+    public void testRead_noDefs() throws CTFReaderException {
+        BitBuffer input = new BitBuffer(ByteBuffer.allocateDirect(128));
+        charArrayFixture.getDeclaration().createDefinition(null, "test", input);
     }
 
     /**
@@ -209,6 +216,7 @@ public class ArrayDefinitionTest {
         String result = charArrayFixture.toString();
         assertNotNull(result);
     }
+
     /**
      * Run the String toString() method test.
      */
@@ -226,6 +234,7 @@ public class ArrayDefinitionTest {
         String result = stringArrayFixture.toString();
         assertNotNull(result);
     }
+
     /**
      * Run the String toString() method test.
      */
@@ -235,6 +244,7 @@ public class ArrayDefinitionTest {
 
         assertNotNull(result);
     }
+
     /**
      * Run the String toString() method test.
      */

@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.ctf.core;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * Non-externalized strings for use with the CTF plugin (event names, field
  * names, etc.)
@@ -20,6 +22,7 @@ package org.eclipse.linuxtools.ctf.core;
  * @since 2.2
  */
 @SuppressWarnings("nls")
+@NonNullByDefault
 public interface CTFStrings {
 
     /** Event name for lost events */

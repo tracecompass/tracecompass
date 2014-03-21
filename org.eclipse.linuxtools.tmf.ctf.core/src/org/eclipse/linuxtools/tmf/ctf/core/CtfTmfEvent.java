@@ -13,11 +13,16 @@
 
 package org.eclipse.linuxtools.tmf.ctf.core;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.ctf.core.event.CTFCallsite;
+import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfCustomAttributes;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
@@ -43,7 +48,6 @@ public class CtfTmfEvent extends TmfEvent
     // Constants
     // ------------------------------------------------------------------------
 
-    static final String NO_STREAM = "No stream"; //$NON-NLS-1$
     private static final String EMPTY_CTF_EVENT_NAME = "Empty CTF event"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
@@ -53,7 +57,10 @@ public class CtfTmfEvent extends TmfEvent
     private final int fSourceCPU;
     private final long fTypeId;
     private final String fEventName;
-    private final IEventDeclaration fDeclaration;
+    private final IEventDeclaration fEventDeclaration;
+    @NonNull
+    private final EventDefinition fEvent;
+    private ITmfEventField fContent;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -63,21 +70,23 @@ public class CtfTmfEvent extends TmfEvent
      * Constructor used by {@link CtfTmfEventFactory#createEvent}
      */
     CtfTmfEvent(CtfTmfTrace trace, long rank, CtfTmfTimestamp timestamp,
-            ITmfEventField content, String fileName, int cpu,
-            IEventDeclaration declaration) {
+            String fileName, int cpu, IEventDeclaration declaration, @NonNull EventDefinition eventDefinition) {
         super(trace,
                 rank,
                 timestamp,
                 String.valueOf(cpu), // Source
-                null, // Event type. We don't use TmfEvent's field here, we re-implement getType()
-                content,
+                null, // Event type. We don't use TmfEvent's field here, we
+                      // re-implement getType()
+                null, // Content handled with a lazy loaded re-implemented in
+                      // getContent()
                 fileName // Reference
         );
 
-        fDeclaration = declaration;
+        fEventDeclaration = declaration;
         fSourceCPU = cpu;
         fTypeId = declaration.getId();
         fEventName = declaration.getName();
+        fEvent = eventDefinition;
 
     }
 
@@ -96,11 +105,12 @@ public class CtfTmfEvent extends TmfEvent
                 null,
                 null,
                 new TmfEventField("", null, new CtfTmfEventField[0]), //$NON-NLS-1$
-                NO_STREAM);
+                null);
         fSourceCPU = -1;
         fTypeId = -1;
         fEventName = EMPTY_CTF_EVENT_NAME;
-        fDeclaration = null;
+        fEventDeclaration = null;
+        fEvent = EventDefinition.NULL_EVENT;
     }
 
     // ------------------------------------------------------------------------
@@ -152,10 +162,10 @@ public class CtfTmfEvent extends TmfEvent
      */
     @Override
     public Set<String> listCustomAttributes() {
-        if (fDeclaration == null) {
+        if (fEventDeclaration == null) {
             return new HashSet<>();
         }
-        return fDeclaration.getCustomAttributes();
+        return fEventDeclaration.getCustomAttributes();
     }
 
     /**
@@ -163,10 +173,10 @@ public class CtfTmfEvent extends TmfEvent
      */
     @Override
     public String getCustomAttribute(String name) {
-        if (fDeclaration == null) {
+        if (fEventDeclaration == null) {
             return null;
         }
-        return fDeclaration.getCustomAttribute(name);
+        return fEventDeclaration.getCustomAttribute(name);
     }
 
     /**
@@ -209,6 +219,43 @@ public class CtfTmfEvent extends TmfEvent
     @Override
     public String getModelUri() {
         return getCustomAttribute(CtfConstants.MODEL_URI_KEY);
+    }
+
+    @Override
+    public synchronized ITmfEventField getContent() {
+        if (fContent == null) {
+            fContent = new TmfEventField(
+                    ITmfEventField.ROOT_FIELD_ID, null, parseFields(fEvent));
+        }
+        return fContent;
+    }
+
+    /**
+     * Extract the field information from the structDefinition haze-inducing
+     * mess, and put them into something ITmfEventField can cope with.
+     */
+    private static CtfTmfEventField[] parseFields(@NonNull EventDefinition eventDef) {
+        List<CtfTmfEventField> fields = new ArrayList<>();
+
+        StructDefinition structFields = eventDef.getFields();
+        if (structFields != null) {
+            if (structFields.getFieldNames() != null) {
+                for (String curFieldName : structFields.getFieldNames()) {
+                    fields.add(CtfTmfEventField.parseField(structFields.getDefinition(curFieldName), curFieldName));
+                }
+            }
+        }
+        /* Add context information as CtfTmfEventField */
+        StructDefinition structContext = eventDef.getContext();
+        if (structContext != null) {
+            for (String contextName : structContext.getFieldNames()) {
+                /* Prefix field name */
+                String curContextName = CtfConstants.CONTEXT_FIELD_PREFIX + contextName;
+                fields.add(CtfTmfEventField.parseField(structContext.getDefinition(contextName), curContextName));
+            }
+        }
+
+        return fields.toArray(new CtfTmfEventField[fields.size()]);
     }
 
 }

@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.ctf.core.tests.headless;
 
+import java.io.FileNotFoundException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -27,14 +28,15 @@ public class ReadTrace {
 
     /**
      * @param args
+     * @throws FileNotFoundException
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
         final String TRACE_PATH = "traces/kernel";
 
         // Change this to enable text output
         final boolean USE_TEXT = false;
 
-        final int LOOP_COUNT = 1;
+        final int LOOP_COUNT = 10;
 
         // Work variables
         long nbEvent = 0L;
@@ -46,34 +48,29 @@ public class ReadTrace {
                 nbEvent = 0L;
                 trace = new CTFTrace(TRACE_PATH);
             } catch (CTFReaderException e) {
-                // do nothing
+                throw new FileNotFoundException(TRACE_PATH);
             }
             start = System.nanoTime();
             if (USE_TEXT) {
                 System.out.println("Event, " + " Time, " + " type, " + " CPU ");
             }
             try (CTFTraceReader traceReader = new CTFTraceReader(trace);) {
-                if (trace != null) {
-                    start = System.nanoTime();
+                start = System.nanoTime();
 
-                    while (traceReader.hasMoreEvents()) {
-                        EventDefinition ed = traceReader.getCurrentEventDef();
-                        nbEvent++;
-                        if (USE_TEXT) {
-                            String output = formatDate(ed.getTimestamp()
-                                    + trace.getOffset());
-                            System.out.println(nbEvent + ", "
-                                    + output + ", " + ed.getDeclaration().getName()
-                                    + ", " + ed.getCPU() + ed.getFields().toString());
-                        }
-                        // long endTime = traceReader.getEndTime();
-                        // long timestamp =
-                        // traceReader.getCurrentEventDef().getTimestamp();
-                        traceReader.advance();
+                while (traceReader.hasMoreEvents()) {
+                    EventDefinition ed = traceReader.getCurrentEventDef();
+                    nbEvent++;
+                    if (USE_TEXT) {
+                        String output = formatDate(ed.getTimestamp()
+                                + trace.getOffset());
+                        System.out.println(nbEvent + ", "
+                                + output + ", " + ed.getDeclaration().getName()
+                                + ", " + ed.getCPU() + ed.getFields().toString());
                     }
-                    // Map<Long, Stream> streams =
-                    // traceReader.getTrace().getStreams();
+
+                    traceReader.advance();
                 }
+
                 stop = System.nanoTime();
 
                 System.out.print('.');

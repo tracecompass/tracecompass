@@ -19,14 +19,17 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.util.UUID;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
+import org.eclipse.linuxtools.ctf.core.event.scope.LexicalScope;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.FloatDefinition;
-import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDefinition;
+import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndex;
 import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntry;
@@ -69,12 +72,12 @@ public class StreamInput implements IDefinitionScope {
     /*
      * Definition of trace packet header
      */
-    private StructDefinition fTracePacketHeaderDef = null;
+    private StructDeclaration fTracePacketHeaderDecl = null;
 
     /*
      * Definition of trace stream packet context
      */
-    private StructDefinition fStreamPacketContextDef = null;
+    private StructDeclaration fStreamPacketContextDecl = null;
 
     /*
      * Total number of lost events in this stream
@@ -156,10 +159,12 @@ public class StreamInput implements IDefinitionScope {
 
     /**
      * Useless for streaminputs
+     *
+     * @since 3.0
      */
     @Override
-    public String getPath() {
-        return ""; //$NON-NLS-1$
+    public LexicalScope getScopePath() {
+        return LexicalScope.STREAM;
     }
 
     // ------------------------------------------------------------------------
@@ -187,13 +192,11 @@ public class StreamInput implements IDefinitionScope {
          * Create the definitions we need to read the packet headers + contexts
          */
         if (getStream().getTrace().getPacketHeader() != null) {
-            fTracePacketHeaderDef = getStream().getTrace().getPacketHeader()
-                    .createDefinition(this, "trace.packet.header"); //$NON-NLS-1$
+            fTracePacketHeaderDecl = getStream().getTrace().getPacketHeader();
         }
 
         if (getStream().getPacketContextDecl() != null) {
-            fStreamPacketContextDef = getStream().getPacketContextDecl()
-                    .createDefinition(this, "stream.packet.context"); //$NON-NLS-1$
+            fStreamPacketContextDecl = getStream().getPacketContextDecl();
         }
 
     }
@@ -219,7 +222,7 @@ public class StreamInput implements IDefinitionScope {
             StreamInputPacketIndexEntry packetIndex = new StreamInputPacketIndexEntry(
                     currentPos);
             createPacketIndexEntry(fileSize, currentPos, packetIndex,
-                    fTracePacketHeaderDef, fStreamPacketContextDef, bitBuffer);
+                    fTracePacketHeaderDecl, fStreamPacketContextDecl, bitBuffer);
             fIndex.addEntry(packetIndex);
             return true;
         }
@@ -232,8 +235,8 @@ public class StreamInput implements IDefinitionScope {
 
     private long createPacketIndexEntry(long fileSizeBytes,
             long packetOffsetBytes, StreamInputPacketIndexEntry packetIndex,
-            StructDefinition tracePacketHeaderDef,
-            StructDefinition streamPacketContextDef, BitBuffer bitBuffer)
+            StructDeclaration tracePacketHeaderDecl,
+            StructDeclaration streamPacketContextDecl, @NonNull BitBuffer bitBuffer)
             throws CTFReaderException {
 
         /*
@@ -245,15 +248,15 @@ public class StreamInput implements IDefinitionScope {
         /*
          * Read the trace packet header if it exists.
          */
-        if (tracePacketHeaderDef != null) {
-            parseTracePacketHeader(tracePacketHeaderDef, bitBuffer);
+        if (tracePacketHeaderDecl != null) {
+            parseTracePacketHeader(tracePacketHeaderDecl, bitBuffer);
         }
 
         /*
          * Read the stream packet context if it exists.
          */
-        if (streamPacketContextDef != null) {
-            parsePacketContext(fileSizeBytes, streamPacketContextDef,
+        if (streamPacketContextDecl != null) {
+            parsePacketContext(fileSizeBytes, streamPacketContextDecl,
                     bitBuffer, packetIndex);
         } else {
             setPacketContextNull(fileSizeBytes, packetIndex);
@@ -334,9 +337,9 @@ public class StreamInput implements IDefinitionScope {
         return bb;
     }
 
-    private void parseTracePacketHeader(StructDefinition tracePacketHeaderDef,
-            BitBuffer bitBuffer) throws CTFReaderException {
-        tracePacketHeaderDef.read(bitBuffer);
+    private void parseTracePacketHeader(StructDeclaration tracePacketHeaderDecl,
+            @NonNull BitBuffer bitBuffer) throws CTFReaderException {
+        StructDefinition tracePacketHeaderDef = tracePacketHeaderDecl.createDefinition(null, LexicalScope.TRACE_PACKET_HEADER.getName(), bitBuffer);
 
         /*
          * Check the CTF magic number
@@ -357,14 +360,7 @@ public class StreamInput implements IDefinitionScope {
         ArrayDefinition uuidDef =
                 (ArrayDefinition) tracePacketHeaderDef.lookupDefinition("uuid"); //$NON-NLS-1$
         if (uuidDef != null) {
-            byte[] uuidArray = new byte[16];
-
-            for (int i = 0; i < uuidArray.length; i++) {
-                IntegerDefinition uuidByteDef = (IntegerDefinition) uuidDef.getElem(i);
-                uuidArray[i] = (byte) uuidByteDef.getValue();
-            }
-
-            UUID uuid = Utils.makeUUID(uuidArray);
+            UUID uuid = Utils.getUUIDfromDefinition(uuidDef);
 
             if (!getStream().getTrace().getUUID().equals(uuid)) {
                 throw new CTFReaderException("UUID mismatch"); //$NON-NLS-1$
@@ -396,9 +392,9 @@ public class StreamInput implements IDefinitionScope {
     }
 
     private void parsePacketContext(long fileSizeBytes,
-            StructDefinition streamPacketContextDef, BitBuffer bitBuffer,
+            StructDeclaration streamPacketContextDecl, @NonNull BitBuffer bitBuffer,
             StreamInputPacketIndexEntry packetIndex) throws CTFReaderException {
-        streamPacketContextDef.read(bitBuffer);
+        StructDefinition streamPacketContextDef = streamPacketContextDecl.createDefinition(null, LexicalScope.STREAM_PACKET_CONTEXT.getName(), bitBuffer);
 
         for (String field : streamPacketContextDef.getDeclaration()
                 .getFieldsList()) {
@@ -436,7 +432,6 @@ public class StreamInput implements IDefinitionScope {
             packetIndex.setContentSizeBits((int) (fileSizeBytes * 8));
         }
 
-
         /* Read the packet size in bits */
         if (packetSize != null) {
             packetIndex.setPacketSizeBits(packetSize.intValue());
@@ -445,7 +440,6 @@ public class StreamInput implements IDefinitionScope {
         } else {
             packetIndex.setPacketSizeBits((int) (fileSizeBytes * 8));
         }
-
 
         /* Read the begin timestamp */
         if (tsBegin != null) {

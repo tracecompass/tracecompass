@@ -317,25 +317,22 @@ public class EventDeclarationTest {
     @Test
     public void testEventDefinition() throws CTFReaderException {
         CTFTrace trace = testTrace.getTrace();
-        EventDefinition ed = new EventDefinition(null, null);
+        EventDefinition ed = null;
         try (CTFTraceReader tr = new CTFTraceReader(trace);) {
             tr.advance();
             ed = tr.getCurrentEventDef();
         }
         assertNotNull(ed);
-        assertNotNull(ed.getPath());
+        assertNotNull(ed.getScopePath());
         assertNotNull(ed.getDeclaration());
         assertNotNull(ed.getFields());
         assertNull(ed.getContext());
         assertNotNull(ed.getPacketContext());
         assertNotNull(ed.getCPU());
-        assertNotNull(ed.getPacketContext());
         assertNotNull(ed.getStreamInputReader());
         assertNull(ed.lookupDefinition("context"));
         assertNotNull(ed.lookupDefinition("fields"));
         assertNull(ed.lookupDefinition("other"));
-        assertNotNull(ed.toString());
-        ed.setContext(ed.getFields());
         assertNotNull(ed.toString());
     }
 

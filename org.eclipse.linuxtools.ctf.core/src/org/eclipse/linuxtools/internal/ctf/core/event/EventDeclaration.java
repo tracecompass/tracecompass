@@ -12,17 +12,21 @@
 
 package org.eclipse.linuxtools.internal.ctf.core.event;
 
-import java.nio.ByteOrder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.ctf.core.CTFStrings;
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
-import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
+import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.ctf.core.event.scope.LexicalScope;
+import org.eclipse.linuxtools.ctf.core.event.types.Declaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.Stream;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
 
@@ -31,6 +35,10 @@ import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
  * events.
  */
 public class EventDeclaration implements IEventDeclaration {
+
+    @NonNull private static final String FIELDS = "fields"; //$NON-NLS-1$
+
+    @NonNull private static final String CONTEXT = "context"; //$NON-NLS-1$
 
     /** Id of lost events */
     public static final long LOST_EVENT_ID = -1L;
@@ -87,18 +95,24 @@ public class EventDeclaration implements IEventDeclaration {
     }
 
     @Override
-    public EventDefinition createDefinition(StreamInputReader streamInputReader) {
-        EventDefinition event = new EventDefinition(this, streamInputReader);
+    public EventDefinition createDefinition(StreamInputReader streamInputReader, @NonNull BitBuffer input, long timestamp) throws CTFReaderException {
+        StructDeclaration streamEventContextDecl = streamInputReader.getStreamEventContextDecl();
+        StructDefinition streamEventContext = streamEventContextDecl != null ? streamEventContextDecl.createDefinition(null, LexicalScope.STREAM_EVENT_CONTEXT.toString(), input) : null;
+        StructDefinition packetContext = streamInputReader.getPacketReader().getCurrentPacketEventHeader();
+        StructDefinition eventContext = fContext != null ? fContext.createDefinition(null, CONTEXT, input) : null;
+        StructDefinition eventPayload = fFields != null ? fFields.createDefinition(null, FIELDS, input) : null;
 
-        if (fContext != null) {
-            event.setContext(fContext.createDefinition(event, "context")); //$NON-NLS-1$
-        }
-
-        if (fFields != null) {
-            event.setFields(fFields.createDefinition(event, "fields")); //$NON-NLS-1$
-        }
-
-        return event;
+        // a bit lttng specific
+        // CTF doesn't require a timestamp,
+        // but it's passed to us
+        return new EventDefinition(
+                this,
+                streamInputReader,
+                timestamp,
+                streamEventContext,
+                eventContext,
+                packetContext,
+                eventPayload);
     }
 
     /**
@@ -109,15 +123,11 @@ public class EventDeclaration implements IEventDeclaration {
      */
     public static synchronized EventDeclaration getLostEventDeclaration() {
         EventDeclaration lostEvent = new EventDeclaration();
-        IntegerDeclaration lostEventsDeclaration = new IntegerDeclaration(32, false, 10, ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 8);
-        IntegerDeclaration timestampDeclaration = new IntegerDeclaration(64, false, 10, ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 8);
-
-        lostEvent.fFields = new StructDeclaration(1);
-        lostEvent.fFields.addField(CTFStrings.LOST_EVENTS_FIELD, lostEventsDeclaration);
-        lostEvent.fFields.addField(CTFStrings.LOST_EVENTS_DURATION, timestampDeclaration);
+        String[] fieldNames = new String[] { CTFStrings.LOST_EVENTS_FIELD, CTFStrings.LOST_EVENTS_DURATION };
+        Declaration[] fieldDeclarations = new Declaration[] { IntegerDeclaration.UINT_32B_DECL, IntegerDeclaration.UINT_64B_DECL };
+        lostEvent.fFields = new StructDeclaration(fieldNames, fieldDeclarations);
         lostEvent.fId = LOST_EVENT_ID;
         lostEvent.fName = CTFStrings.LOST_EVENT_NAME;
-
         return lostEvent;
     }
 

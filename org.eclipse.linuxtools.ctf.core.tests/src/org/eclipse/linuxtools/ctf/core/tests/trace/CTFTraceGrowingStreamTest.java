@@ -124,14 +124,14 @@ public class CTFTraceGrowingStreamTest {
     public void testGrowingLive() throws CTFReaderException, FileNotFoundException, IOException {
         try (CTFTraceReader reader = new CTFTraceReader(fFixture);) {
             reader.setLive(true);
-            assertEquals("0x29", reader.getCurrentEventDef().getFields().getDefinitions().get("f").toString());
+            assertEquals("0x29", reader.getCurrentEventDef().getFields().getDefinition("f").toString());
             reader.advance();
             try (FileOutputStream fos = new FileOutputStream(fGrowingStream, true)) {
                 fos.write(fPackets[1]);
             }
             reader.advance();
             assertNotNull(reader.getCurrentEventDef());
-            assertEquals("0xbab4face", reader.getCurrentEventDef().getFields().getDefinitions().get("f").toString());
+            assertEquals("0xbab4face", reader.getCurrentEventDef().getFields().getDefinition("f").toString());
         }
     }
 
@@ -146,7 +146,7 @@ public class CTFTraceGrowingStreamTest {
     public void testGrowingNotLive() throws CTFReaderException, FileNotFoundException, IOException {
         try (CTFTraceReader reader = new CTFTraceReader(fFixture);) {
             reader.setLive(false);
-            assertEquals("0x29", reader.getCurrentEventDef().getFields().getDefinitions().get("f").toString());
+            assertEquals("0x29", reader.getCurrentEventDef().getFields().getDefinition("f").toString());
             reader.advance();
             try (FileOutputStream fos = new FileOutputStream(fGrowingStream, true)) {
                 fos.write(fPackets[1]);

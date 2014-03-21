@@ -18,6 +18,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
+
 /**
  * A CTF enum declaration.
  *
@@ -28,7 +32,7 @@ import java.util.Set;
  * @author Matthew Khouzam
  * @author Simon Marchi
  */
-public class EnumDeclaration implements IDeclaration {
+public final class EnumDeclaration extends Declaration {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -72,14 +76,26 @@ public class EnumDeclaration implements IDeclaration {
         return this.getContainerType().getAlignment();
     }
 
+    /**
+     * @since 3.0
+     */
+    @Override
+    public int getMaximumSize() {
+        return fContainerType.getMaximumSize();
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
 
+    /**
+     * @since 3.0
+     */
     @Override
-    public EnumDefinition createDefinition(IDefinitionScope definitionScope,
-            String fieldName) {
-        return new EnumDefinition(this, definitionScope, fieldName);
+    public EnumDefinition createDefinition(IDefinitionScope definitionScope, String fieldName, BitBuffer input) throws CTFReaderException {
+        alignRead(input);
+        IntegerDefinition value = getContainerType().createDefinition(definitionScope, fieldName, input);
+        return new EnumDefinition(this, definitionScope, fieldName, value);
     }
 
     /**

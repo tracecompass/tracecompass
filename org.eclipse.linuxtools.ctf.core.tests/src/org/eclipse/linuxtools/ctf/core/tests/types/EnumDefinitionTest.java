@@ -13,17 +13,14 @@ package org.eclipse.linuxtools.ctf.core.tests.types;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
-import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
+import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,21 +33,24 @@ import org.junit.Test;
  */
 public class EnumDefinitionTest {
 
-    private EnumDefinition fixture;
+    private EnumDefinition fixtureA;
+    private EnumDefinition fixtureB;
 
     /**
      * Perform pre-test initialization.
      */
     @Before
     public void setUp() {
+        IntegerDeclaration integerDeclaration = IntegerDeclaration.createDeclaration(1, false, 1, ByteOrder.BIG_ENDIAN,
+                Encoding.ASCII, "", 8);
         EnumDeclaration declaration = new EnumDeclaration(
-                new IntegerDeclaration(1, false, 1, ByteOrder.BIG_ENDIAN,
-                        Encoding.ASCII, null, 8));
+                integerDeclaration);
         declaration.add(0, 10, "a");
         declaration.add(11, 20, "b");
         String fieldName = "";
 
-        fixture = new EnumDefinition(declaration, null, fieldName);
+        fixtureA = new EnumDefinition(declaration, null, fieldName, new IntegerDefinition(integerDeclaration, null, fieldName, 4));
+        fixtureB = new EnumDefinition(declaration, null, fieldName, new IntegerDefinition(integerDeclaration, null, fieldName, 12));
     }
 
     /**
@@ -59,7 +59,8 @@ public class EnumDefinitionTest {
      */
     @Test
     public void testEnumDefinition() {
-        assertNotNull(fixture);
+        assertNotNull(fixtureA);
+        assertNotNull(fixtureB);
     }
 
     /**
@@ -67,9 +68,10 @@ public class EnumDefinitionTest {
      */
     @Test
     public void testGetValue() {
-        String result = fixture.getValue();
+        String result = fixtureA.getValue();
 
         assertNotNull(result);
+        assertEquals("a", result);
     }
 
     /**
@@ -77,33 +79,8 @@ public class EnumDefinitionTest {
      */
     @Test
     public void testGetIntegerValue_one() {
-        fixture.setIntegerValue(1L);
-        long result = fixture.getIntegerValue();
-
-        assertEquals(1L, result);
-    }
-
-    /**
-     * Run the String getValue() method test.
-     */
-    @Test
-    public void testGetIntegerValue_zero() {
-        fixture.setIntegerValue(0);
-        long result = fixture.getIntegerValue();
-
-        assertTrue(0 == result);
-    }
-
-    /**
-     * Run the void read(BitBuffer) method test.
-     * @throws CTFReaderException error
-     */
-    @Test
-    public void testRead() throws CTFReaderException {
-        fixture.setIntegerValue(1L);
-        BitBuffer input = new BitBuffer(ByteBuffer.allocateDirect(128));
-
-        fixture.read(input);
+        long result = fixtureA.getIntegerValue();
+        assertEquals(4L, result);
     }
 
     /**
@@ -111,9 +88,8 @@ public class EnumDefinitionTest {
      */
     @Test
     public void testToString() {
-        fixture.setIntegerValue(16);
-        String result = fixture.toString();
+        String result = fixtureB.toString();
 
-        assertEquals("{ value = b, container = 16 }", result);
+        assertEquals("{ value = b, container = 12 }", result);
     }
 }

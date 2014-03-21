@@ -14,8 +14,10 @@ package org.eclipse.linuxtools.ctf.core.tests.types;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.nio.ByteBuffer;
+
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
-import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
+import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
@@ -32,15 +34,24 @@ import org.junit.Test;
 public class StringDefinitionTest {
 
     private StringDefinition fixture;
+    private String testString;
 
     /**
      * Perform pre-test initialization.
+     *
+     * @throws CTFReaderException won't happen
      */
     @Before
-    public void setUp() {
+    public void setUp() throws CTFReaderException {
         String name = "testString";
         StringDeclaration stringDec = new StringDeclaration();
-        fixture = stringDec.createDefinition(null, name);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(100);
+        BitBuffer bb = new BitBuffer(byteBuffer);
+        byteBuffer.mark();
+        testString = new String("testString");
+        byteBuffer.put(testString.getBytes());
+        byteBuffer.reset();
+        fixture = stringDec.createDefinition(null, name, bb);
     }
 
     /**
@@ -54,7 +65,7 @@ public class StringDefinitionTest {
         String fieldName = "";
 
         StringDefinition result = new StringDefinition(declaration,
-                definitionScope, fieldName);
+                definitionScope, fieldName, "");
 
         assertNotNull(result);
     }
@@ -82,29 +93,10 @@ public class StringDefinitionTest {
      */
     @Test
     public void testSetValue() {
-        fixture.setValue("dummy");
+
         String result = fixture.getValue();
         assertNotNull(result);
-        assertEquals("dummy", result);
-    }
-
-    /**
-     * Run the void read(BitBuffer) method test.
-     * @throws CTFReaderException error
-     */
-    @Test
-    public void testRead() throws CTFReaderException {
-        BitBuffer input = new BitBuffer(java.nio.ByteBuffer.allocateDirect(128));
-        fixture.read(input);
-    }
-
-    /**
-     * Run the void setDeclaration(StringDeclaration) method test.
-     */
-    @Test
-    public void testSetDeclaration() {
-        StringDeclaration declaration = new StringDeclaration();
-        fixture.setDeclaration(declaration);
+        assertEquals("testString", result);
     }
 
     /**

@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.ctf.core.trace;
 import java.nio.ByteOrder;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
-import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
+import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntry;
 
 /**
@@ -112,15 +112,6 @@ public class StreamInputReader implements AutoCloseable {
     }
 
     /**
-     * Gets the current packet context
-     *
-     * @return the current packet context (size, lost events and such)
-     */
-    public StructDefinition getCurrentPacketContext() {
-        return fPacketReader.getStreamPacketContextDef();
-    }
-
-    /**
      * Gets the byte order for a trace
      *
      * @return the trace byte order
@@ -195,6 +186,16 @@ public class StreamInputReader implements AutoCloseable {
         return fLive;
     }
 
+    /**
+     * Get the event context of the stream
+     *
+     * @return the event context declaration of the stream
+     * @since 3.0
+     */
+    public StructDeclaration getStreamEventContextDecl() {
+        return getStreamInput().getStream().getEventContextDecl();
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -214,7 +215,7 @@ public class StreamInputReader implements AutoCloseable {
         if (!fPacketReader.hasMoreEvents()) {
             final StreamInputPacketIndexEntry prevPacket = fPacketReader
                     .getCurrentPacket();
-            if (prevPacket != null || fLive ) {
+            if (prevPacket != null || fLive) {
                 goToNextPacket();
             }
 

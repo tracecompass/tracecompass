@@ -13,7 +13,10 @@ package org.eclipse.linuxtools.ctf.core.event;
 
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
+import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.Stream;
 import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
 
@@ -31,9 +34,17 @@ public interface IEventDeclaration {
      *
      * @param streamInputReader
      *            The StreamInputReader for which this definition is created.
+     * @param input
+     *            the bitbuffer input source
+     * @param timestamp
+     *            The timestamp when the event was taken
      * @return A new EventDefinition.
+     * @throws CTFReaderException
+     *             As a bitbuffer is used to read, it could have wrapped
+     *             IOExceptions.
+     * @since 3.0
      */
-    EventDefinition createDefinition(StreamInputReader streamInputReader);
+    EventDefinition createDefinition(StreamInputReader streamInputReader, @NonNull BitBuffer input, long timestamp) throws CTFReaderException;
 
     /**
      * Gets the name of an event declaration

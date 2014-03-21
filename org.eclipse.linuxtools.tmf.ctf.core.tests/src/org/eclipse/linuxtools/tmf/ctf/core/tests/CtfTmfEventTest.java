@@ -59,7 +59,9 @@ public class CtfTmfEventTest {
 
     /**
      * Perform pre-test initialization.
-     * @throws CTFReaderException error
+     *
+     * @throws CTFReaderException
+     *             error
      */
     @Before
     public void setUp() throws CTFReaderException {
@@ -218,7 +220,7 @@ public class CtfTmfEventTest {
         assertNotNull(nullEvent);
         assertEquals(-1, nullEvent.getCPU());
         assertEquals("Empty CTF event", nullEvent.getType().getName());
-        assertEquals("No stream", nullEvent.getReference());
+        assertNull(nullEvent.getReference());
         assertArrayEquals(new ITmfEventField[0], nullEvent.getContent().getFields());
         assertEquals(-1L, nullEvent.getID());
         assertEquals(-1L, nullEvent.getTimestamp().getValue());

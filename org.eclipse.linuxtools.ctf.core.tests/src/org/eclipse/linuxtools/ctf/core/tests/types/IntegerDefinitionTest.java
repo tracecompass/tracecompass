@@ -14,11 +14,13 @@ package org.eclipse.linuxtools.ctf.core.tests.types;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
+import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
-import org.eclipse.linuxtools.ctf.core.event.types.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
@@ -35,16 +37,24 @@ import org.junit.Test;
 public class IntegerDefinitionTest {
 
     private IntegerDefinition fixture;
-    String name = "testInt";
-    String clockName = "clock";
+    @NonNull private static final String NAME = "testInt";
+    @NonNull private static final String clockName = "clock";
 
     /**
      * Perform pre-test initialization.
+     *
+     * @throws CTFReaderException
+     *             won't happen
      */
     @Before
-    public void setUp() {
-        IntegerDeclaration id = new IntegerDeclaration(1, false, 1, ByteOrder.BIG_ENDIAN, Encoding.NONE, clockName, 8);
-        fixture = id.createDefinition(null, name);
+    public void setUp() throws CTFReaderException {
+        IntegerDeclaration id = IntegerDeclaration.createDeclaration(1, false, 1, ByteOrder.BIG_ENDIAN, Encoding.NONE, clockName, 8);
+        ByteBuffer byb = ByteBuffer.allocate(128);
+        byb.mark();
+        byb.putInt(1);
+        byb.reset();
+        BitBuffer bb = new BitBuffer(byb);
+        fixture = id.createDefinition(null, NAME, bb);
     }
 
     /**
@@ -53,13 +63,13 @@ public class IntegerDefinitionTest {
      */
     @Test
     public void testIntegerDefinition() {
-        IntegerDeclaration declaration = new IntegerDeclaration(1, false, 1,
-                ByteOrder.BIG_ENDIAN, Encoding.ASCII, null, 8);
+        IntegerDeclaration declaration = IntegerDeclaration.createDeclaration(1, false, 1,
+                ByteOrder.BIG_ENDIAN, Encoding.ASCII, "", 8);
         IDefinitionScope definitionScope = null;
         String fieldName = "";
 
         IntegerDefinition result = new IntegerDefinition(declaration,
-                definitionScope, fieldName);
+                definitionScope, fieldName, 1);
         assertNotNull(result);
     }
 
@@ -68,8 +78,6 @@ public class IntegerDefinitionTest {
      */
     @Test
     public void testGetDeclaration() {
-        fixture.setValue(1L);
-
         IntegerDeclaration result = fixture.getDeclaration();
         assertNotNull(result);
     }
@@ -79,22 +87,8 @@ public class IntegerDefinitionTest {
      */
     @Test
     public void testGetValue() {
-        fixture.setValue(1L);
-
         long result = fixture.getValue();
-        assertEquals(1L, result);
-    }
-
-    /**
-     * Run the void read(BitBuffer) method test.
-     * @throws CTFReaderException error
-     */
-    @Test
-    public void testRead() throws CTFReaderException {
-        fixture.setValue(1L);
-        BitBuffer input = new BitBuffer(java.nio.ByteBuffer.allocateDirect(128));
-
-        fixture.read(input);
+        assertEquals(0L, result);
     }
 
     /**
@@ -102,10 +96,8 @@ public class IntegerDefinitionTest {
      */
     @Test
     public void testToString() {
-        fixture.setValue(1L);
-
         String result = fixture.toString();
-        assertNotNull(result);
+        assertEquals("0", result);
     }
 
     /**

@@ -10,7 +10,9 @@
  * Contributors: Simon Marchi - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.ctf.core.event.types;
+package org.eclipse.linuxtools.ctf.core.event.scope;
+
+import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 
 /**
  * The scope of a CTF definition. Used for compound types.
@@ -18,14 +20,17 @@ package org.eclipse.linuxtools.ctf.core.event.types;
  * @version 1.0
  * @author Matthew Khouzam
  * @author Simon Marchi
+ * @since 3.0
  */
 public interface IDefinitionScope {
 
     /**
      * Gets the path in a C style for the scope.
+     *
      * @return the path
+     * @since 3.0
      */
-    String getPath();
+    LexicalScope getScopePath();
 
     /**
      * Looks up in this definition scope.
