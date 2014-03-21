@@ -369,6 +369,11 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         fTimeGraphCtrl.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
+                if (e.character == '+') {
+                    zoomIn();
+                } else if (e.character == '-') {
+                    zoomOut();
+                }
                 adjustVerticalScrollBar();
             }
         });
