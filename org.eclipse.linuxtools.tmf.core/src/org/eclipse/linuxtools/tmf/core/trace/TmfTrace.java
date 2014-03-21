@@ -357,6 +357,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
             for (IAnalysisModule module : fAnalysisModules.values()) {
                 module.dispose();
             }
+            fAnalysisModules.clear();
         }
 
         super.dispose();
