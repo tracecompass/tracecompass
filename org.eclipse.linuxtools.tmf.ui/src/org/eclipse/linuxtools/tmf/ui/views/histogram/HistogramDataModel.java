@@ -192,6 +192,16 @@ public class HistogramDataModel implements IHistogramDataModel {
         }
     }
 
+
+    /**
+     * Disposes the data model
+     * @since 3.0
+     */
+    public void dispose() {
+        fTraceMap.clear();
+        fTrace = null;
+    }
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------

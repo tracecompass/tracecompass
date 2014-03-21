@@ -273,6 +273,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         fTimeRangeColor.dispose();
         fFont.dispose();
         fDataModel.removeHistogramListener(this);
+        fDataModel.dispose();
     }
 
     private Composite createWidget(final Composite parent) {
