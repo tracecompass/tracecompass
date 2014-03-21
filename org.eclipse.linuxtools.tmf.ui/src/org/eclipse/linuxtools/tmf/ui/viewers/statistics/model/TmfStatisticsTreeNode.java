@@ -17,8 +17,8 @@ package org.eclipse.linuxtools.tmf.ui.viewers.statistics.model;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A tree where nodes can be accessed efficiently using paths.
@@ -71,7 +71,7 @@ public class TmfStatisticsTreeNode {
         fTree = tree;
         fPath = path;
         fParent = parent;
-        fChildren = new HashMap<>();
+        fChildren = new ConcurrentHashMap<>();
         fValues = new TmfStatisticsValues();
     }
 

@@ -82,15 +82,12 @@ public class TmfStatisticsTreeNodeTest {
 
         assertTrue(rootNode.containsChild(fTestName));
         assertFalse(rootNode.containsChild(catNode.getName()));
-        assertFalse(rootNode.containsChild(null));
 
         assertTrue(traceNode.containsChild(catNode.getName()));
         assertFalse(traceNode.containsChild(fTypeId1));
-        assertFalse(traceNode.containsChild(null));
 
         assertTrue(catNode.containsChild(fTypeId1));
         assertTrue(catNode.containsChild(fTypeId2));
-        assertFalse(catNode.containsChild(null));
     }
 
     /**
