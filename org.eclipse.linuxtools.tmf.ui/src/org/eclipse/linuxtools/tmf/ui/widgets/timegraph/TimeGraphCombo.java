@@ -17,8 +17,10 @@ package org.eclipse.linuxtools.tmf.ui.widgets.timegraph;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
@@ -415,9 +417,12 @@ public class TimeGraphCombo extends Composite {
             public void treeExpanded(TreeExpansionEvent event) {
                 ITimeGraphEntry entry = (ITimeGraphEntry) event.getElement();
                 fTimeGraphViewer.setExpandedState(entry, true);
+                Set<Object> expandedElements = new HashSet<>(Arrays.asList(fTreeViewer.getExpandedElements()));
                 for (ITimeGraphEntry child : entry.getChildren()) {
-                    boolean expanded = fTreeViewer.getExpandedState(child);
-                    fTimeGraphViewer.setExpandedState(child, expanded);
+                    if (child.hasChildren()) {
+                        boolean expanded = expandedElements.contains(child);
+                        fTimeGraphViewer.setExpandedState(child, expanded);
+                    }
                 }
                 // queue the alignment update because the tree items may only be
                 // actually expanded after the listeners have been notified
@@ -442,9 +447,12 @@ public class TimeGraphCombo extends Composite {
             public void treeExpanded(TimeGraphTreeExpansionEvent event) {
                 ITimeGraphEntry entry = event.getEntry();
                 fTreeViewer.setExpandedState(entry, true);
+                Set<Object> expandedElements = new HashSet<>(Arrays.asList(fTreeViewer.getExpandedElements()));
                 for (ITimeGraphEntry child : entry.getChildren()) {
-                    boolean expanded = fTreeViewer.getExpandedState(child);
-                    fTimeGraphViewer.setExpandedState(child, expanded);
+                    if (child.hasChildren()) {
+                        boolean expanded = expandedElements.contains(child);
+                        fTimeGraphViewer.setExpandedState(child, expanded);
+                    }
                 }
                 alignTreeItems(true);
             }

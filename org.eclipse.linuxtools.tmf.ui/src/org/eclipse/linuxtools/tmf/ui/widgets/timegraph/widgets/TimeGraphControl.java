@@ -22,7 +22,9 @@ package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.resource.JFaceResources;
@@ -357,7 +359,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @return The array of traces
      */
     public ITimeGraphEntry[] getTraces() {
-        return fItemData.getTraces();
+        return fItemData.getEntries();
     }
 
     /**
@@ -366,7 +368,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @return The array of filters
      */
     public boolean[] getTraceFilter() {
-        return fItemData.getTraceFilter();
+        return fItemData.getEntryFilter();
     }
 
     /**
@@ -961,7 +963,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         ITimeGraphEntry trace = null;
         int idx = getSelectedIndex();
         if (idx >= 0) {
-            trace = fItemData.fExpandedItems[idx].fTrace;
+            trace = fItemData.fExpandedItems[idx].fEntry;
         }
         return trace;
     }
@@ -993,7 +995,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 adjustScrolls();
                 redraw();
                 toggled = true;
-                fireTreeEvent(item.fTrace, item.fExpanded);
+                fireTreeEvent(item.fEntry, item.fExpanded);
             }
         }
         return toggled;
@@ -1023,7 +1025,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     ITimeGraphEntry getEntry(Point pt) {
         int idx = getItemIndexAtY(pt.y);
-        return idx >= 0 ? fItemData.fExpandedItems[idx].fTrace : null;
+        return idx >= 0 ? fItemData.fExpandedItems[idx].fEntry : null;
     }
 
     /**
@@ -1158,7 +1160,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     public ITimeGraphEntry[] getExpandedElements() {
         ArrayList<ITimeGraphEntry> elements = new ArrayList<>();
         for (Item item : fItemData.fExpandedItems) {
-            elements.add(item.fTrace);
+            elements.add(item.fEntry);
         }
         return elements.toArray(new ITimeGraphEntry[0]);
     }
@@ -1323,7 +1325,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @param gc Graphics context
      */
     protected void drawItem(Item item, Rectangle bounds, ITimeDataProvider timeProvider, int i, int nameSpace, GC gc) {
-        ITimeGraphEntry entry = item.fTrace;
+        ITimeGraphEntry entry = item.fEntry;
         long time0 = timeProvider.getTime0();
         long time1 = timeProvider.getTime1();
         long selectedTime = fTimeProvider.getSelectionBegin();
@@ -1333,7 +1335,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             return;
         }
 
-        if (! item.fTrace.hasTimeEvents()) {
+        if (! item.fEntry.hasTimeEvents()) {
             Rectangle statesRect = getStatesRect(bounds, i, nameSpace);
             nameRect.width += statesRect.width;
             drawName(item, nameRect, gc);
@@ -1358,7 +1360,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         // K pixels per second
         double pixelsPerNanoSec = (rect.width <= RIGHT_MARGIN) ? 0 : (double) (rect.width - RIGHT_MARGIN) / (time1 - time0);
 
-        if (item.fTrace.hasTimeEvents()) {
+        if (item.fEntry.hasTimeEvents()) {
             fillSpace(rect, gc, selected);
             // Drawing rectangle is smaller than reserved space
             stateRect.y += 3;
@@ -1542,7 +1544,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *            Graphics context
      */
     protected void drawName(Item item, Rectangle bounds, GC gc) {
-        boolean hasTimeEvents = item.fTrace.hasTimeEvents();
+        boolean hasTimeEvents = item.fEntry.hasTimeEvents();
         if (! hasTimeEvents) {
             gc.setBackground(getColorScheme().getBkColorGroup(item.fSelected, fIsInFocus));
             gc.fillRectangle(bounds);
@@ -1581,7 +1583,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
         leftMargin += EXPAND_SIZE + MARGIN;
 
-        Image img = fTimeGraphProvider.getItemImage(item.fTrace);
+        Image img = fTimeGraphProvider.getItemImage(item.fEntry);
         if (img != null) {
             // draw icon
             int imgHeight = img.getImageData().height;
@@ -2394,59 +2396,42 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     private class ItemData {
+        private final Map<ITimeGraphEntry, Item> fItemMap = new LinkedHashMap<>();
         private Item[] fExpandedItems = new Item[0];
         private Item[] fItems = new Item[0];
-        private ITimeGraphEntry fTraces[] = new ITimeGraphEntry[0];
+        private ITimeGraphEntry fRootEntries[] = new ITimeGraphEntry[0];
         private List<ILinkEvent> fLinks = new ArrayList<>();
-        private boolean fTraceFilter[] = new boolean[0];
+        private boolean fEntryFilter[] = new boolean[0];
         private final ArrayList<ITimeGraphEntry> fFilteredOut = new ArrayList<>();
 
         public ItemData() {
         }
 
-        Item findItem(ITimeGraphEntry entry) {
-            if (entry == null) {
-                return null;
-            }
-
-            for (int i = 0; i < fItems.length; i++) {
-                Item item = fItems[i];
-                if (item.fTrace == entry) {
-                    return item;
-                }
-            }
-
-            return null;
+        public Item findItem(ITimeGraphEntry entry) {
+            return fItemMap.get(entry);
         }
 
-        int findItemIndex(ITimeGraphEntry trace) {
-            if (trace == null) {
+        public int findItemIndex(ITimeGraphEntry entry) {
+            Item item = fItemMap.get(entry);
+            if (item == null) {
                 return -1;
             }
-
-            for (int i = 0; i < fExpandedItems.length; i++) {
-                Item item = fExpandedItems[i];
-                if (item.fTrace == trace) {
-                    return i;
-                }
-            }
-
-            return -1;
+            return item.fExpandedIndex;
         }
 
         public void refreshData() {
-            List<Item> itemList = new ArrayList<>();
+            fItemMap.clear();
             fFilteredOut.clear();
             ITimeGraphEntry selection = getSelectedTrace();
-            for (int i = 0; i < fTraces.length; i++) {
-                ITimeGraphEntry entry = fTraces[i];
-                refreshData(itemList, null, 0, entry);
+            for (int i = 0; i < fRootEntries.length; i++) {
+                ITimeGraphEntry entry = fRootEntries[i];
+                refreshData(fItemMap, null, 0, entry);
             }
-            fItems = itemList.toArray(new Item[0]);
+            fItems = fItemMap.values().toArray(new Item[0]);
             updateExpandedItems();
             if (selection != null) {
                 for (Item item : fExpandedItems) {
-                    if (item.fTrace == selection) {
+                    if (item.fEntry == selection) {
                         item.fSelected = true;
                         break;
                     }
@@ -2454,7 +2439,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             }
         }
 
-        private void refreshData(List<Item> itemList, Item parent, int level, ITimeGraphEntry entry) {
+        private void refreshData(Map<ITimeGraphEntry, Item> itemMap, Item parent, int level, ITimeGraphEntry entry) {
             Item item = new Item(entry, entry.getName(), level);
             if (parent != null) {
                 parent.fChildren.add(item);
@@ -2464,20 +2449,23 @@ public class TimeGraphControl extends TimeGraphBaseControl
             } else {
                 item.fItemHeight = fGlobalItemHeight;
             }
-            itemList.add(item);
+            itemMap.put(entry, item);
             if (entry.hasChildren()) {
                 item.fExpanded = true;
                 item.fHasChildren = true;
                 for (ITimeGraphEntry child : entry.getChildren()) {
-                    refreshData(itemList, item, level + 1, child);
+                    refreshData(itemMap, item, level + 1, child);
                 }
             }
         }
 
         public void updateExpandedItems() {
+            for (Item item : fItems) {
+                item.fExpandedIndex = -1;
+            }
             List<Item> expandedItemList = new ArrayList<>();
-            for (int i = 0; i < fTraces.length; i++) {
-                ITimeGraphEntry entry = fTraces[i];
+            for (int i = 0; i < fRootEntries.length; i++) {
+                ITimeGraphEntry entry = fRootEntries[i];
                 Item item = findItem(entry);
                 refreshExpanded(expandedItemList, item);
             }
@@ -2489,12 +2477,13 @@ public class TimeGraphControl extends TimeGraphBaseControl
             // Check for filters
             boolean display = true;
             for (ViewerFilter filter : fFilters) {
-                if (!filter.select(null, item.fTrace.getParent(), item.fTrace)) {
+                if (!filter.select(null, item.fEntry.getParent(), item.fEntry)) {
                     display = false;
                     break;
                 }
             }
             if (display) {
+                item.fExpandedIndex = expandedItemList.size();
                 expandedItemList.add(item);
                 if (item.fHasChildren && item.fExpanded) {
                     for (Item child : item.fChildren) {
@@ -2504,18 +2493,18 @@ public class TimeGraphControl extends TimeGraphBaseControl
             }
         }
 
-        public void refreshData(ITimeGraphEntry traces[]) {
-            if (traces == null) {
-                fTraceFilter = null;
-                fTraces = null;
+        public void refreshData(ITimeGraphEntry[] entries) {
+            if (entries == null) {
+                fEntryFilter = null;
+                fRootEntries = null;
             } else {
-                if (traces.length == 0) {
-                    fTraceFilter = null;
-                } else if (fTraceFilter == null || traces.length != fTraceFilter.length) {
-                    fTraceFilter = new boolean[traces.length];
-                    java.util.Arrays.fill(fTraceFilter, true);
+                if (entries.length == 0) {
+                    fEntryFilter = null;
+                } else if (fEntryFilter == null || entries.length != fEntryFilter.length) {
+                    fEntryFilter = new boolean[entries.length];
+                    java.util.Arrays.fill(fEntryFilter, true);
                 }
-                fTraces = Arrays.copyOf(traces, traces.length);
+                fRootEntries = Arrays.copyOf(entries, entries.length);
             }
 
             refreshData();
@@ -2530,12 +2519,12 @@ public class TimeGraphControl extends TimeGraphBaseControl
             }
         }
 
-        public ITimeGraphEntry[] getTraces() {
-            return fTraces;
+        public ITimeGraphEntry[] getEntries() {
+            return fRootEntries;
         }
 
-        public boolean[] getTraceFilter() {
-            return fTraceFilter;
+        public boolean[] getEntryFilter() {
+            return fEntryFilter;
         }
 
         public List<ITimeGraphEntry> getFilteredOut() {
@@ -2545,16 +2534,17 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     private class Item {
         private boolean fExpanded;
+        private int fExpandedIndex;
         private boolean fSelected;
         private boolean fHasChildren;
         private int fItemHeight;
-        private int fLevel;
-        private List<Item> fChildren;
-        private String fName;
-        private ITimeGraphEntry fTrace;
+        private final int fLevel;
+        private final List<Item> fChildren;
+        private final String fName;
+        private final ITimeGraphEntry fEntry;
 
-        public Item(ITimeGraphEntry trace, String name, int level) {
-            this.fTrace = trace;
+        public Item(ITimeGraphEntry entry, String name, int level) {
+            this.fEntry = entry;
             this.fName = name;
             this.fLevel = level;
             this.fChildren = new ArrayList<>();
@@ -2596,7 +2586,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         int idx = getItemIndexAtY(p.y);
         if (idx >= 0 && idx < fItemData.fExpandedItems.length) {
             Item item = fItemData.fExpandedItems[idx];
-            ITimeGraphEntry entry = item.fTrace;
+            ITimeGraphEntry entry = item.fEntry;
             if (entry.hasTimeEvents()) {
                 ITimeEvent event = Utils.findEvent(entry, getTimeAtX(p.x), 2);
                 if (event != null) {
