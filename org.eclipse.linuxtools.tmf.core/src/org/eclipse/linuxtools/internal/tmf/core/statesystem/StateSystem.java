@@ -278,6 +278,11 @@ public class StateSystem implements ITmfStateSystemBuilder {
     }
 
     @Override
+    public int getParentAttributeQuark(int quark) {
+        return getAttributeTree().getParentAttributeQuark(quark);
+    }
+
+    @Override
     public List<Integer> getQuarks(String... pattern) {
         List<Integer> quarks = new LinkedList<>();
         List<String> prefix = new LinkedList<>();

@@ -422,4 +422,25 @@ public abstract class StateSystemTest {
             fail();
         }
     }
+
+    @Test
+    public void testParentAttribute() {
+        String[] path = { "CPUs/0/Current_thread",
+                          "CPUs/0",
+                          "CPUs" };
+        try {
+            int q = ssq.getQuarkAbsolute(Attributes.CPUS, "0", Attributes.CURRENT_THREAD);
+            for (int i = 0; i < path.length; i++) {
+                String name = ssq.getFullAttributePath(q);
+                assertEquals(path[i], name);
+                q = ssq.getParentAttributeQuark(q);
+            }
+            assertEquals(-1, q);
+            q = ssq.getParentAttributeQuark(q);
+            assertEquals(-1, q);
+        } catch (AttributeNotFoundException e) {
+            fail();
+        }
+    }
+
 }

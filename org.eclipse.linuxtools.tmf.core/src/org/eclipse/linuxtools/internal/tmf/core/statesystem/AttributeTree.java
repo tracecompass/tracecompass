@@ -357,6 +357,22 @@ public final class AttributeTree {
         return listOfChildren;
     }
 
+    /**
+     * Returns the parent quark of the attribute. The root attribute has no
+     * parent and will return <code>-1</code>
+     *
+     * @param quark
+     *            The quark of the attribute
+     * @return Quark of the parent attribute or <code>-1</code> for the root
+     *         attribute
+     */
+    public int getParentAttributeQuark(int quark) {
+        if (quark == -1) {
+            return quark;
+        }
+        return attributeList.get(quark).getParentAttributeQuark();
+    }
+
     private void addSubAttributes(List<Integer> list, Attribute curAttribute,
             boolean recursive) {
         for (Attribute childNode : curAttribute.getSubAttributes()) {

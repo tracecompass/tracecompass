@@ -129,6 +129,24 @@ public abstract class Attribute {
         return targetNode.getQuark();
     }
 
+    /**
+     * Get the parent attribute of this attribute
+     *
+     * @return The parent attribute
+     */
+    public Attribute getParentAttribute() {
+        return this.parent;
+    }
+
+    /**
+     * Get the parent quark of this attribute
+     *
+     * @return The quark of the parent attribute
+     */
+    public int getParentAttributeQuark() {
+        return this.parent.getQuark();
+    }
+
     /* The methods how to access children are left to derived classes */
 
     /**

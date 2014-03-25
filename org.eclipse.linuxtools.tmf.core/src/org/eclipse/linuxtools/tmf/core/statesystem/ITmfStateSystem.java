@@ -249,6 +249,17 @@ public interface ITmfStateSystem {
     String getFullAttributePath(int attributeQuark);
 
     /**
+     * Returns the parent quark of the attribute.
+     *
+     * @param attributeQuark
+     *            The quark of the attribute
+     * @return Quark of the parent attribute or <code>-1</code> if root quark or
+     *         no parent.
+     * @since 3.0
+     */
+    int getParentAttributeQuark(int attributeQuark);
+
+    /**
      * @name Query methods
      */
 
