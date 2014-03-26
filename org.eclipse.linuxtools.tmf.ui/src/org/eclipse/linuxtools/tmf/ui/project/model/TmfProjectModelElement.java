@@ -14,6 +14,7 @@
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
 
+import java.io.File;
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -83,7 +84,7 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
         fName = name;
         fResource = resource;
         fPath = resource.getFullPath();
-        fLocation = resource.getLocationURI();
+        fLocation = new File(resource.getLocationURI()).toURI();
         fParent = parent;
         fChildren = new CopyOnWriteArrayList<>();
     }

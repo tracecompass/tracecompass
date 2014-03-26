@@ -43,6 +43,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -918,6 +919,25 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             operation.setVirtualFolders(false);
 
             operation.run(new SubProgressMonitor(monitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
+
+            File file = (File) fileSystemElement.getFileSystemObject();
+            String sourceLocation = null;
+            IResource sourceResource;
+            if (file.isDirectory()) {
+                sourceResource = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(Path.fromOSString(file.getAbsolutePath()));
+            } else {
+                sourceResource = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(Path.fromOSString(file.getAbsolutePath()));
+            }
+            if (sourceResource != null && sourceResource.exists()) {
+                sourceLocation = sourceResource.getPersistentProperty(TmfCommonConstants.SOURCE_LOCATION);
+            }
+            if (sourceLocation == null) {
+                sourceLocation = URIUtil.toUnencodedString(file.toURI());
+            }
+            IPath path = fContainerPath.addTrailingSeparator().append(fileSystemElement.getLabel());
+            IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
+            resource.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
+
             return true;
         }
 

@@ -29,8 +29,10 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.project.model.TmfImportHelper;
+import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceImportException;
@@ -128,6 +130,9 @@ public class TmfOpenTraceHelper {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID,
                     Messages.TmfOpenTraceHelper_LinkFailed);
         }
+
+        String sourceLocation = URIUtil.toUnencodedString(new File(path).toURI());
+        linkedTrace.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
 
         // No trace type was determined.
         if (traceTypeToSet == null) {

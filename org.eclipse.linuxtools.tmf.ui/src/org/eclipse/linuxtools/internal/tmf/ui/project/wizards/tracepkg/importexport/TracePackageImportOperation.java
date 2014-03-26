@@ -8,13 +8,16 @@
  *
  * Contributors:
  *     Marc-Andre Laperle - Initial API and implementation
+ *     Patrick Tasse - Add support for source location
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg.importexport;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -22,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -31,6 +35,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg.AbstractTracePackageOperation;
@@ -40,6 +45,7 @@ import org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg.TracePack
 import org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg.TracePackageSupplFileElement;
 import org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg.TracePackageSupplFilesElement;
 import org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg.TracePackageTraceElement;
+import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceImportException;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
@@ -179,6 +185,7 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
                 return;
             }
 
+            TracePackageFilesElement traceFilesElement = null;
             for (TracePackageElement packageElement : fImportTraceElements) {
                 TracePackageTraceElement traceElement = (TracePackageTraceElement) packageElement;
                 if (!isFilesChecked(packageElement)) {
@@ -190,7 +197,7 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
                     ModalContext.checkCanceled(progressMonitor);
 
                     if (element instanceof TracePackageFilesElement) {
-                        TracePackageFilesElement traceFilesElement = (TracePackageFilesElement) element;
+                        traceFilesElement = (TracePackageFilesElement) element;
                         setStatus(importTraceFiles(traceFilesElement, progressMonitor));
 
                     } else if (element instanceof TracePackageSupplFilesElement) {
@@ -236,9 +243,20 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
                 }
 
                 importBookmarks(traceRes, traceElement, progressMonitor);
+
+                try {
+                    if (traceFilesElement != null) {
+                        URI uri = new File(getFileName()).toURI();
+                        IPath entryPath = new Path(traceFilesElement.getFileName());
+                        if (traceRes instanceof IFolder) {
+                            entryPath = entryPath.addTrailingSeparator();
+                        }
+                        String sourceLocation = URIUtil.toUnencodedString(URIUtil.toJarURI(uri, entryPath));
+                        traceRes.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
+                    }
+                } catch (CoreException e) {
+                }
             }
-
-
 
         } catch (InterruptedException e) {
             setStatus(Status.CANCEL_STATUS);

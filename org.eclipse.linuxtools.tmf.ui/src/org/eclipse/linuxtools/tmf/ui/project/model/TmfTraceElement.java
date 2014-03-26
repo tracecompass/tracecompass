@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
+import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTxtEvent;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTxtTrace;
@@ -84,6 +85,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
     private static final String sfLocation = Messages.TmfTraceElement_Location;
     private static final String sfEventType = Messages.TmfTraceElement_EventType;
     private static final String sfIsLinked = Messages.TmfTraceElement_IsLinked;
+    private static final String sfSourceLocation = Messages.TmfTraceElement_SourceLocation;
     private static final String sfTracePropertiesCategory = Messages.TmfTraceElement_TraceProperties;
 
     private static final ReadOnlyTextPropertyDescriptor sfNameDescriptor = new ReadOnlyTextPropertyDescriptor(sfName, sfName);
@@ -91,9 +93,10 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
     private static final ReadOnlyTextPropertyDescriptor sfLocationDescriptor = new ReadOnlyTextPropertyDescriptor(sfLocation, sfLocation);
     private static final ReadOnlyTextPropertyDescriptor sfTypeDescriptor = new ReadOnlyTextPropertyDescriptor(sfEventType, sfEventType);
     private static final ReadOnlyTextPropertyDescriptor sfIsLinkedDescriptor = new ReadOnlyTextPropertyDescriptor(sfIsLinked, sfIsLinked);
+    private static final ReadOnlyTextPropertyDescriptor sfSourceLocationDescriptor = new ReadOnlyTextPropertyDescriptor(sfSourceLocation, sfSourceLocation);
 
     private static final IPropertyDescriptor[] sfDescriptors = { sfNameDescriptor, sfPathDescriptor, sfLocationDescriptor,
-            sfTypeDescriptor, sfIsLinkedDescriptor };
+            sfTypeDescriptor, sfIsLinkedDescriptor, sfSourceLocationDescriptor };
 
     static {
         sfNameDescriptor.setCategory(sfResourcePropertiesCategory);
@@ -101,6 +104,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         sfLocationDescriptor.setCategory(sfResourcePropertiesCategory);
         sfTypeDescriptor.setCategory(sfResourcePropertiesCategory);
         sfIsLinkedDescriptor.setCategory(sfResourcePropertiesCategory);
+        sfSourceLocationDescriptor.setCategory(sfResourcePropertiesCategory);
     }
 
     // ------------------------------------------------------------------------
@@ -452,8 +456,15 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
             return URIUtil.toUnencodedString(getLocation());
         }
 
-        if (sfIsLinked.equals(id)) {
-            return Boolean.valueOf(getResource().isLinked()).toString();
+        if (sfSourceLocation.equals(id)) {
+            try {
+                String sourceLocation = getElementUnderTraceFolder().getResource().getPersistentProperty(TmfCommonConstants.SOURCE_LOCATION);
+                if (sourceLocation != null) {
+                    return sourceLocation;
+                }
+            } catch (CoreException e) {
+            }
+            return ""; //$NON-NLS-1$
         }
 
         if (sfEventType.equals(id)) {

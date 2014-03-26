@@ -34,6 +34,7 @@ import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType.TraceElementTy
 import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.util.Pair;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -217,7 +218,7 @@ public final class TmfTraceTypeUIUtils {
 
         TraceTypeHelper traceTypeToSet = null;
         if (validCandidates.isEmpty()) {
-            final String errorMsg = Messages.TmfOpenTraceHelper_NoTraceTypeMatch + path;
+            final String errorMsg = NLS.bind(Messages.TmfOpenTraceHelper_NoTraceTypeMatch, path);
             throw new TmfTraceImportException(errorMsg);
         } else if (validCandidates.size() != 1) {
             List<Pair<Integer, TraceTypeHelper>> candidates = new ArrayList<>(validCandidates);

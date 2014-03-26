@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Patrick Tasse - Add support for source location
  *******************************************************************************/
 package org.eclipse.linuxtools.tmf.core;
 
@@ -30,6 +31,11 @@ public class TmfCommonConstants {
      */
     public static final QualifiedName TRACETYPE = new QualifiedName("org.eclipse.linuxtools.tmf", "tracetype.id"); //$NON-NLS-1$//$NON-NLS-2$
 
+    /**
+     * The source location persistent property of a trace resource.
+     * @since 3.0
+     */
+    public static final QualifiedName SOURCE_LOCATION = new QualifiedName("org.eclipse.linuxtools.tmf", "source.location"); //$NON-NLS-1$//$NON-NLS-2$
 
     /**
      * The supplementary folder name persistent property of a trace resource.

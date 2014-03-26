@@ -9,6 +9,7 @@
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
  *   Marc-Andre Laperle - Log some exceptions
+ *   Patrick Tasse - Add support for source location
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace;
@@ -40,6 +41,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -48,13 +50,10 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.project.model.TmfImportHelper;
+import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.linuxtools.tmf.core.project.model.TraceValidationHelper;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceTypeUIUtils;
 import org.eclipse.ui.IWorkbench;
@@ -256,7 +255,7 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
                         success = false;
                     }
                     else {
-                        success = setTraceType(traceToImport).isOK();
+                        success = setTraceTypeAndSourceLocation(traceToImport).isOK();
                     }
                 }
                 else {
@@ -275,7 +274,7 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
                                 }
                                 resource.create(source, true, new NullProgressMonitor());
                             }
-                            setTraceType(traceToImport);
+                            setTraceTypeAndSourceLocation(traceToImport);
                             success = true;
                         }
                     } else {
@@ -301,7 +300,7 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
                         operation.setContext(getShell());
                         operation.setCreateContainerStructure(false);
                         if (executeImportOperation(operation)) {
-                            setTraceType(traceToImport);
+                            setTraceTypeAndSourceLocation(traceToImport);
                             success = true;
                         }
                     }
@@ -313,8 +312,8 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
         return success;
     }
 
-    private IStatus setTraceType(FileAndName traceToImport) {
-        IStatus validate = Status.OK_STATUS;
+    private IStatus setTraceTypeAndSourceLocation(FileAndName traceToImport) {
+        IStatus status = Status.OK_STATUS;
         IResource resource = fTargetFolder.findMember(traceToImport.getName());
         if (resource != null) {
             try {
@@ -322,56 +321,31 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
                 String traceTypeId = traceToImport.getTraceTypeId();
                 TraceTypeHelper traceType = TmfTraceType.getInstance().getTraceType(traceTypeId);
                 if (traceType != null) {
-                    TmfTraceTypeUIUtils.setTraceType(resource, traceType);
+                    status = TmfTraceTypeUIUtils.setTraceType(resource, traceType);
                 }
 
-                TmfProjectElement tmfProject =
-                        TmfProjectRegistry.getProject(resource.getProject());
-                if (tmfProject != null) {
-                    final TmfTraceFolder tracesFolder = tmfProject.getTracesFolder();
-
-                    List<TmfTraceElement> traces = tracesFolder.getTraces();
-                    boolean found = false;
-                    for (TmfTraceElement traceElement : traces) {
-                        if (traceElement.getName().equals(resource.getName())) {
-                            traceElement.refreshTraceType();
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        TmfTraceElement te = new TmfTraceElement(traceToImport.getName(), resource, tracesFolder);
-                        te.refreshTraceType();
-                        traces = tracesFolder.getTraces();
-                        for (TmfTraceElement traceElement : traces) {
-                            if (traceElement.getName().equals(resource.getName())) {
-                                traceElement.refreshTraceType();
-                                ITmfTrace tmfTrace = null;
-                                try {
-                                    tmfTrace = traceElement.instantiateTrace();
-                                    if (tmfTrace != null) {
-                                        validate = tmfTrace.validate(tmfProject.getResource(), traceElement.getLocation().getPath());
-                                    } else {
-                                        return new Status(IStatus.ERROR, traceElement.getName(), "File does not exist : " + traceElement.getLocation().getPath()); //$NON-NLS-1$
-                                    }
-                                } finally {
-                                    if (tmfTrace != null) {
-                                        tmfTrace.dispose();
-                                    }
-                                }
-                                break;
-                            }
-                        }
-
-                    }
-
+                // Set the source location for this resource
+                File file = traceToImport.getFile();
+                String sourceLocation = null;
+                IResource sourceResource;
+                if (file.isDirectory()) {
+                    sourceResource = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(Path.fromOSString(file.getAbsolutePath()));
+                } else {
+                    sourceResource = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(Path.fromOSString(file.getAbsolutePath()));
                 }
+                if (sourceResource != null && sourceResource.exists()) {
+                    sourceLocation = sourceResource.getPersistentProperty(TmfCommonConstants.SOURCE_LOCATION);
+                }
+                if (sourceLocation == null) {
+                    sourceLocation = URIUtil.toUnencodedString(file.toURI());
+                }
+                resource.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
             } catch (CoreException e) {
                 Activator.getDefault().logError(Messages.BatchImportTraceWizardErrorImportingTraceResource
                         + ' ' + resource.getName(), e);
             }
         }
-        return validate;
+        return status;
     }
 
     @Override

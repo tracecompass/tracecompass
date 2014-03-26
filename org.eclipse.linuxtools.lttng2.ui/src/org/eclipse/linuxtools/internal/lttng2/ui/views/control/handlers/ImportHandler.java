@@ -9,9 +9,12 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *   Bernd Hufmann - Updated for support of streamed traces
+ *   Patrick Tasse - Add support for source location
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.handlers;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -21,12 +24,14 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -40,6 +45,7 @@ import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.ImportFil
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs.TraceControlDialogFactory;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.impl.TraceSessionComponent;
+import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
@@ -157,6 +163,20 @@ public class ImportHandler extends BaseControlViewHandler {
 
                             if (helper != null) {
                                 status.add(TmfTraceTypeUIUtils.setTraceType(file, helper));
+                            }
+
+                            try {
+                                final String scheme = "sftp"; //$NON-NLS-1$
+                                String host = remoteFile.getImportFile().getHost().getName();
+                                int port = remoteFile.getImportFile().getParentRemoteFileSubSystem().getConnectorService().getPort();
+                                String path = remoteFile.getImportFile().getAbsolutePath();
+                                if (file instanceof IFolder) {
+                                    path += IPath.SEPARATOR;
+                                }
+                                URI uri = new URI(scheme, null, host, port, path, null, null);
+                                String sourceLocation = URIUtil.toUnencodedString(uri);
+                                file.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
+                            } catch (URISyntaxException e) {
                             }
                         } catch (ExecutionException e) {
                             status.add(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ImportFailure, e));

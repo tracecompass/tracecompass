@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Ericsson
+ * Copyright (c) 2013, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Jean-Christian Kouamé - Initial API and implementation
+ *   Patrick Tasse - Add support for source location
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
@@ -68,8 +69,13 @@ public class Messages extends NLS {
     /** The descriptor for the event type property */
     public static String TmfTraceElement_EventType;
 
-    /** The description for the linked property */
+    /** The descriptor for the linked property */
     public static String TmfTraceElement_IsLinked;
+
+    /** The descriptor for the source location property
+     * @since 3.0*/
+    public static String TmfTraceElement_SourceLocation;
+
     /** Trace text
      * @since 3.0*/
     public static String TmfTraceElement_TypeName;

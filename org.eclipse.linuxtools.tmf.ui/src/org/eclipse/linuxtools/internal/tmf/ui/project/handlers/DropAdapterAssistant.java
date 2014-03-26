@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
@@ -258,6 +259,11 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 } else if (sourceResource.getType() == IResource.FOLDER) {
                     traceResource = targetExperiment.getProject().getTracesFolder().getResource().getFolder(targetName);
                 }
+                String sourceLocation = sourceResource.getPersistentProperty(TmfCommonConstants.SOURCE_LOCATION);
+                if (sourceLocation == null) {
+                     sourceLocation = URIUtil.toUnencodedString(new File(sourceResource.getLocationURI()).toURI());
+                }
+                traceResource.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
             } catch (CoreException e) {
                 displayException(e);
                 return null;
@@ -330,6 +336,11 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 createLink(traceFolder.getResource(), sourceResource, targetName);
             }
             IResource traceResource = traceFolder.getResource().findMember(targetName);
+            String sourceLocation = sourceResource.getPersistentProperty(TmfCommonConstants.SOURCE_LOCATION);
+            if (sourceLocation == null) {
+                sourceLocation = URIUtil.toUnencodedString(new File(sourceResource.getLocationURI()).toURI());
+            }
+            traceResource.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
             setTraceType(traceResource);
             return traceResource;
         } catch (CoreException e) {
@@ -383,6 +394,12 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 resource = targetExperiment.getProject().getTracesFolder().getResource().getFolder(targetName);
             }
             if (resource != null && resource.exists()) {
+                try {
+                    String sourceLocation = URIUtil.toUnencodedString(path.toFile().toURI());
+                    resource.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
+                } catch (CoreException e) {
+                    displayException(e);
+                }
                 setTraceType(resource);
                 createLink(targetExperiment.getResource(), resource, resource.getName());
                 targetExperiment.deleteSupplementaryResources();
@@ -421,6 +438,12 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
             createLink(traceFolder.getResource(), path, targetName);
         }
         IResource traceResource = traceFolder.getResource().findMember(targetName);
+        try {
+            String sourceLocation = URIUtil.toUnencodedString(path.toFile().toURI());
+            traceResource.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
+        } catch (CoreException e) {
+            displayException(e);
+        }
         setTraceType(traceResource);
         return true;
     }
