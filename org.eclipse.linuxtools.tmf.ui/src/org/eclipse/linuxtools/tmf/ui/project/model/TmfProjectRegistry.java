@@ -129,7 +129,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                 }
 
                 // create folder for supplementary tracing files
-                folder = project.getFolder(TmfCommonConstants.TRACE_SUPPLEMENATARY_FOLDER_NAME);
+                folder = project.getFolder(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER_NAME);
 
                 if (!folder.exists()) {
                     folder.create(true, true, null);

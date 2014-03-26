@@ -30,7 +30,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -701,7 +700,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
             Activator.log(status);
         }
 
-        refreshSupplementaryFiles();
+        TmfTraceManager.refreshSupplementaryFiles(this);
 
         if (signal.getTrace() == this) {
             /* Additionally, the signal is directly for this trace. */
@@ -722,25 +721,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
             // Broadcast in separate thread to prevent deadlock
             broadcastAsync(rangeUpdatedsignal);
             return;
-        }
-    }
-
-    /**
-     * Refresh the supplementary files resources, so it can pick up new files
-     * that got created.
-     * @since 3.0
-     */
-    public void refreshSupplementaryFiles() {
-        if (fResource != null) {
-            IProject project = fResource.getProject();
-            IFolder supplFolder = project.getFolder(TmfCommonConstants.TRACE_SUPPLEMENATARY_FOLDER_NAME);
-            if (supplFolder.exists()) {
-                try {
-                    supplFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
-                } catch (CoreException e) {
-                    Activator.logError("Error refreshing resources", e); //$NON-NLS-1$
-                }
-            }
         }
     }
 

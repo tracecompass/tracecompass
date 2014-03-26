@@ -637,6 +637,7 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
             if (!status.isOK()) {
                 Activator.log(status);
             }
+            TmfTraceManager.refreshSupplementaryFiles(this);
         }
     }
 

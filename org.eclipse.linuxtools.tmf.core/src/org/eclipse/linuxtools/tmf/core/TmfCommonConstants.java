@@ -44,8 +44,9 @@ public class TmfCommonConstants {
 
     /**
      * The name of the parent folder for storing trace specific supplementary data. Each trace will have a sub-directory underneath with folder name equal to the trace name.
+     * @since 3.0
      */
-    public static final String TRACE_SUPPLEMENATARY_FOLDER_NAME = ".tracing"; //$NON-NLS-1$
+    public static final String TRACE_SUPPLEMENTARY_FOLDER_NAME = ".tracing"; //$NON-NLS-1$
 
     /**
      * The name of the default project that can be created under various

@@ -184,7 +184,7 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
     private void exportSupplementaryFiles(IProgressMonitor monitor, Node traceNode, TmfTraceElement traceElement, TracePackageSupplFilesElement element) throws InterruptedException, CoreException {
         Document doc = traceNode.getOwnerDocument();
         if (element.getChildren().length > 0) {
-            IFolder suppFilesFolder = fExportFolder.getFolder(TmfCommonConstants.TRACE_SUPPLEMENATARY_FOLDER_NAME);
+            IFolder suppFilesFolder = fExportFolder.getFolder(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER_NAME);
             if (!suppFilesFolder.exists()) {
                 suppFilesFolder.create(IResource.FORCE, true, new SubProgressMonitor(monitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
             }

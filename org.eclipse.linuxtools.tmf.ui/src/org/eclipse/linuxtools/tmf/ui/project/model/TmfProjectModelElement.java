@@ -231,7 +231,7 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
     public IFolder getSupplementaryFolderParent() {
         TmfProjectElement project = getProject();
         IProject projectResource = project.getResource();
-        IFolder supplFolderParent = projectResource.getFolder(TmfCommonConstants.TRACE_SUPPLEMENATARY_FOLDER_NAME);
+        IFolder supplFolderParent = projectResource.getFolder(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER_NAME);
 
         if (!supplFolderParent.exists()) {
             try {

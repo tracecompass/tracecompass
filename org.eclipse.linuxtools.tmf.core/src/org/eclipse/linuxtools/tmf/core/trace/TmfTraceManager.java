@@ -21,8 +21,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
 import org.eclipse.linuxtools.tmf.core.signal.TmfEventFilterAppliedSignal;
@@ -226,6 +229,35 @@ public final class TmfTraceManager {
             return getTemporaryDir(trace);
         }
         return supplDir + File.separator;
+    }
+
+    /**
+     * Refresh the supplementary files resources for a trace, so it can pick up
+     * new files that got created.
+     *
+     * @param trace
+     *            The trace for which to refresh the supplementary files
+     * @since 3.0
+     */
+    public static void refreshSupplementaryFiles(ITmfTrace trace) {
+        IResource resource = trace.getResource();
+        if (resource != null) {
+            String supplFolderPath = getSupplementaryFileDir(trace);
+            IProject project = resource.getProject();
+            /* Remove the project's path from the supplementary path dir */
+            if (!supplFolderPath.startsWith(project.getLocationURI().getPath())) {
+                Activator.logWarning(String.format("Supplementary files folder for trace %s is not within the project.", trace.getName())); //$NON-NLS-1$
+                return;
+            }
+            IFolder supplFolder = project.getFolder(supplFolderPath.substring(project.getLocationURI().getPath().length()));
+            if (supplFolder.exists()) {
+                try {
+                    supplFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
+                } catch (CoreException e) {
+                    Activator.logError("Error refreshing resources", e); //$NON-NLS-1$
+                }
+            }
+        }
     }
 
     // ------------------------------------------------------------------------
