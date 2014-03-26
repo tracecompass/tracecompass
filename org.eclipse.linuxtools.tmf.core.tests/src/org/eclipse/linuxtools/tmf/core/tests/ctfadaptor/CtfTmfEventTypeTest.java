@@ -19,6 +19,7 @@ import static org.junit.Assert.assertNotNull;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
+import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 import org.junit.Test;
 
 /**
@@ -37,12 +38,12 @@ public class CtfTmfEventTypeTest {
     public void testCtfTmfEventType() {
         String eventName = "";
         ITmfEventField content = new TmfEventField("", null, new ITmfEventField[] {});
-        CtfTmfEventType result = new CtfTmfEventType( eventName, content);
+        CtfTmfEventType result = new CtfTmfEventType(eventName, new TmfTraceStub(), content);
 
         assertNotNull(result);
         assertEquals("", result.toString());
         assertEquals("", result.getName());
-        assertEquals("Ctf Event", result.getContext());
+        assertEquals("Ctf Event/null", result.getContext());
     }
 
     /**
@@ -51,7 +52,7 @@ public class CtfTmfEventTypeTest {
     @Test
     public void testToString() {
         ITmfEventField emptyField = new TmfEventField("", null, new ITmfEventField[] {});
-        CtfTmfEventType fixture = new CtfTmfEventType("", emptyField);
+        CtfTmfEventType fixture = new CtfTmfEventType("", new TmfTraceStub() , emptyField);
 
         String result = fixture.toString();
 

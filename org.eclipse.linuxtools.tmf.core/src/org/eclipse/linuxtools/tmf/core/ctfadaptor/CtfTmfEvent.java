@@ -139,10 +139,10 @@ public class CtfTmfEvent extends TmfEvent
 
     @Override
     public ITmfEventType getType() {
-        CtfTmfEventType ctfTmfEventType = CtfTmfEventType.get(fEventName);
+        CtfTmfEventType ctfTmfEventType = CtfTmfEventType.get(getTrace(), fEventName);
         if (ctfTmfEventType == null) {
             /* Should only return null the first time */
-            ctfTmfEventType = new CtfTmfEventType(fEventName, getContent());
+            ctfTmfEventType = new CtfTmfEventType(fEventName, getTrace(), getContent());
         }
         return ctfTmfEventType;
     }
