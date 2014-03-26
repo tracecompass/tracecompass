@@ -341,7 +341,8 @@
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
-            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+            allPopups="false"
+            locationURI="popup:org.eclipse.ui.popup.any?after=group.open">
          <command
                commandId="org.eclipse.linuxtools.tmf.ui.openFile"
                label="%command.OpenFile.label"
@@ -382,6 +383,41 @@
                </with>
             </visibleWhen>
          </command>
+         <command
+               commandId="org.eclipse.ui.navigate.openResource"
+               disabledIcon="/icons/dlcl16/open.gif"
+               icon="/icons/elcl16/open.gif"
+               label="%command.open"
+               mnemonic="%command.open.mnemonic"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <or>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                        </instanceof>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                        </instanceof>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfAnalysisOutputElement">
+                        </instanceof>
+                     </or>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
          <separator
                name="org.eclipse.linuxtools.tmf.ui.separator1"
                visible="true">
@@ -432,38 +468,6 @@
                name="org.eclipse.linuxtools.tmf.ui.separator0"
                visible="true">
          </separator>
-         <command
-               commandId="org.eclipse.ui.navigate.openResource"
-               disabledIcon="/icons/dlcl16/open.gif"
-               icon="/icons/elcl16/open.gif"
-               label="%command.open"
-               mnemonic="%command.open.mnemonic"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <or>
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
-                        </instanceof>
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
-                        </instanceof>
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfAnalysisOutputElement">
-                        </instanceof>
-                     </or>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
          <command
                commandId="org.eclipse.ui.edit.copy"
                disabledIcon="icons/dtool16/copy_edit.gif"

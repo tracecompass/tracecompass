@@ -483,7 +483,9 @@ A trace or experiment can be open by double-clicking the left mouse button on th
 
 [[Image:images/OpenTraceAction.png]]
 
-When opening a trace or experiment all currently open view will be filled which are defined for the corresponding trace type. Additionally, an internal index will be created for fast navigation within a trace. For LTTng 2.0 kernel traces a persistent state history will also be build. This state history will be used in different views to display kernel state information.
+When opening a trace or experiment all currently opened views will be filled which are defined for the corresponding trace type. Additionally, an internal index will be created for fast navigation within a trace. For LTTng 2.0 kernel traces a persistent state history will also be build. This state history will be used in different views to display kernel state information.
+
+If a trace resource is a file (and not a directory), then the '''Open With''' menu item is available in the context-sensitive menu and can be used to open the trace source file with any applicable internal or external editor. In that case the trace will not be processed by the tracing application.
 
 === Drag and Drop ===
 
