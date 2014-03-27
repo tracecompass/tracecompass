@@ -466,7 +466,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         Map<String, String> traceProperties = getTraceProperties();
         if (id != null && !traceProperties.isEmpty()) {
             String key = (String) id;
-            key = key.replaceFirst(this.getName() + "_", ""); //$NON-NLS-1$ //$NON-NLS-2$
+            key = key.substring(this.getName().length() + 1); // remove name_
             String value = traceProperties.get(key);
             return value;
         }
