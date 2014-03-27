@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTxtEvent;
@@ -404,7 +405,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
     private Map<String, String> getTraceProperties() {
         for (ITmfTrace openedTrace : TmfTraceManager.getInstance().getOpenedTraces()) {
             for (ITmfTrace singleTrace : TmfTraceManager.getTraceSet(openedTrace)) {
-                if (this.getLocation().toString().endsWith(singleTrace.getPath())) {
+                if (this.getLocation().getPath().endsWith(singleTrace.getPath())) {
                     if (singleTrace instanceof ITmfTraceProperties) {
                         ITmfTraceProperties traceProperties = (ITmfTraceProperties) singleTrace;
                         return traceProperties.getTraceProperties();
@@ -448,7 +449,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         }
 
         if (sfLocation.equals(id)) {
-            return getLocation().toString();
+            return URIUtil.toUnencodedString(getLocation());
         }
 
         if (sfIsLinked.equals(id)) {
