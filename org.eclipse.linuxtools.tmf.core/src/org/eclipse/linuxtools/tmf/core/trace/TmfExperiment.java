@@ -19,6 +19,7 @@ package org.eclipse.linuxtools.tmf.core.trace;
 
 import java.io.File;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -538,7 +539,7 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
 
         final File syncFile = (supplDirectory != null) ? new File(supplDirectory + File.separator + SYNCHRONIZATION_FILE_NAME) : null;
 
-        final SynchronizationAlgorithm syncAlgo = SynchronizationManager.synchronizeTraces(syncFile, fTraces, doSync);
+        final SynchronizationAlgorithm syncAlgo = SynchronizationManager.synchronizeTraces(syncFile, Arrays.asList(fTraces), doSync);
 
         final TmfTraceSynchronizedSignal signal = new TmfTraceSynchronizedSignal(this, syncAlgo);
 

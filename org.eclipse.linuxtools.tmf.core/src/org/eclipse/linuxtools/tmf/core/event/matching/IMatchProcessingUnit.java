@@ -12,6 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.core.event.matching;
 
+import java.util.Collection;
+
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
@@ -30,7 +32,7 @@ public interface IMatchProcessingUnit {
      *
      * @param fTraces the set of traces that will be synchronized
      */
-    void init(ITmfTrace[] fTraces);
+    void init(Collection<ITmfTrace> fTraces);
 
     /**
      * Function called when a match is found

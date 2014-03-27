@@ -17,6 +17,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -70,12 +71,13 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
     }
 
     @Override
-    public void init(ITmfTrace[] fTraces) {
+    public void init(Collection<ITmfTrace> traces) {
+        ITmfTrace[] traceArr = traces.toArray(new ITmfTrace[traces.size()]);
         fSyncs.clear();
         /* Create a convex hull for all trace pairs */
-        for (int i = 0; i < fTraces.length; i++) {
-            for (int j = i + 1; j < fTraces.length; j++) {
-                ConvexHull algo = new ConvexHull(fTraces[i].getName(), fTraces[j].getName());
+        for (int i = 0; i < traceArr.length; i++) {
+            for (int j = i + 1; j < traceArr.length; j++) {
+                ConvexHull algo = new ConvexHull(traceArr[i].getName(), traceArr[j].getName());
                 fSyncs.add(algo);
             }
         }

@@ -12,15 +12,13 @@
 
 package org.eclipse.linuxtools.tmf.core.event.matching;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.matching.IMatchProcessingUnit;
-import org.eclipse.linuxtools.tmf.core.event.matching.TmfEventDependency;
-import org.eclipse.linuxtools.tmf.core.event.matching.TmfEventMatching;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
@@ -35,12 +33,12 @@ public class TmfNetworkEventMatching extends TmfEventMatching {
     /**
      * Hashtables for unmatches incoming events
      */
-    private final List<Map<List<Object>, ITmfEvent>> fUnmatchedIn = new ArrayList<>();
+    private final Map<ITmfTrace, Map<List<Object>, ITmfEvent>> fUnmatchedIn = new LinkedHashMap<>();
 
     /**
      * Hashtables for unmatches outgoing events
      */
-    private final List<Map<List<Object>, ITmfEvent>> fUnmatchedOut = new ArrayList<>();
+    private final Map<ITmfTrace, Map<List<Object>, ITmfEvent>> fUnmatchedOut = new LinkedHashMap<>();
 
     /**
      * Enum for in and out types
@@ -62,7 +60,7 @@ public class TmfNetworkEventMatching extends TmfEventMatching {
      * @param traces
      *            The set of traces for which to match events
      */
-    public TmfNetworkEventMatching(ITmfTrace[] traces) {
+    public TmfNetworkEventMatching(Collection<ITmfTrace> traces) {
         this(traces, new TmfEventMatches());
     }
 
@@ -74,7 +72,7 @@ public class TmfNetworkEventMatching extends TmfEventMatching {
      * @param tmfEventMatches
      *            The match processing class
      */
-    public TmfNetworkEventMatching(ITmfTrace[] traces, IMatchProcessingUnit tmfEventMatches) {
+    public TmfNetworkEventMatching(Collection<ITmfTrace> traces, IMatchProcessingUnit tmfEventMatches) {
         super(traces, tmfEventMatches);
     }
 
@@ -86,9 +84,9 @@ public class TmfNetworkEventMatching extends TmfEventMatching {
         // Initialize the matching infrastructure (unmatched event lists)
         fUnmatchedIn.clear();
         fUnmatchedOut.clear();
-        for (int i = 0; i < getTraces().length; i++) {
-            fUnmatchedIn.add(new HashMap<List<Object>, ITmfEvent>());
-            fUnmatchedOut.add(new HashMap<List<Object>, ITmfEvent>());
+        for (ITmfTrace trace : getTraces()) {
+            fUnmatchedIn.put(trace, new HashMap<List<Object>, ITmfEvent>());
+            fUnmatchedOut.put(trace, new HashMap<List<Object>, ITmfEvent>());
         }
         super.initMatching();
     }
@@ -109,16 +107,8 @@ public class TmfNetworkEventMatching extends TmfEventMatching {
         return MatchingType.NETWORK;
     }
 
-    /**
-     * Matches one event
-     *
-     * @param event
-     *            The event to match
-     * @param traceno
-     *            The number of the trace this event belongs to
-     */
     @Override
-    public void matchEvent(ITmfEvent event, int traceno) {
+    public void matchEvent(ITmfEvent event, ITmfTrace trace) {
         if (!(getEventDefinition(event.getTrace()) instanceof ITmfNetworkMatchDefinition)) {
             return;
         }
@@ -131,7 +121,7 @@ public class TmfNetworkEventMatching extends TmfEventMatching {
 
         /* Get the event's unique fields */
         List<Object> eventKey = def.getUniqueField(event);
-        List<Map<List<Object>, ITmfEvent>> unmatchedTbl, companionTbl;
+        Map<ITmfTrace, Map<List<Object>, ITmfEvent>> unmatchedTbl, companionTbl;
 
         /* Point to the appropriate table */
         switch (evType) {
@@ -150,7 +140,7 @@ public class TmfNetworkEventMatching extends TmfEventMatching {
         boolean found = false;
         TmfEventDependency dep = null;
         /* Search for the event in the companion table */
-        for (Map<List<Object>, ITmfEvent> map : companionTbl) {
+        for (Map<List<Object>, ITmfEvent> map : companionTbl.values()) {
             if (map.containsKey(eventKey)) {
                 found = true;
                 ITmfEvent companionEvent = map.get(eventKey);
@@ -191,8 +181,8 @@ public class TmfNetworkEventMatching extends TmfEventMatching {
              * events as value for the unmatched table. Not necessary right now
              * though
              */
-            if (!unmatchedTbl.get(traceno).containsKey(eventKey)) {
-                unmatchedTbl.get(traceno).put(eventKey, event);
+            if (!unmatchedTbl.get(trace).containsKey(eventKey)) {
+                unmatchedTbl.get(trace).put(eventKey, event);
             }
         }
 
@@ -209,10 +199,11 @@ public class TmfNetworkEventMatching extends TmfEventMatching {
         final String cr = System.getProperty("line.separator");
         StringBuilder b = new StringBuilder();
         b.append(getProcessingUnit());
-        for (int i = 0; i < getTraces().length; i++) {
-            b.append("Trace " + i + ":" + cr +
-                    "  " + countEvents(fUnmatchedIn.get(i)) + " unmatched incoming events" + cr +
-                    "  " + countEvents(fUnmatchedOut.get(i)) + " unmatched outgoing events" + cr);
+        int i = 0;
+        for (ITmfTrace trace : getTraces()) {
+            b.append("Trace " + i++ + ":" + cr +
+                    "  " + countEvents(fUnmatchedIn.get(trace)) + " unmatched incoming events" + cr +
+                    "  " + countEvents(fUnmatchedOut.get(trace)) + " unmatched outgoing events" + cr);
         }
 
         return b.toString();

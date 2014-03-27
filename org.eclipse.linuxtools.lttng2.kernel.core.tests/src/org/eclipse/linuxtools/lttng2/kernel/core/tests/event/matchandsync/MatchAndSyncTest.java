@@ -16,12 +16,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.linuxtools.lttng2.kernel.core.event.matching.TcpEventMatching;
 import org.eclipse.linuxtools.lttng2.kernel.core.event.matching.TcpLttngEventMatching;
 import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.event.matching.TmfEventMatching;
 import org.eclipse.linuxtools.tmf.core.event.matching.TmfNetworkEventMatching;
 import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.junit.Test;
 
 /**
@@ -43,9 +47,9 @@ public class MatchAndSyncTest {
         CtfTmfTrace trace1 = CtfTmfTestTrace.SYNC_SRC.getTrace();
         CtfTmfTrace trace2 = CtfTmfTestTrace.SYNC_DEST.getTrace();
 
-        CtfTmfTrace[] tracearr = new CtfTmfTrace[2];
-        tracearr[0] = trace1;
-        tracearr[1] = trace2;
+        List<ITmfTrace> tracearr = new LinkedList<>();
+        tracearr.add(trace1);
+        tracearr.add(trace2);
 
         TmfEventMatching.registerMatchObject(new TcpEventMatching());
         TmfEventMatching.registerMatchObject(new TcpLttngEventMatching());

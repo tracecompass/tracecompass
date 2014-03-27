@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.tmf.core.event.matching;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
@@ -44,7 +45,7 @@ public class TmfEventMatches implements IMatchProcessingUnit {
      */
 
     @Override
-    public void init(ITmfTrace[] fTraces) {
+    public void init(Collection<ITmfTrace> fTraces) {
 
     }
 
