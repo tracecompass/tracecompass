@@ -36,7 +36,7 @@ public class TraceControlTestFacility {
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-    public final static int WAIT_FOR_JOBS_DELAY = 1000;
+    public final static int WAIT_FOR_JOBS_DELAY = 50;
     public final static int GUI_REFESH_DELAY = 500;
 
     public final static String DIRECTORY = "testfiles";
