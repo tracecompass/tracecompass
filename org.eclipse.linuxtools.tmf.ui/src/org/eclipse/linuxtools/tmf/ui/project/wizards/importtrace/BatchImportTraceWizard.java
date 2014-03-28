@@ -279,8 +279,7 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
                             success = true;
                         }
                     } else {
-                        // Add trace directory
-                        subList.add(traceToImport.getFile());
+                        path = path.addTrailingSeparator().append(traceToImport.getName());
                         // Add all files in trace directory
                         File[] fileList = traceToImport.getFile().listFiles();
                         for (File child : fileList) {
@@ -295,7 +294,7 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
                         });
                         ImportOperation operation = new ImportOperation(
                                 path,
-                                parentFile.getParentFile(),
+                                parentFile,
                                 fileSystemStructureProvider,
                                 overwriteQuery,
                                 subList);
