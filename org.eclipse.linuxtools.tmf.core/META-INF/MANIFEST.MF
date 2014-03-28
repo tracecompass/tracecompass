@@ -52,3 +52,4 @@ Export-Package: org.eclipse.linuxtools.internal.tmf.core;x-friends:="org.eclipse
  org.eclipse.linuxtools.tmf.core.trace.text,
  org.eclipse.linuxtools.tmf.core.uml2sd,
  org.eclipse.linuxtools.tmf.core.util
+Import-Package: com.google.common.collect
