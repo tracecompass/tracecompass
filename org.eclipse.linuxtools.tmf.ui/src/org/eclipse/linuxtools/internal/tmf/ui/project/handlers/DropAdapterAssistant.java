@@ -496,12 +496,15 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
         try {
             Map<QualifiedName, String> properties = resource.getPersistentProperties();
             String traceType = properties.get(TmfCommonConstants.TRACETYPE);
+            TraceTypeHelper traceTypeHelper = TmfTraceType.getInstance().getTraceType(traceType);
 
             if (resource instanceof IFolder) {
                 IFolder folder = parentFolder.getFolder(targetName);
                 if (workspace.validateLinkLocation(folder, location).isOK()) {
                     folder.createLink(location, IResource.REPLACE, null);
-                    TmfTraceTypeUIUtils.setTraceType(folder, TmfTraceType.getInstance().getTraceType(traceType));
+                    if (traceTypeHelper != null) {
+                        TmfTraceTypeUIUtils.setTraceType(folder, traceTypeHelper);
+                    }
                 } else {
                     Activator.getDefault().logError("Invalid Trace Location"); //$NON-NLS-1$
                 }
@@ -509,7 +512,9 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 IFile file = parentFolder.getFile(targetName);
                 if (workspace.validateLinkLocation(file, location).isOK()) {
                     file.createLink(location, IResource.REPLACE, null);
-                    TmfTraceTypeUIUtils.setTraceType(file, TmfTraceType.getInstance().getTraceType(traceType));
+                    if (traceTypeHelper != null) {
+                        TmfTraceTypeUIUtils.setTraceType(file, traceTypeHelper);
+                    }
                 } else {
                     Activator.getDefault().logError("Invalid Trace Location"); //$NON-NLS-1$
                 }
