@@ -17,6 +17,7 @@ package org.eclipse.linuxtools.tmf.core.tests.trace;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -577,12 +578,14 @@ public class TmfExperimentTest {
         assertTrue("Experiment context type", context instanceof TmfExperimentContext);
         TmfExperimentContext ctx = (TmfExperimentContext) context;
 
-        int nbTraces = ctx.getContexts().length;
+        int nbTraces = ctx.getNbTraces();
 
         // expRank = sum(trace ranks) - nbTraces + 1 (if lastTraceRead != NO_TRACE)
         long expRank = -nbTraces + ((ctx.getLastTrace() != TmfExperimentContext.NO_TRACE) ? 1 : 0);
         for (int i = 0; i < nbTraces; i++) {
-            long rank = ctx.getContexts()[i].getRank();
+            ITmfContext subContext = ctx.getContext(i);
+            assertNotNull(subContext);
+            long rank = subContext.getRank();
             if (rank == -1) {
                 expRank = -1;
                 break;
