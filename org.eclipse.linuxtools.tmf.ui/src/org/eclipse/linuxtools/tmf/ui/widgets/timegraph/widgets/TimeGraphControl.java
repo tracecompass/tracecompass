@@ -1001,7 +1001,15 @@ public class TimeGraphControl extends TimeGraphBaseControl
         return toggled;
     }
 
-    int getItemIndexAtY(int y) {
+    /**
+     * Gets the index of the item at the given location.
+     *
+     * @param y
+     *            the y coordinate
+     * @return the index of the item at the given location, of -1 if none.
+     * @since 3.0
+     */
+    protected int getItemIndexAtY(int y) {
         if (y < 0) {
             return -1;
         }
@@ -1023,7 +1031,16 @@ public class TimeGraphControl extends TimeGraphBaseControl
         return Math.abs(x - nameWidth) < SNAP_WIDTH;
     }
 
-    ITimeGraphEntry getEntry(Point pt) {
+    /**
+     * Gets the {@link ITimeGraphEntry} at the given location.
+     *
+     * @param pt
+     *            a point in the widget
+     * @return the {@link ITimeGraphEntry} at this point, or <code>null</code>
+     *         if none.
+     * @since 3.0
+     */
+    protected ITimeGraphEntry getEntry(Point pt) {
         int idx = getItemIndexAtY(pt.y);
         return idx >= 0 ? fItemData.fExpandedItems[idx].fEntry : null;
     }
