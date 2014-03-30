@@ -8,11 +8,14 @@
  *
  * Contributors:
  *   Geneviève Bastien - Initial API and implementation
+ *   Mathieu Rail - Added functionality for getting a module's requirements
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.analysis;
 
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.runtime.ContributorFactoryOSGi;
 import org.eclipse.core.runtime.CoreException;
@@ -21,6 +24,8 @@ import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.internal.tmf.core.analysis.TmfAnalysisModuleSourceConfigElement;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
+import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
+import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.osgi.util.NLS;
 import org.osgi.framework.Bundle;
@@ -115,11 +120,36 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
 
     @Override
     public Iterable<Class<? extends ITmfTrace>> getValidTraceTypes() {
-        return Collections.EMPTY_SET;
+        Set<Class<? extends ITmfTrace>> traceTypes = new HashSet<>();
+
+        for (TraceTypeHelper tth : TmfTraceType.getInstance().getTraceTypeHelpers()) {
+            if (appliesToTraceType(tth.getTraceClass())) {
+                traceTypes.add(tth.getTraceClass());
+            }
+        }
+
+        return traceTypes;
     }
 
     @Override
     public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
+        /**
+         * TODO: This method returns only the requirement of the first
+         * applicable tracetype. We may assume that requirements will be the
+         * same no matter the trace type, the trace generator will know how to
+         * handle those. But this will have to be confirmed when the situation
+         * happens.
+         */
+        for (TraceTypeHelper helper : TmfTraceType.getInstance().getTraceTypeHelpers()) {
+            if (appliesToTraceType(helper.getTraceClass())) {
+                try {
+                    return newModule(helper.getTrace()).getAnalysisRequirements();
+                } catch (TmfAnalysisException e) {
+                    Activator.logError("Error in get analysis requirements", e); //$NON-NLS-1$
+                }
+            }
+        }
+
         return Collections.EMPTY_SET;
     }
 

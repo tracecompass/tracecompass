@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Geneviève Bastien - Initial API and implementation
+ *   Mathieu Rail - Added tests for getting a module's requirements
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.tests.analysis;
@@ -19,18 +20,26 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.linuxtools.tmf.core.analysis.Messages;
 import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisManager;
 import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisModuleHelperConfigElement;
+import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisRequirement;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
+import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
+import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.linuxtools.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.tests.stubs.analysis.TestAnalysis;
 import org.eclipse.linuxtools.tmf.tests.stubs.analysis.TestAnalysis2;
+import org.eclipse.linuxtools.tmf.tests.stubs.analysis.TestRequirementAnalysis;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub2;
 import org.eclipse.osgi.util.NLS;
@@ -46,8 +55,11 @@ import org.osgi.framework.Bundle;
  */
 public class AnalysisModuleHelperTest {
 
+    private static final String VALID_TRACE_TYPE = "org.eclipse.linuxtools.tmf.core.tests.tracetype";
+
     private IAnalysisModuleHelper fModule;
     private IAnalysisModuleHelper fModuleOther;
+    private IAnalysisModuleHelper fReqModule;
     private ITmfTrace fTrace;
 
     /**
@@ -61,6 +73,9 @@ public class AnalysisModuleHelperTest {
         fModuleOther = TmfAnalysisManager.getAnalysisModule(AnalysisManagerTest.MODULE_SECOND);
         assertNotNull(fModuleOther);
         assertTrue(fModuleOther instanceof TmfAnalysisModuleHelperConfigElement);
+        fReqModule = TmfAnalysisManager.getAnalysisModule(AnalysisManagerTest.MODULE_REQ);
+        assertNotNull(fReqModule);
+        assertTrue(fReqModule instanceof TmfAnalysisModuleHelperConfigElement);
         fTrace = TmfTestTrace.A_TEST_10K2.getTraceAsStub2();
     }
 
@@ -95,7 +110,8 @@ public class AnalysisModuleHelperTest {
     }
 
     /**
-     * Test the {@link TmfAnalysisModuleHelperConfigElement#appliesToTraceType(Class)}
+     * Test the
+     * {@link TmfAnalysisModuleHelperConfigElement#appliesToTraceType(Class)}
      * method for the 2 modules
      */
     @Test
@@ -112,7 +128,8 @@ public class AnalysisModuleHelperTest {
     }
 
     /**
-     * Test the {@link TmfAnalysisModuleHelperConfigElement#newModule(ITmfTrace)} method
+     * Test the
+     * {@link TmfAnalysisModuleHelperConfigElement#newModule(ITmfTrace)} method
      * for the 2 modules
      */
     @Test
@@ -207,5 +224,59 @@ public class AnalysisModuleHelperTest {
             exception = e;
         }
         assertNotNull(exception);
+    }
+
+    /**
+     * Test for the
+     * {@link TmfAnalysisModuleHelperConfigElement#getValidTraceTypes} method
+     */
+    @Test
+    public void testGetValidTraceTypes() {
+        TraceTypeHelper traceTypeHelper = TmfTraceType.getInstance().getTraceType(VALID_TRACE_TYPE);
+        int traceTypeCount = 0;
+        Iterable<Class<? extends ITmfTrace>> traceTypes = fReqModule.getValidTraceTypes();
+        for (Class<? extends ITmfTrace> traceType : traceTypes) {
+            assertTrue(fReqModule.appliesToTraceType(traceType));
+            assertEquals(traceTypeHelper.getTraceClass(), traceType);
+            traceTypeCount++;
+        }
+        assertEquals(1, traceTypeCount);
+    }
+
+    /**
+     * Test for the
+     * {@link TmfAnalysisModuleHelperConfigElement#getAnalysisRequirements}
+     * method
+     */
+    @Test
+    public void testGetRequirements() {
+        Iterable<TmfAnalysisRequirement> requirements = fReqModule.getAnalysisRequirements();
+        assertNotNull(requirements);
+
+        Map<String, TmfAnalysisRequirement> rMap = new HashMap<>();
+
+        for (TmfAnalysisRequirement req : requirements) {
+            assertFalse(rMap.containsKey(req.getType()));
+            rMap.put(req.getType(), req);
+        }
+        assertEquals(2, rMap.size());
+
+        /* Test if all types and values have been obtained */
+        TmfAnalysisRequirement req = rMap.get(TestRequirementAnalysis.EVENT_TYPE);
+        assertNotNull(req);
+
+        Set<String> values = req.getValues();
+        assertEquals(3, values.size());
+        assertTrue(values.contains(TestRequirementAnalysis.EXIT_SYSCALL));
+        assertTrue(values.contains(TestRequirementAnalysis.SCHED_SWITCH));
+        assertTrue(values.contains(TestRequirementAnalysis.SCHED_WAKEUP));
+
+        req = rMap.get(TestRequirementAnalysis.FIELD_TYPE);
+        assertNotNull(req);
+
+        values = req.getValues();
+        assertEquals(2, values.size());
+        assertTrue(values.contains(TestRequirementAnalysis.PID));
+        assertTrue(values.contains(TestRequirementAnalysis.TID));
     }
 }

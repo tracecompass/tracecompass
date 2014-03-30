@@ -55,6 +55,14 @@
                class="org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfExperimentStub">
          </tracetype>
       </module>
+      <module
+            analysis_module="org.eclipse.linuxtools.tmf.tests.stubs.analysis.TestRequirementAnalysis"
+            id="org.eclipse.linuxtools.tmf.core.tests.analysis.reqtest"
+            name="Test analysis requirements">
+         <tracetype
+               class="org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub">
+         </tracetype>
+      </module>
    </extension>
    <extension
          point="org.eclipse.linuxtools.tmf.core.tracetype">
