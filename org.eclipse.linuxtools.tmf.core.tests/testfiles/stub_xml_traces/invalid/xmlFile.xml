@@ -1,0 +1,19 @@
+<!-- missing name attribute in first event -->
+<trace>
+<event timestamp="1" source="1">
+<field name="b" value="1" type="int" />
+<field name="d" value="3" type="int" />
+</event>
+<event timestamp="3" name="B" source="2">
+<field name="f" value="c" type="string" />
+<field name="g" value="e" type="string" />
+</event>
+<event timestamp="4" name="A" source="1">
+<field name="b" value="3" type="int" />
+<field name="d" value="7" type="int" />
+</event>
+<event timestamp="5" name="B" source="2">
+<field name="f" value="c" type="string" />
+<field name="g" value="e" type="string" />
+</event>
+</trace>

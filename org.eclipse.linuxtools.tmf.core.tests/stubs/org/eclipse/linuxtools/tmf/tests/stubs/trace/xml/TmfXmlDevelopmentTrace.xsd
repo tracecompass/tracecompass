@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- ***************************************************************************
+ * Copyright (c) 2014 École Polytechnique de Montréal
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Geneviève Bastien - Initial API and implementation
+ *************************************************************************** -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	attributeFormDefault="unqualified" elementFormDefault="qualified">
+
+	<xs:element name="trace">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="event" type="event" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="event">
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="field" type="field" />
+		</xs:sequence>
+		<xs:attribute name="timestamp" type="xs:integer" use="required" />
+		<xs:attribute name="name" type="xs:string" use="required" />
+		<xs:attribute name="source" type="xs:integer" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="field">
+		<xs:attribute name="name" type="xs:string" use="required" />
+		<xs:attribute name="value" type="xs:string" use="required" />
+		<xs:attribute name="type" use="required" >
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="int"/>
+					<xs:enumeration value="long"/>
+					<xs:enumeration value="string"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+
+</xs:schema>

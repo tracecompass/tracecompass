@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<CustomXMLTraceDefinitionList>
+<Definition name="handmade">
+<TimeStampOutputFormat>T</TimeStampOutputFormat>
+<InputElement name="trace">
+<InputElement logentry="true" name="event">
+<InputData action="0" format="" name="Ignore"/>
+<Attribute name="name">
+<InputData action="0" format="" name="Message"/>
+</Attribute>
+<Attribute name="source">
+<InputData action="0" format="" name="source"/>
+</Attribute>
+<Attribute name="timestamp">
+<InputData action="0" format="T" name="Time Stamp"/>
+</Attribute>
+<InputElement name="field">
+<InputData action="0" format="" name="Ignore"/>
+<Attribute name="name">
+<InputData action="2" format="" name="fields"/>
+</Attribute>
+<Attribute name="type">
+<InputData action="2" format="" name="type"/>
+</Attribute>
+<Attribute name="value">
+<InputData action="2" format="" name="values"/>
+</Attribute>
+</InputElement>
+</InputElement>
+</InputElement>
+<OutputColumn name="Time Stamp"/>
+<OutputColumn name="Message"/>
+<OutputColumn name="source"/>
+<OutputColumn name="fields"/>
+<OutputColumn name="values"/>
+<OutputColumn name="type"/>
+</Definition>
+</CustomXMLTraceDefinitionList>

@@ -35,6 +35,7 @@ import org.junit.runners.Suite;
     org.eclipse.linuxtools.tmf.core.tests.trace.indexer.AllTests.class,
     org.eclipse.linuxtools.tmf.core.tests.trace.indexer.checkpoint.AllTests.class,
     org.eclipse.linuxtools.tmf.core.tests.trace.location.AllTests.class,
+    org.eclipse.linuxtools.tmf.core.tests.trace.stub.AllTests.class,
     org.eclipse.linuxtools.tmf.core.tests.trace.text.AllTests.class,
     org.eclipse.linuxtools.tmf.core.tests.uml2sd.AllTests.class,
     org.eclipse.linuxtools.tmf.core.tests.util.AllTests.class
