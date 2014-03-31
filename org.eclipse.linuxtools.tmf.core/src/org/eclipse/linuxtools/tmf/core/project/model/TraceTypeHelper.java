@@ -15,6 +15,7 @@
 package org.eclipse.linuxtools.tmf.core.project.model;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType.TraceElementType;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TraceValidationStatus;
@@ -32,6 +33,7 @@ public class TraceTypeHelper {
     private final String fCategoryName;
     private final String fCanonicalName;
     private final TraceElementType fElementType;
+    @NonNull
     private final ITmfTrace fTrace;
     private final boolean fIsDirectory;
 
@@ -53,7 +55,7 @@ public class TraceTypeHelper {
      * @param elementType
      *            True if this helper is for an experiment type
      */
-    public TraceTypeHelper(String canonicalName, String categoryName, String name, ITmfTrace trace, boolean isDir, TraceElementType elementType) {
+    public TraceTypeHelper(String canonicalName, String categoryName, String name, @NonNull ITmfTrace trace, boolean isDir, TraceElementType elementType) {
         fName = name;
         fCategoryName = categoryName;
         fCanonicalName = canonicalName;
@@ -96,12 +98,8 @@ public class TraceTypeHelper {
      *            the trace to validate
      * @return whether it passes the validation
      */
-    public boolean validate(String path) {
-        boolean valid = false;
-        if (fTrace != null) {
-            valid = standardValidate(path);
-        }
-        return valid;
+    public IStatus validate(String path) {
+        return fTrace.validate(null, path);
     }
 
     /**
@@ -114,13 +112,11 @@ public class TraceTypeHelper {
      */
     public int validateWithConfidence(String path) {
         int result = -1;
-        if (fTrace != null) {
-            IStatus status = fTrace.validate(null, path);
-            if (status.isOK()) {
-                result = 0;
-                if (status instanceof TraceValidationStatus) {
-                    result = ((TraceValidationStatus) status).getConfidence();
-                }
+        IStatus status = fTrace.validate(null, path);
+        if (status.isOK()) {
+            result = 0;
+            if (status instanceof TraceValidationStatus) {
+                result = ((TraceValidationStatus) status).getConfidence();
             }
         }
         return result;
@@ -142,11 +138,6 @@ public class TraceTypeHelper {
      */
     public boolean isExperimentType() {
         return fElementType == TraceElementType.EXPERIMENT;
-    }
-
-    private boolean standardValidate(String path) {
-        final boolean valid = fTrace.validate(null, path).isOK();
-        return valid;
     }
 
     /**

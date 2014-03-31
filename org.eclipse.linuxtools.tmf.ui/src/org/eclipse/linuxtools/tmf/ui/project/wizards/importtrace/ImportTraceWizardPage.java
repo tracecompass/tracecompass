@@ -828,7 +828,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                     throw new TmfTraceImportException(Messages.ImportTraceWizard_TraceTypeNotFound);
                 }
 
-                if (!traceTypeHelper.validate(path)) {
+                if (!traceTypeHelper.validate(path).isOK()) {
                     // Trace type exist but doesn't validate for given trace.
                     return;
                 }

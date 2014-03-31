@@ -23,7 +23,6 @@ import java.util.Set;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -34,10 +33,8 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
-import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfCommonProjectElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder;
@@ -178,17 +175,14 @@ public class SelectTraceTypeHandler extends AbstractHandler {
     private static IStatus propagateProperties(TmfCommonProjectElement element, String traceType)
             throws CoreException {
 
-        IResource resource = element.getResource();
-        String svTraceType = resource.getPersistentProperty(TmfCommonConstants.TRACETYPE);
-        TraceTypeHelper svTraceTypeHelper = TmfTraceType.getInstance().getTraceType(svTraceType);
-
         TraceTypeHelper traceTypeHelper = TmfTraceType.getInstance().getTraceType(traceType);
-        TmfTraceTypeUIUtils.setTraceType(resource, traceTypeHelper);
-        final IStatus validateTraceType = validateTraceType(element);
+        final IStatus validateTraceType = traceTypeHelper.validate(element.getLocation().getPath());
         if (!validateTraceType.isOK()) {
-            TmfTraceTypeUIUtils.setTraceType(resource, svTraceTypeHelper);
             return validateTraceType;
         }
+
+        IResource resource = element.getResource();
+        TmfTraceTypeUIUtils.setTraceType(resource, traceTypeHelper);
 
         TmfExperimentFolder experimentFolder = element.getProject().getExperimentsFolder();
         for (final TmfExperimentElement experiment : experimentFolder.getExperiments()) {
@@ -201,28 +195,6 @@ public class SelectTraceTypeHandler extends AbstractHandler {
         }
 
         return Status.OK_STATUS;
-    }
-
-    private static IStatus validateTraceType(TmfCommonProjectElement trace) {
-        IProject project = trace.getProject().getResource();
-        ITmfTrace tmfTrace = null;
-        IStatus validate = null;
-        try {
-            tmfTrace = trace.instantiateTrace();
-            if (tmfTrace != null) {
-                validate = tmfTrace.validate(project, trace.getLocation().getPath());
-            } else {
-                validate =  new Status(IStatus.ERROR, trace.getName(), "File does not exist : " + trace.getLocation().getPath()); //$NON-NLS-1$
-            }
-        } finally {
-            if (tmfTrace != null) {
-                tmfTrace.dispose();
-            }
-        }
-        if (validate == null) {
-            validate = new Status(IStatus.ERROR, "unknown", "unknown"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        return validate;
     }
 
 }

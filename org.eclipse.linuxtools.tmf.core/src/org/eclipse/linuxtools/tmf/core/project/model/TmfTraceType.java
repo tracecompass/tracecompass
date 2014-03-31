@@ -411,19 +411,21 @@ public final class TmfTraceType {
                         trace = (ITmfTrace) ce.createExecutableExtension(TmfTraceType.EXPERIMENT_TYPE_ATTR);
                         elementType = TraceElementType.EXPERIMENT;
                     }
-                    if (trace != null) {
-                        // Deregister trace as signal handler because it is only
-                        // used for validation
-                        TmfSignalManager.deregister(trace);
+                    if (trace == null) {
+                        break;
                     }
+                    // Deregister trace as signal handler because it is only
+                    // used for validation
+                    TmfSignalManager.deregister(trace);
+
+                    final String dirString = ce.getAttribute(TmfTraceType.IS_DIR_ATTR);
+                    boolean isDir = Boolean.parseBoolean(dirString);
+
+                    TraceTypeHelper tt = new TraceTypeHelper(typeId, category, attribute, trace, isDir, elementType);
+                    fTraceTypes.put(typeId, tt);
                 } catch (CoreException e) {
                 }
 
-                final String dirString = ce.getAttribute(TmfTraceType.IS_DIR_ATTR);
-                boolean isDir = Boolean.parseBoolean(dirString);
-
-                TraceTypeHelper tt = new TraceTypeHelper(typeId, category, attribute, trace, isDir, elementType);
-                fTraceTypes.put(typeId, tt);
             }
         }
     }
@@ -488,7 +490,7 @@ public final class TmfTraceType {
     public boolean validate(String traceTypeName, String fileName) {
         if (traceTypeName != null && !traceTypeName.isEmpty()) {
             final TraceTypeHelper traceTypeHelper = fTraceTypes.get(traceTypeName);
-            if (!traceTypeHelper.validate(fileName)) {
+            if (!traceTypeHelper.validate(fileName).isOK()) {
                 return false;
             }
         }
@@ -604,7 +606,7 @@ public final class TmfTraceType {
         final Iterable<TraceTypeHelper> traceTypeHelpers = getTraceTypeHelpers();
         for (TraceTypeHelper traceTypeHelper : traceTypeHelpers) {
             if (traceTypeHelper.isDirectoryTraceType() &&
-                    traceTypeHelper.validate(path)) {
+                    traceTypeHelper.validate(path).isOK()) {
                 return true;
             }
         }
