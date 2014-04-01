@@ -39,8 +39,11 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceCompleteness;
 import org.eclipse.tracecompass.tmf.core.trace.TmfExperiment;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 
@@ -63,11 +66,15 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
     private static final String EXTENSION = ".ht"; //$NON-NLS-1$
 
     private final CountDownLatch fInitialized = new CountDownLatch(1);
+    private final Object fRequestSyncObj = new Object();
 
     @Nullable private ITmfStateSystemBuilder fStateSystem;
     @Nullable private ITmfStateProvider fStateProvider;
     @Nullable private IStateHistoryBackend fHtBackend;
     @Nullable private ITmfEventRequest fRequest;
+    @Nullable private TmfTimeRange fTimeRange = null;
+
+    private int fNbRead = 0;
 
     /**
      * State system backend types
@@ -402,15 +409,19 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
             request.cancel();
         }
 
-        request = new StateSystemEventRequest(provider);
-        provider.getTrace().sendRequest(request);
+        fTimeRange = TmfTimeRange.ETERNITY;
+        final ITmfTrace trace = provider.getTrace();
+        if (trace != null && !isCompleteTrace(trace)) {
+            TmfTimeRange traceTimeRange = trace.getTimeRange();
+            if (traceTimeRange != null) {
+                fTimeRange = traceTimeRange;
+            }
+        }
 
-        /*
-         * Only now that we've actually started the build, we'll update the
-         * class fields, so that they become visible for other callers.
-         */
         fStateProvider = provider;
-        fRequest = request;
+        synchronized (fRequestSyncObj) {
+            startRequest();
+        }
 
         /*
          * The state system object is now created, we can consider this module
@@ -423,7 +434,9 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
          * progress monitor displays that it is running).
          */
         try {
-             request.waitForCompletion();
+            if (fRequest != null) {
+                fRequest.waitForCompletion();
+            }
         } catch (InterruptedException e) {
              e.printStackTrace();
         }
@@ -433,10 +446,10 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         private final ITmfStateProvider sci;
         private final ITmfTrace trace;
 
-        public StateSystemEventRequest(ITmfStateProvider sp) {
+        public StateSystemEventRequest(ITmfStateProvider sp, TmfTimeRange timeRange, int index) {
             super(sp.getExpectedEventType(),
-                    TmfTimeRange.ETERNITY,
-                    0,
+                    timeRange,
+                    index,
                     ITmfEventRequest.ALL_DATA,
                     ITmfEventRequest.ExecutionType.BACKGROUND);
             this.sci = sp;
@@ -469,13 +482,27 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         @Override
         public void handleSuccess() {
             super.handleSuccess();
-            disposeProvider(false);
+            if (isCompleteTrace(trace)) {
+                disposeProvider(false);
+            } else {
+                fNbRead += getNbRead();
+                synchronized (fRequestSyncObj) {
+                    final TmfTimeRange timeRange = fTimeRange;
+                    if (timeRange != null) {
+                        if (getRange().getEndTime().getValue() < timeRange.getEndTime().getValue()) {
+                            startRequest();
+                        }
+                    }
+                }
+            }
         }
 
         @Override
         public void handleCancel() {
             super.handleCancel();
-            disposeProvider(true);
+            if (isCompleteTrace(trace)) {
+                disposeProvider(true);
+            }
         }
 
         @Override
@@ -503,5 +530,39 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         @SuppressWarnings("null")
         @NonNull Iterable<ITmfStateSystem> ret = Collections.singleton((ITmfStateSystem) fStateSystem);
         return ret;
+    }
+
+    /**
+     * Signal handler for the TmfTraceRangeUpdatedSignal signal
+     *
+     * @param signal The incoming signal
+     */
+    @TmfSignalHandler
+    public void traceRangeUpdated(final TmfTraceRangeUpdatedSignal signal) {
+        fTimeRange = signal.getRange();
+        ITmfStateProvider stateProvider = fStateProvider;
+        synchronized (fRequestSyncObj) {
+            if (signal.getTrace() == getTrace() && stateProvider != null && stateProvider.getAssignedStateSystem() != null) {
+                ITmfEventRequest request = fRequest;
+                if ((request == null) || request.isCompleted()) {
+                    startRequest();
+                }
+            }
+        }
+    }
+
+    private void startRequest() {
+        ITmfStateProvider stateProvider = fStateProvider;
+        TmfTimeRange timeRange = fTimeRange;
+        if (stateProvider == null || timeRange == null) {
+            return;
+        }
+        ITmfEventRequest request = new StateSystemEventRequest(stateProvider, timeRange, fNbRead);
+        stateProvider.getTrace().sendRequest(request);
+        fRequest = request;
+    }
+
+    private static boolean isCompleteTrace(ITmfTrace trace) {
+        return !(trace instanceof ITmfTraceCompleteness) || ((ITmfTraceCompleteness) trace).isComplete();
     }
 }

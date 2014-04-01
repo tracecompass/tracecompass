@@ -14,9 +14,14 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.statistics;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -108,6 +113,13 @@ public class TmfStatisticsViewer extends TmfViewer {
     /** Reference to the trace manager */
     private final TmfTraceManager fTraceManager;
 
+    private final Map<ITmfTrace, Job> fUpdateJobsPartial = new HashMap<>();
+    private final Map<ITmfTrace, Job> fUpdateJobsGlobal = new HashMap<>();
+
+    private TmfTimeRange fTimeRange;
+
+    private TmfTimeRange fTimeRangePartial;
+
     /**
      * Create a basic statistics viewer. To be used in conjunction with
      * {@link TmfStatisticsViewer#init(Composite, String, ITmfTrace)}
@@ -154,6 +166,14 @@ public class TmfStatisticsViewer extends TmfViewer {
         super.dispose();
         if (fWaitCursor != null) {
             fWaitCursor.dispose();
+        }
+
+        for (Job j : fUpdateJobsGlobal.values()) {
+            j.cancel();
+        }
+
+        for (Job j : fUpdateJobsPartial.values()) {
+            j.cancel();
         }
 
         // Clean the model for this viewer
@@ -602,136 +622,164 @@ public class TmfStatisticsViewer extends TmfViewer {
      *            partial one.
      */
     private void buildStatisticsTree(final ITmfTrace trace, final TmfTimeRange timeRange, final boolean isGlobal) {
-        final TmfStatisticsTreeNode statTree = TmfStatisticsTreeManager.getStatTreeRoot(getTreeID());
         final TmfStatisticsTree statsData = TmfStatisticsTreeManager.getStatTree(getTreeID());
         if (statsData == null) {
             return;
         }
 
-        synchronized (statsData) {
-            if (isGlobal) {
-                statTree.resetGlobalValue();
-            } else {
-                statTree.resetTimeRangeValue();
+        Map<ITmfTrace, Job> updateJobs;
+        if (isGlobal) {
+            updateJobs = fUpdateJobsGlobal;
+            fTimeRange = timeRange;
+        } else {
+            updateJobs = fUpdateJobsPartial;
+            fTimeRangePartial = timeRange;
+        }
+
+        for (final ITmfTrace aTrace : TmfTraceManager.getTraceSet(trace)) {
+            if (!isListeningTo(aTrace)) {
+                continue;
             }
 
-            for (final ITmfTrace aTrace : TmfTraceManager.getTraceSet(trace)) {
-                if (!isListeningTo(aTrace)) {
-                    continue;
-                }
+            /* Retrieve the statistics object */
+            final TmfStatisticsModule statsMod = aTrace.getAnalysisModuleOfClass(TmfStatisticsModule.class, TmfStatisticsModule.ID);
+            if (statsMod == null) {
+                /* No statistics module available for this trace */
+                continue;
+            }
 
-                /* Retrieve the statistics object */
-                final TmfStatisticsModule statsMod = aTrace.getAnalysisModuleOfClass(TmfStatisticsModule.class, TmfStatisticsModule.ID);
-                if (statsMod == null) {
-                    /* No statistics module available for this trace */
-                    continue;
-                }
-
-                /* Run the potentially long queries in a separate thread */
-                Thread statsThread = new Thread("Statistics update") { //$NON-NLS-1$
-                    @Override
-                    public void run() {
-                        /* Wait until the analysis is ready to be queried */
-                        statsMod.waitForInitialization();
-                        ITmfStatistics stats = statsMod.getStatistics();
-                        if (stats == null) {
-                            /* It should have worked, but didn't */
-                            throw new IllegalStateException();
-                        }
-
-                        /*
-                         * The generic statistics are stored in nanoseconds, so
-                         * we must make sure the time range is scaled correctly.
-                         */
-                        long start = timeRange.getStartTime().normalize(0, TIME_SCALE).getValue();
-                        long end = timeRange.getEndTime().normalize(0, TIME_SCALE).getValue();
-
-                        /*
-                         * Wait on the state system object we are going to query.
-                         *
-                         * TODO Eventually this could be exposed through the
-                         * TmfStateSystemAnalysisModule directly.
-                         */
-                        ITmfStateSystem ss = statsMod.getStateSystem(TmfStatisticsEventTypesModule.ID);
-                        if (ss == null) {
-                            /*
-                             * It should be instantiated after the
-                             * statsMod.waitForInitialization() above.
-                             */
-                            throw new IllegalStateException();
-                        }
-
-                        /*
-                         * Periodically update the statistics while they are
-                         * being built (or, if the back-end is already
-                         * completely built, it will skip over the while() immediately.
-                         */
-                        while (!ss.waitUntilBuilt(LIVE_UPDATE_DELAY)) {
-                            Map<String, Long> map = stats.getEventTypesInRange(start, end);
-                            updateStats(aTrace, isGlobal, map);
-                        }
-                        /* Query one last time for the final values */
-                        Map<String, Long> map = stats.getEventTypesInRange(start, end);
-                        updateStats(aTrace, isGlobal, map);
-                    }
-                };
-                statsThread.start();
+            Job job = updateJobs.get(aTrace);
+            if (job == null) {
+                job = new UpdateJob("Statistics update", aTrace, isGlobal, statsMod); //$NON-NLS-1$
+                updateJobs.put(aTrace, job);
+                job.setSystem(true);
+                job.schedule();
             }
         }
     }
 
-    /*
-     * Update statistics for a given trace
-     */
-    private void updateStats(ITmfTrace trace, boolean isGlobal, Map<String, Long> eventsPerType) {
+    private class UpdateJob extends Job {
 
-        final TmfStatisticsTree statsData = TmfStatisticsTreeManager.getStatTree(getTreeID());
-        if (statsData == null) {
-            /* The stat tree has been disposed, abort mission. */
-            return;
+        private final ITmfTrace fJobTrace;
+        private final boolean fIsGlobal;
+        private final TmfStatisticsModule fStatsMod;
+
+        private UpdateJob(String name, ITmfTrace trace, boolean isGlobal, TmfStatisticsModule statsMod) {
+            super(name);
+            fJobTrace = trace;
+            fIsGlobal = isGlobal;
+            fStatsMod = statsMod;
         }
 
-        Map<String, Long> map = eventsPerType;
-        String name = trace.getName();
+        @Override
+        protected IStatus run(IProgressMonitor monitor) {
 
+            /* Wait until the analysis is ready to be queried */
+            fStatsMod.waitForInitialization();
+            ITmfStatistics stats = fStatsMod.getStatistics();
+            if (stats == null) {
+                /* It should have worked, but didn't */
+                throw new IllegalStateException();
+            }
+
+            /*
+             * TODO Eventually this could be exposed through the
+             * TmfStateSystemAnalysisModule directly.
+             */
+            ITmfStateSystem ss = fStatsMod.getStateSystem(TmfStatisticsEventTypesModule.ID);
+            if (ss == null) {
+                /* It should be instantiated after the
+                 * statsMod.waitForInitialization() above. */
+                throw new IllegalStateException();
+            }
+
+
+            /*
+             * Periodically update the statistics while they are
+             * being built (or, if the back-end is already completely
+             * built, it will skip over the while() immediately.
+             */
+            long start = 0;
+            long end = 0;
+            boolean finished = false;
+            do {
+                if (monitor.isCanceled()) {
+                    return Status.CANCEL_STATUS;
+                }
+                finished = ss.waitUntilBuilt(LIVE_UPDATE_DELAY);
+
+                TmfTimeRange localtimeRange = fIsGlobal ? fTimeRange : fTimeRangePartial;
+                /*
+                 * The generic statistics are stored in nanoseconds, so
+                 * we must make sure the time range is scaled correctly.
+                 */
+                start = localtimeRange.getStartTime().normalize(0, TIME_SCALE).getValue();
+                end = localtimeRange.getEndTime().normalize(0, TIME_SCALE).getValue();
+
+                Map<String, Long> map = stats.getEventTypesInRange(start, end);
+                updateStats(map);
+            } while (!finished);
+
+            /* Query one last time for the final values */
+            Map<String, Long> map = stats.getEventTypesInRange(start, end);
+            updateStats(map);
+
+            return Status.OK_STATUS;
+        }
 
         /*
-         * "Global", "partial", "total", etc., it's all very confusing...
-         *
-         * The base view shows the total count for the trace and for
-         * each even types, organized in columns like this:
-         *
-         *                   |  Global  |  Time range |
-         * trace name        |    A     |      B      |
-         *    Event Type     |          |             |
-         *       <event 1>   |    C     |      D      |
-         *       <event 2>   |   ...    |     ...     |
-         *         ...       |          |             |
-         *
-         * Here, we called the cells like this:
-         *  A : GlobalTotal
-         *  B : TimeRangeTotal
-         *  C : GlobalTypeCount(s)
-         *  D : TimeRangeTypeCount(s)
+         * Update statistics for a given trace
          */
+        private void updateStats(Map<String, Long> eventsPerType) {
 
-        /* Fill in an the event counts (either cells C or D) */
-        for (Map.Entry<String, Long> entry : map.entrySet()) {
-            statsData.setTypeCount(name, entry.getKey(), isGlobal, entry.getValue());
+            final TmfStatisticsTree statsData = TmfStatisticsTreeManager.getStatTree(getTreeID());
+            if (statsData == null) {
+                /* The stat tree has been disposed, abort mission. */
+                return;
+            }
+
+            Map<String, Long> map = eventsPerType;
+            String name = fJobTrace.getName();
+
+
+            /*
+             * "Global", "partial", "total", etc., it's all very confusing...
+             *
+             * The base view shows the total count for the trace and for
+             * each even types, organized in columns like this:
+             *
+             *                   |  Global  |  Time range |
+             * trace name        |    A     |      B      |
+             *    Event Type     |          |             |
+             *       <event 1>   |    C     |      D      |
+             *       <event 2>   |   ...    |     ...     |
+             *         ...       |          |             |
+             *
+             * Here, we called the cells like this:
+             *  A : GlobalTotal
+             *  B : TimeRangeTotal
+             *  C : GlobalTypeCount(s)
+             *  D : TimeRangeTypeCount(s)
+             */
+
+            /* Fill in an the event counts (either cells C or D) */
+            for (Map.Entry<String, Long> entry : map.entrySet()) {
+                statsData.setTypeCount(name, entry.getKey(), fIsGlobal, entry.getValue());
+            }
+
+            /*
+             * Calculate the totals (cell A or B, depending if isGlobal). We will
+             * use the results of the previous request instead of sending another
+             * one.
+             */
+            long globalTotal = 0;
+            for (long val : map.values()) {
+                globalTotal += val;
+            }
+            statsData.setTotal(name, fIsGlobal, globalTotal);
+
+            modelComplete(fIsGlobal);
         }
-
-        /*
-         * Calculate the totals (cell A or B, depending if isGlobal). We will
-         * use the results of the previous request instead of sending another
-         * one.
-         */
-        long globalTotal = 0;
-        for (long val : map.values()) {
-            globalTotal += val;
-        }
-        statsData.setTotal(name, isGlobal, globalTotal);
-
-        modelComplete(isGlobal);
     }
 
     /**
