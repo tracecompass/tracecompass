@@ -23,12 +23,14 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.URIUtil;
@@ -41,6 +43,9 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceSessionState;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.Activator;
+import org.eclipse.linuxtools.internal.lttng2.control.ui.relayd.LttngRelaydConnectionInfo;
+import org.eclipse.linuxtools.internal.lttng2.control.ui.relayd.LttngRelaydConnectionManager;
+import org.eclipse.linuxtools.internal.lttng2.control.ui.relayd.LttngRelaydConsumer;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.ControlView;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.dialogs.IImportDialog;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.dialogs.ImportFileInfo;
@@ -51,8 +56,11 @@ import org.eclipse.linuxtools.internal.tmf.ui.project.wizards.importtrace.Import
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceImportException;
 import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
+import org.eclipse.linuxtools.tmf.ctf.core.CtfConstants;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceTypeUIUtils;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder;
@@ -61,13 +69,15 @@ import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
 import org.eclipse.rse.services.files.IFileService;
 import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
 import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFileSubSystem;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 /**
  * <p>
- * Command handler implementation to import traces from a (remote) session to a tracing project.
+ * Command handler implementation to import traces from a (remote) session to a
+ * tracing project.
  * </p>
  *
  * @author Bernd Hufmann
@@ -112,7 +122,10 @@ public class ImportHandler extends BaseControlViewHandler {
             // create default project
             IProject project = TmfProjectRegistry.createProject(DEFAULT_REMOTE_PROJECT_NAME, null, null);
 
-            if (param.getSession().isStreamedTrace()) {
+            if (param.getSession().isLiveTrace()) {
+                importLiveTrace(new LttngRelaydConnectionInfo(param.getSession().getLiveUrl(), param.getSession().getLivePort(), param.getSession().getName()), project);
+                return null;
+            } else if (param.getSession().isStreamedTrace()) {
 
                 IPreferenceStore store = Activator.getDefault().getPreferenceStore();
                 String notify = store.getString(NOTIFY_IMPORT_STREAMED_PREF_KEY);
@@ -224,9 +237,10 @@ public class ImportHandler extends BaseControlViewHandler {
             for (Iterator<?> iterator = structered.iterator(); iterator.hasNext();) {
                 Object element = iterator.next();
                 if (element instanceof TraceSessionComponent) {
-                    // Add only TraceSessionComponents that are inactive and not destroyed
+                    // Add only TraceSessionComponents that are inactive and not
+                    // destroyed
                     TraceSessionComponent tmpSession = (TraceSessionComponent) element;
-                    if (((tmpSession.isSnapshotSession()) || (tmpSession.getSessionState() == TraceSessionState.INACTIVE)) && (!tmpSession.isDestroyed())) {
+                    if ((tmpSession.isSnapshotSession() || tmpSession.isLiveTrace() || (tmpSession.getSessionState() == TraceSessionState.INACTIVE)) && (!tmpSession.isDestroyed())) {
                         session = tmpSession;
                     }
                 }
@@ -268,7 +282,7 @@ public class ImportHandler extends BaseControlViewHandler {
 
             IFolder traceFolder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
             if (!traceFolder.exists()) {
-                throw new ExecutionException(Messages.TraceControl_ImportDialogInvalidTracingProject + " (" + TmfTracesFolder.TRACES_FOLDER_NAME + ")");  //$NON-NLS-1$//$NON-NLS-2$
+                throw new ExecutionException(Messages.TraceControl_ImportDialogInvalidTracingProject + " (" + TmfTracesFolder.TRACES_FOLDER_NAME + ")"); //$NON-NLS-1$//$NON-NLS-2$
             }
 
             IFolder destinationFolder = trace.getDestinationFolder();
@@ -277,7 +291,7 @@ public class ImportHandler extends BaseControlViewHandler {
             String traceName = trace.getLocalTraceName();
             IFolder folder = destinationFolder.getFolder(traceName);
             if (folder.exists()) {
-                if(!trace.isOverwrite()) {
+                if (!trace.isOverwrite()) {
                     throw new ExecutionException(Messages.TraceControl_ImportDialogTraceAlreadyExistError + ": " + traceName); //$NON-NLS-1$
                 }
             } else {
@@ -294,7 +308,7 @@ public class ImportHandler extends BaseControlViewHandler {
                     return;
                 }
                 String destination = folder.getLocation().addTrailingSeparator().append(sources[i].getName()).toString();
-                subMonitor.setTaskName(Messages.TraceControl_DownloadTask + ' '  + traceName + '/' +sources[i].getName());
+                subMonitor.setTaskName(Messages.TraceControl_DownloadTask + ' ' + traceName + '/' + sources[i].getName());
                 fsss.download(sources[i], destination, null, subMonitor.newChild(1));
             }
         } catch (SystemMessageException e) {
@@ -302,5 +316,75 @@ public class ImportHandler extends BaseControlViewHandler {
         } catch (CoreException e) {
             throw new ExecutionException(e.toString(), e);
         }
+    }
+
+    private static void importLiveTrace(final LttngRelaydConnectionInfo connectionInfo, final IProject project) {
+        Job job = new Job(Messages.TraceControl_ImportJob) {
+
+            @Override
+            protected IStatus run(final IProgressMonitor monitor) {
+                try {
+                    // We initiate the connection first so that we can retrieve the trace path
+                    LttngRelaydConsumer lttngRelaydConsumer = LttngRelaydConnectionManager.getInstance().getConsumer(connectionInfo);
+                    try {
+                        lttngRelaydConsumer.connect();
+                    } catch (CoreException e) {
+                        new Status(IStatus.ERROR, Activator.PLUGIN_ID, org.eclipse.linuxtools.internal.lttng2.control.ui.relayd.Messages.LttngRelaydConnectionManager_ConnectionError, e);
+                    }
+                    initializeTraceResource(connectionInfo, lttngRelaydConsumer.getTracePath(), project);
+                    return Status.OK_STATUS;
+                } catch (CoreException | TmfTraceImportException e) {
+                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.ImportHandler_LiveTraceInitError, e);
+                }
+            }
+
+        };
+        job.setSystem(true);
+        job.schedule();
+    }
+
+
+    private static void initializeTraceResource(final LttngRelaydConnectionInfo connectionInfo, final String tracePath, final IProject project) throws CoreException, TmfTraceImportException {
+        IFolder folder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
+        IFolder traceFolder = folder.getFolder(connectionInfo.getSessionName());
+        Path location = new Path(tracePath);
+        IStatus result = ResourcesPlugin.getWorkspace().validateLinkLocation(folder, location);
+        if (result.isOK()) {
+            traceFolder.createLink(location, IResource.REPLACE, new NullProgressMonitor());
+        } else {
+            throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, result.getMessage()));
+        }
+
+        TraceTypeHelper selectedTraceType = TmfTraceTypeUIUtils.selectTraceType(location.toOSString(), null, null);
+        // No trace type was determined.
+        TmfTraceTypeUIUtils.setTraceType(traceFolder, selectedTraceType);
+
+        final TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
+        final TmfTraceFolder tracesFolder = projectElement.getTracesFolder();
+        final List<TmfTraceElement> traces = tracesFolder.getTraces();
+        TmfTraceElement found = null;
+        for (TmfTraceElement candidate : traces) {
+            if (candidate.getName().equals(connectionInfo.getSessionName())) {
+                found = candidate;
+            }
+        }
+
+        if (found == null) {
+            throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.ImportHandler_LiveTraceElementError));
+        }
+
+        // Properties used to be able to reopen a trace in live mode
+        traceFolder.setPersistentProperty(CtfConstants.LIVE_HOST, connectionInfo.getHost());
+        traceFolder.setPersistentProperty(CtfConstants.LIVE_PORT, Integer.toString(connectionInfo.getPort()));
+        traceFolder.setPersistentProperty(CtfConstants.LIVE_SESSION_NAME, connectionInfo.getSessionName());
+
+        final TmfTraceElement finalTrace = found;
+        Display.getDefault().syncExec(new Runnable() {
+
+            @Override
+            public void run() {
+                TmfOpenTraceHelper.openTraceFromElement(finalTrace);
+            }
+        });
     }
 }

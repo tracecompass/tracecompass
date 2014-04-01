@@ -146,6 +146,7 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
             }
         };
         myJob.setUser(false);
+        myJob.setSystem(true);
         myJob.schedule();
     }
 

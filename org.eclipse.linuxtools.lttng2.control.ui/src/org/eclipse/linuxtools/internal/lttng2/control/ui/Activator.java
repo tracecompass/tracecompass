@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.linuxtools.internal.lttng2.control.ui.relayd.LttngRelaydConnectionManager;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.preferences.ControlPreferences;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -74,11 +75,14 @@ public class Activator extends AbstractUIPlugin {
         super.start(context);
         plugin = this;
         ControlPreferences.getInstance().init(getPreferenceStore());
+        // This registers the connection manager with the signal manager
+        LttngRelaydConnectionManager.getInstance();
     }
 
     @Override
     public void stop(BundleContext context) throws Exception {
         ControlPreferences.getInstance().dispose();
+        LttngRelaydConnectionManager.getInstance().dispose();
         plugin = null;
         super.stop(context);
     }

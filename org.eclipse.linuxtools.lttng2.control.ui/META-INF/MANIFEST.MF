@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 3.0.0.qualifier
+Bundle-Version: 3.1.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.linuxtools.lttng2.control.ui;singleton:=true
 Bundle-Activator: org.eclipse.linuxtools.internal.lttng2.control.ui.Activator
@@ -15,8 +15,11 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.linuxtools.lttng2.control.core;bundle-version="3.0.0",
  org.eclipse.linuxtools.tmf.core;bundle-version="3.0.0",
- org.eclipse.linuxtools.tmf.ui;bundle-version="3.0.0"
+ org.eclipse.linuxtools.tmf.ui;bundle-version="3.0.0",
+ org.eclipse.linuxtools.tmf.ctf.core,
+ org.eclipse.linuxtools.ctf.core
 Export-Package: org.eclipse.linuxtools.internal.lttng2.control.ui;x-friends:="org.eclipse.linuxtools.lttng2.control.ui.tests",
+ org.eclipse.linuxtools.internal.lttng2.control.ui.relayd;x-internal:=true,
  org.eclipse.linuxtools.internal.lttng2.control.ui.views;x-friends:="org.eclipse.linuxtools.lttng2.kernel.ui,org.eclipse.linuxtools.lttng2.control.ui.tests,org.eclipse.linuxtools.lttng2.kernel.ui.swtbot.tests",
  org.eclipse.linuxtools.internal.lttng2.control.ui.views.dialogs;x-friends:="org.eclipse.linuxtools.lttng2.control.ui.tests",
  org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers;x-internal:=true,

@@ -28,6 +28,7 @@ import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTraceCompleteness;
 import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfTraceIndexer;
 import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
 
@@ -186,6 +187,7 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
                 return Status.OK_STATUS;
             }
         };
+        job.setSystem(!isCompleteTrace(fTrace));
         job.schedule();
 
         // Build a background request for all the trace data. The index is
@@ -206,7 +208,9 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
             public void handleSuccess() {
                 fTraceIndex.setTimeRange(fTrace.getTimeRange());
                 fTraceIndex.setNbEvents(fTrace.getNbEvents());
-                fTraceIndex.setIndexComplete();
+                if (isCompleteTrace(fTrace)) {
+                    fTraceIndex.setIndexComplete();
+                }
                 updateTraceStatus();
             }
 
@@ -343,5 +347,9 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
      */
     protected ITmfCheckpointIndex getTraceIndex() {
         return fTraceIndex;
+    }
+
+    private static boolean isCompleteTrace(ITmfTrace trace) {
+        return !(trace instanceof ITmfTraceCompleteness) || ((ITmfTraceCompleteness)trace).isComplete();
     }
 }

@@ -33,7 +33,7 @@ import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceSessionSta
 public class SessionInfo extends TraceInfo implements ISessionInfo {
 
     /**
-     * The default network URL when creating a live session
+     * The default network URL when creating a live session.
      */
     public static final String DEFAULT_LIVE_NETWORK_URK = "net://127.0.0.1"; //$NON-NLS-1$
 
@@ -86,6 +86,16 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
      * The delay in micro seconds before the data is flushed and streamed.
      */
     private int fLiveDelay = -1;
+
+    /**
+     * The live connection url (Relayd).
+     */
+    private String fLiveUrl;
+
+    /**
+     * The live connection port (Relayd).
+     */
+    private Integer fLivePort;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -297,5 +307,25 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
     @Override
     public String getDataUrl() {
         return fDataUrl;
+    }
+
+    @Override
+    public void setLiveUrl(String liveUrl) {
+        fLiveUrl = liveUrl;
+    }
+
+    @Override
+    public void setLivePort(Integer livePort) {
+        fLivePort = livePort;
+    }
+
+    @Override
+    public String getLiveUrl() {
+        return fLiveUrl;
+    }
+
+    @Override
+    public Integer getLivePort() {
+        return fLivePort;
     }
 }

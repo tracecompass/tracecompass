@@ -189,4 +189,34 @@ public interface ISessionInfo extends ITraceInfo {
      *            the data URL
      */
     void setDataUrl(String datalUrl);
+
+    /**
+     * Get the live URL.
+     *
+     * @return the live URL
+     */
+    String getLiveUrl();
+
+    /**
+     * Set the live URL.
+     *
+     * @param liveUrl
+     *            the live URL
+     */
+    void setLiveUrl(String liveUrl);
+
+    /**
+     * Get the live port.
+     *
+     * @return the live port
+     */
+    Integer getLivePort();
+
+    /**
+     * Set the live port.
+     *
+     * @param livePort
+     *            the live port
+     */
+    void setLivePort(Integer livePort);
 }

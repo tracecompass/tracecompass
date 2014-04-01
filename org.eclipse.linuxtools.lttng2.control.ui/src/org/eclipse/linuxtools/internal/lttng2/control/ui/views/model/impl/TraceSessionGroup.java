@@ -135,7 +135,7 @@ public class TraceSessionGroup extends TraceControlComponent {
         ISessionInfo sessionInfo = getControlService().createSession(sessionInf, monitor);
 
         if (sessionInfo != null) {
-            TraceSessionComponent session = new TraceSessionComponent(sessionInfo.getName(), TraceSessionGroup.this);
+            TraceSessionComponent session = new TraceSessionComponent(sessionInfo, TraceSessionGroup.this);
             addChild(session);
             session.getConfigurationFromNode(monitor);
         }

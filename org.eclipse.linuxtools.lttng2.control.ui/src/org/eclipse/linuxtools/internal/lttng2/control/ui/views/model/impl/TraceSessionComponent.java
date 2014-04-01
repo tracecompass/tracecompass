@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2013 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,6 +9,7 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *   Bernd Hufmann - Updated for support of LTTng Tools 2.1
+ *   Marc-Andre Laperle - Support for opening a live session
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl;
 
@@ -91,6 +92,27 @@ public class TraceSessionComponent extends TraceControlComponent {
         fSessionInfo = new SessionInfo(name);
         fActiveImage = Activator.getDefault().loadIcon(TRACE_SESSION_ICON_FILE_ACTIVE);
         fDestroyedImage = Activator.getDefault().loadIcon(TRACE_SESSION_ICON_FILE_DESTROYED);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param sessionInfo
+     *            the session information used to create the session
+     * @param parent
+     *            the parent of this component.
+     */
+    public TraceSessionComponent(ISessionInfo sessionInfo, ITraceControlComponent parent) {
+        this(sessionInfo.getName(), parent);
+        copyLiveInfo(sessionInfo);
+    }
+
+    private void copyLiveInfo(ISessionInfo sessionInfo) {
+        // Since we can't retrieve this information from the node, we copy it over
+        fSessionInfo.setLive(sessionInfo.isLive());
+        fSessionInfo.setLiveDelay(sessionInfo.getLiveDelay());
+        fSessionInfo.setLivePort(sessionInfo.getLivePort());
+        fSessionInfo.setLiveUrl(sessionInfo.getLiveUrl());
     }
 
     // ------------------------------------------------------------------------
@@ -259,7 +281,9 @@ public class TraceSessionComponent extends TraceControlComponent {
     public void getConfigurationFromNode(IProgressMonitor monitor)
             throws ExecutionException {
         removeAllChildren();
+        ISessionInfo oldSessionInfo = fSessionInfo;
         fSessionInfo = getControlService().getSession(getName(), monitor);
+        copyLiveInfo(oldSessionInfo);
 
         IDomainInfo[] domains = fSessionInfo.getDomains();
         for (int i = 0; i < domains.length; i++) {
@@ -419,5 +443,31 @@ public class TraceSessionComponent extends TraceControlComponent {
      */
     public void recordSnapshot(IProgressMonitor monitor) throws ExecutionException {
         getControlService().recordSnapshot(getName(), monitor);
+    }
+
+    /**
+     * Returns if session is live.
+     * @return <code>true</code> if session if live else <code>false</code>
+     */
+    public boolean isLiveTrace() {
+        return fSessionInfo.isLive();
+    }
+
+    /**
+     * Get the live URL.
+     *
+     * @return the live URL
+     */
+    public String getLiveUrl() {
+        return fSessionInfo.getLiveUrl();
+    }
+
+    /**
+     * Get the live port.
+     *
+     * @return the live port
+     */
+    public Integer getLivePort() {
+        return fSessionInfo.getLivePort();
     }
 }

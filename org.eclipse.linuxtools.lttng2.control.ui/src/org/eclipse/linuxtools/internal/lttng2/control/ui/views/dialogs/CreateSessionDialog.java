@@ -71,6 +71,21 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
     private static final String DEFAULT_TEXT = "<" + Messages.EnableChannelDialog_DefaultMessage + ">"; //$NON-NLS-1$ //$NON-NLS-2$
 
     /**
+     * The default port for the connection to Relayd. This actual value is
+     * needed because this is not an optional argument to a command; this is
+     * what is used to connect directly to Relayd from Java through a socket.
+     * There is also currently no way to know the default value by issuing a
+     * command.
+     */
+    private static final int DEFAULT_LIVE_PORT = 5344;
+
+    /**
+     * The default address for the connection to Relayd. Only local is supported
+     * for now. See above comment for why it's needed.
+     */
+    private static final String DEFAULT_LIVE_URL = "127.0.0.1"; //$NON-NLS-1$
+
+    /**
      * Supported network protocols for streaming
      */
     private enum StreamingProtocol {
@@ -236,9 +251,25 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
      */
     private boolean fIsLive = false;
     /**
+     * The text box for the live address (relayd).
+     */
+    private Text fLiveHostAddressText = null;
+    /**
+     * The text box for the live port (relayd).
+     */
+    private Text fLivePortText = null;
+    /**
      * The live delay
      */
     private Integer fLiveDelay = 0;
+    /**
+     * The live url.
+     */
+    private String fLiveUrl = null;
+    /**
+     * The live port.
+     */
+    private Integer fLivePort = 0;
     /**
      * Flag whether default location (path) shall be used or not
      */
@@ -685,7 +716,27 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
             GridData layoutData = new GridData(GridData.FILL_BOTH);
             fLiveGroup.setLayoutData(layoutData);
 
-            Label liveDelayLabel = new Label(fLiveGroup, SWT.RIGHT);
+            Label label = new Label(fLiveGroup, SWT.NONE);
+            label.setText(Messages.TraceControl_CreateSessionLiveConnectionLabel);
+            layoutData = new GridData(GridData.FILL_HORIZONTAL);
+            layoutData.horizontalSpan = 2;
+            label.setLayoutData(layoutData);
+
+            fLiveHostAddressText = new Text(fLiveGroup, SWT.NONE);
+            fLiveHostAddressText.setText(DEFAULT_LIVE_URL);
+            fLiveHostAddressText.setEnabled(false);
+            fLiveHostAddressText.setToolTipText(Messages.TraceControl_CreateSessionLiveConnectionUrlTooltip);
+            layoutData = new GridData(GridData.FILL_HORIZONTAL);
+            layoutData.horizontalSpan = 4;
+            fLiveHostAddressText.setLayoutData(layoutData);
+
+            fLivePortText = new Text(fLiveGroup, SWT.NONE);
+            fLivePortText.setText(Integer.toString(DEFAULT_LIVE_PORT));
+            fLivePortText.setToolTipText(Messages.TraceControl_CreateSessionLiveConnectionPortTooltip);
+            layoutData = new GridData(GridData.FILL_HORIZONTAL);
+            fLivePortText.setLayoutData(layoutData);
+
+            Label liveDelayLabel = new Label(fLiveGroup, SWT.NONE);
             layoutData = new GridData(GridData.FILL_HORIZONTAL);
             liveDelayLabel.setText(Messages.TraceControl_CreateSessionLiveDelayLabel);
             liveDelayLabel.setLayoutData(layoutData);
@@ -772,6 +823,8 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
         if (fParent.isLiveSupported() && fLiveButton != null) {
             fIsLive = fLiveButton.getSelection();
             fLiveDelay = LTTngControlServiceConstants.UNUSED_VALUE;
+            fLiveUrl = DEFAULT_LIVE_URL;
+            fLivePort = DEFAULT_LIVE_PORT;
         }
 
         if (!"".equals(fSessionPath)) { //$NON-NLS-1$
@@ -817,6 +870,8 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
                 String liveDelayText = fLiveDelayText.getText();
                 try {
                     fLiveDelay = liveDelayText.equals(DEFAULT_TEXT) ? LTTngControlServiceConstants.UNUSED_VALUE : Integer.valueOf(liveDelayText);
+                    fLivePort = Integer.valueOf(fLivePortText.getText());
+                    fLiveUrl = fLiveHostAddressText.getText();
                 } catch (NumberFormatException e) {
                     setErrorMessage(Messages.TraceControl_InvalidLiveDelayError);
                     return;
@@ -976,6 +1031,8 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
         }
 
         sessionInfo.setLive(fIsLive);
+        sessionInfo.setLiveUrl(fLiveUrl);
+        sessionInfo.setLivePort(fLivePort);
         sessionInfo.setLiveDelay(fLiveDelay);
         sessionInfo.setSnapshot(fIsSnapshot);
 
