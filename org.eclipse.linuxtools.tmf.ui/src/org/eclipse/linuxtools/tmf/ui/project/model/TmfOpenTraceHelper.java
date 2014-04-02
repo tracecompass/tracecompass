@@ -234,7 +234,7 @@ public class TmfOpenTraceHelper {
         return trace;
     }
 
-    private static ITmfTrace openExperimentElement(final TmfExperimentElement experimentElement, IFile bookmarkFile) {
+    private static ITmfTrace openExperimentElement(final TmfExperimentElement experimentElement) {
         /* Experiment element now has an experiment type associated with it */
         final TmfExperiment experiment = experimentElement.instantiateTrace();
         if (experiment == null) {
@@ -269,17 +269,16 @@ public class TmfOpenTraceHelper {
 
         // Create the experiment
         experiment.initExperiment(ITmfEvent.class, experimentElement.getName(), traces, cacheSize, experimentElement.getResource());
-        experiment.setBookmarksFile(bookmarkFile);
 
         return experiment;
     }
 
-    private static ITmfTrace openProjectElement(final TmfCommonProjectElement element, IFile bookmarkFile) {
+    private static ITmfTrace openProjectElement(final TmfCommonProjectElement element) {
         ITmfTrace trace = null;
         if (element instanceof TmfTraceElement) {
             trace = openTraceElement((TmfTraceElement) element);
         } else if (element instanceof TmfExperimentElement) {
-            trace = openExperimentElement((TmfExperimentElement) element, bookmarkFile);
+            trace = openExperimentElement((TmfExperimentElement) element);
         }
         return trace;
     }
@@ -316,7 +315,7 @@ public class TmfOpenTraceHelper {
             @Override
             public void run() {
 
-                final ITmfTrace trace = openProjectElement(traceElement, file);
+                final ITmfTrace trace = openProjectElement(traceElement);
                 if (trace == null) {
                     return;
                 }
@@ -398,7 +397,7 @@ public class TmfOpenTraceHelper {
             @Override
             public void run() {
 
-                final ITmfTrace trace = openProjectElement(traceElement, file);
+                final ITmfTrace trace = openProjectElement(traceElement);
                 if (trace == null) {
                     return;
                 }

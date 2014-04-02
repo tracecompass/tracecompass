@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -28,7 +28,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 public class TmfTraceOpenedSignal extends TmfSignal {
 
     private final ITmfTrace fTrace;
-    private final IFile fBookmarksFile;
+    private final IFile fEditorFile;
 
     /**
      * Constructor for a new signal.
@@ -37,13 +37,13 @@ public class TmfTraceOpenedSignal extends TmfSignal {
      *            The object sending this signal
      * @param trace
      *            The trace that has been opened
-     * @param bookmarksFile
-     *            Pointer to the bookmark file
+     * @param editorFile
+     *            Pointer to the editor file
      */
-    public TmfTraceOpenedSignal(Object source, ITmfTrace trace, IFile bookmarksFile) {
+    public TmfTraceOpenedSignal(Object source, ITmfTrace trace, IFile editorFile) {
         super(source);
         fTrace = trace;
-        fBookmarksFile = bookmarksFile;
+        fEditorFile = editorFile;
     }
 
     /**
@@ -56,12 +56,13 @@ public class TmfTraceOpenedSignal extends TmfSignal {
     }
 
     /**
-     * Get a pointer to the bookmark file of this trace
+     * Get a pointer to the editor file for this trace
      *
      * @return The IFile object
+     * @since 3.0
      */
-    public IFile getBookmarksFile() {
-        return fBookmarksFile;
+    public IFile getEditorFile() {
+        return fEditorFile;
     }
 
     @Override

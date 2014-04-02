@@ -27,7 +27,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Vector;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.internal.tmf.core.trace.TmfExperimentContext;
@@ -186,18 +185,6 @@ public class TmfExperimentTest {
         assertEquals("getTimestamp", new TmfTimestamp( 2501, (byte) -3), fExperiment.getTimestamp(2500));
         assertEquals("getTimestamp", new TmfTimestamp(10000, (byte) -3), fExperiment.getTimestamp(9999));
         assertNull("getTimestamp", fExperiment.getTimestamp(10000));
-    }
-
-    // ------------------------------------------------------------------------
-    // Bookmarks file handling
-    // ------------------------------------------------------------------------
-
-    @Test
-    public void testBookmarks() {
-        assertNull("GetBookmarksFile", fExperiment.getBookmarksFile());
-        IFile bookmarks = (IFile) fTestTraces[0].getResource();
-        fExperiment.setBookmarksFile(bookmarks);
-        assertEquals("GetBookmarksFile", bookmarks, fExperiment.getBookmarksFile());
     }
 
     // ------------------------------------------------------------------------

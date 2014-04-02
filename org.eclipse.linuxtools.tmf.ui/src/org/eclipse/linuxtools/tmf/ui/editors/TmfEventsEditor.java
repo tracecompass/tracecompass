@@ -451,11 +451,6 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     }
 
     @Override
-    public IFile getBookmarksFile() {
-        return fFile;
-    }
-
-    @Override
     public void setFocus() {
         fEventsTable.setFocus();
     }

@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
@@ -152,6 +153,22 @@ public final class TmfTraceManager {
         return Collections.unmodifiableSet(fTraces.keySet());
     }
 
+    /**
+     * Get the editor file for an opened trace.
+     *
+     * @param trace
+     *            the trace
+     * @return the editor file or null if the trace is not opened
+     * @since 3.0
+     */
+    public synchronized IFile getTraceEditorFile(ITmfTrace trace) {
+        TmfTraceContext ctx = fTraces.get(trace);
+        if (ctx != null) {
+            return ctx.getEditorFile();
+        }
+        return null;
+    }
+
     private TmfTraceContext getCurrentTraceContext() {
         TmfTraceContext curCtx = fTraces.get(fCurrentTrace);
         if (curCtx == null) {
@@ -224,6 +241,7 @@ public final class TmfTraceManager {
     @TmfSignalHandler
     public synchronized void traceOpened(final TmfTraceOpenedSignal signal) {
         final ITmfTrace trace = signal.getTrace();
+        final IFile editorFile = signal.getEditorFile();
         final ITmfTimestamp startTs = trace.getStartTime();
 
         /* Calculate the initial time range */
@@ -232,7 +250,7 @@ public final class TmfTraceManager {
         long endTime = startTs.normalize(0, SCALE).getValue() + offset;
         final TmfTimeRange startTr = new TmfTimeRange(startTs, new TmfTimestamp(endTime, SCALE));
 
-        final TmfTraceContext startCtx = new TmfTraceContext(startTs, startTs, startTr);
+        final TmfTraceContext startCtx = new TmfTraceContext(startTs, startTs, startTr, editorFile);
 
         fTraces.put(trace, startCtx);
 

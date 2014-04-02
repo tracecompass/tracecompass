@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2009, 2014 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -21,7 +21,6 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -88,11 +87,6 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
      * The set of traces that constitute the experiment
      */
     private boolean fInitialized = false;
-
-    /**
-     * The experiment bookmarks file
-     */
-    private IFile fBookmarksFile;
 
     // ------------------------------------------------------------------------
     // Construction
@@ -277,25 +271,6 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
         final ITmfEvent event = getNext(context);
         context.dispose();
         return (event != null) ? event.getTimestamp() : null;
-    }
-
-    /**
-     * Set the file to be used for bookmarks on this experiment
-     *
-     * @param file
-     *            the bookmarks file
-     */
-    public void setBookmarksFile(final IFile file) {
-        fBookmarksFile = file;
-    }
-
-    /**
-     * Get the file used for bookmarks on this experiment
-     *
-     * @return the bookmarks file or null if none is set
-     */
-    public IFile getBookmarksFile() {
-        return fBookmarksFile;
     }
 
     // ------------------------------------------------------------------------
