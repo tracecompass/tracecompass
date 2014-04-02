@@ -839,9 +839,10 @@ public class DsfGdbAdaptor {
                                     }
                                 } else if (trace instanceof TmfExperiment) {
                                     TmfExperiment experiment = (TmfExperiment) trace;
-                                    int nbTraces = experiment.getTraces().length;
+                                    List<ITmfTrace> expTraces = experiment.getTraces();
+                                    int nbTraces = expTraces.size();
                                     for (int i = 0; i < nbTraces; i++) {
-                                        GdbTrace gdbTrace = (GdbTrace) experiment.getTraces()[i];
+                                        GdbTrace gdbTrace = (GdbTrace) expTraces.get(i);
                                         if (gdbTrace.getDsfSessionId().equals(sessionId)) {
                                             wbPage.bringToTop(editor);
                                             if (recordId != -1) {

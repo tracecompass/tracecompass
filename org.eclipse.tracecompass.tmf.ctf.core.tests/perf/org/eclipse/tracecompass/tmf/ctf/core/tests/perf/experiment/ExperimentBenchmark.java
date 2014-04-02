@@ -75,18 +75,18 @@ public class ExperimentBenchmark {
 
                 init(numTraces);
                 fExperiment.sendRequest(expReq);
-                ITmfTrace[] traces = fExperiment.getTraces();
+                List<ITmfTrace> traces = fExperiment.getTraces();
                 for (int i = 0; i < numTraces; i++) {
                     traceReq[i] = new InnerEventRequest(ITmfEvent.class, 0, ITmfEventRequest.ALL_DATA, ExecutionType.BACKGROUND);
-                    traces[i].sendRequest(traceReq[i]);
+                    traces.get(i).sendRequest(traceReq[i]);
                 }
 
                 pm.start();
                 waitForRequest(expReq, traceReq);
                 pm.stop();
 
-                for (int i = 0; i < traces.length; i++) {
-                    if (!expReq.isTraceHandled(traces[i])) {
+                for (int i = 0; i < traces.size(); i++) {
+                    if (!expReq.isTraceHandled(traces.get(i))) {
                         System.err.println("Trace " + i + " not handled!");
                     }
                 }

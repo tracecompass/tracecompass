@@ -13,6 +13,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.editors;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
@@ -344,7 +346,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
      */
     private static @NonNull Iterable<ITmfEventAspect> getExperimentAspects(
             final TmfExperiment experiment) {
-        ITmfTrace[] traces = experiment.getTraces();
+        List<ITmfTrace> traces = experiment.getTraces();
         ImmutableSet.Builder<ITmfEventAspect> builder = new ImmutableSet.Builder<>();
 
         /* For experiments, we'll add a "trace name" aspect/column */
@@ -356,7 +358,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
              * All the traces in this experiment are of the same type, let's
              * just use the normal table for that type.
              */
-            builder.addAll(traces[0].getEventAspects());
+            builder.addAll(traces.get(0).getEventAspects());
 
         } else {
             /*

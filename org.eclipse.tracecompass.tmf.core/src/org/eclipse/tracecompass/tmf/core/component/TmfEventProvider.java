@@ -574,6 +574,7 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
         if (!(child instanceof TmfEventProvider)) {
             throw new IllegalArgumentException();
         }
+        child.setParent(this);
         fChildren.add((TmfEventProvider)child);
     }
 

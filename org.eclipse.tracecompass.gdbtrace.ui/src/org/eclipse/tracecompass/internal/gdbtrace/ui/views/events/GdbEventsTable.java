@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.internal.gdbtrace.ui.views.events;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -95,8 +97,9 @@ public class GdbEventsTable extends TmfEventsTable {
             fSelectedFrame = 0;
         } else if (trace instanceof TmfExperiment) {
             TmfExperiment experiment = (TmfExperiment) trace;
-            if (experiment.getTraces().length > 0) {
-                fSelectedTrace = (GdbTrace) experiment.getTraces()[0];
+            List<ITmfTrace> expTraces = experiment.getTraces();
+            if (!expTraces.isEmpty()) {
+                fSelectedTrace = (GdbTrace) expTraces.get(0);
                 fSelectedFrame = 0;
             }
         }

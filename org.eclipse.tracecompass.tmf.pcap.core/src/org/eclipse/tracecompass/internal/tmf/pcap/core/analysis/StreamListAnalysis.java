@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.internal.tmf.pcap.core.analysis;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -74,9 +75,9 @@ public class StreamListAnalysis extends TmfAbstractAnalysisModule {
 
         // Trace is TmfExperiment. Check if it has a PcapTrace.
         TmfExperiment experiment = (TmfExperiment) trace;
-        ITmfTrace[] traces = experiment.getTraces();
-        for (int i = 0; i < traces.length; i++) {
-            if (traces[i] instanceof PcapTrace) {
+        List<ITmfTrace> traces = experiment.getTraces();
+        for (ITmfTrace expTrace : traces) {
+            if (expTrace instanceof PcapTrace) {
                 return true;
             }
         }

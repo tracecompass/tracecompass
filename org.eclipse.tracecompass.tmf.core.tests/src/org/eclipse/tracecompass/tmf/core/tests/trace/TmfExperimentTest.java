@@ -136,7 +136,7 @@ public class TmfExperimentTest {
         final long nbExperimentEvents = fExperiment.getNbEvents();
         assertEquals("GetNbEvents", NB_EVENTS, nbExperimentEvents);
 
-        final long nbTraceEvents = fExperiment.getTraces()[0].getNbEvents();
+        final long nbTraceEvents = fExperiment.getTraces().get(0).getNbEvents();
         assertEquals("GetNbEvents", NB_EVENTS, nbTraceEvents);
 
         final TmfTimeRange timeRange = fExperiment.getTimeRange();
@@ -164,7 +164,7 @@ public class TmfExperimentTest {
         final long nbExperimentEvents = fExperiment.getNbEvents();
         assertEquals("GetNbEvents", NB_EVENTS, nbExperimentEvents);
 
-        final long nbTraceEvents = fExperiment.getTraces()[0].getNbEvents();
+        final long nbTraceEvents = fExperiment.getTraces().get(0).getNbEvents();
         assertEquals("GetNbEvents", NB_EVENTS, nbTraceEvents);
 
         final TmfTimeRange timeRange = fExperiment.getTimeRange();
@@ -222,7 +222,7 @@ public class TmfExperimentTest {
         TmfExperiment experiment = new TmfExperiment(ITmfEvent.class, EXPERIMENT,
                 null, TmfExperiment.DEFAULT_INDEX_PAGE_SIZE, null);
         ITmfContext context = experiment.seekEvent((TmfExperimentLocation) null);
-        assertNull("seekEvent", context);
+        validateContextRanks(context);
         experiment.dispose();
     }
 
