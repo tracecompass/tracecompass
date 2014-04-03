@@ -49,7 +49,7 @@ public final class AttributeTree {
     public AttributeTree(StateSystem ss) {
         this.ss = ss;
         this.attributeList = Collections.synchronizedList(new ArrayList<Attribute>());
-        this.attributeTreeRoot = new AlphaNumAttribute(null, "root", -1); //$NON-NLS-1$
+        this.attributeTreeRoot = new Attribute(null, "root", -1); //$NON-NLS-1$
     }
 
     /**
@@ -284,8 +284,7 @@ public final class AttributeTree {
                 nextNode = prevNode.getSubAttributeNode(curDirectory);
                 if (nextNode == null) {
                     /* This is where we need to start adding */
-                    nextNode = new AlphaNumAttribute(prevNode, curDirectory,
-                            attributeList.size());
+                    nextNode = new Attribute(prevNode, curDirectory, attributeList.size());
                     prevNode.addSubAttribute(nextNode);
                     attributeList.add(nextNode);
                     ss.addEmptyAttribute();

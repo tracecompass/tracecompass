@@ -13,12 +13,12 @@
 package org.eclipse.linuxtools.internal.tmf.core.statesystem;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * An Attribute is a "node" in the Attribute Tree. It represents a smallest
@@ -30,14 +30,14 @@ import java.util.Map;
  * @author alexmont
  *
  */
-public abstract class Attribute {
+public final class Attribute {
 
     private final Attribute parent;
     private final String name;
     private final int quark;
 
-    /** The list of sub-attributes */
-    protected final List<Attribute> subAttributes;
+    /** The sub-attributes (<basename, attribute>) of this attribute */
+    private final Map<String, Attribute> subAttributes;
 
     /**
      * Constructor
@@ -54,7 +54,7 @@ public abstract class Attribute {
         this.parent = parent;
         this.quark = quark;
         this.name = name;
-        this.subAttributes = new ArrayList<>();
+        this.subAttributes = Collections.synchronizedMap(new HashMap<String, Attribute>());
     }
 
     // ------------------------------------------------------------------------
@@ -80,13 +80,12 @@ public abstract class Attribute {
     }
 
     /**
-     * Get the list of child attributes below this one. This is a read-only
-     * view.
+     * Get the list of child attributes below this one.
      *
-     * @return The list of child attributes.
+     * @return The child attributes.
      */
-    public List<Attribute> getSubAttributes() {
-        return Collections.unmodifiableList(subAttributes);
+    public Iterable<Attribute> getSubAttributes() {
+        return ImmutableList.copyOf(subAttributes.values());
     }
 
     /**
@@ -154,7 +153,12 @@ public abstract class Attribute {
      *
      * @param newSubAttribute The new attribute to add
      */
-    protected abstract void addSubAttribute(Attribute newSubAttribute);
+    public void addSubAttribute(Attribute newSubAttribute) {
+        if (newSubAttribute == null || newSubAttribute.getName() == null) {
+            throw new IllegalArgumentException();
+        }
+        subAttributes.put(newSubAttribute.getName(), newSubAttribute);
+    }
 
     /**
      * Get a sub-attribute from this node's sub-attributes
@@ -166,7 +170,21 @@ public abstract class Attribute {
      *            (indicating where to start searching).
      * @return The requested attribute
      */
-    protected abstract Attribute getSubAttributeNode(String[] path, int index);
+    private Attribute getSubAttributeNode(String[] path, int index) {
+        final Attribute nextNode = subAttributes.get(path[index]);
+
+        if (nextNode == null) {
+            /* We don't have the expected child => the attribute does not exist */
+            return null;
+        }
+        if (index == path.length - 1) {
+            /* It's our job to process this request */
+            return nextNode;
+        }
+
+        /* Pass on the rest of the path to the relevant child */
+        return nextNode.getSubAttributeNode(path, index + 1);
+    }
 
     /**
      * Return a String array composed of the full (absolute) path representing
@@ -213,8 +231,6 @@ public abstract class Attribute {
     private int curDepth;
 
     private void attributeNodeToString(PrintWriter writer, Attribute currentNode) {
-        int j;
-
         writer.println(currentNode.getName() + " (" + currentNode.quark + ')'); //$NON-NLS-1$
         curDepth++;
 
@@ -223,7 +239,7 @@ public abstract class Attribute {
             if (nextNode == null) {
                 continue;
             }
-            for (j = 0; j < curDepth - 1; j++) {
+            for (int j = 0; j < curDepth - 1; j++) {
                 writer.print("  "); //$NON-NLS-1$
             }
             writer.print("  "); //$NON-NLS-1$
@@ -246,53 +262,5 @@ public abstract class Attribute {
         curDepth = 0;
         attributeNodeToString(writer, this);
         writer.print('\n');
-    }
-}
-
-/**
- * This is the basic implementation, where sub-attributes names can be composed
- * of any alphanumeric characters, and are stored as Strings. A HashMap is used
- * to access them.
- *
- * @author alexmont
- *
- */
-final class AlphaNumAttribute extends Attribute {
-
-    private final Map<String, Integer> subAttributesMap;
-
-    public AlphaNumAttribute(Attribute parent, String name, int quark) {
-        super(parent, name, quark);
-        this.subAttributesMap = new HashMap<>();
-    }
-
-    @Override
-    protected synchronized void addSubAttribute(Attribute newSubAttribute) {
-        assert (newSubAttribute != null);
-        assert (newSubAttribute.getName() != null);
-        /* This should catch buggy state changing statements */
-        assert (!newSubAttribute.getName().equals(this.getName()));
-
-        subAttributesMap.put(newSubAttribute.getName(), subAttributes.size());
-        subAttributes.add(newSubAttribute);
-    }
-
-    @Override
-    protected synchronized Attribute getSubAttributeNode(String[] path,
-            int index) {
-        Integer indexOfNextNode = subAttributesMap.get(path[index]);
-        Attribute nextNode;
-
-        if (indexOfNextNode == null) {
-            /* We don't have the expected child => the attribute does not exist */
-            return null;
-        }
-        if (index == path.length - 1) {
-            /* It's our job to process this request */
-            return subAttributes.get(indexOfNextNode);
-        }
-
-        nextNode = subAttributes.get(indexOfNextNode);
-        return nextNode.getSubAttributeNode(path, index + 1);
     }
 }
