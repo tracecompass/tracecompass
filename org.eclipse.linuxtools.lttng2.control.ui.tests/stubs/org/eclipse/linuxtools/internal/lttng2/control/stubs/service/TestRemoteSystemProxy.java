@@ -110,4 +110,9 @@ public class TestRemoteSystemProxy implements IRemoteSystemProxy {
     @Override
     public void setPort(int port) {
     }
+
+    @Override
+    public boolean isLocal() {
+        return false;
+    }
 }

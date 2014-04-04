@@ -130,4 +130,11 @@ public interface IRemoteSystemProxy {
      */
     void removeCommunicationListener(ICommunicationsListener listener);
 
+    /**
+     * Checks whether the local host connector service is used or not.
+     *
+     * @return <code>true</code> if local connection else <false>
+     *
+     */
+    public boolean isLocal();
 }

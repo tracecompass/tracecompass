@@ -195,4 +195,9 @@ public class RemoteSystemProxy implements IRemoteSystemProxy {
             cs.removeCommunicationsListener(listener);
         }
     }
+
+    @Override
+    public boolean isLocal() {
+        return fHost.getSystemType().isLocal();
+    }
 }

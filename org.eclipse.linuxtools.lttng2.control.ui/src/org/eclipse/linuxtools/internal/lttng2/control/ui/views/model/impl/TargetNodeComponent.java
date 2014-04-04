@@ -383,7 +383,11 @@ public class TargetNodeComponent extends TraceControlComponent implements ICommu
      */
     public void deregister() {
         ISystemRegistry registry = RSECorePlugin.getTheSystemRegistry();
-        registry.deleteHost(fHost);
+        // Don't remove local host because it cannot be recreated by
+        // LTTng NewConnection Dialog
+        if (!fRemoteProxy.isLocal()) {
+            registry.deleteHost(fHost);
+        }
     }
 
     // ------------------------------------------------------------------------

@@ -98,7 +98,13 @@ public class CommandShell implements ICommandShell {
         IShellService shellService = fProxy.getShellService();
         Process p = null;
         try {
-            fHostShell = shellService.launchShell("", new String[0], new NullProgressMonitor()); //$NON-NLS-1$
+            String[] env = new String[0];
+
+            if (fProxy.isLocal()) {
+                env = shellService.getHostEnvironment();
+            }
+
+            fHostShell = shellService.launchShell("", env, new NullProgressMonitor()); //$NON-NLS-1$
             p = new HostShellProcessAdapter(fHostShell);
         } catch (Exception e) {
             throw new ExecutionException(Messages.TraceControl_CommandShellError, e);

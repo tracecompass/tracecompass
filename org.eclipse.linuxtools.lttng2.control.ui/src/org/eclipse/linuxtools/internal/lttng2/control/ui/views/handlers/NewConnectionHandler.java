@@ -153,13 +153,11 @@ public class NewConnectionHandler extends BaseControlViewHandler {
                         .getHostsBySubSystemConfigurationCategory("shells"))); //$NON-NLS-1$
 
         for (IHost connection : shellConnections) {
-            if (!connection.getSystemType().isLocal()) {
-                ISubSystem[] subSystems = connection.getSubSystems();
-                for (int i = 0; i < subSystems.length; i++) {
-                    if (subSystems[i] instanceof IFileServiceSubSystem) {
-                        result.add(connection);
-                        break;
-                    }
+            ISubSystem[] subSystems = connection.getSubSystems();
+            for (int i = 0; i < subSystems.length; i++) {
+                if (subSystems[i] instanceof IFileServiceSubSystem) {
+                    result.add(connection);
+                    break;
                 }
             }
         }
