@@ -234,7 +234,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 return null;
             }
         }
-        if (!targetExperiment.getProject().equals(projectElement)) {
+        if (!targetExperiment.getProject().getTracesFolder().equals(sourceResource.getParent())) {
             String targetName = sourceResource.getName();
             for (TmfTraceElement trace : targetExperiment.getProject().getTracesFolder().getTraces()) {
                 if (trace.getName().equals(targetName)) {
@@ -246,7 +246,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 }
             }
             try {
-                if (operation == DND.DROP_COPY) {
+                if (operation == DND.DROP_COPY && !sourceResource.isLinked()) {
                     IPath destination = targetExperiment.getProject().getTracesFolder().getResource().getFullPath().addTrailingSeparator().append(targetName);
                     sourceResource.copy(destination, false, null);
                     cleanupBookmarks(destination);
@@ -314,7 +314,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
             TmfTraceFolder traceFolder,
             int operation) {
 
-        if (sourceResource.getProject().equals(traceFolder.getResource().getProject())) {
+        if (sourceResource.getParent().equals(traceFolder.getResource())) {
             return null;
         }
         String targetName = sourceResource.getName();
@@ -328,7 +328,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
             }
         }
         try {
-            if (operation == DND.DROP_COPY) {
+            if (operation == DND.DROP_COPY && !sourceResource.isLinked()) {
                 IPath destination = traceFolder.getResource().getFullPath().addTrailingSeparator().append(targetName);
                 sourceResource.copy(destination, false, null);
                 cleanupBookmarks(destination);
@@ -336,12 +336,14 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 createLink(traceFolder.getResource(), sourceResource, targetName);
             }
             IResource traceResource = traceFolder.getResource().findMember(targetName);
-            String sourceLocation = sourceResource.getPersistentProperty(TmfCommonConstants.SOURCE_LOCATION);
-            if (sourceLocation == null) {
-                sourceLocation = URIUtil.toUnencodedString(new File(sourceResource.getLocationURI()).toURI());
+            if (traceResource != null && traceResource.exists()) {
+                String sourceLocation = sourceResource.getPersistentProperty(TmfCommonConstants.SOURCE_LOCATION);
+                if (sourceLocation == null) {
+                    sourceLocation = URIUtil.toUnencodedString(new File(sourceResource.getLocationURI()).toURI());
+                }
+                traceResource.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
+                setTraceType(traceResource);
             }
-            traceResource.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
-            setTraceType(traceResource);
             return traceResource;
         } catch (CoreException e) {
             displayException(e);
@@ -438,13 +440,15 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
             createLink(traceFolder.getResource(), path, targetName);
         }
         IResource traceResource = traceFolder.getResource().findMember(targetName);
-        try {
-            String sourceLocation = URIUtil.toUnencodedString(path.toFile().toURI());
-            traceResource.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
-        } catch (CoreException e) {
-            displayException(e);
+        if (traceResource != null && traceResource.exists()) {
+            try {
+                String sourceLocation = URIUtil.toUnencodedString(path.toFile().toURI());
+                traceResource.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
+            } catch (CoreException e) {
+                displayException(e);
+            }
+            setTraceType(traceResource);
         }
-        setTraceType(traceResource);
         return true;
     }
 
