@@ -27,6 +27,8 @@ public class Messages extends NLS {
     public static String Application_WorkspaceRootNotExistError;
     /** Error message if workspace root is write protected */
     public static String Application_WorkspaceRootPermissionError;
+    /** Error message if workspace is already in use */
+    public static String Application_WorkspaceInUseError;
     /** Malformed command */
     public static String CliParser_MalformedCommand;
     /** Unkown command */

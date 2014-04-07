@@ -31,18 +31,20 @@ import org.eclipse.ui.PlatformUI;
  */
 public class Application implements IApplication {
 
+    private Location fInstanceLoc = null;
+
     @Override
     public Object start(IApplicationContext context) throws Exception {
         Display display = PlatformUI.createDisplay();
         try {
             // fetch the Location that we will be modifying
-            Location instanceLoc = Platform.getInstanceLocation();
+            fInstanceLoc = Platform.getInstanceLocation();
 
             // -data @noDefault in <applName>.ini allows us to set the workspace here.
             // If the user wants to change the location then he has to change
             // @noDefault to a specific location or remove -data @noDefault for
             // default location
-            if (!instanceLoc.allowsDefault() && !instanceLoc.isSet()) {
+            if (!fInstanceLoc.allowsDefault() && !fInstanceLoc.isSet()) {
                 File workspaceRoot = new File(TracingRcpPlugin.getWorkspaceRoot());
 
                 if (!workspaceRoot.exists()) {
@@ -61,7 +63,14 @@ public class Application implements IApplication {
 
                 String workspace = TracingRcpPlugin.getWorkspaceRoot() + File.separator + TracingRcpPlugin.WORKSPACE_NAME;
                 // set location to workspace
-                instanceLoc.set(new URL("file", null, workspace), false); //$NON-NLS-1$
+                fInstanceLoc.set(new URL("file", null, workspace), false); //$NON-NLS-1$
+            }
+
+            if (!fInstanceLoc.lock()) {
+                MessageDialog.openError(display.getActiveShell(),
+                        Messages.Application_WorkspaceCreationError,
+                        MessageFormat.format(Messages.Application_WorkspaceInUseError, new Object[] { fInstanceLoc.getURL().getPath() }));
+                return IApplication.EXIT_OK;
             }
 
             int returnCode = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor());
@@ -81,6 +90,7 @@ public class Application implements IApplication {
         }
         final IWorkbench workbench = PlatformUI.getWorkbench();
         final Display display = workbench.getDisplay();
+        fInstanceLoc.release();
         display.syncExec(new Runnable() {
             @Override
             public void run() {
