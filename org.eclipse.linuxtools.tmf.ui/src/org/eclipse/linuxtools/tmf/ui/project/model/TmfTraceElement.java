@@ -456,6 +456,10 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
             return URIUtil.toUnencodedString(getLocation());
         }
 
+        if (sfIsLinked.equals(id)) {
+            return Boolean.valueOf(getResource().isLinked()).toString();
+        }
+
         if (sfSourceLocation.equals(id)) {
             try {
                 String sourceLocation = getElementUnderTraceFolder().getResource().getPersistentProperty(TmfCommonConstants.SOURCE_LOCATION);
