@@ -344,9 +344,11 @@ public class TransientState {
             if (!this.isActive) {
                 return;
             }
-            assert (stateInfo.size() == ongoingStateInfo.size());
+            if (stateInfo.size() > ongoingStateInfo.size()) {
+                throw new IllegalArgumentException();
+            }
 
-            for (int i = 0; i < ongoingStateInfo.size(); i++) {
+            for (int i = 0; i < stateInfo.size(); i++) {
                 /*
                  * We build a dummy interval with end time = -1 to put in the
                  * answer to the query.
