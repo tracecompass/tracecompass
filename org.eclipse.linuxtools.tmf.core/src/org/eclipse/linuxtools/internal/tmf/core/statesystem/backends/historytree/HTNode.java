@@ -389,10 +389,16 @@ public abstract class HTNode {
             for (int i = startIndex; i < intervals.size(); i++) {
                 /*
                  * Now we only have to compare the Start times, since we now the
-                 * End times necessarily fit
+                 * End times necessarily fit.
+                 *
+                 * Second condition is to ignore new attributes that might have
+                 * been created after stateInfo was instantiated (they would be
+                 * null anyway).
                  */
-                if (intervals.get(i).getStartTime() <= t) {
-                    stateInfo.set(intervals.get(i).getAttribute(), intervals.get(i));
+                ITmfStateInterval interval = intervals.get(i);
+                if (interval.getStartTime() <= t &&
+                        interval.getAttribute() < stateInfo.size()) {
+                    stateInfo.set(interval.getAttribute(), interval);
                 }
             }
         } finally {
