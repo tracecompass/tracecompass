@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Alexandre Montplaisir - Initial API and implementation
+ *   Patrick Tasse - Fix TimeRangeException
  ******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.statistics;
@@ -209,8 +210,8 @@ public class TmfStateStatistics implements ITmfStatistics {
         /* Make sure the start/end times are within the state history, so we
          * don't get TimeRange exceptions.
          */
-        long startTime = checkStartTime(start);
-        long endTime = checkEndTime(end);
+        long startTime = checkStartTime(start, typesStats);
+        long endTime = checkEndTime(end, typesStats);
 
         try {
             /* Get the list of quarks, one for each even type in the database */
@@ -278,8 +279,8 @@ public class TmfStateStatistics implements ITmfStatistics {
 
     private long getEventCountAt(long timestamp) {
         /* Make sure the target time is within the range of the history */
-        long ts = checkStartTime(timestamp);
-        ts = checkEndTime(ts);
+        long ts = checkStartTime(timestamp, totalsStats);
+        ts = checkEndTime(ts, totalsStats);
 
         try {
             final int quark = totalsStats.getQuarkAbsolute(Attributes.TOTAL);
@@ -295,18 +296,18 @@ public class TmfStateStatistics implements ITmfStatistics {
         return 0;
     }
 
-    private long checkStartTime(long initialStart) {
+    private static long checkStartTime(long initialStart, ITmfStateSystem ss) {
         long start = initialStart;
-        if (start < totalsStats.getStartTime()) {
-            return totalsStats.getStartTime();
+        if (start < ss.getStartTime()) {
+            return ss.getStartTime();
         }
         return start;
     }
 
-    private long checkEndTime(long initialEnd) {
+    private static long checkEndTime(long initialEnd, ITmfStateSystem ss) {
         long end = initialEnd;
-        if (end > totalsStats.getCurrentEndTime()) {
-            return totalsStats.getCurrentEndTime();
+        if (end > ss.getCurrentEndTime()) {
+            return ss.getCurrentEndTime();
         }
         return end;
     }
