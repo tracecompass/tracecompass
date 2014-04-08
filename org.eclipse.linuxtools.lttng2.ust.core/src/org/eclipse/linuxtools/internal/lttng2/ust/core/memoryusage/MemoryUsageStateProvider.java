@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.linuxtools.lttng2.ust.core.trace.LttngUstTrace;
-import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
@@ -27,6 +26,7 @@ import org.eclipse.linuxtools.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
+import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfEvent;
 
 /**
  * State provider to track the memory of the threads using the UST libc wrapper

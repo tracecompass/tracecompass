@@ -452,7 +452,10 @@ public class TmfTraceTest {
         assertTrue(modules.iterator().hasNext());
         assertTrue(testModules.iterator().hasNext());
 
-        /* Make sure all modules of type TestAnalysis are returned in the second call */
+        /*
+         * Make sure all modules of type TestAnalysis are returned in the second
+         * call
+         */
         for (IAnalysisModule module : modules) {
             if (module instanceof TestAnalysis) {
                 IAnalysisModule otherModule = fTrace.getAnalysisModule(module.getId());

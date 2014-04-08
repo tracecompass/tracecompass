@@ -21,8 +21,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.Activator;
-import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TraceValidationStatus;
+import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace;
 
 /**
  * This is the specification of CtfTmfTrace for use with LTTng 2.x kernel

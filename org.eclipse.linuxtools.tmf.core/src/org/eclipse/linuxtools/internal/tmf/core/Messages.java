@@ -20,7 +20,7 @@ public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.linuxtools.internal.tmf.core.messages"; //$NON-NLS-1$
     public static String TmfCheckpointIndexer_EventsPerSecond;
     public static String TmfCheckpointIndexer_Indexing;
-    public static String TmfEventField_UnsupportedType;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

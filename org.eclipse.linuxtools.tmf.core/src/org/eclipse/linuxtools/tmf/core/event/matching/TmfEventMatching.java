@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
-import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
@@ -240,7 +239,7 @@ class EventMatchingBuildRequest extends TmfEventRequest {
     private final ITmfTrace trace;
 
     EventMatchingBuildRequest(TmfEventMatching matching, ITmfTrace trace) {
-        super(CtfTmfEvent.class,
+        super(ITmfEvent.class,
                 TmfTimeRange.ETERNITY,
                 0,
                 ITmfEventRequest.ALL_DATA,

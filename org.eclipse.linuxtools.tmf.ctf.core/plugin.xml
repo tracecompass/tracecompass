@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.tracetype">
+      <category
+            id="org.eclipse.linuxtools.tmf.ctf.core.category.ctf"
+            name="%tracetype.category.ctf">
+      </category>
+      <type
+            category="org.eclipse.linuxtools.tmf.ctf.core.category.ctf"
+            event_type="org.eclipse.linuxtools.tmf.ctf.core.CtfTmfEvent"
+            id="org.eclipse.linuxtools.tmf.ui.type.ctf"
+            isDirectory="false"
+            name="%tracetype.type.ctf"
+            trace_type="org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace">
+      </type>
+   </extension>
+
+</plugin>

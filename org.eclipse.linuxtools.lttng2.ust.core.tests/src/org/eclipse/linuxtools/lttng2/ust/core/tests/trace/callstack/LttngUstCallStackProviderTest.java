@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.lttng2.ust.core.tests.trace.callstack;
 
-import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.linuxtools.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 
 /**
  * Test suite for the UST callstack state provider, using the trace of a program

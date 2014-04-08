@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- For PDE build, remove "ws" and "arch" -->
+<feature
+      id="org.eclipse.linuxtools.tmf.ctf"
+      label="%featureName"
+      version="3.0.0.qualifier"
+      provider-name="%featureProvider"
+      license-feature="org.eclipse.license"
+      license-feature-version="1.0.0.qualifier">
+
+   <description>
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <update label="Linux Tools Update Site" url="http://download.eclipse.org/linuxtools/update"/>
+   </url>
+
+   <includes
+         id="org.eclipse.linuxtools.tmf"
+         version="0.0.0"
+         name="Tracing and Monitoring Framework (TMF)"/>
+
+   <includes
+         id="org.eclipse.linuxtools.ctf"
+         version="0.0.0"
+         name="Common Trace Format (CTF)"/>
+
+   <requires>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.linuxtools.ctf.core" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.tmf.core" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.linuxtools.tmf.ui" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.help"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.linuxtools.tmf.ctf.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

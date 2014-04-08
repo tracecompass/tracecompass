@@ -15,8 +15,6 @@ package org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.Attributes;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.LttngStrings;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.StateValues;
-import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
-import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
@@ -26,6 +24,8 @@ import org.eclipse.linuxtools.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystemBuilder;
 import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
+import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfEvent;
+import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace;
 
 /**
  * This is the state change input plugin for TMF's state system which handles

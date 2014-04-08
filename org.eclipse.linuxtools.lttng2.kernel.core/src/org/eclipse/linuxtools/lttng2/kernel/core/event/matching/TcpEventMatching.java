@@ -16,13 +16,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.TcpEventStrings;
-import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.matching.ITmfNetworkMatchDefinition;
 import org.eclipse.linuxtools.tmf.core.event.matching.TmfEventMatching.MatchingType;
 import org.eclipse.linuxtools.tmf.core.event.matching.TmfNetworkEventMatching.Direction;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace;
 
 /**
  * Class to match tcp type events. This matching class applies to traces
