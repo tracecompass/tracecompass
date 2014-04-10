@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="Trace Viewer" uid="org.eclipse.linuxtools.tracing.rcp" id="org.eclipse.linuxtools.tracing.rcp.branding.product" application="org.eclipse.linuxtools.tracing.rcp.ui.application" version="0.0.1.qualifier" useFeatures="true" includeLaunchers="true">
+<product name="Trace Viewer" uid="org.eclipse.linuxtools.tracing.rcp" id="org.eclipse.linuxtools.tracing.rcp.branding.product" application="org.eclipse.linuxtools.tracing.rcp.ui.application" version="1.0.0.qualifier" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/org.eclipse.linuxtools.tracing.rcp.branding/icons/alt_about.gif"/>
       <text>
          Linux Tools Trace Viewer
 
-Version: 0.0.1
+Version: 1.0.0
 
-Copyright (c) 2013 Ericsson
+Copyright (c) 2014 Ericsson
 
 All rights reserved. This program and the accompanying materials are
 made available under the terms of the Eclipse Public License v1.0 which
@@ -31,7 +31,6 @@ http://www.eclipse.org/legal/epl-v10.html
    </launcherArgs>
 
    <windowImages i16="/org.eclipse.linuxtools.tracing.rcp.branding/icons/alt_window_16.gif" i32="/org.eclipse.linuxtools.tracing.rcp.branding/icons/alt_window_32.gif"/>
-
 
    <launcher name="traceViewer">
       <solaris/>
