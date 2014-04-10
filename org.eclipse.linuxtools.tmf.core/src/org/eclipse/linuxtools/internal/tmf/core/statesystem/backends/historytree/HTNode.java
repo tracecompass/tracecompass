@@ -1,13 +1,14 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
- * Copyright (c) 2010, 2011 École Polytechnique de Montréal
- * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
+ * Copyright (c) 2010, 2014 Ericsson, École Polytechnique de Montréal, and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
+ * Contributors:
+ *   Alexandre Montplaisir - Initial API and implementation
+ *   Florian Wininger - Add Extension and Leaf Node
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.historytree;
@@ -32,6 +33,67 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
  * @author Alexandre Montplaisir
  */
 public abstract class HTNode {
+
+    // ------------------------------------------------------------------------
+    // Class fields
+    // ------------------------------------------------------------------------
+
+    /**
+     * The type of node
+     */
+    public static enum NodeType {
+        /**
+         * Core node, which is a "front" node, at any level of the tree except
+         * the bottom-most one. It has children, and may have extensions.
+         */
+        CORE,
+        /**
+         * Leaf node, which is a node at the last bottom level of the tree. It
+         * cannot have any children or extensions.
+         */
+        LEAF;
+
+        /**
+         * Determine a node type by reading a serialized byte.
+         *
+         * @param rep
+         *            The byte representation of the node type
+         * @return The corresponding NodeType
+         * @throws IOException
+         *             If the NodeType is unrecognized
+         */
+        public static NodeType fromByte(byte rep) throws IOException {
+            switch (rep) {
+            case 1:
+                return CORE;
+            case 2:
+                return LEAF;
+            default:
+                throw new IOException();
+            }
+        }
+
+        /**
+         * Get the byte representation of this node type. It can then be read
+         * with {@link #fromByte}.
+         *
+         * @return The byte matching this node type
+         */
+        public byte toByte() {
+            switch (this) {
+            case CORE:
+                return 1;
+            case LEAF:
+                return 2;
+            default:
+                throw new IllegalStateException();
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
 
     /* Configuration of the History Tree to which belongs this node */
     private final HTConfig config;
@@ -109,7 +171,8 @@ public abstract class HTNode {
         buffer.flip();
 
         /* Read the common header part */
-        byte type = buffer.get();
+        byte typeByte = buffer.get();
+        NodeType type = NodeType.fromByte(typeByte);
         long start = buffer.getLong();
         long end = buffer.getLong();
         int seqNb = buffer.getInt();
@@ -120,21 +183,17 @@ public abstract class HTNode {
 
         /* Now the rest of the header depends on the node type */
         switch (type) {
-        case 1:
+        case CORE:
             /* Core nodes */
             newNode = new CoreNode(config, seqNb, parentSeqNb, start);
             newNode.readSpecificHeader(buffer);
             break;
 
-        // TODO implement other node types
-        // case 2:
-        // /* Leaf nodes */
-        //
-        //
-        //
-        // case 3:
-        // /* "Claudette" (extended) nodes */
-        //
+        case LEAF:
+            /* Leaf nodes */
+            newNode = new LeafNode(config, seqNb, parentSeqNb, start);
+            newNode.readSpecificHeader(buffer);
+            break;
 
         default:
             /* Unrecognized node type */
@@ -181,7 +240,7 @@ public abstract class HTNode {
             buffer.clear();
 
             /* Write the common header part */
-            buffer.put(this.getNodeType());
+            buffer.put(this.getNodeType().toByte());
             buffer.putLong(nodeStart);
             buffer.putLong(nodeEnd);
             buffer.putInt(sequenceNumber);
@@ -254,7 +313,7 @@ public abstract class HTNode {
     /**
      * Get the end time of this node.
      *
-     * @return The end time  of this node
+     * @return The end time of this node
      */
     public long getNodeEnd() {
         if (this.isOnDisk) {
@@ -409,7 +468,8 @@ public abstract class HTNode {
      *            The timestamp
      * @return The Interval containing the information we want, or null if it
      *         wasn't found
-     * @throws TimeRangeException If 't' is invalid
+     * @throws TimeRangeException
+     *             If 't' is invalid
      */
     public HTInterval getRelevantInterval(int key, long t) throws TimeRangeException {
         rwl.readLock().lock();
@@ -477,7 +537,6 @@ public abstract class HTNode {
 
         return index;
     }
-
 
     /**
      * <pre>
@@ -575,7 +634,7 @@ public abstract class HTNode {
         writer.println("Node #" + sequenceNumber + ":");
 
         /* Array of children */
-        if (this.getNodeType() == 1) { /* Only Core Nodes can have children */
+        if (this.getNodeType() == NodeType.CORE) { /* Only Core Nodes can have children */
             CoreNode thisNode = (CoreNode) this;
             writer.print("  " + thisNode.getNbChildren() + " children");
             if (thisNode.getNbChildren() >= 1) {
@@ -605,7 +664,7 @@ public abstract class HTNode {
      *
      * @return The node type
      */
-    public abstract byte getNodeType();
+    public abstract NodeType getNodeType();
 
     /**
      * Return the specific header size of this node. This means the size

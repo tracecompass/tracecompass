@@ -1,13 +1,14 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
- * Copyright (c) 2010, 2011 École Polytechnique de Montréal
- * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
+ * Copyright (c) 2010, 2014 Ericsson, École Polytechnique de Montréal, and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
+ * Contributors:
+ *   Alexandre Montplaisir - Initial API and implementation
+ *   Florian Wininger - Add Extension and Leaf Node
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.historytree;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 
@@ -45,7 +47,7 @@ public class HistoryTree {
     private static final int HISTORY_FILE_MAGIC_NUMBER = 0x05FFA900;
 
     /** File format version. Increment when breaking compatibility. */
-    private static final int FILE_VERSION = 3;
+    private static final int FILE_VERSION = 4;
 
     // ------------------------------------------------------------------------
     // Tree-specific configuration
@@ -68,7 +70,7 @@ public class HistoryTree {
     private int nodeCount;
 
     /** "Cache" to keep the active nodes in memory */
-    private final List<CoreNode> latestBranch;
+    private final List<HTNode> latestBranch;
 
     // ------------------------------------------------------------------------
     // Constructors/"Destructors"
@@ -86,8 +88,8 @@ public class HistoryTree {
      */
     public HistoryTree(HTConfig conf) throws IOException {
         /*
-         * Simple check to make sure we have enough place in the 0th block
-         * for the tree configuration
+         * Simple check to make sure we have enough place in the 0th block for
+         * the tree configuration
          */
         if (conf.getBlockSize() < TREE_HEADER_SIZE) {
             throw new IllegalArgumentException();
@@ -96,13 +98,13 @@ public class HistoryTree {
         config = conf;
         treeEnd = conf.getTreeStart();
         nodeCount = 0;
-        latestBranch = Collections.synchronizedList(new ArrayList<CoreNode>());
+        latestBranch = Collections.synchronizedList(new ArrayList<HTNode>());
 
         /* Prepare the IO object */
         treeIO = new HT_IO(config, true);
 
         /* Add the first node to the tree */
-        CoreNode firstNode = initNewCoreNode(-1, conf.getTreeStart());
+        LeafNode firstNode = initNewLeafNode(-1, conf.getTreeStart());
         latestBranch.add(firstNode);
     }
 
@@ -211,16 +213,16 @@ public class HistoryTree {
      *            start
      * @throws ClosedChannelException
      */
-    private List<CoreNode> buildLatestBranch(int rootNodeSeqNb) throws ClosedChannelException {
-        HTNode nextChildNode;
+    private List<HTNode> buildLatestBranch(int rootNodeSeqNb) throws ClosedChannelException {
+        List<HTNode> list = new ArrayList<>();
 
-        List<CoreNode> list = new ArrayList<>();
+        HTNode nextChildNode = treeIO.readNode(rootNodeSeqNb);
+        list.add(nextChildNode);
 
-        nextChildNode = treeIO.readNode(rootNodeSeqNb);
-        list.add((CoreNode) nextChildNode);
-        while (list.get(list.size() - 1).getNbChildren() > 0) {
-            nextChildNode = treeIO.readNode(list.get(list.size() - 1).getLatestChild());
-            list.add((CoreNode) nextChildNode);
+        /* Follow the last branch up to the leaf */
+        while (nextChildNode.getNodeType() == HTNode.NodeType.CORE) {
+            nextChildNode = treeIO.readNode(((CoreNode) nextChildNode).getLatestChild());
+            list.add(nextChildNode);
         }
         return Collections.synchronizedList(list);
     }
@@ -328,7 +330,7 @@ public class HistoryTree {
      *
      * @return The root node
      */
-    public CoreNode getRootNode() {
+    public HTNode getRootNode() {
         return latestBranch.get(0);
     }
 
@@ -487,7 +489,13 @@ public class HistoryTree {
         synchronized (latestBranch) {
             final long splitTime = treeEnd;
 
-            assert (indexOfNode < latestBranch.size());
+            if (indexOfNode >= latestBranch.size()) {
+                /*
+                 * We need to make sure (indexOfNode - 1) doesn't get the last
+                 * node in the branch, because that one is a Leaf Node.
+                 */
+                throw new IllegalStateException();
+            }
 
             /* Check if we need to add a new root node */
             if (indexOfNode == 0) {
@@ -496,7 +504,7 @@ public class HistoryTree {
             }
 
             /* Check if we can indeed add a child to the target parent */
-            if (latestBranch.get(indexOfNode - 1).getNbChildren() == config.getMaxChildren()) {
+            if (((CoreNode) latestBranch.get(indexOfNode - 1)).getNbChildren() == config.getMaxChildren()) {
                 /* If not, add a branch starting one level higher instead */
                 addSiblingNode(indexOfNode - 1);
                 return;
@@ -507,11 +515,21 @@ public class HistoryTree {
                 latestBranch.get(i).closeThisNode(splitTime);
                 treeIO.writeNode(latestBranch.get(i));
 
-                CoreNode prevNode = latestBranch.get(i - 1);
-                CoreNode newNode = initNewCoreNode(prevNode.getSequenceNumber(),
-                        splitTime + 1);
-                prevNode.linkNewChild(newNode);
+                CoreNode prevNode = (CoreNode) latestBranch.get(i - 1);
+                HTNode newNode;
 
+                switch (latestBranch.get(i).getNodeType()) {
+                case CORE:
+                    newNode = initNewCoreNode(prevNode.getSequenceNumber(), splitTime + 1);
+                    break;
+                case LEAF:
+                    newNode = initNewLeafNode(prevNode.getSequenceNumber(), splitTime + 1);
+                    break;
+                default:
+                    throw new IllegalStateException();
+                }
+
+                prevNode.linkNewChild(newNode);
                 latestBranch.set(i, newNode);
             }
         }
@@ -524,7 +542,7 @@ public class HistoryTree {
     private void addNewRootNode() {
         final long splitTime = this.treeEnd;
 
-        CoreNode oldRootNode = latestBranch.get(0);
+        HTNode oldRootNode = latestBranch.get(0);
         CoreNode newRootNode = initNewCoreNode(-1, config.getTreeStart());
 
         /* Tell the old root node that it isn't root anymore */
@@ -544,17 +562,25 @@ public class HistoryTree {
         int depth = latestBranch.size();
         latestBranch.clear();
         latestBranch.add(newRootNode);
+
+        // Create new coreNode
         for (int i = 1; i < depth + 1; i++) {
-            CoreNode prevNode = latestBranch.get(i - 1);
+            CoreNode prevNode = (CoreNode) latestBranch.get(i - 1);
             CoreNode newNode = initNewCoreNode(prevNode.getParentSequenceNumber(),
                     splitTime + 1);
             prevNode.linkNewChild(newNode);
             latestBranch.add(newNode);
         }
+
+        // Create the new leafNode
+        CoreNode prevNode = (CoreNode) latestBranch.get(depth);
+        LeafNode newNode = initNewLeafNode(prevNode.getParentSequenceNumber(), splitTime + 1);
+        prevNode.linkNewChild(newNode);
+        latestBranch.add(newNode);
     }
 
     /**
-     * Add a new empty node to the tree.
+     * Add a new empty core node to the tree.
      *
      * @param parentSeqNumber
      *            Sequence number of this node's parent
@@ -564,6 +590,27 @@ public class HistoryTree {
      */
     private CoreNode initNewCoreNode(int parentSeqNumber, long startTime) {
         CoreNode newNode = new CoreNode(config, this.nodeCount, parentSeqNumber,
+                startTime);
+        this.nodeCount++;
+
+        /* Update the treeEnd if needed */
+        if (startTime >= this.treeEnd) {
+            this.treeEnd = startTime + 1;
+        }
+        return newNode;
+    }
+
+    /**
+     * Add a new empty leaf node to the tree.
+     *
+     * @param parentSeqNumber
+     *            Sequence number of this node's parent
+     * @param startTime
+     *            Start time of the new node
+     * @return The newly created node
+     */
+    private LeafNode initNewLeafNode(int parentSeqNumber, long startTime) {
+        LeafNode newNode = new LeafNode(config, this.nodeCount, parentSeqNumber,
                 startTime);
         this.nodeCount++;
 
@@ -681,8 +728,8 @@ public class HistoryTree {
             }
 
             /*
-             * Test that the childStartTimes[] array matches the real nodes' start
-             * times
+             * Test that the childStartTimes[] array matches the real nodes'
+             * start times
              */
             for (int i = 0; i < node.getNbChildren(); i++) {
                 otherNode = treeIO.readNode(node.getChild(i));
@@ -745,26 +792,44 @@ public class HistoryTree {
     /* Only used for debugging, shouldn't be externalized */
     @SuppressWarnings("nls")
     private void preOrderPrint(PrintWriter writer, boolean printIntervals,
-            CoreNode currentNode, int curDepth) {
+            HTNode currentNode, int curDepth) {
 
         writer.println(currentNode.toString());
         if (printIntervals) {
             currentNode.debugPrintIntervals(writer);
         }
 
-        try {
-            for (int i = 0; i < currentNode.getNbChildren(); i++) {
-                HTNode nextNode = treeIO.readNode(currentNode.getChild(i));
-                assert (nextNode instanceof CoreNode); // TODO temporary
-                for (int j = 0; j < curDepth; j++) {
-                    writer.print("  ");
+        switch (currentNode.getNodeType()) {
+        case LEAF:
+            /* Stop if it's the leaf node */
+            return;
+
+        case CORE:
+            try {
+                final CoreNode node = (CoreNode) currentNode;
+                /* Print the extensions, if any */
+                int extension = node.getExtensionSequenceNumber();
+                while (extension != -1) {
+                    HTNode nextNode = treeIO.readNode(extension);
+                    preOrderPrint(writer, printIntervals, nextNode, curDepth);
                 }
-                writer.print("+-");
-                preOrderPrint(writer, printIntervals, (CoreNode) nextNode,
-                              curDepth + 1);
+
+                /* Print the child nodes */
+                for (int i = 0; i < node.getNbChildren(); i++) {
+                    HTNode nextNode = treeIO.readNode(node.getChild(i));
+                    for (int j = 0; j < curDepth; j++) {
+                        writer.print("  ");
+                    }
+                    writer.print("+-");
+                    preOrderPrint(writer, printIntervals, nextNode, curDepth + 1);
+                }
+            } catch (ClosedChannelException e) {
+                Activator.logError(e.getMessage());
             }
-        } catch (ClosedChannelException e) {
-            e.printStackTrace();
+            break;
+
+        default:
+            break;
         }
     }
 

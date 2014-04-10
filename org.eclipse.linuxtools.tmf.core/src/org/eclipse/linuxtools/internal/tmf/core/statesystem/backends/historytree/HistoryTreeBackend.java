@@ -178,15 +178,13 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         }
 
         /* We start by reading the information in the root node */
-        // FIXME using CoreNode for now, we'll have to redo this part to handle
-        // different node types
-        CoreNode currentNode = sht.getRootNode();
+        HTNode currentNode = sht.getRootNode();
         currentNode.writeInfoFromNode(stateInfo, t);
 
         /* Then we follow the branch down in the relevant children */
         try {
-            while (currentNode.getNbChildren() > 0) {
-                currentNode = (CoreNode) sht.selectNextChild(currentNode, t);
+            while (currentNode.getNodeType() == HTNode.NodeType.CORE) {
+                currentNode = sht.selectNextChild((CoreNode) currentNode, t);
                 currentNode.writeInfoFromNode(stateInfo, t);
             }
         } catch (ClosedChannelException e) {
@@ -225,14 +223,12 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
             throw new TimeRangeException();
         }
 
-        // FIXME using CoreNode for now, we'll have to redo this part to handle
-        // different node types
-        CoreNode currentNode = sht.getRootNode();
+        HTNode currentNode = sht.getRootNode();
         HTInterval interval = currentNode.getRelevantInterval(key, t);
 
         try {
-            while (interval == null && currentNode.getNbChildren() > 0) {
-                currentNode = (CoreNode) sht.selectNextChild(currentNode, t);
+            while (interval == null && currentNode.getNodeType() == HTNode.NodeType.CORE) {
+                currentNode = sht.selectNextChild((CoreNode)currentNode, t);
                 interval = currentNode.getRelevantInterval(key, t);
             }
         } catch (ClosedChannelException e) {

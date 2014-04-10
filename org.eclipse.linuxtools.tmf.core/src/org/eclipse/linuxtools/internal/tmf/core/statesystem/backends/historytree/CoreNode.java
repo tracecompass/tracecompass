@@ -1,13 +1,14 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
- * Copyright (c) 2010, 2011 École Polytechnique de Montréal
- * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
+ * Copyright (c) 2010, 2014 Ericsson, École Polytechnique de Montréal, and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
+ * Contributors:
+ *   Alexandre Montplaisir - Initial API and implementation
+ *   Florian Wininger - Add Extension and Leaf Node
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.historytree;
@@ -21,9 +22,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * It extends HTNode by adding support for child nodes, and also extensions.
  *
  * @author Alexandre Montplaisir
- *
  */
-public class CoreNode extends HTNode {
+public final class CoreNode extends HTNode {
 
     /** Number of bytes in a int */
     private static final int SIZE_INT = 4;
@@ -61,7 +61,7 @@ public class CoreNode extends HTNode {
      * @param start
      *            The earliest timestamp stored in this node
      */
-    protected CoreNode(HTConfig config, int seqNumber, int parentSeqNumber,
+    public CoreNode(HTConfig config, int seqNumber, int parentSeqNumber,
             long start) {
         super(config, seqNumber, parentSeqNumber, start);
         this.nbChildren = 0;
@@ -212,7 +212,7 @@ public class CoreNode extends HTNode {
      * @param childNode
      *            The SHTNode object of the new child
      */
-    public void linkNewChild(CoreNode childNode) {
+    public void linkNewChild(HTNode childNode) {
         rwl.writeLock().lock();
         try {
             assert (nbChildren < getConfig().getMaxChildren());
@@ -227,8 +227,8 @@ public class CoreNode extends HTNode {
     }
 
     @Override
-    public byte getNodeType() {
-        return 1;
+    public NodeType getNodeType() {
+        return NodeType.CORE;
     }
 
     @Override
