@@ -122,16 +122,17 @@ public class CTFTraceGrowingStreamTest {
      */
     @Test
     public void testGrowingLive() throws CTFReaderException, FileNotFoundException, IOException {
-        CTFTraceReader reader = new CTFTraceReader(fFixture);
-        reader.setLive(true);
-        assertEquals("0x29", reader.getCurrentEventDef().getFields().getDefinitions().get("f").toString());
-        reader.advance();
-        try (FileOutputStream fos = new FileOutputStream(fGrowingStream, true)) {
-            fos.write(fPackets[1]);
+        try (CTFTraceReader reader = new CTFTraceReader(fFixture);) {
+            reader.setLive(true);
+            assertEquals("0x29", reader.getCurrentEventDef().getFields().getDefinitions().get("f").toString());
+            reader.advance();
+            try (FileOutputStream fos = new FileOutputStream(fGrowingStream, true)) {
+                fos.write(fPackets[1]);
+            }
+            reader.advance();
+            assertNotNull(reader.getCurrentEventDef());
+            assertEquals("0xbab4face", reader.getCurrentEventDef().getFields().getDefinitions().get("f").toString());
         }
-        reader.advance();
-        assertNotNull(reader.getCurrentEventDef());
-        assertEquals("0xbab4face", reader.getCurrentEventDef().getFields().getDefinitions().get("f").toString());
     }
 
     /**
@@ -143,14 +144,15 @@ public class CTFTraceGrowingStreamTest {
      */
     @Test
     public void testGrowingNotLive() throws CTFReaderException, FileNotFoundException, IOException {
-        CTFTraceReader reader = new CTFTraceReader(fFixture);
-        reader.setLive(false);
-        assertEquals("0x29", reader.getCurrentEventDef().getFields().getDefinitions().get("f").toString());
-        reader.advance();
-        try (FileOutputStream fos = new FileOutputStream(fGrowingStream, true)) {
-            fos.write(fPackets[1]);
+        try (CTFTraceReader reader = new CTFTraceReader(fFixture);) {
+            reader.setLive(false);
+            assertEquals("0x29", reader.getCurrentEventDef().getFields().getDefinitions().get("f").toString());
+            reader.advance();
+            try (FileOutputStream fos = new FileOutputStream(fGrowingStream, true)) {
+                fos.write(fPackets[1]);
+            }
+            reader.advance();
+            assertNull(reader.getCurrentEventDef());
         }
-        reader.advance();
-        assertNull(reader.getCurrentEventDef());
     }
 }

@@ -416,7 +416,7 @@ public class IOstructgenTest {
      */
     @After
     public void tearDown(){
-        trace.dispose();
+        trace.close();
     }
 
     /**

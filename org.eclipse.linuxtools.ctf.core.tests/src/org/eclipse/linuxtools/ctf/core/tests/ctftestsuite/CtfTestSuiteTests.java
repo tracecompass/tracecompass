@@ -143,14 +143,11 @@ public class CtfTestSuiteTests {
      */
     @Test
     public void testTrace() {
-        CTFTrace trace = null;
-        CTFTraceReader reader = null;
-        try {
-            /* Instantiate the trace object (which implies parsing the metadata) */
-            trace = new CTFTrace(fTracePath);
+        try (/* Instantiate the trace (which implies parsing the metadata) */
+                CTFTrace trace = new CTFTrace(fTracePath);
+                /* Read the trace until the end */
+                CTFTraceReader reader = new CTFTraceReader(trace);) {
 
-            /* Read the trace until the end */
-            reader = new CTFTraceReader(trace);
             reader.getCurrentEventDef();
             while (reader.advance()) {
                 assertNotNull(reader.getCurrentEventDef());
@@ -161,14 +158,6 @@ public class CtfTestSuiteTests {
             checkIfWeShouldFail(e);
         } catch (OutOfMemoryError e) {
             checkIfWeShouldFail(e);
-        } finally {
-            if (reader != null) {
-                reader.dispose();
-            }
-            if (trace != null) {
-                trace.dispose();
-            }
-
         }
     }
 

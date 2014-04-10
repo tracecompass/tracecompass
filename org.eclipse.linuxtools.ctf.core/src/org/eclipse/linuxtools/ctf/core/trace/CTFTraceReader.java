@@ -30,7 +30,7 @@ import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputReaderTimestamp
  * @author Matthew Khouzam
  * @author Alexandre Montplaisir
  */
-public class CTFTraceReader {
+public class CTFTraceReader implements AutoCloseable {
 
     private static final int MIN_PRIO_SIZE = 16;
 
@@ -124,12 +124,13 @@ public class CTFTraceReader {
     /**
      * Dispose the CTFTraceReader
      *
-     * @since 2.0
+     * @since 3.0
      */
-    public void dispose() {
+    @Override
+    public void close() {
         for (StreamInputReader reader : fStreamInputReaders) {
             if (reader != null) {
-                reader.dispose();
+                reader.close();
             }
         }
         fStreamInputReaders.clear();

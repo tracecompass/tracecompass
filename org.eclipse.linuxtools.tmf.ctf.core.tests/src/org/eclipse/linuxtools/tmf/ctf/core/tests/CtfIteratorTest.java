@@ -63,6 +63,9 @@ public class CtfIteratorTest {
      */
     @After
     public void tearDown() {
+        if (trace != null) {
+            trace.dispose();
+        }
         if (iterator != null) {
             iterator.dispose();
         }
@@ -74,8 +77,9 @@ public class CtfIteratorTest {
      */
     @Test
     public void testCtfIterator_noinit() throws CTFReaderException {
-        CtfIterator result = new CtfIterator(trace);
-        assertNotNull(result);
+        try (CtfIterator result = new CtfIterator(trace);) {
+            assertNotNull(result);
+        }
     }
 
     /**
@@ -85,9 +89,9 @@ public class CtfIteratorTest {
     @Test
     public void testCtfIterator_init() throws CTFReaderException {
         trace.init("test");
-        CtfIterator result = new CtfIterator(trace);
-
-        assertNotNull(result);
+        try (CtfIterator result = new CtfIterator(trace);) {
+            assertNotNull(result);
+        }
     }
 
     /**
@@ -99,9 +103,9 @@ public class CtfIteratorTest {
     public void testCtfIterator_position() throws CTFReaderException {
         long timestampValue = 1L;
         long rank = 1L;
-        CtfIterator result = new CtfIterator(trace, new CtfLocationInfo(timestampValue, 0), rank);
-
-        assertNotNull(result);
+        try (CtfIterator result = new CtfIterator(trace, new CtfLocationInfo(timestampValue, 0), rank);) {
+            assertNotNull(result);
+        }
     }
 
 
@@ -120,10 +124,10 @@ public class CtfIteratorTest {
      */
     @Test
     public void testCompareTo() throws CTFReaderException {
-        CtfIterator o = new CtfIterator(trace);
-        int result = iterator.compareTo(o);
-
-        assertEquals(1L, result);
+        try (CtfIterator o = new CtfIterator(trace);) {
+            int result = iterator.compareTo(o);
+            assertEquals(1L, result);
+        }
     }
 
     /**
@@ -133,13 +137,14 @@ public class CtfIteratorTest {
      */
     @Test
     public void testEquals_other() throws CTFReaderException {
-        CtfIterator obj = new CtfIterator(trace);
-        CtfLocation ctfLocation1 = new CtfLocation(new CtfLocationInfo(1, 0));
-        obj.setLocation(ctfLocation1);
-        obj.increaseRank();
+        try (CtfIterator obj = new CtfIterator(trace);) {
+            CtfLocation ctfLocation1 = new CtfLocation(new CtfLocationInfo(1, 0));
+            obj.setLocation(ctfLocation1);
+            obj.increaseRank();
 
-        boolean result = iterator.equals(obj);
-        assertTrue(result);
+            boolean result = iterator.equals(obj);
+            assertTrue(result);
+        }
     }
 
     /**

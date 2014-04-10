@@ -65,9 +65,10 @@ public class CtfTmfEventTest {
     public void setUp() throws CTFReaderException {
         assumeTrue(testTrace.exists());
         CtfTmfTrace trace = testTrace.getTrace();
-        CtfIterator tr = new CtfIterator(trace);
-        tr.advance();
-        fixture = tr.getCurrentEvent();
+        try (CtfIterator tr = new CtfIterator(trace);) {
+            tr.advance();
+            fixture = tr.getCurrentEvent();
+        }
     }
 
     /**

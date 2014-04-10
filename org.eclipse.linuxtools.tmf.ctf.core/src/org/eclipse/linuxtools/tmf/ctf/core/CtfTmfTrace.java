@@ -130,7 +130,7 @@ public class CtfTmfTrace extends TmfTrace
     public synchronized void dispose() {
         CtfIteratorManager.removeTrace(this);
         if (fTrace != null) {
-            fTrace.dispose();
+            fTrace.close();
             fTrace = null;
         }
         super.dispose();
@@ -144,28 +144,27 @@ public class CtfTmfTrace extends TmfTrace
      */
     @Override
     public IStatus validate(final IProject project, final String path) {
-        IStatus validTrace = new TraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID);
-        try {
-            final CTFTrace temp = new CTFTrace(path);
+        IStatus status = new TraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID);
+        try (final CTFTrace temp = new CTFTrace(path);) {
             if (!temp.majorIsSet()) {
-                validTrace = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_MajorNotSet);
+                status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_MajorNotSet);
             } else {
-                CTFTraceReader ctfTraceReader = new CTFTraceReader(temp);
-                if (!ctfTraceReader.hasMoreEvents()) {
-                    // TODO: This will need an additional check when we support live traces
-                    // because having no event is valid for a live trace
-                    validTrace = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_NoEvent);
+                try (CTFTraceReader ctfTraceReader = new CTFTraceReader(temp);) {
+                    if (!ctfTraceReader.hasMoreEvents()) {
+                        // TODO: This will need an additional check when we
+                        // support live traces
+                        // because having no event is valid for a live trace
+                        status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_NoEvent);
+                    }
                 }
-                ctfTraceReader.dispose();
             }
-            temp.dispose();
         } catch (final CTFReaderException e) {
-            validTrace = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError +": " + e.toString()); //$NON-NLS-1$
-        } catch (final BufferOverflowException e){
-            validTrace = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError +": " + Messages.CtfTmfTrace_BufferOverflowErrorMessage); //$NON-NLS-1$
+            status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + e.toString()); //$NON-NLS-1$
+        } catch (final BufferOverflowException e) {
+            status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + Messages.CtfTmfTrace_BufferOverflowErrorMessage); //$NON-NLS-1$
         }
 
-        return validTrace;
+        return status;
     }
 
     /**

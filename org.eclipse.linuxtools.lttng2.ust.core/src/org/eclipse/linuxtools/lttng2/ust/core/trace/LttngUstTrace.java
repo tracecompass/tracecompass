@@ -50,29 +50,20 @@ public class LttngUstTrace extends CtfTmfTrace {
      */
     @Override
     public IStatus validate(final IProject project, final String path)  {
-        CTFTrace temp;
-        IStatus status;
-        /*  Make sure the trace is openable as a CTF trace. */
-        try {
-            temp = new CTFTrace(path);
-        } catch (CTFReaderException e) {
-            status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.toString(), e);
-            return status;
-        } catch (NullPointerException e) {
-            status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.toString(), e);
-            return status;
-        } catch (final BufferOverflowException e) {
-            status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.LttngUstTrace_TraceReadError + ": " + Messages.LttngUstTrace_MalformedTrace); //$NON-NLS-1$
-            return status;
-        }
+        try (CTFTrace temp = new CTFTrace(path);) {
+            /* Make sure the domain is "ust" in the trace's env vars */
+            String dom = temp.getEnvironment().get("domain"); //$NON-NLS-1$
+            if (dom != null && dom.equals("\"ust\"")) { //$NON-NLS-1$
+                return new TraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID);
+            }
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.LttngUstTrace_DomainError);
 
-        /* Make sure the domain is "ust" in the trace's env vars */
-        String dom = temp.getEnvironment().get("domain"); //$NON-NLS-1$
-        temp.dispose();
-        if (dom != null && dom.equals("\"ust\"")) { //$NON-NLS-1$
-            return new TraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID);
+        } catch (CTFReaderException e) {
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.toString(), e);
+        } catch (NullPointerException e) {
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.toString(), e);
+        } catch (final BufferOverflowException e) {
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.LttngUstTrace_TraceReadError + ": " + Messages.LttngUstTrace_MalformedTrace); //$NON-NLS-1$
         }
-        status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.LttngUstTrace_DomainError);
-        return status;
     }
 }

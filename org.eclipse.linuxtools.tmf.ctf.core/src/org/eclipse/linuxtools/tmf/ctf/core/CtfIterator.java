@@ -98,6 +98,11 @@ public class CtfIterator extends CTFTraceReader
         }
     }
 
+    @Override
+    public void dispose() {
+        close();
+    }
+
     private void setUnknownLocation() {
         fCurLocation = NULL_LOCATION;
         fCurRank = UNKNOWN_RANK;

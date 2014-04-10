@@ -78,8 +78,9 @@ public class CTFTraceGrowingTest {
      */
     @Test
     public void testEmptyStream() throws CTFReaderException {
-        CTFTraceReader reader = new CTFTraceReader(fixture);
-        assertNull(reader.getCurrentEventDef());
+        try (CTFTraceReader reader = new CTFTraceReader(fixture);) {
+            assertNull(reader.getCurrentEventDef());
+        }
     }
 
     /**
@@ -91,11 +92,12 @@ public class CTFTraceGrowingTest {
     @Test
     public void testAddStream() throws CTFReaderException {
         File stream = new File(fPathName + "/" + "channel1");
-        CTFTraceReader reader = new CTFTraceReader(fixture);
-        fixture.addStreamFile(stream);
-        reader.update();
-        assertTrue(reader.advance());
-        assertNotNull(reader.getCurrentEventDef());
+        try (CTFTraceReader reader = new CTFTraceReader(fixture);) {
+            fixture.addStreamFile(stream);
+            reader.update();
+            assertTrue(reader.advance());
+            assertNotNull(reader.getCurrentEventDef());
+        }
     }
 
     /**
@@ -107,15 +109,16 @@ public class CTFTraceGrowingTest {
     @Test
     public void testAddTwoStreams1() throws CTFReaderException {
         File stream = new File(fPathName + "/" + "channel1");
-        CTFTraceReader reader = new CTFTraceReader(fixture);
-        fixture.addStreamFile(stream);
-        stream = new File(fPathName + "/" + "channel2");
-        fixture.addStreamFile(stream);
-        reader.update();
-        assertTrue(reader.advance());
-        EventDefinition currentEventDef = reader.getCurrentEventDef();
-        assertNotNull(reader.getCurrentEventDef());
-        assertEquals(16518l, currentEventDef.getTimestamp());
+        try (CTFTraceReader reader = new CTFTraceReader(fixture);) {
+            fixture.addStreamFile(stream);
+            stream = new File(fPathName + "/" + "channel2");
+            fixture.addStreamFile(stream);
+            reader.update();
+            assertTrue(reader.advance());
+            EventDefinition currentEventDef = reader.getCurrentEventDef();
+            assertNotNull(reader.getCurrentEventDef());
+            assertEquals(16518l, currentEventDef.getTimestamp());
+        }
     }
 
     /**
@@ -127,17 +130,18 @@ public class CTFTraceGrowingTest {
     @Test
     public void testAddTwoStreams2() throws CTFReaderException {
         File stream = new File(fPathName + "/" + "channel1");
-        CTFTraceReader reader = new CTFTraceReader(fixture);
-        fixture.addStreamFile(stream);
-        stream = new File(fPathName + "/" + "channel2");
-        reader.update();
-        assertTrue(reader.advance());
-        fixture.addStreamFile(stream);
-        reader.update();
-        assertTrue(reader.advance());
-        EventDefinition currentEventDef = reader.getCurrentEventDef();
-        assertNotNull(currentEventDef);
-        assertEquals(223007L, currentEventDef.getTimestamp());
+        try (CTFTraceReader reader = new CTFTraceReader(fixture);) {
+            fixture.addStreamFile(stream);
+            stream = new File(fPathName + "/" + "channel2");
+            reader.update();
+            assertTrue(reader.advance());
+            fixture.addStreamFile(stream);
+            reader.update();
+            assertTrue(reader.advance());
+            EventDefinition currentEventDef = reader.getCurrentEventDef();
+            assertNotNull(currentEventDef);
+            assertEquals(223007L, currentEventDef.getTimestamp());
+        }
     }
 
     /**
@@ -149,22 +153,23 @@ public class CTFTraceGrowingTest {
     @Test
     public void testAddTwoStreams3() throws CTFReaderException {
         File stream = new File(fPathName + "/" + "channel1");
-        CTFTraceReader reader = new CTFTraceReader(fixture);
-        fixture.addStreamFile(stream);
-        stream = new File(fPathName + "/" + "channel2");
-        reader.update();
-        reader.update();
-        reader.update();
-        assertTrue(reader.advance());
-        fixture.addStreamFile(stream);
-        reader.update();
-        reader.update();
-        reader.update();
-        reader.update();
-        assertTrue(reader.advance());
-        EventDefinition currentEventDef = reader.getCurrentEventDef();
-        assertNotNull(currentEventDef);
-        assertEquals(223007L, currentEventDef.getTimestamp());
+        try (CTFTraceReader reader = new CTFTraceReader(fixture);) {
+            fixture.addStreamFile(stream);
+            stream = new File(fPathName + "/" + "channel2");
+            reader.update();
+            reader.update();
+            reader.update();
+            assertTrue(reader.advance());
+            fixture.addStreamFile(stream);
+            reader.update();
+            reader.update();
+            reader.update();
+            reader.update();
+            assertTrue(reader.advance());
+            EventDefinition currentEventDef = reader.getCurrentEventDef();
+            assertNotNull(currentEventDef);
+            assertEquals(223007L, currentEventDef.getTimestamp());
+        }
     }
 
     /**
@@ -176,9 +181,10 @@ public class CTFTraceGrowingTest {
     @Test(expected = CTFReaderException.class)
     public void testAddStreamFail() throws CTFReaderException {
         File stream = new File(fPathName + "/" + "metadata");
-        CTFTraceReader reader = new CTFTraceReader(fixture);
-        fixture.addStreamFile(stream);
-        assertNull(reader.getCurrentEventDef());
+        try (CTFTraceReader reader = new CTFTraceReader(fixture);) {
+            fixture.addStreamFile(stream);
+            assertNull(reader.getCurrentEventDef());
+        }
     }
 
 }

@@ -49,34 +49,26 @@ public class LttngKernelTrace extends CtfTmfTrace {
      * CTF trace in the "kernel" domain.
      */
     @Override
-    public IStatus validate(final IProject project, final String path)  {
-        CTFTrace temp;
-        IStatus validStatus;
+    public IStatus validate(final IProject project, final String path) {
         /*
          * Make sure the trace is openable as a CTF trace. We do this here
          * instead of calling super.validate() to keep the reference to "temp".
          */
-        try {
-            temp = new CTFTrace(path);
-        } catch (CTFReaderException e) {
-            validStatus = new Status(IStatus.ERROR,  Activator.PLUGIN_ID, e.toString(), e);
-            return validStatus;
-        } catch (NullPointerException e){
-            validStatus = new Status(IStatus.ERROR,  Activator.PLUGIN_ID, e.toString(), e);
-            return validStatus;
-        } catch (final BufferOverflowException e) {
-            validStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.LttngKernelTrace_TraceReadError + ": " + Messages.LttngKernelTrace_MalformedTrace); //$NON-NLS-1$
-            return validStatus;
-        }
+        try (CTFTrace temp = new CTFTrace(path);) {
+            /* Make sure the domain is "kernel" in the trace's env vars */
+            String dom = temp.getEnvironment().get("domain"); //$NON-NLS-1$
+            if (dom != null && dom.equals("\"kernel\"")) { //$NON-NLS-1$
+                return new TraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID);
+            }
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.LttngKernelTrace_DomainError);
 
-        /* Make sure the domain is "kernel" in the trace's env vars */
-        String dom = temp.getEnvironment().get("domain"); //$NON-NLS-1$
-        temp.dispose();
-        if (dom != null && dom.equals("\"kernel\"")) { //$NON-NLS-1$
-            return new TraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID);
+        } catch (CTFReaderException e) {
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.toString(), e);
+        } catch (NullPointerException e) {
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.toString(), e);
+        } catch (final BufferOverflowException e) {
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.LttngKernelTrace_TraceReadError + ": " + Messages.LttngKernelTrace_MalformedTrace); //$NON-NLS-1$
         }
-        validStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.LttngKernelTrace_DomainError);
-        return validStatus;
     }
 
 }

@@ -317,10 +317,11 @@ public class EventDeclarationTest {
     @Test
     public void testEventDefinition() throws CTFReaderException {
         CTFTrace trace = testTrace.getTrace();
-        CTFTraceReader tr = new CTFTraceReader(trace);
-        tr.advance();
         EventDefinition ed = new EventDefinition(null, null);
-        ed = tr.getCurrentEventDef();
+        try (CTFTraceReader tr = new CTFTraceReader(trace);) {
+            tr.advance();
+            ed = tr.getCurrentEventDef();
+        }
         assertNotNull(ed);
         assertNotNull(ed.getPath());
         assertNotNull(ed.getDeclaration());
@@ -334,7 +335,7 @@ public class EventDeclarationTest {
         assertNotNull(ed.lookupDefinition("fields"));
         assertNull(ed.lookupDefinition("other"));
         assertNotNull(ed.toString());
-        ed.setContext( ed.getFields());
+        ed.setContext(ed.getFields());
         assertNotNull(ed.toString());
     }
 

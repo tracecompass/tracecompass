@@ -90,10 +90,8 @@ public class ReadTraceBenchmark {
             stop = System.nanoTime();
             openTime.add(stop - start);
             start = System.nanoTime();
-            try {
+            try (CTFTraceReader traceReader = new CTFTraceReader(trace);) {
                 if (trace != null) {
-                    CTFTraceReader traceReader = new CTFTraceReader(trace);
-
                     start = System.nanoTime();
 
                     while (traceReader.hasMoreEvents()) {

@@ -28,7 +28,7 @@ import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntr
  * @author Matthew Khouzam
  * @author Simon Marchi
  */
-public class StreamInputReader {
+public class StreamInputReader implements AutoCloseable {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -96,10 +96,11 @@ public class StreamInputReader {
     /**
      * Dispose the StreamInputReader
      *
-     * @since 2.0
+     * @since 3.0
      */
-    public void dispose() {
-        fPacketReader.dispose();
+    @Override
+    public void close() {
+        fPacketReader.close();
     }
 
     // ------------------------------------------------------------------------

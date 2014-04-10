@@ -36,7 +36,7 @@ import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntr
  * @author Matthew Khouzam
  * @author Simon Marchi
  */
-public class StreamInputPacketReader implements IDefinitionScope {
+public class StreamInputPacketReader implements IDefinitionScope, AutoCloseable {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -144,9 +144,10 @@ public class StreamInputPacketReader implements IDefinitionScope {
     /**
      * Dispose the StreamInputPacketReader
      *
-     * @since 2.0
+     * @since 3.0
      */
-    public void dispose() {
+    @Override
+    public void close() {
         fBitBuffer.setByteBuffer(null);
     }
 

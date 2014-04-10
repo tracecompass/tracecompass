@@ -61,7 +61,7 @@ import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseE
  * @author Matthew Khouzam
  * @version $Revision: 1.0 $
  */
-public class CTFTrace implements IDefinitionScope {
+public class CTFTrace implements IDefinitionScope, AutoCloseable {
 
     @SuppressWarnings("nls")
     @Override
@@ -232,9 +232,10 @@ public class CTFTrace implements IDefinitionScope {
     /**
      * Dispose the trace
      *
-     * @since 2.0
+     * @since 3.0
      */
-    public void dispose() {
+    @Override
+    public void close() {
         for (FileInputStream fis : fFileInputStreams) {
             if (fis != null) {
                 try {

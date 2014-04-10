@@ -52,10 +52,8 @@ public class ReadTrace {
             if (USE_TEXT) {
                 System.out.println("Event, " + " Time, " + " type, " + " CPU ");
             }
-            try {
+            try (CTFTraceReader traceReader = new CTFTraceReader(trace);) {
                 if (trace != null) {
-                    CTFTraceReader traceReader = new CTFTraceReader(trace);
-
                     start = System.nanoTime();
 
                     while (traceReader.hasMoreEvents()) {
