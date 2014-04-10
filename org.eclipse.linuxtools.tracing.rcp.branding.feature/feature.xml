@@ -19,6 +19,10 @@
       %license
    </license>
 
+   <url>
+      <update label="Linux Tools Update Site" url="http://download.eclipse.org/linuxtools/update"/>
+   </url>
+
    <plugin
          id="org.eclipse.linuxtools.tracing.rcp.branding"
          download-size="0"
