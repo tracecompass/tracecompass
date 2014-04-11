@@ -49,6 +49,8 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.ModalContext;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
@@ -86,9 +88,12 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.dialogs.FileSystemElement;
 import org.eclipse.ui.dialogs.IOverwriteQuery;
 import org.eclipse.ui.dialogs.WizardResourceImportPage;
+import org.eclipse.ui.internal.ide.DialogUtil;
 import org.eclipse.ui.internal.ide.dialogs.IElementFilter;
 import org.eclipse.ui.model.AdaptableList;
 import org.eclipse.ui.model.WorkbenchContentProvider;
+import org.eclipse.ui.model.WorkbenchLabelProvider;
+import org.eclipse.ui.model.WorkbenchViewerComparator;
 import org.eclipse.ui.wizards.datatransfer.FileSystemStructureProvider;
 import org.eclipse.ui.wizards.datatransfer.IImportStructureProvider;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
@@ -149,6 +154,15 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     /** The directory browse button. */
     protected Button directoryBrowseButton;
 
+    /**
+     * ResourceTreeAndListGroup was internal in Kepler and we referenced it. It
+     * is now removed in Luna. To keep our builds compatible with Kepler, we
+     * need to have our own version of this class. Once we stop supporting
+     * Kepler, we can delete this class and use the public one from the
+     * platform.
+     */
+    private ResourceTreeAndListGroup fSelectionGroup;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -163,6 +177,35 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
      */
     protected ImportTraceWizardPage(String name, IStructuredSelection selection) {
         super(name, selection);
+    }
+
+    /**
+     *  Create the import source selection widget. (Copied from WizardResourceImportPage
+     *  but instead always uses the internal ResourceTreeAndListGroup to keep compatibility
+     *  with Kepler)
+     */
+    @Override
+    protected void createFileSelectionGroup(Composite parent) {
+
+        //Just create with a dummy root.
+        fSelectionGroup = new ResourceTreeAndListGroup(parent,
+                new FileSystemElement("Dummy", null, true),//$NON-NLS-1$
+                getFolderProvider(), new WorkbenchLabelProvider(),
+                getFileProvider(), new WorkbenchLabelProvider(), SWT.NONE,
+                DialogUtil.inRegularFontMode(parent));
+
+        ICheckStateListener listener = new ICheckStateListener() {
+            @Override
+            public void checkStateChanged(CheckStateChangedEvent event) {
+                updateWidgetEnablements();
+            }
+        };
+
+        WorkbenchViewerComparator comparator = new WorkbenchViewerComparator();
+        fSelectionGroup.setTreeComparator(comparator);
+        fSelectionGroup.setListComparator(comparator);
+        fSelectionGroup.addCheckStateListener(listener);
+
     }
 
     /**
@@ -459,7 +502,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     // ------------------------------------------------------------------------
     private void resetSelection() {
         TraceFileSystemElement root = getFileSystemTree();
-        selectionGroup.setRoot(root);
+        fSelectionGroup.setRoot(root);
     }
 
     private TraceFileSystemElement getFileSystemTree() {
@@ -603,7 +646,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             return false;
         }
 
-        if (selectionGroup.getCheckedElementCount() == 0) {
+        if (fSelectionGroup.getCheckedElementCount() == 0) {
             setMessage(null);
             setErrorMessage(Messages.ImportTraceWizard_SelectTraceNoneSelected);
             return false;
@@ -785,7 +828,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
                 // List fileSystemElements will be filled using the passThroughFilter
                 SubMonitor subMonitor = SubMonitor.convert(progressMonitor, 1);
-                getSelectedResources(passThroughFilter, subMonitor);
+                fSelectionGroup.getAllCheckedListItems(passThroughFilter, subMonitor);
 
                 // Check if operation was cancelled.
                 ModalContext.checkCanceled(subMonitor);
