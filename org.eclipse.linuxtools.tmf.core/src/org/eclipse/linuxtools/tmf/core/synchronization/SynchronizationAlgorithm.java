@@ -91,11 +91,11 @@ public abstract class SynchronizationAlgorithm extends TmfEventMatches implement
     /**
      * Returns a timestamp transformation algorithm
      *
-     * @param name
-     *            The name of the trace to get the transform for
+     * @param hostId
+     *            The host ID of the trace to get the transform for
      * @return The timestamp transformation formula
      */
-    public abstract ITmfTimestampTransform getTimestampTransform(String name);
+    public abstract ITmfTimestampTransform getTimestampTransform(String hostId);
 
     /**
      * Gets the quality of the synchronization between two given traces
@@ -113,23 +113,10 @@ public abstract class SynchronizationAlgorithm extends TmfEventMatches implement
      * identity. This function returns true if the synchronization algorithm has
      * failed for some reason
      *
-     * @param name
-     *            The name of the trace
+     * @param hostId
+     *            The host ID of the trace
      * @return true if trace has formula
      */
-    public abstract boolean isTraceSynced(String name);
-
-    /**
-     * Rename a trace involved in this algorithm. This function is necessary
-     * because after synchronization, the trace whose timestamp changes is
-     * copied with a new name and the synchronization needs to keep track of the
-     * new name.
-     *
-     * @param oldname
-     *            Original name of the trace
-     * @param newname
-     *            New name of the trace
-     */
-    public abstract void renameTrace(String oldname, String newname);
+    public abstract boolean isTraceSynced(String hostId);
 
 }

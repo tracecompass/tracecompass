@@ -160,8 +160,19 @@ public class SynchronizeTracesHandler extends AbstractHandler {
                                  */
                                 for (int i = 0; i < tl.size(); i++) {
                                     TmfTraceElement traceel = tl.get(i);
+                                    /*
+                                     * Find the trace corresponding to this
+                                     * element in the experiment
+                                     */
+                                    ITmfTrace expTrace = null;
+                                    for (ITmfTrace t : experiment.getTraces()) {
+                                        if (t.getName().equals(traceel.getName())) {
+                                            expTrace = t;
+                                            break;
+                                        }
+                                    }
                                     try {
-                                        if (syncAlgo.isTraceSynced(traceel.getName())) {
+                                        if ((expTrace != null) && syncAlgo.isTraceSynced(expTrace.getHostId())) {
 
                                             /* Find the original trace */
                                             TmfTraceElement origtrace = null;
@@ -193,8 +204,6 @@ public class SynchronizeTracesHandler extends AbstractHandler {
 
                                                 if (newtrace != null) {
 
-                                                    syncAlgo.renameTrace(origtrace.getName(), newtrace.getName());
-
                                                     /*
                                                      * Instantiate the new trace
                                                      * and set its sync formula
@@ -217,7 +226,8 @@ public class SynchronizeTracesHandler extends AbstractHandler {
                                                      */
                                                     exp.removeTrace(traceel);
                                                 } else {
-                                                    TraceUtils.displayErrorMsg(Messages.SynchronizeTracesHandler_Title, Messages.SynchronizeTracesHandler_Error + CR + CR + String.format(Messages.SynchronizeTracesHandler_CopyProblem, origtrace.getName()));
+                                                    TraceUtils.displayErrorMsg(Messages.SynchronizeTracesHandler_Title,
+                                                            Messages.SynchronizeTracesHandler_Error + CR + CR + String.format(Messages.SynchronizeTracesHandler_CopyProblem, origtrace.getName()));
                                                 }
                                             }
                                         }

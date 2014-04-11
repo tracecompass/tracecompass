@@ -90,11 +90,11 @@ public class ExperimentSyncTest {
             fTraces[0].setTimestampTransform(tt1);
             fTraces[1].setTimestampTransform(tt2);
 
-            assertEquals("TmfTimestampTransform [ IDENTITY ]", tt2.toString());
+            assertEquals(tt2, TmfTimestampTransform.IDENTITY);
             assertEquals("TmfTimestampLinear [ alpha = 0.9999413783703139011056845831168394, beta = 79796507913179.33347660124688298171 ]", tt1.toString());
 
-            assertEquals(syncAlgo.getTimestampTransform(fTraces[0].getName()),fTraces[0].getTimestampTransform());
-            assertEquals(syncAlgo.getTimestampTransform(fTraces[1].getName()),fTraces[1].getTimestampTransform());
+            assertEquals(syncAlgo.getTimestampTransform(fTraces[0].getHostId()),fTraces[0].getTimestampTransform());
+            assertEquals(syncAlgo.getTimestampTransform(fTraces[1].getHostId()),fTraces[1].getTimestampTransform());
 
         } catch (TmfTraceException e) {
             fail("Exception thrown in experiment synchronization " + e.getMessage());

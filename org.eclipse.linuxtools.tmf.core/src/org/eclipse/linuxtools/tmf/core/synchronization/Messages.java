@@ -38,8 +38,8 @@ public class Messages extends NLS {
     public static String SyncAlgorithmFullyIncremental_incomplete;
     public static String SyncAlgorithmFullyIncremental_nbmatch;
     public static String SyncAlgorithmFullyIncremental_nbacc;
-    public static String SyncAlgorithmFullyIncremental_reftrace;
-    public static String SyncAlgorithmFullyIncremental_othertrace;
+    public static String SyncAlgorithmFullyIncremental_refhost;
+    public static String SyncAlgorithmFullyIncremental_otherhost;
     public static String SyncAlgorithmFullyIncremental_refformula;
     public static String SyncAlgorithmFullyIncremental_NA;
     public static String SyncAlgorithmFullyIncremental_quality;

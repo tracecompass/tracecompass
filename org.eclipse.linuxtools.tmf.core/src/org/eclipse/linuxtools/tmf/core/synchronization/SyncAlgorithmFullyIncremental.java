@@ -77,7 +77,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
         /* Create a convex hull for all trace pairs */
         for (int i = 0; i < traceArr.length; i++) {
             for (int j = i + 1; j < traceArr.length; j++) {
-                ConvexHull algo = new ConvexHull(traceArr[i].getName(), traceArr[j].getName());
+                ConvexHull algo = new ConvexHull(traceArr[i].getHostId(), traceArr[j].getHostId());
                 fSyncs.add(algo);
             }
         }
@@ -85,23 +85,23 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
 
     @Override
     protected void processMatch(TmfEventDependency match) {
-        String trace1 = match.getSourceEvent().getTrace().getName();
-        String trace2 = match.getDestinationEvent().getTrace().getName();
+        String host1 = match.getSourceEvent().getTrace().getHostId();
+        String host2 = match.getDestinationEvent().getTrace().getHostId();
 
         /* Process only if source and destination are different */
-        if (trace1.equals(trace2)) {
+        if (host1.equals(host2)) {
             return;
         }
 
-        /* Check if a convex hull algorithm already exists for these 2 traces */
+        /* Check if a convex hull algorithm already exists for these 2 hosts */
         ConvexHull algo = null;
         for (ConvexHull traceSync : fSyncs) {
-            if (traceSync.isForTraces(trace1, trace2)) {
+            if (traceSync.isForHosts(host1, host2)) {
                 algo = traceSync;
             }
         }
         if (algo == null) {
-            algo = new ConvexHull(trace1, trace2);
+            algo = new ConvexHull(host1, host2);
             fSyncs.add(algo);
         }
         algo.processMatch(match);
@@ -110,19 +110,19 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
 
     @Override
     public ITmfTimestampTransform getTimestampTransform(ITmfTrace trace) {
-        return getTimestampTransform(trace.getName());
+        return getTimestampTransform(trace.getHostId());
     }
 
     @Override
-    public ITmfTimestampTransform getTimestampTransform(String name) {
+    public ITmfTimestampTransform getTimestampTransform(String hostId) {
         for (ConvexHull traceSync : fSyncs) {
-            if (traceSync.isTraceSynced(name)) {
+            if (traceSync.isTraceSynced(hostId)) {
                 /*
                  * Since there are many traces, maybe the reference trace is
                  * also synchronized, so we need to chain sync formulas
                  */
-                ITmfTimestampTransform refTt = getTimestampTransform(traceSync.getReferenceTrace());
-                return refTt.composeWith(traceSync.getTimestampTransform(name));
+                ITmfTimestampTransform refTt = getTimestampTransform(traceSync.getReferenceHost());
+                return refTt.composeWith(traceSync.getTimestampTransform(hostId));
             }
         }
         return TmfTimestampTransform.IDENTITY;
@@ -131,7 +131,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
     @Override
     public SyncQuality getSynchronizationQuality(ITmfTrace trace1, ITmfTrace trace2) {
         for (ConvexHull traceSync : fSyncs) {
-            if (traceSync.isForTraces(trace1.getName(), trace2.getName())) {
+            if (traceSync.isForHosts(trace1.getHostId(), trace2.getHostId())) {
                 return traceSync.getQuality();
             }
         }
@@ -139,34 +139,19 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
     }
 
     @Override
-    public boolean isTraceSynced(String name) {
+    public boolean isTraceSynced(String hostId) {
         boolean traceSynced = false;
         for (ConvexHull traceSync : fSyncs) {
-            traceSynced = traceSynced || traceSync.isTraceSynced(name);
+            traceSynced = traceSynced || traceSync.isTraceSynced(hostId);
         }
         return traceSynced;
-    }
-
-    /**
-     * Rename one of the traces in the synchronization
-     *
-     * @param oldname
-     *            The name of the original trace
-     * @param newname
-     *            The new name of the trace
-     */
-    @Override
-    public void renameTrace(String oldname, String newname) {
-        for (ConvexHull traceSync : fSyncs) {
-            traceSync.renameTrace(oldname, newname);
-        }
     }
 
     @Override
     public Map<String, Map<String, Object>> getStats() {
         Map<String, Map<String, Object>> statmap = new LinkedHashMap<>();
         for (ConvexHull traceSync : fSyncs) {
-            statmap.put(traceSync.getReferenceTrace() + " <==> " + traceSync.getOtherTrace(), traceSync.getStats()); //$NON-NLS-1$
+            statmap.put(traceSync.getReferenceHost() + " <==> " + traceSync.getOtherHost(), traceSync.getStats()); //$NON-NLS-1$
         }
         return statmap;
     }
@@ -212,7 +197,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
         private BigDecimal fAlphamin, fBetamax, fAlphamax, fBetamin, fAlpha, fBeta;
 
         private int fNbMatches, fNbAccurateMatches;
-        private String fReferenceTrace = "", fOtherTrace = ""; //$NON-NLS-1$//$NON-NLS-2$
+        private String fReferenceHost = "", fOtherHost = ""; //$NON-NLS-1$//$NON-NLS-2$
         private SyncQuality fQuality;
 
         private Map<String, Object> fStats = new LinkedHashMap<>();
@@ -220,18 +205,18 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
         /**
          * Initialization of the attributes
          *
-         * @param trace1
-         *            Name of the first trace
-         * @param trace2
-         *            Name of the second trace
+         * @param host1
+         *            ID of the first host
+         * @param host2
+         *            ID of the second host
          */
-        public ConvexHull(String trace1, String trace2) {
-            if (trace1.compareTo(trace2) > 0) {
-                fReferenceTrace = trace2;
-                fOtherTrace = trace1;
+        public ConvexHull(String host1, String host2) {
+            if (host1.compareTo(host2) > 0) {
+                fReferenceHost = host2;
+                fOtherHost = host1;
             } else {
-                fReferenceTrace = trace1;
-                fOtherTrace = trace2;
+                fReferenceHost = host1;
+                fOtherHost = host2;
             }
             fLmax = new SyncPoint[2];
             fLmin = new SyncPoint[2];
@@ -257,7 +242,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
             fNbMatches++;
 
             /* Initialize data depending on the which hull the match is part of */
-            if (match.getSourceEvent().getTrace().getName().compareTo(match.getDestinationEvent().getTrace().getName()) > 0) {
+            if (match.getSourceEvent().getTrace().getHostId().compareTo(match.getDestinationEvent().getTrace().getHostId()) > 0) {
                 boundList = fUpperBoundList;
                 otherBoundList = fLowerBoundList;
                 line = fLmin;
@@ -407,8 +392,8 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
             boundList.addLast(p);
         }
 
-        public ITmfTimestampTransform getTimestampTransform(String name) {
-            if (name.equals(fOtherTrace) && (fQuality == SyncQuality.ACCURATE || fQuality == SyncQuality.APPROXIMATE || fQuality == SyncQuality.FAIL)) {
+        public ITmfTimestampTransform getTimestampTransform(String hostId) {
+            if (hostId.equals(fOtherHost) && (fQuality == SyncQuality.ACCURATE || fQuality == SyncQuality.APPROXIMATE || fQuality == SyncQuality.FAIL)) {
                 /* alpha: beta => 1 / fAlpha, -1 * fBeta / fAlpha); */
                 return new TmfTimestampTransformLinear(BigDecimal.ONE.divide(fAlpha, fMc), BigDecimal.valueOf(-1).multiply(fBeta).divide(fAlpha, fMc));
             }
@@ -441,8 +426,8 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
                     break;
                 }
 
-                fStats.put(Messages.SyncAlgorithmFullyIncremental_reftrace, fReferenceTrace);
-                fStats.put(Messages.SyncAlgorithmFullyIncremental_othertrace, fOtherTrace);
+                fStats.put(Messages.SyncAlgorithmFullyIncremental_refhost, fReferenceHost);
+                fStats.put(Messages.SyncAlgorithmFullyIncremental_otherhost, fOtherHost);
                 fStats.put(Messages.SyncAlgorithmFullyIncremental_quality, syncQuality);
                 fStats.put(Messages.SyncAlgorithmFullyIncremental_alpha, fAlpha);
                 fStats.put(Messages.SyncAlgorithmFullyIncremental_beta, fBeta);
@@ -452,36 +437,28 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
                                                                                                                           // fAlphamin);
                 fStats.put(Messages.SyncAlgorithmFullyIncremental_nbmatch, (fNbMatches == 0) ? Messages.SyncAlgorithmFullyIncremental_NA : fNbMatches);
                 fStats.put(Messages.SyncAlgorithmFullyIncremental_nbacc, (fNbAccurateMatches == 0) ? Messages.SyncAlgorithmFullyIncremental_NA : fNbAccurateMatches);
-                fStats.put(Messages.SyncAlgorithmFullyIncremental_refformula, Messages.SyncAlgorithmFullyIncremental_T_ + fReferenceTrace);
-                fStats.put(Messages.SyncAlgorithmFullyIncremental_otherformula, fAlpha + Messages.SyncAlgorithmFullyIncremental_mult + Messages.SyncAlgorithmFullyIncremental_T_ + fReferenceTrace + Messages.SyncAlgorithmFullyIncremental_add + fBeta);
+                fStats.put(Messages.SyncAlgorithmFullyIncremental_refformula, Messages.SyncAlgorithmFullyIncremental_T_ + fReferenceHost);
+                fStats.put(Messages.SyncAlgorithmFullyIncremental_otherformula, fAlpha + Messages.SyncAlgorithmFullyIncremental_mult + Messages.SyncAlgorithmFullyIncremental_T_ + fReferenceHost + Messages.SyncAlgorithmFullyIncremental_add + fBeta);
             }
             return fStats;
 
         }
 
-        public String getReferenceTrace() {
-            return fReferenceTrace;
+        public String getReferenceHost() {
+            return fReferenceHost;
         }
 
-        public String getOtherTrace() {
-            return fOtherTrace;
+        public String getOtherHost() {
+            return fOtherHost;
         }
 
-        public boolean isTraceSynced(String name) {
+        public boolean isTraceSynced(String hostId) {
             /* Returns true if the timestamp transform is not identity */
-            return (name.equals(fOtherTrace) && (fQuality == SyncQuality.ACCURATE || fQuality == SyncQuality.APPROXIMATE || fQuality == SyncQuality.FAIL));
+            return (hostId.equals(fOtherHost) && (fQuality == SyncQuality.ACCURATE || fQuality == SyncQuality.APPROXIMATE || fQuality == SyncQuality.FAIL));
         }
 
-        public boolean isForTraces(String trace1, String trace2) {
-            return ((fReferenceTrace.equals(trace1) && fOtherTrace.equals(trace2)) || (fReferenceTrace.equals(trace2) && fOtherTrace.equals(trace1)));
-        }
-
-        public void renameTrace(String oldname, String newname) {
-            if (oldname.equals(fOtherTrace)) {
-                fOtherTrace = newname;
-            } else if (oldname.equals(fReferenceTrace)) {
-                fReferenceTrace = newname;
-            }
+        public boolean isForHosts(String hostId1, String hostId2) {
+            return ((fReferenceHost.equals(hostId1) && fOtherHost.equals(hostId2)) || (fReferenceHost.equals(hostId2) && fOtherHost.equals(hostId1)));
         }
 
         private void writeObject(ObjectOutputStream s)
@@ -504,7 +481,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
         @Override
         public String toString() {
             StringBuilder b = new StringBuilder();
-            b.append("Between " + fReferenceTrace + " and " + fOtherTrace + " [");
+            b.append("Between " + fReferenceHost + " and " + fOtherHost + " [");
             b.append(" alpha " + fAlpha + " beta " + fBeta + " ]");
             return b.toString();
         }
