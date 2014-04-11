@@ -96,6 +96,7 @@
                 <fileset><directory>traces/synctraces</directory></fileset>
                 <fileset><directory>traces/synthetic-trace</directory></fileset>
                 <fileset><directory>traces/trace2</directory></fileset>
+                <fileset><directory>traces/exp</directory></fileset>
               </filesets>
             </configuration>
             <goals>

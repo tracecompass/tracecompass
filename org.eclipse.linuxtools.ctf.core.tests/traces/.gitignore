@@ -2,6 +2,7 @@
 *.gz
 *.tar
 *.ht
+*.zip
 /ctf-testsuite
 /cyg-profile
 /funky_trace
@@ -11,3 +12,4 @@
 /synctraces
 /synthetic-trace
 /trace2
+/exp
