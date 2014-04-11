@@ -25,6 +25,7 @@ import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.analysis.Messages;
 import org.eclipse.linuxtools.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
+import org.eclipse.linuxtools.tmf.core.tests.shared.TmfTestHelper;
 import org.eclipse.linuxtools.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.tests.stubs.analysis.TestAnalysis;
@@ -225,5 +226,27 @@ public class AnalysisModuleTest {
          * Cannot test anymore of this method, need a parameter provider to do
          * this
          */
+    }
+
+    /**
+     * Test the {@link TmfTestHelper#executeAnalysis(IAnalysisModule)} method
+     */
+    @Test
+    public void testHelper() {
+        TestAnalysis module = setUpAnalysis();
+
+        try {
+            module.setTrace(TmfTestTrace.A_TEST_10K.getTrace());
+        } catch (TmfAnalysisException e) {
+            fail(e.getMessage());
+        }
+
+        module.setParameter(TestAnalysis.PARAM_TEST, 1);
+        boolean res = TmfTestHelper.executeAnalysis(module);
+        assertTrue(res);
+
+        module.setParameter(TestAnalysis.PARAM_TEST, 0);
+        res = TmfTestHelper.executeAnalysis(module);
+        assertFalse(res);
     }
 }
