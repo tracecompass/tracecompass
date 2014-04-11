@@ -40,6 +40,7 @@ import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 
 /**
@@ -406,8 +407,8 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
             // sci.getTrace() will eventually return a @NonNull
             @SuppressWarnings("null")
             @NonNull ITmfTrace tr = sci.getTrace();
+            trace = tr;
 
-            this.trace = tr;
         }
 
         @Override
@@ -415,6 +416,16 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
             super.handleData(event);
             if (event.getTrace() == trace) {
                 sci.processEvent(event);
+            } else if (trace instanceof TmfExperiment) {
+                /*
+                 * If the request is for an experiment, check if the event is
+                 * from one of the child trace
+                 */
+                for (ITmfTrace childTrace : ((TmfExperiment) trace).getTraces()) {
+                    if (childTrace == event.getTrace()) {
+                        sci.processEvent(event);
+                    }
+                }
             }
         }
 
