@@ -234,7 +234,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 return null;
             }
         }
-        if (!targetExperiment.getProject().getTracesFolder().equals(sourceResource.getParent())) {
+        if (!targetExperiment.getProject().getTracesFolder().getResource().equals(sourceResource.getParent())) {
             String targetName = sourceResource.getName();
             for (TmfTraceElement trace : targetExperiment.getProject().getTracesFolder().getTraces()) {
                 if (trace.getName().equals(targetName)) {
