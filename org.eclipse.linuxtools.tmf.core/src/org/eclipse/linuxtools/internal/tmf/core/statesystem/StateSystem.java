@@ -415,8 +415,8 @@ public class StateSystem implements ITmfStateSystemBuilder {
 
         if (stackDepth >= 100000) {
             /*
-             * Limit stackDepth to 100000, to avoid having Attribute Trees grow out
-             * of control due to buggy insertions
+             * Limit stackDepth to 100000, to avoid having Attribute Trees grow
+             * out of control due to buggy insertions
              */
             String message = "Stack limit reached, not pushing"; //$NON-NLS-1$
             throw new AttributeNotFoundException(message);
@@ -468,7 +468,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
 
         /* Update the state value of the stack-attribute */
         ITmfStateValue nextSV;
-        if (--stackDepth == 0 ) {
+        if (--stackDepth == 0) {
             /* Store a null state value */
             nextSV = TmfStateValue.nullValue();
         } else {
@@ -542,7 +542,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
      */
     protected void replaceOngoingState(List<ITmfStateInterval> newStateIntervals) {
         transState.replaceOngoingState(newStateIntervals);
-   }
+    }
 
     //--------------------------------------------------------------------------
     //        Regular query methods (sent to the back-end)
@@ -686,8 +686,8 @@ public class StateSystem implements ITmfStateSystemBuilder {
             throw new StateSystemDisposedException();
         }
 
-        List<ITmfStateInterval> intervals;
-        ITmfStateInterval currentInterval;
+        List<ITmfStateInterval> intervals = new LinkedList<>();
+        ITmfStateInterval currentInterval = null;
         long ts, tEnd;
 
         IProgressMonitor mon = monitor;
@@ -707,29 +707,21 @@ public class StateSystem implements ITmfStateSystemBuilder {
             tEnd = t2;
         }
 
-        /* Get the initial state at time T1 */
-        intervals = new ArrayList<>();
-        currentInterval = querySingleState(t1, attributeQuark);
-        intervals.add(currentInterval);
-
         /*
          * Iterate over the "resolution points". We skip unneeded queries in the
          * case the current interval is longer than the resolution.
          */
-        for (ts = t1; (currentInterval.getEndTime() != -1) && (ts < tEnd);
-                ts += resolution) {
+        for (ts = t1; ts <= tEnd;
+                ts += ((currentInterval.getEndTime() - ts) / resolution + 1) * resolution) {
             if (mon.isCanceled()) {
                 return intervals;
-            }
-            if (ts <= currentInterval.getEndTime()) {
-                continue;
             }
             currentInterval = querySingleState(ts, attributeQuark);
             intervals.add(currentInterval);
         }
 
         /* Add the interval at t2, if it wasn't included already. */
-        if (currentInterval.getEndTime() < tEnd) {
+        if (currentInterval != null && currentInterval.getEndTime() < tEnd) {
             currentInterval = querySingleState(tEnd, attributeQuark);
             intervals.add(currentInterval);
         }
