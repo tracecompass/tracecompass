@@ -44,30 +44,29 @@ public class MatchAndSyncTest {
         final String cr = System.getProperty("line.separator");
         assumeTrue(CtfTmfTestTrace.SYNC_SRC.exists());
         assumeTrue(CtfTmfTestTrace.SYNC_DEST.exists());
-        CtfTmfTrace trace1 = CtfTmfTestTrace.SYNC_SRC.getTrace();
-        CtfTmfTrace trace2 = CtfTmfTestTrace.SYNC_DEST.getTrace();
+        try (CtfTmfTrace trace1 = CtfTmfTestTrace.SYNC_SRC.getTrace();
+                CtfTmfTrace trace2 = CtfTmfTestTrace.SYNC_DEST.getTrace();) {
 
-        List<ITmfTrace> tracearr = new LinkedList<>();
-        tracearr.add(trace1);
-        tracearr.add(trace2);
+            List<ITmfTrace> tracearr = new LinkedList<>();
+            tracearr.add(trace1);
+            tracearr.add(trace2);
 
-        TmfEventMatching.registerMatchObject(new TcpEventMatching());
-        TmfEventMatching.registerMatchObject(new TcpLttngEventMatching());
+            TmfEventMatching.registerMatchObject(new TcpEventMatching());
+            TmfEventMatching.registerMatchObject(new TcpLttngEventMatching());
 
-        TmfNetworkEventMatching twoTraceMatch = new TmfNetworkEventMatching(tracearr);
-        assertTrue(twoTraceMatch.matchEvents());
+            TmfNetworkEventMatching twoTraceMatch = new TmfNetworkEventMatching(tracearr);
+            assertTrue(twoTraceMatch.matchEvents());
 
-        String stats = twoTraceMatch.toString();
-        assertEquals("TmfEventMatches [ Number of matches found: 46 ]" +
-                "Trace 0:" + cr +
-                "  3 unmatched incoming events" + cr +
-                "  2 unmatched outgoing events" + cr +
-                "Trace 1:" + cr +
-                "  2 unmatched incoming events" + cr +
-                "  1 unmatched outgoing events" + cr, stats);
+            String stats = twoTraceMatch.toString();
+            assertEquals("TmfEventMatches [ Number of matches found: 46 ]" +
+                    "Trace 0:" + cr +
+                    "  3 unmatched incoming events" + cr +
+                    "  2 unmatched outgoing events" + cr +
+                    "Trace 1:" + cr +
+                    "  2 unmatched incoming events" + cr +
+                    "  1 unmatched outgoing events" + cr, stats);
 
-        CtfTmfTestTrace.SYNC_SRC.dispose();
-        CtfTmfTestTrace.SYNC_DEST.dispose();
+        }
     }
 
 }

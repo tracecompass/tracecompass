@@ -41,44 +41,44 @@ public class Benchmark {
         // Work variables
         long nbEvent = 0L;
         final Vector<Double> benchs = new Vector<>();
-        CtfTmfTrace trace = null;
         long start, stop;
         for (int loops = 0; loops < NUM_LOOPS; loops++) {
             nbEvent = 0L;
-            trace = new CtfTmfTrace();
-            try {
-                trace.initTrace(null, TRACE_PATH, CtfTmfEvent.class);
-            } catch (final TmfTraceException e) {
-                loops = NUM_LOOPS +1;
-                break;
-            }
-
-            start = System.nanoTime();
-            if (nbEvent != -1) {
-                final CtfTmfContext traceReader = (CtfTmfContext) trace.seekEvent(0);
+            try (CtfTmfTrace trace = new CtfTmfTrace();) {
+                try {
+                    trace.initTrace(null, TRACE_PATH, CtfTmfEvent.class);
+                } catch (final TmfTraceException e) {
+                    loops = NUM_LOOPS + 1;
+                    break;
+                }
 
                 start = System.nanoTime();
-                CtfTmfEvent current = traceReader.getCurrentEvent();
-                while (current != null) {
-                    nbEvent++;
-                    if (USE_TEXT) {
+                if (nbEvent != -1) {
+                    final CtfTmfContext traceReader = (CtfTmfContext) trace.seekEvent(0);
 
-                        System.out.println("Event " + nbEvent + " Time "
-                                + current.getTimestamp().toString() + " type " + current.getType().getName()
-                                + " on CPU " + current.getSource() + " " + current.getContent().toString());
+                    start = System.nanoTime();
+                    CtfTmfEvent current = traceReader.getCurrentEvent();
+                    while (current != null) {
+                        nbEvent++;
+                        if (USE_TEXT) {
+
+                            System.out.println("Event " + nbEvent + " Time "
+                                    + current.getTimestamp().toString() + " type " + current.getType().getName()
+                                    + " on CPU " + current.getSource() + " " + current.getContent().toString());
+                        }
+                        // advance the trace to the next event.
+                        boolean hasMore = traceReader.advance();
+                        if (hasMore) {
+                            // you can know the trace has more events.
+                        }
+                        current = traceReader.getCurrentEvent();
                     }
-                    // advance the trace to the next event.
-                    boolean hasMore = traceReader.advance();
-                    if( hasMore ){
-                        // you can know the trace has more events.
-                    }
-                    current = traceReader.getCurrentEvent();
                 }
-            }
-            stop = System.nanoTime();
-            System.out.print('.');
-            final double time = (stop - start) / (double) nbEvent;
-            benchs.add(time);
+                stop = System.nanoTime();
+                System.out.print('.');
+                final double time = (stop - start) / (double) nbEvent;
+                benchs.add(time);
+            } // trace.close()
         }
         System.out.println("");
         double avg = 0;

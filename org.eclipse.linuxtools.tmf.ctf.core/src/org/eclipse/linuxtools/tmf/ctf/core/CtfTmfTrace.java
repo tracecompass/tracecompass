@@ -51,7 +51,8 @@ import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
  * @author Matthew khouzam
  */
 public class CtfTmfTrace extends TmfTrace
-        implements ITmfEventParser, ITmfTraceProperties, ITmfPersistentlyIndexable {
+        implements ITmfEventParser, ITmfTraceProperties, ITmfPersistentlyIndexable,
+        AutoCloseable {
 
     // -------------------------------------------
     // Constants
@@ -124,6 +125,11 @@ public class CtfTmfTrace extends TmfTrace
              */
             throw new TmfTraceException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void close() {
+        dispose();
     }
 
     @Override

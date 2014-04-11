@@ -77,7 +77,7 @@ public enum CtfTmfTestTrace {
      */
     public synchronized CtfTmfTrace getTrace() {
         if (fTrace != null) {
-            fTrace.dispose();
+            fTrace.close();
         }
         fTrace = new CtfTmfTraceStub();
         try {

@@ -163,8 +163,9 @@ public class CtfIteratorTest {
      */
     @Test
     public void testGetCtfTmfTrace() {
-        CtfTmfTrace result = iterator.getCtfTmfTrace();
-        assertNotNull(result);
+        try (CtfTmfTrace result = iterator.getCtfTmfTrace();) {
+            assertNotNull(result);
+        }
     }
 
     /**

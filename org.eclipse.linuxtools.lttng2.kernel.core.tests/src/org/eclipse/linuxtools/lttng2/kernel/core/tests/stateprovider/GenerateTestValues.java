@@ -57,8 +57,8 @@ public class GenerateTestValues {
 
         /* Prepare the files */
         File logFile = File.createTempFile("TestValues", ".java");
-        final CtfTmfTrace trace = testTrace.getTrace();
-        try (PrintWriter writer = new PrintWriter(new FileWriter(logFile), true);) {
+        try (final CtfTmfTrace trace = testTrace.getTrace();
+                PrintWriter writer = new PrintWriter(new FileWriter(logFile), true);) {
             /* Build and query the state system */
             TmfStateSystemAnalysisModule module = new TmfStateSystemAnalysisModule() {
                 @Override

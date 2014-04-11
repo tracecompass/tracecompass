@@ -64,8 +64,8 @@ public class CtfTmfEventTest {
     @Before
     public void setUp() throws CTFReaderException {
         assumeTrue(testTrace.exists());
-        CtfTmfTrace trace = testTrace.getTrace();
-        try (CtfIterator tr = new CtfIterator(trace);) {
+        try (CtfTmfTrace trace = testTrace.getTrace();
+                CtfIterator tr = new CtfIterator(trace);) {
             tr.advance();
             fixture = tr.getCurrentEvent();
         }
@@ -172,12 +172,14 @@ public class CtfTmfEventTest {
     @Test
     public void testGetters() {
         long rank = fixture.getRank();
-        CtfTmfTrace trace = fixture.getTrace();
+        try (CtfTmfTrace trace = fixture.getTrace();) {
+            assertEquals("kernel", trace.getName());
+        }
         String reference = fixture.getReference();
         String source = fixture.getSource();
         ITmfEventType type = fixture.getType();
         assertEquals(ITmfContext.UNKNOWN_RANK, rank);
-        assertEquals("kernel", trace.getName());
+
         assertEquals("channel0_1", reference);
         assertEquals("1", source);
         assertEquals("lttng_statedump_vm_map", type.toString());
