@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
+import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.linuxtools.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
@@ -242,13 +243,15 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         try {
             Map<QualifiedName, String> properties = trace.getResource().getPersistentProperties();
-            String traceType = properties.get(TmfCommonConstants.TRACETYPE);
+            TraceTypeHelper traceType = TmfTraceType.getInstance().getTraceType(properties.get(TmfCommonConstants.TRACETYPE));
 
             if (resource instanceof IFolder) {
                 IFolder folder = experiment.getFolder(trace.getName());
                 if (workspace.validateLinkLocation(folder, location).isOK()) {
                     folder.createLink(location, IResource.REPLACE, null);
-                    setProperties(folder, traceType);
+                    if (traceType != null) {
+                        TmfTraceTypeUIUtils.setTraceType(folder, traceType);
+                    }
 
                 } else {
                     Activator.getDefault().logError("Error creating link. Invalid trace location " + location); //$NON-NLS-1$
@@ -257,7 +260,9 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
                 IFile file = experiment.getFile(trace.getName());
                 if (workspace.validateLinkLocation(file, location).isOK()) {
                     file.createLink(location, IResource.REPLACE, null);
-                    setProperties(file, traceType);
+                    if (traceType != null) {
+                        TmfTraceTypeUIUtils.setTraceType(file, traceType);
+                    }
                 } else {
                     Activator.getDefault().logError("Error creating link. Invalid trace location " + location); //$NON-NLS-1$
                 }
@@ -284,10 +289,6 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
         removeChild(trace);
         trace.getResource().delete(true, null);
         deleteSupplementaryResources();
-    }
-
-    private static void setProperties(IResource resource, String traceType) throws CoreException {
-        resource.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceType);
     }
 
     @Override
