@@ -33,18 +33,6 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
  */
 public abstract class HTNode {
 
-    /**
-     * Size of an entry in the data section.
-     *
-     * <pre>
-     *   16  2 x Timevalue/long (interval start + end)
-     * +  4  int (key)
-     * +  1  byte (type)
-     * +  4  int (valueOffset)
-     * </pre>
-     */
-    protected static final int DATA_ENTRY_SIZE = 25;
-
     /* Configuration of the History Tree to which belongs this node */
     private final HTConfig config;
 
@@ -58,6 +46,9 @@ public abstract class HTNode {
 
     /* Where the Strings section begins (from the start of the node */
     private int stringSectionOffset;
+
+    /* Sum of bytes of all intervals in the node */
+    private int sizeOfIntervalSection;
 
     /* True if this node was read from disk (meaning its end time is now fixed) */
     private volatile boolean isOnDisk;
@@ -87,6 +78,7 @@ public abstract class HTNode {
         this.parentSequenceNumber = parentSeqNumber;
 
         this.stringSectionOffset = config.getBlockSize();
+        this.sizeOfIntervalSection = 0;
         this.isOnDisk = false;
         this.intervals = new ArrayList<>();
     }
@@ -322,6 +314,7 @@ public abstract class HTNode {
             assert (newInterval.getIntervalSize() <= this.getNodeFreeSpace());
 
             intervals.add(newInterval);
+            sizeOfIntervalSection += newInterval.getIntervalSize();
 
             /* Update the in-node offset "pointer" */
             stringSectionOffset -= (newInterval.getStringsEntrySize());
@@ -510,7 +503,7 @@ public abstract class HTNode {
      * @return The offset, within the node, where the Data section ends
      */
     private int getDataSectionEndOffset() {
-        return this.getTotalHeaderSize() + HTNode.DATA_ENTRY_SIZE * intervals.size();
+        return this.getTotalHeaderSize() + sizeOfIntervalSection;
     }
 
     /**

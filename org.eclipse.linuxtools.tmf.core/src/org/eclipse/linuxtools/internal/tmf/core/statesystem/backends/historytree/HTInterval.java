@@ -1,6 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
- * Copyright (c) 2010, 2011 École Polytechnique de Montréal
+ * Copyright (c) 2012, 2014 Ericsson, École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
  *
  * All rights reserved. This program and the accompanying materials are
@@ -8,6 +7,9 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
+ * Contributors:
+ *    Alexandre Montplaisir - Initial API and implementation
+ *    Florian Wininger - Allow to change the size of a interval
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.historytree;
@@ -30,6 +32,18 @@ import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 public final class HTInterval implements ITmfStateInterval, Comparable<HTInterval> {
 
     private static final String errMsg = "Invalid interval data. Maybe your file is corrupt?"; //$NON-NLS-1$
+
+    /**
+     * Size of an entry in the data section.
+     *
+     * <pre>
+     *   16  2 x Timevalue/long (interval start + end)
+     * +  4  int (key)
+     * +  1  byte (type)
+     * +  4  int (valueOffset)
+     * </pre>
+     */
+    private static final int DATA_ENTRY_SIZE = 25;
 
     /* 'Byte' equivalent for state values types */
     private static final byte TYPE_NULL = -1;
@@ -368,7 +382,7 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
      * @return The interval size
      */
     public int getIntervalSize() {
-        return stringsEntrySize + HTNode.DATA_ENTRY_SIZE;
+        return stringsEntrySize + DATA_ENTRY_SIZE;
     }
 
     private int computeStringsEntrySize() {
