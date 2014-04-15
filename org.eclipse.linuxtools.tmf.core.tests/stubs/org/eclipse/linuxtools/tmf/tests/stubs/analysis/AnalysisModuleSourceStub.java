@@ -31,7 +31,7 @@ public class AnalysisModuleSourceStub implements IAnalysisModuleSource {
         List<IAnalysisModuleHelper> list = new ArrayList<>();
         IAnalysisModuleHelper helper = new AnalysisModuleTestHelper(moduleStubEnum.TEST);
         list.add(helper);
-        helper = new AnalysisModuleTestHelper(moduleStubEnum.TESTCTF);
+        helper = new AnalysisModuleTestHelper(moduleStubEnum.TEST2);
         list.add(helper);
         return list;
     }

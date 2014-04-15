@@ -25,11 +25,10 @@ import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.analysis.Messages;
 import org.eclipse.linuxtools.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
-import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.tests.stubs.analysis.TestAnalysis;
-import org.eclipse.linuxtools.tmf.tests.stubs.analysis.TestCtfAnalysis;
+import org.eclipse.linuxtools.tmf.tests.stubs.analysis.TestAnalysis2;
 import org.eclipse.osgi.util.NLS;
 import org.junit.After;
 import org.junit.Test;
@@ -48,7 +47,6 @@ public class AnalysisModuleTest {
     @After
     public void cleanupTraces() {
         TmfTestTrace.A_TEST_10K.dispose();
-        CtfTmfTestTrace.KERNEL.dispose();
     }
 
     /**
@@ -154,7 +152,7 @@ public class AnalysisModuleTest {
      */
     @Test
     public void testSetWrongTrace() {
-        IAnalysisModule module = new TestCtfAnalysis();
+        IAnalysisModule module = new TestAnalysis2();
 
         module.setName(MODULE_GENERIC_NAME);
         module.setId(MODULE_GENERIC_ID);

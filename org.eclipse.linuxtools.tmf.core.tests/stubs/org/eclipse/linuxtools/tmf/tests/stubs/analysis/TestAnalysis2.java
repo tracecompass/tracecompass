@@ -15,17 +15,17 @@ package org.eclipse.linuxtools.tmf.tests.stubs.analysis;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.linuxtools.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.tests.stubs.ctf.CtfTmfTraceStub;
+import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub2;
 
 /**
  * Simple analysis type for test
  */
-public class TestCtfAnalysis extends TmfAbstractAnalysisModule{
+public class TestAnalysis2 extends TmfAbstractAnalysisModule {
 
     @Override
     public boolean canExecute(ITmfTrace trace) {
-        /* This just makes sure the trace is a ctf stub trace */
-        return (CtfTmfTraceStub.class.isAssignableFrom(trace.getClass()));
+        /* This just makes sure the trace is a trace stub 2 */
+        return (TmfTraceStub2.class.isAssignableFrom(trace.getClass()));
     }
 
     @Override

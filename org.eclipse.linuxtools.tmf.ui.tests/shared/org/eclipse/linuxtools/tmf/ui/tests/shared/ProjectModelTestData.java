@@ -12,8 +12,6 @@
 
 package org.eclipse.linuxtools.tmf.ui.tests.shared;
 
-import static org.junit.Assume.assumeTrue;
-
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.TimeoutException;
@@ -29,7 +27,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.project.model.TmfImportHelper;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
-import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.linuxtools.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfCommonProjectElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
@@ -56,7 +54,7 @@ public class ProjectModelTestData {
     /** Default test project name */
     public static final String PROJECT_NAME = "Test_Project";
 
-    private static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.KERNEL;
+    private static final TmfTestTrace testTrace = TmfTestTrace.A_TEST_10K;
 
     /**
      * Gets a project element with traces all initialized
@@ -67,13 +65,11 @@ public class ProjectModelTestData {
      */
     public static TmfProjectElement getFilledProject() throws CoreException {
 
-        assumeTrue(CtfTmfTestTrace.KERNEL.exists());
-
         IProject project = TmfProjectRegistry.createProject(PROJECT_NAME, null, null);
         IFolder traceFolder = project.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
 
         /* Create a trace, if it exist, it will be replaced */
-        File file = new File(testTrace.getPath());
+        File file = new File(testTrace.getFullPath());
         String path = file.getAbsolutePath();
         final IPath pathString = Path.fromOSString(path);
         IResource linkedTrace = TmfImportHelper.createLink(traceFolder, pathString, pathString.lastSegment());
@@ -81,7 +77,7 @@ public class ProjectModelTestData {
             return null;
         }
         linkedTrace.setPersistentProperty(TmfCommonConstants.TRACETYPE,
-                "org.eclipse.linuxtools.tmf.core.tests.ctf.tracetype");
+                "org.eclipse.linuxtools.tmf.core.tests.tracetype");
 
         final TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
         TmfTraceElement traceElement = projectElement.getTracesFolder().getTraces().get(0);

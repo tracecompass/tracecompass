@@ -28,13 +28,13 @@
          </tracetype>
       </module>
       <module
-         id="org.eclipse.linuxtools.tmf.core.tests.analysis.testctf"
-         name="Test analysis ctf"
-         analysis_module="org.eclipse.linuxtools.tmf.tests.stubs.analysis.TestCtfAnalysis"
+         id="org.eclipse.linuxtools.tmf.core.tests.analysis.testother"
+         name="Test other analysis"
+         analysis_module="org.eclipse.linuxtools.tmf.tests.stubs.analysis.TestAnalysis2"
          automatic="true">
          <tracetype
                applies="true"
-               class="org.eclipse.linuxtools.tmf.tests.stubs.ctf.CtfTmfTraceStub">
+               class="org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub2">
          </tracetype>
       </module>
       <module

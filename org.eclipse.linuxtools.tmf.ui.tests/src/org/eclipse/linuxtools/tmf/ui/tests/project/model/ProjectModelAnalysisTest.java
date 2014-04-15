@@ -16,13 +16,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfAnalysisElement;
@@ -50,7 +48,6 @@ public class ProjectModelAnalysisTest {
      */
     @Before
     public void setUp() {
-        assumeTrue(CtfTmfTestTrace.KERNEL.exists());
         try {
             fixture = ProjectModelTestData.getFilledProject();
         } catch (CoreException e) {

@@ -17,8 +17,8 @@ import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.tests.stubs.ctf.CtfTmfTraceStub;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
+import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub2;
 import org.osgi.framework.Bundle;
 
 /**
@@ -34,8 +34,8 @@ public class AnalysisModuleTestHelper implements IAnalysisModuleHelper {
     public enum moduleStubEnum {
         /** Test analysis */
         TEST,
-        /** Test analysis ctf */
-        TESTCTF
+        /** Test analysis 2 */
+        TEST2
     }
 
     private moduleStubEnum fModule;
@@ -85,8 +85,8 @@ public class AnalysisModuleTestHelper implements IAnalysisModuleHelper {
         switch (fModule) {
         case TEST:
             return TmfTraceStub.class.isAssignableFrom(traceclass);
-        case TESTCTF:
-            return CtfTmfTraceStub.class.isAssignableFrom(traceclass);
+        case TEST2:
+            return TmfTraceStub2.class.isAssignableFrom(traceclass);
         default:
             return false;
         }
@@ -103,8 +103,8 @@ public class AnalysisModuleTestHelper implements IAnalysisModuleHelper {
             module.setAutomatic(isAutomatic());
             module.setTrace(trace);
             break;
-        case TESTCTF:
-            module = new TestCtfAnalysis();
+        case TEST2:
+            module = new TestAnalysis2();
             module.setName(getName());
             module.setId(getId());
             module.setAutomatic(isAutomatic());

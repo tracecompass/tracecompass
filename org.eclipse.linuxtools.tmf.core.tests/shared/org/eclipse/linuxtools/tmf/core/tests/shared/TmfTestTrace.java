@@ -20,12 +20,14 @@ import java.net.URL;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
+import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub2;
 
 /**
- * Wrapper, imitating the {@link CtfTmfTestTrace} class for the non-ctf traces
+ * Generic TMF test traces
  *
  * @author Geneviève Bastien
  */
@@ -42,7 +44,7 @@ public enum TmfTestTrace {
     R_TEST_10K("R-Test-10K");
 
     private final String fPath;
-    private final String fDirectory = "testfiles";
+    private final String fDirectory = "../org.eclipse.linuxtools.tmf.core.tests/testfiles";
     private ITmfTrace fTrace = null;
 
     private TmfTestTrace(String file) {
@@ -85,14 +87,32 @@ public enum TmfTestTrace {
         try {
             File test = new File(FileLocator.toFileURL(location).toURI());
             fTrace = new TmfTraceStub(test.toURI().getPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (TmfTraceException e) {
-            throw new RuntimeException(e);
+
+        } catch (URISyntaxException | IOException | TmfTraceException  e) {
+            throw new IllegalStateException(e);
         }
         return fTrace;
+    }
+
+    /**
+     * Return a ITmfTrace object that is of type {@link TmfTraceStub2}. It
+     * will be already initTrace()'ed. But the trace will be deregistered from
+     * signal managers and will need to be manually disposed of by the caller.
+     *
+     * @return a {@link ITmfTrace} reference to this trace
+     */
+    public ITmfTrace getTraceAsStub2() {
+        ITmfTrace trace = null;
+        final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(fDirectory + File.separator + fPath), null);
+        try {
+            File test = new File(FileLocator.toFileURL(location).toURI());
+            trace = new TmfTraceStub2(test.toURI().getPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null);
+            TmfSignalManager.deregister(trace);
+
+        } catch (URISyntaxException | IOException | TmfTraceException  e) {
+            throw new IllegalStateException(e);
+        }
+        return trace;
     }
 
     /**

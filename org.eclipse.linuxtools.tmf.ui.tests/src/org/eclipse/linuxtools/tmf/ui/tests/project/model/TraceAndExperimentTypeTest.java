@@ -17,7 +17,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.concurrent.TimeoutException;
 
@@ -25,7 +24,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
-import org.eclipse.linuxtools.tmf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfExperimentStub;
@@ -64,7 +62,6 @@ public class TraceAndExperimentTypeTest {
      */
     @Before
     public void setUp() {
-        assumeTrue(CtfTmfTestTrace.KERNEL.exists());
         try {
             fixture = ProjectModelTestData.getFilledProject();
             fExperiment = ProjectModelTestData.addExperiment(fixture, EXPERIMENT_NAME);
