@@ -142,8 +142,9 @@ public class DsfGdbAdaptor {
 
     private TmfEventType tmfEventType = new TmfEventType(ITmfEventType.DEFAULT_CONTEXT_ID, "GDB Tracepoint", TmfEventField.makeRoot(new String[] { "Content" })); //$NON-NLS-1$ //$NON-NLS-2$
 
-    @SuppressWarnings("unused")
-    private DsfGdbPlatformEventListener fPlatformEventListener = new DsfGdbPlatformEventListener();
+    {
+        new DsfGdbPlatformEventListener();
+    }
 
     /**
      * <b><u>DsfGdbPlatformEventListener</u></b>
