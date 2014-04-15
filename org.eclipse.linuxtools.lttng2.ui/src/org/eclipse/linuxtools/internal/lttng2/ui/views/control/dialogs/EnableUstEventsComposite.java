@@ -9,6 +9,7 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *   Bernd Hufmann - Updated for support of LTTng Tools 2.1
+ *   Marc-Andre Laperle - Add filtering textbox
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.ui.views.control.dialogs;
 
@@ -21,6 +22,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.LogLevelType;
 import org.eclipse.linuxtools.internal.lttng2.core.control.model.TraceLogLevel;
 import org.eclipse.linuxtools.internal.lttng2.ui.views.control.messages.Messages;
@@ -43,6 +45,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.dialogs.FilteredTree;
+import org.eclipse.ui.dialogs.PatternFilter;
 
 /**
  * <p>
@@ -375,16 +379,21 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
         tpGroup.setLayout(layout);
         data = new GridData(GridData.FILL_BOTH);
         tpGroup.setLayoutData(data);
+        new FilteredTree(tpGroup, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, new PatternFilter(), true) {
+            @Override
+            protected TreeViewer doCreateTreeViewer(Composite aparent, int style) {
+                fTracepointsViewer = new CheckboxTreeViewer(aparent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+                fTracepointsViewer.getTree().setToolTipText(Messages.TraceControl_EnableEventsTracepointTreeTooltip);
+                fTracepointsViewer.setContentProvider(new UstContentProvider());
 
-        fTracepointsViewer = new CheckboxTreeViewer(tpGroup, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-        fTracepointsViewer.getTree().setToolTipText(Messages.TraceControl_EnableEventsTracepointTreeTooltip);
-        fTracepointsViewer.setContentProvider(new UstContentProvider());
+                fTracepointsViewer.setLabelProvider(new UstLabelProvider());
+                fTracepointsViewer.addCheckStateListener(new UstCheckStateListener());
 
-        fTracepointsViewer.setLabelProvider(new UstLabelProvider());
-        fTracepointsViewer.addCheckStateListener(new UstCheckStateListener());
-
-        fTracepointsViewer.setInput(fProviderGroup.getParent());
-        fTracepointsViewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
+                fTracepointsViewer.setInput(fProviderGroup.getParent());
+                fTracepointsViewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
+                return fTracepointsViewer;
+            }
+        };
     }
 
     /**
