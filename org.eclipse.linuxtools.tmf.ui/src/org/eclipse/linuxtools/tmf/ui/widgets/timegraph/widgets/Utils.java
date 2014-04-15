@@ -89,7 +89,7 @@ public class Utils {
      * @since 2.1
      */
     public static void updateTimeZone() {
-        TimeZone timeZone = TmfTimePreferences.getInstance().getTimeZone();
+        TimeZone timeZone = TmfTimePreferences.getTimeZone();
         TIME_FORMAT.setTimeZone(timeZone);
         DATE_FORMAT.setTimeZone(timeZone);
     }

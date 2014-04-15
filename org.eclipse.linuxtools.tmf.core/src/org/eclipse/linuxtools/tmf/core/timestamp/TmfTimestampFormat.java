@@ -244,7 +244,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
      * The default constructor (uses the default pattern)
      */
     public TmfTimestampFormat() {
-        this(TmfTimePreferences.getInstance().getTimePattern());
+        this(TmfTimePreferences.getTimePattern());
     }
 
     /**
@@ -285,8 +285,8 @@ public class TmfTimestampFormat extends SimpleDateFormat {
      * @since 2.1
      */
     public static void updateDefaultFormats() {
-        fDefaultTimeFormat = new TmfTimestampFormat(TmfTimePreferences.getInstance().getTimePattern(), TmfTimePreferences.getInstance().getTimeZone());
-        fDefaultIntervalFormat = new TmfTimestampFormat(TmfTimePreferences.getInstance().getIntervalPattern());
+        fDefaultTimeFormat = new TmfTimestampFormat(TmfTimePreferences.getTimePattern(), TmfTimePreferences.getTimeZone());
+        fDefaultIntervalFormat = new TmfTimestampFormat(TmfTimePreferences.getIntervalPattern());
     }
 
     /**
@@ -294,7 +294,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
      */
     public static TmfTimestampFormat getDefaulTimeFormat() {
         if (fDefaultTimeFormat == null) {
-            fDefaultTimeFormat = new TmfTimestampFormat(TmfTimePreferences.getInstance().getTimePattern(), TmfTimePreferences.getInstance().getTimeZone());
+            fDefaultTimeFormat = new TmfTimestampFormat(TmfTimePreferences.getTimePattern(), TmfTimePreferences.getTimeZone());
         }
         return fDefaultTimeFormat;
     }
@@ -304,7 +304,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
      */
     public static TmfTimestampFormat getDefaulIntervalFormat() {
         if (fDefaultIntervalFormat == null) {
-            fDefaultIntervalFormat = new TmfTimestampFormat(TmfTimePreferences.getInstance().getIntervalPattern());
+            fDefaultIntervalFormat = new TmfTimestampFormat(TmfTimePreferences.getIntervalPattern());
         }
         return fDefaultIntervalFormat;
     }

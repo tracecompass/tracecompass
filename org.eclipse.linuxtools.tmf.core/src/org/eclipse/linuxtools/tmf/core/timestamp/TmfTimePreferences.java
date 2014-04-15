@@ -30,7 +30,7 @@ import org.eclipse.linuxtools.internal.tmf.core.Activator;
  * @version 1.0
  * @since 2.1
  */
-public class TmfTimePreferences {
+public final class TmfTimePreferences {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -42,11 +42,6 @@ public class TmfTimePreferences {
     private static final String TIME_DELIMITER_DEFAULT = ITmfTimePreferencesConstants.DELIMITER_COLON;
     private static final String SSEC_DELIMITER_DEFAULT = ITmfTimePreferencesConstants.DELIMITER_SPACE;
     private static final String TIME_ZONE_DEFAULT = TimeZone.getDefault().getID();
-    // ------------------------------------------------------------------------
-    // Attributes
-    // ------------------------------------------------------------------------
-
-    private static TmfTimePreferences fPreferences;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -64,21 +59,7 @@ public class TmfTimePreferences {
         defaultPreferences.put(ITmfTimePreferencesConstants.SSEC_DELIMITER, SSEC_DELIMITER_DEFAULT);
         defaultPreferences.put(ITmfTimePreferencesConstants.TIME_ZONE, TIME_ZONE_DEFAULT);
 
-        // Create the singleton and update default formats
-        getInstance();
-    }
-
-    /**
-     * Get the TmfTimePreferences singleton
-     *
-     * @return The TmfTimePreferences instance
-     */
-    public static synchronized TmfTimePreferences getInstance() {
-        if (fPreferences == null) {
-            fPreferences = new TmfTimePreferences();
-            TmfTimestampFormat.updateDefaultFormats();
-        }
-        return fPreferences;
+        TmfTimestampFormat.updateDefaultFormats();
     }
 
     /**
@@ -96,7 +77,7 @@ public class TmfTimePreferences {
      *
      * @return the timestamp pattern
      */
-    public String getTimePattern() {
+    public static String getTimePattern() {
         return computeTimePattern(getPreferenceMap(false));
     }
 
@@ -105,7 +86,7 @@ public class TmfTimePreferences {
      *
      * @return the interval pattern
      */
-    public String getIntervalPattern() {
+    public static String getIntervalPattern() {
         return computeIntervalPattern(getPreferenceMap(false));
     }
 
@@ -114,7 +95,7 @@ public class TmfTimePreferences {
      *
      * @return the time zone
      */
-    public TimeZone getTimeZone() {
+    public static TimeZone getTimeZone() {
         return TimeZone.getTimeZone(Platform.getPreferencesService().getString(Activator.PLUGIN_ID, ITmfTimePreferencesConstants.TIME_ZONE, TimeZone.getDefault().getID(), null));
     }
 
@@ -123,7 +104,7 @@ public class TmfTimePreferences {
      *
      * @return a collection containing the default preferences
      */
-    public Map<String, String> getDefaultPreferenceMap() {
+    public static Map<String, String> getDefaultPreferenceMap() {
         return getPreferenceMap(true);
     }
 
@@ -132,7 +113,7 @@ public class TmfTimePreferences {
      *
      * @return a collection containing the current preferences
      */
-    public Map<String, String> getPreferenceMap() {
+    public static Map<String, String> getPreferenceMap() {
         return getPreferenceMap(false);
     }
 
@@ -173,7 +154,7 @@ public class TmfTimePreferences {
      * @param prefsMap the preferences to apply when computing the time pattern
      * @return the time pattern resulting in applying the preferences
      */
-    public String computeTimePattern(Map<String, String> prefsMap) {
+    public static String computeTimePattern(Map<String, String> prefsMap) {
         String dateTimeFormat = prefsMap.get(ITmfTimePreferencesConstants.DATIME);
         if (dateTimeFormat == null) {
             dateTimeFormat = ITmfTimePreferencesConstants.DEFAULT_TIME_PATTERN;
