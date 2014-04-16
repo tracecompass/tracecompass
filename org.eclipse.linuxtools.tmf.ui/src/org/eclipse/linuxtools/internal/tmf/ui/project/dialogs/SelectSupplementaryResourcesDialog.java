@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 Ericsson
+ * Copyright (c) 2009, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,11 +9,11 @@
  * Contributors:
  *     Francois Chouinard - Copied and adapted from NewFolderDialog
  *     Marc-Andre Laperle - Add select/deselect all
+ *     Patrick Tasse - Add support for folder elements
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.ui.project.dialogs;
 
-import java.io.File;
 import java.util.Arrays;
 
 import org.eclipse.core.resources.IResource;
@@ -145,19 +145,18 @@ public class SelectSupplementaryResourcesDialog extends Dialog {
             }
         });
 
-//        fTreeViewer.setLabelProvider(new WorkbenchLabelProvider());
+        fTreeViewer.setLabelProvider(new LabelProvider() {
+            @Override
+            public String getText(Object element) {
+                if (element instanceof IResource) {
+                    IResource resource = (IResource) element;
+                    // remove .tracing/ segment
+                    return resource.getProjectRelativePath().removeFirstSegments(1).toString();
+                }
+                return super.getText(element);
+            }
+        });
 
-      fTreeViewer.setLabelProvider(new LabelProvider() {
-          @Override
-          public String getText(Object element) {
-              if (element instanceof IResource) {
-                  IResource resource = (IResource) element;
-                  // show also trace name
-                  return resource.getParent().getName() + File.separator + resource.getName();
-              }
-              return super.getText(element);
-          }
-      });
         fTreeViewer.setInput(fAvailableResources);
 
         fTreeViewer.addSelectionChangedListener(new ISelectionChangedListener() {

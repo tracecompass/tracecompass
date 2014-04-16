@@ -11,6 +11,7 @@
  *   Geneviève Bastien - Copied supplementary files handling from TmfTracElement
  *                 Moved to this class code to copy a model element
  *                 Renamed from TmfWithFolderElement to TmfCommonProjectElement
+ *   Patrick Tasse - Add support for folder elements
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -29,6 +31,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModuleHelper;
@@ -197,16 +200,31 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
     public abstract ITmfTrace instantiateTrace();
 
     /**
-     * Return the resource name for this element
+     * Return the supplementary folder path for this element. The returned path
+     * is relative to the project's supplementary folder.
      *
-     * @return The name of the resource for this element
+     * @return The supplementary folder path for this element
      */
-    protected String getResourceName() {
-        return fResource.getName() + getSuffix();
+    protected String getSupplementaryFolderPath() {
+        return getElementPath() + getSuffix();
     }
 
     /**
-     * @return The suffix for resource names
+     * Return the element path relative to its common element (traces folder,
+     * experiments folder or experiment element).
+     * @return The element path
+     */
+    public String getElementPath() {
+        ITmfProjectModelElement parent = getParent();
+        while (!(parent instanceof TmfTracesFolder || parent instanceof TmfExperimentElement || parent instanceof TmfExperimentFolder)) {
+            parent = parent.getParent();
+        }
+        IPath path = fResource.getFullPath().makeRelativeTo(parent.getPath());
+        return path.toString();
+    }
+
+    /**
+     * @return The suffix for the supplementary folder
      */
     protected String getSuffix() {
         return ""; //$NON-NLS-1$
@@ -340,7 +358,8 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
 
         /* Copy supplementary files first, only if needed */
         if (copySuppFiles) {
-            copySupplementaryFolder(newName);
+            String newElementPath = new Path(getElementPath()).removeLastSegments(1).append(newName).toString();
+            copySupplementaryFolder(newElementPath);
         }
         /* Copy the trace */
         try {
@@ -388,50 +407,61 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      * Deletes this element specific supplementary folder.
      */
     public void deleteSupplementaryFolder() {
-        IFolder supplFolder = getTraceSupplementaryFolder(getResourceName());
-        if (supplFolder.exists()) {
-            try {
-                supplFolder.delete(true, new NullProgressMonitor());
-            } catch (CoreException e) {
-                Activator.getDefault().logError("Error deleting supplementary folder " + supplFolder, e); //$NON-NLS-1$
-            }
+        IFolder supplFolder = getTraceSupplementaryFolder(getSupplementaryFolderPath());
+        try {
+            deleteFolder(supplFolder);
+        } catch (CoreException e) {
+            Activator.getDefault().logError("Error deleting supplementary folder " + supplFolder, e); //$NON-NLS-1$
+        }
+    }
+
+    private static void deleteFolder(IFolder folder) throws CoreException {
+        if (folder.exists()) {
+            folder.delete(true, new NullProgressMonitor());
+        }
+        IContainer parent = folder.getParent();
+        // delete empty folders up to the parent project
+        if (parent instanceof IFolder && (!parent.exists() || parent.members().length == 0)) {
+            deleteFolder((IFolder) parent);
         }
     }
 
     /**
      * Renames the element specific supplementary folder according to the new
-     * element name.
+     * element name or path.
      *
-     * @param newName
-     *            The new element name
+     * @param newElementPath
+     *            The new element name or path
      */
-    public void renameSupplementaryFolder(String newName) {
-        IFolder oldSupplFolder = getTraceSupplementaryFolder(getResourceName());
-        IFolder newSupplFolder = getTraceSupplementaryFolder(newName + getSuffix());
+    public void renameSupplementaryFolder(String newElementPath) {
+        IFolder oldSupplFolder = getTraceSupplementaryFolder(getSupplementaryFolderPath());
 
         // Rename supplementary folder
-        if (oldSupplFolder.exists()) {
-            try {
+        try {
+            if (oldSupplFolder.exists()) {
+                IFolder newSupplFolder = prepareTraceSupplementaryFolder(newElementPath + getSuffix(), false);
                 oldSupplFolder.move(newSupplFolder.getFullPath(), true, new NullProgressMonitor());
-            } catch (CoreException e) {
-                Activator.getDefault().logError("Error renaming supplementary folder " + oldSupplFolder, e); //$NON-NLS-1$
             }
+            deleteFolder(oldSupplFolder);
+        } catch (CoreException e) {
+            Activator.getDefault().logError("Error renaming supplementary folder " + oldSupplFolder, e); //$NON-NLS-1$
         }
     }
 
     /**
-     * Copies the element specific supplementary folder to the new element name.
+     * Copies the element specific supplementary folder to the new element name
+     * or path.
      *
-     * @param newName
-     *            The new element name
+     * @param newElementPath
+     *            The new element name or path
      */
-    public void copySupplementaryFolder(String newName) {
-        IFolder oldSupplFolder = getTraceSupplementaryFolder(getResourceName());
-        IFolder newSupplFolder = getTraceSupplementaryFolder(newName + getSuffix());
+    public void copySupplementaryFolder(String newElementPath) {
+        IFolder oldSupplFolder = getTraceSupplementaryFolder(getSupplementaryFolderPath());
 
         // copy supplementary folder
         if (oldSupplFolder.exists()) {
             try {
+                IFolder newSupplFolder = prepareTraceSupplementaryFolder(newElementPath + getSuffix(), false);
                 oldSupplFolder.copy(newSupplFolder.getFullPath(), true, new NullProgressMonitor());
             } catch (CoreException e) {
                 Activator.getDefault().logError("Error renaming supplementary folder " + oldSupplFolder, e); //$NON-NLS-1$
@@ -446,7 +476,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      *            The destination folder to copy to.
      */
     public void copySupplementaryFolder(IFolder destination) {
-        IFolder oldSupplFolder = getTraceSupplementaryFolder(getResourceName());
+        IFolder oldSupplFolder = getTraceSupplementaryFolder(getSupplementaryFolderPath());
 
         // copy supplementary folder
         if (oldSupplFolder.exists()) {
@@ -464,7 +494,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      * trace resource
      */
     public void refreshSupplementaryFolder() {
-        createSupplementaryDirectory();
+        createSupplementaryFolder();
     }
 
     /**
@@ -484,7 +514,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      * @return array of resources under the trace supplementary folder.
      */
     public IResource[] getSupplementaryResources() {
-        IFolder supplFolder = getTraceSupplementaryFolder(getResourceName());
+        IFolder supplFolder = getTraceSupplementaryFolder(getSupplementaryFolderPath());
         if (supplFolder.exists()) {
             try {
                 return supplFolder.members();
@@ -519,15 +549,8 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
         deleteSupplementaryResources(getSupplementaryResources());
     }
 
-    private void createSupplementaryDirectory() {
-        IFolder supplFolder = getTraceSupplementaryFolder(getResourceName());
-        if (!supplFolder.exists()) {
-            try {
-                supplFolder.create(true, true, new NullProgressMonitor());
-            } catch (CoreException e) {
-                Activator.getDefault().logError("Error creating resource supplementary file " + supplFolder, e); //$NON-NLS-1$
-            }
-        }
+    private void createSupplementaryFolder() {
+        IFolder supplFolder = prepareTraceSupplementaryFolder(getSupplementaryFolderPath(), true);
 
         try {
             fResource.setPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER, supplFolder.getLocationURI().getPath());

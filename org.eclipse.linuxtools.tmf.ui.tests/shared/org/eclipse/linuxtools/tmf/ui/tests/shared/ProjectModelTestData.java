@@ -34,7 +34,7 @@ import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
@@ -66,7 +66,7 @@ public class ProjectModelTestData {
     public static TmfProjectElement getFilledProject() throws CoreException {
 
         IProject project = TmfProjectRegistry.createProject(PROJECT_NAME, null, null);
-        IFolder traceFolder = project.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
+        IFolder traceFolder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
 
         /* Create a trace, if it exist, it will be replaced */
         File file = new File(testTrace.getFullPath());

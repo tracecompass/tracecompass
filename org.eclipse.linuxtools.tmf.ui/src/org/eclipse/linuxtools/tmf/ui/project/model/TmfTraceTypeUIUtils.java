@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Alexandre Montplaisir - Initial API and implementation
+ *   Patrick Tasse - Add support for folder elements
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
@@ -269,8 +270,9 @@ public final class TmfTraceTypeUIUtils {
         resource.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceTypeId);
 
         TmfProjectElement tmfProject = TmfProjectRegistry.getProject(resource.getProject(), true);
-        if (resource.getParent().equals(tmfProject.getTracesFolder().getResource())) {
-            refreshTraceElement(tmfProject.getTracesFolder().getTraces(), resource.getName());
+        if (tmfProject.getTracesFolder().getPath().isPrefixOf(resource.getFullPath())) {
+            String elementPath = resource.getFullPath().makeRelativeTo(tmfProject.getTracesFolder().getPath()).toString();
+            refreshTraceElement(tmfProject.getTracesFolder().getTraces(), elementPath);
         } else if (resource.getParent().equals(tmfProject.getExperimentsFolder().getResource())) {
             /* The trace type to set is for an experiment */
             for (TmfExperimentElement experimentElement : tmfProject.getExperimentsFolder().getExperiments()) {
@@ -281,8 +283,9 @@ public final class TmfTraceTypeUIUtils {
             }
         } else {
             for (TmfExperimentElement experimentElement : tmfProject.getExperimentsFolder().getExperiments()) {
-                if (resource.getParent().equals(experimentElement.getResource())) {
-                    refreshTraceElement(experimentElement.getTraces(), resource.getName());
+                if (experimentElement.getPath().isPrefixOf(resource.getFullPath())) {
+                    String elementPath = resource.getFullPath().makeRelativeTo(experimentElement.getPath()).toString();
+                    refreshTraceElement(experimentElement.getTraces(), elementPath);
                     break;
                 }
             }
@@ -291,9 +294,9 @@ public final class TmfTraceTypeUIUtils {
         return Status.OK_STATUS;
     }
 
-    private static void refreshTraceElement(List<TmfTraceElement> traceElements, String traceName) {
+    private static void refreshTraceElement(List<TmfTraceElement> traceElements, String elementPath) {
         for (TmfTraceElement traceElement : traceElements) {
-            if (traceElement.getName().equals(traceName)) {
+            if (traceElement.getElementPath().equals(elementPath)) {
                 traceElement.refreshTraceType();
                 break;
             }

@@ -9,6 +9,7 @@
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Bernd Hufmann - Implement getParent()
+ *   Patrick Tasse - Add support for folder elements
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
@@ -48,16 +49,11 @@ public class TmfNavigatorContentProvider implements IPipelinedTreeContentProvide
             return project.getParent();
         }
 
-        if (element instanceof TmfTraceFolder) {
-            TmfTraceFolder folder = (TmfTraceFolder) element;
+        if (element instanceof TmfTracesFolder) {
+            TmfTracesFolder folder = (TmfTracesFolder) element;
             // Return the corresponding IProject as parent because from CNF point of view the IProject is the parent.
             // The IProject is needed e.g. for link with Editor to work correctly.
             return folder.getParent().getResource();
-        }
-
-        if (element instanceof TmfTraceElement) {
-            TmfTraceElement traceElement = (TmfTraceElement) element;
-            return traceElement.getParent();
         }
 
         if (element instanceof TmfExperimentFolder) {
@@ -67,10 +63,11 @@ public class TmfNavigatorContentProvider implements IPipelinedTreeContentProvide
             return folder.getParent().getResource();
         }
 
-        if (element instanceof TmfExperimentElement) {
-            TmfExperimentElement expElement = (TmfExperimentElement) element;
-            return expElement.getParent();
+        if (element instanceof ITmfProjectModelElement) {
+            ITmfProjectModelElement modelElement = (ITmfProjectModelElement) element;
+            return modelElement.getParent();
         }
+
         return null;
     }
 
@@ -80,8 +77,8 @@ public class TmfNavigatorContentProvider implements IPipelinedTreeContentProvide
             IProject project = (IProject) element;
             return project.isAccessible();
         }
-        if (element instanceof TmfProjectModelElement) {
-            TmfProjectModelElement modelElement = (TmfProjectModelElement) element;
+        if (element instanceof ITmfProjectModelElement) {
+            ITmfProjectModelElement modelElement = (ITmfProjectModelElement) element;
             return modelElement.hasChildren();
         }
         return false;

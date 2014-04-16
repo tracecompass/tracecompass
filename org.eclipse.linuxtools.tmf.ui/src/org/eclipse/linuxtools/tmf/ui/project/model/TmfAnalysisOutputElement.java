@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Geneviève Bastien - Initial API and implementation
+ *   Patrick Tasse - Add support for folder elements
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
@@ -46,11 +47,6 @@ public class TmfAnalysisOutputElement extends TmfProjectModelElement {
         super(name, resource, parent);
         fOutput = output;
         parent.addChild(this);
-    }
-
-    @Override
-    public TmfProjectElement getProject() {
-        return getParent().getProject();
     }
 
     /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 École Polytechnique de Montréal and others
+ * Copyright (c) 2013, 2014 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,6 +9,7 @@
  * Contributors:
  *   Geneviève Bastien - Initial API and implementation
  *   Marc-Andre Laperle - Add method to get opened tmf projects
+ *   Patrick Tasse - Add support for folder elements
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
@@ -16,9 +17,11 @@ package org.eclipse.linuxtools.tmf.ui.project.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfProjectNature;
 import org.eclipse.swt.widgets.Display;
@@ -72,4 +75,25 @@ public class TraceUtils {
         }
         return tmfProjects;
     }
+
+    /**
+     * Create a folder, ensuring all parent folders are also created.
+     *
+     * @param folder
+     *            the folder to create
+     * @param monitor
+     *            the progress monitor
+     * @throws CoreException
+     *            if the folder cannot be created
+     * @since 3.0
+     */
+    public static void createFolder(IFolder folder, IProgressMonitor monitor) throws CoreException {
+        if (!folder.exists()) {
+            if (folder.getParent() instanceof IFolder) {
+                createFolder((IFolder) folder.getParent(), monitor);
+            }
+            folder.create(true, true, monitor);
+        }
+    }
+
 }

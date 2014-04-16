@@ -9,6 +9,7 @@
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Geneviève Bastien - Moved the add and remove code to the experiment class
+ *   Patrick Tasse - Add support for folder elements
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.wizards;
@@ -21,6 +22,7 @@ import java.util.Vector;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
@@ -85,6 +87,7 @@ public class SelectTracesWizardPage extends WizardPage {
         fCheckboxTableViewer = CheckboxTableViewer.newCheckList(container, SWT.BORDER);
         fCheckboxTableViewer.setContentProvider(new TraceFolderContentProvider());
         fCheckboxTableViewer.setLabelProvider(new TraceFolderLabelProvider());
+        fCheckboxTableViewer.setSorter(new ViewerSorter());
 
         final Table table = fCheckboxTableViewer.getTable();
         final FormData formData = new FormData();
@@ -104,7 +107,7 @@ public class SelectTracesWizardPage extends WizardPage {
         for (ITmfProjectModelElement child : fExperiment.getChildren()) {
             if (child instanceof TmfTraceElement) {
                 TmfTraceElement trace = (TmfTraceElement) child;
-                String name = trace.getResource().getName();
+                String name = trace.getElementPath();
                 fPreviousTraces.put(name, trace);
             }
         }
@@ -120,7 +123,7 @@ public class SelectTracesWizardPage extends WizardPage {
         while (element != null) {
             if (element instanceof TmfTraceElement) {
                 TmfTraceElement trace = (TmfTraceElement) element;
-                if (keys.contains(trace.getResource().getName())) {
+                if (keys.contains(trace.getElementPath())) {
                     fCheckboxTableViewer.setChecked(element, true);
                 }
             }
@@ -141,7 +144,7 @@ public class SelectTracesWizardPage extends WizardPage {
         Set<String> keys = fPreviousTraces.keySet();
         TmfTraceElement[] traces = getSelection();
         for (TmfTraceElement trace : traces) {
-            String name = trace.getResource().getName();
+            String name = trace.getElementPath();
             if (keys.contains(name)) {
                 fPreviousTraces.remove(name);
             } else {

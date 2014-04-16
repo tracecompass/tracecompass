@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson
+ * Copyright (c) 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,20 +7,26 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Francois Chouinard - Copied and adapted from NewFolderDialog
- *   Patrick Tasse - Close editors to release resources
+ *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.wizards;
 
-import org.eclipse.core.resources.IContainer;
+import java.lang.reflect.InvocationTargetException;
+
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
@@ -32,35 +38,38 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.dialogs.SelectionStatusDialog;
 
 /**
- * Implementation of a dialog box to rename a trace.
- * <p>
- * @version 1.0
- * @author Francois Chouinard
+ * Implementation of new folder dialog that creates the folder element.
+ * @since 3.0
  */
-public class RenameTraceDialog extends SelectionStatusDialog {
+public class NewFolderDialog extends SelectionStatusDialog {
 
     // ------------------------------------------------------------------------
     // Members
     // ------------------------------------------------------------------------
 
-    private final TmfTraceElement fTrace;
-    private Text fNewTraceNameText;
+    private Text fFolderName;
+    private final IFolder fParentFolder;
 
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
     /**
      * Constructor
-     * @param shell The parent shell
-     * @param trace The trace element to rename
+     *
+     * @param shell
+     *            The parent shell
+     * @param parent
+     *            The parent trace folder
      */
-    public RenameTraceDialog(Shell shell, TmfTraceElement trace) {
+    public NewFolderDialog(Shell shell, TmfTraceFolder parent) {
         super(shell);
-        fTrace = trace;
-        setTitle(Messages.RenameTraceDialog_DialogTitle);
+        fParentFolder = parent.getResource();
+        setTitle(Messages.NewFolderDialog_DialogTitle);
         setStatusLineAboveButtons(true);
     }
 
@@ -74,11 +83,11 @@ public class RenameTraceDialog extends SelectionStatusDialog {
         composite.setLayout(new GridLayout());
         composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        createNewTraceNameGroup(composite);
+        createFolderNameGroup(composite);
         return composite;
     }
 
-    private void createNewTraceNameGroup(Composite parent) {
+    private void createFolderNameGroup(Composite parent) {
         Font font = parent.getFont();
         Composite folderGroup = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout();
@@ -86,48 +95,33 @@ public class RenameTraceDialog extends SelectionStatusDialog {
         folderGroup.setLayout(layout);
         folderGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        // Old trace name label
-        Label oldTraceLabel = new Label(folderGroup, SWT.NONE);
-        oldTraceLabel.setFont(font);
-        oldTraceLabel.setText(Messages.RenameTraceDialog_TraceName);
+        // New folder label
+        Label folderLabel = new Label(folderGroup, SWT.NONE);
+        folderLabel.setFont(font);
+        folderLabel.setText(Messages.NewFolderDialog_FolderName);
 
-        // Old trace name field
-        Text oldTraceName = new Text(folderGroup, SWT.BORDER);
+        // New folder name entry field
+        fFolderName = new Text(folderGroup, SWT.BORDER);
         GridData data = new GridData(GridData.FILL_HORIZONTAL);
         data.widthHint = IDialogConstants.ENTRY_FIELD_WIDTH;
-        oldTraceName.setLayoutData(data);
-        oldTraceName.setFont(font);
-        oldTraceName.setText(fTrace.getName());
-        oldTraceName.setEnabled(false);
-
-        // New trace name label
-        Label newTaceLabel = new Label(folderGroup, SWT.NONE);
-        newTaceLabel.setFont(font);
-        newTaceLabel.setText(Messages.RenameTraceDialog_TraceNewName);
-
-        // New trace name entry field
-        fNewTraceNameText = new Text(folderGroup, SWT.BORDER);
-        data = new GridData(GridData.FILL_HORIZONTAL);
-        data.widthHint = IDialogConstants.ENTRY_FIELD_WIDTH;
-        fNewTraceNameText.setLayoutData(data);
-        fNewTraceNameText.setFont(font);
-        fNewTraceNameText.addListener(SWT.Modify, new Listener() {
+        fFolderName.setLayoutData(data);
+        fFolderName.setFont(font);
+        fFolderName.addListener(SWT.Modify, new Listener() {
             @Override
             public void handleEvent(Event event) {
-                validateNewTraceName();
+                validateNewFolderName();
             }
         });
     }
 
-    private void validateNewTraceName() {
+    private void validateNewFolderName() {
 
-        String newTraceName = fNewTraceNameText.getText();
-        IWorkspace workspace = fTrace.getResource().getWorkspace();
-        IStatus nameStatus = workspace.validateName(newTraceName, IResource.FOLDER);
+        String name = fFolderName.getText();
+        IWorkspace workspace = fParentFolder.getWorkspace();
+        IStatus nameStatus = workspace.validateName(name, IResource.FOLDER);
 
-        if ("".equals(newTraceName)) { //$NON-NLS-1$
-            updateStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR,
-                    Messages.Dialog_EmptyNameError, null));
+        if ("".equals(name)) { //$NON-NLS-1$
+            updateStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, Messages.Dialog_EmptyNameError, null));
             return;
         }
 
@@ -136,10 +130,8 @@ public class RenameTraceDialog extends SelectionStatusDialog {
             return;
         }
 
-        IContainer parentFolder = fTrace.getResource().getParent();
-        if (parentFolder.findMember(newTraceName) != null) {
-            updateStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR,
-                    Messages.Dialog_ExistingNameError, null));
+        if (fParentFolder.findMember(name) != null) {
+            updateStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, Messages.Dialog_ExistingNameError, null));
             return;
         }
 
@@ -162,8 +154,39 @@ public class RenameTraceDialog extends SelectionStatusDialog {
 
     @Override
     protected void okPressed() {
-        setSelectionResult(new String[] { fNewTraceNameText.getText() });
+        IFolder folder = createNewFolder(fFolderName.getText());
+        if (folder == null) {
+            return;
+        }
+        setSelectionResult(new IFolder[] { folder });
         super.okPressed();
+    }
+
+    private IFolder createNewFolder(String folderName) {
+
+        final IFolder folder = fParentFolder.getFolder(new Path(folderName));
+
+        WorkspaceModifyOperation operation = new WorkspaceModifyOperation() {
+            @Override
+            public void execute(IProgressMonitor monitor) throws CoreException {
+                try {
+                    monitor.beginTask("", 1000); //$NON-NLS-1$
+                    folder.create(false, true, monitor);
+                } finally {
+                    monitor.done();
+                }
+            }
+        };
+        try {
+            PlatformUI.getWorkbench().getProgressService().busyCursorWhile(operation);
+        } catch (InterruptedException | RuntimeException exception) {
+            return null;
+        } catch (InvocationTargetException exception) {
+            MessageDialog.openError(getShell(), "", NLS.bind("", exception.getTargetException().getMessage())); //$NON-NLS-1$ //$NON-NLS-2$
+            return null;
+        }
+
+        return folder;
     }
 
 }

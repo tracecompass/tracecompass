@@ -118,7 +118,7 @@ public class TmfOpenTraceHelper {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
         }
         IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectRoot);
-        IFolder folder = project.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
+        IFolder folder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
         String traceName = getTraceName(path, folder);
         if (traceExists(path, folder)) {
             return openTraceFromProject(projectRoot, traceName);
@@ -224,7 +224,7 @@ public class TmfOpenTraceHelper {
         }
 
         try {
-            trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass());
+            trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass(), traceElement.getElementPath());
         } catch (final TmfTraceException e) {
             TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, traceElement.getTypeName()),
                     Messages.TmfOpenTraceHelper_InitError + ENDL + ENDL + e);

@@ -166,7 +166,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
      *            The parent element (trace folder)
      */
     public TmfTraceElement(String name, IResource trace, TmfTraceFolder parent) {
-        this(name, trace, (TmfProjectModelElement) parent);
+        super(name, trace, parent);
     }
 
     /**
@@ -180,10 +180,6 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
      *            The parent element (experiment folder)
      */
     public TmfTraceElement(String name, IResource trace, TmfExperimentElement parent) {
-        this(name, trace, (TmfProjectModelElement) parent);
-    }
-
-    private TmfTraceElement(String name, IResource trace, TmfProjectModelElement parent) {
         super(name, trace, parent);
     }
 
@@ -344,7 +340,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         // traces folder
         if (getParent() instanceof TmfExperimentElement) {
             for (TmfTraceElement aTrace : getProject().getTracesFolder().getTraces()) {
-                if (aTrace.getName().equals(getName())) {
+                if (aTrace.getElementPath().equals(getElementPath())) {
                     return aTrace;
                 }
             }
@@ -368,26 +364,6 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
             return Boolean.toString(isLinked).equals(value);
         }
         return false;
-    }
-
-    // ------------------------------------------------------------------------
-    // TmfTraceElement
-    // ------------------------------------------------------------------------
-
-    @Override
-    public TmfProjectElement getProject() {
-        if (getParent() instanceof TmfTraceFolder) {
-            TmfTraceFolder folder = (TmfTraceFolder) getParent();
-            TmfProjectElement project = (TmfProjectElement) folder.getParent();
-            return project;
-        }
-        if (getParent() instanceof TmfExperimentElement) {
-            TmfExperimentElement experiment = (TmfExperimentElement) getParent();
-            TmfExperimentFolder folder = (TmfExperimentFolder) experiment.getParent();
-            TmfProjectElement project = (TmfProjectElement) folder.getParent();
-            return project;
-        }
-        return null;
     }
 
     // ------------------------------------------------------------------------
@@ -476,6 +452,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
                 IConfigurationElement ce = sfTraceTypeAttributes.get(getTraceType());
                 return (ce != null) ? (getCategory(ce) + " : " + ce.getAttribute(TmfTraceType.NAME_ATTR)) : ""; //$NON-NLS-1$ //$NON-NLS-2$
             }
+            return ""; //$NON-NLS-1$
         }
 
         Map<String, String> traceProperties = getTraceProperties();
@@ -544,11 +521,11 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
 
         // Close experiments that contain the trace if open
         if (getParent() instanceof TmfTraceFolder) {
-            TmfExperimentFolder experimentFolder = getProject().getExperimentsFolder();
-            for (ITmfProjectModelElement experiment : experimentFolder.getChildren()) {
-                for (ITmfProjectModelElement child : experiment.getChildren()) {
-                    if (child.getName().equals(getName())) {
-                        ((TmfExperimentElement) experiment).closeEditors();
+            TmfExperimentFolder experimentsFolder = getProject().getExperimentsFolder();
+            for (TmfExperimentElement experiment : experimentsFolder.getExperiments()) {
+                for (TmfTraceElement trace : experiment.getTraces()) {
+                    if (trace.getElementPath().equals(getElementPath())) {
+                        experiment.closeEditors();
                         break;
                     }
                 }
@@ -587,15 +564,15 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
                 TmfExperimentFolder experimentFolder = getProject().getExperimentsFolder();
 
                 // Propagate the removal to traces
-                for (ITmfProjectModelElement experiment : experimentFolder.getChildren()) {
-                    List<ITmfProjectModelElement> toRemove = new LinkedList<>();
-                    for (ITmfProjectModelElement child : experiment.getChildren()) {
-                        if (child.getName().equals(getName())) {
-                            toRemove.add(child);
+                for (TmfExperimentElement experiment : experimentFolder.getExperiments()) {
+                    List<TmfTraceElement> toRemove = new LinkedList<>();
+                    for (TmfTraceElement trace : experiment.getTraces()) {
+                        if (trace.getElementPath().equals(getElementPath())) {
+                            toRemove.add(trace);
                         }
                     }
-                    for (ITmfProjectModelElement child : toRemove) {
-                        ((TmfExperimentElement) experiment).removeTrace((TmfTraceElement) child);
+                    for (TmfTraceElement child : toRemove) {
+                        experiment.removeTrace(child);
                     }
                 }
 

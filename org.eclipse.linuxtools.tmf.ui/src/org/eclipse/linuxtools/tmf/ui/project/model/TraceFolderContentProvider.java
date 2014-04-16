@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 Ericsson
+ * Copyright (c) 2010, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Patrick Tasse - Add support for folder elements
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
@@ -33,12 +34,9 @@ public class TraceFolderContentProvider implements IStructuredContentProvider {
         if (inputElement instanceof TmfTraceFolder) {
             TmfTraceFolder folder = (TmfTraceFolder) inputElement;
             List<ITmfProjectModelElement> elements = new ArrayList<>();
-            for (ITmfProjectModelElement element : folder.getChildren()) {
-                if (element instanceof TmfTraceElement) {
-                    TmfTraceElement trace = (TmfTraceElement) element;
-                    if (trace.getTraceType() != null) {
-                        elements.add(trace);
-                    }
+            for (TmfTraceElement trace : folder.getTraces()) {
+                if (trace.getTraceType() != null) {
+                    elements.add(trace);
                 }
             }
             return elements.toArray();

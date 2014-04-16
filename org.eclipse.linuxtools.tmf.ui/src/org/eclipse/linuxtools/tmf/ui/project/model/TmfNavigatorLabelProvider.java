@@ -173,9 +173,26 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider {
     @Override
     public String getText(Object element) {
 
+        if (element instanceof TmfTracesFolder) {
+            TmfTracesFolder folder = (TmfTracesFolder) element;
+            return folder.getName() + " [" + folder.getTraces().size() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+        }
+
         if (element instanceof TmfTraceFolder) {
             TmfTraceFolder folder = (TmfTraceFolder) element;
-            return folder.getName() + " [" + folder.getTraces().size() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+            int nbTraces = folder.getTraces().size();
+            if (nbTraces > 0) {
+                return folder.getName() + " [" + folder.getTraces().size() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+            }
+            return folder.getName();
+        }
+
+        if (element instanceof TmfTraceElement) {
+            TmfTraceElement trace = (TmfTraceElement) element;
+            if (trace.getParent() instanceof TmfExperimentElement) {
+                return trace.getElementPath();
+            }
+            return trace.getName();
         }
 
         if (element instanceof TmfExperimentElement) {

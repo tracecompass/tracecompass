@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Patrick Tasse - Add support for folder elements
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
@@ -26,8 +27,10 @@ import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource2;
 
 /**
- * Implementation of the model element for the experiment folder.
+ * Implementation of model element representing the unique "Experiments" folder
+ * in the project.
  * <p>
+ *
  * @version 1.0
  * @author Francois Chouinard
  *
@@ -84,11 +87,6 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
     @Override
     public IFolder getResource() {
         return (IFolder) fResource;
-    }
-
-    @Override
-    public TmfProjectElement getProject() {
-        return (TmfProjectElement) getParent();
     }
 
     @Override

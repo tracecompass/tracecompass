@@ -61,6 +61,7 @@ import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceTypeUIUtils;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.linuxtools.tmf.ui.project.wizards.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -187,7 +188,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 if (project.hasNature(TmfProjectNature.ID)) {
                     TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
                     fTraceFolderElement = projectElement.getTracesFolder();
-                    traceFolder = project.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
+                    traceFolder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
                 }
             } catch (CoreException e) {
             }
@@ -200,7 +201,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                     TmfCommonConstants.DEFAULT_TRACE_PROJECT_NAME, null, new NullProgressMonitor());
             TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
             fTraceFolderElement = projectElement.getTracesFolder();
-            traceFolder = project.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
+            traceFolder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
         }
 
         // Set the target trace folder

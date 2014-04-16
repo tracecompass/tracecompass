@@ -31,7 +31,7 @@ import org.eclipse.linuxtools.internal.lttng2.control.ui.Activator;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.remote.IRemoteSystemProxy;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TraceUtils;
 import org.eclipse.rse.core.subsystems.RemoteChildrenContentsType;
 import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
@@ -233,13 +233,13 @@ public class ImportDialog extends Dialog implements IImportDialog {
             }
 
             IProject project = fProjects.get(fProjectIndex);
-            IFolder traceFolder = project.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
+            IFolder traceFolder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
 
             if (!traceFolder.exists()) {
                 // Invalid LTTng 2.0 project
                 MessageDialog.openError(getShell(),
                         Messages.TraceControl_ImportDialogTitle,
-                        Messages.TraceControl_ImportDialogInvalidTracingProject + " (" + TmfTraceFolder.TRACE_FOLDER_NAME + ")");  //$NON-NLS-1$//$NON-NLS-2$
+                        Messages.TraceControl_ImportDialogInvalidTracingProject + " (" + TmfTracesFolder.TRACES_FOLDER_NAME + ")");  //$NON-NLS-1$//$NON-NLS-2$
                 return;
             }
 

@@ -52,6 +52,7 @@ import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceTypeUIUtils;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace.BatchImportTraceWizard;
 import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
 import org.eclipse.rse.services.files.IFileService;
@@ -144,7 +145,7 @@ public class ImportHandler extends BaseControlViewHandler {
                             downloadTrace(remoteFile, selectedProject, monitor);
 
                             // Set trace type
-                            IFolder traceFolder = selectedProject.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
+                            IFolder traceFolder = selectedProject.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
 
                             if (monitor.isCanceled()) {
                                 status.add(Status.CANCEL_STATUS);
@@ -253,9 +254,9 @@ public class ImportHandler extends BaseControlViewHandler {
         try {
             IRemoteFileSubSystem fsss = trace.getImportFile().getParentRemoteFileSubSystem();
 
-            IFolder traceFolder = project.getFolder(TmfTraceFolder.TRACE_FOLDER_NAME);
+            IFolder traceFolder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
             if (!traceFolder.exists()) {
-                throw new ExecutionException(Messages.TraceControl_ImportDialogInvalidTracingProject + " (" + TmfTraceFolder.TRACE_FOLDER_NAME + ")");  //$NON-NLS-1$//$NON-NLS-2$
+                throw new ExecutionException(Messages.TraceControl_ImportDialogInvalidTracingProject + " (" + TmfTracesFolder.TRACES_FOLDER_NAME + ")");  //$NON-NLS-1$//$NON-NLS-2$
             }
 
             String traceName = trace.getLocalTraceName();

@@ -113,6 +113,14 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
         return fLocation;
     }
 
+    /**
+     * @since 3.0
+     */
+    @Override
+    public TmfProjectElement getProject() {
+        return fParent.getProject();
+    }
+
     @Override
     public ITmfProjectModelElement getParent() {
         return fParent;
@@ -212,35 +220,47 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
     }
 
     /**
-     * Returns the trace specific supplementary directory under the project's supplementary folder.
-     * The folder will be created if it doesn't exist.
+     * Returns the trace specific supplementary folder under the project's
+     * supplementary folder. The returned folder and its parent folders may not
+     * exist.
      *
-     * @param supplFoldername - folder name.
-     * @return returns the trace specific supplementary directory
+     * @param supplFolderPath
+     *            folder path relative to the project's supplementary folder
+     * @return the trace specific supplementary folder
      */
-    public IFolder getTraceSupplementaryFolder(String supplFoldername) {
-        IFolder supplFolderParent = getSupplementaryFolderParent();
-        return supplFolderParent.getFolder(supplFoldername);
-    }
-
-    /**
-     * Returns the supplementary folder for this project
-     *
-     * @return the supplementary folder for this project
-     */
-    public IFolder getSupplementaryFolderParent() {
+    public IFolder getTraceSupplementaryFolder(String supplFolderPath) {
         TmfProjectElement project = getProject();
         IProject projectResource = project.getResource();
         IFolder supplFolderParent = projectResource.getFolder(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER_NAME);
+        IFolder folder = supplFolderParent.getFolder(supplFolderPath);
+        return folder;
+    }
 
-        if (!supplFolderParent.exists()) {
-            try {
-                supplFolderParent.create(true, true, new NullProgressMonitor());
-            } catch (CoreException e) {
-                Activator.getDefault().logError("Error creating project specific supplementary folder " + supplFolderParent, e); //$NON-NLS-1$
+    /**
+     * Returns the trace specific supplementary folder under the project's
+     * supplementary folder. Its parent folders will be created if they don't
+     * exist. If createFolder is true, the returned folder will be created,
+     * otherwise it may not exist.
+     *
+     * @param supplFolderPath
+     *            folder path relative to the project's supplementary folder
+     * @param createFolder
+     *            if true, the returned folder will be created
+     * @return the trace specific supplementary folder
+     * @since 3.0
+     */
+    public IFolder prepareTraceSupplementaryFolder(String supplFolderPath, boolean createFolder) {
+        IFolder folder = getTraceSupplementaryFolder(supplFolderPath);
+        try {
+            if (createFolder) {
+                TraceUtils.createFolder(folder, new NullProgressMonitor());
+            } else {
+                TraceUtils.createFolder((IFolder) folder.getParent(), new NullProgressMonitor());
             }
+        } catch (CoreException e) {
+            Activator.getDefault().logError("Error creating supplementary folder " + folder.getFullPath(), e); //$NON-NLS-1$
         }
-        return supplFolderParent;
+        return folder;
     }
 
     @Override

@@ -18,7 +18,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
-import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
@@ -57,23 +56,23 @@ public class TmfEditorLinkHelper implements ILinkHelper {
                 // Check for experiments, traces which are folders or traces which are files
                 if (traceTypeId.equals(TmfExperiment.class.getCanonicalName())) {
                     // Case 1: Experiment
-                    for (final ITmfProjectModelElement projectElement : project.getExperimentsFolder().getChildren()) {
-                        if (projectElement.getName().equals(file.getParent().getName())) {
-                            return new StructuredSelection(projectElement);
+                    for (final TmfExperimentElement experimentElement : project.getExperimentsFolder().getExperiments()) {
+                        if (experimentElement.getResource().equals(file.getParent())) {
+                            return new StructuredSelection(experimentElement);
                         }
                     }
                 } else if (traceTypeId.equals(TmfTrace.class.getCanonicalName())) {
                     // Case 2: Trace that is a folder
-                    for (final ITmfProjectModelElement projectElement : project.getTracesFolder().getChildren()) {
-                        if (projectElement.getName().equals(file.getParent().getName())) {
-                            return new StructuredSelection(projectElement);
+                    for (final TmfTraceElement traceElement : project.getTracesFolder().getTraces()) {
+                        if (traceElement.getResource().equals(file.getParent())) {
+                            return new StructuredSelection(traceElement);
                         }
                     }
                 } else {
                     // Case 3: Trace that is a file
-                    for (final ITmfProjectModelElement projectElement : project.getTracesFolder().getChildren()) {
-                        if (projectElement.getResource().equals(file)) {
-                            return new StructuredSelection(projectElement);
+                    for (final TmfTraceElement traceElement : project.getTracesFolder().getTraces()) {
+                        if (traceElement.getResource().equals(file)) {
+                            return new StructuredSelection(traceElement);
                         }
                     }
                 }

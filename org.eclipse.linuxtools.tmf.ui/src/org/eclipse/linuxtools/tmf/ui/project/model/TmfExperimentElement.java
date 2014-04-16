@@ -21,15 +21,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceProxy;
+import org.eclipse.core.resources.IResourceProxyVisitor;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
@@ -145,34 +149,26 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
     }
 
     @Override
-    public TmfProjectElement getProject() {
-        return (TmfProjectElement) getParent().getParent();
-    }
-
-    @Override
     void refreshChildren() {
         IFolder folder = getResource();
 
         /* Update the trace children of this experiment */
         // Get the children from the model
         Map<String, ITmfProjectModelElement> childrenMap = new HashMap<>();
-        for (ITmfProjectModelElement element : getTraces()) {
-            childrenMap.put(element.getResource().getName(), element);
+        for (TmfTraceElement trace : getTraces()) {
+            childrenMap.put(trace.getElementPath(), trace);
         }
 
-        try {
-            IResource[] members = folder.members();
-            for (IResource resource : members) {
-                String name = resource.getName();
-                ITmfProjectModelElement element = childrenMap.get(name);
-                if (element instanceof TmfTraceElement) {
-                    childrenMap.remove(name);
-                } else if (!resource.isHidden()) {
-                    // exclude hidden resources (e.g. bookmarks file)
-                    element = new TmfTraceElement(name, resource, this);
-                }
+        List<IResource> members = getTraceResources();
+        for (IResource resource : members) {
+            String name = resource.getName();
+            String elementPath = resource.getFullPath().makeRelativeTo(folder.getFullPath()).toString();
+            ITmfProjectModelElement element = childrenMap.get(elementPath);
+            if (element instanceof TmfTraceElement) {
+                childrenMap.remove(elementPath);
+            } else {
+                element = new TmfTraceElement(name, resource, this);
             }
-        } catch (CoreException e) {
         }
 
         // Cleanup dangling children from the model
@@ -182,6 +178,24 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
 
         /* Update the analysis under this experiment */
         super.refreshChildren();
+    }
+
+    private List<IResource> getTraceResources() {
+        IFolder folder = getResource();
+        final List<IResource> list = new ArrayList<>();
+        try {
+            folder.accept(new IResourceProxyVisitor() {
+                @Override
+                public boolean visit(IResourceProxy resource) throws CoreException {
+                    if (resource.isLinked()) {
+                        list.add(resource.requestResource());
+                    }
+                    return true;
+                }
+            }, IResource.NONE);
+        } catch (CoreException e) {
+        }
+        return list;
     }
 
     // ------------------------------------------------------------------------
@@ -246,7 +260,8 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
             TraceTypeHelper traceType = TmfTraceType.getInstance().getTraceType(properties.get(TmfCommonConstants.TRACETYPE));
 
             if (resource instanceof IFolder) {
-                IFolder folder = experiment.getFolder(trace.getName());
+                IFolder folder = experiment.getFolder(trace.getElementPath());
+                TraceUtils.createFolder((IFolder) folder.getParent(), new NullProgressMonitor());
                 if (workspace.validateLinkLocation(folder, location).isOK()) {
                     folder.createLink(location, IResource.REPLACE, null);
                     if (traceType != null) {
@@ -257,7 +272,8 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
                     Activator.getDefault().logError("Error creating link. Invalid trace location " + location); //$NON-NLS-1$
                 }
             } else {
-                IFile file = experiment.getFile(trace.getName());
+                IFile file = experiment.getFile(trace.getElementPath());
+                TraceUtils.createFolder((IFolder) file.getParent(), new NullProgressMonitor());
                 if (workspace.validateLinkLocation(file, location).isOK()) {
                     file.createLink(location, IResource.REPLACE, null);
                     if (traceType != null) {
@@ -287,8 +303,17 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
 
         /* Finally, remove the trace from experiment*/
         removeChild(trace);
-        trace.getResource().delete(true, null);
+        deleteTraceResource(trace.getResource());
         deleteSupplementaryResources();
+    }
+
+    private void deleteTraceResource(IResource resource) throws CoreException {
+        resource.delete(true, null);
+        IContainer parent = resource.getParent();
+        // delete empty folders up to the parent experiment folder
+        if (!parent.equals(getResource()) && parent.members().length == 0) {
+            deleteTraceResource(parent);
+        }
     }
 
     @Override

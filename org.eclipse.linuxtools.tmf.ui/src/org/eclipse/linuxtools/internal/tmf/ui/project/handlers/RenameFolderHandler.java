@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson
+ * Copyright (c) 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,8 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Francois Chouinard - Initial API and implementation
- *   Patrick Tasse - Add support for folder elements
+ *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.tmf.ui.project.handlers;
@@ -18,8 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -30,19 +28,18 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
-import org.eclipse.linuxtools.tmf.ui.project.wizards.RenameTraceDialog;
+import org.eclipse.linuxtools.tmf.ui.project.wizards.RenameFolderDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
- * Handler for the Rename Trace command.
+ * Handler for the Rename Folder command.
  */
-public class RenameTraceHandler extends AbstractHandler {
+public class RenameFolderHandler extends AbstractHandler {
 
     // ------------------------------------------------------------------------
     // Execution
@@ -58,31 +55,31 @@ public class RenameTraceHandler extends AbstractHandler {
         }
 
         ISelection selection = HandlerUtil.getCurrentSelection(event);
-        TmfTraceElement selectedTrace = null;
+        TmfTraceFolder selectedFolder = null;
         if (selection instanceof IStructuredSelection) {
             Object element = ((IStructuredSelection) selection).getFirstElement();
-            if (element instanceof TmfTraceElement) {
-                selectedTrace = (TmfTraceElement) element;
+            if (element instanceof TmfTraceFolder) {
+                selectedFolder = (TmfTraceFolder) element;
             }
         }
-        if (selectedTrace == null) {
+        if (selectedFolder == null) {
+            return null;
+        }
+        final TmfTraceFolder oldFolder = selectedFolder;
+
+        // Fire the Rename Folder dialog
+        RenameFolderDialog dialog = new RenameFolderDialog(window.getShell(), oldFolder);
+        dialog.open();
+
+        if (dialog.getReturnCode() != Window.OK) {
             return null;
         }
 
-        // If trace is under an experiment, use the original trace from the traces folder
-        final TmfTraceElement oldTrace = selectedTrace.getElementUnderTraceFolder();
-
-        RenameTraceDialog dialog = new RenameTraceDialog(window.getShell(), oldTrace);
-        if (dialog.open() != Window.OK) {
-            return null;
-        }
-
-        final TmfTraceFolder traceFolder = (TmfTraceFolder) oldTrace.getParent();
         final String newName = (String) dialog.getFirstResult();
 
-        IFolder parentFolder = (IFolder) oldTrace.getParent().getResource();
-        final TmfTraceFolder tracesFolder = oldTrace.getProject().getTracesFolder();
-        final IPath newPath = parentFolder.getFullPath().append(newName);
+        IContainer parentFolder = oldFolder.getResource().getParent();
+        final TmfTraceFolder tracesFolder = oldFolder.getProject().getTracesFolder();
+        final IPath newFolderPath = parentFolder.getFullPath().append(newName);
 
         WorkspaceModifyOperation operation = new WorkspaceModifyOperation() {
             @Override
@@ -92,24 +89,16 @@ public class RenameTraceHandler extends AbstractHandler {
                     if (monitor.isCanceled()) {
                         throw new OperationCanceledException();
                     }
-                    // Close the trace if open
-                    oldTrace.closeEditors();
 
-                    if (oldTrace.getResource() instanceof IFolder) {
-                        IFolder folder = (IFolder) oldTrace.getResource();
-                        IFile bookmarksFile = oldTrace.getBookmarksFile();
-                        if (bookmarksFile.exists()) {
-                            IFile newBookmarksFile = folder.getFile(bookmarksFile.getName().replace(oldTrace.getName(), newName));
-                            if (!newBookmarksFile.exists()) {
-                                IPath newBookmarksPath = newBookmarksFile.getFullPath();
-                                bookmarksFile.move(newBookmarksPath, IResource.FORCE | IResource.SHALLOW, monitor);
-                            }
-                        }
+                    for (TmfTraceElement traceElement : oldFolder.getTraces()) {
+                        traceElement.closeEditors();
+
+                        IPath relativePath = traceElement.getPath().makeRelativeTo(oldFolder.getPath());
+                        String newElementPath = newFolderPath.makeRelativeTo(tracesFolder.getPath()).append(relativePath).toString();
+                        traceElement.renameSupplementaryFolder(newElementPath);
                     }
 
-                    String newElementPath = newPath.makeRelativeTo(tracesFolder.getPath()).toString();
-                    oldTrace.renameSupplementaryFolder(newElementPath);
-                    oldTrace.getResource().move(newPath, IResource.FORCE | IResource.SHALLOW, monitor);
+                    oldFolder.getResource().move(newFolderPath, IResource.FORCE | IResource.SHALLOW, monitor);
                     if (monitor.isCanceled()) {
                         throw new OperationCanceledException();
                     }
@@ -134,25 +123,20 @@ public class RenameTraceHandler extends AbstractHandler {
             @Override
             protected void execute(IProgressMonitor monitor) throws CoreException, InvocationTargetException, InterruptedException {
 
-                // Locate the new trace object
-                TmfTraceElement newTrace = null;
-                String newElementPath = oldTrace.getParent().getPath().append(newName).makeRelativeTo(tracesFolder.getPath()).toString();
-                for (TmfTraceElement element : traceFolder.getTraces()) {
-                    if (element.getElementPath().equals(newElementPath)) {
-                        newTrace = element;
-                        break;
-                    }
-                }
-                if (newTrace == null) {
-                    return;
-                }
-
-                TmfExperimentFolder experimentFolder = newTrace.getProject().getExperimentsFolder();
-                for (final TmfExperimentElement experiment : experimentFolder.getExperiments()) {
-                    for (final TmfTraceElement expTrace : experiment.getTraces()) {
-                        if (expTrace.getElementPath().equals(oldTrace.getElementPath())) {
-                            experiment.removeTrace(expTrace);
-                            experiment.addTrace(newTrace);
+                IPath oldFolderElementPath = oldFolder.getPath().makeRelativeTo(tracesFolder.getPath());
+                IPath newFolderElementPath = oldFolderElementPath.removeLastSegments(1).append(newName);
+                for (TmfExperimentElement experiment : oldFolder.getProject().getExperimentsFolder().getExperiments()) {
+                    for (TmfTraceElement oldTrace : experiment.getTraces()) {
+                        if (oldTrace.getElementPath().startsWith(oldFolderElementPath.toString())) {
+                            experiment.removeTrace(oldTrace);
+                            String relativePath = oldTrace.getElementPath().substring(oldFolderElementPath.toString().length() + 1);
+                            String newTraceElementPath = newFolderElementPath.append(relativePath).toString();
+                            for (TmfTraceElement newTrace : tracesFolder.getTraces()) {
+                                if (newTrace.getElementPath().equals(newTraceElementPath)) {
+                                    experiment.addTrace(newTrace);
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
@@ -162,10 +146,13 @@ public class RenameTraceHandler extends AbstractHandler {
         try {
             PlatformUI.getWorkbench().getProgressService().busyCursorWhile(operation);
         } catch (InterruptedException e) {
+            return null;
         } catch (InvocationTargetException e) {
             MessageDialog.openError(window.getShell(), e.toString(), e.getTargetException().toString());
+            return null;
         }
 
         return null;
     }
+
 }

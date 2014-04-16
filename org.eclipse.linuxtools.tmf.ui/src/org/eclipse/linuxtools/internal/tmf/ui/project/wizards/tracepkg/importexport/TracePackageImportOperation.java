@@ -389,7 +389,7 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
                 tmfTraceElement.refreshSupplementaryFolder();
                 String traceName = tmfTraceElement.getResource().getName();
                 // Project/.tracing/tracename
-                IPath destinationContainerPath = tmfTraceElement.getTraceSupplementaryFolder(traceName).getFullPath();
+                IPath destinationContainerPath = tmfTraceElement.prepareTraceSupplementaryFolder(traceName, false).getFullPath();
                 return importFiles(archiveFile, fileNameAndLabelPairs, destinationContainerPath, monitor);
             }
         }

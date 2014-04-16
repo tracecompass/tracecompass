@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 Ericsson
+ * Copyright (c) 2010, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,39 +8,28 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Patrick Tasse - Add support for folder elements
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
 
-import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.swt.graphics.Image;
 
 /**
- * Label provider implementation for trace folders for tree viewers that display
+ * Label provider implementation for trace folders for viewers that display
  * the content of a trace folder.
  * <p>
  *
  * @version 1.0
  * @author Francois Chouinard
  */
-public class TraceFolderLabelProvider extends LabelProvider implements ITableLabelProvider {
+public class TraceFolderLabelProvider extends LabelProvider {
 
     @Override
-    public Image getColumnImage(Object element, int columnIndex) {
-        return null;
-    }
-
-    @Override
-    public String getColumnText(Object element, int columnIndex) {
+    public String getText(Object element) {
         if (element instanceof TmfTraceElement) {
             TmfTraceElement entry = (TmfTraceElement) element;
-            switch (columnIndex) {
-                case 0:
-                    return entry.getName();
-                default:
-                    return null;
-            }
+            return entry.getElementPath();
         }
         return null;
     }

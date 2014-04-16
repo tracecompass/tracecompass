@@ -271,6 +271,10 @@
                   </with>
                </enablement>
          </commonWizard>
+         <commonSorter
+               class="org.eclipse.linuxtools.tmf.ui.project.model.TmfViewerSorter"
+               id="org.eclipse.linuxtools.tmf.ui.navigator.viewerSorter">
+         </commonSorter>
       </navigatorContent>
    </extension>
    <extension
@@ -469,6 +473,32 @@
                visible="true">
          </separator>
          <command
+               commandId="org.eclipse.linuxtools.tmf.ui.command.new_folder"
+               icon="icons/etool16/newfolder_wiz.gif"
+               label="%command.new_folder"
+               mnemonic="%command.new_folder.mnemonic"
+               style="push"
+               tooltip="%command.new_folder.description">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <or>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                        </instanceof>
+                     </or>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
                commandId="org.eclipse.ui.edit.copy"
                disabledIcon="icons/dtool16/copy_edit.gif"
                icon="icons/etool16/copy_edit.gif"
@@ -521,6 +551,16 @@
                         <instanceof
                               value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
                         </instanceof>
+                        <and>
+                           <not>
+                              <instanceof
+                                    value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder">
+                              </instanceof>
+                           </not>
+                           <instanceof
+                                 value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                           </instanceof>
+                        </and>
                      </or>
                   </iterate>
                </with>
@@ -555,6 +595,16 @@
                         <instanceof
                               value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
                         </instanceof>
+                        <and>
+                           <not>
+                              <instanceof
+                                    value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder">
+                              </instanceof>
+                           </not>
+                           <instanceof
+                                 value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                           </instanceof>
+                        </and>
                      </or>
                   </iterate>
                </with>
@@ -978,6 +1028,12 @@
       </category>
       <command
             categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
+            description="%command.new_folder.description"
+            id="org.eclipse.linuxtools.tmf.ui.command.new_folder"
+            name="%command.new_folder">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
             description="%command.new_experiment.description"
             id="org.eclipse.linuxtools.tmf.ui.command.new_experiment"
             name="%command.new_experiment">
@@ -1294,6 +1350,30 @@
          </activeWhen>
       </handler>
       <handler
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.RenameFolderHandler"
+            commandId="org.eclipse.ui.edit.rename">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate
+                     operator="and">
+                  <and>
+                     <not>
+                        <instanceof
+                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder">
+                        </instanceof>
+                     </not>
+                     <instanceof
+                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                     </instanceof>
+                  </and>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
             class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteTraceHandler"
             commandId="org.eclipse.ui.edit.delete">
          <activeWhen>
@@ -1317,6 +1397,42 @@
                      value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
                </instanceof>
             </iterate>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteFolderHandler"
+            commandId="org.eclipse.ui.edit.delete">
+         <activeWhen>
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <not>
+                  <instanceof
+                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder">
+                  </instanceof>
+               </not>
+               <instanceof
+                     value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+               </instanceof>
+            </iterate>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.NewFolderHandler"
+            commandId="org.eclipse.linuxtools.tmf.ui.command.new_folder">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate
+                     ifEmpty="false"
+                     operator="or">
+                  <instanceof
+                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                  </instanceof>
+               </iterate>
+            </and>
          </activeWhen>
       </handler>
       <handler

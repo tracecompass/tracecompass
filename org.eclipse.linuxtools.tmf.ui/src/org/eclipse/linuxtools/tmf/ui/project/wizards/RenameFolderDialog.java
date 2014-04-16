@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson
+ * Copyright (c) 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,8 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Francois Chouinard - Copied and adapted from NewFolderDialog
- *   Patrick Tasse - Close editors to release resources
+ *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.wizards;
@@ -20,7 +19,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
@@ -35,32 +34,31 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.SelectionStatusDialog;
 
 /**
- * Implementation of a dialog box to rename a trace.
- * <p>
- * @version 1.0
- * @author Francois Chouinard
+ * Implementation of a dialog box to rename a folder.
+ * @since 3.0
  */
-public class RenameTraceDialog extends SelectionStatusDialog {
+public class RenameFolderDialog extends SelectionStatusDialog {
 
     // ------------------------------------------------------------------------
     // Members
     // ------------------------------------------------------------------------
 
-    private final TmfTraceElement fTrace;
-    private Text fNewTraceNameText;
+    private final TmfTraceFolder fFolder;
+    private Text fNewFolderNameText;
 
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
+
     /**
      * Constructor
      * @param shell The parent shell
-     * @param trace The trace element to rename
+     * @param folder The trace element to rename
      */
-    public RenameTraceDialog(Shell shell, TmfTraceElement trace) {
+    public RenameFolderDialog(Shell shell, TmfTraceFolder folder) {
         super(shell);
-        fTrace = trace;
-        setTitle(Messages.RenameTraceDialog_DialogTitle);
+        fFolder = folder;
+        setTitle(Messages.RenameFolderDialog_DialogTitle);
         setStatusLineAboveButtons(true);
     }
 
@@ -89,7 +87,7 @@ public class RenameTraceDialog extends SelectionStatusDialog {
         // Old trace name label
         Label oldTraceLabel = new Label(folderGroup, SWT.NONE);
         oldTraceLabel.setFont(font);
-        oldTraceLabel.setText(Messages.RenameTraceDialog_TraceName);
+        oldTraceLabel.setText(Messages.RenameFolderDialog_FolderName);
 
         // Old trace name field
         Text oldTraceName = new Text(folderGroup, SWT.BORDER);
@@ -97,35 +95,35 @@ public class RenameTraceDialog extends SelectionStatusDialog {
         data.widthHint = IDialogConstants.ENTRY_FIELD_WIDTH;
         oldTraceName.setLayoutData(data);
         oldTraceName.setFont(font);
-        oldTraceName.setText(fTrace.getName());
+        oldTraceName.setText(fFolder.getName());
         oldTraceName.setEnabled(false);
 
         // New trace name label
         Label newTaceLabel = new Label(folderGroup, SWT.NONE);
         newTaceLabel.setFont(font);
-        newTaceLabel.setText(Messages.RenameTraceDialog_TraceNewName);
+        newTaceLabel.setText(Messages.RenameFolderDialog_FolderNewName);
 
         // New trace name entry field
-        fNewTraceNameText = new Text(folderGroup, SWT.BORDER);
+        fNewFolderNameText = new Text(folderGroup, SWT.BORDER);
         data = new GridData(GridData.FILL_HORIZONTAL);
         data.widthHint = IDialogConstants.ENTRY_FIELD_WIDTH;
-        fNewTraceNameText.setLayoutData(data);
-        fNewTraceNameText.setFont(font);
-        fNewTraceNameText.addListener(SWT.Modify, new Listener() {
+        fNewFolderNameText.setLayoutData(data);
+        fNewFolderNameText.setFont(font);
+        fNewFolderNameText.addListener(SWT.Modify, new Listener() {
             @Override
             public void handleEvent(Event event) {
-                validateNewTraceName();
+                validateNewFolderName();
             }
         });
     }
 
-    private void validateNewTraceName() {
+    private void validateNewFolderName() {
 
-        String newTraceName = fNewTraceNameText.getText();
-        IWorkspace workspace = fTrace.getResource().getWorkspace();
-        IStatus nameStatus = workspace.validateName(newTraceName, IResource.FOLDER);
+        String newFolderName = fNewFolderNameText.getText();
+        IWorkspace workspace = fFolder.getResource().getWorkspace();
+        IStatus nameStatus = workspace.validateName(newFolderName, IResource.FOLDER);
 
-        if ("".equals(newTraceName)) { //$NON-NLS-1$
+        if ("".equals(newFolderName)) { //$NON-NLS-1$
             updateStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR,
                     Messages.Dialog_EmptyNameError, null));
             return;
@@ -136,8 +134,8 @@ public class RenameTraceDialog extends SelectionStatusDialog {
             return;
         }
 
-        IContainer parentFolder = fTrace.getResource().getParent();
-        if (parentFolder.findMember(newTraceName) != null) {
+        IContainer parentFolder = fFolder.getResource().getParent();
+        if (parentFolder.findMember(newFolderName) != null) {
             updateStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR,
                     Messages.Dialog_ExistingNameError, null));
             return;
@@ -162,7 +160,7 @@ public class RenameTraceDialog extends SelectionStatusDialog {
 
     @Override
     protected void okPressed() {
-        setSelectionResult(new String[] { fNewTraceNameText.getText() });
+        setSelectionResult(new String[] { fNewFolderNameText.getText() });
         super.okPressed();
     }
 

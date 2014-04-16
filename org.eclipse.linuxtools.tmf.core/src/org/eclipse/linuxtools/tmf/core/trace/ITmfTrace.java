@@ -11,6 +11,7 @@
  *   Francois Chouinard - Updated as per TMF Trace Model 1.0
  *   Geneviève Bastien  - Added timestamp transforms and timestamp
  *                        creation functions
+ *   Patrick Tasse - Add support for folder elements
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.core.trace;
@@ -152,6 +153,27 @@ public interface ITmfTrace extends ITmfEventProvider {
      *             If we couldn't open the trace
      */
     void initTrace(IResource resource, String path, Class<? extends ITmfEvent> type) throws TmfTraceException;
+
+    /**
+     * Initialize a newly instantiated "empty" trace object. This is used to
+     * properly parameterize an ITmfTrace instantiated with its parameterless
+     * constructor.
+     * <p>
+     * Typically, the parameterless constructor will provide the block size and
+     * its associated parser and indexer.
+     *
+     * @param resource
+     *            the trace resource
+     * @param path
+     *            the trace path
+     * @param type
+     *            the trace event type
+     * @param name
+     *            the trace name
+     * @throws TmfTraceException
+     *             If we couldn't open the trace
+     */
+    void initTrace(IResource resource, String path, Class<? extends ITmfEvent> type, String name) throws TmfTraceException;
 
     /**
      * Validate that the trace is of the correct type. The implementation should

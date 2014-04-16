@@ -207,6 +207,12 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
     // ------------------------------------------------------------------------
 
     @Override
+    public void initTrace(final IResource resource, final String path, final Class<? extends ITmfEvent> type, String name) throws TmfTraceException {
+        setName(name);
+        initTrace(resource, path, type);
+    }
+
+    @Override
     public void initTrace(final IResource resource, final String path, final Class<? extends ITmfEvent> type) throws TmfTraceException {
         initialize(resource, path, type);
     }
@@ -229,10 +235,9 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
         }
         fPath = path;
         fResource = resource;
-        String traceName = (resource != null) ? resource.getName() : null;
-        // If no resource was provided, extract the display name the trace path
-        if (traceName == null) {
-            traceName = new Path(path).lastSegment();
+        String traceName = getName();
+        if (traceName == null || traceName.isEmpty()) {
+            traceName = (resource != null) ? resource.getName() : new Path(path).lastSegment();
         }
         if (fParser == null) {
             if (this instanceof ITmfEventParser) {
