@@ -245,8 +245,6 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
                 }
             }
         }
-        // Invoke GC to release MappedByteBuffer objects (Java bug JDK-4724038)
-        System.gc();
     }
 
     // ------------------------------------------------------------------------

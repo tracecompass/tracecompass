@@ -557,6 +557,13 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
             TmfExperimentElement experiment = (TmfExperimentElement) getParent();
             experiment.closeEditors();
         }
+
+        /*
+         * We will be closing a trace shortly. Invoke GC to release
+         * MappedByteBuffer objects, which some trace types, like CTF, use.
+         * (see Java bug JDK-4724038)
+         */
+        System.gc();
     }
 
     /**
