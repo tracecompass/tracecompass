@@ -73,7 +73,7 @@ public class TmfSignalThrottlerTest {
             sender.sendSignal(sig3);
         }
 
-        sleep(1000);
+        sleep(5000);
 
         assertEquals(1, listener.nbReceived[0]);
         assertEquals(0, listener.nbReceived[1]);
@@ -107,7 +107,7 @@ public class TmfSignalThrottlerTest {
             }
         }
 
-        sleep(2000);
+        sleep(5000);
 
         for (int nb : listener.nbReceived) {
             assertEquals(1, nb);
@@ -125,11 +125,11 @@ public class TmfSignalThrottlerTest {
         final MySignal sig3 = new MySignal(sender, 0);
 
         sender.sendSignal(sig1);
-        sleep(1000);
+        sleep(2000);
         sender.sendSignal(sig2);
-        sleep(1000);
+        sleep(2000);
         sender.sendSignal(sig3);
-        sleep(1000);
+        sleep(2000);
 
         assertEquals(3, listener.nbReceived[0]);
     }
