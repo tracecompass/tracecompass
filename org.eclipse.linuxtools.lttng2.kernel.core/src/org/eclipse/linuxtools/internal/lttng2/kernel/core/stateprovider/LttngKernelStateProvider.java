@@ -86,7 +86,6 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
          */
         final CtfTmfEvent event = (CtfTmfEvent) ev;
 
-        final ITmfEventField content = event.getContent();
         final String eventName = event.getType().getName();
         final long ts = event.getTimestamp().getValue();
 
@@ -132,7 +131,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             case LttngStrings.IRQ_HANDLER_ENTRY:
             /* Fields: int32 irq, string name */
             {
-                Integer irqId = ((Long) content.getField(LttngStrings.IRQ).getValue()).intValue();
+                Integer irqId = ((Long) event.getContent().getField(LttngStrings.IRQ).getValue()).intValue();
 
                 /* Mark this IRQ as active in the resource tree.
                  * The state value = the CPU on which this IRQ is sitting */
@@ -155,7 +154,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             case LttngStrings.IRQ_HANDLER_EXIT:
             /* Fields: int32 irq, int32 ret */
             {
-                Integer irqId = ((Long) content.getField(LttngStrings.IRQ).getValue()).intValue();
+                Integer irqId = ((Long) event.getContent().getField(LttngStrings.IRQ).getValue()).intValue();
 
                 /* Put this IRQ back to inactive in the resource tree */
                 quark = ss.getQuarkRelativeAndAdd(getNodeIRQs(), irqId.toString());
@@ -173,7 +172,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             case LttngStrings.SOFTIRQ_ENTRY:
             /* Fields: int32 vec */
             {
-                Integer softIrqId = ((Long) content.getField(LttngStrings.VEC).getValue()).intValue();
+                Integer softIrqId = ((Long) event.getContent().getField(LttngStrings.VEC).getValue()).intValue();
 
                 /* Mark this SoftIRQ as active in the resource tree.
                  * The state value = the CPU on which this SoftIRQ is processed */
@@ -196,7 +195,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             case LttngStrings.SOFTIRQ_EXIT:
             /* Fields: int32 vec */
             {
-                Integer softIrqId = ((Long) content.getField(LttngStrings.VEC).getValue()).intValue();
+                Integer softIrqId = ((Long) event.getContent().getField(LttngStrings.VEC).getValue()).intValue();
 
                 /* Put this SoftIRQ back to inactive (= -1) in the resource tree */
                 quark = ss.getQuarkRelativeAndAdd(getNodeSoftIRQs(), softIrqId.toString());
@@ -214,7 +213,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             case LttngStrings.SOFTIRQ_RAISE:
             /* Fields: int32 vec */
             {
-                Integer softIrqId = ((Long) content.getField(LttngStrings.VEC).getValue()).intValue();
+                Integer softIrqId = ((Long) event.getContent().getField(LttngStrings.VEC).getValue()).intValue();
 
                 /* Mark this SoftIRQ as *raised* in the resource tree.
                  * State value = -2 */
@@ -230,6 +229,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
              *         string next_comm, int32 next_tid, int32 next_prio
              */
             {
+                ITmfEventField content = event.getContent();
                 Integer prevTid = ((Long) content.getField(LttngStrings.PREV_TID).getValue()).intValue();
                 Long prevState = (Long) content.getField(LttngStrings.PREV_STATE).getValue();
                 String nextProcessName = (String) content.getField(LttngStrings.NEXT_COMM).getValue();
@@ -285,6 +285,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             /* Fields: string parent_comm, int32 parent_tid,
              *         string child_comm, int32 child_tid */
             {
+                ITmfEventField content = event.getContent();
                 // String parentProcessName = (String) event.getFieldValue("parent_comm");
                 String childProcessName = (String) content.getField(LttngStrings.CHILD_COMM).getValue();
                 // assert ( parentProcessName.equals(childProcessName) );
@@ -337,7 +338,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
              * this is when we should delete everything wrt to the process.
              */
             {
-                Integer tid = ((Long) content.getField(LttngStrings.TID).getValue()).intValue();
+                Integer tid = ((Long) event.getContent().getField(LttngStrings.TID).getValue()).intValue();
                 /*
                  * Remove the process and all its sub-attributes from the
                  * current state
@@ -352,6 +353,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
              * int32 type, int32 mode, int32 pid, int32 submode, int32 vpid,
              * int32 ppid, int32 tid, string name, int32 status, int32 vtid */
             {
+                ITmfEventField content = event.getContent();
                 int tid = ((Long) content.getField(LttngStrings.TID).getValue()).intValue();
                 int pid = ((Long) content.getField(LttngStrings.PID).getValue()).intValue();
                 int ppid = ((Long) content.getField(LttngStrings.PPID).getValue()).intValue();
@@ -407,7 +409,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
              * string comm, int32 pid, int32 prio, int32 success,
              * int32 target_cpu */
             {
-                final int tid = ((Long) content.getField(LttngStrings.TID).getValue()).intValue();
+                final int tid = ((Long) event.getContent().getField(LttngStrings.TID).getValue()).intValue();
                 final int threadNode = ss.getQuarkRelativeAndAdd(getNodeThreads(), String.valueOf(tid));
 
                 /*
