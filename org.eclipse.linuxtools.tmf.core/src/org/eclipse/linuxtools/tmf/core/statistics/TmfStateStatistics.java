@@ -21,8 +21,6 @@ import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
-import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
-import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 
@@ -146,10 +144,10 @@ public class TmfStateStatistics implements ITmfStatistics {
             final int quark = totalsStats.getQuarkAbsolute(Attributes.TOTAL);
             count= totalsStats.querySingleState(endTime, quark).getStateValue().unboxInt();
 
-        } catch (TimeRangeException e) {
+        } catch (StateSystemDisposedException e) {
             /* Assume there is no events for that range */
             return 0;
-        } catch (AttributeNotFoundException | StateValueTypeException | StateSystemDisposedException e) {
+        } catch (AttributeNotFoundException e) {
             e.printStackTrace();
         }
 
@@ -177,9 +175,9 @@ public class TmfStateStatistics implements ITmfStatistics {
                 map.put(curEventName, eventCount);
             }
 
-        } catch (TimeRangeException e) {
+        } catch (StateSystemDisposedException e) {
             /* Assume there is no events, nothing will be put in the map. */
-        } catch (AttributeNotFoundException | StateValueTypeException | StateSystemDisposedException e) {
+        } catch (AttributeNotFoundException e) {
             e.printStackTrace();
         }
         return map;
@@ -212,6 +210,11 @@ public class TmfStateStatistics implements ITmfStatistics {
          */
         long startTime = checkStartTime(start, typesStats);
         long endTime = checkEndTime(end, typesStats);
+        if (endTime < startTime) {
+            /* The start/end times do not intersect this state system range.
+             * Return the empty map. */
+            return map;
+        }
 
         try {
             /* Get the list of quarks, one for each even type in the database */
@@ -261,14 +264,8 @@ public class TmfStateStatistics implements ITmfStatistics {
                 }
             }
 
-        } catch (TimeRangeException | StateSystemDisposedException e) {
+        } catch (StateSystemDisposedException e) {
             /* Assume there is no (more) events, nothing will be put in the map. */
-        } catch (StateValueTypeException e) {
-            /*
-             * This exception type would show a logic problem however,
-             * so they should not happen.
-             */
-            throw new IllegalStateException();
         }
         return map;
     }
@@ -287,9 +284,9 @@ public class TmfStateStatistics implements ITmfStatistics {
             long count = totalsStats.querySingleState(ts, quark).getStateValue().unboxInt();
             return count;
 
-        } catch (TimeRangeException e) {
-            /* Assume there is no events for that range */
-        } catch (AttributeNotFoundException | StateValueTypeException | StateSystemDisposedException e) {
+        } catch (StateSystemDisposedException e) {
+            /* Assume there is no (more) events, nothing will be put in the map. */
+        } catch (AttributeNotFoundException e) {
             e.printStackTrace();
         }
 
