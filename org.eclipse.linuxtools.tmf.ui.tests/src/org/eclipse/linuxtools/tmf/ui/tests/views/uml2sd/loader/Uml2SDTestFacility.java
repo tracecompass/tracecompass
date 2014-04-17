@@ -62,7 +62,7 @@ public class Uml2SDTestFacility {
     private TmfUml2SDTestTrace    fParser = null;
     private TmfExperiment fExperiment = null;
 
-    private boolean fIsInitialized = false;
+    private volatile boolean fIsInitialized = false;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -152,8 +152,14 @@ public class Uml2SDTestFacility {
      */
     public void dispose() {
         if (fIsInitialized) {
-            fTrace.broadcast(new TmfTraceClosedSignal(this, fExperiment));
-            fExperiment.dispose();
+            ITmfTrace trace = fTrace;
+            TmfExperiment experiment = fExperiment;
+            if (trace == null || experiment == null) {
+                throw new IllegalStateException();
+            }
+
+            trace.broadcast(new TmfTraceClosedSignal(this, experiment));
+            experiment.dispose();
 
             // Wait for all Eclipse jobs to finish
             waitForJobs();
@@ -311,8 +317,13 @@ public class Uml2SDTestFacility {
      * Disposes the experiment.
      */
     public void disposeExperiment() {
-        fTrace.broadcast(new TmfTraceClosedSignal(this, fExperiment));
-        fExperiment.dispose();
+        ITmfTrace trace = fTrace;
+        TmfExperiment experiment = fExperiment;
+        if (trace == null || experiment == null) {
+            throw new IllegalStateException();
+        }
+        trace.broadcast(new TmfTraceClosedSignal(this, experiment));
+        experiment.dispose();
         delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
     }
 
