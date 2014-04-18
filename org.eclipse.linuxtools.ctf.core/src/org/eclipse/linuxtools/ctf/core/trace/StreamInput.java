@@ -13,6 +13,8 @@
 package org.eclipse.linuxtools.ctf.core.trace;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -41,7 +43,7 @@ import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntr
  *
  * @since 2.0
  */
-public class StreamInput implements IDefinitionScope {
+public class StreamInput implements IDefinitionScope, AutoCloseable {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -69,20 +71,25 @@ public class StreamInput implements IDefinitionScope {
 
     private long fTimestampEnd;
 
-    /*
+    /**
      * Definition of trace packet header
      */
     private StructDeclaration fTracePacketHeaderDecl = null;
 
-    /*
+    /**
      * Definition of trace stream packet context
      */
     private StructDeclaration fStreamPacketContextDecl = null;
 
-    /*
+    /**
      * Total number of lost events in this stream
      */
     private long fLostSoFar = 0;
+
+    /**
+     * File input stream, the parent input file
+     */
+    private final FileInputStream fFileInputStream;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -93,16 +100,32 @@ public class StreamInput implements IDefinitionScope {
      *
      * @param stream
      *            The stream to which this StreamInput belongs to.
-     * @param fileChannel
-     *            The FileChannel to the trace file.
      * @param file
      *            Information about the trace file (for debugging purposes).
+     * @throws CTFReaderException
+     *             The file must exist
+     * @since 3.0
      */
-    public StreamInput(Stream stream, FileChannel fileChannel, File file) {
+    public StreamInput(Stream stream, File file) throws CTFReaderException {
         fStream = stream;
-        fFileChannel = fileChannel;
         fFile = file;
+        try {
+            fFileInputStream = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            throw new CTFReaderException(e);
+        }
+
+        fFileChannel = fFileInputStream.getChannel();
         fIndex = new StreamInputPacketIndex();
+    }
+
+    /**
+     * @since 3.0
+     */
+    @Override
+    public void close() throws IOException {
+        fFileChannel.close();
+        fFileInputStream.close();
     }
 
     // ------------------------------------------------------------------------

@@ -576,11 +576,11 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
             throw new CTFReaderException("Unexpected end of stream"); //$NON-NLS-1$
         }
 
-        /* Create the stream input */
-        StreamInput streamInput = new StreamInput(stream, fc, streamFile);
-
-        /* Add a reference to the streamInput in the stream */
-        stream.addInput(streamInput);
+        /*
+         * Create the stream input and add a reference to the streamInput in the
+         * stream
+         */
+        stream.addInput(new StreamInput(stream, streamFile));
 
         return stream;
     }
@@ -891,6 +891,28 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
             return candidates.floor(dummyCs);
         }
         return callsite;
+    }
+
+    /**
+     * Add a new stream
+     *
+     * @param id
+     *            the ID of the stream
+     * @param streamFile
+     *            new file in the stream
+     * @throws CTFReaderException
+     *             The file must exist
+     * @since 3.0
+     */
+    public void addStream(long id, File streamFile) throws CTFReaderException {
+        Stream stream = null;
+        if (fStreams.containsKey(id)) {
+            stream = fStreams.get(id);
+        } else {
+            stream = new Stream(this);
+            fStreams.put(id, stream);
+        }
+        stream.addInput(new StreamInput(stream, streamFile));
     }
 }
 

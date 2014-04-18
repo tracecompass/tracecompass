@@ -16,7 +16,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
-import java.nio.channels.FileChannel;
 import java.util.Set;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
@@ -114,7 +113,7 @@ public class StreamInputReaderTest {
     @Test(expected = CTFReaderException.class)
     public void testStreamInputReader_invalid() throws CTFReaderException {
         StreamInput streamInput = new StreamInput(
-                new Stream(new CTFTrace("")), (FileChannel) null, new File(""));
+                new Stream(new CTFTrace("")), new File(""));
 
         StreamInputReader result = new StreamInputReader(streamInput);
         assertNotNull(result);

@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
-import java.nio.channels.FileChannel;
+import java.io.FilenameFilter;
 import java.util.Map;
 import java.util.Set;
 
@@ -59,8 +59,20 @@ public class StreamTest {
         fixture.setPacketContext(new StructDeclaration(1L));
         fixture.setEventHeader(new StructDeclaration(1L));
         fixture.setId(1L);
-        fixture.addInput(new StreamInput(new Stream(testTrace.getTrace()),
-                (FileChannel) null, new File("")));
+        fixture.addInput(new StreamInput(new Stream(testTrace.getTrace()), createFile()));
+    }
+
+    private static File createFile() {
+        File path = new File(testTrace.getPath());
+        return path.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                if (name.contains("hann")) {
+                    return true;
+                }
+                return false;
+            }
+        })[0];
     }
 
     /**
@@ -76,8 +88,8 @@ public class StreamTest {
     }
 
     /**
-     * Run the void addEvent(EventDeclaration) method test with the basic
-     * event.
+     * Run the void addEvent(EventDeclaration) method test with the basic event.
+     *
      * @throws ParseException
      */
     @Test
@@ -93,6 +105,7 @@ public class StreamTest {
     public void testEventContextIsSet() {
         assertTrue(fixture.isEventContextSet());
     }
+
     /**
      * Run the boolean eventContextIsSet() method test.
      */
@@ -187,7 +200,6 @@ public class StreamTest {
         boolean result = fixture.isPacketContextSet();
         assertTrue(result);
     }
-
 
     /**
      * Run the void setEventContext(StructDeclaration) method test.
