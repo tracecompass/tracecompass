@@ -3435,6 +3435,48 @@ public void start(BundleContext context) throws Exception {
 
 where '''MyLttngKernelParameterProvider''' will be registered to analysis ''"my.lttng.kernel.analysis.id"''. When the analysis module is created, the new module will register automatically to the singleton parameter provider instance. Only one module is registered to a parameter provider at a given time, the one corresponding to the currently selected trace.
 
+== Providing requirements to analyses ==
+
+=== Analysis requirement provider API ===
+
+A requirement defines the needs of an analysis. For example, an analysis could need an event named ''"sched_switch"'' in order to be properly executed. The requirements are represented by the class '''TmfAnalysisRequirement'''. Since '''IAnalysisModule''' extends the '''IAnalysisRequirementProvider''' interface, all analysis modules must provide their requirements. If the analysis module extends '''TmfAbstractAnalysisModule''', it has the choice between overriding the requirements getter ('''IAnalysisRequirementProvider#getAnalysisRequirements()''') or not, since the abstract class returns an empty collection by default (no requirements).
+
+=== Requirement values ===
+
+When instantiating a requirement, the developer needs to specify a type to which all the values added to the requirement will be linked. In the earlier example, there would be an ''"event"''  or ''"eventName"'' type. The type is represented by a string, like all values added to the requirement object. With an 'event' type requirement, a trace generator like the LTTng Control could automatically enable the required events. This is possible by calling the '''TmfAnalysisRequirementHelper''' class. Another point we have to take into consideration is the priority level of each value added to the requirement object. The enum '''TmfAnalysisRequirement#ValuePriorityLevel''' gives the choice between '''ValuePriorityLevel#MANDATORY''' and '''ValuePriorityLevel#OPTIONAL'''. That way, we can tell if an analysis can run without a value or not. To add values, one must call '''TmfAnalysisRequirement#addValue()'''.
+
+Moreover, information can be added to requirements. That way, the developer can explicitly give help details at the requirement level instead of at the analysis level (which would just be a general help text). To add information to a requirement, the method '''TmfAnalysisRequirement#addInformation()''' must be called. Adding information is not mandatory.
+
+=== Example of providing requirements ===
+
+In this example, we will implement a method that initializes a requirement object and return it in the '''IAnalysisRequirementProvider#getAnalysisRequirements()''' getter. The example method will return a set with two requirements. The first one will indicate the events needed by a specific analysis and the last one will tell on what domain type the analysis applies. In the event type requirement, we will indicate that the analysis needs a mandatory event and an optional one.
+
+<pre>
+@Override
+public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
+    Set<TmfAnalysisRequirement> requirements = new HashSet<>();
+
+    /* Create requirements of type 'event' and 'domain' */
+    TmfAnalysisRequirement eventRequirement = new TmfAnalysisRequirement("event");
+    TmfAnalysisRequirement domainRequirement = new TmfAnalysisRequirement("domain");
+
+    /* Add the values */
+    domainRequirement.addValue("kernel", TmfAnalysisRequirement.ValuePriorityLevel.MANDATORY);
+    eventRequirement.addValue("sched_switch", TmfAnalysisRequirement.ValuePriorityLevel.MANDATORY);
+    eventRequirement.addValue("sched_wakeup", TmfAnalysisRequirement.ValuePriorityLevel.OPTIONAL);
+
+    /* An information about the events */
+    eventRequirement.addInformation("The event sched_wakeup is optional because it's not properly handled by this analysis yet.");
+
+    /* Add them to the set */
+    requirements.add(domainRequirement);
+    requirements.add(eventRequirement);
+
+    return requirements;
+}
+</pre>
+
+
 == TODO ==
 
 Here's a list of features not yet implemented that would improve the analysis module user experience:
@@ -3449,3 +3491,5 @@ Here's a list of features not yet implemented that would improve the analysis mo
 ** Give the user a visual status of the analysis: not executed, in progress, completed, error.
 ** Give a small screenshot of the output as icon for it.
 ** Allow to specify parameter values from the GUI.
+* Add the possibility for an analysis requirement to be composed of another requirement.
+* Generate a trace session from analysis requirements.
