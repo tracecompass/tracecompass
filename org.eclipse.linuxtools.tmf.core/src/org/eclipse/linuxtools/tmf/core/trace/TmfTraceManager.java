@@ -241,7 +241,7 @@ public final class TmfTraceManager {
      */
     public static void refreshSupplementaryFiles(ITmfTrace trace) {
         IResource resource = trace.getResource();
-        if (resource != null) {
+        if (resource != null && resource.exists()) {
             String supplFolderPath = getSupplementaryFileDir(trace);
             IProject project = resource.getProject();
             /* Remove the project's path from the supplementary path dir */

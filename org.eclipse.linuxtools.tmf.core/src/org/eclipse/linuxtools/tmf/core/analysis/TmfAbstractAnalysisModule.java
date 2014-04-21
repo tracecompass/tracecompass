@@ -222,7 +222,6 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
         fStarted = false;
         fJob = null;
         fFinishedLatch.countDown();
-        TmfTraceManager.refreshSupplementaryFiles(fTrace);
     }
 
     /**
@@ -268,6 +267,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
             fStarted = true;
         }
 
+        final ITmfTrace trace = fTrace;
         /*
          * Actual analysis will be run on a separate thread
          */
@@ -285,6 +285,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
                         monitor.done();
                         setAnalysisCompleted();
                     }
+                    TmfTraceManager.refreshSupplementaryFiles(trace);
                 }
                 if (!fAnalysisCancelled) {
                     return Status.OK_STATUS;
