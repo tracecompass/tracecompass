@@ -21,8 +21,8 @@ import static org.junit.Assume.assumeTrue;
 import java.util.Map;
 
 import org.eclipse.linuxtools.ctf.core.CTFStrings;
+import org.eclipse.linuxtools.statesystem.core.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
-import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.statistics.ITmfStatistics;
 import org.eclipse.linuxtools.tmf.core.statistics.TmfStateStatistics;
 import org.eclipse.linuxtools.tmf.core.statistics.TmfStatisticsEventTypesModule;

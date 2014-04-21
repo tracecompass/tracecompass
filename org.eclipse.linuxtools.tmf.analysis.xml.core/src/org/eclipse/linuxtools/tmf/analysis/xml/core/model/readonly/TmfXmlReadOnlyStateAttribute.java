@@ -12,9 +12,9 @@
 
 package org.eclipse.linuxtools.tmf.analysis.xml.core.model.readonly;
 
+import org.eclipse.linuxtools.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.model.TmfXmlStateAttribute;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
-import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
 import org.w3c.dom.Element;
 
 /**

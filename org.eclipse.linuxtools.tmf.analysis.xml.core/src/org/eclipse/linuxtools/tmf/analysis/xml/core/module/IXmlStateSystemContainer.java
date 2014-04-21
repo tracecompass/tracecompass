@@ -12,8 +12,8 @@
 
 package org.eclipse.linuxtools.tmf.analysis.xml.core.module;
 
+import org.eclipse.linuxtools.statesystem.core.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.model.TmfXmlLocation;
-import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 
 /**
  * Interface that all XML defined objects who provide, use or contain state

@@ -14,11 +14,11 @@ package org.eclipse.linuxtools.internal.tmf.core.statesystem.mipmap;
 
 import java.util.List;
 
-import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
-import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
-import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystemBuilder;
-import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
-import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue.Type;
+import org.eclipse.linuxtools.statesystem.core.ITmfStateSystemBuilder;
+import org.eclipse.linuxtools.statesystem.core.exceptions.StateValueTypeException;
+import org.eclipse.linuxtools.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.linuxtools.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.linuxtools.statesystem.core.statevalue.ITmfStateValue.Type;
 
 /**
  * The maximum mipmap feature.

@@ -12,10 +12,10 @@
 
 package org.eclipse.linuxtools.tmf.analysis.xml.core.model.readwrite;
 
+import org.eclipse.linuxtools.statesystem.core.ITmfStateSystemBuilder;
+import org.eclipse.linuxtools.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.model.TmfXmlStateAttribute;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
-import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
-import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystemBuilder;
 import org.w3c.dom.Element;
 
 /**

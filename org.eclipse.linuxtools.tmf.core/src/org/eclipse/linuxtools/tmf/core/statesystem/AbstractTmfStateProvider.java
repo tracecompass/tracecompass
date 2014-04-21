@@ -15,11 +15,12 @@ package org.eclipse.linuxtools.tmf.core.statesystem;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import org.eclipse.linuxtools.statesystem.core.ITmfStateSystem;
+import org.eclipse.linuxtools.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-
 
 /**
  * Instead of using IStateChangeInput directly, one can extend this class, which
@@ -75,11 +76,17 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
         return trace;
     }
 
+    /**
+     * @since 3.0
+     */
     @Override
     public long getStartTime() {
         return trace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
     }
 
+    /**
+     * @since 3.0
+     */
     @Override
     public void assignTargetStateSystem(ITmfStateSystemBuilder ssb) {
         ss = ssb;
@@ -87,6 +94,9 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
         eventHandlerThread.start();
     }
 
+    /**
+     * @since 3.0
+     */
     @Override
     public ITmfStateSystem getAssignedStateSystem() {
         return ss;

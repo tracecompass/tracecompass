@@ -15,18 +15,17 @@ package org.eclipse.linuxtools.tmf.core.tests.statesystem.mipmap;
 
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.mipmap.AbstractTmfMipmapStateProvider;
+import org.eclipse.linuxtools.statesystem.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.statesystem.core.exceptions.StateValueTypeException;
+import org.eclipse.linuxtools.statesystem.core.exceptions.TimeRangeException;
+import org.eclipse.linuxtools.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.linuxtools.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
-import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
-import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
-import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
-import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
-import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue.Type;
-import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfNanoTimestamp;
 
@@ -41,7 +40,7 @@ class TmfMipmapStateProviderStub extends AbstractTmfMipmapStateProvider {
     public final static String TEST_ATTRIBUTE_NAME = "test_attribute"; //$NON-NLS-1$
 
     private int resolution;
-    private Type type;
+    private ITmfStateValue.Type type;
     private final static String MIPMAP_ID = "MIPMAP_ID"; //$NON-NLS-1$
 
     private final String ERROR_ATTRIBUTE_NOT_FOUND = "Error : Impossible to find the attribute"; //$NON-NLS-1$
@@ -56,7 +55,7 @@ class TmfMipmapStateProviderStub extends AbstractTmfMipmapStateProvider {
      * @param type
      *            the type of value to use
      */
-    public TmfMipmapStateProviderStub(int resolution, Type type) {
+    public TmfMipmapStateProviderStub(int resolution, ITmfStateValue.Type type) {
         super(null, TmfEvent.class, MIPMAP_ID);
         this.resolution = resolution;
         this.type = type;
@@ -99,11 +98,11 @@ class TmfMipmapStateProviderStub extends AbstractTmfMipmapStateProvider {
         ITmfStateValue value;
         if (longVal == null) {
             value = TmfStateValue.nullValue();
-        } else if (type == Type.LONG) {
+        } else if (type == ITmfStateValue.Type.LONG) {
             value = TmfStateValue.newValueLong(longVal);
-        } else if (type == Type.INTEGER) {
+        } else if (type == ITmfStateValue.Type.INTEGER) {
             value = TmfStateValue.newValueInt(longVal.intValue());
-        } else if (type == Type.DOUBLE) {
+        } else if (type == ITmfStateValue.Type.DOUBLE) {
             value = TmfStateValue.newValueDouble(longVal.doubleValue());
         } else {
             value = TmfStateValue.nullValue();

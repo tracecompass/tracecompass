@@ -30,6 +30,7 @@ import org.junit.runners.Suite;
     org.eclipse.linuxtools.lttng2.kernel.ui.tests.AllTests.class,
     org.eclipse.linuxtools.lttng2.ust.core.tests.AllTests.class,
     org.eclipse.linuxtools.lttng2.ust.ui.tests.AllTests.class,
+    org.eclipse.linuxtools.statesystem.core.tests.AllTests.class,
     org.eclipse.linuxtools.tmf.core.tests.AllTmfCoreTests.class,
     org.eclipse.linuxtools.tmf.ui.tests.AllTmfUITests.class,
     org.eclipse.linuxtools.tmf.ctf.core.tests.AllTests.class

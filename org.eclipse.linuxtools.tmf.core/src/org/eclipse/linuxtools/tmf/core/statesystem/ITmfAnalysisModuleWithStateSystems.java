@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.core.statesystem;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.linuxtools.statesystem.core.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
 
 /**

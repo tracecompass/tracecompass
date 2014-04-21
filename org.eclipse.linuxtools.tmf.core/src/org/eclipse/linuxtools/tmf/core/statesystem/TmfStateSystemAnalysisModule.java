@@ -23,14 +23,16 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.linuxtools.internal.tmf.core.statesystem.StateSystem;
-import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.IStateHistoryBackend;
-import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.InMemoryBackend;
-import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.NullBackend;
-import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.historytree.HistoryTreeBackend;
-import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.historytree.ThreadedHistoryTreeBackend;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.partial.PartialHistoryBackend;
 import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.partial.PartialStateSystem;
+import org.eclipse.linuxtools.statesystem.core.ITmfStateSystem;
+import org.eclipse.linuxtools.statesystem.core.ITmfStateSystemBuilder;
+import org.eclipse.linuxtools.statesystem.core.StateSystemFactory;
+import org.eclipse.linuxtools.statesystem.core.backend.IStateHistoryBackend;
+import org.eclipse.linuxtools.statesystem.core.backend.InMemoryBackend;
+import org.eclipse.linuxtools.statesystem.core.backend.NullBackend;
+import org.eclipse.linuxtools.statesystem.core.backend.historytree.HistoryTreeBackend;
+import org.eclipse.linuxtools.statesystem.core.backend.historytree.ThreadedHistoryTreeBackend;
 import org.eclipse.linuxtools.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
@@ -210,7 +212,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
             try {
                 IStateHistoryBackend backend = new HistoryTreeBackend(htFile, version);
                 fHtBackend = backend;
-                fStateSystem = new StateSystem(id, backend, false);
+                fStateSystem = StateSystemFactory.newStateSystem(id, backend, false);
                 fInitialized.countDown();
                 return;
             } catch (IOException e) {
@@ -229,7 +231,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
             IStateHistoryBackend backend = new ThreadedHistoryTreeBackend(htFile,
                     provider.getStartTime(), provider.getVersion(), QUEUE_SIZE);
             fHtBackend = backend;
-            fStateSystem = new StateSystem(id, backend);
+            fStateSystem = StateSystemFactory.newStateSystem(id, backend);
             provider.assignTargetStateSystem(fStateSystem);
             build(provider);
         } catch (IOException e) {
@@ -299,7 +301,9 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
                 new PartialHistoryBackend(partialProvider, pss, realBackend, granularity);
 
         /* 4 */
-        StateSystem realSS = new StateSystem(id, partialBackend);
+        @SuppressWarnings("restriction")
+        org.eclipse.linuxtools.internal.statesystem.core.StateSystem realSS =
+        (org.eclipse.linuxtools.internal.statesystem.core.StateSystem) StateSystemFactory.newStateSystem(id, partialBackend);
 
         /* 5 */
         pss.assignUpstream(realSS);
@@ -322,7 +326,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
     private void createNullHistory(String id, ITmfStateProvider provider) {
         IStateHistoryBackend backend = new NullBackend();
         fHtBackend = backend;
-        fStateSystem = new StateSystem(id, backend);
+        fStateSystem = StateSystemFactory.newStateSystem(id, backend);
         provider.assignTargetStateSystem(fStateSystem);
         build(provider);
     }
@@ -335,7 +339,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
     private void createInMemoryHistory(String id, ITmfStateProvider provider) {
         IStateHistoryBackend backend = new InMemoryBackend(provider.getStartTime());
         fHtBackend = backend;
-        fStateSystem = new StateSystem(id, backend);
+        fStateSystem = StateSystemFactory.newStateSystem(id, backend);
         provider.assignTargetStateSystem(fStateSystem);
         build(provider);
     }

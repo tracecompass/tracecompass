@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.linuxtools.statesystem.core.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.model.TmfXmlEventHandler;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.model.TmfXmlLocation;
@@ -28,7 +29,6 @@ import org.eclipse.linuxtools.tmf.analysis.xml.core.module.IXmlStateSystemContai
 import org.eclipse.linuxtools.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.statesystem.AbstractTmfStateProvider;
-import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;

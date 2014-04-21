@@ -17,15 +17,16 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.linuxtools.internal.tmf.core.statesystem.StateSystem;
-import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.IStateHistoryBackend;
-import org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.InMemoryBackend;
-import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
-import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
-import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
-import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemOperations;
-import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue.Type;
-import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
+import org.eclipse.linuxtools.internal.tmf.core.statesystem.mipmap.TmfStateSystemOperations;
+import org.eclipse.linuxtools.statesystem.core.ITmfStateSystemBuilder;
+import org.eclipse.linuxtools.statesystem.core.StateSystemFactory;
+import org.eclipse.linuxtools.statesystem.core.backend.IStateHistoryBackend;
+import org.eclipse.linuxtools.statesystem.core.backend.InMemoryBackend;
+import org.eclipse.linuxtools.statesystem.core.exceptions.AttributeNotFoundException;
+import org.eclipse.linuxtools.statesystem.core.exceptions.StateValueTypeException;
+import org.eclipse.linuxtools.statesystem.core.exceptions.TimeRangeException;
+import org.eclipse.linuxtools.statesystem.core.statevalue.ITmfStateValue.Type;
+import org.eclipse.linuxtools.statesystem.core.statevalue.TmfStateValue;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -41,8 +42,8 @@ public class TmfMipmapStateProviderWeightedTest {
     private static final long INTERVAL = 1000L;
     private static final int RESOLUTION = 2;
     private static final double DELTA = 0.0001;
-    private static StateSystem ssqi;
-    private static StateSystem ssqd;
+    private static ITmfStateSystemBuilder ssqi;
+    private static ITmfStateSystemBuilder ssqd;
 
     /**
      * Startup code, build a state system with uneven state durations
@@ -52,12 +53,12 @@ public class TmfMipmapStateProviderWeightedTest {
         /* setup for INTEGER test */
         TmfMipmapStateProviderStub mmpi = new TmfMipmapStateProviderStub(RESOLUTION, Type.INTEGER);
         IStateHistoryBackend bei = new InMemoryBackend(0);
-        ssqi = new StateSystem(SSID, bei);
+        ssqi = StateSystemFactory.newStateSystem(SSID, bei);
         mmpi.assignTargetStateSystem(ssqi);
         /* setup for DOUBLE test */
         TmfMipmapStateProviderStub mmpd = new TmfMipmapStateProviderStub(RESOLUTION, Type.DOUBLE);
         IStateHistoryBackend bed = new InMemoryBackend(0);
-        ssqd = new StateSystem(SSID, bed);
+        ssqd = StateSystemFactory.newStateSystem(SSID, bed);
         mmpd.assignTargetStateSystem(ssqd);
         /*
          * Every 10,000 ns chunk contains the following states:
