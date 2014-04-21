@@ -20,11 +20,11 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        AnalysisModuleTest.class,
-        AnalysisModuleHelperTest.class,
-        AnalysisManagerTest.class,
-        AnalysisParameterProviderTest.class,
-        AnalysisRequirementTest.class
+    AnalysisModuleTest.class,
+    AnalysisManagerTest.class,
+    AnalysisParameterProviderTest.class,
+    AnalysisRequirementTest.class,
+    AnalysisRequirementHelperTest.class
 })
 public class AllTests {
 
