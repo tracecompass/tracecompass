@@ -17,6 +17,7 @@ package org.eclipse.linuxtools.tmf.ui.project.model;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFolder;
@@ -33,6 +34,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.TmfProjectNature;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 
@@ -154,7 +156,30 @@ public class TmfProjectRegistry implements IResourceChangeListener {
      */
     @Override
     public void resourceChanged(IResourceChangeEvent event) {
-        if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
+        if (event.getType() == IResourceChangeEvent.PRE_DELETE || event.getType() == IResourceChangeEvent.PRE_CLOSE) {
+            if (event.getResource() instanceof IProject) {
+                IProject project = (IProject) event.getResource();
+                try {
+                    if (project.hasNature(TmfProjectNature.ID)) {
+                        TmfProjectElement tmfProjectElement = registry.get(project);
+                        final List<TmfTraceElement> traces = tmfProjectElement.getTracesFolder().getTraces();
+                        if (!traces.isEmpty()) {
+                            // Close editors in UI Thread
+                            Display.getDefault().syncExec(new Runnable() {
+                                @Override
+                                public void run() {
+                                    for (TmfTraceElement traceElement : traces) {
+                                        traceElement.closeEditors();
+                                    }
+                                }
+                            });
+                        }
+                    }
+                } catch (CoreException e) {
+                    Activator.getDefault().logError("Error handling resource change event for " + project.getName(), e); //$NON-NLS-1$
+                }
+            }
+        } else if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
             for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {
                 if (delta.getResource() instanceof IProject) {
                     IProject project = (IProject) delta.getResource();
