@@ -31,6 +31,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
+import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder;
@@ -152,8 +153,8 @@ public class RenameTraceHandler extends AbstractHandler {
         try {
             PlatformUI.getWorkbench().getProgressService().busyCursorWhile(operation);
         } catch (InterruptedException exception) {
-        } catch (InvocationTargetException exception) {
-        } catch (RuntimeException exception) {
+        } catch (InvocationTargetException | RuntimeException exception) {
+            Activator.getDefault().logError("Error renaming trace" + fTrace.getName(), exception); //$NON-NLS-1$
         }
 
         return null;
@@ -166,11 +167,14 @@ public class RenameTraceHandler extends AbstractHandler {
             IPath location = resource.getLocation();
             // Get the trace properties for this resource
             String traceTypeId = resource.getPersistentProperty(TmfCommonConstants.TRACETYPE);
+            TraceTypeHelper traceType = TmfTraceType.getInstance().getTraceType(traceTypeId);
             if (resource instanceof IFolder) {
                 IFolder folder = ((IFolder) experiment.getResource()).getFolder(trace.getName());
                 if (ResourcesPlugin.getWorkspace().validateLinkLocation(folder, location).isOK()) {
                     folder.createLink(location, IResource.REPLACE, null);
-                    TmfTraceTypeUIUtils.setTraceType(folder, TmfTraceType.getInstance().getTraceType(traceTypeId));
+                    if (traceType != null) {
+                        TmfTraceTypeUIUtils.setTraceType(folder, traceType);
+                    }
                 }
                 else {
                     Activator.getDefault().logError("RenamaeTraceHandler: Invalid Trace Location: " + location); //$NON-NLS-1$
@@ -180,7 +184,9 @@ public class RenameTraceHandler extends AbstractHandler {
                 IFile file = ((IFolder) experiment.getResource()).getFile(trace.getName());
                 if (ResourcesPlugin.getWorkspace().validateLinkLocation(file, location).isOK()) {
                     file.createLink(location, IResource.REPLACE, null);
-                    TmfTraceTypeUIUtils.setTraceType(file, TmfTraceType.getInstance().getTraceType(traceTypeId));
+                    if (traceType != null) {
+                        TmfTraceTypeUIUtils.setTraceType(file, traceType);
+                    }
                 }
                 else {
                     Activator.getDefault().logError("RenamaeTraceHandler: Invalid Trace Location: " + location); //$NON-NLS-1$
