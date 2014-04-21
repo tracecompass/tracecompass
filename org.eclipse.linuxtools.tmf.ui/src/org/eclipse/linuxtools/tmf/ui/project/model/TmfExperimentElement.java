@@ -35,7 +35,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
@@ -256,8 +255,8 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
         IPath location = resource.getLocation();
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         try {
-            Map<QualifiedName, String> properties = trace.getResource().getPersistentProperties();
-            TraceTypeHelper traceType = TmfTraceType.getInstance().getTraceType(properties.get(TmfCommonConstants.TRACETYPE));
+            String traceTypeId = trace.getResource().getPersistentProperty(TmfCommonConstants.TRACETYPE);
+            TraceTypeHelper traceType = TmfTraceType.getInstance().getTraceType(traceTypeId);
 
             if (resource instanceof IFolder) {
                 IFolder folder = experiment.getFolder(trace.getElementPath());

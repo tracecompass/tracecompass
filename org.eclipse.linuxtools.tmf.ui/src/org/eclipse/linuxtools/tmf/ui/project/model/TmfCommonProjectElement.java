@@ -481,6 +481,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
         // copy supplementary folder
         if (oldSupplFolder.exists()) {
             try {
+                TraceUtils.createFolder((IFolder) destination.getParent(), new NullProgressMonitor());
                 oldSupplFolder.copy(destination.getFullPath(), true, new NullProgressMonitor());
             } catch (CoreException e) {
                 Activator.getDefault().logError("Error copying supplementary folder " + oldSupplFolder, e); //$NON-NLS-1$
