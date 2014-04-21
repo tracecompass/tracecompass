@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Geneviève Bastien - Initial API and implementation
+ *   Guilliano Molaire - Implementation of requirements and valid trace types getters
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.tests.stubs.analysis;
@@ -23,6 +24,8 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub2;
 import org.osgi.framework.Bundle;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Analysis Module Helper for the stub analysis source
@@ -122,11 +125,24 @@ public class AnalysisModuleTestHelper implements IAnalysisModuleHelper {
 
     @Override
     public Iterable<Class<? extends ITmfTrace>> getValidTraceTypes() {
-        return Collections.EMPTY_SET;
+        return ImmutableList.<Class<? extends ITmfTrace>> of(
+                TmfTraceStub.class,
+                TmfTraceStub2.class);
     }
 
     @Override
     public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
-        return Collections.EMPTY_SET;
+        switch (fModule) {
+        case TEST:
+            return ImmutableList.of(
+                    AnalysisRequirementFactory.REQUIREMENT_1,
+                    AnalysisRequirementFactory.REQUIREMENT_3);
+        case TEST2:
+            return ImmutableList.of(
+                    AnalysisRequirementFactory.REQUIREMENT_2,
+                    AnalysisRequirementFactory.REQUIREMENT_3);
+        default:
+            return Collections.EMPTY_SET;
+        }
     }
 }
