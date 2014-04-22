@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -382,7 +383,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
             long endTime = Math.min(end + 1, entry.getEndTime());
             long resolution = Math.max(1, (end - ssq.getStartTime()) / getDisplayWidth());
             List<ITimeEvent> eventList = getEventList(entry, startTime, endTime, resolution, monitor);
-            if (monitor.isCanceled()) {
+            if (eventList == null) {
                 return;
             }
             for (ITimeEvent event : eventList) {
@@ -401,7 +402,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
     }
 
     @Override
-    protected List<ITimeEvent> getEventList(TimeGraphEntry tgentry, long startTime, long endTime, long resolution, IProgressMonitor monitor) {
+    protected @Nullable List<ITimeEvent> getEventList(TimeGraphEntry tgentry, long startTime, long endTime, long resolution, IProgressMonitor monitor) {
         List<ITimeEvent> eventList = null;
         if (!(tgentry instanceof ControlFlowEntry)) {
             return eventList;

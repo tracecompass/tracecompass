@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.Attributes;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.Messages;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources.ResourcesEntry.Type;
@@ -192,7 +193,7 @@ public class ResourcesView extends AbstractTimeGraphView {
     }
 
     @Override
-    protected List<ITimeEvent> getEventList(TimeGraphEntry entry,
+    protected @Nullable List<ITimeEvent> getEventList(TimeGraphEntry entry,
             long startTime, long endTime, long resolution,
             IProgressMonitor monitor) {
         ResourcesEntry resourcesEntry = (ResourcesEntry) entry;

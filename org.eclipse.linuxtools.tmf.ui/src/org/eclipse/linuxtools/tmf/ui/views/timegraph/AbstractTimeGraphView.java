@@ -27,6 +27,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IStatusLineManager;
@@ -1100,7 +1101,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
      *            The progress monitor object
      * @return The list of events for the entry
      */
-    protected abstract List<ITimeEvent> getEventList(TimeGraphEntry entry,
+    protected abstract @Nullable List<ITimeEvent> getEventList(TimeGraphEntry entry,
             long startTime, long endTime, long resolution,
             IProgressMonitor monitor);
 
