@@ -242,4 +242,10 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
         }
         return supplFolderParent;
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + '(' + getPath() + ')';
+    }
+
 }
