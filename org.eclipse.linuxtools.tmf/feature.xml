@@ -23,11 +23,6 @@
       <update label="Linux Tools Update Site" url="http://download.eclipse.org/linuxtools/update"/>
    </url>
 
-   <includes
-         id="org.eclipse.linuxtools.ctf"
-         version="0.0.0"
-         name="Common Trace Format (CTF)"/>
-
    <requires>
       <import plugin="org.eclipse.linuxtools.ctf.core" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.runtime"/>

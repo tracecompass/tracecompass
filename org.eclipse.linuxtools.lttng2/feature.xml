@@ -24,14 +24,8 @@
    </url>
 
    <includes
-         id="org.eclipse.linuxtools.tmf"
-         version="0.0.0"
-         name="Tracing and Monitoring Framework (TMF)"/>
-
-   <includes
-         id="org.eclipse.linuxtools.ctf"
-         version="0.0.0"
-         name="Common Trace Format (CTF)"/>
+         id="org.eclipse.linuxtools.tmf.ctf"
+         version="0.0.0"/>
 
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
