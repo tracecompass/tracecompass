@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 Ericsson
+ * Copyright (c) 2014 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,22 +7,21 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Francois Chouinard - Initial API and implementation
+ *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng2.kernel.core.tests;
+package org.eclipse.linuxtools.lttng2.kernel.core.tests.analysis;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * Runner for the lttng2.kernel unit tests.
+ * Test suite for org.eclipse.linuxtools.lttng2.kernel.core.analysis package
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    ActivatorTest.class,
-    org.eclipse.linuxtools.lttng2.kernel.core.tests.analysis.AllTests.class,
-    org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider.TestAll.class,
-    org.eclipse.linuxtools.lttng2.kernel.core.tests.event.matchandsync.AllTests.class
+    LttngKernelAnalysisTest.class
 })
-public class AllTests { }
+public class AllTests {
+
+}

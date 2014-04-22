@@ -14,11 +14,8 @@ package org.eclipse.linuxtools.lttng2.kernel.core.analysis;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.LttngKernelStateProvider;
-import org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngKernelTrace;
-import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
  * State System Module for lttng kernel traces
@@ -42,20 +39,6 @@ public class LttngKernelAnalysisModule extends TmfStateSystemAnalysisModule {
      */
     public LttngKernelAnalysisModule() {
         super();
-    }
-
-    @Override
-    public void setTrace(ITmfTrace trace) throws TmfAnalysisException {
-        if (!(trace instanceof LttngKernelTrace)) {
-            throw new IllegalArgumentException("LttngKernelStateSystemModule: trace should be of type LttngKernelTrace"); //$NON-NLS-1$
-        }
-        super.setTrace(trace);
-    }
-
-    @Override
-    protected LttngKernelTrace getTrace() {
-        /* Cast should be safe because we check the type at the setTrace() */
-        return (LttngKernelTrace) super.getTrace();
     }
 
     @Override

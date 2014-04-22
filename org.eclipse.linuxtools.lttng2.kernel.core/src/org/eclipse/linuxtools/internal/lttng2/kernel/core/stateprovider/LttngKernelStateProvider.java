@@ -24,8 +24,7 @@ import org.eclipse.linuxtools.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.statesystem.AbstractTmfStateProvider;
-import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfEvent;
-import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
  * This is the state change input plugin for TMF's state system which handles
@@ -54,8 +53,8 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
      * @param trace
      *            The LTTng 2.0 kernel trace directory
      */
-    public LttngKernelStateProvider(CtfTmfTrace trace) {
-        super(trace, CtfTmfEvent.class, "LTTng Kernel"); //$NON-NLS-1$
+    public LttngKernelStateProvider(ITmfTrace trace) {
+        super(trace, ITmfEvent.class, "LTTng Kernel"); //$NON-NLS-1$
     }
 
     // ------------------------------------------------------------------------
@@ -75,23 +74,22 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
 
     @Override
     public LttngKernelStateProvider getNewInstance() {
-        return new LttngKernelStateProvider((CtfTmfTrace) this.getTrace());
+        return new LttngKernelStateProvider(this.getTrace());
     }
 
     @Override
-    protected void eventHandle(ITmfEvent ev) {
+    protected void eventHandle(ITmfEvent event) {
         /*
          * AbstractStateChangeInput should have already checked for the correct
          * class type
          */
-        final CtfTmfEvent event = (CtfTmfEvent) ev;
 
         final String eventName = event.getType().getName();
         final long ts = event.getTimestamp().getValue();
 
         try {
             /* Shortcut for the "current CPU" attribute node */
-            final Integer currentCPUNode = ss.getQuarkRelativeAndAdd(getNodeCPUs(), String.valueOf(event.getCPU()));
+            final Integer currentCPUNode = ss.getQuarkRelativeAndAdd(getNodeCPUs(), event.getSource());
 
             /*
              * Shortcut for the "current thread" attribute node. It requires
@@ -136,7 +134,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
                 /* Mark this IRQ as active in the resource tree.
                  * The state value = the CPU on which this IRQ is sitting */
                 quark = ss.getQuarkRelativeAndAdd(getNodeIRQs(), irqId.toString());
-                value = TmfStateValue.newValueInt(event.getCPU());
+                value = TmfStateValue.newValueInt(Integer.parseInt(event.getSource()));
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Change the status of the running process to interrupted */
@@ -177,7 +175,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
                 /* Mark this SoftIRQ as active in the resource tree.
                  * The state value = the CPU on which this SoftIRQ is processed */
                 quark = ss.getQuarkRelativeAndAdd(getNodeSoftIRQs(), softIrqId.toString());
-                value = TmfStateValue.newValueInt(event.getCPU());
+                value = TmfStateValue.newValueInt(Integer.parseInt(event.getSource()));
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Change the status of the running process to interrupted */

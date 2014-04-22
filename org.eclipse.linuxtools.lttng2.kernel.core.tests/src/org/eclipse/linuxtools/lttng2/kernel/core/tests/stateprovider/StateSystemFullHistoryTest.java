@@ -148,7 +148,7 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
 
         @Override
         protected ITmfStateProvider createStateProvider() {
-            return new LttngKernelStateProvider((CtfTmfTrace) getTrace());
+            return new LttngKernelStateProvider(getTrace());
         }
 
         @Override
