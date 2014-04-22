@@ -34,6 +34,9 @@ public class CpuUsageView extends TmfView {
     /** ID string */
     public static final String ID = "org.eclipse.linuxtools.lttng2.kernel.ui.views.cpuusage"; //$NON-NLS-1$
 
+    private CpuUsageComposite fTreeViewer = null;
+    private TmfXYChartViewer fXYViewer = null;
+
     /**
      * Constructor
      */
@@ -46,10 +49,10 @@ public class CpuUsageView extends TmfView {
 
         final SashForm sash = new SashForm(parent, SWT.NONE);
 
-        CpuUsageComposite treeViewer = new CpuUsageComposite(sash);
+        fTreeViewer = new CpuUsageComposite(sash);
 
         /* Build the XY chart part of the view */
-        TmfXYChartViewer xyViewer = new CpuUsageXYViewer(sash, treeViewer);
+        fXYViewer = new CpuUsageXYViewer(sash, fTreeViewer);
 
         sash.setLayout(new FillLayout());
 
@@ -57,14 +60,25 @@ public class CpuUsageView extends TmfView {
         ITmfTrace trace = getActiveTrace();
         if (trace != null) {
             TmfTraceSelectedSignal signal = new TmfTraceSelectedSignal(this, trace);
-            treeViewer.traceSelected(signal);
-            xyViewer.traceSelected(signal);
+            fTreeViewer.traceSelected(signal);
+            fXYViewer.traceSelected(signal);
         }
 
     }
 
     @Override
     public void setFocus() {
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        if (fTreeViewer != null) {
+            fTreeViewer.dispose();
+        }
+        if (fXYViewer != null) {
+            fXYViewer.dispose();
+        }
     }
 
 }
