@@ -8,14 +8,21 @@
  *
  * Contributors:
  *   Geneviève Bastien - Initial API and implementation
+ *   Mathieu Rail - Provide the requirements of the analysis
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng2.kernel.core.analysis;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.linuxtools.internal.lttng2.kernel.core.LttngStrings;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.LttngKernelStateProvider;
+import org.eclipse.linuxtools.lttng2.control.core.session.SessionConfigStrings;
+import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisRequirement;
+import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisRequirement.ValuePriorityLevel;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * State System Module for lttng kernel traces
@@ -34,11 +41,33 @@ public class LttngKernelAnalysisModule extends TmfStateSystemAnalysisModule {
     /** The ID of this analysis module */
     public static final String ID = "org.eclipse.linuxtools.lttng2.kernel.analysis"; //$NON-NLS-1$
 
-    /**
-     * Constructor adding the views to the analysis
-     */
-    public LttngKernelAnalysisModule() {
-        super();
+    private static final ImmutableSet<String> REQUIRED_EVENTS = ImmutableSet.of(
+            LttngStrings.EXIT_SYSCALL,
+            LttngStrings.IRQ_HANDLER_ENTRY,
+            LttngStrings.IRQ_HANDLER_EXIT,
+            LttngStrings.SOFTIRQ_ENTRY,
+            LttngStrings.SOFTIRQ_EXIT,
+            LttngStrings.SOFTIRQ_RAISE,
+            LttngStrings.SCHED_SWITCH,
+            LttngStrings.SCHED_PROCESS_FORK,
+            LttngStrings.SCHED_PROCESS_EXIT,
+            LttngStrings.SCHED_PROCESS_FREE,
+            LttngStrings.STATEDUMP_PROCESS_STATE,
+            LttngStrings.SCHED_WAKEUP,
+            LttngStrings.SCHED_WAKEUP_NEW,
+            /* Add the prefix for syscalls */
+            LttngStrings.SYSCALL_PREFIX
+            );
+
+    /** The requirements as an immutable set */
+    private static final ImmutableSet<TmfAnalysisRequirement> REQUIREMENTS;
+
+    static {
+        /* initialize the requirement: domain and events */
+        TmfAnalysisRequirement domainReq = new TmfAnalysisRequirement(SessionConfigStrings.CONFIG_ELEMENT_DOMAIN);
+        domainReq.addValue(SessionConfigStrings.CONFIG_DOMAIN_TYPE_KERNEL, ValuePriorityLevel.MANDATORY);
+
+        REQUIREMENTS = ImmutableSet.of(domainReq, new TmfAnalysisRequirement(SessionConfigStrings.CONFIG_ELEMENT_EVENT, REQUIRED_EVENTS, ValuePriorityLevel.MANDATORY));
     }
 
     @Override
@@ -58,4 +87,8 @@ public class LttngKernelAnalysisModule extends TmfStateSystemAnalysisModule {
         return Messages.LttngKernelAnalysisModule_Help;
     }
 
+    @Override
+    public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
+        return REQUIREMENTS;
+    }
 }
