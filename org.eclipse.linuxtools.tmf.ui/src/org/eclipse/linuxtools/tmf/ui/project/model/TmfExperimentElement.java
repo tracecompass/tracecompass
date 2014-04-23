@@ -32,6 +32,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -261,7 +262,8 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
             if (resource instanceof IFolder) {
                 IFolder folder = experiment.getFolder(trace.getElementPath());
                 TraceUtils.createFolder((IFolder) folder.getParent(), new NullProgressMonitor());
-                if (workspace.validateLinkLocation(folder, location).isOK()) {
+                IStatus result = workspace.validateLinkLocation(folder, location);
+                if (result.isOK() || result.matches(IStatus.INFO | IStatus.WARNING)) {
                     folder.createLink(location, IResource.REPLACE, null);
                     if (traceType != null) {
                         TmfTraceTypeUIUtils.setTraceType(folder, traceType);
@@ -273,7 +275,8 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
             } else {
                 IFile file = experiment.getFile(trace.getElementPath());
                 TraceUtils.createFolder((IFolder) file.getParent(), new NullProgressMonitor());
-                if (workspace.validateLinkLocation(file, location).isOK()) {
+                IStatus result = workspace.validateLinkLocation(file, location);
+                if (result.isOK() || result.matches(IStatus.INFO | IStatus.WARNING)) {
                     file.createLink(location, IResource.REPLACE, null);
                     if (traceType != null) {
                         TmfTraceTypeUIUtils.setTraceType(file, traceType);

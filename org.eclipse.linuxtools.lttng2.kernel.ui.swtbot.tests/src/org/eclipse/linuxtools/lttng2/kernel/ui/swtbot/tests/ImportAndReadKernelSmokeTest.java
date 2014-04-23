@@ -9,6 +9,7 @@
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
  *   Marc-Andre Laperle
+ *   Patrick Tasse - Add support for folder elements
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng2.kernel.ui.swtbot.tests;
@@ -24,6 +25,8 @@ import java.util.List;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -37,6 +40,8 @@ import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfOpenTraceHelper;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.linuxtools.tmf.ui.swtbot.tests.SWTBotUtil;
 import org.eclipse.linuxtools.tmf.ui.swtbot.tests.conditions.ConditionHelpers;
 import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramView;
@@ -142,7 +147,9 @@ public class ImportAndReadKernelSmokeTest {
             @Override
             public void run() {
                 try {
-                    (new TmfOpenTraceHelper()).openTraceFromPath("test", ctt.getPath(), PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "org.eclipse.linuxtools.lttng2.kernel.tracetype");
+                    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(TRACE_PROJECT_NAME);
+                    TmfTraceFolder destinationFolder = TmfProjectRegistry.getProject(project, true).getTracesFolder();
+                    TmfOpenTraceHelper.openTraceFromPath(destinationFolder, ctt.getPath(), PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "org.eclipse.linuxtools.lttng2.kernel.tracetype");
                 } catch (CoreException e) {
                     exception[0] = e;
                 }

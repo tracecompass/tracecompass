@@ -11,12 +11,14 @@
  **********************************************************************/
 package org.eclipse.linuxtools.internal.tracing.rcp.ui;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.internal.tracing.rcp.ui.cli.CliParser;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWorkbenchPage;
@@ -96,19 +98,19 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     public void postWindowCreate() {
         super.postWindowOpen();
         TracingRcpPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(new PerspectiveListener());
-        createDefaultProject();
+        IProject defaultProject = createDefaultProject();
         hideActionSets();
-        openTraceIfNecessary();
+        openTraceIfNecessary(defaultProject);
     }
 
 
 
-    private static void openTraceIfNecessary() {
+    private static void openTraceIfNecessary(IProject project) {
         String traceToOpen = TracingRcpPlugin.getDefault().getCli().getArgument(CliParser.OPEN_FILE_LOCATION);
         if (traceToOpen != null) {
-            TmfOpenTraceHelper oth = new TmfOpenTraceHelper();
             try {
-                oth.openTraceFromPath(TmfCommonConstants.DEFAULT_TRACE_PROJECT_NAME, traceToOpen, TracingRcpPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell());
+                TmfTraceFolder destinationFolder = TmfProjectRegistry.getProject(project).getTracesFolder();
+                TmfOpenTraceHelper.openTraceFromPath(destinationFolder, traceToOpen, TracingRcpPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell());
             } catch (CoreException e) {
                 TracingRcpPlugin.getDefault().logError(e.getMessage());
             }
@@ -132,8 +134,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         }
     }
 
-    private static void createDefaultProject() {
-        TmfProjectRegistry.createProject(TmfCommonConstants.DEFAULT_TRACE_PROJECT_NAME, null, new NullProgressMonitor());
+    private static IProject createDefaultProject() {
+        return TmfProjectRegistry.createProject(TmfCommonConstants.DEFAULT_TRACE_PROJECT_NAME, null, new NullProgressMonitor());
     }
 
     /**

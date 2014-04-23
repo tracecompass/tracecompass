@@ -542,7 +542,8 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
 
             if (resource instanceof IFolder) {
                 IFolder folder = parentFolder.getFolder(targetName);
-                if (workspace.validateLinkLocation(folder, location).isOK()) {
+                IStatus result = workspace.validateLinkLocation(folder, location);
+                if (result.isOK() || result.matches(IStatus.INFO | IStatus.WARNING)) {
                     folder.createLink(location, IResource.REPLACE, null);
                     if (traceTypeHelper != null) {
                         TmfTraceTypeUIUtils.setTraceType(folder, traceTypeHelper);
@@ -552,7 +553,8 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 }
             } else {
                 IFile file = parentFolder.getFile(targetName);
-                if (workspace.validateLinkLocation(file, location).isOK()) {
+                IStatus result = workspace.validateLinkLocation(file, location);
+                if (result.isOK() || result.matches(IStatus.INFO | IStatus.WARNING)) {
                     file.createLink(location, IResource.REPLACE, null);
                     if (traceTypeHelper != null) {
                         TmfTraceTypeUIUtils.setTraceType(file, traceTypeHelper);
@@ -580,14 +582,16 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
 
             if (source.isDirectory()) {
                 IFolder folder = parentFolder.getFolder(targetName);
-                if (workspace.validateLinkLocation(folder, location).isOK()) {
+                IStatus result = workspace.validateLinkLocation(folder, location);
+                if (result.isOK() || result.matches(IStatus.INFO | IStatus.WARNING)) {
                     folder.createLink(location, IResource.REPLACE, null);
                 } else {
                     Activator.getDefault().logError("Invalid Trace Location"); //$NON-NLS-1$
                 }
             } else {
                 IFile file = parentFolder.getFile(targetName);
-                if (workspace.validateLinkLocation(file, location).isOK()) {
+                IStatus result = workspace.validateLinkLocation(file, location);
+                if (result.isOK() || result.matches(IStatus.INFO | IStatus.WARNING)) {
                     file.createLink(location, IResource.REPLACE, null);
                 } else {
                     Activator.getDefault().logError("Invalid Trace Location"); //$NON-NLS-1$

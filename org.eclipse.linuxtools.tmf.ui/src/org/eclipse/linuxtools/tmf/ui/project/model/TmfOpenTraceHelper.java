@@ -19,11 +19,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -67,14 +63,17 @@ import org.eclipse.ui.part.FileEditorInput;
  */
 public class TmfOpenTraceHelper {
 
+    private TmfOpenTraceHelper() {
+    }
+
     private static final String ENDL = System.getProperty("line.separator"); //$NON-NLS-1$
 
     /**
-     * Opens a trace from a path while importing it to the project
-     * "projectRoot". The trace is linked as a resource.
+     * Opens a trace from a path while importing it to the destination folder.
+     * The trace is linked as a resource.
      *
-     * @param projectRoot
-     *            The project to import to
+     * @param destinationFolder
+     *            The destination trace folder
      * @param path
      *            the file to import
      * @param shell
@@ -83,17 +82,18 @@ public class TmfOpenTraceHelper {
      * @throws CoreException
      *             core exceptions if something is not well set up in the back
      *             end
+     * @since 3.0
      */
-    public IStatus openTraceFromPath(String projectRoot, String path, Shell shell) throws CoreException {
-        return openTraceFromPath(projectRoot, path, shell, null);
+    public static IStatus openTraceFromPath(TmfTraceFolder destinationFolder, String path, Shell shell) throws CoreException {
+        return openTraceFromPath(destinationFolder, path, shell, null);
     }
 
     /**
-     * Opens a trace from a path while importing it to the project
-     * "projectRoot". The trace is linked as a resource.
+     * Opens a trace from a path while importing it to the destination folder.
+     * The trace is linked as a resource.
      *
-     * @param projectRoot
-     *            The project to import to
+     * @param destinationFolder
+     *            The destination trace folder
      * @param path
      *            the file to import
      * @param shell
@@ -105,9 +105,9 @@ public class TmfOpenTraceHelper {
      *             core exceptions if something is not well set up in the back
      *             end
      *
-     * @since 2.2
+     * @since 3.0
      */
-    public IStatus openTraceFromPath(String projectRoot, String path, Shell shell, String tracetypeHint) throws CoreException {
+    public static IStatus openTraceFromPath(TmfTraceFolder destinationFolder, String path, Shell shell, String tracetypeHint) throws CoreException {
         TraceTypeHelper traceTypeToSet = null;
         try {
             traceTypeToSet = TmfTraceTypeUIUtils.selectTraceType(path, null, tracetypeHint);
@@ -117,11 +117,10 @@ public class TmfOpenTraceHelper {
             mb.open();
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
         }
-        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectRoot);
-        IFolder folder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
+        IFolder folder = destinationFolder.getResource();
         String traceName = getTraceName(path, folder);
         if (traceExists(path, folder)) {
-            return openTraceFromProject(projectRoot, traceName);
+            return openTraceFromFolder(destinationFolder, traceName);
         }
         final IPath pathString = Path.fromOSString(path);
         IResource linkedTrace = TmfImportHelper.createLink(folder, pathString, traceName);
@@ -141,18 +140,18 @@ public class TmfOpenTraceHelper {
 
         IStatus ret = TmfTraceTypeUIUtils.setTraceType(linkedTrace, traceTypeToSet);
         if (ret.isOK()) {
-            ret = openTraceFromProject(projectRoot, traceName);
+            ret = openTraceFromFolder(destinationFolder, traceName);
         }
         return ret;
     }
 
-    private static boolean traceExists(String file, IFolder folder) {
-        String val = getTraceName(file, folder);
+    private static boolean traceExists(String path, IFolder folder) {
+        String val = getTraceName(path, folder);
         return (folder.findMember(val) != null);
     }
 
-    private static boolean isWrongMember(IFolder folder, String ret, final File traceFile) {
-        final IResource candidate = folder.findMember(ret);
+    private static boolean isWrongMember(IFolder folder, String name, final File traceFile) {
+        final IResource candidate = folder.findMember(name);
         if (candidate != null) {
             final IPath rawLocation = candidate.getRawLocation();
             final File file = rawLocation.toFile();
@@ -163,51 +162,47 @@ public class TmfOpenTraceHelper {
 
     /**
      * Gets the display name, either "filename" or "filename(n)" if there is
-     * already a filename existing where n is the next non-used integer starting
+     * already a filename existing where n is the next unused integer starting
      * from 2
      *
-     * @param file
-     *            the file with path
+     * @param path
+     *            the file path
      * @param folder
      *            the folder to import to
      * @return the filename
      */
-    private static String getTraceName(String file, IFolder folder) {
-        String ret;
-        final File traceFile = new File(file);
-        ret = traceFile.getName();
-        for (int i = 2; isWrongMember(folder, ret, traceFile); i++) {
-            ret = traceFile.getName() + '(' + i + ')';
+    private static String getTraceName(String path, IFolder folder) {
+        String name;
+        final File traceFile = new File(path);
+        name = traceFile.getName();
+        for (int i = 2; isWrongMember(folder, name, traceFile); i++) {
+            name = traceFile.getName() + '(' + i + ')';
         }
-        return ret;
+        return name;
     }
 
     /**
-     * Open a trace from a project
+     * Open a trace from a trace folder
      *
-     * @param projectRoot
-     *            the root of the project
+     * @param destinationFolder
+     *            The destination trace folder
      * @param traceName
      *            the trace name
      * @return success or error
+     * @since 3.0
      */
-    public static IStatus openTraceFromProject(String projectRoot, String traceName) {
-        final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        final IWorkspaceRoot root = workspace.getRoot();
-        IProject project = root.getProject(projectRoot);
-        final TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
-        final TmfTraceFolder tracesFolder = projectElement.getTracesFolder();
-        final List<TmfTraceElement> traces = tracesFolder.getTraces();
-        TmfTraceElement found = null;
-        for (TmfTraceElement candidate : traces) {
-            if (candidate.getName().equals(traceName)) {
-                found = candidate;
+    private static IStatus openTraceFromFolder(TmfTraceFolder destinationFolder, String traceName) {
+        final List<ITmfProjectModelElement> elements = destinationFolder.getChildren();
+        TmfTraceElement traceElement = null;
+        for (ITmfProjectModelElement element : elements) {
+            if (element instanceof TmfTraceElement && element.getName().equals(traceName)) {
+                traceElement = (TmfTraceElement) element;
             }
         }
-        if (found == null) {
+        if (traceElement == null) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, NLS.bind(Messages.TmfOpenTraceHelper_TraceNotFound, traceName));
         }
-        openTraceFromElement(found);
+        openTraceFromElement(traceElement);
         return Status.OK_STATUS;
     }
 

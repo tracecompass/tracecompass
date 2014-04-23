@@ -55,7 +55,7 @@ public class TmfImportHelper {
         if (source.isDirectory()) {
             IFolder folder = parentFolder.getFolder(targetName);
             IStatus result = workspace.validateLinkLocation(folder, location);
-            if (result.isOK()) {
+            if (result.isOK() || result.matches(IStatus.INFO | IStatus.WARNING)) {
                 folder.createLink(location, IResource.REPLACE, new NullProgressMonitor());
             } else {
                 Activator.getDefault().logError(result.getMessage());
@@ -63,7 +63,7 @@ public class TmfImportHelper {
         } else {
             IFile file = parentFolder.getFile(targetName);
             IStatus result = workspace.validateLinkLocation(file, location);
-            if (result.isOK()) {
+            if (result.isOK() || result.matches(IStatus.INFO | IStatus.WARNING)) {
                 file.createLink(location, IResource.REPLACE,
                         new NullProgressMonitor());
             } else {
