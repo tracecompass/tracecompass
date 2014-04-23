@@ -29,6 +29,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -114,6 +115,7 @@ public class TestCustomTxtWizard {
      * @throws FileNotFoundException
      *             the xml file wasn't written, this is bad
      */
+    @Ignore
     @Test
     public void testNew() throws FileNotFoundException, IOException {
         File xmlFile = ResourcesPlugin.getWorkspace().getRoot().getLocation().append(".metadata/.plugins/org.eclipse.linuxtools.tmf.core/custom_txt_parsers.xml").toFile();
@@ -183,6 +185,7 @@ public class TestCustomTxtWizard {
      * @throws FileNotFoundException
      *             the xml file wasn't written, this is bad
      */
+    @Ignore
     @Test
     public void testEdit() throws FileNotFoundException, IOException {
         File xmlFile = ResourcesPlugin.getWorkspace().getRoot().getLocation().append(".metadata/.plugins/org.eclipse.linuxtools.tmf.core/custom_txt_parsers.xml").toFile();
