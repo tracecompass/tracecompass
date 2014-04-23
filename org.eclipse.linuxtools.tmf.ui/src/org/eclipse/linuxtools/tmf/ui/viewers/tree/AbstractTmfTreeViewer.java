@@ -470,4 +470,10 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
         updateContent(this.getWindowStartTime(), this.getWindowEndTime(), false);
     }
 
+    @Override
+    public void reset() {
+        super.reset();
+        clearContent();
+    }
+
 }
