@@ -22,7 +22,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     ActivatorTest.class,
-    org.eclipse.linuxtools.lttng2.core.tests.control.model.impl.AllTests.class
+    org.eclipse.linuxtools.lttng2.core.tests.control.model.impl.AllTests.class,
+    org.eclipse.linuxtools.lttng2.core.tests.session.AllTests.class
 })
 public class AllTests {
 
