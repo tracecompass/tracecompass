@@ -37,6 +37,7 @@ import org.eclipse.linuxtools.tmf.ui.views.uml2sd.dialogs.FilterCriteria;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.dialogs.FilterListDialog;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.LoadersManager;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.loader.TmfUml2SDSyncLoader;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PartInitException;
@@ -179,6 +180,11 @@ public class Uml2SDTestFacility {
             final long endTimeMillis = System.currentTimeMillis() + waitTimeMillis;
             while(System.currentTimeMillis() < endTimeMillis) {
                 if (!display.readAndDispatch()) {
+                    if ("cocoa".equals (SWT.getPlatform ())) {
+                        // The display needs to be woken up because it's possible
+                        // to get in a state where nothing will wake up the UI thread
+                        display.asyncExec(null);
+                    }
                     display.sleep();
                 }
                 display.update();
