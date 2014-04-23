@@ -27,6 +27,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -68,6 +69,7 @@ import org.junit.Test;
  */
 public class TestCustomTxtWizard {
 
+    private static final String MANAGE_CUSTOM_PARSERS_SHELL_TITLE = "Manage Custom Parsers";
     private static final String PROJECT_NAME = "Test";
     private static final String EXPECTED_TEST_DEFINITION = "<Definition name=\"Test\">\n" +
             "<TimeStampOutputFormat>ss</TimeStampOutputFormat>\n" +
@@ -135,6 +137,7 @@ public class TestCustomTxtWizard {
         }
         assertNotNull(treeNode);
         treeNode.contextMenu("Manage Custom Parsers...").click();
+        fBot.waitUntil(Conditions.shellIsActive(MANAGE_CUSTOM_PARSERS_SHELL_TITLE));
         fBot.button("New...").click();
 
         fBot.textWithLabel("Log type:").setText(PROJECT_NAME);
@@ -234,6 +237,7 @@ public class TestCustomTxtWizard {
         }
         assertNotNull(treeNode);
         treeNode.contextMenu("Manage Custom Parsers...").click();
+        fBot.waitUntil(Conditions.shellIsActive(MANAGE_CUSTOM_PARSERS_SHELL_TITLE));
         fBot.list().select(fBot.list().getItems()[0]);
         fBot.button("Edit...").click();
 
