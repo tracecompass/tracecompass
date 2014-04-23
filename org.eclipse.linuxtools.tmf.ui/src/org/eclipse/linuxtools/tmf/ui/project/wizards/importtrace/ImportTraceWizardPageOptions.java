@@ -19,6 +19,7 @@ import java.util.Map;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TraceUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -91,18 +92,17 @@ public class ImportTraceWizardPageOptions extends AbstractImportTraceWizardPage 
             fProjects.setSelection(fProjects.indexOf(proj.getName()));
         } else if (fProjects.getItemCount() > 0) {
             fProjects.setSelection(0);
+            updateWithSelection();
         }
-        updateWithSelection();
         setMessage(Messages.SharedSelectProject);
         this.setTitle(Messages.ImportTraceWizardPageOptionsTitle);
     }
 
     private void updateWithSelection() {
-        final String TRACE = "Traces"; //$NON-NLS-1$
         String[] selection = fProjects.getSelection();
         if (selection.length > 0) {
             final String listItem = selection[0];
-            IFolder folder = fProjectsMap.get(listItem).getFolder(TRACE);
+            IFolder folder = fProjectsMap.get(listItem).getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
             getBatchWizard().setTraceFolder(folder);
             ImportTraceWizardPageOptions.this.setErrorMessage(null);
         } else {

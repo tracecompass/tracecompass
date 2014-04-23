@@ -103,7 +103,7 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
 
     private Map<String, Set<String>> fParentFiles = new HashMap<>();
 
-    // Target import directory ('Traces' folder)
+    // Target import directory (trace folder)
     private IFolder fTargetFolder;
 
     /**
