@@ -269,6 +269,8 @@ public class ImportAndReadSmokeTest {
     }
 
     private static void deleteProject() {
+        // Wait for any analysis to complete because it might create supplementary files
+        SWTBotUtil.waitForJobs();
         try {
             ResourcesPlugin.getWorkspace().getRoot().getProject(TRACE_PROJECT_NAME).refreshLocal(IResource.DEPTH_INFINITE, null);
         } catch (CoreException e) {
