@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Ericsson
+ * Copyright (c) 2014 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,21 +7,21 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Alexandre Montplaisir - Initial API and implementation
+ *   Guilliano Molaire - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng2.ust.core.tests;
+package org.eclipse.linuxtools.lttng2.ust.core.tests.analysis.memory;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * Runner for the lttng2.kernel unit tests.
+ * Test suite.
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    ActivatorTest.class,
-    org.eclipse.linuxtools.lttng2.ust.core.tests.analysis.memory.AllTests.class,
-    org.eclipse.linuxtools.lttng2.ust.core.tests.trace.callstack.AllTests.class
+    UstMemoryAnalysisModuleTest.class
 })
-public class AllTests { }
+public class AllTests {
+
+}

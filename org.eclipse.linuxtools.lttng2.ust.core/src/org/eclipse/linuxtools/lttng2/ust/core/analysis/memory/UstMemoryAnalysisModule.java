@@ -8,16 +8,23 @@
  *
  * Contributors:
  *   Geneviève Bastien - Initial API and implementation
+ *   Guilliano Molaire - Provide the requirements of the analysis
  *******************************************************************************/
 
 package org.eclipse.linuxtools.lttng2.ust.core.analysis.memory;
 
 import org.eclipse.linuxtools.internal.lttng2.ust.core.memoryusage.MemoryUsageStateProvider;
+import org.eclipse.linuxtools.internal.lttng2.ust.core.memoryusage.UstMemoryStrings;
+import org.eclipse.linuxtools.lttng2.control.core.session.SessionConfigStrings;
 import org.eclipse.linuxtools.lttng2.ust.core.trace.LttngUstTrace;
+import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisRequirement;
+import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisRequirement.ValuePriorityLevel;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * This analysis build a state system from the libc memory instrumentation on a
@@ -33,9 +40,37 @@ public class UstMemoryAnalysisModule extends TmfStateSystemAnalysisModule {
      */
     public static String ID = "org.eclipse.linuxtools.lttng2.ust.analysis.memory"; //$NON-NLS-1$
 
+    private static final ImmutableSet<String> REQUIRED_EVENTS = ImmutableSet.of(
+            UstMemoryStrings.MALLOC,
+            UstMemoryStrings.FREE,
+            UstMemoryStrings.CALLOC,
+            UstMemoryStrings.REALLOC,
+            UstMemoryStrings.MEMALIGN,
+            UstMemoryStrings.POSIX_MEMALIGN
+            );
+
+    /** The requirements as an immutable set */
+    private static final ImmutableSet<TmfAnalysisRequirement> REQUIREMENTS;
+
+    static {
+        /* Initialize the requirements for the analysis: domain and events */
+        TmfAnalysisRequirement eventsReq = new TmfAnalysisRequirement(SessionConfigStrings.CONFIG_ELEMENT_EVENT, REQUIRED_EVENTS, ValuePriorityLevel.MANDATORY);
+        /*
+         * In order to have these events, the libc wrapper with probes should be
+         * loaded
+         */
+        eventsReq.addInformation(Messages.UstMemoryAnalysisModule_EventsLoadingInformation);
+        eventsReq.addInformation(Messages.UstMemoryAnalysisModule_EventsLoadingExampleInformation);
+
+        /* The domain type of the analysis */
+        TmfAnalysisRequirement domainReq = new TmfAnalysisRequirement(SessionConfigStrings.CONFIG_ELEMENT_DOMAIN);
+        domainReq.addValue(SessionConfigStrings.CONFIG_DOMAIN_TYPE_UST, ValuePriorityLevel.MANDATORY);
+
+        REQUIREMENTS = ImmutableSet.of(domainReq, eventsReq);
+    }
+
     @Override
-    protected
-    ITmfStateProvider createStateProvider() {
+    protected ITmfStateProvider createStateProvider() {
         return new MemoryUsageStateProvider(getTrace());
     }
 
@@ -52,4 +87,8 @@ public class UstMemoryAnalysisModule extends TmfStateSystemAnalysisModule {
         return (LttngUstTrace) super.getTrace();
     }
 
+    @Override
+    public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
+        return REQUIREMENTS;
+    }
 }
