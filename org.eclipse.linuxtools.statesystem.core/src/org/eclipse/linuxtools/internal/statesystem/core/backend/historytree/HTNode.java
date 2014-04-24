@@ -394,7 +394,7 @@ public abstract class HTNode {
         try {
             assert (endtime >= this.nodeStart);
 
-            if (intervals.size() > 0) {
+            if (!intervals.isEmpty()) {
                 /*
                  * Sort the intervals by ascending order of their end time. This
                  * speeds up lookups a bit
@@ -433,12 +433,7 @@ public abstract class HTNode {
         /* This is from a state system query, we are "reading" this node */
         rwl.readLock().lock();
         try {
-            if (intervals.size() == 0) {
-                return;
-            }
-            int startIndex = getStartIndexFor(t);
-
-            for (int i = startIndex; i < intervals.size(); i++) {
+            for (int i = getStartIndexFor(t); i < intervals.size(); i++) {
                 /*
                  * Now we only have to compare the Start times, since we now the
                  * End times necessarily fit.
@@ -474,13 +469,7 @@ public abstract class HTNode {
     public HTInterval getRelevantInterval(int key, long t) throws TimeRangeException {
         rwl.readLock().lock();
         try {
-            if (intervals.size() == 0) {
-                return null;
-            }
-
-            int startIndex = getStartIndexFor(t);
-
-            for (int i = startIndex; i < intervals.size(); i++) {
+            for (int i = getStartIndexFor(t); i < intervals.size(); i++) {
                 HTInterval curInterval = intervals.get(i);
                 if (curInterval.getAttribute() == key
                         && curInterval.getStartTime() <= t
@@ -488,6 +477,7 @@ public abstract class HTNode {
                     return curInterval;
                 }
             }
+
             /* We didn't find the relevant information in this node */
             return null;
 
@@ -498,6 +488,10 @@ public abstract class HTNode {
 
     private int getStartIndexFor(long t) throws TimeRangeException {
         /* Should only be called by methods with the readLock taken */
+
+        if (intervals.isEmpty()) {
+            return 0;
+        }
         /*
          * Since the intervals are sorted by end time, we can skip all the ones
          * at the beginning whose end times are smaller than 't'. Java does
