@@ -12,9 +12,9 @@
 
 package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views;
 
+import org.eclipse.linuxtools.internal.lttng2.control.ui.views.ControlView;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow.ControlFlowView;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources.ResourcesView;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.ControlView;
 import org.eclipse.linuxtools.tmf.ui.project.wizards.NewTmfProjectWizard;
 import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramView;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.TmfStatisticsView;

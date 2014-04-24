@@ -25,7 +25,7 @@
    </url>
 
    <includes
-         id="org.eclipse.linuxtools.lttng2"
+         id="org.eclipse.linuxtools.lttng2.control"
          version="0.0.0"
          name="Linux Tracing Toolkit next generation (LTTng)"/>
 

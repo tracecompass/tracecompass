@@ -1,0 +1,8 @@
+instructions.configure=\
+org.eclipse.equinox.p2.touchpoint.eclipse.addRepository(location:http${#58}//download.eclipse.org/linuxtools/updates-nightly,type:0,name:Linux Tools,enabled:false); \
+org.eclipse.equinox.p2.touchpoint.eclipse.addRepository(location:http${#58}//download.eclipse.org/linuxtools/updates-nightly,type:1,name:Linux Tools,enabled:false); 
+
+update.id = org.eclipse.linuxtools.lttng2.source.feature.group
+update.range = 0.0.0
+update.severity = 0
+update.description = Transition to the new feature name lttng2.control

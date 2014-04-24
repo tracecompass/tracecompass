@@ -15,10 +15,10 @@ package org.eclipse.linuxtools.lttng2.kernel.ui.swtbot.tests;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.eclipse.linuxtools.internal.lttng2.control.ui.views.ControlView;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.PerspectiveFactory;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow.ControlFlowView;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources.ResourcesView;
-import org.eclipse.linuxtools.internal.lttng2.ui.views.control.ControlView;
 import org.eclipse.linuxtools.tmf.ui.swtbot.tests.AbstractPerspectiveChecker;
 import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramView;
 import org.eclipse.linuxtools.tmf.ui.views.statistics.TmfStatisticsView;

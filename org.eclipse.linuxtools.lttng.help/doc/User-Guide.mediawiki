@@ -86,8 +86,8 @@ The LTTng plug-ins are structured as a stack of features/plug-ins as following:
 ** ''Plug-ins'': org.eclipse.linuxtools.tmf.core, org.eclipse.linuxtools.tmf.ui
 
 * '''LTTng''' - The wrapper for the LTTng tracer control. Can be used for kernel or application tracing.
-** ''Feature'': org.eclipse.linuxtools.lttng2
-** ''Plug-ins'': org.eclipse.linuxtools.lttng2.core, org.eclipse.linuxtools.lttng2.ui
+** ''Feature'': org.eclipse.linuxtools.lttng2.control
+** ''Plug-ins'': org.eclipse.linuxtools.lttng2.control.core, org.eclipse.linuxtools.lttng2.control.ui
 
 * '''LTTng Kernel''' - Analysis components specific to Linux kernel traces
 ** ''Feature'': org.eclipse.linuxtools.lttng2.kernel
