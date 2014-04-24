@@ -22,18 +22,21 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.varia.NullAppender;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.ui.IViewReference;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests perspectives to make sure they have all the views
  *
  * @author Matthew Khouzam
  */
+@RunWith(SWTBotJunit4ClassRunner.class)
 public abstract class AbstractPerspectiveChecker {
 
     private static SWTWorkbenchBot fBot;
