@@ -577,10 +577,10 @@
                   checkEnabled="false">
                <with
                      variable="selection">
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <or>
+                  <or>
+                     <iterate
+                           ifEmpty="false"
+                           operator="and">
                         <and>
                            <instanceof
                                  value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
@@ -592,9 +592,17 @@
                               </test>
                            </not>
                         </and>
+                     </iterate>
+                     <iterate
+                           ifEmpty="false"
+                           operator="and">
                         <instanceof
                               value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
                         </instanceof>
+                     </iterate>
+                     <iterate
+                           ifEmpty="false"
+                           operator="and">
                         <and>
                            <not>
                               <instanceof
@@ -605,8 +613,8 @@
                                  value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
                            </instanceof>
                         </and>
-                     </or>
-                  </iterate>
+                     </iterate>
+                  </or>
                </with>
             </visibleWhen>
          </command>

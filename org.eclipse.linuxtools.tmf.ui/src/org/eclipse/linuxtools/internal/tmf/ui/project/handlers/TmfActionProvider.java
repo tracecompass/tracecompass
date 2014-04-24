@@ -20,7 +20,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.OpenWithMenu;
 import org.eclipse.ui.navigator.CommonActionProvider;
 import org.eclipse.ui.navigator.ICommonActionConstants;
@@ -37,8 +36,6 @@ import org.eclipse.ui.navigator.ICommonViewerWorkbenchSite;
 public class TmfActionProvider extends CommonActionProvider {
 
     private OpenAction openAction;
-    private DeleteAction deleteAction;
-    private RefreshAction refreshAction;
 
     private IWorkbenchPage page;
 
@@ -55,8 +52,6 @@ public class TmfActionProvider extends CommonActionProvider {
             ICommonViewerWorkbenchSite workbenchSite = (ICommonViewerWorkbenchSite) viewSite;
             page = workbenchSite.getPage();
             openAction = new OpenAction(page, workbenchSite.getSelectionProvider());
-            deleteAction = new DeleteAction(page, workbenchSite.getSelectionProvider());
-            refreshAction = new RefreshAction(page, workbenchSite.getSelectionProvider());
         }
     }
 
@@ -80,12 +75,6 @@ public class TmfActionProvider extends CommonActionProvider {
     public void fillActionBars(IActionBars actionBars) {
         if (openAction.isEnabled()) {
             actionBars.setGlobalActionHandler(ICommonActionConstants.OPEN, openAction);
-        }
-        if (deleteAction.isEnabled()) {
-            actionBars.setGlobalActionHandler(ActionFactory.DELETE.getId(), deleteAction);
-        }
-        if (refreshAction.isEnabled()) {
-            actionBars.setGlobalActionHandler(ActionFactory.REFRESH.getId(), refreshAction);
         }
     }
 
