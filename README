@@ -4,9 +4,12 @@ Eclipse, which includes the generic Tracing and Monitoring Framework (TMF).
 The plugins are categorized as follows:
 org.eclipse.linuxtools.ctf.*          Common Trace Format (CTF) reader library
 org.eclipse.linuxtools.gdbtrace.*     Support for reading and viewing GDB traces
-org.eclipse.linuxtools.lttng*         LTTng 2.x integration
+org.eclipse.linuxtools.lttng2.*       LTTng 2.x integration
 org.eclipse.linuxtools.tmf.*          Tracing and Monitoring Framework
 org.eclipse.linuxtools.tracing.rcp.*  Code specific to the RCP version
+
+See the plugins.svg file for a diagram showing the dependencies between the
+different plugins.
 
 
 To set up the environment to build TMF from within Eclipse, see this wiki page:
