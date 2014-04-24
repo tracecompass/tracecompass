@@ -21,8 +21,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
-import org.apache.log4j.varia.NullAppender;
+import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -31,7 +32,6 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -101,7 +101,7 @@ public class TestCustomTxtWizard {
         Thread.currentThread().setName("SWTBot Thread"); // for the debugger
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
-        fLogger.addAppender(new NullAppender());
+        fLogger.addAppender(new ConsoleAppender(new SimpleLayout()));
         fBot = new SWTWorkbenchBot();
 
         SWTBotUtil.closeView("welcome", fBot);
@@ -120,7 +120,6 @@ public class TestCustomTxtWizard {
      * @throws FileNotFoundException
      *             the xml file wasn't written, this is bad
      */
-    @Ignore
     @Test
     public void testNew() throws FileNotFoundException, IOException {
         File xmlFile = ResourcesPlugin.getWorkspace().getRoot().getLocation().append(".metadata/.plugins/org.eclipse.linuxtools.tmf.core/custom_txt_parsers.xml").toFile();
@@ -141,6 +140,7 @@ public class TestCustomTxtWizard {
         assertNotNull(treeNode);
         treeNode.contextMenu("Manage Custom Parsers...").click();
         fBot.waitUntil(Conditions.shellIsActive(MANAGE_CUSTOM_PARSERS_SHELL_TITLE));
+
         fBot.button("New...").click();
 
         fBot.textWithLabel("Log type:").setText(PROJECT_NAME);
@@ -191,7 +191,6 @@ public class TestCustomTxtWizard {
      * @throws FileNotFoundException
      *             the xml file wasn't written, this is bad
      */
-    @Ignore
     @Test
     public void testEdit() throws FileNotFoundException, IOException {
         File xmlFile = ResourcesPlugin.getWorkspace().getRoot().getLocation().append(".metadata/.plugins/org.eclipse.linuxtools.tmf.core/custom_txt_parsers.xml").toFile();
