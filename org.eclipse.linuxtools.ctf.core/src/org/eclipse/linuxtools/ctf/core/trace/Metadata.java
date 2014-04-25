@@ -93,6 +93,7 @@ public class Metadata {
 
     /**
      * For network streaming
+     *
      * @since 3.0
      */
     public Metadata() {
@@ -146,8 +147,8 @@ public class Metadata {
                 /* Check if metadata is packet-based, if not it is text based */
                 Reader metadataTextInput =
                         (isPacketBased(metadataFileChannel) ?
-                        readBinaryMetaData(metadataFileChannel) :
-                        new FileReader(getMetadataPath()));) {
+                                readBinaryMetaData(metadataFileChannel) :
+                                new FileReader(getMetadataPath()));) {
 
             readMetaDataText(metadataTextInput);
 
@@ -349,39 +350,26 @@ public class Metadata {
         /* Use byte order that was detected with the magic number */
         headerByteBuffer.order(detectedByteOrder);
 
-        MetadataPacketHeader header = new MetadataPacketHeader();
-
-        /* Read from the ByteBuffer */
-        header.magic = headerByteBuffer.getInt();
-        headerByteBuffer.get(header.uuid);
-        header.checksum = headerByteBuffer.getInt();
-        header.contentSize = headerByteBuffer.getInt();
-        header.packetSize = headerByteBuffer.getInt();
-        header.compressionScheme = headerByteBuffer.get();
-        header.encryptionScheme = headerByteBuffer.get();
-        header.checksumScheme = headerByteBuffer.get();
-        header.ctfMajorVersion = headerByteBuffer.get();
-        header.ctfMinorVersion = headerByteBuffer.get();
+        MetadataPacketHeader header = new MetadataPacketHeader(headerByteBuffer);
 
         /* Check TSDL magic number */
-        if (header.magic != Utils.TSDL_MAGIC) {
+        if (!header.isMagicValid()) {
             throw new CTFReaderException("TSDL magic number does not match"); //$NON-NLS-1$
         }
 
         /* Check UUID */
-        UUID uuid = Utils.makeUUID(header.uuid);
         if (!trace.uuidIsSet()) {
-            trace.setUUID(uuid);
-        } else if (!trace.getUUID().equals(uuid)) {
+            trace.setUUID(header.getUuid());
+        } else if (!trace.getUUID().equals(header.getUuid())) {
             throw new CTFReaderException("UUID mismatch"); //$NON-NLS-1$
         }
 
         /* Extract the text from the packet */
-        int payloadSize = ((header.contentSize / 8) - METADATA_PACKET_HEADER_SIZE);
+        int payloadSize = ((header.getContentSize() / 8) - METADATA_PACKET_HEADER_SIZE);
         if (payloadSize < 0) {
             throw new CTFReaderException("Invalid metadata packet payload size."); //$NON-NLS-1$
         }
-        int skipSize = (header.packetSize - header.contentSize) / 8;
+        int skipSize = (header.getPacketSize() - header.getContentSize()) / 8;
 
         /* Read the payload + the padding in a ByteBuffer */
         ByteBuffer payloadByteBuffer = ByteBuffer.allocateDirect(payloadSize
@@ -408,30 +396,62 @@ public class Metadata {
 
     private static class MetadataPacketHeader {
 
-        public int magic;
-        public byte uuid[] = new byte[16];
-        public int checksum;
-        public int contentSize;
-        public int packetSize;
-        public byte compressionScheme;
-        public byte encryptionScheme;
-        public byte checksumScheme;
-        public byte ctfMajorVersion;
-        public byte ctfMinorVersion;
+        private final int fMagic;
+        private final UUID fUuid;
+        private final int fChecksum;
+        private final int fContentSize;
+        private final int fPacketSize;
+        private final byte fCompressionScheme;
+        private final byte fEncryptionScheme;
+        private final byte fChecksumScheme;
+        private final byte fCtfMajorVersion;
+        private final byte fCtfMinorVersion;
+
+        public MetadataPacketHeader(ByteBuffer headerByteBuffer) {
+            /* Read from the ByteBuffer */
+            fMagic = headerByteBuffer.getInt();
+            byte[] uuidBytes = new byte[16];
+            headerByteBuffer.get(uuidBytes);
+            fUuid = Utils.makeUUID(uuidBytes);
+            fChecksum = headerByteBuffer.getInt();
+            fContentSize = headerByteBuffer.getInt();
+            fPacketSize = headerByteBuffer.getInt();
+            fCompressionScheme = headerByteBuffer.get();
+            fEncryptionScheme = headerByteBuffer.get();
+            fChecksumScheme = headerByteBuffer.get();
+            fCtfMajorVersion = headerByteBuffer.get();
+            fCtfMinorVersion = headerByteBuffer.get();
+        }
+
+        public boolean isMagicValid() {
+            return fMagic == Utils.TSDL_MAGIC;
+        }
+
+        public UUID getUuid() {
+            return fUuid;
+        }
+
+        public int getContentSize() {
+            return fContentSize;
+        }
+
+        public int getPacketSize() {
+            return fPacketSize;
+        }
 
         @Override
         public String toString() {
             /* Only for debugging, shouldn't be externalized */
             /* Therefore it cannot be covered by test cases */
             return "MetadataPacketHeader [magic=0x" //$NON-NLS-1$
-                    + Integer.toHexString(magic) + ", uuid=" //$NON-NLS-1$
-                    + Arrays.toString(uuid) + ", checksum=" + checksum //$NON-NLS-1$
-                    + ", contentSize=" + contentSize + ", packetSize=" //$NON-NLS-1$ //$NON-NLS-2$
-                    + packetSize + ", compressionScheme=" + compressionScheme //$NON-NLS-1$
-                    + ", encryptionScheme=" + encryptionScheme //$NON-NLS-1$
-                    + ", checksumScheme=" + checksumScheme //$NON-NLS-1$
-                    + ", ctfMajorVersion=" + ctfMajorVersion //$NON-NLS-1$
-                    + ", ctfMinorVersion=" + ctfMinorVersion + ']'; //$NON-NLS-1$
+                    + Integer.toHexString(fMagic) + ", uuid=" //$NON-NLS-1$
+                    + fUuid.toString() + ", checksum=" + fChecksum //$NON-NLS-1$
+                    + ", contentSize=" + fContentSize + ", packetSize=" //$NON-NLS-1$ //$NON-NLS-2$
+                    + fPacketSize + ", compressionScheme=" + fCompressionScheme //$NON-NLS-1$
+                    + ", encryptionScheme=" + fEncryptionScheme //$NON-NLS-1$
+                    + ", checksumScheme=" + fChecksumScheme //$NON-NLS-1$
+                    + ", ctfMajorVersion=" + fCtfMajorVersion //$NON-NLS-1$
+                    + ", ctfMinorVersion=" + fCtfMinorVersion + ']'; //$NON-NLS-1$
         }
 
     }
