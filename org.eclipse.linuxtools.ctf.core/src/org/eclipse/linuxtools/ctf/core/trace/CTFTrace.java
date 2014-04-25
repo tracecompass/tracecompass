@@ -467,7 +467,7 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
     /**
      * Get all the streams as an iterable.
      *
-     * @return Iterable<Stream> an iterable over streams.
+     * @return Iterable&lt;Stream&gt; an iterable over streams.
      * @since 3.0
      */
     public Iterable<Stream> getStreams() {

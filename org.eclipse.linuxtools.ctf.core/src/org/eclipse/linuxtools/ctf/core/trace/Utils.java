@@ -61,15 +61,15 @@ public class Utils {
     /**
      * Performs an unsigned long comparison on two unsigned long numbers.
      *
-     * @note As Java does not support unsigned types and arithmetic, parameters
+     * <strong> As Java does not support unsigned types and arithmetic, parameters
      *       are received encoded as a signed long (two-complement) but the
-     *       operation is an unsigned comparator.
+     *       operation is an unsigned comparator.</strong>
      *
      * @param left
      *            Left operand of the comparator.
      * @param right
      *            Right operand of the comparator.
-     * @return -1 if left < right, 1 if left > right, 0 if left == right.
+     * @return -1 if left &lt; right, 1 if left &gt; right, 0 if left == right.
      */
     public static int unsignedCompare(long left, long right) {
         /*

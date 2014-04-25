@@ -46,7 +46,7 @@ public class FloatDeclaration implements IDeclaration {
      * @param byteOrder
      *            The byte order
      * @param alignment
-     *            The alignment. Should be >= 1
+     *            The alignment. Should be &ge; 1
      */
     public FloatDeclaration(int exponent, int mantissa, ByteOrder byteOrder,
             long alignment) {

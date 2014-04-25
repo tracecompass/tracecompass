@@ -201,7 +201,7 @@ public class StreamInput implements IDefinitionScope {
     /**
      * Adds the next packet header index entry to the index of a stream input.
      *
-     * @warning slow, can corrupt data if not used properly
+     * <strong>This method is slow and can corrupt data if not used properly</strong>
      * @return true if there are more packets to add
      * @throws CTFReaderException
      *             If there was a problem reading the packed header

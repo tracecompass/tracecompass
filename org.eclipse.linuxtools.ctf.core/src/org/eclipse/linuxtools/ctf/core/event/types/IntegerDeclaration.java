@@ -60,7 +60,7 @@ public class IntegerDeclaration implements IDeclaration {
      * @param clock
      *            The clock path, can be null
      * @param alignment
-     *            The minimum alignment. Should be >= 1
+     *            The minimum alignment. Should be &ge; 1
      */
     public IntegerDeclaration(int len, boolean signed, int base,
             ByteOrder byteOrder, Encoding encoding, String clock, long alignment) {

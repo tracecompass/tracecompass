@@ -83,7 +83,7 @@ public class EnumDeclaration implements IDeclaration {
     }
 
     /**
-     * Add a value. Do not overlap, this is <i><u><b>not</i></u></b> an interval
+     * Add a value. Do not overlap, this is <em><strong>not</strong></em> an interval
      * tree.
      *
      * @param low

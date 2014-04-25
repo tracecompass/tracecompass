@@ -85,7 +85,7 @@ public class ArrayDefinition extends Definition {
     /**
      * Get the element at i
      * @param i the index (cannot be negative)
-     * @return The element at I, if I > length, null, if I < 0, the method throws an out of bounds exception
+     * @return The element at I, if I &gt; length, null, if I &lt; 0, the method throws an out of bounds exception
      */
     public Definition getElem(int i) {
         if (i > definitions.length) {
