@@ -110,7 +110,7 @@ public class ExportTracePackageSelectTraceWizardPage extends WizardPage {
                 return null;
             }
         });
-        traceViewer.setLabelProvider(new TmfNavigatorLabelProvider());
+        traceViewer.setLabelProvider(new ExportLabelProvider());
         fTraceTable.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -201,4 +201,18 @@ public class ExportTracePackageSelectTraceWizardPage extends WizardPage {
     public boolean canFlipToNextPage() {
         return getCheckedTraces().size() > 0;
     }
+
+    private class ExportLabelProvider extends TmfNavigatorLabelProvider {
+        @Override
+        public String getText(Object element) {
+
+            if (element instanceof TmfTraceElement) {
+                TmfTraceElement folder = (TmfTraceElement) element;
+                return folder.getElementPath();
+            }
+            return super.getText(element);
+        }
+    }
+
+
 }

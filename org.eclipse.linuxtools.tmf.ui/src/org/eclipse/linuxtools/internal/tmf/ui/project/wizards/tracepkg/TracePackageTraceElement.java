@@ -62,7 +62,7 @@ public class TracePackageTraceElement extends TracePackageElement {
 
     @Override
     public String getText() {
-        return fTraceElement != null ? fTraceElement.getName() : fImportName;
+        return fTraceElement != null ? fTraceElement.getElementPath() : fImportName;
     }
 
     /**
