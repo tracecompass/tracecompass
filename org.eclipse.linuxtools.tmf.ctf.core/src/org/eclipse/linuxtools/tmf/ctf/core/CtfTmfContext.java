@@ -64,7 +64,7 @@ public class CtfTmfContext implements ITmfContext {
      * @since 3.0
      */
     @Override
-    public ITmfLocation getLocation() {
+    public synchronized ITmfLocation getLocation() {
         return fCurLocation;
     }
 
@@ -77,7 +77,7 @@ public class CtfTmfContext implements ITmfContext {
      * @since 3.0
      */
     @Override
-    public void setLocation(ITmfLocation location) {
+    public synchronized void setLocation(ITmfLocation location) {
         fCurLocation = (CtfLocation) location;
         if (fCurLocation != null) {
             getIterator().seek(fCurLocation.getLocationInfo());
