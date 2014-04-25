@@ -27,27 +27,27 @@ public class TmfCoreTestPlugin extends Plugin {
     // Attributes
     // ------------------------------------------------------------------------
 
-	// The plug-in ID
-	@SuppressWarnings("javadoc")
+    // The plug-in ID
+    @SuppressWarnings("javadoc")
     public static final String PLUGIN_ID = "org.eclipse.linuxtools.tmf.tests";
 
-	// The shared instance
-	private static TmfCoreTestPlugin fPlugin;
+    // The shared instance
+    private static TmfCoreTestPlugin fPlugin;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
-	/**
-	 * The constructor
-	 */
-	public TmfCoreTestPlugin() {
-		setDefault(this);
-	}
+    /**
+     * The constructor
+     */
+    public TmfCoreTestPlugin() {
+        setDefault(this);
+    }
 
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Accessors
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     /**
      * @return the shared instance
@@ -56,29 +56,29 @@ public class TmfCoreTestPlugin extends Plugin {
         return fPlugin;
     }
 
-	/**
-	 * @param plugin the shared instance
-	 */
-	private static void setDefault(TmfCoreTestPlugin plugin) {
-		fPlugin = plugin;
-	}
+    /**
+     * @param plugin the shared instance
+     */
+    private static void setDefault(TmfCoreTestPlugin plugin) {
+        fPlugin = plugin;
+    }
 
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // Operations
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
-	@Override
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		setDefault(this);
-		TmfCoreTracer.init();
-	}
+    @Override
+    public void start(BundleContext context) throws Exception {
+        super.start(context);
+        setDefault(this);
+        TmfCoreTracer.init();
+    }
 
-	@Override
-	public void stop(BundleContext context) throws Exception {
-		TmfCoreTracer.stop();
-		setDefault(null);
-		super.stop(context);
-	}
+    @Override
+    public void stop(BundleContext context) throws Exception {
+        TmfCoreTracer.stop();
+        setDefault(null);
+        super.stop(context);
+    }
 
 }

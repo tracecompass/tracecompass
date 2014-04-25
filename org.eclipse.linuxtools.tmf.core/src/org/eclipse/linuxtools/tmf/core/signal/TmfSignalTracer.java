@@ -20,20 +20,20 @@ package org.eclipse.linuxtools.tmf.core.signal;
  */
 public class TmfSignalTracer {
 
-	static TmfSignalTracer fInstance;
+    static TmfSignalTracer fInstance;
 
     /**
      * @return The single instance of the signal tracer object
      */
-	static public TmfSignalTracer getInstance() {
-		if (fInstance == null) {
-			fInstance = new TmfSignalTracer();
-		}
-		return fInstance;
-	}
+    static public TmfSignalTracer getInstance() {
+        if (fInstance == null) {
+            fInstance = new TmfSignalTracer();
+        }
+        return fInstance;
+    }
 
-	private TmfSignalTracer() {
-	}
+    private TmfSignalTracer() {
+    }
 
     /**
      * Handler for all TMF signal types
@@ -41,8 +41,8 @@ public class TmfSignalTracer {
      * @param signal
      *            Incoming signal
      */
-	@TmfSignalHandler
-	public void traceSignal(TmfSignal signal) {
-		System.out.println(signal.getSource().toString() + ": " + signal.toString()); //$NON-NLS-1$
-	}
+    @TmfSignalHandler
+    public void traceSignal(TmfSignal signal) {
+        System.out.println(signal.getSource().toString() + ": " + signal.toString()); //$NON-NLS-1$
+    }
 }

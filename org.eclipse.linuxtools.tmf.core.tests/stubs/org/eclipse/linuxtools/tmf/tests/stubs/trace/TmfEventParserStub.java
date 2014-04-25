@@ -80,8 +80,8 @@ public class TmfEventParserStub implements ITmfEventParser {
             return null;
         }
 
-        //       	String name = eventStream.getName();
-        //       	name = name.substring(name.lastIndexOf('/') + 1);
+        //           String name = eventStream.getName();
+        //           name = name.substring(name.lastIndexOf('/') + 1);
 
         // no need to use synchronized since it's already cover by the calling method
 

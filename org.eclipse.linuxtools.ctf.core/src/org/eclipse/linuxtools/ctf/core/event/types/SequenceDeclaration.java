@@ -16,7 +16,7 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 
 /**
  * A CTF sequence declaration.
- * 
+ *
  * An array where the size is fixed but declared in the trace, unlike array
  * where it is declared with a literal
  *

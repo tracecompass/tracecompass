@@ -8,21 +8,21 @@
 * http://www.eclipse.org/legal/epl-v10.html
 *
 * Contributors:
-* 	Geneviève Bastien - Initial API and implementation
+*     Geneviève Bastien - Initial API and implementation
 *************************************************************************** -->
 <tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="xmldefinition.xsd">
+    xsi:noNamespaceSchemaLocation="xmldefinition.xsd">
 
-	<stateProvider id="test.builtin.sp" version="1">
-		<head>
-			<label value="Test a builtin XML module file" />
-		</head>
+    <stateProvider id="test.builtin.sp" version="1">
+        <head>
+            <label value="Test a builtin XML module file" />
+        </head>
 
-		<eventHandler eventName="test">
-			<stateChange>
-				<stateAttribute type="constant" value="cpu" />
-				<stateValue type="eventField" value="cpu" />
-			</stateChange>
-		</eventHandler>
-	</stateProvider>
+        <eventHandler eventName="test">
+            <stateChange>
+                <stateAttribute type="constant" value="cpu" />
+                <stateValue type="eventField" value="cpu" />
+            </stateChange>
+        </eventHandler>
+    </stateProvider>
 </tmfxml>

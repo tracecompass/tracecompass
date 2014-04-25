@@ -27,51 +27,51 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 public class TmfFilterEventTypeNode extends TmfFilterTreeNode {
 
     public static final String NODE_NAME = "EVENTTYPE"; //$NON-NLS-1$
-	public static final String TYPE_ATTR = "type"; //$NON-NLS-1$
-	public static final String NAME_ATTR = "name"; //$NON-NLS-1$
+    public static final String TYPE_ATTR = "type"; //$NON-NLS-1$
+    public static final String NAME_ATTR = "name"; //$NON-NLS-1$
 
-	private String fType;
-	private String fName;
+    private String fType;
+    private String fName;
 
-	/**
-	 * @param parent the parent node
-	 */
-	public TmfFilterEventTypeNode(ITmfFilterTreeNode parent) {
-		super(parent);
-	}
+    /**
+     * @param parent the parent node
+     */
+    public TmfFilterEventTypeNode(ITmfFilterTreeNode parent) {
+        super(parent);
+    }
 
-	@Override
-	public String getNodeName() {
-		return NODE_NAME;
-	}
+    @Override
+    public String getNodeName() {
+        return NODE_NAME;
+    }
 
-	/**
-	 * @return the event type
-	 */
-	public String getEventType() {
-		return fType;
-	}
+    /**
+     * @return the event type
+     */
+    public String getEventType() {
+        return fType;
+    }
 
-	/**
-	 * @param type the event type
-	 */
-	public void setEventType(String type) {
-		this.fType = type;
-	}
+    /**
+     * @param type the event type
+     */
+    public void setEventType(String type) {
+        this.fType = type;
+    }
 
-	/**
-	 * @return TBD
-	 */
-	public String getName() {
-		return fName;
-	}
+    /**
+     * @return TBD
+     */
+    public String getName() {
+        return fName;
+    }
 
-	/**
-	 * @param name TBD
-	 */
-	public void setName(String name) {
-		this.fName = name;
-	}
+    /**
+     * @param name TBD
+     */
+    public void setName(String name) {
+        this.fName = name;
+    }
 
     @Override
     public boolean matches(ITmfEvent event) {
@@ -100,34 +100,34 @@ public class TmfFilterEventTypeNode extends TmfFilterTreeNode {
         return false;
     }
 
-	@Override
-	public List<String> getValidChildren() {
-		if (getChildrenCount() == 0) {
-			return super.getValidChildren();
-		}
+    @Override
+    public List<String> getValidChildren() {
+        if (getChildrenCount() == 0) {
+            return super.getValidChildren();
+        }
         return new ArrayList<>(0); // only one child allowed
-	}
+    }
 
-	@Override
-	public String toString() {
-		StringBuffer buf = new StringBuffer();
-		buf.append("EventType is " + fName); //$NON-NLS-1$
-		if (getChildrenCount() > 0) {
-			buf.append(" and "); //$NON-NLS-1$
-		}
-		if (getChildrenCount() > 1) {
-			buf.append("( "); //$NON-NLS-1$
-		}
-		for (int i = 0; i < getChildrenCount(); i++) {
-			ITmfFilterTreeNode node = getChildren()[i];
-			buf.append(node.toString());
-			if (i < getChildrenCount() - 1) {
-				buf.append(" and "); //$NON-NLS-1$
-			}
-		}
-		if (getChildrenCount() > 1) {
-			buf.append(" )"); //$NON-NLS-1$
-		}
-		return buf.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("EventType is " + fName); //$NON-NLS-1$
+        if (getChildrenCount() > 0) {
+            buf.append(" and "); //$NON-NLS-1$
+        }
+        if (getChildrenCount() > 1) {
+            buf.append("( "); //$NON-NLS-1$
+        }
+        for (int i = 0; i < getChildrenCount(); i++) {
+            ITmfFilterTreeNode node = getChildren()[i];
+            buf.append(node.toString());
+            if (i < getChildrenCount() - 1) {
+                buf.append(" and "); //$NON-NLS-1$
+            }
+        }
+        if (getChildrenCount() > 1) {
+            buf.append(" )"); //$NON-NLS-1$
+        }
+        return buf.toString();
+    }
 }

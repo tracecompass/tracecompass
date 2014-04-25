@@ -998,45 +998,45 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     protected void moveToMessageInPage() {
         fLock.lock();
         try {
-        	if (!fView.getSDWidget().isDisposed()) {
-        		// Check for GUI thread
-        		if(Display.getCurrent() != null) {
-        			// Already in GUI thread - execute directly
-        			TmfSyncMessage prevMessage = null;
-        			TmfSyncMessage syncMessage = null;
-        			boolean isExactTime = false;
-        			for (int i = 0; i < fFrame.syncMessageCount(); i++) {
-        				if (fFrame.getSyncMessage(i) instanceof TmfSyncMessage) {
-        					syncMessage = (TmfSyncMessage) fFrame.getSyncMessage(i);
-        					if (syncMessage.getStartTime().compareTo(fCurrentTime, false) == 0) {
-        						isExactTime = true;
-        						break;
-        					} else if ((syncMessage.getStartTime().compareTo(fCurrentTime, false) > 0) && (prevMessage != null)) {
-        					    syncMessage = prevMessage;
-        					    break;
-        					}
-        					prevMessage = syncMessage;
-        				}
-        			}
-        			if (fIsSelect && isExactTime) {
-        				fView.getSDWidget().moveTo(syncMessage);
-        			}
-        			else {
-        				fView.getSDWidget().ensureVisible(syncMessage);
-        				fView.getSDWidget().clearSelection();
-        				fView.getSDWidget().redraw();
-        			}
-        		}
-        		else {
-        			// Not in GUI thread - queue action in GUI thread.
-        			fView.getSDWidget().getDisplay().asyncExec(new Runnable() {
-        				@Override
-        				public void run() {
-        					moveToMessageInPage();
-        				}
-        			});
-        		}
-        	}
+            if (!fView.getSDWidget().isDisposed()) {
+                // Check for GUI thread
+                if(Display.getCurrent() != null) {
+                    // Already in GUI thread - execute directly
+                    TmfSyncMessage prevMessage = null;
+                    TmfSyncMessage syncMessage = null;
+                    boolean isExactTime = false;
+                    for (int i = 0; i < fFrame.syncMessageCount(); i++) {
+                        if (fFrame.getSyncMessage(i) instanceof TmfSyncMessage) {
+                            syncMessage = (TmfSyncMessage) fFrame.getSyncMessage(i);
+                            if (syncMessage.getStartTime().compareTo(fCurrentTime, false) == 0) {
+                                isExactTime = true;
+                                break;
+                            } else if ((syncMessage.getStartTime().compareTo(fCurrentTime, false) > 0) && (prevMessage != null)) {
+                                syncMessage = prevMessage;
+                                break;
+                            }
+                            prevMessage = syncMessage;
+                        }
+                    }
+                    if (fIsSelect && isExactTime) {
+                        fView.getSDWidget().moveTo(syncMessage);
+                    }
+                    else {
+                        fView.getSDWidget().ensureVisible(syncMessage);
+                        fView.getSDWidget().clearSelection();
+                        fView.getSDWidget().redraw();
+                    }
+                }
+                else {
+                    // Not in GUI thread - queue action in GUI thread.
+                    fView.getSDWidget().getDisplay().asyncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            moveToMessageInPage();
+                        }
+                    });
+                }
+            }
         }
         finally {
             fLock.unlock();

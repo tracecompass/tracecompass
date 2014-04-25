@@ -32,51 +32,51 @@ import org.eclipse.swt.widgets.Display;
 public class ColorSettingsManager {
 
     // The color settings file name
-	private static final String COLOR_SETTINGS_FILE_NAME = "color_settings.xml"; //$NON-NLS-1$
+    private static final String COLOR_SETTINGS_FILE_NAME = "color_settings.xml"; //$NON-NLS-1$
 
-	// The path for the color settings file
-	private static final String COLOR_SETTINGS_PATH_NAME =
+    // The path for the color settings file
+    private static final String COLOR_SETTINGS_PATH_NAME =
         Activator.getDefault().getStateLocation().addTrailingSeparator().append(COLOR_SETTINGS_FILE_NAME).toString();
 
-	// The default color setting
-	private static final ColorSetting DEFAULT_COLOR_SETTING = new ColorSetting(
-			Display.getDefault().getSystemColor(SWT.COLOR_LIST_FOREGROUND).getRGB(),
-			Display.getDefault().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB(),
-			Display.getDefault().getSystemColor(SWT.COLOR_LIST_FOREGROUND).getRGB(),
-			null);
+    // The default color setting
+    private static final ColorSetting DEFAULT_COLOR_SETTING = new ColorSetting(
+            Display.getDefault().getSystemColor(SWT.COLOR_LIST_FOREGROUND).getRGB(),
+            Display.getDefault().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB(),
+            Display.getDefault().getSystemColor(SWT.COLOR_LIST_FOREGROUND).getRGB(),
+            null);
 
-	/**
-	 * Special value for priority if unknown.
-	 */
-	public static final int PRIORITY_NONE = Integer.MAX_VALUE;
+    /**
+     * Special value for priority if unknown.
+     */
+    public static final int PRIORITY_NONE = Integer.MAX_VALUE;
 
-	// The stored color settings
-	private static ColorSetting[] fColorSettings = ColorSettingsXML.load(COLOR_SETTINGS_PATH_NAME);
+    // The stored color settings
+    private static ColorSetting[] fColorSettings = ColorSettingsXML.load(COLOR_SETTINGS_PATH_NAME);
 
-	// The listener list
-	private static List<IColorSettingsListener> fListeners = new ArrayList<>();
+    // The listener list
+    private static List<IColorSettingsListener> fListeners = new ArrayList<>();
 
-	/**
-	 * Returns an array of color settings.
-	 *
-	 * @return an array of color settings.
-	 */
-	public static ColorSetting[] getColorSettings() {
-		return (fColorSettings != null) ? Arrays.copyOf(fColorSettings, fColorSettings.length) : null;
-	}
+    /**
+     * Returns an array of color settings.
+     *
+     * @return an array of color settings.
+     */
+    public static ColorSetting[] getColorSettings() {
+        return (fColorSettings != null) ? Arrays.copyOf(fColorSettings, fColorSettings.length) : null;
+    }
 
-	/**
-	 * Sets the array of color settings.
-	 *
-	 * @param colorSettings A array of color settings to set
-	 */
-	public static void setColorSettings(ColorSetting[] colorSettings) {
-		fColorSettings = (colorSettings != null) ? Arrays.copyOf(colorSettings, colorSettings.length) : null;
-		ColorSettingsXML.save(COLOR_SETTINGS_PATH_NAME, fColorSettings);
-		fireColorSettingsChanged();
-	}
+    /**
+     * Sets the array of color settings.
+     *
+     * @param colorSettings A array of color settings to set
+     */
+    public static void setColorSettings(ColorSetting[] colorSettings) {
+        fColorSettings = (colorSettings != null) ? Arrays.copyOf(colorSettings, colorSettings.length) : null;
+        ColorSettingsXML.save(COLOR_SETTINGS_PATH_NAME, fColorSettings);
+        fireColorSettingsChanged();
+    }
 
-	    /**
+        /**
      * Gets the color settings that matches the filter for given event.
      *
      * @param event
@@ -85,69 +85,69 @@ public class ColorSettingsManager {
      * @return color settings defined for filter if found else default color
      *         settings
      */
-	public static ColorSetting getColorSetting(ITmfEvent event) {
+    public static ColorSetting getColorSetting(ITmfEvent event) {
         for (int i = 0; i < fColorSettings.length; i++) {
-        	ColorSetting colorSetting = fColorSettings[i];
-        	if (colorSetting.getFilter() != null && colorSetting.getFilter().matches(event)) {
-        		return colorSetting;
-        	}
+            ColorSetting colorSetting = fColorSettings[i];
+            if (colorSetting.getFilter() != null && colorSetting.getFilter().matches(event)) {
+                return colorSetting;
+            }
         }
         return DEFAULT_COLOR_SETTING;
-	}
+    }
 
-	/**
-	 * Gets the color settings priority for the given event.
-	 *
-	 * @param event A event the event to check
-	 * @return the priority defined for the filter else PRIORITY_NONE
-	 */
-	public static int getColorSettingPriority(ITmfEvent event) {
+    /**
+     * Gets the color settings priority for the given event.
+     *
+     * @param event A event the event to check
+     * @return the priority defined for the filter else PRIORITY_NONE
+     */
+    public static int getColorSettingPriority(ITmfEvent event) {
         for (int i = 0; i < fColorSettings.length; i++) {
-        	ColorSetting colorSetting = fColorSettings[i];
-        	if (colorSetting.getFilter() != null && colorSetting.getFilter().matches(event)) {
-        		return i;
-        	}
+            ColorSetting colorSetting = fColorSettings[i];
+            if (colorSetting.getFilter() != null && colorSetting.getFilter().matches(event)) {
+                return i;
+            }
         }
         return PRIORITY_NONE;
-	}
+    }
 
-	/**
-	 * Returns the color settings based the priority.
-	 *
-	 * @param priority A priority (index) of color settings
-	 * @return the color settings defined for the priority else default color settings
-	 */
-	public static ColorSetting getColorSetting(int priority) {
-		if (priority < fColorSettings.length) {
-			return fColorSettings[priority];
-		}
-		return DEFAULT_COLOR_SETTING;
-	}
+    /**
+     * Returns the color settings based the priority.
+     *
+     * @param priority A priority (index) of color settings
+     * @return the color settings defined for the priority else default color settings
+     */
+    public static ColorSetting getColorSetting(int priority) {
+        if (priority < fColorSettings.length) {
+            return fColorSettings[priority];
+        }
+        return DEFAULT_COLOR_SETTING;
+    }
 
-	/**
-	 * Adds a color settings listener.
-	 *
-	 * @param listener A listener to add.
-	 */
-	public static void addColorSettingsListener(IColorSettingsListener listener) {
-		if (! fListeners.contains(listener)) {
-			fListeners.add(listener);
-		}
-	}
+    /**
+     * Adds a color settings listener.
+     *
+     * @param listener A listener to add.
+     */
+    public static void addColorSettingsListener(IColorSettingsListener listener) {
+        if (! fListeners.contains(listener)) {
+            fListeners.add(listener);
+        }
+    }
 
-	/**
-	 * Removes a color settings listener.
-	 *
-	 * @param listener A listener to remove.
-	 */
-	public static void removeColorSettingsListener(IColorSettingsListener listener) {
-		fListeners.remove(listener);
-	}
+    /**
+     * Removes a color settings listener.
+     *
+     * @param listener A listener to remove.
+     */
+    public static void removeColorSettingsListener(IColorSettingsListener listener) {
+        fListeners.remove(listener);
+    }
 
-	// Notify listeners
-	private static void fireColorSettingsChanged() {
-		for (IColorSettingsListener listener : fListeners) {
-			listener.colorSettingsChanged(fColorSettings);
-		}
-	}
+    // Notify listeners
+    private static void fireColorSettingsChanged() {
+        for (IColorSettingsListener listener : fListeners) {
+            listener.colorSettingsChanged(fColorSettings);
+        }
+    }
 }

@@ -52,12 +52,12 @@ public abstract class TmfEditor extends EditorPart implements ITmfComponent {
     // ------------------------------------------------------------------------
 
     @Override
-	public String getName() {
+    public String getName() {
         return fName;
     }
 
     @Override
-	public void broadcast(TmfSignal signal) {
+    public void broadcast(TmfSignal signal) {
         TmfSignalManager.dispatchSignal(signal);
     }
 

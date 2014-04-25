@@ -198,7 +198,7 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
                 if (event.getItemizedEntry() == null) {
                     event.merge((TimeChartEvent) timeEvent);
                 } else {
-                	event.mergeDecorations((TimeChartEvent) timeEvent);
+                    event.mergeDecorations((TimeChartEvent) timeEvent);
                     event.getItemizedEntry().addTraceEvent(timeEvent);
                 }
             }

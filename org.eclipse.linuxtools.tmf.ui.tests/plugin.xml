@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-	<extension
+    <extension
        point="org.eclipse.ui.views">
-		<category id="org.eclipse.linuxtools.tmf.ui.stubs" name="TMF UI Stubs">
-		</category>
-		<view category="org.eclipse.linuxtools.tmf.ui.stubs"
-			class="org.eclipse.linuxtools.tmf.ui.widgets.timegraph.test.stub.views.TsfTraceAnalysisView"
-			id="org.eclipse.linuxtools.tmf.ui.widgets.timeAnalysis.test.stub.views.TmfTaTimeAnalysis"
-			name="Time Graph View" restorable="true">
-		</view>
+        <category id="org.eclipse.linuxtools.tmf.ui.stubs" name="TMF UI Stubs">
+        </category>
+        <view category="org.eclipse.linuxtools.tmf.ui.stubs"
+            class="org.eclipse.linuxtools.tmf.ui.widgets.timegraph.test.stub.views.TsfTraceAnalysisView"
+            id="org.eclipse.linuxtools.tmf.ui.widgets.timeAnalysis.test.stub.views.TmfTaTimeAnalysis"
+            name="Time Graph View" restorable="true">
+        </view>
   <view
         category="org.eclipse.linuxtools.tmf.ui.stubs"
         class="org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView"

@@ -700,7 +700,7 @@ public class TmfVirtualTable extends Composite {
     /**
      * Method setItemCount
      * @param nbItems int the number of items in the table
-	 *
+     *
      */
     public void setItemCount(int nbItems) {
         final int nb = Math.max(0, nbItems);
@@ -1069,7 +1069,7 @@ public class TmfVirtualTable extends Composite {
 
     /**
      * @return the tooltipProvider
-	 */
+     */
     public TooltipProvider getTooltipProvider() {
         return tooltipProvider;
     }
@@ -1083,7 +1083,7 @@ public class TmfVirtualTable extends Composite {
 
     /**
      * @return the doubleClickListener
-	 */
+     */
     public IDoubleClickListener getDoubleClickListener() {
         return doubleClickListener;
     }

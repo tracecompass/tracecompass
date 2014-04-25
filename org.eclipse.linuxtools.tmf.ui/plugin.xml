@@ -44,7 +44,7 @@
             id="org.eclipse.linuxtools.tmf.ui.views.colors"
             name="%colors.view.name"
             restorable="true">
-      </view> 
+      </view>
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.tmf.ui.views.category"
@@ -126,7 +126,7 @@
             project="true">
          <description>
             %project.new.wizard.description
-            
+
          </description>
       </wizard>
       <wizard
@@ -1049,7 +1049,7 @@
       </command>
       <category
             description="%commands.uml2sd.category.name"
-            id="org.eclipse.linuxtools.tmf.ui.views.uml2sd.category"    
+            id="org.eclipse.linuxtools.tmf.ui.views.uml2sd.category"
             name="%commands.uml2sd.category.name">
       </category>
       <command
@@ -1069,7 +1069,7 @@
             description="%commands.uml2sd.showstart.description"
             id="org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.ShowNodeStart"
             name="%commands.uml2sd.showstart">
-      </command>      
+      </command>
       <command
             categoryId="org.eclipse.linuxtools.tmf.ui.views.uml2sd.category"
             description="%commands.uml2sd.scrollup.description"
@@ -1534,25 +1534,25 @@
             contextId="org.eclipse.linuxtools.tmf.ui.view.uml2sd.context"
             commandId="org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.GoToMessage"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
-      </key>   
+      </key>
       <key
             sequence="SHIFT+ALT+END"
             contextId="org.eclipse.linuxtools.tmf.ui.view.uml2sd.context"
             commandId="org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.ShowNodeEnd"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
-      </key>   
+      </key>
       <key
             sequence="SHIFT+ALT+HOME"
             contextId="org.eclipse.linuxtools.tmf.ui.view.uml2sd.context"
             commandId="org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.ShowNodeStart"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
-      </key>    
+      </key>
       <key
             sequence="SHIFT+ALT+ARROW_UP"
             contextId="org.eclipse.linuxtools.tmf.ui.view.uml2sd.context"
             commandId="org.eclipse.linuxtools.tmf.ui.views.uml2sd.handlers.MoveSDUp"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
-      </key>  
+      </key>
       <key
             sequence="SHIFT+ALT+ARROW_DOWN"
             contextId="org.eclipse.linuxtools.tmf.ui.view.uml2sd.context"

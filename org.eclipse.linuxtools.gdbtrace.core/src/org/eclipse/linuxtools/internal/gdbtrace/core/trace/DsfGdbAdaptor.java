@@ -221,7 +221,7 @@ public class DsfGdbAdaptor {
                                     final ICommandControlService commandControl = tracker.getService(ICommandControlService.class);
                                     if (traceControl != null && commandControl != null) {
                                         ITraceTargetDMContext traceContext = (ITraceTargetDMContext) commandControl.getContext();
-                                        traceControl.getCurrentTraceRecordContext(traceContext,	queryRm);
+                                        traceControl.getCurrentTraceRecordContext(traceContext,    queryRm);
                                     } else {
                                         queryRm.done();
                                     }

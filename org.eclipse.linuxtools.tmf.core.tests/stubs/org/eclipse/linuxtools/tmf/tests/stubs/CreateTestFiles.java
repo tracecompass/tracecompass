@@ -39,7 +39,7 @@ public class CreateTestFiles {
     // ========================================================================
 
     private static final String DIRECTORY = "testfiles";
-    //	private static final String FILE_NAMES[] = { "Test-10", "Test-1K", "Test-10K", "Test-100K" };
+    //    private static final String FILE_NAMES[] = { "Test-10", "Test-1K", "Test-10K", "Test-100K" };
     //    private static final int    FILE_SIZES[] = {       10 ,     1000 ,     10000 ,     100000  };
     private static final String FILE_NAMES[] = { "Test-10K" };
     private static final int    FILE_SIZES[] = {     10000  };

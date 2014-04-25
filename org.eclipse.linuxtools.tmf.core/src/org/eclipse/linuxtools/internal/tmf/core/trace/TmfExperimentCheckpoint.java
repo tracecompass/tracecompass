@@ -69,27 +69,27 @@ public class TmfExperimentCheckpoint implements Comparable<TmfExperimentCheckpoi
 
     @Override
     public int hashCode() {
-    	int result = 37;
-    	result = 17 * result + fTimestamp.hashCode();
-    	return result;
+        int result = 37;
+        result = 17 * result + fTimestamp.hashCode();
+        return result;
     }
 
     @Override
     public boolean equals(final Object other) {
-    	if (!(other instanceof TmfExperimentCheckpoint)) {
-    		return false;
-    	}
-    	final TmfExperimentCheckpoint o = (TmfExperimentCheckpoint) other;
-    	return fTimestamp.equals(o.fTimestamp);
+        if (!(other instanceof TmfExperimentCheckpoint)) {
+            return false;
+        }
+        final TmfExperimentCheckpoint o = (TmfExperimentCheckpoint) other;
+        return fTimestamp.equals(o.fTimestamp);
     }
 
     // ------------------------------------------------------------------------
     // Comparable
     // ------------------------------------------------------------------------
 
-	@Override
-	public int compareTo(final TmfExperimentCheckpoint other) {
-		return fTimestamp.compareTo(other.fTimestamp, false);
-	}
+    @Override
+    public int compareTo(final TmfExperimentCheckpoint other) {
+        return fTimestamp.compareTo(other.fTimestamp, false);
+    }
 
 }

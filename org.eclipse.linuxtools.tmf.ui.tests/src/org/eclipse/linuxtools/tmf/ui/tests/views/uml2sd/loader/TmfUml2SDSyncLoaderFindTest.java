@@ -160,7 +160,7 @@ public class TmfUml2SDSyncLoaderFindTest {
 
         fFacility.getLoader().find(criteria);
         // Wait for the selection to finish - needed due to new platform behavior in Juno
-	    fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
+        fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         assertTrue("find", fTmfComponent.isSignalReceived());
         assertFalse("find", fTmfComponent.isSignalError());
         assertFalse("find", fTmfComponent.isCurrentTimeError());
@@ -195,7 +195,7 @@ public class TmfUml2SDSyncLoaderFindTest {
 
         fFacility.getLoader().find(criteria);
         // Wait for the selection to finish - needed due to new platform behavior in Juno
-		fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
+        fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         assertTrue("find", fTmfComponent.isSignalReceived());
         assertFalse("find", fTmfComponent.isSignalError());
         assertFalse("find", fTmfComponent.isCurrentTimeError());

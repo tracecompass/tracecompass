@@ -19,12 +19,12 @@ import org.eclipse.swt.widgets.TableItem;
  */
 public interface IDoubleClickListener {
 
-	/**
-	 * Handle a double click event
-	 * @param table the table that was double clicked
-	 * @param item the item that was double clicked in the table
-	 * @param column the column that was double clicked in the item in the table.
-	 */
-	void handleDoubleClick(TmfVirtualTable table, TableItem item, int column);
+    /**
+     * Handle a double click event
+     * @param table the table that was double clicked
+     * @param item the item that was double clicked in the table
+     * @param column the column that was double clicked in the item in the table.
+     */
+    void handleDoubleClick(TmfVirtualTable table, TableItem item, int column);
 
 }

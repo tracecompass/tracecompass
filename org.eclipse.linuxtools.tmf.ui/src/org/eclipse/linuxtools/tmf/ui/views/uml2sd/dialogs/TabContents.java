@@ -234,8 +234,8 @@ public class TabContents extends Composite {
     }
 
     /**
-	 * Updates parent OK button based on input data.
-	 */
+     * Updates parent OK button based on input data.
+     */
     public void updateOkButton() {
         if (fParentOkButton == null) {
             return;

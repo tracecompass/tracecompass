@@ -18,12 +18,12 @@ package org.eclipse.linuxtools.tmf.ui.widgets.virtualtable;
  */
 public interface TooltipProvider {
 
-	/**
-	 * get a Tooltip for a given column in a table row. (a cell if you will)
-	 * @param column the column
-	 * @param data the object being selected. (quite often a "TableItem")
-	 * @return the string of text to display in the tooltip.
-	 */
-	String getTooltip(int column, Object data);
+    /**
+     * get a Tooltip for a given column in a table row. (a cell if you will)
+     * @param column the column
+     * @param data the object being selected. (quite often a "TableItem")
+     * @return the string of text to display in the tooltip.
+     */
+    String getTooltip(int column, Object data);
 
 }

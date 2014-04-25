@@ -8,7 +8,7 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
- *   Thomas Gatterweh	- Updated scaling / synchronization
+ *   Thomas Gatterweh    - Updated scaling / synchronization
  *   Francois Chouinard - Refactoring to align with TMF Event Model 1.0
  *   Francois Chouinard - Implement augmented interface
  *   Geneviève Bastien  - Added copy constructor with new value

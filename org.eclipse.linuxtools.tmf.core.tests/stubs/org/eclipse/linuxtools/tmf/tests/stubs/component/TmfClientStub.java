@@ -33,12 +33,12 @@ public class TmfClientStub extends TmfComponent {
 
     public void findProvider() {
         fProviders = TmfProviderManager.getProviders(TmfSyntheticEventStub.class, TmfSyntheticEventProviderStub.class);
-        //		TmfEventRequest<TmfEventStub> request;
+        //        TmfEventRequest<TmfEventStub> request;
         System.out.println(fProviders.length);
     }
 
     public void triggeRequest() {
-        //		TmfEventRequest<TmfEventStub> request;
+        //        TmfEventRequest<TmfEventStub> request;
     }
 
 }

@@ -67,10 +67,10 @@ public class SelectTracesHandler extends AbstractHandler {
         fExperiment = null;
         if (selection instanceof TreeSelection) {
             TreeSelection sel = (TreeSelection) selection;
-    		// There should be only one item selected as per the plugin.xml
+            // There should be only one item selected as per the plugin.xml
             Object element = sel.getFirstElement();
             if (element instanceof TmfExperimentElement) {
-            	fExperiment = (TmfExperimentElement) element;
+                fExperiment = (TmfExperimentElement) element;
             }
         }
 

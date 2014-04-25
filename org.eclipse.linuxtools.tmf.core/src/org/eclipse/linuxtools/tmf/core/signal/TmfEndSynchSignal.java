@@ -26,8 +26,8 @@ public class TmfEndSynchSignal extends TmfSignal {
      * @param synchId
      *            The ID assigned to this signal
      */
-	public TmfEndSynchSignal(int synchId) {
-		super(null, synchId);
-	}
+    public TmfEndSynchSignal(int synchId) {
+        super(null, synchId);
+    }
 
 }

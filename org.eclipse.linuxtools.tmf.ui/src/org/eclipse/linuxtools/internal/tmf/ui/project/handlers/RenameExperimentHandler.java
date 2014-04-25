@@ -32,9 +32,9 @@ import org.eclipse.ui.PlatformUI;
  */
 public class RenameExperimentHandler extends AbstractHandler {
 
-	private TmfExperimentElement fExperiment = null;
+    private TmfExperimentElement fExperiment = null;
 
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // isEnabled
     // ------------------------------------------------------------------------
 
@@ -65,7 +65,7 @@ public class RenameExperimentHandler extends AbstractHandler {
             TreeSelection sel = (TreeSelection) selection;
             Object element = sel.getFirstElement();
             if (element instanceof TmfExperimentElement) {
-            	fExperiment = (TmfExperimentElement) element;
+                fExperiment = (TmfExperimentElement) element;
             }
         }
 

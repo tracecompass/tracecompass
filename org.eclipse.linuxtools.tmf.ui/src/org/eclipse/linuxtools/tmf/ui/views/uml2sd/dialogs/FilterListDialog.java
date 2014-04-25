@@ -134,8 +134,8 @@ public class FilterListDialog extends Dialog {
     }
 
     /**
-	 * Handles table selection count.
-	 */
+     * Handles table selection count.
+     */
     protected void handleTableSelectionCount() {
         int count = fTable.getSelectionCount();
         fEdit.setEnabled(count == 1);

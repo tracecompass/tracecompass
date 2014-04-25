@@ -24,7 +24,7 @@
   <name>Linux Tools TMF (Tracing and Monitoring Framework) Feature</name>
 
   <groupId>org.eclipse.linuxtools.tmf</groupId>
-  
+
   <build>
     <plugins>
       <plugin>

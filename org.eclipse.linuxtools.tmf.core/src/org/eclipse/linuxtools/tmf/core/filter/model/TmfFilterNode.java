@@ -27,81 +27,81 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 public class TmfFilterNode extends TmfFilterTreeNode {
 
     public static final String NODE_NAME = "FILTER"; //$NON-NLS-1$
-	public static final String NAME_ATTR = "name"; //$NON-NLS-1$
+    public static final String NAME_ATTR = "name"; //$NON-NLS-1$
 
-	String fFilterName;
+    String fFilterName;
 
-	/**
-	 * @param filterName the filter name
-	 */
-	public TmfFilterNode(String filterName) {
-		super(null);
-		fFilterName = filterName;
-	}
-
-	/**
-	 * @param parent the parent node
+    /**
      * @param filterName the filter name
-	 */
-	public TmfFilterNode(ITmfFilterTreeNode parent, String filterName) {
-		super(parent);
-		fFilterName = filterName;
-	}
+     */
+    public TmfFilterNode(String filterName) {
+        super(null);
+        fFilterName = filterName;
+    }
 
-	/**
-	 * @return the filer name
-	 */
-	public String getFilterName() {
-		return fFilterName;
-	}
+    /**
+     * @param parent the parent node
+     * @param filterName the filter name
+     */
+    public TmfFilterNode(ITmfFilterTreeNode parent, String filterName) {
+        super(parent);
+        fFilterName = filterName;
+    }
 
-	/**
-	 * @param filterName the filer name
-	 */
-	public void setFilterName(String filterName) {
-		fFilterName = filterName;
-	}
+    /**
+     * @return the filer name
+     */
+    public String getFilterName() {
+        return fFilterName;
+    }
 
-	@Override
-	public String getNodeName() {
-		return NODE_NAME;
-	}
+    /**
+     * @param filterName the filer name
+     */
+    public void setFilterName(String filterName) {
+        fFilterName = filterName;
+    }
 
-	@Override
-	public boolean matches(ITmfEvent event) {
-		// There should be at most one child
-		for (ITmfFilterTreeNode node : getChildren()) {
-			if (node.matches(event)) {
-				return true;
-			}
-		}
-		return false;
-	}
+    @Override
+    public String getNodeName() {
+        return NODE_NAME;
+    }
 
-	@Override
-	public List<String> getValidChildren() {
-		if (getChildrenCount() == 0) {
-			return super.getValidChildren();
-		}
+    @Override
+    public boolean matches(ITmfEvent event) {
+        // There should be at most one child
+        for (ITmfFilterTreeNode node : getChildren()) {
+            if (node.matches(event)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public List<String> getValidChildren() {
+        if (getChildrenCount() == 0) {
+            return super.getValidChildren();
+        }
         return new ArrayList<>(0); // only one child allowed
-	}
+    }
 
-	@Override
-	public String toString() {
-		StringBuffer buf = new StringBuffer();
-		if (getChildrenCount() > 1) {
-			buf.append("( "); //$NON-NLS-1$
-		}
-		for (int i = 0; i < getChildrenCount(); i++) {
-			ITmfFilterTreeNode node = getChildren()[i];
-			buf.append(node.toString());
-			if (i < (getChildrenCount() - 1)) {
-				buf.append(" and "); //$NON-NLS-1$
-			}
-		}
-		if (getChildrenCount() > 1) {
-			buf.append(" )"); //$NON-NLS-1$
-		}
-		return buf.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();
+        if (getChildrenCount() > 1) {
+            buf.append("( "); //$NON-NLS-1$
+        }
+        for (int i = 0; i < getChildrenCount(); i++) {
+            ITmfFilterTreeNode node = getChildren()[i];
+            buf.append(node.toString());
+            if (i < (getChildrenCount() - 1)) {
+                buf.append(" and "); //$NON-NLS-1$
+            }
+        }
+        if (getChildrenCount() > 1) {
+            buf.append(" )"); //$NON-NLS-1$
+        }
+        return buf.toString();
+    }
 }

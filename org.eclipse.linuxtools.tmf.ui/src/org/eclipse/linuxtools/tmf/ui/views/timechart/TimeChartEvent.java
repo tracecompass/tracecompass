@@ -70,7 +70,7 @@ public class TimeChartEvent implements ITimeEvent {
         fIsSearchMatch = decorationProvider.isSearchMatch(event);
     }
 
-	@Override
+    @Override
     public ITimeGraphEntry getEntry() {
         return fParentEntry;
     }
@@ -119,7 +119,7 @@ public class TimeChartEvent implements ITimeEvent {
      *            The other event
      */
     public void merge(TimeChartEvent event) {
-    	mergeDecorations(event);
+        mergeDecorations(event);
         if (fTime == event.getTime() && fDuration == event.getDuration()) {
             return;
         }
@@ -131,7 +131,7 @@ public class TimeChartEvent implements ITimeEvent {
         fNbEvents += event.fNbEvents;
         fItemizedEntry = null;
         synchronized (fRankRangeList) {
-        	fRankRangeList.merge(event.getRankRangeList());
+            fRankRangeList.merge(event.getRankRangeList());
         }
     }
 
@@ -145,8 +145,8 @@ public class TimeChartEvent implements ITimeEvent {
     public void mergeDecorations(TimeChartEvent event) {
         fColorSettingPriority = Math.min(fColorSettingPriority, event.getColorSettingPriority());
         fIsBookmark |= event.fIsBookmark;
-    	fIsVisible |= event.fIsVisible;
-    	fIsSearchMatch |= event.fIsSearchMatch;
+        fIsVisible |= event.fIsVisible;
+        fIsSearchMatch |= event.fIsSearchMatch;
     }
 
     /**
@@ -165,7 +165,7 @@ public class TimeChartEvent implements ITimeEvent {
      * @return The priority
      */
     public int getColorSettingPriority() {
-    	return fColorSettingPriority;
+        return fColorSettingPriority;
     }
 
     /**
@@ -175,7 +175,7 @@ public class TimeChartEvent implements ITimeEvent {
      *            The priority to set
      */
     public void setColorSettingPriority(int priority) {
-    	fColorSettingPriority = priority;
+        fColorSettingPriority = priority;
     }
 
     /**
@@ -184,7 +184,7 @@ public class TimeChartEvent implements ITimeEvent {
      * @return Y/N
      */
     public boolean isBookmarked() {
-    	return fIsBookmark;
+        return fIsBookmark;
     }
 
     /**
@@ -194,7 +194,7 @@ public class TimeChartEvent implements ITimeEvent {
      *            Should time time event become a bookmark, or not
      */
     public void setIsBookmarked(boolean isBookmarked) {
-    	fIsBookmark = isBookmarked;
+        fIsBookmark = isBookmarked;
     }
 
     /**
@@ -203,7 +203,7 @@ public class TimeChartEvent implements ITimeEvent {
      * @return If the event is visible
      */
     public boolean isVisible() {
-    	return fIsVisible;
+        return fIsVisible;
     }
 
     /**
@@ -212,7 +212,7 @@ public class TimeChartEvent implements ITimeEvent {
      * @param isVisible The new status
      */
     public void setIsVisible(boolean isVisible) {
-    	fIsVisible = isVisible;
+        fIsVisible = isVisible;
     }
 
     /**
@@ -221,7 +221,7 @@ public class TimeChartEvent implements ITimeEvent {
      * @return If it matches, Y/N
      */
     public boolean isSearchMatch() {
-    	return fIsSearchMatch;
+        return fIsSearchMatch;
     }
 
     /**
@@ -231,7 +231,7 @@ public class TimeChartEvent implements ITimeEvent {
      *            The new matching status
      */
     public void setIsSearchMatch(boolean isSearchMatch) {
-    	fIsSearchMatch = isSearchMatch;
+        fIsSearchMatch = isSearchMatch;
     }
 
     /**

@@ -26,13 +26,13 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
  */
 public interface ITmfEventParser {
 
-	/**
-	 * Parses the trace event referenced by the context.
-	 * The context should *not* be altered.
-	 *
-	 * @param context the trace context
-	 * @return a parsed event (null if none)
-	 */
-	ITmfEvent parseEvent(ITmfContext context);
+    /**
+     * Parses the trace event referenced by the context.
+     * The context should *not* be altered.
+     *
+     * @param context the trace context
+     * @return a parsed event (null if none)
+     */
+    ITmfEvent parseEvent(ITmfContext context);
 
 }

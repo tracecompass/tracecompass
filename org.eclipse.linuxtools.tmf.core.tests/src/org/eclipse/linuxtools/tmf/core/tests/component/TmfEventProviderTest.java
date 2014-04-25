@@ -223,13 +223,13 @@ public class TmfEventProviderTest {
             request1.waitForStart();
             request2.waitForStart();
 
-//	        // Verify that the requests are running
-//	        assertTrue("isRunning", request1.isRunning());
-//	        assertTrue("isRunning", request2.isRunning());
+//            // Verify that the requests are running
+//            assertTrue("isRunning", request1.isRunning());
+//            assertTrue("isRunning", request2.isRunning());
 
             request1.waitForCompletion();
 
-//	        // Check if request2 is still running
+//            // Check if request2 is still running
 //            assertTrue("isRunning",  request2.isRunning());
 
             // Verify result (request1)

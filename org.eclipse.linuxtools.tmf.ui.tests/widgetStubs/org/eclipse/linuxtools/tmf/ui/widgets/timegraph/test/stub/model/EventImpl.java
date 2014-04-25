@@ -19,67 +19,67 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
  */
 @SuppressWarnings("javadoc")
 public class EventImpl implements ITimeEvent {
-	// ========================================================================
-	// Data
-	// ========================================================================
-	public static enum Type {ERROR, WARNING, TIMEADJUSTMENT, ALARM, EVENT, INFORMATION, UNKNOWN, INFO1, INFO2, INFO3, INFO4, INFO5, INFO6, INFO7, INFO8, INFO9}
+    // ========================================================================
+    // Data
+    // ========================================================================
+    public static enum Type {ERROR, WARNING, TIMEADJUSTMENT, ALARM, EVENT, INFORMATION, UNKNOWN, INFO1, INFO2, INFO3, INFO4, INFO5, INFO6, INFO7, INFO8, INFO9}
 
-	private long time = 0;
-	private ITimeGraphEntry trace = null;
-	private Type myType = Type.UNKNOWN;
-	private long duration;
+    private long time = 0;
+    private ITimeGraphEntry trace = null;
+    private Type myType = Type.UNKNOWN;
+    private long duration;
 
-	// ========================================================================
-	// Constructor
-	// ========================================================================
-	public EventImpl(long time, ITimeGraphEntry trace, Type type) {
-		this.time = time;
-		this.trace = trace;
-		this.myType = type;
-	}
+    // ========================================================================
+    // Constructor
+    // ========================================================================
+    public EventImpl(long time, ITimeGraphEntry trace, Type type) {
+        this.time = time;
+        this.trace = trace;
+        this.myType = type;
+    }
 
-	// ========================================================================
-	// Methods
-	// ========================================================================
-	public Type getType() {
-		return myType;
-	}
+    // ========================================================================
+    // Methods
+    // ========================================================================
+    public Type getType() {
+        return myType;
+    }
 
-	public void setType(Type myType) {
-		this.myType = myType;
-	}
+    public void setType(Type myType) {
+        this.myType = myType;
+    }
 
-	public void setTime(long time) {
-		this.time = time;
-	}
+    public void setTime(long time) {
+        this.time = time;
+    }
 
-	public void setTrace(ITimeGraphEntry trace) {
-		this.trace = trace;
-	}
+    public void setTrace(ITimeGraphEntry trace) {
+        this.trace = trace;
+    }
 
-	@Override
-	public long getTime() {
-		return time;
-	}
+    @Override
+    public long getTime() {
+        return time;
+    }
 
-	@Override
-	public ITimeGraphEntry getEntry() {
-		return trace;
-	}
+    @Override
+    public ITimeGraphEntry getEntry() {
+        return trace;
+    }
 
-	/**
-	 * @param duration the duration to set
-	 */
-	public void setDuration(long duration) {
-		this.duration = duration;
-	}
+    /**
+     * @param duration the duration to set
+     */
+    public void setDuration(long duration) {
+        this.duration = duration;
+    }
 
-	/**
-	 * @return the duration
-	 */
-	@Override
-	public long getDuration() {
-		return duration;
-	}
+    /**
+     * @return the duration
+     */
+    @Override
+    public long getDuration() {
+        return duration;
+    }
 
 }

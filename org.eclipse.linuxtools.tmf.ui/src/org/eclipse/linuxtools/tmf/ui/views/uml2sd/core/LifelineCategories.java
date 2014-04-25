@@ -31,51 +31,51 @@ public class LifelineCategories {
     // ------------------------------------------------------------------------
 
     /**
-	 * The category name
-	 */
-	private String fName = null;
-	/**
-	 * The category image
-	 */
-	private IImage fCategoryImage = null;
+     * The category name
+     */
+    private String fName = null;
+    /**
+     * The category image
+     */
+    private IImage fCategoryImage = null;
 
     // ------------------------------------------------------------------------
     // Methods
     // ------------------------------------------------------------------------
 
-	/**
-	 * Returns the category name.
-	 *
-	 * @return the category name
-	 */
-	public String getName() {
-		return fName;
-	}
+    /**
+     * Returns the category name.
+     *
+     * @return the category name
+     */
+    public String getName() {
+        return fName;
+    }
 
-	/**
-	 * Sets the category name.
-	 *
-	 * @param string the name
-	 */
-	public void setName(String string) {
-		fName = string;
-	}
+    /**
+     * Sets the category name.
+     *
+     * @param string the name
+     */
+    public void setName(String string) {
+        fName = string;
+    }
 
-	/**
-	 * Returns the category icon.
-	 *
-	 * @return the category icon
-	 */
-	public IImage getImage() {
-		return fCategoryImage;
-	}
+    /**
+     * Returns the category icon.
+     *
+     * @return the category icon
+     */
+    public IImage getImage() {
+        return fCategoryImage;
+    }
 
-	/**
-	 * Sets the category icon.
-	 *
-	 * @param image the icon
-	 */
-	public void setImage(IImage image) {
-		fCategoryImage = image;
-	}
+    /**
+     * Sets the category icon.
+     *
+     * @param image the icon
+     */
+    public void setImage(IImage image) {
+        fCategoryImage = image;
+    }
 }

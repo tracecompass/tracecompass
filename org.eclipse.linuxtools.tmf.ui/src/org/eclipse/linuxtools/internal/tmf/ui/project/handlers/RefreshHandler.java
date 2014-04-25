@@ -42,9 +42,9 @@ public class RefreshHandler extends AbstractHandler {
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
 
-    	// Check if we are closing down
-    	IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-    	if (window == null) {
+        // Check if we are closing down
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        if (window == null) {
             return null;
         }
 

@@ -32,14 +32,14 @@ import org.xml.sax.SAXException;
  */
 public class FilterManager {
 
-	private static final String SAVED_FILTERS_FILE_NAME = "saved_filters.xml"; //$NON-NLS-1$
-	private static final String SAVED_FILTERS_PATH_NAME =
+    private static final String SAVED_FILTERS_FILE_NAME = "saved_filters.xml"; //$NON-NLS-1$
+    private static final String SAVED_FILTERS_PATH_NAME =
         Activator.getDefault().getStateLocation().addTrailingSeparator().append(SAVED_FILTERS_FILE_NAME).toString();
 
     private static ITmfFilterTreeNode fRoot = new TmfFilterRootNode();
     static {
-    	try {
-	        fRoot = new TmfFilterXMLParser(SAVED_FILTERS_PATH_NAME).getTree();
+        try {
+            fRoot = new TmfFilterXMLParser(SAVED_FILTERS_PATH_NAME).getTree();
         } catch (FileNotFoundException e) {
         } catch (SAXException e) {
             Activator.getDefault().logError("Error parsing saved filter xml file: " + SAVED_FILTERS_PATH_NAME, e); //$NON-NLS-1$
@@ -54,7 +54,7 @@ public class FilterManager {
      * @return The array of filters
      */
     public static ITmfFilterTreeNode[] getSavedFilters() {
-    	return fRoot.clone().getChildren();
+        return fRoot.clone().getChildren();
     }
 
     /**
@@ -64,13 +64,13 @@ public class FilterManager {
      *            The filters to save
      */
     public static void setSavedFilters(ITmfFilterTreeNode[] filters) {
-    	fRoot = new TmfFilterRootNode();
-    	for (ITmfFilterTreeNode filter : filters) {
-    		fRoot.addChild(filter.clone());
-    	}
-		try {
-	        TmfFilterXMLWriter writerXML = new TmfFilterXMLWriter(fRoot);
-	        writerXML.saveTree(SAVED_FILTERS_PATH_NAME);
+        fRoot = new TmfFilterRootNode();
+        for (ITmfFilterTreeNode filter : filters) {
+            fRoot.addChild(filter.clone());
+        }
+        try {
+            TmfFilterXMLWriter writerXML = new TmfFilterXMLWriter(fRoot);
+            writerXML.saveTree(SAVED_FILTERS_PATH_NAME);
         } catch (ParserConfigurationException e) {
             Activator.getDefault().logError("Error saving filter xml file: " + SAVED_FILTERS_PATH_NAME, e); //$NON-NLS-1$
         }

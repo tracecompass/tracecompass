@@ -25,38 +25,38 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
  */
 public class TmfFilterRootNode extends TmfFilterTreeNode {
 
-	@SuppressWarnings("javadoc")
+    @SuppressWarnings("javadoc")
     public static final String NODE_NAME = "ROOT"; //$NON-NLS-1$
 
-	private static final String[] VALID_CHILDREN = {
-		TmfFilterNode.NODE_NAME
-	};
+    private static final String[] VALID_CHILDREN = {
+        TmfFilterNode.NODE_NAME
+    };
 
-	/**
-	 * Default constructor
-	 */
-	public TmfFilterRootNode() {
-		super(null);
-	}
+    /**
+     * Default constructor
+     */
+    public TmfFilterRootNode() {
+        super(null);
+    }
 
-	@Override
-	public String getNodeName() {
-		return NODE_NAME;
-	}
+    @Override
+    public String getNodeName() {
+        return NODE_NAME;
+    }
 
-	@Override
-	public boolean matches(ITmfEvent event) {
-		for (ITmfFilterTreeNode node : getChildren()) {
-			if (! node.matches(event)) {
-				return false;
-			}
-		}
-		return true;
-	}
+    @Override
+    public boolean matches(ITmfEvent event) {
+        for (ITmfFilterTreeNode node : getChildren()) {
+            if (! node.matches(event)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-	@Override
-	public List<String> getValidChildren() {
-		return Arrays.asList(VALID_CHILDREN);
-	}
+    @Override
+    public List<String> getValidChildren() {
+        return Arrays.asList(VALID_CHILDREN);
+    }
 
 }

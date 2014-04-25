@@ -26,8 +26,8 @@ public class CustomXmlEventType extends CustomEventType {
      * @param definition
      *            Trace definition
      */
-	public CustomXmlEventType(CustomXmlTraceDefinition definition) {
-		super(definition);
-	}
+    public CustomXmlEventType(CustomXmlTraceDefinition definition) {
+        super(definition);
+    }
 
 }

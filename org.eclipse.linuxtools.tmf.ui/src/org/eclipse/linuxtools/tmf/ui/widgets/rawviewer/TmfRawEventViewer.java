@@ -78,97 +78,97 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     private Composite fTextArea;
     private StyledText fStyledText;
     private Font fFixedFont;
-	private Slider fSlider;
+    private Slider fSlider;
 
-	private final List<LineData> fLines = new ArrayList<>();
-	private boolean fActualRanks = false;
-	private int fTopLineIndex;
-	private int fLastTopLineIndex;
-	private final CaretPosition[] fStoredCaretPosition = new CaretPosition[]
-	            { new CaretPosition(0, 0), new CaretPosition(0,0)};
-	private int fNumVisibleLines;
+    private final List<LineData> fLines = new ArrayList<>();
+    private boolean fActualRanks = false;
+    private int fTopLineIndex;
+    private int fLastTopLineIndex;
+    private final CaretPosition[] fStoredCaretPosition = new CaretPosition[]
+                { new CaretPosition(0, 0), new CaretPosition(0,0)};
+    private int fNumVisibleLines;
     private ITmfLocation fSelectedLocation = null;
     private long fHighlightedRank = Long.MIN_VALUE;
     private int fCursorYCoordinate = -1;
     private int fHoldSelection = 0;
 
-	private static class LineData {
-	    long rank;
-	    ITmfLocation location;
-	    String string;
-	    public LineData(long rank, ITmfLocation location, String string) {
-	        this.rank = rank;
-	        this.location = location;
+    private static class LineData {
+        long rank;
+        ITmfLocation location;
+        String string;
+        public LineData(long rank, ITmfLocation location, String string) {
+            this.rank = rank;
+            this.location = location;
             if (string.length() == 0) {
                 this.string = " "; // workaround for setLineBackground has no effect on empty line //$NON-NLS-1$
             } else {
                 this.string = string;
             }
-	    }
+        }
         @Override
         public String toString() {
             return rank + " [" + location + "]: " + string; //$NON-NLS-1$ //$NON-NLS-2$
         }
-	}
+    }
 
-	private static class CaretPosition {
-	    int time;
-	    int caretOffset;
-	    public CaretPosition(int time, int caretOffset) {
-	        this.time = time;
-	        this.caretOffset = caretOffset;
-	    }
-	}
+    private static class CaretPosition {
+        int time;
+        int caretOffset;
+        public CaretPosition(int time, int caretOffset) {
+            this.time = time;
+            this.caretOffset = caretOffset;
+        }
+    }
 
-	// ------------------------------------------------------------------------
-	// Constructor
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // Constructor
+    // ------------------------------------------------------------------------
 
-	/**
-	 * Constructor
-	 * @param parent The parent composite
-	 * @param style The style bits
-	 */
-	public TmfRawEventViewer(Composite parent, int style) {
-		super(parent, style & (~SWT.H_SCROLL) & (~SWT.V_SCROLL));
+    /**
+     * Constructor
+     * @param parent The parent composite
+     * @param style The style bits
+     */
+    public TmfRawEventViewer(Composite parent, int style) {
+        super(parent, style & (~SWT.H_SCROLL) & (~SWT.V_SCROLL));
 
-		// Set the layout
-		GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = 2;
-		gridLayout.horizontalSpacing = 0;
-		gridLayout.verticalSpacing = 0;
+        // Set the layout
+        GridLayout gridLayout = new GridLayout();
+        gridLayout.numColumns = 2;
+        gridLayout.horizontalSpacing = 0;
+        gridLayout.verticalSpacing = 0;
         gridLayout.marginWidth = 0;
         gridLayout.marginHeight = 0;
-		setLayout(gridLayout);
+        setLayout(gridLayout);
 
-		// Create the controls
-		createTextArea(style & SWT.H_SCROLL);
-		createSlider(style & SWT.V_SCROLL);
+        // Create the controls
+        createTextArea(style & SWT.H_SCROLL);
+        createSlider(style & SWT.V_SCROLL);
 
-		// Prevent the slider from being traversed
-		setTabList(new Control[] { fScrolledComposite });
-	}
+        // Prevent the slider from being traversed
+        setTabList(new Control[] { fScrolledComposite });
+    }
 
     @Override
-	public void dispose() {
+    public void dispose() {
         if (fFixedFont != null) {
             fFixedFont.dispose();
             fFixedFont = null;
         }
-	    super.dispose();
-	}
+        super.dispose();
+    }
 
-	// ------------------------------------------------------------------------
-	// Text area handling
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // Text area handling
+    // ------------------------------------------------------------------------
 
     /**
-	 * Create the text area and add listeners
-	 */
-	private void createTextArea(int style) {
-	    fScrolledComposite = new ScrolledComposite(this, style);
-	    fScrolledComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-	    fTextArea = new Composite(fScrolledComposite, SWT.NONE);
+     * Create the text area and add listeners
+     */
+    private void createTextArea(int style) {
+        fScrolledComposite = new ScrolledComposite(this, style);
+        fScrolledComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        fTextArea = new Composite(fScrolledComposite, SWT.NONE);
         fTextArea.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         fScrolledComposite.setContent(fTextArea);
         fScrolledComposite.setExpandHorizontal(true);
@@ -205,38 +205,38 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 
         fTextArea.setBackground(fStyledText.getBackground());
         fTextArea.addMouseListener(new MouseAdapter() {
-			@Override
+            @Override
             public void mouseDown(MouseEvent e) {
-				fTextArea.setFocus();
+                fTextArea.setFocus();
             }});
-	}
+    }
 
-	// ------------------------------------------------------------------------
-	// Slider handling
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // Slider handling
+    // ------------------------------------------------------------------------
 
-	private void createSlider(int style) {
-		fSlider = new Slider(this, SWT.VERTICAL);
+    private void createSlider(int style) {
+        fSlider = new Slider(this, SWT.VERTICAL);
         fSlider.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
         fSlider.setValues(0, 0, SLIDER_MAX, SLIDER_MAX, 1, 1);
-		fSlider.addSelectionListener(this);
+        fSlider.addSelectionListener(this);
         if ((style & SWT.V_SCROLL) == 0) {
             fSlider.setVisible(false);
         }
-	}
+    }
 
-	// ------------------------------------------------------------------------
-	// Controls interactions
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // Controls interactions
+    // ------------------------------------------------------------------------
 
-	@Override
-	public boolean setFocus() {
-		boolean isVisible = isVisible();
-		if (isVisible) {
-			fTextArea.setFocus();
-		}
-		return isVisible;
-	}
+    @Override
+    public boolean setFocus() {
+        boolean isVisible = isVisible();
+        if (isVisible) {
+            fTextArea.setFocus();
+        }
+        return isVisible;
+    }
 
     @Override
     public void setMenu(Menu menu) {
@@ -248,48 +248,48 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
      * @param trace The trace to set
      */
     public void setTrace(ITmfTrace trace) {
-	    fTrace = trace;
-	    fTopLineIndex = 0;
-	    fLines.clear();
-	    refreshEventCount();
-	}
+        fTrace = trace;
+        fTopLineIndex = 0;
+        fLines.clear();
+        refreshEventCount();
+    }
 
     /**
      * Refreshes the event count, updates the slider thumb and loads display
      */
-	public void refreshEventCount() {
-		if (fTrace != null) {
-			if (fTrace.getNbEvents() > 0) {
-				fSlider.setThumb((int) Math.max(SLIDER_MAX / fTrace.getNbEvents(), 1));
-			} else {
-				fSlider.setThumb(SLIDER_MAX);
-			}
+    public void refreshEventCount() {
+        if (fTrace != null) {
+            if (fTrace.getNbEvents() > 0) {
+                fSlider.setThumb((int) Math.max(SLIDER_MAX / fTrace.getNbEvents(), 1));
+            } else {
+                fSlider.setThumb(SLIDER_MAX);
+            }
 
-			if (!isVisible()) {
+            if (!isVisible()) {
                 return;
             }
 
-			if (fLines.size() == 0) {
-		        setTopRank(0);
-		    } else if (fLines.size() < fNumVisibleLines) {
-		        fBottomContext = null;
-		        loadLineData();
-		        fillTextArea();
-	            //fSlider.setSelection((int) (SLIDER_MAX * ((double) fLines.get(fTopLineIndex).rank / fTrace.getNbEvents())));
-	            fSlider.setSelection((int) (SLIDER_MAX * fTrace.getLocationRatio(fLines.get(fTopLineIndex).location)));
-		    }
+            if (fLines.size() == 0) {
+                setTopRank(0);
+            } else if (fLines.size() < fNumVisibleLines) {
+                fBottomContext = null;
+                loadLineData();
+                fillTextArea();
+                //fSlider.setSelection((int) (SLIDER_MAX * ((double) fLines.get(fTopLineIndex).rank / fTrace.getNbEvents())));
+                fSlider.setSelection((int) (SLIDER_MAX * fTrace.getLocationRatio(fLines.get(fTopLineIndex).location)));
+            }
         } else {
             fBottomContext = null;
             fillTextArea();
             fSlider.setThumb(SLIDER_MAX);
             fSlider.setSelection(0);
-		}
-	}
+        }
+    }
 
-	/**
-	 * Selects the event of given rank and makes it visible.
-	 * @param rank The rank of event
-	 */
+    /**
+     * Selects the event of given rank and makes it visible.
+     * @param rank The rank of event
+     */
     public void selectAndReveal(long rank) {
         if (fTrace == null || !isVisible()) {
             return;
@@ -379,7 +379,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         refreshTextArea();
     }
 
-	private void loadLineData() {
+    private void loadLineData() {
         if (fTopLineIndex < 0) {
             //if (fLines.size() > 0 && fLines.get(0).rank > 0) {
                 //long endRank = fLines.get(0).rank;
@@ -401,7 +401,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 //}
             //}
             if (fLines.size() > 0 && fTrace.getLocationRatio(fLines.get(0).location) > 0) {
-            	double lastRatio = fTrace.getLocationRatio(fLines.get(fLines.size() - 1).location);
+                double lastRatio = fTrace.getLocationRatio(fLines.get(fLines.size() - 1).location);
                 double firstRatio = fTrace.getLocationRatio(fLines.get(0).location);
                 double delta;
                 boolean singleEvent = false;
@@ -423,7 +423,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                         location = context.getLocation();
                         ITmfEvent event = fTrace.getNext(context);
                         if (event == null) {
-                        	break;
+                            break;
                         }
                         if (event.getContent() != null && event.getContent().getValue() != null) {
                             String[] lines = event.getContent().getValue().toString().split("\r?\n"); //$NON-NLS-1$
@@ -450,7 +450,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                         break;
                     }
                     if (singleEvent) {
-                    	delta = Math.min(delta * 10, 0.1);
+                        delta = Math.min(delta * 10, 0.1);
                     }
                 }
             }
@@ -459,19 +459,19 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
             }
         }
 
-	    while (fLines.size() - fTopLineIndex < fNumVisibleLines) {
-	        if (fBottomContext == null) {
-	            if (fLines.size() == 0) {
-	                fBottomContext = fTrace.seekEvent(0);
-	            } else {
+        while (fLines.size() - fTopLineIndex < fNumVisibleLines) {
+            if (fBottomContext == null) {
+                if (fLines.size() == 0) {
+                    fBottomContext = fTrace.seekEvent(0);
+                } else {
                     //fBottomContext = fTrace.seekEvent(fLines.get(fLines.size() - 1).rank + 1);
-	                fBottomContext = fTrace.seekEvent(fLines.get(fLines.size() - 1).location);
-	                fTrace.getNext(fBottomContext);
-	            }
-	            if (fBottomContext == null) {
-	                break;
-	            }
-	        }
+                    fBottomContext = fTrace.seekEvent(fLines.get(fLines.size() - 1).location);
+                    fTrace.getNext(fBottomContext);
+                }
+                if (fBottomContext == null) {
+                    break;
+                }
+            }
             long rank = fBottomContext.getRank();
             ITmfLocation location = fBottomContext.getLocation() != null ? fBottomContext.getLocation() : null;
             ITmfEvent event = fTrace.getNext(fBottomContext);
@@ -482,7 +482,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 for (String line : event.getContent().getValue().toString().split("\r?\n")) { //$NON-NLS-1$
                     int crPos;
                     if ((crPos = line.indexOf('\r')) != -1) {
-                    	line = line.substring(0, crPos);
+                        line = line.substring(0, crPos);
                     }
                     LineData lineData = new LineData(rank, location, line);
                     fLines.add(lineData);
@@ -491,32 +491,32 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 LineData lineData = new LineData(rank, location, ""); //$NON-NLS-1$
                 fLines.add(lineData);
             }
-	    }
-	    fTopLineIndex = Math.max(0, Math.min(fTopLineIndex, fLines.size() - 1));
+        }
+        fTopLineIndex = Math.max(0, Math.min(fTopLineIndex, fLines.size() - 1));
 
-	    if (fLines.size() > MAX_LINE_DATA_SIZE) {
-	        if (fTopLineIndex < MAX_LINE_DATA_SIZE / 2) {
-	            long rank = fLines.get(MAX_LINE_DATA_SIZE - 1).rank;
-	            for (int i = MAX_LINE_DATA_SIZE; i < fLines.size(); i++) {
-	                if (fLines.get(i).rank > rank) {
-	                    fLines.subList(i, fLines.size()).clear();
-	                    fBottomContext = null;
-	                    break;
-	                }
-	            }
-	        } else {
-	            long rank = fLines.get(fLines.size() - MAX_LINE_DATA_SIZE).rank;
-	            for (int i = fLines.size() - MAX_LINE_DATA_SIZE - 1; i >= 0; i--) {
+        if (fLines.size() > MAX_LINE_DATA_SIZE) {
+            if (fTopLineIndex < MAX_LINE_DATA_SIZE / 2) {
+                long rank = fLines.get(MAX_LINE_DATA_SIZE - 1).rank;
+                for (int i = MAX_LINE_DATA_SIZE; i < fLines.size(); i++) {
+                    if (fLines.get(i).rank > rank) {
+                        fLines.subList(i, fLines.size()).clear();
+                        fBottomContext = null;
+                        break;
+                    }
+                }
+            } else {
+                long rank = fLines.get(fLines.size() - MAX_LINE_DATA_SIZE).rank;
+                for (int i = fLines.size() - MAX_LINE_DATA_SIZE - 1; i >= 0; i--) {
                     if (fLines.get(i).rank < rank) {
                         fLines.subList(0, i + 1).clear();
                         fTopLineIndex -= (i + 1);
                         fLastTopLineIndex -= (i + 1);
                         break;
                     }
-	            }
-	        }
-	    }
-	}
+                }
+            }
+        }
+    }
 
     private void refreshTextArea() {
         fStyledText.setText(""); //$NON-NLS-1$
@@ -547,60 +547,60 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         }
         int endLine = Math.min(fNumVisibleLines, fLines.size());
         if (endLine < fStyledText.getLineCount()) {
-    	    int endOffset = fStyledText.getOffsetAtLine(endLine) - 1;
-    	    if (endOffset > fStyledText.getCharCount()) {
+            int endOffset = fStyledText.getOffsetAtLine(endLine) - 1;
+            if (endOffset > fStyledText.getCharCount()) {
                 fHoldSelection++;
-    	        fStyledText.replaceTextRange(endOffset, fStyledText.getCharCount() - endOffset, ""); //$NON-NLS-1$
+                fStyledText.replaceTextRange(endOffset, fStyledText.getCharCount() - endOffset, ""); //$NON-NLS-1$
                 fHoldSelection--;
-    	    }
+            }
         }
         fTextArea.layout();
         fScrolledComposite.setMinSize(fTextArea.computeSize(SWT.DEFAULT, SWT.DEFAULT));
     }
 
-	private void updateTextArea() {
-	    if (fTopLineIndex < fLastTopLineIndex) {
-	        StringBuffer insertedText = new StringBuffer();
-	        for (int i = fTopLineIndex; i < fLastTopLineIndex; i++) {
-	            insertedText.append(fLines.get(i).string + "\n"); //$NON-NLS-1$
-	        }
-	        fStyledText.replaceTextRange(0, 0, insertedText.toString());
+    private void updateTextArea() {
+        if (fTopLineIndex < fLastTopLineIndex) {
+            StringBuffer insertedText = new StringBuffer();
+            for (int i = fTopLineIndex; i < fLastTopLineIndex; i++) {
+                insertedText.append(fLines.get(i).string + "\n"); //$NON-NLS-1$
+            }
+            fStyledText.replaceTextRange(0, 0, insertedText.toString());
             for (int i = 0; i < fLastTopLineIndex - fTopLineIndex; i++) {
                 LineData lineData = fLines.get(fTopLineIndex + i);
                 setLineBackground(i, lineData);
             }
-	        fLastTopLineIndex = fTopLineIndex;
-	    } else if (fTopLineIndex > fLastTopLineIndex) {
-	        int length = 0;
-	        for (int i = 0; i < fTopLineIndex - fLastTopLineIndex && i < fNumVisibleLines; i++) {
-	            length += fLines.get(i + fLastTopLineIndex).string.length();
-	            if (i < fStyledText.getLineCount()) {
+            fLastTopLineIndex = fTopLineIndex;
+        } else if (fTopLineIndex > fLastTopLineIndex) {
+            int length = 0;
+            for (int i = 0; i < fTopLineIndex - fLastTopLineIndex && i < fNumVisibleLines; i++) {
+                length += fLines.get(i + fLastTopLineIndex).string.length();
+                if (i < fStyledText.getLineCount()) {
                     length += 1;
                 }
-	        }
-	        fStyledText.replaceTextRange(0, length, ""); //$NON-NLS-1$
+            }
+            fStyledText.replaceTextRange(0, length, ""); //$NON-NLS-1$
             fLastTopLineIndex = fTopLineIndex;
             fillTextArea();
-	    }
+        }
         int endLine = Math.min(fNumVisibleLines, fLines.size());
         if (endLine < fStyledText.getLineCount()) {
-    	    int endOffset = fStyledText.getOffsetAtLine(endLine) - 1;
-    	    if (endOffset > fStyledText.getCharCount()) {
-    	        fStyledText.replaceTextRange(endOffset, fStyledText.getCharCount() - endOffset, ""); //$NON-NLS-1$
-    	    }
+            int endOffset = fStyledText.getOffsetAtLine(endLine) - 1;
+            if (endOffset > fStyledText.getCharCount()) {
+                fStyledText.replaceTextRange(endOffset, fStyledText.getCharCount() - endOffset, ""); //$NON-NLS-1$
+            }
         }
-	    fTextArea.layout();
-	    fScrolledComposite.setMinSize(fTextArea.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-	}
+        fTextArea.layout();
+        fScrolledComposite.setMinSize(fTextArea.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+    }
 
-	private void refreshLineBackgrounds() {
+    private void refreshLineBackgrounds() {
         for (int i = 0; (i < fStyledText.getLineCount()) && (i < fNumVisibleLines) && (i < fLines.size() - fTopLineIndex); i++) {
             LineData lineData = fLines.get(fTopLineIndex + i);
             setLineBackground(i, lineData);
         }
-	}
+    }
 
-	private void setLineBackground(int index, LineData lineData) {
+    private void setLineBackground(int index, LineData lineData) {
         if (lineData.location.equals(fSelectedLocation)) {
             fStyledText.setLineBackground(index, 1, COLOR_BACKGROUND_SELECTED);
         } else if (lineData.rank == fHighlightedRank) {
@@ -610,25 +610,25 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         } else {
             fStyledText.setLineBackground(index, 1, COLOR_BACKGROUND_ODD);
         }
-	}
+    }
 
-	private void storeCaretPosition(int time, int caretOffset) {
-	    if (fStoredCaretPosition[0].time == time) {
-	        fStoredCaretPosition[0].caretOffset = caretOffset;
-	    } else {
-	        fStoredCaretPosition[1] = fStoredCaretPosition[0];
-	        fStoredCaretPosition[0] = new CaretPosition(time, caretOffset);
-	    }
-	}
+    private void storeCaretPosition(int time, int caretOffset) {
+        if (fStoredCaretPosition[0].time == time) {
+            fStoredCaretPosition[0].caretOffset = caretOffset;
+        } else {
+            fStoredCaretPosition[1] = fStoredCaretPosition[0];
+            fStoredCaretPosition[0] = new CaretPosition(time, caretOffset);
+        }
+    }
 
-	private int getPreviousCaretOffset(int time) {
-	    if (fStoredCaretPosition[0].time == time) {
-	        return fStoredCaretPosition[1].caretOffset;
-	    }
+    private int getPreviousCaretOffset(int time) {
+        if (fStoredCaretPosition[0].time == time) {
+            return fStoredCaretPosition[1].caretOffset;
+        }
         return fStoredCaretPosition[0].caretOffset;
-	}
+    }
 
-	private void updateHighlightedRank() {
+    private void updateHighlightedRank() {
         if (fCursorYCoordinate < 0 || fCursorYCoordinate > fStyledText.getSize().y) {
             if (fHighlightedRank != Long.MIN_VALUE) {
                 fHighlightedRank = Long.MIN_VALUE;
@@ -650,7 +650,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 refreshLineBackgrounds();
             }
         }
-	}
+    }
 
     // ------------------------------------------------------------------------
     // ControlListener (ScrolledComposite)
@@ -681,7 +681,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 
     @Override
     public void widgetSelected(SelectionEvent e) {
-    	fTextArea.setFocus();
+        fTextArea.setFocus();
         if (fLines.size() == 0) {
             return;
         }
@@ -693,11 +693,11 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
             case SWT.NONE: {
                 //long rank = (long) (fTrace.getNbEvents() * ((double) fSlider.getSelection() / SLIDER_MAX));
                 //setTopRank(rank);
-            	if (fSlider.getSelection() == 0 || fSlider.getThumb() == SLIDER_MAX) {
+                if (fSlider.getSelection() == 0 || fSlider.getThumb() == SLIDER_MAX) {
                     fLines.clear();
                     setTopPosition(0.0);
                     break;
-            	}
+                }
                 double ratio = (double) fSlider.getSelection() / (SLIDER_MAX - fSlider.getThumb());
                 double delta = Math.pow(10, -15);
                 fLines.clear();

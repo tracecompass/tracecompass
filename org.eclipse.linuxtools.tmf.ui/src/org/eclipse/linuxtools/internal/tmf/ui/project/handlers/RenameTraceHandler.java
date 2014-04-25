@@ -53,9 +53,9 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
  */
 public class RenameTraceHandler extends AbstractHandler {
 
-	private TmfTraceElement fTrace = null;
+    private TmfTraceElement fTrace = null;
 
-	// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // isEnabled
     // ------------------------------------------------------------------------
 
@@ -84,10 +84,10 @@ public class RenameTraceHandler extends AbstractHandler {
         fTrace = null;
         if (selection instanceof TreeSelection) {
             TreeSelection sel = (TreeSelection) selection;
-    		// There should be only one item selected as per the plugin.xml
+            // There should be only one item selected as per the plugin.xml
             Object element = sel.getFirstElement();
             if (element instanceof TmfTraceElement) {
-            	fTrace = (TmfTraceElement) element;
+                fTrace = (TmfTraceElement) element;
             }
         }
 
