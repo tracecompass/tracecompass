@@ -14,61 +14,117 @@
 	attributeFormDefault="unqualified" elementFormDefault="qualified">
 
 	<xs:complexType name="timeGraphView">
+		<xs:annotation>
+			<xs:documentation>Declares a data-driven time graph view, which defines how the view will display the results of an analysis. For now, only state system analysis are supported by this view.</xs:documentation></xs:annotation>
 		<xs:sequence>
-			<xs:element maxOccurs="1" minOccurs="0" name="head" type="headOutput" />
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="definedValue" type="definedValue" />
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="entry" type="viewEntry" />
+			<xs:element maxOccurs="1" minOccurs="0" name="head" type="headOutput" >
+				<xs:annotation>
+					<xs:documentation>Provider meta-information on this view, like labels and analysis it applies to.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="definedValue" type="definedValue" >
+				<xs:annotation>
+					<xs:documentation>Define a mapping between a human-readable text and the value used in the analysis. The "definedValue"'s optional "color" attribute is the color with which this value will be displayed.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="entry" type="viewEntry" >
+				<xs:annotation>
+					<xs:documentation>Define how to determine the entries (lines) to show on the time graph view. An entry may have children entry elements defined as children, where children are sub-elements of this one (for example, child attributes in the state system). A parent/child relationship may be defined for entries of the same level. See the viewEntry element documentation for more details.</xs:documentation></xs:annotation></xs:element>
 		</xs:sequence>
-		<xs:attribute name="id" type="xs:string" use="required" />
+		<xs:attribute name="id" type="xs:string" use="required" >
+			<xs:annotation>
+				<xs:documentation>The unique identifier of this view element. It will be used by the framework to identify this view.</xs:documentation></xs:annotation></xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="headOutput">
+		<xs:annotation>
+			<xs:documentation>Declares the meta-information that can be defined for an XML time graph view.</xs:documentation></xs:annotation>
 		<xs:sequence>
 			<xs:element maxOccurs="unbounded" minOccurs="0" name="analysis">
+				<xs:annotation>
+					<xs:documentation>Indicate that the view applies to the analysis identified with the given ID. To have a view apply to an XML-defined state system analysis, you'd use the state provider ID in the "stateProvider" element.</xs:documentation></xs:annotation>
 				<xs:complexType>
-					<xs:attribute name="id" type="xs:string" use="required" />
-					<xs:attribute name="ssid" type="xs:string" use="optional" />
+					<xs:attribute name="id" type="xs:string" use="required" >
+						<xs:annotation>
+							<xs:documentation>The ID of the analysis this view applies to.</xs:documentation></xs:annotation></xs:attribute>
+					<xs:attribute name="ssid" type="xs:string" use="optional" >
+						<xs:annotation>
+							<xs:documentation>The ID of the state system this view applies to. The attribute is used only if the analysis contains more than one state system.</xs:documentation></xs:annotation></xs:attribute>
 				</xs:complexType>
 			</xs:element>
 			<xs:element maxOccurs="1" minOccurs="0" name="label">
+				<xs:annotation>
+					<xs:documentation>Add a label to the time graph view. If provided, this text will be displayed to the user to identify this view, otherwise, the view's ID will be used.</xs:documentation></xs:annotation>
 				<xs:complexType>
-					<xs:attribute name="value" use="required" />
+					<xs:attribute name="value" use="required" >
+						<xs:annotation>
+							<xs:documentation>The text used as a name for this time graph view.</xs:documentation></xs:annotation></xs:attribute>
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
 
 	<xs:complexType name="viewEntry">
+		<xs:annotation>
+			<xs:documentation>Define a path to entries in the view. If this element is at the top level, the base path to reach the entry is the root of the state system. Otherwise, it will use the parent element's corresponding attribute as the base. Each view entry element corresponds to a time graph view entry that will actually be displayed.</xs:documentation></xs:annotation>
 		<xs:sequence>
-			<xs:element maxOccurs="1" minOccurs="0" name="display" type="viewStateAttribute" />
-			<xs:element maxOccurs="1" minOccurs="0" name="id" type="viewStateAttribute" />
-			<xs:element maxOccurs="1" minOccurs="0" name="parent" type="viewStateAttribute" />
-			<xs:element maxOccurs="1" minOccurs="0" name="name" type="viewStateAttribute" />
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="entry" type="viewEntry" />
+			<xs:element maxOccurs="1" minOccurs="0" name="display" type="viewStateAttribute" >
+				<xs:annotation>
+					<xs:documentation>Indicate the attribute whose value will be displayed in the time graph (the value that changes over time). If this element is not specified, no entry will be created for this element, and all other elements will be ignored.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" name="id" type="viewStateAttribute" >
+				<xs:annotation>
+					<xs:documentation>Specify which attribute to use as ID for this entry. This ID will be used in the ID column in the view, and will also be used to build the tree if a parent element is specified. If this element is not present, the display attribute's name will be used as ID.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" name="parent" type="viewStateAttribute" >
+				<xs:annotation>
+					<xs:documentation>Specify how to find the parent's ID of this entry. By default, the parent/child hierarchy is the same as defined in the timeGraphView element of the XML file. This element will add to this default parent/child relationship so that elements at the same XML-defined level can still have a relationship.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" name="name" type="viewStateAttribute" >
+				<xs:annotation>
+					<xs:documentation>Specify how to find the name of this entry. Typically, the name will be human-readable. If not specified, the display attribute's name will be used as the name.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="entry" type="viewEntry" >
+				<xs:annotation>
+					<xs:documentation>Define child entries for this entry. Child entries will be shown as children of this entry (with or without additional parent/child relationship defined through the viewEntry element's "parent" element).</xs:documentation></xs:annotation></xs:element>
 		</xs:sequence>
-		<xs:attribute name="path" type="xs:string" use="required" />
+		<xs:attribute name="path" type="xs:string" use="required" >
+			<xs:annotation>
+				<xs:documentation>The path of the entry in the state system. Wildcards '*' may be used. For example, to display entries from all CPUs, the path could be "CPUs/*" and one entry will be created for each sub-attribute of the "CPUs" attribute. Each entry will be used as the base for all child elements, unless specified otherwise.</xs:documentation></xs:annotation></xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="viewStateAttribute">
 		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="stateAttribute" type="stateAttribute" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="stateAttribute" type="viewStateAttribute" >
+				<xs:annotation>
+					<xs:documentation>If the type is a "query", those stateAttribute elements describe the  elements of the query.</xs:documentation></xs:annotation></xs:element>
 		</xs:sequence>
 		<xs:attribute name="type" use="required">
+			<xs:annotation>
+				<xs:documentation>The type of path to this attribute. The value of the other attributes will depend on the selected type.</xs:documentation></xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="constant" />
-					<xs:enumeration value="location" />
-					<xs:enumeration value="query" />
-					<xs:enumeration value="self" />
+					<xs:enumeration value="constant" >
+						<xs:annotation>
+							<xs:documentation>This type identifies the state system attribute by a constant string. For instance, if the state system attribute to display is "Status", it would be a constant type with value "Status".</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="location" >
+						<xs:annotation>
+							<xs:documentation>This type indicates that the path to the attribute is at the specified location. A location avoids having to write the full path to an attribute every time it is being used. The location itself is a sequence of stateAttribute elements. For example, if we previously defined a location named "Procname" for path "Threads/tid/Procname", we can use a stateAttribute of type location with "Procname" value.</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="query" >
+						<xs:annotation>
+							<xs:documentation>This type indicates that the path to the attribute is the result of a query. If this type is selected, a sequence of stateAttribute elements needs to be specified for this viewStateAttribute. The result of the query is the attribute name of the current element. For example, if the attribute we want is the PID of the current process on CPU 0, that PID can be found through the query "CPUs/0/CurrentThread". The value of this attribute would be for example 1234, which is the attribute we are looking for.</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="self" >
+						<xs:annotation>
+							<xs:documentation>This type indicates that the requested attribute is the attribute itself. For this attribute, the reference is always relative (setting it to absolute will be ignored).</xs:documentation></xs:annotation></xs:enumeration>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="value" type="xs:string" />
+		<xs:attribute name="value" type="xs:string" >
+			<xs:annotation>
+				<xs:documentation>The value of this state attribute. A value should be specified if the type is "constant" or "location".</xs:documentation></xs:annotation></xs:attribute>
 		<xs:attribute name="reference" use="optional" default="relative">
+			<xs:annotation>
+				<xs:documentation>Specify which state system attribute to use as the base to reach this path. It is either absolute or relative. By default, it is relative to the current entry.</xs:documentation></xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="relative" />
-					<xs:enumeration value="absolute" />
+					<xs:enumeration value="relative" >
+						<xs:annotation>
+							<xs:documentation>The path will be calculated starting from the entry under which this viewStateAttribute element is defined.</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="absolute" >
+						<xs:annotation>
+							<xs:documentation>The path will be calculated starting from the root of the state system. That means that if the entry itself is one of "CPUs/*", we could reach another attribute from the root of the state system, like "Threads/tid".</xs:documentation></xs:annotation></xs:enumeration>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>

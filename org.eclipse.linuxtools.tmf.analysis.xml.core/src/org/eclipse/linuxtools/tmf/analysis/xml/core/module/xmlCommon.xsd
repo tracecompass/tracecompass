@@ -14,16 +14,30 @@
 	attributeFormDefault="unqualified" elementFormDefault="qualified">
 
 	<xs:complexType name="definedValue">
-		<xs:attribute name="name" type="xs:string" use="required" />
-		<xs:attribute name="value" type="xs:string" use="required" />
-		<xs:attribute name="color" type="xs:string" use="optional" />
+		<xs:annotation>
+			<xs:documentation>Maps a string (usually a human-readable value used by the XML elements) to another string (a value in the system, which can be converted to an integer, long by the a stateValue element or used as-is).</xs:documentation></xs:annotation>
+		<xs:attribute name="name" type="xs:string" use="required" >
+			<xs:annotation>
+				<xs:documentation>The human-readable string to identify this value. This is what will be manipulated by the XML and shown to the end-user (if applicable).</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="value" type="xs:string" use="required" >
+			<xs:annotation>
+				<xs:documentation>A system value the 'name' maps to. It will usually not be shown to the end user.</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="color" type="xs:string" use="optional" >
+			<xs:annotation>
+				<xs:documentation>Optional color attribute to this mapping. This attribute is used in XML-defined views to represent this mapping.</xs:documentation></xs:annotation></xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="location">
+		<xs:annotation>
+			<xs:documentation>Define a path in a state system, that can then be used as a shortcut in other XML elements.</xs:documentation></xs:annotation>
 		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="stateAttribute" type="stateAttribute" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="stateAttribute" type="stateAttribute" >
+				<xs:annotation>
+					<xs:documentation>Define each element of the path represented by this location. For instance, if location "abc" has path "a/b/c", there would be a sequence of 3 stateAttribute elements of type constant.</xs:documentation></xs:annotation></xs:element>
 		</xs:sequence>
-		<xs:attribute name="id" type="xs:string" use="required" />
+		<xs:attribute name="id" type="xs:string" use="required" >
+			<xs:annotation>
+				<xs:documentation>The identifier of this location, used inside the XML element in the scope of which it is defined.</xs:documentation></xs:annotation></xs:attribute>
 		<xs:anyAttribute />
 	</xs:complexType>
 

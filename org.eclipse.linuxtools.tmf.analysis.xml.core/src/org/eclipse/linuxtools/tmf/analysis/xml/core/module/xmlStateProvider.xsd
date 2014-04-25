@@ -14,144 +14,282 @@
 	attributeFormDefault="unqualified" elementFormDefault="qualified">
 
 	<xs:complexType name="stateProvider">
+		<xs:annotation>
+			<xs:documentation>Declares a data-driven state provider which defines how events change the state of attributes of the system. Each state provider defined in XML will become an analysis in TMF.</xs:documentation></xs:annotation>
 		<xs:sequence maxOccurs="1" minOccurs="1">
-			<xs:element maxOccurs="1" minOccurs="0" name="head" type="headProvider" />
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="definedValue" type="definedValue" />
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="location" type="location" />
-			<xs:element maxOccurs="unbounded" minOccurs="1" name="eventHandler" type="eventHandler" />
+			<xs:element maxOccurs="1" minOccurs="0" name="head" type="headProvider" >
+				<xs:annotation>
+					<xs:documentation>Provide meta-information on this state provider, like labels and applicable trace types.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="definedValue" type="definedValue" >
+				<xs:annotation>
+					<xs:documentation>Define a value that maps a string used in the state provider to a numbered value.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="location" type="location" >
+				<xs:annotation>
+					<xs:documentation>Declare shortcuts to frequently used attribute/data locations. For instance, if a path to an often-used attribute is CPUs/{event.some_field}/Threads/Status, it may be a good idea to put this path in a location and then use the location name in the event handlers.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="unbounded" minOccurs="1" name="eventHandler" type="eventHandler" >
+				<xs:annotation>
+					<xs:documentation>Define how a given event will modify the state system being built. For each event in the trace that causes a state change, a event handler should be defined.</xs:documentation></xs:annotation></xs:element>
 		</xs:sequence>
-		<xs:attribute name="id" type="xs:string" use="required" />
-		<xs:attribute name="version" type="xs:integer" use="required" />
+		<xs:attribute name="id" type="xs:string" use="required" >
+			<xs:annotation>
+				<xs:documentation>The unique ID of this state provider. It will be used to identify the analysis that will be built from this state provider.</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="version" type="xs:integer" use="required" >
+			<xs:annotation>
+				<xs:documentation>The version ID of this state provider. Whenever the state provider changes so that the resulting state system is different from previous versions, this version number should be bumped.</xs:documentation></xs:annotation></xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="headProvider">
+		<xs:annotation>
+			<xs:documentation>Declares the meta-information that can be defined for an XML state provider.</xs:documentation></xs:annotation>
 		<xs:sequence>
 			<xs:element maxOccurs="unbounded" minOccurs="0" name="traceType">
+				<xs:annotation>
+					<xs:documentation>Indicate that the state provider applies to a given trace type.</xs:documentation></xs:annotation>
 				<xs:complexType>
-					<xs:attribute name="id" use="required" />
+					<xs:attribute name="id" use="required" >
+						<xs:annotation>
+							<xs:documentation>The ID of the trace type, as declared in a org.eclipse.linuxtools.tmf.core.tracetype extension point or a custom trace parser. For example: "org.eclipse.linuxtools.lttng2.kernel.tracetype" or "org.eclipse.linuxtools.lttng2.ust.tracetype" for respectively LTTng Kernel and LTTng UST traces.</xs:documentation></xs:annotation></xs:attribute>
 				</xs:complexType>
 			</xs:element>
 			<xs:element maxOccurs="1" minOccurs="0" name="label">
+				<xs:annotation>
+					<xs:documentation>Add a label to the state provider. If provided, this text will be the name of the analysis that the user will see in TMF.</xs:documentation></xs:annotation>
 				<xs:complexType>
-					<xs:attribute name="value" />
+					<xs:attribute name="value" >
+						<xs:annotation>
+							<xs:documentation>The text to name this state provider (and the analysis it will generate).</xs:documentation></xs:annotation></xs:attribute>
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
 
 	<xs:complexType name="eventHandler">
+		<xs:annotation>
+			<xs:documentation>Define how an event modifies the state of the system. There should be one event handler for each event causing a state change.</xs:documentation></xs:annotation>
 		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="1" name="stateChange" type="stateChange" />
+			<xs:element maxOccurs="unbounded" minOccurs="1" name="stateChange" type="stateChange" >
+				<xs:annotation>
+					<xs:documentation>Define how the state system is modified by the event. An event may cause more than one state change.</xs:documentation></xs:annotation></xs:element>
 		</xs:sequence>
-		<xs:attribute name="eventName" type="xs:string" use="required" />
+		<xs:attribute name="eventName" type="xs:string" use="required" >
+			<xs:annotation>
+				<xs:documentation>Name of the event that causes a state change.</xs:documentation></xs:annotation></xs:attribute>
 		<xs:anyAttribute />
 	</xs:complexType>
 
 	<xs:complexType name="stateChange">
+		<xs:annotation>
+			<xs:documentation>Define a change of state in the state system being built.</xs:documentation></xs:annotation>
 		<xs:choice maxOccurs="1" minOccurs="1">
 			<xs:sequence maxOccurs="1" minOccurs="1">
-				<xs:element maxOccurs="unbounded" minOccurs="1" name="stateAttribute" type="stateAttribute" />
-				<xs:element maxOccurs="1" minOccurs="1" name="stateValue" type="stateValue" />
+				<xs:annotation>
+					<xs:documentation>Describe a single attribute assignation. Simply put: a state change where path/to/attribute=value.</xs:documentation></xs:annotation>
+				<xs:element maxOccurs="unbounded" minOccurs="1" name="stateAttribute" type="stateAttribute" >
+					<xs:annotation>
+						<xs:documentation>Explain how to reach an attribute in the state system. It describes the path/to/attribute.</xs:documentation></xs:annotation></xs:element>
+				<xs:element maxOccurs="1" minOccurs="1" name="stateValue" type="stateValue" >
+					<xs:annotation>
+						<xs:documentation>Explain how to obtain the value of the state attribute to modify.</xs:documentation></xs:annotation></xs:element>
 			</xs:sequence>
 			<xs:sequence maxOccurs="1" minOccurs="1">
-				<xs:element maxOccurs="1" minOccurs="1" name="if" type="conditionSingle" />
-				<xs:element maxOccurs="1" minOccurs="1" name="then" type="stateChange" />
-				<xs:element maxOccurs="1" minOccurs="0" name="else" type="stateChange" />
+				<xs:annotation>
+					<xs:documentation>Describe a conditional state change, where different path conditions may lead to different state changes.</xs:documentation></xs:annotation>
+				<xs:element maxOccurs="1" minOccurs="1" name="if" type="conditionSingle" >
+					<xs:annotation>
+						<xs:documentation>Define the condition to verify.</xs:documentation></xs:annotation></xs:element>
+				<xs:element maxOccurs="1" minOccurs="1" name="then" type="stateChange" >
+					<xs:annotation>
+						<xs:documentation>Define the state change to use if the previous condition is true.</xs:documentation></xs:annotation></xs:element>
+				<xs:element maxOccurs="1" minOccurs="0" name="else" type="stateChange" >
+					<xs:annotation>
+						<xs:documentation>Optionally define the state change to use if the condition is false.</xs:documentation></xs:annotation></xs:element>
 			</xs:sequence>
 		</xs:choice>
 	</xs:complexType>
 
 	<xs:complexType name="condition">
+		<xs:annotation>
+			<xs:documentation>Define a conditional statement. Conditions may use values of the state system or from the event being handled. This element defines a statement in the form of "if (some_path == value)".</xs:documentation></xs:annotation>
 		<xs:sequence maxOccurs="1" minOccurs="1">
 			<xs:choice maxOccurs="1" minOccurs="1">
-				<xs:element maxOccurs="unbounded" minOccurs="1" name="stateAttribute" type="stateAttribute" />
-				<xs:element maxOccurs="1" minOccurs="1" name="field" type="eventField" />
+				<xs:element maxOccurs="unbounded" minOccurs="1" name="stateAttribute" type="stateAttribute" >
+					<xs:annotation>
+						<xs:documentation>Compare the current value of an attribute of the state system.</xs:documentation></xs:annotation></xs:element>
+				<xs:element maxOccurs="1" minOccurs="1" name="field" type="eventField" >
+					<xs:annotation>
+						<xs:documentation>Compare the value of an event field.</xs:documentation></xs:annotation></xs:element>
 			</xs:choice>
-			<xs:element maxOccurs="1" minOccurs="1" name="stateValue" type="stateValue" />
+			<xs:element maxOccurs="1" minOccurs="1" name="stateValue" type="stateValue" >
+				<xs:annotation>
+					<xs:documentation>Define the value to compare to.</xs:documentation></xs:annotation></xs:element>
 		</xs:sequence>
 		<xs:anyAttribute />
 	</xs:complexType>
 
 	<xs:complexType name="conditionSingle">
+		<xs:annotation>
+			<xs:documentation>Define a conditional statement with only one child. From this element, a condition may be composed of other conditional elements to create more complex conditional statements.</xs:documentation></xs:annotation>
 		<xs:choice maxOccurs="1" minOccurs="1">
-			<xs:element name="condition" type="condition" />
-			<xs:element name="not" type="conditionSingle" />
-			<xs:element name="and" type="conditionMultiple" />
-			<xs:element name="or" type="conditionMultiple" />
+			<xs:element name="condition" type="condition" >
+				<xs:annotation>
+					<xs:documentation>Define a condition element, in the form "if (some_path == value)".</xs:documentation></xs:annotation></xs:element>
+			<xs:element name="not" type="conditionSingle" >
+				<xs:annotation>
+					<xs:documentation>Negate the result of the following condition, allowing statements of the form "if (!cond)".</xs:documentation></xs:annotation></xs:element>
+			<xs:element name="and" type="conditionMultiple" >
+				<xs:annotation>
+					<xs:documentation>ANDs 2 conditional statements, allowing statements of the form "if (condA AND condB)"</xs:documentation></xs:annotation></xs:element>
+			<xs:element name="or" type="conditionMultiple" >
+				<xs:annotation>
+					<xs:documentation>ORs 2 conditional statements, allowing statements of the form "if (condA OR condB)"</xs:documentation></xs:annotation></xs:element>
 		</xs:choice>
 		<xs:anyAttribute />
 	</xs:complexType>
 
 	<xs:complexType name="conditionMultiple">
+		<xs:annotation>
+			<xs:documentation>Allows the composition of more than one conditional statements.</xs:documentation></xs:annotation>
 		<xs:sequence maxOccurs="unbounded" minOccurs="1">
-			<xs:element maxOccurs="1" minOccurs="0" name="condition" type="condition" />
-			<xs:element maxOccurs="1" minOccurs="0" name="or" type="conditionMultiple" />
-			<xs:element maxOccurs="1" minOccurs="0" name="and" type="conditionMultiple" />
-			<xs:element maxOccurs="1" minOccurs="0" name="not" type="conditionSingle" />
+			<xs:element maxOccurs="1" minOccurs="0" name="condition" type="condition" >
+				<xs:annotation>
+					<xs:documentation>Define a condition element, in the form "if (some_path == value)".</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" name="or" type="conditionMultiple" >
+				<xs:annotation>
+					<xs:documentation>ORs 2 conditional statements, allowing statements of the form "if (condA OR condB)"</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" name="and" type="conditionMultiple" >
+				<xs:annotation>
+					<xs:documentation>ANDs 2 conditional statements, allowing statements of the form "if (condA AND condB)"</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" name="not" type="conditionSingle" >
+				<xs:annotation>
+					<xs:documentation>Negate the result of the following condition, allowing statements of the form "if (!cond)".</xs:documentation></xs:annotation></xs:element>
 		</xs:sequence>
 		<xs:anyAttribute />
 	</xs:complexType>
 
 	<xs:complexType name="stateAttribute">
+		<xs:annotation>
+			<xs:documentation>Define a path to an attribute of the state system.</xs:documentation></xs:annotation>
 		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="stateAttribute" type="stateAttribute" />
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="stateAttribute" type="stateAttribute" >
+				<xs:annotation>
+					<xs:documentation>If the type is a "query", those stateAttribute elements describe the elements of the query.</xs:documentation></xs:annotation></xs:element>
 		</xs:sequence>
 		<xs:attribute name="type" use="required">
+			<xs:annotation>
+				<xs:documentation>The type of path to this attribute. The meaning of those paths type will depend on the context where the stateAttribute is being used. Not all types will make sense everywhere.</xs:documentation></xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="null" />
-					<xs:enumeration value="constant" />
-					<xs:enumeration value="eventField" />
-					<xs:enumeration value="location" />
-					<xs:enumeration value="query" />
+					<xs:enumeration value="null" >
+						<xs:annotation>
+							<xs:documentation>This type does not change the current attribute. Whatever attribute was the reference attribute at a given time, it will be returned as is.</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="constant" >
+						<xs:annotation>
+							<xs:documentation>This type identifies the state system attribute by a constant string. For instance, if the first level attribute of the state system is "Threads", then a constant type with "Threads" value should be used.</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="eventField" >
+						<xs:annotation>
+							<xs:documentation>This type identifies the attribute by the value of an event field. Note that the event field corresponds to the attribute name, not its value. For example, if the event has a field called "current_cpu" with a value of "2", "2" would be the attribute name we want.</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="location" >
+						<xs:annotation>
+							<xs:documentation>This type indicates that the path to the attribute is at the specified location. Location simply avoids having to write full path to an attribute each time it is being used, but the location itself is a sequence of stateAttribute elements. For example, if we previously defined a location named "CurrentThead" for path "CPUs/{current_cpu}/CurrentThread", we can use a stateAttribute of type location with "CurrentThread" value.</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="query" >
+						<xs:annotation>
+							<xs:documentation>This type indicates that the path to the attribute is the result of a query. If this type is selected, a sequence of stateAttribute elements needs to be specified for this state attribute. The result of the query is the attribute name of the current element. For example, if the attribute we want is the PID of the current process on CPU 0, that PID can be found through the query "CPUs/0/CurrentThread". The value of this attribute would be, for example, 1234, the attribute we are looking for.</xs:documentation></xs:annotation></xs:enumeration>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="value" type="xs:string" />
+		<xs:attribute name="value" type="xs:string" >
+			<xs:annotation>
+				<xs:documentation>The value of this state attribute. A value should be specified only if the type is "constant", "eventField" or "location".</xs:documentation></xs:annotation></xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="stateValue">
+		<xs:annotation>
+			<xs:documentation>Define a value, that can be assigned to an attribute of the state system.</xs:documentation></xs:annotation>
 		<xs:sequence>
-			<xs:element maxOccurs="unbounded" minOccurs="0" name="stateAttribute" type="stateAttribute" />
+			<xs:annotation>
+				<xs:documentation>For a "query" value type, a sequence of stateAttributes will define the query whose result is the value.</xs:documentation></xs:annotation>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="stateAttribute" type="stateAttribute" ></xs:element>
 		</xs:sequence>
 		<xs:attribute name="type" use="required">
+			<xs:annotation>
+				<xs:documentation>The type of this state value. It will describe how to obtain to value and/or what to do with it.</xs:documentation></xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="null" />
-					<xs:enumeration value="int" />
-					<xs:enumeration value="long" />
-					<xs:enumeration value="string" />
-					<xs:enumeration value="eventField" />
-					<xs:enumeration value="eventName" />
-					<xs:enumeration value="delete" />
-					<xs:enumeration value="query" />
+					<xs:enumeration value="null" >
+						<xs:annotation>
+							<xs:documentation>Indicate that the value is a null value.</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="int" >
+						<xs:annotation>
+							<xs:documentation>The value is a constant of type integer.</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="long" >
+						<xs:annotation>
+							<xs:documentation>The value is a constant of type long</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="string" >
+						<xs:annotation>
+							<xs:documentation>The value is a constant of type string</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="eventField" >
+						<xs:annotation>
+							<xs:documentation>The value is the content of an event field. The "value" attribute is the field name. To convert this field to a certain type, attribute "forcedType" may be used.</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="eventName" >
+						<xs:annotation>
+							<xs:documentation>The value is the name of the event.</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="delete" >
+						<xs:annotation>
+							<xs:documentation>Indicate that the attribute the value is to be applied to should be deleted.</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="query" >
+						<xs:annotation>
+							<xs:documentation>The value is the result of a query to the state system. If this type is selected, a sequence of stateAttributes must be defined in this stateValue element.</xs:documentation></xs:annotation></xs:enumeration>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="increment" type="xs:boolean" />
+		<xs:attribute name="increment" type="xs:boolean" >
+			<xs:annotation>
+				<xs:documentation>Indicate that the current value will be added to any previously available value.</xs:documentation></xs:annotation></xs:attribute>
 		<xs:attribute name="stack">
+			<xs:annotation>
+				<xs:documentation>Indicate that a stack operation will be performed with the value</xs:documentation></xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="pop"/>
-					<xs:enumeration value="push"/>
-					<xs:enumeration value="peek"/>
+					<xs:enumeration value="pop">
+						<xs:annotation>
+							<xs:documentation>The value will be popped from the stack</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="push">
+						<xs:annotation>
+							<xs:documentation>The value will be pushed on a stack</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="peek">
+						<xs:annotation>
+							<xs:documentation>The value will be peeked from the top of the stack, but it will stay there</xs:documentation></xs:annotation></xs:enumeration>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="forcedType">
+			<xs:annotation>
+				<xs:documentation>Indicate the desired type for the state value. If the value is not already of this type, a conversion will be attempted. The forcedType is used to convert values of event fields.</xs:documentation></xs:annotation>
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="int" />
-					<xs:enumeration value="long" />
-					<xs:enumeration value="string" />
+					<xs:enumeration value="int" >
+						<xs:annotation>
+							<xs:documentation>The value should be an integer</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="long" >
+						<xs:annotation>
+							<xs:documentation>The value should be a long</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="string" >
+						<xs:annotation>
+							<xs:documentation>The value should be a double</xs:documentation></xs:annotation></xs:enumeration>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="value" type="xs:string" />
+		<xs:attribute name="value" type="xs:string" >
+			<xs:annotation>
+				<xs:documentation>Indicate what the value is. A value should be specified only if the type is int, long, string or event_field. See the documentation on types for information on what to put for value.</xs:documentation></xs:annotation></xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="eventField">
-		<xs:attribute name="name" type="xs:string" use="required" />
+		<xs:annotation>
+			<xs:documentation>This element is used in conditions where the value of an event field is compared to something else. It is not the same as the stateAttribute's type eventField, where the eventField is used as the name for an attribute to the state system.</xs:documentation></xs:annotation>
+		<xs:attribute name="name" type="xs:string" use="required" >
+			<xs:annotation>
+				<xs:documentation>Indicate which field to use.</xs:documentation></xs:annotation></xs:attribute>
 	</xs:complexType>
 
 </xs:schema>

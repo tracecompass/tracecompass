@@ -19,8 +19,12 @@
 	<xs:element name="tmfxml">
 		<xs:complexType>
 			<xs:choice maxOccurs="unbounded">
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="timeGraphView" type="timeGraphView" />
-				<xs:element maxOccurs="unbounded" minOccurs="0" name="stateProvider" type="stateProvider" />
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="timeGraphView" type="timeGraphView" >
+					<xs:annotation>
+						<xs:documentation>Define a new time graph view.</xs:documentation></xs:annotation></xs:element>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="stateProvider" type="stateProvider" >
+					<xs:annotation>
+						<xs:documentation>Define a new state provider</xs:documentation></xs:annotation></xs:element>
 			</xs:choice>
 		</xs:complexType>
 	</xs:element>
