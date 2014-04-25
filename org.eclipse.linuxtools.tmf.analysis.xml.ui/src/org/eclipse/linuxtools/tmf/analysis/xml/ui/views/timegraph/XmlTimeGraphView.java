@@ -432,20 +432,32 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
 
         long entryStart = ss.getStartTime();
         long entryEnd = ss.getCurrentEndTime();
+
         try {
-            boolean first = true;
-            List<ITmfStateInterval> execNameIntervals = ss.queryHistoryRange(displayQuark, ss.getStartTime(), ss.getCurrentEndTime());
 
-            for (ITmfStateInterval execNameInterval : execNameIntervals) {
+            ITmfStateInterval oneInterval = ss.querySingleState(entryStart, displayQuark);
 
-                if (!execNameInterval.getStateValue().isNull()) {
-                    if (first) {
-                        entryStart = execNameInterval.getStartTime();
-                        first = false;
-                    }
-                    entryEnd = execNameInterval.getEndTime();
+            /* The entry start is the first non-null interval */
+            while (oneInterval.getStateValue().isNull()) {
+                long ts = oneInterval.getEndTime() + 1;
+                if (ts > ss.getCurrentEndTime()) {
+                    break;
                 }
+                oneInterval = ss.querySingleState(ts, displayQuark);
             }
+            entryStart = oneInterval.getStartTime();
+
+            /* The entry end is the last non-null interval */
+            oneInterval = ss.querySingleState(entryEnd, displayQuark);
+            while (oneInterval.getStateValue().isNull()) {
+                long ts = oneInterval.getStartTime() - 1;
+                if (ts < ss.getStartTime()) {
+                    break;
+                }
+                oneInterval = ss.querySingleState(ts, displayQuark);
+            }
+            entryEnd = oneInterval.getEndTime();
+
         } catch (AttributeNotFoundException | StateSystemDisposedException e) {
         }
 
