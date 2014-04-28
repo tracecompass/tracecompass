@@ -13,6 +13,9 @@
 
 package org.eclipse.linuxtools.tmf.core.event;
 
+import java.util.Collection;
+import java.util.Collections;
+
 /**
  * A basic implementation of ITmfEventType.
  *
@@ -95,14 +98,12 @@ public class TmfEventType implements ITmfEventType {
         return fRootField;
     }
 
+    /**
+     * @since 3.0
+     */
     @Override
-    public String[] getFieldNames() {
-        return (fRootField != null) ? fRootField.getFieldNames() : new String[0];
-    }
-
-    @Override
-    public String getFieldName(final int index) {
-        return (fRootField != null) ? fRootField.getFieldName(index) : null;
+    public Collection<String> getFieldNames() {
+        return (fRootField != null) ? fRootField.getFieldNames() : Collections.EMPTY_SET;
     }
 
     // ------------------------------------------------------------------------

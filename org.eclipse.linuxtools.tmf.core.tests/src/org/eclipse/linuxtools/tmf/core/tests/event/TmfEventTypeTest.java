@@ -14,11 +14,14 @@
 
 package org.eclipse.linuxtools.tmf.core.tests.event;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.util.Collection;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
@@ -43,10 +46,11 @@ public class TmfEventTypeTest {
 
     private final String fLabel0 = "label1";
     private final String fLabel1 = "label2";
+    private final String fLabel2 = "label3";
 
     private final String[] fLabels0 = new String[] { };
     private final String[] fLabels1 = new String[] { fLabel0, fLabel1 };
-    private final String[] fLabels2 = new String[] { fLabel1, fLabel0, fLabel1 };
+    private final String[] fLabels2 = new String[] { fLabel1, fLabel0, fLabel2 };
 
     private final ITmfEventType fType0 = new TmfEventType(fContext1, fTypeId1, TmfEventField.makeRoot(fLabels0));
     private final ITmfEventType fType1 = new TmfEventType(fContext1, fTypeId2, TmfEventField.makeRoot(fLabels1));
@@ -63,8 +67,7 @@ public class TmfEventTypeTest {
         assertEquals("getContext", ITmfEventType.DEFAULT_CONTEXT_ID, type.getContext());
         assertEquals("getName", ITmfEventType.DEFAULT_TYPE_ID, type.getName());
         assertNull("getRootField", type.getRootField());
-        assertEquals("getFieldNames", 0, type.getFieldNames().length);
-        assertNull("getFieldName", type.getFieldName(0));
+        assertEquals("getFieldNames", 0, type.getFieldNames().size());
     }
 
     @Test
@@ -73,34 +76,25 @@ public class TmfEventTypeTest {
         assertEquals("getContext", fContext1, type0.getContext());
         assertEquals("getName", fTypeId1, type0.getName());
         assertEquals("getRootField", TmfEventField.makeRoot(fLabels0), type0.getRootField());
-        final String[] labels0 = type0.getFieldNames();
-        assertEquals("getFieldNames length", fLabels0.length, labels0.length);
-        for (int i = 0; i < labels0.length; i++) {
-            assertEquals("getFieldNames", fLabels0[i], labels0[i]);
-        }
-        assertNull("getFieldName", type0.getFieldName(labels0.length));
+        final Collection<String> labels0 = type0.getFieldNames();
+        assertEquals("getFieldNames length", fLabels0.length, labels0.size());
+        assertArrayEquals(fLabels0, labels0.toArray(new String[labels0.size()]));
 
         final ITmfEventType type1 = new TmfEventType(fContext1, fTypeId1, TmfEventField.makeRoot(fLabels1));
         assertEquals("getContext", fContext1, type1.getContext());
         assertEquals("getName", fTypeId1, type1.getName());
         assertEquals("getRootField", TmfEventField.makeRoot(fLabels1), type1.getRootField());
-        final String[] labels1 = type1.getFieldNames();
-        assertEquals("getFieldNames length", fLabels1.length, labels1.length);
-        for (int i = 0; i < labels1.length; i++) {
-            assertEquals("getFieldNames", fLabels1[i], labels1[i]);
-        }
-        assertNull("getFieldName", type1.getFieldName(labels1.length));
+        final Collection<String> labels1 = type1.getFieldNames();
+        assertEquals("getFieldNames length", fLabels1.length, labels1.size());
+        assertArrayEquals(fLabels1, labels1.toArray(new String[labels1.size()]));
 
         final ITmfEventType type2 = new TmfEventType(fContext2, fTypeId2, TmfEventField.makeRoot(fLabels2));
         assertEquals("getContext", fContext2, type2.getContext());
         assertEquals("getName", fTypeId2, type2.getName());
         assertEquals("getRootField", TmfEventField.makeRoot(fLabels2), type2.getRootField());
-        final String[] labels2 = type2.getFieldNames();
-        assertEquals("getFieldNames length", fLabels2.length, labels2.length);
-        for (int i = 0; i < labels2.length; i++) {
-            assertEquals("getFieldNames", fLabels2[i], labels2[i]);
-        }
-        assertNull("getFieldName", type2.getFieldName(labels2.length));
+        final Collection<String> labels2 = type2.getFieldNames();
+        assertEquals("getFieldNames length", fLabels2.length, labels2.size());
+        assertArrayEquals(fLabels2, labels2.toArray(new String[labels2.size()]));
     }
 
     @Test
@@ -126,12 +120,9 @@ public class TmfEventTypeTest {
         assertEquals("getContext", fContext1, copy.getContext());
         assertEquals("getName", fTypeId1, copy.getName());
         assertEquals("getRootField", TmfEventField.makeRoot(fLabels1), copy.getRootField());
-        final String[] labels1 = copy.getFieldNames();
-        assertEquals("getFieldNames length", fLabels1.length, labels1.length);
-        for (int i = 0; i < labels1.length; i++) {
-            assertEquals("getFieldNames", fLabels1[i], labels1[i]);
-        }
-        assertNull("getFieldName", copy.getFieldName(labels1.length));
+        final Collection<String> labels1 = copy.getFieldNames();
+        assertEquals("getFieldNames length", fLabels1.length, labels1.size());
+        assertArrayEquals(fLabels1, labels1.toArray(new String[labels1.size()]));
     }
 
     @Test

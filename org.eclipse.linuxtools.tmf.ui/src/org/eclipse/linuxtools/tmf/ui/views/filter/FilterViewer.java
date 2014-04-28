@@ -396,7 +396,7 @@ class FilterViewer extends Composite {
                 try {
                     ITmfEvent event = (ITmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
                     ITmfEventType eventType = event.getType();
-                    if (eventType != null && eventType.getFieldNames().length > 0) {
+                    if (eventType != null && eventType.getFieldNames().size() > 0) {
                         fieldsList.add("[" + TmfTraceType.getCategoryName(ce.getAttribute(TmfTraceType.CATEGORY_ATTR)) + //$NON-NLS-1$
                                 " : " + ce.getAttribute(TmfTraceType.NAME_ATTR) + "]"); //$NON-NLS-1$ //$NON-NLS-2$
                         for (String field : eventType.getFieldNames()) {

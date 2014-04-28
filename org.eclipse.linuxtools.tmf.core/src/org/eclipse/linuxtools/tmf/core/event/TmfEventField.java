@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 Ericsson
+ * Copyright (c) 2009, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -14,8 +14,13 @@
 
 package org.eclipse.linuxtools.tmf.core.event;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collection;
+
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * A basic implementation of ITmfEventField.
@@ -35,12 +40,9 @@ public class TmfEventField implements ITmfEventField {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final String fName;
-    private final Object fValue;
-    private final ITmfEventField[] fFields;
-
-    private final String[] fFieldNames;
-    private final Map<String, ITmfEventField> fNameMapping;
+    private final @NonNull String fName;
+    private final @Nullable Object fValue;
+    private final @NonNull ImmutableMap<String, ITmfEventField> fFields;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -49,27 +51,33 @@ public class TmfEventField implements ITmfEventField {
     /**
      * Full constructor
      *
-     * @param name the event field id
-     * @param value the event field value
-     * @param fields the list of subfields
+     * @param name
+     *            the event field id
+     * @param value
+     *            the event field value
+     * @param fields
+     *            the list of subfields
+     * @throws IllegalArgumentException
+     *             If 'name' is null, or if 'fields' has duplicate field names.
      */
-    public TmfEventField(final String name, final Object value, final ITmfEventField[] fields) {
+    @SuppressWarnings("null") /* ImmutableMap methods do not return @NonNull */
+    public TmfEventField(String name, @Nullable Object value, @Nullable ITmfEventField[] fields) {
         if (name == null) {
             throw new IllegalArgumentException();
         }
         fName = name;
         fValue = value;
-        fFields = fields;
 
-        /* Fill the fFieldNames and fNameMapping structures */
-        final int nbFields = (fFields != null) ? fFields.length : 0;
-        fFieldNames = new String[nbFields];
-        fNameMapping = new HashMap<>();
-
-        for (int i = 0; i < nbFields; i++) {
-            final String curName = fFields[i].getName();
-            fFieldNames[i] = curName;
-            fNameMapping.put(curName, fFields[i]);
+        if (fields == null) {
+            fFields = ImmutableMap.of();
+        } else {
+            /* Java 8 streams will make this even more simple! */
+            ImmutableMap.Builder<String, ITmfEventField> mapBuilder = new ImmutableMap.Builder<>();
+            for (ITmfEventField field : fields) {
+                final String curName = field.getName();
+                mapBuilder.put(curName, field);
+            }
+            fFields = mapBuilder.build();
         }
     }
 
@@ -85,8 +93,6 @@ public class TmfEventField implements ITmfEventField {
         fName = field.fName;
         fValue = field.fValue;
         fFields = field.fFields;
-        fFieldNames = field.fFieldNames;
-        fNameMapping = field.fNameMapping;
     }
 
     // ------------------------------------------------------------------------
@@ -103,43 +109,32 @@ public class TmfEventField implements ITmfEventField {
         return fValue;
     }
 
+    /**
+     * @since 3.0
+     */
     @Override
-    public String[] getFieldNames() {
-        return fFieldNames;
-    }
-
-    @Override
-    public String getFieldName(final int index) {
-        final ITmfEventField field = getField(index);
-        if (field != null) {
-            return field.getName();
-        }
-        return null;
-    }
-
-    @Override
-    public ITmfEventField[] getFields() {
-        return (fFields != null) ? fFields : new ITmfEventField[0];
-    }
-
-    @Override
-    public ITmfEventField getField(final String name) {
-        return fNameMapping.get(name);
-    }
-
-    @Override
-    public ITmfEventField getField(final int index) {
-        if (fFields != null && index >= 0 && index < fFields.length) {
-            return fFields[index];
-        }
-        return null;
+    public Collection<String> getFieldNames() {
+        return fFields.keySet();
     }
 
     /**
      * @since 3.0
      */
     @Override
-    public ITmfEventField getSubField(final String[] names) {
+    public Collection<ITmfEventField> getFields() {
+        return fFields.values();
+    }
+
+    @Override
+    public ITmfEventField getField(final String name) {
+        return fFields.get(name);
+    }
+
+    /**
+     * @since 3.0
+     */
+    @Override
+    public ITmfEventField getSubField(final String... names) {
         ITmfEventField field = this;
         for (String name : names) {
             field = field.getField(name);
@@ -175,10 +170,11 @@ public class TmfEventField implements ITmfEventField {
 
     @Override
     public int hashCode() {
+        Object value = fValue;
         final int prime = 31;
         int result = 1;
         result = prime * result + fName.hashCode();
-        result = prime * result + ((fValue == null) ? 0 : fValue.hashCode());
+        result = prime * result + ((value == null) ? 0 : value.hashCode());
         return result;
     }
 
@@ -197,11 +193,12 @@ public class TmfEventField implements ITmfEventField {
         if (!fName.equals(other.fName)) {
             return false;
         }
-        if (fValue == null) {
+        Object value = this.fValue;
+        if (value == null) {
             if (other.fValue != null) {
                 return false;
             }
-        } else if (!fValue.equals(other.fValue)) {
+        } else if (!value.equals(other.fValue)) {
             return false;
         }
         return true;
@@ -223,7 +220,7 @@ public class TmfEventField implements ITmfEventField {
             ret.append('=');
             ret.append(fValue);
 
-            if (fFields != null && fFields.length > 0) {
+            if (!fFields.isEmpty()) {
                 /*
                  * In addition to its own name/value, this field also has
                  * sub-fields.
@@ -237,14 +234,8 @@ public class TmfEventField implements ITmfEventField {
     }
 
     private void appendSubFields(StringBuilder sb) {
-        ITmfEventField field;
-        for (int i = 0; i < getFields().length; i++) {
-            field = getFields()[i];
-            if (i != 0) {
-                sb.append(", ");//$NON-NLS-1$
-            }
-            sb.append(field.toString());
-        }
+        Joiner joiner = Joiner.on(", ").skipNulls(); //$NON-NLS-1$
+        sb.append(joiner.join(getFields()));
     }
 
     /**

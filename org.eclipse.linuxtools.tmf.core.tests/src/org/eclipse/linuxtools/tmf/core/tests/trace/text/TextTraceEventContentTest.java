@@ -13,9 +13,12 @@ package org.eclipse.linuxtools.tmf.core.tests.trace.text;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
+import java.util.List;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.trace.text.TextTraceEventContent;
@@ -32,8 +35,11 @@ public class TextTraceEventContentTest {
     // ------------------------------------------------------------------------
     // Members
     // ------------------------------------------------------------------------
+
     private TextTraceEventContent fEventContent1;
+    private TextTraceEventContent fEventContent1Clone;
     private TextTraceEventContent fEventContent2;
+    private TextTraceEventContent fEventContent2Clone;
 
     public TextTraceEventContentTest () {
         fEventContent1 = new TextTraceEventContent(SyslogEventType.LABELS);
@@ -43,6 +49,13 @@ public class TextTraceEventContentTest {
         fEventContent1.setFieldValue(Index.LOGGER, "LoggerA");
         fEventContent1.setFieldValue(Index.MESSAGE, "MessageA");
 
+        fEventContent1Clone = new TextTraceEventContent(SyslogEventType.LABELS);
+        fEventContent1Clone.setValue("CONTENT");
+        fEventContent1Clone.setFieldValue(Index.TIMESTAMP, "Jan 1 01:01:01");
+        fEventContent1Clone.setFieldValue(Index.HOST, "HostA");
+        fEventContent1Clone.setFieldValue(Index.LOGGER, "LoggerA");
+        fEventContent1Clone.setFieldValue(Index.MESSAGE, "MessageA");
+
         fEventContent2 = new TextTraceEventContent(SyslogEventType.LABELS);
         fEventContent2.setFieldValue(SyslogEventType.LABELS[0], "Jan 1 02:02:02");
         fEventContent2.setFieldValue(SyslogEventType.LABELS[1], "HostB");
@@ -50,6 +63,14 @@ public class TextTraceEventContentTest {
         StringBuffer buffer = new StringBuffer();
         buffer.append("Message B");
         fEventContent2.setFieldValue(SyslogEventType.LABELS[3],   buffer);
+
+        fEventContent2Clone = new TextTraceEventContent(SyslogEventType.LABELS);
+        fEventContent2Clone.setFieldValue(SyslogEventType.LABELS[0], "Jan 1 02:02:02");
+        fEventContent2Clone.setFieldValue(SyslogEventType.LABELS[1], "HostB");
+        fEventContent2Clone.setFieldValue(SyslogEventType.LABELS[2], "LoggerB");
+        buffer = new StringBuffer();
+        buffer.append("Message B");
+        fEventContent2Clone.setFieldValue(SyslogEventType.LABELS[3],   buffer);
     }
 
     public void testConstructorConstructor() {
@@ -68,10 +89,10 @@ public class TextTraceEventContentTest {
         SyslogEventType eventType = SyslogEventType.INSTANCE;
         assertEquals("getTypeId", "Syslog", eventType.getName());
         assertNotNull ("instance", eventType);
-        assertEquals("getLabel", "Timestamp", eventType.getFieldNames()[0]);
-        assertEquals("getLabel", "Host", eventType.getFieldNames()[1]);
-        assertEquals("getLabel", "Logger", eventType.getFieldNames()[2]);
-        assertEquals("getLabel", "Message", eventType.getFieldNames()[3]);
+        assertTrue (eventType.getFieldNames().contains("Timestamp"));
+        assertTrue (eventType.getFieldNames().contains("Host"));
+        assertTrue (eventType.getFieldNames().contains("Logger"));
+        assertTrue (eventType.getFieldNames().contains("Message"));
     }
 
     // ------------------------------------------------------------------------
@@ -79,25 +100,15 @@ public class TextTraceEventContentTest {
     // ------------------------------------------------------------------------
 
     @Test
-    public void testEqualsReflexivity() {
-        TextTraceEventContent content1 = fEventContent1.clone();
-        TextTraceEventContent content2 = fEventContent2.clone();
-        assertEquals("equals", content1, content1);
-        assertEquals("equals", content2, content2);
+    public void testEquals() {
+        assertEquals("equals", fEventContent1, fEventContent1);
+        assertEquals("equals", fEventContent2, fEventContent2);
 
-        assertTrue("equals", !content1.equals(content2));
-        assertTrue("equals", !content2.equals(content1));
-    }
+        assertTrue("equals", !fEventContent1.equals(fEventContent2));
+        assertTrue("equals", !fEventContent2.equals(fEventContent1));
 
-    @Test
-    public void testEqualsTransivity() {
-        TextTraceEventContent content1 = fEventContent1.clone();
-        TextTraceEventContent content2 = fEventContent1.clone();
-        TextTraceEventContent content3 = fEventContent1.clone();
-
-        assertEquals("equals", content1, content2);
-        assertEquals("equals", content2, content3);
-        assertEquals("equals", content1, content3);
+        assertEquals("equals", fEventContent1, fEventContent1Clone);
+        assertEquals("equals", fEventContent2, fEventContent2Clone);
     }
 
     @Test
@@ -109,16 +120,15 @@ public class TextTraceEventContentTest {
     // ------------------------------------------------------------------------
     // hashCode
     // ------------------------------------------------------------------------
+
     @Test
     public void testHashCode() {
-        TextTraceEventContent content1 = fEventContent1.clone();
-        TextTraceEventContent content2 = fEventContent2.clone();
 
-        assertEquals("hashCode", fEventContent1.hashCode(), content1.hashCode());
-        assertEquals("hashCode", fEventContent2.hashCode(), content2.hashCode());
+        assertEquals("hashCode", fEventContent1.hashCode(), fEventContent1Clone.hashCode());
+        assertEquals("hashCode", fEventContent2.hashCode(), fEventContent2Clone.hashCode());
 
-        assertTrue("hashCode", fEventContent1.hashCode() != content2.hashCode());
-        assertTrue("hashCode", fEventContent2.hashCode() != content1.hashCode());
+        assertNotEquals("hashCode", fEventContent1.hashCode(), fEventContent2.hashCode());
+        assertNotEquals("hashCode", fEventContent2.hashCode(), fEventContent1.hashCode());
     }
 
     // ------------------------------------------------------------------------
@@ -155,16 +165,16 @@ public class TextTraceEventContentTest {
 
     @Test
     public void testGetFields() {
-        ITmfEventField[] fields = fEventContent1.getFields();
-        assertEquals(4, fields.length);
-        assertEquals("getFields:TIMESTAMP", SyslogEventType.LABELS[0], fields[Index.TIMESTAMP].getName());
-        assertEquals("getFields:TIMESTAMP", "Jan 1 01:01:01", fields[Index.TIMESTAMP].getValue());
-        assertEquals("getFields:HOST", SyslogEventType.LABELS[1], fields[Index.HOST].getName());
-        assertEquals("getFields:HOST", "HostA", fields[Index.HOST].getValue());
-        assertEquals("getFields:LOGGER", SyslogEventType.LABELS[2], fields[Index.LOGGER].getName());
-        assertEquals("getFields:LOGGER", "LoggerA", fields[Index.LOGGER].getValue());
-        assertEquals("getFields:MESSAGE", SyslogEventType.LABELS[3], fields[Index.MESSAGE].getName());
-        assertEquals("getFields:MESSAGE", "MessageA", fields[Index.MESSAGE].getValue());
+        List<TextTraceEventContent> fields = fEventContent1.getFields();
+        assertEquals(4, fields.size());
+        assertEquals("getFields:TIMESTAMP", SyslogEventType.LABELS[0], fields.get(Index.TIMESTAMP).getName());
+        assertEquals("getFields:TIMESTAMP", "Jan 1 01:01:01", fields.get(Index.TIMESTAMP).getValue());
+        assertEquals("getFields:HOST", SyslogEventType.LABELS[1], fields.get(Index.HOST).getName());
+        assertEquals("getFields:HOST", "HostA", fields.get(Index.HOST).getValue());
+        assertEquals("getFields:LOGGER", SyslogEventType.LABELS[2], fields.get(Index.LOGGER).getName());
+        assertEquals("getFields:LOGGER", "LoggerA", fields.get(Index.LOGGER).getValue());
+        assertEquals("getFields:MESSAGE", SyslogEventType.LABELS[3], fields.get(Index.MESSAGE).getName());
+        assertEquals("getFields:MESSAGE", "MessageA", fields.get(Index.MESSAGE).getValue());
     }
 
     @Test
@@ -186,28 +196,6 @@ public class TextTraceEventContentTest {
         assertEquals("getgetFieldName:Message", "MessageA", field.getValue());
 
         field = fEventContent1.getField("BlaBla");
-        assertNull(field);
-    }
-
-    @Test
-    public void testGetFieldWithIndex() {
-        ITmfEventField field = fEventContent1.getField(0);
-        assertEquals("getField:TIMESTAMP", SyslogEventType.LABELS[0], field.getName());
-        assertEquals("getField:TIMESTAMP", "Jan 1 01:01:01", field.getValue());
-
-        field = fEventContent1.getField(1);
-        assertEquals("getField:HOST", SyslogEventType.LABELS[1], field.getName());
-        assertEquals("getField:HOST", "HostA", field.getValue());
-
-        field = fEventContent1.getField(2);
-        assertEquals("getField:LOGGER", SyslogEventType.LABELS[2], field.getName());
-        assertEquals("getField:LOGGER", "LoggerA", field.getValue());
-
-        field = fEventContent1.getField(3);
-        assertEquals("getField:MESSAGE", SyslogEventType.LABELS[3], field.getName());
-        assertEquals("getField:MESSAGE", "MessageA", field.getValue());
-
-        field = fEventContent1.getField(4);
         assertNull(field);
     }
 
@@ -237,8 +225,8 @@ public class TextTraceEventContentTest {
     @Test
     public void testGetFieldNames() {
         String[] labels = {"Timestamp", "Host", "Logger", "Message"};
-        String[] names = fEventContent1.getFieldNames();
-        assertArrayEquals(labels, names);
+        List<String> names = fEventContent1.getFieldNames();
+        assertArrayEquals(labels, names.toArray(new String[names.size()]));
     }
 
 }
