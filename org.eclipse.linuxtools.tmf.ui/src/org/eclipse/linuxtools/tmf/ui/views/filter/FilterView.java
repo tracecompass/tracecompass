@@ -23,8 +23,6 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -44,7 +42,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.xml.sax.SAXException;
@@ -152,17 +149,7 @@ public class FilterView extends TmfView {
         });
         this.getSite().setSelectionProvider(fViewer.getTreeViewer());
 
-        // Adds root context menu
-        MenuManager menuManager = new MenuManager();
-        menuManager.setRemoveAllWhenShown(true);
-        menuManager.addMenuListener(new IMenuListener() {
-            @Override
-            public void menuAboutToShow(IMenuManager manager) {
-                fViewer.fillContextMenu(manager);
-            }
-        });
-        Menu contextMenu = menuManager.createContextMenu(fViewer.getTreeViewer().getTree());
-        fViewer.getTreeViewer().getTree().setMenu(contextMenu);
+        MenuManager menuManager = fViewer.getMenuManager();
         this.getSite().registerContextMenu(menuManager, fViewer.getTreeViewer());
     }
 

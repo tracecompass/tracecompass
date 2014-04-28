@@ -21,7 +21,9 @@ import java.util.Map.Entry;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.ISelection;
@@ -45,11 +47,11 @@ import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterOrNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterRootNode;
 import org.eclipse.linuxtools.tmf.core.filter.model.TmfFilterTreeNode;
+import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTxtEvent;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTxtTraceDefinition;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlEvent;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTraceDefinition;
-import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -74,6 +76,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TreeItem;
 
@@ -85,6 +88,7 @@ class FilterViewer extends Composite {
     private TreeViewer fViewer;
 
     private Composite fComposite;
+    private MenuManager fMenuManager;
 
     public FilterViewer(Composite parent, int style) {
         super(parent, style);
@@ -107,6 +111,8 @@ class FilterViewer extends Composite {
         gl.marginHeight = 0;
         gl.marginWidth = 0;
         fComposite.setLayout(gl);
+
+        createContextMenu();
 
         fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
@@ -142,6 +148,31 @@ class FilterViewer extends Composite {
         DropTarget dropTarget = new DropTarget(fViewer.getTree(), operations);
         dropTarget.setTransfer(new Transfer[] { LocalSelectionTransfer.getTransfer() });
         dropTarget.addDropListener(new FilterDropTargetAdapter(this));
+    }
+
+    /**
+     * Create the context menu for the tree viewer
+     */
+    private void createContextMenu() {
+        // Adds root context menu
+        fMenuManager = new MenuManager();
+        fMenuManager.setRemoveAllWhenShown(true);
+        fMenuManager.addMenuListener(new IMenuListener() {
+            @Override
+            public void menuAboutToShow(IMenuManager manager) {
+                fillContextMenu(manager);
+            }
+        });
+
+        // Context
+        Menu contextMenu = fMenuManager.createContextMenu(fViewer.getTree());
+
+        // Publish it
+        fViewer.getTree().setMenu(contextMenu);
+    }
+
+    public MenuManager getMenuManager() {
+        return fMenuManager;
     }
 
     /**
