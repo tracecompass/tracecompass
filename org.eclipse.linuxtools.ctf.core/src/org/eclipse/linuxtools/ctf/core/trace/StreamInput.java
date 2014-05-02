@@ -362,7 +362,7 @@ public class StreamInput implements IDefinitionScope, AutoCloseable {
 
     private void parseTracePacketHeader(StructDeclaration tracePacketHeaderDecl,
             @NonNull BitBuffer bitBuffer) throws CTFReaderException {
-        StructDefinition tracePacketHeaderDef = tracePacketHeaderDecl.createDefinition(null, LexicalScope.TRACE_PACKET_HEADER.getName(), bitBuffer);
+        StructDefinition tracePacketHeaderDef = tracePacketHeaderDecl.createDefinition(fStream.getTrace(), LexicalScope.TRACE_PACKET_HEADER.getName(), bitBuffer);
 
         /*
          * Check the CTF magic number
