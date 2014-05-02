@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.tracetype">
+      <type
+            category="org.eclipse.linuxtools.btf.category"
+            event_type="org.eclipse.linuxtools.tmf.core.event.TmfEvent"
+            id="org.eclipse.linuxtools.btf.trace"
+            isDirectory="false"
+            name="BTF Trace"
+            trace_type="org.eclipse.linuxtools.btf.core.trace.BtfTrace">
+      </type>
+      <category
+            id="org.eclipse.linuxtools.btf.category"
+            name="BTF Traces">
+      </category>
+   </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.analysis">
+      <module
+            analysis_module="org.eclipse.linuxtools.btf.core.analysis.BtfAnalysisModule"
+            automatic="true"
+            id="org.eclipse.linuxtools.btf.core.analysis"
+            name="BTF Analysis">
+         <tracetype
+               applies="true"
+               class="org.eclipse.linuxtools.btf.core.trace.BtfTrace">
+         </tracetype>
+      </module>
+   </extension>
+</plugin>

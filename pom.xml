@@ -90,6 +90,10 @@
 </profiles>
 
   <modules>
+    <module>org.eclipse.linuxtools.btf.core</module>
+    <module>org.eclipse.linuxtools.btf.core.tests</module>
+    <module>org.eclipse.linuxtools.btf.ui</module>
+
     <module>org.eclipse.linuxtools.ctf</module>
     <module>org.eclipse.linuxtools.ctf.core</module>
     <module>org.eclipse.linuxtools.ctf.core.tests</module>

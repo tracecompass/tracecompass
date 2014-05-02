@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="stateprovider.xsd">
+
+	<timeGraphView id="org.eclipse.linuxtools.btf.analysis.xml">
+		<head>
+			<analysis id="org.eclipse.linuxtools.btf.core.analysis" />
+			<label value="BTF View" />
+		</head>
+		<!-- StateValues -->
+		<definedValue name="STATE_CORE_IDLE" value="0" color="#888888" />
+		<definedValue name="STATE_RUNNING" value="1" color="#95bc5f" />
+		<definedValue name="STATE_SUSPENDED" value="2" color="#bcdd68" />
+		<!-- sat = 20, val = 90 -->
+		<definedValue name="STATE_TASK_NOTSTARTED" value="3" color="#FFFFFF"/>
+		<definedValue name="STATE_TASK_ACTIVE" value="4" color="#e4e6b8" />
+		<definedValue name="STATE_TASK_READY" value="5" color="#d4e6b8" />
+		<definedValue name="STATE_TASK_RUNNING" value="6" color="#95bc5f" />
+		<definedValue name="STATE_TASK_WAITING" value="7" color="#e6b8c2" />
+		<definedValue name="STATE_TASK_PARKING" value="8" color="#c7b8e6" />
+		<definedValue name="STATE_TASK_POLLING" value="9" color="#b8e4e6" />
+
+		<!-- Control Flow View -->
+		<entry path="Tasks/*">
+			<display type="self" />
+			<entry path="Core*/*">
+				<display type="self" />
+			</entry>
+		</entry>
+		<entry path="Cores">
+			<display type="self" />
+			<entry path="Core*">
+				<display type="self" />
+				<entry path="*">
+					<display type="self" />
+				</entry>
+			</entry>
+		</entry>
+	</timeGraphView>
+</tmfxml>

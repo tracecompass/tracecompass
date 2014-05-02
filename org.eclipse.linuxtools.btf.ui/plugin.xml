@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.linuxtools.tmf.ui.tracetypeui">
+      <type
+            icon="icons/btf.png"
+            tracetype="org.eclipse.linuxtools.btf.trace">
+         <eventsTableType
+               class="org.eclipse.linuxtools.btf.ui.BtfEventViewer">
+         </eventsTableType>
+      </type>
+   </extension>
+</plugin>
