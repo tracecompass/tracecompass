@@ -61,6 +61,8 @@ public abstract class AbstractProviderTest {
 
     private CtfTmfTrace fTrace = null;
     private ITmfStateSystem fSS = null;
+    private TestLttngCallStackModule fModule;
+
 
     // ------------------------------------------------------------------------
     // Abstract methods
@@ -98,16 +100,16 @@ public abstract class AbstractProviderTest {
         assumeTrue(testTrace.exists());
 
         fTrace = testTrace.getTrace();
-        TestLttngCallStackModule module = new TestLttngCallStackModule();
+        fModule = new TestLttngCallStackModule();
         try {
-            module.setTrace(fTrace);
+            fModule.setTrace(fTrace);
         } catch (TmfAnalysisException e) {
             fail();
         }
-        module.schedule();
-        assertTrue(module.waitForCompletion());
+        fModule.schedule();
+        assertTrue(fModule.waitForCompletion());
 
-        fSS = module.getStateSystem();
+        fSS = fModule.getStateSystem();
         assertNotNull(fSS);
     }
 
@@ -116,6 +118,7 @@ public abstract class AbstractProviderTest {
      */
     @After
     public void tearDown() {
+        fModule.close();
         if (fTrace != null) {
             fTrace.dispose();
             File suppDir = new File(TmfTraceManager.getSupplementaryFileDir(fTrace));
@@ -135,21 +138,21 @@ public abstract class AbstractProviderTest {
     public void testOtherUstTrace() {
         /* Initialize the trace and analysis module */
         final ITmfTrace ustTrace = otherUstTrace.getTrace();
-        TestLttngCallStackModule module = new TestLttngCallStackModule();
-        try {
-            module.setTrace(ustTrace);
-        } catch (TmfAnalysisException e) {
-            fail();
+        try (TestLttngCallStackModule module = new TestLttngCallStackModule();) {
+            try {
+                module.setTrace(ustTrace);
+            } catch (TmfAnalysisException e) {
+                fail();
+            }
+            module.schedule();
+            assertTrue(module.waitForCompletion());
+
+            /* Make sure the generated state system exists, but is empty */
+            ITmfStateSystem ss = module.getStateSystem();
+            assertNotNull(ss);
+            assertTrue(ss.getStartTime() >= ustTrace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
+            assertEquals(0, ss.getNbAttributes());
         }
-        module.schedule();
-        assertTrue(module.waitForCompletion());
-
-        /* Make sure the generated state system exists, but is empty */
-        ITmfStateSystem ss = module.getStateSystem();
-        assertNotNull(ss);
-        assertTrue(ss.getStartTime() >= ustTrace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
-        assertEquals(0, ss.getNbAttributes());
-
         /* Dispose the trace */
         ustTrace.dispose();
         File suppDir = new File(TmfTraceManager.getSupplementaryFileDir(ustTrace));

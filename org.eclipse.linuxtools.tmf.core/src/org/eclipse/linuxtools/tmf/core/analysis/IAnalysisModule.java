@@ -42,7 +42,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * @author Geneviève Bastien
  * @since 3.0
  */
-public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProvider {
+public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProvider, AutoCloseable {
 
     // --------------------------------------------------------
     // Getters and setters
@@ -239,4 +239,11 @@ public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProv
      *            The of the parameter that changed
      */
     void notifyParameterChanged(String name);
+
+    // -----------------------------------------------------
+    // AutoCloseable (remove the thrown exception)
+    // -----------------------------------------------------
+
+    @Override
+    void close();
 }

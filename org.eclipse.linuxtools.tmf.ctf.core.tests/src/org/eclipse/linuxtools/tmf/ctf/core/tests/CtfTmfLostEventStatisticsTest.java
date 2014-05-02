@@ -56,6 +56,10 @@ public class CtfTmfLostEventStatisticsTest {
     /** The statistics back-end object for the trace with lost events */
     private ITmfStatistics fStats;
 
+    /* The two analysis modules needed for fStats */
+    private TmfStatisticsTotalsModule fTotalsMod;
+    private TmfStatisticsEventTypesModule fEventTypesMod;
+
     // ------------------------------------------------------------------------
     // Maintenance
     // ------------------------------------------------------------------------
@@ -76,22 +80,22 @@ public class CtfTmfLostEventStatisticsTest {
         fTrace = lostEventsTrace.getTrace();
 
         /* Prepare the two analysis-backed state systems */
-        TmfStatisticsTotalsModule totalsMod = new TmfStatisticsTotalsModule();
-        TmfStatisticsEventTypesModule eventTypesMod = new TmfStatisticsEventTypesModule();
+        fTotalsMod = new TmfStatisticsTotalsModule();
+        fEventTypesMod = new TmfStatisticsEventTypesModule();
         try {
-            totalsMod.setTrace(fTrace);
-            eventTypesMod.setTrace(fTrace);
+            fTotalsMod.setTrace(fTrace);
+            fEventTypesMod.setTrace(fTrace);
         } catch (TmfAnalysisException e) {
             fail();
         }
 
-        totalsMod.schedule();
-        eventTypesMod.schedule();
-        assertTrue(totalsMod.waitForCompletion());
-        assertTrue(eventTypesMod.waitForCompletion());
+        fTotalsMod.schedule();
+        fEventTypesMod.schedule();
+        assertTrue(fTotalsMod.waitForCompletion());
+        assertTrue(fEventTypesMod.waitForCompletion());
 
-        ITmfStateSystem totalsSS = totalsMod.getStateSystem();
-        ITmfStateSystem eventTypesSS = eventTypesMod.getStateSystem();
+        ITmfStateSystem totalsSS = fTotalsMod.getStateSystem();
+        ITmfStateSystem eventTypesSS = fEventTypesMod.getStateSystem();
         assertNotNull(totalsSS);
         assertNotNull(eventTypesSS);
 
@@ -103,6 +107,9 @@ public class CtfTmfLostEventStatisticsTest {
      */
     @After
     public void tearDown() {
+        fStats.dispose();
+        fTotalsMod.close();
+        fEventTypesMod.close();
         fTrace.dispose();
     }
 

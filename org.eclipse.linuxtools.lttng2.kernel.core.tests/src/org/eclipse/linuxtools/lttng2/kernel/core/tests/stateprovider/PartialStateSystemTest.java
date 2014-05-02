@@ -38,8 +38,10 @@ import org.junit.Test;
  */
 public class PartialStateSystemTest extends StateSystemTest {
 
-    private static File stateFile;
     private static final String TEST_FILE_NAME = "test-partial";
+
+    private static File stateFile;
+    private static TestLttngKernelAnalysisModule module;
 
 
     /**
@@ -53,7 +55,7 @@ public class PartialStateSystemTest extends StateSystemTest {
             stateFile.delete();
         }
 
-        TestLttngKernelAnalysisModule module = new TestLttngKernelAnalysisModule(TEST_FILE_NAME);
+        module = new TestLttngKernelAnalysisModule(TEST_FILE_NAME);
         try {
             module.setTrace(testTrace.getTrace());
         } catch (TmfAnalysisException e) {
@@ -71,6 +73,7 @@ public class PartialStateSystemTest extends StateSystemTest {
      */
     @AfterClass
     public static void tearDownClass() {
+        module.close();
         stateFile.delete();
     }
 

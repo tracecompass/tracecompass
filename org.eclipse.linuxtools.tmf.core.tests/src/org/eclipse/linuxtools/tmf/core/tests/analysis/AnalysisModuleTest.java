@@ -55,33 +55,34 @@ public class AnalysisModuleTest {
      */
     @Test
     public void testGettersSetters() {
-        IAnalysisModule module = new TestAnalysis();
+        try (IAnalysisModule module = new TestAnalysis();) {
 
-        module.setName(MODULE_GENERIC_NAME);
-        module.setId(MODULE_GENERIC_ID);
-        assertEquals(MODULE_GENERIC_ID, module.getId());
-        assertEquals(MODULE_GENERIC_NAME, module.getName());
+            module.setName(MODULE_GENERIC_NAME);
+            module.setId(MODULE_GENERIC_ID);
+            assertEquals(MODULE_GENERIC_ID, module.getId());
+            assertEquals(MODULE_GENERIC_NAME, module.getName());
 
-        module.setAutomatic(false);
-        assertFalse(module.isAutomatic());
-        module.setAutomatic(true);
-        assertTrue(module.isAutomatic());
-        module.addParameter(TestAnalysis.PARAM_TEST);
-        assertNull(module.getParameter(TestAnalysis.PARAM_TEST));
-        module.setParameter(TestAnalysis.PARAM_TEST, 1);
-        assertEquals(1, module.getParameter(TestAnalysis.PARAM_TEST));
+            module.setAutomatic(false);
+            assertFalse(module.isAutomatic());
+            module.setAutomatic(true);
+            assertTrue(module.isAutomatic());
+            module.addParameter(TestAnalysis.PARAM_TEST);
+            assertNull(module.getParameter(TestAnalysis.PARAM_TEST));
+            module.setParameter(TestAnalysis.PARAM_TEST, 1);
+            assertEquals(1, module.getParameter(TestAnalysis.PARAM_TEST));
 
-        /* Try to set and get wrong parameter */
-        String wrongParam = "abc";
-        Exception exception = null;
-        try {
-            module.setParameter(wrongParam, 1);
-        } catch (RuntimeException e) {
-            exception = e;
-            assertEquals(NLS.bind(Messages.TmfAbstractAnalysisModule_InvalidParameter, wrongParam, module.getName()), e.getMessage());
+            /* Try to set and get wrong parameter */
+            String wrongParam = "abc";
+            Exception exception = null;
+            try {
+                module.setParameter(wrongParam, 1);
+            } catch (RuntimeException e) {
+                exception = e;
+                assertEquals(NLS.bind(Messages.TmfAbstractAnalysisModule_InvalidParameter, wrongParam, module.getName()), e.getMessage());
+            }
+            assertNotNull(exception);
+            assertNull(module.getParameter(wrongParam));
         }
-        assertNotNull(exception);
-        assertNull(module.getParameter(wrongParam));
     }
 
     private static TestAnalysis setUpAnalysis() {
@@ -92,7 +93,6 @@ public class AnalysisModuleTest {
         module.addParameter(TestAnalysis.PARAM_TEST);
 
         return module;
-
     }
 
     /**
@@ -153,22 +153,22 @@ public class AnalysisModuleTest {
      */
     @Test
     public void testSetWrongTrace() {
-        IAnalysisModule module = new TestAnalysis2();
+        try (IAnalysisModule module = new TestAnalysis2();) {
 
-        module.setName(MODULE_GENERIC_NAME);
-        module.setId(MODULE_GENERIC_ID);
-        assertEquals(MODULE_GENERIC_ID, module.getId());
-        assertEquals(MODULE_GENERIC_NAME, module.getName());
+            module.setName(MODULE_GENERIC_NAME);
+            module.setId(MODULE_GENERIC_ID);
+            assertEquals(MODULE_GENERIC_ID, module.getId());
+            assertEquals(MODULE_GENERIC_NAME, module.getName());
 
-        Exception exception = null;
-        try {
-            module.setTrace(TmfTestTrace.A_TEST_10K.getTrace());
-        } catch (TmfAnalysisException e) {
-            exception = e;
+            Exception exception = null;
+            try {
+                module.setTrace(TmfTestTrace.A_TEST_10K.getTrace());
+            } catch (TmfAnalysisException e) {
+                exception = e;
+            }
+            assertNotNull(exception);
+            assertEquals(NLS.bind(Messages.TmfAbstractAnalysisModule_AnalysisCannotExecute, module.getName()), exception.getMessage());
         }
-        assertNotNull(exception);
-        assertEquals(NLS.bind(Messages.TmfAbstractAnalysisModule_AnalysisCannotExecute, module.getName()), exception.getMessage());
-
     }
 
     /**

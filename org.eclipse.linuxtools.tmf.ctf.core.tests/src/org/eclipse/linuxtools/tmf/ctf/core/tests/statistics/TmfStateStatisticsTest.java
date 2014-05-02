@@ -36,6 +36,9 @@ public class TmfStateStatisticsTest extends TmfStatisticsTest {
 
     private ITmfTrace fTrace;
 
+    private TmfStatisticsTotalsModule fTotalsMod;
+    private TmfStatisticsEventTypesModule fEventTypesMod;
+
     /**
      * Class setup
      */
@@ -52,22 +55,22 @@ public class TmfStateStatisticsTest extends TmfStatisticsTest {
         fTrace = testTrace.getTrace();
 
         /* Prepare the two analysis-backed state systems */
-        TmfStatisticsTotalsModule totalsMod = new TmfStatisticsTotalsModule();
-        TmfStatisticsEventTypesModule eventTypesMod = new TmfStatisticsEventTypesModule();
+        fTotalsMod = new TmfStatisticsTotalsModule();
+        fEventTypesMod = new TmfStatisticsEventTypesModule();
         try {
-            totalsMod.setTrace(fTrace);
-            eventTypesMod.setTrace(fTrace);
+            fTotalsMod.setTrace(fTrace);
+            fEventTypesMod.setTrace(fTrace);
         } catch (TmfAnalysisException e) {
             fail();
         }
 
-        totalsMod.schedule();
-        eventTypesMod.schedule();
-        assertTrue(totalsMod.waitForCompletion());
-        assertTrue(eventTypesMod.waitForCompletion());
+        fTotalsMod.schedule();
+        fEventTypesMod.schedule();
+        assertTrue(fTotalsMod.waitForCompletion());
+        assertTrue(fEventTypesMod.waitForCompletion());
 
-        ITmfStateSystem totalsSS = totalsMod.getStateSystem();
-        ITmfStateSystem eventTypesSS = eventTypesMod.getStateSystem();
+        ITmfStateSystem totalsSS = fTotalsMod.getStateSystem();
+        ITmfStateSystem eventTypesSS = fEventTypesMod.getStateSystem();
         assertNotNull(totalsSS);
         assertNotNull(eventTypesSS);
 
@@ -79,6 +82,8 @@ public class TmfStateStatisticsTest extends TmfStatisticsTest {
      */
     @After
     public void tearDown() {
+        fTotalsMod.close();
+        fEventTypesMod.close();
         fTrace.dispose();
     }
 }
