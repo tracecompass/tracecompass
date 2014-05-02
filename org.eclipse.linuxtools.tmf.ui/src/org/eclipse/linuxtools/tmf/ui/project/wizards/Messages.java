@@ -9,6 +9,7 @@
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Patrick Tasse - Add support for folder elements
+ *   Marc-Andre Laperle - Preserve folder structure on import
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.wizards;
@@ -69,6 +70,11 @@ public class Messages extends NLS {
      * The label of the checkbox to create a link to the trace in workspace (import trace wizard)
      */
     public static String ImportTraceWizard_CreateLinksInWorkspace;
+    /**
+     * The label of the checkbox to preserve the folder structure of selected the traces in workspace (import trace wizard)
+     * @since 3.0
+     */
+    public static String ImportTraceWizard_PreserveFolderStructure;
     /**
      * The error message for invalid trace directory (import trace wizard)
      */

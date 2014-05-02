@@ -14,6 +14,7 @@
  *   Matthew Khouzam - Moved out some common functions
  *   Patrick Tasse - Add sorting of file system elements
  *   Bernd Hufmann - Re-design of trace selection and trace validation
+ *   Marc-Andre Laperle - Preserve folder structure on import
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace;
@@ -140,6 +141,8 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     private Button fOverwriteExistingResourcesCheckbox;
     // Button to link or copy traces to workspace
     private Button fCreateLinksInWorkspaceButton;
+    // Button to preserve folder structure
+    private Button fPreserveFolderStructureButton;
     private boolean entryChanged = false;
     /** The directory name field */
     protected Combo directoryNameField;
@@ -597,6 +600,11 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             }
         });
 
+        fPreserveFolderStructureButton = new Button(optionsGroup, SWT.CHECK);
+        fPreserveFolderStructureButton.setFont(optionsGroup.getFont());
+        fPreserveFolderStructureButton.setText(Messages.ImportTraceWizard_PreserveFolderStructure);
+        fPreserveFolderStructureButton.setSelection(true);
+
         updateWidgetEnablements();
     }
 
@@ -668,8 +676,9 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         // Save directory for next import operation
         fRootDirectory = getSourceDirectoryName();
 
-        final TraceValidateAndImportOperation operation = new TraceValidateAndImportOperation(traceId, getContainerFullPath(),
-                fImportUnrecognizedButton.getSelection(), fOverwriteExistingResourcesCheckbox.getSelection(), fCreateLinksInWorkspaceButton.getSelection());
+        IPath baseSourceContainerPath = new Path(getSourceDirectory().getAbsolutePath());
+        final TraceValidateAndImportOperation operation = new TraceValidateAndImportOperation(traceId, baseSourceContainerPath, getContainerFullPath(),
+                fImportUnrecognizedButton.getSelection(), fOverwriteExistingResourcesCheckbox.getSelection(), fCreateLinksInWorkspaceButton.getSelection(), fPreserveFolderStructureButton.getSelection());
 
         IStatus status = Status.OK_STATUS;
         try {
@@ -713,19 +722,23 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     private class TraceValidateAndImportOperation {
         private IStatus fStatus;
         private String fTraceType;
-        private IPath fContainerPath;
+        private IPath fDestinationContainerPath;
+        private IPath fBaseSourceContainerPath;
         private boolean fImportUnrecognizedTraces;
         private boolean fLink;
+        private boolean fPreserveFolderStructure;
         private ImportConfirmation fConfirmationMode = ImportConfirmation.SKIP;
 
-        private TraceValidateAndImportOperation(String traceId, IPath containerPath, boolean doImport, boolean overwrite, boolean link) {
+        private TraceValidateAndImportOperation(String traceId, IPath baseSourceContainerPath, IPath destinationContainerPath, boolean doImport, boolean overwrite, boolean link, boolean preserveFolderStructure) {
             fTraceType = traceId;
-            fContainerPath = containerPath;
+            fBaseSourceContainerPath = baseSourceContainerPath;
+            fDestinationContainerPath = destinationContainerPath;
             fImportUnrecognizedTraces = doImport;
             if (overwrite) {
                 fConfirmationMode = ImportConfirmation.OVERWRITE_ALL;
             }
             fLink = link;
+            fPreserveFolderStructure = preserveFolderStructure;
         }
 
         public void run(IProgressMonitor progressMonitor) {
@@ -764,6 +777,8 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                     TraceFileSystemElement element = fileSystemElementsIter.next();
                     File fileResource = (File) element.getFileSystemObject();
                     String resourcePath = fileResource.getAbsolutePath();
+                    element.setDestinationContainerPath(computeDestinationContainerPath(new Path(resourcePath)));
+
                     currentPath = resourcePath;
                     SubMonitor sub = subMonitor.newChild(1);
                     if (element.isDirectory()) {
@@ -777,6 +792,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                         TraceFileSystemElement parentElement = (TraceFileSystemElement)element.getParent();
                         File parentFile = (File) parentElement.getFileSystemObject();
                         String parentPath = parentFile.getAbsolutePath();
+                        parentElement.setDestinationContainerPath(computeDestinationContainerPath(new Path(parentPath)));
                         currentPath = parentPath;
                         if (!folderElements.containsKey(parentPath)) {
                             if (isDirectoryTrace(parentElement)) {
@@ -794,9 +810,31 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             } catch (InterruptedException e) {
                 setStatus(Status.CANCEL_STATUS);
             } catch (Exception e) {
-                setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.ImportTraceWizard_ImportProblem + ": " + //$NON-NLS-1$
-                        (currentPath != null ? currentPath : "") , e)); //$NON-NLS-1$
+                String errorMessage = Messages.ImportTraceWizard_ImportProblem + ": " + //$NON-NLS-1$
+                        (currentPath != null ? currentPath : ""); //$NON-NLS-1$
+                Activator.getDefault().logError(errorMessage, e);
+                setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, errorMessage , e));
             }
+        }
+
+        private IPath computeDestinationContainerPath(Path resourcePath) {
+            IPath destinationContainerPath = fDestinationContainerPath;
+
+            // We need to figure out the new destination path relative to the selected "base" source directory.
+            // Here for example, the selected source directory is /home/user
+            if (fPreserveFolderStructure) {
+                // /home/user/bar/foo/trace -> /home/user/bar/foo
+                IPath sourceContainerPath = resourcePath.removeLastSegments(1);
+                if (fBaseSourceContainerPath.equals(resourcePath)) {
+                    // Use resourcePath directory if fBaseSourceContainerPath points to a directory trace
+                    sourceContainerPath = resourcePath;
+                }
+                // /home/user/bar/foo, /home/user -> bar/foo
+                IPath relativeContainerPath = sourceContainerPath.makeRelativeTo(fBaseSourceContainerPath);
+                // project/Traces + bar/foo -> project/Traces/bar/foo
+                destinationContainerPath = fDestinationContainerPath.append(relativeContainerPath);
+            }
+            return destinationContainerPath;
         }
 
         private void validateAndImportTrace(TraceFileSystemElement fileSystemElement, IProgressMonitor monitor)
@@ -837,9 +875,9 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             }
 
             // Finally import trace
-            if (importResource(fileSystemElement, monitor)) {
-                IResource resource = fTargetFolder.findMember(fileSystemElement.getLabel());
-                TmfTraceTypeUIUtils.setTraceType(resource, traceTypeHelper);
+            IResource importedResource = importResource(fileSystemElement, monitor);
+            if (importedResource != null) {
+                TmfTraceTypeUIUtils.setTraceType(importedResource, traceTypeHelper);
             }
 
         }
@@ -853,7 +891,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
          *            trace file system object to import
          * @param monitor
          *            a progress monitor
-         * @return true if trace was imported else false
+         * @return the imported resource or null if no resource was imported
          *
          * @throws InvocationTargetException
          *             if problems during import operation
@@ -862,8 +900,9 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
          * @throws CoreException
          *             if problems with workspace
          */
-        private boolean importResource(TraceFileSystemElement fileSystemElement, IProgressMonitor monitor)
+        private IResource importResource(TraceFileSystemElement fileSystemElement, IProgressMonitor monitor)
                 throws InvocationTargetException, InterruptedException, CoreException {
+
             ImportConfirmation mode = checkForNameClashes(fileSystemElement);
             switch (mode) {
             case RENAME:
@@ -879,16 +918,17 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             case SKIP:
             case SKIP_ALL:
             default:
-                return false;
+                return null;
             }
 
             List<TraceFileSystemElement> subList = new ArrayList<>();
 
-            IPath containerPath = fContainerPath;
             FileSystemElement parentFolder = fileSystemElement.getParent();
 
+            IPath containerPath = fileSystemElement.getDestinationContainerPath();
+            IPath tracePath = containerPath.addTrailingSeparator().append(fileSystemElement.getLabel());
             if (fileSystemElement.isDirectory() && (!fLink)) {
-                containerPath = containerPath.addTrailingSeparator().append(fileSystemElement.getLabel());
+                containerPath = tracePath;
 
                 Object[] array = fileSystemElement.getFiles().getChildren();
                 for (int i = 0; i < array.length; i++) {
@@ -935,11 +975,11 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             if (sourceLocation == null) {
                 sourceLocation = URIUtil.toUnencodedString(file.toURI());
             }
-            IPath path = fContainerPath.addTrailingSeparator().append(fileSystemElement.getLabel());
-            IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
+
+            IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(tracePath);
             resource.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
 
-            return true;
+            return resource;
         }
 
         private boolean isDirectoryTrace(FileSystemElement fileSystemElement) {
@@ -952,18 +992,17 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         }
 
         private ImportConfirmation checkForNameClashes(TraceFileSystemElement fileSystemElement) throws InterruptedException {
-
-            String traceName = ((File)fileSystemElement.getFileSystemObject()).getName();
+            IPath tracePath = getInitialDestinationPath(fileSystemElement);
 
             // handle rename
-            if (getExistingTrace(traceName) != null) {
+            if (getExistingTrace(tracePath) != null) {
                 if ((fConfirmationMode == ImportConfirmation.RENAME_ALL) ||
                     (fConfirmationMode == ImportConfirmation.OVERWRITE_ALL) ||
                     (fConfirmationMode == ImportConfirmation.SKIP_ALL)) {
                     return fConfirmationMode;
                 }
 
-                int returnCode = promptForOverwrite(traceName);
+                int returnCode = promptForOverwrite(tracePath);
                 if (returnCode < 0) {
                     // Cancel
                     throw new InterruptedException();
@@ -974,9 +1013,9 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             return ImportConfirmation.CONTINUE;
         }
 
-        private int promptForOverwrite(String traceName) {
+        private int promptForOverwrite(IPath tracePath) {
             final MessageDialog dialog = new MessageDialog(getContainer()
-                    .getShell(), null, null, NLS.bind(Messages.ImportTraceWizard_TraceAlreadyExists, traceName),
+                    .getShell(), null, null, NLS.bind(Messages.ImportTraceWizard_TraceAlreadyExists, tracePath.makeRelativeTo(fTraceFolderElement.getProject().getPath())),
                     MessageDialog.QUESTION, new String[] {
                         ImportConfirmation.RENAME.getInName(),
                         ImportConfirmation.RENAME_ALL.getInName(),
@@ -1002,14 +1041,23 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             return returnValue[0];
         }
 
+        /**
+         * @return the initial destination path, before rename, if any
+         */
+        private IPath getInitialDestinationPath(TraceFileSystemElement fileSystemElement) {
+            IPath traceFolderPath = fileSystemElement.getDestinationContainerPath();
+            return traceFolderPath.append(((File)fileSystemElement.getFileSystemObject()).getName());
+        }
+
         private void rename(TraceFileSystemElement fileSystemElement) {
-            String traceName = ((File)fileSystemElement.getFileSystemObject()).getName();
-            TmfTraceElement trace = getExistingTrace(traceName);
+            IPath tracePath = getInitialDestinationPath(fileSystemElement);
+            TmfTraceElement trace = getExistingTrace(tracePath);
             if (trace == null) {
                 return;
             }
 
-            IFolder folder = trace.getProject().getTracesFolder().getResource();
+            // Not using IFolder on purpose to leave the door open to import directly into an IProject
+            IContainer folder = (IContainer) trace.getParent().getResource();
             int i = 2;
             while (true) {
                 String name = trace.getName() + '(' + Integer.toString(i++) + ')';
@@ -1022,8 +1070,8 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         }
 
         private void delete(TraceFileSystemElement fileSystemElement, IProgressMonitor monitor) throws CoreException {
-            String traceName = ((File)fileSystemElement.getFileSystemObject()).getName();
-            TmfTraceElement trace = getExistingTrace(traceName);
+            IPath tracePath = getInitialDestinationPath(fileSystemElement);
+            TmfTraceElement trace = getExistingTrace(tracePath);
             if (trace == null) {
                 return;
             }
@@ -1031,10 +1079,10 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             trace.delete(monitor);
         }
 
-        private TmfTraceElement getExistingTrace(String traceName) {
+        private TmfTraceElement getExistingTrace(IPath tracePath) {
             List<TmfTraceElement> traces = fTraceFolderElement.getTraces();
             for (TmfTraceElement t : traces) {
-                if (t.getName().equals(traceName)) {
+                if (t.getPath().equals(tracePath)) {
                     return t;
                 }
             }
@@ -1064,9 +1112,14 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
         private boolean fIsPopulated = false;
         private String fLabel = null;
+        private IPath fDestinationContainerPath;
 
         public TraceFileSystemElement(String name, FileSystemElement parent, boolean isDirectory) {
             super(name, parent, isDirectory);
+        }
+
+        public void setDestinationContainerPath(IPath destinationContainerPath) {
+            fDestinationContainerPath = destinationContainerPath;
         }
 
         public void setPopulated() {
@@ -1118,6 +1171,15 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 return name;
             }
             return fLabel;
+        }
+
+        /**
+         * The full path to the container that will contain the trace
+         *
+         * @return the destination container path
+         */
+        public IPath getDestinationContainerPath() {
+            return fDestinationContainerPath;
         }
 
         /**
