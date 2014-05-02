@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
+import org.eclipse.linuxtools.ctf.core.event.scope.LexicalScope;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -98,6 +99,35 @@ public final class StructDefinition extends ScopedDefinition {
             Iterable<String> fieldNames,
             Definition[] definitions) {
         super(declaration, definitionScope, structFieldName);
+        fFieldNames = ImmutableList.copyOf(fieldNames);
+        fDefinitions = definitions;
+        if (fFieldNames.isEmpty()) {
+            fDefinitionsMap = Collections.EMPTY_MAP;
+        }
+    }
+
+    /**
+     * Constructor This one takes the scope and thus speeds up definition
+     * creation
+     *
+     * @param declaration
+     *            the parent declaration
+     * @param definitionScope
+     *            the parent scope
+     * @param scope
+     *            the scope of this variable
+     * @param structFieldName
+     *            the field name
+     * @param fieldNames
+     *            the list of fields
+     * @param definitions
+     *            the definitions
+     * @since 3.1
+     */
+    public StructDefinition(@NonNull StructDeclaration declaration,
+            IDefinitionScope definitionScope, @NonNull LexicalScope scope,
+            @NonNull String structFieldName, @NonNull Iterable<String> fieldNames, Definition[] definitions) {
+        super(declaration, definitionScope, structFieldName, scope);
         fFieldNames = ImmutableList.copyOf(fieldNames);
         fDefinitions = definitions;
         if (fFieldNames == null) {

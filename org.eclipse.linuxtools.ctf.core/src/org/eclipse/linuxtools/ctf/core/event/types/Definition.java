@@ -65,10 +65,31 @@ public abstract class Definition {
      * @since 3.0
      */
     public Definition(@NonNull IDeclaration declaration, IDefinitionScope definitionScope, @NonNull String fieldName) {
+        this(declaration, definitionScope, fieldName, declaration.getPath(definitionScope, fieldName));
+    }
+
+    /**
+     * Constructor This one takes the scope and thus speeds up definition creation
+     *
+     *
+     * @param declaration
+     *            the event declaration
+     *
+     * @param definitionScope
+     *            the definition is in a scope, (normally a struct) what is it?
+     *
+     * @param fieldName
+     *            the name of the defintions. it is a field in the parent scope.
+     *
+     * @param scope
+     *            the scope
+     * @since 3.1
+     */
+    public Definition(@NonNull IDeclaration declaration, IDefinitionScope definitionScope, @NonNull String fieldName, LexicalScope scope) {
         fDeclaration = declaration;
         fDefinitionScope = definitionScope;
         fFieldName = fieldName;
-        fPath = fDeclaration.getPath(definitionScope, fieldName);
+        fPath = scope;
     }
 
     // ------------------------------------------------------------------------

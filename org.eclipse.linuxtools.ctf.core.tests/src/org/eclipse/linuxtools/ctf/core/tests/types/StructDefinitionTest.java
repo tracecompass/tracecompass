@@ -134,7 +134,7 @@ public class StructDefinitionTest {
     @Test
     public void testLookupArray() {
         String name = INT_ID;
-        AbstractArrayDefinition result = fixture.lookupArray2(name);
+        AbstractArrayDefinition result = fixture.lookupArrayDefinition(name);
         assertNull(result);
     }
 
@@ -185,7 +185,7 @@ public class StructDefinitionTest {
     @Test
     public void testLookupFixedStringDefinition() {
         String name = SEQUENCE_ID;
-        AbstractArrayDefinition result = fixture.lookupArray2(name);
+        AbstractArrayDefinition result = fixture.lookupArrayDefinition(name);
         assertNotNull(result);
     }
 

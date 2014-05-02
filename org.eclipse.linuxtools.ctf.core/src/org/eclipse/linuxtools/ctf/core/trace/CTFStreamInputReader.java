@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.ctf.core.trace;
 
 import java.nio.ByteOrder;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
@@ -37,7 +38,7 @@ public class CTFStreamInputReader implements AutoCloseable {
     /**
      * The StreamInput we are reading.
      */
-    private final CTFStreamInput fStreamInput;
+    private final @NonNull CTFStreamInput fStreamInput;
 
     /**
      * The packet reader used to read packets from this trace file.
@@ -77,6 +78,9 @@ public class CTFStreamInputReader implements AutoCloseable {
      *             if an error occurs
      */
     public CTFStreamInputReader(CTFStreamInput streamInput) throws CTFReaderException {
+        if (streamInput == null) {
+            throw new IllegalArgumentException("streamInput cannot be null"); //$NON-NLS-1$
+        }
         fStreamInput = streamInput;
         fPacketReader = new CTFStreamInputPacketReader(this);
         /*
@@ -431,7 +435,7 @@ public class CTFStreamInputReader implements AutoCloseable {
         int result = 1;
         result = (prime * result) + fId;
         result = (prime * result)
-                + ((fStreamInput == null) ? 0 : fStreamInput.hashCode());
+                + fStreamInput.hashCode();
         return result;
     }
 
@@ -450,14 +454,7 @@ public class CTFStreamInputReader implements AutoCloseable {
         if (fId != other.fId) {
             return false;
         }
-        if (fStreamInput == null) {
-            if (other.fStreamInput != null) {
-                return false;
-            }
-        } else if (!fStreamInput.equals(other.fStreamInput)) {
-            return false;
-        }
-        return true;
+        return fStreamInput.equals(other.fStreamInput);
     }
 
     @Override

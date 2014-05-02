@@ -123,7 +123,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
      *             out of bounds exception or such
      */
     public StructDefinition getEventContextDefinition(@NonNull BitBuffer input) throws CTFReaderException {
-        return fStreamEventContextDecl.createDefinition(this, LexicalScope.STREAM_EVENT_CONTEXT.getName(), input);
+        return fStreamEventContextDecl.createDefinition(fStreamInputReader.getStreamInput(), LexicalScope.STREAM_EVENT_CONTEXT, input);
     }
 
     /**
@@ -136,7 +136,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
      *             out of bounds exception or such
      */
     public StructDefinition getStreamEventHeaderDefinition(@NonNull BitBuffer input) throws CTFReaderException {
-        return fStreamEventHeaderDecl.createDefinition(this, LexicalScope.STREAM_EVENT_HEADER.getName(), input);
+        return fStreamEventHeaderDecl.createDefinition(this, LexicalScope.EVENT_HEADER, input);
     }
 
     /**
@@ -149,7 +149,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
      *             out of bounds exception or such
      */
     public StructDefinition getStreamPacketContextDefinition(@NonNull BitBuffer input) throws CTFReaderException {
-        return fStreamPacketContextDecl.createDefinition(this, LexicalScope.STREAM_PACKET_CONTEXT.getName(), input);
+        return fStreamPacketContextDecl.createDefinition(fStreamInputReader.getStreamInput(), LexicalScope.STREAM_PACKET_CONTEXT, input);
     }
 
     /**
@@ -162,7 +162,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
      *             out of bounds exception or such
      */
     public StructDefinition getTracePacketHeaderDefinition(@NonNull BitBuffer input) throws CTFReaderException {
-        return fTracePacketHeaderDecl.createDefinition(this, LexicalScope.TRACE_PACKET_HEADER.getName(), input);
+        return fTracePacketHeaderDecl.createDefinition(fStreamInputReader.getStreamInput().getStream().getTrace(), LexicalScope.TRACE_PACKET_HEADER, input);
     }
 
     /**

@@ -219,7 +219,7 @@ public class VariantDefinitionTest {
      */
     @Test
     public void testLookupArray() {
-        AbstractArrayDefinition result = fixture.lookupArray2(ENUM_3);
+        AbstractArrayDefinition result = fixture.lookupArrayDefinition(ENUM_3);
         assertNull(result);
     }
 

@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.ctf.core.event.types;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
+import org.eclipse.linuxtools.ctf.core.event.scope.LexicalScope;
 
 /**
  * Scoped defintion. a defintion where you can lookup various datatypes
@@ -43,6 +44,24 @@ public abstract class ScopedDefinition extends Definition implements IDefinition
     }
 
     /**
+     * Constructor This one takes the scope and thus speeds up definition
+     * creation
+     *
+     * @param declaration
+     *            the parent declaration
+     * @param definitionScope
+     *            the parent scope
+     * @param fieldName
+     *            the field name
+     * @param scope
+     *            the lexical scope
+     * @since 3.1
+     */
+    public ScopedDefinition(StructDeclaration declaration, @Nullable IDefinitionScope definitionScope, String fieldName, LexicalScope scope) {
+        super(declaration, definitionScope, fieldName, scope);
+    }
+
+    /**
      * Lookup an array in a struct. If the name returns a non-array (like an
      * int) then the method returns null
      *
@@ -50,8 +69,7 @@ public abstract class ScopedDefinition extends Definition implements IDefinition
      *            the name of the array
      * @return the array or null.
      */
-    @Nullable
-    public AbstractArrayDefinition lookupArray2(String name){
+    public @Nullable AbstractArrayDefinition lookupArrayDefinition(String name) {
         Definition def = lookupDefinition(name);
         return (AbstractArrayDefinition) ((def instanceof AbstractArrayDefinition) ? def : null);
     }
@@ -63,6 +81,7 @@ public abstract class ScopedDefinition extends Definition implements IDefinition
      * @param name
      *            the name of the array
      * @return the array or null.
+     * @deprecated use {@link ScopedDefinition#lookupArrayDefinition(String)}
      */
     @Deprecated
     @Nullable
@@ -110,6 +129,7 @@ public abstract class ScopedDefinition extends Definition implements IDefinition
      * @return the sequence or null if a definition is not found or it does not
      *         match the desired datatype.
      * @since 3.0
+     * @deprecated use {@link ScopedDefinition#lookupArrayDefinition(String)}
      */
     @Deprecated
     @Nullable

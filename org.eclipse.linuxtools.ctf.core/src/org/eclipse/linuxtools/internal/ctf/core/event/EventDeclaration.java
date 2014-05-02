@@ -36,10 +36,6 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFStreamInputReader;
  */
 public class EventDeclaration implements IEventDeclaration {
 
-    @NonNull private static final String FIELDS = "fields"; //$NON-NLS-1$
-
-    @NonNull private static final String CONTEXT = "context"; //$NON-NLS-1$
-
     /** Id of lost events */
     public static final long LOST_EVENT_ID = -1L;
 
@@ -97,10 +93,10 @@ public class EventDeclaration implements IEventDeclaration {
     @Override
     public EventDefinition createDefinition(CTFStreamInputReader streamInputReader, @NonNull BitBuffer input, long timestamp) throws CTFReaderException {
         StructDeclaration streamEventContextDecl = streamInputReader.getStreamEventContextDecl();
-        StructDefinition streamEventContext = streamEventContextDecl != null ? streamEventContextDecl.createDefinition(null, LexicalScope.STREAM_EVENT_CONTEXT.toString(), input) : null;
+        StructDefinition streamEventContext = streamEventContextDecl != null ? streamEventContextDecl.createDefinition(fStream.getTrace(), LexicalScope.STREAM_EVENT_CONTEXT, input) : null;
         StructDefinition packetContext = streamInputReader.getPacketReader().getCurrentPacketEventHeader();
-        StructDefinition eventContext = fContext != null ? fContext.createDefinition(null, CONTEXT, input) : null;
-        StructDefinition eventPayload = fFields != null ? fFields.createDefinition(null, FIELDS, input) : null;
+        StructDefinition eventContext = fContext != null ? fContext.createDefinition(fStream.getTrace(), LexicalScope.CONTEXT, input) : null;
+        StructDefinition eventPayload = fFields != null ? fFields.createDefinition(fStream.getTrace(), LexicalScope.FIELDS, input) : null;
 
         // a bit lttng specific
         // CTF doesn't require a timestamp,

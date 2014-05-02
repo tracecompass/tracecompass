@@ -34,7 +34,7 @@ public class LexicalScope implements Comparable<LexicalScope> {
      *
      * @since 3.0
      */
-    public static final LexicalScope ROOT = new LexicalScope(null, ""); //$NON-NLS-1$
+    public static final LexicalScope ROOT = new RootScope();
 
     /**
      * Trace string
@@ -84,7 +84,7 @@ public class LexicalScope implements Comparable<LexicalScope> {
      * @since 3.0
      *
      */
-    public static final LexicalScope PACKET_HEADER = new LexicalScope(PACKET, "header"); //$NON-NLS-1$
+    public static final LexicalScope PACKET_HEADER = new PacketHeaderScope();
 
     /**
      * Stream packet scope
@@ -136,11 +136,18 @@ public class LexicalScope implements Comparable<LexicalScope> {
     public static final LexicalScope STREAM_EVENT_HEADER = new LexicalScope(STREAM_EVENT, "header"); //$NON-NLS-1$
 
     /**
+     * Event header
+     *
+     * @since 3.1
+     */
+    public static final LexicalScope EVENT_HEADER = new EventHeaderScope(EVENT, "header"); //$NON-NLS-1$
+
+    /**
      * Fields in an event
      *
      * @since 3.0
      */
-    public static final LexicalScope FIELDS = new LexicalScope(ROOT, "fields"); //$NON-NLS-1$
+    public static final LexicalScope FIELDS = new FieldsScope(ROOT, "fields"); //$NON-NLS-1$
 
     /**
      * Context of an event
@@ -170,7 +177,6 @@ public class LexicalScope implements Comparable<LexicalScope> {
     private final String fPath;
     private final Map<String, LexicalScope> fChildren;
 
-
     /**
      * The scope constructor
      *
@@ -187,7 +193,8 @@ public class LexicalScope implements Comparable<LexicalScope> {
                 pathString = pathString.substring(1);
             }
             if (pathString == null) {
-                // we should get an NPE on pathString.startsWith before getting this
+                // we should get an NPE on pathString.startsWith before getting
+                // this
                 throw new IllegalStateException(
                         "Lexical scope constructor had null pathstring for " + //$NON-NLS-1$
                                 parent.toString() + " and " + name); //$NON-NLS-1$
@@ -240,7 +247,7 @@ public class LexicalScope implements Comparable<LexicalScope> {
 
     @Override
     public String toString() {
-        return fPath + '.' + fName;
+        return (fPath.isEmpty() ? fName : fPath + '.' + fName);
     }
 
     @Override

@@ -350,7 +350,7 @@ public class CTFStreamInput implements IDefinitionScope, AutoCloseable {
 
     private void parseTracePacketHeader(StructDeclaration tracePacketHeaderDecl,
             @NonNull BitBuffer bitBuffer) throws CTFReaderException {
-        StructDefinition tracePacketHeaderDef = tracePacketHeaderDecl.createDefinition(fStream.getTrace(), LexicalScope.TRACE_PACKET_HEADER.getName(), bitBuffer);
+        StructDefinition tracePacketHeaderDef = tracePacketHeaderDecl.createDefinition(fStream.getTrace(), LexicalScope.TRACE_PACKET_HEADER, bitBuffer);
 
         /*
          * Check the CTF magic number
@@ -405,7 +405,7 @@ public class CTFStreamInput implements IDefinitionScope, AutoCloseable {
     private void parsePacketContext(long fileSizeBytes,
             StructDeclaration streamPacketContextDecl, @NonNull BitBuffer bitBuffer,
             StreamInputPacketIndexEntry packetIndex) throws CTFReaderException {
-        StructDefinition streamPacketContextDef = streamPacketContextDecl.createDefinition(null, LexicalScope.STREAM_PACKET_CONTEXT.getName(), bitBuffer);
+        StructDefinition streamPacketContextDef = streamPacketContextDecl.createDefinition(this, LexicalScope.STREAM_PACKET_CONTEXT, bitBuffer);
 
         for (String field : streamPacketContextDef.getDeclaration()
                 .getFieldsList()) {

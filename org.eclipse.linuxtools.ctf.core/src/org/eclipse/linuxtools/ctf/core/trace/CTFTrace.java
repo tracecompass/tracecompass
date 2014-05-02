@@ -510,7 +510,7 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
 
         if (fPacketHeaderDecl != null) {
             /* Read the packet header */
-            fPacketHeaderDef = fPacketHeaderDecl.createDefinition(null, LexicalScope.PACKET_HEADER.toString(), streamBitBuffer);
+            fPacketHeaderDef = fPacketHeaderDecl.createDefinition(this, LexicalScope.PACKET_HEADER, streamBitBuffer);
 
             /* Check the magic number */
             IntegerDefinition magicDef = (IntegerDefinition) fPacketHeaderDef.lookupDefinition("magic"); //$NON-NLS-1$
