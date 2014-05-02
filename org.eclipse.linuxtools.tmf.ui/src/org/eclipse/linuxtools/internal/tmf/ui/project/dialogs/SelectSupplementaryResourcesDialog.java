@@ -120,9 +120,6 @@ public class SelectSupplementaryResourcesDialog extends Dialog {
 
             @Override
             public boolean hasChildren(Object element) {
-                if (element instanceof IResource[]) {
-                    return true;
-                }
                 return false;
             }
 
@@ -133,14 +130,14 @@ public class SelectSupplementaryResourcesDialog extends Dialog {
 
             @Override
             public Object[] getElements(Object inputElement) {
-                return getChildren(inputElement);
+                if (inputElement instanceof IResource[]) {
+                    return (Object[]) inputElement;
+                }
+                return null;
             }
 
             @Override
             public Object[] getChildren(Object parentElement) {
-                if (parentElement instanceof IResource[]) {
-                    return (Object[]) parentElement;
-                }
                 return null;
             }
         });
@@ -158,6 +155,8 @@ public class SelectSupplementaryResourcesDialog extends Dialog {
         });
 
         fTreeViewer.setInput(fAvailableResources);
+
+        setAllChecked(true);
 
         fTreeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
@@ -181,10 +180,7 @@ public class SelectSupplementaryResourcesDialog extends Dialog {
         selectAll.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                Object[] items = fAvailableResources;
-                for (Object treeItem : items) {
-                    fTreeViewer.setChecked(treeItem, true);
-                }
+                setAllChecked(true);
 
                 updateOKButtonEnablement();
             }
@@ -195,10 +191,7 @@ public class SelectSupplementaryResourcesDialog extends Dialog {
         deselectAll.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                Object[] items = fAvailableResources;
-                for (Object treeItem : items) {
-                    fTreeViewer.setChecked(treeItem, false);
-                }
+                setAllChecked(false);
 
                 updateOKButtonEnablement();
             }
@@ -207,6 +200,12 @@ public class SelectSupplementaryResourcesDialog extends Dialog {
         getShell().setMinimumSize(new Point(300, 150));
 
         return composite;
+    }
+
+    private void setAllChecked(boolean state) {
+        for (Object element : fAvailableResources) {
+            fTreeViewer.setChecked(element, state);
+        }
     }
 
     private void updateOKButtonEnablement() {

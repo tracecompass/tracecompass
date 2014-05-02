@@ -665,26 +665,25 @@
                <with
                      variable="selection">
                   <and>
-                     <count
-                           value="1">
-                     </count>
                      <iterate
                            ifEmpty="false"
                            operator="and">
-                        <and>
-                           <or>
-                              <instanceof
-                                    value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
-                              </instanceof>
-                              <instanceof
-                                    value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
-                              </instanceof>
-                           </or>
-                           <test
-                                 forcePluginActivation="true"
-                                 property="org.eclipse.linuxtools.tmf.ui.hasSupplementaryFiles">
-                           </test>
-                        </and>
+                        <or>
+                           <instanceof
+                                 value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                           </instanceof>
+                           <instanceof
+                                 value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                           </instanceof>
+                        </or>
+                     </iterate>
+                     <iterate
+                           ifEmpty="false"
+                           operator="or">
+                        <test
+                              forcePluginActivation="true"
+                              property="org.eclipse.linuxtools.tmf.ui.hasSupplementaryFiles">
+                        </test>
                      </iterate>
                   </and>
                </with>
@@ -1419,19 +1418,6 @@
       <handler
             class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteTraceSupplementaryFilesHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.delete_suppl_files">
-         <activeWhen>
-            <and>
-               <count
-                     value="1">
-               </count>
-               <iterate
-                     operator="and">
-                  <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
-                  </instanceof>
-               </iterate>
-            </and>
-         </activeWhen>
       </handler>
       <handler
             class="org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg.importexport.ExportTracePackageHandler"
@@ -1449,23 +1435,6 @@
                      operator="and">
                   <instanceof
                         value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
-                  </instanceof>
-               </iterate>
-            </and>
-         </activeWhen>
-      </handler>
-      <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteExperimentSupplementaryFilesHandler"
-            commandId="org.eclipse.linuxtools.tmf.ui.command.delete_suppl_files">
-         <activeWhen>
-            <and>
-               <count
-                     value="1">
-               </count>
-               <iterate
-                     operator="and">
-                  <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
                   </instanceof>
                </iterate>
             </and>
