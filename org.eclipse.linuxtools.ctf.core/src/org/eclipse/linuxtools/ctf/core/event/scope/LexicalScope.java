@@ -119,7 +119,7 @@ public class LexicalScope implements Comparable<LexicalScope> {
      *
      * @since 3.0
      */
-    public static final LexicalScope TRACE_PACKET_HEADER = new LexicalScope(STREAM_EVENT, "header"); //$NON-NLS-1$
+    public static final LexicalScope TRACE_PACKET_HEADER = new LexicalScope(TRACE_PACKET, "header"); //$NON-NLS-1$
 
     /**
      * Stream event context
@@ -133,7 +133,7 @@ public class LexicalScope implements Comparable<LexicalScope> {
      *
      * @since 3.0
      */
-    public static final LexicalScope STREAM_EVENT_HEADER = new LexicalScope(TRACE_PACKET, "header"); //$NON-NLS-1$
+    public static final LexicalScope STREAM_EVENT_HEADER = new LexicalScope(STREAM_EVENT, "header"); //$NON-NLS-1$
 
     /**
      * Fields in an event
@@ -169,6 +169,7 @@ public class LexicalScope implements Comparable<LexicalScope> {
     private final String fName;
     private final String fPath;
     private final Map<String, LexicalScope> fChildren;
+
 
     /**
      * The scope constructor
