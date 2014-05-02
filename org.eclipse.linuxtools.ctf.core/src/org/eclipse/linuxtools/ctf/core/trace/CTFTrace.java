@@ -446,13 +446,6 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
         return (fPath != null) ? fPath.getPath() : ""; //$NON-NLS-1$
     }
 
-    /**
-     * @since 3.0
-     */
-    @Override
-    public LexicalScope getScopePath() {
-        return LexicalScope.TRACE;
-    }
 
     // ------------------------------------------------------------------------
     // Operations
@@ -517,7 +510,7 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
 
         if (fPacketHeaderDecl != null) {
             /* Read the packet header */
-            fPacketHeaderDef = fPacketHeaderDecl.createDefinition(null, LexicalScope.PACKET_HEADER.getName(), streamBitBuffer);
+            fPacketHeaderDef = fPacketHeaderDecl.createDefinition(null, LexicalScope.PACKET_HEADER.toString(), streamBitBuffer);
 
             /* Check the magic number */
             IntegerDefinition magicDef = (IntegerDefinition) fPacketHeaderDef.lookupDefinition("magic"); //$NON-NLS-1$
@@ -567,6 +560,18 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
         return stream;
     }
 
+    // ------------------------------------------------------------------------
+    // IDefinitionScope
+    // ------------------------------------------------------------------------
+
+    /**
+     * @since 3.0
+     */
+    @Override
+    public LexicalScope getScopePath() {
+        return LexicalScope.TRACE;
+    }
+
     /**
      * Looks up a definition from packet
      *
@@ -577,11 +582,15 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
      */
     @Override
     public Definition lookupDefinition(String lookupPath) {
-        if (lookupPath.equals("trace.packet.header")) { //$NON-NLS-1$
+        if (lookupPath.equals(LexicalScope.TRACE_PACKET_HEADER.toString())) {
             return fPacketHeaderDef;
         }
         return null;
     }
+
+    // ------------------------------------------------------------------------
+    // Live trace reading
+    // ------------------------------------------------------------------------
 
     /**
      * Add a new stream file to support new streams while the trace is being
