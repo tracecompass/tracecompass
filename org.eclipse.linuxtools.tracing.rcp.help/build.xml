@@ -44,9 +44,9 @@
     </target>
 
     <target name="test" description="Verify that all of the HTML files are well-formed XML">
-        <!-- 
+        <!--
         Don't bother with DTD validation: we only care if the files are well-formed.
-        We therefore provide an empty DTD 
+        We therefore provide an empty DTD
         -->
         <xmlvalidate lenient="true">
             <fileset dir="doc">
@@ -69,7 +69,7 @@
             <pageAppendum>
 = Updating This Document =
 
-This document is maintained in a collaborative wiki.  If you wish to update or modify this document please visit 
+This document is maintained in a collaborative wiki.  If you wish to update or modify this document please visit
 http://wiki.eclipse.org/Linux_Tools_Project/LTTng2/User_Guide.
             </pageAppendum>
         </mediawiki-to-eclipse-help>

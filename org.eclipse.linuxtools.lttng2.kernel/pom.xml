@@ -24,7 +24,7 @@
   <name>Linux Tools LTTng Kernel Analysis Feature</name>
 
   <groupId>org.eclipse.linuxtools.lttng2</groupId>
-  
+
   <build>
     <plugins>
       <plugin>

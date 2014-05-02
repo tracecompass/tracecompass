@@ -29,7 +29,7 @@ import org.junit.Test;
 /**
  * The class <code>IntegerDefinitionTest</code> contains tests for the class
  * <code>{@link IntegerDefinition}</code>.
- * 
+ *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
@@ -45,7 +45,7 @@ public class FloatDefinitionTest {
 
     /**
      * Perform pre-test initialization.
-     * 
+     *
      * @throws CTFReaderException
      *             error creating floats
      */
