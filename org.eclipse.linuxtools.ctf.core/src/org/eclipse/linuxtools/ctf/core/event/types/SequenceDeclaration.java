@@ -91,7 +91,7 @@ public class SequenceDeclaration extends CompoundDeclaration {
     @Override
     public SequenceDefinition createDefinition(
             IDefinitionScope definitionScope, String fieldName, BitBuffer input) throws CTFReaderException {
-        Definition lenDef = null;
+        IDefinition lenDef = null;
 
         if (definitionScope != null) {
             lenDef = definitionScope.lookupDefinition(getLengthName());

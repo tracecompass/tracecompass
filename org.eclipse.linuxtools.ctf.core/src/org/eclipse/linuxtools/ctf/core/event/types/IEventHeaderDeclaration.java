@@ -7,36 +7,35 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Matthew Khouzam - Initial API and implementation
+ *    Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.ctf.core.event.types;
 
-import java.util.List;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * Interface for data definitions containing heterogenous definitions
- * (subfields)
+ * Event header declaration abstract class
  *
  * @author Matthew Khouzam
  * @since 3.1
  */
-public interface ICompositeDefinition extends IDefinition {
-
+@NonNullByDefault
+public interface IEventHeaderDeclaration extends IDeclaration {
     /**
-     * Gets the definition of the field
-     *
-     * @param fieldName
-     *            the fieldname
-     * @return The definitions of all the fields
+     * The id of an event
      */
-    Definition getDefinition(String fieldName);
-
+    String ID = "id"; //$NON-NLS-1$
     /**
-     * Gets an array of the field names
-     *
-     * @return the field names array
+     * The name of a timestamp field
      */
-    List<String> getFieldNames();
-
+    String TIMESTAMP = "timestamp"; //$NON-NLS-1$
+    /**
+     * Extended header
+     */
+    String EXTENDED = "extended"; //$NON-NLS-1$
+    /**
+     * Compact header (not to be confused with compact vs large)
+     */
+    String COMPACT = "compact"; //$NON-NLS-1$
 }

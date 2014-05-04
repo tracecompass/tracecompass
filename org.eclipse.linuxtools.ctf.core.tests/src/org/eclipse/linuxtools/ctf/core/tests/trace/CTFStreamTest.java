@@ -17,18 +17,21 @@ import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
-import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFStream;
 import org.eclipse.linuxtools.ctf.core.trace.CTFStreamInput;
+import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.internal.ctf.core.event.EventDeclaration;
 import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseException;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,6 +49,8 @@ public class CTFStreamTest {
 
     private CTFStream fixture;
 
+    private CTFStreamInput fInput;
+
     /**
      * Perform pre-test initialization.
      *
@@ -59,7 +64,13 @@ public class CTFStreamTest {
         fixture.setPacketContext(new StructDeclaration(1L));
         fixture.setEventHeader(new StructDeclaration(1L));
         fixture.setId(1L);
-        fixture.addInput(new CTFStreamInput(new CTFStream(testTrace.getTrace()), createFile()));
+        fInput = new CTFStreamInput(new CTFStream(testTrace.getTrace()), createFile());
+        fixture.addInput(fInput);
+    }
+
+    @After
+    public void tearDown() throws IOException{
+        fInput.close();
     }
 
     private static File createFile() {
@@ -82,9 +93,10 @@ public class CTFStreamTest {
      */
     @Test
     public void testStream() throws CTFReaderException {
-        CTFTrace trace = testTrace.getTrace();
-        CTFStream result = new CTFStream(trace);
-        assertNotNull(result);
+        try (CTFTrace trace = testTrace.getTrace()) {
+            CTFStream result = new CTFStream(trace);
+            assertNotNull(result);
+        }
     }
 
     /**
@@ -135,7 +147,8 @@ public class CTFStreamTest {
      */
     @Test
     public void testGetEventHeaderDecl() {
-        assertNotNull(fixture.getEventHeaderDecl());
+        IDeclaration eventHeaderDecl = fixture.getEventHeaderDeclaration();
+        assertNotNull(eventHeaderDecl);
     }
 
     /**

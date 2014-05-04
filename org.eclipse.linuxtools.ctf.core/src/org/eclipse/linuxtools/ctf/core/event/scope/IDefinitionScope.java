@@ -39,5 +39,6 @@ public interface IDefinitionScope {
      *            The path to look up
      * @return The Definition that was read
      */
+    // TODO: change to IDefintion
     Definition lookupDefinition(String lookupPath);
 }

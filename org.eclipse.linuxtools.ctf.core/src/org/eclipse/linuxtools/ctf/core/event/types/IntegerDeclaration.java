@@ -100,7 +100,42 @@ public class IntegerDeclaration extends Declaration implements ISimpleDatatypeDe
      * @since 3.0
      */
     public static final IntegerDeclaration INT_8_DECL = new IntegerDeclaration(8, true, ByteOrder.BIG_ENDIAN);
-
+    /**
+     * Unsigned 5 bit int, used for event headers
+     *
+     * @since 3.1
+     */
+    public static final IntegerDeclaration UINT_5B_DECL = new IntegerDeclaration(5, false, ByteOrder.BIG_ENDIAN);
+    /**
+     * Unsigned 5 bit int, used for event headers
+     *
+     * @since 3.1
+     */
+    public static final IntegerDeclaration UINT_5L_DECL = new IntegerDeclaration(5, false, ByteOrder.BIG_ENDIAN);
+    /**
+     * Unsigned 5 bit int, used for event headers
+     *
+     * @since 3.1
+     */
+    public static final IntegerDeclaration UINT_27B_DECL = new IntegerDeclaration(27, false, ByteOrder.BIG_ENDIAN);
+    /**
+     * Unsigned 5 bit int, used for event headers
+     *
+     * @since 3.1
+     */
+    public static final IntegerDeclaration UINT_27L_DECL = new IntegerDeclaration(27, false, ByteOrder.BIG_ENDIAN);
+    /**
+     * Unsigned 16 bit int, used for event headers
+     *
+     * @since 3.1
+     */
+    public static final IntegerDeclaration UINT_16B_DECL = new IntegerDeclaration(16, false, ByteOrder.BIG_ENDIAN);
+    /**
+     * Unsigned 16 bit int, used for event headers
+     *
+     * @since 3.1
+     */
+    public static final IntegerDeclaration UINT_16L_DECL = new IntegerDeclaration(16, false, ByteOrder.LITTLE_ENDIAN);
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -140,10 +175,34 @@ public class IntegerDeclaration extends Declaration implements ISimpleDatatypeDe
     public static IntegerDeclaration createDeclaration(int len, boolean signed, int base,
             @Nullable ByteOrder byteOrder, Encoding encoding, String clock, long alignment) {
         if (encoding.equals(Encoding.NONE) && (alignment == 8) && (clock.equals("")) && base == 10) { //$NON-NLS-1$
-            if (len == 8) {
+            switch (len) {
+            case 5:
+                if (!signed) {
+                    if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
+                        return UINT_5B_DECL;
+                    }
+                    return UINT_5L_DECL;
+                }
+                break;
+            case 8:
                 return signed ? INT_8_DECL : UINT_8_DECL;
-            }
-            if (len == 32) {
+            case 16:
+                if (!signed) {
+                    if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
+                        return UINT_16B_DECL;
+                    }
+                    return UINT_16L_DECL;
+                }
+                break;
+            case 27:
+                if (!signed) {
+                    if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
+                        return UINT_27B_DECL;
+                    }
+                    return UINT_27L_DECL;
+                }
+                break;
+            case 32:
                 if (signed) {
                     if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
                         return INT_32B_DECL;
@@ -154,7 +213,7 @@ public class IntegerDeclaration extends Declaration implements ISimpleDatatypeDe
                     return UINT_32B_DECL;
                 }
                 return UINT_32L_DECL;
-            } else if (len == 64) {
+            case 64:
                 if (signed) {
                     if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
                         return INT_64B_DECL;
@@ -165,6 +224,7 @@ public class IntegerDeclaration extends Declaration implements ISimpleDatatypeDe
                     return UINT_64B_DECL;
                 }
                 return UINT_64L_DECL;
+            default:
             }
         }
         return new IntegerDeclaration(len, signed, base, byteOrder, encoding, clock, alignment);
