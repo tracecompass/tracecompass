@@ -32,7 +32,7 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
  * @author Matthew Khouzam
  * @author Simon Marchi
  */
-public final class EnumDeclaration extends Declaration {
+public final class EnumDeclaration extends Declaration implements ISimpleDatatypeDeclaration {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -99,8 +99,8 @@ public final class EnumDeclaration extends Declaration {
     }
 
     /**
-     * Add a value. Do not overlap, this is <em><strong>not</strong></em> an interval
-     * tree.
+     * Add a value. Do not overlap, this is <em><strong>not</strong></em> an
+     * interval tree.
      *
      * @param low
      *            lowest value that this int can be to have label as a return

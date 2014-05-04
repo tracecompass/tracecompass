@@ -25,7 +25,7 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
  * @version 1.0
  * @author Matthew Khouzam
  */
-public final class FloatDeclaration extends Declaration {
+public final class FloatDeclaration extends Declaration implements ISimpleDatatypeDeclaration {
 
     // ------------------------------------------------------------------------
     // Attributes

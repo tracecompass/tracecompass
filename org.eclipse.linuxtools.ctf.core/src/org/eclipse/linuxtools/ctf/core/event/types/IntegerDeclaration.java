@@ -34,7 +34,7 @@ import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
  * @author Simon Marchi
  */
 @NonNullByDefault
-public class IntegerDeclaration extends Declaration {
+public class IntegerDeclaration extends Declaration implements ISimpleDatatypeDeclaration {
 
     // ------------------------------------------------------------------------
     // Helpers
