@@ -18,6 +18,7 @@ import java.util.Iterator;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -28,7 +29,6 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.synchronization.SynchronizationAlgorithm;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
-import org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TraceUtils;
@@ -166,7 +166,7 @@ public class SynchronizeTracesHandler extends AbstractHandler {
                                      */
                                     ITmfTrace expTrace = null;
                                     for (ITmfTrace t : experiment.getTraces()) {
-                                        if (t.getName().equals(traceel.getName())) {
+                                        if (t.getResource().equals(traceel.getResource())) {
                                             expTrace = t;
                                             break;
                                         }
@@ -175,12 +175,7 @@ public class SynchronizeTracesHandler extends AbstractHandler {
                                         if ((expTrace != null) && syncAlgo.isTraceSynced(expTrace.getHostId())) {
 
                                             /* Find the original trace */
-                                            TmfTraceElement origtrace = null;
-                                            for (ITmfProjectModelElement el : traceel.getProject().getTracesFolder().getTraces()) {
-                                                if (el.getName().equals(traceel.getName())) {
-                                                    origtrace = (TmfTraceElement) el;
-                                                }
-                                            }
+                                            TmfTraceElement origtrace = traceel.getElementUnderTraceFolder();
 
                                             if (origtrace != null) {
                                                 /*
@@ -188,14 +183,13 @@ public class SynchronizeTracesHandler extends AbstractHandler {
                                                  * new name does not exist
                                                  */
                                                 String newname = traceel.getName();
+                                                IContainer parentFolder = origtrace.getResource().getParent();
                                                 boolean traceexists;
                                                 do {
                                                     traceexists = false;
                                                     newname += "_"; //$NON-NLS-1$
-                                                    for (ITmfProjectModelElement el : traceel.getProject().getTracesFolder().getTraces()) {
-                                                        if (el.getName().equals(newname)) {
-                                                            traceexists = true;
-                                                        }
+                                                    if (parentFolder.findMember(newname) != null) {
+                                                        traceexists = true;
                                                     }
                                                 } while (traceexists);
 
