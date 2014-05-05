@@ -12,6 +12,9 @@
 
 package org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.linuxtools.tmf.ui.project.model.TmfCommonProjectElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfNavigatorLabelProvider;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.swt.graphics.Image;
@@ -62,7 +65,26 @@ public class TracePackageTraceElement extends TracePackageElement {
 
     @Override
     public String getText() {
-        return fTraceElement != null ? fTraceElement.getElementPath() : fImportName;
+        return fTraceElement != null ? fTraceElement.getElementPath() : getDestinationElementPath();
+    }
+
+    /**
+     * Return the target TmfCommonProjectElement element path for a given trace
+     * package element. {@link TmfCommonProjectElement#getElementPath()}
+     *
+     * @return the element path
+     */
+    public String getDestinationElementPath() {
+        String traceName = getImportName();
+        for (TracePackageElement element : getChildren()) {
+            if (element instanceof TracePackageFilesElement) {
+                TracePackageFilesElement tracePackageFilesElement = (TracePackageFilesElement) element;
+                IPath filePath = new Path(tracePackageFilesElement.getFileName());
+                return filePath.removeLastSegments(1).append(traceName).toString();
+            }
+        }
+
+        return traceName;
     }
 
     /**
@@ -70,6 +92,13 @@ public class TracePackageTraceElement extends TracePackageElement {
      */
     public TmfTraceElement getTraceElement() {
         return fTraceElement;
+    }
+
+    /**
+     * @return the import name
+     */
+    public String getImportName() {
+        return fImportName;
     }
 
     /**

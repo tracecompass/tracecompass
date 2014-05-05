@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -36,7 +37,6 @@ import org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg.TracePack
 import org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg.TracePackageTraceElement;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TraceUtils;
 import org.eclipse.swt.SWT;
@@ -359,9 +359,8 @@ public class ImportTracePackageWizardPage extends AbstractTracePackageWizardPage
                 continue;
             }
 
-            String traceName = traceElement.getText();
-            if (traceExists(traceName)) {
-                int returnCode = promptForOverwrite(traceName);
+            if (traceExists(traceElement)) {
+                int returnCode = promptForOverwrite(traceElement.getDestinationElementPath());
                 // The return code is an index to a button in the dialog but the
                 // 'X' button in the window corner is not considered a button
                 // therefore it returns -1 and unfortunately, there is no
@@ -394,15 +393,9 @@ public class ImportTracePackageWizardPage extends AbstractTracePackageWizardPage
         return true;
     }
 
-    private boolean traceExists(String traceName) {
-        List<TmfTraceElement> traces = fTmfTraceFolder.getTraces();
-        for (TmfTraceElement t : traces) {
-            if (t.getName().equals(traceName)) {
-                return true;
-            }
-        }
-
-        return false;
+    private boolean traceExists(TracePackageTraceElement traceElement) {
+        IResource traceRes = fTmfTraceFolder.getResource().findMember(traceElement.getDestinationElementPath());
+        return traceRes != null;
     }
 
     private int promptForOverwrite(String traceName) {
