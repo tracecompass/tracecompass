@@ -117,6 +117,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     // Constants
     // ------------------------------------------------------------------------
     private static final String IMPORT_WIZARD_PAGE = "ImportTraceWizardPage"; //$NON-NLS-1$
+    private static final String IMPORT_WIZARD_ROOT_DIRECTORY_ID = IMPORT_WIZARD_PAGE + ".import_root_directory_id"; //$NON-NLS-1$
     private static final String IMPORT_WIZARD_IMPORT_UNRECOGNIZED_ID = IMPORT_WIZARD_PAGE + ".import_unrecognized_traces_id"; //$NON-NLS-1$
     private static final String IMPORT_WIZARD_PRESERVE_FOLDERS_ID = IMPORT_WIZARD_PAGE + ".import_preserve_folders_id"; //$NON-NLS-1$
     private static final String SEPARATOR = ":"; //$NON-NLS-1$
@@ -126,8 +127,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     // Attributes
     // ------------------------------------------------------------------------
 
-    // Folder navigation start point (saved between invocations)
-    private static String fRootDirectory = null;
     // Target import directory ('Traces' folder)
     private IFolder fTargetFolder;
     // Target Trace folder element
@@ -219,16 +218,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     // ------------------------------------------------------------------------
     // WizardResourceImportPage
     // ------------------------------------------------------------------------
-
-    @Override
-    public void createControl(Composite parent) {
-        super.createControl(parent);
-        // Restore last directory if applicable
-        if (fRootDirectory != null) {
-            directoryNameField.setText(fRootDirectory);
-            updateFromSourceField();
-        }
-    }
 
     @Override
     protected void createSourceGroup(Composite parent) {
@@ -438,10 +427,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         return result.toOSString();
     }
 
-    private String getSourceDirectoryName() {
-        return getSourceDirectoryName(directoryNameField.getText());
-    }
-
     private void updateFromSourceField() {
         setSourceName(directoryNameField.getText());
         updateWidgetEnablements();
@@ -564,15 +549,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         fImportUnrecognizedButton = new Button(composite, SWT.CHECK);
         fImportUnrecognizedButton.setSelection(true);
         fImportUnrecognizedButton.setText(Messages.ImportTraceWizard_ImportUnrecognized);
-
-        IDialogSettings settings = getDialogSettings();
-        boolean value;
-        if (settings.get(IMPORT_WIZARD_IMPORT_UNRECOGNIZED_ID) == null) {
-            value = true;
-        } else {
-            value = settings.getBoolean(IMPORT_WIZARD_IMPORT_UNRECOGNIZED_ID);
-        }
-        fImportUnrecognizedButton.setSelection(value);
     }
 
     // ------------------------------------------------------------------------
@@ -605,15 +581,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         fPreserveFolderStructureButton.setFont(optionsGroup.getFont());
         fPreserveFolderStructureButton.setText(Messages.ImportTraceWizard_PreserveFolderStructure);
         fPreserveFolderStructureButton.setSelection(true);
-
-        IDialogSettings settings = getDialogSettings();
-        boolean value;
-        if (settings.get(IMPORT_WIZARD_PRESERVE_FOLDERS_ID) == null) {
-            value = true;
-        } else {
-            value = settings.getBoolean(IMPORT_WIZARD_PRESERVE_FOLDERS_ID);
-        }
-        fPreserveFolderStructureButton.setSelection(value);
 
         updateWidgetEnablements();
     }
@@ -660,6 +627,54 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         return true;
     }
 
+    @Override
+    protected void restoreWidgetValues() {
+        super.restoreWidgetValues();
+
+        IDialogSettings settings = getDialogSettings();
+        boolean value;
+        if (settings.get(IMPORT_WIZARD_IMPORT_UNRECOGNIZED_ID) == null) {
+            value = true;
+        } else {
+            value = settings.getBoolean(IMPORT_WIZARD_IMPORT_UNRECOGNIZED_ID);
+        }
+        fImportUnrecognizedButton.setSelection(value);
+
+        if (settings.get(IMPORT_WIZARD_PRESERVE_FOLDERS_ID) == null) {
+            value = true;
+        } else {
+            value = settings.getBoolean(IMPORT_WIZARD_PRESERVE_FOLDERS_ID);
+        }
+        fPreserveFolderStructureButton.setSelection(value);
+
+        String[] directoryNames = settings.getArray(IMPORT_WIZARD_ROOT_DIRECTORY_ID);
+        if ((directoryNames != null) && (directoryNames.length != 0)) {
+            for (int i = 0; i < directoryNames.length; i++) {
+                directoryNameField.add(directoryNames[i]);
+            }
+        }
+    }
+
+    @Override
+    protected void saveWidgetValues() {
+        // Persist dialog settings
+        IDialogSettings settings = getDialogSettings();
+        settings.put(IMPORT_WIZARD_IMPORT_UNRECOGNIZED_ID, fImportUnrecognizedButton.getSelection());
+        settings.put(IMPORT_WIZARD_PRESERVE_FOLDERS_ID, fPreserveFolderStructureButton.getSelection());
+
+        // update directory names history
+        String[] directoryNames = settings.getArray(IMPORT_WIZARD_ROOT_DIRECTORY_ID);
+        if (directoryNames == null) {
+            directoryNames = new String[0];
+        }
+
+        String items[] = directoryNameField.getItems();
+        for (int i = 0; i < items.length; i++) {
+            directoryNames = addToHistory(directoryNames, items[i]);
+        }
+        settings.put(IMPORT_WIZARD_ROOT_DIRECTORY_ID, directoryNames);
+    }
+
     // ------------------------------------------------------------------------
     // Import the trace(s)
     // ------------------------------------------------------------------------
@@ -670,11 +685,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
      * @return <code>true</code> if successful else <code>false</code>
      */
     public boolean finish() {
-        // Persist dialog settings
-        IDialogSettings settings = getDialogSettings();
-        settings.put(IMPORT_WIZARD_IMPORT_UNRECOGNIZED_ID, fImportUnrecognizedButton.getSelection());
-        settings.put(IMPORT_WIZARD_PRESERVE_FOLDERS_ID, fPreserveFolderStructureButton.getSelection());
-
         String traceTypeName = fTraceTypes.getText();
         String traceId = null;
         if (!AUTO_DETECT.equals(traceTypeName)) {
@@ -685,8 +695,8 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             traceId = TmfTraceType.getInstance().getTraceTypeId(tokens[0], tokens[1]);
         }
 
-        // Save directory for next import operation
-        fRootDirectory = getSourceDirectoryName();
+        // Save dialog settings
+        saveWidgetValues();
 
         IPath baseSourceContainerPath = new Path(getSourceDirectory().getAbsolutePath());
         final TraceValidateAndImportOperation operation = new TraceValidateAndImportOperation(traceId, baseSourceContainerPath, getContainerFullPath(),
