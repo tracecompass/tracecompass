@@ -61,11 +61,12 @@ public class TextTraceEventContent implements ITmfEventField {
      * @param fieldNames
      *            the array of field names
      */
-    @SuppressWarnings("null") // Collections.EMPTY_LIST
     private TextTraceEventContent(@NonNull String fieldName) {
         fName = fieldName;
         fValue = null;
-        fFields = Collections.EMPTY_LIST;
+        @SuppressWarnings("null")
+        @NonNull List<TextTraceEventContent> fields = Collections.EMPTY_LIST;
+        fFields = fields;
     }
 
     // ------------------------------------------------------------------------
@@ -89,20 +90,6 @@ public class TextTraceEventContent implements ITmfEventField {
             fieldNames.add(field.getName());
         }
         return fieldNames;
-    }
-
-    /**
-     * Get a field name by index
-     *
-     * @param index
-     *            The index of the field
-     * @return The name of the field at that index
-     */
-    public String getFieldName(int index) {
-        if (index >= 0 && index < fFields.size()) {
-            return fFields.get(index).getName();
-        }
-        return null;
     }
 
     @Override
@@ -141,6 +128,34 @@ public class TextTraceEventContent implements ITmfEventField {
     // ------------------------------------------------------------------------
     // Convenience getters and setters
     // ------------------------------------------------------------------------
+
+    /**
+     * Get a field name by index
+     *
+     * @param index
+     *            The index of the field
+     * @return The name of the field at that index
+     */
+    public String getFieldName(int index) {
+        if (index >= 0 && index < fFields.size()) {
+            return fFields.get(index).getName();
+        }
+        return null;
+    }
+
+    /**
+     * Get a field by index
+     *
+     * @param index
+     *            The index of the field
+     * @return The field object at the requested index
+     */
+    public ITmfEventField getField(int index) {
+        if (index >= 0 && index < fFields.size()) {
+            return fFields.get(index);
+        }
+        return null;
+    }
 
     /**
      * Get a subfield value by name
