@@ -101,7 +101,7 @@ public class SyslogTrace extends TextTrace<SyslogEvent> {
 
     @Override
     protected void parseNextLine(SyslogEvent event, String line) {
-        TextTraceEventContent content = (TextTraceEventContent) event.getContent();
+        TextTraceEventContent content = event.getContent();
         ((StringBuffer) content.getValue()).append("\n").append(line); //$NON-NLS-1$
         if (line.trim().length() > 0) {
             ((StringBuffer) content.getFieldValue(Index.MESSAGE)).append(SEPARATOR + line.trim());

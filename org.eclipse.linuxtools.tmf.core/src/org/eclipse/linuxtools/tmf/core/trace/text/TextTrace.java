@@ -25,13 +25,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
-import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TraceValidationStatus;
 import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfPersistentlyIndexable;
@@ -53,7 +51,7 @@ import org.eclipse.linuxtools.tmf.core.trace.location.TmfLongLocation;
  *
  * @since 3.0
  */
-public abstract class TextTrace<T extends TmfEvent> extends TmfTrace implements ITmfEventParser, ITmfPersistentlyIndexable {
+public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace implements ITmfEventParser, ITmfPersistentlyIndexable {
 
     private static final TmfLongLocation NULL_LOCATION = new TmfLongLocation(-1L);
     private static final int MAX_LINES = 100;
@@ -133,7 +131,7 @@ public abstract class TextTrace<T extends TmfEvent> extends TmfTrace implements 
     }
 
     @Override
-    public synchronized TmfContext seekEvent(ITmfLocation location) {
+    public synchronized TextTraceContext seekEvent(ITmfLocation location) {
         TextTraceContext context = new TextTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
         if (NULL_LOCATION.equals(location) || fFile == null) {
             return context;
@@ -170,7 +168,7 @@ public abstract class TextTrace<T extends TmfEvent> extends TmfTrace implements 
     }
 
     @Override
-    public synchronized TmfContext seekEvent(double ratio) {
+    public synchronized TextTraceContext seekEvent(double ratio) {
         if (fFile == null) {
             return new TextTraceContext(NULL_LOCATION, ITmfContext.UNKNOWN_RANK);
         }
@@ -184,7 +182,7 @@ public abstract class TextTrace<T extends TmfEvent> extends TmfTrace implements 
                 pos--;
             }
             ITmfLocation location = new TmfLongLocation(Long.valueOf(pos));
-            TmfContext context = seekEvent(location);
+            TextTraceContext context = seekEvent(location);
             context.setRank(ITmfContext.UNKNOWN_RANK);
             return context;
         } catch (IOException e) {
@@ -218,15 +216,18 @@ public abstract class TextTrace<T extends TmfEvent> extends TmfTrace implements 
     }
 
     @Override
-    public ITmfEvent parseEvent(ITmfContext tmfContext) {
-        ITmfContext context = seekEvent(tmfContext.getLocation());
+    public TextTraceEvent parseEvent(ITmfContext tmfContext) {
+        TextTraceContext context = seekEvent(tmfContext.getLocation());
         return parse(context);
     }
 
     @Override
     public synchronized T getNext(ITmfContext context) {
-        ITmfContext savedContext = new TmfContext(context.getLocation(), context.getRank());
-        T event = parse(context);
+        if (!(context instanceof TextTraceContext)) {
+            throw new IllegalArgumentException();
+        }
+        TextTraceContext savedContext = new TextTraceContext(context.getLocation(), context.getRank());
+        T event = parse((TextTraceContext) context);
         if (event != null) {
             updateAttributes(savedContext, event.getTimestamp());
             context.increaseRank();
@@ -241,14 +242,11 @@ public abstract class TextTrace<T extends TmfEvent> extends TmfTrace implements 
      *            the context
      * @return the next event or null
      */
-    protected synchronized T parse(ITmfContext tmfContext) {
+    protected synchronized T parse(TextTraceContext tmfContext) {
         if (fFile == null) {
             return null;
         }
-        if (!(tmfContext instanceof TextTraceContext)) {
-            return null;
-        }
-        TextTraceContext context = (TextTraceContext) tmfContext;
+        TextTraceContext context = tmfContext;
         if (context.getLocation() == null || !(context.getLocation().getLocationInfo() instanceof Long) || NULL_LOCATION.equals(context.getLocation())) {
             return null;
         }

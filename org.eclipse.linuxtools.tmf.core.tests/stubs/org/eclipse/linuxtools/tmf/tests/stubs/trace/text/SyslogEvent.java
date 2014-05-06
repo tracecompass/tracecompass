@@ -12,16 +12,15 @@
 
 package org.eclipse.linuxtools.tmf.tests.stubs.trace.text;
 
-import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.text.TextTraceEvent;
+import org.eclipse.linuxtools.tmf.core.trace.text.TextTraceEventContent;
 
 /**
  * System log trace implementation of TmfEvent.
  */
-public class SyslogEvent extends TmfEvent {
+public class SyslogEvent extends TextTraceEvent {
 
     /**
      * Default constructor
@@ -57,8 +56,8 @@ public class SyslogEvent extends TmfEvent {
      * @param reference
      *            the event reference
      */
-    public SyslogEvent(ITmfTrace parentTrace, final ITmfTimestamp timestamp, final String source,
-            final ITmfEventType type, final ITmfEventField content, final String reference) {
+    public SyslogEvent(SyslogTrace parentTrace, final ITmfTimestamp timestamp, final String source,
+            final ITmfEventType type, final TextTraceEventContent content, final String reference) {
         super(parentTrace, timestamp, source, type, content, reference);
     }
 
