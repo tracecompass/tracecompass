@@ -21,6 +21,9 @@ import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.LttngKernelStateProvider;
 import org.eclipse.linuxtools.statesystem.core.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
@@ -41,13 +44,12 @@ import org.junit.Test;
  */
 public class StateSystemFullHistoryTest extends StateSystemTest {
 
-    private static final String TEST_FILE_NAME = "test.ht";
-    private static final String BENCHMARK_FILE_NAME = "test.benchmark.ht";
+    private static final @NonNull String TEST_FILE_NAME = "test.ht";
+    private static final @NonNull String BENCHMARK_FILE_NAME = "test.benchmark.ht";
 
     private static File stateFile;
     private static File stateFileBenchmark;
     private static TestLttngKernelAnalysisModule module;
-
 
     /**
      * Initialize the test cases (build the history file once for all tests).
@@ -130,6 +132,7 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
         }
     }
 
+    @NonNullByDefault
     private static class TestLttngKernelAnalysisModule extends TmfStateSystemAnalysisModule {
 
         private final String htFileName;
@@ -145,7 +148,7 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
         }
 
         @Override
-        public void setTrace(ITmfTrace trace) throws TmfAnalysisException {
+        public void setTrace(@Nullable ITmfTrace trace) throws TmfAnalysisException {
             if (!(trace instanceof CtfTmfTrace)) {
                 throw new IllegalStateException("TestLttngKernelAnalysisModule: trace should be of type CtfTmfTrace"); //$NON-NLS-1$
             }

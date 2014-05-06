@@ -76,6 +76,9 @@ public class GenerateTestValues {
             module.schedule();
             module.waitForCompletion();
             ITmfStateSystem ssq = module.getStateSystem();
+            if (ssq == null) {
+                throw new IllegalStateException();
+            }
 
             List<ITmfStateInterval> fullState = ssq.queryFullState(targetTimestamp);
 

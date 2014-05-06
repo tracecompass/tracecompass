@@ -20,6 +20,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.types.ArrayDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
@@ -46,7 +47,7 @@ import org.junit.Test;
  */
 public class CtfTmfEventFieldTest {
 
-    private static final String ROOT = "root";
+    private static final @NonNull String ROOT = "root";
     private static final String SEQ = "seq";
     private static final String ARRAY_STR = "array_str";
     private static final String ARRAY_FLOAT = "array_float";

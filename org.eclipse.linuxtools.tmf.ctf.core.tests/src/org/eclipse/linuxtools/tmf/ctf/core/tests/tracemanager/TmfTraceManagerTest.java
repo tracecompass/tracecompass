@@ -114,11 +114,17 @@ public class TmfTraceManagerTest {
     // ------------------------------------------------------------------------
 
     private void openTrace(ITmfTrace trace) {
+        if (trace == null) {
+            throw new IllegalArgumentException();
+        }
         TmfSignalManager.dispatchSignal(new TmfTraceOpenedSignal(this, trace, null));
         selectTrace(trace);
     }
 
     private void closeTrace(ITmfTrace trace) {
+        if (trace == null) {
+            throw new IllegalArgumentException();
+        }
         TmfSignalManager.dispatchSignal(new TmfTraceClosedSignal(this, trace));
         /*
          * In TMF, the next tab would now be selected (if there are some), which

@@ -19,6 +19,9 @@ import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.LttngKernelStateProvider;
 import org.eclipse.linuxtools.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
@@ -38,7 +41,7 @@ import org.junit.Test;
  */
 public class PartialStateSystemTest extends StateSystemTest {
 
-    private static final String TEST_FILE_NAME = "test-partial";
+    private static final @NonNull String TEST_FILE_NAME = "test-partial";
 
     private static File stateFile;
     private static TestLttngKernelAnalysisModule module;
@@ -139,6 +142,7 @@ public class PartialStateSystemTest extends StateSystemTest {
         super.testRangeQueryInvalidTime2();
     }
 
+    @NonNullByDefault
     private static class TestLttngKernelAnalysisModule extends TmfStateSystemAnalysisModule {
 
         private final String htFileName;
@@ -154,7 +158,7 @@ public class PartialStateSystemTest extends StateSystemTest {
         }
 
         @Override
-        public void setTrace(ITmfTrace trace) throws TmfAnalysisException {
+        public void setTrace(@Nullable ITmfTrace trace) throws TmfAnalysisException {
             if (!(trace instanceof CtfTmfTrace)) {
                 throw new IllegalStateException("TestLttngKernelAnalysisModule: trace should be of type CtfTmfTrace"); //$NON-NLS-1$
             }
