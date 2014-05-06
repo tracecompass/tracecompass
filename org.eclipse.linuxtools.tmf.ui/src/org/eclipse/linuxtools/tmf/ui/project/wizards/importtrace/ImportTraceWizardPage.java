@@ -118,6 +118,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     // ------------------------------------------------------------------------
     private static final String IMPORT_WIZARD_PAGE = "ImportTraceWizardPage"; //$NON-NLS-1$
     private static final String IMPORT_WIZARD_IMPORT_UNRECOGNIZED_ID = IMPORT_WIZARD_PAGE + ".import_unrecognized_traces_id"; //$NON-NLS-1$
+    private static final String IMPORT_WIZARD_PRESERVE_FOLDERS_ID = IMPORT_WIZARD_PAGE + ".import_preserve_folders_id"; //$NON-NLS-1$
     private static final String SEPARATOR = ":"; //$NON-NLS-1$
     private static final String AUTO_DETECT = Messages.ImportTraceWizard_AutoDetection;
 
@@ -605,6 +606,15 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         fPreserveFolderStructureButton.setText(Messages.ImportTraceWizard_PreserveFolderStructure);
         fPreserveFolderStructureButton.setSelection(true);
 
+        IDialogSettings settings = getDialogSettings();
+        boolean value;
+        if (settings.get(IMPORT_WIZARD_PRESERVE_FOLDERS_ID) == null) {
+            value = true;
+        } else {
+            value = settings.getBoolean(IMPORT_WIZARD_PRESERVE_FOLDERS_ID);
+        }
+        fPreserveFolderStructureButton.setSelection(value);
+
         updateWidgetEnablements();
     }
 
@@ -660,8 +670,10 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
      * @return <code>true</code> if successful else <code>false</code>
      */
     public boolean finish() {
+        // Persist dialog settings
         IDialogSettings settings = getDialogSettings();
         settings.put(IMPORT_WIZARD_IMPORT_UNRECOGNIZED_ID, fImportUnrecognizedButton.getSelection());
+        settings.put(IMPORT_WIZARD_PRESERVE_FOLDERS_ID, fPreserveFolderStructureButton.getSelection());
 
         String traceTypeName = fTraceTypes.getText();
         String traceId = null;
