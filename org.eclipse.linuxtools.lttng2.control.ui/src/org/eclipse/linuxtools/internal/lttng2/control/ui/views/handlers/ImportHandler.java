@@ -54,7 +54,7 @@ import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceTypeUIUtils;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TraceUtils;
-import org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace.BatchImportTraceWizard;
+import org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace.ImportTraceWizard;
 import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
 import org.eclipse.rse.services.files.IFileService;
 import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
@@ -112,7 +112,7 @@ public class ImportHandler extends BaseControlViewHandler {
                 TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
                 TmfTraceFolder traceFolder = projectElement.getTracesFolder();
 
-                BatchImportTraceWizard wizard = new BatchImportTraceWizard();
+                ImportTraceWizard wizard = new ImportTraceWizard();
                 wizard.init(PlatformUI.getWorkbench(), new StructuredSelection(traceFolder));
                 WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
                 dialog.open();
