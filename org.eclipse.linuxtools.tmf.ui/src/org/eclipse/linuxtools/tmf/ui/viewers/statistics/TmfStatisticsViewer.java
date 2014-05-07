@@ -38,6 +38,7 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 import org.eclipse.linuxtools.tmf.ui.viewers.TmfViewer;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfBaseColumnData;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfBaseColumnDataProvider;
+import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsFormatter;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTree;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTreeManager;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTreeNode;
@@ -333,7 +334,13 @@ public class TmfStatisticsViewer extends TmfViewer {
             treeColumn.getColumn().setWidth(columnData.getWidth());
             treeColumn.getColumn().setToolTipText(columnData.getTooltip());
 
-            if (columnData.getComparator() != null) { // A comparator is defined.
+            // If is dummy column
+            if (columnData == columnDataList.get(TmfBaseColumnDataProvider.StatsColumn.DUMMY.getIndex())) {
+                treeColumn.getColumn().setResizable(false);
+            }
+
+            // A comparator is defined.
+            if (columnData.getComparator() != null) {
                 // Adds a listener on the columns header for sorting purpose.
                 treeColumn.getColumn().addSelectionListener(new SelectionAdapter() {
 
@@ -354,8 +361,8 @@ public class TmfStatisticsViewer extends TmfViewer {
                         if (fTreeViewer.getTree().getSortDirection() == SWT.UP
                                 || fTreeViewer.getTree().getSortColumn() != treeColumn.getColumn()) {
                             /*
-                             * Puts the descendant order if the old order was
-                             * up or if the selected column has changed.
+                             * Puts the descendant order if the old order was up
+                             * or if the selected column has changed.
                              */
                             fTreeViewer.setComparator(columnData.getComparator());
                             fTreeViewer.getTree().setSortDirection(SWT.DOWN);
@@ -374,44 +381,84 @@ public class TmfStatisticsViewer extends TmfViewer {
             treeColumn.setLabelProvider(columnData.getLabelProvider());
         }
 
-        // Handler that will draw the bar charts.
+        // Handler that will draw the percentages and the bar charts.
         fTreeViewer.getTree().addListener(SWT.EraseItem, new Listener() {
             @Override
             public void handleEvent(Event event) {
                 if (columnDataList.get(event.index).getPercentageProvider() != null) {
+
                     TmfStatisticsTreeNode node = (TmfStatisticsTreeNode) event.item.getData();
 
-                    double percentage = columnDataList.get(event.index).getPercentageProvider().getPercentage(node);
-                    if (percentage == 0) {  // No bar to draw
+                    // If node is hidden, exit immediately.
+                    if (TmfBaseColumnDataProvider.HIDDEN_FOLDER_LEVELS.contains(node.getName())) {
                         return;
                     }
 
-                    if ((event.detail & SWT.SELECTED) > 0) {    // The item is selected.
-                        // Draws our own background to avoid overwritten the bar.
+                    // Otherwise, get percentage and draw bar and text if applicable.
+                    double percentage = columnDataList.get(event.index).getPercentageProvider().getPercentage(node);
+
+                    // The item is selected.
+                    if ((event.detail & SWT.SELECTED) > 0) {
+                        // Draws our own background to avoid overwriting the bar.
                         event.gc.fillRectangle(event.x, event.y, event.width, event.height);
                         event.detail &= ~SWT.SELECTED;
                     }
 
-                    int barWidth = (int) ((fTreeViewer.getTree().getColumn(event.index).getWidth() - 8) * percentage);
-                    int oldAlpha = event.gc.getAlpha();
-                    Color oldForeground = event.gc.getForeground();
-                    Color oldBackground = event.gc.getBackground();
-                    /*
-                     * Draws a transparent gradient rectangle from the color of
-                     * foreground and background.
-                     */
-                    event.gc.setAlpha(64);
-                    event.gc.setForeground(event.item.getDisplay().getSystemColor(SWT.COLOR_BLUE));
-                    event.gc.setBackground(event.item.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-                    event.gc.fillGradientRectangle(event.x, event.y, barWidth, event.height, true);
-                    event.gc.drawRectangle(event.x, event.y, barWidth, event.height);
-                    // Restores old values
-                    event.gc.setForeground(oldForeground);
-                    event.gc.setBackground(oldBackground);
-                    event.gc.setAlpha(oldAlpha);
-                    event.detail &= ~SWT.BACKGROUND;
+                    // Drawing the percentage text
+                    // if events are present in top node
+                    // and the current node is not the top node
+                    // and if is total or partial events column.
+                    // If not, exit the method.
+                    if (!((event.index == TmfBaseColumnDataProvider.StatsColumn.TOTAL.getIndex() || event.index == TmfBaseColumnDataProvider.StatsColumn.PARTIAL.getIndex())
+                    && node != node.getTop())) {
+                        return;
+                    }
+
+                    long eventValue = event.index == TmfBaseColumnDataProvider.StatsColumn.TOTAL.getIndex() ?
+                            node.getTop().getValues().getTotal() : node.getTop().getValues().getPartial();
+
+                    if (eventValue != 0) {
+
+                        int oldAlpha = event.gc.getAlpha();
+                        Color oldForeground = event.gc.getForeground();
+                        Color oldBackground = event.gc.getBackground();
+
+                        // Bar to draw
+                        if (percentage != 0) {
+                            /*
+                             * Draws a transparent gradient rectangle from the
+                             * color of foreground and background.
+                             */
+                            int barWidth = (int) ((fTreeViewer.getTree().getColumn(event.index).getWidth() - 8) * percentage);
+                            event.gc.setAlpha(64);
+                            event.gc.setForeground(event.item.getDisplay().getSystemColor(SWT.COLOR_BLUE));
+                            event.gc.setBackground(event.item.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+                            event.gc.fillGradientRectangle(event.x, event.y, barWidth, event.height, true);
+                            event.gc.drawRectangle(event.x, event.y, barWidth, event.height);
+
+                            // Restore old values
+                            event.gc.setBackground(oldBackground);
+                            event.gc.setAlpha(oldAlpha);
+                            event.detail &= ~SWT.BACKGROUND;
+
+                        }
+
+                        String percentageText = TmfStatisticsFormatter.toPercentageText(percentage);
+                        String absoluteNumberText = TmfStatisticsFormatter.toColumnData(node, TmfBaseColumnDataProvider.StatsColumn.getColumn(event.index));
+
+                        if (event.width > event.gc.stringExtent(percentageText).x + event.gc.stringExtent(absoluteNumberText).x) {
+                            int textHeight = event.gc.stringExtent(percentageText).y;
+                            event.gc.setForeground(event.item.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+                            event.gc.drawText(percentageText, event.x, event.y + (event.height - textHeight) / 2, true);
+                        }
+
+                        // Restores old values
+                        event.gc.setForeground(oldForeground);
+
+                    }
                 }
             }
+
         });
 
         // Initializes the comparator parameters
@@ -501,12 +548,12 @@ public class TmfStatisticsViewer extends TmfViewer {
      *            request.
      */
     protected void modelIncomplete(boolean isGlobalRequest) {
-        if (isGlobalRequest) {  // Clean the global statistics
+        if (isGlobalRequest) { // Clean the global statistics
             /*
              * No need to reset the global number of events, since the index of
              * the last requested event is known.
              */
-        } else {    // Clean the partial statistics
+        } else { // Clean the partial statistics
             resetTimeRangeValue();
         }
         refresh();
@@ -538,11 +585,11 @@ public class TmfStatisticsViewer extends TmfViewer {
     }
 
     /**
-     * Requests all the data of the trace to the state system which
-     * contains information about the statistics.
+     * Requests all the data of the trace to the state system which contains
+     * information about the statistics.
      *
-     * Since the viewer may be listening to multiple traces, it may receive
-     * an experiment rather than a single trace. The filtering is done with the
+     * Since the viewer may be listening to multiple traces, it may receive an
+     * experiment rather than a single trace. The filtering is done with the
      * method {@link #isListeningTo(String trace)}.
      *
      * @param trace
@@ -606,17 +653,19 @@ public class TmfStatisticsViewer extends TmfViewer {
                          */
                         ITmfStateSystem ss = statsMod.getStateSystem(TmfStatisticsEventTypesModule.ID);
                         if (ss == null) {
-                            /* It should be instantiated after the
-                             * statsMod.waitForInitialization() above. */
+                            /*
+                             * It should be instantiated after the
+                             * statsMod.waitForInitialization() above.
+                             */
                             throw new IllegalStateException();
                         }
 
                         /*
                          * Periodically update the statistics while they are
-                         * being built (or, if the back-end is already completely
-                         * built, it will skip over the while() immediately.
+                         * being built (or, if the back-end is already
+                         * completely built, it will skip over the while() immediately.
                          */
-                        while(!ss.waitUntilBuilt(LIVE_UPDATE_DELAY)) {
+                        while (!ss.waitUntilBuilt(LIVE_UPDATE_DELAY)) {
                             Map<String, Long> map = stats.getEventTypesInRange(start, end);
                             updateStats(aTrace, isGlobal, map);
                         }
@@ -637,12 +686,13 @@ public class TmfStatisticsViewer extends TmfViewer {
 
         final TmfStatisticsTree statsData = TmfStatisticsTreeManager.getStatTree(getTreeID());
         if (statsData == null) {
-            /* The stat tree  has been disposed, abort mission. */
+            /* The stat tree has been disposed, abort mission. */
             return;
         }
 
         Map<String, Long> map = eventsPerType;
         String name = trace.getName();
+
 
         /*
          * "Global", "partial", "total", etc., it's all very confusing...
@@ -694,8 +744,8 @@ public class TmfStatisticsViewer extends TmfViewer {
     }
 
     /**
-     * When the trace is loading the cursor will be different so the user
-     * knows that the processing is not finished yet.
+     * When the trace is loading the cursor will be different so the user knows
+     * that the processing is not finished yet.
      *
      * Calls to this method are stacked.
      *

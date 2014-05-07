@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Mathieu Denis <mathieu.denis@polymtl.ca> - Implementation and Initial API
+ *   Vincent Perot - Add percentages to the label provider
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.viewers.statistics.model;
@@ -31,7 +32,7 @@ import com.google.common.collect.ImmutableSet;
  * Create a basic list of columns with providers.
  *
  * @author Mathieu Denis
- * @since 2.0
+ * @since 3.0
  */
 public class TmfBaseColumnDataProvider {
 
@@ -61,8 +62,85 @@ public class TmfBaseColumnDataProvider {
     // Class attributes
     // ------------------------------------------------------------------------
 
-    /** Level for which statistics should not be displayed. */
-    private static final Set<String> HIDDEN_FOLDER_LEVELS = ImmutableSet.of("Event Types"); //$NON-NLS-1$
+    /**
+     * Level for which statistics should not be displayed.
+     *
+     * @since 3.0
+     */
+    public static final Set<String> HIDDEN_FOLDER_LEVELS = ImmutableSet.of("Event Types"); //$NON-NLS-1$
+
+    private static final String EMPTY_STRING = ""; //$NON-NLS-1$
+
+    // ------------------------------------------------------------------------
+    // Column index (Ideally, this should not be hardcoded).
+    // ------------------------------------------------------------------------
+
+    /**
+     * Possible columns in the view
+     *
+     * @since 3.0
+     */
+    public static enum StatsColumn {
+        /**
+         * Column index for the event type column.
+         */
+        EVENT(0),
+        /**
+         * Column index for the event total count column.
+         */
+        TOTAL(1),
+        /**
+         * Column index for the event partial count column.
+         */
+        PARTIAL(2),
+        /**
+         * Column index for the dummy column.
+         */
+        DUMMY(3);
+
+        private final int colIndex;
+
+        private StatsColumn(int index) {
+            colIndex = index;
+        }
+
+        /**
+         * Getter method for the column index.
+         *
+         * @return the index of the column
+         */
+        public int getIndex() {
+            return colIndex;
+        }
+
+        /**
+         * Method to get the column at a certain index.
+         *
+         * @param index the index of the column
+         *
+         * @return the column at the specified index
+         */
+        public static StatsColumn getColumn(int index) {
+            switch(index) {
+            case 0:
+                return EVENT;
+
+            case 1:
+                return TOTAL;
+
+            case 2:
+                return PARTIAL;
+
+            case 3:
+                return DUMMY;
+
+            // Other values are illegal.
+            default:
+                throw new IllegalArgumentException();
+            }
+
+        }
+    }
 
     // ------------------------------------------------------------------------
     // Instance fields
@@ -115,16 +193,16 @@ public class TmfBaseColumnDataProvider {
         builder.add(new TmfBaseColumnData(
                 EVENTS_COUNT_COLUMN,
                 140,
-                SWT.LEFT,
+                SWT.RIGHT,
                 EVENTS_COUNT_COLUMN_TIP,
                 new ColumnLabelProvider() {
                     @Override
                     public String getText(Object element) {
                         TmfStatisticsTreeNode node = (TmfStatisticsTreeNode) element;
                         if (!HIDDEN_FOLDER_LEVELS.contains(node.getName())) {
-                            return Long.toString(node.getValues().getTotal());
+                            return TmfStatisticsFormatter.toColumnData(node, StatsColumn.TOTAL);
                         }
-                        return ""; //$NON-NLS-1$
+                        return EMPTY_STRING;
                     }
                 },
                 new ViewerComparator() {
@@ -139,15 +217,9 @@ public class TmfBaseColumnDataProvider {
                 new ITmfColumnPercentageProvider() {
                     @Override
                     public double getPercentage(TmfStatisticsTreeNode node) {
-                        TmfStatisticsTreeNode parent = node;
-                        do {
-                            parent = parent.getParent();
-                        } while (parent != null && parent.getValues().getTotal() == 0);
-
-                        if (parent == null) {
-                            return 0;
-                        }
-                        return (double) node.getValues().getTotal() / parent.getValues().getTotal();
+                        TmfStatisticsTreeNode top = node.getTop();
+                        return (top == null || top.getValues().getTotal() == 0) ?
+                                0 : (double) (node.getValues().getTotal()) / top.getValues().getTotal();
                     }
                 }));
 
@@ -155,17 +227,18 @@ public class TmfBaseColumnDataProvider {
         builder.add(new TmfBaseColumnData(
                 PARTIAL_EVENTS_COUNT_COLUMN,
                 140,
-                SWT.LEFT,
+                SWT.RIGHT,
                 PARTIAL_COUNT_COLUMN_TIP,
                 new ColumnLabelProvider() {
                     @Override
                     public String getText(Object element) {
                         TmfStatisticsTreeNode node = (TmfStatisticsTreeNode) element;
                         if (!HIDDEN_FOLDER_LEVELS.contains(node.getName())) {
-                            return Long.toString(node.getValues().getPartial());
+                            return TmfStatisticsFormatter.toColumnData(node, StatsColumn.PARTIAL);
                         }
-                        return ""; //$NON-NLS-1$
+                        return EMPTY_STRING;
                     }
+
                 },
                 new ViewerComparator() {
                     @Override
@@ -179,15 +252,25 @@ public class TmfBaseColumnDataProvider {
                 new ITmfColumnPercentageProvider() {
                     @Override
                     public double getPercentage(TmfStatisticsTreeNode node) {
-                        TmfStatisticsTreeNode parent = node;
-                        do {
-                            parent = parent.getParent();
-                        } while (parent != null && parent.getValues().getPartial() == 0);
+                        TmfStatisticsTreeNode top = node.getTop();
+                        return (top == null || top.getValues().getPartial() == 0) ?
+                                0 : (double) (node.getValues().getPartial()) / top.getValues().getPartial();
+                    }
+                }));
 
-                        if (parent == null) {
-                            return 0;
-                        }
-                        return (double) node.getValues().getPartial() / parent.getValues().getPartial();
+        /* Dummy column used to "fix" the display on Linux (using GTK) */
+        builder.add(new TmfBaseColumnData(EMPTY_STRING, 1, SWT.RIGHT, EMPTY_STRING,
+                new ColumnLabelProvider() {
+                    @Override
+                    public String getText(Object element) {
+                        return EMPTY_STRING;
+                    }
+                },
+                new ViewerComparator(),
+                new ITmfColumnPercentageProvider() {
+                    @Override
+                    public double getPercentage(TmfStatisticsTreeNode node) {
+                        return 0;
                     }
                 }));
 

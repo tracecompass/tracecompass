@@ -49,6 +49,11 @@ public class TmfStatisticsTreeNode {
     private final TmfStatisticsValues fValues;
 
     /**
+     * Return the node at the top of the branch
+     */
+    private final TmfStatisticsTreeNode fTopNode;
+
+    /**
      * Constructor.
      *
      * @param tree
@@ -60,8 +65,10 @@ public class TmfStatisticsTreeNode {
      */
     public TmfStatisticsTreeNode(TmfStatisticsTree tree,
             TmfStatisticsTreeNode parent, final String... path) {
-        /* The path must not contain any null element, or else we won't be
-         * able to walk the tree. */
+        /*
+         * The path must not contain any null element, or else we won't be able
+         * to walk the tree.
+         */
         for (String elem : path) {
             if (elem == null) {
                 throw new IllegalArgumentException();
@@ -73,6 +80,13 @@ public class TmfStatisticsTreeNode {
         fParent = parent;
         fChildren = new ConcurrentHashMap<>();
         fValues = new TmfStatisticsValues();
+
+        /* calculating top node */
+        TmfStatisticsTreeNode topNode = this;
+        while (topNode.getParent() != null && topNode.getParent().getParent() != null) {
+            topNode = topNode.getParent();
+        }
+        fTopNode = topNode;
     }
 
     /**
@@ -157,6 +171,16 @@ public class TmfStatisticsTreeNode {
     }
 
     /**
+     * Return the top node.
+     *
+     * @return Top node.
+     * @since 3.0
+     */
+    public TmfStatisticsTreeNode getTop() {
+        return fTopNode;
+    }
+
+    /**
      * Get the path of the node.
      *
      * @return The path of the node.
@@ -194,8 +218,8 @@ public class TmfStatisticsTreeNode {
     }
 
     /**
-     * Resets the global number of events. It doesn't remove any node
-     * and doesn't modify the partial event count. Works recursively.
+     * Resets the global number of events. It doesn't remove any node and
+     * doesn't modify the partial event count. Works recursively.
      *
      * @since 2.0
      */
