@@ -17,6 +17,7 @@ import static org.junit.Assert.assertNotNull;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.junit.Before;
@@ -35,7 +36,9 @@ public class BitBufferTest {
 
     /**
      * Perform pre-test initialization.
-     * @throws CTFReaderException An error that cannot happen (position is under 128)
+     *
+     * @throws CTFReaderException
+     *             An error that cannot happen (position is under 128)
      */
     @Before
     public void setUp() throws CTFReaderException {
@@ -187,5 +190,44 @@ public class BitBufferTest {
     public void testSetByteOrder() {
         ByteOrder byteOrder = ByteOrder.BIG_ENDIAN;
         fixture.setByteOrder(byteOrder);
+    }
+
+    /**
+     * Test the get function
+     */
+    @Test
+    public void testGetBytes() {
+        @NonNull byte[] data = new byte[2];
+        ByteBuffer bb = ByteBuffer.allocate(10);
+        bb.put((byte) 0);
+        bb.put((byte) 1);
+        bb.put((byte) 1);
+        bb.put((byte) 0);
+        fixture = new BitBuffer(bb);
+        fixture.get(data);
+        assertEquals(0, data[0]);
+        assertEquals(1, data[1]);
+        fixture.get(data);
+        assertEquals(1, data[0]);
+        assertEquals(0, data[1]);
+    }
+
+    /**
+     * Test the get function
+     *
+     * @throws CTFReaderException
+     *             won't happen but we seek in a buffer
+     */
+    @Test
+    public void testGetBytesMiddle() throws CTFReaderException {
+        @NonNull byte[] data = new byte[5];
+        // this string has been carefully selected and tested... don't change
+        // the string and expect the result to be the same.
+        ByteBuffer bb = ByteBuffer.wrap(new String("hello world").getBytes());
+        fixture = new BitBuffer(bb);
+        fixture.position(6 * 8);
+        fixture.get(data);
+        String actual = new String(data);
+        assertEquals("world", actual);
     }
 }

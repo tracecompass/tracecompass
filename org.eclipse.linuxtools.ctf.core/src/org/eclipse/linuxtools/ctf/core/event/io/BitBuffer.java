@@ -15,9 +15,11 @@
 
 package org.eclipse.linuxtools.ctf.core.event.io;
 
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 
 /**
@@ -50,6 +52,10 @@ public final class BitBuffer {
     // ------------------------------------------------------------------------
 
     private ByteBuffer fBuffer;
+
+    /**
+     * Bit-buffer's position, maximum value = Integer.MAX_VALUE * 8
+     */
     private long fPosition;
     private ByteOrder fByteOrder;
 
@@ -167,6 +173,28 @@ public final class BitBuffer {
         }
         long retVal = getInt(length, signed);
         return (signed ? retVal : (retVal & 0xFFFFFFFFL));
+    }
+
+    /**
+     * Relative bulk <i>get</i> method.
+     *
+     * <p>
+     * This method transfers <strong>bytes</strong> from this buffer into the
+     * given destination array. This method currently only supports reads
+     * aligned to 8 bytes. It is up to the developer to shift the bits in
+     * post-processing to do unaligned reads.
+     *
+     * @param dst
+     *            the bytes to write to
+     * @throws BufferUnderflowException
+     *             - If there are fewer than length bytes remaining in this
+     *             buffer
+     * @since 3.1
+     */
+    public void get(@NonNull byte[] dst) {
+        fBuffer.position((int) (fPosition / 8));
+        fBuffer.get(dst);
+        fPosition += dst.length * 8;
     }
 
     /**
