@@ -46,7 +46,7 @@ import org.eclipse.linuxtools.internal.lttng2.control.ui.views.dialogs.TraceCont
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
-import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
+import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceImportException;
 import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
@@ -75,10 +75,6 @@ public class ImportHandler extends BaseControlViewHandler {
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-    /** Trace Type ID for LTTng Kernel traces */
-    private static final String LTTNG_KERNEL_TRACE_TYPE = "org.eclipse.linuxtools.lttng2.kernel.tracetype"; //$NON-NLS-1$
-    /** Trace Type ID for Generic CTF traces */
-    private static final String GENERIC_CTF_TRACE_TYPE = "org.eclipse.linuxtools.tmf.ui.type.ctf"; //$NON-NLS-1$
     /** Name of default project to import traces to */
     public static final String DEFAULT_REMOTE_PROJECT_NAME = "Remote"; //$NON-NLS-1$
 
@@ -159,10 +155,10 @@ public class ImportHandler extends BaseControlViewHandler {
                             if (file != null) {
                                 TraceTypeHelper helper = null;
 
-                                if (remoteFile.isKernel()) {
-                                    helper = TmfTraceType.getInstance().getTraceType(LTTNG_KERNEL_TRACE_TYPE);
-                                } else {
-                                    helper = TmfTraceType.getInstance().getTraceType(GENERIC_CTF_TRACE_TYPE);
+                                try {
+                                    helper = TmfTraceTypeUIUtils.selectTraceType(file.getLocationURI().getPath(), null, null);
+                                } catch (TmfTraceImportException e) {
+                                    // the trace did not match any trace type
                                 }
 
                                 if (helper != null) {

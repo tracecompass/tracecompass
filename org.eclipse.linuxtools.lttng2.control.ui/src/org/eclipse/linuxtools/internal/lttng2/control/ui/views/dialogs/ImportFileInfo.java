@@ -39,10 +39,6 @@ public class ImportFileInfo {
      */
     private boolean fIsOverwrite;
     /**
-     * Flag that specifies if it is a kernel trace or not
-     */
-    private boolean fIsKernel;
-    /**
      * Destination folder to import the trace to (full workspace path)
      */
     private IFolder fDestinationFolder;
@@ -61,16 +57,12 @@ public class ImportFileInfo {
      *            The destination folder (full workspace path)
      * @param isOverwrite
      *            global overwrite flag
-     * @param isKernel
-     *            <code>true</code> if it is a kernel trace else
-     *            <code>false</code>
      */
-    public ImportFileInfo(IRemoteFile file, String traceName, IFolder destinationFolder, boolean isOverwrite, boolean isKernel) {
+    public ImportFileInfo(IRemoteFile file, String traceName, IFolder destinationFolder, boolean isOverwrite) {
         fRemoteFile = file;
         fLocalTraceName = traceName;
         fDestinationFolder = destinationFolder;
         fIsOverwrite = isOverwrite;
-        fIsKernel = isKernel;
     }
 
     // ------------------------------------------------------------------------
@@ -121,25 +113,6 @@ public class ImportFileInfo {
      */
     public void setRemoteFile(IRemoteFile remoteFile) {
         fRemoteFile = remoteFile;
-    }
-
-    /**
-     * Returns whether it is a kernel trace or not
-     *
-     * @return <code>true</code> if it is a kernel trace else <code>false</code>
-     */
-    public boolean isKernel() {
-        return fIsKernel;
-    }
-
-    /**
-     * Sets whether it is a kernel trace or not
-     *
-     * @param isKernel
-     *            <code>true</code> for kernel trace else <code>false</code>
-     */
-    public void setKernel(boolean isKernel) {
-        fIsKernel = isKernel;
     }
 
     /**

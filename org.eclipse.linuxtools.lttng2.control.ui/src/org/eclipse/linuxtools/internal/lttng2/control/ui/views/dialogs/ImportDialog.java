@@ -76,9 +76,6 @@ public class ImportDialog extends Dialog implements IImportDialog {
     /** Name of metadata file of trace */
     public static final String METADATA_FILE_NAME = "metadata"; //$NON-NLS-1$
 
-    /** Default name of kernel traces */
-    public static final String DEFAULT_KERNEL_TRACE_NAME = "kernel"; //$NON-NLS-1$
-
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -251,10 +248,6 @@ public class ImportDialog extends Dialog implements IImportDialog {
                 if (!file.isDirectory() && file.getName().equals(METADATA_FILE_NAME)) {
                     IRemoteFile trace = file.getParentRemoteFile();
                     IRemoteFile parent = trace.getParentRemoteFile();
-                    boolean isKernel = false;
-                    if (trace.getName().equals(DEFAULT_KERNEL_TRACE_NAME)) {
-                        isKernel = true;
-                    }
 
                     String path = fSession.isSnapshotSession() ? fSession.getSnapshotInfo().getSnapshotPath() : fSession.getSessionPath();
                     path = getUnifiedPath(path);
@@ -265,7 +258,7 @@ public class ImportDialog extends Dialog implements IImportDialog {
 
                     IFolder destinationFolder = traceFolder.getFolder(new Path(relativeTracePath.toOSString()));
 
-                    ImportFileInfo info = new ImportFileInfo(trace, trace.getName(), destinationFolder, overwriteAll, isKernel);
+                    ImportFileInfo info = new ImportFileInfo(trace, trace.getName(), destinationFolder, overwriteAll);
                     IFolder folder = destinationFolder.getFolder(trace.getName());
 
                     // Verify if trace directory already exists (and not overwrite)
