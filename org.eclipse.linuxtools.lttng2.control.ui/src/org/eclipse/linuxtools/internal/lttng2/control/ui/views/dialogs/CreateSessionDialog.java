@@ -297,7 +297,13 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
             fSnapshotButton.setToolTipText(Messages.TraceControl_CreateSessionSnapshotTooltip);
             GridData data = new GridData(GridData.FILL_HORIZONTAL);
             data.horizontalSpan = 4;
-            fSnapshotButton.setData(data);
+            fSnapshotButton.setLayoutData(data);
+            fSnapshotButton.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    updateEnablement();
+                }
+            });
         }
 
         // layout widgets
