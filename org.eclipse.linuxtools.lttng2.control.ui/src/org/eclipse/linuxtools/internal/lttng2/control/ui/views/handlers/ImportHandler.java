@@ -53,6 +53,7 @@ import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceTypeUIUtils;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder;
+import org.eclipse.linuxtools.tmf.ui.project.model.TraceUtils;
 import org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace.BatchImportTraceWizard;
 import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
 import org.eclipse.rse.services.files.IFileService;
@@ -140,44 +141,47 @@ public class ImportHandler extends BaseControlViewHandler {
                     IProject selectedProject = dialog.getProject();
                     for (Iterator<ImportFileInfo> iterator = traces.iterator(); iterator.hasNext();) {
                         try {
-                            ImportFileInfo remoteFile = iterator.next();
-
-                            downloadTrace(remoteFile, selectedProject, monitor);
-
-                            // Set trace type
-                            IFolder traceFolder = selectedProject.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
 
                             if (monitor.isCanceled()) {
                                 status.add(Status.CANCEL_STATUS);
                                 break;
                             }
 
+                            ImportFileInfo remoteFile = iterator.next();
+
+                            downloadTrace(remoteFile, selectedProject, monitor);
+
+                            // Set trace type
+                            IFolder traceFolder = remoteFile.getDestinationFolder();
+
                             IResource file = traceFolder.findMember(remoteFile.getLocalTraceName());
 
-                            TraceTypeHelper helper = null;
+                            if (file != null) {
+                                TraceTypeHelper helper = null;
 
-                            if (remoteFile.isKernel()) {
-                                helper = TmfTraceType.getInstance().getTraceType(LTTNG_KERNEL_TRACE_TYPE);
-                            } else {
-                                helper = TmfTraceType.getInstance().getTraceType(GENERIC_CTF_TRACE_TYPE);
-                            }
-
-                            if (helper != null) {
-                                status.add(TmfTraceTypeUIUtils.setTraceType(file, helper));
-                            }
-
-                            try {
-                                final String scheme = "sftp"; //$NON-NLS-1$
-                                String host = remoteFile.getImportFile().getHost().getName();
-                                int port = remoteFile.getImportFile().getParentRemoteFileSubSystem().getConnectorService().getPort();
-                                String path = remoteFile.getImportFile().getAbsolutePath();
-                                if (file instanceof IFolder) {
-                                    path += IPath.SEPARATOR;
+                                if (remoteFile.isKernel()) {
+                                    helper = TmfTraceType.getInstance().getTraceType(LTTNG_KERNEL_TRACE_TYPE);
+                                } else {
+                                    helper = TmfTraceType.getInstance().getTraceType(GENERIC_CTF_TRACE_TYPE);
                                 }
-                                URI uri = new URI(scheme, null, host, port, path, null, null);
-                                String sourceLocation = URIUtil.toUnencodedString(uri);
-                                file.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
-                            } catch (URISyntaxException e) {
+
+                                if (helper != null) {
+                                    status.add(TmfTraceTypeUIUtils.setTraceType(file, helper));
+                                }
+
+                                try {
+                                    final String scheme = "sftp"; //$NON-NLS-1$
+                                    String host = remoteFile.getImportFile().getHost().getName();
+                                    int port = remoteFile.getImportFile().getParentRemoteFileSubSystem().getConnectorService().getPort();
+                                    String path = remoteFile.getImportFile().getAbsolutePath();
+                                    if (file instanceof IFolder) {
+                                        path += IPath.SEPARATOR;
+                                    }
+                                    URI uri = new URI(scheme, null, host, port, path, null, null);
+                                    String sourceLocation = URIUtil.toUnencodedString(uri);
+                                    file.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
+                                } catch (URISyntaxException e) {
+                                }
                             }
                         } catch (ExecutionException e) {
                             status.add(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ImportFailure, e));
@@ -259,8 +263,11 @@ public class ImportHandler extends BaseControlViewHandler {
                 throw new ExecutionException(Messages.TraceControl_ImportDialogInvalidTracingProject + " (" + TmfTracesFolder.TRACES_FOLDER_NAME + ")");  //$NON-NLS-1$//$NON-NLS-2$
             }
 
+            IFolder destinationFolder = trace.getDestinationFolder();
+            TraceUtils.createFolder(destinationFolder, monitor);
+
             String traceName = trace.getLocalTraceName();
-            IFolder folder = traceFolder.getFolder(traceName);
+            IFolder folder = destinationFolder.getFolder(traceName);
             if (folder.exists()) {
                 if(!trace.isOverwrite()) {
                     throw new ExecutionException(Messages.TraceControl_ImportDialogTraceAlreadyExistError + ": " + traceName); //$NON-NLS-1$

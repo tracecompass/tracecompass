@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.Dialog;
@@ -105,7 +106,6 @@ public class ImportDialog extends Dialog implements IImportDialog {
      * The parent where the new node should be added.
      */
     private TraceSessionComponent fSession = null;
-
     /**
      * The name of the default project name
      */
@@ -255,31 +255,25 @@ public class ImportDialog extends Dialog implements IImportDialog {
                     if (trace.getName().equals(DEFAULT_KERNEL_TRACE_NAME)) {
                         isKernel = true;
                     }
-                    StringBuffer traceName = new StringBuffer();
-                    traceName.append(trace.getName());
-                    traceName.insert(0, '-');
 
                     String path = fSession.isSnapshotSession() ? fSession.getSnapshotInfo().getSnapshotPath() : fSession.getSessionPath();
                     path = getUnifiedPath(path);
-                    String parentPath = getUnifiedPath(parent.getAbsolutePath());
+                    IPath sessionParentPath = new Path(path).removeLastSegments(1);
+                    IPath traceParentPath = new Path(parent.getAbsolutePath());
 
-                    while (!parentPath.equals(path)) {
-                        traceName.insert(0, parent.getName());
-                        traceName.insert(0, '-');
-                        parent = parent.getParentRemoteFile();
-                        parentPath = getUnifiedPath(parent.getAbsolutePath());
-                    }
-                    traceName.insert(0, parent.getName());
+                    IPath relativeTracePath = traceParentPath.makeRelativeTo(sessionParentPath);
 
-                    ImportFileInfo info = new ImportFileInfo(trace, traceName.toString(), overwriteAll, isKernel);
-                    IFolder folder = traceFolder.getFolder(traceName.toString());
+                    IFolder destinationFolder = traceFolder.getFolder(new Path(relativeTracePath.toOSString()));
+
+                    ImportFileInfo info = new ImportFileInfo(trace, trace.getName(), destinationFolder, overwriteAll, isKernel);
+                    IFolder folder = destinationFolder.getFolder(trace.getName());
 
                     // Verify if trace directory already exists (and not overwrite)
                     if (folder.exists() && !overwriteAll) {
 
                         // Ask user for overwrite or new name
                         IImportConfirmationDialog conf = TraceControlDialogFactory.getInstance().getImportConfirmationDialog();
-                        conf.setTraceName(traceName.toString());
+                        conf.setTraceName(trace.getName());
 
                         // Don't add trace to list if dialog was cancelled.
                         if (conf.open() == Window.OK) {

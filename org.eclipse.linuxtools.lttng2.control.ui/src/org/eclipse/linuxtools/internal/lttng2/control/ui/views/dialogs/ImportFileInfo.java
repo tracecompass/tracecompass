@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2013 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -11,6 +11,7 @@
  **********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.control.ui.views.dialogs;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
 
 /**
@@ -37,8 +38,14 @@ public class ImportFileInfo {
      * Global overwrite flag
      */
     private boolean fIsOverwrite;
-
+    /**
+     * Flag that specifies if it is a kernel trace or not
+     */
     private boolean fIsKernel;
+    /**
+     * Destination folder to import the trace to (full workspace path)
+     */
+    private IFolder fDestinationFolder;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -50,15 +57,18 @@ public class ImportFileInfo {
      *            A remote file reference
      * @param traceName
      *            A trace name
+     * @param destinationFolder
+     *            The destination folder (full workspace path)
      * @param isOverwrite
      *            global overwrite flag
      * @param isKernel
      *            <code>true</code> if it is a kernel trace else
      *            <code>false</code>
      */
-    public ImportFileInfo(IRemoteFile file, String traceName, boolean isOverwrite, boolean isKernel) {
+    public ImportFileInfo(IRemoteFile file, String traceName, IFolder destinationFolder, boolean isOverwrite, boolean isKernel) {
         fRemoteFile = file;
         fLocalTraceName = traceName;
+        fDestinationFolder = destinationFolder;
         fIsOverwrite = isOverwrite;
         fIsKernel = isKernel;
     }
@@ -130,6 +140,15 @@ public class ImportFileInfo {
      */
     public void setKernel(boolean isKernel) {
         fIsKernel = isKernel;
+    }
+
+    /**
+     * Returns the destination folder to import the trace to (full workspace path).
+     *
+     * @return destination folder
+     */
+    public IFolder getDestinationFolder() {
+        return fDestinationFolder;
     }
 }
 
