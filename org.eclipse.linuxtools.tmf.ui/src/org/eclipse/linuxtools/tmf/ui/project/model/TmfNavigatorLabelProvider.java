@@ -19,7 +19,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
@@ -38,7 +41,7 @@ import org.osgi.framework.Bundle;
  * @version 1.0
  * @author Francois Chouinard
  */
-public class TmfNavigatorLabelProvider implements ICommonLabelProvider {
+public class TmfNavigatorLabelProvider implements ICommonLabelProvider, IStyledLabelProvider {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -245,6 +248,24 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider {
 
     @Override
     public void init(ICommonContentExtensionSite aConfig) {
+    }
+
+    /**
+     * @since 3.0
+     */
+    @Override
+    public StyledString getStyledText(Object element) {
+        String text = getText(element);
+        if (text != null) {
+            if (element instanceof ITmfStyledProjectModelElement) {
+                Styler styler = ((ITmfStyledProjectModelElement) element).getStyler();
+                if (styler != null) {
+                    return new StyledString(text, styler);
+                }
+            }
+            return new StyledString(text);
+        }
+        return null;
     }
 
 }

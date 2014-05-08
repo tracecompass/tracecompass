@@ -22,11 +22,13 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisOutput;
 import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisManager;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.swt.graphics.TextStyle;
 import org.osgi.framework.Bundle;
 
 /**
@@ -35,9 +37,17 @@ import org.osgi.framework.Bundle;
  * @author Geneviève Bastien
  * @since 3.0
  */
-public class TmfAnalysisElement extends TmfProjectModelElement {
+public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfStyledProjectModelElement {
+
+    private static final Styler ANALYSIS_CANT_EXECUTE_STYLER = new Styler() {
+        @Override
+        public void applyStyles(TextStyle textStyle) {
+            textStyle.strikeout = true;
+        }
+    };
 
     private final String fAnalysisId;
+    private boolean fCanExecute = true;
 
     /**
      * Constructor
@@ -63,6 +73,8 @@ public class TmfAnalysisElement extends TmfProjectModelElement {
 
     @Override
     void refreshChildren() {
+        fCanExecute = true;
+
         /* Refresh the outputs of this analysis */
         Map<String, TmfAnalysisOutputElement> childrenMap = new HashMap<>();
         for (TmfAnalysisOutputElement output : getAvailableOutputs()) {
@@ -96,6 +108,11 @@ public class TmfAnalysisElement extends TmfProjectModelElement {
             IAnalysisModule module = trace.getAnalysisModule(fAnalysisId);
             if (module == null) {
                 deleteOutputs();
+                /*
+                 * Trace is opened, but the analysis is null, so it does not
+                 * apply
+                 */
+                fCanExecute = false;
                 return;
             }
 
@@ -107,11 +124,24 @@ public class TmfAnalysisElement extends TmfProjectModelElement {
                 }
                 outputElement.refreshChildren();
             }
+
         }
         /* Remove outputs that are not children of this analysis anymore */
         for (TmfAnalysisOutputElement output : childrenMap.values()) {
             removeChild(output);
         }
+    }
+
+    // ------------------------------------------------------------------------
+    // TmfProjectModelElement
+    // ------------------------------------------------------------------------
+
+    @Override
+    public Styler getStyler() {
+        if (!fCanExecute) {
+            return ANALYSIS_CANT_EXECUTE_STYLER;
+        }
+        return null;
     }
 
     // ------------------------------------------------------------------------
@@ -151,13 +181,14 @@ public class TmfAnalysisElement extends TmfProjectModelElement {
     public String getHelpMessage() {
         ITmfProjectModelElement parent = getParent();
 
+        ITmfTrace trace = null;
         if (parent instanceof TmfTraceElement) {
             TmfTraceElement traceElement = (TmfTraceElement) parent;
-            ITmfTrace trace = traceElement.getTrace();
+            trace = traceElement.getTrace();
             if (trace != null) {
                 IAnalysisModule module = trace.getAnalysisModule(fAnalysisId);
                 if (module != null) {
-                    return module.getHelpText();
+                    return module.getHelpText(trace);
                 }
             }
         }
@@ -215,4 +246,5 @@ public class TmfAnalysisElement extends TmfProjectModelElement {
             TmfOpenTraceHelper.openTraceFromElement(traceElement);
         }
     }
+
 }
