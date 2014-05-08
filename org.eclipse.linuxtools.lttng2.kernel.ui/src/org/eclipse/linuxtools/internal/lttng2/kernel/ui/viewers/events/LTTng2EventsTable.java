@@ -13,8 +13,6 @@
 package org.eclipse.linuxtools.internal.lttng2.kernel.ui.viewers.events;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
 import org.eclipse.linuxtools.tmf.ui.widgets.virtualtable.ColumnData;
 import org.eclipse.swt.SWT;
@@ -69,17 +67,15 @@ public class LTTng2EventsTable extends TmfEventsTable {
     }
 
     @Override
-    protected ITmfEventField[] extractItemFields(ITmfEvent event) {
-        ITmfEventField[] fields = EMPTY_FIELD_ARRAY;
-        if (event != null) {
-            fields = new TmfEventField[] {
-                     new TmfEventField(ITmfEvent.EVENT_FIELD_TIMESTAMP, event.getTimestamp().toString(), null),
-                     new TmfEventField(ITmfEvent.EVENT_FIELD_REFERENCE, event.getReference(), null),
-                     new TmfEventField(ITmfEvent.EVENT_FIELD_TYPE, event.getType().getName(), null),
-                     new TmfEventField(ITmfEvent.EVENT_FIELD_CONTENT, event.getContent().toString(), null)
-                    };
+    public String[] getItemStrings(ITmfEvent event) {
+        if (event == null) {
+            return EMPTY_STRING_ARRAY;
         }
-        return fields;
+        return new String[] {
+                event.getTimestamp().toString(),
+                event.getReference(),
+                event.getType().getName(),
+                event.getContent().toString()
+        };
     }
-
 }

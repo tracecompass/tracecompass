@@ -22,8 +22,6 @@ import org.eclipse.linuxtools.internal.gdbtrace.core.event.GdbTraceEvent;
 import org.eclipse.linuxtools.internal.gdbtrace.core.event.GdbTraceEventContent;
 import org.eclipse.linuxtools.internal.gdbtrace.core.trace.GdbTrace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
@@ -106,18 +104,19 @@ public class GdbEventsTable extends TmfEventsTable {
     }
 
     @Override
-    protected ITmfEventField[] extractItemFields(ITmfEvent event) {
-        ITmfEventField[] fields = EMPTY_FIELD_ARRAY;
-        if (event != null) {
-            GdbTraceEventContent content = (GdbTraceEventContent) event.getContent();
-            fields = new TmfEventField[] {
-                    new TmfEventField(TRACE_FRAME_COLUMN, content.getFrameNumber(), null),
-                    new TmfEventField(TRACEPOINT_COLUMN, content.getTracepointNumber(), null),
-                    new TmfEventField(FILE_COLUMN, event.getReference(), null),
-                    new TmfEventField(CONTENT_COLUMN, content.toString(), null)
-            };
+    public String[] getItemStrings(ITmfEvent event) {
+        if (event == null) {
+            return EMPTY_STRING_ARRAY;
         }
-        return fields;
+        // FIXME Unchecked cast. Null check should be replaced with instanceof
+        // GdbTraceEvent check, and its getContent() should be overriden.
+        GdbTraceEventContent content = (GdbTraceEventContent) event.getContent();
+        return new String[] {
+                String.valueOf(content.getFrameNumber()),
+                String.valueOf(content.getTracepointNumber()),
+                event.getReference(),
+                content.toString()
+        };
     }
 
     @Override

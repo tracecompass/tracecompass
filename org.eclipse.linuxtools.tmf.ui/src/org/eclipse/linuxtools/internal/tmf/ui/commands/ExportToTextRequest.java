@@ -67,14 +67,13 @@ public class ExportToTextRequest extends TmfEventRequest {
         try {
             if (fFilter == null || fFilter.matches(event)) {
                 if (fTable != null) {
-                    ITmfEventField[] fields = fTable.getItemFields(event);
+                    String[] entries = fTable.getItemStrings(event);
                     boolean needTab = false;
-                    for (ITmfEventField field: fields) {
+                    for (String entry : entries) {
                         if (needTab) {
                             fWriter.write('\t');
                         }
-                        Object value = field.getValue();
-                        printValue(value);
+                        printValue(entry);
                         needTab = true;
                     }
                 } else { // fallback to default formatting

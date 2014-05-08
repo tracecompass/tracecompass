@@ -78,8 +78,6 @@ import org.eclipse.linuxtools.internal.tmf.ui.dialogs.MultiLineInputDialog;
 import org.eclipse.linuxtools.tmf.core.component.ITmfEventProvider;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.linuxtools.tmf.core.event.lookup.ITmfModelLookup;
 import org.eclipse.linuxtools.tmf.core.event.lookup.ITmfSourceLookup;
@@ -160,6 +158,12 @@ import org.eclipse.ui.themes.ColorUtil;
  */
 public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorSettingsListener, ISelectionProvider {
 
+    /**
+     * Empty string array, used by {@link #getItemStrings}.
+     * @since 3.0
+     */
+    protected static final String[] EMPTY_STRING_ARRAY = new String[0];
+
     private static final Image BOOKMARK_IMAGE = Activator.getDefault().getImageFromPath(
             "icons/elcl16/bookmark_obj.gif"); //$NON-NLS-1$
     private static final Image SEARCH_IMAGE = Activator.getDefault().getImageFromPath("icons/elcl16/search.gif"); //$NON-NLS-1$
@@ -173,11 +177,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private static final String SEARCH_HINT = Messages.TmfEventsTable_SearchHint;
     private static final String FILTER_HINT = Messages.TmfEventsTable_FilterHint;
     private static final int MAX_CACHE_SIZE = 1000;
-    /**
-     * Empty ITmfEventField array, used by {@link #extractItemFields(ITmfEvent)}
-     * @since 2.2
-     */
-    public static final ITmfEventField[] EMPTY_FIELD_ARRAY = new TmfEventField[0];
 
     /**
      * The events table search/filter keys
@@ -1008,12 +1007,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      *            Which rank this event has in the trace/experiment
      */
     protected void setItemData(final TableItem item, final ITmfEvent event, final long rank) {
-        final ITmfEventField[] fields = extractItemFields(event);
-        final String[] content = new String[fields.length];
-        for (int i = 0; i < fields.length; i++) {
-            content[i] = fields[i].getValue() != null ? fields[i].getValue().toString() : ""; //$NON-NLS-1$
-        }
-        item.setText(content);
+        item.setText(getItemStrings(event));
         item.setData(event);
         item.setData(Key.TIMESTAMP, new TmfTimestamp(event.getTimestamp()));
         item.setData(Key.RANK, rank);
@@ -1854,43 +1848,28 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     }
 
     /**
-     * Extract the fields of an event (item in the table).
+     * Get the contents of the row in the events table corresponding to an
+     * event. The order of the elements corresponds to the order of the columns.
+     *
+     * TODO Use column IDs, not indexes, so that the column order can be
+     * re-arranged.
      *
      * @param event
-     *            The event to extract from
-     * @return The array of fields
-     * @since 2.2
+     *            The event printed in this row
+     * @return The event row entries
+     * @since 3.0
      */
-    public final ITmfEventField[] getItemFields(final ITmfEvent event) {
-        return extractItemFields(event);
-    }
-
-    /**
-     * Extract the fields of an event (item in the table).
-     *
-     * @param event
-     *            The event to extract from
-     * @return The array of fields
-     *
-     *         FIXME: Add support for column selection
-     */
-    protected ITmfEventField[] extractItemFields(final ITmfEvent event) {
-        ITmfEventField[] fields = EMPTY_FIELD_ARRAY;
-        if (event != null) {
-            final String timestamp = event.getTimestamp().toString();
-            final String source = event.getSource();
-            final String type = event.getType().getName();
-            final String reference = event.getReference();
-            final String content = event.getContent().toString();
-            fields = new TmfEventField[] {
-                    new TmfEventField(ITmfEvent.EVENT_FIELD_TIMESTAMP, timestamp, null),
-                    new TmfEventField(ITmfEvent.EVENT_FIELD_SOURCE, source, null),
-                    new TmfEventField(ITmfEvent.EVENT_FIELD_TYPE, type, null),
-                    new TmfEventField(ITmfEvent.EVENT_FIELD_REFERENCE, reference, null),
-                    new TmfEventField(ITmfEvent.EVENT_FIELD_CONTENT, content, null)
-            };
+    public String[] getItemStrings(ITmfEvent event) {
+        if (event == null) {
+            return EMPTY_STRING_ARRAY;
         }
-        return fields;
+        return new String[] {
+                event.getTimestamp().toString(),
+                event.getSource(),
+                event.getType().getName(),
+                event.getReference(),
+                event.getContent().toString()
+        };
     }
 
     /**

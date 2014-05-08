@@ -13,7 +13,6 @@
 package org.eclipse.linuxtools.tmf.core.parsers.custom;
 
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -180,13 +179,20 @@ public class CustomEvent extends TmfEvent {
     // ------------------------------------------------------------------------
 
     /**
-     * @return The event fields
+     * Get the contents of the row in the events table corresponding to this
+     * event. The order of the elements corresponds to the order of the columns.
+     *
+     * @return The event row entries
      */
-    public TmfEventField[] extractItemFields() {
+    public String[] getEventStrings() {
         if (fData != null) {
             processData();
         }
-        return Arrays.copyOf(fColumnData, fColumnData.length);
+        String[] entries = new String[fColumnData.length];
+        for (int i = 0; i < fColumnData.length; i++) {
+            entries[i] = fColumnData[i].getValue().toString();
+        }
+        return entries;
     }
 
     private void processData() {

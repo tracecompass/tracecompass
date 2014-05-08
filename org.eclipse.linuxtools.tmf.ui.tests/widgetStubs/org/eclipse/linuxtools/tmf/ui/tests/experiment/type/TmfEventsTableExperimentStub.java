@@ -14,8 +14,6 @@ package org.eclipse.linuxtools.tmf.ui.tests.experiment.type;
 
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
 import org.eclipse.linuxtools.tmf.ui.widgets.virtualtable.ColumnData;
 import org.eclipse.swt.SWT;
@@ -68,24 +66,17 @@ public class TmfEventsTableExperimentStub extends TmfEventsTable {
     }
 
     @Override
-    protected ITmfEventField[] extractItemFields(ITmfEvent event) {
-        ITmfEventField[] fields = new TmfEventField[0];
-        if (event != null) {
-            final String timestamp = event.getTimestamp().toString();
-            final String source = event.getSource();
-            final String type = event.getType().getName();
-            final String reference = event.getReference();
-            final String content = event.getContent().toString();
-            fields = new TmfEventField[] {
-                    new TmfEventField(ITmfEvent.EVENT_FIELD_TIMESTAMP, timestamp, null),
-                    new TmfEventField(ITmfEvent.EVENT_FIELD_SOURCE, source, null),
-                    new TmfEventField(ITmfEvent.EVENT_FIELD_TYPE, type, null),
-                    new TmfEventField(ITmfEvent.EVENT_FIELD_REFERENCE, reference, null),
-                    new TmfEventField("Trace", event.getTrace().getName(), null),
-                    new TmfEventField(ITmfEvent.EVENT_FIELD_CONTENT, content, null)
-            };
+    public String[] getItemStrings(ITmfEvent event) {
+        if (event == null) {
+            return EMPTY_STRING_ARRAY;
         }
-        return fields;
+        return new String[] {
+                event.getTimestamp().toString(),
+                event.getSource(),
+                event.getType().getName(),
+                event.getReference(),
+                event.getTrace().getName(),
+                event.getContent().toString()
+        };
     }
-
 }
