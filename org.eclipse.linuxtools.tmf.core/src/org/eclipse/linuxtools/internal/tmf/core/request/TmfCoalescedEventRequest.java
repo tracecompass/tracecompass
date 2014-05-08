@@ -191,16 +191,12 @@ public class TmfCoalescedEventRequest extends TmfEventRequest {
         super.handleData(data);
         long index = getIndex() + getNbRead() - 1;
         for (ITmfEventRequest request : fRequests) {
-            if (data == null) {
-                request.handleData(null);
-            } else {
-                long start = request.getIndex();
-                if (!request.isCompleted() && index >= start && request.getNbRead() < request.getNbRequested()) {
-                    ITmfTimestamp ts = data.getTimestamp();
-                    if (request.getRange().contains(ts)) {
-                        if (request.getDataType().isInstance(data)) {
-                            request.handleData(data);
-                        }
+            long start = request.getIndex();
+            if (!request.isCompleted() && index >= start && request.getNbRead() < request.getNbRequested()) {
+                ITmfTimestamp ts = data.getTimestamp();
+                if (request.getRange().contains(ts)) {
+                    if (request.getDataType().isInstance(data)) {
+                        request.handleData(data);
                     }
                 }
             }

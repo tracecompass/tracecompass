@@ -251,9 +251,7 @@ class EventMatchingBuildRequest extends TmfEventRequest {
     @Override
     public void handleData(final ITmfEvent event) {
         super.handleData(event);
-        if (event != null) {
-            matching.matchEvent(event, trace);
-        }
+        matching.matchEvent(event, trace);
     }
 
     @Override

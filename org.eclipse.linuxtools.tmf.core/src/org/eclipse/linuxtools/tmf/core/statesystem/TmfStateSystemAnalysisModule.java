@@ -411,9 +411,9 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         }
 
         @Override
-        public void handleData(final @Nullable ITmfEvent event) {
+        public void handleData(final ITmfEvent event) {
             super.handleData(event);
-            if (event != null && event.getTrace() == trace) {
+            if (event.getTrace() == trace) {
                 sci.processEvent(event);
             }
         }

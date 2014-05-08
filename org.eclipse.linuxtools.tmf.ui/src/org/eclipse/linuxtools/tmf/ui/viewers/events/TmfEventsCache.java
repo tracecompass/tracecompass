@@ -349,19 +349,17 @@ public class TmfEventsCache {
                             return;
                         }
                         super.handleData(event);
-                        if (event != null) {
-                            if (((fFilter == null) || fFilter.matches(event)) && (skipCount-- <= 0)) {
-                                synchronized (TmfEventsCache.this) {
-                                    if (monitor.isCanceled()) {
-                                        return;
-                                    }
-                                    fCache[count] = new CachedEvent(event, rank);
-                                    count++;
-                                    fCacheEndIndex++;
+                        if (((fFilter == null) || fFilter.matches(event)) && (skipCount-- <= 0)) {
+                            synchronized (TmfEventsCache.this) {
+                                if (monitor.isCanceled()) {
+                                    return;
                                 }
-                                if (fFilter != null) {
-                                    fTable.cacheUpdated(false);
-                                }
+                                fCache[count] = new CachedEvent(event, rank);
+                                count++;
+                                fCacheEndIndex++;
+                            }
+                            if (fFilter != null) {
+                                fTable.cacheUpdated(false);
                             }
                         }
                         if (count >= fCache.length) {

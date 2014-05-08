@@ -13,6 +13,7 @@
 
 package org.eclipse.linuxtools.tmf.core.request;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 
@@ -118,7 +119,7 @@ public interface ITmfEventRequest {
      * @param event
      *            The trace event to process
      */
-    void handleData(ITmfEvent event);
+    void handleData(@NonNull ITmfEvent event);
 
     // ------------------------------------------------------------------------
     // Request notifications

@@ -305,7 +305,7 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
         @Override
         public void handleData(final ITmfEvent event) {
             super.handleData(event);
-            if (event != null && event.getTrace() == trace) {
+            if (event.getTrace() == trace) {
                 eventCount++;
 
                 /* Check if we need to register a new checkpoint */
@@ -340,7 +340,7 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
         @Override
         public void handleData(final ITmfEvent event) {
             super.handleData(event);
-            if (event != null && event.getTrace() == trace) {
+            if (event.getTrace() == trace) {
                 sci.processEvent(event);
             }
         }

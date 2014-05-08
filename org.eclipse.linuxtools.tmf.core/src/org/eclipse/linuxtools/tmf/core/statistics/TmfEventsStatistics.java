@@ -196,7 +196,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
         @Override
         public void handleData(final ITmfEvent event) {
             super.handleData(event);
-            if (event != null && event.getTrace() == trace) {
+            if (event.getTrace() == trace) {
                 String eventType = event.getType().getName();
                 /*
                  * Special handling for lost events: instead of counting just
@@ -266,7 +266,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
         @Override
         public void handleData(ITmfEvent event) {
             super.handleData(event);
-            if ((event != null)  && (event.getTrace() == trace)) {
+            if (event.getTrace() == trace) {
                 long ts = event.getTimestamp().normalize(0, SCALE).getValue();
                 Long key = results.floorKey(ts);
                 if (key != null) {

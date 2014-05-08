@@ -90,16 +90,14 @@ public class HistogramRequest extends TmfEventRequest {
     @Override
     public void handleData(ITmfEvent event) {
         super.handleData(event);
-        if (event != null) {
-            if (event instanceof ITmfLostEvent) {
-                ITmfLostEvent lostEvents = (ITmfLostEvent) event;
-                /* clear the old data when it is a new request */
-                fHistogram.countLostEvent(lostEvents.getTimeRange(), lostEvents.getNbLostEvents(), fFullRange);
+        if (event instanceof ITmfLostEvent) {
+            ITmfLostEvent lostEvents = (ITmfLostEvent) event;
+            /* clear the old data when it is a new request */
+            fHistogram.countLostEvent(lostEvents.getTimeRange(), lostEvents.getNbLostEvents(), fFullRange);
 
-            } else { /* handle lost event */
-                long timestamp = event.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-                fHistogram.countEvent(getNbRead(), timestamp, event.getTrace());
-            }
+        } else { /* handle lost event */
+            long timestamp = event.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+            fHistogram.countEvent(getNbRead(), timestamp, event.getTrace());
         }
     }
 

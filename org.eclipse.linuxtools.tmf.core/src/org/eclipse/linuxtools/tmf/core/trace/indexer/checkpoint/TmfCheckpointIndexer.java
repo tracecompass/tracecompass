@@ -196,11 +196,9 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
             @Override
             public void handleData(final ITmfEvent event) {
                 super.handleData(event);
-                if (event != null) {
-                    // Update the trace status at regular intervals
-                    if ((getNbRead() % fCheckpointInterval) == 0) {
-                        updateTraceStatus();
-                    }
+                // Update the trace status at regular intervals
+                if ((getNbRead() % fCheckpointInterval) == 0) {
+                    updateTraceStatus();
                 }
             }
 

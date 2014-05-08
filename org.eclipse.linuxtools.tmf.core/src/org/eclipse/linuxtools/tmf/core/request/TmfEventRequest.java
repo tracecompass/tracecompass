@@ -276,9 +276,7 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
 
     @Override
     public void handleData(ITmfEvent event) {
-        if (event != null) {
-            fNbRead++;
-        }
+        fNbRead++;
     }
 
     @Override
