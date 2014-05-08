@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,9 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Matthew Khouzam - Initial API and implementation
- *   Marc-Andre Laperle
- *   Bernd Hufmann - Extracted functionality to class AbstractImportAndReadSmokeTest
+ *   Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ctf.ui.swtbot.tests;
@@ -17,17 +15,17 @@ package org.eclipse.linuxtools.tmf.ctf.ui.swtbot.tests;
 import static org.junit.Assert.assertNotNull;
 
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
-import org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace.BatchImportTraceWizard;
+import org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace.ImportTraceWizard;
 import org.eclipse.linuxtools.tmf.ui.swtbot.tests.conditions.ConditionHelpers;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IWorkbench;
@@ -37,14 +35,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * SWTBot Smoke test. base for other tests
+ * SWTBot Smoke test using ImportTraceWizard.
  *
- * @author Matthew Khouzam
+ * @author Bernd Hufmann
  */
 @RunWith(SWTBotJunit4ClassRunner.class)
-public class ImportAndReadSmokeTest extends AbstractImportAndReadSmokeTest {
+public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTest {
 
-    private static final String TRACE_PROJECT_NAME = "test";
+    private static final String TRACE_PROJECT_NAME = "Tracing";
 
     /**
      * Main test case
@@ -53,10 +51,8 @@ public class ImportAndReadSmokeTest extends AbstractImportAndReadSmokeTest {
     public void test() {
         createProject();
 
-        batchImportOpenWizard();
-        batchImportSelecTraceType();
-        batchImportAddDirectory();
-        batchImportSelectTrace();
+        importOpenWizard();
+        importAddDirectory();
         importFinish();
 
         TmfEventsEditor tmfEd = openEditor();
@@ -68,8 +64,8 @@ public class ImportAndReadSmokeTest extends AbstractImportAndReadSmokeTest {
         deleteProject();
     }
 
-    private static void batchImportOpenWizard() {
-        fWizard = new BatchImportTraceWizard();
+    private static void importOpenWizard() {
+        fWizard = new ImportTraceWizard();
 
         UIThreadRunnable.asyncExec(new VoidResult() {
             @Override
@@ -80,7 +76,7 @@ public class ImportAndReadSmokeTest extends AbstractImportAndReadSmokeTest {
                     final IWorkbenchWindow activeWorkbenchWindow = workbench.getActiveWorkbenchWindow();
                     Shell shell = activeWorkbenchWindow.getShell();
                     assertNotNull(shell);
-                    ((BatchImportTraceWizard) fWizard).init(PlatformUI.getWorkbench(), StructuredSelection.EMPTY);
+                    ((ImportTraceWizard) fWizard).init(PlatformUI.getWorkbench(), StructuredSelection.EMPTY);
                     WizardDialog dialog = new WizardDialog(shell, fWizard);
                     dialog.open();
                 }
@@ -90,46 +86,19 @@ public class ImportAndReadSmokeTest extends AbstractImportAndReadSmokeTest {
         fBot.waitUntil(ConditionHelpers.isWizardReady(fWizard));
     }
 
-    private static void batchImportSelecTraceType() {
-        final SWTBotTree tree = fBot.tree();
-        final String ctfId = "Common Trace Format";
-        fBot.waitUntil(ConditionHelpers.IsTreeNodeAvailable(ctfId, tree));
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(TRACE_TYPE_NAME, tree.getTreeItem(ctfId)));
-        tree.getTreeItem(ctfId).getNode(TRACE_TYPE_NAME).check();
-        batchImportClickNext();
-    }
+    private static void importAddDirectory() {
+        SWTBotCombo sourceCombo = fBot.comboBox();
+        sourceCombo.setText(fTrace.getPath());
 
-    private static void batchImportAddDirectory() {
-        UIThreadRunnable.syncExec(new VoidResult() {
-            @Override
-            public void run() {
-                ((BatchImportTraceWizard) fWizard).addFileToScan(fTrace.getPath());
-            }
-        });
-        final SWTBotButton removeButton = fBot.button("Remove");
-        fBot.waitUntil(Conditions.widgetIsEnabled(removeButton));
-        removeButton.click();
-        fBot.waitUntil(Conditions.tableHasRows(fBot.table(), 1));
+        SWTBotText text = fBot.text();
+        text.setFocus();
 
-        batchImportClickNext();
-    }
-
-    private static void batchImportSelectTrace() {
+        fBot.activeShell();
         SWTBotTree tree = fBot.tree();
         fBot.waitUntil(Conditions.widgetIsEnabled(tree));
-        final SWTBotTreeItem genericCtfTreeItem = tree.getTreeItem(TRACE_TYPE_NAME);
+        final SWTBotTreeItem genericCtfTreeItem = tree.getTreeItem(TRACE_NAME);
         fBot.waitUntil(Conditions.widgetIsEnabled(genericCtfTreeItem));
-        genericCtfTreeItem.expand();
         genericCtfTreeItem.check();
-        batchImportClickNext();
-    }
-
-    private static void batchImportClickNext() {
-        IWizardPage currentPage = fWizard.getContainer().getCurrentPage();
-        IWizardPage desiredPage = fWizard.getNextPage(currentPage);
-        SWTBotButton nextButton = fBot.button("Next >");
-        nextButton.click();
-        fBot.waitUntil(ConditionHelpers.isWizardOnPage(fWizard, desiredPage));
     }
 
     @Override

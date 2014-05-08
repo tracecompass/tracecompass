@@ -73,6 +73,8 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -352,8 +354,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         directoryNameField.addKeyListener(new KeyListener() {
             @Override
             public void keyPressed(KeyEvent e) {
-                // If there has been a key pressed then mark as dirty
-                entryChanged = true;
                 if (e.character == SWT.CR) { // Windows...
                     entryChanged = false;
                     updateFromSourceField();
@@ -377,6 +377,13 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                     entryChanged = false;
                     updateFromSourceField();
                 }
+            }
+        });
+
+        directoryNameField.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                entryChanged = true;
             }
         });
 
