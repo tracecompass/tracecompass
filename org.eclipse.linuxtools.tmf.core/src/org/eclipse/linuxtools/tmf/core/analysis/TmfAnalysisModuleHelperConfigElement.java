@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.ContributorFactoryOSGi;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.internal.tmf.core.analysis.TmfAnalysisModuleSourceConfigElement;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
@@ -133,29 +134,28 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
 
     @Override
     public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
-        /**
-         * TODO: This method returns only the requirement of the first
-         * applicable tracetype. We may assume that requirements will be the
-         * same no matter the trace type, the trace generator will know how to
-         * handle those. But this will have to be confirmed when the situation
-         * happens.
-         */
-        for (TraceTypeHelper helper : TmfTraceType.getInstance().getTraceTypeHelpers()) {
-            if (appliesToTraceType(helper.getTraceClass())) {
-                try {
-                    return newModule(helper.getTrace()).getAnalysisRequirements();
-                } catch (TmfAnalysisException e) {
-                    Activator.logError("Error in get analysis requirements", e); //$NON-NLS-1$
-                }
-            }
+        IAnalysisModule module = createModule();
+        if (module != null) {
+            return module.getAnalysisRequirements();
         }
-
         return Collections.EMPTY_SET;
     }
 
     // ---------------------------------------
     // Functionalities
     // ---------------------------------------
+
+    private IAnalysisModule createModule() {
+        IAnalysisModule module = null;
+        try {
+            module = (IAnalysisModule) fCe.createExecutableExtension(TmfAnalysisModuleSourceConfigElement.ANALYSIS_MODULE_ATTR);
+            module.setName(getName());
+            module.setId(getId());
+        } catch (CoreException e) {
+            Activator.logError("Error getting analysis modules from configuration files", e); //$NON-NLS-1$
+        }
+        return module;
+    }
 
     @Override
     public IAnalysisModule newModule(ITmfTrace trace) throws TmfAnalysisException {
@@ -165,28 +165,37 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
             throw new TmfAnalysisException(NLS.bind(Messages.TmfAnalysisModuleHelper_AnalysisDoesNotApply, getName()));
         }
 
-        IAnalysisModule module = null;
-        try {
-            module = (IAnalysisModule) fCe.createExecutableExtension(TmfAnalysisModuleSourceConfigElement.ANALYSIS_MODULE_ATTR);
-            module.setName(getName());
-            module.setId(getId());
-            module.setAutomatic(isAutomatic());
-
-            /* Get the module's parameters */
-            final IConfigurationElement[] parametersCE = fCe.getChildren(TmfAnalysisModuleSourceConfigElement.PARAMETER_ELEM);
-            for (IConfigurationElement element : parametersCE) {
-                module.addParameter(element.getAttribute(TmfAnalysisModuleSourceConfigElement.NAME_ATTR));
-                String defaultValue = element.getAttribute(TmfAnalysisModuleSourceConfigElement.DEFAULT_VALUE_ATTR);
-                if (defaultValue != null) {
-                    module.setParameter(element.getAttribute(TmfAnalysisModuleSourceConfigElement.NAME_ATTR), defaultValue);
-                }
-            }
-            module.setTrace(trace);
-            TmfAnalysisManager.analysisModuleCreated(module);
-        } catch (CoreException e) {
-            Activator.logError("Error getting analysis modules from configuration files", e); //$NON-NLS-1$
+        IAnalysisModule module = createModule();
+        if (module == null) {
+            return null;
         }
+
+        module.setAutomatic(isAutomatic());
+
+        /* Get the module's parameters */
+        final IConfigurationElement[] parametersCE = fCe.getChildren(TmfAnalysisModuleSourceConfigElement.PARAMETER_ELEM);
+        for (IConfigurationElement element : parametersCE) {
+            module.addParameter(element.getAttribute(TmfAnalysisModuleSourceConfigElement.NAME_ATTR));
+            String defaultValue = element.getAttribute(TmfAnalysisModuleSourceConfigElement.DEFAULT_VALUE_ATTR);
+            if (defaultValue != null) {
+                module.setParameter(element.getAttribute(TmfAnalysisModuleSourceConfigElement.NAME_ATTR), defaultValue);
+            }
+        }
+        module.setTrace(trace);
+        TmfAnalysisManager.analysisModuleCreated(module);
+
         return module;
 
+    }
+
+    @Override
+    public String getHelpText(@NonNull ITmfTrace trace) {
+        IAnalysisModule module = createModule();
+        if (module != null) {
+            String ret = module.getHelpText(trace);
+            module.dispose();
+            return ret;
+        }
+        return getHelpText();
     }
 }

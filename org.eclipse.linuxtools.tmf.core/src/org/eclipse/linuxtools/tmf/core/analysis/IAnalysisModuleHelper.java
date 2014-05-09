@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.tmf.core.analysis;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.osgi.framework.Bundle;
@@ -68,6 +69,22 @@ public interface IAnalysisModuleHelper extends IAnalysisRequirementProvider {
     String getHelpText();
 
     /**
+     * Gets a specific help message/documentation for this analysis module
+     * applied on the given trace. This help message can add information on the
+     * status of this analysis for a given trace, whether it can be executed or
+     * not and why.
+     *
+     * This help text will be displayed to the user and may contain information
+     * on what the module does, how to use it and how to correctly generate the
+     * trace to make it available
+     *
+     * @param trace
+     *            A trace for which to get specific help message
+     * @return The generic help text
+     */
+    String getHelpText(@NonNull ITmfTrace trace);
+
+    /**
      * Gets the icon for this module
      *
      * @return The icon path
@@ -106,8 +123,8 @@ public interface IAnalysisModuleHelper extends IAnalysisRequirementProvider {
      * helper and initializes it with the trace.
      *
      * After the module is fully created, this method should call
-     * {@link TmfAnalysisManager#analysisModuleCreated(IAnalysisModule)} in order
-     * for the new module listeners to be executed on this module.
+     * {@link TmfAnalysisManager#analysisModuleCreated(IAnalysisModule)} in
+     * order for the new module listeners to be executed on this module.
      *
      * @param trace
      *            The trace to be linked to the module

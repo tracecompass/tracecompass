@@ -16,6 +16,7 @@ package org.eclipse.linuxtools.tmf.tests.stubs.analysis;
 import java.util.Collections;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisRequirement;
@@ -73,6 +74,11 @@ public class AnalysisModuleTestHelper implements IAnalysisModuleHelper {
 
     @Override
     public String getHelpText() {
+        return "";
+    }
+
+    @Override
+    public String getHelpText(@NonNull ITmfTrace trace) {
         return "";
     }
 

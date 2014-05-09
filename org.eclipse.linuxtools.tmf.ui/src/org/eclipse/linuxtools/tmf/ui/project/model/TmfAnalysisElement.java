@@ -198,6 +198,10 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
             return new String();
         }
 
+        if (trace != null) {
+            return helper.getHelpText(trace);
+        }
+
         return helper.getHelpText();
     }
 

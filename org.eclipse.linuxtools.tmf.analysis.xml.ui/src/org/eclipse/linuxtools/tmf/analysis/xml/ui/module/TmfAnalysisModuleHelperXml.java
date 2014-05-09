@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.Activator;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
@@ -98,6 +99,11 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper {
     @Override
     public String getHelpText() {
         return new String();
+    }
+
+    @Override
+    public String getHelpText(@NonNull ITmfTrace trace) {
+        return ""; //$NON-NLS-1$
     }
 
     @Override

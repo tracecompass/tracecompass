@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -26,6 +27,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
+import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisRequirement.ValuePriorityLevel;
 import org.eclipse.linuxtools.tmf.core.component.TmfComponent;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
@@ -403,14 +405,30 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
 
     /**
      * Gets the help text specific for a trace who does not have required
-     * characteristics for module to execute
+     * characteristics for module to execute. The default implementation uses
+     * the analysis requirements.
      *
      * @param trace
      *            The trace to apply the analysis to
      * @return Help text
      */
-    protected String getTraceCannotExecuteHelpText(ITmfTrace trace) {
-        return Messages.TmfAbstractAnalysisModule_AnalysisCannotExecute;
+    protected String getTraceCannotExecuteHelpText(@NonNull ITmfTrace trace) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(NLS.bind(Messages.TmfAbstractAnalysisModule_AnalysisCannotExecute, getName()));
+        for (TmfAnalysisRequirement requirement : getAnalysisRequirements()) {
+            if (!requirement.isFulfilled(trace)) {
+                builder.append("\n\n"); //$NON-NLS-1$
+                builder.append(NLS.bind(Messages.TmfAnalysis_RequirementNotFulfilled, requirement.getType()));
+                builder.append("\n"); //$NON-NLS-1$
+                builder.append(NLS.bind(Messages.TmfAnalysis_RequirementMandatoryValues, requirement.getValues(ValuePriorityLevel.MANDATORY)));
+                Set<String> information = requirement.getInformation();
+                if (!information.isEmpty()) {
+                    builder.append("\n"); //$NON-NLS-1$
+                    builder.append(NLS.bind(Messages.TmfAnalysis_RequirementInformation, information));
+                }
+            }
+        }
+        return builder.toString();
     }
 
     @Override
@@ -425,7 +443,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
         }
         String text = getShortHelpText(trace);
         if (!canExecute(trace)) {
-            text = text + getTraceCannotExecuteHelpText(trace);
+            text = text + "\n\n" + getTraceCannotExecuteHelpText(trace); //$NON-NLS-1$
         }
         return text;
     }
