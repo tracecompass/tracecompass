@@ -152,8 +152,9 @@ abstract public class AbstractTracePackageOperation {
     protected int getNbCheckedElements(TracePackageElement[] elements) {
         int totalWork = 0;
         for (TracePackageElement tracePackageElement : elements) {
-            if (tracePackageElement.getChildren() != null) {
-                totalWork += getNbCheckedElements(tracePackageElement.getChildren());
+            TracePackageElement[] children = tracePackageElement.getChildren();
+            if (children != null && children.length > 0) {
+                totalWork += getNbCheckedElements(children);
             } else if (tracePackageElement.isChecked()) {
                 ++totalWork;
             }

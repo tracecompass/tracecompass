@@ -196,7 +196,7 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
 
                 // project/.traceExport/.tracing/A/B
                 IFolder folder = fExportFolder.getFolder(relativeToExportFolder.removeLastSegments(1));
-                TraceUtils.createFolder(folder, monitor);
+                TraceUtils.createFolder(folder, new SubProgressMonitor(monitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
 
                 res.refreshLocal(0, new SubProgressMonitor(monitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
                 createExportResource(folder, res);
@@ -222,7 +222,7 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
 
         // project/.traceExport/A/B
         IFolder folder = fExportFolder.getFolder(relativeToExportFolder.removeLastSegments(1));
-        TraceUtils.createFolder(folder, monitor);
+        TraceUtils.createFolder(folder, new SubProgressMonitor(monitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
 
         createExportResource(folder, resource);
         Element fileElement = doc.createElement(ITracePackageConstants.TRACE_FILE_ELEMENT);
