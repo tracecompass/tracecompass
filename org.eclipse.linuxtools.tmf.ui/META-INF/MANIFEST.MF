@@ -37,6 +37,7 @@ Export-Package: org.eclipse.linuxtools.internal.tmf.ui;x-friends:="org.eclipse.l
  org.eclipse.linuxtools.tmf.ui.properties,
  org.eclipse.linuxtools.tmf.ui.viewers,
  org.eclipse.linuxtools.tmf.ui.viewers.events,
+ org.eclipse.linuxtools.tmf.ui.viewers.events.text,
  org.eclipse.linuxtools.tmf.ui.viewers.statistics,
  org.eclipse.linuxtools.tmf.ui.viewers.statistics.model,
  org.eclipse.linuxtools.tmf.ui.viewers.tree,
