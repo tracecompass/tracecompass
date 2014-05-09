@@ -52,6 +52,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
+import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxy;
 
 /**
  * <p>
@@ -109,7 +110,7 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         @Override
         public Object[] getElements(Object inputElement) {
             List<Object> children = new ArrayList<>();
-            IRemoteServicesManager manager = Activator.getService(IRemoteServicesManager.class);
+            IRemoteServicesManager manager = RemoteSystemProxy.getService(IRemoteServicesManager.class);
             if (manager != null) {
                 children.addAll(manager.getAllConnectionTypes());
             }
@@ -200,7 +201,7 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         fConnectionTree.setAutoExpandLevel(2);
         fConnectionTree.setInput(this);
 
-        IRemoteServicesManager manager = Activator.getService(IRemoteServicesManager.class);
+        IRemoteServicesManager manager = RemoteSystemProxy.getService(IRemoteServicesManager.class);
         if (manager == null) {
             return result;
         }

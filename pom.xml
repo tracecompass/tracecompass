@@ -155,7 +155,6 @@
 
   <modules>
     <module>doc</module>
-
     <module>org.eclipse.tracecompass.common.core</module>
 
     <module>org.eclipse.tracecompass.btf</module>
@@ -197,6 +196,10 @@
     <module>org.eclipse.tracecompass.tmf.analysis.xml.core.tests</module>
     <module>org.eclipse.tracecompass.tmf.analysis.xml.ui</module>
     <module>org.eclipse.tracecompass.tmf.analysis.xml.ui.tests</module>
+
+    <module>org.eclipse.tracecompass.tmf.remote</module>
+    <module>org.eclipse.tracecompass.tmf.remote.core</module>
+    <module>org.eclipse.tracecompass.tmf.remote.ui</module>
 
     <module>org.eclipse.tracecompass.releng-site</module>
     <module>org.eclipse.tracecompass.target</module>

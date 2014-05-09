@@ -27,9 +27,9 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote.CommandResult;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote.ICommandResult;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlService;
+import org.eclipse.tracecompass.tmf.remote.core.shell.CommandResult;
+import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandResult;
 
 @SuppressWarnings("javadoc")
 public class LTTngToolsFileShell extends TestCommandShell {
@@ -263,11 +263,7 @@ public class LTTngToolsFileShell extends TestCommandShell {
 
         String[] output = new String[1];
         output[0] = String.valueOf("Command not found");
-        CommandResult result = new CommandResult(0, null, null);
-        // For verification of setters of class CommandResult
-        result.setOutput(output);
-        result.setErrorOutput(output);
-        result.setResult(1);
+        CommandResult result = new CommandResult(1, output, output);
         return result;
     }
 

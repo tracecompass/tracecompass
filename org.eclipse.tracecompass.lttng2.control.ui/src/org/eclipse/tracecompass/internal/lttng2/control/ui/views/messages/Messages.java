@@ -36,12 +36,7 @@ public final class Messages extends NLS {
     // Failures
     public static String TraceControl_ConnectionFailure;
     public static String TraceControl_DisconnectionFailure;
-    public static String TraceControl_ExecutionCancelled;
-    public static String TraceControl_ExecutionFailure;
-    public static String TraceControl_ExecutionTimeout;
-    public static String TraceControl_ShellNotConnected;
 
-    public static String TraceControl_CommandShellError;
     public static String TraceControl_CommandError;
     public static String TraceControl_UnexpectedCommandOutputFormat;
     public static String TraceControl_UnexpectedNameError;
@@ -323,7 +318,6 @@ public final class Messages extends NLS {
     public static String TraceControl_LoggingPreference;
     public static String TraceControl_LogfilePath;
     public static String TraceControl_AppendLogfilePreference;
-    public static String TraceControl_CommandTimeout;
 
     public static String TraceControl_VerboseLevelsPreference;
     public static String TraceControl_VerboseLevelNonePreference;

@@ -55,7 +55,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote.IRemoteSystemProxy;
+import org.eclipse.tracecompass.tmf.remote.core.proxy.IRemoteSystemProxy;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.ui.ISharedImages;

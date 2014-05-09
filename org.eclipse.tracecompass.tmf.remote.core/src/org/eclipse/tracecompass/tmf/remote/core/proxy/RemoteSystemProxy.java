@@ -11,7 +11,7 @@
  *   Markus Schorn - Bug 448058: Use org.eclipse.remote in favor of RSE
  *   Bernd Hufmann - Update to org.eclipse.remote API 2.0
  **********************************************************************/
-package org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote;
+package org.eclipse.tracecompass.tmf.remote.core.proxy;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -26,11 +26,14 @@ import org.eclipse.remote.core.IRemoteProcessService;
 import org.eclipse.remote.core.IRemoteServicesManager;
 import org.eclipse.remote.core.RemoteConnectionChangeEvent;
 import org.eclipse.remote.core.exception.RemoteConnectionException;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
+
+import org.eclipse.tracecompass.internal.tmf.remote.core.Activator;
+import org.eclipse.tracecompass.tmf.remote.core.shell.CommandShell;
+import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandShell;
 
 /**
  * <p>
@@ -136,6 +139,17 @@ public class RemoteSystemProxy implements IRemoteSystemProxy, IRemoteConnectionC
     }
 
     /**
+     * Return the OSGi service with the given service interface.
+     *
+     * @param service
+     *            service interface
+     * @return the specified service or null if it's not registered
+     */
+    public static @Nullable <T> T getService(Class<T> service) {
+        return Activator.getService(service);
+    }
+
+    /**
      * Return a remote connection using OSGI service.
      *
      * @param remoteServicesId
@@ -166,10 +180,10 @@ public class RemoteSystemProxy implements IRemoteSystemProxy, IRemoteConnectionC
      */
     public static @Nullable IRemoteConnection getLocalConnection() {
         IRemoteServicesManager manager = Activator.getService(IRemoteServicesManager.class);
-        if (manager == null) {
-            return null;
+        if (manager != null) {
+            IRemoteConnectionType type = manager.getLocalConnectionType();
+            return type.getConnection(LOCAL_CONNECTION_NAME);
         }
-        IRemoteConnectionType type = manager.getLocalConnectionType();
-        return type.getConnection(LOCAL_CONNECTION_NAME);
+        return null;
     }
 }

@@ -54,8 +54,8 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.Snapshot
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.UstProviderInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.XmlMiValidationErrorHandler;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote.ICommandResult;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote.ICommandShell;
+import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandResult;
+import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandShell;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

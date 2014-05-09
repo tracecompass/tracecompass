@@ -10,7 +10,7 @@
  *   Bernd Hufmann - Initial API and implementation
  *   Markus Schorn - Bug 448058: Use org.eclipse.remote in favor of RSE
  **********************************************************************/
-package org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote;
+package org.eclipse.tracecompass.tmf.remote.core.shell;
 
 import java.util.List;
 

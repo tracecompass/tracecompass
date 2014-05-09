@@ -55,10 +55,6 @@ public class ControlPreferences {
      */
     public static final String TRACE_CONTROL_VERBOSE_LEVEL_PREF = "trace.control.verbose.level"; //$NON-NLS-1$
     /**
-     * The command time-out preference
-     */
-    public static final String TRACE_CONTROL_COMMAND_TIMEOUT_PREF = "trace.control.command.timeout"; //$NON-NLS-1$
-    /**
      * The verbose level value for none
      */
     public static final String TRACE_CONTROL_VERBOSE_LEVEL_NONE = "trace.control.verbose.level.none"; //$NON-NLS-1$
@@ -179,14 +175,6 @@ public class ControlPreferences {
     public String getLogfilePath() {
         return fPreferenceStore.getString(TRACE_CONTROL_LOG_FILE_PATH_PREF);
     }
-
-    /**
-     * @return command timeout value
-     */
-    public int getCommandTimeout() {
-        return fPreferenceStore.getInt(TRACE_CONTROL_COMMAND_TIMEOUT_PREF);
-    }
-
 
     // ------------------------------------------------------------------------
     // Operations

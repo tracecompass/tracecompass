@@ -34,9 +34,9 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.Targ
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceProviderGroup;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionGroup;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.UstProviderComponent;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote.RemoteSystemProxy;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.ILttngControlService;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlService;
+import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxy;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -45,8 +45,8 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionGroup;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote.IRemoteSystemProxy;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlServiceConstants;
+import org.eclipse.tracecompass.tmf.remote.core.proxy.IRemoteSystemProxy;
 
 /**
  * <p>

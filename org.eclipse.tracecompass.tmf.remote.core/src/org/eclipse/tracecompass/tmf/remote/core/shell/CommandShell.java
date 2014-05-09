@@ -12,7 +12,7 @@
  *   Markus Schorn - Bug 448058: Use org.eclipse.remote in favor of RSE
  *   Bernd Hufmann - Update to org.eclipse.remote API 2.0
  **********************************************************************/
-package org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote;
+package org.eclipse.tracecompass.tmf.remote.core.shell;
 
 import java.io.IOException;
 import java.util.List;
@@ -29,8 +29,8 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.remote.core.IRemoteProcess;
 import org.eclipse.remote.core.IRemoteProcessService;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.preferences.ControlPreferences;
+import org.eclipse.tracecompass.internal.tmf.remote.core.messages.Messages;
+import org.eclipse.tracecompass.internal.tmf.remote.core.preferences.TmfRemotePreferences;
 
 /**
  * <p>
@@ -107,7 +107,7 @@ public class CommandShell implements ICommandShell {
             fExecutor.execute(future);
 
             try {
-                return future.get(ControlPreferences.getInstance().getCommandTimeout(), TimeUnit.SECONDS);
+                return future.get(TmfRemotePreferences.getCommandTimeout(), TimeUnit.SECONDS);
             } catch (java.util.concurrent.ExecutionException ex) {
                 throw new ExecutionException(Messages.TraceControl_ExecutionFailure, ex);
             } catch (InterruptedException ex) {

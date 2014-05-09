@@ -33,6 +33,5 @@ public class ControlPreferenceInitializer extends AbstractPreferenceInitializer 
         store.setDefault(ControlPreferences.TRACE_CONTROL_LOG_FILE_PATH_PREF, ControlPreferences.TRACE_CONTROL_DEFAULT_LOG_PATH);
         store.setDefault(ControlPreferences.TRACE_CONTROL_LOG_COMMANDS_PREF, false);
         store.setDefault(ControlPreferences.TRACE_CONTROL_VERBOSE_LEVEL_PREF, ControlPreferences.TRACE_CONTROL_VERBOSE_LEVEL_NONE);
-        store.setDefault(ControlPreferences.TRACE_CONTROL_COMMAND_TIMEOUT_PREF, ControlPreferences.TRACE_CONTROL_DEFAULT_TIMEOUT_VALUE);
     }
 }

@@ -15,7 +15,6 @@ import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -109,9 +108,6 @@ public class ControlPreferencePage extends FieldEditorPreferencePage implements 
         fIsAppend.setEnabled(enabled, getFieldEditorParent());
         logfile.setEnabled(false, getFieldEditorParent());
 
-        IntegerFieldEditor commandTimeout = new IntegerFieldEditor(ControlPreferences.TRACE_CONTROL_COMMAND_TIMEOUT_PREF, Messages.TraceControl_CommandTimeout, getFieldEditorParent());
-        commandTimeout.setValidRange(ControlPreferences.TRACE_CONTROL_MIN_TIMEOUT_VALUE, ControlPreferences.TRACE_CONTROL_MAX_TIMEOUT_VALUE);
-        addField(commandTimeout);
     }
 
     @Override

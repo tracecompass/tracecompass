@@ -11,13 +11,14 @@
  *   Markus Schorn - Bug 448058: Use org.eclipse.remote in favor of RSE
  *   Bernd Hufmann - Update to org.eclipse.remote API 2.0
  **********************************************************************/
-package org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote;
+package org.eclipse.tracecompass.tmf.remote.core.proxy;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.remote.core.IRemoteFileService;
 import org.eclipse.remote.core.IRemoteProcessBuilder;
+import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandShell;
 
 /**
  * <p>
@@ -27,11 +28,6 @@ import org.eclipse.remote.core.IRemoteProcessBuilder;
  * @author Bernd Hufmann
  */
 public interface IRemoteSystemProxy {
-
-    /**
-     * Invalid port number for IP based connections.
-     */
-    int INVALID_PORT_NUMBER = -1;
 
     // ------------------------------------------------------------------------
     // Operations

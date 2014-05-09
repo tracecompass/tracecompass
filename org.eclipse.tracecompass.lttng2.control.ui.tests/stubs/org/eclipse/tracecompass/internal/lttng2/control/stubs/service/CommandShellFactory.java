@@ -27,14 +27,6 @@ public class CommandShellFactory {
         return fInstance;
     }
 
-//    public ICommandShell getRealShell() {
-//        ISystemRegistry registry = RSECorePlugin.getTheSystemRegistry();
-//        IHost host = registry.getLocalHost();
-//        RemoteSystemProxy proxy = new RemoteSystemProxy(host);
-//        ICommandShell shell = new LTTngToolsSimulatorShell(proxy);
-//        return shell;
-//    }
-
     public LTTngToolsFileShell getFileShell() {
         return new LTTngToolsFileShell();
     }

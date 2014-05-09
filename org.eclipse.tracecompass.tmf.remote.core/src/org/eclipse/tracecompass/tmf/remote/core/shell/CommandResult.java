@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,7 +9,7 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
-package org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote;
+package org.eclipse.tracecompass.tmf.remote.core.shell;
 
 import java.util.Arrays;
 
@@ -70,33 +70,12 @@ public class CommandResult implements ICommandResult {
     }
 
     @Override
-    public void setResult(int result) {
-        fResult = result;
-    }
-
-    @Override
     public String[] getOutput() {
         return Arrays.copyOf(fOutput, fOutput.length);
     }
 
     @Override
-    public void setOutput(String[] output) {
-        fOutput = new String[0];
-        if (output != null) {
-            fOutput = Arrays.copyOf(output, output.length);
-        }
-    }
-
-    @Override
     public String[] getErrorOutput() {
         return Arrays.copyOf(fErrorOutput, fErrorOutput.length);
-    }
-
-    @Override
-    public void setErrorOutput(String[] output) {
-        fErrorOutput = new String[0];
-        if (output != null) {
-            fErrorOutput = Arrays.copyOf(output, output.length);
-        }
     }
 }

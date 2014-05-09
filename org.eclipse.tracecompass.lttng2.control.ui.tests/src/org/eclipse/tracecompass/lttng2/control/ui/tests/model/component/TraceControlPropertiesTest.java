@@ -53,7 +53,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.property.TraceE
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.property.TraceProbeEventPropertySource;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.property.TraceSessionPropertySource;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.property.UstProviderPropertySource;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote.RemoteSystemProxy;
+import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxy;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.junit.After;
 import org.junit.Test;

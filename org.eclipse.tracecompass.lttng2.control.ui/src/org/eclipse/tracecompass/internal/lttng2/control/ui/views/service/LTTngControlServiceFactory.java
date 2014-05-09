@@ -21,8 +21,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.logging.ControlCommandLogger;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.preferences.ControlPreferences;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote.ICommandResult;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote.ICommandShell;
+import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandResult;
+import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandShell;
 
 /**
  * Factory to create LTTngControlService instances depending on the version of

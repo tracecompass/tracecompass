@@ -17,7 +17,6 @@ import java.net.URL;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
@@ -25,7 +24,6 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.relayd.LttngRelaydCon
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.preferences.ControlPreferences;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -209,18 +207,4 @@ public class Activator extends AbstractUIPlugin {
     public void logError(String message, Throwable exception) {
         getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, exception));
     }
-
-    /**
-     * Return the OSGi service with the given service interface.
-     *
-     * @param service
-     *            service interface
-     * @return the specified service or null if it's not registered
-     */
-    public static @Nullable <T> T getService(Class<T> service) {
-        BundleContext context = plugin.getBundle().getBundleContext();
-        ServiceReference<T> ref = context.getServiceReference(service);
-        return ((ref != null) ? context.getService(ref) : null);
-    }
-
 }
