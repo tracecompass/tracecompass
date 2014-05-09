@@ -72,8 +72,7 @@ public class CTFTraceTest {
      */
     @Test
     public void testOpen_existing() {
-        try {
-            CTFTrace result = testTrace.getTraceFromFile();
+        try (CTFTrace result = testTrace.getTraceFromFile();) {
             assertNotNull(result.getUUID());
         } catch (CTFReaderException e) {
             fail();
@@ -89,8 +88,9 @@ public class CTFTraceTest {
     @Test(expected = org.eclipse.linuxtools.ctf.core.trace.CTFReaderException.class)
     public void testOpen_invalid() throws CTFReaderException {
         File path = new File("");
-        CTFTrace result = new CTFTrace(path);
-        assertNotNull(result);
+        try (CTFTrace result = new CTFTrace(path);) {
+            assertNotNull(result);
+        }
     }
 
     /**
@@ -252,8 +252,7 @@ public class CTFTraceTest {
      */
     @Test
     public void testPacketHeaderIsSet_invalid() {
-        try {
-            CTFTrace fixture2 = testTrace.getTraceFromFile();
+        try (CTFTrace fixture2 = testTrace.getTraceFromFile();){
             fixture2.setMinor(1L);
             fixture2.setUUID(UUID.randomUUID());
             fixture2.setPacketHeader((StructDeclaration) null); /* it's null here! */
@@ -389,22 +388,23 @@ public class CTFTraceTest {
      * @throws CTFReaderException not expected
      */
     @Test
-    public void callsitePosition() throws CTFReaderException{
+    public void callsitePosition() throws CTFReaderException {
         long ip1 = 2;
         long ip2 = 5;
         long ip3 = 7;
-        CTFTrace callsiteTest = testTrace.getTraceFromFile();
-        callsiteTest.addCallsite("testEvent", null, ip1, null, 23);
-        callsiteTest.addCallsite("testEvent", null, ip2, null, 50);
-        callsiteTest.addCallsite("testEvent", null, ip3, null, 15);
+        try (CTFTrace callsiteTest = testTrace.getTraceFromFile()) {
+            callsiteTest.addCallsite("testEvent", null, ip1, null, 23);
+            callsiteTest.addCallsite("testEvent", null, ip2, null, 50);
+            callsiteTest.addCallsite("testEvent", null, ip3, null, 15);
 
-        assertEquals(2, (callsiteTest.getCallsite("testEvent", 1)).getIp());
-        assertEquals(2, (callsiteTest.getCallsite("testEvent", 2)).getIp());
-        assertEquals(5, (callsiteTest.getCallsite("testEvent", 3)).getIp());
-        assertEquals(5, (callsiteTest.getCallsite("testEvent", 5)).getIp());
-        assertEquals(7, (callsiteTest.getCallsite("testEvent", 6)).getIp());
-        assertEquals(7, (callsiteTest.getCallsite("testEvent", 7)).getIp());
-        assertEquals(7, (callsiteTest.getCallsite("testEvent", 8)).getIp());
+            assertEquals(2, (callsiteTest.getCallsite("testEvent", 1)).getIp());
+            assertEquals(2, (callsiteTest.getCallsite("testEvent", 2)).getIp());
+            assertEquals(5, (callsiteTest.getCallsite("testEvent", 3)).getIp());
+            assertEquals(5, (callsiteTest.getCallsite("testEvent", 5)).getIp());
+            assertEquals(7, (callsiteTest.getCallsite("testEvent", 6)).getIp());
+            assertEquals(7, (callsiteTest.getCallsite("testEvent", 7)).getIp());
+            assertEquals(7, (callsiteTest.getCallsite("testEvent", 8)).getIp());
+        }
     }
 
 }

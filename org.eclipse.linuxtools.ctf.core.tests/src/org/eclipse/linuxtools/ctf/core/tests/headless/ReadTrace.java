@@ -41,43 +41,42 @@ public class ReadTrace {
         // Work variables
         long nbEvent = 0L;
         Vector<Double> benchs = new Vector<>();
-        CTFTrace trace = null;
         long start, stop;
         for (int loops = 0; loops < LOOP_COUNT; loops++) {
-            try {
+            try (CTFTrace trace = new CTFTrace(TRACE_PATH);) {
                 nbEvent = 0L;
-                trace = new CTFTrace(TRACE_PATH);
-            } catch (CTFReaderException e) {
-                throw new FileNotFoundException(TRACE_PATH);
-            }
-            start = System.nanoTime();
-            if (USE_TEXT) {
-                System.out.println("Event, " + " Time, " + " type, " + " CPU ");
-            }
-            try (CTFTraceReader traceReader = new CTFTraceReader(trace);) {
-                start = System.nanoTime();
 
-                while (traceReader.hasMoreEvents()) {
-                    EventDefinition ed = traceReader.getCurrentEventDef();
-                    nbEvent++;
-                    if (USE_TEXT) {
-                        String output = formatDate(ed.getTimestamp()
-                                + trace.getOffset());
-                        System.out.println(nbEvent + ", "
-                                + output + ", " + ed.getDeclaration().getName()
-                                + ", " + ed.getCPU() + ed.getFields().toString());
+                start = System.nanoTime();
+                if (USE_TEXT) {
+                    System.out.println("Event, " + " Time, " + " type, " + " CPU ");
+                }
+                try (CTFTraceReader traceReader = new CTFTraceReader(trace);) {
+                    start = System.nanoTime();
+
+                    while (traceReader.hasMoreEvents()) {
+                        EventDefinition ed = traceReader.getCurrentEventDef();
+                        nbEvent++;
+                        if (USE_TEXT) {
+                            String output = formatDate(ed.getTimestamp()
+                                    + trace.getOffset());
+                            System.out.println(nbEvent + ", "
+                                    + output + ", " + ed.getDeclaration().getName()
+                                    + ", " + ed.getCPU() + ed.getFields().toString());
+                        }
+
+                        traceReader.advance();
                     }
 
-                    traceReader.advance();
+                    stop = System.nanoTime();
+
+                    System.out.print('.');
+                    double time = (stop - start) / (double) nbEvent;
+                    benchs.add(time);
+                } catch (CTFReaderException e) {
+                    System.out.println("error");
                 }
-
-                stop = System.nanoTime();
-
-                System.out.print('.');
-                double time = (stop - start) / (double) nbEvent;
-                benchs.add(time);
             } catch (CTFReaderException e) {
-                System.out.println("error");
+                throw new FileNotFoundException(TRACE_PATH);
             }
         }
         System.out.println("");

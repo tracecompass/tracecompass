@@ -58,10 +58,10 @@ public class CTFTraceReaderTest {
      */
     @Test
     public void testOpen_existing() throws CTFReaderException {
-        CTFTrace trace = testTrace.getTrace();
-
-        CTFTraceReader result = new CTFTraceReader(trace);
-        assertNotNull(result);
+        try (CTFTrace trace = testTrace.getTrace();
+                CTFTraceReader result = new CTFTraceReader(trace);) {
+            assertNotNull(result);
+        }
     }
 
     /**
@@ -72,10 +72,10 @@ public class CTFTraceReaderTest {
      */
     @Test(expected = org.eclipse.linuxtools.ctf.core.trace.CTFReaderException.class)
     public void testOpen_nonexisting() throws CTFReaderException {
-        CTFTrace trace = new CTFTrace("badfile.bad");
-
-        CTFTraceReader result = new CTFTraceReader(trace);
-        assertNotNull(result);
+        try (CTFTrace trace = new CTFTrace("badfile.bad");
+                CTFTraceReader result = new CTFTraceReader(trace);) {
+            assertNotNull(result);
+        }
     }
 
     /**
@@ -86,10 +86,10 @@ public class CTFTraceReaderTest {
      */
     @Test(expected = org.eclipse.linuxtools.ctf.core.trace.CTFReaderException.class)
     public void testOpen_invalid() throws CTFReaderException {
-        CTFTrace trace = new CTFTrace("");
-
-        CTFTraceReader result = new CTFTraceReader(trace);
-        assertNotNull(result);
+        try (CTFTrace trace = new CTFTrace("");
+                CTFTraceReader result = new CTFTraceReader(trace);) {
+            assertNotNull(result);
+        }
     }
 
     /**
@@ -134,8 +134,9 @@ public class CTFTraceReaderTest {
      */
     @Test
     public void testCopyFrom() throws CTFReaderException {
-        CTFTraceReader result = fixture.copyFrom();
-        assertNotNull(result);
+        try (CTFTraceReader result = fixture.copyFrom();) {
+            assertNotNull(result);
+        }
     }
 
     /**
@@ -158,8 +159,9 @@ public class CTFTraceReaderTest {
      */
     @Test
     public void testEquals() throws CTFReaderException {
-        CTFTraceReader fixture2 = new CTFTraceReader(testTrace.getTrace());
-        assertEquals(fixture, fixture2);
+        try (CTFTraceReader fixture2 = new CTFTraceReader(testTrace.getTrace());) {
+            assertEquals(fixture, fixture2);
+        }
     }
 
     /**

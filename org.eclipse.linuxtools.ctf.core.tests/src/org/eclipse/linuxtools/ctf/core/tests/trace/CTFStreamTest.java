@@ -179,8 +179,9 @@ public class CTFStreamTest {
      */
     @Test
     public void testGetTrace() {
-        CTFTrace result = fixture.getTrace();
-        assertNotNull(result);
+        try (CTFTrace result = fixture.getTrace();) {
+            assertNotNull(result);
+        }
     }
 
     /**

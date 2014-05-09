@@ -204,10 +204,11 @@ public class MetadataTest {
 
     @Test
     public void testStreamTextMD() throws CTFReaderException {
-        CTFTrace trace = testSingleFragment();
-        fixture.parseTextFragment(mdSecond);
-        assertEquals(2, trace.getEvents(0L).size());
-        assertEquals("bozo_the_clown", trace.getEvents(0L).get(1L).getName());
+        try (CTFTrace trace = testSingleFragment();) {
+            fixture.parseTextFragment(mdSecond);
+            assertEquals(2, trace.getEvents(0L).size());
+            assertEquals("bozo_the_clown", trace.getEvents(0L).get(1L).getName());
+        }
     }
 
     /**

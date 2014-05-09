@@ -316,24 +316,26 @@ public class EventDeclarationTest {
      */
     @Test
     public void testEventDefinition() throws CTFReaderException {
-        CTFTrace trace = testTrace.getTrace();
-        EventDefinition ed = null;
-        try (CTFTraceReader tr = new CTFTraceReader(trace);) {
-            tr.advance();
-            ed = tr.getCurrentEventDef();
+        try (CTFTrace trace = testTrace.getTrace();) {
+            EventDefinition ed = null;
+            try (CTFTraceReader tr = new CTFTraceReader(trace);) {
+                tr.advance();
+                ed = tr.getCurrentEventDef();
+            }
+
+            assertNotNull(ed);
+            assertNotNull(ed.getScopePath());
+            assertNotNull(ed.getDeclaration());
+            assertNotNull(ed.getFields());
+            assertNull(ed.getContext());
+            assertNotNull(ed.getPacketContext());
+            assertNotNull(ed.getCPU());
+            assertNotNull(ed.getStreamInputReader());
+            assertNull(ed.lookupDefinition("context"));
+            assertNotNull(ed.lookupDefinition("fields"));
+            assertNull(ed.lookupDefinition("other"));
+            assertNotNull(ed.toString());
         }
-        assertNotNull(ed);
-        assertNotNull(ed.getScopePath());
-        assertNotNull(ed.getDeclaration());
-        assertNotNull(ed.getFields());
-        assertNull(ed.getContext());
-        assertNotNull(ed.getPacketContext());
-        assertNotNull(ed.getCPU());
-        assertNotNull(ed.getStreamInputReader());
-        assertNull(ed.lookupDefinition("context"));
-        assertNotNull(ed.lookupDefinition("fields"));
-        assertNull(ed.lookupDefinition("other"));
-        assertNotNull(ed.toString());
     }
 
     EventDeclaration e1;

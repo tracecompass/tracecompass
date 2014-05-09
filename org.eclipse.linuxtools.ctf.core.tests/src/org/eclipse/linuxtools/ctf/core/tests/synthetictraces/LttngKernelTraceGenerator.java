@@ -274,7 +274,6 @@ public class LttngKernelTraceGenerator {
         File metadataFile = new File(file.getPath() + File.separator + "metadata");
         File[] streams = new File[fNbChans];
         FileChannel[] channels = new FileChannel[fNbChans];
-        FileOutputStream fos = null;
 
         try {
             for (int i = 0; i < fNbChans; i++) {
@@ -363,10 +362,8 @@ public class LttngKernelTraceGenerator {
                 e.printStackTrace();
             }
         }
-        try {
-            fos = new FileOutputStream(metadataFile);
+        try (FileOutputStream fos = new FileOutputStream(metadataFile);) {
             fos.write(metadata.getBytes());
-            fos.close();
         } catch (IOException e) {
         }
     }

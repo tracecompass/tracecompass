@@ -194,16 +194,11 @@ public class CTFTraceReader implements AutoCloseable {
              * For each trace file of the stream.
              */
             for (CTFStreamInput streamInput : streamInputs) {
-                /*
-                 * Create a reader.
-                 */
-                CTFStreamInputReader streamInputReader = new CTFStreamInputReader(
-                        streamInput);
 
                 /*
-                 * Add it to the group.
+                 * Create a reader and add it to the group.
                  */
-                fStreamInputReaders.add(streamInputReader);
+                fStreamInputReaders.add(new CTFStreamInputReader(streamInput));
             }
         }
 
@@ -317,7 +312,6 @@ public class CTFTraceReader implements AutoCloseable {
      */
     public EventDefinition getCurrentEventDef() {
         CTFStreamInputReader top = getTopStream();
-
         return (top != null) ? top.getCurrentEvent() : null;
     }
 

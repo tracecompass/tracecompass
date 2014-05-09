@@ -76,22 +76,17 @@ public class ReadTraceBenchmark {
         Vector<Long> openTime = new Vector<>();
         Vector<Double> benchs = new Vector<>();
         Vector<Double> seeks = new Vector<>();
-        CTFTrace trace = null;
+
         long start, stop;
         double time;
         for (int loops = 0; loops < LOOP_COUNT; loops++) {
             start = System.nanoTime();
-            try {
+            try (CTFTrace trace = new CTFTrace(tracePath);) {
                 nbEvent = 0L;
-                trace = new CTFTrace(tracePath);
-            } catch (CTFReaderException e) {
-                // do nothing
-            }
-            stop = System.nanoTime();
-            openTime.add(stop - start);
-            start = System.nanoTime();
-            try (CTFTraceReader traceReader = new CTFTraceReader(trace);) {
-                if (trace != null) {
+                stop = System.nanoTime();
+                openTime.add(stop - start);
+                start = System.nanoTime();
+                try (CTFTraceReader traceReader = new CTFTraceReader(trace);) {
                     start = System.nanoTime();
 
                     while (traceReader.hasMoreEvents()) {
@@ -110,9 +105,11 @@ public class ReadTraceBenchmark {
                     }
                     stop = System.nanoTime();
                     seeks.add((double) (stop - start) / timestamps.size());
+                } catch (CTFReaderException e) {
+                    System.out.println("error");
                 }
             } catch (CTFReaderException e) {
-                System.out.println("error");
+                // do nothing
             }
         }
         System.out.println("");
