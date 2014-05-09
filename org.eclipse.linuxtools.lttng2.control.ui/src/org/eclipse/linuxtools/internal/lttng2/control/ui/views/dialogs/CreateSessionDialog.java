@@ -184,7 +184,7 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
     /**
      * The session name string.
      */
-    private String fSessionName = null;
+    private String fSessionName = ""; //$NON-NLS-1$;
     /**
      * The  session path string.
      */
@@ -241,7 +241,7 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
     public void initialize(TraceSessionGroup group) {
        fParent = group;
        fStreamingComposite = null;
-       fSessionName = null;
+       fSessionName = ""; //$NON-NLS-1$
        fSessionPath = null;
        fIsSnapshot = false;
        fIsDefaultPath = true;
