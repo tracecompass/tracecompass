@@ -31,6 +31,7 @@ import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisRequirement;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.linuxtools.tmf.core.tests.shared.TmfTestHelper;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.junit.After;
 import org.junit.Before;
@@ -89,6 +90,21 @@ public class LttngKernelAnalysisTest {
 
         List<Integer> quarks = ss.getQuarks("*");
         assertFalse(quarks.isEmpty());
+    }
+
+    /**
+     * Test the canExecute method on valid and invalid traces
+     */
+    @Test
+    public void testCanExecute() {
+        /* Test with a valid kernel trace */
+        assertTrue(fKernelAnalysisModule.canExecute(fTrace));
+
+        /* Test with a CTF trace that does not have required events */
+        assumeTrue(CtfTmfTestTrace.CYG_PROFILE.exists());
+        try (CtfTmfTrace trace = CtfTmfTestTrace.CYG_PROFILE.getTrace();) {
+            assertFalse(fKernelAnalysisModule.canExecute(trace));
+        }
     }
 
     /**

@@ -100,6 +100,9 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
 
     @Override
     public void setTrace(ITmfTrace trace) throws TmfAnalysisException {
+        if (trace == null) {
+            throw new TmfAnalysisException(Messages.TmfAbstractAnalysisModule_NullTrace);
+        }
         if (fTrace != null) {
             throw new TmfAnalysisException(NLS.bind(Messages.TmfAbstractAnalysisModule_TraceSetMoreThanOnce, getName()));
         }
@@ -108,6 +111,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
         if (!canExecute(trace)) {
             throw new TmfAnalysisException(NLS.bind(Messages.TmfAbstractAnalysisModule_AnalysisCannotExecute, getName()));
         }
+
         fTrace = trace;
         /* Get the parameter providers for this trace */
         fParameterProviders = TmfAnalysisManager.getParameterProviders(this, fTrace);
@@ -182,7 +186,12 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
     }
 
     @Override
-    public boolean canExecute(ITmfTrace trace) {
+    public boolean canExecute(@NonNull ITmfTrace trace) {
+        for (TmfAnalysisRequirement requirement : getAnalysisRequirements()) {
+            if (!requirement.isFulfilled(trace)) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -251,7 +260,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
         cancel();
     }
 
-    private void execute() {
+    private void execute(@NonNull final ITmfTrace trace) {
 
         /*
          * TODO: The analysis in a job should be done at the analysis manager
@@ -272,7 +281,6 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
             fStarted = true;
         }
 
-        final ITmfTrace trace = fTrace;
         /*
          * Actual analysis will be run on a separate thread
          */
@@ -311,10 +319,11 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
 
     @Override
     public IStatus schedule() {
-        if (fTrace == null) {
+        final ITmfTrace trace = fTrace;
+        if (trace == null) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, String.format("No trace specified for analysis %s", getName())); //$NON-NLS-1$
         }
-        execute();
+        execute(trace);
 
         return Status.OK_STATUS;
     }

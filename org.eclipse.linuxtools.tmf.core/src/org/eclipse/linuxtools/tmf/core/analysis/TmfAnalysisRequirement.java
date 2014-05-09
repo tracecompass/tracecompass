@@ -13,10 +13,16 @@
 
 package org.eclipse.linuxtools.tmf.core.analysis;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Set;
+
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTraceWithPreDefinedEvents;
+import org.eclipse.linuxtools.tmf.core.trace.TmfEventTypeCollectionHelper;
 
 /**
  * Class that contains all the values associated with a type needed by an
@@ -40,6 +46,11 @@ import java.util.Set;
  * @since 3.0
  */
 public class TmfAnalysisRequirement {
+
+    /**
+     * String for requirement type 'event', that can be used by analysis
+     */
+    public static final String TYPE_EVENT = "event"; //$NON-NLS-1$
 
     private final String fType;
     private final Map<String, ValuePriorityLevel> fValues = new HashMap<>();
@@ -210,6 +221,26 @@ public class TmfAnalysisRequirement {
     }
 
     /**
+     * Gets all the values associated with the requirement with a given priority
+     * level.
+     *
+     * @param level
+     *            The desired level
+     * @return Set containing the values with the given priority level
+     */
+    public Set<String> getValues(ValuePriorityLevel level) {
+        synchronized (fValues) {
+            Set<String> values = new HashSet<>();
+            for (Entry<String, ValuePriorityLevel> entry : fValues.entrySet()) {
+                if (entry.getValue() == level) {
+                    values.add(entry.getKey());
+                }
+            }
+            return values;
+        }
+    }
+
+    /**
      * Gets information about the requirement.
      *
      * @return The set of all the information
@@ -229,5 +260,32 @@ public class TmfAnalysisRequirement {
         synchronized (fValues) {
             return fValues.get(value);
         }
+    }
+
+    /**
+     * Verifies whether a trace fulfills this requirement
+     *
+     * @param trace
+     *            The trace on which to check for this requirement
+     * @return True if the trace has all mandatory values of this requirement
+     */
+    public boolean isFulfilled(@NonNull ITmfTrace trace) {
+        switch (fType) {
+        case TYPE_EVENT:
+            if (trace instanceof ITmfTraceWithPreDefinedEvents) {
+                Set<String> traceEvents = TmfEventTypeCollectionHelper.getEventNames(((ITmfTraceWithPreDefinedEvents) trace).getContainedEventTypes());
+                Set<String> mandatoryValues = getValues(ValuePriorityLevel.MANDATORY);
+                return traceEvents.containsAll(mandatoryValues);
+            }
+            break;
+        default:
+            return true;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return fType + ": " + fValues; //$NON-NLS-1$
     }
 }

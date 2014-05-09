@@ -290,7 +290,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
                     status.add(module.schedule());
                 }
             } catch (TmfAnalysisException e) {
-                status.add(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+                status.add(new Status(IStatus.WARNING, Activator.PLUGIN_ID, e.getMessage()));
             }
         }
         return status;

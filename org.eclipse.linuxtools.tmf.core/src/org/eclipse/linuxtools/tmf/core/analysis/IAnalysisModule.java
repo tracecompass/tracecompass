@@ -142,7 +142,7 @@ public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProv
      *            The trace to analyze
      * @return Whether the analysis can be executed
      */
-    boolean canExecute(ITmfTrace trace);
+    boolean canExecute(@NonNull ITmfTrace trace);
 
     /**
      * Schedule the execution of the analysis. If the trace has been set and is

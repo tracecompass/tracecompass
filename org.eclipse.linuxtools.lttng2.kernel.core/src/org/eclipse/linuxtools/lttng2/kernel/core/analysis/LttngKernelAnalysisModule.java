@@ -41,6 +41,7 @@ public class LttngKernelAnalysisModule extends TmfStateSystemAnalysisModule {
     /** The ID of this analysis module */
     public static final String ID = "org.eclipse.linuxtools.lttng2.kernel.analysis"; //$NON-NLS-1$
 
+    /* TODO: Are all those mandatory events really mandatory or should some of them be optional? */
     private static final ImmutableSet<String> REQUIRED_EVENTS = ImmutableSet.of(
             LttngStrings.EXIT_SYSCALL,
             LttngStrings.IRQ_HANDLER_ENTRY,
@@ -54,10 +55,14 @@ public class LttngKernelAnalysisModule extends TmfStateSystemAnalysisModule {
             LttngStrings.SCHED_PROCESS_FREE,
             LttngStrings.STATEDUMP_PROCESS_STATE,
             LttngStrings.SCHED_WAKEUP,
-            LttngStrings.SCHED_WAKEUP_NEW,
+            LttngStrings.SCHED_WAKEUP_NEW
+            );
+
+    private static final ImmutableSet<String> OPTIONAL_EVENTS = ImmutableSet.of(
             /* Add the prefix for syscalls */
             LttngStrings.SYSCALL_PREFIX
             );
+
 
     /** The requirements as an immutable set */
     private static final ImmutableSet<TmfAnalysisRequirement> REQUIREMENTS;
@@ -67,7 +72,10 @@ public class LttngKernelAnalysisModule extends TmfStateSystemAnalysisModule {
         TmfAnalysisRequirement domainReq = new TmfAnalysisRequirement(SessionConfigStrings.CONFIG_ELEMENT_DOMAIN);
         domainReq.addValue(SessionConfigStrings.CONFIG_DOMAIN_TYPE_KERNEL, ValuePriorityLevel.MANDATORY);
 
-        REQUIREMENTS = ImmutableSet.of(domainReq, new TmfAnalysisRequirement(SessionConfigStrings.CONFIG_ELEMENT_EVENT, REQUIRED_EVENTS, ValuePriorityLevel.MANDATORY));
+        TmfAnalysisRequirement eventReq = new TmfAnalysisRequirement(SessionConfigStrings.CONFIG_ELEMENT_EVENT, REQUIRED_EVENTS, ValuePriorityLevel.MANDATORY);
+        eventReq.addValues(OPTIONAL_EVENTS, ValuePriorityLevel.OPTIONAL);
+
+        REQUIREMENTS = ImmutableSet.of(domainReq, eventReq);
     }
 
     @Override

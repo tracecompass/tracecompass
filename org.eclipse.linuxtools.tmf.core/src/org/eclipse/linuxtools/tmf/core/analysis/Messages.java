@@ -40,6 +40,9 @@ public class Messages extends NLS {
     /** Parameter is invalid */
     public static String TmfAbstractAnalysisModule_InvalidParameter;
 
+    /** The trace to set was null */
+    public static String TmfAbstractAnalysisModule_NullTrace;
+
     /** Running analysis */
     public static String TmfAbstractAnalysisModule_RunningAnalysis;
 
