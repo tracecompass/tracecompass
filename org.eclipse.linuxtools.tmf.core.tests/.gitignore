@@ -1,6 +1,0 @@
-bin
-@dot
-javaCompiler...args
-build.xml
-target
-testfiles/
