@@ -36,7 +36,6 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 import org.eclipse.linuxtools.tmf.ui.viewers.TmfViewer;
-import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.ITmfColumnDataProvider;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfBaseColumnData;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfBaseColumnDataProvider;
 import org.eclipse.linuxtools.tmf.ui.viewers.statistics.model.TmfStatisticsTree;
@@ -306,9 +305,10 @@ public class TmfStatisticsViewer extends TmfViewer {
      * This method can be overridden to change the representation of the data in
      * the columns.
      *
-     * @return an object implementing ITmfBaseColumnDataProvider.
+     * @return An object of type {@link TmfBaseColumnDataProvider}.
+     * @since 3.0
      */
-    protected ITmfColumnDataProvider getColumnDataProvider() {
+    protected TmfBaseColumnDataProvider getColumnDataProvider() {
         return new TmfBaseColumnDataProvider();
     }
 

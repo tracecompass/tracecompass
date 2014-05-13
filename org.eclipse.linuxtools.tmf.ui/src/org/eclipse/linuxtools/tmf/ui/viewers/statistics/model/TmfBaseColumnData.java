@@ -13,53 +13,53 @@
 
 package org.eclipse.linuxtools.tmf.ui.viewers.statistics.model;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ViewerComparator;
 
 /**
  * Contains all the information necessary to build a column of the table.
  *
- * @version 2.0
  * @author Mathieu Denis
  * @since 2.0
  */
-public class TmfBaseColumnData implements ITmfStatisticsColumnData {
+public class TmfBaseColumnData {
 
     /**
      * Name of the column.
      */
-    protected final String fHeader;
+    private final String fHeader;
 
     /**
      * Width of the column.
      */
-    protected final int fWidth;
+    private final int fWidth;
 
     /**
      * Alignment of the column.
      */
-    protected final int fAlignment;
+    private final int fAlignment;
 
     /**
      * Tooltip of the column.
      */
-    protected final String fTooltip;
+    private final String fTooltip;
 
     /**
      * Adapts a StatisticsTreeNode into the content of it's corresponding cell
      * for that column.
      */
-    protected final ColumnLabelProvider fLabelProvider;
+    private final ColumnLabelProvider fLabelProvider;
 
     /**
      * Used to sort elements of this column. Can be null.
      */
-    protected final ViewerComparator fComparator;
+    private final @Nullable ViewerComparator fComparator;
 
     /**
      * Used to draw bar charts in this column. Can be null.
      */
-    protected final ITmfColumnPercentageProvider fPercentageProvider;
+    private final @Nullable ITmfColumnPercentageProvider fPercentageProvider;
 
     /**
      * Used to draw bar charts in columns.
@@ -109,37 +109,69 @@ public class TmfBaseColumnData implements ITmfStatisticsColumnData {
         fPercentageProvider = p;
     }
 
-    @Override
+    /**
+     * Return the column name.
+     *
+     * @return the name of the column.
+     */
     public String getHeader() {
         return fHeader;
     }
 
-    @Override
+    /**
+     * Return the width of the column at the creation.
+     *
+     * @return the width of the column.
+     */
     public int getWidth() {
         return fWidth;
     }
 
-    @Override
+    /**
+     * Return the alignment of the column.
+     *
+     * @see org.eclipse.swt.SWT
+     * @return an integer representing the alignment inside the column.
+     */
     public int getAlignment() {
         return fAlignment;
     }
 
-    @Override
+    /**
+     * Provide the text to show in the tooltip when the cursor comes over the
+     * column header.
+     *
+     * @return text to show in the tooltip
+     */
     public String getTooltip() {
         return fTooltip;
     }
 
-    @Override
+    /**
+     * Return the labelProvider which provides the information to put in column
+     * cells.
+     *
+     * @return a ColumnLabelProvider.
+     */
     public ColumnLabelProvider getLabelProvider() {
         return fLabelProvider;
     }
 
-    @Override
+    /**
+     * Return a ViewerComparator used to sort viewer's contents.
+     *
+     * @return the comparator.
+     */
     public ViewerComparator getComparator() {
         return fComparator;
     }
 
-    @Override
+    /**
+     * Return the provider of the percentage. Used to draw bar charts in
+     * columns.
+     *
+     * @return the percentageProvider.
+     */
     public ITmfColumnPercentageProvider getPercentageProvider() {
         return fPercentageProvider;
     }
