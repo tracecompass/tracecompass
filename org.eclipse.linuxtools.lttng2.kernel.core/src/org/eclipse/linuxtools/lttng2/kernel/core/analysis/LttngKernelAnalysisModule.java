@@ -35,11 +35,10 @@ public class LttngKernelAnalysisModule extends TmfStateSystemAnalysisModule {
     /**
      * The file name of the History Tree
      */
-    @NonNull
-    public static final String HISTORY_TREE_FILE_NAME = "stateHistory.ht"; //$NON-NLS-1$
+    public static final @NonNull String HISTORY_TREE_FILE_NAME = "stateHistory.ht"; //$NON-NLS-1$
 
     /** The ID of this analysis module */
-    public static final String ID = "org.eclipse.linuxtools.lttng2.kernel.analysis"; //$NON-NLS-1$
+    public static final @NonNull String ID = "org.eclipse.linuxtools.lttng2.kernel.analysis"; //$NON-NLS-1$
 
     /*
      * TODO: Decide which events should be mandatory for the analysis, once the

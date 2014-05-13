@@ -31,6 +31,7 @@ import org.eclipse.linuxtools.statesystem.core.exceptions.StateSystemDisposedExc
 import org.eclipse.linuxtools.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -93,13 +94,10 @@ public class ResourcesView extends AbstractTimeGraphView {
 
     @Override
     protected void buildEventList(ITmfTrace trace, ITmfTrace parentTrace, IProgressMonitor monitor) {
-        LttngKernelAnalysisModule module = trace.getAnalysisModuleOfClass(LttngKernelAnalysisModule.class, LttngKernelAnalysisModule.ID);
-        if (module == null) {
+        if (trace == null) {
             return;
         }
-        module.schedule();
-        module.waitForInitialization();
-        ITmfStateSystem ssq = module.getStateSystem();
+        ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(trace, LttngKernelAnalysisModule.ID);
         if (ssq == null) {
             return;
         }
@@ -197,11 +195,7 @@ public class ResourcesView extends AbstractTimeGraphView {
             long startTime, long endTime, long resolution,
             IProgressMonitor monitor) {
         ResourcesEntry resourcesEntry = (ResourcesEntry) entry;
-        LttngKernelAnalysisModule module = resourcesEntry.getTrace().getAnalysisModuleOfClass(LttngKernelAnalysisModule.class, LttngKernelAnalysisModule.ID);
-        if (module == null) {
-            return null;
-        }
-        ITmfStateSystem ssq = module.getStateSystem();
+        ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(resourcesEntry.getTrace(), LttngKernelAnalysisModule.ID);
         if (ssq == null) {
             return null;
         }

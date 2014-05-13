@@ -30,6 +30,7 @@ import org.eclipse.linuxtools.statesystem.core.exceptions.StateValueTypeExceptio
 import org.eclipse.linuxtools.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -157,11 +158,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
             ResourcesEntry entry = (ResourcesEntry) event.getEntry();
 
             if (tcEvent.hasValue()) {
-                LttngKernelAnalysisModule module = entry.getTrace().getAnalysisModuleOfClass(LttngKernelAnalysisModule.class, LttngKernelAnalysisModule.ID);
-                if (module == null) {
-                    return retMap;
-                }
-                ITmfStateSystem ss = module.getStateSystem();
+                ITmfStateSystem ss = TmfStateSystemAnalysisModule.getStateSystem(entry.getTrace(), LttngKernelAnalysisModule.ID);
                 if (ss == null) {
                     return retMap;
                 }
@@ -290,11 +287,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
             return;
         }
 
-        LttngKernelAnalysisModule module = entry.getTrace().getAnalysisModuleOfClass(LttngKernelAnalysisModule.class, LttngKernelAnalysisModule.ID);
-        if (module == null) {
-            return;
-        }
-        ITmfStateSystem ss = module.getStateSystem();
+        ITmfStateSystem ss = TmfStateSystemAnalysisModule.getStateSystem(entry.getTrace(), LttngKernelAnalysisModule.ID);
         if (ss == null) {
             return;
         }

@@ -13,6 +13,7 @@
 
 package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 
@@ -21,7 +22,7 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
  */
 public class ControlFlowEntry extends TimeGraphEntry {
 
-    private final ITmfTrace fTrace;
+    private final @NonNull ITmfTrace fTrace;
     private final int fThreadId;
     private final int fParentThreadId;
     private final int fThreadQuark;
@@ -44,7 +45,7 @@ public class ControlFlowEntry extends TimeGraphEntry {
      * @param endTime
      *            The end time of this process
      */
-    public ControlFlowEntry(int quark, ITmfTrace trace, String execName, int threadId, int parentThreadId, long startTime, long endTime) {
+    public ControlFlowEntry(int quark, @NonNull ITmfTrace trace, String execName, int threadId, int parentThreadId, long startTime, long endTime) {
         super(execName, startTime, endTime);
         fTrace = trace;
         fThreadId = threadId;
@@ -66,7 +67,7 @@ public class ControlFlowEntry extends TimeGraphEntry {
      *
      * @return the entry's trace
      */
-    public ITmfTrace getTrace() {
+    public @NonNull ITmfTrace getTrace() {
         return fTrace;
     }
 

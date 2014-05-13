@@ -84,6 +84,37 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         PARTIAL
     }
 
+
+    /**
+     * Retrieve a state system belonging to trace, by passing the ID of the
+     * relevant analysis module.
+     *
+     * This will start the execution of the analysis module, and start the
+     * construction of the state system, if needed.
+     *
+     * @param trace
+     *            The trace for which you want the state system
+     * @param moduleId
+     *            The ID of the state system analysis module
+     * @return The state system, or null if there was no match
+     * @since 3.1
+     */
+    public static @Nullable ITmfStateSystem getStateSystem(ITmfTrace trace, String moduleId) {
+        TmfStateSystemAnalysisModule module =
+                trace.getAnalysisModuleOfClass(TmfStateSystemAnalysisModule.class, moduleId);
+        if (module != null) {
+            module.schedule();
+            module.waitForInitialization();
+            /*
+             * FIXME If we keep a reference to "module", the compiler expects us to
+             * close it. The Analysis Module's API should be reworked to not expose
+             * these objects directly (utility classes instead?)
+             */
+            return module.getStateSystem();
+        }
+        return null;
+    }
+
     /**
      * Get the state provider for this analysis module
      *

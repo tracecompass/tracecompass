@@ -31,6 +31,7 @@ import org.eclipse.linuxtools.statesystem.core.exceptions.StateSystemDisposedExc
 import org.eclipse.linuxtools.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.viewers.tree.AbstractTmfTreeViewer;
 import org.eclipse.linuxtools.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.linuxtools.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
@@ -260,16 +261,11 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
         if (execName != null) {
             return execName;
         }
-        TmfStateSystemAnalysisModule module = getTrace().getAnalysisModuleOfClass(TmfStateSystemAnalysisModule.class, LttngKernelAnalysisModule.ID);
-        if (module == null) {
+        ITmfTrace trace = getTrace();
+        if (trace == null) {
             return tid;
         }
-        /*
-         * Do not schedule the analysis here. It should have been executed when
-         * the CPU usage analysis was executed. If it's not available, there
-         * might be a good reason (disk space?) so don't force it.
-         */
-        ITmfStateSystem kernelSs = module.getStateSystem();
+        ITmfStateSystem kernelSs = TmfStateSystemAnalysisModule.getStateSystem(trace, LttngKernelAnalysisModule.ID);
         if (kernelSs == null) {
             return tid;
         }
