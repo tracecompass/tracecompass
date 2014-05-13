@@ -136,5 +136,4 @@ public class ImportAndReadSmokeTest extends AbstractImportAndReadSmokeTest {
     protected String getProjectName() {
         return TRACE_PROJECT_NAME;
     }
-
 }

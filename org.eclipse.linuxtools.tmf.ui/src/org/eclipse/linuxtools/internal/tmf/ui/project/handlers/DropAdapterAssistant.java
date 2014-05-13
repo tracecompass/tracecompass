@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.internal.tmf.ui.project.handlers;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -503,13 +503,10 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
             IRunnableWithProgress runnable = new IRunnableWithProgress() {
                 @Override
                 public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-                    try {
-                        InputStream inputStream = new FileInputStream(source);
+                    try (InputStream inputStream = new FileInputStream(source);) {
                         IFile targetFile = folder.getFile(targetName);
                         targetFile.create(inputStream, IResource.NONE, monitor);
-                    } catch (CoreException e) {
-                        displayException(e);
-                    } catch (FileNotFoundException e) {
+                    } catch (CoreException | IOException e) {
                         displayException(e);
                     }
                 }

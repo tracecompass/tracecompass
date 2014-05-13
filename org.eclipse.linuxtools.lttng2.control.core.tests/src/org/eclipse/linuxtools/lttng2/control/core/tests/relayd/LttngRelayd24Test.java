@@ -88,8 +88,9 @@ public class LttngRelayd24Test {
     @Test
     public void testViewerConnection() throws IOException {
         InetAddress addr = InetAddress.getByName(ADDRESS);
-        try (Socket connection = new Socket(addr, PORT)) {
-            ILttngRelaydConnector relayD = LttngRelaydConnectorFactory.getNewConnector(connection);
+        try (Socket connection = new Socket(addr, PORT);
+                ILttngRelaydConnector relayD = LttngRelaydConnectorFactory.getNewConnector(connection);) {
+
             List<SessionResponse> sessions = relayD.getSessions();
             assertTrue(sessions.size() > 0);
             SessionResponse lttngViewerSession = sessions.get(0);

@@ -31,7 +31,7 @@ import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -117,15 +117,13 @@ public class StateProviderModuleTest {
 
         fModule.setXmlFile(new Path(TmfXmlTestFiles.VALID_FILE.getFile().getAbsolutePath()));
 
-        try {
-            ITmfTrace trace = CtfTmfTestTrace.KERNEL.getTrace();
+        try (CtfTmfTrace trace = CtfTmfTestTrace.KERNEL.getTrace();) {
             fModule.setTrace(trace);
             fModule.schedule();
+
             assertTrue(fModule.waitForCompletion(new NullProgressMonitor()));
         } catch (TmfAnalysisException e) {
             fail("Cannot set trace " + e.getMessage());
-        } finally {
-            CtfTmfTestTrace.KERNEL.dispose();
         }
 
     }

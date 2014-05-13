@@ -61,21 +61,21 @@ public class AnalysisParameterProviderTest {
         ITmfTrace trace = TmfTestTrace.A_TEST_10K.getTrace();
         /* Make sure the value is set to null */
         IAnalysisModuleHelper helper = TmfAnalysisManager.getAnalysisModule(AnalysisManagerTest.MODULE_PARAM);
-        IAnalysisModule module;
-        try {
-            module = helper.newModule(trace);
+        try (IAnalysisModule module = helper.newModule(trace);) {
+
+            assertEquals(10, module.getParameter(TestAnalysis.PARAM_TEST));
+
+            /* Change the value of the parameter in the provider */
+            List<IAnalysisParameterProvider> providers = TmfAnalysisManager.getParameterProviders(module, trace);
+            assertEquals(1, providers.size());
+            TestAnalysisParameterProvider provider = (TestAnalysisParameterProvider) providers.get(0);
+            provider.setValue(5);
+            assertEquals(5, module.getParameter(TestAnalysis.PARAM_TEST));
+
         } catch (TmfAnalysisException e) {
             fail(e.getMessage());
             return;
         }
-        assertEquals(10, module.getParameter(TestAnalysis.PARAM_TEST));
-
-        /* Change the value of the parameter in the provider */
-        List<IAnalysisParameterProvider> providers = TmfAnalysisManager.getParameterProviders(module, trace);
-        assertEquals(1, providers.size());
-        TestAnalysisParameterProvider provider = (TestAnalysisParameterProvider) providers.get(0);
-        provider.setValue(5);
-        assertEquals(5, module.getParameter(TestAnalysis.PARAM_TEST));
     }
 
 }

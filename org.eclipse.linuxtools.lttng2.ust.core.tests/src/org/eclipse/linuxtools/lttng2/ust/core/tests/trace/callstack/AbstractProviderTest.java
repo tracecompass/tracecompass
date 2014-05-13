@@ -32,7 +32,6 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
@@ -137,27 +136,27 @@ public abstract class AbstractProviderTest {
     @Test
     public void testOtherUstTrace() {
         /* Initialize the trace and analysis module */
-        final ITmfTrace ustTrace = otherUstTrace.getTrace();
-        try (TestLttngCallStackModule module = new TestLttngCallStackModule();) {
-            try {
-                module.setTrace(ustTrace);
-            } catch (TmfAnalysisException e) {
-                fail();
-            }
-            module.schedule();
-            assertTrue(module.waitForCompletion());
+        try (CtfTmfTrace ustTrace = otherUstTrace.getTrace();) {
+            try (TestLttngCallStackModule module = new TestLttngCallStackModule();) {
+                try {
+                    module.setTrace(ustTrace);
+                } catch (TmfAnalysisException e) {
+                    fail();
+                }
+                module.schedule();
+                assertTrue(module.waitForCompletion());
 
-            /* Make sure the generated state system exists, but is empty */
-            ITmfStateSystem ss = module.getStateSystem();
-            assertNotNull(ss);
-            assertTrue(ss.getStartTime() >= ustTrace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
-            assertEquals(0, ss.getNbAttributes());
+                /* Make sure the generated state system exists, but is empty */
+                ITmfStateSystem ss = module.getStateSystem();
+                assertNotNull(ss);
+                assertTrue(ss.getStartTime() >= ustTrace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
+                assertEquals(0, ss.getNbAttributes());
+            }
+            /* Dispose the trace */
+            File suppDir = new File(TmfTraceManager.getSupplementaryFileDir(ustTrace));
+            deleteDirectory(suppDir);
+            assertFalse(suppDir.exists());
         }
-        /* Dispose the trace */
-        ustTrace.dispose();
-        File suppDir = new File(TmfTraceManager.getSupplementaryFileDir(ustTrace));
-        deleteDirectory(suppDir);
-        assertFalse(suppDir.exists());
     }
 
     /**

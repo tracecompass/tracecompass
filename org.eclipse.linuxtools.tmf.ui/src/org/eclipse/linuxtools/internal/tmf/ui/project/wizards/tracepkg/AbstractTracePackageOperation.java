@@ -17,7 +17,6 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Vector;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -122,20 +121,14 @@ abstract public class AbstractTracePackageOperation {
         }
 
         try {
-            ZipFile zipFile = new ZipFile(fFileName);
-            return new ZipArchiveFile(zipFile);
-        } catch (ZipException e) {
-            // ignore
+            return new ZipArchiveFile(new ZipFile(fFileName));
         } catch (IOException e) {
             // ignore
         }
 
         try {
-            TarFile tarFile = new TarFile(fFileName);
-            return new TarArchiveFile(tarFile);
-        } catch (TarException e) {
-            // ignore
-        } catch (IOException e) {
+            return new TarArchiveFile(new TarFile(fFileName));
+        } catch (TarException | IOException e) {
             // ignore
         }
 

@@ -825,17 +825,12 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
             if (sync_file.exists()) {
                 sync_file.delete();
             }
-            FileOutputStream fos;
-            ObjectOutputStream oos;
 
             /* Save the header of the file */
-            try {
-                fos = new FileOutputStream(sync_file, false);
-                oos = new ObjectOutputStream(fos);
+            try (FileOutputStream fos = new FileOutputStream(sync_file, false);
+                    ObjectOutputStream oos = new ObjectOutputStream(fos);) {
 
                 oos.writeObject(fTsTransform);
-                oos.close();
-                fos.close();
             } catch (IOException e1) {
                 Activator.logError("Error writing timestamp transform for trace", e1); //$NON-NLS-1$
             }
