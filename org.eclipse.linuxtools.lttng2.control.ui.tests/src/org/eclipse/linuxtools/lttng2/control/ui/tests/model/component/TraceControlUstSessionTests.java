@@ -526,7 +526,7 @@ public class TraceControlUstSessionTests {
         fFacility.destroySession(session);
 
         // Verify that no more session components exist
-        assertEquals(0, groups[1].getChildren().length);
+        assertEquals("Session components still exist.", 0, groups[1].getChildren().length);
 
         //-------------------------------------------------------------------------
         // Disconnect node
@@ -540,6 +540,6 @@ public class TraceControlUstSessionTests {
 
         fFacility.executeCommand(node, "delete");
 
-        assertEquals(0,fFacility.getControlView().getTraceControlRoot().getChildren().length);
+        assertEquals("Node not deleted.", 0, fFacility.getControlView().getTraceControlRoot().getChildren().length);
     }
 }
