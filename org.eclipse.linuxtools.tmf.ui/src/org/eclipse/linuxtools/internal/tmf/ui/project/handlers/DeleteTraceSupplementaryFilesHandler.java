@@ -112,8 +112,8 @@ public class DeleteTraceSupplementaryFilesHandler extends AbstractHandler {
             }
         }
 
-        SelectSupplementaryResourcesDialog dialog = new SelectSupplementaryResourcesDialog(window.getShell(),
-                resourceMap.values().toArray(new IResource[0]));
+        SelectSupplementaryResourcesDialog dialog =
+                new SelectSupplementaryResourcesDialog(window.getShell(), resourceMap);
         if (dialog.open() != Window.OK) {
             return null;
         }
