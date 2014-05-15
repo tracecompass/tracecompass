@@ -65,7 +65,6 @@ import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceTypeUIUtils;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder;
-import org.eclipse.linuxtools.tmf.ui.project.wizards.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
