@@ -152,14 +152,14 @@
       </category>
       <wizard
             category="org.eclipse.linuxtools.tmf.import.category"
-            class="org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace.ImportTraceWizard"
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.wizards.importtrace.ImportTraceWizard"
             icon="icons/etool16/import.gif"
             id="org.eclipse.linuxtools.tmf.ui.trace.import.wizard"
             name="%project.import.wizard.name">
       </wizard>
       <wizard
             category="org.eclipse.linuxtools.tmf.import.category"
-            class="org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace.BatchImportTraceWizard"
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.wizards.importtrace.BatchImportTraceWizard"
             icon="icons/etool16/import.gif"
             id="org.eclipse.linuxtools.tmf.ui.batch_import"
             name="%project.import.wizard.name.batch">

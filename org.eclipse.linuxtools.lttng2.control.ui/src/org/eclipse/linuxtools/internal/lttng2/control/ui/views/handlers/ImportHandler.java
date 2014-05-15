@@ -45,6 +45,7 @@ import org.eclipse.linuxtools.internal.lttng2.control.ui.views.dialogs.ImportFil
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.dialogs.TraceControlDialogFactory;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
+import org.eclipse.linuxtools.internal.tmf.ui.project.wizards.importtrace.ImportTraceWizard;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceImportException;
 import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
@@ -54,7 +55,6 @@ import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceTypeUIUtils;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.linuxtools.tmf.ui.project.model.TraceUtils;
-import org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace.ImportTraceWizard;
 import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
 import org.eclipse.rse.services.files.IFileService;
 import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;

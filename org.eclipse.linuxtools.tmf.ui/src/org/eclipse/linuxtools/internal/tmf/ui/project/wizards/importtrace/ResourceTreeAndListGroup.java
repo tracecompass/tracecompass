@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Marc-Andre Laperle - Copied from platform (org.eclipse.ui.internal.ide.dialogs)
  *******************************************************************************/
-package org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace;
+package org.eclipse.linuxtools.internal.tmf.ui.project.wizards.importtrace;
 
 import java.util.ArrayList;
 import java.util.Collection;

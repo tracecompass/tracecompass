@@ -10,7 +10,7 @@
  *   Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace;
+package org.eclipse.linuxtools.internal.tmf.ui.project.wizards.importtrace;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;

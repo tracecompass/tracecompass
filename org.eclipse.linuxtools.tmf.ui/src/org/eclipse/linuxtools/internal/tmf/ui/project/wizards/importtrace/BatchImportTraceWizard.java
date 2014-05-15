@@ -12,7 +12,7 @@
  *   Patrick Tasse - Add support for source location
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace;
+package org.eclipse.linuxtools.internal.tmf.ui.project.wizards.importtrace;
 
 import java.io.File;
 import java.io.FileInputStream;

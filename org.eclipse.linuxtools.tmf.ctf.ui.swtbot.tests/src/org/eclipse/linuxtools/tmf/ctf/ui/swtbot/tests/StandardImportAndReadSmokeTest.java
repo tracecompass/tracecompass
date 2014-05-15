@@ -16,8 +16,8 @@ import static org.junit.Assert.assertNotNull;
 
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.linuxtools.internal.tmf.ui.project.wizards.importtrace.ImportTraceWizard;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
-import org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace.ImportTraceWizard;
 import org.eclipse.linuxtools.tmf.ui.swtbot.tests.conditions.ConditionHelpers;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;

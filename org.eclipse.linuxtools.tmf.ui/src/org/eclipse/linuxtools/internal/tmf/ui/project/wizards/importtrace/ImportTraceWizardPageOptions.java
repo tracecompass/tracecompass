@@ -11,7 +11,7 @@
  *   Marc-Andre Laperle - Use common method to get opened tmf projects
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui.project.wizards.importtrace;
+package org.eclipse.linuxtools.internal.tmf.ui.project.wizards.importtrace;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
