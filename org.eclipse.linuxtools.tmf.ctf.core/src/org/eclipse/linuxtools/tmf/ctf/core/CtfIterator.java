@@ -14,8 +14,8 @@
 package org.eclipse.linuxtools.tmf.ctf.core;
 
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
-import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
 import org.eclipse.linuxtools.ctf.core.trace.CTFStreamInputReader;
+import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
 import org.eclipse.linuxtools.internal.tmf.ctf.core.Activator;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
@@ -140,6 +140,21 @@ public class CtfIterator extends CTFTraceReader
     }
 
     /**
+     * Return the current timestamp location pointed to by the iterator.
+     * This is the timestamp for use in CtfLocation, not the event timestamp.
+     *
+     * @return long The current timestamp location
+     */
+    public synchronized long getCurrentTimestamp() {
+        final CTFStreamInputReader top = super.getPrio().peek();
+        if (top != null) {
+            long ts = top.getCurrentEvent().getTimestamp();
+            return fTrace.getCTFTrace().timestampCyclesToNanos(ts);
+        }
+        return 0;
+    }
+
+    /**
      * Seek this iterator to a given location.
      *
      * @param ctfLocationData
@@ -210,8 +225,6 @@ public class CtfIterator extends CTFTraceReader
 
     @Override
     public synchronized boolean advance() {
-        long index = fCurLocation.getLocationInfo().getIndex();
-        long timestamp = fCurLocation.getLocationInfo().getTimestamp();
         boolean ret = false;
         try {
             ret = super.advance();
@@ -220,8 +233,10 @@ public class CtfIterator extends CTFTraceReader
         }
 
         if (ret) {
-            final long timestampValue = getCurrentEvent().getTimestamp().getValue();
+            long timestamp = fCurLocation.getLocationInfo().getTimestamp();
+            final long timestampValue = getCurrentTimestamp();
             if (timestamp == timestampValue) {
+                long index = fCurLocation.getLocationInfo().getIndex();
                 fCurLocation = new CtfLocation(timestampValue, index + 1);
             } else {
                 fCurLocation = new CtfLocation(timestampValue, 0L);

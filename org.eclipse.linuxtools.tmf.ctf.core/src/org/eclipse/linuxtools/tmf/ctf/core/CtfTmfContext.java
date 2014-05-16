@@ -126,11 +126,12 @@ public class CtfTmfContext implements ITmfContext {
      */
     public synchronized boolean advance() {
         final CtfLocationInfo curLocationData = fCurLocation.getLocationInfo();
-        boolean retVal = getIterator().advance();
-        CtfTmfEvent currentEvent = getIterator().getCurrentEvent();
+        CtfIterator iterator = getIterator();
+        boolean retVal = iterator.advance();
+        CtfTmfEvent currentEvent = iterator.getCurrentEvent();
 
         if (currentEvent != null) {
-            final long timestampValue = currentEvent.getTimestamp().getValue();
+            final long timestampValue = iterator.getCurrentTimestamp();
             if (curLocationData.getTimestamp() == timestampValue) {
                 fCurLocation = new CtfLocation(timestampValue, curLocationData.getIndex() + 1);
             } else {

@@ -260,14 +260,12 @@ public class CtfTmfTrace extends TmfTrace
             context.setRank(0);
         }
         if (currentLocation.getLocationInfo() == CtfLocation.INVALID_LOCATION) {
-            currentLocation = new CtfLocation(getEndTime().getValue() + 1, 0L);
+            currentLocation = new CtfLocation(getCTFTrace().getCurrentEndTime() + 1, 0L);
         }
         context.setLocation(currentLocation);
         if (location == null) {
-            CtfTmfEvent event = getIterator(this, context).getCurrentEvent();
-            if (event != null) {
-                currentLocation = new CtfLocation(event.getTimestamp().getValue(), 0);
-            }
+            long timestamp = getIterator(this, context).getCurrentTimestamp();
+            currentLocation = new CtfLocation(timestamp, 0);
         }
         if (context.getRank() != 0) {
             context.setRank(ITmfContext.UNKNOWN_RANK);
@@ -283,8 +281,8 @@ public class CtfTmfTrace extends TmfTrace
             context.setRank(ITmfContext.UNKNOWN_RANK);
             return context;
         }
-        final long end = this.getEndTime().getValue();
-        final long start = this.getStartTime().getValue();
+        final long end = getCTFTrace().getCurrentEndTime();
+        final long start = getCTFTrace().getCurrentStartTime();
         final long diff = end - start;
         final long ratioTs = Math.round(diff * ratio) + start;
         context.seek(ratioTs);
