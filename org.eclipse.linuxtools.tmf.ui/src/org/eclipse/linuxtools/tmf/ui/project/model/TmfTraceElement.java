@@ -499,15 +499,20 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
      * Copy this trace in the trace folder. No other parameters are mentioned so
      * the trace is copied in this element's project trace folder
      *
-     * @param string
+     * @param newName
      *            The new trace name
      * @return the new Resource object
      * @since 2.0
      */
-    public TmfTraceElement copy(String string) {
-        TmfTraceFolder folder = this.getProject().getTracesFolder();
-        IResource res = super.copy(string, false);
-        return new TmfTraceElement(string, res, folder);
+    public TmfTraceElement copy(String newName) {
+        TmfTraceFolder folder = (TmfTraceFolder) getParent();
+        IResource res = super.copy(newName, false);
+        for (TmfTraceElement trace : folder.getTraces()) {
+            if (trace.getResource().equals(res)) {
+                return trace;
+            }
+        }
+        return null;
     }
 
     /**
