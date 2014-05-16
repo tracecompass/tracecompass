@@ -14,7 +14,7 @@ package org.eclipse.linuxtools.internal.statesystem.core;
 
 import java.io.PrintWriter;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -54,7 +54,7 @@ public final class Attribute {
         this.parent = parent;
         this.quark = quark;
         this.name = name;
-        this.subAttributes = Collections.synchronizedMap(new HashMap<String, Attribute>());
+        this.subAttributes = Collections.synchronizedMap(new LinkedHashMap<String, Attribute>());
     }
 
     // ------------------------------------------------------------------------
