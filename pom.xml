@@ -188,6 +188,15 @@
                             <arch>x86_64</arch>
                         </environment>
                     </environments>
+                    <filters>
+                      <filter>
+                        <type>eclipse-plugin</type>
+                        <id>org.eclipse.jdt.annotation</id>
+                        <restrictTo>
+                          <versionRange>[1.0,2.0)</versionRange>
+                        </restrictTo>
+                      </filter>
+                    </filters>
                 </configuration>
             </plugin>
             <plugin>
