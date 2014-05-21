@@ -27,8 +27,8 @@ import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
-import org.eclipse.linuxtools.ctf.core.trace.Stream;
-import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
+import org.eclipse.linuxtools.ctf.core.trace.CTFStream;
+import org.eclipse.linuxtools.ctf.core.trace.CTFStreamInputReader;
 
 /**
  * Representation of one type of event. A bit like "int" or "long" but for trace
@@ -73,7 +73,7 @@ public class EventDeclaration implements IEventDeclaration {
     /**
      * Stream to which belongs this event.
      */
-    private Stream fStream = null;
+    private CTFStream fStream = null;
 
     /**
      * Loglevel of an event
@@ -95,7 +95,7 @@ public class EventDeclaration implements IEventDeclaration {
     }
 
     @Override
-    public EventDefinition createDefinition(StreamInputReader streamInputReader, @NonNull BitBuffer input, long timestamp) throws CTFReaderException {
+    public EventDefinition createDefinition(CTFStreamInputReader streamInputReader, @NonNull BitBuffer input, long timestamp) throws CTFReaderException {
         StructDeclaration streamEventContextDecl = streamInputReader.getStreamEventContextDecl();
         StructDefinition streamEventContext = streamEventContextDecl != null ? streamEventContextDecl.createDefinition(null, LexicalScope.STREAM_EVENT_CONTEXT.toString(), input) : null;
         StructDefinition packetContext = streamInputReader.getPacketReader().getCurrentPacketEventHeader();
@@ -202,12 +202,12 @@ public class EventDeclaration implements IEventDeclaration {
      *            the stream
      * @since 2.0
      */
-    public void setStream(Stream stream) {
+    public void setStream(CTFStream stream) {
         fStream = stream;
     }
 
     @Override
-    public Stream getStream() {
+    public CTFStream getStream() {
         return fStream;
     }
 

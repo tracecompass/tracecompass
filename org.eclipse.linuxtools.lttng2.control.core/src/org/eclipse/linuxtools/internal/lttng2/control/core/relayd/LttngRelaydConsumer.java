@@ -25,8 +25,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.Metadata;
-import org.eclipse.linuxtools.ctf.core.trace.Stream;
-import org.eclipse.linuxtools.ctf.core.trace.StreamInput;
+import org.eclipse.linuxtools.ctf.core.trace.CTFStream;
+import org.eclipse.linuxtools.ctf.core.trace.CTFStreamInput;
 import org.eclipse.linuxtools.internal.lttng2.control.core.Activator;
 import org.eclipse.linuxtools.internal.lttng2.control.core.relayd.lttngviewerCommands.AttachSessionResponse;
 import org.eclipse.linuxtools.internal.lttng2.control.core.relayd.lttngviewerCommands.LttngViewerCommands;
@@ -72,8 +72,8 @@ public class LttngRelaydConsumer {
         fPort = port;
         fSession = session;
         fCtfTrace = ctfTrace;
-        for (Stream s : fCtfTrace.getCTFTrace().getStreams()) {
-            for (StreamInput si : s.getStreamInputs()) {
+        for (CTFStream s : fCtfTrace.getCTFTrace().getStreams()) {
+            for (CTFStreamInput si : s.getStreamInputs()) {
                 fStreams.put(si.getStream().getId(), new File(si.getStream().getTrace().getPath() + si.getFilename()));
             }
         }

@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.tmf.ctf.core;
 
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
-import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
+import org.eclipse.linuxtools.ctf.core.trace.CTFStreamInputReader;
 import org.eclipse.linuxtools.internal.tmf.ctf.core.Activator;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
@@ -127,7 +127,7 @@ public class CtfIterator extends CTFTraceReader
      * @return CtfTmfEvent The current event
      */
     public synchronized CtfTmfEvent getCurrentEvent() {
-        final StreamInputReader top = super.getPrio().peek();
+        final CTFStreamInputReader top = super.getPrio().peek();
         if (top != null) {
             if (!fCurLocation.equals(fPreviousLocation)) {
                 fPreviousLocation = fCurLocation;

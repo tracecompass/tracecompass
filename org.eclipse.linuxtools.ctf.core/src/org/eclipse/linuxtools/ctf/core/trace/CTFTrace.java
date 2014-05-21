@@ -116,7 +116,7 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
     /**
      * Collection of streams contained in the trace.
      */
-    private final Map<Long, Stream> fStreams = new HashMap<>();
+    private final Map<Long, CTFStream> fStreams = new HashMap<>();
 
     /**
      * Collection of environment variables set by the tracer
@@ -210,9 +210,9 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
         }
 
         /* Create their index */
-        for (Stream stream : getStreams()) {
-            Set<StreamInput> inputs = stream.getStreamInputs();
-            for (StreamInput s : inputs) {
+        for (CTFStream stream : getStreams()) {
+            Set<CTFStreamInput> inputs = stream.getStreamInputs();
+            for (CTFStreamInput s : inputs) {
                 addStream(s);
             }
         }
@@ -272,9 +272,9 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
      * @param id
      *            Long the id of the stream
      * @return Stream the stream that we need
-     * @since 2.0
+     * @since 3.0
      */
-    public Stream getStream(Long id) {
+    public CTFStream getStream(Long id) {
         return fStreams.get(id);
     }
 
@@ -444,7 +444,7 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
      * @return Iterable&lt;Stream&gt; an iterable over streams.
      * @since 3.0
      */
-    public Iterable<Stream> getStreams() {
+    public Iterable<CTFStream> getStreams() {
         return fStreams.values();
     }
 
@@ -470,7 +470,7 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
     // Operations
     // ------------------------------------------------------------------------
 
-    private void addStream(StreamInput s) {
+    private void addStream(CTFStreamInput s) {
 
         /*
          * Copy the events
@@ -502,10 +502,10 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
      * @throws CTFReaderException
      *             if there is a file error
      */
-    private Stream openStreamInput(File streamFile) throws CTFReaderException {
+    private CTFStream openStreamInput(File streamFile) throws CTFReaderException {
         MappedByteBuffer byteBuffer;
         BitBuffer streamBitBuffer;
-        Stream stream;
+        CTFStream stream;
         FileChannel fc;
 
         if (!streamFile.canRead()) {
@@ -580,7 +580,7 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
          * Create the stream input and add a reference to the streamInput in the
          * stream
          */
-        stream.addInput(new StreamInput(stream, streamFile));
+        stream.addInput(new CTFStreamInput(stream, streamFile));
 
         return stream;
     }
@@ -622,9 +622,9 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
      *            A stream object.
      * @throws ParseException
      *             If there was some problem reading the metadata
-     * @since 2.0
+     * @since 3.0
      */
-    public void addStream(Stream stream) throws ParseException {
+    public void addStream(CTFStream stream) throws ParseException {
         /*
          * If there is already a stream without id (the null key), it must be
          * the only one
@@ -644,7 +644,7 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
         /*
          * If a stream with the same ID already exists, it is not valid.
          */
-        Stream existingStream = fStreams.get(stream.getId());
+        CTFStream existingStream = fStreams.get(stream.getId());
         if (existingStream != null) {
             throw new ParseException("Stream id already exists"); //$NON-NLS-1$
         }
@@ -905,14 +905,14 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
      * @since 3.0
      */
     public void addStream(long id, File streamFile) throws CTFReaderException {
-        Stream stream = null;
+        CTFStream stream = null;
         if (fStreams.containsKey(id)) {
             stream = fStreams.get(id);
         } else {
-            stream = new Stream(this);
+            stream = new CTFStream(this);
             fStreams.put(id, stream);
         }
-        stream.addInput(new StreamInput(stream, streamFile));
+        stream.addInput(new CTFStreamInput(stream, streamFile));
     }
 }
 

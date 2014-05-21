@@ -16,7 +16,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
-import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
+import org.eclipse.linuxtools.ctf.core.trace.CTFStreamInputReader;
 import org.eclipse.linuxtools.ctf.core.trace.Utils;
 
 /**
@@ -25,7 +25,7 @@ import org.eclipse.linuxtools.ctf.core.trace.Utils;
  * Compares two StreamInputReader by their timestamp (smaller comes before).
  */
 public class StreamInputReaderTimestampComparator implements
-        Comparator<StreamInputReader>, Serializable {
+        Comparator<CTFStreamInputReader>, Serializable {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -39,11 +39,11 @@ public class StreamInputReaderTimestampComparator implements
 
     /**
      * @throws NullPointerException
-     *             If any {@link StreamInputReader} parameter is null, of if any
+     *             If any {@link CTFStreamInputReader} parameter is null, of if any
      *             of them does not contain a current event.
      */
     @Override
-    public int compare(StreamInputReader a, StreamInputReader b) {
+    public int compare(CTFStreamInputReader a, CTFStreamInputReader b) {
         EventDefinition event_a = a.getCurrentEvent();
         EventDefinition event_b = b.getCurrentEvent();
 

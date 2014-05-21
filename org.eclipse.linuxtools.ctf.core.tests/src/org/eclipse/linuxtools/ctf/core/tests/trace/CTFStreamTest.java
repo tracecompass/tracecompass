@@ -25,8 +25,8 @@ import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
-import org.eclipse.linuxtools.ctf.core.trace.Stream;
-import org.eclipse.linuxtools.ctf.core.trace.StreamInput;
+import org.eclipse.linuxtools.ctf.core.trace.CTFStream;
+import org.eclipse.linuxtools.ctf.core.trace.CTFStreamInput;
 import org.eclipse.linuxtools.internal.ctf.core.event.EventDeclaration;
 import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseException;
 import org.junit.Before;
@@ -34,17 +34,17 @@ import org.junit.Test;
 
 /**
  * The class <code>StreamTest</code> contains tests for the class
- * <code>{@link Stream}</code>.
+ * <code>{@link CTFStream}</code>.
  *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
 @SuppressWarnings("javadoc")
-public class StreamTest {
+public class CTFStreamTest {
 
     private static final CtfTestTrace testTrace = CtfTestTrace.KERNEL;
 
-    private Stream fixture;
+    private CTFStream fixture;
 
     /**
      * Perform pre-test initialization.
@@ -54,12 +54,12 @@ public class StreamTest {
     @Before
     public void setUp() throws CTFReaderException {
         assumeTrue(testTrace.exists());
-        fixture = new Stream(testTrace.getTrace());
+        fixture = new CTFStream(testTrace.getTrace());
         fixture.setEventContext(new StructDeclaration(1L));
         fixture.setPacketContext(new StructDeclaration(1L));
         fixture.setEventHeader(new StructDeclaration(1L));
         fixture.setId(1L);
-        fixture.addInput(new StreamInput(new Stream(testTrace.getTrace()), createFile()));
+        fixture.addInput(new CTFStreamInput(new CTFStream(testTrace.getTrace()), createFile()));
     }
 
     private static File createFile() {
@@ -83,7 +83,7 @@ public class StreamTest {
     @Test
     public void testStream() throws CTFReaderException {
         CTFTrace trace = testTrace.getTrace();
-        Stream result = new Stream(trace);
+        CTFStream result = new CTFStream(trace);
         assertNotNull(result);
     }
 
@@ -170,7 +170,7 @@ public class StreamTest {
      */
     @Test
     public void testGetStreamInputs() {
-        Set<StreamInput> result = fixture.getStreamInputs();
+        Set<CTFStreamInput> result = fixture.getStreamInputs();
         assertNotNull(result);
     }
 

@@ -31,7 +31,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
-import org.eclipse.linuxtools.ctf.core.trace.Stream;
+import org.eclipse.linuxtools.ctf.core.trace.CTFStream;
 import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseException;
 import org.junit.Before;
 import org.junit.Test;
@@ -113,7 +113,7 @@ public class CTFTraceTest {
 
         // Add a stream
         try {
-            Stream stream = new Stream(testTrace.getTrace());
+            CTFStream stream = new CTFStream(testTrace.getTrace());
             stream.setId(1234);
             fixture.addStream(stream);
         } catch (CTFReaderException e) {
@@ -187,7 +187,7 @@ public class CTFTraceTest {
     @Test
     public void testGetStream() {
         Long id = new Long(0L);
-        Stream result = fixture.getStream(id);
+        CTFStream result = fixture.getStream(id);
         assertNotNull(result);
     }
 

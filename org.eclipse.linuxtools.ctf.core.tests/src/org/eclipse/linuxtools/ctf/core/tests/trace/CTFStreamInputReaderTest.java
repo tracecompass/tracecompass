@@ -28,9 +28,9 @@ import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFResponse;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
-import org.eclipse.linuxtools.ctf.core.trace.Stream;
-import org.eclipse.linuxtools.ctf.core.trace.StreamInput;
-import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
+import org.eclipse.linuxtools.ctf.core.trace.CTFStream;
+import org.eclipse.linuxtools.ctf.core.trace.CTFStreamInput;
+import org.eclipse.linuxtools.ctf.core.trace.CTFStreamInputReader;
 import org.eclipse.linuxtools.internal.ctf.core.event.EventDeclaration;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,17 +39,17 @@ import com.google.common.collect.ImmutableList;
 
 /**
  * The class <code>StreamInputReaderTest</code> contains tests for the class
- * <code>{@link StreamInputReader}</code>.
+ * <code>{@link CTFStreamInputReader}</code>.
  *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
 @SuppressWarnings("javadoc")
-public class StreamInputReaderTest {
+public class CTFStreamInputReaderTest {
 
     private static final CtfTestTrace testTrace = CtfTestTrace.KERNEL;
 
-    private StreamInputReader fixture;
+    private CTFStreamInputReader fixture;
 
     private static ImmutableList<String> wrap(String s) {
         return ImmutableList.<String> builder().add(s).build();
@@ -76,19 +76,19 @@ public class StreamInputReaderTest {
                 );
     }
 
-    private static StreamInputReader getStreamInputReader() throws CTFReaderException {
+    private static CTFStreamInputReader getStreamInputReader() throws CTFReaderException {
         assumeTrue(testTrace.exists());
         CTFTrace trace = testTrace.getTrace();
-        Stream s = trace.getStream((long) 0);
-        Set<StreamInput> streamInput = s.getStreamInputs();
-        StreamInputReader retVal = null;
-        for (StreamInput si : streamInput) {
+        CTFStream s = trace.getStream((long) 0);
+        Set<CTFStreamInput> streamInput = s.getStreamInputs();
+        CTFStreamInputReader retVal = null;
+        for (CTFStreamInput si : streamInput) {
             /*
              * For the tests, we'll use the stream input corresponding to the
              * CPU 0
              */
             if (si.getFilename().endsWith("0_0")) {
-                retVal = new StreamInputReader(si);
+                retVal = new CTFStreamInputReader(si);
                 break;
             }
         }
@@ -112,10 +112,10 @@ public class StreamInputReaderTest {
      */
     @Test(expected = CTFReaderException.class)
     public void testStreamInputReader_invalid() throws CTFReaderException {
-        StreamInput streamInput = new StreamInput(
-                new Stream(new CTFTrace("")), new File(""));
+        CTFStreamInput streamInput = new CTFStreamInput(
+                new CTFStream(new CTFTrace("")), new File(""));
 
-        StreamInputReader result = new StreamInputReader(streamInput);
+        CTFStreamInputReader result = new CTFStreamInputReader(streamInput);
         assertNotNull(result);
     }
 

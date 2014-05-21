@@ -42,7 +42,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDeclaration;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
-import org.eclipse.linuxtools.ctf.core.trace.Stream;
+import org.eclipse.linuxtools.ctf.core.trace.CTFStream;
 import org.eclipse.linuxtools.ctf.parser.CTFParser;
 import org.eclipse.linuxtools.internal.ctf.core.Activator;
 import org.eclipse.linuxtools.internal.ctf.core.event.EventDeclaration;
@@ -252,7 +252,7 @@ public class IOStructGen {
                 }
             } else {
                 /* Add an empty stream that will have a null id */
-                fTrace.addStream(new Stream(fTrace));
+                fTrace.addStream(new CTFStream(fTrace));
             }
 
             if (DEBUG) {
@@ -621,7 +621,7 @@ public class IOStructGen {
 
     private void parseStream(CommonTree streamNode) throws ParseException {
 
-        Stream stream = new Stream(fTrace);
+        CTFStream stream = new CTFStream(fTrace);
 
         List<CommonTree> children = streamNode.getChildren();
         if (children == null) {
@@ -660,7 +660,7 @@ public class IOStructGen {
         popScope();
     }
 
-    private void parseStreamDeclaration(CommonTree streamDecl, Stream stream)
+    private void parseStreamDeclaration(CommonTree streamDecl, CTFStream stream)
             throws ParseException {
 
         /* There should be a left and right */
@@ -794,7 +794,7 @@ public class IOStructGen {
              * could be possible to just get the only existing stream, whatever
              * is its id.
              */
-            Stream stream = fTrace.getStream(null);
+            CTFStream stream = fTrace.getStream(null);
 
             if (stream != null) {
                 event.setStream(stream);
@@ -850,7 +850,7 @@ public class IOStructGen {
 
             long streamId = getStreamID(rightNode);
 
-            Stream stream = fTrace.getStream(streamId);
+            CTFStream stream = fTrace.getStream(streamId);
 
             if (stream == null) {
                 throw new ParseException("Stream " + streamId + " not found"); //$NON-NLS-1$ //$NON-NLS-2$

@@ -24,7 +24,7 @@ import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTraceReader;
-import org.eclipse.linuxtools.ctf.core.trace.Stream;
+import org.eclipse.linuxtools.ctf.core.trace.CTFStream;
 import org.eclipse.linuxtools.internal.ctf.core.event.EventDeclaration;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +55,7 @@ public class EventDeclarationTest {
         fixture.setContext(new StructDeclaration(1L));
         fixture.setId(1L);
         fixture.setFields(new StructDeclaration(1L));
-        fixture.setStream(new Stream(testTrace.getTrace()));
+        fixture.setStream(new CTFStream(testTrace.getTrace()));
         fixture.setName("");
     }
 
@@ -99,7 +99,7 @@ public class EventDeclarationTest {
         obj.setContext(new StructDeclaration(1L));
         obj.setId(1L);
         obj.setFields(new StructDeclaration(1L));
-        obj.setStream(new Stream(testTrace.getTrace()));
+        obj.setStream(new CTFStream(testTrace.getTrace()));
         obj.setName("");
 
         assertTrue(fixture.equals(fixture));
@@ -235,7 +235,7 @@ public class EventDeclarationTest {
      */
     @Test
     public void testGetStream() {
-        Stream result = fixture.getStream();
+        CTFStream result = fixture.getStream();
         assertNotNull(result);
     }
 
@@ -253,7 +253,7 @@ public class EventDeclarationTest {
      */
     @Test
     public void testHashCode_null() {
-        fixture.setStream((Stream) null);
+        fixture.setStream((CTFStream) null);
         fixture.setName((String) null);
 
         int result = fixture.hashCode();
@@ -303,7 +303,7 @@ public class EventDeclarationTest {
      */
     @Test
     public void testStreamIsSet_null() {
-        fixture.setStream((Stream) null);
+        fixture.setStream((CTFStream) null);
 
         boolean result = fixture.streamIsSet();
         assertEquals(false, result);

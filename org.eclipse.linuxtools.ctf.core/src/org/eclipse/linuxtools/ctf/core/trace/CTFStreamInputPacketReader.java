@@ -36,11 +36,11 @@ import com.google.common.collect.ImmutableList;
 /**
  * CTF trace packet reader. Reads the events of a packet of a trace file.
  *
- * @version 1.0
  * @author Matthew Khouzam
  * @author Simon Marchi
+ * @since 3.0
  */
-public class StreamInputPacketReader implements IDefinitionScope, AutoCloseable {
+public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseable {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -51,7 +51,7 @@ public class StreamInputPacketReader implements IDefinitionScope, AutoCloseable 
     private final BitBuffer fBitBuffer;
 
     /** StreamInputReader that uses this StreamInputPacketReader. */
-    private final StreamInputReader fStreamInputReader;
+    private final CTFStreamInputReader fStreamInputReader;
 
     /** Trace packet header. */
     private final StructDeclaration fTracePacketHeaderDecl;
@@ -98,14 +98,14 @@ public class StreamInputPacketReader implements IDefinitionScope, AutoCloseable 
      * @param streamInputReader
      *            The StreamInputReader to which this packet reader belongs to.
      */
-    public StreamInputPacketReader(StreamInputReader streamInputReader) {
+    public CTFStreamInputPacketReader(CTFStreamInputReader streamInputReader) {
         fStreamInputReader = streamInputReader;
 
         /* Set the BitBuffer's byte order. */
         fBitBuffer = new BitBuffer();
         fBitBuffer.setByteOrder(streamInputReader.getByteOrder());
 
-        final Stream currentStream = streamInputReader.getStreamInput().getStream();
+        final CTFStream currentStream = streamInputReader.getStreamInput().getStream();
         fTracePacketHeaderDecl = currentStream.getTrace().getPacketHeader();
         fStreamPacketContextDecl = currentStream.getPacketContextDecl();
         fStreamEventHeaderDecl = currentStream.getEventHeaderDecl();
@@ -120,7 +120,6 @@ public class StreamInputPacketReader implements IDefinitionScope, AutoCloseable 
      * @return an context definition, can be null
      * @throws CTFReaderException
      *             out of bounds exception or such
-     * @since 3.0
      */
     public StructDefinition getEventContextDefinition(@NonNull BitBuffer input) throws CTFReaderException {
         return fStreamEventContextDecl.createDefinition(this, LexicalScope.STREAM_EVENT_CONTEXT.getName(), input);
@@ -134,7 +133,6 @@ public class StreamInputPacketReader implements IDefinitionScope, AutoCloseable 
      * @return an context definition, can be null
      * @throws CTFReaderException
      *             out of bounds exception or such
-     * @since 3.0
      */
     public StructDefinition getStreamEventHeaderDefinition(@NonNull BitBuffer input) throws CTFReaderException {
         return fStreamEventHeaderDecl.createDefinition(this, LexicalScope.STREAM_EVENT_HEADER.getName(), input);
@@ -148,7 +146,6 @@ public class StreamInputPacketReader implements IDefinitionScope, AutoCloseable 
      * @return an context definition, can be null
      * @throws CTFReaderException
      *             out of bounds exception or such
-     * @since 3.0
      */
     public StructDefinition getStreamPacketContextDefinition(@NonNull BitBuffer input) throws CTFReaderException {
         return fStreamPacketContextDecl.createDefinition(this, LexicalScope.STREAM_PACKET_CONTEXT.getName(), input);
@@ -162,7 +159,6 @@ public class StreamInputPacketReader implements IDefinitionScope, AutoCloseable 
      * @return an header definition, can be null
      * @throws CTFReaderException
      *             out of bounds exception or such
-     * @since 3.0
      */
     public StructDefinition getTracePacketHeaderDefinition(@NonNull BitBuffer input) throws CTFReaderException {
         return fTracePacketHeaderDecl.createDefinition(this, LexicalScope.TRACE_PACKET_HEADER.getName(), input);
@@ -170,8 +166,6 @@ public class StreamInputPacketReader implements IDefinitionScope, AutoCloseable 
 
     /**
      * Dispose the StreamInputPacketReader
-     *
-     * @since 3.0
      */
     @Override
     public void close() {
@@ -200,9 +194,6 @@ public class StreamInputPacketReader implements IDefinitionScope, AutoCloseable 
         return fCurrentCpu;
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public LexicalScope getScopePath() {
         return LexicalScope.PACKET;
@@ -477,7 +468,6 @@ public class StreamInputPacketReader implements IDefinitionScope, AutoCloseable 
      * Get stream event header
      *
      * @return the stream event header
-     * @since 3.0
      */
     public StructDefinition getCurrentStreamEventHeader() {
         return fCurrentStreamEventHeaderDef;
@@ -487,7 +477,6 @@ public class StreamInputPacketReader implements IDefinitionScope, AutoCloseable 
      * Get the current packet event header
      *
      * @return the current packet event header
-     * @since 3.0
      */
     public StructDefinition getCurrentPacketEventHeader() {
         return fCurrentTracePacketHeaderDef;

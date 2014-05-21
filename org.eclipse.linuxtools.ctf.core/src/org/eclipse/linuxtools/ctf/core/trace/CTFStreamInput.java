@@ -41,9 +41,9 @@ import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntr
  * <p>
  * Represents a trace file that belongs to a certain stream.
  *
- * @since 2.0
+ * @since 3.0
  */
-public class StreamInput implements IDefinitionScope, AutoCloseable {
+public class CTFStreamInput implements IDefinitionScope, AutoCloseable {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -52,7 +52,7 @@ public class StreamInput implements IDefinitionScope, AutoCloseable {
     /**
      * The associated Stream
      */
-    private final Stream fStream;
+    private final CTFStream fStream;
 
     /**
      * FileChannel to the trace file
@@ -104,9 +104,8 @@ public class StreamInput implements IDefinitionScope, AutoCloseable {
      *            Information about the trace file (for debugging purposes).
      * @throws CTFReaderException
      *             The file must exist
-     * @since 3.0
      */
-    public StreamInput(Stream stream, File file) throws CTFReaderException {
+    public CTFStreamInput(CTFStream stream, File file) throws CTFReaderException {
         fStream = stream;
         fFile = file;
         try {
@@ -119,9 +118,6 @@ public class StreamInput implements IDefinitionScope, AutoCloseable {
         fIndex = new StreamInputPacketIndex();
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public void close() throws IOException {
         fFileChannel.close();
@@ -137,7 +133,7 @@ public class StreamInput implements IDefinitionScope, AutoCloseable {
      *
      * @return the stream the streamInput wrapper is wrapping
      */
-    public Stream getStream() {
+    public CTFStream getStream() {
         return fStream;
     }
 
@@ -182,8 +178,6 @@ public class StreamInput implements IDefinitionScope, AutoCloseable {
 
     /**
      * Useless for streaminputs
-     *
-     * @since 3.0
      */
     @Override
     public LexicalScope getScopePath() {
@@ -508,10 +502,10 @@ public class StreamInput implements IDefinitionScope, AutoCloseable {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof StreamInput)) {
+        if (!(obj instanceof CTFStreamInput)) {
             return false;
         }
-        StreamInput other = (StreamInput) obj;
+        CTFStreamInput other = (CTFStreamInput) obj;
         if (fFile == null) {
             if (other.fFile != null) {
                 return false;

@@ -31,7 +31,7 @@ import org.junit.Test;
  * @version $Revision: 1.0 $
  */
 @SuppressWarnings("javadoc")
-public class StreamInputPacketIndexTest {
+public class CTFStreamInputPacketIndexTest {
 
     private StreamInputPacketIndex fixture;
     private StreamInputPacketIndexEntry entry;

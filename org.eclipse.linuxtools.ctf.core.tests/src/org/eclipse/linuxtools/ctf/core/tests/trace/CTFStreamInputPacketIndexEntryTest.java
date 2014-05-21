@@ -25,7 +25,7 @@ import org.junit.Test;
  * @author ematkho
  * @version $Revision: 1.0 $
  */
-public class StreamInputPacketIndexEntryTest {
+public class CTFStreamInputPacketIndexEntryTest {
 
     private StreamInputPacketIndexEntry fixture;
 

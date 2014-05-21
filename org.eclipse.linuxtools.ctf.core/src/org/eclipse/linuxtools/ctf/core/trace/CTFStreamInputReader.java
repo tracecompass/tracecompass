@@ -24,11 +24,11 @@ import com.google.common.collect.ImmutableSet;
 /**
  * A CTF trace event reader. Reads the events of a trace file.
  *
- * @version 1.0
  * @author Matthew Khouzam
  * @author Simon Marchi
+ * @since 3.0
  */
-public class StreamInputReader implements AutoCloseable {
+public class CTFStreamInputReader implements AutoCloseable {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -37,12 +37,12 @@ public class StreamInputReader implements AutoCloseable {
     /**
      * The StreamInput we are reading.
      */
-    private final StreamInput fStreamInput;
+    private final CTFStreamInput fStreamInput;
 
     /**
      * The packet reader used to read packets from this trace file.
      */
-    private final StreamInputPacketReader fPacketReader;
+    private final CTFStreamInputPacketReader fPacketReader;
 
     /**
      * Iterator on the packet index
@@ -75,11 +75,10 @@ public class StreamInputReader implements AutoCloseable {
      *            The StreamInput to read.
      * @throws CTFReaderException
      *             if an error occurs
-     * @since 2.0
      */
-    public StreamInputReader(StreamInput streamInput) throws CTFReaderException {
+    public CTFStreamInputReader(CTFStreamInput streamInput) throws CTFReaderException {
         fStreamInput = streamInput;
-        fPacketReader = new StreamInputPacketReader(this);
+        fPacketReader = new CTFStreamInputPacketReader(this);
         /*
          * Get the iterator on the packet index.
          */
@@ -92,8 +91,6 @@ public class StreamInputReader implements AutoCloseable {
 
     /**
      * Dispose the StreamInputReader
-     *
-     * @since 3.0
      */
     @Override
     public void close() {
@@ -164,7 +161,7 @@ public class StreamInputReader implements AutoCloseable {
     /*
      * for internal use only
      */
-    StreamInput getStreamInput() {
+    CTFStreamInput getStreamInput() {
         return fStreamInput;
     }
 
@@ -172,7 +169,6 @@ public class StreamInputReader implements AutoCloseable {
      * Gets the event definition set for this StreamInput
      *
      * @return Unmodifiable set with the event definitions
-     * @since 3.0
      */
     public Iterable<IEventDeclaration> getEventDeclarations() {
         return ImmutableSet.copyOf(fStreamInput.getStream().getEvents().values());
@@ -183,7 +179,6 @@ public class StreamInputReader implements AutoCloseable {
      *
      * @param live
      *            whether the trace is read live or not
-     * @since 3.0
      */
     public void setLive(boolean live) {
         fLive = live;
@@ -193,7 +188,6 @@ public class StreamInputReader implements AutoCloseable {
      * Get if the trace is to read live or not
      *
      * @return whether the trace is live or not
-     * @since 3.0
      */
     public boolean isLive() {
         return fLive;
@@ -203,7 +197,6 @@ public class StreamInputReader implements AutoCloseable {
      * Get the event context of the stream
      *
      * @return the event context declaration of the stream
-     * @since 3.0
      */
     public StructDeclaration getStreamEventContextDecl() {
         return getStreamInput().getStream().getEventContextDecl();
@@ -218,7 +211,6 @@ public class StreamInputReader implements AutoCloseable {
      * @return If an event has been successfully read.
      * @throws CTFReaderException
      *             if an error occurs
-     * @since 3.0
      */
     public CTFResponse readNextEvent() throws CTFReaderException {
 
@@ -429,7 +421,7 @@ public class StreamInputReader implements AutoCloseable {
     /**
      * @return the packetReader
      */
-    public StreamInputPacketReader getPacketReader() {
+    public CTFStreamInputPacketReader getPacketReader() {
         return fPacketReader;
     }
 
@@ -451,10 +443,10 @@ public class StreamInputReader implements AutoCloseable {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof StreamInputReader)) {
+        if (!(obj instanceof CTFStreamInputReader)) {
             return false;
         }
-        StreamInputReader other = (StreamInputReader) obj;
+        CTFStreamInputReader other = (CTFStreamInputReader) obj;
         if (fId != other.fId) {
             return false;
         }

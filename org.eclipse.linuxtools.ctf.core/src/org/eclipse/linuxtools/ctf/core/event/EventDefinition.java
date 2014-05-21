@@ -21,7 +21,7 @@ import org.eclipse.linuxtools.ctf.core.event.scope.LexicalScope;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
-import org.eclipse.linuxtools.ctf.core.trace.StreamInputReader;
+import org.eclipse.linuxtools.ctf.core.trace.CTFStreamInputReader;
 import org.eclipse.linuxtools.internal.ctf.core.event.EventDeclaration;
 
 import com.google.common.collect.ImmutableList;
@@ -71,7 +71,7 @@ public final class EventDefinition implements IDefinitionScope {
     /**
      * The StreamInputReader that reads this event definition.
      */
-    private final StreamInputReader fStreamInputReader;
+    private final CTFStreamInputReader fStreamInputReader;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -97,7 +97,7 @@ public final class EventDefinition implements IDefinitionScope {
      * @since 3.0
      */
     public EventDefinition(IEventDeclaration declaration,
-            StreamInputReader streamInputReader,
+            CTFStreamInputReader streamInputReader,
             long timestamp,
             StructDefinition streamContext,
             StructDefinition eventContext,
@@ -220,8 +220,9 @@ public final class EventDefinition implements IDefinitionScope {
      * Gets the stream input reader that this event was made by
      *
      * @return the parent
+     * @since 3.0
      */
-    public StreamInputReader getStreamInputReader() {
+    public CTFStreamInputReader getStreamInputReader() {
         return fStreamInputReader;
     }
 

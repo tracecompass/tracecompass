@@ -26,9 +26,9 @@ import org.eclipse.linuxtools.internal.ctf.core.event.metadata.exceptions.ParseE
  * <b><u>Stream</u></b>
  * <p>
  * Represents a stream in a trace.
- * @since 2.0
+ * @since 3.0
  */
-public class Stream {
+public class CTFStream {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -60,7 +60,7 @@ public class Stream {
     /**
      * The inputs associated to this stream
      */
-    private final Set<StreamInput> fInputs = new HashSet<>();
+    private final Set<CTFStreamInput> fInputs = new HashSet<>();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -72,7 +72,7 @@ public class Stream {
      * @param trace
      *            The trace to which belongs this stream.
      */
-    public Stream(CTFTrace trace) {
+    public CTFStream(CTFTrace trace) {
         fTrace = trace;
     }
 
@@ -181,7 +181,7 @@ public class Stream {
      *
      * @return the set of all stream inputs for this stream
      */
-    public Set<StreamInput> getStreamInputs() {
+    public Set<CTFStreamInput> getStreamInputs() {
         return fInputs;
     }
 
@@ -257,7 +257,7 @@ public class Stream {
      * @param input
      *            The StreamInput to add.
      */
-    public void addInput(StreamInput input) {
+    public void addInput(CTFStreamInput input) {
         fInputs.add(input);
     }
 

@@ -24,7 +24,7 @@ import org.junit.Test;
  * @author ematkho
  * @version $Revision: 1.0 $
  */
-public class StreamInputReaderTimestampComparatorTest {
+public class CTFStreamInputReaderTimestampComparatorTest {
 
     private StreamInputReaderTimestampComparator fixture;
 

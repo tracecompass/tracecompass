@@ -30,12 +30,12 @@ import org.junit.runners.Suite;
     CTFTraceGrowingTest.class,
     IOstructgenTest.class,
     MetadataTest.class,
-    StreamInputPacketIndexEntryTest.class,
-    StreamInputPacketIndexTest.class,
-    StreamInputReaderTest.class,
-    StreamInputReaderTimestampComparatorTest.class,
-    StreamInputTest.class,
-    StreamTest.class,
+    CTFStreamInputPacketIndexEntryTest.class,
+    CTFStreamInputPacketIndexTest.class,
+    CTFStreamInputReaderTest.class,
+    CTFStreamInputReaderTimestampComparatorTest.class,
+    CTFStreamInputTest.class,
+    CTFStreamTest.class,
     UtilsTest.class
 })
 public class TestAll {

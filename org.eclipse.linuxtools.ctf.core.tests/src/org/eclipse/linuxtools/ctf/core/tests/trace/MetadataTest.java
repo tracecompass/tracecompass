@@ -24,7 +24,7 @@ import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.ctf.core.trace.Metadata;
-import org.eclipse.linuxtools.ctf.core.trace.Stream;
+import org.eclipse.linuxtools.ctf.core.trace.CTFStream;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -188,12 +188,12 @@ public class MetadataTest {
     protected CTFTrace testSingleFragment() throws CTFReaderException {
         fixture = new Metadata();
         CTFTrace trace = fixture.getTrace();
-        for (Stream s : trace.getStreams()) {
+        for (CTFStream s : trace.getStreams()) {
             fail("This should be empty, has" + s.toString());
         }
         fixture.parseText(mdStart);
         int count = 0;
-        for (Stream s : trace.getStreams()) {
+        for (CTFStream s : trace.getStreams()) {
             count++;
             assertNotNull(s);
         }

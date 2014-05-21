@@ -50,12 +50,12 @@ public class CTFTraceReader implements AutoCloseable {
     /**
      * Vector of all the trace file readers.
      */
-    private final List<StreamInputReader> fStreamInputReaders = new ArrayList<>();
+    private final List<CTFStreamInputReader> fStreamInputReaders = new ArrayList<>();
 
     /**
      * Priority queue to order the trace file readers by timestamp.
      */
-    private PriorityQueue<StreamInputReader> fPrio;
+    private PriorityQueue<CTFStreamInputReader> fPrio;
 
     /**
      * Array to count the number of event per trace file.
@@ -132,7 +132,7 @@ public class CTFTraceReader implements AutoCloseable {
      */
     @Override
     public void close() {
-        for (StreamInputReader reader : fStreamInputReaders) {
+        for (CTFStreamInputReader reader : fStreamInputReaders) {
             if (reader != null) {
                 reader.close();
             }
@@ -169,7 +169,7 @@ public class CTFTraceReader implements AutoCloseable {
      * @return The priority queue of input readers
      * @since 2.0
      */
-    protected PriorityQueue<StreamInputReader> getPrio() {
+    protected PriorityQueue<CTFStreamInputReader> getPrio() {
         return fPrio;
     }
 
@@ -187,17 +187,17 @@ public class CTFTraceReader implements AutoCloseable {
         /*
          * For each stream.
          */
-        for (Stream stream : fTrace.getStreams()) {
-            Set<StreamInput> streamInputs = stream.getStreamInputs();
+        for (CTFStream stream : fTrace.getStreams()) {
+            Set<CTFStreamInput> streamInputs = stream.getStreamInputs();
 
             /*
              * For each trace file of the stream.
              */
-            for (StreamInput streamInput : streamInputs) {
+            for (CTFStreamInput streamInput : streamInputs) {
                 /*
                  * Create a reader.
                  */
-                StreamInputReader streamInputReader = new StreamInputReader(
+                CTFStreamInputReader streamInputReader = new CTFStreamInputReader(
                         streamInput);
 
                 /*
@@ -222,14 +222,14 @@ public class CTFTraceReader implements AutoCloseable {
      * @since 3.0
      */
     public void update() throws CTFReaderException {
-        Set<StreamInputReader> readers = new HashSet<>();
-        for (Stream stream : fTrace.getStreams()) {
-            Set<StreamInput> streamInputs = stream.getStreamInputs();
-            for (StreamInput streamInput : streamInputs) {
+        Set<CTFStreamInputReader> readers = new HashSet<>();
+        for (CTFStream stream : fTrace.getStreams()) {
+            Set<CTFStreamInput> streamInputs = stream.getStreamInputs();
+            for (CTFStreamInput streamInput : streamInputs) {
                 /*
                  * Create a reader.
                  */
-                StreamInputReader streamInputReader = new StreamInputReader(
+                CTFStreamInputReader streamInputReader = new CTFStreamInputReader(
                         streamInput);
 
                 /*
@@ -244,7 +244,7 @@ public class CTFTraceReader implements AutoCloseable {
         }
         long[] temp = fEventCountPerTraceFile;
         fEventCountPerTraceFile = new long[readers.size() + temp.length];
-        for (StreamInputReader reader : readers) {
+        for (CTFStreamInputReader reader : readers) {
             fPrio.add(reader);
         }
         for (int i = 0; i < temp.length; i++) {
@@ -260,7 +260,7 @@ public class CTFTraceReader implements AutoCloseable {
      */
     public Iterable<IEventDeclaration> getEventDeclarations() {
         ImmutableSet.Builder<IEventDeclaration> builder = new Builder<>();
-        for (StreamInputReader sir : fStreamInputReaders) {
+        for (CTFStreamInputReader sir : fStreamInputReaders) {
             builder.addAll(sir.getEventDeclarations());
         }
         return builder.build();
@@ -290,7 +290,7 @@ public class CTFTraceReader implements AutoCloseable {
 
         int pos = 0;
 
-        for (StreamInputReader reader : fStreamInputReaders) {
+        for (CTFStreamInputReader reader : fStreamInputReaders) {
             /*
              * Add each trace file reader in the priority queue, if we are able
              * to read an event from it.
@@ -316,7 +316,7 @@ public class CTFTraceReader implements AutoCloseable {
      *         of the trace.
      */
     public EventDefinition getCurrentEventDef() {
-        StreamInputReader top = getTopStream();
+        CTFStreamInputReader top = getTopStream();
 
         return (top != null) ? top.getCurrentEvent() : null;
     }
@@ -332,7 +332,7 @@ public class CTFTraceReader implements AutoCloseable {
         /*
          * Remove the reader from the top of the priority queue.
          */
-        StreamInputReader top = fPrio.poll();
+        CTFStreamInputReader top = fPrio.poll();
 
         /*
          * If the queue was empty.
@@ -408,7 +408,7 @@ public class CTFTraceReader implements AutoCloseable {
          * Remove all the trace readers from the priority queue
          */
         fPrio.clear();
-        for (StreamInputReader streamInputReader : fStreamInputReaders) {
+        for (CTFStreamInputReader streamInputReader : fStreamInputReaders) {
             /*
              * Seek the trace reader.
              */
@@ -428,8 +428,9 @@ public class CTFTraceReader implements AutoCloseable {
      * Gets the stream with the oldest event
      *
      * @return the stream with the oldest event
+     * @since 3.0
      */
-    public StreamInputReader getTopStream() {
+    public CTFStreamInputReader getTopStream() {
         return fPrio.peek();
     }
 
@@ -466,7 +467,7 @@ public class CTFTraceReader implements AutoCloseable {
         }
 
         for (int j = 0; j < fEventCountPerTraceFile.length; j++) {
-            StreamInputReader se = fStreamInputReaders.get(j);
+            CTFStreamInputReader se = fStreamInputReaders.get(j);
 
             long len = (width * fEventCountPerTraceFile[se.getName()])
                     / numEvents;
@@ -505,7 +506,7 @@ public class CTFTraceReader implements AutoCloseable {
      * @since 3.0
      */
     public void setLive(boolean live) {
-        for (StreamInputReader s : fPrio) {
+        for (CTFStreamInputReader s : fPrio) {
             s.setLive(live);
         }
     }
