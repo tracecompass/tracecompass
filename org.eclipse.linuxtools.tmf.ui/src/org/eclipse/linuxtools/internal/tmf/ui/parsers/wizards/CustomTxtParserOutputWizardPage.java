@@ -24,10 +24,12 @@ import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomEventsTable;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTxtTrace;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTxtTraceDefinition;
-import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfTraceIndexer;
+import org.eclipse.linuxtools.tmf.core.trace.indexer.checkpoint.TmfCheckpointIndexer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -222,7 +224,12 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
         }
 
         try {
-            final CustomTxtTrace trace = new CustomTxtTrace(null, definition, tmpFile.getAbsolutePath(), CACHE_SIZE);
+            final CustomTxtTrace trace = new CustomTxtTrace(null, definition, tmpFile.getAbsolutePath(), CACHE_SIZE) {
+                @Override
+                protected ITmfTraceIndexer createIndexer(int interval) {
+                    return new TmfCheckpointIndexer(this, interval);
+                }
+            };
             trace.getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, false);
             previewTable.dispose();
             previewTable = new CustomEventsTable(definition, tableContainer, CACHE_SIZE);
