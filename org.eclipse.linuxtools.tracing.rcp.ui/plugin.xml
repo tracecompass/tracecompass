@@ -52,11 +52,6 @@
                   label="%command.import"
                   style="push">
             </command>
-            <command
-                  commandId="org.eclipse.linuxtools.tmf.ui.batch_import"
-                  label="%command.batch_import"
-                  style="push">
-            </command>
             <separator
                   name="ImportSeparator"
                   visible="true">

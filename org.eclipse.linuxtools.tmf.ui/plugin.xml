@@ -159,13 +159,6 @@
       </wizard>
       <wizard
             category="org.eclipse.linuxtools.tmf.import.category"
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.wizards.importtrace.BatchImportTraceWizard"
-            icon="icons/etool16/import.gif"
-            id="org.eclipse.linuxtools.tmf.ui.batch_import"
-            name="%project.import.wizard.name.batch">
-      </wizard>
-      <wizard
-            category="org.eclipse.linuxtools.tmf.import.category"
             class="org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg.importexport.ImportTracePackageWizard"
             icon="icons/etool16/import.gif"
             id="org.eclipse.linuxtools.tmf.ui.trace.import.package.wizard"
@@ -410,27 +403,6 @@
                commandId="org.eclipse.linuxtools.tmf.ui.import"
                label="%command.import"
                mnemonic="%command.import.mnemonic"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate
-                        operator="and">
-                     <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
-                     </instanceof>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="org.eclipse.linuxtools.tmf.ui.batch_import"
-               label="%command.batch_import"
-               mnemonic="%command.batch_import.mnemonic"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -1143,11 +1115,6 @@
             name="%command.import">
       </command>
       <command
-            description="%command.batch_import.description"
-            id="org.eclipse.linuxtools.tmf.ui.batch_import"
-            name="%command.batch_import">
-      </command>
-      <command
             categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
             description="%command.export_to_text.description"
             id="org.eclipse.linuxtools.tmf.ui.exportToText"
@@ -1536,10 +1503,6 @@
                </iterate>
             </and>
          </activeWhen>
-      </handler>
-      <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.BatchImportTraceHandler"
-            commandId="org.eclipse.linuxtools.tmf.ui.batch_import">
       </handler>
       <handler
             class="org.eclipse.linuxtools.internal.tmf.ui.commands.ExportToTextCommandHandler"
