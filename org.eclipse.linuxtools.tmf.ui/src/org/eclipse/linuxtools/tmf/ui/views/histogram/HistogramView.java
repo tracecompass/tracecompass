@@ -370,13 +370,9 @@ public class HistogramView extends TmfView {
                 public void run() {
                     HistogramScaledData.hideLostEvents = hideLostEventsAction.isChecked();
                     long maxNbEvents = HistogramScaledData.hideLostEvents ? fFullTraceHistogram.fScaledData.fMaxValue : fFullTraceHistogram.fScaledData.fMaxCombinedValue;
-                    fFullTraceHistogram.getMaxNbEventsText().setText(Long.toString(maxNbEvents));
-                    fFullTraceHistogram.getMaxNbEventsText().getParent().layout();
-                    fFullTraceHistogram.fCanvas.redraw();
+                    fFullTraceHistogram.setMaxNbEvents(maxNbEvents);
                     maxNbEvents = HistogramScaledData.hideLostEvents ? fTimeRangeHistogram.fScaledData.fMaxValue : fTimeRangeHistogram.fScaledData.fMaxCombinedValue;
-                    fTimeRangeHistogram.getMaxNbEventsText().setText(Long.toString(maxNbEvents));
-                    fTimeRangeHistogram.getMaxNbEventsText().getParent().layout();
-                    fTimeRangeHistogram.fCanvas.redraw();
+                    fTimeRangeHistogram.setMaxNbEvents(maxNbEvents);
                 }
             };
             hideLostEventsAction.setText(Messages.HistogramView_hideLostEvents);

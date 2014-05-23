@@ -30,9 +30,6 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -54,7 +51,6 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 
 /**
  * Re-usable histogram widget.
@@ -106,7 +102,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     private final Color fSelectionForegroundColor = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
     private final Color fSelectionBackgroundColor = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
     private final Color fLastEventColor = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED);
-    private final Color fFillColor = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
 
     // Application colors, they need to be disposed
     private final Color[] fHistoBarColors = new Color[] {new Color(Display.getDefault(), 90, 90, 255), // blue
@@ -171,10 +166,10 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     private Font fFont;
 
     // Histogram text fields
-    private Text fMaxNbEventsText;
-    private Text fMinNbEventsText;
-    private Text fTimeRangeStartText;
-    private Text fTimeRangeEndText;
+    private Label fMaxNbEventsLabel;
+    private Label fMinNbEventsLabel;
+    private Label fTimeRangeStartLabel;
+    private Label fTimeRangeEndLabel;
 
     /**
      * Histogram drawing area
@@ -278,7 +273,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     private Composite createWidget(final Composite parent) {
 
-        final Color labelColor = parent.getBackground();
         fFont = adjustFont(parent);
 
         final int initalWidth = 10;
@@ -311,12 +305,10 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         gridData = new GridData();
         gridData.horizontalAlignment = SWT.RIGHT;
         gridData.verticalAlignment = SWT.TOP;
-        fMaxNbEventsText = new Text(composite, SWT.READ_ONLY | SWT.RIGHT);
-        fMaxNbEventsText.setFont(fFont);
-        fMaxNbEventsText.setBackground(labelColor);
-        fMaxNbEventsText.setEditable(false);
-        fMaxNbEventsText.setText("0"); //$NON-NLS-1$
-        fMaxNbEventsText.setLayoutData(gridData);
+        fMaxNbEventsLabel = new Label(composite, SWT.RIGHT);
+        fMaxNbEventsLabel.setFont(fFont);
+        fMaxNbEventsLabel.setText("0"); //$NON-NLS-1$
+        fMaxNbEventsLabel.setLayoutData(gridData);
 
         // Histogram itself
         Composite canvasComposite = new Composite(composite, SWT.BORDER);
@@ -346,12 +338,10 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         gridData = new GridData();
         gridData.horizontalAlignment = SWT.RIGHT;
         gridData.verticalAlignment = SWT.BOTTOM;
-        fMinNbEventsText = new Text(composite, SWT.READ_ONLY | SWT.RIGHT);
-        fMinNbEventsText.setFont(fFont);
-        fMinNbEventsText.setBackground(labelColor);
-        fMinNbEventsText.setEditable(false);
-        fMinNbEventsText.setText("0"); //$NON-NLS-1$
-        fMinNbEventsText.setLayoutData(gridData);
+        fMinNbEventsLabel = new Label(composite, SWT.RIGHT);
+        fMinNbEventsLabel.setFont(fFont);
+        fMinNbEventsLabel.setText("0"); //$NON-NLS-1$
+        fMinNbEventsLabel.setLayoutData(gridData);
 
         // Dummy cell
         gridData = new GridData(initalWidth, SWT.DEFAULT);
@@ -364,30 +354,17 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         gridData = new GridData();
         gridData.horizontalAlignment = SWT.LEFT;
         gridData.verticalAlignment = SWT.BOTTOM;
-        fTimeRangeStartText = new Text(composite, SWT.READ_ONLY);
-        fTimeRangeStartText.setFont(fFont);
-        fTimeRangeStartText.setBackground(labelColor);
-        fTimeRangeStartText.setLayoutData(gridData);
+        fTimeRangeStartLabel = new Label(composite, SWT.NONE);
+        fTimeRangeStartLabel.setFont(fFont);
+        fTimeRangeStartLabel.setLayoutData(gridData);
 
         // Window range end time
         gridData = new GridData();
         gridData.horizontalAlignment = SWT.RIGHT;
         gridData.verticalAlignment = SWT.BOTTOM;
-        fTimeRangeEndText = new Text(composite, SWT.READ_ONLY);
-        fTimeRangeEndText.setFont(fFont);
-        fTimeRangeEndText.setBackground(labelColor);
-        fTimeRangeEndText.setLayoutData(gridData);
-
-        FocusListener listener = new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                fCanvas.setFocus();
-            }
-        };
-        fMaxNbEventsText.addFocusListener(listener);
-        fMinNbEventsText.addFocusListener(listener);
-        fTimeRangeStartText.addFocusListener(listener);
-        fTimeRangeEndText.addFocusListener(listener);
+        fTimeRangeEndLabel = new Label(composite, SWT.NONE);
+        fTimeRangeEndLabel.setFont(fFont);
+        fTimeRangeEndLabel.setLayoutData(gridData);
 
         return composite;
     }
@@ -437,13 +414,15 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     }
 
     /**
-     * Returns the text control for the maximum of events in one bar
+     * Set the max number events to be displayed
      *
-     * @return the text control
-     * @since 2.2
+     * @param maxNbEvents
+     *            the maximum number of events
      */
-    public Text getMaxNbEventsText() {
-        return fMaxNbEventsText;
+    void setMaxNbEvents(long maxNbEvents) {
+        fMaxNbEventsLabel.setText(Long.toString(maxNbEvents));
+        fMaxNbEventsLabel.getParent().layout();
+        fCanvas.redraw();
     }
 
     /**
@@ -641,11 +620,11 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                                 // Display histogram and update X-,Y-axis labels
                                 updateRangeTextControls();
                                 long maxNbEvents = HistogramScaledData.hideLostEvents ? fScaledData.fMaxValue : fScaledData.fMaxCombinedValue;
-                                fMaxNbEventsText.setText(Long.toString(maxNbEvents));
+                                fMaxNbEventsLabel.setText(Long.toString(maxNbEvents));
                                 // The Y-axis area might need to be re-sized
-                                GridData gd = (GridData) fMaxNbEventsText.getLayoutData();
-                                gd.widthHint = Math.max(gd.widthHint, fMaxNbEventsText.computeSize(SWT.DEFAULT, SWT.DEFAULT).x);
-                                fMaxNbEventsText.getParent().layout();
+                                GridData gd = (GridData) fMaxNbEventsLabel.getLayoutData();
+                                gd.widthHint = Math.max(gd.widthHint, fMaxNbEventsLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT).x);
+                                fMaxNbEventsLabel.getParent().layout();
                             }
                         }
                     }
@@ -690,11 +669,11 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      */
     private void updateRangeTextControls() {
         if (fDataModel.getStartTime() < fDataModel.getEndTime()) {
-            fTimeRangeStartText.setText(TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getStartTime()));
-            fTimeRangeEndText.setText(TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getEndTime()));
+            fTimeRangeStartLabel.setText(TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getStartTime()));
+            fTimeRangeEndLabel.setText(TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getEndTime()));
         } else {
-            fTimeRangeStartText.setText(""); //$NON-NLS-1$
-            fTimeRangeEndText.setText(""); //$NON-NLS-1$
+            fTimeRangeStartLabel.setText(""); //$NON-NLS-1$
+            fTimeRangeEndLabel.setText(""); //$NON-NLS-1$
         }
     }
 
@@ -822,7 +801,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
             drawDelimiter(imageGC, fLastEventColor, height, delimiterIndex);
 
             // Fill the area to the right of delimiter with background color
-            imageGC.setBackground(fFillColor);
+            imageGC.setBackground(fComposite.getBackground());
             imageGC.fillRectangle(delimiterIndex + 1, 0, width - (delimiterIndex + 1), height);
 
         } catch (final Exception e) {
