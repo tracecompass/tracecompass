@@ -164,14 +164,14 @@ public class TmfOpenTraceHelper {
             // First check parent
             File parent = file.getParentFile();
             String pathToUse = parent.getAbsolutePath();
-            if (TmfTraceType.getInstance().isDirectoryTrace(pathToUse)) {
+            if (TmfTraceType.isDirectoryTrace(pathToUse)) {
                 return pathToUse;
             }
             // Second check grandparent
             File grandParent = parent.getParentFile();
             if (grandParent != null) {
                 pathToUse = grandParent.getAbsolutePath();
-                if (TmfTraceType.getInstance().isDirectoryTrace(pathToUse)) {
+                if (TmfTraceType.isDirectoryTrace(pathToUse)) {
                     return pathToUse;
                 }
             }

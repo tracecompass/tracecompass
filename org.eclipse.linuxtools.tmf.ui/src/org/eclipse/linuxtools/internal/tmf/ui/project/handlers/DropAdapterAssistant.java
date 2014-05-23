@@ -538,7 +538,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
         try {
             Map<QualifiedName, String> properties = resource.getPersistentProperties();
             String traceType = properties.get(TmfCommonConstants.TRACETYPE);
-            TraceTypeHelper traceTypeHelper = TmfTraceType.getInstance().getTraceType(traceType);
+            TraceTypeHelper traceTypeHelper = TmfTraceType.getTraceType(traceType);
 
             if (resource instanceof IFolder) {
                 IFolder folder = parentFolder.getFolder(targetName);
@@ -647,7 +647,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
     private static void setTraceType(IResource traceResource) {
         try {
             String traceType = traceResource.getPersistentProperties().get(TmfCommonConstants.TRACETYPE);
-            TraceTypeHelper traceTypeHelper = TmfTraceType.getInstance().getTraceType(traceType);
+            TraceTypeHelper traceTypeHelper = TmfTraceType.getTraceType(traceType);
             if (traceTypeHelper == null) {
                 traceTypeHelper = TmfTraceTypeUIUtils.selectTraceType(traceResource.getLocationURI().getPath(), null, null);
             }

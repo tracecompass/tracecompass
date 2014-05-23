@@ -577,7 +577,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         fTraceTypes.setLayoutData(data);
         fTraceTypes.setFont(parent.getFont());
 
-        String[] availableTraceTypes = TmfTraceType.getInstance().getAvailableTraceTypes();
+        String[] availableTraceTypes = TmfTraceType.getAvailableTraceTypes();
         String[] traceTypeList = new String[availableTraceTypes.length + 1];
         traceTypeList[0] = AUTO_DETECT;
         for (int i = 0; i < availableTraceTypes.length; i++) {
@@ -741,7 +741,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             if (tokens.length < 2) {
                 return false;
             }
-            traceId = TmfTraceType.getInstance().getTraceTypeId(tokens[0], tokens[1]);
+            traceId = TmfTraceType.getTraceTypeId(tokens[0], tokens[1]);
         }
 
         // Save dialog settings
@@ -928,11 +928,11 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                     return;
                 }
             } else {
-                boolean isDirectoryTraceType = TmfTraceType.getInstance().isDirectoryTraceType(fTraceType);
+                boolean isDirectoryTraceType = TmfTraceType.isDirectoryTraceType(fTraceType);
                 if (fileSystemElement.isDirectory() != isDirectoryTraceType) {
                     return;
                 }
-                traceTypeHelper = TmfTraceType.getInstance().getTraceType(fTraceType);
+                traceTypeHelper = TmfTraceType.getTraceType(fTraceType);
 
                 if (traceTypeHelper == null) {
                     // Trace type not found
@@ -1056,7 +1056,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         private boolean isDirectoryTrace(FileSystemElement fileSystemElement) {
             File file = (File) fileSystemElement.getFileSystemObject();
             String path = file.getAbsolutePath();
-            if (TmfTraceType.getInstance().isDirectoryTrace(path)) {
+            if (TmfTraceType.isDirectoryTrace(path)) {
                 return true;
             }
             return false;

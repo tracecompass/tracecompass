@@ -540,7 +540,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
                 writer.write(xmlString);
             }
 
-            TmfTraceType.getInstance().addCustomTraceType(TmfTraceType.CUSTOM_TXT_CATEGORY, definitionName);
+            TmfTraceType.addCustomTraceType(TmfTraceType.CUSTOM_TXT_CATEGORY, definitionName);
 
         } catch (ParserConfigurationException e) {
             Activator.logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
@@ -907,7 +907,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
                 writer.write(xmlString);
             }
 
-            TmfTraceType.getInstance().removeCustomTraceType(TmfTraceType.CUSTOM_TXT_CATEGORY, definitionName);
+            TmfTraceType.removeCustomTraceType(TmfTraceType.CUSTOM_TXT_CATEGORY, definitionName);
 
         } catch (ParserConfigurationException e) {
             Activator.logError("Error deleting CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$

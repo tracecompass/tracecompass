@@ -232,7 +232,7 @@ public class AnalysisModuleHelperTest {
      */
     @Test
     public void testGetValidTraceTypes() {
-        TraceTypeHelper traceTypeHelper = TmfTraceType.getInstance().getTraceType(VALID_TRACE_TYPE);
+        TraceTypeHelper traceTypeHelper = TmfTraceType.getTraceType(VALID_TRACE_TYPE);
         int traceTypeCount = 0;
         Iterable<Class<? extends ITmfTrace>> traceTypes = fReqModule.getValidTraceTypes();
         for (Class<? extends ITmfTrace> traceType : traceTypes) {

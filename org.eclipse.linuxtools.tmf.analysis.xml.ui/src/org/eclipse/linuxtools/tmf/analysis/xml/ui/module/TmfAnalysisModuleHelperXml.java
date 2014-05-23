@@ -133,7 +133,7 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper {
 
         for (Element element : elements) {
             String traceTypeId = element.getAttribute(TmfXmlStrings.ID);
-            TraceTypeHelper helper = TmfTraceType.getInstance().getTraceType(traceTypeId);
+            TraceTypeHelper helper = TmfTraceType.getTraceType(traceTypeId);
             if ((helper != null) && helper.getTrace().getClass().isAssignableFrom(traceClass)) {
                 return true;
             }

@@ -54,7 +54,7 @@ class ImportTraceContentProvider implements ITreeContentProvider {
      *            the trace file.
      */
     public synchronized void addCandidate(String category, File traceToOpen) {
-        fTraceTypes.put(TmfTraceType.getInstance().getTraceType(category).getName(), category);
+        fTraceTypes.put(TmfTraceType.getTraceType(category).getName(), category);
         if (!fTraceFiles.containsKey(category)) {
             fTraceFiles.put(category, new TreeSet<FileAndName>());
         }

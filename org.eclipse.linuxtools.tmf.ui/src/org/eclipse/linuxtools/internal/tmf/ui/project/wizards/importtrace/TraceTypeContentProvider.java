@@ -40,8 +40,8 @@ public class TraceTypeContentProvider implements ITreeContentProvider {
         fTraceType.clear();
         fTraceCategory.clear();
 
-        for (String category : TmfTraceType.getInstance().getTraceCategories()) {
-            List<TraceTypeHelper> value = TmfTraceType.getInstance().getTraceTypes(category);
+        for (String category : TmfTraceType.getTraceCategories()) {
+            List<TraceTypeHelper> value = TmfTraceType.getTraceTypes(category);
             if (!value.isEmpty()) {
                 fTraceCategory.add(category);
                 fTraceType.put(category, value);

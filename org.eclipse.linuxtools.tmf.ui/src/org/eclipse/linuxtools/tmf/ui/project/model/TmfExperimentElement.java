@@ -213,7 +213,7 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
     public void refreshTraceType() {
         super.refreshTraceType();
         if (getTraceType() == null) {
-            IConfigurationElement ce = TmfTraceType.getInstance().getTraceAttributes(TmfTraceType.DEFAULT_EXPERIMENT_TYPE);
+            IConfigurationElement ce = TmfTraceType.getTraceAttributes(TmfTraceType.DEFAULT_EXPERIMENT_TYPE);
             if (ce != null) {
                 try {
                     IFolder experimentFolder = getResource();
@@ -257,7 +257,7 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         try {
             String traceTypeId = trace.getResource().getPersistentProperty(TmfCommonConstants.TRACETYPE);
-            TraceTypeHelper traceType = TmfTraceType.getInstance().getTraceType(traceTypeId);
+            TraceTypeHelper traceType = TmfTraceType.getTraceType(traceTypeId);
 
             if (resource instanceof IFolder) {
                 IFolder folder = experiment.getFolder(trace.getElementPath());

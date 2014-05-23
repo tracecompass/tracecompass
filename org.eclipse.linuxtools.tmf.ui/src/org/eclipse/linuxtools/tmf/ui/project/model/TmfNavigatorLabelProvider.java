@@ -111,7 +111,7 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider, IStyledL
             TmfCommonProjectElement trace = (TmfCommonProjectElement) element;
             try {
                 String traceType = trace.getResource().getPersistentProperty(TmfCommonConstants.TRACETYPE);
-                if (traceType == null || TmfTraceType.getInstance().getTraceType(traceType) == null) {
+                if (traceType == null || TmfTraceType.getTraceType(traceType) == null) {
                     return fUnknownTraceIcon;
                 }
 

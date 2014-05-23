@@ -115,7 +115,7 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
                         (resource.getPersistentProperty(TmfCommonConstants.TRACETYPE) == null);
                 ITmfProjectModelElement element = childrenMap.get(name);
                 if (isFolder && !(element instanceof TmfTraceFolder) && !(element instanceof TmfTraceElement)) {
-                    if (TmfTraceType.getInstance().isDirectoryTrace(resource.getLocationURI().getPath())) {
+                    if (TmfTraceType.isDirectoryTrace(resource.getLocationURI().getPath())) {
                         element = new TmfTraceElement(name, resource, this);
                     } else {
                         element = new TmfTraceFolder(name, (IFolder) resource, this);

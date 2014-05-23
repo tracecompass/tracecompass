@@ -478,7 +478,7 @@ public class ImportTraceWizardScanPage extends AbstractImportTraceWizardPage {
                     final TraceValidationHelper traceToScan = fTracesToScan.take();
 
                     if (!getBatchWizard().hasScanned(traceToScan)) {
-                        getBatchWizard().addResult(traceToScan, TmfTraceType.getInstance().validate(traceToScan));
+                        getBatchWizard().addResult(traceToScan, TmfTraceType.validate(traceToScan));
                     }
 
                     /*

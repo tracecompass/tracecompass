@@ -352,7 +352,7 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
         TraceTypeHelper traceType = null;
         String traceTypeStr = traceElement.getTraceType();
         if (traceTypeStr != null) {
-            traceType = TmfTraceType.getInstance().getTraceType(traceTypeStr);
+            traceType = TmfTraceType.getTraceType(traceTypeStr);
             if (traceType == null) {
                 return new Status(IStatus.ERROR, Activator.PLUGIN_ID, MessageFormat.format(Messages.ImportTracePackageWizardPage_ErrorSettingTraceType, traceElement.getTraceType(), destinationName));
             }

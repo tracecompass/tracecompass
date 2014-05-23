@@ -193,7 +193,7 @@ public class NewExperimentDialog extends SelectionStatusDialog {
                      * Experiments can be set to the default experiment type. No
                      * need to force user to select an experiment type
                      */
-                    IConfigurationElement ce = TmfTraceType.getInstance().getTraceAttributes(TmfTraceType.DEFAULT_EXPERIMENT_TYPE);
+                    IConfigurationElement ce = TmfTraceType.getTraceAttributes(TmfTraceType.DEFAULT_EXPERIMENT_TYPE);
                     if (ce != null) {
                         try {
                             experimentFolder.setPersistentProperty(TmfCommonConstants.TRACETYPE, ce.getAttribute(TmfTraceType.ID_ATTR));

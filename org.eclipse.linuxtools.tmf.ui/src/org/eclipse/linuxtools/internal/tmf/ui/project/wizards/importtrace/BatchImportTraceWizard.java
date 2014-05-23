@@ -319,7 +319,7 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
             try {
                 // Set the trace type for this resource
                 String traceTypeId = traceToImport.getTraceTypeId();
-                TraceTypeHelper traceType = TmfTraceType.getInstance().getTraceType(traceTypeId);
+                TraceTypeHelper traceType = TmfTraceType.getTraceType(traceTypeId);
                 if (traceType != null) {
                     status = TmfTraceTypeUIUtils.setTraceType(resource, traceType);
                 }

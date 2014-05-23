@@ -123,7 +123,7 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
     public Iterable<Class<? extends ITmfTrace>> getValidTraceTypes() {
         Set<Class<? extends ITmfTrace>> traceTypes = new HashSet<>();
 
-        for (TraceTypeHelper tth : TmfTraceType.getInstance().getTraceTypeHelpers()) {
+        for (TraceTypeHelper tth : TmfTraceType.getTraceTypeHelpers()) {
             if (appliesToTraceType(tth.getTraceClass())) {
                 traceTypes.add(tth.getTraceClass());
             }

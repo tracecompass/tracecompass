@@ -126,14 +126,14 @@ public final class TmfTraceTypeUIUtils {
      * @return true if the trace is a custom type
      */
     private static boolean isCustomTraceId(String traceTypeId) {
-        TraceTypeHelper traceType = TmfTraceType.getInstance().getTraceType(traceTypeId);
+        TraceTypeHelper traceType = TmfTraceType.getTraceType(traceTypeId);
         if (traceType != null) {
             return TmfTraceType.isCustomTrace(traceType.getCategoryName() + SEPARATOR + traceType.getName());
         }
         return false;
     }
 
-    private static TraceTypeHelper getTraceTypeToSet(TmfTraceType type, List<Pair<Integer, TraceTypeHelper>> candidates, Shell shell) {
+    private static TraceTypeHelper getTraceTypeToSet(List<Pair<Integer, TraceTypeHelper>> candidates, Shell shell) {
         final Map<String, String> names = new HashMap<>();
         Shell shellToShow = new Shell(shell);
         shellToShow.setText(Messages.TmfTraceType_SelectTraceType);
@@ -170,7 +170,7 @@ public final class TmfTraceTypeUIUtils {
                 display.sleep();
             }
         }
-        return type.getTraceTypeHelper(candidatesToSet[0]);
+        return TmfTraceType.getTraceTypeHelper(candidatesToSet[0]);
     }
 
     /**
@@ -191,7 +191,6 @@ public final class TmfTraceTypeUIUtils {
      *             file
      */
     public static TraceTypeHelper selectTraceType(String path, Shell shell, String traceTypeHint) throws TmfTraceImportException {
-        TmfTraceType type = TmfTraceType.getInstance();
 
         Comparator<Pair<Integer, TraceTypeHelper>> comparator = new Comparator<Pair<Integer, TraceTypeHelper>>() {
             @Override
@@ -204,7 +203,7 @@ public final class TmfTraceTypeUIUtils {
             }
         };
         TreeSet<Pair<Integer, TraceTypeHelper>> validCandidates = new TreeSet<>(comparator);
-        final Iterable<TraceTypeHelper> traceTypeHelpers = type.getTraceTypeHelpers();
+        final Iterable<TraceTypeHelper> traceTypeHelpers = TmfTraceType.getTraceTypeHelpers();
         for (TraceTypeHelper traceTypeHelper : traceTypeHelpers) {
             if (traceTypeHelper.isExperimentType()) {
                 continue;
@@ -243,7 +242,7 @@ public final class TmfTraceTypeUIUtils {
                         traceTypeToSet = candidate.getSecond();
                     }
                 } else {
-                    traceTypeToSet = getTraceTypeToSet(type, reducedCandidates, shell);
+                    traceTypeToSet = getTraceTypeToSet(reducedCandidates, shell);
                 }
             }
         } else {

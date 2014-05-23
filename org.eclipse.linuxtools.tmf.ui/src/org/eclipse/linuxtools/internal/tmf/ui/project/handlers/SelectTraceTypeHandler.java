@@ -175,7 +175,7 @@ public class SelectTraceTypeHandler extends AbstractHandler {
     private static IStatus propagateProperties(TmfCommonProjectElement element, String traceType)
             throws CoreException {
 
-        TraceTypeHelper traceTypeHelper = TmfTraceType.getInstance().getTraceType(traceType);
+        TraceTypeHelper traceTypeHelper = TmfTraceType.getTraceType(traceType);
         final IStatus validateTraceType = traceTypeHelper.validate(element.getLocation().getPath());
         if (!validateTraceType.isOK()) {
             return validateTraceType;

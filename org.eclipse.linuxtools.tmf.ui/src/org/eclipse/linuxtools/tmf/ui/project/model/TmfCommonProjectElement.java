@@ -110,7 +110,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
             childrenMap.put(analysis.getAnalysisId(), analysis);
         }
 
-        TraceTypeHelper helper = TmfTraceType.getInstance().getTraceType(getTraceType());
+        TraceTypeHelper helper = TmfTraceType.getTraceType(getTraceType());
 
         Class<? extends ITmfTrace> traceClass = null;
 
