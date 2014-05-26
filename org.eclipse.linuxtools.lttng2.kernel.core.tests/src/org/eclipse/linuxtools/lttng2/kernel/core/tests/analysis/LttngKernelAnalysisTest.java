@@ -98,6 +98,7 @@ public class LttngKernelAnalysisTest {
     @Test
     public void testCanExecute() {
         /* Test with a valid kernel trace */
+        assertNotNull(fTrace);
         assertTrue(fKernelAnalysisModule.canExecute(fTrace));
 
         /* Test with a CTF trace that does not have required events */

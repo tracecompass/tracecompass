@@ -235,9 +235,6 @@ public class ImportAndReadKernelSmokeTest {
 
     private static CtfTmfEvent getEvent(int rank) {
         CtfTmfTrace trace = CtfTmfTestTrace.SYNTHETIC_TRACE.getTrace();
-        if (trace == null) {
-            return null;
-        }
         ITmfContext ctx = trace.seekEvent(0);
         for (int i = 0; i < rank; i++) {
             trace.getNext(ctx);

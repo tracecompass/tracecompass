@@ -12,6 +12,9 @@
 
 package org.eclipse.linuxtools.tmf.ctf.core.tests.shared;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfEvent;
@@ -26,6 +29,7 @@ import org.eclipse.linuxtools.tmf.ctf.core.tests.stubs.CtfTmfTraceStub;
  *
  * @author Alexandre Montplaisir
  */
+@NonNullByDefault
 public enum CtfTmfTestTrace {
     /** Example kernel trace */
     KERNEL,
@@ -50,11 +54,12 @@ public enum CtfTmfTestTrace {
 
 
     private final String fPath;
-    private CtfTmfTraceStub fTrace = null;
+    private @Nullable CtfTmfTraceStub fTrace = null;
 
     private CtfTmfTestTrace() {
-        /* This makes my head spin */
-        fPath = CtfTestTrace.valueOf(this.name()).getPath();
+        @SuppressWarnings("null")
+        @NonNull String path = CtfTestTrace.valueOf(this.name()).getPath();
+        fPath = path;
     }
 
     /**
@@ -76,17 +81,19 @@ public enum CtfTmfTestTrace {
      * @return A CtfTmfTrace reference to this trace
      */
     public synchronized CtfTmfTrace getTrace() {
-        if (fTrace != null) {
-            fTrace.close();
+        CtfTmfTraceStub trace = fTrace;
+        if (trace != null) {
+            trace.close();
         }
-        fTrace = new CtfTmfTraceStub();
+        trace = new CtfTmfTraceStub();
         try {
-            fTrace.initTrace(null, fPath, CtfTmfEvent.class);
+            trace.initTrace(null, fPath, CtfTmfEvent.class);
         } catch (TmfTraceException e) {
             /* Should not happen if tracesExist() passed */
             throw new RuntimeException(e);
         }
-        return fTrace;
+        fTrace = trace;
+        return trace;
     }
 
     /**
