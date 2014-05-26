@@ -334,6 +334,24 @@ public class TraceControlPropertiesTest {
         assertEquals("with filter", event.getFilterExpression());
 
         //-------------------------------------------------------------------------
+        // Verify Log Level Type of UST events (> LTTng 2.4)
+        //-------------------------------------------------------------------------
+        event = (TraceEventComponent) domains[1].getChildren()[1].getChildren()[0];
+        adapter = event.getAdapter(IPropertySource.class);
+        eventSource = (TraceEventPropertySource) adapter;
+        assertEquals("== TRACE_DEBUG_LINE", eventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_LOGLEVEL_PROPERTY_ID));
+
+        event = (TraceEventComponent) domains[1].getChildren()[1].getChildren()[1];
+        adapter = event.getAdapter(IPropertySource.class);
+        eventSource = (TraceEventPropertySource) adapter;
+        assertEquals("<= TRACE_INFO", eventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_LOGLEVEL_PROPERTY_ID));
+
+        event = (TraceEventComponent) domains[1].getChildren()[1].getChildren()[2];
+        adapter = event.getAdapter(IPropertySource.class);
+        eventSource = (TraceEventPropertySource) adapter;
+        assertEquals("TRACE_DEBUG_SYSTEM", eventSource.getPropertyValue(TraceEventPropertySource.TRACE_EVENT_LOGLEVEL_PROPERTY_ID));
+
+        //-------------------------------------------------------------------------
         // Delete node
         //-------------------------------------------------------------------------
         node.disconnect();

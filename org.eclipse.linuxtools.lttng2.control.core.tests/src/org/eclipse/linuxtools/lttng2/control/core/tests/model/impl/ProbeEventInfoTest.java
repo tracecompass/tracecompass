@@ -140,8 +140,8 @@ public class ProbeEventInfoTest {
      */
     @Test
     public void testToString_1() {
-        assertEquals("[ProbeEventInfo([EventInfo([BaseEventInfo([TraceInfo(Name=probeEvent1)],type=TRACEPOINT,level=TRACE_DEBUG)],State=ENABLED)],fAddress=0xc1231234)]", fEventInfo1.toString());
-        assertEquals("[ProbeEventInfo([EventInfo([BaseEventInfo([TraceInfo(Name=probeEvent2)],type=FUNCTION,level=TRACE_DEBUG)],State=DISABLED)],fOffset=0x100,fSymbol=init_post)]", fEventInfo2.toString());
+        assertEquals("[ProbeEventInfo([EventInfo([BaseEventInfo([TraceInfo(Name=probeEvent1)],type=TRACEPOINT,level=TRACE_DEBUG)],State=ENABLED,levelType=LOGLEVEL_NONE)],fAddress=0xc1231234)]", fEventInfo1.toString());
+        assertEquals("[ProbeEventInfo([EventInfo([BaseEventInfo([TraceInfo(Name=probeEvent2)],type=FUNCTION,level=TRACE_DEBUG)],State=DISABLED,levelType=LOGLEVEL_NONE)],fOffset=0x100,fSymbol=init_post)]", fEventInfo2.toString());
     }
 
     // ------------------------------------------------------------------------

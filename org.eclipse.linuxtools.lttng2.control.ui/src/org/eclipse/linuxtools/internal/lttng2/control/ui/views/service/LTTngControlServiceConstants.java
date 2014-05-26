@@ -323,7 +323,7 @@ public interface LTTngControlServiceConstants {
     /**
      * Pattern to match for event information (lttng list <session>)
      */
-    static final Pattern EVENT_PATTERN = Pattern.compile("\\s+(.*)\\s+\\(loglevel:\\s+(.*)\\s+\\(\\d*\\)\\)\\s+\\(type:\\s+(.*)\\)\\s+\\[(enabled|disabled)\\]\\s*(\\[.*\\]){0,1}.*"); //$NON-NLS-1$
+    static final Pattern EVENT_PATTERN = Pattern.compile("\\s+(.*)\\s+\\(loglevel\\s*(:|<=|==)\\s+(.*)\\s+\\(\\d*\\)\\)\\s+\\(type:\\s+(.*)\\)\\s+\\[(enabled|disabled)\\]\\s*(\\[.*\\]){0,1}.*"); //$NON-NLS-1$
     /**
      * Pattern to match a wildcarded event information (lttng list <session>)
      */

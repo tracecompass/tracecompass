@@ -1215,10 +1215,11 @@ public class LTTngControlService implements ILttngControlService {
 
             if (matcher.matches()) {
                 IEventInfo eventInfo = new EventInfo(matcher.group(1).trim());
-                eventInfo.setLogLevel(matcher.group(2).trim());
-                eventInfo.setEventType(matcher.group(3).trim());
-                eventInfo.setState(matcher.group(4));
-                String filter = matcher.group(5);
+                eventInfo.setLogLevelType(matcher.group(2).trim());
+                eventInfo.setLogLevel(matcher.group(3).trim());
+                eventInfo.setEventType(matcher.group(4).trim());
+                eventInfo.setState(matcher.group(5));
+                String filter = matcher.group(6);
                 if (filter != null) {
                     filter = filter.substring(1, filter.length() - 1); // remove '[' and ']'
                     eventInfo.setFilterExpression(filter);

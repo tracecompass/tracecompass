@@ -212,7 +212,7 @@ public class SessionInfoTest {
                 + "[SnapshotInfo([TraceInfo(Name=snapshot-1)],snapshotPath=/home/user/lttng-trace/mysession/,ID=1,isStreamedSnapshot=false)],"
                     + "Domains=[DomainInfo([TraceInfo(Name=test1)],"
                         + "Channels=[ChannelInfo([TraceInfo(Name=channel1)],State=DISABLED,OverwriteMode=true,SubBuffersSize=13,NumberOfSubBuffers=12,SwitchTimer=10,ReadTimer=11,output=splice(),"
-                            + "Events=[EventInfo([BaseEventInfo([TraceInfo(Name=event1)],type=TRACEPOINT,level=TRACE_DEBUG)],State=ENABLED)])],"
+                            + "Events=[EventInfo([BaseEventInfo([TraceInfo(Name=event1)],type=TRACEPOINT,level=TRACE_DEBUG)],State=ENABLED,levelType=LOGLEVEL_ONLY)])],"
                 + "isKernel=false)],NetworkUrl=null,ControlUrl=null,DataUrl=null)]", result);
     }
 
@@ -232,7 +232,7 @@ public class SessionInfoTest {
         assertEquals("[SessionInfo([TraceInfo(Name=session1)],Path=/home/user/lttng-trace/mysession/,State=ACTIVE,isStreamedTrace=false,isSnapshot=false,"
                     + "Domains=[DomainInfo([TraceInfo(Name=test1)],"
                         + "Channels=[ChannelInfo([TraceInfo(Name=channel1)],State=DISABLED,OverwriteMode=true,SubBuffersSize=13,NumberOfSubBuffers=12,SwitchTimer=10,ReadTimer=11,output=splice(),"
-                            + "Events=[EventInfo([BaseEventInfo([TraceInfo(Name=event1)],type=TRACEPOINT,level=TRACE_DEBUG)],State=ENABLED)])],"
+                            + "Events=[EventInfo([BaseEventInfo([TraceInfo(Name=event1)],type=TRACEPOINT,level=TRACE_DEBUG)],State=ENABLED,levelType=LOGLEVEL_ONLY)])],"
                 + "isKernel=false)],NetworkUrl=null,ControlUrl=null,DataUrl=null)]", result);
     }
 

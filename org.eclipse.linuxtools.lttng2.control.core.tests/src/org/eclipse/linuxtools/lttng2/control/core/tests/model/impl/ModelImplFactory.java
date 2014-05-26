@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -81,9 +81,13 @@ public class ModelImplFactory {
 
         fEventInfo1 = new EventInfo("event1");
         fEventInfo1.setEventType(TraceEventType.TRACEPOINT);
+        fEventInfo1.setLogLevelType("==");
+        fEventInfo1.setLogLevel(TraceLogLevel.TRACE_DEBUG);
         fEventInfo1.setState(TraceEnablement.ENABLED);
 
         fEventInfo2 = new EventInfo("event2");
+        fEventInfo2.setLogLevelType("<=");
+        fEventInfo2.setLogLevel(TraceLogLevel.TRACE_INFO);
         fEventInfo2.setEventType(TraceEventType.UNKNOWN);
         fEventInfo2.setState(TraceEnablement.DISABLED);
 

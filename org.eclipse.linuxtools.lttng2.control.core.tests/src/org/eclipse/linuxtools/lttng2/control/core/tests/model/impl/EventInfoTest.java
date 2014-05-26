@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.IEventInfo;
+import org.eclipse.linuxtools.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceEventType;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.impl.EventInfo;
@@ -57,7 +58,7 @@ public class EventInfoTest {
     // ------------------------------------------------------------------------
 
     /**
-     * Run the BaseEventInfo() constructor test.
+     * Run the EventInfo() constructor test.
      */
     @Test
     public void testBaseEventInfo() {
@@ -78,6 +79,13 @@ public class EventInfoTest {
         assertEquals("DISABLED", state.toString());
         assertEquals(0, state.ordinal());
 
+        LogLevelType logType = fixture.getLogLevelType();
+        assertEquals("", logType.getShortName());
+        assertEquals("LOGLEVEL_NONE", logType.name());
+        assertEquals("LOGLEVEL_NONE", logType.toString());
+        assertEquals(0, state.ordinal());
+
+
     }
 
     /**
@@ -90,6 +98,7 @@ public class EventInfoTest {
         assertEquals(fEventInfo1.getName(), info.getName());
         assertEquals(fEventInfo1.getEventType(), info.getEventType());
         assertEquals(fEventInfo1.getState(), info.getState());
+        assertEquals(fEventInfo1.getLogLevelType(), info.getLogLevelType());
     }
 
     /**
@@ -187,6 +196,22 @@ public class EventInfoTest {
         assertEquals("ENABLED", state.name());
         assertEquals("ENABLED", state.toString());
         assertEquals(1, state.ordinal());
+
+        fixture.setLogLevelType("==");
+        assertEquals("LOGLEVEL_ONLY", fixture.getLogLevelType().name());
+        assertEquals("==", fixture.getLogLevelType().getShortName());
+
+        fixture.setLogLevelType("<=");
+        assertEquals("LOGLEVEL", fixture.getLogLevelType().name());
+        assertEquals("<=", fixture.getLogLevelType().getShortName());
+
+        fixture.setLogLevelType("");
+        assertEquals("LOGLEVEL_NONE", fixture.getLogLevelType().name());
+        assertEquals("", fixture.getLogLevelType().getShortName());
+
+        fixture.setLogLevelType(LogLevelType.LOGLEVEL_ONLY);
+        assertEquals("LOGLEVEL_ONLY", fixture.getLogLevelType().name());
+        assertEquals("==", fixture.getLogLevelType().getShortName());
     }
 
     /**
@@ -201,7 +226,23 @@ public class EventInfoTest {
         String result = fixture.toString();
 
         // add additional test code here
-        assertEquals("[EventInfo([BaseEventInfo([TraceInfo(Name=testName)],type=TRACEPOINT,level=TRACE_DEBUG)],State=DISABLED)]", result);
+        assertEquals("[EventInfo([BaseEventInfo([TraceInfo(Name=testName)],type=TRACEPOINT,level=TRACE_DEBUG)],State=DISABLED,levelType=LOGLEVEL_NONE)]", result);
+    }
+
+    /**
+     * Run the String toString() method test.
+     */
+    @Test
+    public void testToString_2() {
+        EventInfo fixture = new EventInfo("event");
+        fixture.setName("testName");
+        fixture.setEventType(TraceEventType.TRACEPOINT);
+        fixture.setLogLevelType(LogLevelType.LOGLEVEL_ONLY);
+
+        String result = fixture.toString();
+
+        // add additional test code here
+        assertEquals("[EventInfo([BaseEventInfo([TraceInfo(Name=testName)],type=TRACEPOINT,level=TRACE_DEBUG)],State=DISABLED,levelType=LOGLEVEL_ONLY)]", result);
     }
 
     // ------------------------------------------------------------------------

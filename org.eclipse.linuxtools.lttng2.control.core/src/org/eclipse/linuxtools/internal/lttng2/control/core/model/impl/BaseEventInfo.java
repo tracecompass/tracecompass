@@ -68,6 +68,7 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
     public BaseEventInfo(BaseEventInfo other) {
         super(other);
         fEventType = other.fEventType;
+        fLogLevel = other.fLogLevel;
         for (Iterator<IFieldInfo> iterator = other.fFields.iterator(); iterator.hasNext();) {
             IFieldInfo field = iterator.next();
             if (field instanceof FieldInfo) {
@@ -252,4 +253,5 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
             output.append(")]");
             return output.toString();
     }
+
 }

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2013 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,6 +12,7 @@
 package org.eclipse.linuxtools.internal.lttng2.control.core.model.impl;
 
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.IEventInfo;
+import org.eclipse.linuxtools.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceEnablement;
 
 /**
@@ -31,6 +32,10 @@ public class EventInfo extends BaseEventInfo implements IEventInfo {
      * The enable state of the event.
      */
     private TraceEnablement fState = TraceEnablement.DISABLED;
+    /**
+     * The log level type.
+     */
+    private LogLevelType fLogLevelType = LogLevelType.LOGLEVEL_NONE;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -50,6 +55,7 @@ public class EventInfo extends BaseEventInfo implements IEventInfo {
     public EventInfo(EventInfo other) {
         super(other);
         fState = other.fState;
+        fLogLevelType = other.fLogLevelType;
     }
 
     // ------------------------------------------------------------------------
@@ -77,10 +83,33 @@ public class EventInfo extends BaseEventInfo implements IEventInfo {
     }
 
     @Override
+    public LogLevelType getLogLevelType() {
+        return fLogLevelType;
+    }
+
+    @Override
+    public void setLogLevelType(LogLevelType type) {
+        fLogLevelType = type;
+    }
+
+    @Override
+    public void setLogLevelType(String shortName) {
+        if (LogLevelType.LOGLEVEL.getShortName().equals(shortName)) {
+            fLogLevelType = LogLevelType.LOGLEVEL;
+        } else if (LogLevelType.LOGLEVEL_ONLY.getShortName().equals(shortName)) {
+            fLogLevelType = LogLevelType.LOGLEVEL_ONLY;
+        } else {
+            fLogLevelType= LogLevelType.LOGLEVEL_NONE;
+        }
+    }
+
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + ((fState == null) ? 0 : (fState.ordinal() + 1));
+        result = prime * result + ((fLogLevelType == null) ? 0 : fLogLevelType.hashCode());
         return result;
     }
 
@@ -99,6 +128,9 @@ public class EventInfo extends BaseEventInfo implements IEventInfo {
         if (fState != other.fState) {
             return false;
         }
+        if (fLogLevelType != other.fLogLevelType) {
+            return false;
+        }
         return true;
     }
 
@@ -110,6 +142,8 @@ public class EventInfo extends BaseEventInfo implements IEventInfo {
             output.append(super.toString());
             output.append(",State=");
             output.append(fState);
+            output.append(",levelType=");
+            output.append(fLogLevelType);
             output.append(")]");
             return output.toString();
     }

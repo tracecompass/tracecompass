@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.internal.lttng2.control.ui.views.property;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.linuxtools.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceEventComponent;
@@ -124,7 +125,12 @@ public class TraceEventPropertySource extends BasePropertySource {
             return fEvent.getEventType().name();
         }
         if (TRACE_EVENT_LOGLEVEL_PROPERTY_ID.equals(id)) {
-            return fEvent.getLogLevel().name();
+            StringBuffer buffer = new StringBuffer();
+            if (fEvent.getLogLevelType() != LogLevelType.LOGLEVEL_NONE) {
+                buffer.append(fEvent.getLogLevelType().getShortName()).append(' ');
+            }
+            buffer.append(fEvent.getLogLevel().name());
+            return buffer.toString();
         }
         if (TRACE_EVENT_STATE_PROPERTY_ID.equals(id)) {
             return fEvent.getState().name();

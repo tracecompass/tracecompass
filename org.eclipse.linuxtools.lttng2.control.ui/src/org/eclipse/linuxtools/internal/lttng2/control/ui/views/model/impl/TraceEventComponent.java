@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.IEventInfo;
+import org.eclipse.linuxtools.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceEventType;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceLogLevel;
@@ -180,6 +181,22 @@ public class TraceEventComponent extends TraceControlComponent {
      */
     public void setFilterExpression(String filter) {
         fEventInfo.setFilterExpression(filter);
+    }
+
+    /**
+     * Returns the log level type
+     * @return event log level type
+     */
+    public LogLevelType getLogLevelType() {
+        return fEventInfo.getLogLevelType();
+    }
+
+    /**
+     * Sets the trace event log level type to the given level type
+     * @param levelType - event log level type to set
+     */
+    public void setLogLevelType(LogLevelType levelType) {
+        fEventInfo.setLogLevelType(levelType);
     }
 
     @Override

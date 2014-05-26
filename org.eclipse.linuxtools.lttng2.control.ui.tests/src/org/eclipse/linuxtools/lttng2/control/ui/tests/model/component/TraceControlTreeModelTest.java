@@ -26,6 +26,7 @@ import java.net.URL;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.internal.lttng2.control.stubs.service.TestRemoteSystemProxy;
+import org.eclipse.linuxtools.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TargetNodeState;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceEventType;
@@ -420,16 +421,34 @@ public class TraceControlTreeModelTest {
         // Verify event info (UST global, channel0)
         // ------------------------------------------------------------------------
         ustEvents = channel.getChildren();
-        assertEquals(2, ustEvents.length);
+        assertEquals(4, ustEvents.length);
 
         event = (TraceEventComponent) ustEvents[0];
         assertEquals("ust_tests_hello:tptest_sighandler", event.getName());
         assertEquals(TraceLogLevel.TRACE_DEBUG_LINE, event.getLogLevel());
+        assertEquals(LogLevelType.LOGLEVEL_ONLY, event.getLogLevelType());
+        assertEquals(LogLevelType.LOGLEVEL_ONLY.getShortName(), event.getLogLevelType().getShortName());
         assertEquals(TraceEventType.TRACEPOINT, event.getEventType());
         assertEquals(TraceEnablement.DISABLED, event.getState());
 
         event = (TraceEventComponent) ustEvents[1];
-        assertEquals("*", ustEvents[1].getName());
+        assertEquals("ust_tests_hello:tptest_sighandler1", event.getName());
+        assertEquals(TraceLogLevel.TRACE_INFO, event.getLogLevel());
+        assertEquals(LogLevelType.LOGLEVEL, event.getLogLevelType());
+        assertEquals(LogLevelType.LOGLEVEL.getShortName(), event.getLogLevelType().getShortName());
+        assertEquals(TraceEventType.TRACEPOINT, event.getEventType());
+        assertEquals(TraceEnablement.DISABLED, event.getState());
+
+        event = (TraceEventComponent) ustEvents[2];
+        assertEquals("ust_tests_hello:tptest_sighandler2", event.getName());
+        assertEquals(TraceLogLevel.TRACE_DEBUG_SYSTEM, event.getLogLevel());
+        assertEquals(LogLevelType.LOGLEVEL_NONE, event.getLogLevelType());
+        assertEquals(LogLevelType.LOGLEVEL_NONE.getShortName(), event.getLogLevelType().getShortName());
+        assertEquals(TraceEventType.TRACEPOINT, event.getEventType());
+        assertEquals(TraceEnablement.DISABLED, event.getState());
+
+        event = (TraceEventComponent) ustEvents[3];
+        assertEquals("*", event.getName());
         assertEquals(TraceLogLevel.LEVEL_UNKNOWN, event.getLogLevel());
         assertEquals(TraceEventType.TRACEPOINT, event.getEventType());
         assertEquals(TraceEnablement.ENABLED, event.getState());
