@@ -1954,7 +1954,7 @@ The following chapters describe the Sequence Diagram Framework as well as a refe
 In the UML2 Sequence Diagram Framework an Eclipse extension point is defined so that other plug-ins can contribute code to create sequence diagram. 
 
 '''Identifier''': org.eclipse.linuxtools.tmf.ui.uml2SDLoader<br>
-'''Since''': Since 0.3.2 (based on UML2SD of org.eclipse.tptp.common.ui)<br>
+'''Since''': 1.0<br>
 '''Description''': This extension point aims to list and connect any UML2 Sequence Diagram loader.<br>
 '''Configuration Markup''':<br>
 
@@ -2053,7 +2053,7 @@ This tutorial describes how to create a UML2 Sequence Diagram Loader extension a
 
 === Prerequisites ===
 
-The tutorial is based on Eclipse 3.7 (Eclipse Indigo) and TMF 0.3.2.   
+The tutorial is based on Eclipse 4.4 (Eclipse Luna) and TMF 3.0.0.
 
 === Creating an Eclipse UI Plug-in ===
 
@@ -2069,7 +2069,7 @@ To create a new project with name org.eclipse.linuxtools.tmf.sample.ui select ''
 To open the plug-in manifest, double-click on the MANIFEST.MF file. <br>
 [[Image:images/SelectManifest.png]]<br>
 
-Change to the Dependencies tab and select '''Add...''' of the ''Required Plug-ins'' section. A new dialog box will open. Next find plug-in ''org.eclipse.linuxtools.tmf.ui'' and press '''OK'''<br>
+Change to the Dependencies tab and select '''Add...''' of the ''Required Plug-ins'' section. A new dialog box will open. Next find plug-ins ''org.eclipse.linuxtools.tmf.ui'' and ''org.eclipse.linuxtools.tmf.core'' and then press '''OK'''<br>
 [[Image:images/AddDependencyTmfUi.png]]<br>
 
 Change to the Extensions tab and select '''Add...''' of the ''All Extension'' section. A new dialog box will open. Find the view extension ''org.eclipse.ui.views'' and press '''Finish'''.<br> 
@@ -2291,7 +2291,7 @@ public class SampleLoader implements IUml2SDLoader {
         // Get new occurrence on lifelines
         lifeLine1.getNewEventOccurrence();
         
-        EllipsisisMessage info = new EllipsisisMessage();
+        EllipsisMessage info = new EllipsisMessage();
         info.setName("Object deletion");
         info.setStartLifeline(lifeLine2);
         testFrame.addNode(info);
@@ -2314,7 +2314,7 @@ Now it's time to run the example application. To launch the Example Application 
 
 === Adding time information ===
 
-To add time information in sequence diagram the timestamp has to be set for each message. The sequence diagram framework uses the ''TmfTimestamp'' class of plug-in ''org.eclipse.linuxtools.tmf''. Use ''setTime()'' on each message ''SyncMessage'' since start and end time are the same. For each ''AsyncMessage'' set start and end time separately by using methods ''setStartTime'' and ''setEndTime''. For example: <br>
+To add time information in sequence diagram the timestamp has to be set for each message. The sequence diagram framework uses the ''TmfTimestamp'' class of plug-in ''org.eclipse.linuxtools.tmf.core''. Use ''setTime()'' on each message ''SyncMessage'' since start and end time are the same. For each ''AsyncMessage'' set start and end time separately by using methods ''setStartTime'' and ''setEndTime''. For example: <br>
 
 <pre>
     private void createFrame() {
@@ -2339,7 +2339,7 @@ By hovering over a message it will show the time information in the appearing to
 [[Image:images/SampleDiagramSyncMessage.png]] <br>
 [[Image:images/SampleDiagramAsyncMessage.png]] <br>
 
-To see the time elapsed between 2 messages, select one message and hover over a second message. A tooltip will show with the delta in time. Note if the second message is before the first then a negative delta is displayed. Note that for ''AsynMessage'' the end time is used for the delta calculation.<br>
+To see the time elapsed between 2 messages, select one message and hover over a second message. A tooltip will show with the delta in time. Note if the second message is before the first then a negative delta is displayed. Note that for ''AsyncMessage'' the end time is used for the delta calculation.<br>
 [[Image:images/SampleDiagramMessageDelta.png]] <br>
 
 === Default Coolbar and Menu Items ===
@@ -2553,7 +2553,7 @@ Note that the find dialog will be opened by typing the key shortcut CRTL+F.
 
 ==== Using the Filter Provider Interface ====
 
-For filtering of sequence diagram elements two interfaces exists. One basic for filtering and one for extended filtering. The basic filtering comes with two dialog for entering filter criteria as regular expressions and one for selecting the filter to be used. Multiple filters can be active at a time. Filter criteria are persisted in the Eclipse workspace.
+For filtering of sequence diagram elements two interfaces exist. One basic for filtering and one for extended filtering. The basic filtering comes with two dialog for entering filter criteria as regular expressions and one for selecting the filter to be used. Multiple filters can be active at a time. Filter criteria are persisted in the Eclipse workspace.
 <br>
 To use the basic filter provider, first the interface method of the ''ISDFilterProvider'' has to be implemented by a class. Typically, this is implemented in the loader class. Add the ''ISDFilterProvider'' to the list of implemented interfaces, implement the method ''filter()''and set the provider in the ''setViewer()'' method as well as remove the provider in the ''dispose()'' method of the loader class. Please note that the ''ISDFindProvider'' extends the interface ''ISDGraphNodeSupporter'' which methods (''isNodeSupported()'' and ''getNodeName()'') have to be implemented, too. <br>
 Note that no example implementation of ''filter()'' is provided. 
@@ -2800,13 +2800,13 @@ A third type of event request is issued for finding specific data across pages.
 
 ==== TMF Signal Framework ====
 
-The reference loader extends the class ''TmfComponent''. By doing that the loader is register as TMF signal handler for sending and receiving TMF signals. The loader implements signal handlers for the following TMF signals:
+The reference loader extends the class ''TmfComponent''. By doing that the loader is registered as a TMF signal handler for sending and receiving TMF signals. The loader implements signal handlers for the following TMF signals:
 *''TmfTraceSelectedSignal''
 This signal indicates that a trace or experiment was selected. When receiving this signal the indexing request is initiated and the first page is displayed after receiving the relevant information.
-*''traceClosed''
+*''TmfTraceClosedSignal''
 This signal indicates that a trace or experiment was closed. When receiving this signal the loader resets its data and a blank page is loaded in the Sequence Diagram View.
 *''TmfTimeSynchSignal''
-This signal indicates that a event with a certain timestamp is selected. When receiving this signal the corresponding message is selected in the Sequence Diagram View. If necessary, the page is changed.
+This signal is used to indicate that a new time or time range has been selected. It contains a begin and end time. If a single time is selected then the begin and end time are the same. When receiving this signal the corresponding message matching the begin time is selected in the Sequence Diagram View. If necessary, the page is changed.
 *''TmfRangeSynchSignal''
 This signal indicates that a new time range is in focus. When receiving this signal the loader loads the page which corresponds to the start time of the time range signal. The message with the start time will be in focus.
 
@@ -2848,30 +2848,24 @@ The reference implementation in class ''TmfUml2SDSyncLoader'' in package ''org.e
     }
 </pre>
 
-The analysis looks for event type Strings containing ''SEND'' and ''RECEIVE''. If event type matches these key words, the analyzer will look for strings ''sender'', ''receiver'' and ''signal'' in the event fields of type ''ITmfEventField''. If all the data is found a sequence diagram event from can be created. Note that Sync Messages are assumed, which means start and end time are the same.
+The analysis looks for event type Strings containing ''SEND'' and ''RECEIVE''. If event type matches these key words, the analyzer will look for strings ''sender'', ''receiver'' and ''signal'' in the event fields of type ''ITmfEventField''. If all the data is found a sequence diagram event can be created using this information. Note that Sync Messages are assumed, which means start and end time are the same.
 
 === How to use the Reference Implementation ===
 
-An example trace visualizer is provided that uses a trace in binary format. It contains trace events with sequence diagram information. To parse the data using TMF a class is provided that implements ''ITmfTrace''. Additionally, a parser is provided that reads from the file and converts a trace event to ''TmfEvent''. This parser implements the interface ''ITmfEventParser''. To get the source code see [[#Downloading the Reference Plug-in | Download the Reference Plug-in]]
-<br>
-The plug-in structure will look like this:<br>
-[[Image:images/ReferencePlugin.png]]<br>
+An example CTF (Common Trace Format) trace is provided that contains trace events with sequence diagram information. To download the reference trace, use the following link: [https://wiki.eclipse.org/images/3/35/ReferenceTrace.zip Reference Trace].
 
-To open the plug-in manifest, double-click on the MANIFEST.MF file. <br>
-[[Image:images/SelectManifestRef.png]]<br>
-
-Run the Reference Application. To launch the Eclipse Application select the ''Overview'' tab and click on '''Launch an Eclipse Application'''<br>
-[[Image:images/RunApplicationRef.png]]<br>
-
-To open the Reference Sequence Diagram View, select '''Windows -> Show View -> Other... -> TMF -> Sequence Diagram''' <br> 
+Run an Eclipse application with TMF 3.0 or later installed. To open the Reference Sequence Diagram View, select '''Windows -> Show View -> Other... -> TMF -> Sequence Diagram''' <br>
 [[Image:images/ShowTmfSDView.png]]<br>
 
-An blank Sequence Diagram View will open. 
+A blank Sequence Diagram View will open.
 
-Select the '''Select Experiment''' button of the toolbar to load the sequence diagram from the data provided in the trace file. What this does is open the file ''tracesets/sdEvents'', parse this file through TMF and analyze all events of type ''TmfEvent'' and generates the Sequence Diagram out of it.  <br>
+Then import the reference trace to the '''Project Explorer''' using the '''Import Trace Package...''' menu option.<br>
+[[Image:images/ImportTracePackage.png]]
+
+Next, open the trace by double-clicking on the trace element in the '''Project Explorer'''. The trace will be opened and the Sequence Diagram view will be filled.
 [[Image:images/ReferenceSeqDiagram.png]]<br>
 
-Now the reference application can be explored. To demonstrate the view features try the following things:
+Now the reference implementation can be explored. To demonstrate the view features try the following things:
 *Select a message in the Sequence diagram. As result the corresponding event will be selected in the Events View.
 *Select an event in the Events View. As result the corresponding message in the Sequence Diagram View will be selected. If necessary, the page will be changed.
 *In the Events View, press key ''End''. As result, the Sequence Diagram view will jump to the last page.  
@@ -2879,14 +2873,9 @@ Now the reference application can be explored. To demonstrate the view features 
 *In the Sequence Diagram View select the find button. Enter the expression '''REGISTER.*''', select '''Search for Interaction''' and press '''Find'''. As result the corresponding message will be selected in the Sequence Diagram and the corresponding event in the Events View will be selected. Select again '''Find''' the next occurrence of will be selected. Since the second occurrence is on a different page than the first, the corresponding page will be loaded.
 * In the Sequence Diagram View, select menu item '''Hide Patterns...'''. Add the filter '''BALL.*''' for '''Interaction''' only and select '''OK'''. As result all messages with name ''BALL_REQUEST'' and ''BALL_REPLY'' will be hidden. To remove the filter, select menu item '''Hide Patterns...''', deselect the corresponding filter and press '''OK'''. All the messages will be shown again.<br> 
  
-To dispose the diagram, select the '''Dispose Experiment''' button of the toolbar. The current sequence diagram will be disposed and an empty diagram will be loaded. 
-
 === Extending the Reference Loader ===
 
 In some case it might be necessary to change the implementation of the analysis of each ''TmfEvent'' for the generation of ''Sequence Diagram Events''. For that just extend the class ''TmfUml2SDSyncLoader'' and overwrite the method ''protected ITmfSyncSequenceDiagramEvent getSequnceDiagramEvent(TmfEvent tmfEvent)'' with your own implementation.
-
-=== Downloading the Reference Plug-in ===
-To download the reference plug-in that demonstrates the reference loader, use the following link: [http://wiki.eclipse.org/images/d/d3/ReferencePlugin.zip Reference Plug-in]. Just extract the zip file and import the extracted Eclipse plug-in (plug-in name: ''org.eclipse.linuxtools.tmf.reference.ui'') to your Eclipse workspace. <br>
 
 = CTF Parser =
 

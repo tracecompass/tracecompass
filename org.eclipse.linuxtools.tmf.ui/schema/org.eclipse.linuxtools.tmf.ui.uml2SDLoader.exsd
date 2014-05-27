@@ -93,7 +93,7 @@ Either &lt;code&gt;org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView&lt;/code&gt
          <meta.section type="since"/>
       </appinfo>
       <documentation>
-         Since 0.3.2 (based on UML2SD of org.eclipse.tptp.common.ui)
+         1.0
       </documentation>
    </annotation>
 
