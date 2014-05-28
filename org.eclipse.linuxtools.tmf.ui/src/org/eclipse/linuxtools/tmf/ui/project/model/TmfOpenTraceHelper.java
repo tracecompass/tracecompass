@@ -245,7 +245,7 @@ public class TmfOpenTraceHelper {
         final ITmfEvent traceEvent = traceElement.instantiateEvent();
         if ((trace == null) || (traceEvent == null)) {
             TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, traceElement.getTypeName()),
-                    NLS.bind(Messages.TmfOpenTraceHelper_NoTraceOrExperimentType, traceElement.getTypeName()));
+                    Messages.TmfOpenTraceHelper_NoTraceType);
             if (trace != null) {
                 trace.dispose();
             }
