@@ -1486,6 +1486,7 @@ The '''LTTng Kernel''' perspective is built upon the [[#Tracing_Perspective | Tr
 
 * [[#Control_Flow_View | Control Flow View]] - to visualize processes state transitions
 * [[#Resources_View | Resources View]] - to visualize system resources state transitions
+* [[#LTTng_Tracer_Control | LTTng Tracer Control]] - to configure LTTng tracing sessions remotely
 
 
 [[Image:images/LTTngKernelPerspective.png]]
@@ -1498,9 +1499,11 @@ The perspective can be opened from the Eclipse Open Perspective dialog ('''Windo
 
 == Control Flow View ==
 
-The '''''Control Flow''''' view is a LTTng-specific view that shows per-process events graphically. To enable it, select ''Control Flow'' under ''LTTng'' within the ''Show View'' window ('''Window''' -> '''Show View''' -> '''Other...'''):
+The '''''Control Flow''''' view is a LTTng-specific view that shows per-process events graphically. The LTTng Kernel analysis is executed the first time a LTTng Kernel is opened. After opening the trace, the element '''Control Flow''' is added under the '''LTTng Kernel Analysis''' tree element in the Project Explorer. To open the view,  double-click the '''Control Flow''' tree element.
 
 [[Image:images/Cfv_show_view.png]]
+
+Alternatively, select ''Control Flow'' under ''LTTng'' within the ''Show View'' window ('''Window''' -> '''Show View''' -> '''Other...'''):
 
 You should get something like this:
 
@@ -1647,7 +1650,9 @@ The Control Flow View '''toolbar''', located at the top right of the view, has s
 
 == Resources View ==
 
-This view is specific to kernel trace. To open it, go in '''Window''' -> '''Show View''' -> '''Other...''' and select '''LTTng/Resources''' in the list.
+This view is specific to LTTng kernel traces.  The LTTng Kernel analysis is executed the first time a LTTng Kernel is opened. After opening the trace, the element '''Resources''' is added under the '''LTTng Kernel Analysis''' tree element of the Project Explorer. To open the view, double-click the '''Resources''' tree element.
+
+Alternatively, go in '''Window''' -> '''Show View''' -> '''Other...''' and select '''LTTng/Resources''' in the list.
 
 [[Image:images/Rv_example.png| Example of resources view with all trace points and syscalls enabled]]
 
@@ -1715,6 +1720,50 @@ The Resources View '''toolbar''', located at the top right of the view, has shor
 | Zoom Out
 | Zooms out on the selection by 50%
 |}
+
+== LTTng CPU Usage View ==
+
+The CPU Usage analysis and view is specific to LTTng Kernel traces. The CPU usage is derived from a kernel trace as long as the '''sched_switch''' event was enabled during the collection of the trace. This analysis is executed the first time that the CPU Usage view is opened after opening the trace. To open the view, double-click on the '''CPU Usage''' tree element under the '''LTTng Kernel Analysis''' tree element of the Project Explorer.
+
+[[Image:images/LTTng_OpenCpuUsageView.png]]
+
+Now, the CPU Usage view will show:
+
+[[Image:images/LTTng_CpuUsageView.png]]
+
+The view is divided into the following important sections: '''Process Information''' and the '''CPU Usage Chart'''.
+
+
+=== Process Information ===
+The Process Information is displayed on the left side of the view and shows all threads that were executing on all available CPUs in the current time range. For each process, it shows in different columns the thread ID (TID), process name (Process), the average (%) execution time and the actual execution time (Time) during the current time range. It shows all threads that were executing on the CPUs in the current time range.
+
+
+=== CPU Usage Chart ===
+
+The CPU Usage Chart on the right side of the view, plots the total time spent on all CPUs of all processes and the time of the selected process.
+
+
+==== Using the mouse ====
+
+The CPU Usage chart is usable with the mouse. The following actions are set:
+
+* '''left-click''': select a time or time range begin time
+* '''Shift-left-click''': select a time range end time
+* '''left-drag horizontally''': select a time range or change the time range begin or end time
+* '''middle-drag''': pan left or right
+* '''right-drag horizontally''': zoom region
+* '''mouse wheel up/down''': zoom in or out
+
+
+==== Tooltips ====
+
+Hover the cursor over a line of the chart and a tooltip will pop up with the following information:
+* '''time''': current time of mouse position
+* '''Total''': The total CPU usage
+
+
+[[Image:images/LTTng_CpuUsageViewToolTip.png]]
+
 
 == LTTng Kernel Events Editor ==
 
