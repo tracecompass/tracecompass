@@ -122,7 +122,7 @@ Here are the quick steps to verify that your installation is functional:
 
 If an error message is displayed, you might want to double-check that the trace type is correctly set (right-click on the trace and "Select Trace Type...").
 
-Refer to [[#Tracing Perspective | Tracing Perspective]] for detailed description of the views and their usage.
+Refer to [[#Tracing Perspective]] for detailed description of the views and their usage.
 
 To download sample LTTng traces, go to [http://lttng.org/download]. At the bottom of the page there is a link to some sample LTTng 2.0 kernel traces.
 
@@ -132,10 +132,10 @@ To download sample LTTng traces, go to [http://lttng.org/download]. At the botto
 
 The '''Tracing''' perspective is part of the '''Tracing and Monitoring Framework (TMF)''' and groups the following views:
 
-* [[#Project_View | Project View]]
-* [[#Events_Editor | Events Editor]]
-* [[#Histogram_View | Histogram View]]
-* [[#Statistics_View   | Statistics View]]
+* [[#Project View]]
+* [[#Events Editor]]
+* [[#Histogram View]]
+* [[#Statistics View]]
 
 The views are synchronized i.e. selecting an event, a timestamp, a time range, etc will update the other views accordingly.
 
@@ -147,14 +147,14 @@ The perspective can be opened from the Eclipse Open Perspective dialog ('''Windo
 
 In addition to these views, the '''Tracing and Monitoring Framework (TMF)''' feature provides a set of generic tracing specific views, such as:
 
-* [[#Colors_View | Colors View]]
-* [[#Filters_View | Filters View]]
-* [[#Time_Chart_View  | Time Chart View]]
-* [[#Environment_Variables_View  | Environment Variables View]]
-* [[#State_System_Explorer_View | State System Explorer View]]
-* [[#Call_Stack_View | Call Stack View]]
+* [[#Colors View]]
+* [[#Filters View]]
+* [[#Time Chart View]]
+* [[#Environment Variables View]]
+* [[#State System Explorer View]]
+* [[#Call Stack View]]
 
-The framework also supports user creation of [[#Custom_Parsers  | Custom Parsers]].
+The framework also supports user creation of [[#Custom Parsers]].
 
 To open one of the above '''Tracing''' views, use the Eclipse Show View dialog ('''Window > Show View > Other...'''). Then select the relevant view from the '''Tracing''' category.
 
@@ -162,7 +162,7 @@ To open one of the above '''Tracing''' views, use the Eclipse Show View dialog (
 
 Additionally, the '''LTTng''' feature provides an '''LTTng Tracer Control''' functionality. It comes with a dedicated '''Control View'''.
 
-* [[#LTTng_Tracer_Control | LTTng Tracer Control]]
+* [[#LTTng Tracer Control]]
 
 == Project View ==
 
@@ -186,23 +186,27 @@ A new project will appear in the '''Project Explorer''' view.
 
 Tracing projects have two sub-folders: '''Traces''' which holds the individual traces, and '''Experiments''' which holds sets of traces that we want to correlate.
 
-=== Importing Traces in a Project ===
+=== Importing Traces to the Project ===
 
-The '''Traces''' folder holds the set of traces available for a tracing project. The following chapters will explain different ways to import traces to the '''Traces''' folder of a tracing project.
+The '''Traces''' folder holds the set of traces available for a tracing project. It can optionally contain a tree of trace folders to organize traces into sub-folders. The following chapters will explain different ways to import traces to the '''Traces''' folder of a tracing project.
+
+* [[#Opening a Trace]]
+* [[#Importing]]
+* [[#Drag and Drop]]
 
 ==== Opening a Trace ====
 
-To open a trace, right-click on the '''Traces''' folder and and select '''Open Trace...'''.
+To open a trace, right-click on a target trace folder and select '''Open Trace...'''.
 
 [[Image:images/OpenTraceFile.png]]
 
-A new dialog will show for selecting a trace to open. Select a trace file and then click on '''OK'''. Note that for traces that are directories (such as Common Trace Format (CTF) traces) any file in the trace directory can be selected to open the trace. Now, the trace viewer will attempt to detect the trace types of the selected trace. The auto detection algorithm will validate the trace against all known trace types. If multiple trace types are valid, a trace type is chosen based on a confidence criteria. The validation process and the computation of the confidence level are trace type specific. After successful validation the trace will be linked into the '''Traces''' folder and then opened with the detected trace type.
+A new dialog will show for selecting a trace to open. Select a trace file and then click on '''OK'''. Note that for traces that are directories (such as Common Trace Format (CTF) traces) any file in the trace directory can be selected to open the trace. Now, the trace viewer will attempt to detect the trace types of the selected trace. The auto detection algorithm will validate the trace against all known trace types. If multiple trace types are valid, a trace type is chosen based on a confidence criteria. The validation process and the computation of the confidence level are trace type specific. After successful validation the trace will be linked into the selected target trace folder and then opened with the detected trace type.
 
 Note that a trace type is an extension point of the '''Tracing and Monitoring Framework (TMF)'''. Depending on the which features are loaded, the list of available trace types can vary.
 
 ==== Importing ====
 
-To import a set of traces to the '''Traces''' folder, right-click on the '''Traces''' folder and select '''Import...''' from the context-sensitive menu.
+To import a set of traces to a trace folder, right-click on the target folder and select '''Import...''' from the context-sensitive menu.
 
 [[Image:images/ProjectImportTraceAction.png]]
 
@@ -210,104 +214,41 @@ At this point, the '''Import Trace Wizard''' will show for selecting traces to i
 
 If '''Trace Type''' is set to '''<Automatic Detection>''', the wizard will attempt to detect the trace types of the selected files. The automatic detection algorithm validates a trace against all known trace types. If multiple trace types are valid, a trace type is chosen based on a confidence criteria. The validation process and the computation of the confidence level are trace type specific. Optionally, '''Import unrecognized traces''' can be selected to import trace files that could not be automatically detected by '''<Automatic Detection>'''.
 
-Select or deselect the checkboxes for '''Overwrite existing trace without warning''' and '''Create links into workspace'''. When all options are configured, click on '''Finish'''.
+Select or deselect the checkboxes for '''Overwrite existing trace without warning''', '''Create links in workspace''' and '''Preserve folder structure'''. When all options are configured, click on '''Finish'''.
 
 Note that traces of certain types (e.g. LTTng Kernel) are actually a composite of multiple channel traces grouped under a folder. Either the folder or its files can be selected to import the trace.
 
+The option '''Preserve folder structure''' will create, if necessary, the structure of folders relative to (and excluding) the selected '''Source directory''' into the target trace folder.
+
 [[Image:images/ProjectImportTraceDialog.png]]
 
-If a trace already exists with the same name, the user can choose to rename the imported trace, overwrite the original trace or skip the trace. When rename is chosen, a number is appended to the trace name, for example smalltrace becomes smalltrace(2).
+If a trace already exists with the same name in the target trace folder, the user can choose to rename the imported trace, overwrite the original trace or skip the trace. When rename is chosen, a number is appended to the trace name, for example smalltrace becomes smalltrace(2).
 
 [[Image:images/ProjectImportTraceDialogRename.png]]
 
 If one selects '''Rename All''', '''Overwrite All''' or '''Skip All''' the choice will be applied for all traces with a name conflict.
 
-Upon successful importing, the traces will be stored in the '''Traces''' folder. If a trace type was associated to a trace, then the corresponding icon will be displayed. If no trace type is detected the unknown icon [[Image:images/unknown_parser.gif]] will be displayed. Linked traces will have a little arrow as decorator on the right bottom corner.
+Upon successful importing, the traces will be stored in the target trace folder. If a trace type was associated to a trace, then the corresponding icon will be displayed. If no trace type is detected the unknown icon [[Image:images/unknown_parser.gif]] will be displayed. Linked traces will have a little arrow as decorator on the right bottom corner.
 
 Note that trace type is an extension point of the '''Tracing and Monitoring Framework (TMF)'''. Depending on the which features are loaded, the list of trace types can vary.
 
-Alternatively, one can open the '''Import...''' menu from the '''File''' main menu.
-
-[[Image:images/importImages/importImportMenu.png]]
-
-Then select '''Trace Import''' and click on '''Next>'''.
+Alternatively, one can open the '''Import...''' menu from the '''File''' main menu, then select '''Tracing''' > '''Trace Import''' and click on '''Next >'''.
 
 [[Image:images/ProjectImportWizardSelect.png]]
 
 At this point, the '''Import Trace Wizard''' will show. To import traces to the tracing project, follow the instructions that were described above.
 
-==== Batch Importing ====
+==== Drag and Drop ====
 
-The '''Batch Import Trace Wizard''' allows users to search their media for traces and import multiple traces of varying trace types simultaneously. It also handles name clashes and renaming of traces.
+Traces can be also be imported to a project by dragging from another tracing project and dropping to the project's target trace folder. The trace will be copied and the trace type will be set.
 
-To import a set of traces to the '''Traces''' folder, right-click on the '''Traces''' folder and select '''Batch Import...''' from the context-sensitive menu. 
+Any resource can be dragged and dropped from a non-tracing project, and any file or folder can be dragged from an external tool, into a tracing project's trace folder. The resource will be copied or imported as a new trace and it will be attempted to detect the trace types of the imported resource. The automatic detection algorithm validates a trace against all known trace types. If multiple trace types are valid, a trace type is chosen based on a confidence criteria. The validation process and the computation of the confidence level are trace type specific. If no trace type is detected the user needs to set the trace type manually.
 
-[[Image:images/importImages/importBatchImport.png]]
+To import the trace as a link, use the platform-specific key modifier while dragging the source trace. A link will be created in the target project to the trace's location on the file system.
 
-At this point, the '''Batch Import Wizard''' is opened.
+If a folder containing traces is dropped on a trace folder, the full directory structure will be copied or linked to the target trace folder. The trace type of the contained traces will not be auto-detected.
 
-The '''Available trace types''' page is visible. Select a trace type to scan for by clicking an item in trace types tree. If one selects a parent element, the new state will be propagated to the children.
-
-[[Image:images/importImages/importSelectTraceTypeToImport.png]]
-
-When that is done, the warning message will go away and the user can click '''Next >'''.
-
-[[Image:images/importImages/importSelectTraceTypeComplete.png]]
-
-Then select one or more files or directories to scan for traces. The directories added will be recursively scanned, all children files and directories will be scanned. This can be slow depending on the size of the directory to scan.
-
-[[Image:images/importImages/importSelectFilesToScan.png]]
-
-One can add a directory by clicking on '''Add Directory...''' then selecting a directory to import.
-
-[[Image:images/importImages/importSelectedDirectory.png]]
-
-One can also add a file by clicking on '''Add File...''' then selecting a file to import.
-
-[[Image:images/importImages/importAddFile.png]]
-
-Once the files and directories are selected, a background scanner will already start scanning them for potential matches. to select the candidates, click '''Next >'''.
-
-Here the user will see the results of the scan. The list will grow as more files are scanned.
-To select a trace to import, first open a trace type.
-
-[[Image:images/importImages/importScan1.png]]
-
-Then select the trace to import.
-
-[[Image:images/importImages/importScan2.png]]
-
-When that is done, typically one can press '''Finish''', and the trace will be imported. They can set the trace to be '''linked''' or '''copied'''. A '''linked''' trace is not copied to the user's workspace, rather, the original file is used. This is useful for traces that are very large and that the user does not want to copy several times. '''Copied''' traces are as their name indicates, copied to the local workspace. This is useful if there is a trace on a network or on some removable media. The user can also specify if the trace should '''overwrite''' the resources in the workspace or not.
-
-[[Image:images/importImages/importScan3.png]]
-
-One can select several traces also and import them simultaneously. In this case there is a problem, the name of both traces are the same, this is a conflicting name and needs to be resolved.
-
-[[Image:images/importImages/importScan4.png]]
-
-To do so, select one of the conflicting traces, then '''click on its name'''. Then type in a new name.
-
-[[Image:images/importImages/importScan5.png]]
-
-Here the traces shall be copied instead of linked.
-
-[[Image:images/importImages/importScan6.png]]
-
-At this point, press '''Finish''' to import the traces.
-
-If the '''Finish''' button is grayed, or if the user wishes to import to a different project, they need to press '''Next >'''. The user then needs to select a project to import to on the '''options''' page.
-
-[[Image:images/importImages/importOptions.png]]
-
-You will then see the traces in the '''Traces''' folder as shown below and can '''open''' them by '''double-clicking''' on them. For more details on how to open a trace see section [[#Opening_a_Trace_or_Experiment|Opening a Trace or Experiment]].
-
-[[Image:images/importImages/importFinish.png]]
-
-Alternatively, one can open the '''Import...''' menu from the '''File''' main menu.
-
-[[Image:images/importImages/importImportMenu.png]]
-
-Then select '''Batch Trace Import''' and click on next. This will open the '''Batch Import Wizard'''. To import traces to the tracing project, follow the instructions as described above. 
+It is also possible to drop a trace, resource, file or folder into an existing experiment. If the item does not already exist as a trace in the project's trace folder, it will first be copied or imported, then the trace will be added to the experiment.
 
 === Trace Package Exporting and Importing ===
 
@@ -317,15 +258,15 @@ A trace package is an archive file that contains the trace itself and can also c
 
 The '''Export Trace Package Wizard''' allows users to select a trace and export its files and bookmarks to an archive on a media.
 
-The '''Traces''' folder holds the set of traces available for a tracing project. To export a trace contained in the '''Traces''' folder, one can open the '''Export...''' menu from the '''File''' main menu. Then select '''Trace Package Export'''
+The '''Traces''' folder holds the set of traces available for a tracing project. To export traces contained in the '''Traces''' folder, one can open the '''Export...''' menu from the '''File''' main menu. Then select '''Trace Package Export'''
 
 [[Image:images/tracePackageImages/fileExport.png]]
 
-At this point, the '''Trace Package Export''' is opened. The project containing the trace has to be selected first then the trace to be exported.
+At this point, the '''Trace Package Export''' is opened. The project containing the traces has to be selected first then the traces to be exported.
 
 [[Image:images/tracePackageImages/chooseTrace.png]]
 
-One can also open the wizard and skip the first page by selecting a trace in the '''Traces''' folder by double clicking on the project name, double clicking on the '''Traces''' folder, right-clicking on the trace then selecting '''Export Trace Package...''' menu item in the context-sensitive menu.
+One can also open the wizard and skip the first page by expanding the project, selecting traces or trace folders under the '''Traces''' folder, then right-clicking and selecting the '''Export Trace Package...''' menu item in the context-sensitive menu.
 
 [[Image:images/tracePackageImages/exportSelectedTrace.png]]
 
@@ -339,7 +280,7 @@ The '''To archive file''' field is used to specify the location where to save th
 
 The '''Options''' section allows the user to choose between a tar archive or a zip archive. Compression can also be toggled on or off.
 
-When Finish button is clicked, the package is generated and saved to the media.
+When Finish button is clicked, the package is generated and saved to the media. The folder structure of the selected traces relative to the '''Traces''' folder is preserved in the trace package.
 
 ==== Importing ====
 
@@ -349,7 +290,7 @@ The '''Traces''' folder holds the set of traces for a tracing project. To import
 
 [[Image:images/tracePackageImages/fileImport.png]]
 
-One can also open the wizard by double clicking on the project name, right-clicking on the  '''Traces''' folder then selecting '''Import Trace Package...''' menu item in the context-sensitive menu.
+One can also open the wizard by expanding the project name, right-clicking on a target folder under the '''Traces''' folder then selecting '''Import Trace Package...''' menu item in the context-sensitive menu.
 
 [[Image:images/tracePackageImages/importTraceFolder.png]]
 
@@ -361,11 +302,11 @@ The '''From archive file''' field is used to specify the location of the trace p
 
 If the wizard was opened using the File menu, the destination project has to be selected in the '''Into project''' field.
 
-When Finish is clicked, the trace is imported under the project's Trace folder.
+When Finish is clicked, the trace is imported in the target folder. The folder structure from the trace package is restored in the target folder.
 
 === Selecting a Trace Type ===
 
-If no trace type was selected a trace type as to be associated to a trace before it can be opened. To select a trace type select the relevant trace and click the right mouse button. In the context-sensitive menu, select '''Select Trace Type...''' menu item. A sub-menu will show will all available trace type categories. From the relevant category select the required trace type. The examples, below show how to select the '''Common Trace Format''' types '''LTTng Kernel''' and '''Generic CTF trace'''.
+If no trace type was selected a trace type has to be associated to a trace before it can be opened. To select a trace type select the relevant trace and click the right mouse button. In the context-sensitive menu, select '''Select Trace Type...''' menu item. A sub-menu will show will all available trace type categories. From the relevant category select the required trace type. The examples, below show how to select the '''Common Trace Format''' types '''LTTng Kernel''' and '''Generic CTF trace'''.
 
 [[Image:images/SelectLTTngKernelTraceType.png]]
 
@@ -374,6 +315,16 @@ If no trace type was selected a trace type as to be associated to a trace before
 After selecting the trace type, the trace icon will be updated with the corresponding trace type icon.
 
 [[Image:images/ExplorerWithAssociatedTraceType.png]]
+
+=== Opening a Trace or Experiment ===
+
+A trace or experiment can be opened by double-clicking the left mouse button on the trace or experiment in the '''Project Explorer''' view. Alternatively, select the trace or experiment in the in the '''Project Explorer''' view and click the right mouse button. Then select '''Open''' menu item of the context-sensitive menu.
+
+[[Image:images/OpenTraceAction.png]]
+
+When opening a trace or experiment, all currently opened views which are relevant for the corresponding trace type will be updated.
+
+If a trace resource is a file (and not a directory), then the '''Open With''' menu item is available in the context-sensitive menu and can be used to open the trace source file with any applicable internal or external editor. In that case the trace will not be processed by the tracing application.
 
 === Creating a Experiment ===
 
@@ -401,7 +352,7 @@ Now the selected traces will be linked to the experiment and will be shown under
 
 [[Image:images/ExplorerWithExperiment.png]]
 
-Alternatively, traces can be added to an experiment using [[#Drag_and_Drop | Drag and Drop]].
+Alternatively, traces can be added to an experiment using [[#Drag and Drop]].
 
 === Removing Traces from an Experiment ===
 
@@ -425,7 +376,7 @@ A new dialog box will show for entering a new name. Enter a new trace or experim
 
 After successful renaming the new name will show in the '''Project Explorer'''. In case of a trace all reference links to that trace will be updated too. Note that linked traces only changes the display name, the underlying trace resource will stay the original name.
 
-Note that all supplementary files will be also handled accordingly (see also [[#Deleting Supplementary Files | Deleting Supplementary Files]]).
+Note that all supplementary files will be also handled accordingly (see also [[#Deleting Supplementary Files]]).
 
 === Copying a Trace or Experiment ===
 
@@ -441,7 +392,7 @@ A new dialog box will show for entering a new name. Enter a new trace or experim
 
 After successful copy operation the new trace or experiment respectively will show in the '''Project Explorer'''. In case of a linked trace, the copied trace will be a link to the original trace too.
 
-Note that the directory for all supplementary files will be copied, too. (see also [[#Deleting Supplementary Files | Deleting Supplementary Files]]).
+Note that the directory for all supplementary files will be copied, too. (see also [[#Deleting Supplementary Files]]).
 
 === Deleting a Trace or Experiment ===
 
@@ -455,7 +406,7 @@ A confirmation dialog box will open. To perform the deletion press '''OK''' othe
 
 After successful operation the selected trace or experiment will be removed from the project. In case of a linked trace only the link will be removed. The actual trace resource remain on the disk.
 
-Note that the directory for all supplementary files will be deleted, too. (see also [[#Deleting Supplementary Files | Deleting Supplementary Files]]).
+Note that the directory for all supplementary files will be deleted, too. (see also [[#Deleting Supplementary Files]]).
 
 === Deleting Supplementary Files ===
 
@@ -463,45 +414,19 @@ Supplementary files are by definition trace specific files that accompany a trac
 
 All supplementary file are hidden from the user and are handled internally by the TMF. However, there is a possibility to delete the supplementary files so that there are recreated when opening a trace.
 
-To delete all supplementary files from a single trace, first, make sure the trace is not opened, then select the relevant trace in the '''Project Explorer''' view and click the right mouse button. Then select the '''Delete Supplementary Files...''' menu item from the context-sensitive menu.
+To delete all supplementary files from one or many traces and experiments, select the relevant traces and experiments in the '''Project Explorer''' view and click the right mouse button. Then select the '''Delete Supplementary Files...''' menu item from the context-sensitive menu.
 
 [[Image:images/DeleteSupplementaryFilesAction.png]]
 
-A new dialog box will open with a list of supplementary files. Select the file(s) to delete from the list and press '''OK'''.
+A new dialog box will open with a list of supplementary files, grouped under the trace or experiment they belong to. Select the file(s) to delete from the list and press '''OK'''. The traces and experiments that need to be closed in order to do this operation will automatically be closed.
 
 [[Image:images/DeleteSupplementaryFilesDialog.png]]
-
-To delete all supplementary files from all traces of a experiment, select the relevant experiment in the '''Project Explorer''' view and click the right mouse button. In the context-sensitive menu select '''Delete Supplementary Files...''' menu item. The experiment and included traces need to be closed in order to do this operation.
-
-A new dialog box will open with a list of supplementary files. Note that the supplementary files are prefixed with the trace name to indicate the trace they belong to. Select the file(s) to delete from the list and press '''OK'''.
-
-[[Image:images/DeleteExpSupplementaryFilesDialog.png]]
-
-=== Opening a Trace or Experiment ===
-
-A trace or experiment can be open by double-clicking the left mouse button on the trace or experiment in the '''Project Explorer''' view. Alternatively, select the trace or experiment in the in the '''Project Explorer''' view and click the right mouse button. Then select '''Open''' menu item of the context-sensitive menu.
-
-[[Image:images/OpenTraceAction.png]]
-
-When opening a trace or experiment all currently opened views will be filled which are defined for the corresponding trace type. Additionally, an internal index will be created for fast navigation within a trace. For LTTng 2.0 kernel traces a persistent state history will also be build. This state history will be used in different views to display kernel state information.
-
-If a trace resource is a file (and not a directory), then the '''Open With''' menu item is available in the context-sensitive menu and can be used to open the trace source file with any applicable internal or external editor. In that case the trace will not be processed by the tracing application.
-
-=== Drag and Drop ===
-
-Traces can be also be imported to a project by dragging from another tracing project and dropping to the project's trace folder. The trace will be copied and the trace type will be set.
-
-Any resource can be dragged and dropped from a non-tracing project, and any file or folder can be dragged from an external tool, into a tracing project's trace folder. The resource will be copied or imported as a new trace and it will be attempted to detect the trace types of the imported resource. The automatic detection algorithm validates a trace against all known trace types. If multiple trace types are valid, a trace type is chosen based on a confidence criteria. The validation process and the computation of the confidence level are trace type specific. If no trace type is detected the user needs to set the trace type manually.
-
-To import the trace as a link, use the platform-specific key modifier while dragging the source trace. A link will be created in the target project to the trace's location on the file system.
-
-It is also possible to drop a trace, resource, file or folder into an existing experiment. If the item does not already exist as a trace in the project's trace folder, it will first be copied or imported, then the trace will be added to the experiment.
 
 === Link with Editor ===
 
 The tracing projects support the feature '''Link With Editor''' of the Project Explorer view. With this feature it is now possible to<br/>
-* select a trace element in the Project Explorer view and the corresponding [[#Events_Editor | Events Editor]] will get focus if the relevant trace is open.
-* select an [[#Events_Editor | Events Editor]] and the corresponding trace element will be highlighted in the Project Explorer view.
+* select a trace element in the Project Explorer view and the corresponding [[#Events Editor]] will get focus if the relevant trace is open.
+* select an [[#Events Editor]] and the corresponding trace element will be highlighted in the Project Explorer view.
 
 To enable or disable this feature toggle the '''Link With Editor''' button of the Project Explorer view as shown below.
 
@@ -600,9 +525,9 @@ If a source file is available in the trace for the selected event, the item '''O
 If an EMF model URI is available in the trace for the selected event, the item '''Open Model Element''' is shown in the context menu. Selecting this menu item will attempt to open the model file in the project specified in the URI. The model file will be opened in its default model editor. If the model file is not found, an error dialog is shown displaying the URI information.
 
 === Exporting To Text ===
-It is possible to export the content of the trace to a text file based on the columns displayed in the events table. If a filter (see '''[[#Filtering| Filtering]]''') was defined prior exporting only events that match the filter will be exported to the file. To export the trace to text, press the right mouse button on the events table. A context-sensitive menu will show. Select the '''Export To Text...''' menu option. A file locater dialog will open. Fill in the file name and location and then press on '''OK'''. A window with a progress bar will open till the export is finished.
+It is possible to export the content of the trace to a text file based on the columns displayed in the events table. If a filter (see '''[[#Filtering]]''') was defined prior exporting only events that match the filter will be exported to the file. To export the trace to text, press the right mouse button on the events table. A context-sensitive menu will show. Select the '''Export To Text...''' menu option. A file locater dialog will open. Fill in the file name and location and then press on '''OK'''. A window with a progress bar will open till the export is finished.
 
-''Note'':  The columns in the text file are separated by tabs.    
+''Note'':  The columns in the text file are separated by tabs.
 
 == Histogram View ==
 
@@ -760,7 +685,7 @@ Clicking the '''Import Mapping File''' ([[Image:images/import.gif]]) icon will o
 There is support in the LTTng-UST integration plugin to display the callstack of applications traced with the ''liblttng-ust-cyg-profile.so'' library (see the ''liblttng-ust-cyg-profile'' man page for additional information). To do so, you need to:
 
 * Recompile your application with "''-g -finstrument-functions''".
-* Add the ''vtid'' and ''procname'' contexts to your trace session. See the [[#Adding Contexts to Channels and Events of a Domain | Adding Contexts to Channels and Events of a Domain]] section. Or if using the command-line:
+* Add the ''vtid'' and ''procname'' contexts to your trace session. See the [[#Adding Contexts to Channels and Events of a Domain]] section. Or if using the command-line:
 ** <pre>lttng add-context -u -t vtid -t procname</pre>
 * Preload the ''liblttng-ust-cyg-profile'' library when running your program:
 ** <pre>LD_PRELOAD=/usr/lib/liblttng-ust-cyg-profile.so ./myprogram</pre>
@@ -786,7 +711,7 @@ Custom parser wizards allow the user to define their own parsers for text or XML
 The '''New Custom Text Parser''' wizard can be used to create a custom parser for text logs. It can be launched several ways:
 
 * Select '''File''' &gt; '''New''' &gt; '''Other...''' &gt; '''Tracing''' &gt; '''Custom Text Parser'''
-* Open the '''[[#Managing_custom_parsers | Manage Custom Parsers]]''' dialog, select the '''Text''' radio button and click the '''New...''' button
+* Open the '''[[#Managing custom parsers|Manage Custom Parsers]]''' dialog, select the '''Text''' radio button and click the '''New...''' button
 
 [[Image:images/CustomTextParserInput.png]]
 
@@ -853,7 +778,7 @@ Click the '''Finish''' button to close the wizard and save the custom parser.
 The '''New Custom XML Parser''' wizard can be used to create a custom parser for XML logs. It can be launched several ways:
 
 * Select '''File''' &gt; '''New''' &gt; '''Other...''' &gt; '''Tracing''' &gt; '''Custom XML Parser'''
-* Open the '''[[#Managing_custom_parsers | Manage Custom Parsers]]''' dialog, select the '''XML''' radio button and click the '''New...''' button
+* Open the '''[[#Managing custom parsers|Manage Custom Parsers]]''' dialog, select the '''XML''' radio button and click the '''New...''' button
 
 [[Image:images/CustomXMLParserInput.png]]
 
@@ -956,7 +881,7 @@ Select a custom parser from the list, click the '''Export...''' button and enter
 
 === Opening a trace using a custom parser ===
 
-Once a custom parser has been created, any [[#Importing Traces in a Project|imported trace]] file can be opened and parsed using it.
+Once a custom parser has been created, any [[#Importing Traces to the Project|imported trace]] file can be opened and parsed using it.
 
 To do so:
 
@@ -970,7 +895,7 @@ The trace will be opened in an editor showing the events table, and an entry wil
 
 The LTTng Tracer Control in Eclipse for the LTTng Tracer toolchain version v2.0 (or later) is done using SSH and requires an SSH server to be running on the remote host. For the SSH connection the SSH implementation of RSE is used. For that a new System Type was defined using the corresponding RSE extension. The functions to control the LTTng tracer (e.g. start and stop), either locally or remotely, are available from a dedicated Control View.
 
-In the following sections the LTTng 2.0 tracer control integration in Eclipse is described. Please refer to the LTTng 2.0 tracer control command line manual for more details and descriptions about all commands and their command line parameters [[#References | References]].
+In the following sections the LTTng 2.0 tracer control integration in Eclipse is described. Please refer to the LTTng 2.0 tracer control command line manual for more details and descriptions about all commands and their command line parameters [[#References]].
 
 == Control View ==
 To open the Control View, select '''Window->Show View->Other...->LTTng->Control View''.
@@ -1025,7 +950,7 @@ To disconnect from a remote host, select the host in the Control View and press 
 
 === Connecting to a Remote Host ===
 
-To connect to a remote host, select the host in the Control View and press the '''Connect''' button. Alternatively, press the right mouse button. A context-sensitive menu will show. Select the '''Connect''' button. This will start the connection process as discribed in [[#Creating a New Connection to a Remote Host | Creating a New Connection to a Remote Host]].
+To connect to a remote host, select the host in the Control View and press the '''Connect''' button. Alternatively, press the right mouse button. A context-sensitive menu will show. Select the '''Connect''' button. This will start the connection process as discribed in [[#Creating a New Connection to a Remote Host]].
 
 [[Image:images/LTTng2ControlViewConnect.png]]
 
@@ -1049,7 +974,7 @@ Fill in the '''Session Name''' and optionally the '''Session Path''' and press '
 === Creating a Tracing Session With Advanced Options ===
 LTTng Tools version v2.1.0 introduces the possibility to configure the trace output location at session creation time. The trace can be stored in the (tracer) local file system or can be transferred over the network.
 
-To create a tracing session and configure the trace output, open the trace session dialog as described in chapter [[#Creating a Tracing Session | Creating a Tracing Session]]. A dialog box will open for entering information about the session to be created.
+To create a tracing session and configure the trace output, open the trace session dialog as described in chapter [[#Creating a Tracing Session]]. A dialog box will open for entering information about the session to be created.
 
 [[Image:images/LTTng2CreateSessionDialog_Advanced.png]]
 
@@ -1063,18 +988,18 @@ If button '''Use same protocol and address for data and control''' is selected t
 
 If button '''Use same protocol and address for data and control''' is not selected the '''Protocol''' can be '''net''' for the default network protocol which is TCP (IPv4), '''net6''' for the default network protocol which is TCP (IPv6), '''tcp''' for the network protocol TCP (IPv4) and '''tcp6''' for the network protocol TCP (IPv6). Note that for '''net''' and '''net6''' always the default port is used and hence the port text fields are disabled. To configure non-default ports use '''tcp''' or '''tcp6'''.
 
-The text field '''Trace Path''' allows for specifying the path relative to the location defined by the '''relayd''' or relative to the location specified by the '''Address''' when using protocol '''file'''. For more information about the '''relayd''' see '''LTTng relayd User Manual''' in chapter [[#References | References]].
+The text field '''Trace Path''' allows for specifying the path relative to the location defined by the '''relayd''' or relative to the location specified by the '''Address''' when using protocol '''file'''. For more information about the '''relayd''' see '''LTTng relayd User Manual''' in chapter [[#References]].
 
 To create a session with advanced options, fill in the relevant parameters and press '''Ok'''. Upon successful operation a new session will be created and added under the tree node '''Sessions'''.
 
 === Creating a Snapshot Tracing Session ===
-LTTng Tools version v2.3.0 introduces the possibility to create snapshot tracing sessions. After starting tracing the trace events are not stored on disk or over the network. They are only transfered to disk or over the network when the user records a snapshot. To create such a snapshot session, open the trace session dialog as described in chapter [[#Creating a Tracing Session | Creating a Tracing Session]].
+LTTng Tools version v2.3.0 introduces the possibility to create snapshot tracing sessions. After starting tracing the trace events are not stored on disk or over the network. They are only transfered to disk or over the network when the user records a snapshot. To create such a snapshot session, open the trace session dialog as described in chapter [[#Creating a Tracing Session]].
 
 [[Image:images/LTTng2CreateSessionDialog_Snapshot.png]]
 
 Fill in all necessary information, select checkbox for '''Snapshot Mode''' and press '''Ok'''. By default, the location for the snapshot output will be on the host where the host is located.
 
-Refer to chapter [[#Recording a Snapshot | Recording a Snapshot]] for how to create a snapshot.
+Refer to chapter [[#Recording a Snapshot]] for how to create a snapshot.
 
 === Enabling Channels - General ===
 
@@ -1203,7 +1128,7 @@ Upon successful operation, the dynamic function probe event with the given name 
 
 === Enabling UST Events On Session Level ===
 
-For enabling UST events, first open the enable events dialog as described in section [[#Enabling Kernel Events On Session Level | Enabling Kernel Events On Session Level]] and select domain '''UST'''.
+For enabling UST events, first open the enable events dialog as described in section [[#Enabling Kernel Events On Session Level]] and select domain '''UST'''.
 
 To enable '''Tracepoint''' events, first select the corresponding '''Select''' button, then select either all tracepoins (select '''All''') or select selectively one or more tracepoints in the displayed tree of tracepoints and finally press '''Ok'''.
 
@@ -1239,19 +1164,19 @@ Kernel events can also be enabled on the domain level. For that select the relev
 
 [[Image:images/LTTng2EventOnDomainAction.png]]
 
-To enable events for domain '''Kernel''' follow the instructions in section [[#Enabling Kernel Events On Session Level | Enabling Kernel Events On Session Level]], for domain '''UST global''' [[#Enabling UST Events On Session Level | Enabling UST Events On Session Level]].
+To enable events for domain '''Kernel''' follow the instructions in section [[#Enabling Kernel Events On Session Level]], for domain '''UST global''' [[#Enabling UST Events On Session Level]].
 
 When enabling events on the domain level, the events will be add to the default channel '''channel0'''. This channel will be created by on the server side if neccessary.
 
 === Enabling Events On Channel Level ===
 
-Kernel events can also be enabled on the channel level. If necessary, create a channel as described in sections [[#Enabling Channels On Session Level | Creating Channels On Session Level]] or [[#Enabling Channels On Domain Level | Creating Channels On Domain Level]].
+Kernel events can also be enabled on the channel level. If necessary, create a channel as described in sections [[#Enabling Channels On Session Level]] or [[#Enabling Channels On Domain Level]].
 
 Then select the relevant channel tree node, click the right mouse button and the select '''Enable Event...'''. A new dialog box will open for providing information about the events to be enabled. Depending on the domain, '''Kernel''' or '''UST global''', the domain specifc fields are shown and the domain selector is preselected and read-only.
 
 [[Image:images/LTTng2EventOnChannelAction.png]]
 
-To enable events for domain '''Kernel''' follow the instructions in section [[#Enabling Kernel Events On Session Level | Enabling Kernel Events On Session Level]], for domain '''UST global''' [[#Enabling UST Events On Session Level | Enabling UST Events On Session Level]].
+To enable events for domain '''Kernel''' follow the instructions in section [[#Enabling Kernel Events On Session Level]], for domain '''UST global''' [[#Enabling UST Events On Session Level]].
 
 When enabling events on the channel level, the events will be add to the selected channel.
 
@@ -1273,7 +1198,7 @@ Upon successful operation, the selected events will be '''ENABLED''' and the ico
 
 === Enabling Tracepoint Events From Provider ===
 
-It is possible to enable events of type '''Tracepoint''' directly from the providers and assign the enabled event to a session and channel. Before doing that a session has to be created as described in section [[#Creating a Tracing Session | Creating a Tracing Session]]. Also, if other than default channel '''channel0''' is required, create a channel as described in sections [[#Enabling Channels On Session Level | Creating Channels On Session Level]] or [[#Enabling Channels On Domain Level | Creating Channels On Domain Level]].
+It is possible to enable events of type '''Tracepoint''' directly from the providers and assign the enabled event to a session and channel. Before doing that a session has to be created as described in section [[#Creating a Tracing Session]]. Also, if other than default channel '''channel0''' is required, create a channel as described in sections [[#Enabling Channels On Session Level]] or [[#Enabling Channels On Domain Level]].
 
 To assign tracepoint events to a session and channel, select the events to be enabled under the provider (e.g. provider '''Kernel'''), click right mouse button and then select '''Enable Event...''' menu item from the context sensitive menu.
 
@@ -1289,15 +1214,15 @@ Select a session from the '''Session List''' drop-down menu, a channel from the 
 
 === Configuring Filter Expression On UST Event Fields ===
 
-Since LTTng Tools v2.1.0 it is possible to configure a filter expression on UST event fields. To configure a filter expression on UST event fields, open the enable event dialog as described in chapters [[#Enabling UST Events On Session Level | Enabling UST Events On Session Level]], [[#Enabling Events On Domain Level | Enabling Events On Domain Level]] or [[#Enabling Events On Channel Level | Enabling Events On Channel Level]], select UST if needed, select the relevant '''Tracepoint''' event(s) and enter the filter expression in the '''Filter Expression''' text field.
+Since LTTng Tools v2.1.0 it is possible to configure a filter expression on UST event fields. To configure a filter expression on UST event fields, open the enable event dialog as described in chapters [[#Enabling UST Events On Session Level]], [[#Enabling Events On Domain Level]] or [[#Enabling Events On Channel Level]], select UST if needed, select the relevant '''Tracepoint''' event(s) and enter the filter expression in the '''Filter Expression''' text field.
 
 [[Image:images/LTTng2EnableEventWithFilter.png]]
 
-Alternatively, open the dialog box for assigning events to a session and channel described in [[#Enabling Tracepoint Events From Provider | Enabling Tracepoint Events From Provider]] (for UST providers) and enter the filter expression in the '''Filter Expression''' text field.
+Alternatively, open the dialog box for assigning events to a session and channel described in [[#Enabling Tracepoint Events From Provider]] (for UST providers) and enter the filter expression in the '''Filter Expression''' text field.
 
 [[Image:images/LTTng2AssignEventDialogWithFilter.png]]
 
-For the syntax of the filter expression refer to the '''LTTng Tracer Control Command Line Tool User Manual''' of chapter [[#References |References]].
+For the syntax of the filter expression refer to the '''LTTng Tracer Control Command Line Tool User Manual''' of chapter [[#References]].
 
 === Adding Contexts to Channels and Events of a Domain ===
 
@@ -1319,7 +1244,7 @@ Adding contexts on channels and events from the channel level, will enable the s
 
 [[Image:images/LTTng2AddContextOnChannelAction.png]]
 
-A new display will open for selecting one or more contexts to add. Select one or more contexts as described in chapter [[#Adding Contexts to Channels and Events of a Domain | Adding Contexts to Channels and Events of a Domain]]. Upon successful operation, the selected context will be added to all channels and their events of the selected domain. '''Note''' that the LTTng 2.0 tracer control on the remote host doesn't provide a way to retrieve added contexts. Hence it's not possible to display the context information in the GUI.
+A new display will open for selecting one or more contexts to add. Select one or more contexts as described in chapter [[#Adding Contexts to Channels and Events of a Domain]]. Upon successful operation, the selected context will be added to all channels and their events of the selected domain. '''Note''' that the LTTng 2.0 tracer control on the remote host doesn't provide a way to retrieve added contexts. Hence it's not possible to display the context information in the GUI.
 
 === Adding Contexts to an Event of a Specific Channel ===
 
@@ -1327,7 +1252,7 @@ Adding contexts to an event of a channel is only available in LTTng Tools versio
 
 [[Image:images/LTTng2AddContextToEventsAction.png]]
 
-A new display will open for selecting one or more contexts to add. Select one or more contexts as described in chapter [[#Adding Contexts to Channels and Events of a Domain | Adding Contexts to Channels and Events of a Domain]]. Upon successful operation, the selected context will be added to the selected event.
+A new display will open for selecting one or more contexts to add. Select one or more contexts as described in chapter [[#Adding Contexts to Channels and Events of a Domain]]. Upon successful operation, the selected context will be added to the selected event.
 
 === Start Tracing ===
 
@@ -1339,11 +1264,11 @@ Upon successful operation, the tracing session will be '''ACTIVE''' and the icon
 
 === Recording a Snapshot ===
 
-LTTng Tools version v2.3.0 introduces the possibility to create snapshot tracing sessions. After creating a snapshot session (see [[#Creating a Snapshot Tracing Session | Creating a Snapshot Tracing Session]]) and starting tracing (see [[#Start Tracing | Start Tracing]]) it possible to record snapshots. To record a snapshot select one or more sessions and press the '''Record Snapshot''' button. Alternatively, press the right mouse button on the session tree nodes. A context-sensitive menu will show. Then select the '''Recored Snapshot''' menu item.
+LTTng Tools version v2.3.0 introduces the possibility to create snapshot tracing sessions. After creating a snapshot session (see [[#Creating a Snapshot Tracing Session]]) and starting tracing (see [[#Start Tracing]]) it possible to record snapshots. To record a snapshot select one or more sessions and press the '''Record Snapshot''' button. Alternatively, press the right mouse button on the session tree nodes. A context-sensitive menu will show. Then select the '''Recored Snapshot''' menu item.
 
 [[Image:images/LTTng2RecordSnapshotAction.png]]
 
-This action can be executed many times. It is possible to import the recorded snpshots to a tracing project. The trace session might be '''ACTIVE''' or '''INACTIVE''' for that. Refer to section [[#Importing Session Traces to a Tracing Project | Importing Session Traces to a Tracing Project]] on how to import a trace to a tracing project.
+This action can be executed many times. It is possible to import the recorded snpshots to a tracing project. The trace session might be '''ACTIVE''' or '''INACTIVE''' for that. Refer to section [[#Importing Session Traces to a Tracing Project]] on how to import a trace to a tracing project.
 
 === Stop Tracing ===
 
@@ -1406,7 +1331,7 @@ If the existing trace should not be overwritten select, then select the '''Renam
 
 === Importing Network Traces to a Tracing Project ===
 
-Since LTTng Tools v2.1.0 it is possible to store traces over the network. To import network traces, execute the '''Import''' action as described in chapter [[#Importing Session Traces to a Tracing Project|Importing Session Traces to a Tracing Project]]. For network traces the '''Batch Import Trace Wizard''' will be displayed. Follow the instructions in chapter [[#Batch Importing|Batch Importing]] to import the network traces of the current session. 
+Since LTTng Tools v2.1.0 it is possible to store traces over the network. To import network traces, execute the '''Import''' action as described in chapter [[#Importing Session Traces to a Tracing Project]]. For network traces the '''Import Trace Wizard''' will be displayed. Follow the instructions in chapter [[#Importing]] to import the network traces of the current session.
 
 == Properties View ==
 
@@ -1482,12 +1407,11 @@ This section presents a description of the LTTng Kernel Perspective.
 
 == LTTng Kernel Perspective ==
 
-The '''LTTng Kernel''' perspective is built upon the [[#Tracing_Perspective | Tracing Perspective]], re-organizes them slightly and adds the following views:
+The '''LTTng Kernel''' perspective is built upon the [[#Tracing Perspective]], re-organizes them slightly and adds the following views:
 
-* [[#Control_Flow_View | Control Flow View]] - to visualize processes state transitions
-* [[#Resources_View | Resources View]] - to visualize system resources state transitions
-* [[#LTTng_Tracer_Control | LTTng Tracer Control]] - to configure LTTng tracing sessions remotely
-
+* [[#Control Flow View]] - to visualize processes state transitions
+* [[#Resources View]] - to visualize system resources state transitions
+* [[#LTTng Tracer Control]] - to configure LTTng tracing sessions remotely
 
 [[Image:images/LTTngKernelPerspective.png]]
 
@@ -1555,7 +1479,7 @@ The states flow is usable with the mouse. The following actions are set:
 * '''drag the time ruler horizontally''': zoom in or out with fixed start time
 * '''double-click the time ruler''': reset zoom to full range
 
-When the current time indicator is changed (when clicking in the states flow), all the other views are '''synchronized'''. For example, the [[#LTTng_Kernel_Events_Editor|Events Editor]] will show the event matching the current time indicator. The reverse behaviour is also implemented: selecting an event within the Events View will update the Control Flow View current time indicator.
+When the current time indicator is changed (when clicking in the states flow), all the other views are '''synchronized'''. For example, the [[#LTTng Kernel Events Editor|Events Editor]] will show the event matching the current time indicator. The reverse behaviour is also implemented: selecting an event within the Events View will update the Control Flow View current time indicator.
 
 ==== Incomplete regions ====
 
@@ -1654,7 +1578,7 @@ This view is specific to LTTng kernel traces.  The LTTng Kernel analysis is exec
 
 Alternatively, go in '''Window''' -> '''Show View''' -> '''Other...''' and select '''LTTng/Resources''' in the list.
 
-[[Image:images/Rv_example.png| Example of resources view with all trace points and syscalls enabled]]
+[[Image:images/Rv_example.png|Example of resources view with all trace points and syscalls enabled]]
 
 This view shows the state of system resources i.e. if changes occured during the trace either on '''CPUs''', '''IRQs''' or '''soft IRQs''', it will appear in this view. The left side of the view present a list of resources that are affected by at least one event of the trace. The right side illustrate the state in which each resource is at some point in time. For state '''USERMODE''' it also prints the process name in the state bar. For state '''SYSCALL''' the name of the system call is
 displayed in the state region.
@@ -1673,15 +1597,15 @@ Then, by selecting '''Next Event''', it will show the next state transition and 
 
 [[Image:images/RV_infobox2.png|Shows the next state of the IRQ]]
 
-This view is also synchronized with the others : [[#Histogram_View | Histogram View]], [[#LTTng_Kernel_Events_Editor | Events Editor]], [[#Control_Flow_View | Control Flow View]], etc.
+This view is also synchronized with the others : [[#Histogram View]], [[#LTTng Kernel Events Editor|Events Editor]], [[#Control Flow View]], etc.
 
 === Navigation ===
 
-See Control Flow View's '''[[#Using_the_mouse|Using the mouse]]''' and '''[[#Zoom_region|Zoom region]]'''.
+See Control Flow View's '''[[#Using the mouse]]''' and '''[[#Zoom region]]'''.
 
 === Incomplete regions ===
 
-See Control Flow View's '''[[#Incomplete_regions|Incomplete regions]]'''.
+See Control Flow View's '''[[#Incomplete regions]]'''.
 
 === Toolbar ===
 
@@ -1767,7 +1691,7 @@ Hover the cursor over a line of the chart and a tooltip will pop up with the fol
 
 == LTTng Kernel Events Editor ==
 
-The LTTng Kernel Events editor '''is''' the plain TMF [[#Events_Editor | Events Editor]], except that it provides its own specialized viewer to replace the standard one. In short, it has exactly the same behaviour but the layout is slightly different:
+The LTTng Kernel Events editor '''is''' the plain TMF [[#Events Editor]], except that it provides its own specialized viewer to replace the standard one. In short, it has exactly the same behaviour but the layout is slightly different:
 
 * '''Timestamp''': the event timestamp
 * '''Channel''': the event channel (data collector)
@@ -1851,15 +1775,15 @@ The ones used for trace synchronization are '''inet_sock_local_in''' and '''inet
 
 In order to synchronize traces, create a new experiment and select all traces that need to be synchronized. Right-click on the experiment and select '''Synchronize traces'''. For each trace whose time needs to be transformed, a new trace named as the original but followed by a '_' will be created with the transformed timestamps, and the original trace will be replaced in the experiment. The original trace can still be accessed under the '''Traces''' folder.
 
-[[Image:images/Sync_menu.png| Right-click synchronize traces to perform the trace synchronization]]
+[[Image:images/Sync_menu.png|Right-click synchronize traces to perform the trace synchronization]]
 
 When opening the experiment now, all the views will be synchronized. The following screenshot presents the differences in the filtered Control Flow View before and after the time synchronization.
 
-[[Image:images/Sync_cfv.png| Example of Control Flow View before and after trace synchronization]]
+[[Image:images/Sync_cfv.png|Example of Control Flow View before and after trace synchronization]]
 
 Information on the quality of the synchronization, the timestamp transformation formula and some synchronization statistics can be visualized in the '''Synchronization''' view. To open the '''Synchronization''' view, use the Eclipse Show View dialog ('''Window''' -> '''Show View''' -> '''Other...'''). Then select '''Synchronization''' under '''Tracing'''.
 
-[[Image:images/Sync_view.png| Example of Synchronization view]]
+[[Image:images/Sync_view.png|Example of Synchronization view]]
 
 = Timestamp formatting =
 
