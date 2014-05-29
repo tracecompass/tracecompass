@@ -4,7 +4,7 @@
 LTTng (Linux Trace Toolkit, next generation) is a highly efficient tracing tool for Linux that can be used to track down kernel and application performance issues as well as troubleshoot problems involving multiple concurrent processes and threads. It consists of a set of kernel modules, daemons - to collect the raw tracing data - and a set of tools to control, visualize and analyze the generated data. It also provides support for user space application instrumentation.
 For more information about LTTng, refer to the project [http://lttng.org site]
 
-'''Note''': This User Guide covers the integration of the latest LTTng (v2.0) in Eclipse. The legacy version (v0.x) of both the tracer and the LTTng integration are no longer being maintained.
+'''Note''': This User Guide covers the integration of the latest LTTng (up to v2.4) in Eclipse.
 
 == About Tracing ==
 
@@ -14,7 +14,7 @@ Tracing is similar to logging: it consists in recording events that happen in a 
 
 Traces may include events from the operating system kernel (IRQ handler entry/exit, system call entry/exit, scheduling activity, network activity, etc). They can also consists of application events (a.k.a UST - User Space Tracing) or a mix of the two.
 
-For the maximum level of detail, tracing events may be viewed like a log file. However, trace analyzers and viewers are available to derive useful information from the raw data. These programs must be specially designed to handle quickly the enormous amount of data a trace may contain.
+For the maximum level of detail, tracing events may be viewed like a log file. However, trace analyzers and viewers are available to derive useful information from the raw data coupled with knowledge of the traced program. These programs must be specially designed to handle quickly the enormous amount of data a trace may contain.
 
 == LTTng integration ==
 
@@ -30,10 +30,16 @@ The LTTng Eclipse plug-in provides the following views:
 
 These views can be extended or tailored for specific trace types (e.g. kernel, HW, user app).
 
-At present, the LTTng Eclipse plug-in for Eclipse supports the following kernel-oriented analysis:
+At present, the LTTng Eclipse plug-in for Eclipse supports the following kernel-oriented views:
 
 * ''Control Flow'' - to visualize processes state transitions
 * ''Resources'' - to visualize system resources state transitions
+* ''CPU usage'' - to visualize the usage of the processor with respect to the time in traces
+
+It also supports the following User Space traces views:
+
+* ''Memory Usage'' - to visualize the memory usage per thread with respect to time in the traces
+* ''Call Stack'' - to visualize the call stack's evolution over time
 
 Although the control and fetching parts are targeted at the LTTng tracer, the underlying framework can also be used to process any trace that complies with the ''Common Trace Format'' ([http://www.efficios.com/ctf CTF]). CTF specifies a very efficient and compact binary trace format that is meant to be application-, architecture-, and language-agnostic.
 
@@ -47,11 +53,14 @@ The LTTng Eclipse plug-in has a number of features to allow efficient handling o
 * Views synchronization of currently selected time or time range, and window time range
 * Efficient searching and filtering of events
 * Support for trace bookmarks
+* Support for importing and exporting trace packages
 
 There is also support for the integration of non-LTTng trace types:
 
 * Built-in CTF parser
 * Dynamic creation of customized parsers (for XML and text traces)
+* Dynamic creation of customized state systems (from XML files)
+* Dynamic creation of customized views (from XML files)
 
 = Installation =
 
@@ -81,9 +90,16 @@ The LTTng plug-ins are structured as a stack of features/plug-ins as following:
 ** ''Feature'': org.eclipse.linuxtools.ctf
 ** ''Plug-ins'': org.eclipse.linuxtools.ctf.core, org.eclipse.linuxtools.ctf.parser
 
+* '''State System Core''' - State system for TMF
+** ''Plug-ins'': org.eclipse.linuxtools.statesystem.core
+
 * '''TMF''' - ''Tracing and Monitoring Framework'' a framework for generic trace processing
 ** ''Feature'': org.eclipse.linuxtools.tmf
-** ''Plug-ins'': org.eclipse.linuxtools.tmf.core, org.eclipse.linuxtools.tmf.ui
+** ''Plug-ins'': org.eclipse.linuxtools.tmf.core, org.eclipse.linuxtools.tmf.ui. org.eclipse.linuxtools.tmf.analysis.xml.core, org.eclipse.linuxtools.tmf.analysis.xml.ui
+
+* '''CTF support for TMF''' - CTF support for the TMF Feature
+** ''Feature'': org.eclipse.linuxtools.tmf.ctf
+** ''Plug-ins'': org.eclipse.linuxtools.tmf.ctf.core
 
 * '''LTTng''' - The wrapper for the LTTng tracer control. Can be used for kernel or application tracing.
 ** ''Feature'': org.eclipse.linuxtools.lttng2.control
@@ -93,15 +109,21 @@ The LTTng plug-ins are structured as a stack of features/plug-ins as following:
 ** ''Feature'': org.eclipse.linuxtools.lttng2.kernel
 ** ''Plug-ins'': org.eclipse.linuxtools.lttng2.kernel.core, org.eclipse.linuxtools.lttng2.kernel.ui
 
+* '''LTTng UST''' - Analysis components specific to Linux userspace traces
+** ''Feature'': org.eclipse.linuxtools.lttng2.ust
+** ''Plug-ins'': org.eclipse.linuxtools.lttng2.ust.core, org.eclipse.linuxtools.lttng2.ust.ui
+
 == LTTng Eclipse Dependencies ==
 
-The Eclipse LTTng controls the LTTng tracer through an ''ssh'' connection even if the tracer is running locally (the 'degenerate' case).
+The Eclipse LTTng controls the LTTng tracer through an ''ssh'' connection, if the tracer is running locally it can use or bypass the ''ssh'' connection.
 
 Therefore, the target system (where the tracer runs) needs to run an ''ssh'' server as well as ''sftp'' server (for file transfer) to which you have permission to connect.
 
 On the host side (where Eclipse is running), you also need to have Eclipse RSE (Remote System Explorer) installed to handle the SSH connection and transport. The RSE can be installed the standard way (''Help'' > ''Install New Software...'' > ''General Purpose Tools'' > ''Remote System Explorer End-User Runtime'').
 
 == Installation Verification ==
+
+If you do not have any, sample LTTng traces can be found here [http://lttng.org/download]. At the bottom of the page there is a link to some sample LTTng 2.0 kernel traces. The trace needs to be uncompressed to be read.
 
 Here are the quick steps to verify that your installation is functional:
 
@@ -112,8 +134,8 @@ Here are the quick steps to verify that your installation is functional:
 ** Enter the name of your project (e.g. "MyLTTngProject")
 ** The project will be created. It will contain 2 empty folders: "Traces" and "Experiments"
 * Open a sample trace
-** Right-click on the newly created project "Traces" folder and select "Open Trace Directory..."
-** Navigate to the sample LTTng trace that you want to visualize
+** Right-click on the newly created project "Traces" folder and select "Open Trace..."
+** Navigate to the sample LTTng trace that you want to visualize and select any file in the trace folder
 ** The newly imported trace should appear under the Traces folder
 * Visualize the trace
 ** Expand the Traces folder
@@ -122,9 +144,7 @@ Here are the quick steps to verify that your installation is functional:
 
 If an error message is displayed, you might want to double-check that the trace type is correctly set (right-click on the trace and "Select Trace Type...").
 
-Refer to [[#Tracing Perspective | Tracing Perspective]] for detailed description of the views and their usage.
-
-To download sample LTTng traces, go to [http://lttng.org/download]. At the bottom of the page there is a link to some sample LTTng 2.0 kernel traces.
+Refer to [[#Tracing Perspective]] for detailed description of the views and their usage.
 
 = LTTng =
 
@@ -661,50 +681,6 @@ The State System Explorer view allows the user to inspect the state interval val
 The view shows a tree of currently selected traces and their registered state system IDs. For each state system the tree structure of attributes is displayed. The attribute name, quark, value, start and end time, and full attribute path are shown for each attribute.
 
 To modify the time of attributes shown in the view, select a different current time in other views that support time synchronization (e.g. event table, histogram view). When a time range is selected, this view uses the begin time.
-
-== Call Stack View ==
-
-The Call Stack view allows the user to visualize the call stack per thread over time, if the application and trace provide this information.
-
-The view shows the call stack information for the currently selected trace.
-
-The table on the left-hand side of the view shows the threads and call stack. The function name, depth, entry and exit time and duration are shown for the call stack at the selected time.
-
-Double-clicking on a function entry in the table will zoom the time graph to the selected function's range of execution.
-
-The time graph on the right-hand side of the view shows the call stack state graphically over time. The function name is visible on each call stack event if size permits. The color of each call stack event is randomly assigned based on the function name, allowing for easy identification of repeated calls to the same function.
-
-Clicking on the time graph will set the current time and consequently update the table with the current call stack information.
-
-Shift-clicking on the time graph will select a time range. When the selection is a time range, the begin time is used to update the stack information.
-
-Double-clicking on a call stack event will zoom the time graph to the selected function's range of execution.
-
-Clicking the '''Select Next Event''' or '''Select Previous Event''' or using the left and right arrows will navigate to the next or previous call stack event, and select the function currently at the top of the call stack.
-
-Clicking the '''Import Mapping File''' ([[Image:images/import.gif]]) icon will open a file selection dialog, allowing you to import a text file containing mappings from function addresses to function names. If the callstack provider for the current trace type only provides function addresses, a mapping file will be required to get the function names in the view. See the following sections for an example with LTTng-UST traces.
-
-=== Using the Callstack View with LTTng-UST traces ===
-
-There is support in the LTTng-UST integration plugin to display the callstack of applications traced with the ''liblttng-ust-cyg-profile.so'' library (see the ''liblttng-ust-cyg-profile'' man page for additional information). To do so, you need to:
-
-* Recompile your application with "''-g -finstrument-functions''".
-* Add the ''vtid'' and ''procname'' contexts to your trace session. See the [[#Adding Contexts to Channels and Events of a Domain]] section. Or if using the command-line:
-** <pre>lttng add-context -u -t vtid -t procname</pre>
-* Preload the ''liblttng-ust-cyg-profile'' library when running your program:
-** <pre>LD_PRELOAD=/usr/lib/liblttng-ust-cyg-profile.so ./myprogram</pre>
-
-Once you load the resulting trace, making sure it's set to the ''Common Trace Format - LTTng UST Trace'' type, the Callstack View should be populated with the relevant information. However, since GCC's cyg-profile instrumentation only provides function addresses, and not names, an additional step is required to get the function names showing in the view. The following section explains how to do so.
-
-=== Importing a function name mapping file for LTTng-UST traces ===
-
-If you followed the steps in the previous section, you should have a Callstack View populated with function entries and exits. However, the view will display the function addresses instead of names in the intervals, which are not very useful by themselves. To get the actual function names, you need to:
-
-* Generate a mapping file from the binary, using:
-** <pre>nm myprogram > mapping.txt</pre>
-* Click the '''Import Mapping File''' ([[Image:images/import.gif]]) button in the Callstack View, and select the ''mapping.txt'' file that was just created.
-
-The view should now update to display the function names instead. Make sure the binary used for taking the trace is the one used for this step too (otherwise, there is a good chance of the addresses not being the same).
 
 == Custom Parsers ==
 
@@ -1714,8 +1690,78 @@ The LTTng Kernel Events editor '''is''' the plain TMF [[#Events_Editor | Events 
 * '''Event Type''': the event type (or kernel marker)
 * '''Content''': the raw event content
 
-
 [[Image:images/LTTng2EventsEditor.png]]
+
+= LTTng-UST Analyses =
+
+The Userspace traces are taken on an application level. With kernel traces, you know what events you will have as the domain is known and cloistered. Userspace traces can contain pretty much anything. Some analyses are offered if certain events are enabled.
+
+== Call Stack View ==
+
+The Call Stack view allows the user to visualize the call stack per thread over time, if the application and trace provide this information.
+
+To open this view go in '''Window''' -> '''Show View''' -> '''Other...''' and select '''Tracing/Call Stack''' in the list. The view shows the call stack information for the currently selected trace. Conversely, you can select a trace and expand it in the '''Project Explorer''' then expand '''LTTng-UST CallStack Analysis''' (the trace must be loaded) and open '''Call Stack'''.
+
+The table on the left-hand side of the view shows the threads and call stack. The function name, depth, entry and exit time and duration are shown for the call stack at the selected time.
+
+Double-clicking on a function entry in the table will zoom the time graph to the selected function's range of execution.
+
+The time graph on the right-hand side of the view shows the call stack state graphically over time. The function name is visible on each call stack event if size permits. The color of each call stack event is randomly assigned based on the function name, allowing for easy identification of repeated calls to the same function.
+
+Clicking on the time graph will set the current time and consequently update the table with the current call stack information.
+
+Shift-clicking on the time graph will select a time range. When the selection is a time range, the begin time is used to update the stack information.
+
+Double-clicking on a call stack event will zoom the time graph to the selected function's range of execution.
+
+Clicking the '''Select Next Event''' or '''Select Previous Event''' or using the left and right arrows will navigate to the next or previous call stack event, and select the function currently at the top of the call stack.
+
+Clicking the '''Import Mapping File''' ([[Image:images/import.gif]]) icon will open a file selection dialog, allowing you to import a text file containing mappings from function addresses to function names. If the callstack provider for the current trace type only provides function addresses, a mapping file will be required to get the function names in the view. See the following sections for an example with LTTng-UST traces.
+
+=== Using the Callstack View with LTTng-UST traces ===
+
+There is support in the LTTng-UST integration plugin to display the callstack of applications traced with the ''liblttng-ust-cyg-profile.so'' library (see the ''liblttng-ust-cyg-profile'' man page for additional information). To do so, you need to:
+
+* Recompile your application with "''-g -finstrument-functions''".
+* Add the ''vtid'' and ''procname'' contexts to your trace session. See the [[#Adding Contexts to Channels and Events of a Domain]] section. Or if using the command-line:
+** <pre>lttng add-context -u -t vtid -t procname</pre>
+* Preload the ''liblttng-ust-cyg-profile'' library when running your program:
+** <pre>LD_PRELOAD=/usr/lib/liblttng-ust-cyg-profile.so ./myprogram</pre>
+
+Once you load the resulting trace, making sure it's set to the ''Common Trace Format - LTTng UST Trace'' type, the Callstack View should be populated with the relevant information. However, since GCC's cyg-profile instrumentation only provides function addresses, and not names, an additional step is required to get the function names showing in the view. The following section explains how to do so.
+
+=== Importing a function name mapping file for LTTng-UST traces ===
+
+If you followed the steps in the previous section, you should have a Callstack View populated with function entries and exits. However, the view will display the function addresses instead of names in the intervals, which are not very useful by themselves. To get the actual function names, you need to:
+
+* Generate a mapping file from the binary, using:
+** <pre>nm myprogram > mapping.txt</pre>
+* Click the '''Import Mapping File''' ([[Image:images/import.gif]]) button in the Callstack View, and select the ''mapping.txt'' file that was just created.
+
+The view should now update to display the function names instead. Make sure the binary used for taking the trace is the one used for this step too (otherwise, there is a good chance of the addresses not being the same).
+
+== Memory Usage ==
+
+The Memory Usage view allows the user to visualize the active memory usage per thread over time, if the application and trace provide this information.
+
+The view shows the memory consumption for the currently selected trace.
+
+The time chart plots heap memory usage graphically over time. There is one line per process, unassigned memory usage is mapped to "Other".
+
+In this implementation, the user needs to trace while hooking the ''liblttng-ust-libc-wrapper'' by running  ''LD_PRELOAD=liblttng-ust-libc-wrapper.so'' '''<exename>'''. This will add tracepoints to memory allocation and freeing to the heap, NOT shared memory or stack usage. If the contexts '''vtid''' and '''procname''' are enabled, then the view will associate the heap usage to processes. As detailed earlier, to enable the contexts, see the [[#Adding Contexts to Channels and Events of a Domain]] section. Or if using the command-line:
+* <pre>lttng add-context -u -t vtid -t procname</pre>
+
+If thread information is available the view will look like this:
+
+[[Image:images/memoryUsage/memory-usage-multithread.png]]
+
+If thread information is not available it will look like this:
+
+[[Image:images/memoryUsage/memory-usage-no-thread-info.png]]
+
+The view allows selection of a specific time by left-clicking on a point in the chart. Left mouse dragging will select a time range. Right mouse dragging on the area will zoom in on that window. Middle mouse dragging will move the display window. Mouse wheel operations will zoom in and out also.
+
+Please note this view will not show shared memory or stack memory usage.
 
 = Trace synchronization =
 
