@@ -353,8 +353,6 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
             }
         });
 
-        fDialogComposite.layout();
-
         getShell().setMinimumSize(new Point(500, 650));
 
         return fDialogComposite;
