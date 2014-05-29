@@ -698,7 +698,7 @@ The '''MATCHES''' node matches when the specified event ''field'' value matches 
 
 The '''COMPARE''' node matches when the specified event ''field'' value compared with the specified ''value'' gives the specified ''result''. The result can be set to ''smaller than'', ''equal'' or ''greater than''. The type of comparison can be numerical, alphanumerical or based on time stamp. A ''not'' operator can be applied to invert the condition.
 
-Filters can be added, deleted, imported and exported using the buttons in the Filters view toolbar. Changes to the preset filters are only applied and persisted to disk when the '''save filters''' button is pressed.
+Filters can be added, deleted, imported and exported using the buttons in the Filters view toolbar. The nodes in the view can be Cut (Ctrl-X), Copied (Ctrl-C) and Pasted (Ctrl-V) by using the buttons in the toolbar or by using the key bindings. This makes it easier to quickly build new filters from existing ones. Changes to the preset filters are only applied and persisted to disk when the '''save filters''' button is pressed.
 
 To apply a saved preset filter in an events table, right-click on the table and select '''Apply preset filter...''' > ''filter name''.
 
