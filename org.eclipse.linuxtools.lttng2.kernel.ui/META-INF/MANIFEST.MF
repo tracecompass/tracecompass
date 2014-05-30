@@ -17,9 +17,14 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.linuxtools.lttng2.control.core;bundle-version="3.0.0",
  org.eclipse.linuxtools.lttng2.control.ui;bundle-version="3.0.0",
  org.eclipse.linuxtools.lttng2.kernel.core;bundle-version="3.0.0"
-Export-Package: org.eclipse.linuxtools.internal.lttng2.kernel.ui;x-friends:="org.eclipse.linuxtools.lttng2.kernel.ui.tests",
- org.eclipse.linuxtools.internal.lttng2.kernel.ui.viewers.events;x-internal:=true,
- org.eclipse.linuxtools.internal.lttng2.kernel.ui.views;x-friends:="org.eclipse.linuxtools.lttng2.kernel.ui.swtbot.tests",
- org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow;x-friends:="org.eclipse.linuxtools.lttng2.kernel.ui.swtbot.tests",
- org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.cpuusage;x-friends:="org.eclipse.linuxtools.lttng2.kernel.ui.swtbot.tests",
- org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources;x-friends:="org.eclipse.linuxtools.lttng2.kernel.ui.swtbot.tests"
+Export-Package: org.eclipse.linuxtools.internal.lttng2.kernel.ui;x-fri
+ ends:="org.eclipse.linuxtools.lttng2.kernel.ui.tests",org.eclipse.lin
+ uxtools.internal.lttng2.kernel.ui.viewers.events;x-internal:=true,org
+ .eclipse.linuxtools.internal.lttng2.kernel.ui.views;x-friends:="org.e
+ clipse.linuxtools.lttng2.kernel.ui.swtbot.tests",org.eclipse.linuxtoo
+ ls.internal.lttng2.kernel.ui.views.controlflow;x-friends:="org.eclips
+ e.linuxtools.lttng2.kernel.ui.swtbot.tests",org.eclipse.linuxtools.in
+ ternal.lttng2.kernel.ui.views.cpuusage;x-friends:="org.eclipse.linuxt
+ ools.lttng2.kernel.ui.swtbot.tests",org.eclipse.linuxtools.internal.l
+ ttng2.kernel.ui.views.resources;x-friends:="org.eclipse.linuxtools.lt
+ tng2.kernel.ui.swtbot.tests"

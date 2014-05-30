@@ -17,9 +17,11 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.linuxtools.gdbtrace.core;bundle-version="3.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Export-Package: org.eclipse.linuxtools.internal.gdbtrace.ui;x-friends:="org.eclipse.linuxtools.gdbtrace.ui.tests",
- org.eclipse.linuxtools.internal.gdbtrace.ui.views;x-internal:=true,
- org.eclipse.linuxtools.internal.gdbtrace.ui.views.events;x-internal:=true,
- org.eclipse.linuxtools.internal.gdbtrace.ui.views.project.dialogs;x-internal:=true,
- org.eclipse.linuxtools.internal.gdbtrace.ui.views.project.handlers;x-internal:=true
+Export-Package: org.eclipse.linuxtools.internal.gdbtrace.ui;x-friends:
+ ="org.eclipse.linuxtools.gdbtrace.ui.tests",org.eclipse.linuxtools.in
+ ternal.gdbtrace.ui.views;x-internal:=true,org.eclipse.linuxtools.inte
+ rnal.gdbtrace.ui.views.events;x-internal:=true,org.eclipse.linuxtools
+ .internal.gdbtrace.ui.views.project.dialogs;x-internal:=true,org.ecli
+ pse.linuxtools.internal.gdbtrace.ui.views.project.handlers;x-internal
+ :=true
 Import-Package: org.eclipse.cdt.core

@@ -16,18 +16,28 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.linuxtools.lttng2.control.core;bundle-version="3.0.0",
  org.eclipse.linuxtools.tmf.core;bundle-version="3.0.0",
  org.eclipse.linuxtools.tmf.ui;bundle-version="3.0.0"
-Export-Package: org.eclipse.linuxtools.internal.lttng2.control.ui;x-friends:="org.eclipse.linuxtools.lttng2.control.ui.tests",
- org.eclipse.linuxtools.internal.lttng2.control.ui.views;x-friends:="org.eclipse.linuxtools.lttng2.kernel.ui,org.eclipse.linuxtools.lttng2.control.ui.tests,org.eclipse.linuxtools.lttng2.kernel.ui.swtbot.tests",
- org.eclipse.linuxtools.internal.lttng2.control.ui.views.dialogs;x-friends:="org.eclipse.linuxtools.lttng2.control.ui.tests",
- org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers;x-internal:=true,
- org.eclipse.linuxtools.internal.lttng2.control.ui.views.logging;x-friends:="org.eclipse.linuxtools.lttng2.control.ui.tests",
- org.eclipse.linuxtools.internal.lttng2.control.ui.views.messages;x-internal:=true,
- org.eclipse.linuxtools.internal.lttng2.control.ui.views.model;x-friends:="org.eclipse.linuxtools.lttng2.control.ui.tests",
- org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl;x-friends:="org.eclipse.linuxtools.lttng2.control.ui.tests",
- org.eclipse.linuxtools.internal.lttng2.control.ui.views.preferences;x-friends:="org.eclipse.linuxtools.lttng2.control.ui.tests",
- org.eclipse.linuxtools.internal.lttng2.control.ui.views.property;x-friends:="org.eclipse.linuxtools.lttng2.control.ui.tests",
- org.eclipse.linuxtools.internal.lttng2.control.ui.views.remote;x-friends:="org.eclipse.linuxtools.lttng2.control.ui.tests",
- org.eclipse.linuxtools.internal.lttng2.control.ui.views.service;x-friends:="org.eclipse.linuxtools.lttng2.control.ui.tests"
+Export-Package: org.eclipse.linuxtools.internal.lttng2.control.ui;x-fr
+ iends:="org.eclipse.linuxtools.lttng2.control.ui.tests",org.eclipse.l
+ inuxtools.internal.lttng2.control.ui.views;x-friends:="org.eclipse.li
+ nuxtools.lttng2.kernel.ui,org.eclipse.linuxtools.lttng2.control.ui.te
+ sts,org.eclipse.linuxtools.lttng2.kernel.ui.swtbot.tests",org.eclipse
+ .linuxtools.internal.lttng2.control.ui.views.dialogs;x-friends:="org.
+ eclipse.linuxtools.lttng2.control.ui.tests",org.eclipse.linuxtools.in
+ ternal.lttng2.control.ui.views.handlers;x-internal:=true,org.eclipse.
+ linuxtools.internal.lttng2.control.ui.views.logging;x-friends:="org.e
+ clipse.linuxtools.lttng2.control.ui.tests",org.eclipse.linuxtools.int
+ ernal.lttng2.control.ui.views.messages;x-internal:=true,org.eclipse.l
+ inuxtools.internal.lttng2.control.ui.views.model;x-friends:="org.ecli
+ pse.linuxtools.lttng2.control.ui.tests",org.eclipse.linuxtools.intern
+ al.lttng2.control.ui.views.model.impl;x-friends:="org.eclipse.linuxto
+ ols.lttng2.control.ui.tests",org.eclipse.linuxtools.internal.lttng2.c
+ ontrol.ui.views.preferences;x-friends:="org.eclipse.linuxtools.lttng2
+ .control.ui.tests",org.eclipse.linuxtools.internal.lttng2.control.ui.
+ views.property;x-friends:="org.eclipse.linuxtools.lttng2.control.ui.t
+ ests",org.eclipse.linuxtools.internal.lttng2.control.ui.views.remote;
+ x-friends:="org.eclipse.linuxtools.lttng2.control.ui.tests",org.eclip
+ se.linuxtools.internal.lttng2.control.ui.views.service;x-friends:="or
+ g.eclipse.linuxtools.lttng2.control.ui.tests"
 Import-Package: org.eclipse.rse.core,
  org.eclipse.rse.core.model,
  org.eclipse.rse.core.subsystems,
