@@ -49,6 +49,11 @@
    </element>
 
    <element name="type">
+      <annotation>
+         <appInfo>
+            <meta.element labelAttribute="tracetype"/>
+         </appInfo>
+      </annotation>
       <complexType>
          <sequence>
             <element ref="eventsTableType" minOccurs="0" maxOccurs="1"/>
@@ -78,6 +83,11 @@
    </element>
 
    <element name="experiment">
+      <annotation>
+         <appInfo>
+            <meta.element labelAttribute="tracetype"/>
+         </appInfo>
+      </annotation>
       <complexType>
          <sequence>
             <element ref="eventsTableType" minOccurs="0" maxOccurs="1"/>
