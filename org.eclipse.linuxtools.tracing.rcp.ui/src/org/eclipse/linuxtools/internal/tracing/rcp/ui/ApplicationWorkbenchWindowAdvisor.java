@@ -109,7 +109,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         String traceToOpen = TracingRcpPlugin.getDefault().getCli().getArgument(CliParser.OPEN_FILE_LOCATION);
         if (traceToOpen != null) {
             try {
-                TmfTraceFolder destinationFolder = TmfProjectRegistry.getProject(project).getTracesFolder();
+                TmfTraceFolder destinationFolder = TmfProjectRegistry.getProject(project, true).getTracesFolder();
                 TmfOpenTraceHelper.openTraceFromPath(destinationFolder, traceToOpen, TracingRcpPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell());
             } catch (CoreException e) {
                 TracingRcpPlugin.getDefault().logError(e.getMessage());
