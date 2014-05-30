@@ -41,28 +41,30 @@ public class LttngKernelAnalysisModule extends TmfStateSystemAnalysisModule {
     /** The ID of this analysis module */
     public static final String ID = "org.eclipse.linuxtools.lttng2.kernel.analysis"; //$NON-NLS-1$
 
-    /* TODO: Are all those mandatory events really mandatory or should some of them be optional? */
-    private static final ImmutableSet<String> REQUIRED_EVENTS = ImmutableSet.of(
+    /*
+     * TODO: Decide which events should be mandatory for the analysis, once the
+     * appropriate error messages and session setup are in place.
+     */
+    private static final ImmutableSet<String> REQUIRED_EVENTS = ImmutableSet.of();
+
+    private static final ImmutableSet<String> OPTIONAL_EVENTS = ImmutableSet.of(
             LttngStrings.EXIT_SYSCALL,
             LttngStrings.IRQ_HANDLER_ENTRY,
             LttngStrings.IRQ_HANDLER_EXIT,
             LttngStrings.SOFTIRQ_ENTRY,
             LttngStrings.SOFTIRQ_EXIT,
             LttngStrings.SOFTIRQ_RAISE,
-            LttngStrings.SCHED_SWITCH,
             LttngStrings.SCHED_PROCESS_FORK,
             LttngStrings.SCHED_PROCESS_EXIT,
             LttngStrings.SCHED_PROCESS_FREE,
+            LttngStrings.SCHED_SWITCH,
             LttngStrings.STATEDUMP_PROCESS_STATE,
             LttngStrings.SCHED_WAKEUP,
-            LttngStrings.SCHED_WAKEUP_NEW
-            );
+            LttngStrings.SCHED_WAKEUP_NEW,
 
-    private static final ImmutableSet<String> OPTIONAL_EVENTS = ImmutableSet.of(
-            /* Add the prefix for syscalls */
+            /* FIXME Add the prefix for syscalls */
             LttngStrings.SYSCALL_PREFIX
             );
-
 
     /** The requirements as an immutable set */
     private static final ImmutableSet<TmfAnalysisRequirement> REQUIREMENTS;
