@@ -40,11 +40,11 @@ public class Messages extends NLS {
     public static String TmfEventsTable_ApplyPresetFilterMenuName;
     public static String TmfEventsTable_ClearFiltersActionText;
     public static String TmfEventsTable_ContentColumnHeader;
-
     public static String TmfEventsTable_Export_to_text;
     public static String TmfEventsTable_FilterHint;
     public static String TmfEventsTable_HideRawActionText;
     public static String TmfEventsTable_HideTableActionText;
+    public static String TmfEventsTable_MultipleBookmarksToolTip;
     public static String TmfEventsTable_OpenSourceCodeActionText;
     public static String TmfEventsTable_OpenSourceCodeNotFound;
     public static String TmfEventsTable_OpenSourceCodeSelectFileDialogTitle;

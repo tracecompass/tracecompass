@@ -20,9 +20,9 @@ package org.eclipse.linuxtools.tmf.ui.viewers.events;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -146,6 +146,10 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.ide.IGotoMarker;
 import org.eclipse.ui.themes.ColorUtil;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+
 /**
  * The generic TMF Events table
  *
@@ -263,7 +267,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private ListenerList selectionChangedListeners = new ListenerList();
 
     // Bookmark map <Rank, MarkerId>
-    private Map<Long, Long> fBookmarksMap = new HashMap<>();
+    private Multimap<Long, Long> fBookmarksMap = HashMultimap.create();
     private IFile fBookmarksFile;
     private long fPendingGotoRank = -1;
 
@@ -1012,16 +1016,22 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         item.setData(Key.TIMESTAMP, new TmfTimestamp(event.getTimestamp()));
         item.setData(Key.RANK, rank);
 
-        boolean bookmark = false;
-        final Long markerId = fBookmarksMap.get(rank);
-        if (markerId != null) {
-            bookmark = true;
+        final Collection<Long> markerIds = fBookmarksMap.get(rank);
+        if (!markerIds.isEmpty()) {
+            Joiner joiner = Joiner.on("\n -").skipNulls(); //$NON-NLS-1$
+            List<Object> parts = new ArrayList<>();
+            if (markerIds.size() > 1) {
+                parts.add(Messages.TmfEventsTable_MultipleBookmarksToolTip);
+            }
             try {
-                final IMarker marker = fBookmarksFile.findMarker(markerId);
-                item.setData(Key.BOOKMARK, marker.getAttribute(IMarker.MESSAGE));
-            } catch (final CoreException e) {
+                for (long markerId : markerIds) {
+                    final IMarker marker = fBookmarksFile.findMarker(markerId);
+                    parts.add(marker.getAttribute(IMarker.MESSAGE));
+                }
+            } catch (CoreException e) {
                 displayException(e);
             }
+            item.setData(Key.BOOKMARK, joiner.join(parts));
         } else {
             item.setData(Key.BOOKMARK, null);
         }
@@ -1047,12 +1057,12 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         }
 
         if (searchMatch) {
-            if (bookmark) {
+            if (!markerIds.isEmpty()) {
                 item.setImage(SEARCH_MATCH_BOOKMARK_IMAGE);
             } else {
                 item.setImage(SEARCH_MATCH_IMAGE);
             }
-        } else if (bookmark) {
+        } else if (!markerIds.isEmpty()) {
             item.setImage(BOOKMARK_IMAGE);
         } else {
             item.setImage((Image) null);
@@ -2119,9 +2129,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      *            The bookmark to remove
      */
     public void removeBookmark(final IMarker bookmark) {
-        for (final Entry<Long, Long> entry : fBookmarksMap.entrySet()) {
+        for (final Entry<Long, Long> entry : fBookmarksMap.entries()) {
             if (entry.getValue().equals(bookmark.getId())) {
-                fBookmarksMap.remove(entry.getKey());
+                fBookmarksMap.remove(entry.getKey(), entry.getValue());
                 fTable.refresh();
                 return;
             }
@@ -2133,12 +2143,14 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             return;
         }
         if (fBookmarksMap.containsKey(rank)) {
-            final Long markerId = fBookmarksMap.remove(rank);
+            final Collection<Long> markerIds = fBookmarksMap.removeAll(rank);
             fTable.refresh();
             try {
-                final IMarker bookmark = fBookmarksFile.findMarker(markerId);
-                if (bookmark != null) {
-                    bookmark.delete();
+                for (long markerId : markerIds) {
+                    final IMarker bookmark = fBookmarksFile.findMarker(markerId);
+                    if (bookmark != null) {
+                        bookmark.delete();
+                    }
                 }
             } catch (final CoreException e) {
                 displayException(e);
