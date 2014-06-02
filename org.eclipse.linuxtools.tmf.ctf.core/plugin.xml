@@ -11,7 +11,7 @@
             category="org.eclipse.linuxtools.tmf.ctf.core.category.ctf"
             event_type="org.eclipse.linuxtools.tmf.ctf.core.CtfTmfEvent"
             id="org.eclipse.linuxtools.tmf.ui.type.ctf"
-            isDirectory="false"
+            isDirectory="true"
             name="%tracetype.type.ctf"
             trace_type="org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace">
       </type>
