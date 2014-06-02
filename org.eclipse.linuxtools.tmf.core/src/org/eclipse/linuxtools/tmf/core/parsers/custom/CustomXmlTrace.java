@@ -148,11 +148,10 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser, ITmfPer
             } else if (location.getLocationInfo() instanceof Long) {
                 fFile.seek((Long) location.getLocationInfo());
             }
-            final String recordElementStart = "<" + fRecordInputElement.elementName; //$NON-NLS-1$
             long rawPos = fFile.getFilePointer();
             String line = fFile.getNextLine();
             while (line != null) {
-                final int idx = line.indexOf(recordElementStart);
+                final int idx = indexOfElement(fRecordInputElement.elementName, line, 0);
                 if (idx != -1) {
                     context.setLocation(new TmfLongLocation(rawPos + idx));
                     return context;
@@ -256,12 +255,10 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser, ITmfPer
             event = extractEvent(element, fRecordInputElement);
             ((StringBuffer) event.getContent().getValue()).append(elementBuffer);
 
-
-            final String recordElementStart = "<" + fRecordInputElement.elementName; //$NON-NLS-1$
             long rawPos = fFile.getFilePointer();
             String line = fFile.getNextLine();
             while (line != null) {
-                final int idx = line.indexOf(recordElementStart);
+                final int idx = indexOfElement(fRecordInputElement.elementName, line, 0);
                 if (idx != -1) {
                     context.setLocation(new TmfLongLocation(rawPos + idx));
                     return event;
@@ -317,6 +314,23 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser, ITmfPer
             Activator.logError("Error parsing element buffer. File: " + getPath(), e); //$NON-NLS-1$
         }
         return null;
+    }
+
+    private static int indexOfElement(String elementName, String line, int fromIndex) {
+        final String recordElementStart = '<' + elementName;
+        int index = line.indexOf(recordElementStart, fromIndex);
+        if (index == -1) {
+            return index;
+        }
+        int nextCharIndex = index + recordElementStart.length();
+        if (nextCharIndex < line.length()) {
+            char c = line.charAt(nextCharIndex);
+            // Check that the match is not just a substring of another element
+            if (Character.isLetterOrDigit(c)) {
+                return indexOfElement(elementName, line, nextCharIndex);
+            }
+        }
+        return index;
     }
 
     private void readElement(final StringBuffer buffer, final RandomAccessFile raFile) {
@@ -521,11 +535,10 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser, ITmfPer
         }
         try (BufferedRandomAccessFile rafile = new BufferedRandomAccessFile(path, "r")) { //$NON-NLS-1$
             int lineCount = 0;
-            final String recordElementStart = "<" + fRecordInputElement.elementName; //$NON-NLS-1$
             long rawPos = 0;
             String line = rafile.getNextLine();
             while ((line != null) && (lineCount++ < MAX_LINES)) {
-                final int idx = line.indexOf(recordElementStart);
+                final int idx = indexOfElement(fRecordInputElement.elementName, line, 0);
                 if (idx != -1) {
                     rafile.seek(rawPos + idx + 1); // +1 is for the <
                     final StringBuffer elementBuffer = new StringBuffer("<"); //$NON-NLS-1$
