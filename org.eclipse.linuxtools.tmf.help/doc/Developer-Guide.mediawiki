@@ -3329,11 +3329,37 @@ Note that with these extension points, it is possible to use the same module cla
 
 Analyses will typically produce outputs the user can examine. Outputs can be a text dump, a .dot file, an XML file, a view, etc. All output types must implement the '''IAnalysisOutput''' interface.
 
-An output can be registered to an analysis module at any moment by calling the '''IAnalysisModule#registerOutput()''' method. Analyses themselves will know what outputs are available and may register them in the analysis constructor or after analysis completion.
+An output can be registered to an analysis module at any moment by calling the '''IAnalysisModule#registerOutput()''' method. Analyses themselves may know what outputs are available and may register them in the analysis constructor or after analysis completion.
 
 The various concrete output types are:
 
 * '''TmfAnalysisViewOutput''': It takes a view ID as parameter and, when selected, opens the view.
+
+=== Using the extension point to add outputs ===
+
+Analysis outputs can also be hooked to an analysis using the same extension point ''org.eclipse.linuxtools.tmf.core.analysis'' in the plugin.xml file. Outputs can be matched either to a specific analysis identified by an ID, or to all analysis modules extending or implementing a given class or interface.
+
+The following code shows how to add a view output to the analysis defined above directly in the plugin.xml file. This extension does not have to be in the same plugin as the extension defining the analysis. Typically, an analysis module can be defined in a core plugin, along with some outputs that do not require UI elements. Other outputs, like views, who need UI elements, will be defined in a ui plugin.
+
+<pre>
+<extension
+         point="org.eclipse.linuxtools.tmf.core.analysis">
+      <output
+            class="org.eclipse.linuxtools.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="my.plugin.package.ui.views.myView">
+         <analysisId
+               id="my.lttng.kernel.analysis.id">
+         </analysisId>
+      </output>
+      <output
+            class="org.eclipse.linuxtools.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="my.plugin.package.ui.views.myMoreGenericView">
+         <analysisModuleClass
+               class="my.plugin.package.core.MyAnalysisModuleClass">
+         </analysisModuleClass>
+      </output>
+</extension>
+</pre>
 
 == Providing help for the module ==
 
