@@ -42,7 +42,7 @@
           <executions>
             <execution>
               <id>prepare</id>
-              <phase>validate</phase>
+              <phase>pre-integration-test</phase>
               <configuration>
                 <target>
                  <ant antfile="get-traces.xml" dir="traces" />
