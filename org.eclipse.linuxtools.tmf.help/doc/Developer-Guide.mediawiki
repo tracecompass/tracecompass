@@ -403,7 +403,7 @@ This tutorial will cover concepts like:
 
 === Prerequisites ===
 
-The tutorial is based on Eclipse 4.3 (Eclipse Kepler), TMF 2.0.0 and SWTChart 0.7.0. You can install SWTChart by using the Orbit update site. http://download.eclipse.org/tools/orbit/downloads/
+The tutorial is based on Eclipse 4.4 (Eclipse Luna), TMF 3.0.0 and SWTChart 0.7.0. If you are using TMF from the source repository, SWTChart is already included in the target definition file (see org.eclipse.linuxtools.lttng.target). You can also install it manually by using the Orbit update site. http://download.eclipse.org/tools/orbit/downloads/
 
 === Creating an Eclipse UI Plug-in ===
 
@@ -537,8 +537,8 @@ Then we need to actually gather data from the trace. This is done asynchronously
         // Create the request to get data from the trace
 
         TmfEventRequest req = new TmfEventRequest(TmfEvent.class,
-                TmfTimeRange.ETERNITY, TmfEventRequest.ALL_DATA,
-                ExecutionType.BACKGROUND) {
+                TmfTimeRange.ETERNITY, 0, ITmfEventRequest.ALL_DATA,
+                ITmfEventRequest.ExecutionType.BACKGROUND) {
 
             @Override
             public void handleData(ITmfEvent data) {
@@ -569,8 +569,8 @@ The chart expects an array of doubles for both the X and Y axis values. To provi
 
 <pre>
         TmfEventRequest req = new TmfEventRequest(TmfEvent.class,
-                TmfTimeRange.ETERNITY, TmfEventRequest.ALL_DATA,
-                ExecutionType.BACKGROUND) {
+                TmfTimeRange.ETERNITY, 0, ITmfEventRequest.ALL_DATA,
+                ITmfEventRequest.ExecutionType.BACKGROUND) {
 
             ArrayList<Double> xValues = new ArrayList<Double>();
             ArrayList<Double> yValues = new ArrayList<Double>();
