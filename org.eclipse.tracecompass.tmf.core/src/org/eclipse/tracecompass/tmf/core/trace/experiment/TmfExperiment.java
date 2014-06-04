@@ -19,7 +19,9 @@ package org.eclipse.tracecompass.tmf.core.trace.experiment;
 
 import java.io.File;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -107,6 +109,12 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
      */
     private boolean fInitialized = false;
 
+    /**
+     * Lock for synchronization methods. These methods cannot be 'synchronized'
+     * since it makes it impossible to use an event request on the experiment
+     * during synchronization (the request thread would block)
+     */
+    private final Lock fSyncLock = new ReentrantLock();
 
     // ------------------------------------------------------------------------
     // Construction
@@ -520,7 +528,7 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
      * @return The synchronization object
      * @since 3.0
      */
-    public synchronized SynchronizationAlgorithm synchronizeTraces() {
+    public SynchronizationAlgorithm synchronizeTraces() {
         return synchronizeTraces(false);
     }
 
@@ -533,25 +541,30 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
      * @return The synchronization object
      * @since 3.0
      */
-    public synchronized SynchronizationAlgorithm synchronizeTraces(boolean doSync) {
+    public SynchronizationAlgorithm synchronizeTraces(boolean doSync) {
+        fSyncLock.lock();
 
-        String syncDirectory = getSynchronizationFolder(true);
+        try {
+            String syncDirectory = getSynchronizationFolder(true);
 
-        final File syncFile = (syncDirectory != null) ? new File(syncDirectory + File.separator + SYNCHRONIZATION_FILE_NAME) : null;
+            final File syncFile = (syncDirectory != null) ? new File(syncDirectory + File.separator + SYNCHRONIZATION_FILE_NAME) : null;
 
-        final SynchronizationAlgorithm syncAlgo = SynchronizationManager.synchronizeTraces(syncFile, Arrays.asList(fTraces), doSync);
+            final SynchronizationAlgorithm syncAlgo = SynchronizationManager.synchronizeTraces(syncFile, Collections.<ITmfTrace> singleton(this), doSync);
 
-        final TmfTraceSynchronizedSignal signal = new TmfTraceSynchronizedSignal(this, syncAlgo);
+            final TmfTraceSynchronizedSignal signal = new TmfTraceSynchronizedSignal(this, syncAlgo);
 
-        /* Broadcast in separate thread to prevent deadlock */
-        new Thread() {
-            @Override
-            public void run() {
-                broadcast(signal);
-            }
-        }.start();
+            /* Broadcast in separate thread to prevent deadlock */
+            new Thread() {
+                @Override
+                public void run() {
+                    broadcast(signal);
+                }
+            }.start();
 
-        return syncAlgo;
+            return syncAlgo;
+        } finally {
+            fSyncLock.unlock();
+        }
     }
 
     @Override

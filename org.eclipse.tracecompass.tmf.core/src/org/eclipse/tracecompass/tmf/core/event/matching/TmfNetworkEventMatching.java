@@ -84,7 +84,7 @@ public class TmfNetworkEventMatching extends TmfEventMatching {
         // Initialize the matching infrastructure (unmatched event lists)
         fUnmatchedIn.clear();
         fUnmatchedOut.clear();
-        for (ITmfTrace trace : getTraces()) {
+        for (ITmfTrace trace : getIndividualTraces()) {
             fUnmatchedIn.put(trace, new HashMap<List<Object>, ITmfEvent>());
             fUnmatchedOut.put(trace, new HashMap<List<Object>, ITmfEvent>());
         }
@@ -187,8 +187,8 @@ public class TmfNetworkEventMatching extends TmfEventMatching {
              * events as value for the unmatched table. Not necessary right now
              * though
              */
-            if (!unmatchedTbl.get(trace).containsKey(eventKey)) {
-                unmatchedTbl.get(trace).put(eventKey, event);
+            if (!unmatchedTbl.get(event.getTrace()).containsKey(eventKey)) {
+                unmatchedTbl.get(event.getTrace()).put(eventKey, event);
             }
         }
 
@@ -206,7 +206,7 @@ public class TmfNetworkEventMatching extends TmfEventMatching {
         StringBuilder b = new StringBuilder();
         b.append(getProcessingUnit());
         int i = 0;
-        for (ITmfTrace trace : getTraces()) {
+        for (ITmfTrace trace : getIndividualTraces()) {
             b.append("Trace " + i++ + ":" + cr +
                     "  " + countEvents(fUnmatchedIn.get(trace)) + " unmatched incoming events" + cr +
                     "  " + countEvents(fUnmatchedOut.get(trace)) + " unmatched outgoing events" + cr);

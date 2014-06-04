@@ -12,11 +12,10 @@
 
 package org.eclipse.tracecompass.tmf.core.event.matching;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -24,6 +23,8 @@ import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
@@ -50,6 +51,8 @@ public abstract class TmfEventMatching implements ITmfEventMatching {
         NETWORK
     }
 
+    private static final Multimap<MatchingType, ITmfMatchEventDefinition> MATCH_DEFINITIONS = HashMultimap.create();
+
     /**
      * The array of traces to match
      */
@@ -59,8 +62,6 @@ public abstract class TmfEventMatching implements ITmfEventMatching {
      * The class to call once a match is found
      */
     private final IMatchProcessingUnit fMatches;
-
-    private static final Map<MatchingType, List<ITmfMatchEventDefinition>> fMatchDefinitions = new HashMap<>();
 
     private final Multimap<ITmfTrace, ITmfMatchEventDefinition> fMatchMap = HashMultimap.create();
 
@@ -76,17 +77,35 @@ public abstract class TmfEventMatching implements ITmfEventMatching {
         if (tmfEventMatches == null) {
             throw new IllegalArgumentException();
         }
-        fTraces = traces;
+        fTraces = new HashSet<>(traces);
         fMatches = tmfEventMatches;
     }
 
     /**
-     * Returns the traces to process
+     * Returns the traces to synchronize. These are the traces that were
+     * specified in the constructor, they may contain either traces or
+     * experiment.
      *
-     * @return The traces
+     * @return The traces to synchronize
      */
-    protected Collection<? extends ITmfTrace> getTraces() {
-        return fTraces;
+    protected Collection<ITmfTrace> getTraces() {
+        return new HashSet<>(fTraces);
+    }
+
+    /**
+     * Returns the individual traces to process. If some of the traces specified
+     * to synchronize in the constructor were experiments, only the traces
+     * contained in this experiment will be returned. No {@link TmfExperiment}
+     * are returned by this method.
+     *
+     * @return The individual traces to synchronize, no experiments
+     */
+    protected Collection<ITmfTrace> getIndividualTraces() {
+        Set<ITmfTrace> traces = new HashSet<>();
+        for (ITmfTrace trace : fTraces) {
+            traces.addAll(Arrays.asList(TmfTraceManager.getTraceSet(trace)));
+        }
+        return traces;
     }
 
     /**
@@ -116,11 +135,11 @@ public abstract class TmfEventMatching implements ITmfEventMatching {
      */
     protected void initMatching() {
         fMatches.init(fTraces);
-        List<ITmfMatchEventDefinition> deflist = fMatchDefinitions.get(getMatchingType());
+        Collection<ITmfMatchEventDefinition> deflist = MATCH_DEFINITIONS.get(getMatchingType());
         if (deflist == null) {
             return;
         }
-        for (ITmfTrace trace : fTraces) {
+        for (ITmfTrace trace : getIndividualTraces()) {
             for (ITmfMatchEventDefinition def : deflist) {
                 if (def.canMatchTrace(trace)) {
                     fMatchMap.put(trace, def);
@@ -227,10 +246,7 @@ public abstract class TmfEventMatching implements ITmfEventMatching {
      */
     public static void registerMatchObject(ITmfMatchEventDefinition match) {
         for (MatchingType type : match.getApplicableMatchingTypes()) {
-            if (!fMatchDefinitions.containsKey(type)) {
-                fMatchDefinitions.put(type, new ArrayList<ITmfMatchEventDefinition>());
-            }
-            fMatchDefinitions.get(type).add(match);
+            MATCH_DEFINITIONS.put(type, match);
         }
     }
 

@@ -15,7 +15,7 @@ package org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.event.matching;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assume.assumeTrue;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
@@ -26,6 +26,8 @@ import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching;
 import org.eclipse.tracecompass.tmf.core.synchronization.SynchronizationAlgorithm;
 import org.eclipse.tracecompass.tmf.core.synchronization.SynchronizationManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
+import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.BeforeClass;
@@ -62,7 +64,8 @@ public class TraceSynchronizationBenchmark {
         try (CtfTmfTrace trace1 = CtfTmfTestTrace.SYNC_SRC.getTrace();
                 CtfTmfTrace trace2 = CtfTmfTestTrace.SYNC_DEST.getTrace();) {
             ITmfTrace[] traces = { trace1, trace2 };
-            runCpuTest(traces, "Match TCP events", 40);
+            TmfExperiment experiment = new TmfExperiment(CtfTmfEvent.class, "Test experiment", traces, TmfExperiment.DEFAULT_INDEX_PAGE_SIZE, null);
+            runCpuTest(experiment, "Match TCP events", 40);
         }
     }
 
@@ -78,19 +81,20 @@ public class TraceSynchronizationBenchmark {
                 CtfTmfTrace trace2 = CtfTmfTestTrace.DJANGO_DB.getTrace();
                 CtfTmfTrace trace3 = CtfTmfTestTrace.DJANGO_HTTPD.getTrace();) {
             ITmfTrace[] traces = { trace1, trace2, trace3 };
-            runCpuTest(traces, "Django traces", 10);
-            runMemoryTest(traces, "Django traces", 10);
+            TmfExperiment experiment = new TmfExperiment(CtfTmfEvent.class, "Test experiment", traces, TmfExperiment.DEFAULT_INDEX_PAGE_SIZE, null);
+            runCpuTest(experiment, "Django traces", 10);
+            runMemoryTest(experiment, "Django traces", 10);
         }
     }
 
-    private static void runCpuTest(ITmfTrace[] testTraces, String testName, int loop_count) {
+    private static void runCpuTest(TmfExperiment experiment, String testName, int loop_count) {
         Performance perf = Performance.getDefault();
         PerformanceMeter pm = perf.createPerformanceMeter(TEST_ID + testName + TIME);
         perf.tagAsSummary(pm, TEST_SUMMARY + ':' + testName + TIME, Dimension.CPU_TIME);
 
         for (int i = 0; i < loop_count; i++) {
             pm.start();
-            SynchronizationManager.synchronizeTraces(null, Arrays.asList(testTraces), true);
+            SynchronizationManager.synchronizeTraces(null, Collections.<ITmfTrace> singleton(experiment), true);
             pm.stop();
         }
         pm.commit();
@@ -98,7 +102,7 @@ public class TraceSynchronizationBenchmark {
     }
 
     /* Benchmark memory used by the algorithm */
-    private static void runMemoryTest(ITmfTrace[] testTraces, String testName, int loop_count) {
+    private static void runMemoryTest(TmfExperiment experiment, String testName, int loop_count) {
         Performance perf = Performance.getDefault();
         PerformanceMeter pm = perf.createPerformanceMeter(TEST_ID + testName + MEMORY);
         perf.tagAsSummary(pm, TEST_SUMMARY + ':' + testName + MEMORY, Dimension.USED_JAVA_HEAP);
@@ -107,7 +111,7 @@ public class TraceSynchronizationBenchmark {
 
             System.gc();
             pm.start();
-            SynchronizationAlgorithm algo = SynchronizationManager.synchronizeTraces(null, Arrays.asList(testTraces), true);
+            SynchronizationAlgorithm algo = SynchronizationManager.synchronizeTraces(null, Collections.<ITmfTrace> singleton(experiment), true);
             assertNotNull(algo);
 
             System.gc();
