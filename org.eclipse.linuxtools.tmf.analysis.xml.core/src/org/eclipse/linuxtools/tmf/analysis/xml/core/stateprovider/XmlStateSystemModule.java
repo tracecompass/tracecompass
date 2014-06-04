@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
@@ -29,7 +30,7 @@ import org.w3c.dom.Element;
  */
 public class XmlStateSystemModule extends TmfStateSystemAnalysisModule {
 
-    private IPath fXmlFile;
+    private @Nullable IPath fXmlFile;
 
     @Override
     protected StateSystemBackendType getBackendType() {
@@ -45,7 +46,11 @@ public class XmlStateSystemModule extends TmfStateSystemAnalysisModule {
     @Override
     public String getName() {
         String name = getId();
-        Element doc = XmlUtils.getElementInFile(fXmlFile.makeAbsolute().toString(), TmfXmlStrings.STATE_PROVIDER, getId());
+        IPath xmlFile = fXmlFile;
+        if (xmlFile == null) {
+            return name;
+        }
+        Element doc = XmlUtils.getElementInFile(xmlFile.makeAbsolute().toString(), TmfXmlStrings.STATE_PROVIDER, getId());
         /* Label may be available in XML header */
         List<Element> head = XmlUtils.getChildElements(doc, TmfXmlStrings.HEAD);
         if (head.size() == 1) {
