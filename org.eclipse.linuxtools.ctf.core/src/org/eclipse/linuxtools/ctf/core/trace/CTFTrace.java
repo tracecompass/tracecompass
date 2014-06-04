@@ -915,6 +915,9 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
      */
     public CTFCallsite getCallsite(String eventName, long ip) {
         final TreeSet<CTFCallsite> candidates = fCallsitesByName.get(eventName);
+        if (candidates == null) {
+            return null;
+        }
         final CTFCallsite dummyCs = new CTFCallsite(null, null, ip, null, -1);
         final CTFCallsite callsite = candidates.ceiling(dummyCs);
         if (callsite == null) {
