@@ -30,6 +30,7 @@ public class CustomTxtParserWizard extends Wizard implements INewWizard {
     CustomTxtParserOutputWizardPage outputPage;
     private ISelection selection;
     CustomTxtTraceDefinition definition;
+    String initialDefinitionName;
 
     /**
      * Default constructor
@@ -47,13 +48,14 @@ public class CustomTxtParserWizard extends Wizard implements INewWizard {
     public CustomTxtParserWizard(CustomTxtTraceDefinition definition) {
         super();
         this.definition = definition;
+        this.initialDefinitionName = definition.definitionName;
     }
 
     @Override
     public boolean performFinish() {
         CustomTxtTraceDefinition def = outputPage.getDefinition();
-        if (definition != null && !definition.definitionName.equals(def.definitionName)) {
-            CustomTxtTraceDefinition.delete(definition.definitionName);
+        if (definition != null && !initialDefinitionName.equals(def.definitionName)) {
+            CustomTxtTraceDefinition.delete(initialDefinitionName);
         }
         def.save();
         return true;
