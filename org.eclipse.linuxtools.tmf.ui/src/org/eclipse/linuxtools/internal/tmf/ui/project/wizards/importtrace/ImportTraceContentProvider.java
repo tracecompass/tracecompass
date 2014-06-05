@@ -24,6 +24,7 @@ import java.util.TreeSet;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
+import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
 
 /**
  * A helper class to show the trace types and files and names. it contains the
@@ -48,19 +49,23 @@ class ImportTraceContentProvider implements ITreeContentProvider {
     /**
      * Add a trace candidate to display
      *
-     * @param category
-     *            the category of the trace
+     * @param traceTypeId
+     *            the trace type id of the trace
      * @param traceToOpen
      *            the trace file.
      */
-    public synchronized void addCandidate(String category, File traceToOpen) {
-        fTraceTypes.put(TmfTraceType.getTraceType(category).getName(), category);
-        if (!fTraceFiles.containsKey(category)) {
-            fTraceFiles.put(category, new TreeSet<FileAndName>());
+    public synchronized void addCandidate(String traceTypeId, File traceToOpen) {
+        TraceTypeHelper traceTypeHelper = TmfTraceType.getTraceType(traceTypeId);
+        if (traceTypeHelper == null) {
+            return;
+        }
+        fTraceTypes.put(traceTypeHelper.getName(), traceTypeId);
+        if (!fTraceFiles.containsKey(traceTypeId)) {
+            fTraceFiles.put(traceTypeId, new TreeSet<FileAndName>());
         }
         final FileAndName traceFile = new FileAndName(traceToOpen, traceToOpen.getName());
-        traceFile.setTraceTypeId(category);
-        final Set<FileAndName> categorySet = fTraceFiles.get(category);
+        traceFile.setTraceTypeId(traceTypeId);
+        final Set<FileAndName> categorySet = fTraceFiles.get(traceTypeId);
         categorySet.add(traceFile);
     }
 

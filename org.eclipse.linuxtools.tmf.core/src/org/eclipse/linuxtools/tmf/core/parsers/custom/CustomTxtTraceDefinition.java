@@ -908,6 +908,8 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             }
 
             TmfTraceType.removeCustomTraceType(TmfTraceType.CUSTOM_TXT_CATEGORY, definitionName);
+            // Check if default definition needs to be reloaded
+            TmfTraceType.addCustomTraceType(TmfTraceType.CUSTOM_TXT_CATEGORY, definitionName);
 
         } catch (ParserConfigurationException e) {
             Activator.logError("Error deleting CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$

@@ -801,6 +801,8 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             }
 
             TmfTraceType.removeCustomTraceType(TmfTraceType.CUSTOM_XML_CATEGORY, definitionName);
+            // Check if default definition needs to be reloaded
+            TmfTraceType.addCustomTraceType(TmfTraceType.CUSTOM_XML_CATEGORY, definitionName);
 
         } catch (ParserConfigurationException e) {
             Activator.logError("Error deleteing CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$

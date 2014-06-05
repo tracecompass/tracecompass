@@ -176,6 +176,9 @@ public class SelectTraceTypeHandler extends AbstractHandler {
             throws CoreException {
 
         TraceTypeHelper traceTypeHelper = TmfTraceType.getTraceType(traceType);
+        if (traceTypeHelper == null) {
+            return Status.CANCEL_STATUS;
+        }
         final IStatus validateTraceType = traceTypeHelper.validate(element.getLocation().getPath());
         if (!validateTraceType.isOK()) {
             return validateTraceType;

@@ -237,6 +237,7 @@ public class AnalysisModuleHelperTest {
         Iterable<Class<? extends ITmfTrace>> traceTypes = fReqModule.getValidTraceTypes();
         for (Class<? extends ITmfTrace> traceType : traceTypes) {
             assertTrue(fReqModule.appliesToTraceType(traceType));
+            assertNotNull(traceTypeHelper);
             assertEquals(traceTypeHelper.getTraceClass(), traceType);
             traceTypeCount++;
         }

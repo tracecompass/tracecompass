@@ -487,7 +487,7 @@ public final class TmfTraceType {
     public static boolean validate(String traceTypeName, String fileName) {
         if (traceTypeName != null && !traceTypeName.isEmpty()) {
             final TraceTypeHelper traceTypeHelper = TRACE_TYPES.get(traceTypeName);
-            if (!traceTypeHelper.validate(fileName).isOK()) {
+            if (traceTypeHelper == null || !traceTypeHelper.validate(fileName).isOK()) {
                 return false;
             }
         }
