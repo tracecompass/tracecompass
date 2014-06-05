@@ -160,8 +160,11 @@ public class TmfProjectRegistry implements IResourceChangeListener {
             if (event.getResource() instanceof IProject) {
                 IProject project = (IProject) event.getResource();
                 try {
-                    if (project.hasNature(TmfProjectNature.ID)) {
+                    if (project.isAccessible() && project.hasNature(TmfProjectNature.ID)) {
                         TmfProjectElement tmfProjectElement = registry.get(project);
+                        if (tmfProjectElement == null) {
+                            return;
+                        }
                         final List<TmfTraceElement> traces = tmfProjectElement.getTracesFolder().getTraces();
                         if (!traces.isEmpty()) {
                             // Close editors in UI Thread
