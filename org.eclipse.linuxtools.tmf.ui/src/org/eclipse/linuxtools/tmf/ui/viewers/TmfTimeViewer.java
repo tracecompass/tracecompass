@@ -274,7 +274,10 @@ public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvide
         fTrace = trace;
 
         long timestamp = TmfTraceManager.getInstance().getSelectionBeginTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-        long windowStartTime = TmfTraceManager.getInstance().getCurrentRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        TmfTimeRange currentRange = TmfTraceManager.getInstance().getCurrentRange();
+        long windowStartTime = currentRange.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        long windowEndTime = currentRange.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        long windowDuration = windowEndTime - windowStartTime;
         long startTime = fTrace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
         long endTime = fTrace.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
 
@@ -282,9 +285,9 @@ public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvide
         setSelectionEndTime(timestamp);
         setStartTime(startTime);
         setWindowStartTime(windowStartTime);
-        setWindowDuration(fTrace.getInitialRangeOffset().getValue());
+        setWindowEndTime(windowEndTime);
+        setWindowDuration(windowDuration);
         setEndTime(endTime);
-        setWindowEndTime(windowStartTime + getWindowDuration());
     }
 
     /**
