@@ -47,6 +47,9 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
 
     private static final int BYTES_TO_KB = 1024;
 
+    // Timeout between updates in the updateData thread
+    private static final long BUILD_UPDATE_TIMEOUT = 500;
+
     /**
      * Constructor
      *
@@ -74,66 +77,79 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
             if (getTrace() == null || fModule == null) {
                 return;
             }
+            fModule.waitForInitialization();
             ITmfStateSystem ss = fModule.getStateSystem();
             /* Don't wait for the module completion, when it's ready, we'll know */
             if (ss == null) {
                 return;
             }
+
             double[] xvalues = getXAxis(start, end, nb);
             setXAxis(xvalues);
-            List<Integer> tidQuarks = ss.getSubAttributes(-1, false);
-            long traceStart = getStartTime();
-            long traceEnd = getEndTime();
-            long offset = this.getTimeOffset();
 
-            /* Initialize quarks and series names */
-            for (int quark : tidQuarks) {
-                fYValues.put(quark, new double[xvalues.length]);
-                fMemoryQuarks.put(quark, ss.getQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_MEMORY_ATTRIBUTE));
-                int procNameQuark = ss.getQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_PROCNAME_ATTRIBUTE);
-                try {
-                    ITmfStateValue procnameValue = ss.querySingleState(start, procNameQuark).getStateValue();
-                    String procname = new String();
-                    if (!procnameValue.isNull()) {
-                        procname = procnameValue.unboxStr();
-                    }
-                    fSeriesName.put(quark, new String(procname + ' ' + '(' + ss.getAttributeName(quark) + ')').trim());
-                } catch (TimeRangeException e) {
-                    fSeriesName.put(quark, '(' + ss.getAttributeName(quark) + ')');
-                }
-            }
+            boolean complete = false;
+            long currentEnd = start;
 
-            /*
-             * TODO: It should only show active threads in the time range. If a
-             * tid does not have any memory value (only 1 interval in the time
-             * range with value null or 0), then its series should not be
-             * displayed.
-             */
-            double yvalue = 0.0;
-            for (int i = 0; i < xvalues.length; i++) {
+            while (!complete && currentEnd < end) {
                 if (monitor.isCanceled()) {
                     return;
                 }
-                double x = xvalues[i];
-                long time = (long) x + offset;
-                // make sure that time is in the trace range after double to
-                // long conversion
-                time = time < traceStart ? traceStart : time;
-                time = time > traceEnd ? traceEnd : time;
+                complete = ss.waitUntilBuilt(BUILD_UPDATE_TIMEOUT);
+                currentEnd = ss.getCurrentEndTime();
+                List<Integer> tidQuarks = ss.getSubAttributes(-1, false);
+                long traceStart = getStartTime();
+                long traceEnd = getEndTime();
+                long offset = this.getTimeOffset();
 
+                /* Initialize quarks and series names */
                 for (int quark : tidQuarks) {
+                    fYValues.put(quark, new double[xvalues.length]);
+                    fMemoryQuarks.put(quark, ss.getQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_MEMORY_ATTRIBUTE));
+                    int procNameQuark = ss.getQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_PROCNAME_ATTRIBUTE);
                     try {
-                        yvalue = ss.querySingleState(time, fMemoryQuarks.get(quark)).getStateValue().unboxLong() / BYTES_TO_KB;
-                        fYValues.get(quark)[i] = yvalue;
+                        ITmfStateValue procnameValue = ss.querySingleState(start, procNameQuark).getStateValue();
+                        String procname = new String();
+                        if (!procnameValue.isNull()) {
+                            procname = procnameValue.unboxStr();
+                        }
+                        fSeriesName.put(quark, new String(procname + ' ' + '(' + ss.getAttributeName(quark) + ')').trim());
                     } catch (TimeRangeException e) {
-                        fYValues.get(quark)[i] = 0;
+                        fSeriesName.put(quark, '(' + ss.getAttributeName(quark) + ')');
                     }
                 }
+
+                /*
+                 * TODO: It should only show active threads in the time range. If a
+                 * tid does not have any memory value (only 1 interval in the time
+                 * range with value null or 0), then its series should not be
+                 * displayed.
+                 */
+                double yvalue = 0.0;
+                for (int i = 0; i < xvalues.length; i++) {
+                    if (monitor.isCanceled()) {
+                        return;
+                    }
+                    double x = xvalues[i];
+                    long time = (long) x + offset;
+                    // make sure that time is in the trace range after double to
+                    // long conversion
+                    time = time < traceStart ? traceStart : time;
+                    time = time > traceEnd ? traceEnd : time;
+
+                    for (int quark : tidQuarks) {
+                        try {
+                            yvalue = ss.querySingleState(time, fMemoryQuarks.get(quark)).getStateValue().unboxLong() / BYTES_TO_KB;
+                            fYValues.get(quark)[i] = yvalue;
+                        } catch (TimeRangeException e) {
+                            fYValues.get(quark)[i] = 0;
+                        }
+                    }
+                }
+                for (int quark : tidQuarks) {
+                    setSeries(fSeriesName.get(quark), fYValues.get(quark));
+                }
+                updateDisplay();
             }
-            for (int quark : tidQuarks) {
-                setSeries(fSeriesName.get(quark), fYValues.get(quark));
-            }
-            updateDisplay();
         } catch (AttributeNotFoundException | StateValueTypeException | StateSystemDisposedException e) {
             Activator.logError("Error updating the data of the Memory usage view", e); //$NON-NLS-1$
         }
