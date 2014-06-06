@@ -47,6 +47,9 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class CpuUsageComposite extends AbstractTmfTreeViewer {
 
+    // Timeout between to wait for in the updateElements method
+    private static final long BUILD_UPDATE_TIMEOUT = 500;
+
     private LttngKernelCpuUsageAnalysis fModule = null;
 
     private static final String[] COLUMN_NAMES = new String[] {
@@ -185,10 +188,18 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
         if (getTrace() == null || fModule == null) {
             return null;
         }
+        fModule.waitForInitialization();
         ITmfStateSystem ss = fModule.getStateSystem();
-        /* Don't wait for the module completion, when it's ready, we'll know */
         if (ss == null) {
             return null;
+        }
+
+        boolean complete = false;
+        long currentEnd = start;
+
+        while (!complete && currentEnd < end) {
+            complete = ss.waitUntilBuilt(BUILD_UPDATE_TIMEOUT);
+            currentEnd = ss.getCurrentEndTime();
         }
 
         /* Initialize the data */
