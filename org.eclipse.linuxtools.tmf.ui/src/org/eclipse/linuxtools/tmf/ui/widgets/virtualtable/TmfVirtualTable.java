@@ -579,7 +579,6 @@ public class TmfVirtualTable extends Composite {
                 switch (event.detail) {
                 case SWT.ARROW_DOWN:
                 case SWT.ARROW_UP:
-                case SWT.NONE:
                 case SWT.END:
                 case SWT.HOME:
                 case SWT.PAGE_DOWN:
@@ -588,11 +587,27 @@ public class TmfVirtualTable extends Composite {
                     refreshTable();
                     break;
                 }
+                // Not handled because of bug on Linux described below.
+                case SWT.NONE:
                 default:
                     break;
                 }
             }
         });
+
+        /*
+         * In Linux, the selection event above has event.detail set to SWT.NONE
+         * instead of SWT.DRAG during dragging of the thumb. To prevent refresh
+         * overflow, only update the table when the mouse button is released.
+         */
+        fSlider.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseUp(MouseEvent e) {
+                fTableTopEventRank = fSlider.getSelection();
+                refreshTable();
+            }
+        });
+
     }
 
     // ------------------------------------------------------------------------
