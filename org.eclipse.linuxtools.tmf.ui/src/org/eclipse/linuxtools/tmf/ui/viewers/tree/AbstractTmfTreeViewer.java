@@ -14,14 +14,17 @@ package org.eclipse.linuxtools.tmf.ui.viewers.tree;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableFontProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
@@ -318,6 +321,18 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
     // ------------------------------------------------------------------------
 
     /**
+     * Set the currently selected items in the treeviewer
+     *
+     * @param selection
+     *            The list of selected items
+     * @since 3.1
+     */
+    public void setSelection(@NonNull List<ITmfTreeViewerEntry> selection) {
+        IStructuredSelection sel = new StructuredSelection(selection);
+        fTreeViewer.setSelection(sel, true);
+    }
+
+    /**
      * Add a selection listener to the tree viewer. This will be called when the
      * selection changes and contain all the selected items.
      *
@@ -361,6 +376,18 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
     }
 
     /**
+     * Method called after the content has been updated and the new input has
+     * been set on the tree.
+     *
+     * @param rootEntry
+     *            The new input of this viewer, or null if none
+     * @since 3.1
+     */
+    protected void contentChanged(ITmfTreeViewerEntry rootEntry) {
+
+    }
+
+    /**
      * Requests an update of the viewer's content in a given time range or
      * selection time range. An extra parameter defines whether these times
      * correspond to the selection or the visible range, as the viewer may
@@ -386,6 +413,7 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
                         public void run() {
                             if (rootEntry != fTreeViewer.getInput()) {
                                 fTreeViewer.setInput(rootEntry);
+                                contentChanged(rootEntry);
                             } else {
                                 fTreeViewer.refresh();
                             }

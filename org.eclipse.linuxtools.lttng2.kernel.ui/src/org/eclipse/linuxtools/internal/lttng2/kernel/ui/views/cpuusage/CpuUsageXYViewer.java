@@ -19,9 +19,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.Activator;
 import org.eclipse.linuxtools.lttng2.kernel.core.cpuusage.LttngKernelCpuUsageAnalysis;
 import org.eclipse.linuxtools.statesystem.core.ITmfStateSystem;
@@ -57,28 +54,10 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
      *
      * @param parent
      *            parent composite
-     * @param treeViewer
-     *            The tree viewer containing the list of threads with CPU usage.
-     *            A listener will be added to that viewer so it can synchronize
-     *            with the selection from the viewer.
      */
-    public CpuUsageXYViewer(Composite parent, CpuUsageComposite treeViewer) {
+    public CpuUsageXYViewer(Composite parent) {
         super(parent, Messages.CpuUsageXYViewer_Title, Messages.CpuUsageXYViewer_TimeXAxis, Messages.CpuUsageXYViewer_CpuYAxis);
         setResolution(RESOLUTION);
-
-        /* Add selection listener to tree viewer */
-        treeViewer.addSelectionChangeListener(new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                if (event.getSelection() instanceof IStructuredSelection) {
-                    Object selection = ((IStructuredSelection) event.getSelection()).getFirstElement();
-                    if (selection instanceof CpuUsageEntry) {
-                        CpuUsageEntry entry = (CpuUsageEntry) selection;
-                        setSelectedThread(Long.valueOf(entry.getTid()));
-                    }
-                }
-            }
-        });
     }
 
     @Override

@@ -12,9 +12,12 @@
 
 package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.cpuusage;
 
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -35,7 +38,7 @@ public class CpuUsageView extends TmfView {
     public static final String ID = "org.eclipse.linuxtools.lttng2.kernel.ui.views.cpuusage"; //$NON-NLS-1$
 
     private CpuUsageComposite fTreeViewer = null;
-    private TmfXYChartViewer fXYViewer = null;
+    private CpuUsageXYViewer fXYViewer = null;
 
     /**
      * Constructor
@@ -52,7 +55,23 @@ public class CpuUsageView extends TmfView {
         fTreeViewer = new CpuUsageComposite(sash);
 
         /* Build the XY chart part of the view */
-        fXYViewer = new CpuUsageXYViewer(sash, fTreeViewer);
+        fXYViewer = new CpuUsageXYViewer(sash);
+
+        /* Add selection listener to tree viewer */
+        fTreeViewer.addSelectionChangeListener(new ISelectionChangedListener() {
+            @Override
+            public void selectionChanged(SelectionChangedEvent event) {
+                ISelection selection = event.getSelection();
+                if (selection instanceof IStructuredSelection) {
+                    Object structSelection = ((IStructuredSelection) selection).getFirstElement();
+                    if (structSelection instanceof CpuUsageEntry) {
+                        CpuUsageEntry entry = (CpuUsageEntry) structSelection;
+                        fTreeViewer.setSelectedThread(entry.getTid());
+                        fXYViewer.setSelectedThread(Long.valueOf(entry.getTid()));
+                    }
+                }
+            }
+        });
 
         sash.setLayout(new FillLayout());
 
