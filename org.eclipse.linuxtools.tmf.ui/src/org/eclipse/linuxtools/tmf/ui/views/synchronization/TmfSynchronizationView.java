@@ -14,9 +14,15 @@ package org.eclipse.linuxtools.tmf.ui.views.synchronization;
 
 import java.util.Map;
 
+import org.eclipse.linuxtools.internal.tmf.ui.Activator;
+import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSynchronizedSignal;
 import org.eclipse.linuxtools.tmf.core.synchronization.SynchronizationAlgorithm;
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
+import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 import org.eclipse.linuxtools.tmf.ui.views.TmfView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -71,6 +77,10 @@ public class TmfSynchronizationView extends TmfView {
         nameCol.pack();
         valueCol.pack();
 
+        ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
+        if (trace != null) {
+            traceSelected(new TmfTraceSelectedSignal(this, trace));
+        }
     }
 
     private void updateTable() {
@@ -104,6 +114,30 @@ public class TmfSynchronizationView extends TmfView {
     @Override
     public void setFocus() {
         fTree.setFocus();
+    }
+
+    /**
+     * Handler called when a trace is selected
+     *
+     * @param signal
+     *            Contains information about the selected trace
+     */
+    @TmfSignalHandler
+    public void traceSelected(TmfTraceSelectedSignal signal) {
+        fAlgoSync = null;
+        if (signal.getTrace() instanceof TmfExperiment) {
+            try {
+                fAlgoSync = ((TmfExperiment) signal.getTrace()).synchronizeTraces();
+            } catch (TmfTraceException e) {
+                Activator.getDefault().logError("Error while getting the synchronization data of experiment", e); //$NON-NLS-1$
+            }
+        }
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                updateTable();
+            }
+        });
     }
 
     /**
