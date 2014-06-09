@@ -249,6 +249,9 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace {
         super.init(traceName, type);
         // register as VIP after super.init() because TmfComponent registers to signal manager there
         TmfSignalManager.registerVIP(this);
+        if (fIndexer != null) {
+            fIndexer.dispose();
+        }
         fIndexer = createIndexer(fCacheSize);
     }
 
