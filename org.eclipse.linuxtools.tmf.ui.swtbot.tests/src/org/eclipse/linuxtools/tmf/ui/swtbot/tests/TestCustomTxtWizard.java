@@ -29,7 +29,6 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
-import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -139,7 +138,7 @@ public class TestCustomTxtWizard {
         }
         assertNotNull(treeNode);
         treeNode.contextMenu("Manage Custom Parsers...").click();
-        fBot.waitUntil(Conditions.shellIsActive(MANAGE_CUSTOM_PARSERS_SHELL_TITLE));
+        fBot.shell(MANAGE_CUSTOM_PARSERS_SHELL_TITLE).setFocus();
 
         fBot.button("New...").click();
 
@@ -239,7 +238,7 @@ public class TestCustomTxtWizard {
         }
         assertNotNull(treeNode);
         treeNode.contextMenu("Manage Custom Parsers...").click();
-        fBot.waitUntil(Conditions.shellIsActive(MANAGE_CUSTOM_PARSERS_SHELL_TITLE));
+        fBot.shell(MANAGE_CUSTOM_PARSERS_SHELL_TITLE).setFocus();
         fBot.list().select(fBot.list().getItems()[0]);
         fBot.button("Edit...").click();
 
