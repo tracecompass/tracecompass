@@ -13,11 +13,16 @@ package org.eclipse.linuxtools.internal.lttng2.control.ui.views.dialogs;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.Activator;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.linuxtools.tmf.core.io.BufferedRandomAccessFile;
@@ -27,6 +32,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -35,7 +41,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 
 import com.google.common.collect.ImmutableList;
 
@@ -57,6 +62,11 @@ public class OpenCommandScriptDialog extends Dialog implements ISelectCommandScr
      */
     public static final String CREATE_SESSION_ICON_FILE = "icons/elcl16/add_button.gif"; //$NON-NLS-1$
 
+    // Dialog settings constants
+    private static final String DIALOG_SETTINGS_SECTION = "OpenCommandScriptDialog"; //$NON-NLS-1$
+    private static final String FILE_NAME_ID = "STORE_FILE_NAME_ID"; //$NON-NLS-1$
+    private static final int COMBO_HISTORY_LENGTH = 5;
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -66,7 +76,7 @@ public class OpenCommandScriptDialog extends Dialog implements ISelectCommandScr
     private Composite fDialogComposite = null;
     private Button fBrowseButton;
     private Label fFileNameLabel = null;
-    private Text fFileNameText = null;
+    private Combo fFileNameCombo = null;
 
     // Output list of commands
     private List<String> fCommands = null;
@@ -133,7 +143,7 @@ public class OpenCommandScriptDialog extends Dialog implements ISelectCommandScr
 
         fFileNameLabel = new Label(sessionGroup, SWT.RIGHT);
         fFileNameLabel.setText(Messages.TraceControl_ExecuteScriptSelectLabel);
-        fFileNameText = new Text(sessionGroup, SWT.NONE);
+        fFileNameCombo = new Combo(sessionGroup, SWT.BORDER);
 
         fBrowseButton = new Button(sessionGroup, SWT.PUSH);
         fBrowseButton.setText(Messages.TraceControl_ExecuteScriptBrowseText);
@@ -152,7 +162,7 @@ public class OpenCommandScriptDialog extends Dialog implements ISelectCommandScr
 
         data = new GridData(GridData.FILL_HORIZONTAL);
         data.horizontalSpan = 4;
-        fFileNameText.setLayoutData(data);
+        fFileNameCombo.setLayoutData(data);
 
         data = new GridData(GridData.FILL_HORIZONTAL);
         data.horizontalSpan = 1;
@@ -160,7 +170,61 @@ public class OpenCommandScriptDialog extends Dialog implements ISelectCommandScr
         // Initialize a empty list
         fCommands = new ArrayList<>();
 
+        restoreWidgetValues();
+
         return fDialogComposite;
+    }
+
+    private void restoreWidgetValues() {
+        IDialogSettings workbenchSettings = Activator.getDefault().getDialogSettings();
+        IDialogSettings settings = workbenchSettings.getSection(DIALOG_SETTINGS_SECTION);
+        if (settings == null) {
+            settings = workbenchSettings.addNewSection(DIALOG_SETTINGS_SECTION);
+        }
+        String[] fileNames = settings.getArray(FILE_NAME_ID);
+        if ((fileNames != null) && (fileNames.length != 0)) {
+            for (int i = 0; i < fileNames.length; i++) {
+                fFileNameCombo.add(fileNames[i]);
+            }
+        }
+    }
+
+    private void saveWidgetValues() {
+        IDialogSettings workbenchSettings = Activator.getDefault().getDialogSettings();
+        IDialogSettings settings = workbenchSettings.getSection(DIALOG_SETTINGS_SECTION);
+        if (settings != null) {
+            // update file names history
+            String[] fileNames = settings.getArray(FILE_NAME_ID);
+            if (fileNames == null) {
+                fileNames = new String[0];
+            }
+
+            fileNames = addToHistory(fileNames, fFileNameCombo.getText().trim());
+            settings.put(FILE_NAME_ID, fileNames);
+        }
+    }
+
+    /**
+     * Adds an entry to a history, while taking care of duplicate history items
+     * and excessively long histories.  The assumption is made that all histories
+     * should be of length <code>COMBO_HISTORY_LENGTH</code>.
+     *
+     * @param history the current history
+     * @param newEntry the entry to add to the history
+     */
+    private static String[] addToHistory(String[] history, String newEntry) {
+        List<String> list = new ArrayList<>(Arrays.asList(history));
+        list.remove(newEntry);
+        list.add(0, newEntry);
+
+        // since only one new item was added, we can be over the limit
+        // by at most one item
+        if (list.size() > COMBO_HISTORY_LENGTH) {
+            list.remove(COMBO_HISTORY_LENGTH);
+        }
+        String[] r = new String[list.size()];
+        list.toArray(r);
+        return r;
     }
 
     private void handleFilePathBrowseButtonPressed(int fileDialogStyle) {
@@ -168,7 +232,7 @@ public class OpenCommandScriptDialog extends Dialog implements ISelectCommandScr
         dialog.setFilterExtensions(new String[] { "*.*", "*.*" }); //$NON-NLS-1$ //$NON-NLS-2$
         dialog.setText(Messages.TraceControl_ExecuteScriptDialogTitle);
         String selectedFileName = dialog.open();
-        fFileNameText.setText(selectedFileName);
+        fFileNameCombo.setText(selectedFileName);
     }
 
     @Override
@@ -180,9 +244,10 @@ public class OpenCommandScriptDialog extends Dialog implements ISelectCommandScr
     @Override
     protected void okPressed() {
         // Validate input data
-        String sessionPath = fFileNameText.getText();
+        String sessionPath = fFileNameCombo.getText();
 
         if (!"".equals(sessionPath)) { //$NON-NLS-1$
+
             ImmutableList.Builder<String> builder = new ImmutableList.Builder<>();
             try (BufferedRandomAccessFile rafile = new BufferedRandomAccessFile(sessionPath, "r")) { //$NON-NLS-1$
                 String line = rafile.getNextLine();
@@ -191,8 +256,10 @@ public class OpenCommandScriptDialog extends Dialog implements ISelectCommandScr
                     line = rafile.getNextLine();
                 }
             } catch (IOException e) {
+                ErrorDialog.openError(getShell(), null, null, new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, e.getLocalizedMessage(), e));
                 return;
             }
+            saveWidgetValues();
             fCommands = builder.build();
             super.okPressed();
         }
