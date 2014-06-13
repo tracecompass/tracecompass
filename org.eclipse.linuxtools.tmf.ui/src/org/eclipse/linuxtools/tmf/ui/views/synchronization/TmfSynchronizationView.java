@@ -121,6 +121,7 @@ public class TmfSynchronizationView extends TmfView {
      *
      * @param signal
      *            Contains information about the selected trace
+     * @since 3.1
      */
     @TmfSignalHandler
     public void traceSelected(TmfTraceSelectedSignal signal) {
