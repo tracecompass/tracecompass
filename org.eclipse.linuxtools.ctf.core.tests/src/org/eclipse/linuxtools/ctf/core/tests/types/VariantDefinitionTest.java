@@ -55,21 +55,18 @@ public class VariantDefinitionTest {
     private VariantDefinition fixture;
 
     StructDefinition fStructDefinition;
-    @NonNull private static final String TEST_STRUCT_ID = "testStruct";
-
-    @NonNull private static final String ENUM_7 = "g";
-    @NonNull private static final String ENUM_6 = "f";
-    @NonNull private static final String ENUM_5 = "e";
-    @NonNull private static final String ENUM_4 = "d";
-    @NonNull private static final String ENUM_3 = "c";
-    @NonNull private static final String ENUM_2 = "b";
-    @NonNull private static final String ENUM_1 = "a";
-
-    @NonNull private static final String TAG_ID = "a";
-
-    @NonNull private static final String LENGTH_SEQ = "_len";
-    @NonNull private static final String VAR_FIELD_NAME = "var";
-    private static final String ENUM_8 = null;
+    private static final @NonNull String TEST_STRUCT_ID = "testStruct";
+    private static final @NonNull String ENUM_7 = "g";
+    private static final @NonNull String ENUM_6 = "f";
+    private static final @NonNull String ENUM_5 = "e";
+    private static final @NonNull String ENUM_4 = "d";
+    private static final @NonNull String ENUM_3 = "c";
+    private static final @NonNull String ENUM_2 = "b";
+    private static final @NonNull String ENUM_1 = "a";
+    private static final @NonNull String TAG_ID = "a";
+    private static final @NonNull String LENGTH_SEQ = "_len";
+    private static final @NonNull String VAR_FIELD_NAME = "var";
+    private static final @NonNull String ENUM_8 = "bbq ribs";
 
     /**
      * Perform pre-test initialization.
