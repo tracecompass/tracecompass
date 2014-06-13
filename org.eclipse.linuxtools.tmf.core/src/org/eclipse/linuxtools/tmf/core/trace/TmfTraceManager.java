@@ -15,8 +15,10 @@
 package org.eclipse.linuxtools.tmf.core.trace;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,6 +27,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
@@ -203,6 +206,35 @@ public final class TmfTraceManager {
             return exp.getTraces();
         }
         return new ITmfTrace[] { trace };
+    }
+
+    /**
+     * Get the trace set of a given trace or experiment, including the
+     * experiment. For a standard trace, this is simply a set containing only
+     * that trace. For experiments, it is the set of all the traces contained in
+     * this experiment, along with the experiment.
+     *
+     * @param trace
+     *            The trace or experiment
+     * @return The corresponding trace set, including the experiment
+     * @since 3.1
+     */
+    public static @NonNull Set<ITmfTrace> getTraceSetWithExperiment(ITmfTrace trace) {
+        if (trace == null) {
+            @SuppressWarnings("null")
+            @NonNull Set<ITmfTrace> emptySet = Collections.EMPTY_SET;
+            return emptySet;
+        }
+        if (trace instanceof TmfExperiment) {
+            TmfExperiment exp = (TmfExperiment) trace;
+            ITmfTrace[] traces = exp.getTraces();
+            Set<ITmfTrace> alltraces = new LinkedHashSet<>(Arrays.asList(traces));
+            alltraces.add(exp);
+            return alltraces;
+        }
+        @SuppressWarnings("null")
+        @NonNull Set<ITmfTrace> singleton = Collections.singleton(trace);
+        return singleton;
     }
 
     /**

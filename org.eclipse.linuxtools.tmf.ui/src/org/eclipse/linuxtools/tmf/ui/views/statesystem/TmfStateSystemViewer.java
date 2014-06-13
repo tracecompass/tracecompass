@@ -207,7 +207,7 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
      * system entries if they do not exist yet.
      */
     private void updateEntriesList(List<ITmfTreeViewerEntry> entries, long timestamp) {
-        for (final ITmfTrace trace : TmfTraceManager.getTraceSet(getTrace())) {
+        for (final ITmfTrace trace : TmfTraceManager.getTraceSetWithExperiment(getTrace())) {
             if (trace == null) {
                 continue;
             }

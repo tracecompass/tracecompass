@@ -24,4 +24,5 @@ Export-Package: org.eclipse.linuxtools.tmf.ctf.core.tests,
  org.eclipse.linuxtools.tmf.ctf.core.tests.statistics;x-internal:=true,
  org.eclipse.linuxtools.tmf.ctf.core.tests.stubs,
  org.eclipse.linuxtools.tmf.ctf.core.tests.tracemanager;x-internal:=true
-Import-Package: org.eclipse.test.performance
+Import-Package: com.google.common.collect,
+ org.eclipse.test.performance

@@ -20,6 +20,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
+import java.util.Set;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
@@ -40,6 +41,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Test suite for the {@link TmfTraceManager}.
@@ -191,6 +194,25 @@ public class TmfTraceManagerTest {
 
         assertEquals(2, actual.length);
         assertArrayEquals(expected, actual);
+    }
+
+    /**
+     * Test the contents of the complete trace set.
+     */
+    @Test
+    public void testTraceSetWithExperiment() {
+        /* Test with a trace */
+        Set<ITmfTrace> expected = ImmutableSet.of(trace1);
+        Set<ITmfTrace> actual = TmfTraceManager.getTraceSetWithExperiment(trace1);
+        assertEquals(1, actual.size());
+        assertEquals(expected, actual);
+
+        /* Test with an experiment */
+        TmfExperiment exp = createExperiment(trace1, trace2);
+        expected = ImmutableSet.of(trace1, trace2, exp);
+        actual = TmfTraceManager.getTraceSetWithExperiment(exp);
+        assertEquals(3, actual.size());
+        assertEquals(expected, actual);
     }
 
     /**
