@@ -128,6 +128,12 @@ public class TmfAnalysisManager {
      *
      * This map is read-only
      *
+     * TODO: This method is only used to populate the project view in the UI. It
+     * should be deprecated eventually, after some UI rework, so that the trace
+     * type does not drive whether the analysis module applies or not to a
+     * trace, but rather the content of the trace or experiment (once it is
+     * opened)
+     *
      * @param traceclass
      *            The trace class to get modules for
      * @return The map of available {@link IAnalysisModuleHelper}

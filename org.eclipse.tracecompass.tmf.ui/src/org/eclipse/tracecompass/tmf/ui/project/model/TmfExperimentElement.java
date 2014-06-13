@@ -42,8 +42,11 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstants;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
+import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
+import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
@@ -180,6 +183,27 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
 
         /* Update the analysis under this experiment */
         super.refreshChildren();
+
+        /*
+         * If the experiment is opened, add any analysis that was not added by
+         * the parent if it is available with the experiment
+         */
+        ITmfTrace experiment = getTrace();
+        if (experiment == null) {
+            return;
+        }
+        Map<String, TmfAnalysisElement> analysisMap = new HashMap<>();
+        for (TmfAnalysisElement analysis : getAvailableAnalysis()) {
+            analysisMap.put(analysis.getAnalysisId(), analysis);
+        }
+        for (IAnalysisModuleHelper module : TmfAnalysisManager.getAnalysisModules().values()) {
+            if (!analysisMap.containsKey(module.getId()) && module.appliesToExperiment() && (experiment.getAnalysisModule(module.getId()) != null)) {
+                IFolder newresource = ResourcesPlugin.getWorkspace().getRoot().getFolder(fResource.getFullPath().append(module.getId()));
+                TmfAnalysisElement analysis = new TmfAnalysisElement(module.getName(), newresource, this, module);
+                analysis.refreshChildren();
+                analysisMap.put(module.getId(), analysis);
+            }
+        }
     }
 
     private List<IResource> getTraceResources() {

@@ -102,6 +102,14 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper {
         return false;
     }
 
+    /**
+     * @since 1.0
+     */
+    @Override
+    public boolean appliesToExperiment() {
+        return false;
+    }
+
     @Override
     public String getHelpText() {
         return new String();

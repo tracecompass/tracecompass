@@ -75,6 +75,11 @@ public class AnalysisModuleTestHelper implements IAnalysisModuleHelper {
     }
 
     @Override
+    public boolean appliesToExperiment() {
+        return false;
+    }
+
+    @Override
     public String getHelpText() {
         return "";
     }
@@ -153,4 +158,5 @@ public class AnalysisModuleTestHelper implements IAnalysisModuleHelper {
             return Collections.EMPTY_SET;
         }
     }
+
 }

@@ -32,10 +32,11 @@
          </tracetype>
       </module>
       <module
-         id="org.eclipse.linuxtools.tmf.core.tests.analysis.testother"
-         name="Test other analysis"
-         analysis_module="org.eclipse.tracecompass.tmf.tests.stubs.analysis.TestAnalysis2"
-         automatic="true">
+            analysis_module="org.eclipse.tracecompass.tmf.tests.stubs.analysis.TestAnalysis2"
+            automatic="true"
+            id="org.eclipse.linuxtools.tmf.core.tests.analysis.testother"
+            name="Test other analysis"
+            applies_experiment="true">
          <tracetype
                applies="true"
                class="org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub3">

@@ -96,6 +96,13 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="applies_experiment" type="boolean">
+            <annotation>
+               <documentation>
+                  If true, indicate that an instance of this analysis will also be added to an experiment containing one or more trace(s) it applies to. In this case, the analysis will be run on the full experiment and the result is more than just the aggregation of each trace's analysis (default false).
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

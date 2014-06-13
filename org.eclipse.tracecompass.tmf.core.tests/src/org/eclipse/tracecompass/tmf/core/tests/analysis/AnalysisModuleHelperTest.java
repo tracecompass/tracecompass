@@ -37,6 +37,7 @@ import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 import org.eclipse.tracecompass.tmf.tests.stubs.analysis.TestAnalysis;
 import org.eclipse.tracecompass.tmf.tests.stubs.analysis.TestAnalysis2;
 import org.eclipse.tracecompass.tmf.tests.stubs.analysis.TestRequirementAnalysis;
@@ -128,12 +129,14 @@ public class AnalysisModuleHelperTest {
         assertTrue(fModule.appliesToTraceType(TmfTraceStub.class));
         assertTrue(fModule.appliesToTraceType(TmfTraceStub2.class));
         assertFalse(fModule.appliesToTraceType(TmfTraceStub3.class));
+        assertFalse(fModule.appliesToTraceType(TmfExperiment.class));
 
         /* stub module 2 */
         assertFalse(fModuleOther.appliesToTraceType(TmfTrace.class));
         assertFalse(fModuleOther.appliesToTraceType(TmfTraceStub.class));
         assertTrue(fModuleOther.appliesToTraceType(TmfTraceStub2.class));
         assertTrue(fModuleOther.appliesToTraceType(TmfTraceStub3.class));
+        assertFalse(fModuleOther.appliesToTraceType(TmfExperiment.class));
     }
 
     /**
@@ -188,6 +191,87 @@ public class AnalysisModuleHelperTest {
             }
         }
         assertNull(exception);
+    }
+
+
+    /**
+     * Test the analysis modules with a differing result for experiments
+     */
+    @Test
+    public void testAppliesToExperiment() {
+        ITmfTrace trace1 = TmfTestTrace.A_TEST_10K.getTrace();
+        ITmfTrace trace2 = TmfTestTrace.A_TEST_10K2.getTrace();
+        ITmfTrace trace3 = TmfTestTrace.A_TEST_10K2.getTraceAsStub2();
+
+        /* Create an experiment with TmfTraceStub */
+        ITmfTrace[] tracesExp1 = { trace1, trace2 };
+        TmfExperiment exp1 = new TmfExperiment(tracesExp1[0].getEventType(), "Experiment 1", tracesExp1, TmfExperiment.DEFAULT_INDEX_PAGE_SIZE, null);
+
+        /* Create an experiment containing some TmfTraceStub2 */
+        ITmfTrace[] tracesExp2 = { trace1, trace3 };
+        TmfExperiment exp2 = new TmfExperiment(tracesExp2[0].getEventType(), "Experiment 1", tracesExp2, TmfExperiment.DEFAULT_INDEX_PAGE_SIZE, null);
+
+        try {
+
+            /* fModule should throw exception for both experiments */
+            Exception exception = null;
+            IAnalysisModule module = null;
+            try {
+                module = fModule.newModule(exp1);
+            } catch (TmfAnalysisException e) {
+                exception = e;
+            } finally {
+                if (module != null) {
+                    module.dispose();
+                }
+            }
+            assertNotNull(exception);
+            assertEquals(NLS.bind(Messages.TmfAnalysisModuleHelper_AnalysisDoesNotApply, fModule.getName()), exception.getMessage());
+
+            exception = null;
+            try {
+                module = fModule.newModule(exp2);
+            } catch (TmfAnalysisException e) {
+                exception = e;
+            } finally {
+                if (module != null) {
+                    module.dispose();
+                }
+            }
+            assertNotNull(exception);
+            assertEquals(NLS.bind(Messages.TmfAnalysisModuleHelper_AnalysisDoesNotApply, fModule.getName()), exception.getMessage());
+
+            /* fModuleOther should throw exception for exp1, but not exp2 */
+            exception = null;
+            try {
+                module = fModuleOther.newModule(exp1);
+            } catch (TmfAnalysisException e) {
+                exception = e;
+            } finally {
+                if (module != null) {
+                    module.dispose();
+                }
+            }
+            assertNotNull(exception);
+            assertEquals(NLS.bind(Messages.TmfAnalysisModuleHelper_AnalysisDoesNotApply, fModuleOther.getName()), exception.getMessage());
+
+            exception = null;
+            try {
+                module = fModuleOther.newModule(exp2);
+                assertNotNull(module);
+            } catch (TmfAnalysisException e) {
+                exception = e;
+            } finally {
+                if (module != null) {
+                    module.dispose();
+                }
+            }
+            assertNull(exception);
+
+        } finally {
+            exp2.dispose();
+            exp1.dispose();
+        }
     }
 
     /**
