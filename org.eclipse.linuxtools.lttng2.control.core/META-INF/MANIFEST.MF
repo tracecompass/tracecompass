@@ -12,23 +12,11 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.linuxtools.ctf.core;bundle-version="3.0.0",
  org.eclipse.linuxtools.tmf.core;bundle-version="3.0.0",
  org.eclipse.linuxtools.tmf.ctf.core;bundle-version="3.0.0"
-Export-Package: org.eclipse.linuxtools.internal.lttng2.control.core;x-
- friends:="org.eclipse.linuxtools.lttng2.control.core.tests",org.eclip
- se.linuxtools.internal.lttng2.control.core.model;x-friends:="org.ecli
- pse.linuxtools.lttng2.control.ui,org.eclipse.linuxtools.lttng2.contro
- l.ui.tests,org.eclipse.linuxtools.lttng2.control.core.tests",org.ecli
- pse.linuxtools.internal.lttng2.control.core.model.impl;x-friends:="or
- g.eclipse.linuxtools.lttng2.control.ui,org.eclipse.linuxtools.lttng2.
- control.ui.tests,org.eclipse.linuxtools.lttng2.control.core.tests",or
- g.eclipse.linuxtools.internal.lttng2.control.core.relayd;x-friends:="
- org.eclipse.linuxtools.lttng2.control.core.tests,org.eclipse.linuxtoo
- ls.lttng2.control.ui,org.eclipse.linuxtools.lttng2.control.ui.tests",
- org.eclipse.linuxtools.internal.lttng2.control.core.relayd.impl;x-fri
- ends:="org.eclipse.linuxtools.lttng2.control.core.tests,org.eclipse.l
- inuxtools.lttng2.control.ui,org.eclipse.linuxtools.lttng2.control.ui.
- tests",org.eclipse.linuxtools.internal.lttng2.control.core.relayd.ltt
- ngviewerCommands;x-friends:="org.eclipse.linuxtools.lttng2.control.co
- re.tests,org.eclipse.linuxtools.lttng2.control.ui,org.eclipse.linuxto
- ols.lttng2.control.ui.tests",org.eclipse.linuxtools.lttng2.control.co
- re.session
+Export-Package: org.eclipse.linuxtools.internal.lttng2.control.core;x-friends:="org.eclipse.linuxtools.lttng2.control.core.tests",
+ org.eclipse.linuxtools.internal.lttng2.control.core.model;x-friends:="org.eclipse.linuxtools.lttng2.control.ui,org.eclipse.linuxtools.lttng2.control.ui.tests,org.eclipse.linuxtools.lttng2.control.core.tests",
+ org.eclipse.linuxtools.internal.lttng2.control.core.model.impl;x-friends:="org.eclipse.linuxtools.lttng2.control.ui,org.eclipse.linuxtools.lttng2.control.ui.tests,org.eclipse.linuxtools.lttng2.control.core.tests",
+ org.eclipse.linuxtools.internal.lttng2.control.core.relayd;x-friends:="org.eclipse.linuxtools.lttng2.control.core.tests,org.eclipse.linuxtools.lttng2.control.ui,org.eclipse.linuxtools.lttng2.control.ui.tests",
+ org.eclipse.linuxtools.internal.lttng2.control.core.relayd.impl;x-friends:="org.eclipse.linuxtools.lttng2.control.core.tests,org.eclipse.linuxtools.lttng2.control.ui,org.eclipse.linuxtools.lttng2.control.ui.tests",
+ org.eclipse.linuxtools.internal.lttng2.control.core.relayd.lttngviewerCommands;x-friends:="org.eclipse.linuxtools.lttng2.control.core.tests,org.eclipse.linuxtools.lttng2.control.ui,org.eclipse.linuxtools.lttng2.control.ui.tests",
+ org.eclipse.linuxtools.lttng2.control.core.session
 Import-Package: com.google.common.collect

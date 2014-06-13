@@ -15,10 +15,10 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.linuxtools.tmf.ctf.core,
  org.eclipse.linuxtools.ctf.core,
  org.eclipse.linuxtools.ctf.core.tests
-Export-Package: org.eclipse.linuxtools.tmf.ctf.core.tests,org.eclipse.
- linuxtools.tmf.ctf.core.tests.headless;x-internal:=true,org.eclipse.l
- inuxtools.tmf.ctf.core.tests.request;x-internal:=true,org.eclipse.lin
- uxtools.tmf.ctf.core.tests.shared,org.eclipse.linuxtools.tmf.ctf.core
- .tests.statistics;x-internal:=true,org.eclipse.linuxtools.tmf.ctf.cor
- e.tests.stubs,org.eclipse.linuxtools.tmf.ctf.core.tests.tracemanager;
- x-internal:=true
+Export-Package: org.eclipse.linuxtools.tmf.ctf.core.tests,
+ org.eclipse.linuxtools.tmf.ctf.core.tests.headless;x-internal:=true,
+ org.eclipse.linuxtools.tmf.ctf.core.tests.request;x-internal:=true,
+ org.eclipse.linuxtools.tmf.ctf.core.tests.shared,
+ org.eclipse.linuxtools.tmf.ctf.core.tests.statistics;x-internal:=true,
+ org.eclipse.linuxtools.tmf.ctf.core.tests.stubs,
+ org.eclipse.linuxtools.tmf.ctf.core.tests.tracemanager;x-internal:=true
