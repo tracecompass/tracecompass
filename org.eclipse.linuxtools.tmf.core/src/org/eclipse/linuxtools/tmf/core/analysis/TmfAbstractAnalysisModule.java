@@ -33,6 +33,7 @@ import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfStartAnalysisSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceClosedSignal;
+import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 import org.eclipse.osgi.util.NLS;
@@ -379,6 +380,26 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
         if (signal.getTrace() == fTrace) {
             cancel();
             fTrace = null;
+        }
+    }
+
+    /**
+     * Signal handler for when the trace becomes active
+     *
+     * @param signal
+     *            Trace selected signal
+     * @since 3.1
+     */
+    @TmfSignalHandler
+    public void traceSelected(TmfTraceSelectedSignal signal) {
+        /*
+         * Since some parameter providers may handle many traces, we need to
+         * register the current trace to it
+         */
+        if (signal.getTrace() == fTrace) {
+            for (IAnalysisParameterProvider provider : fParameterProviders) {
+                provider.registerModule(this);
+            }
         }
     }
 

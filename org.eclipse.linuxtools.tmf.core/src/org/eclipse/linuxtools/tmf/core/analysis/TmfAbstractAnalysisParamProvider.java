@@ -12,6 +12,9 @@
 
 package org.eclipse.linuxtools.tmf.core.analysis;
 
+import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
+
 /**
  * Abstract class for parameter providers, implements methods and
  * functionalities to warn the analysis module of parameter changed
@@ -31,7 +34,17 @@ public abstract class TmfAbstractAnalysisParamProvider implements IAnalysisParam
         if (module == null) {
             throw new IllegalArgumentException();
         }
-        fModule = module;
+        ITmfTrace selectedTrace = TmfTraceManager.getInstance().getActiveTrace();
+        /* If no trace is active, just register the module */
+        if (selectedTrace == null) {
+            fModule = module;
+            return;
+        }
+        IAnalysisModule selectedModule = selectedTrace.getAnalysisModule(module.getId());
+        /* register only if the module is for the currently selected trace */
+        if (selectedModule == module) {
+            fModule = module;
+        }
     }
 
     /**
