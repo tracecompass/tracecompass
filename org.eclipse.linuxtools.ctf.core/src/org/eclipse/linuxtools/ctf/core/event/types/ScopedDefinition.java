@@ -48,9 +48,23 @@ public abstract class ScopedDefinition extends Definition implements IDefinition
      *
      * @param name
      *            the name of the array
-     * @return the array or null if a definition is not found or it does not
-     *         match the desired datatype.
+     * @return the array or null.
      */
+    @Nullable
+    public AbstractArrayDefinition lookupArray2(String name){
+        Definition def = lookupDefinition(name);
+        return (AbstractArrayDefinition) ((def instanceof AbstractArrayDefinition) ? def : null);
+    }
+
+    /**
+     * Lookup an array in a struct. If the name returns a non-array (like an
+     * int) then the method returns null
+     *
+     * @param name
+     *            the name of the array
+     * @return the array or null.
+     */
+    @Deprecated
     @Nullable
     public ArrayDefinition lookupArray(String name) {
         Definition def = lookupDefinition(name);
@@ -97,6 +111,7 @@ public abstract class ScopedDefinition extends Definition implements IDefinition
      *         match the desired datatype.
      * @since 3.0
      */
+    @Deprecated
     @Nullable
     public SequenceDefinition lookupSequence(String name) {
         Definition def = lookupDefinition(name);

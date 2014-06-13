@@ -23,8 +23,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.scope.LexicalScope;
-import org.eclipse.linuxtools.ctf.core.event.types.ArrayDeclaration;
-import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
+import org.eclipse.linuxtools.ctf.core.event.types.CompoundDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
@@ -34,17 +33,17 @@ import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
+import org.eclipse.linuxtools.internal.ctf.core.event.types.ArrayDeclaration;
+import org.eclipse.linuxtools.internal.ctf.core.event.types.ArrayDefinition;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * The class <code>ArrayDefinitionTest</code> contains tests for the class
+ * The class <code>ArrayDefinition2Test</code> contains tests for the class
  * <code>{@link ArrayDefinition}</code>.
  *
- * @author ematkho
- * @version $Revision: 1.0 $
  */
-public class ArrayDefinitionTest {
+public class ArrayDefinition2Test {
 
     @NonNull private CTFTrace trace = new CTFTrace();
     private ArrayDefinition charArrayFixture;
@@ -121,7 +120,7 @@ public class ArrayDefinitionTest {
      */
     @Test
     public void testArrayDefinition_baseDeclaration() {
-        ArrayDeclaration declaration = charArrayFixture.getDeclaration();
+        ArrayDeclaration declaration = (ArrayDeclaration) charArrayFixture.getDeclaration();
         String fieldName = "";
 
         @SuppressWarnings("null")
@@ -150,33 +149,33 @@ public class ArrayDefinitionTest {
      */
     @Test
     public void testGetDeclaration() {
-        ArrayDeclaration result = charArrayFixture.getDeclaration();
+        ArrayDeclaration result = (ArrayDeclaration) charArrayFixture.getDeclaration();
 
         assertNotNull(result);
     }
 
     /**
-     * Run the Definition getElem(int) method test.
+     * Run the Definition getDefinitions().get(int) method test.
      */
     @Test
-    public void testGetElem_noDefs() {
+    public void testgetElem_noDefs() {
         int i = 0;
-        Definition result = charArrayFixture.getElem(i);
+        Definition result = charArrayFixture.getDefinitions().get(i);
 
         assertNotNull(result);
     }
 
     /**
-     * Run the Definition getElem(int) method test.
+     * Run the Definition getDefinitions().get(int) method test.
      */
     @Test
-    public void testGetElem_withDefs() {
+    public void testgetElem_withDefs() {
         List<Definition> defs = createDefs();
         IDefinitionScope definitionScope = getDefinitionScope();
-        ArrayDefinition ad = new ArrayDefinition(charArrayFixture.getDeclaration(), definitionScope, "test", defs);
+        ArrayDefinition ad = new ArrayDefinition((CompoundDeclaration) charArrayFixture.getDeclaration(), definitionScope, "test", defs);
         int j = 1;
 
-        Definition result = ad.getElem(j);
+        Definition result = ad.getDefinitions().get(j);
 
         assertNotNull(result);
     }

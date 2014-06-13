@@ -19,14 +19,12 @@ import java.nio.ByteBuffer;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
-import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
+import org.eclipse.linuxtools.ctf.core.event.types.AbstractArrayDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
-import org.eclipse.linuxtools.ctf.core.event.types.SequenceDeclaration;
-import org.eclipse.linuxtools.ctf.core.event.types.SequenceDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
@@ -34,6 +32,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
+import org.eclipse.linuxtools.internal.ctf.core.event.types.SequenceDeclaration;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -135,8 +134,7 @@ public class StructDefinitionTest {
     @Test
     public void testLookupArray() {
         String name = INT_ID;
-        ArrayDefinition result = fixture.lookupArray(name);
-
+        AbstractArrayDefinition result = fixture.lookupArray2(name);
         assertNull(result);
     }
 
@@ -185,9 +183,9 @@ public class StructDefinitionTest {
      * Run the SequenceDefinition lookupSequence(String) method test.
      */
     @Test
-    public void testLookupSequence() {
+    public void testLookupFixedStringDefinition() {
         String name = SEQUENCE_ID;
-        SequenceDefinition result = fixture.lookupSequence(name);
+        AbstractArrayDefinition result = fixture.lookupArray2(name);
         assertNotNull(result);
     }
 

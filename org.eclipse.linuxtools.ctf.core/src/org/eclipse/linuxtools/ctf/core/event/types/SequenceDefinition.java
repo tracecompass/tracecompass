@@ -26,13 +26,13 @@ import com.google.common.collect.ImmutableList;
  * An array where the size is fixed but declared in the trace, unlike array
  * where it is declared with a literal
  *
+ * @deprecated use {@link AbstractArrayDefinition}
  * @version 1.0
  * @author Matthew Khouzam
  * @author Simon Marchi
  */
+@Deprecated
 public final class SequenceDefinition extends Definition {
-
-    // TODO: investigate merging with arraydefinition
 
     // ------------------------------------------------------------------------
     // Attributes

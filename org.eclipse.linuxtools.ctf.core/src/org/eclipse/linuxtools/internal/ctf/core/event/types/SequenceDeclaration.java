@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011-2012 Ericsson, Ecole Polytechnique de Montreal and others
+ * Copyright (c) 2014 Ericsson, Ecole Polytechnique de Montreal and others
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -7,16 +7,22 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors: Matthew Khouzam - Initial API and implementation
- * Contributors: Simon Marchi - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.ctf.core.event.types;
+package org.eclipse.linuxtools.internal.ctf.core.event.types;
 
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
+import org.eclipse.linuxtools.ctf.core.event.types.AbstractArrayDefinition;
+import org.eclipse.linuxtools.ctf.core.event.types.CompoundDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.types.Definition;
+import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -29,13 +35,11 @@ import com.google.common.collect.Multimap;
  *
  * An array where the size is fixed but declared in the trace, unlike array
  * where it is declared with a literal
- * @deprecated use {@link org.eclipse.linuxtools.internal.ctf.core.event.types.SequenceDeclaration}
- * @version 1.0
+ *
  * @author Matthew Khouzam
- * @author Simon Marchi
+ * @since 3.1
  */
-@Deprecated
-public class SequenceDeclaration extends Declaration {
+public class SequenceDeclaration extends CompoundDeclaration {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -43,7 +47,7 @@ public class SequenceDeclaration extends Declaration {
 
     private final IDeclaration fElemType;
     private final String fLengthName;
-    private final Multimap<String, String> fPaths = ArrayListMultimap.<String, String>create();
+    private final Multimap<String, String> fPaths = ArrayListMultimap.create();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -66,11 +70,7 @@ public class SequenceDeclaration extends Declaration {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
-    /**
-     * Gets the element type
-     *
-     * @return the element type
-     */
+    @Override
     public IDeclaration getElementType() {
         return fElemType;
     }
@@ -89,17 +89,16 @@ public class SequenceDeclaration extends Declaration {
         return getElementType().getAlignment();
     }
 
-
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
 
     /**
      * Is the Sequence a string?
+     *
      * @return true, if the elements are chars, false otherwise
-     * @since 3.0
      */
-    public boolean isString(){
+    public boolean isString() {
         IntegerDeclaration elemInt;
         IDeclaration elementType = getElementType();
         if (elementType instanceof IntegerDeclaration) {
@@ -111,12 +110,8 @@ public class SequenceDeclaration extends Declaration {
         return false;
     }
 
-    /**
-     * @since 3.0
-     */
-    @SuppressWarnings("null") // immutablelist
     @Override
-    public SequenceDefinition createDefinition(
+    public AbstractArrayDefinition createDefinition(
             IDefinitionScope definitionScope, String fieldName, BitBuffer input) throws CTFReaderException {
         Definition lenDef = null;
 
@@ -143,6 +138,12 @@ public class SequenceDeclaration extends Declaration {
             throw new CTFReaderException("Sequence length too long " + length); //$NON-NLS-1$
         }
 
+        if (isString()) {
+            // Don't create "useless" definitions
+            byte[] data = new byte[(int) length];
+            input.get(data);
+            return new ByteArrayDefinition(this, definitionScope, fieldName, data);
+        }
         Collection<String> collection = fPaths.get(fieldName);
         while (collection.size() < length) {
             fPaths.put(fieldName, fieldName + '[' + collection.size() + ']');
@@ -150,9 +151,13 @@ public class SequenceDeclaration extends Declaration {
         List<String> paths = (List<String>) fPaths.get(fieldName);
         Builder<Definition> definitions = new ImmutableList.Builder<>();
         for (int i = 0; i < length; i++) {
-            definitions.add(fElemType.createDefinition(definitionScope, paths.get(i), input));
+            @SuppressWarnings("null")
+            @NonNull String elemName = paths.get(i);
+            definitions.add(fElemType.createDefinition(definitionScope, elemName, input));
         }
-        return new SequenceDefinition(this, definitionScope, fieldName, definitions.build());
+        @SuppressWarnings("null")
+        @NonNull ImmutableList<Definition> build = definitions.build();
+        return new ArrayDefinition(this, definitionScope, fieldName, build);
     }
 
     @Override
@@ -161,9 +166,6 @@ public class SequenceDeclaration extends Declaration {
         return "[declaration] sequence[" + Integer.toHexString(hashCode()) + ']'; //$NON-NLS-1$
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public int getMaximumSize() {
         return Integer.MAX_VALUE;

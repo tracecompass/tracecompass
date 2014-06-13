@@ -24,8 +24,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    ArrayDeclarationTest.class,
-    ArrayDefinitionTest.class,
+    ArrayDeclaration2Test.class,
+    ArrayDefinition2Test.class,
     DefinitionTest.class,
     EnumDeclarationTest.class,
     EnumDefinitionTest.class,
@@ -35,8 +35,8 @@ import org.junit.runners.Suite;
     IntegerDeclarationTest.class,
     IntegerDefinitionTest.class,
     IntegerEndiannessTest.class,
-    SequenceDeclarationTest.class,
-    SequenceDefinitionTest.class,
+    SequenceDeclaration2Test.class,
+    SequenceDefinition2Test.class,
     StringDeclarationTest.class,
     StringDefinitionTest.class,
     StructDeclarationTest.class,

@@ -11,31 +11,34 @@
 
 package org.eclipse.linuxtools.ctf.core.tests.types;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
-import org.eclipse.linuxtools.ctf.core.event.types.ArrayDeclaration;
-import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
+import org.eclipse.linuxtools.ctf.core.event.types.AbstractArrayDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
+import org.eclipse.linuxtools.internal.ctf.core.event.types.ArrayDeclaration;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * The class <code>ArrayDeclarationTest</code> contains tests for the class
+ * The class <code>ArrayDeclaration2Test</code> contains tests for the class
  * <code>{@link ArrayDeclaration}</code>.
  *
- * @author ematkho
+ * @author Matthew Khouzam
  * @version $Revision: 1.0 $
  */
-public class ArrayDeclarationTest {
+public class ArrayDeclaration2Test {
 
     private ArrayDeclaration fixture;
 
@@ -74,7 +77,7 @@ public class ArrayDeclarationTest {
     public void testCreateDefinition() throws CTFReaderException {
         String fieldName = "";
         IDefinitionScope definitionScope = null;
-        ArrayDefinition result;
+        AbstractArrayDefinition result;
         byte[] array = { 't', 'e', 's', 't', '\0', 't', 'h', 'i', 's', '\0' };
         ByteBuffer byb = ByteBuffer.wrap(array);
         BitBuffer bb = new BitBuffer(byb);

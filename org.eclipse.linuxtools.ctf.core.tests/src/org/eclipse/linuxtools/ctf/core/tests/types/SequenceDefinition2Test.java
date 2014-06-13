@@ -11,9 +11,7 @@
 
 package org.eclipse.linuxtools.ctf.core.tests.types;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.nio.ByteOrder;
 
@@ -22,27 +20,27 @@ import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
-import org.eclipse.linuxtools.ctf.core.event.types.SequenceDeclaration;
-import org.eclipse.linuxtools.ctf.core.event.types.SequenceDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
+import org.eclipse.linuxtools.internal.ctf.core.event.types.ByteArrayDefinition;
+import org.eclipse.linuxtools.internal.ctf.core.event.types.SequenceDeclaration;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
 
 /**
- * The class <code>SequenceDefinitionTest</code> contains tests for the class
- * <code>{@link SequenceDefinition}</code>.
+ * The class <code>SequenceDefinition2Test</code> contains tests for the class
+ * <code>{@link SequenceDefinition2}</code>.
  *
  * @author ematkho
  * @version $Revision: 1.0 $
  */
 @SuppressWarnings("javadoc")
-public class SequenceDefinitionTest {
+public class SequenceDefinition2Test {
 
-    private SequenceDefinition fixture;
+    private ByteArrayDefinition fixture;
     private final static int seqLen = 15;
 
     private static ImmutableList<String> wrap(String s) {
@@ -56,34 +54,14 @@ public class SequenceDefinitionTest {
      */
     @Before
     public void setUp() throws CTFReaderException {
-        StructDeclaration structDec;
-        StructDefinition structDef;
-
-        IntegerDeclaration id = IntegerDeclaration.createDeclaration(8, false, 8,
-                ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, "", 8);
-        String lengthName = "LengthName";
-        structDec = new StructDeclaration(0);
-        structDec.addField(lengthName, id);
-        structDef = new StructDefinition(structDec, null, "x",
-                wrap(lengthName),
-                new Definition[] { new IntegerDefinition(id, null, lengthName, seqLen) });
-
-        SequenceDeclaration sd = new SequenceDeclaration(lengthName, id);
-        BitBuffer input = new BitBuffer(
-                java.nio.ByteBuffer.allocateDirect(seqLen * 8));
-        for (int i = 0; i < seqLen; i++) {
-            input.putInt(i);
-        }
-
-        fixture = sd.createDefinition(structDef, "TestX", input);
-        assert (fixture != null);
+        fixture = initString();
     }
 
-    private static SequenceDefinition initNonString() throws CTFReaderException {
+    private static ByteArrayDefinition initString() throws CTFReaderException {
         StructDeclaration structDec;
         StructDefinition structDef;
 
-        int len = 32;
+        int len = 8;
         IntegerDeclaration id = IntegerDeclaration.createDeclaration(len, false, len,
                 ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, "", 8);
         String lengthName = "LengthName";
@@ -99,17 +77,17 @@ public class SequenceDefinitionTest {
             input.putInt(i);
         }
 
-        SequenceDefinition ret = sd.createDefinition(structDef, "TestX", input);
+        ByteArrayDefinition ret = (ByteArrayDefinition) sd.createDefinition(structDef, "TestX", input);
         assertNotNull(ret);
         return ret;
     }
 
     /**
-     * Run the SequenceDefinition(SequenceDeclaration,DefinitionScope,String)
+     * Run the FixedStringDefinition(SequenceDeclaration,DefinitionScope,String)
      * constructor test.
      */
     @Test
-    public void testSequenceDefinition() {
+    public void testFixedStringDefinition() {
         assertNotNull(fixture);
     }
 
@@ -118,7 +96,7 @@ public class SequenceDefinitionTest {
      */
     @Test
     public void testGetDeclaration() {
-        SequenceDeclaration result = fixture.getDeclaration();
+        SequenceDeclaration result = (SequenceDeclaration) fixture.getDeclaration();
         assertNotNull(result);
     }
 
@@ -128,27 +106,8 @@ public class SequenceDefinitionTest {
     @Test
     public void testGetElem() {
         int i = 1;
-        Definition result = fixture.getElem(i);
+        Definition result = fixture.getDefinitions().get(i);
         assertNotNull(result);
-    }
-
-    /**
-     * Run the int getLength() method test.
-     */
-    @Test
-    public void testGetLength() {
-        int result = fixture.getLength();
-
-        assertEquals(seqLen, result);
-    }
-
-    /**
-     * Run the boolean isString() method test.
-     */
-    @Test
-    public void testIsString() {
-        boolean result = fixture.getDeclaration().isString();
-        assertTrue(result);
     }
 
     /**
@@ -160,13 +119,4 @@ public class SequenceDefinitionTest {
         assertNotNull(result);
     }
 
-    /**
-     * Run the String toString() method test.
-     */
-    @Test
-    public void testToString_nonString() throws Exception {
-        fixture = initNonString();
-        String result = fixture.toString();
-        assertNotNull(result);
-    }
 }

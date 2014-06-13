@@ -1,28 +1,32 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 Ericsson, Ecole Polytechnique de Montreal and others
+ * Copyright (c) 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: Matthew Khouzam - Initial API and implementation
- * Contributors: Simon Marchi - Initial API and implementation
+ * Contributors:
+ *   Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.ctf.core.event.types;
+package org.eclipse.linuxtools.internal.ctf.core.event.types;
 
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
+import org.eclipse.linuxtools.ctf.core.event.types.AbstractArrayDefinition;
+import org.eclipse.linuxtools.ctf.core.event.types.CompoundDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.types.Definition;
+import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
-import com.google.common.collect.Multimap;
 
 /**
  * A CTF array declaration
@@ -32,13 +36,10 @@ import com.google.common.collect.Multimap;
  * can refer to any type not containing the type of the array being declared (no
  * circular dependency). The length is the number of elements in an array.
  *
- * @deprecated use {@link org.eclipse.linuxtools.internal.ctf.core.event.types.ArrayDeclaration}
- * @version 1.0
  * @author Matthew Khouzam
- * @author Simon Marchi
+ * @since 3.1
  */
-@Deprecated
-public class ArrayDeclaration extends Declaration {
+public final class ArrayDeclaration extends CompoundDeclaration {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -57,7 +58,7 @@ public class ArrayDeclaration extends Declaration {
      *
      * TODO: investigate performance
      */
-    private final Multimap<String, String> fChildrenNames = ArrayListMultimap.<String, String> create();
+    private final ArrayListMultimap<String, String> fChildrenNames = ArrayListMultimap.create();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -80,17 +81,15 @@ public class ArrayDeclaration extends Declaration {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
-    /**
-     *
-     * @return the type of element in the array
-     */
+    @Override
     public IDeclaration getElementType() {
         return fElemType;
     }
 
     /**
+     * Get the length of the array
      *
-     * @return how many elements in the array
+     * @return the length of the array
      */
     public int getLength() {
         return fLength;
@@ -102,7 +101,6 @@ public class ArrayDeclaration extends Declaration {
      *
      * @return true if this array is in fact an UTF-8 string. false if it's a
      *         "normal" array of generic Definition's.
-     * @since 3.0
      */
     public boolean isString() {
         if (fElemType instanceof IntegerDeclaration) {
@@ -127,14 +125,15 @@ public class ArrayDeclaration extends Declaration {
     // Operations
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 3.0
-     */
-    @Deprecated
     @Override
-    public ArrayDefinition createDefinition(IDefinitionScope definitionScope,
+    public AbstractArrayDefinition createDefinition(IDefinitionScope definitionScope,
             @NonNull String fieldName, BitBuffer input) throws CTFReaderException {
         alignRead(input);
+        if (isString()) {
+            byte[] data = new byte[fLength];
+            input.get(data);
+            return new ByteArrayDefinition(this, definitionScope, fieldName, data);
+        }
         List<Definition> definitions = read(input, definitionScope, fieldName);
         return new ArrayDefinition(this, definitionScope, fieldName, definitions);
     }
@@ -153,7 +152,7 @@ public class ArrayDeclaration extends Declaration {
                 fChildrenNames.put(fieldName, fieldName + '[' + i + ']');
             }
         }
-        List<String> elemNames = (List<String>) fChildrenNames.get(fieldName);
+        List<String> elemNames = fChildrenNames.get(fieldName);
         for (int i = 0; i < fLength; i++) {
             String name = elemNames.get(i);
             if (name == null) {
@@ -166,9 +165,6 @@ public class ArrayDeclaration extends Declaration {
         return ret;
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public int getMaximumSize() {
         long val = (long) fLength * fElemType.getMaximumSize();

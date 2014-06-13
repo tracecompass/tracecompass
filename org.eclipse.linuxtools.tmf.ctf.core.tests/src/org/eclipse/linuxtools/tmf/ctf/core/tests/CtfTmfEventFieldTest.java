@@ -22,18 +22,18 @@ import java.nio.ByteOrder;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
-import org.eclipse.linuxtools.ctf.core.event.types.ArrayDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.FloatDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.FloatDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
-import org.eclipse.linuxtools.ctf.core.event.types.SequenceDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDeclaration;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
+import org.eclipse.linuxtools.internal.ctf.core.event.types.ArrayDeclaration;
+import org.eclipse.linuxtools.internal.ctf.core.event.types.SequenceDeclaration;
 import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfEventField;
 import org.junit.Before;
 import org.junit.Test;
@@ -190,7 +190,7 @@ public class CtfTmfEventFieldTest {
      */
     @Test
     public void testParseField_array_float() {
-        Definition fieldDef = fixture.lookupArray(ARRAY_FLOAT);
+        Definition fieldDef = fixture.lookupArray2(ARRAY_FLOAT);
         CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
         assertEquals("test=[2.0, 2.0]", result.toString());
     }
@@ -211,7 +211,7 @@ public class CtfTmfEventFieldTest {
      */
     @Test
     public void testParseField_array_int() {
-        Definition fieldDef = fixture.lookupArray(ARRAY_INT);
+        Definition fieldDef = fixture.lookupArray2(ARRAY_INT);
         CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
         assertEquals("test=[2, 2]", result.toString());
     }
@@ -254,7 +254,7 @@ public class CtfTmfEventFieldTest {
      */
     @Test
     public void testParseField_array_string() {
-        Definition fieldDef = fixture.lookupArray(ARRAY_STR);
+        Definition fieldDef = fixture.lookupArray2(ARRAY_STR);
         CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
         assertEquals("test=[two, two]", result.toString());
     }
@@ -275,7 +275,7 @@ public class CtfTmfEventFieldTest {
      */
     @Test
     public void testParseField_array_struct() {
-        Definition fieldDef = fixture.lookupArray(ARRAY_STRUCT);
+        Definition fieldDef = fixture.lookupArray2(ARRAY_STRUCT);
         CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
         assertEquals("test=[[str=two, int=2], [str=two, int=2]]", result.toString());
     }
@@ -296,7 +296,7 @@ public class CtfTmfEventFieldTest {
      */
     @Test
     public void testParseField_array_enum() {
-        Definition fieldDef = fixture.lookupArray(ARRAY_ENUM);
+        Definition fieldDef = fixture.lookupArray2(ARRAY_ENUM);
         CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
         assertEquals("test=[float, float]", result.toString());
     }
@@ -317,7 +317,7 @@ public class CtfTmfEventFieldTest {
      */
     @Test
     public void testParseField_array_variant() {
-        Definition fieldDef = fixture.lookupArray(ARRAY_VARIANT);
+        Definition fieldDef = fixture.lookupArray2(ARRAY_VARIANT);
         CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
         assertEquals("test=[float=2.0, float=2.0]", result.toString());
     }

@@ -199,7 +199,8 @@ public class IntegerDeclaration extends Declaration {
         fBase = base;
 
         @SuppressWarnings("null")
-        @NonNull ByteOrder actualByteOrder = (byteOrder == null ? ByteOrder.nativeOrder() : byteOrder);
+        @NonNull
+        ByteOrder actualByteOrder = (byteOrder == null ? ByteOrder.nativeOrder() : byteOrder);
         fByteOrder = actualByteOrder;
 
         fEncoding = encoding;
@@ -258,6 +259,16 @@ public class IntegerDeclaration extends Declaration {
      */
     public boolean isCharacter() {
         return (fLength == 8) && (fEncoding != Encoding.NONE);
+    }
+
+    /**
+     * Is the integer an unsigned byte (8 bits and no sign)?
+     *
+     * @return is the integer an unsigned byte
+     * @since 3.1
+     */
+    public boolean isUnsignedByte() {
+        return (fLength == 8) && (!fSigned);
     }
 
     /**
@@ -329,7 +340,8 @@ public class IntegerDeclaration extends Declaration {
          */
 
         @SuppressWarnings("null")
-        @NonNull BigInteger ret = BigInteger.ONE.shiftLeft(significantBits).subtract(BigInteger.ONE);
+        @NonNull
+        BigInteger ret = BigInteger.ONE.shiftLeft(significantBits).subtract(BigInteger.ONE);
         return ret;
     }
 
@@ -342,7 +354,8 @@ public class IntegerDeclaration extends Declaration {
     public BigInteger getMinValue() {
         if (!fSigned) {
             @SuppressWarnings("null")
-            @NonNull BigInteger ret = BigInteger.ZERO;
+            @NonNull
+            BigInteger ret = BigInteger.ZERO;
             return ret;
         }
 
@@ -356,7 +369,8 @@ public class IntegerDeclaration extends Declaration {
          * (1 << N).
          */
         @SuppressWarnings("null")
-        @NonNull BigInteger ret = BigInteger.ONE.shiftLeft(significantBits).negate();
+        @NonNull
+        BigInteger ret = BigInteger.ONE.shiftLeft(significantBits).negate();
         return ret;
     }
 

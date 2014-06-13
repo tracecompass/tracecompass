@@ -14,7 +14,10 @@ package org.eclipse.linuxtools.ctf.core.trace;
 
 import java.util.UUID;
 
-import org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition;
+import org.eclipse.linuxtools.ctf.core.event.types.AbstractArrayDefinition;
+import org.eclipse.linuxtools.ctf.core.event.types.CompoundDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 
 /**
@@ -65,9 +68,9 @@ public final class Utils {
     /**
      * Performs an unsigned long comparison on two unsigned long numbers.
      *
-     * <strong> As Java does not support unsigned types and arithmetic, parameters
-     *       are received encoded as a signed long (two-complement) but the
-     *       operation is an unsigned comparator.</strong>
+     * <strong> As Java does not support unsigned types and arithmetic,
+     * parameters are received encoded as a signed long (two-complement) but the
+     * operation is an unsigned comparator.</strong>
      *
      * @param left
      *            Left operand of the comparator.
@@ -102,9 +105,50 @@ public final class Utils {
      * @return the UUID
      * @throws CTFReaderException
      *             if the definition contains less than 16 elements
-     * @since 3.0
+     * @since 3.1
      */
-    public static UUID getUUIDfromDefinition(ArrayDefinition uuidDef) throws CTFReaderException {
+    public static UUID getUUIDfromDefinition(AbstractArrayDefinition uuidDef) throws CTFReaderException {
+        byte[] uuidArray = new byte[16];
+        IDeclaration declaration = uuidDef.getDeclaration();
+        if (!(declaration instanceof CompoundDeclaration)) {
+            throw new CTFReaderException("UUID must be a sequence of unsigned bytes"); //$NON-NLS-1$
+        }
+        CompoundDeclaration uuidDec = (CompoundDeclaration) declaration;
+
+        IDeclaration uuidElem = uuidDec.getElementType();
+        if (!(uuidElem instanceof IntegerDeclaration)) {
+            throw new CTFReaderException("UUID must be a sequence of unsigned bytes"); //$NON-NLS-1$
+        }
+        IntegerDeclaration intUuidElem = (IntegerDeclaration) uuidElem;
+        if (!intUuidElem.isUnsignedByte()) {
+            throw new CTFReaderException("UUID must be a sequence of unsigned bytes"); //$NON-NLS-1$
+        }
+        for (int i = 0; i < uuidArray.length; i++) {
+            IntegerDefinition uuidByteDef = (IntegerDefinition) uuidDef.getDefinitions().get(i);
+            if (uuidByteDef == null) {
+                throw new CTFReaderException("UUID incomplete, only " + i + " bytes available"); //$NON-NLS-1$ //$NON-NLS-2$
+            }
+            uuidArray[i] = (byte) uuidByteDef.getValue();
+        }
+
+        UUID uuid = Utils.makeUUID(uuidArray);
+        return uuid;
+    }
+
+    /**
+     * Gets a UUID from an array defintion
+     *
+     * @param uuidDef
+     *            the array defintions, must contain integer bytes
+     * @return the UUID
+     * @throws CTFReaderException
+     *             if the definition contains less than 16 elements
+     * @since 3.1
+     * @deprecated use
+     *             {@link Utils#getUUIDfromDefinition(AbstractArrayDefinition uuidDef)}
+     */
+    @Deprecated
+    public static UUID getUUIDfromDefinition(org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition uuidDef) throws CTFReaderException {
         byte[] uuidArray = new byte[16];
 
         for (int i = 0; i < uuidArray.length; i++) {
