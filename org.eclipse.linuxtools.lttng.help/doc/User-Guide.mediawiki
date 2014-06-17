@@ -122,7 +122,7 @@ Here are the quick steps to verify that your installation is functional:
 
 If an error message is displayed, you might want to double-check that the trace type is correctly set (right-click on the trace and "Select Trace Type...").
 
-Refer to [[#Tracing Perspective]] for detailed description of the views and their usage.
+Refer to [[#Tracing Perspective | Tracing Perspective]] for detailed description of the views and their usage.
 
 To download sample LTTng traces, go to [http://lttng.org/download]. At the bottom of the page there is a link to some sample LTTng 2.0 kernel traces.
 
@@ -132,10 +132,10 @@ To download sample LTTng traces, go to [http://lttng.org/download]. At the botto
 
 The '''Tracing''' perspective is part of the '''Tracing and Monitoring Framework (TMF)''' and groups the following views:
 
-* [[#Project View]]
-* [[#Events Editor]]
-* [[#Histogram View]]
-* [[#Statistics View]]
+* [[#Project_View | Project View]]
+* [[#Events_Editor | Events Editor]]
+* [[#Histogram_View | Histogram View]]
+* [[#Statistics_View   | Statistics View]]
 
 The views are synchronized i.e. selecting an event, a timestamp, a time range, etc will update the other views accordingly.
 
@@ -147,14 +147,14 @@ The perspective can be opened from the Eclipse Open Perspective dialog ('''Windo
 
 In addition to these views, the '''Tracing and Monitoring Framework (TMF)''' feature provides a set of generic tracing specific views, such as:
 
-* [[#Colors View]]
-* [[#Filters View]]
-* [[#Time Chart View]]
-* [[#Environment Variables View]]
-* [[#State System Explorer View]]
-* [[#Call Stack View]]
+* [[#Colors_View | Colors View]]
+* [[#Filters_View | Filters View]]
+* [[#Time_Chart_View  | Time Chart View]]
+* [[#Environment_Variables_View  | Environment Variables View]]
+* [[#State_System_Explorer_View | State System Explorer View]]
+* [[#Call_Stack_View | Call Stack View]]
 
-The framework also supports user creation of [[#Custom Parsers]].
+The framework also supports user creation of [[#Custom_Parsers  | Custom Parsers]].
 
 To open one of the above '''Tracing''' views, use the Eclipse Show View dialog ('''Window > Show View > Other...'''). Then select the relevant view from the '''Tracing''' category.
 
@@ -162,7 +162,7 @@ To open one of the above '''Tracing''' views, use the Eclipse Show View dialog (
 
 Additionally, the '''LTTng''' feature provides an '''LTTng Tracer Control''' functionality. It comes with a dedicated '''Control View'''.
 
-* [[#LTTng Tracer Control]]
+* [[#LTTng_Tracer_Control | LTTng Tracer Control]]
 
 == Project View ==
 
@@ -190,9 +190,9 @@ Tracing projects have two sub-folders: '''Traces''' which holds the individual t
 
 The '''Traces''' folder holds the set of traces available for a tracing project. It can optionally contain a tree of trace folders to organize traces into sub-folders. The following chapters will explain different ways to import traces to the '''Traces''' folder of a tracing project.
 
-* [[#Opening a Trace]]
-* [[#Importing]]
-* [[#Drag and Drop]]
+* [[#Opening a Trace | Opening a Trace]]
+* [[#Importing | Importing]]
+* [[#Drag and Drop | Drag and Drop]]
 
 ==== Opening a Trace ====
 
@@ -352,7 +352,7 @@ Now the selected traces will be linked to the experiment and will be shown under
 
 [[Image:images/ExplorerWithExperiment.png]]
 
-Alternatively, traces can be added to an experiment using [[#Drag and Drop]].
+Alternatively, traces can be added to an experiment using [[#Drag_and_Drop | Drag and Drop]].
 
 === Removing Traces from an Experiment ===
 
@@ -376,7 +376,7 @@ A new dialog box will show for entering a new name. Enter a new trace or experim
 
 After successful renaming the new name will show in the '''Project Explorer'''. In case of a trace all reference links to that trace will be updated too. Note that linked traces only changes the display name, the underlying trace resource will stay the original name.
 
-Note that all supplementary files will be also handled accordingly (see also [[#Deleting Supplementary Files]]).
+Note that all supplementary files will be also handled accordingly (see also [[#Deleting Supplementary Files | Deleting Supplementary Files]]).
 
 === Copying a Trace or Experiment ===
 
@@ -392,7 +392,7 @@ A new dialog box will show for entering a new name. Enter a new trace or experim
 
 After successful copy operation the new trace or experiment respectively will show in the '''Project Explorer'''. In case of a linked trace, the copied trace will be a link to the original trace too.
 
-Note that the directory for all supplementary files will be copied, too. (see also [[#Deleting Supplementary Files]]).
+Note that the directory for all supplementary files will be copied, too. (see also [[#Deleting Supplementary Files | Deleting Supplementary Files]]).
 
 === Deleting a Trace or Experiment ===
 
@@ -406,7 +406,7 @@ A confirmation dialog box will open. To perform the deletion press '''OK''' othe
 
 After successful operation the selected trace or experiment will be removed from the project. In case of a linked trace only the link will be removed. The actual trace resource remain on the disk.
 
-Note that the directory for all supplementary files will be deleted, too. (see also [[#Deleting Supplementary Files]]).
+Note that the directory for all supplementary files will be deleted, too. (see also [[#Deleting Supplementary Files | Deleting Supplementary Files]]).
 
 === Deleting Supplementary Files ===
 
@@ -425,8 +425,8 @@ A new dialog box will open with a list of supplementary files, grouped under the
 === Link with Editor ===
 
 The tracing projects support the feature '''Link With Editor''' of the Project Explorer view. With this feature it is now possible to<br/>
-* select a trace element in the Project Explorer view and the corresponding [[#Events Editor]] will get focus if the relevant trace is open.
-* select an [[#Events Editor]] and the corresponding trace element will be highlighted in the Project Explorer view.
+* select a trace element in the Project Explorer view and the corresponding [[#Events Editor | Events Editor]] will get focus if the relevant trace is open.
+* select an [[#Events Editor | Events Editor]] and the corresponding trace element will be highlighted in the Project Explorer view.
 
 To enable or disable this feature toggle the '''Link With Editor''' button of the Project Explorer view as shown below.
 
@@ -525,7 +525,7 @@ If a source file is available in the trace for the selected event, the item '''O
 If an EMF model URI is available in the trace for the selected event, the item '''Open Model Element''' is shown in the context menu. Selecting this menu item will attempt to open the model file in the project specified in the URI. The model file will be opened in its default model editor. If the model file is not found, an error dialog is shown displaying the URI information.
 
 === Exporting To Text ===
-It is possible to export the content of the trace to a text file based on the columns displayed in the events table. If a filter (see '''[[#Filtering]]''') was defined prior exporting only events that match the filter will be exported to the file. To export the trace to text, press the right mouse button on the events table. A context-sensitive menu will show. Select the '''Export To Text...''' menu option. A file locater dialog will open. Fill in the file name and location and then press on '''OK'''. A window with a progress bar will open till the export is finished.
+It is possible to export the content of the trace to a text file based on the columns displayed in the events table. If a filter (see '''[[#Filtering| Filtering]]''') was defined prior exporting only events that match the filter will be exported to the file. To export the trace to text, press the right mouse button on the events table. A context-sensitive menu will show. Select the '''Export To Text...''' menu option. A file locater dialog will open. Fill in the file name and location and then press on '''OK'''. A window with a progress bar will open till the export is finished.
 
 ''Note'':  The columns in the text file are separated by tabs.
 
@@ -895,7 +895,7 @@ The trace will be opened in an editor showing the events table, and an entry wil
 
 The LTTng Tracer Control in Eclipse for the LTTng Tracer toolchain version v2.0 (or later) is done using SSH and requires an SSH server to be running on the remote host. For the SSH connection the SSH implementation of RSE is used. For that a new System Type was defined using the corresponding RSE extension. The functions to control the LTTng tracer (e.g. start and stop), either locally or remotely, are available from a dedicated Control View.
 
-In the following sections the LTTng 2.0 tracer control integration in Eclipse is described. Please refer to the LTTng 2.0 tracer control command line manual for more details and descriptions about all commands and their command line parameters [[#References]].
+In the following sections the LTTng 2.0 tracer control integration in Eclipse is described. Please refer to the LTTng 2.0 tracer control command line manual for more details and descriptions about all commands and their command line parameters [[#References | References]].
 
 == Control View ==
 To open the Control View, select '''Window->Show View->Other...->LTTng->Control View''.
@@ -950,7 +950,7 @@ To disconnect from a remote host, select the host in the Control View and press 
 
 === Connecting to a Remote Host ===
 
-To connect to a remote host, select the host in the Control View and press the '''Connect''' button. Alternatively, press the right mouse button. A context-sensitive menu will show. Select the '''Connect''' button. This will start the connection process as discribed in [[#Creating a New Connection to a Remote Host]].
+To connect to a remote host, select the host in the Control View and press the '''Connect''' button. Alternatively, press the right mouse button. A context-sensitive menu will show. Select the '''Connect''' button. This will start the connection process as discribed in [[#Creating a New Connection to a Remote Host | Creating a New Connection to a Remote Host]].
 
 [[Image:images/LTTng2ControlViewConnect.png]]
 
@@ -974,7 +974,7 @@ Fill in the '''Session Name''' and optionally the '''Session Path''' and press '
 === Creating a Tracing Session With Advanced Options ===
 LTTng Tools version v2.1.0 introduces the possibility to configure the trace output location at session creation time. The trace can be stored in the (tracer) local file system or can be transferred over the network.
 
-To create a tracing session and configure the trace output, open the trace session dialog as described in chapter [[#Creating a Tracing Session]]. A dialog box will open for entering information about the session to be created.
+To create a tracing session and configure the trace output, open the trace session dialog as described in chapter [[#Creating a Tracing Session | Creating a Tracing Session]]. A dialog box will open for entering information about the session to be created.
 
 [[Image:images/LTTng2CreateSessionDialog_Advanced.png]]
 
@@ -988,18 +988,18 @@ If button '''Use same protocol and address for data and control''' is selected t
 
 If button '''Use same protocol and address for data and control''' is not selected the '''Protocol''' can be '''net''' for the default network protocol which is TCP (IPv4), '''net6''' for the default network protocol which is TCP (IPv6), '''tcp''' for the network protocol TCP (IPv4) and '''tcp6''' for the network protocol TCP (IPv6). Note that for '''net''' and '''net6''' always the default port is used and hence the port text fields are disabled. To configure non-default ports use '''tcp''' or '''tcp6'''.
 
-The text field '''Trace Path''' allows for specifying the path relative to the location defined by the '''relayd''' or relative to the location specified by the '''Address''' when using protocol '''file'''. For more information about the '''relayd''' see '''LTTng relayd User Manual''' in chapter [[#References]].
+The text field '''Trace Path''' allows for specifying the path relative to the location defined by the '''relayd''' or relative to the location specified by the '''Address''' when using protocol '''file'''. For more information about the '''relayd''' see '''LTTng relayd User Manual''' in chapter [[#References | References]].
 
 To create a session with advanced options, fill in the relevant parameters and press '''Ok'''. Upon successful operation a new session will be created and added under the tree node '''Sessions'''.
 
 === Creating a Snapshot Tracing Session ===
-LTTng Tools version v2.3.0 introduces the possibility to create snapshot tracing sessions. After starting tracing the trace events are not stored on disk or over the network. They are only transfered to disk or over the network when the user records a snapshot. To create such a snapshot session, open the trace session dialog as described in chapter [[#Creating a Tracing Session]].
+LTTng Tools version v2.3.0 introduces the possibility to create snapshot tracing sessions. After starting tracing the trace events are not stored on disk or over the network. They are only transfered to disk or over the network when the user records a snapshot. To create such a snapshot session, open the trace session dialog as described in chapter [[#Creating a Tracing Session | Creating a Tracing Session]].
 
 [[Image:images/LTTng2CreateSessionDialog_Snapshot.png]]
 
 Fill in all necessary information, select checkbox for '''Snapshot Mode''' and press '''Ok'''. By default, the location for the snapshot output will be on the host where the host is located.
 
-Refer to chapter [[#Recording a Snapshot]] for how to create a snapshot.
+Refer to chapter [[#Recording a Snapshot | Recording a Snapshot]] for how to create a snapshot.
 
 === Enabling Channels - General ===
 
@@ -1128,7 +1128,7 @@ Upon successful operation, the dynamic function probe event with the given name 
 
 === Enabling UST Events On Session Level ===
 
-For enabling UST events, first open the enable events dialog as described in section [[#Enabling Kernel Events On Session Level]] and select domain '''UST'''.
+For enabling UST events, first open the enable events dialog as described in section [[#Enabling Kernel Events On Session Level | Enabling Kernel Events On Session Level]] and select domain '''UST'''.
 
 To enable '''Tracepoint''' events, first select the corresponding '''Select''' button, then select either all tracepoins (select '''All''') or select selectively one or more tracepoints in the displayed tree of tracepoints and finally press '''Ok'''.
 
@@ -1164,19 +1164,18 @@ Kernel events can also be enabled on the domain level. For that select the relev
 
 [[Image:images/LTTng2EventOnDomainAction.png]]
 
-To enable events for domain '''Kernel''' follow the instructions in section [[#Enabling Kernel Events On Session Level]], for domain '''UST global''' [[#Enabling UST Events On Session Level]].
-
-When enabling events on the domain level, the events will be add to the default channel '''channel0'''. This channel will be created by on the server side if neccessary.
+To enable events for domain '''Kernel''' follow the instructions in section [[#Enabling Kernel Events On Session Level | Enabling Kernel Events On Session Level]], for domain '''UST global''', see section [[#Enabling UST Events On Session Level | Enabling UST Events On Session Level]].
+The events will be add to the default channel '''channel0'''. This channel will be created by on the server side if neccessary.
 
 === Enabling Events On Channel Level ===
 
-Kernel events can also be enabled on the channel level. If necessary, create a channel as described in sections [[#Enabling Channels On Session Level]] or [[#Enabling Channels On Domain Level]].
+Kernel events can also be enabled on the channel level. If necessary, create a channel as described in sections [[#Enabling Channels On Session Level | Enabling Channels On Session Level]] or [[#Enabling Channels On Domain Level | Enabling Channels On Domain Level]].
 
 Then select the relevant channel tree node, click the right mouse button and the select '''Enable Event...'''. A new dialog box will open for providing information about the events to be enabled. Depending on the domain, '''Kernel''' or '''UST global''', the domain specifc fields are shown and the domain selector is preselected and read-only.
 
 [[Image:images/LTTng2EventOnChannelAction.png]]
 
-To enable events for domain '''Kernel''' follow the instructions in section [[#Enabling Kernel Events On Session Level]], for domain '''UST global''' [[#Enabling UST Events On Session Level]].
+To enable events for domain '''Kernel''' follow the instructions in section [[#Enabling Kernel Events On Session Level | Enabling Kernel Events On Session Level]], for domain '''UST global''' [[#Enabling UST Events On Session Level | Enabling UST Events On Session Level]].
 
 When enabling events on the channel level, the events will be add to the selected channel.
 
@@ -1198,7 +1197,7 @@ Upon successful operation, the selected events will be '''ENABLED''' and the ico
 
 === Enabling Tracepoint Events From Provider ===
 
-It is possible to enable events of type '''Tracepoint''' directly from the providers and assign the enabled event to a session and channel. Before doing that a session has to be created as described in section [[#Creating a Tracing Session]]. Also, if other than default channel '''channel0''' is required, create a channel as described in sections [[#Enabling Channels On Session Level]] or [[#Enabling Channels On Domain Level]].
+It is possible to enable events of type '''Tracepoint''' directly from the providers and assign the enabled event to a session and channel. Before doing that a session has to be created as described in section [[#Creating a Tracing Session | Creating a Tracing Session]]. Also, if other than default channel '''channel0''' is required, create a channel as described in sections [[#Enabling Channels On Session Level | Enabling Channels On Session Level]] or [[#Enabling Channels On Domain Level | Enabling Channels On Domain Level]].
 
 To assign tracepoint events to a session and channel, select the events to be enabled under the provider (e.g. provider '''Kernel'''), click right mouse button and then select '''Enable Event...''' menu item from the context sensitive menu.
 
@@ -1214,15 +1213,15 @@ Select a session from the '''Session List''' drop-down menu, a channel from the 
 
 === Configuring Filter Expression On UST Event Fields ===
 
-Since LTTng Tools v2.1.0 it is possible to configure a filter expression on UST event fields. To configure a filter expression on UST event fields, open the enable event dialog as described in chapters [[#Enabling UST Events On Session Level]], [[#Enabling Events On Domain Level]] or [[#Enabling Events On Channel Level]], select UST if needed, select the relevant '''Tracepoint''' event(s) and enter the filter expression in the '''Filter Expression''' text field.
+Since LTTng Tools v2.1.0 it is possible to configure a filter expression on UST event fields. To configure a filter expression on UST event fields, open the enable event dialog as described in chapters [[#Enabling UST Events On Session Level | Enabling UST Events On Session Level]], [[#Enabling Events On Domain Level | Enabling Events On Domain Level]] or [[#Enabling Events On Channel Level | Enabling Events On Channel Level]], select UST if needed, select the relevant '''Tracepoint''' event(s) and enter the filter expression in the '''Filter Expression''' text field.
 
 [[Image:images/LTTng2EnableEventWithFilter.png]]
 
-Alternatively, open the dialog box for assigning events to a session and channel described in [[#Enabling Tracepoint Events From Provider]] (for UST providers) and enter the filter expression in the '''Filter Expression''' text field.
+Alternatively, open the dialog box for assigning events to a session and channel described in [[#Enabling Tracepoint Events From Provider | Enabling Tracepoint Events From Provider]] (for UST providers) and enter the filter expression in the '''Filter Expression''' text field.
 
 [[Image:images/LTTng2AssignEventDialogWithFilter.png]]
 
-For the syntax of the filter expression refer to the '''LTTng Tracer Control Command Line Tool User Manual''' of chapter [[#References]].
+For the syntax of the filter expression refer to the '''LTTng Tracer Control Command Line Tool User Manual''' of chapter [[#References |References]].
 
 === Adding Contexts to Channels and Events of a Domain ===
 
@@ -1244,7 +1243,7 @@ Adding contexts on channels and events from the channel level, will enable the s
 
 [[Image:images/LTTng2AddContextOnChannelAction.png]]
 
-A new display will open for selecting one or more contexts to add. Select one or more contexts as described in chapter [[#Adding Contexts to Channels and Events of a Domain]]. Upon successful operation, the selected context will be added to all channels and their events of the selected domain. '''Note''' that the LTTng 2.0 tracer control on the remote host doesn't provide a way to retrieve added contexts. Hence it's not possible to display the context information in the GUI.
+A new display will open for selecting one or more contexts to add. Select one or more contexts as described in chapter [[#Adding Contexts to Channels and Events of a Domain | Adding Contexts to Channels and Events of a Domain]]. Upon successful operation, the selected context will be added to all channels and their events of the selected domain. '''Note''' that the LTTng 2.0 tracer control on the remote host doesn't provide a way to retrieve added contexts. Hence it's not possible to display the context information in the GUI.
 
 === Adding Contexts to an Event of a Specific Channel ===
 
@@ -1252,7 +1251,7 @@ Adding contexts to an event of a channel is only available in LTTng Tools versio
 
 [[Image:images/LTTng2AddContextToEventsAction.png]]
 
-A new display will open for selecting one or more contexts to add. Select one or more contexts as described in chapter [[#Adding Contexts to Channels and Events of a Domain]]. Upon successful operation, the selected context will be added to the selected event.
+A new display will open for selecting one or more contexts to add. Select one or more contexts as described in chapter [[#Adding Contexts to Channels and Events of a Domain | Adding Contexts to Channels and Events of a Domain]]. Upon successful operation, the selected context will be added to the selected event.
 
 === Start Tracing ===
 
@@ -1264,11 +1263,11 @@ Upon successful operation, the tracing session will be '''ACTIVE''' and the icon
 
 === Recording a Snapshot ===
 
-LTTng Tools version v2.3.0 introduces the possibility to create snapshot tracing sessions. After creating a snapshot session (see [[#Creating a Snapshot Tracing Session]]) and starting tracing (see [[#Start Tracing]]) it possible to record snapshots. To record a snapshot select one or more sessions and press the '''Record Snapshot''' button. Alternatively, press the right mouse button on the session tree nodes. A context-sensitive menu will show. Then select the '''Recored Snapshot''' menu item.
+LTTng Tools version v2.3.0 introduces the possibility to create snapshot tracing sessions. After creating a snapshot session (see [[#Creating a Snapshot Tracing Session | Creating a Snapshot Tracing Session]]) and starting tracing (see [[#Start Tracing | Start Tracing]]) it possible to record snapshots. To record a snapshot select one or more sessions and press the '''Record Snapshot''' button. Alternatively, press the right mouse button on the session tree nodes. A context-sensitive menu will show. Then select the '''Recored Snapshot''' menu item.
 
 [[Image:images/LTTng2RecordSnapshotAction.png]]
 
-This action can be executed many times. It is possible to import the recorded snpshots to a tracing project. The trace session might be '''ACTIVE''' or '''INACTIVE''' for that. Refer to section [[#Importing Session Traces to a Tracing Project]] on how to import a trace to a tracing project.
+This action can be executed many times. It is possible to import the recorded snpshots to a tracing project. The trace session might be '''ACTIVE''' or '''INACTIVE''' for that. Refer to section [[#Importing Session Traces to a Tracing Project | Importing Session Traces to a Tracing Project]] on how to import a trace to a tracing project.
 
 === Stop Tracing ===
 
@@ -1331,7 +1330,7 @@ If the existing trace should not be overwritten select, then select the '''Renam
 
 === Importing Network Traces to a Tracing Project ===
 
-Since LTTng Tools v2.1.0 it is possible to store traces over the network. To import network traces, execute the '''Import''' action as described in chapter [[#Importing Session Traces to a Tracing Project]]. For network traces the '''Import Trace Wizard''' will be displayed. Follow the instructions in chapter [[#Importing]] to import the network traces of the current session.
+Since LTTng Tools v2.1.0 it is possible to store traces over the network. To import network traces, execute the '''Import''' action as described in chapter [[#Importing Session Traces to a Tracing Project | Importing Session Traces to a Tracing Project]]. For network traces the '''Import Trace Wizard''' will be displayed. Follow the instructions in chapter [[#Importing | Importing]] to import the network traces of the current session.
 
 == Properties View ==
 
@@ -1407,11 +1406,11 @@ This section presents a description of the LTTng Kernel Perspective.
 
 == LTTng Kernel Perspective ==
 
-The '''LTTng Kernel''' perspective is built upon the [[#Tracing Perspective]], re-organizes them slightly and adds the following views:
+The '''LTTng Kernel''' perspective is built upon the [[#Tracing_Perspective | Tracing Perspective]], re-organizes them slightly and adds the following views:
 
-* [[#Control Flow View]] - to visualize processes state transitions
-* [[#Resources View]] - to visualize system resources state transitions
-* [[#LTTng Tracer Control]] - to configure LTTng tracing sessions remotely
+* [[#Control_Flow_View | Control Flow View]] - to visualize processes state transitions
+* [[#Resources_View | Resources View]] - to visualize system resources state transitions
+* [[#LTTng_Tracer_Control | LTTng Tracer Control]] - to configure LTTng tracing sessions remotely
 
 [[Image:images/LTTngKernelPerspective.png]]
 
@@ -1597,15 +1596,15 @@ Then, by selecting '''Next Event''', it will show the next state transition and 
 
 [[Image:images/RV_infobox2.png|Shows the next state of the IRQ]]
 
-This view is also synchronized with the others : [[#Histogram View]], [[#LTTng Kernel Events Editor|Events Editor]], [[#Control Flow View]], etc.
+This view is also synchronized with the others : [[#Histogram_View | Histogram View]], [[#LTTng_Kernel_Events_Editor | Events Editor]], [[#Control_Flow_View | Control Flow View]], etc.
 
 === Navigation ===
 
-See Control Flow View's '''[[#Using the mouse]]''' and '''[[#Zoom region]]'''.
+See Control Flow View's '''[[#Using_the_mouse | Using the mouse]]''' and '''[[#Zoom_region | Zoom region]]'''.
 
 === Incomplete regions ===
 
-See Control Flow View's '''[[#Incomplete regions]]'''.
+See Control Flow View's '''[[#Incomplete_regions | Incomplete regions]]'''.
 
 === Toolbar ===
 
@@ -1691,7 +1690,7 @@ Hover the cursor over a line of the chart and a tooltip will pop up with the fol
 
 == LTTng Kernel Events Editor ==
 
-The LTTng Kernel Events editor '''is''' the plain TMF [[#Events Editor]], except that it provides its own specialized viewer to replace the standard one. In short, it has exactly the same behaviour but the layout is slightly different:
+The LTTng Kernel Events editor '''is''' the plain TMF [[#Events_Editor | Events Editor]], except that it provides its own specialized viewer to replace the standard one. In short, it has exactly the same behaviour but the layout is slightly different:
 
 * '''Timestamp''': the event timestamp
 * '''Channel''': the event channel (data collector)
@@ -2020,7 +2019,7 @@ The full XML file for the example above would look like this:
 
 === Debugging the XML state provider ===
 
-To debug the state system that was generated by the XML state provider, one could use the [[#State System Explorer View]], along with the events editor. By selecting an event, you can see what changes this event caused and the states of other attributes at the time.
+To debug the state system that was generated by the XML state provider, one could use the [[#State System Explorer View | State System Explorer View]], along with the events editor. By selecting an event, you can see what changes this event caused and the states of other attributes at the time.
 
 If there are corrections to make, you may modify the XML state provider file, and re-import it. To re-run the analysis, you must first delete the supplementary files by right-clicking on your trace, and selecting ''Delete supplementary files...''. Check you analysis's .ht file, so that the analysis will be run again when the trace is reopened. The supplementary file deletion will have closed the trace, so it needs to be opened again to use the newly imported analysis file.
 
@@ -2030,7 +2029,7 @@ If modifications are made to the XML state provider after it has been "published
 
 A time graph view is a view divided in two, with a tree viewer on the left showing information on the different entries to display and a Gantt-like viewer on the right, showing the state of the entries over time. The [[#Control_Flow_View | Control Flow View]] is an example of a time graph view.
 
-Such views can be defined in XML using the data in the state system. The state system itself could have been built by an XML-defined state provider or by any pre-defined Java analysis. It only requires knowing the structure of the state system, which can be explored using the [[#State System Explorer View]] (or programmatically using the methods in ''ITmfStateSystem'').
+Such views can be defined in XML using the data in the state system. The state system itself could have been built by an XML-defined state provider or by any pre-defined Java analysis. It only requires knowing the structure of the state system, which can be explored using the [[#State System Explorer View | State System Explorer View]] (or programmatically using the methods in ''ITmfStateSystem'').
 
 In the example above, suppose we want to display the status for each task. In the state system, it means the path of the entries to display is "Tasks/*". The attribute whose value should be shown in the Gantt chart is the entry attribute itself. So the XML to display these entries would be as such:
 
