@@ -285,7 +285,9 @@ public final class BitBuffer {
     }
 
     private int getIntBE(long index, int length, boolean signed) {
-        assert ((length > 0) && (length <= BIT_INT));
+        if ((length <= 0) || (length > BIT_INT)) {
+            throw new IllegalArgumentException("Length must be between 1-32 bits"); //$NON-NLS-1$
+        }
         long end = index + length;
         int startByte = (int) (index / BIT_CHAR);
         int endByte = (int) ((end + (BIT_CHAR - 1)) / BIT_CHAR);
@@ -337,7 +339,9 @@ public final class BitBuffer {
     }
 
     private int getIntLE(long index, int length, boolean signed) {
-        assert ((length > 0) && (length <= BIT_INT));
+        if ((length <= 0) || (length > BIT_INT)) {
+            throw new IllegalArgumentException("Length must be between 1-32 bits"); //$NON-NLS-1$
+        }
         long end = index + length;
         int startByte = (int) (index / BIT_CHAR);
         int endByte = (int) ((end + (BIT_CHAR - 1)) / BIT_CHAR);
@@ -446,7 +450,9 @@ public final class BitBuffer {
     }
 
     private void putIntBE(long index, int length, int value) {
-        assert ((length > 0) && (length <= BIT_INT));
+        if ((length <= 0) || (length > BIT_INT)) {
+            throw new IllegalArgumentException("Length must be between 1-32 bits"); //$NON-NLS-1$
+        }
         long end = index + length;
         int startByte = (int) (index / BIT_CHAR);
         int endByte = (int) ((end + (BIT_CHAR - 1)) / BIT_CHAR);
@@ -511,7 +517,9 @@ public final class BitBuffer {
     }
 
     private void putIntLE(long index, int length, int value) {
-        assert ((length > 0) && (length <= BIT_INT));
+        if ((length <= 0) || (length > BIT_INT)) {
+            throw new IllegalArgumentException("Length must be between 1-32 bits"); //$NON-NLS-1$
+        }
         long end = index + length;
         int startByte = (int) (index / BIT_CHAR);
         int endByte = (int) ((end + (BIT_CHAR - 1)) / BIT_CHAR);
