@@ -80,7 +80,15 @@ public class NewHistogramViewer extends TmfBarChartViewer {
                             /* No statistics module available for this trace */
                             continue;
                         }
+                        statsMod.waitForInitialization();
                         final ITmfStatistics stats = statsMod.getStatistics();
+                        if (stats == null) {
+                            /*
+                             * Should not be null after waitForInitialization()
+                             * is called.
+                             */
+                            throw new IllegalStateException();
+                        }
                         List<Long> values = stats.histogramQuery(start, end, nb);
 
                         for (int i = 0; i < nb; i++) {
