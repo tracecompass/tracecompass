@@ -49,12 +49,12 @@ public class CtfTmfEventFieldTest {
 
     private static final @NonNull String ROOT = "root";
     private static final String SEQ = "seq";
-    private static final String ARRAY_STR = "array_str";
-    private static final String ARRAY_FLOAT = "array_float";
-    private static final String ARRAY_INT = "array_int";
-    private static final String ARRAY_STRUCT = "array_struct";
-    private static final String ARRAY_VARIANT = "array_variant";
-    private static final String ARRAY_ENUM = "array_enum";
+    private static final @NonNull String ARRAY_STR = "array_str";
+    private static final @NonNull String ARRAY_FLOAT = "array_float";
+    private static final @NonNull String ARRAY_INT = "array_int";
+    private static final @NonNull String ARRAY_STRUCT = "array_struct";
+    private static final @NonNull String ARRAY_VARIANT = "array_variant";
+    private static final @NonNull String ARRAY_ENUM = "array_enum";
     private static final String STR = "str";
     private static final String FLOAT = "float";
     private static final String LEN = "len";
