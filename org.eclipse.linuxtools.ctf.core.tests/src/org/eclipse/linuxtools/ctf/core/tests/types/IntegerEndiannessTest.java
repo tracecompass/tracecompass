@@ -35,11 +35,12 @@ import org.junit.Test;
  */
 public class IntegerEndiannessTest {
 
-    @NonNull private static final String name = "testInt";
-    @NonNull private static final String clockName = "clock";
+    private static final @NonNull String name = "testInt";
+    private static final @NonNull String clockName = "clock";
 
     private ByteBuffer bb;
-    @NonNull private BitBuffer input = new BitBuffer(java.nio.ByteBuffer.allocate(0));
+
+    private @NonNull BitBuffer input = new BitBuffer();
 
     /**
      * Set up the bit-buffer to be used
@@ -47,6 +48,10 @@ public class IntegerEndiannessTest {
     @Before
     public void setUp() {
         bb = java.nio.ByteBuffer.allocateDirect(8);
+        final ByteBuffer byb = bb;
+        if (byb == null) {
+            throw new IllegalStateException("Failed to allocate memory");
+        }
         bb.put((byte) 0xab);
         bb.put((byte) 0xcd);
         bb.put((byte) 0xef);
@@ -55,7 +60,8 @@ public class IntegerEndiannessTest {
         bb.put((byte) 0x56);
         bb.put((byte) 0x78);
         bb.put((byte) 0x9a);
-        input = new BitBuffer(bb);
+
+        input = new BitBuffer(byb);
     }
 
     /**

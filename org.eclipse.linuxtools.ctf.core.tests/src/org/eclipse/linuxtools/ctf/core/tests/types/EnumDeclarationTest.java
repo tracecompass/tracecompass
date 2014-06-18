@@ -25,6 +25,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
+import org.eclipse.linuxtools.ctf.core.tests.io.Util;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.junit.Before;
 import org.junit.Test;
@@ -90,8 +91,7 @@ public class EnumDeclarationTest {
         IDefinitionScope definitionScope = null;
         String fieldName = "";
         byte[] array = { 't', 'e', 's', 't', '\0', 't', 'h', 'i', 's', '\0' };
-        ByteBuffer byb = ByteBuffer.wrap(array);
-        BitBuffer bb = new BitBuffer(byb);
+        BitBuffer bb = new BitBuffer(Util.testMemory(ByteBuffer.wrap(array)));
 
         EnumDefinition result = fixture.createDefinition(definitionScope,
                 fieldName, bb);

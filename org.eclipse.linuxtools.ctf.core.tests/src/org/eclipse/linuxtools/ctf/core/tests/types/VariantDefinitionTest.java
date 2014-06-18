@@ -35,6 +35,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDefinition;
+import org.eclipse.linuxtools.ctf.core.tests.io.Util;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.internal.ctf.core.event.types.ArrayDeclaration;
 import org.junit.Before;
@@ -107,7 +108,7 @@ public class VariantDefinitionTest {
         sDec.addField(VAR_FIELD_NAME, varDec);
         varDec.setTag(TAG_ID);
 
-        ByteBuffer byteBuffer = ByteBuffer.allocate(100);
+        final ByteBuffer byteBuffer = Util.testMemory(ByteBuffer.allocate(100));
         BitBuffer bb = new BitBuffer(byteBuffer);
         byteBuffer.mark();
         byteBuffer.putInt(1);

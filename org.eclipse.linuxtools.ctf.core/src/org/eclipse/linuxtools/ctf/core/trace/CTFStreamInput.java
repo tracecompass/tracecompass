@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.util.UUID;
@@ -310,17 +311,16 @@ public class CTFStreamInput implements IDefinitionScope, AutoCloseable {
                 + ((packetIndex.getPacketSizeBits() + 7) / 8);
     }
 
-    ByteBuffer getByteBufferAt(long position, long size) throws IOException {
-        return fFileChannel.map(MapMode.READ_ONLY, position, size);
+    @NonNull
+    ByteBuffer getByteBufferAt(long position, long size) throws CTFReaderException, IOException {
+        MappedByteBuffer map = fFileChannel.map(MapMode.READ_ONLY, position, size);
+        if (map == null) {
+            throw new CTFReaderException("Failed to allocate mapped byte buffer"); //$NON-NLS-1$
+        }
+        return map;
     }
 
-    /**
-     * @param fileSizeBytes
-     * @param packetOffsetBytes
-     * @param packetIndex
-     * @return
-     * @throws CTFReaderException
-     */
+    @NonNull
     private ByteBuffer createPacketBitBuffer(long fileSizeBytes,
             long packetOffsetBytes, StreamInputPacketIndexEntry packetIndex) throws CTFReaderException {
         /*

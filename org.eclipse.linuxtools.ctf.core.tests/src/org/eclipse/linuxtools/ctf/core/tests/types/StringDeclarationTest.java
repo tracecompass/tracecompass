@@ -72,13 +72,19 @@ public class StringDeclarationTest {
     /**
      * Run the StringDefinition createDefinition(DefinitionScope,String) method
      * test.
-     * @throws CTFReaderException out of buffer exception
+     *
+     * @throws CTFReaderException
+     *             out of buffer exception
      */
     @Test
     public void testCreateDefinition() throws CTFReaderException {
         IDefinitionScope definitionScope = null;
         String fieldName = "id";
-        BitBuffer bb = new BitBuffer(ByteBuffer.allocate(100));
+        ByteBuffer allocate = ByteBuffer.allocate(100);
+        if (allocate == null) {
+            throw new IllegalStateException("Failed to allocate memory");
+        }
+        BitBuffer bb = new BitBuffer(allocate);
         StringDefinition result = fixture.createDefinition(definitionScope,
                 fieldName, bb);
 
@@ -98,7 +104,7 @@ public class StringDeclarationTest {
         assertEquals(1, result.ordinal());
     }
 
-     /**
+    /**
      * Run the String toString() method test.
      */
     @Test

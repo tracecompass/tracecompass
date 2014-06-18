@@ -42,7 +42,7 @@ public class BitBufferTest {
      */
     @Before
     public void setUp() throws CTFReaderException {
-        fixture = new BitBuffer(java.nio.ByteBuffer.allocateDirect(1));
+        fixture = new BitBuffer(Util.testMemory(ByteBuffer.allocateDirect(1)));
         fixture.setByteOrder(ByteOrder.BIG_ENDIAN);
         fixture.position(1);
     }
@@ -56,7 +56,7 @@ public class BitBufferTest {
 
         assertNotNull(result);
         assertEquals(0, result.position());
-        assertNotNull( result.getByteBuffer());
+        assertNotNull(result.getByteBuffer());
     }
 
     /**
@@ -64,9 +64,7 @@ public class BitBufferTest {
      */
     @Test
     public void testBitBuffer_fromByteBuffer() {
-        ByteBuffer buf = ByteBuffer.allocate(0);
-        BitBuffer result = new BitBuffer(buf);
-
+        BitBuffer result = new BitBuffer(Util.testMemory(ByteBuffer.allocate(0)));
         assertNotNull(result);
         assertEquals(0, result.position());
     }
@@ -205,8 +203,7 @@ public class BitBufferTest {
         byte[] data = new byte[5];
         // this string has been carefully selected and tested... don't change
         // the string and expect the result to be the same.
-        ByteBuffer bb = ByteBuffer.wrap(new String("hello world").getBytes());
-        fixture = new BitBuffer(bb);
+        fixture = new BitBuffer(Util.testMemory(ByteBuffer.wrap(new String("hello world").getBytes())));
         fixture.position(6 * 8);
         fixture.get(data);
         String actual = new String(data);

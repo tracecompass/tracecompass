@@ -66,8 +66,9 @@ public final class BitBuffer {
     /**
      * Default constructor, makes a big-endian buffer
      */
+    @SuppressWarnings("null")
     public BitBuffer() {
-        this(ByteBuffer.allocate(0), ByteOrder.BIG_ENDIAN);
+        this(ByteBuffer.allocateDirect(0), ByteOrder.BIG_ENDIAN);
     }
 
     /**
@@ -76,7 +77,7 @@ public final class BitBuffer {
      * @param buf
      *            the bytebuffer to read
      */
-    public BitBuffer(ByteBuffer buf) {
+    public BitBuffer(@NonNull ByteBuffer buf) {
         this(buf, ByteOrder.BIG_ENDIAN);
     }
 
@@ -88,10 +89,7 @@ public final class BitBuffer {
      * @param order
      *            the byte order (big-endian, little-endian, network?)
      */
-    public BitBuffer(ByteBuffer buf, ByteOrder order) {
-        if (buf == null) {
-            throw new IllegalArgumentException("Buffer cannot be null"); //$NON-NLS-1$
-        }
+    public BitBuffer(@NonNull ByteBuffer buf, ByteOrder order) {
         fBuffer = buf;
         setByteOrder(order);
         resetPosition();

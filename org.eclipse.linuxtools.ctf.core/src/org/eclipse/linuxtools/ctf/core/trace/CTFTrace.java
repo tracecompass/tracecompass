@@ -504,6 +504,9 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
                 FileChannel fc = fis.getChannel()) {
             /* Map one memory page of 4 kiB */
             byteBuffer = fc.map(MapMode.READ_ONLY, 0, (int) Math.min(fc.size(), 4096L));
+            if( byteBuffer == null){
+                throw new IllegalStateException("Failed to allocate memory"); //$NON-NLS-1$
+            }
         } catch (IOException e) {
             /* Shouldn't happen at this stage if every other check passed */
             throw new CTFReaderException(e);

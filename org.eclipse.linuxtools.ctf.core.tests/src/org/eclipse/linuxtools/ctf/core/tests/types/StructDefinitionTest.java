@@ -31,6 +31,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDefinition;
+import org.eclipse.linuxtools.ctf.core.tests.io.Util;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.internal.ctf.core.event.types.SequenceDeclaration;
 import org.junit.Before;
@@ -45,16 +46,16 @@ import org.junit.Test;
  */
 public class StructDefinitionTest {
 
-    @NonNull private static final String TEST_STRUCT_ID = "testStruct";
-    @NonNull private static final String ENUM_2 = "y";
-    @NonNull private static final String ENUM_1 = "x";
-    @NonNull private static final String TAG_ID = "Tag";
-    @NonNull private static final String INT_ID = "_id";
-    @NonNull private static final String STRING_ID = "_args";
-    @NonNull private static final String ENUM_ID = "_enumArgs";
-    @NonNull private static final String SEQUENCE_ID = "_seq";
-    @NonNull private static final String LENGTH_SEQ = "_len";
-    @NonNull private static final String VAR_FIELD_NAME = "SomeVariant";
+    private static final @NonNull String TEST_STRUCT_ID = "testStruct";
+    private static final @NonNull String ENUM_2 = "y";
+    private static final @NonNull String ENUM_1 = "x";
+    private static final @NonNull String TAG_ID = "Tag";
+    private static final @NonNull String INT_ID = "_id";
+    private static final @NonNull String STRING_ID = "_args";
+    private static final @NonNull String ENUM_ID = "_enumArgs";
+    private static final @NonNull String SEQUENCE_ID = "_seq";
+    private static final @NonNull String LENGTH_SEQ = "_len";
+    private static final @NonNull String VAR_FIELD_NAME = "SomeVariant";
 
     private StructDefinition fixture;
     private StructDefinition emptyStruct;
@@ -92,8 +93,7 @@ public class StructDefinitionTest {
         bytes[4] = 1;
         bytes[8] = 2;
         bytes[13] = 3;
-        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
-        BitBuffer bb = new BitBuffer(byteBuffer);
+        BitBuffer bb = new BitBuffer(Util.testMemory(ByteBuffer.wrap(bytes)));
         fixture = sDec.createDefinition(null, TEST_STRUCT_ID, bb);
         EnumDefinition eDef = tagDec.createDefinition(fixture, TAG_ID, bb);
         assertNotNull(eDef);

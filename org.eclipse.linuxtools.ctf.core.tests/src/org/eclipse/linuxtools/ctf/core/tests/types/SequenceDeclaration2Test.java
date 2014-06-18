@@ -55,6 +55,9 @@ public class SequenceDeclaration2Test {
         fixture = new SequenceDeclaration(FIELD_NAME, new StringDeclaration());
         byte array[] = { 't', 'e', 's', 't', '\0', 't', 'h', 'i', 's', '\0' };
         ByteBuffer byb = ByteBuffer.wrap(array);
+        if( byb == null){
+            throw new IllegalStateException("Failed to allocate memory");
+        }
         input = new BitBuffer(byb);
     }
 
