@@ -42,9 +42,8 @@ public class BitBufferTest {
      */
     @Before
     public void setUp() throws CTFReaderException {
-        fixture = new BitBuffer(java.nio.ByteBuffer.allocateDirect(128));
+        fixture = new BitBuffer(java.nio.ByteBuffer.allocateDirect(0));
         fixture.setByteOrder(ByteOrder.BIG_ENDIAN);
-        fixture.setByteBuffer(ByteBuffer.allocate(0));
         fixture.position(1);
     }
 
@@ -99,10 +98,9 @@ public class BitBufferTest {
         ByteBuffer result = fixture.getByteBuffer();
 
         assertNotNull(result);
-        assertEquals("java.nio.HeapByteBuffer[pos=0 lim=0 cap=0]", result.toString());
-        assertEquals(false, result.isDirect());
-        assertEquals(true, result.hasArray());
-        assertEquals(0, result.arrayOffset());
+        assertEquals("java.nio.DirectByteBuffer[pos=0 lim=0 cap=0]", result.toString());
+        assertEquals(true, result.isDirect());
+        assertEquals(false, result.hasArray());
         assertEquals(0, result.limit());
         assertEquals(0, result.remaining());
         assertEquals(0, result.position());
@@ -166,24 +164,6 @@ public class BitBufferTest {
     }
 
     /**
-     * Run the void setByteBuffer(ByteBuffer) method test.
-     */
-    @Test
-    public void testSetByteBuffer() {
-        ByteBuffer buf = ByteBuffer.allocate(0);
-        fixture.setByteBuffer(buf);
-    }
-
-    /**
-     * Run the void setByteBuffer(ByteBuffer) method test.
-     */
-    @Test
-    public void testSetByteBuffer_null() {
-        ByteBuffer buf = null;
-        fixture.setByteBuffer(buf);
-    }
-
-    /**
      * Run the void setByteOrder(ByteOrder) method test.
      */
     @Test
@@ -197,7 +177,8 @@ public class BitBufferTest {
      */
     @Test
     public void testGetBytes() {
-        @NonNull byte[] data = new byte[2];
+        @NonNull
+        byte[] data = new byte[2];
         ByteBuffer bb = ByteBuffer.allocate(10);
         bb.put((byte) 0);
         bb.put((byte) 1);
@@ -220,7 +201,8 @@ public class BitBufferTest {
      */
     @Test
     public void testGetBytesMiddle() throws CTFReaderException {
-        @NonNull byte[] data = new byte[5];
+        @NonNull
+        byte[] data = new byte[5];
         // this string has been carefully selected and tested... don't change
         // the string and expect the result to be the same.
         ByteBuffer bb = ByteBuffer.wrap(new String("hello world").getBytes());

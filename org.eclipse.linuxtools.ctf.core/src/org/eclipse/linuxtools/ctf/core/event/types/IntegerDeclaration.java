@@ -312,7 +312,10 @@ public class IntegerDeclaration extends Declaration {
     @Override
     public IntegerDefinition createDefinition(@Nullable IDefinitionScope definitionScope,
             String fieldName, BitBuffer input) throws CTFReaderException {
+        ByteOrder byteOrder = input.getByteOrder();
+        input.setByteOrder(fByteOrder);
         long value = read(input);
+        input.setByteOrder(byteOrder);
         return new IntegerDefinition(this, definitionScope, fieldName, value);
     }
 

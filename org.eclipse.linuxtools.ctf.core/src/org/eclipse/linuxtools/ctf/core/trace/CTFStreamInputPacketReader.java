@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.ctf.core.CTFStrings;
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
@@ -47,8 +48,8 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
     // ------------------------------------------------------------------------
 
     /** BitBuffer used to read the trace file. */
-    @NonNull
-    private final BitBuffer fBitBuffer;
+    @Nullable
+    private BitBuffer fBitBuffer;
 
     /** StreamInputReader that uses this StreamInputPacketReader. */
     private final CTFStreamInputReader fStreamInputReader;
@@ -169,7 +170,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
      */
     @Override
     public void close() {
-        fBitBuffer.setByteBuffer(null);
+        fBitBuffer = null;
     }
 
     // ------------------------------------------------------------------------
@@ -228,20 +229,20 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
                 throw new CTFReaderException(e.getMessage(), e);
             }
 
-            fBitBuffer.setByteBuffer(bb);
-
+            BitBuffer bitBuffer = new BitBuffer(bb);
+            fBitBuffer = bitBuffer;
             /*
              * Read trace packet header.
              */
             if (fTracePacketHeaderDecl != null) {
-                fCurrentTracePacketHeaderDef = getTracePacketHeaderDefinition(fBitBuffer);
+                fCurrentTracePacketHeaderDef = getTracePacketHeaderDefinition(bitBuffer);
             }
 
             /*
              * Read stream packet context.
              */
             if (fStreamPacketContextDecl != null) {
-                fCurrentStreamPacketContextDef = getStreamPacketContextDefinition(fBitBuffer);
+                fCurrentStreamPacketContextDef = getStreamPacketContextDefinition(bitBuffer);
 
                 /* Read CPU ID */
                 if (getCurrentPacket().getTarget() != null) {
@@ -275,8 +276,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
              */
             fLastTimestamp = currentPacket.getTimestampBegin();
         } else {
-            fBitBuffer.setByteBuffer(null);
-
+            fBitBuffer = null;
             fLastTimestamp = 0;
         }
     }
@@ -287,8 +287,10 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
      * @return True if it is possible to read any more events from this packet.
      */
     public boolean hasMoreEvents() {
-        if (fCurrentPacket != null) {
-            return fHasLost || (fBitBuffer.position() < fCurrentPacket.getContentSizeBits());
+        BitBuffer bitBuffer = fBitBuffer;
+        StreamInputPacketIndexEntry currentPacket = fCurrentPacket;
+        if (currentPacket != null && bitBuffer != null) {
+            return fHasLost || (bitBuffer.position() < currentPacket.getContentSizeBits());
         }
         return false;
     }
@@ -341,6 +343,9 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
         }
 
         final BitBuffer currentBitBuffer = fBitBuffer;
+        if( currentBitBuffer == null ) {
+            return null;
+        }
         final long posStart = currentBitBuffer.position();
         /* Read the stream event header. */
         if (fStreamEventHeaderDecl != null) {
@@ -395,7 +400,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
         if (eventDeclaration == null) {
             throw new CTFReaderException("Incorrect event id : " + eventID); //$NON-NLS-1$
         }
-        EventDefinition eventDef = eventDeclaration.createDefinition(fStreamInputReader, fBitBuffer, timestamp);
+        EventDefinition eventDef = eventDeclaration.createDefinition(fStreamInputReader, currentBitBuffer, timestamp);
 
         /*
          * Set the event timestamp using the timestamp calculated by
