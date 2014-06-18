@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.statesystem.core.statevalue;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.linuxtools.internal.statesystem.core.Activator;
 import org.eclipse.linuxtools.statesystem.core.exceptions.StateValueTypeException;
 
 /**
@@ -141,6 +142,16 @@ public abstract class TmfStateValue implements ITmfStateValue {
     public static TmfStateValue newValueString(@Nullable String strValue) {
         if (strValue == null) {
             return nullValue();
+        }
+        /*
+         * Make sure the String does not contain "weird" things, like ISO
+         * control characters.
+         */
+        for (char c : strValue.toCharArray()) {
+            if (Character.isISOControl(c)) {
+                Activator.getDefault().logError("Trying to use invalid string: " + strValue); //$NON-NLS-1$
+                throw new IllegalArgumentException();
+            }
         }
         return new StringStateValue(strValue);
     }
