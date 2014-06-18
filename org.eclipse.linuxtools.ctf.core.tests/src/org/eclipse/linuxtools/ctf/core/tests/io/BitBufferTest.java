@@ -42,7 +42,7 @@ public class BitBufferTest {
      */
     @Before
     public void setUp() throws CTFReaderException {
-        fixture = new BitBuffer(java.nio.ByteBuffer.allocateDirect(0));
+        fixture = new BitBuffer(java.nio.ByteBuffer.allocateDirect(1));
         fixture.setByteOrder(ByteOrder.BIG_ENDIAN);
         fixture.position(1);
     }
@@ -56,7 +56,7 @@ public class BitBufferTest {
 
         assertNotNull(result);
         assertEquals(0, result.position());
-        assertEquals(null, result.getByteBuffer());
+        assertNotNull( result.getByteBuffer());
     }
 
     /**
@@ -79,7 +79,7 @@ public class BitBufferTest {
         int length = 1;
         boolean result = fixture.canRead(length);
 
-        assertEquals(false, result);
+        assertEquals(true, result);
     }
 
     /**
@@ -98,14 +98,14 @@ public class BitBufferTest {
         ByteBuffer result = fixture.getByteBuffer();
 
         assertNotNull(result);
-        assertEquals("java.nio.DirectByteBuffer[pos=0 lim=0 cap=0]", result.toString());
+        assertEquals("java.nio.DirectByteBuffer[pos=0 lim=1 cap=1]", result.toString());
         assertEquals(true, result.isDirect());
         assertEquals(false, result.hasArray());
-        assertEquals(0, result.limit());
-        assertEquals(0, result.remaining());
+        assertEquals(1, result.limit());
+        assertEquals(1, result.remaining());
         assertEquals(0, result.position());
-        assertEquals(0, result.capacity());
-        assertEquals(false, result.hasRemaining());
+        assertEquals(1, result.capacity());
+        assertEquals(true, result.hasRemaining());
         assertEquals(false, result.isReadOnly());
     }
 

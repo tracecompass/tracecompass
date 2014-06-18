@@ -51,7 +51,8 @@ public final class BitBuffer {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final ByteBuffer fBuffer;
+    private final @NonNull ByteBuffer fBuffer;
+    private final long fBitCapacity;
 
     /**
      * Bit-buffer's position, maximum value = Integer.MAX_VALUE * 8
@@ -66,7 +67,7 @@ public final class BitBuffer {
      * Default constructor, makes a big-endian buffer
      */
     public BitBuffer() {
-        this(null, ByteOrder.BIG_ENDIAN);
+        this(ByteBuffer.allocate(0), ByteOrder.BIG_ENDIAN);
     }
 
     /**
@@ -88,9 +89,13 @@ public final class BitBuffer {
      *            the byte order (big-endian, little-endian, network?)
      */
     public BitBuffer(ByteBuffer buf, ByteOrder order) {
+        if (buf == null) {
+            throw new IllegalArgumentException("Buffer cannot be null"); //$NON-NLS-1$
+        }
         fBuffer = buf;
         setByteOrder(order);
         resetPosition();
+        fBitCapacity = fBuffer.capacity() * BIT_CHAR;
     }
 
     private void resetPosition() {
@@ -594,14 +599,7 @@ public final class BitBuffer {
      * @return does the buffer have enough room to read the next "length"
      */
     public boolean canRead(int length) {
-        if (fBuffer == null) {
-            return false;
-        }
-
-        if ((fPosition + length) > (((long) fBuffer.capacity()) * BIT_CHAR)) {
-            return false;
-        }
-        return true;
+        return ((fPosition + length) <= fBitCapacity);
     }
 
     /**
@@ -612,9 +610,7 @@ public final class BitBuffer {
      */
     public void setByteOrder(ByteOrder order) {
         fByteOrder = order;
-        if (fBuffer != null) {
-            fBuffer.order(order);
-        }
+        fBuffer.order(order);
     }
 
     /**
@@ -637,7 +633,8 @@ public final class BitBuffer {
      */
     public void position(long newPosition) throws CTFReaderException {
 
-        if ((fBuffer != null) && (newPosition / 8) > fBuffer.capacity()) {
+
+        if (newPosition > fBitCapacity) {
             throw new CTFReaderException("Out of bounds exception on a position move, attempting to access position: " + newPosition); //$NON-NLS-1$
         }
         fPosition = newPosition;
@@ -686,9 +683,6 @@ public final class BitBuffer {
      */
     public void clear() {
         resetPosition();
-        if (fBuffer == null) {
-            return;
-        }
         fBuffer.clear();
     }
 
