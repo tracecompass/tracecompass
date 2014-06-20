@@ -29,6 +29,7 @@ import java.util.Map;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -92,6 +93,10 @@ public class TimeGraphControl extends TimeGraphBaseControl
     /** Max scrollbar size */
     public static final int H_SCROLLBAR_MAX = Integer.MAX_VALUE - 1;
 
+    /** Constant indicating that all levels of the time graph should be expanded
+     * @since 3.1 */
+    public static final int ALL_LEVELS = AbstractTreeViewer.ALL_LEVELS;
+
     private static final int DRAG_NONE = 0;
     private static final int DRAG_TRACE_ITEM = 1;
     private static final int DRAG_SPLIT_LINE = 2;
@@ -145,6 +150,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private final List<ViewerFilter> fFilters = new ArrayList<>();
     private MenuDetectEvent fPendingMenuDetectEvent = null;
     private boolean fHideArrows = false;
+    private int fAutoExpandLevel = ALL_LEVELS;
 
     private int fBorderWidth = 0;
     private int fHeaderHeight = 0;
@@ -479,6 +485,37 @@ public class TimeGraphControl extends TimeGraphBaseControl
         index = Math.max(0,  index);
         fTopIndex = index;
         redraw();
+    }
+
+    /**
+     * Sets the auto-expand level to be used when the entries are refreshed
+     * using {@link #refreshData()} or {@link #refreshData(ITimeGraphEntry[])}.
+     * The value 0 means that there is no auto-expand; 1 means that top-level
+     * entries are expanded, but not their children; 2 means that top-level
+     * entries are expanded, and their children, but not grand-children; and so
+     * on.
+     * <p>
+     * The value {@link #ALL_LEVELS} means that all subtrees should be expanded.
+     * </p>
+     * @param level
+     *            non-negative level, or <code>ALL_LEVELS</code> to expand all
+     *            levels of the tree
+     * @since 3.1
+     */
+    public void setAutoExpandLevel(int level) {
+        fAutoExpandLevel = level;
+    }
+
+    /**
+     * Returns the auto-expand level.
+     *
+     * @return non-negative level, or <code>ALL_LEVELS</code> if all levels of
+     *         the tree are expanded automatically
+     * @see #setAutoExpandLevel
+     * @since 3.1
+     */
+    public int getAutoExpandLevel() {
+        return fAutoExpandLevel;
     }
 
     /**
@@ -2468,7 +2505,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             }
             itemMap.put(entry, item);
             if (entry.hasChildren()) {
-                item.fExpanded = true;
+                item.fExpanded = fAutoExpandLevel == ALL_LEVELS || level < fAutoExpandLevel;
                 item.fHasChildren = true;
                 for (ITimeGraphEntry child : entry.getChildren()) {
                     refreshData(itemMap, item, level + 1, child);

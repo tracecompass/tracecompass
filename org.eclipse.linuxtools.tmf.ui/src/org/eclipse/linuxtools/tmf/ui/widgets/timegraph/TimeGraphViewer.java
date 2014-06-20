@@ -22,6 +22,7 @@ import java.util.List;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
@@ -65,6 +66,10 @@ import org.eclipse.swt.widgets.Slider;
  * @author Patrick Tasse, and others
  */
 public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
+
+    /** Constant indicating that all levels of the time graph should be expanded
+     * @since 3.1 */
+    public static final int ALL_LEVELS = AbstractTreeViewer.ALL_LEVELS;
 
     private static final int DEFAULT_NAME_WIDTH = 200;
     private static final int MIN_NAME_WIDTH = 6;
@@ -1270,6 +1275,36 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      */
     public int getTopIndex() {
         return fTimeGraphCtrl.getTopIndex();
+    }
+
+    /**
+     * Sets the auto-expand level to be used when the input of the viewer is set
+     * using {@link #setInput(Object)}. The value 0 means that there is no
+     * auto-expand; 1 means that top-level elements are expanded, but not their
+     * children; 2 means that top-level elements are expanded, and their
+     * children, but not grand-children; and so on.
+     * <p>
+     * The value {@link #ALL_LEVELS} means that all subtrees should be expanded.
+     * </p>
+     * @param level
+     *            non-negative level, or <code>ALL_LEVELS</code> to expand all
+     *            levels of the tree
+     * @since 3.1
+     */
+    public void setAutoExpandLevel(int level) {
+        fTimeGraphCtrl.setAutoExpandLevel(level);
+    }
+
+    /**
+     * Returns the auto-expand level.
+     *
+     * @return non-negative level, or <code>ALL_LEVELS</code> if all levels of
+     *         the tree are expanded automatically
+     * @see #setAutoExpandLevel
+     * @since 3.1
+     */
+    public int getAutoExpandLevel() {
+        return fTimeGraphCtrl.getAutoExpandLevel();
     }
 
     /**
