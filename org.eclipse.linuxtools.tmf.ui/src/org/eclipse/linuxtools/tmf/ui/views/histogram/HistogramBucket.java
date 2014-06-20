@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Xavier Raynaud - Initial API and implementation
+ *   Patrick Tasse - Fix concurrency issue
  *******************************************************************************/
 package org.eclipse.linuxtools.tmf.ui.views.histogram;
 
@@ -37,8 +38,8 @@ public class HistogramBucket {
      */
     public HistogramBucket(int... values) {
         fEvents = values;
-        for (int i: fEvents) {
-            fNbEvents +=i;
+        for (int i : fEvents) {
+            fNbEvents += i;
         }
     }
 
@@ -71,16 +72,16 @@ public class HistogramBucket {
      * Add an event in this bucket
      * @param traceIndex a trace index - see {@link HistogramDataModel#setTrace}.
      */
-    public void addEvent(int traceIndex) {
-        this.fNbEvents++;
-        ensureCapacity(traceIndex+1);
+    public synchronized void addEvent(int traceIndex) {
+        ensureCapacity(traceIndex + 1);
         fEvents[traceIndex]++;
+        fNbEvents++;
     }
 
     private void ensureCapacity(int len) {
         if (fEvents == null) {
             fEvents = new int[len];
-        } else if (fEvents.length<len) {
+        } else if (fEvents.length < len) {
             int[] oldArray = fEvents;
             fEvents = new int[len];
             System.arraycopy(oldArray, 0, fEvents, 0, oldArray.length);
@@ -113,12 +114,14 @@ public class HistogramBucket {
      * Merge the given bucket in this one.
      * @param histogramBucket a bucket to merge in this one.
      */
-    public void add(HistogramBucket histogramBucket) {
+    public synchronized void add(HistogramBucket histogramBucket) {
         if (histogramBucket != null && histogramBucket.fNbEvents != 0) {
-            fNbEvents += histogramBucket.fNbEvents;
-            ensureCapacity(histogramBucket.fEvents.length);
-            for (int i = 0; i<histogramBucket.fEvents.length; i++) {
-                fEvents[i] += histogramBucket.fEvents[i];
+            int len = histogramBucket.fEvents.length;
+            ensureCapacity(len);
+            for (int i = 0; i < len; i++) {
+                int nbEvents = histogramBucket.fEvents[i];
+                fEvents[i] += nbEvents;
+                fNbEvents += nbEvents;
             }
         }
     }
