@@ -49,6 +49,7 @@ public class TmfStatisticsEventTypesModule extends TmfStateSystemAnalysisModule 
      * Constructor
      */
     public TmfStatisticsEventTypesModule() {
+        super();
         setId(ID);
         setName(NAME);
     }
