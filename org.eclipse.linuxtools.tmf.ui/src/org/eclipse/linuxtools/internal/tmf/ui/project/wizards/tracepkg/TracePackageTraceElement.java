@@ -13,7 +13,6 @@
 package org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfCommonProjectElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfNavigatorLabelProvider;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
@@ -79,12 +78,46 @@ public class TracePackageTraceElement extends TracePackageElement {
         for (TracePackageElement element : getChildren()) {
             if (element instanceof TracePackageFilesElement) {
                 TracePackageFilesElement tracePackageFilesElement = (TracePackageFilesElement) element;
-                IPath filePath = new Path(tracePackageFilesElement.getFileName());
-                return filePath.removeLastSegments(1).append(traceName).toString();
+                String fileName = tracePackageFilesElement.getFileName();
+                String parentDir = removeLastSegment(fileName);
+                return append(parentDir, traceName);
             }
         }
 
         return traceName;
+    }
+
+    /**
+     * We do this outside of the Path class because we don't want it to convert
+     * \ to / on Windows in the presence of regular expressions
+     */
+    private static String removeLastSegment(String str) {
+        String ret = removeAllTrailing(str, IPath.SEPARATOR);
+        int lastIndexOf = ret.lastIndexOf(IPath.SEPARATOR);
+        if (lastIndexOf != -1) {
+            ret = ret.substring(0, lastIndexOf);
+            ret = removeAllTrailing(ret, IPath.SEPARATOR);
+        } else {
+            ret = ""; //$NON-NLS-1$
+        }
+
+        return ret;
+    }
+
+    private static String removeAllTrailing(String str, char toRemove) {
+        String ret = str;
+        while (ret.endsWith(Character.toString(toRemove))) {
+            ret = ret.substring(0, ret.length() - 1);
+        }
+        return ret;
+    }
+
+    private static String append(String path, String str) {
+        if (!path.isEmpty()) {
+            return path + IPath.SEPARATOR + str;
+        }
+
+        return str;
     }
 
     /**
