@@ -21,6 +21,7 @@ import org.eclipse.linuxtools.internal.lttng2.control.core.relayd.impl.LttngRela
 import org.eclipse.linuxtools.internal.lttng2.control.core.relayd.impl.LttngRelaydConnector_Unsupported;
 import org.eclipse.linuxtools.internal.lttng2.control.core.relayd.lttngviewerCommands.Command;
 import org.eclipse.linuxtools.internal.lttng2.control.core.relayd.lttngviewerCommands.ConnectResponse;
+import org.eclipse.linuxtools.internal.lttng2.control.core.relayd.lttngviewerCommands.ConnectionType;
 import org.eclipse.linuxtools.internal.lttng2.control.core.relayd.lttngviewerCommands.ViewerCommand;
 
 /**
@@ -51,6 +52,10 @@ public final class LttngRelaydConnectorFactory {
         ViewerCommand connectCommand = new ViewerCommand(Command.VIEWER_CONNECT, ConnectResponse.SIZE, 0);
 
         outNet.write(connectCommand.serialize());
+        outNet.flush();
+
+        ConnectResponse payload = new ConnectResponse(0, 2, 4, ConnectionType.VIEWER_CLIENT_COMMAND);
+        outNet.write(payload.serialize());
         outNet.flush();
 
         ConnectResponse connectReply = new ConnectResponse(inNet);
