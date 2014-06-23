@@ -28,6 +28,8 @@ public class SessionResponse implements IRelayResponse {
 
     /**
      * Response size
+     *
+     * fHostname + fSessionName + fId + fLiveTimer + fClients + fStreams
      */
     public static final int SIZE =
             LttngViewerCommands.LTTNG_VIEWER_HOST_NAME_MAX + LttngViewerCommands.LTTNG_VIEWER_NAME_MAX + (Long.SIZE + Integer.SIZE + Integer.SIZE + Integer.SIZE) / 8;

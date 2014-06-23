@@ -26,8 +26,10 @@ public class ViewerCommand implements IRelayCommand {
 
     /**
      * Command size
+     *
+     * fDataSize + fCmdVersion + fCmd
      */
-    public static final int SIZE = (Long.SIZE + Command.SIZE + Integer.SIZE) / 8;
+    public static final int SIZE = (Long.SIZE + Integer.SIZE) / 8 + Command.SIZE;
     /**
      * data size following this header, you normally attach a payload that one,
      * in bytes

@@ -26,6 +26,11 @@ import java.nio.ByteOrder;
  */
 public class MetadataPacketResponse implements IRelayResponse {
 
+    /**
+     * Response size
+     *
+     * fData.length + fStatus
+     */
     private static final int SIZE = (Long.SIZE + Integer.SIZE) / 8;
     /** status of the metadata request */
     private final GetMetadataReturnCode fStatus;

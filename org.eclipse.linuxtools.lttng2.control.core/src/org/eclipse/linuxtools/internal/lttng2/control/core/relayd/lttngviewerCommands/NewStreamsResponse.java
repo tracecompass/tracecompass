@@ -29,6 +29,11 @@ import com.google.common.collect.ImmutableList;
  */
 public class NewStreamsResponse implements IRelayResponse {
 
+    /**
+     * Response size
+     *
+     * fStatus + fNbStreams
+     */
     private static final int SIZE = (Integer.SIZE + Integer.SIZE) / 8;
     /** status of the request */
     private final NewStreamsReturnCode fStatus;

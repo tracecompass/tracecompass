@@ -26,9 +26,12 @@ import java.nio.ByteOrder;
  */
 public class IndexResponse implements IRelayResponse {
 
-    // Sum of the field sizes / 8 ( 7 longs and 2 ints)
     /**
      * Command size
+     *
+     * Sum of the field sizes / 8 ( 7 longs and 2 ints):
+     * fOffset + fPacketSize + fContentSize + fTimestampBegin + fTimestampEnd +
+     * fEventsDiscarded + fStreamId + fStatus + fFlags
      */
     public final static int SIZE =
             (Long.SIZE * 7 + Integer.SIZE * 2) / 8;

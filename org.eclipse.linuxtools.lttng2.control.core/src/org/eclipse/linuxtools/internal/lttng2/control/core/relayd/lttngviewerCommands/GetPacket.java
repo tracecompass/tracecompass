@@ -26,6 +26,8 @@ public class GetPacket implements IRelayCommand {
 
     /**
      * Command size
+     *
+     * fStreamId + fOffset + fLength
      */
     public static final int SIZE = (Long.SIZE + Long.SIZE + Integer.SIZE) / 8;
     /** the stream Id */

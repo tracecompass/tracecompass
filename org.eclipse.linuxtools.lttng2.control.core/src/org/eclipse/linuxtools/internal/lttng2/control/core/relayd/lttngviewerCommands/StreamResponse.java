@@ -28,6 +28,8 @@ public class StreamResponse implements IRelayResponse {
 
     /**
      * Response size
+     *
+     * fId + fCtfTraceId + fMetadataFlag + fPathName + fChannelName
      */
     public static final int SIZE = (Long.SIZE + Long.SIZE + Integer.SIZE) / 8 + LttngViewerCommands.LTTNG_VIEWER_PATH_MAX + LttngViewerCommands.LTTNG_VIEWER_NAME_MAX;
 

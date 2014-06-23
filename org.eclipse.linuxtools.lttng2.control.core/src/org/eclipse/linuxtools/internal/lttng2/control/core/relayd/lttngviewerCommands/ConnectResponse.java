@@ -28,6 +28,8 @@ public class ConnectResponse implements IRelayResponse, IRelayCommand {
 
     /**
      * Response or command size
+     *
+     * fViewerSessionId + fMajor + fMinor + fType
      */
     public static final int SIZE = (Long.SIZE + Integer.SIZE + Integer.SIZE + Integer.SIZE) / 8;
     /** session id, counts from 1 and increments by session */

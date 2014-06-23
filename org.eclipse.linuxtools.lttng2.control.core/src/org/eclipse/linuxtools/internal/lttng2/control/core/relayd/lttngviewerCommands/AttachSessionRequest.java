@@ -27,9 +27,9 @@ public class AttachSessionRequest implements IRelayCommand {
     /**
      * Command size
      *
-     * long + int + seek command which is 2 ints
+     * fSessionId + fOffset + fSeek
      */
-    public static final int SIZE =(Long.SIZE + Integer.SIZE + SeekCommand.SIZE) / 8;
+    public static final int SIZE = (Long.SIZE + Long.SIZE) / 8 + SeekCommand.SIZE;
     /** the id of a session */
     private final long fSessionId;
     /** unused for now */

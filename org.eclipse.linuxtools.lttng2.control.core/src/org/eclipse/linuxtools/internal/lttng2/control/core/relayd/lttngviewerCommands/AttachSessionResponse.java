@@ -30,7 +30,10 @@ import com.google.common.collect.ImmutableList.Builder;
  */
 public class AttachSessionResponse implements IRelayResponse {
 
-    /* enum + stream count, first half of a packet */
+    /**
+     * Response size
+     *
+     * fStatus + fStreamsCount (first half of a packet) */
     private static final int SIZE = (Integer.SIZE + Integer.SIZE) / 8;
     /** enum lttng_viewer_attach_return_code */
     private final AttachReturnCode fStatus;

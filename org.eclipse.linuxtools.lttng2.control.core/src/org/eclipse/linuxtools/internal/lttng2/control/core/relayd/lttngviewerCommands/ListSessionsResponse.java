@@ -31,7 +31,7 @@ import com.google.common.collect.ImmutableList.Builder;
 public class ListSessionsResponse implements IRelayResponse {
 
     /**
-     * Response size
+     * Response size (nbSessions)
      */
     public static final int PACKET_FIXED_SIZE = Integer.SIZE / 8;
 

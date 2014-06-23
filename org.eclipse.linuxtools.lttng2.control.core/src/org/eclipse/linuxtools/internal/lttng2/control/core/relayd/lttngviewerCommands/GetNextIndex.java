@@ -25,7 +25,7 @@ import java.nio.ByteOrder;
 public class GetNextIndex implements IRelayCommand {
 
     /**
-     * Command size
+     * Command size (fStreamId)
      */
     public static final int SIZE = Long.SIZE / 8;
     /**

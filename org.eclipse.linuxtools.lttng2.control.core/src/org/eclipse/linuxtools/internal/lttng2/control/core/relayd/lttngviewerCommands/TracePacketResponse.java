@@ -26,7 +26,12 @@ import java.nio.ByteOrder;
  */
 public class TracePacketResponse implements IRelayResponse {
 
-    private static final int SIZE = (Integer.SIZE + Integer.SIZE) / 8;
+    /**
+     * Command size
+     *
+     * fStatus + fData.length + fFlags
+     */
+    private static final int SIZE = (Integer.SIZE + Integer.SIZE + Integer.SIZE) / 8;
     /** Enum lttng_viewer_get_packet_return_code */
     private final GetPacketReturnCode fStatus;
     /** flags: is there new metadata or new streams? */

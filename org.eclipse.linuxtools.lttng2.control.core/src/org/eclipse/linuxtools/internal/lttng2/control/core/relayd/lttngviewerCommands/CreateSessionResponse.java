@@ -27,7 +27,7 @@ import java.nio.ByteOrder;
 public class CreateSessionResponse implements IRelayResponse {
 
     /**
-     * Response size
+     * Response size (fStatus)
      */
     public static final int SIZE = Integer.SIZE / 8;
 
