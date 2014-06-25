@@ -312,12 +312,12 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
             EventDeclaration lostEventDeclaration = EventDeclaration.getLostEventDeclaration();
             StructDeclaration lostFields = lostEventDeclaration.getFields();
             // this is a hard coded map, we know it's not null
-            IntegerDeclaration lostFieldsDecl = (IntegerDeclaration) lostFields.getFields().get(CTFStrings.LOST_EVENTS_FIELD);
+            IntegerDeclaration lostFieldsDecl = (IntegerDeclaration) lostFields.getField(CTFStrings.LOST_EVENTS_FIELD);
             if (lostFieldsDecl == null)
             {
                 throw new IllegalStateException("Lost events count not declared!"); //$NON-NLS-1$
             }
-            IntegerDeclaration lostEventsDurationDecl = (IntegerDeclaration) lostFields.getFields().get(CTFStrings.LOST_EVENTS_DURATION);
+            IntegerDeclaration lostEventsDurationDecl = (IntegerDeclaration) lostFields.getField(CTFStrings.LOST_EVENTS_DURATION);
             if (lostEventsDurationDecl == null) {
                 throw new IllegalStateException("Lost events duration not declared!"); //$NON-NLS-1$
             }

@@ -12,16 +12,15 @@
 
 package org.eclipse.linuxtools.ctf.core.event.types;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * A CTF structure declaration.
@@ -41,13 +40,7 @@ public class StructDeclaration extends Declaration {
     // ------------------------------------------------------------------------
 
     /** linked list of field names. So fieldName->fieldValue */
-    private final Map<String, IDeclaration> fFieldMap = new LinkedHashMap<>();
-
-    /** List of strings for acceleration */
-    @NonNull
-    private ImmutableList<String> fFieldNames;
-    /** array declaration for acceleration */
-    private List<IDeclaration> fFieldDeclarations;
+    private final @NonNull Map<String, IDeclaration> fFieldMap = new LinkedHashMap<>();
 
     /** maximum bit alignment */
     private long fMaxAlign;
@@ -64,11 +57,8 @@ public class StructDeclaration extends Declaration {
      *            aligned and has a 32 bit aligned field, the struct becomes 32
      *            bit aligned.
      */
-    @SuppressWarnings("null")
-    // ImmutableList.of()
     public StructDeclaration(long align) {
         fMaxAlign = Math.max(align, 1);
-        fFieldNames = ImmutableList.of();
     }
 
     /**
@@ -80,11 +70,9 @@ public class StructDeclaration extends Declaration {
      *            all the fields
      * @since 3.0
      */
-    @SuppressWarnings("null")
-    // ImmutableList.of()
     public StructDeclaration(String[] names, Declaration[] declarations) {
         fMaxAlign = 1;
-        fFieldNames = ImmutableList.of();
+
         for (int i = 0; i < names.length; i++) {
             addField(names[i], declarations[i]);
         }
@@ -115,13 +103,26 @@ public class StructDeclaration extends Declaration {
     }
 
     /**
-     * get the fields of the struct in a map. Faster access time than a list.
+     * Get the fields of the struct as a map.
      *
-     * @return a HashMap of the fields (key is the name)
+     * @return a Map of the fields (key is the name)
      * @since 2.0
      */
     public Map<String, IDeclaration> getFields() {
         return fFieldMap;
+    }
+
+    /**
+     * Get the field declaration corresponding to a field name.
+     *
+     * @param fieldName
+     *            The field name
+     * @return The declaration of the field, or null if there is no such field.
+     * @since 3.1
+     */
+    @Nullable
+    public IDeclaration getField(String fieldName) {
+        return fFieldMap.get(fieldName);
     }
 
     /**
@@ -146,10 +147,8 @@ public class StructDeclaration extends Declaration {
     @Override
     public int getMaximumSize() {
         int maxSize = 0;
-        if (fFieldDeclarations != null) {
-            for (IDeclaration field : fFieldDeclarations) {
-                maxSize += field.getMaximumSize();
-            }
+        for (IDeclaration field : fFieldMap.values()) {
+            maxSize += field.getMaximumSize();
         }
         return Math.min(maxSize, Integer.MAX_VALUE);
     }
@@ -161,16 +160,21 @@ public class StructDeclaration extends Declaration {
     /**
      * @since 3.0
      */
-    @SuppressWarnings("null")
-    // immutablelist
     @Override
     public StructDefinition createDefinition(IDefinitionScope definitionScope,
             String fieldName, BitBuffer input) throws CTFReaderException {
         alignRead(input);
-        final Definition[] myFields = new Definition[fFieldNames.size()];
-        StructDefinition structDefinition = new StructDefinition(this, definitionScope, fieldName, fFieldNames, myFields);
-        for (int i = 0; i < fFieldNames.size(); i++) {
-            myFields[i] = fFieldDeclarations.get(i).createDefinition(structDefinition, fFieldNames.get(i), input);
+        final Definition[] myFields = new Definition[fFieldMap.size()];
+        StructDefinition structDefinition = new StructDefinition(this, definitionScope, fieldName, fFieldMap.keySet(), myFields);
+
+        Iterator<Map.Entry<String, IDeclaration>> iter = fFieldMap.entrySet().iterator();
+        for (int i = 0; i < fFieldMap.size(); i++) {
+            Map.Entry<String, IDeclaration> entry = iter.next();
+            String name = entry.getKey();
+            if (name == null) {
+                throw new IllegalStateException();
+            }
+            myFields[i] = entry.getValue().createDefinition(structDefinition, name, input);
         }
         return structDefinition;
     }
@@ -183,13 +187,9 @@ public class StructDeclaration extends Declaration {
      * @param declaration
      *            the declaration of the field
      */
-    @SuppressWarnings("null")
-    // Immutable list copyof cannot return null
     public void addField(String name, IDeclaration declaration) {
         fFieldMap.put(name, declaration);
         fMaxAlign = Math.max(fMaxAlign, declaration.getAlignment());
-        fFieldNames = ImmutableList.copyOf(fFieldMap.keySet());
-        fFieldDeclarations = ImmutableList.<IDeclaration>copyOf(fFieldMap.values());
     }
 
     @Override

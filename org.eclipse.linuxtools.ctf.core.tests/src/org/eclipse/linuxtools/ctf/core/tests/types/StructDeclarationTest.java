@@ -13,10 +13,10 @@ package org.eclipse.linuxtools.ctf.core.tests.types;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.nio.ByteBuffer;
-import java.util.Map;
 
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
@@ -88,14 +88,13 @@ public class StructDeclarationTest {
     }
 
     /**
-     * Run the HashMap<String, Declaration> getFields() method test.
+     * Run the Declaration getField(String) method test.
      */
     @Test
-    public void testGetFields() {
-        Map<String, IDeclaration> result = fixture.getFields();
+    public void testGetField() {
+        IDeclaration result = fixture.getField("test");
 
-        assertNotNull(result);
-        assertEquals(0, result.size());
+        assertNull(result);
     }
 
     /**

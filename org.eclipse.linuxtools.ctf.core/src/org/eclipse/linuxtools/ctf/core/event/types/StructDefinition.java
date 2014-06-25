@@ -51,6 +51,33 @@ public final class StructDefinition extends ScopedDefinition {
     // ------------------------------------------------------------------------
 
     /**
+     * *DEPRECATED* TODO: To remove once we break the API...
+     *
+     * Not marked with the annotation to not annoy callers using a List, which
+     * is still as valid with the new constructor. But the compiler gives an
+     * error even though a Iterable is a List too...
+     *
+     * @param declaration
+     *            the parent declaration
+     * @param definitionScope
+     *            the parent scope
+     * @param structFieldName
+     *            the field name
+     * @param fieldNames
+     *            the list of fields
+     * @param definitions
+     *            the definitions
+     * @since 3.1
+     */
+    public StructDefinition(@NonNull StructDeclaration declaration,
+            IDefinitionScope definitionScope,
+            @NonNull String structFieldName,
+            List<String> fieldNames,
+            Definition[] definitions) {
+        this(declaration, definitionScope, structFieldName, (Iterable<String>) fieldNames, definitions);
+    }
+
+    /**
      * Constructor
      *
      * @param declaration
@@ -63,10 +90,13 @@ public final class StructDefinition extends ScopedDefinition {
      *            the list of fields
      * @param definitions
      *            the definitions
-     * @since 3.0
+     * @since 3.1
      */
     public StructDefinition(@NonNull StructDeclaration declaration,
-            IDefinitionScope definitionScope, @NonNull String structFieldName, List<String> fieldNames, Definition[] definitions) {
+            IDefinitionScope definitionScope,
+            @NonNull String structFieldName,
+            Iterable<String> fieldNames,
+            Definition[] definitions) {
         super(declaration, definitionScope, structFieldName);
         fFieldNames = ImmutableList.copyOf(fieldNames);
         fDefinitions = definitions;
@@ -89,19 +119,17 @@ public final class StructDefinition extends ScopedDefinition {
      */
     public Definition getDefinition(String fieldName) {
         if (fDefinitionsMap == null) {
-            buildFieldsMap();
-        }
-        return fDefinitionsMap.get(fieldName);
-    }
-
-    private void buildFieldsMap() {
-        Builder<String, Definition> mapBuilder = new ImmutableMap.Builder<>();
-        for (int i = 0; i < fFieldNames.size(); i++) {
-            if (fDefinitions[i] != null) {
-                mapBuilder.put(fFieldNames.get(i), fDefinitions[i]);
+            /* Build the definitions map */
+            Builder<String, Definition> mapBuilder = new ImmutableMap.Builder<>();
+            for (int i = 0; i < fFieldNames.size(); i++) {
+                if (fDefinitions[i] != null) {
+                    mapBuilder.put(fFieldNames.get(i), fDefinitions[i]);
+                }
             }
+            fDefinitionsMap = mapBuilder.build();
         }
-        fDefinitionsMap = mapBuilder.build();
+
+        return fDefinitionsMap.get(fieldName);
     }
 
     /**
