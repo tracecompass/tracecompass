@@ -23,6 +23,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
+import org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.views.xychart.XmlXYView;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.linuxtools.tmf.analysis.xml.ui.views.timegraph.XmlTimeGraphView;
@@ -50,7 +51,8 @@ public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener
      * Enum to match the name of a view's XML element to its view ID.
      */
     private static enum ViewType {
-        TIME_GRAPH_VIEW(TmfXmlUiStrings.TIME_GRAPH_VIEW, XmlTimeGraphView.ID);
+        TIME_GRAPH_VIEW(TmfXmlUiStrings.TIME_GRAPH_VIEW, XmlTimeGraphView.ID),
+        XY_VIEW(TmfXmlUiStrings.XY_VIEW, XmlXYView.ID);
 
         private final String fXmlElem;
         private final String fViewId;
@@ -68,6 +70,7 @@ public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener
             return fViewId;
         }
     }
+
 
     @Override
     public void moduleCreated(IAnalysisModule module) {

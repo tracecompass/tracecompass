@@ -32,6 +32,22 @@
 				<xs:documentation>The unique identifier of this view element. It will be used by the framework to identify this view.</xs:documentation></xs:annotation></xs:attribute>
 	</xs:complexType>
 
+	<xs:complexType name="xyView">
+		<xs:annotation>
+			<xs:documentation>Declares a data-driven XY chart view, which defines how the view will display the results of an analysis. For now, only state system analyses are supported by this view.</xs:documentation></xs:annotation>
+		<xs:sequence>
+			<xs:element maxOccurs="1" minOccurs="0" name="head" type="headOutput" >
+				<xs:annotation>
+					<xs:documentation>Provider meta-information on this view, like labels and analyses it applies to.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="1" minOccurs="1" name="entry" type="xyViewEntry" >
+				<xs:annotation>
+					<xs:documentation>Define how to determine the entries (series) to show on the XY view. See the xyViewEntry element documentation for more details.</xs:documentation></xs:annotation></xs:element>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string" use="required" >
+			<xs:annotation>
+				<xs:documentation>The unique identifier of this view element. It will be used by the framework to identify this view.</xs:documentation></xs:annotation></xs:attribute>
+	</xs:complexType>
+
 	<xs:complexType name="headOutput">
 		<xs:annotation>
 			<xs:documentation>Declares the meta-information that can be defined for an XML time graph view.</xs:documentation></xs:annotation>
@@ -83,6 +99,22 @@
 		<xs:attribute name="path" type="xs:string" use="required" >
 			<xs:annotation>
 				<xs:documentation>The path of the entry in the state system. Wildcards '*' may be used. For example, to display entries from all CPUs, the path could be "CPUs/*" and one entry will be created for each sub-attribute of the "CPUs" attribute. Each entry will be used as the base for all child elements, unless specified otherwise.</xs:documentation></xs:annotation></xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="xyViewEntry">
+		<xs:annotation>
+			<xs:documentation>Define a path to entries in the view. If this element is at the top level, the base path to reach the entry is the root of the state system. Otherwise, it will use the parent element's corresponding attribute as the base. Each XY view entry element corresponds to a series in the resulting view.</xs:documentation></xs:annotation>
+		<xs:sequence>
+			<xs:element maxOccurs="1" minOccurs="0" name="display" type="viewStateAttribute" >
+				<xs:annotation>
+					<xs:documentation>Indicate the attribute whose value will be displayed in the time graph (the value that changes over time). If this element is not specified, no entry will be created for this element, and all other elements will be ignored.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" name="name" type="viewStateAttribute" >
+				<xs:annotation>
+					<xs:documentation>Specify how to find the name of this entry. Typically, the name will be human-readable. If not specified, the display attribute's name will be used as the name.</xs:documentation></xs:annotation></xs:element>
+		</xs:sequence>
+		<xs:attribute name="path" type="xs:string" use="required" >
+			<xs:annotation>
+				<xs:documentation>The path of the entry in the state system. Wildcards '*' may be used. For example, to display entries from all CPUs, the path could be "CPUs/*" and one series will be created for each sub-attribute of the "CPUs" attribute. Each entry will be used as the base for all child elements, unless specified otherwise.</xs:documentation></xs:annotation></xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="viewStateAttribute">

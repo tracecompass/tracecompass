@@ -13,7 +13,7 @@
 <tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
 
-    <stateSystemView id="org.eclipse.linuxtools.tmf.analysis.xml.ui.views.statesystem">
+    <timeGraphView id="org.eclipse.linuxtools.tmf.analysis.xml.ui.views.statesystem">
         <head>
             <analysis id="kernel.linux.sp" />
             <label value="Xml kernel View" />
@@ -31,5 +31,5 @@
             <display type="self" />
             <display type="constant" value="a" />
         </entry>
-    </stateSystemView>
+    </timeGraphView>
 </tmfxml>

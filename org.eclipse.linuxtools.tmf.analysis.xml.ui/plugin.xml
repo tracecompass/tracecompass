@@ -92,5 +92,13 @@
             name="%xmltimegraph.view.name"
             restorable="true">
       </view>
+      <view
+            allowMultiple="false"
+            category="org.eclipse.linuxtools.lttng2.ui.views.category"
+            class="org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.views.xychart.XmlXYView"
+            id="org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.views.xyview"
+            name="%xmlxychart.view.name"
+            restorable="true">
+      </view>
    </extension>
 </plugin>

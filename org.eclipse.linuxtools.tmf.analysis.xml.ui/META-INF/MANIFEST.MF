@@ -16,5 +16,6 @@ Require-Bundle: org.eclipse.ui,
 Export-Package: org.eclipse.linuxtools.internal.tmf.analysis.xml.ui;x-friends:="org.eclipse.linuxtools.tmf.analysis.xml.ui.tests",
  org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.handler;x-internal:=true,
  org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.views;x-internal:=true,
+ org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.views.xychart;x-internal:=true,
  org.eclipse.linuxtools.tmf.analysis.xml.ui.module,
  org.eclipse.linuxtools.tmf.analysis.xml.ui.views.timegraph

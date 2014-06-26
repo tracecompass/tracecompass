@@ -42,6 +42,18 @@
         </entry>
     </timeGraphView>
 
+    <xyView id="org.eclipse.linuxtools.tmf.analysis.xml.core.tests.xy">
+        <head>
+            <analysis id="kernel.linux.sp" />
+            <label value="Xml XY view" />
+        </head>
+
+        <entry path="CPUs/*">
+            <display type="constant" value="Status" />
+            <name type="self" />
+        </entry>
+    </xyView>
+
     <stateProvider id="kernel.linux.sp" version="1">
         <head>
             <traceType id="org.eclipse.linuxtools.lttng2.kernel.tracetype" />
