@@ -25,11 +25,11 @@ import java.util.TreeSet;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
+import org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.views.XmlViewInfo;
 import org.eclipse.linuxtools.statesystem.core.ITmfStateSystem;
 import org.eclipse.linuxtools.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.linuxtools.statesystem.core.exceptions.StateSystemDisposedException;
@@ -42,7 +42,6 @@ import org.eclipse.linuxtools.tmf.analysis.xml.core.model.readonly.TmfXmlReadOnl
 import org.eclipse.linuxtools.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
-import org.eclipse.linuxtools.tmf.analysis.xml.ui.module.TmfXmlAnalysisOutputSource;
 import org.eclipse.linuxtools.tmf.analysis.xml.ui.views.timegraph.XmlEntry.EntryDisplayType;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
 import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
@@ -71,10 +70,7 @@ import org.w3c.dom.Element;
 public class XmlTimeGraphView extends AbstractTimeGraphView {
 
     /** View ID. */
-    public static final String ID = "org.eclipse.linuxtools.tmf.analysis.xml.ui.views.timegraph"; //$NON-NLS-1$
-
-    private static final String XML_VIEW_ID_PROPERTY = "XmlViewId"; //$NON-NLS-1$
-    private static final String XML_VIEW_FILE_PROPERTY = "XmlViewFile"; //$NON-NLS-1$
+    public static final @NonNull String ID = "org.eclipse.linuxtools.tmf.analysis.xml.ui.views.timegraph"; //$NON-NLS-1$
 
     private static final String[] DEFAULT_COLUMN_NAMES = new String[] {
             Messages.XmlTimeGraphView_ColumnName,
@@ -93,8 +89,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
     private static final String SPLIT_STRING = "/"; //$NON-NLS-1$
 
-    private String fId = null;
-    private String fFilePath = null;
+    private final @NonNull XmlViewInfo fViewInfo = new XmlViewInfo(ID);
     private final ITmfXmlModelFactory fFactory;
 
     // ------------------------------------------------------------------------
@@ -116,40 +111,17 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
             @Override
             public void propertyChange(PropertyChangeEvent event) {
                 if (event.getProperty().equals(TmfXmlUiStrings.XML_OUTPUT_DATA)) {
-                    String data = (String) event.getNewValue();
-                    String[] idFile = data.split(TmfXmlAnalysisOutputSource.DATA_SEPARATOR);
-                    fId = (idFile.length > 0) ? idFile[0] : null;
-                    fFilePath = (idFile.length > 1) ? idFile[1] : null;
-                    loadNewXmlView();
-                    savePersistentData();
+                    Object newValue = event.getNewValue();
+                    if (newValue instanceof String) {
+                        String data = (String) newValue;
+                        fViewInfo.setViewData(data);
+                        loadNewXmlView();
+                    }
                 }
             }
         });
-        IDialogSettings settings = getPersistentPropertyStore();
 
-        fId = settings.get(XML_VIEW_ID_PROPERTY);
-        fFilePath = settings.get(XML_VIEW_FILE_PROPERTY);
         fFactory = TmfXmlReadOnlyModelFactory.getInstance();
-    }
-
-    @NonNull
-    private IDialogSettings getPersistentPropertyStore() {
-        IDialogSettings settings = Activator.getDefault().getDialogSettings();
-        IDialogSettings section = settings.getSection(getClass().getName());
-        if (section == null) {
-            section = settings.addNewSection(getClass().getName());
-            if (section == null) {
-                throw new IllegalStateException();
-            }
-        }
-        return section;
-    }
-
-    private void savePersistentData() {
-        IDialogSettings settings = getPersistentPropertyStore();
-
-        settings.put(XML_VIEW_ID_PROPERTY, fId);
-        settings.put(XML_VIEW_FILE_PROPERTY, fFilePath);
     }
 
     private void loadNewXmlView() {
@@ -247,11 +219,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
          * Get the view element from the XML file. If the element can't be
          * found, return.
          */
-        String id = fId;
-        if (id == null) {
-            return;
-        }
-        Element viewElement = XmlUtils.getElementInFile(fFilePath, TmfXmlUiStrings.TIME_GRAPH_VIEW, id);
+        Element viewElement = fViewInfo.getViewElement(TmfXmlUiStrings.TIME_GRAPH_VIEW);
         if (viewElement == null) {
             return;
         }
@@ -264,28 +232,13 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
             ((XmlPresentationProvider) pres).loadNewStates(viewElement);
         }
 
-        List<Element> heads = XmlUtils.getChildElements(viewElement, TmfXmlStrings.HEAD);
-
-        List<String> analysisIds = new LinkedList<>();
-        if (!heads.isEmpty()) {
-            Element head = heads.get(0);
-            /* Set the title of this view from the label in the header */
-            List<Element> labels = XmlUtils.getChildElements(head, TmfXmlStrings.LABEL);
-            String title = Messages.XmlTimeGraphView_DefaultTitle;
-            for (Element label : labels) {
-                if (!label.getAttribute(TmfXmlStrings.VALUE).equals(EMPTY_STRING)) {
-                    title = label.getAttribute(TmfXmlStrings.VALUE);
-                }
-                break;
-            }
-            setViewTitle(title);
-
-            /* Get the application analysis from the view's XML header */
-            List<Element> applicableAnalysis = XmlUtils.getChildElements(head, TmfXmlStrings.ANALYSIS);
-            for (Element oneAnalysis : applicableAnalysis) {
-                analysisIds.add(oneAnalysis.getAttribute(TmfXmlStrings.ID));
-            }
+        String title = fViewInfo.getViewTitle(viewElement);
+        if (title == null) {
+            title = Messages.XmlTimeGraphView_DefaultTitle;
         }
+        setViewTitle(title);
+        Set<String> analysisIds = fViewInfo.getViewAnalysisIds(viewElement);
+
         List<Element> entries = XmlUtils.getChildElements(viewElement, TmfXmlUiStrings.ENTRY_ELEMENT);
         Set<XmlEntry> entryList = new TreeSet<>(getEntryComparator());
         for (ITmfTrace aTrace : TmfTraceManager.getTraceSet(trace)) {
