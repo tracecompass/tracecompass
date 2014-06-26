@@ -95,6 +95,16 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     @Override
     public void loadTrace(ITmfTrace trace) {
         super.loadTrace(trace);
+        reinitialize();
+    }
+
+    /**
+     * Forces a reinitialization of the data sources, even if it has already
+     * been initialized for this trace before
+     *
+     * @since 3.1
+     */
+    protected void reinitialize() {
         fSeriesValues.clear();
         Thread thread = new Thread() {
             @Override
