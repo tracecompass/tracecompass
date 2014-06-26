@@ -58,7 +58,7 @@
   <profile>
     <id>lttngPackage</id>
       <properties>
-          <lttngPackageDestination>/var/www/technology/linuxtools/lttng/update-nightly/</lttngPackageDestination>
+          <lttngPackageDestination>/var/www/tools/linuxtools/lttng/update-nightly/</lttngPackageDestination>
       </properties>
       <modules>
         <module>org.eclipse.linuxtools.lttng.releng-site</module>
