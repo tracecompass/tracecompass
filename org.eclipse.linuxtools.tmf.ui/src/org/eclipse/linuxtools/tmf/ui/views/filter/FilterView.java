@@ -234,8 +234,8 @@ public class FilterView extends TmfView {
         public void run() {
             try {
                 FileDialog dlg = new FileDialog(new Shell(), SWT.SAVE);
-                dlg.setFilterNames(new String[] { Messages.FilterView_FileDialogFilterName + " (*.filter.xml)" }); //$NON-NLS-1$
-                dlg.setFilterExtensions(new String[] { "*.filter.xml" }); //$NON-NLS-1$
+                dlg.setFilterNames(new String[] { Messages.FilterView_FileDialogFilterName + " (*.xml)" }); //$NON-NLS-1$
+                dlg.setFilterExtensions(new String[] { "*.xml" }); //$NON-NLS-1$
 
                 String fn = dlg.open();
                 if (fn != null) {
@@ -256,8 +256,8 @@ public class FilterView extends TmfView {
                 ITmfFilterTreeNode root = null;
                 try {
                     FileDialog dlg = new FileDialog(new Shell(), SWT.OPEN);
-                    dlg.setFilterNames(new String[] { Messages.FilterView_FileDialogFilterName + " (*.filter.xml)" }); //$NON-NLS-1$
-                    dlg.setFilterExtensions(new String[] { "*.filter.xml" }); //$NON-NLS-1$
+                    dlg.setFilterNames(new String[] { Messages.FilterView_FileDialogFilterName + " (*.xml)" }); //$NON-NLS-1$
+                    dlg.setFilterExtensions(new String[] { "*.xml" }); //$NON-NLS-1$
 
                     TmfFilterXMLParser parserXML = null;
                     String fn = dlg.open();
