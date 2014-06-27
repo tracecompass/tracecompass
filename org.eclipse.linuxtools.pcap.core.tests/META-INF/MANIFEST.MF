@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 3.0.0.qualifier
+Bundle-Version: 3.1.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.linuxtools.pcap.core.tests;singleton:=true
 Bundle-ActivationPolicy: lazy
@@ -10,5 +10,20 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
- org.eclipse.linuxtools.pcap.core;bundle-version="3.0.0"
-Export-Package: org.eclipse.linuxtools.pcap.core.tests
+ org.eclipse.linuxtools.pcap.core;bundle-version="3.1.0"
+Export-Package: org.eclipse.linuxtools.pcap.core.tests,
+ org.eclipse.linuxtools.pcap.core.tests.file;x-internal:=true,
+ org.eclipse.linuxtools.pcap.core.tests.packet;x-internal:=true,
+ org.eclipse.linuxtools.pcap.core.tests.perf,
+ org.eclipse.linuxtools.pcap.core.tests.perf.trace;x-internal:=true,
+ org.eclipse.linuxtools.pcap.core.tests.protocol;x-internal:=true,
+ org.eclipse.linuxtools.pcap.core.tests.protocol.ethernet2;x-internal:=true,
+ org.eclipse.linuxtools.pcap.core.tests.protocol.ipv4;x-internal:=true,
+ org.eclipse.linuxtools.pcap.core.tests.protocol.pcap;x-internal:=true,
+ org.eclipse.linuxtools.pcap.core.tests.protocol.tcp;x-internal:=true,
+ org.eclipse.linuxtools.pcap.core.tests.protocol.udp;x-internal:=true,
+ org.eclipse.linuxtools.pcap.core.tests.protocol.unknown;x-internal:=true,
+ org.eclipse.linuxtools.pcap.core.tests.shared,
+ org.eclipse.linuxtools.pcap.core.tests.stream;x-internal:=true
+Import-Package: com.google.common.collect,
+ org.eclipse.test.performance

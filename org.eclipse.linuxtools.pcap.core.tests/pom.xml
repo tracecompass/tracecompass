@@ -16,16 +16,51 @@
   <parent>
     <artifactId>linuxtools-lttng-parent</artifactId>
     <groupId>org.eclipse.linuxtools.lttng</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>org.eclipse.linuxtools.pcap.core.tests</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>3.1.0-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
 
   <name>Linux Tools Pcap Parser Core Tests Plug-in</name>
 
- <build>
+  <!-- Do not download the test traces if "maven.test.skip" is set -->
+  <profiles>
+    <profile>
+      <id>download-traces</id>
+      <activation>
+        <property>
+          <name>!maven.test.skip</name>
+        </property>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>prepare</id>
+                <phase>pre-integration-test</phase>
+                <configuration>
+                  <target>
+                    <ant antfile="get-traces.xml" dir="rsc" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <build>
     <plugins>
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
@@ -33,12 +68,46 @@
         <version>${tycho-version}</version>
         <configuration>
           <testSuite>org.eclipse.linuxtools.pcap.core.tests</testSuite>
-          <testClass>org.eclipse.linuxtools.pcap.core.tests.AllTests</testClass>
+          <testClass>org.eclipse.linuxtools.pcap.core.tests.AllPcapCoreTests</testClass>
           <useUIHarness>false</useUIHarness>
           <useUIThread>false</useUIThread>
           <product>org.eclipse.platform.ide</product>
         </configuration>
       </plugin>
+
+      <!-- We don't use the ant file to clean because of http://jira.codehaus.org/browse/MANTRUN-78 -->
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>2.5</version>
+        <executions>
+          <execution>
+            <id>clean-traces</id>
+            <phase>clean</phase>
+            <configuration>
+              <filesets>
+                <fileset>
+                  <directory>rsc</directory>
+                  <includes>
+                    <include>*.zip</include>
+                    <include>*.pcap</include>
+                    <include>*.cap</include>
+                    <include>*.tar*</include>
+                  </includes>
+                  <excludes>
+                    <exclude>*.xml</exclude>
+                    <exclude>*.sh</exclude>
+                  </excludes>
+                </fileset>
+                <fileset><directory>rsc/kernel</directory></fileset>
+              </filesets>
+            </configuration>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 
