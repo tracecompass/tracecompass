@@ -13,13 +13,12 @@
 package org.eclipse.tracecompass.tmf.core.event.matching;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 
 /**
  * This class matches events typically network-style, ie. where some events are
@@ -33,12 +32,12 @@ public class TmfNetworkEventMatching extends TmfEventMatching {
     /**
      * Hashtables for unmatches incoming events
      */
-    private final Map<ITmfTrace, Map<List<Object>, ITmfEvent>> fUnmatchedIn = new LinkedHashMap<>();
+    private final Table<ITmfTrace, IEventMatchingKey, ITmfEvent> fUnmatchedIn = HashBasedTable.create();
 
     /**
      * Hashtables for unmatches outgoing events
      */
-    private final Map<ITmfTrace, Map<List<Object>, ITmfEvent>> fUnmatchedOut = new LinkedHashMap<>();
+    private final Table<ITmfTrace, IEventMatchingKey, ITmfEvent> fUnmatchedOut = HashBasedTable.create();
 
     /**
      * Enum for in and out types
@@ -84,22 +83,7 @@ public class TmfNetworkEventMatching extends TmfEventMatching {
         // Initialize the matching infrastructure (unmatched event lists)
         fUnmatchedIn.clear();
         fUnmatchedOut.clear();
-        for (ITmfTrace trace : getIndividualTraces()) {
-            fUnmatchedIn.put(trace, new HashMap<List<Object>, ITmfEvent>());
-            fUnmatchedOut.put(trace, new HashMap<List<Object>, ITmfEvent>());
-        }
         super.initMatching();
-    }
-
-    /**
-     * Function that counts the events in a hashtable.
-     *
-     * @param tbl
-     *            The table to count events for
-     * @return The number of events
-     */
-    protected int countEvents(Map<List<Object>, ITmfEvent> tbl) {
-        return tbl.size();
     }
 
     @Override
@@ -126,8 +110,12 @@ public class TmfNetworkEventMatching extends TmfEventMatching {
         }
 
         /* Get the event's unique fields */
-        List<Object> eventKey = def.getUniqueField(event);
-        Map<ITmfTrace, Map<List<Object>, ITmfEvent>> unmatchedTbl, companionTbl;
+        IEventMatchingKey eventKey = def.getEventKey(event);
+
+        if (eventKey == null) {
+            return;
+        }
+        Table<ITmfTrace, IEventMatchingKey, ITmfEvent> unmatchedTbl, companionTbl;
 
         /* Point to the appropriate table */
         switch (evType) {
@@ -146,13 +134,13 @@ public class TmfNetworkEventMatching extends TmfEventMatching {
         boolean found = false;
         TmfEventDependency dep = null;
         /* Search for the event in the companion table */
-        for (Map<List<Object>, ITmfEvent> map : companionTbl.values()) {
-            if (map.containsKey(eventKey)) {
+        for (ITmfTrace mTrace : getIndividualTraces()) {
+            if (companionTbl.contains(mTrace, eventKey)) {
                 found = true;
-                ITmfEvent companionEvent = map.get(eventKey);
+                ITmfEvent companionEvent = companionTbl.get(mTrace, eventKey);
 
                 /* Remove the element from the companion table */
-                map.remove(eventKey);
+                companionTbl.remove(mTrace, eventKey);
 
                 /* Create the dependency object */
                 switch (evType) {
@@ -187,8 +175,8 @@ public class TmfNetworkEventMatching extends TmfEventMatching {
              * events as value for the unmatched table. Not necessary right now
              * though
              */
-            if (!unmatchedTbl.get(event.getTrace()).containsKey(eventKey)) {
-                unmatchedTbl.get(event.getTrace()).put(eventKey, event);
+            if (!unmatchedTbl.contains(event.getTrace(), eventKey)) {
+                unmatchedTbl.put(event.getTrace(), eventKey, event);
             }
         }
 
@@ -208,8 +196,8 @@ public class TmfNetworkEventMatching extends TmfEventMatching {
         int i = 0;
         for (ITmfTrace trace : getIndividualTraces()) {
             b.append("Trace " + i++ + ":" + cr +
-                    "  " + countEvents(fUnmatchedIn.get(trace)) + " unmatched incoming events" + cr +
-                    "  " + countEvents(fUnmatchedOut.get(trace)) + " unmatched outgoing events" + cr);
+                    "  " + fUnmatchedIn.row(trace).size() + " unmatched incoming events" + cr +
+                    "  " + fUnmatchedOut.row(trace).size() + " unmatched outgoing events" + cr);
         }
 
         return b.toString();

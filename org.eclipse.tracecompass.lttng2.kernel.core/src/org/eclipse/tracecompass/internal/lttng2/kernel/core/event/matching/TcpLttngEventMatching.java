@@ -12,15 +12,15 @@
 
 package org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.TcpEventStrings;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
+import org.eclipse.tracecompass.tmf.core.event.matching.IEventMatchingKey;
 import org.eclipse.tracecompass.tmf.core.event.matching.ITmfNetworkMatchDefinition;
+import org.eclipse.tracecompass.tmf.core.event.matching.TcpEventKey;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching.MatchingType;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfNetworkEventMatching.Direction;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -60,37 +60,6 @@ public class TcpLttngEventMatching implements ITmfNetworkMatchDefinition {
         return false;
     }
 
-    /**
-     * The key to uniquely identify a TCP packet depends on many fields. This
-     * method computes the key for a given event.
-     *
-     * @param event
-     *            The event for which to compute the key
-     * @return the unique key for this event
-     */
-    @Override
-    public List<Object> getUniqueField(ITmfEvent event) {
-        List<Object> keys = new ArrayList<>();
-
-        TmfEventField field = (TmfEventField) event.getContent();
-        ITmfEventField data;
-
-        data = field.getSubField(key_seq);
-        if (data != null) {
-            keys.add(data.getValue());
-        }
-        data = field.getSubField(key_ackseq);
-        if (data != null) {
-            keys.add(data.getValue());
-        }
-        data = field.getSubField(key_flags);
-        if (data != null) {
-            keys.add(data.getValue());
-        }
-
-        return keys;
-    }
-
     @Override
     public boolean canMatchTrace(ITmfTrace trace) {
         if (!(trace instanceof ITmfTraceWithPreDefinedEvents)) {
@@ -120,6 +89,36 @@ public class TcpLttngEventMatching implements ITmfNetworkMatchDefinition {
     public MatchingType[] getApplicableMatchingTypes() {
         MatchingType[] types = { MatchingType.NETWORK };
         return types;
+    }
+
+    @Override
+    public IEventMatchingKey getEventKey(ITmfEvent event) {
+        TmfEventField field = (TmfEventField) event.getContent();
+        ITmfEventField data;
+
+        long seq = -1, ackseq = -1, flags = -1;
+        data = field.getSubField(key_seq);
+        if (data != null) {
+            seq = (long) data.getValue();
+        } else {
+            return null;
+        }
+        data = field.getSubField(key_ackseq);
+        if (data != null) {
+            ackseq = (long) data.getValue();
+        } else {
+            return null;
+        }
+        data = field.getSubField(key_flags);
+        if (data != null) {
+            flags = (long) data.getValue();
+        } else {
+            return null;
+        }
+
+        IEventMatchingKey key = new TcpEventKey(seq, ackseq, flags);
+
+        return key;
     }
 
 }

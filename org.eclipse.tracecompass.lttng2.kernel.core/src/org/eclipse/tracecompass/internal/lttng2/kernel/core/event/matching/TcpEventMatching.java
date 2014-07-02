@@ -12,14 +12,14 @@
 
 package org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.TcpEventStrings;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
+import org.eclipse.tracecompass.tmf.core.event.matching.IEventMatchingKey;
 import org.eclipse.tracecompass.tmf.core.event.matching.ITmfNetworkMatchDefinition;
+import org.eclipse.tracecompass.tmf.core.event.matching.TcpEventKey;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching.MatchingType;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfNetworkEventMatching.Direction;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -72,23 +72,12 @@ public class TcpEventMatching implements ITmfNetworkMatchDefinition {
         return null;
     }
 
-    /**
-     * The key to uniquely identify a TCP packet depends on many fields. This
-     * method computes the key for a given event.
-     *
-     * @param event
-     *            The event for which to compute the key
-     * @return the unique key for this event
-     */
     @Override
-    public List<Object> getUniqueField(ITmfEvent event) {
-        List<Object> keys = new ArrayList<>();
-
-        keys.add(event.getContent().getField(TcpEventStrings.SEQ).getValue());
-        keys.add(event.getContent().getField(TcpEventStrings.ACKSEQ).getValue());
-        keys.add(event.getContent().getField(TcpEventStrings.FLAGS).getValue());
-
-        return keys;
+    public IEventMatchingKey getEventKey(ITmfEvent event) {
+        IEventMatchingKey key = new TcpEventKey((long) event.getContent().getField(TcpEventStrings.SEQ).getValue(),
+                (long) event.getContent().getField(TcpEventStrings.ACKSEQ).getValue(),
+                (long) event.getContent().getField(TcpEventStrings.FLAGS).getValue());
+        return key;
     }
 
     @Override

@@ -12,8 +12,6 @@
 
 package org.eclipse.tracecompass.tmf.core.event.matching;
 
-import java.util.List;
-
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching.MatchingType;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -28,13 +26,14 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 public interface ITmfMatchEventDefinition {
 
     /**
-     * Returns a list of values for an event that uniquely identifies this event
+     * Returns a key for an event that uniquely identifies this event and will
+     * match the key from another event.
      *
      * @param event
      *            The event for which to compute the key
      * @return the unique key for this event
      */
-    List<Object> getUniqueField(ITmfEvent event);
+    IEventMatchingKey getEventKey(ITmfEvent event);
 
     /**
      * Verifies whether a trace has all required events to match using this
