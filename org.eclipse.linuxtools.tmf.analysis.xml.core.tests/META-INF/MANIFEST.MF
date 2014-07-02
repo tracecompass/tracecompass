@@ -17,4 +17,5 @@ Require-Bundle: org.junit,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: org.junit.runners
-Export-Package: org.eclipse.linuxtools.tmf.analysis.xml.core.tests.common;x-friends:="org.eclipse.linuxtools.tmf.analysis.xml.ui.tests"
+Export-Package: org.eclipse.linuxtools.tmf.analysis.xml.core.tests,
+ org.eclipse.linuxtools.tmf.analysis.xml.core.tests.common;x-friends:="org.eclipse.linuxtools.tmf.analysis.xml.ui.tests"
