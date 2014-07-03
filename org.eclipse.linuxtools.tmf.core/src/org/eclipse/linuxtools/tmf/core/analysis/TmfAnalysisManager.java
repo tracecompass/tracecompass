@@ -38,6 +38,16 @@ public class TmfAnalysisManager {
     private static final List<ITmfNewAnalysisModuleListener> fListeners = new ArrayList<>();
 
     /**
+     * Constructor, not to be used
+     * TODO This class is not meant to be instantiated, put me private in next major release
+     * @deprecated It was never meant to be public
+     */
+    @Deprecated
+    public TmfAnalysisManager() {
+
+    }
+
+    /**
      * Registers a new source of modules
      *
      * @param source
