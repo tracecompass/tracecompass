@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,23 +7,21 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Alexandre Montplaisir - Initial implementation and API
+ *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng2.kernel.core.tests.perf;
+package org.eclipse.linuxtools.lttng2.kernel.core.tests.perf.event.matching;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * Run all performance test suites.
- *
- * @author Alexandre Montplaisir
+ * Test suite
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        org.eclipse.linuxtools.lttng2.kernel.core.tests.perf.analysis.AllPerfTests.class,
-        org.eclipse.linuxtools.lttng2.kernel.core.tests.perf.event.matching.AllPerfTests.class
+        EventMatchingBenchmark.class,
+        TraceSynchronizationBenchmark.class
 })
 public class AllPerfTests {
 

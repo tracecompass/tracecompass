@@ -41,6 +41,15 @@ public enum CtfTestTrace {
     /** Trace synchronization: destination trace */
     SYNC_DEST("../org.eclipse.linuxtools.ctf.core.tests/traces/synctraces/scp_dest"),
 
+    /** Trace synchronization (case 2): django client trace */
+    DJANGO_CLIENT("../org.eclipse.linuxtools.ctf.core.tests/traces/django-benchmark/django-client"),
+
+    /** Trace synchronization (case 2): django db trace */
+    DJANGO_DB("../org.eclipse.linuxtools.ctf.core.tests/traces/django-benchmark/django-db"),
+
+    /** Trace synchronization (case 2): django web server trace */
+    DJANGO_HTTPD("../org.eclipse.linuxtools.ctf.core.tests/traces/django-benchmark/django-httpd"),
+
     /** UST trace with lots of lost events */
     HELLO_LOST("../org.eclipse.linuxtools.ctf.core.tests/traces/hello-lost"),
 

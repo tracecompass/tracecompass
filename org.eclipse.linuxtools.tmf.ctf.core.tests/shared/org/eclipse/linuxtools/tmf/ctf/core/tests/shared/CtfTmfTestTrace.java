@@ -41,6 +41,12 @@ public enum CtfTmfTestTrace {
     SYNC_SRC,
     /** Trace synchronization: destination trace */
     SYNC_DEST,
+    /** Trace synchronization (case 2): django client trace */
+    DJANGO_CLIENT,
+    /** Trace synchronization (case 2): django db trace */
+    DJANGO_DB,
+    /** Trace synchronization (case 2): django web server trace */
+    DJANGO_HTTPD,
     /** UST trace with lots of lost events */
     HELLO_LOST,
     /** UST trace with lttng-ust-cyg-profile events (aka -finstrument-functions) */
