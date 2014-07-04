@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="org.eclipse.linuxtools.tmf.core.tracetype" name="Tmf Trace Type" schema="schema/org.eclipse.linuxtools.tmf.core.tracetype.exsd"/>
-   <extension-point id="org.eclipse.linuxtools.tmf.core.analysis" name="Trace Analysis Module" schema="schema/org.eclipse.linuxtools.tmf.core.analysis.exsd"/>
+   <extension-point id="org.eclipse.linuxtools.tmf.core.tracetype" name="%extensionpoint.trace_type.name" schema="schema/org.eclipse.linuxtools.tmf.core.tracetype.exsd"/>
+   <extension-point id="org.eclipse.linuxtools.tmf.core.analysis" name="%extensionpoint.analysis_module.name" schema="schema/org.eclipse.linuxtools.tmf.core.analysis.exsd"/>
 
    <extension
          point="org.eclipse.core.runtime.preferences">

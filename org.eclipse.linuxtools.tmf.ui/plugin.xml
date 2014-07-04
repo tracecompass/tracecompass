@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="org.eclipse.linuxtools.tmf.ui.uml2SDLoader" name="TMF UML 2 Sequence Diagram Loader" schema="schema/org.eclipse.linuxtools.tmf.ui.uml2SDLoader.exsd"/>
-   <extension-point id="org.eclipse.linuxtools.tmf.ui.tracetypeui" name="Tmf Trace Type UI Elements" schema="schema/org.eclipse.linuxtools.tmf.ui.tracetypeui.exsd"/>
+   <extension-point id="org.eclipse.linuxtools.tmf.ui.uml2SDLoader" name="%extensionpoint.sequence_diagram_loader.name" schema="schema/org.eclipse.linuxtools.tmf.ui.uml2SDLoader.exsd"/>
+   <extension-point id="org.eclipse.linuxtools.tmf.ui.tracetypeui" name="%extensionpoint.trace_type_ui.name" schema="schema/org.eclipse.linuxtools.tmf.ui.tracetypeui.exsd"/>
 
     <extension
          point="org.eclipse.ui.perspectives">
@@ -292,7 +292,7 @@
       <decorator
             icon="icons/ovr16/trace_folder_ovr.png"
             id="org.eclipse.linuxtools.tmf.ui.trace_folder.decorator"
-            label="Trace Folder"
+            label="%project.model.trace_folder"
             lightweight="true"
             location="TOP_RIGHT"
             state="true">
@@ -305,7 +305,7 @@
       <decorator
             icon="icons/ovr16/experiment_folder_ovr.png"
             id="org.eclipse.linuxtools.tmf.ui.experiment_folder.decorator"
-            label="Trace Experiment Folder"
+            label="%project.model.experiment_folder"
             lightweight="true"
             location="TOP_RIGHT"
             state="true">
@@ -318,7 +318,7 @@
       <decorator
             icon="icons/ovr16/link_ovr.gif"
             id="org.eclipse.linuxtools.tmf.ui.linked_trace.decorator"
-            label="Linked Trace"
+            label="%project.model.linked_trace"
             lightweight="true"
             location="BOTTOM_RIGHT"
             state="true">
@@ -812,7 +812,7 @@
                label="%command.select_traces"
                mnemonic="%command.select_traces.mnemonic"
                style="push"
-               tooltip="%commands.select_traces.description">
+               tooltip="%command.select_traces.description">
             <visibleWhen
                   checkEnabled="false">
                <with
@@ -836,7 +836,7 @@
                label="%command.synchronize_traces"
                mnemonic="%command.synchronize_traces.mnemonic"
                style="push"
-               tooltip="%commands.synchronize_traces.description">
+               tooltip="%command.synchronize_traces.description">
             <visibleWhen
                   checkEnabled="false">
                <with
@@ -1010,17 +1010,17 @@
             name="%command.select_trace_type">
          <commandParameter
                id="org.eclipse.linuxtools.tmf.ui.commandparameter.select_trace_type.bundle"
-               name="%commands.trace.select_trace_type.bundle"
+               name="%command.select_trace_type.bundle"
                optional="false">
          </commandParameter>
          <commandParameter
                id="org.eclipse.linuxtools.tmf.ui.commandparameter.select_trace_type.type"
-               name="%commands.trace.select_trace_type.type"
+               name="%command.select_trace_type.type"
                optional="false">
          </commandParameter>
          <commandParameter
                id="org.eclipse.linuxtools.tmf.ui.commandparameter.select_trace_type.icon"
-               name="%commands.trace.select_trace_type.icon"
+               name="%command.select_trace_type.icon"
                optional="false">
          </commandParameter>
       </command>
