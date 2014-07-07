@@ -106,9 +106,12 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
                     classApplies = Boolean.parseBoolean(classAppliesVal);
                 }
                 if (classApplies) {
-                    applies = applyclass.isAssignableFrom(traceclass);
+                    applies |= applyclass.isAssignableFrom(traceclass);
                 } else {
-                    applies = !applyclass.isAssignableFrom(traceclass);
+                    /* If the trace type does not apply, reset the applies variable to false */
+                    if (applyclass.isAssignableFrom(traceclass)) {
+                        applies = false;
+                    }
                 }
             } catch (ClassNotFoundException e) {
                 Activator.logError("Error in applies to trace", e); //$NON-NLS-1$
@@ -139,6 +142,7 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
             return module.getAnalysisRequirements();
         }
         return Collections.EMPTY_SET;
+
     }
 
     // ---------------------------------------
@@ -197,5 +201,6 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
             return ret;
         }
         return getHelpText();
+
     }
 }

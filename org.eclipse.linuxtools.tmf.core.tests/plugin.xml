@@ -13,6 +13,10 @@
          <tracetype
                class="org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub">
          </tracetype>
+         <tracetype
+               applies="false"
+               class="org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub3">
+         </tracetype>
       </module>
       <module
          id="org.eclipse.linuxtools.tmf.core.tests.analysis.test2"
@@ -32,6 +36,10 @@
          name="Test other analysis"
          analysis_module="org.eclipse.linuxtools.tmf.tests.stubs.analysis.TestAnalysis2"
          automatic="true">
+         <tracetype
+               applies="true"
+               class="org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub3">
+         </tracetype>
          <tracetype
                applies="true"
                class="org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub2">
@@ -76,6 +84,20 @@
             id="org.eclipse.linuxtools.tmf.core.tests.tracetype"
             name="TMF Tests"
             trace_type="org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub">
+      </type>
+      <type
+            category="org.eclipse.linuxtools.tmf.core.tests.category"
+            event_type="org.eclipse.linuxtools.tmf.core.event.TmfEvent"
+            id="org.eclipse.linuxtools.tmf.core.tests.secondtt"
+            name="TMF Tests 2"
+            trace_type="org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub2">
+      </type>
+      <type
+            category="org.eclipse.linuxtools.tmf.core.tests.category"
+            event_type="org.eclipse.linuxtools.tmf.core.event.TmfEvent"
+            id="org.eclipse.linuxtools.tmf.core.tests.thirdtt"
+            name="TMF Tests 3"
+            trace_type="org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub3">
       </type>
       <experiment
             category="org.eclipse.linuxtools.tmf.core.tests.category"

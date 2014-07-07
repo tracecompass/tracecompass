@@ -23,6 +23,13 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 public class TmfTraceStub2 extends TmfTraceStub {
 
     /**
+     * Default constructor
+     */
+    public TmfTraceStub2() {
+        super();
+    }
+
+    /**
      * Constructor to specify the parser and indexer. The streaming interval
      * will be 0.
      *
