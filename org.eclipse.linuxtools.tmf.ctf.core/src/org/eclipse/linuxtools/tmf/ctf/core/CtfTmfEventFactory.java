@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.tmf.ctf.core;
 import org.eclipse.linuxtools.ctf.core.CTFStrings;
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
-import org.eclipse.linuxtools.ctf.core.event.types.Definition;
+import org.eclipse.linuxtools.ctf.core.event.types.IDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
@@ -64,8 +64,8 @@ public final class CtfTmfEventFactory {
 
         /* Handle the special case of lost events */
         if (eventDecl.getName().equals(CTFStrings.LOST_EVENT_NAME)) {
-            Definition nbLostEventsDef = eventDef.getFields().getDefinition(CTFStrings.LOST_EVENTS_FIELD);
-            Definition durationDef = eventDef.getFields().getDefinition(CTFStrings.LOST_EVENTS_DURATION);
+            IDefinition nbLostEventsDef = eventDef.getFields().getDefinition(CTFStrings.LOST_EVENTS_FIELD);
+            IDefinition durationDef = eventDef.getFields().getDefinition(CTFStrings.LOST_EVENTS_DURATION);
             if (!(nbLostEventsDef instanceof IntegerDefinition) || !(durationDef instanceof IntegerDefinition)) {
                 /*
                  * One or both of these fields doesn't exist, or is not of the

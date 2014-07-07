@@ -60,7 +60,7 @@ public interface IDeclaration {
      * @return the path of the definition
      * @since 3.0
      */
-    public LexicalScope getPath(IDefinitionScope definitionScope, @NonNull String fieldName);
+    public @NonNull LexicalScope getPath(IDefinitionScope definitionScope, @NonNull String fieldName);
 
     /**
      * The minimum alignment. if the field is 32 bits, the definition will pad

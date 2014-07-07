@@ -22,6 +22,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.ctf.core.event.CTFCallsite;
 import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
 import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.types.IDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfCustomAttributes;
@@ -241,7 +242,7 @@ public class CtfTmfEvent extends TmfEvent
         if (structFields != null) {
             if (structFields.getFieldNames() != null) {
                 for (String curFieldName : structFields.getFieldNames()) {
-                    fields.add(CtfTmfEventField.parseField(structFields.getDefinition(curFieldName), curFieldName));
+                    fields.add(CtfTmfEventField.parseField((IDefinition)structFields.getDefinition(curFieldName), curFieldName));
                 }
             }
         }
@@ -251,7 +252,7 @@ public class CtfTmfEvent extends TmfEvent
             for (String contextName : structContext.getFieldNames()) {
                 /* Prefix field name */
                 String curContextName = CtfConstants.CONTEXT_FIELD_PREFIX + contextName;
-                fields.add(CtfTmfEventField.parseField(structContext.getDefinition(contextName), curContextName));
+                fields.add(CtfTmfEventField.parseField((IDefinition)structContext.getDefinition(contextName), curContextName));
             }
         }
 

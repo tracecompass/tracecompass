@@ -29,6 +29,7 @@ import org.eclipse.linuxtools.ctf.core.event.scope.LexicalScope;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.FloatDefinition;
+import org.eclipse.linuxtools.ctf.core.event.types.IDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
@@ -409,7 +410,7 @@ public class CTFStreamInput implements IDefinitionScope, AutoCloseable {
 
         for (String field : streamPacketContextDef.getDeclaration()
                 .getFieldsList()) {
-            Definition id = streamPacketContextDef.lookupDefinition(field);
+            IDefinition id = streamPacketContextDef.lookupDefinition(field);
             if (id instanceof IntegerDefinition) {
                 packetIndex.addAttribute(field,
                         ((IntegerDefinition) id).getValue());

@@ -27,6 +27,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.CompoundDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.types.IDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
@@ -161,7 +162,7 @@ public class ArrayDefinition2Test {
     @Test
     public void testgetElem_noDefs() {
         int i = 0;
-        Definition result = charArrayFixture.getDefinitions().get(i);
+        IDefinition result = charArrayFixture.getDefinitions().get(i);
 
         assertNotNull(result);
     }
@@ -176,7 +177,7 @@ public class ArrayDefinition2Test {
         ArrayDefinition ad = new ArrayDefinition((CompoundDeclaration) charArrayFixture.getDeclaration(), definitionScope, "test", defs);
         int j = 1;
 
-        Definition result = ad.getDefinitions().get(j);
+        IDefinition result = ad.getDefinitions().get(j);
 
         assertNotNull(result);
     }

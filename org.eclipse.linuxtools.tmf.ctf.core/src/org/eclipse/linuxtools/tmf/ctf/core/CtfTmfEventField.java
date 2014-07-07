@@ -27,6 +27,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.FloatDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.types.IDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDefinition;
@@ -81,8 +82,25 @@ public abstract class CtfTmfEventField extends TmfEventField {
      * @param fieldName
      *            String The name to assign to this field
      * @return The resulting CtfTmfEventField object
+     * @deprecated use {@link CtfTmfEventField#parseField(IDefinition, String)}
      */
+    @Deprecated
     public static CtfTmfEventField parseField(Definition fieldDef,
+            String fieldName) {
+        return parseField((IDefinition) fieldDef, fieldName);
+    }
+
+    /**
+     * Factory method to instantiate CtfTmfEventField objects.
+     *
+     * @param fieldDef
+     *            The CTF Definition of this event field
+     * @param fieldName
+     *            String The name to assign to this field
+     * @return The resulting CtfTmfEventField object
+     * @since 3.1
+     */
+    public static CtfTmfEventField parseField(IDefinition fieldDef,
             String fieldName) {
         CtfTmfEventField field = null;
 
@@ -118,7 +136,7 @@ public abstract class CtfTmfEventField extends TmfEventField {
                 IntegerDeclaration elemIntType = (IntegerDeclaration) elemType;
                 long[] values = new long[arrayDef.getLength()];
                 for (int i = 0; i < arrayDef.getLength(); i++) {
-                    Definition elem = arrayDef.getDefinitions().get(i);
+                    IDefinition elem = arrayDef.getDefinitions().get(i);
                     if (elem == null) {
                         break;
                     }
@@ -133,7 +151,7 @@ public abstract class CtfTmfEventField extends TmfEventField {
                 CtfTmfEventField[] elements = new CtfTmfEventField[arrayDef.getLength()];
                 /* Parse the elements of the array. */
                 int i = 0;
-                for (Definition definition : definitions) {
+                for (IDefinition definition : definitions) {
                     CtfTmfEventField curField = CtfTmfEventField.parseField(
                             definition, fieldName + '[' + i + ']');
                     elements[i] = curField;
@@ -160,7 +178,7 @@ public abstract class CtfTmfEventField extends TmfEventField {
             VariantDefinition varDef = (VariantDefinition) fieldDef;
 
             String curFieldName = varDef.getCurrentFieldName();
-            Definition curFieldDef = varDef.getCurrentField();
+            IDefinition curFieldDef = varDef.getCurrentField();
             if (curFieldDef != null) {
                 CtfTmfEventField subField = CtfTmfEventField.parseField(curFieldDef, curFieldName);
                 field = new CTFVariantField(fieldName, subField);

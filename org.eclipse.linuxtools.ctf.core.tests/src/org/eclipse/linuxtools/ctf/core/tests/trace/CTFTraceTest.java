@@ -26,7 +26,7 @@ import java.nio.ByteOrder;
 import java.util.UUID;
 
 import org.eclipse.linuxtools.ctf.core.event.CTFClock;
-import org.eclipse.linuxtools.ctf.core.event.types.Definition;
+import org.eclipse.linuxtools.ctf.core.event.types.IDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
@@ -215,7 +215,7 @@ public class CTFTraceTest {
     @Test
     public void testLookupDefinition() {
         String lookupPath = "trace.packet.header";
-        Definition result = fixture.lookupDefinition(lookupPath);
+        IDefinition result = fixture.lookupDefinition(lookupPath);
         assertNotNull(result);
     }
 

@@ -17,6 +17,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.types.IDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDeclaration;
 import org.junit.Test;
 
@@ -55,7 +56,7 @@ public class DefinitionTest {
      */
     @Test
     public void testToString() {
-        Definition fixture = new DefTest(null, "Hello");
+        IDefinition fixture = new DefTest(null, "Hello");
         String result = fixture.toString();
 
         assertNotNull(result);

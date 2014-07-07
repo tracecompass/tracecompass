@@ -21,7 +21,7 @@ import static org.junit.Assume.assumeTrue;
 import java.io.File;
 import java.io.FilenameFilter;
 
-import org.eclipse.linuxtools.ctf.core.event.types.Definition;
+import org.eclipse.linuxtools.ctf.core.event.types.IDefinition;
 import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFStream;
@@ -117,7 +117,7 @@ public class CTFStreamInputTest {
      */
     @Test
     public void testLookupDefinition() {
-        Definition result = fixture.lookupDefinition("id");
+        IDefinition result = fixture.lookupDefinition("id");
         assertNull(result);
     }
 

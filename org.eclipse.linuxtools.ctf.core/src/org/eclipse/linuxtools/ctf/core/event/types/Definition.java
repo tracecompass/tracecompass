@@ -31,7 +31,7 @@ import org.eclipse.linuxtools.ctf.core.event.scope.LexicalScope;
  * @author Matthew Khouzam
  * @author Simon Marchi
  */
-public abstract class Definition {
+public abstract class Definition implements IDefinition {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -40,7 +40,7 @@ public abstract class Definition {
     private final String fFieldName;
 
     /** The complete path of this field */
-    private final LexicalScope fPath;
+    private final @NonNull LexicalScope fPath;
 
     private final IDefinitionScope fDefinitionScope;
 
@@ -106,12 +106,7 @@ public abstract class Definition {
         return fFieldName;
     }
 
-    /**
-     * Get the complete path of this field.
-     *
-     * @return The path
-     * @since 3.0
-     */
+    @Override
     public LexicalScope getScopePath() {
         return fPath;
     }
@@ -133,12 +128,7 @@ public abstract class Definition {
     // Operations
     // ------------------------------------------------------------------------
 
-    /**
-     *
-     * @return gets the declaration of a datatype
-     *
-     */
-    @NonNull
+    @Override
     public IDeclaration getDeclaration() {
         return fDeclaration;
     }

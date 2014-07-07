@@ -21,6 +21,7 @@ import org.eclipse.linuxtools.ctf.core.event.types.AbstractArrayDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.CompoundDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
+import org.eclipse.linuxtools.ctf.core.event.types.IDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
@@ -113,7 +114,7 @@ public class SequenceDeclaration extends CompoundDeclaration {
     @Override
     public AbstractArrayDefinition createDefinition(
             IDefinitionScope definitionScope, String fieldName, BitBuffer input) throws CTFReaderException {
-        Definition lenDef = null;
+        IDefinition lenDef = null;
 
         if (definitionScope != null) {
             lenDef = definitionScope.lookupDefinition(getLengthName());
