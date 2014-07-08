@@ -144,7 +144,7 @@ public final class TmfTraceType {
         IConfigurationElement[] elements = Platform.getExtensionRegistry()
                 .getConfigurationElementsFor(TMF_TRACE_TYPE_ID);
         for (IConfigurationElement element : elements) {
-            if (element.getName().equals(CATEGORY_ELEM) && categoryId.equals(element.getAttribute(ID_ATTR))) {
+            if (element.getName().equals(CATEGORY_ELEM) && element.getAttribute(ID_ATTR).equals(categoryId)) {
                 return element.getAttribute(NAME_ATTR);
             }
         }
