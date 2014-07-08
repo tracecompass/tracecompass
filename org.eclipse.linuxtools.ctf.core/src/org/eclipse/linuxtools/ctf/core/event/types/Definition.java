@@ -69,7 +69,8 @@ public abstract class Definition implements IDefinition {
     }
 
     /**
-     * Constructor This one takes the scope and thus speeds up definition creation
+     * Constructor This one takes the scope and thus speeds up definition
+     * creation
      *
      *
      * @param declaration
@@ -85,7 +86,7 @@ public abstract class Definition implements IDefinition {
      *            the scope
      * @since 3.1
      */
-    public Definition(@NonNull IDeclaration declaration, IDefinitionScope definitionScope, @NonNull String fieldName, LexicalScope scope) {
+    public Definition(@NonNull IDeclaration declaration, IDefinitionScope definitionScope, @NonNull String fieldName, @NonNull LexicalScope scope) {
         fDeclaration = declaration;
         fDefinitionScope = definitionScope;
         fFieldName = fieldName;

@@ -37,7 +37,7 @@ import com.google.common.collect.ImmutableMap.Builder;
  * @author Matthew Khouzam
  * @author Simon Marchi
  */
-public final class StructDefinition extends ScopedDefinition {
+public final class StructDefinition extends ScopedDefinition implements ICompositeDefinition {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -130,7 +130,7 @@ public final class StructDefinition extends ScopedDefinition {
         super(declaration, definitionScope, structFieldName, scope);
         fFieldNames = ImmutableList.copyOf(fieldNames);
         fDefinitions = definitions;
-        if (fFieldNames == null) {
+        if (fFieldNames.isEmpty()) {
             fDefinitionsMap = Collections.EMPTY_MAP;
         }
     }
@@ -139,14 +139,7 @@ public final class StructDefinition extends ScopedDefinition {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
-    /**
-     * Gets the definition of the field
-     *
-     * @param fieldName
-     *            the fieldname
-     * @return The definitions of all the fields
-     * @since 3.0
-     */
+    @Override
     public Definition getDefinition(String fieldName) {
         if (fDefinitionsMap == null) {
             /* Build the definitions map */
@@ -158,16 +151,10 @@ public final class StructDefinition extends ScopedDefinition {
             }
             fDefinitionsMap = mapBuilder.build();
         }
-
         return fDefinitionsMap.get(fieldName);
     }
 
-    /**
-     * Gets an array of the field names
-     *
-     * @return the field names array
-     * @since 3.0
-     */
+    @Override
     public List<String> getFieldNames() {
         return fFieldNames;
     }

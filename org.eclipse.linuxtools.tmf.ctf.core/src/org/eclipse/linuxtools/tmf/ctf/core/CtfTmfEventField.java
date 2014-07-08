@@ -26,12 +26,12 @@ import org.eclipse.linuxtools.ctf.core.event.types.CompoundDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.FloatDefinition;
+import org.eclipse.linuxtools.ctf.core.event.types.ICompositeDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.StringDefinition;
-import org.eclipse.linuxtools.ctf.core.event.types.StructDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.VariantDefinition;
 import org.eclipse.linuxtools.internal.ctf.core.event.types.ArrayDefinition;
 import org.eclipse.linuxtools.internal.ctf.core.event.types.ByteArrayDefinition;
@@ -164,8 +164,8 @@ public abstract class CtfTmfEventField extends TmfEventField {
             /* This is an array of ascii bytes, a.k.a. a String! */
             field = new CTFStringField(fieldName, fieldDef.toString());
 
-        } else if (fieldDef instanceof StructDefinition) {
-            StructDefinition strDef = (StructDefinition) fieldDef;
+        } else if (fieldDef instanceof ICompositeDefinition) {
+            ICompositeDefinition strDef = (ICompositeDefinition) fieldDef;
 
             List<ITmfEventField> list = new ArrayList<>();
             /* Recursively parse the fields */
