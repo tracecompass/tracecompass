@@ -65,6 +65,12 @@
       </modules>
   </profile>
   <profile>
+    <id>performance</id>
+    <modules>
+      <module>org.eclipse.linuxtools.lttng.alltests</module>
+    </modules>
+  </profile>
+  <profile>
     <id>macosx</id>
     <activation>
       <os>

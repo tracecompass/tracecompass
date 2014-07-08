@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright (C) 2014 Ericsson
+
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+-->
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <artifactId>linuxtools-lttng-parent</artifactId>
+    <groupId>org.eclipse.linuxtools.lttng</groupId>
+    <version>3.1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>org.eclipse.linuxtools.lttng.alltests</artifactId>
+  <version>3.0.0-SNAPSHOT</version>
+  <packaging>eclipse-test-plugin</packaging>
+
+  <name>Linux Tools LTTng Component All Tests</name>
+
+  <properties>
+    <perf.database.loc>//127.0.0.1</perf.database.loc>
+    <perf.config>build=20140707-1632;host=myhost;config=linux;jvm=1.7</perf.config>
+    <perfFilesDestination>target</perfFilesDestination>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-surefire-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <configuration>
+          <argLine>${tycho.testArgLine} -Declipse.perf.dbloc=${perf.database.loc} -Declipse.perf.config=${perf.config}</argLine>
+          <runOrder>reversealphabetical</runOrder>
+          <includes>
+              <include>**/RunAllPerfTests.java</include>
+              <include>**/PerfResultsToJSon.java</include>
+          </includes>
+          <useUIHarness>false</useUIHarness>
+          <useUIThread>false</useUIThread>
+          <product>org.eclipse.platform.ide</product>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>deploy-performance-files</id>
+            <phase>install</phase>
+              <goals>
+                <goal>run</goal>
+              </goals>
+              <configuration>
+              <target>
+                <copy includeemptydirs="false"
+                  todir="${perfFilesDestination}">
+                  <fileset dir=".">
+                    <include name="*.json" />
+                    <include name="*.js" />
+                  </fileset>
+                </copy>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- We don't use the ant file to clean because of http://jira.codehaus.org/browse/MANTRUN-78 -->
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>2.5</version>
+        <executions>
+          <execution>
+            <id>clean-performance-files</id>
+            <phase>clean</phase>
+            <configuration>
+              <filesets>
+                <fileset>
+                  <directory>.</directory>
+                  <includes>
+                    <include>*.json</include>
+                    <include>*.js</include>
+                  </includes>
+                </fileset>
+              </filesets>
+            </configuration>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

@@ -8,6 +8,8 @@ Bundle-SymbolicName: org.eclipse.linuxtools.lttng.alltests;singleton:=true
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.junit;bundle-version="4.0.0",
+ org.eclipse.core.runtime,
+ org.eclipse.test.performance,
  org.eclipse.linuxtools.ctf.core.tests;bundle-version="2.1.0",
  org.eclipse.linuxtools.gdbtrace.core.tests;bundle-version="1.1.0",
  org.eclipse.linuxtools.gdbtrace.ui.tests;bundle-version="1.1.0",
@@ -30,3 +32,6 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.linuxtools.tmf.analysis.xml.ui.tests;bundle-version="1.0.0",
  org.eclipse.linuxtools.pcap.core.tests;bundle-version="3.0.0"
 Export-Package: org.eclipse.linuxtools.lttng.alltests;x-internal:=true
+Import-Package: org.apache.derby.jdbc,
+ org.json
+Bundle-Activator: org.eclipse.linuxtools.lttng.alltests.Activator
