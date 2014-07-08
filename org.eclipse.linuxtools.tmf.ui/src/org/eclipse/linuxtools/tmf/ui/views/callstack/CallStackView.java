@@ -52,7 +52,6 @@ import org.eclipse.linuxtools.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.statesystem.core.statevalue.ITmfStateValue.Type;
-import org.eclipse.linuxtools.tmf.core.callstack.CallStackStateProvider;
 import org.eclipse.linuxtools.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimeSynchSignal;
@@ -214,19 +213,19 @@ public class CallStackView extends TmfView {
         private ArrayList<CallStackEntry> fChildren;
         // The name of entry
         private final String fName;
-        // The thread attribute quark
-        private final int fThreadQuark;
+        // The call stack quark
+        private final int fCallStackQuark;
         // The state system from which this entry comes
         private final ITmfStateSystem fSS;
 
-        public ThreadEntry(ITmfTrace trace, String name, int threadQuark, long startTime, long endTime) {
+        public ThreadEntry(ITmfStateSystem ss, String name, int callStackQuark, long startTime, long endTime) {
             fChildren = new ArrayList<>();
             fName = name;
             fTraceStartTime = startTime;
             fTraceEndTime = endTime;
-            fThreadQuark = threadQuark;
+            fCallStackQuark = callStackQuark;
 
-            fSS = getCallStackStateSystem(trace);
+            fSS = ss;
         }
 
         @Override
@@ -242,8 +241,7 @@ public class CallStackView extends TmfView {
                     return false;
                 }
                 try {
-                    int eventStackQuark = ss.getQuarkRelative(fThreadQuark, CallStackStateProvider.CALL_STACK);
-                    ITmfStateInterval eventStackInterval = ss.querySingleState(ss.getStartTime(), eventStackQuark);
+                    ITmfStateInterval eventStackInterval = ss.querySingleState(ss.getStartTime(), fCallStackQuark);
                     return ! eventStackInterval.getStateValue().isNull() || eventStackInterval.getEndTime() != ss.getCurrentEndTime();
                 } catch (AttributeNotFoundException e) {
                     Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
@@ -291,8 +289,8 @@ public class CallStackView extends TmfView {
             return null;
         }
 
-        public int getThreadQuark() {
-            return fThreadQuark;
+        public int getCallStackQuark() {
+            return fCallStackQuark;
         }
 
         @Nullable
@@ -704,7 +702,7 @@ public class CallStackView extends TmfView {
                         continue;
                     }
                     try {
-                        int quark = ss.getQuarkRelative(threadEntry.getThreadQuark(), CallStackStateProvider.CALL_STACK);
+                        int quark = threadEntry.getCallStackQuark();
                         ITmfStateInterval stackInterval = ss.querySingleState(beginTime, quark);
                         if (beginTime == stackInterval.getStartTime()) {
                             int stackLevel = stackInterval.getStateValue().unboxInt();
@@ -793,7 +791,11 @@ public class CallStackView extends TmfView {
             if (monitor.isCanceled()) {
                 return;
             }
-            ITmfStateSystem ss = getCallStackStateSystem(aTrace);
+            AbstractCallStackAnalysis module = getCallStackModule(trace);
+            if (module == null) {
+                return;
+            }
+            ITmfStateSystem ss = module.getStateSystem();
             if (ss == null) {
                 addUnavailableEntry(aTrace, entryList);
                 continue;
@@ -807,22 +809,23 @@ public class CallStackView extends TmfView {
             long endTime = ss.getCurrentEndTime() + 1;
             fStartTime = Math.min(fStartTime, startTime);
             fEndTime = Math.max(fEndTime, endTime);
-            List<Integer> threadQuarks = ss.getQuarks(CallStackStateProvider.THREADS, "*"); //$NON-NLS-1$
+            String[] threadPaths = module.getThreadsPattern();
+            List<Integer> threadQuarks = ss.getQuarks(threadPaths);
             for (int i = 0; i < threadQuarks.size(); i++) {
                 if (monitor.isCanceled()) {
                     return;
                 }
                 int threadQuark = threadQuarks.get(i);
-                String thread = ss.getAttributeName(threadQuark);
-                String threadEntryName = thread + ' ' + '(' + aTrace.getName() + ')';
-                ThreadEntry threadEntry = new ThreadEntry(aTrace, threadEntryName, threadQuark, startTime, endTime);
-                entryList.add(threadEntry);
-                int eventStackQuark;
                 try {
-                    eventStackQuark = ss.getQuarkRelative(threadQuark, CallStackStateProvider.CALL_STACK);
+                    String[] callStackPath = module.getCallStackPath();
+                    int callStackQuark = ss.getQuarkRelative(threadQuark, callStackPath);
+                    String thread = ss.getAttributeName(threadQuark);
+                    String threadEntryName = thread + ' ' + '(' + aTrace.getName() + ')';
+                    ThreadEntry threadEntry = new ThreadEntry(ss, threadEntryName, callStackQuark, startTime, endTime);
+                    entryList.add(threadEntry);
                     int level = 1;
-                    for (int stackLevelQuark : ss.getSubAttributes(eventStackQuark, false)) {
-                        CallStackEntry callStackEntry = new CallStackEntry(stackLevelQuark, level++, aTrace);
+                    for (int stackLevelQuark : ss.getSubAttributes(callStackQuark, false)) {
+                        CallStackEntry callStackEntry = new CallStackEntry(stackLevelQuark, level++, aTrace, ss);
                         threadEntry.addChild(callStackEntry);
                     }
                 } catch (AttributeNotFoundException e) {
@@ -848,15 +851,12 @@ public class CallStackView extends TmfView {
 
     private void addUnavailableEntry(ITmfTrace trace, List<ThreadEntry> list) {
         String threadName = Messages.CallStackView_StackInfoNotAvailable + ' ' + '(' + trace.getName() + ')';
-        ThreadEntry threadEntry = new ThreadEntry(trace, threadName, -1, 0, 0);
+        ThreadEntry threadEntry = new ThreadEntry(null, threadName, -1, 0, 0);
         list.add(threadEntry);
     }
 
     private void buildStatusEvents(ITmfTrace trace, CallStackEntry entry, IProgressMonitor monitor) {
-        ITmfStateSystem ss = getCallStackStateSystem(entry.getTrace());
-        if (ss == null) {
-            return;
-        }
+        ITmfStateSystem ss = entry.getStateSystem();
         long start = ss.getStartTime();
         long end = ss.getCurrentEndTime() + 1;
         long resolution = Math.max(1, (end - start) / fDisplayWidth);
@@ -873,10 +873,7 @@ public class CallStackView extends TmfView {
     private static List<ITimeEvent> getEventList(CallStackEntry entry,
             long startTime, long endTime, long resolution,
             IProgressMonitor monitor) {
-        ITmfStateSystem ss = getCallStackStateSystem(entry.getTrace());
-        if (ss == null) {
-            return null;
-        }
+        ITmfStateSystem ss = entry.getStateSystem();
         long start = Math.max(startTime, ss.getStartTime());
         long end = Math.min(endTime, ss.getCurrentEndTime() + 1);
         if (end <= start) {
@@ -1103,14 +1100,10 @@ public class CallStackView extends TmfView {
                     if (entry instanceof CallStackEntry) {
                         try {
                             CallStackEntry callStackEntry = (CallStackEntry) entry;
-                            ITmfTrace trace = callStackEntry.getTrace();
-                            ITmfStateSystem ss = getCallStackStateSystem(trace);
-                            if (ss == null) {
-                                return;
-                            }
+                            ITmfStateSystem ss = callStackEntry.getStateSystem();
                             long time = Math.max(ss.getStartTime(), Math.min(ss.getCurrentEndTime(), viewer.getSelectionBegin()));
                             ThreadEntry threadEntry = (ThreadEntry) callStackEntry.getParent();
-                            int quark = ss.getQuarkRelative(threadEntry.getThreadQuark(), CallStackStateProvider.CALL_STACK);
+                            int quark = ss.getParentAttributeQuark(callStackEntry.getQuark());
                             ITmfStateInterval stackInterval = ss.querySingleState(time, quark);
                             long newTime = stackInterval.getEndTime() + 1;
                             viewer.setSelectedTimeNotify(newTime, true);
@@ -1157,14 +1150,10 @@ public class CallStackView extends TmfView {
                     if (entry instanceof CallStackEntry) {
                         try {
                             CallStackEntry callStackEntry = (CallStackEntry) entry;
-                            ITmfTrace trace = callStackEntry.getTrace();
-                            ITmfStateSystem ss = getCallStackStateSystem(trace);
-                            if (ss == null) {
-                                return;
-                            }
+                            ITmfStateSystem ss = callStackEntry.getStateSystem();
                             long time = Math.max(ss.getStartTime(), Math.min(ss.getCurrentEndTime(), viewer.getSelectionBegin()));
                             ThreadEntry threadEntry = (ThreadEntry) callStackEntry.getParent();
-                            int quark = ss.getQuarkRelative(threadEntry.getThreadQuark(), CallStackStateProvider.CALL_STACK);
+                            int quark = ss.getParentAttributeQuark(callStackEntry.getQuark());
                             ITmfStateInterval stackInterval = ss.querySingleState(time, quark);
                             if (stackInterval.getStartTime() == time && time > ss.getStartTime()) {
                                 stackInterval = ss.querySingleState(time - 1, quark);
@@ -1197,8 +1186,7 @@ public class CallStackView extends TmfView {
         return fPrevEventAction;
     }
 
-    @Nullable
-    static ITmfStateSystem getCallStackStateSystem(ITmfTrace trace) {
+    private static @Nullable AbstractCallStackAnalysis getCallStackModule(ITmfTrace trace) {
         /*
          * Since we cannot know the exact analysis ID (in separate plugins), we
          * will search using the analysis type.
@@ -1221,12 +1209,7 @@ public class CallStackView extends TmfView {
         /* This analysis is not automatic, we need to schedule it on-demand */
         module.schedule();
         module.waitForInitialization();
-        ITmfStateSystem ss = module.getStateSystem();
-        if (ss == null) {
-            /* If we've waited for initialization, 'ss' should not be null */
-            throw new IllegalStateException();
-        }
-        return ss;
+        return module;
     }
 
     // ------------------------------------------------------------------------

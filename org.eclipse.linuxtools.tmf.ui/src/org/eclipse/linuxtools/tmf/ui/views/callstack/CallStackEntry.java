@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.linuxtools.statesystem.core.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.EventIterator;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -39,22 +41,43 @@ public class CallStackEntry implements ITimeGraphEntry {
     private long fEndTime;
     private List<ITimeEvent> fEventList = new ArrayList<>(1);
     private List<ITimeEvent> fZoomedEventList = null;
+    private @NonNull ITmfStateSystem fSS;
 
     /**
      * Standard constructor
      *
      * @param quark
-     *            The event stack quark
+     *            The call stack quark
      * @param stackLevel
      *            The stack level
      * @param trace
      *            The trace that this view is talking about
+     * @deprecated Use {@link #CallStackEntry(int, int, ITmfTrace, ITmfStateSystem)}
      */
+    @Deprecated
     public CallStackEntry(int quark, int stackLevel, ITmfTrace trace) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Standard constructor
+     *
+     * @param quark
+     *            The call stack quark
+     * @param stackLevel
+     *            The stack level
+     * @param trace
+     *            The trace that this view is talking about
+     * @param ss
+     *            The call stack state system
+     * @since 3.1
+     */
+    public CallStackEntry(int quark, int stackLevel, ITmfTrace trace, @NonNull ITmfStateSystem ss) {
         fQuark = quark;
         fStackLevel = stackLevel;
         fTrace = trace;
         fFunctionName = ""; //$NON-NLS-1$
+        fSS = ss;
     }
 
     @Override
@@ -170,6 +193,16 @@ public class CallStackEntry implements ITimeGraphEntry {
      */
     public ITmfTrace getTrace() {
         return fTrace;
+    }
+
+    /**
+     * Retrieve the call stack state system associated with this entry.
+     *
+     * @return The call stack state system
+     * @since 3.1
+     */
+    public @NonNull ITmfStateSystem getStateSystem() {
+        return fSS;
     }
 
     /**
