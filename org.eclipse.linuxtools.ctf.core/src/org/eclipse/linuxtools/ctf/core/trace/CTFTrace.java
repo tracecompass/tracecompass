@@ -24,12 +24,11 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -236,9 +235,23 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
      *            The ID of the stream from which to read
      * @return The Hash map with the event declarations
      * @since 2.0
+     * @deprecated use {@link CTFTrace#getEventDeclarations(Long)}
      */
+    @Deprecated
     public Map<Long, IEventDeclaration> getEvents(Long streamId) {
         return fStreams.get(streamId).getEvents();
+    }
+
+    /**
+     * Gets an event declaration list for a given streamID
+     *
+     * @param streamId
+     *            The ID of the stream from which to read
+     * @return The list of event declarations
+     * @since 3.1
+     */
+    public Collection<IEventDeclaration> getEventDeclarations(Long streamId) {
+        return fStreams.get(streamId).getEventDeclarations();
     }
 
     /**
@@ -250,8 +263,25 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
      *            the ID of the event
      * @return the event declaration
      * @since 2.0
+     * @deprecated use {@link CTFTrace#getEventType(long, int)} instead
      */
+    @Deprecated
     public IEventDeclaration getEventType(long streamId, long id) {
+        return getStream(streamId).getEventDeclaration((int) id);
+    }
+
+
+    /**
+     * Get an event by it's ID
+     *
+     * @param streamId
+     *            The ID of the stream from which to read
+     * @param id
+     *            the ID of the event
+     * @return the event declaration
+     * @since 3.1
+     */
+    public IEventDeclaration getEventType(long streamId, int id) {
         return getEvents(streamId).get(id);
     }
 
@@ -455,16 +485,10 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
     private void addStream(CTFStreamInput s) {
 
         /*
-         * Copy the events
+         * add the stream
          */
-        Iterator<Entry<Long, IEventDeclaration>> it = s.getStream()
-                .getEvents().entrySet().iterator();
-        while (it.hasNext()) {
-            Entry<Long, IEventDeclaration> pairs = it.next();
-            Long eventNum = pairs.getKey();
-            IEventDeclaration eventDec = pairs.getValue();
-            getEvents(s.getStream().getId()).put(eventNum, eventDec);
-        }
+        CTFStream stream = s.getStream();
+        fStreams.put(stream.getId(), stream);
 
         /*
          * index the trace

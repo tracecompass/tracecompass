@@ -85,7 +85,7 @@ public class CtfTmfEvent extends TmfEvent
 
         fEventDeclaration = declaration;
         fSourceCPU = cpu;
-        fTypeId = declaration.getId();
+        fTypeId = declaration.getId().longValue();
         fEventName = declaration.getName();
         fEvent = eventDefinition;
 
@@ -242,7 +242,7 @@ public class CtfTmfEvent extends TmfEvent
         if (structFields != null) {
             if (structFields.getFieldNames() != null) {
                 for (String curFieldName : structFields.getFieldNames()) {
-                    fields.add(CtfTmfEventField.parseField((IDefinition)structFields.getDefinition(curFieldName), curFieldName));
+                    fields.add(CtfTmfEventField.parseField((IDefinition) structFields.getDefinition(curFieldName), curFieldName));
                 }
             }
         }
@@ -252,7 +252,7 @@ public class CtfTmfEvent extends TmfEvent
             for (String contextName : structContext.getFieldNames()) {
                 /* Prefix field name */
                 String curContextName = CtfConstants.CONTEXT_FIELD_PREFIX + contextName;
-                fields.add(CtfTmfEventField.parseField((IDefinition)structContext.getDefinition(contextName), curContextName));
+                fields.add(CtfTmfEventField.parseField((IDefinition) structContext.getDefinition(contextName), curContextName));
             }
         }
 

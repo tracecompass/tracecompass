@@ -18,10 +18,8 @@ import static org.junit.Assume.assumeTrue;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTrace;
@@ -156,8 +154,7 @@ public class CTFStreamTest {
      */
     @Test
     public void testGetEvents() {
-        Map<Long, IEventDeclaration> result = fixture.getEvents();
-        assertNotNull(result);
+        assertNotNull(fixture.getEventDeclarations());
     }
 
     /**

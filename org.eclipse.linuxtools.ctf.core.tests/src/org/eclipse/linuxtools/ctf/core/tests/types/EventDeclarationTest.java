@@ -217,8 +217,7 @@ public class EventDeclarationTest {
      */
     @Test
     public void testGetId() {
-        Long result = fixture.getId();
-        assertNotNull(result);
+        assertEquals(1,fixture.id());
     }
 
     /**

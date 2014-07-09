@@ -318,7 +318,8 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
      */
     public EventDefinition readNextEvent() throws CTFReaderException {
         /* Default values for those fields */
-        long eventID = EventDeclaration.UNSET_EVENT_ID;
+        // compromise since we cannot have 64 bit addressing of arrays yet.
+        int eventID = (int) EventDeclaration.UNSET_EVENT_ID;
         long timestamp = 0;
         if (fHasLost) {
             fHasLost = false;
@@ -409,7 +410,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
                     timestampDef = variantCurrentField.lookupInteger("timestamp"); //$NON-NLS-1$
                 }
                 if (simpleIdDef != null) {
-                    eventID = simpleIdDef.getIntegerValue();
+                    eventID = simpleIdDef.getIntegerValue().intValue();
                 }
                 if (timestampDef != null) {
                     timestamp = calculateTimestamp(timestampDef);
@@ -417,7 +418,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
             }
         }
         /* Get the right event definition using the event id. */
-        IEventDeclaration eventDeclaration = fStreamInputReader.getStreamInput().getStream().getEvents().get(eventID);
+        IEventDeclaration eventDeclaration = fStreamInputReader.getStreamInput().getStream().getEventDeclaration(eventID);
         if (eventDeclaration == null) {
             throw new CTFReaderException("Incorrect event id : " + eventID); //$NON-NLS-1$
         }

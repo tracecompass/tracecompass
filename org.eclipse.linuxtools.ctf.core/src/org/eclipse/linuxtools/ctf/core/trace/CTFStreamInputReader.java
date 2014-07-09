@@ -20,7 +20,7 @@ import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.StructDeclaration;
 import org.eclipse.linuxtools.internal.ctf.core.trace.StreamInputPacketIndexEntry;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableList;
 
 /**
  * A CTF trace event reader. Reads the events of a trace file.
@@ -175,7 +175,7 @@ public class CTFStreamInputReader implements AutoCloseable {
      * @return Unmodifiable set with the event definitions
      */
     public Iterable<IEventDeclaration> getEventDeclarations() {
-        return ImmutableSet.copyOf(fStreamInput.getStream().getEvents().values());
+        return ImmutableList.copyOf(fStreamInput.getStream().getEventDeclarations());
     }
 
     /**

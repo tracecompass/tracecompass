@@ -12,11 +12,16 @@
 
 package org.eclipse.linuxtools.ctf.core.trace;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IEventHeaderDeclaration;
@@ -57,7 +62,9 @@ public class CTFStream {
     /**
      * Maps event ids to events
      */
-    private Map<Long, IEventDeclaration> fEvents = new HashMap<>();
+    private final ArrayList<IEventDeclaration> fEvents = new ArrayList<>();
+
+    private boolean fEventUnsetId = false;
 
     /**
      * The inputs associated to this stream
@@ -229,9 +236,48 @@ public class CTFStream {
      *
      * @return all the event declarations for this stream, using the id as a key
      *         for the hashmap.
+     * @deprecated use {@link CTFStream#getEventDeclarations()}
      */
+    @Deprecated
     public Map<Long, IEventDeclaration> getEvents() {
-        return fEvents;
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Get all the event declarations in this stream.
+     *
+     * @return The event declarations for this stream
+     * @since 3.1
+     */
+    public @NonNull Collection<IEventDeclaration> getEventDeclarations() {
+        List<IEventDeclaration> retVal = new ArrayList<>(fEvents);
+        retVal.removeAll(Collections.<IEventDeclaration> singletonList(null));
+        return retVal;
+    }
+
+    /**
+     * Get the event declaration for a given ID.
+     *
+     * @param eventId
+     *            The ID, can be {@link EventDeclaration#UNSET_EVENT_ID}, or any
+     *            positive value
+     * @return The event declaration with the given ID for this stream, or
+     *         'null' if there are no declaration with this ID
+     * @throws IllegalArgumentException
+     *             If the passed ID is invalid
+     * @since 3.1
+     */
+    public @Nullable IEventDeclaration getEventDeclaration(int eventId) {
+        int eventIndex = (eventId == EventDeclaration.UNSET_EVENT_ID) ? 0 : eventId;
+        if (eventIndex < 0) {
+            /* Any negative value other than UNSET_EVENT_ID is invalid */
+            throw new IllegalArgumentException("Event ID cannot be negative."); //$NON-NLS-1$
+        }
+        if (eventIndex >= fEvents.size()) {
+            /* This ID could be valid, but there are no declarations with it */
+            return null;
+        }
+        return fEvents.get(eventIndex);
     }
 
     // ------------------------------------------------------------------------
@@ -239,7 +285,7 @@ public class CTFStream {
     // ------------------------------------------------------------------------
 
     /**
-     * Adds an event to the event map.
+     * Adds an event to the event list.
      *
      * An event in a stream can omit its id if it is the only event in this
      * stream. An event for which no id has been specified has a null id. It is
@@ -254,31 +300,67 @@ public class CTFStream {
      *             stream
      */
     public void addEvent(IEventDeclaration event) throws ParseException {
-        /*
-         * If there is an event without id (the null key), it must be the only
-         * one
-         */
-        if (fEvents.get(null) != null) {
+        if (fEventUnsetId) {
             throw new ParseException("Event without id with multiple events in a stream"); //$NON-NLS-1$
         }
+        int id = ((EventDeclaration) event).id();
 
         /*
          * If there is an event without id (the null key), it must be the only
          * one
          */
-        if ((event.getId() == null) && (fEvents.size() != 0)) {
-            throw new ParseException("Event without id with multiple events in a stream"); //$NON-NLS-1$
-        }
-
-        /* Check if an event with the same ID already exists */
-        if (fEvents.get(event.getId()) != null) {
-            throw new ParseException("Event id already exists"); //$NON-NLS-1$
-        }
-        if (event.getId() == null) {
-            fEvents.put(EventDeclaration.UNSET_EVENT_ID, event);
+        if (id == EventDeclaration.UNSET_EVENT_ID) {
+            if (!fEvents.isEmpty()) {
+                throw new ParseException("Event without id with multiple events in a stream"); //$NON-NLS-1$
+            }
+            fEventUnsetId = true;
+            fEvents.add(event);
         } else {
-            /* Put the event in the map */
-            fEvents.put(event.getId(), event);
+            /* Check if an event with the same ID already exists */
+            if (fEvents.size() > id && fEvents.get(id) != null) {
+                throw new ParseException("Event id already exists"); //$NON-NLS-1$
+            }
+            ensureSize(fEvents, id);
+            /* Put the event in the list */
+            fEvents.set(id, event);
+        }
+    }
+
+    /**
+     * Add a list of event declarations to this stream. There must be no overlap
+     * between the two lists of event declarations. This will merge the two
+     * lists and preserve the indexes of both lists.
+     *
+     * @param events
+     *            list of the events to add
+     * @throws CTFReaderException
+     *             if the list already contains data
+     * @since 3.1
+     */
+    public void addEvents(Collection<IEventDeclaration> events) throws CTFReaderException {
+        if (fEventUnsetId) {
+            throw new CTFReaderException("Cannot add to a stream with an unidentified event"); //$NON-NLS-1$
+        }
+        if (fEvents.isEmpty()) {
+            fEvents.addAll(events);
+            return;
+        }
+        for (IEventDeclaration event : events) {
+            if (event != null) {
+                int index = event.getId().intValue();
+                ensureSize(fEvents, index);
+                if (fEvents.get(index) != null) {
+                    throw new CTFReaderException("Both lists have an event defined at position " + index); //$NON-NLS-1$
+                }
+                fEvents.set(index, event);
+            }
+        }
+    }
+
+    private static void ensureSize(ArrayList<? extends Object> list, int index) {
+        list.ensureCapacity(index);
+        while (list.size() <= index) {
+            list.add(null);
         }
     }
 
