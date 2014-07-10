@@ -17,6 +17,7 @@ package org.eclipse.linuxtools.tmf.core.tests.event;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -25,6 +26,7 @@ import static org.junit.Assert.fail;
 import java.util.Collection;
 
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
+import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.junit.Test;
 
@@ -277,6 +279,56 @@ public class TmfEventFieldTest {
         assertFalse("equals", fField2.equals(fField1));
 
         assertFalse("equals", fField1.equals(fStructTerminalField1));
+    }
+
+    /**
+     * Test with same fields, but different values (should not be equal)
+     */
+    @Test
+    public void testNonEqualsValue() {
+        final String fieldName = "myfield";
+        final Object value1 = new String("test-string");
+        final Object value2 = new TmfEvent();
+        final TmfEventField[] fields = { fField1, fField2 };
+
+        final TmfEventField field1 = new TmfEventField(fieldName, value1, fields);
+        final TmfEventField field2 = new TmfEventField(fieldName, value2, fields);
+
+        assertNotEquals(field1, field2);
+        assertNotEquals(field2, field1);
+    }
+
+    /**
+     * Test with same value, but different fields (should not be equal)
+     */
+    @Test
+    public void testNonEqualsFields() {
+        final String fieldName = "myfield";
+        final Object value = new String("test-string");
+        final TmfEventField[] fields1 = { fField1, fField2 };
+        final TmfEventField[] fields2 = { fField2, fField3 };
+
+        final TmfEventField field1 = new TmfEventField(fieldName, value, fields1);
+        final TmfEventField field2 = new TmfEventField(fieldName, value, fields2);
+
+        assertNotEquals(field1, field2);
+        assertNotEquals(field2, field1);
+    }
+
+    /**
+     * Test with same field and values (should be equals)
+     */
+    @Test
+    public void testEqualsEverything() {
+        final String fieldName = "myfield";
+        final Object value = new String("test-string");
+        final TmfEventField[] fields = { fField1, fField2 };
+
+        final TmfEventField field1 = new TmfEventField(fieldName, value, fields);
+        final TmfEventField field2 = new TmfEventField(fieldName, value, fields);
+
+        assertEquals(field1, field2);
+        assertEquals(field2, field1);
     }
 
     // ------------------------------------------------------------------------

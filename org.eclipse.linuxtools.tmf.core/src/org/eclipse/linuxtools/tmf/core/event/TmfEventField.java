@@ -175,6 +175,7 @@ public class TmfEventField implements ITmfEventField {
         int result = 1;
         result = prime * result + fName.hashCode();
         result = prime * result + ((value == null) ? 0 : value.hashCode());
+        result = prime * result + fFields.hashCode();
         return result;
     }
 
@@ -189,10 +190,15 @@ public class TmfEventField implements ITmfEventField {
         if (!(obj instanceof TmfEventField)) {
             return false;
         }
+
         final TmfEventField other = (TmfEventField) obj;
+
+        /* Check that 'fName' is the same */
         if (!fName.equals(other.fName)) {
             return false;
         }
+
+        /* Check that 'fValue' is the same */
         Object value = this.fValue;
         if (value == null) {
             if (other.fValue != null) {
@@ -201,6 +207,12 @@ public class TmfEventField implements ITmfEventField {
         } else if (!value.equals(other.fValue)) {
             return false;
         }
+
+        /* Check that 'fFields' are the same */
+        if (!fFields.equals(other.fFields)) {
+            return false;
+        }
+
         return true;
     }
 
