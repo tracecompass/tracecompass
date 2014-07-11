@@ -21,7 +21,7 @@ import org.eclipse.osgi.util.NLS;
  */
 public class Messages extends NLS {
 
-    private static final String BUNDLE_NAME = "org.eclipse.linuxtools.tmf.core.callstack"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.eclipse.linuxtools.tmf.core.callstack.messages"; //$NON-NLS-1$
 
     /**
      * The value popped from a 'func_exit' event doesn't match the current
