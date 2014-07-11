@@ -706,7 +706,7 @@ public class CallStackView extends TmfView {
                         ITmfStateInterval stackInterval = ss.querySingleState(beginTime, quark);
                         if (beginTime == stackInterval.getStartTime()) {
                             int stackLevel = stackInterval.getStateValue().unboxInt();
-                            CallStackEntry selectedEntry = threadEntry.getChildren().get(Math.max(0, stackLevel - 1));
+                            ITimeGraphEntry selectedEntry = threadEntry.getChildren().get(Math.max(0, stackLevel - 1));
                             fTimeGraphCombo.setSelection(selectedEntry);
                             viewer.getTimeGraphControl().fireSelectionChanged();
                             break;
@@ -840,11 +840,11 @@ public class CallStackView extends TmfView {
             refresh();
         }
         for (ThreadEntry threadEntry : entryList) {
-            for (CallStackEntry callStackEntry : threadEntry.getChildren()) {
+            for (ITimeGraphEntry callStackEntry : threadEntry.getChildren()) {
                 if (monitor.isCanceled()) {
                     return;
                 }
-                buildStatusEvents(trace, callStackEntry, monitor);
+                buildStatusEvents(trace, (CallStackEntry) callStackEntry, monitor);
             }
         }
     }
@@ -938,7 +938,8 @@ public class CallStackView extends TmfView {
                 continue;
             }
             long queryTime = Math.max(ss.getStartTime(), Math.min(ss.getCurrentEndTime(), time));
-            for (CallStackEntry callStackEntry : threadEntry.getChildren()) {
+            for (ITimeGraphEntry child : threadEntry.getChildren()) {
+                CallStackEntry callStackEntry = (CallStackEntry) child;
                 try {
                     ITmfStateInterval stackLevelInterval = ss.querySingleState(queryTime, callStackEntry.getQuark());
                     ITmfStateValue nameValue = stackLevelInterval.getStateValue();
@@ -1109,7 +1110,7 @@ public class CallStackView extends TmfView {
                             viewer.setSelectedTimeNotify(newTime, true);
                             stackInterval = ss.querySingleState(Math.min(ss.getCurrentEndTime(), newTime), quark);
                             int stackLevel = stackInterval.getStateValue().unboxInt();
-                            CallStackEntry selectedEntry = threadEntry.getChildren().get(Math.max(0, stackLevel - 1));
+                            ITimeGraphEntry selectedEntry = threadEntry.getChildren().get(Math.max(0, stackLevel - 1));
                             fTimeGraphCombo.setSelection(selectedEntry);
                             viewer.getTimeGraphControl().fireSelectionChanged();
                             startZoomThread(viewer.getTime0(), viewer.getTime1());
@@ -1160,7 +1161,7 @@ public class CallStackView extends TmfView {
                             }
                             viewer.setSelectedTimeNotify(stackInterval.getStartTime(), true);
                             int stackLevel = stackInterval.getStateValue().unboxInt();
-                            CallStackEntry selectedEntry = threadEntry.getChildren().get(Math.max(0, stackLevel - 1));
+                            ITimeGraphEntry selectedEntry = threadEntry.getChildren().get(Math.max(0, stackLevel - 1));
                             fTimeGraphCombo.setSelection(selectedEntry);
                             viewer.getTimeGraphControl().fireSelectionChanged();
                             startZoomThread(viewer.getTime0(), viewer.getTime1());

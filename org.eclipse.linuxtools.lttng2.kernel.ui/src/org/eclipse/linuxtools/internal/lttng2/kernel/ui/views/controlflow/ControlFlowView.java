@@ -571,8 +571,8 @@ public class ControlFlowView extends AbstractTimeGraphView {
         return list;
     }
 
-    private ControlFlowEntry findEntry(List<TimeGraphEntry> entryList, ITmfTrace trace, int threadId) {
-        for (TimeGraphEntry entry : entryList) {
+    private ControlFlowEntry findEntry(List<? extends ITimeGraphEntry> entryList, ITmfTrace trace, int threadId) {
+        for (ITimeGraphEntry entry : entryList) {
             if (entry instanceof ControlFlowEntry) {
                 ControlFlowEntry controlFlowEntry = (ControlFlowEntry) entry;
                 if (controlFlowEntry.getThreadId() == threadId && controlFlowEntry.getTrace() == trace) {

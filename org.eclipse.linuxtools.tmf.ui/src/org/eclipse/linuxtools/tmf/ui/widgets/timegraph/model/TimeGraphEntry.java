@@ -26,10 +26,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class TimeGraphEntry implements ITimeGraphEntry {
 
     /** Entry's parent */
-    private TimeGraphEntry fParent = null;
+    private ITimeGraphEntry fParent = null;
 
     /** List of child entries */
-    private final List<TimeGraphEntry> fChildren = new CopyOnWriteArrayList<>();
+    private final List<ITimeGraphEntry> fChildren = new CopyOnWriteArrayList<>();
 
     /** Name of this entry (text to show) */
     private String fName;
@@ -68,7 +68,23 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      *
      * @param entry The new parent entry
      */
+    /*
+     * TODO: This method can be removed in the next major API version.
+     */
     protected void setParent(TimeGraphEntry entry) {
+        fParent = entry;
+    }
+
+    /**
+     * Sets the entry's parent
+     *
+     * @param entry The new parent entry
+     * @since 3.1
+     */
+    /*
+     * TODO: This method should be added to the interface in the next major API version.
+     */
+    protected void setParent(ITimeGraphEntry entry) {
         fParent = entry;
     }
 
@@ -78,7 +94,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
     }
 
     @Override
-    public List<TimeGraphEntry> getChildren() {
+    public List<? extends ITimeGraphEntry> getChildren() {
         return fChildren;
     }
 
@@ -201,9 +217,42 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      * @param child
      *            The child entry
      */
+    /*
+     * TODO: This method can be removed in the next major API version.
+     */
     public void addChild(TimeGraphEntry child) {
         child.fParent = this;
         fChildren.add(child);
+    }
+
+    /**
+     * Add a child entry to this one
+     *
+     * @param child
+     *            The child entry
+     * @since 3.1
+     */
+    public void addChild(ITimeGraphEntry child) {
+        if (child instanceof TimeGraphEntry) {
+            ((TimeGraphEntry) child).fParent = this;
+        }
+        fChildren.add(child);
+    }
+
+    /**
+     * Add a child entry to this one at the specified position
+     *
+     * @param index
+     *            Index at which the specified entry is to be inserted
+     * @param child
+     *            The child entry
+     * @since 3.1
+     */
+    public void addChild(int index, ITimeGraphEntry child) {
+        if (child instanceof TimeGraphEntry) {
+            ((TimeGraphEntry) child).fParent = this;
+        }
+        fChildren.add(index, child);
     }
 
     @Override

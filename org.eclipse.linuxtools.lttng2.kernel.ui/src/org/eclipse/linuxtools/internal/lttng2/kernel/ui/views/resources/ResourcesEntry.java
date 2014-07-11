@@ -182,7 +182,7 @@ public class ResourcesEntry extends TimeGraphEntry implements Comparable<ITimeGr
         }
 
         rEntry.setParent(this);
-        getChildren().add(index, rEntry);
+        addChild(index, rEntry);
     }
 
     @Override

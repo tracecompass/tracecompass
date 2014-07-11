@@ -35,6 +35,7 @@ import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
@@ -173,17 +174,20 @@ public class ResourcesView extends AbstractTimeGraphView {
                 refresh();
             }
             long resolution = Math.max(1, (endTime - ssq.getStartTime()) / getDisplayWidth());
-            for (TimeGraphEntry entry : traceEntry.getChildren()) {
+            for (ITimeGraphEntry child : traceEntry.getChildren()) {
                 if (monitor.isCanceled()) {
                     return;
                 }
-                List<ITimeEvent> eventList = getEventList(entry, start, endTime, resolution, monitor);
-                if (eventList != null) {
-                    for (ITimeEvent event : eventList) {
-                        entry.addEvent(event);
+                if (child instanceof TimeGraphEntry) {
+                    TimeGraphEntry entry = (TimeGraphEntry) child;
+                    List<ITimeEvent> eventList = getEventList(entry, start, endTime, resolution, monitor);
+                    if (eventList != null) {
+                        for (ITimeEvent event : eventList) {
+                            entry.addEvent(event);
+                        }
                     }
+                    redraw();
                 }
-                redraw();
             }
 
             start = end;
