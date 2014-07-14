@@ -27,6 +27,13 @@ public class Messages extends NLS {
      * @since 2.1*/
     public static String CtfTmfTrace_BufferOverflowErrorMessage;
 
+    /**
+     * Text for host ID
+     *
+     * @since 3.1
+     */
+    public static String CtfTmfTrace_HostID;
+
     /** Major version number not set */
     public static String CtfTmfTrace_MajorNotSet;
 

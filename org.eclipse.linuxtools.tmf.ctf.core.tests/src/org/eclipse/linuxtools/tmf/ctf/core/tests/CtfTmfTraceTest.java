@@ -227,12 +227,12 @@ public class CtfTmfTraceTest {
     }
 
     /**
-     * Run the int getNbEnvVars() method test.
+     * Run the getTraceProperties() method test.
      */
     @Test
-    public void testGetNbEnvVars() {
+    public void testGetTraceProperties() {
         int result = fixture.getTraceProperties().size();
-        assertEquals(8, result);
+        assertEquals(9, result);
     }
 
     /**
