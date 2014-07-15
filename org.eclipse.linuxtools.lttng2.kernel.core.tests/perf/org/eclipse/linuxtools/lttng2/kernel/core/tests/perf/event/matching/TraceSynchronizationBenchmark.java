@@ -38,7 +38,7 @@ import org.junit.Test;
  */
 public class TraceSynchronizationBenchmark {
 
-    private static final String TEST_ID = "org.eclipse.linuxtools#Trace synchronization";
+    private static final String TEST_ID = "org.eclipse.linuxtools#Trace synchronization#";
     private static final String TIME = " (time)";
     private static final String MEMORY = " (memory usage)";
     private static final String TEST_SUMMARY = "Trace synchronization";
@@ -90,8 +90,8 @@ public class TraceSynchronizationBenchmark {
 
     private static void runCpuTest(ITmfTrace[] testTraces, String testName, int loop_count) {
         Performance perf = Performance.getDefault();
-        PerformanceMeter pm = perf.createPerformanceMeter(TEST_ID + TIME + '#' + testName);
-        perf.tagAsSummary(pm, TEST_SUMMARY + TIME + ':' + testName, Dimension.CPU_TIME);
+        PerformanceMeter pm = perf.createPerformanceMeter(TEST_ID + testName + TIME);
+        perf.tagAsSummary(pm, TEST_SUMMARY + ':' + testName + TIME, Dimension.CPU_TIME);
 
         for (int i = 0; i < loop_count; i++) {
             TmfExperiment experiment = new TmfExperiment(CtfTmfEvent.class, "Test experiment", testTraces, BLOCK_SIZE);
@@ -112,8 +112,8 @@ public class TraceSynchronizationBenchmark {
     /* Benchmark memory used by the algorithm */
     private static void runMemoryTest(ITmfTrace[] testTraces, String testName, int loop_count) {
         Performance perf = Performance.getDefault();
-        PerformanceMeter pm = perf.createPerformanceMeter(TEST_ID + MEMORY + '#' + testName);
-        perf.tagAsSummary(pm, TEST_SUMMARY + MEMORY + ':' + testName, Dimension.USED_JAVA_HEAP);
+        PerformanceMeter pm = perf.createPerformanceMeter(TEST_ID + testName + MEMORY);
+        perf.tagAsSummary(pm, TEST_SUMMARY + ':' + testName + MEMORY, Dimension.USED_JAVA_HEAP);
 
         for (int i = 0; i < loop_count; i++) {
             TmfExperiment experiment = new TmfExperiment(CtfTmfEvent.class, "Test experiment", testTraces, BLOCK_SIZE);

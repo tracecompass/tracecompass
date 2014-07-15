@@ -40,7 +40,7 @@ import org.junit.Test;
  */
 public class ExperimentBenchmark {
 
-    private static final String TEST_ID = "org.eclipse.linuxtools#Experiment benchmark";
+    private static final String TEST_ID = "org.eclipse.linuxtools#Experiment benchmark#";
     private static final int MAX_TRACES = 160;
     private static final int BLOCK_SIZE = 100;
     private static final String TRACES_ROOT_PATH = CtfTestTrace.TRACE_EXPERIMENT.getPath();
@@ -56,10 +56,10 @@ public class ExperimentBenchmark {
         Performance perf = Performance.getDefault();
 
         for (int numTraces = 1; numTraces < MAX_TRACES; numTraces = (int) (1.6 * (numTraces + 1))) {
-            PerformanceMeter pm = perf.createPerformanceMeter(TEST_ID + '(' + numTraces + ')');
-            perf.tagAsSummary(pm, "Experiment Benchmark traces:" + numTraces, Dimension.CPU_TIME);
+            PerformanceMeter pm = perf.createPerformanceMeter(TEST_ID + numTraces + " traces");
+            perf.tagAsSummary(pm, "Experiment Benchmark:" + numTraces + " traces", Dimension.CPU_TIME);
             if ((int) (1.6 * (numTraces + 1)) > MAX_TRACES) {
-                perf.tagAsGlobalSummary(pm, "Experiment Benchmark traces: " + numTraces, Dimension.CPU_TIME);
+                perf.tagAsGlobalSummary(pm, "Experiment Benchmark:" + numTraces + " traces", Dimension.CPU_TIME);
             }
 
             for (int s = 0; s < SAMPLE_SIZE; s++) {
