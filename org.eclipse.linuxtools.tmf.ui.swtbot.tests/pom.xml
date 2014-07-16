@@ -39,11 +39,9 @@
           <argLine>${tycho.testArgLine} ${base.ui.test.vmargs}</argLine>
           <product>org.eclipse.platform.ide</product>
 <!-- Disable GTK3 with Luna because it makes the test hang (bug in IcedTea http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=1736) -->
-<!-- Disable the disablement because of bug in Tycho 0.20.0 (https://bugs.eclipse.org/bugs/show_bug.cgi?id=431793)
           <environmentVariables>
             <SWT_GTK3>0</SWT_GTK3>
           </environmentVariables>
--->
         </configuration>
       </plugin>
     </plugins>
