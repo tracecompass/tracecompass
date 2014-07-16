@@ -574,6 +574,30 @@
                commandId="org.eclipse.ui.edit.delete"
                disabledIcon="icons/dtool16/delete.gif"
                icon="icons/etool16/delete.gif"
+               label="%command.clear"
+               mnemonic="%command.clear.mnemonic"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <instanceof
+                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.ui.edit.delete"
+               disabledIcon="icons/dtool16/delete.gif"
+               icon="icons/etool16/delete.gif"
                label="%command.remove"
                mnemonic="%command.remove.mnemonic"
                style="push">
@@ -1362,6 +1386,24 @@
                      value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
                </instanceof>
             </iterate>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteFolderHandler"
+            commandId="org.eclipse.ui.edit.delete">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate
+                     ifEmpty="false"
+                     operator="or">
+                  <instanceof
+                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder">
+                  </instanceof>
+               </iterate>
+            </and>
          </activeWhen>
       </handler>
       <handler
