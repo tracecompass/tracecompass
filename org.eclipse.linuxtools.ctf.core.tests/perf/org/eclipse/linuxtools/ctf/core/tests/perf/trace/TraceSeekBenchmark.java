@@ -91,7 +91,11 @@ public class TraceSeekBenchmark {
                 List<Long> seekTimestamps = new LinkedList<>();
                 final long range = endTime - startTime;
                 for (int i = 0; i < NB_SEEKS; i++) {
-                    seekTimestamps.add(startTime + (RND.nextLong() % range));
+                    long delta = (RND.nextLong() % range);
+                    if (delta < 0) {
+                        delta += range;
+                    }
+                    seekTimestamps.add(startTime + delta);
                 }
 
                 /* Benchmark seeking to the generated timestamps */
