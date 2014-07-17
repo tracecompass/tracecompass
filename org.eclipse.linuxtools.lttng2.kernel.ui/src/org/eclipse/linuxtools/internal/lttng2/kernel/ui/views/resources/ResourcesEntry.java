@@ -153,38 +153,6 @@ public class ResourcesEntry extends TimeGraphEntry implements Comparable<ITimeGr
         return true;
     }
 
-    /**
-     * Add a child to this entry of type ResourcesEntry
-     *
-     * @param entry
-     *            The entry to add
-     */
-    @Override
-    public void addChild(TimeGraphEntry entry) {
-        // FIXME This check won't be necessary once all ITimeGraphEntry's are
-        // made Comparable.
-        if (!(entry instanceof ResourcesEntry)) {
-            throw new IllegalArgumentException();
-        }
-        ResourcesEntry rEntry = (ResourcesEntry) entry;
-
-        /*
-         * Insert in the array, keeping the elements sorted
-         * (CopyOnWriteArrayList doesn't support Collections#sort,
-         * unfortunately).
-         */
-        int index;
-        for (index = 0; index < getChildren().size(); index++) {
-            ResourcesEntry other = (ResourcesEntry) getChildren().get(index);
-            if (rEntry.compareTo(other) < 0) {
-                break;
-            }
-        }
-
-        rEntry.setParent(this);
-        addChild(index, rEntry);
-    }
-
     @Override
     public int compareTo(ITimeGraphEntry other) {
         if (!(other instanceof ResourcesEntry)) {

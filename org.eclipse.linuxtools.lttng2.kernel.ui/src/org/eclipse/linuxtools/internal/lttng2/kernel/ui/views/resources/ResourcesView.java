@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,6 +103,12 @@ public class ResourcesView extends AbstractTimeGraphView {
         if (ssq == null) {
             return;
         }
+        Comparator<ITimeGraphEntry> comparator = new Comparator<ITimeGraphEntry>() {
+            @Override
+            public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
+                return ((ResourcesEntry) o1).compareTo(o2);
+            }
+        };
 
         Map<Integer, ResourcesEntry> entryMap = new HashMap<>();
         TimeGraphEntry traceEntry = null;
@@ -127,6 +134,7 @@ public class ResourcesView extends AbstractTimeGraphView {
 
             if (traceEntry == null) {
                 traceEntry = new ResourcesEntry(trace, trace.getName(), startTime, endTime, 0);
+                traceEntry.sortChildren(comparator);
                 List<TimeGraphEntry> entryList = Collections.singletonList(traceEntry);
                 addToEntryList(parentTrace, entryList);
             } else {
