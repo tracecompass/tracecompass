@@ -82,7 +82,7 @@ public class PcapFile implements Closeable {
         }
 
         if (!pcapFile.canRead()) {
-            throw new IOException("File is not readable."); //$NON-NLS-1$
+            throw new BadPcapFileException("File is not readable."); //$NON-NLS-1$
         }
 
         // File is not empty. Try to open.
@@ -110,7 +110,6 @@ public class PcapFile implements Closeable {
         case PcapFileValues.MAGIC_BIG_ENDIAN_MICRO: // file is big endian
             fByteOrder = be;
             fTimestampPrecision = PcapTimestampScale.MICROSECOND;
-            System.out.println();
             break;
         case PcapFileValues.MAGIC_LITTLE_ENDIAN_MICRO: // file is little endian
             fByteOrder = le;
