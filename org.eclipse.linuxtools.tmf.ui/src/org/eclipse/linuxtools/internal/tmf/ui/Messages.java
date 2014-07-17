@@ -269,7 +269,9 @@ public class Messages extends NLS {
     public static String CallStackView_ExitTimeColumn;
     public static String CallStackView_DurationColumn;
     public static String CallStackView_StackInfoNotAvailable;
-
+    public static String CallStackView_SortByThreadName;
+    public static String CallStackView_SortByThreadId;
+    public static String CallStackView_SortByThreadTime;
     public static String CallStackView_ImportMappingButtonText;
     public static String CallStackView_ImportMappingButtonTooltip;
     public static String CallStackView_ImportMappingDialogTitle;

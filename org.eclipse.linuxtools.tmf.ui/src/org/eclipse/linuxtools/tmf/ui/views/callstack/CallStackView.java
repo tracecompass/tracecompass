@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.tmf.ui.views.callstack;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +31,10 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -90,6 +94,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 
@@ -113,7 +119,7 @@ public class CallStackView extends TmfView {
      */
     private enum State { IDLE, BUSY, PENDING }
 
-    private static final String[] COLUMN_NAMES = new String[] {
+    private static final String[] COLUMN_TIMES = new String[] {
             Messages.CallStackView_FunctionColumn,
             Messages.CallStackView_DepthColumn,
             Messages.CallStackView_EntryTimeColumn,
@@ -136,6 +142,20 @@ public class CallStackView extends TmfView {
     private static final Image STACKFRAME_IMAGE = Activator.getDefault().getImageFromPath("icons/obj16/stckframe_obj.gif"); //$NON-NLS-1$
 
     private static final String IMPORT_MAPPING_ICON_PATH = "icons/etool16/import.gif"; //$NON-NLS-1$
+
+    private static final ImageDescriptor SORT_BY_NAME_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_alpha.gif"); //$NON-NLS-1$
+    private static final ImageDescriptor SORT_BY_NAME_REV_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_alpha_rev.gif"); //$NON-NLS-1$
+    private static final ImageDescriptor SORT_BY_ID_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_num.gif"); //$NON-NLS-1$
+    private static final ImageDescriptor SORT_BY_ID_REV_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_num_rev.gif"); //$NON-NLS-1$
+    private static final ImageDescriptor SORT_BY_TIME_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_time.gif"); //$NON-NLS-1$
+    private static final ImageDescriptor SORT_BY_TIME_REV_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_time_rev.gif"); //$NON-NLS-1$
+    private static final String SORT_OPTION_KEY = "sort.option"; //$NON-NLS-1$
+    private enum SortOption { BY_NAME, BY_NAME_REV, BY_ID, BY_ID_REV, BY_TIME, BY_TIME_REV }
+    private SortOption fSortOption;
+    private Comparator<ITimeGraphEntry> fThreadComparator = null;
+    private Action fSortByNameAction;
+    private Action fSortByIdAction;
+    private Action fSortByTimeAction;
 
     // ------------------------------------------------------------------------
     // Fields
@@ -221,11 +241,13 @@ public class CallStackView extends TmfView {
         private final int fCallStackQuark;
         // The state system from which this entry comes
         private final ITmfStateSystem fSS;
+        // The thread id
+        private final long fThreadId;
 
-        public ThreadEntry(ITmfStateSystem ss, String name, int callStackQuark, long startTime, long endTime) {
+        public ThreadEntry(ITmfStateSystem ss, String name, long threadId, int callStackQuark, long startTime, long endTime) {
             super(name, startTime, endTime);
             fCallStackQuark = callStackQuark;
-
+            fThreadId = threadId;
             fSS = ss;
         }
 
@@ -238,9 +260,51 @@ public class CallStackView extends TmfView {
             return fCallStackQuark;
         }
 
+        public long getThreadId() {
+            return fThreadId;
+        }
+
         @Nullable
         public ITmfStateSystem getStateSystem() {
             return fSS;
+        }
+    }
+
+    private class ThreadNameComparator implements Comparator<ITimeGraphEntry> {
+        private boolean reverse;
+        public ThreadNameComparator(boolean reverse) {
+            this.reverse = reverse;
+        }
+        @Override
+        public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
+            return reverse ? o2.getName().compareTo(o1.getName()) :
+                o1.getName().compareTo(o2.getName());
+        }
+    }
+
+    private class ThreadIdComparator implements Comparator<ITimeGraphEntry> {
+        private boolean reverse;
+        public ThreadIdComparator(boolean reverse) {
+            this.reverse = reverse;
+        }
+        @Override
+        public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
+            ThreadEntry t1 = (ThreadEntry) o1;
+            ThreadEntry t2 = (ThreadEntry) o2;
+            return reverse ? Long.compare(t2.getThreadId(), t1.getThreadId()) :
+                Long.compare(t1.getThreadId(), t2.getThreadId());
+        }
+    }
+
+    private class ThreadTimeComparator implements Comparator<ITimeGraphEntry> {
+        private boolean reverse;
+        public ThreadTimeComparator(boolean reverse) {
+            this.reverse = reverse;
+        }
+        @Override
+        public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
+            return reverse ? Long.compare(o2.getStartTime(), o1.getStartTime()) :
+                Long.compare(o1.getStartTime(), o2.getStartTime());
         }
     }
 
@@ -443,7 +507,7 @@ public class CallStackView extends TmfView {
 
         fTimeGraphCombo.setTreeLabelProvider(new TreeLabelProvider());
 
-        fTimeGraphCombo.setTreeColumns(COLUMN_NAMES);
+        fTimeGraphCombo.setTreeColumns(COLUMN_TIMES);
 
         fTimeGraphCombo.getTreeViewer().getTree().getColumn(0).setWidth(COLUMN_WIDTHS[0]);
         fTimeGraphCombo.getTreeViewer().getTree().getColumn(1).setWidth(COLUMN_WIDTHS[1]);
@@ -535,6 +599,8 @@ public class CallStackView extends TmfView {
         // View Action Handling
         makeActions();
         contributeToActionBars();
+        createContextMenu();
+        loadSortOption();
 
         IEditorPart editor = getSite().getPage().getActiveEditor();
         if (editor instanceof ITmfTraceEditor) {
@@ -757,6 +823,7 @@ public class CallStackView extends TmfView {
             String[] threadPaths = module.getThreadsPattern();
             List<Integer> threadQuarks = ss.getQuarks(threadPaths);
             TraceEntry traceEntry = new TraceEntry(trace.getName(), startTime, endTime);
+            traceEntry.sortChildren(fThreadComparator);
             entryList.add(traceEntry);
             for (int i = 0; i < threadQuarks.size(); i++) {
                 if (monitor.isCanceled()) {
@@ -767,7 +834,18 @@ public class CallStackView extends TmfView {
                     String[] callStackPath = module.getCallStackPath();
                     int callStackQuark = ss.getQuarkRelative(threadQuark, callStackPath);
                     String threadName = ss.getAttributeName(threadQuark);
-                    ThreadEntry threadEntry = new ThreadEntry(ss, threadName, callStackQuark, startTime, endTime);
+                    long threadId = ss.querySingleState(ss.getCurrentEndTime() , threadQuark).getStateValue().unboxLong();
+                    long start = startTime;
+                    ITmfStateInterval startInterval = ss.querySingleState(startTime, callStackQuark);
+                    if (startInterval.getStateValue().isNull()) {
+                        start = Math.min(startInterval.getEndTime() + 1, endTime);
+                    }
+                    long end = endTime;
+                    ITmfStateInterval endInterval = ss.querySingleState(ss.getCurrentEndTime(), callStackQuark);
+                    if (endInterval.getStateValue().isNull()) {
+                        end = endInterval.getStartTime() == startTime ? endTime : endInterval.getStartTime();
+                    }
+                    ThreadEntry threadEntry = new ThreadEntry(ss, threadName, threadId, callStackQuark, start, end);
                     traceEntry.addChild(threadEntry);
                     int level = 1;
                     for (int stackLevelQuark : ss.getSubAttributes(callStackQuark, false)) {
@@ -776,6 +854,8 @@ public class CallStackView extends TmfView {
                     }
                 } catch (AttributeNotFoundException e) {
                     Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
+                } catch (StateSystemDisposedException e) {
+                    /* Ignored */
                 }
             }
         }
@@ -936,6 +1016,9 @@ public class CallStackView extends TmfView {
                         fEntryList = new ArrayList<>();
                     }
                     entries = fEntryList.toArray(new ITimeGraphEntry[0]);
+                    for (TraceEntry traceEntry : fEntryList) {
+                        traceEntry.sortChildren(fThreadComparator);
+                    }
                 }
                 fTimeGraphCombo.setInput(entries);
                 fTimeGraphCombo.getTimeGraphViewer().setTimeBounds(fStartTime, fEndTime);
@@ -1026,6 +1109,11 @@ public class CallStackView extends TmfView {
 
     private void fillLocalToolBar(IToolBarManager manager) {
         manager.add(getImportMappingAction());
+        manager.add(new Separator());
+        manager.add(getSortByNameAction());
+        manager.add(getSortByIdAction());
+        manager.add(getSortByTimeAction());
+        manager.add(new Separator());
         manager.add(fTimeGraphCombo.getTimeGraphViewer().getResetScaleAction());
         manager.add(getPreviousEventAction());
         manager.add(getNextEventAction());
@@ -1034,6 +1122,17 @@ public class CallStackView extends TmfView {
         manager.add(fTimeGraphCombo.getTimeGraphViewer().getZoomInAction());
         manager.add(fTimeGraphCombo.getTimeGraphViewer().getZoomOutAction());
         manager.add(new Separator());
+    }
+
+    private void createContextMenu() {
+        final MenuManager contextMenu = new MenuManager();
+        contextMenu.add(getSortByNameAction());
+        contextMenu.add(getSortByIdAction());
+        contextMenu.add(getSortByTimeAction());
+
+        Tree tree = fTimeGraphCombo.getTreeViewer().getTree();
+        Menu menu = contextMenu.createContextMenu(tree);
+        tree.setMenu(menu);
     }
 
     /**
@@ -1198,6 +1297,120 @@ public class CallStackView extends TmfView {
         fImportMappingAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(IMPORT_MAPPING_ICON_PATH));
 
         return fImportMappingAction;
+    }
+
+    private Action getSortByNameAction() {
+        if (fSortByNameAction == null) {
+            fSortByNameAction = new Action(Messages.CallStackView_SortByThreadName, IAction.AS_CHECK_BOX) {
+                @Override
+                public void run() {
+                    if (fSortOption == SortOption.BY_NAME) {
+                        saveSortOption(SortOption.BY_NAME_REV);
+                    } else {
+                        saveSortOption(SortOption.BY_NAME);
+                    }
+                }
+            };
+            fSortByNameAction.setToolTipText(Messages.CallStackView_SortByThreadName);
+        }
+        return fSortByNameAction;
+    }
+
+    private Action getSortByIdAction() {
+        if (fSortByIdAction == null) {
+            fSortByIdAction = new Action(Messages.CallStackView_SortByThreadId, IAction.AS_CHECK_BOX) {
+                @Override
+                public void run() {
+                    if (fSortOption == SortOption.BY_ID) {
+                        saveSortOption(SortOption.BY_ID_REV);
+                    } else {
+                        saveSortOption(SortOption.BY_ID);
+                    }
+                }
+            };
+            fSortByIdAction.setToolTipText(Messages.CallStackView_SortByThreadId);
+        }
+        return fSortByIdAction;
+    }
+
+    private Action getSortByTimeAction() {
+        if (fSortByTimeAction == null) {
+            fSortByTimeAction = new Action(Messages.CallStackView_SortByThreadTime, IAction.AS_CHECK_BOX) {
+                @Override
+                public void run() {
+                    if (fSortOption == SortOption.BY_TIME) {
+                        saveSortOption(SortOption.BY_TIME_REV);
+                    } else {
+                        saveSortOption(SortOption.BY_TIME);
+                    }
+                }
+            };
+            fSortByTimeAction.setToolTipText(Messages.CallStackView_SortByThreadTime);
+        }
+        return fSortByTimeAction;
+    }
+
+    private void loadSortOption() {
+        IDialogSettings settings = Activator.getDefault().getDialogSettings();
+        IDialogSettings section = settings.getSection(getClass().getName());
+        if (section == null) {
+            return;
+        }
+        String sortOption = section.get(SORT_OPTION_KEY);
+
+        // reset defaults
+        getSortByNameAction().setChecked(false);
+        getSortByNameAction().setImageDescriptor(SORT_BY_NAME_ICON);
+        getSortByIdAction().setChecked(false);
+        getSortByIdAction().setImageDescriptor(SORT_BY_ID_ICON);
+        getSortByTimeAction().setChecked(false);
+        getSortByTimeAction().setImageDescriptor(SORT_BY_TIME_ICON);
+
+        if (sortOption.equals(SortOption.BY_NAME.name())) {
+            fSortOption = SortOption.BY_NAME;
+            fThreadComparator = new ThreadNameComparator(false);
+            getSortByNameAction().setChecked(true);
+        } else if (sortOption.equals(SortOption.BY_NAME_REV.name())) {
+            fSortOption = SortOption.BY_NAME_REV;
+            fThreadComparator = new ThreadNameComparator(true);
+            getSortByNameAction().setChecked(true);
+            getSortByNameAction().setImageDescriptor(SORT_BY_NAME_REV_ICON);
+        } else if (sortOption.equals(SortOption.BY_ID.name())) {
+            fSortOption = SortOption.BY_ID;
+            fThreadComparator = new ThreadIdComparator(false);
+            getSortByIdAction().setChecked(true);
+        } else if (sortOption.equals(SortOption.BY_ID_REV.name())) {
+            fSortOption = SortOption.BY_ID_REV;
+            fThreadComparator = new ThreadIdComparator(true);
+            getSortByIdAction().setChecked(true);
+            getSortByIdAction().setImageDescriptor(SORT_BY_ID_REV_ICON);
+        } else if (sortOption.equals(SortOption.BY_TIME.name())) {
+            fSortOption = SortOption.BY_TIME;
+            fThreadComparator = new ThreadTimeComparator(false);
+            getSortByTimeAction().setChecked(true);
+        } else if (sortOption.equals(SortOption.BY_TIME_REV.name())) {
+            fSortOption = SortOption.BY_TIME_REV;
+            fThreadComparator = new ThreadTimeComparator(true);
+            getSortByTimeAction().setChecked(true);
+            getSortByTimeAction().setImageDescriptor(SORT_BY_TIME_REV_ICON);
+        }
+    }
+
+    private void saveSortOption(SortOption sortOption) {
+        IDialogSettings settings = Activator.getDefault().getDialogSettings();
+        IDialogSettings section = settings.getSection(getClass().getName());
+        if (section == null) {
+            section = settings.addNewSection(getClass().getName());
+        }
+        section.put(SORT_OPTION_KEY, sortOption.name());
+        loadSortOption();
+        if (fEntryList == null) {
+            return;
+        }
+        for (TraceEntry traceEntry : fEntryList) {
+            traceEntry.sortChildren(fThreadComparator);
+        }
+        refresh();
     }
 
     private class ImportMappingJob extends Job {
