@@ -41,9 +41,17 @@ public class Messages extends NLS {
     */
     public static String ImportTraceWizard_DirectoryLocation;
     /**
+     * The label of the archive location (import trace wizard)
+    */
+    public static String ImportTraceWizard_ArchiveLocation;
+    /**
      * The title of the select trace directory dialog (import trace wizard)
      */
     public static String ImportTraceWizard_SelectTraceDirectoryTitle;
+    /**
+     * The title of the select trace archive dialog (import trace wizard)
+     */
+    public static String ImportTraceWizard_SelectTraceArchiveTitle;
     /**
      * The message of the select trace directory dialog (import trace wizard)
      */
@@ -105,6 +113,10 @@ public class Messages extends NLS {
      */
     public static String ImportTraceWizard_SelectTraceSourceEmpty;
     /**
+     * The error message when the specified archive file is not valid.
+     */
+    public static String ImportTraceWizard_BadArchiveFormat;
+    /**
      * The error message when no trace is selected (import trace wizard).
      */
     public static String ImportTraceWizard_SelectTraceNoneSelected;
@@ -144,6 +156,10 @@ public class Messages extends NLS {
      * The import operation task name.
      */
     public static String ImportTraceWizard_ImportOperationTaskName;
+    /**
+     * The extract import operation task name
+     */
+    public static String ImportTraceWizard_ExtractImportOperationTaskName;
     /**
      * The label to indicate that trace type auto detection shall be used.
      */

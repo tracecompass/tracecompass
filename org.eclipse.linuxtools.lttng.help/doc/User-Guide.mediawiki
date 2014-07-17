@@ -210,15 +210,17 @@ To import a set of traces to a trace folder, right-click on the target folder an
 
 [[Image:images/ProjectImportTraceAction.png]]
 
-At this point, the '''Import Trace Wizard''' will show for selecting traces to import. By default, it shows the correct destination directory where the traces will be imported to. Now, specify the location of the traces in the '''Source directory'''. For that click on the button '''Browse''', browse the media to the location of the traces and click on '''OK'''. Then select the traces to import in the list of files and folders. Optionally, select the '''Trace Type''' from the drop-down menu.
+At this point, the '''Import Trace Wizard''' will show for selecting traces to import. By default, it shows the correct destination directory where the traces will be imported to. Now, specify the location of the traces in the '''Root directory'''. For that click on the button '''Browse''', browse the media to the location of the traces and click on '''OK'''. Then select the traces to import in the list of files and folders.
 
-If '''Trace Type''' is set to '''<Automatic Detection>''', the wizard will attempt to detect the trace types of the selected files. The automatic detection algorithm validates a trace against all known trace types. If multiple trace types are valid, a trace type is chosen based on a confidence criteria. The validation process and the computation of the confidence level are trace type specific. Optionally, '''Import unrecognized traces''' can be selected to import trace files that could not be automatically detected by '''<Automatic Detection>'''.
+Traces can also be imported from an archive file such as a zip or a tar file by selecting the '''Select archive file''' option then by clicking '''Browse'''. Then select the traces to import in the list of files and folders as usual.
+
+Optionally, select the '''Trace Type''' from the drop-down menu. If '''Trace Type''' is set to '''<Automatic Detection>''', the wizard will attempt to detect the trace types of the selected files. The automatic detection algorithm validates a trace against all known trace types. If multiple trace types are valid, a trace type is chosen based on a confidence criteria. The validation process and the computation of the confidence level are trace type specific. Optionally, '''Import unrecognized traces''' can be selected to import trace files that could not be automatically detected by '''<Automatic Detection>'''.
 
 Select or deselect the checkboxes for '''Overwrite existing trace without warning''', '''Create links in workspace''' and '''Preserve folder structure'''. When all options are configured, click on '''Finish'''.
 
 Note that traces of certain types (e.g. LTTng Kernel) are actually a composite of multiple channel traces grouped under a folder. Either the folder or its files can be selected to import the trace.
 
-The option '''Preserve folder structure''' will create, if necessary, the structure of folders relative to (and excluding) the selected '''Source directory''' into the target trace folder.
+The option '''Preserve folder structure''' will create, if necessary, the structure of folders relative to (and excluding) the selected '''Root directory''' (or '''Archive file''') into the target trace folder.
 
 [[Image:images/ProjectImportTraceDialog.png]]
 
