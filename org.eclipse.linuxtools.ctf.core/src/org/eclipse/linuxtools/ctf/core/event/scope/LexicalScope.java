@@ -185,27 +185,27 @@ public class LexicalScope implements Comparable<LexicalScope> {
      * @param name
      *            the name of the field
      */
+    @SuppressWarnings("null")
     public LexicalScope(@Nullable LexicalScope parent, String name) {
         fName = name;
         if (parent != null) {
             String pathString = Joiner.on('.').skipNulls().join(parent.fPath, parent.getName());
+            /*
+             * if joiner return null, we get an NPE... so we won't assign fPath
+             * to null
+             */
             if (pathString.startsWith(".")) { //$NON-NLS-1$
+                /*
+                 * substring throws an exception or returns a string, it won't
+                 * return null
+                 */
                 pathString = pathString.substring(1);
-            }
-            if (pathString == null) {
-                // we should get an NPE on pathString.startsWith before getting
-                // this
-                throw new IllegalStateException(
-                        "Lexical scope constructor had null pathstring for " + //$NON-NLS-1$
-                                parent.toString() + " and " + name); //$NON-NLS-1$
             }
             fPath = pathString;
             parent.addChild(fName, this);
         } else {
             fPath = ""; //$NON-NLS-1$
         }
-
-        @SuppressWarnings("null")
         @NonNull
         Map<String, LexicalScope> children =
                 Collections.synchronizedMap(new HashMap<String, LexicalScope>());
