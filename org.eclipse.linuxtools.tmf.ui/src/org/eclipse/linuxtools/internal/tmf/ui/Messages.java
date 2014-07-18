@@ -254,6 +254,7 @@ public class Messages extends NLS {
     public static String FilterViewer_RegexHint;
     public static String FilterViewer_RegexLabel;
     public static String FilterViewer_ResultLabel;
+    public static String FilterViewer_Subfilter_ToolTip;
     public static String FilterViewer_TimestampButtonText;
     public static String FilterViewer_TypeLabel;
     public static String FilterViewer_ValueHint;

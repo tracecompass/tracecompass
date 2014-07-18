@@ -9,6 +9,7 @@
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *   Xavier Raynaud - add cut/copy/paste/dnd support
+ *   Vincent Perot - Add subfield filtering
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.filter;
@@ -348,6 +349,7 @@ class FilterViewer extends Composite {
 
     /**
      * Gets the TreeViewer displaying filters
+     *
      * @return a {@link TreeViewer}
      */
     TreeViewer getTreeViewer() {
@@ -689,6 +691,7 @@ class FilterViewer extends Composite {
             fFieldCombo = new Combo(this, SWT.DROP_DOWN);
             fFieldCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
             fFieldCombo.setItems(getFieldsList(fNode));
+            fFieldCombo.setToolTipText(Messages.FilterViewer_Subfilter_ToolTip);
             if (fNode.getField() != null) {
                 fFieldCombo.setText(fNode.getField());
             }
@@ -789,6 +792,7 @@ class FilterViewer extends Composite {
             fFieldCombo = new Combo(this, SWT.DROP_DOWN);
             fFieldCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
             fFieldCombo.setItems(getFieldsList(fNode));
+            fFieldCombo.setToolTipText(Messages.FilterViewer_Subfilter_ToolTip);
             if (fNode.getField() != null) {
                 fFieldCombo.setText(fNode.getField());
             }
@@ -888,6 +892,7 @@ class FilterViewer extends Composite {
             fFieldCombo = new Combo(this, SWT.DROP_DOWN);
             fFieldCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
             fFieldCombo.setItems(getFieldsList(fNode));
+            fFieldCombo.setToolTipText(Messages.FilterViewer_Subfilter_ToolTip);
             if (fNode.getField() != null) {
                 fFieldCombo.setText(fNode.getField());
             }
@@ -978,6 +983,7 @@ class FilterViewer extends Composite {
             fFieldCombo = new Combo(this, SWT.DROP_DOWN);
             fFieldCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
             fFieldCombo.setItems(getFieldsList(fNode));
+            fFieldCombo.setToolTipText(Messages.FilterViewer_Subfilter_ToolTip);
             if (fNode.getField() != null) {
                 fFieldCombo.setText(fNode.getField());
             }
