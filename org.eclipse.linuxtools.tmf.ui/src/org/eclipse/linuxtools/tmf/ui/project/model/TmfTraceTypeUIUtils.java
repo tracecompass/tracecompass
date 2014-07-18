@@ -264,6 +264,24 @@ public final class TmfTraceTypeUIUtils {
      *             An exception caused by accessing eclipse project items.
      */
     public static IStatus setTraceType(IResource resource, TraceTypeHelper traceType) throws CoreException {
+        return setTraceType(resource, traceType, true);
+    }
+        /**
+         * Set the trace type of a {@Link TraceTypeHelper}. Should only be
+         * used internally by this project.
+         *
+         * @param resource
+         *            the resource to set
+         * @param traceType
+         *            the {@link TraceTypeHelper} to set the trace type to.
+         * @param refresh
+         *            Flag for refreshing the project
+         * @return Status.OK_Status if successful, error is otherwise.
+         * @throws CoreException
+         *             An exception caused by accessing eclipse project items.
+         * @since 3.1
+         */
+    public static IStatus setTraceType(IResource resource, TraceTypeHelper traceType, boolean refresh) throws CoreException {
         String traceTypeId = traceType.getCanonicalName();
 
         resource.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceTypeId);
@@ -289,7 +307,9 @@ public final class TmfTraceTypeUIUtils {
                 }
             }
         }
-        tmfProject.refresh();
+        if (refresh) {
+            tmfProject.refresh();
+        }
         return Status.OK_STATUS;
     }
 
