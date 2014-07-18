@@ -29,6 +29,7 @@ public class Messages extends NLS {
     public static String DeleteDialog_Title;
     public static String DeleteTraceHandler_Message;
     public static String DeleteTraceHandler_Error;
+    public static String DeleteTraceHandler_TaskName;
     public static String DeleteExperimentHandler_Message;
     public static String DeleteExperimentHandler_Error;
     public static String DeleteFolderHandler_Message;
