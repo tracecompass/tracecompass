@@ -77,7 +77,7 @@ public class GdbEventsTable extends TmfEventsTable {
                         if (data instanceof GdbTraceEvent) {
                             GdbTraceEvent event = (GdbTraceEvent) data;
                             GdbTrace gdbTrace = (GdbTrace) event.getTrace();
-                            GdbTraceEventContent content = (GdbTraceEventContent) event.getContent();
+                            GdbTraceEventContent content = event.getContent();
                             selectFrame(gdbTrace, content.getFrameNumber());
                             return;
                         }

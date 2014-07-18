@@ -14,7 +14,6 @@
 package org.eclipse.linuxtools.internal.gdbtrace.core.event;
 
 import org.eclipse.linuxtools.internal.gdbtrace.core.trace.GdbTrace;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
@@ -37,16 +36,29 @@ public class GdbTraceEvent extends TmfEvent {
 
     /**
      * Full constructor
-     * @param trace the parent trace
-     * @param timestamp the event timestamp
-     * @param source the event source
-     * @param type the event type
-     * @param content the event content
-     * @param reference the event reference
+     *
+     * @param trace
+     *            the parent trace
+     * @param timestamp
+     *            the event timestamp
+     * @param source
+     *            the event source
+     * @param type
+     *            the event type
+     * @param content
+     *            the event content
+     * @param reference
+     *            the event reference
      */
     public GdbTraceEvent(GdbTrace trace, ITmfTimestamp timestamp, String source,
-            ITmfEventType type, ITmfEventField content, String reference) {
+            ITmfEventType type, GdbTraceEventContent content, String reference) {
         super(trace, timestamp, source, type, content, reference);
+    }
+
+    @Override
+    public GdbTraceEventContent getContent() {
+        /* We only allow GdbTraceEventContent at the constructor */
+        return (GdbTraceEventContent) super.getContent();
     }
 
 }
