@@ -15,6 +15,7 @@
  *                            provide base classes for time graph view
  *                            Add display of links between items
  *   Xavier Raynaud, Kalray - Code optimization
+ *   Generoso Pagano, Inria - Support for drag selection listeners
  *****************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets;
@@ -40,8 +41,10 @@ import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestampDelta;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphColorListener;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider2;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphTreeListener;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.StateItem;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphTimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphTreeExpansionEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -139,6 +142,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private ITimeGraphPresentationProvider fTimeGraphProvider = null;
     private ItemData fItemData = null;
     private List<SelectionListener> fSelectionListeners;
+    private List<ITimeGraphTimeListener> fDragSelectionListeners;
     private final List<ISelectionChangedListener> fSelectionChangedListeners = new ArrayList<>();
     private final List<ITimeGraphTreeListener> fTreeListeners = new ArrayList<>();
     private final List<MenuDetectListener> fTimeGraphEntryMenuListeners = new ArrayList<>();
@@ -355,6 +359,65 @@ public class TimeGraphControl extends TimeGraphBaseControl
             while (it.hasNext()) {
                 SelectionListener listener = it.next();
                 listener.widgetDefaultSelected(null);
+            }
+        }
+    }
+
+    /**
+     * Add a drag selection listener
+     *
+     * @param listener
+     *            The listener to add
+     * @since 3.1
+     */
+    public void addDragSelectionListener(ITimeGraphTimeListener listener) {
+        if (listener == null) {
+            SWT.error(SWT.ERROR_NULL_ARGUMENT);
+        }
+        if (null == fDragSelectionListeners) {
+            fDragSelectionListeners = new ArrayList<>();
+        }
+        fDragSelectionListeners.add(listener);
+    }
+
+    /**
+     * Remove a drag selection listener
+     *
+     * @param listener
+     *            The listener to remove
+     * @since 3.1
+     */
+    public void removeDragSelectionListener(ITimeGraphTimeListener listener) {
+        if (null != fDragSelectionListeners) {
+            fDragSelectionListeners.remove(listener);
+        }
+    }
+
+    /**
+     * Drag Selection changed callback
+     *
+     * @param start
+     *            Time interval start
+     * @param end
+     *            Time interval end
+     * @since 3.1
+     */
+    public void fireDragSelectionChanged(long start, long end) {
+        // check for backward intervals
+        long beginTime, endTime;
+        if (start > end) {
+            beginTime = end;
+            endTime = start;
+        } else {
+            beginTime = start;
+            endTime = end;
+        }
+        // call the listeners
+        if (null != fDragSelectionListeners) {
+            Iterator<ITimeGraphTimeListener> it = fDragSelectionListeners.iterator();
+            while (it.hasNext()) {
+                ITimeGraphTimeListener listener = it.next();
+                listener.timeSelected(new TimeGraphTimeEvent(this, beginTime, endTime));
             }
         }
     }
@@ -2015,6 +2078,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             fDragX = Math.min(Math.max(e.x, fTimeProvider.getNameSpace()), size.x - RIGHT_MARGIN);
             redraw();
             fTimeGraphScale.setDragRange(fDragX0, fDragX);
+            fireDragSelectionChanged(getTimeAtX(fDragX0), getTimeAtX(fDragX));
         } else if (DRAG_ZOOM == fDragState) {
             fDragX = Math.min(Math.max(e.x, fTimeProvider.getNameSpace()), size.x - RIGHT_MARGIN);
             redraw();
