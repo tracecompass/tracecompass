@@ -42,7 +42,7 @@ public class CallStackEntry extends TimeGraphEntry {
      *            The stack level
      * @param trace
      *            The trace that this view is talking about
-     * @deprecated Use {@link #CallStackEntry(int, int, ITmfTrace, ITmfStateSystem)}
+     * @deprecated Use {@link #CallStackEntry(String, int, int, ITmfTrace, ITmfStateSystem)}
      */
     @Deprecated
     public CallStackEntry(int quark, int stackLevel, ITmfTrace trace) {
