@@ -149,6 +149,61 @@ public class CTFCallsite implements Comparable<CTFCallsite> {
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((fEventName == null) ? 0 : fEventName.hashCode());
+        result = prime * result + ((fFileName == null) ? 0 : fFileName.hashCode());
+        result = prime * result + ((fFunctionName == null) ? 0 : fFunctionName.hashCode());
+        result = prime * result + (int) (fIp ^ (fIp >>> 32));
+        result = prime * result + (int) (fLineNumber ^ (fLineNumber >>> 32));
+        return result;
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        CTFCallsite other = (CTFCallsite) obj;
+        if (fEventName == null) {
+            if (other.fEventName != null) {
+                return false;
+            }
+        } else if (!fEventName.equals(other.fEventName)) {
+            return false;
+        }
+        if (fFileName == null) {
+            if (other.fFileName != null) {
+                return false;
+            }
+        } else if (!fFileName.equals(other.fFileName)) {
+            return false;
+        }
+        if (fFunctionName == null) {
+            if (other.fFunctionName != null) {
+                return false;
+            }
+        } else if (!fFunctionName.equals(other.fFunctionName)) {
+            return false;
+        }
+        if (fIp != other.fIp) {
+            return false;
+        }
+        if (fLineNumber != other.fLineNumber) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public String toString() {
         return fFileName + "/" + fFunctionName + ":" + fLineNumber; //$NON-NLS-1$ //$NON-NLS-2$
     }
