@@ -15,13 +15,24 @@
 
 package org.eclipse.linuxtools.tmf.ui.project.wizards;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRunnable;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -293,37 +304,135 @@ public class SelectTracesWizardPage extends WizardPage {
     public boolean performFinish() {
 
         IFolder experiment = fExperiment.getResource();
-        boolean changed = false;
 
-        // Add the selected traces to the experiment
-        Set<String> keys = fPreviousTraces.keySet();
-        TmfTraceElement[] traces = getSelection();
-        for (TmfTraceElement trace : traces) {
-            String name = trace.getElementPath();
-            if (keys.contains(name)) {
-                fPreviousTraces.remove(name);
-            } else {
-                fExperiment.addTrace(trace);
-                changed = true;
+        final SelectTracesOperation operation = new SelectTracesOperation(experiment, getSelection());
+
+        IStatus status = Status.OK_STATUS;
+        try {
+            getContainer().run(true, true, new IRunnableWithProgress() {
+                @Override
+                public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                    // Wrapper to have only one resource changed event at the end of the operation.
+                    IWorkspaceRunnable workspaceRunnable = new IWorkspaceRunnable() {
+                        @Override
+                        public void run(IProgressMonitor pm) throws CoreException {
+                            operation.run(pm);
+                        }
+                    };
+
+                    IWorkspace workspace = ResourcesPlugin.getWorkspace();
+                    try {
+                        workspace.run(workspaceRunnable, workspace.getRoot(), IWorkspace.AVOID_UPDATE, monitor);
+                    } catch (CoreException e) {
+                        throw new InvocationTargetException(e);
+                    } finally {
+                        monitor.done();
+                    }
+                }
+            });
+
+            status = operation.getStatus();
+        } catch (InvocationTargetException e) {
+            status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.SelectTracesWizardPage_SelectionError, e);
+        } catch (InterruptedException e) {
+            status = Status.CANCEL_STATUS;
+        } finally {
+            if (!status.isOK()) {
+                if (status.getSeverity() == IStatus.CANCEL) {
+                    setMessage(Messages.SelectTracesWizardPage_SelectionOperationCancelled);
+                    setErrorMessage(null);
+                } else {
+                    if (status.getException() != null) {
+                        MessageDialog.open(MessageDialog.ERROR, getContainer().getShell(),
+                                Messages.SelectTracesWizardPage_InternalErrorTitle, status.getMessage() + ": " + status.getException(), SWT.SHEET); //$NON-NLS-1$
+                    }
+                    setMessage(null);
+                    setErrorMessage(Messages.SelectTracesWizardPage_SelectionError);
+                }
+                return false;
             }
         }
-
-        // Remove traces that were unchecked (thus left in fPreviousTraces)
-        keys = fPreviousTraces.keySet();
-        for (String key : keys) {
-            try {
-                fExperiment.removeTrace(fPreviousTraces.get(key));
-            } catch (CoreException e) {
-                Activator.getDefault().logError("Error selecting traces for experiment " + experiment.getName(), e); //$NON-NLS-1$
-            }
-            changed = true;
-        }
-        if (changed) {
-            fExperiment.closeEditors();
-            fExperiment.deleteSupplementaryResources();
-        }
+        setErrorMessage(null);
 
         return true;
+    }
+
+    private class SelectTracesOperation {
+
+        IFolder experiment = null;
+        TmfTraceElement[] traces;
+        private IStatus fStatus;
+
+        public SelectTracesOperation(IFolder experiment, TmfTraceElement[] traces) {
+            this.experiment = experiment;
+            this.traces = traces;
+        }
+
+        public void run(IProgressMonitor progressMonitor) {
+
+            // Check if operation was cancelled.
+            boolean changed = false;
+
+            // Add the selected traces to the experiment
+            Set<String> keys = fPreviousTraces.keySet();
+            SubMonitor subMonitor = SubMonitor.convert(progressMonitor, traces.length + keys.size());
+            try {
+                for (TmfTraceElement trace : traces) {
+                    ModalContext.checkCanceled(progressMonitor);
+                    String name = trace.getElementPath();
+                    if (keys.contains(name)) {
+                        subMonitor.setTaskName(Messages.SelectTracesWizardPage_TraceRemovalTask + " " + trace.getElementPath()); //$NON-NLS-1$
+                        fPreviousTraces.remove(name);
+                    } else {
+                        subMonitor.setTaskName(Messages.SelectTracesWizardPage_TraceSelectionTask + " " + trace.getElementPath()); //$NON-NLS-1$
+                        fExperiment.addTrace(trace, false);
+                        changed = true;
+                    }
+                    subMonitor.worked(1);
+                }
+
+                // Remove traces that were unchecked (thus left in fPreviousTraces)
+                keys = fPreviousTraces.keySet();
+                for (String key : keys) {
+                    ModalContext.checkCanceled(progressMonitor);
+                    TmfTraceElement trace = fPreviousTraces.get(key);
+                    subMonitor.setTaskName(Messages.SelectTracesWizardPage_TraceRemovalTask + " " + trace.getElementPath()); //$NON-NLS-1$
+
+                    try {
+                        fExperiment.removeTrace(trace);
+                    } catch (CoreException e) {
+                        Activator.getDefault().logError(Messages.SelectTracesWizardPage_SelectionError + " " + experiment.getName(), e); //$NON-NLS-1$
+                    }
+                    changed = true;
+                    subMonitor.worked(1);
+                }
+                if (changed) {
+                    fExperiment.closeEditors();
+                    fExperiment.deleteSupplementaryResources();
+                }
+                setStatus(Status.OK_STATUS);
+            } catch (InterruptedException e) {
+                setStatus(Status.CANCEL_STATUS);
+            } catch (Exception e) {
+                Activator.getDefault().logError(Messages.SelectTracesWizardPage_SelectionError, e);
+                setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.SelectTracesWizardPage_SelectionError , e));
+            }
+        }
+
+        /**
+         * Set the status for this operation
+         *
+         * @param status
+         *            the status
+         */
+        protected void setStatus(IStatus status) {
+            fStatus = status;
+        }
+
+        public IStatus getStatus() {
+            return fStatus;
+        }
+
     }
 
     /**

@@ -52,6 +52,31 @@ public class Messages extends NLS {
      */
     public static String SelectTracesWizardPage_Description;
     /**
+     * The error message when selecting of traces for an experiment fails.
+     * @since 3.1
+     */
+    public static String SelectTracesWizardPage_SelectionError;
+    /**
+     * The task name for selecting of a trace for an experiment.
+     * @since 3.1
+     */
+    public static String SelectTracesWizardPage_TraceSelectionTask;
+    /**
+     * The task name for removing of a trace for an experiment.
+     * @since 3.1
+     */
+    public static String SelectTracesWizardPage_TraceRemovalTask;
+    /**
+     * The cancel message for the trace selection operation.
+     * @since 3.1
+     */
+    public static String SelectTracesWizardPage_SelectionOperationCancelled;
+    /**
+     * The error message title.
+     * @since 3.1
+     */
+    public static String SelectTracesWizardPage_InternalErrorTitle;
+    /**
      * The error message when no name was entered in a dialog box (new trace or experiment dialog)
      */
     public static String Dialog_EmptyNameError;
