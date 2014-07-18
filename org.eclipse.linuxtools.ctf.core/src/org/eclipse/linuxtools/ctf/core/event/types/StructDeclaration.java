@@ -12,11 +12,9 @@
 
 package org.eclipse.linuxtools.ctf.core.event.types;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -200,14 +198,11 @@ public class StructDeclaration extends Declaration {
             LexicalScope fieldScope, @NonNull BitBuffer input) throws CTFReaderException {
         alignRead(input);
         final Definition[] myFields = new Definition[fFieldMap.size()];
-        Set<String> keySet = fFieldMap.keySet();
-        if (keySet == null) {
-            keySet = Collections.EMPTY_SET;
-            if( keySet == null ) {
-                throw new IllegalStateException();
-            }
-        }
-        StructDefinition structDefinition = new StructDefinition(this, definitionScope, fieldScope, fieldScope.getName(), keySet, myFields);
+        /*
+         * Key set is NOT null
+         */
+        @SuppressWarnings("null")
+        StructDefinition structDefinition = new StructDefinition(this, definitionScope, fieldScope, fieldScope.getName(), fFieldMap.keySet(), myFields);
         Iterator<Map.Entry<String, IDeclaration>> iter = fFieldMap.entrySet().iterator();
         for (int i = 0; i < fFieldMap.size(); i++) {
             Map.Entry<String, IDeclaration> entry = iter.next();
