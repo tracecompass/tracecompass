@@ -134,7 +134,7 @@ public class TextTraceTest {
         IStatus status = trace.validate(null, validTracePath);
         assertTrue(status.isOK());
         assertTrue(status instanceof TraceValidationStatus);
-        assertEquals(100, ((TraceValidationStatus) status).getConfidence());
+        assertEquals(180, ((TraceValidationStatus) status).getConfidence());
 
         URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(OTHER_PATH), null);
         URI uri = FileLocator.toFileURL(location).toURI();

@@ -88,14 +88,15 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
         int confidence = 0;
         try (BufferedRandomAccessFile rafile = new BufferedRandomAccessFile(path, "r")) { //$NON-NLS-1$
             int lineCount = 0;
-            int matches = 0;
+            double matches = 0.0;
             String line = rafile.getNextLine();
             while ((line != null) && (lineCount++ < MAX_LINES)) {
                 Matcher matcher = getFirstLinePattern().matcher(line);
                 if (matcher.matches()) {
-                    matches++;
+                    int groupCount = matcher.groupCount();
+                    matches += (1.0 + groupCount / ((double) groupCount + 1));
                 }
-                confidence = MAX_CONFIDENCE * matches / lineCount;
+                confidence = (int) (MAX_CONFIDENCE * matches / lineCount);
                 line = rafile.getNextLine();
             }
         } catch (IOException e) {
@@ -106,7 +107,6 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
         return new TraceValidationStatus(confidence, Activator.PLUGIN_ID);
 
     }
-
     @Override
     public void initTrace(IResource resource, String path, Class<? extends ITmfEvent> type) throws TmfTraceException {
         super.initTrace(resource, path, type);
