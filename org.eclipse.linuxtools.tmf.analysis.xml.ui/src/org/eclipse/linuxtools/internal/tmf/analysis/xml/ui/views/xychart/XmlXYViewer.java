@@ -41,6 +41,7 @@ import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
 import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.ui.TmfUiRefreshHandler;
 import org.eclipse.linuxtools.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.w3c.dom.Element;
@@ -56,8 +57,6 @@ import org.w3c.dom.Element;
 public class XmlXYViewer extends TmfCommonXLineChartViewer {
 
     private static final String SPLIT_STRING = "/"; //$NON-NLS-1$
-    /** Timeout between updates in the updateData thread */
-    private static final long BUILD_UPDATE_TIMEOUT = 500;
 
     @SuppressWarnings("null")
     private static final @NonNull Pattern WILDCARD_PATTERN = Pattern.compile("\\*"); //$NON-NLS-1$
@@ -191,7 +190,7 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
                 return;
             }
 
-            complete = ss.waitUntilBuilt(BUILD_UPDATE_TIMEOUT);
+            complete = ss.waitUntilBuilt(TmfUiRefreshHandler.UPDATE_PERIOD);
             currentEnd = ss.getCurrentEndTime();
             try {
                 List<Integer> quarks = entry.getQuarks();

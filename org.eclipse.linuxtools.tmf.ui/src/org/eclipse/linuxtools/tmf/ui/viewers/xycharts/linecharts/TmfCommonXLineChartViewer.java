@@ -19,6 +19,7 @@ import java.util.Map.Entry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.linuxtools.tmf.ui.TmfUiRefreshHandler;
 import org.eclipse.linuxtools.tmf.ui.viewers.xycharts.TmfChartTimeStampFormat;
 import org.eclipse.linuxtools.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.swt.SWT;
@@ -110,8 +111,8 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
             @Override
             public void run() {
                 initializeDataSource();
-                Display.getDefault().asyncExec(new Runnable() {
-
+                TmfUiRefreshHandler.getInstance().queueUpdate(TmfCommonXLineChartViewer.this,
+                        new Runnable() {
                     @Override
                     public void run() {
                         if (!getSwtChart().isDisposed()) {
