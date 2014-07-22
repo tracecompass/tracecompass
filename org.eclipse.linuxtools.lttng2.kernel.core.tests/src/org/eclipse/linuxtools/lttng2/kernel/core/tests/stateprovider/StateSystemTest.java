@@ -15,6 +15,7 @@ package org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ import org.eclipse.linuxtools.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -54,6 +56,14 @@ public abstract class StateSystemTest {
 
     /* Offset in the trace + start time of the trace */
     static final long interestingTimestamp1 = 18670067372290L + 1331649577946812237L;
+
+    /**
+     * Class set-up
+     */
+    @BeforeClass
+    public static void setUpClass() {
+        assumeTrue(testTrace.exists());
+    }
 
     @Test
     public void testFullQuery1() {

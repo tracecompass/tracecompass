@@ -35,6 +35,7 @@ import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableSet;
@@ -50,12 +51,19 @@ public class LttngKernelAnalysisTest {
     private LttngKernelAnalysisModule fKernelAnalysisModule;
 
     /**
+     * Class setup
+     */
+    @BeforeClass
+    public static void setUpClass() {
+        assumeTrue(CtfTmfTestTrace.KERNEL.exists());
+    }
+
+    /**
      * Set-up the test
      */
     @Before
     public void setUp() {
         fKernelAnalysisModule = new LttngKernelAnalysisModule();
-        assumeTrue(CtfTmfTestTrace.KERNEL.exists());
         fTrace = CtfTmfTestTrace.KERNEL.getTrace();
     }
 

@@ -29,6 +29,7 @@ import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -46,13 +47,19 @@ public class ExperimentSyncTest {
     private static TmfExperiment fExperiment;
 
     /**
+     * Class setup
+     */
+    @BeforeClass
+    public static void setUpClass() {
+        assumeTrue(CtfTmfTestTrace.SYNC_SRC.exists());
+        assumeTrue(CtfTmfTestTrace.SYNC_DEST.exists());
+    }
+
+    /**
      * Setup the traces and experiment
      */
     @Before
     public void setUp() {
-        assumeTrue(CtfTmfTestTrace.SYNC_SRC.exists());
-        assumeTrue(CtfTmfTestTrace.SYNC_DEST.exists());
-
         fTraces = new CtfTmfTrace[2];
         fTraces[0] = CtfTmfTestTrace.SYNC_SRC.getTrace();
         fTraces[1] = CtfTmfTestTrace.SYNC_DEST.getTrace();

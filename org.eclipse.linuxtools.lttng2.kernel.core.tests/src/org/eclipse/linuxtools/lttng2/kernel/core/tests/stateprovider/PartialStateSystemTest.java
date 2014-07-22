@@ -30,8 +30,8 @@ import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -43,15 +43,15 @@ public class PartialStateSystemTest extends StateSystemTest {
 
     private static final @NonNull String TEST_FILE_NAME = "test-partial";
 
-    private static File stateFile;
-    private static TestLttngKernelAnalysisModule module;
+    private File stateFile;
+    private TestLttngKernelAnalysisModule module;
 
 
     /**
      * Initialization
      */
-    @BeforeClass
-    public static void initialize() {
+    @Before
+    public void initialize() {
         assumeTrue(testTrace.exists());
         stateFile = new File(TmfTraceManager.getSupplementaryFileDir(testTrace.getTrace()) + TEST_FILE_NAME);
         if (stateFile.exists()) {
@@ -74,8 +74,8 @@ public class PartialStateSystemTest extends StateSystemTest {
     /**
      * Class clean-up
      */
-    @AfterClass
-    public static void tearDownClass() {
+    @After
+    public void tearDownClass() {
         module.close();
         stateFile.delete();
     }
