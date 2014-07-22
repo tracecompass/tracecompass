@@ -25,35 +25,43 @@
   <version>3.0.0-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
 
- <build>
-     <!-- workaround for https://issues.sonatype.org/browse/TYCHO-168 -->
-     <resources>
-      <resource>
-        <directory>src</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </resource>
-    </resources>
+  <!-- Do not download the test traces if "maven.test.skip" is set -->
+  <profiles>
+    <profile>
+      <id>download-traces</id>
+      <activation>
+        <property>
+          <name>!maven.test.skip</name>
+        </property>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>prepare</id>
+                <phase>pre-integration-test</phase>
+                <configuration>
+                  <target>
+                    <ant antfile="get-traces.xml" dir="traces" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-antrun-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>prepare</id>
-              <phase>pre-integration-test</phase>
-              <configuration>
-                <target>
-                 <ant antfile="get-traces.xml" dir="traces" />
-                </target>
-              </configuration>
-              <goals>
-                <goal>run</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-surefire-plugin</artifactId>
@@ -67,6 +75,7 @@
           <product>org.eclipse.platform.ide</product>
         </configuration>
       </plugin>
+
       <!-- We don't use the ant file to clean because of http://jira.codehaus.org/browse/MANTRUN-78 -->
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
