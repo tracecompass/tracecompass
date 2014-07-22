@@ -19,18 +19,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
-import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -69,10 +62,10 @@ import org.junit.runner.RunWith;
  *
  */
 @RunWith(SWTBotJunit4ClassRunner.class)
-public class TestCustomTxtWizard {
+public class TestCustomTxtWizard extends AbstractCustomParserWizard {
 
     private static final String MANAGE_CUSTOM_PARSERS_SHELL_TITLE = "Manage Custom Parsers";
-    private static final String PROJECT_NAME = "Test";
+    private static final String PROJECT_NAME = "TestText";
     private static final String CATEGORY_NAME = "Test Category";
     private static final String TRACETYPE_NAME = "Test Trace";
     private static final String EXPECTED_TEST_DEFINITION = "<Definition category=\"Test Category\" name=\"Test Trace\">\n" +
@@ -90,28 +83,6 @@ public class TestCustomTxtWizard {
             "</InputLine>\n" +
             "<OutputColumn name=\"Time Stamp\"/>\n" +
             "<OutputColumn name=\"Message\"/>\n";
-
-    /** The Log4j logger instance. */
-    private static final Logger fLogger = Logger.getRootLogger();
-    private static SWTWorkbenchBot fBot;
-
-    /** Test Class setup */
-    @BeforeClass
-    public static void init() {
-        SWTBotUtil.failIfUIThread();
-        Thread.currentThread().setName("SWTBot Thread"); // for the debugger
-        /* set up for swtbot */
-        SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
-        fLogger.addAppender(new ConsoleAppender(new SimpleLayout()));
-        fBot = new SWTWorkbenchBot();
-
-        SWTBotUtil.closeView("welcome", fBot);
-
-        SWTBotUtil.switchToTracingPerspective();
-        /* finish waiting for eclipse to load */
-        SWTBotUtil.waitForJobs();
-
-    }
 
     /**
      * Test to create a custom txt trace and compare the xml
@@ -287,27 +258,5 @@ public class TestCustomTxtWizard {
         assertEquals("", xmlPart);
 
         SWTBotUtil.deleteProject(PROJECT_NAME, fBot);
-    }
-
-    private static String extractTestXml(File xmlFile, String category, String definitionName) throws IOException, FileNotFoundException {
-        StringBuilder xmlPart = new StringBuilder();
-        boolean started = false;
-        try (RandomAccessFile raf = new RandomAccessFile(xmlFile, "r");) {
-            String s = raf.readLine();
-            while (s != null) {
-                if (s.equals("<Definition category=\"" + category + "\" name=\"" + definitionName + "\">")) {
-                    started = true;
-                }
-                if (started) {
-                    if (s.equals("</Definition>")) {
-                        break;
-                    }
-                    xmlPart.append(s);
-                    xmlPart.append('\n');
-                }
-                s = raf.readLine();
-            }
-        }
-        return xmlPart.toString();
     }
 }
