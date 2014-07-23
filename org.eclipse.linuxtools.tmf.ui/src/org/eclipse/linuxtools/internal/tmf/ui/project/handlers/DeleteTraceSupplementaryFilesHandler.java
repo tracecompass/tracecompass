@@ -13,6 +13,7 @@
 
 package org.eclipse.linuxtools.internal.tmf.ui.project.handlers;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -27,14 +28,20 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.project.dialogs.SelectSupplementaryResourcesDialog;
+import org.eclipse.linuxtools.internal.tmf.ui.project.operations.TmfWorkspaceModifyOperation;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfCommonProjectElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -112,38 +119,67 @@ public class DeleteTraceSupplementaryFilesHandler extends AbstractHandler {
             }
         }
 
-        SelectSupplementaryResourcesDialog dialog =
+        final SelectSupplementaryResourcesDialog dialog =
                 new SelectSupplementaryResourcesDialog(window.getShell(), resourceMap);
         if (dialog.open() != Window.OK) {
             return null;
         }
 
-        Set<IProject> projectsToRefresh = new HashSet<>();
+        TmfWorkspaceModifyOperation operation = new TmfWorkspaceModifyOperation() {
+            @Override
+            public void execute(IProgressMonitor monitor) throws CoreException {
 
-        // Delete the resources that were selected
-        List<IResource> allResourcesToDelete = Arrays.asList(dialog.getResources());
-        for (TmfCommonProjectElement element : resourceMap.keySet()) {
-            List<IResource> traceResourcesToDelete = new ArrayList<>(resourceMap.get(element));
-            traceResourcesToDelete.retainAll(allResourcesToDelete);
-            if (!traceResourcesToDelete.isEmpty()) {
-                // Delete the selected resources
-                element.closeEditors();
-                element.deleteSupplementaryResources(traceResourcesToDelete.toArray(new IResource[0]));
-                projectsToRefresh.add(element.getProject().getResource());
-            }
+                Set<IProject> projectsToRefresh = new HashSet<>();
+
+                // Delete the resources that were selected
+                List<IResource> allResourcesToDelete = Arrays.asList(dialog.getResources());
+
+                SubMonitor subMonitor = SubMonitor.convert(monitor, allResourcesToDelete.size());
+
+                for (TmfCommonProjectElement element : resourceMap.keySet()) {
+                    if (monitor.isCanceled()) {
+                        throw new OperationCanceledException();
+                    }
+                    List<IResource> traceResourcesToDelete = new ArrayList<>(resourceMap.get(element));
+                    traceResourcesToDelete.retainAll(allResourcesToDelete);
+                    if (!traceResourcesToDelete.isEmpty()) {
+                        subMonitor.setTaskName(NLS.bind(Messages.DeleteSupplementaryFiles_DeletionTask, element.getElementPath()));
+                        // Delete the selected resources
+                        element.closeEditors();
+                        element.deleteSupplementaryResources(traceResourcesToDelete.toArray(new IResource[0]));
+                        projectsToRefresh.add(element.getProject().getResource());
+                    }
+                    subMonitor.worked(traceResourcesToDelete.size());
+                }
+
+                subMonitor = SubMonitor.convert(monitor, projectsToRefresh.size());
+
+                // Refresh projects
+                Iterator<IProject> projectIterator = projectsToRefresh.iterator();
+                while (projectIterator.hasNext()) {
+                    if (monitor.isCanceled()) {
+                        throw new OperationCanceledException();
+                    }
+                    IProject project = projectIterator.next();
+                    subMonitor.setTaskName(NLS.bind(Messages.DeleteSupplementaryFiles_ProjectRefreshTask, project.getName()));
+                    try {
+                        project.refreshLocal(IResource.DEPTH_INFINITE, null);
+                    } catch (CoreException e) {
+                        Activator.getDefault().logError("Error refreshing project " + project, e); //$NON-NLS-1$
+                    }
+                    subMonitor.worked(1);
+                }
+           }
+        };
+
+        try {
+            PlatformUI.getWorkbench().getProgressService().run(true, true, operation);
+        } catch (InterruptedException e) {
+            return null;
+        } catch (InvocationTargetException e) {
+            MessageDialog.openError(window.getShell(), e.toString(), e.getTargetException().toString());
+            return null;
         }
-
-        // Refresh projects
-        Iterator<IProject> projectIterator = projectsToRefresh.iterator();
-        while (projectIterator.hasNext()) {
-            IProject project = projectIterator.next();
-            try {
-                project.refreshLocal(IResource.DEPTH_INFINITE, null);
-            } catch (CoreException e) {
-                Activator.getDefault().logError("Error refreshing project " + project, e); //$NON-NLS-1$
-            }
-        }
-
         return null;
     }
 

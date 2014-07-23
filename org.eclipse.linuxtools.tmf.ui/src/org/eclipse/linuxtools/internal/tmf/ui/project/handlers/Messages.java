@@ -65,6 +65,9 @@ public class Messages extends NLS {
     public static String SynchronizeTracesHandler_ErrorSynchingExperiment;
     public static String SynchronizeTracesHandler_ErrorSynchingForTrace;
 
+    public static String DeleteSupplementaryFiles_DeletionTask;
+    public static String DeleteSupplementaryFiles_ProjectRefreshTask;
+
     public static String AnalysisModule_Help;
 
     public static String TmfActionProvider_OpenWith;
