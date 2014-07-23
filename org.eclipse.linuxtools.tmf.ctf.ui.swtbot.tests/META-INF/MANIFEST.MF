@@ -8,18 +8,25 @@ Bundle-SymbolicName: org.eclipse.linuxtools.tmf.ctf.ui.swtbot.tests;singleton:=t
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: org.eclipse.linuxtools.tmf.ctf.ui.swtbot.tests
-Require-Bundle: org.apache.log4j,
+Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.core.resources,
  org.eclipse.core.runtime,
- org.eclipse.linuxtools.tmf.ui,
- org.eclipse.linuxtools.tmf.core,
- org.eclipse.linuxtools.tmf.core.tests,
- org.eclipse.linuxtools.tmf.ui.swtbot.tests,
- org.eclipse.linuxtools.tmf.ctf.core,
- org.eclipse.linuxtools.tmf.ctf.core.tests,
- org.eclipse.swtbot.eclipse.finder,
- org.eclipse.swtbot.junit4_x,
  org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.ui.views,
- org.junit
+ org.eclipse.linuxtools.tmf.core,
+ org.eclipse.linuxtools.tmf.ui,
+ org.eclipse.linuxtools.tmf.ui.swtbot.tests,
+ org.eclipse.linuxtools.tmf.ctf.core,
+ org.eclipse.linuxtools.tmf.ctf.core.tests
+Import-Package: org.apache.log4j,
+ org.apache.log4j.varia,
+ org.eclipse.swtbot.eclipse.finder,
+ org.eclipse.swtbot.eclipse.finder.widgets,
+ org.eclipse.swtbot.swt.finder,
+ org.eclipse.swtbot.swt.finder.finders,
+ org.eclipse.swtbot.swt.finder.junit,
+ org.eclipse.swtbot.swt.finder.results,
+ org.eclipse.swtbot.swt.finder.utils,
+ org.eclipse.swtbot.swt.finder.waits,
+ org.eclipse.swtbot.swt.finder.widgets
