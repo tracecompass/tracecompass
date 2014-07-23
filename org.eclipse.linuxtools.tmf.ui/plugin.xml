@@ -529,44 +529,49 @@
                   checkEnabled="false">
                <with
                      variable="selection">
-                  <or>
-                     <iterate
-                           ifEmpty="false"
-                           operator="and">
-                        <and>
+                  <and>
+                     <or>
+                        <iterate
+                              ifEmpty="false"
+                              operator="and">
                            <instanceof
-                                 value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                                 value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
                            </instanceof>
-                           <not>
-                              <test
-                                    forcePluginActivation="true"
-                                    property="org.eclipse.linuxtools.tmf.ui.isExperimentTrace">
-                              </test>
-                           </not>
-                        </and>
-                     </iterate>
-                     <iterate
-                           ifEmpty="false"
-                           operator="and">
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
-                        </instanceof>
-                     </iterate>
-                     <iterate
-                           ifEmpty="false"
-                           operator="and">
-                        <and>
-                           <not>
+                        </iterate>
+                        <iterate
+                              ifEmpty="false"
+                              operator="and">
+                           <or>
+                              <instanceof
+                                    value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                              </instanceof>
+                              <and>
+                                 <instanceof
+                                       value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                                 </instanceof>
+                                 <not>
+                                    <test
+                                          forcePluginActivation="true"
+                                          property="org.eclipse.linuxtools.tmf.ui.isExperimentTrace">
+                                    </test>
+                                 </not>
+                              </and>
+                           </or>
+                        </iterate>
+                     </or>
+                     <not>
+                        <with
+                              variable="selection">
+                           <iterate
+                                 ifEmpty="false"
+                                 operator="and">
                               <instanceof
                                     value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder">
                               </instanceof>
-                           </not>
-                           <instanceof
-                                 value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
-                           </instanceof>
-                        </and>
-                     </iterate>
-                  </or>
+                           </iterate>
+                        </with>
+                     </not>
+                  </and>
                </with>
             </visibleWhen>
          </command>
@@ -581,9 +586,6 @@
                   checkEnabled="false">
                <with
                      variable="selection">
-                  <count
-                        value="1">
-                  </count>
                   <iterate
                         ifEmpty="false"
                         operator="and">
@@ -1345,19 +1347,6 @@
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteTraceHandler"
-            commandId="org.eclipse.ui.edit.delete">
-         <activeWhen>
-            <iterate
-                  ifEmpty="false"
-                  operator="and">
-               <instanceof
-                     value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
-               </instanceof>
-            </iterate>
-         </activeWhen>
-      </handler>
-      <handler
             class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteExperimentHandler"
             commandId="org.eclipse.ui.edit.delete">
          <activeWhen>
@@ -1371,25 +1360,25 @@
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteFolderHandler"
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteTraceFolderElementHandler"
             commandId="org.eclipse.ui.edit.delete">
          <activeWhen>
             <iterate
                   ifEmpty="false"
                   operator="and">
-               <not>
+               <or>
                   <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder">
+                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
                   </instanceof>
-               </not>
-               <instanceof
-                     value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
-               </instanceof>
+                  <instanceof
+                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                  </instanceof>
+               </or>
             </iterate>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteFolderHandler"
+            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteTraceFolderElementHandler"
             commandId="org.eclipse.ui.edit.delete">
          <activeWhen>
             <and>

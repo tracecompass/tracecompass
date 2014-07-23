@@ -30,14 +30,22 @@ public class Messages extends NLS {
     public static String DeleteTraceHandler_Message;
     public static String DeleteTraceHandler_Error;
     public static String DeleteTraceHandler_TaskName;
+    public static String DeleteTraceHandlerGeneric_Message;
+    public static String DeleteTraceHandlerGeneric_Error;
     public static String DeleteExperimentHandler_Message;
     public static String DeleteExperimentHandler_Error;
     public static String DeleteFolderHandler_Message;
     public static String DeleteFolderHandler_Error;
+    public static String DeleteFolderHandler_TaskName;
 
+    public static String RemoveDialog_Title;
+    public static String RemoveTraceFromExperimentHandler_Message;
+    public static String RemoveTraceFromExperimentHandler_TaskName;
+    public static String RemoveTraceFromExperimentHandler_Error;
     public static String ClearDialog_Title;
     public static String DeleteFolderHandlerClear_Message;
     public static String DeleteFolderHandlerClear_Error;
+    public static String DeleteFolderHandlerClear_TaskName;
 
     public static String SelectTraceTypeHandler_ErrorSelectingTrace;
     public static String SelectTraceTypeHandler_Title;
