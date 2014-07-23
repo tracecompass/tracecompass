@@ -12,7 +12,10 @@
 
 package org.eclipse.linuxtools.lttng2.ust.core.tests.trace.callstack;
 
+import static org.junit.Assume.assumeTrue;
+
 import org.eclipse.linuxtools.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.junit.BeforeClass;
 
 /**
  * Test suite for the UST callstack state provider, using the trace of a program
@@ -25,6 +28,14 @@ public class LttngUstCallStackProviderTest extends AbstractProviderTest {
     private static final long[] timestamps = { 1378850463600000000L,
                                                1378850463770000000L,
                                                1378850463868753000L };
+
+    /**
+     * Class setup
+     */
+    @BeforeClass
+    public static void setUpClass() {
+        assumeTrue(CtfTmfTestTrace.CYG_PROFILE.exists());
+    }
 
     @Override
     protected CtfTmfTestTrace getTestTrace() {

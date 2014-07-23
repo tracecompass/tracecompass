@@ -17,7 +17,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.util.List;
@@ -96,7 +95,6 @@ public abstract class AbstractProviderTest {
     @Before
     public void setUp() {
         CtfTmfTestTrace testTrace = getTestTrace();
-        assumeTrue(testTrace.exists());
 
         fTrace = testTrace.getTrace();
         fModule = new TestLttngCallStackModule();
