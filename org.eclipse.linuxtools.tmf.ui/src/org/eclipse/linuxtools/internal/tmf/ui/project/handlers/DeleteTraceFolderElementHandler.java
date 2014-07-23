@@ -23,21 +23,18 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRunnable;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
+import org.eclipse.linuxtools.internal.tmf.ui.project.operations.TmfWorkspaceModifyOperation;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
@@ -252,7 +249,7 @@ public class DeleteTraceFolderElementHandler extends AbstractHandler {
         final Iterator<Object> iterator = fSelection.iterator();
         final int nbElements = fSelection.size();
 
-        DeleteOperation operation = new DeleteOperation() {
+        TmfWorkspaceModifyOperation operation = new TmfWorkspaceModifyOperation() {
             @Override
             public void execute(IProgressMonitor monitor) throws CoreException {
                 SubMonitor subMonitor = SubMonitor.convert(monitor, nbElements);
@@ -349,42 +346,4 @@ public class DeleteTraceFolderElementHandler extends AbstractHandler {
         return null;
     }
 
-    private abstract class DeleteOperation implements IRunnableWithProgress {
-        @Override
-        public synchronized final void run(IProgressMonitor monitor)
-                throws InvocationTargetException, InterruptedException {
-            final InvocationTargetException[] iteHolder = new InvocationTargetException[1];
-            try {
-                IWorkspaceRunnable workspaceRunnable = new IWorkspaceRunnable() {
-                    @Override
-                    public void run(IProgressMonitor pm) throws CoreException {
-                        try {
-                            execute(pm);
-                        } catch (InvocationTargetException e) {
-                            // Pass it outside the workspace runnable
-                            iteHolder[0] = e;
-                        } catch (InterruptedException e) {
-                            // Re-throw as OperationCanceledException, which will be
-                            // caught and re-thrown as InterruptedException below.
-                            throw new OperationCanceledException(e.getMessage());
-                        }
-                        // CoreException and OperationCanceledException are propagated
-                    }
-                };
-
-                IWorkspace workspace = ResourcesPlugin.getWorkspace();
-                workspace.run(workspaceRunnable, workspace.getRoot(), IWorkspace.AVOID_UPDATE, monitor);
-            } catch (CoreException e) {
-                throw new InvocationTargetException(e);
-            } catch (OperationCanceledException e) {
-                throw new InterruptedException(e.getMessage());
-            }
-            // Re-throw the InvocationTargetException, if any occurred
-            if (iteHolder[0] != null) {
-                throw iteHolder[0];
-            }
-        }
-
-        protected abstract void execute(IProgressMonitor monitor) throws CoreException, InvocationTargetException, InterruptedException;
-    }
 }
