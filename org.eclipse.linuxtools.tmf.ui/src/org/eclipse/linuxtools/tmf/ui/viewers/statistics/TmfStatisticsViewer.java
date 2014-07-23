@@ -68,6 +68,9 @@ public class TmfStatisticsViewer extends TmfViewer {
     /** Timestamp scale used for all statistics (nanosecond) */
     private static final byte TIME_SCALE = ITmfTimestamp.NANOSECOND_SCALE;
 
+    /** The delay (in ms) between each update in live-reading mode */
+    private static final long LIVE_UPDATE_DELAY = 1000;
+
     /** The actual tree viewer to display */
     private TreeViewer fTreeViewer;
 
@@ -663,7 +666,7 @@ public class TmfStatisticsViewer extends TmfViewer {
                          * being built (or, if the back-end is already
                          * completely built, it will skip over the while() immediately.
                          */
-                        while (!ss.waitUntilBuilt(TmfUiRefreshHandler.UPDATE_PERIOD)) {
+                        while (!ss.waitUntilBuilt(LIVE_UPDATE_DELAY)) {
                             Map<String, Long> map = stats.getEventTypesInRange(start, end);
                             updateStats(aTrace, isGlobal, map);
                         }

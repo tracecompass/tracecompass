@@ -8,20 +8,15 @@
  *
  * Contributors:
  *     Alexandre Montplaisir - Initial API and implementation
+ *     Patrick Tasse - Update queue handling
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui;
 
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import org.eclipse.linuxtools.tmf.core.component.ITmfComponent;
 import org.eclipse.swt.widgets.Display;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * This handler offers "coalescing" of UI updates.
@@ -33,40 +28,36 @@ import com.google.common.collect.ImmutableList;
  * <p>
  * Instead of calling {@link Display#asyncExec} directly, threads that want to
  * queue updates to the UI can instead call
- * {@link TmfUiRefreshHandler#queueUpdate}. This will schedule a UI update,
- * which will happen after *at least* {@link #UPDATE_PERIOD} milliseconds.
- * <ul><li>
- * During that time, new requests received from the same component will replace
- * the previous one (as we assume the latest UI update request is the most
- * up-to-date and interesting one).
- * </li><li>
- * Requests received from other components will be added to the queue (keeping
- * only the latest request from each component), and once the timeout expires,
- * they will all be sent to the UI thread via one single call to
- * {@link Display#syncExec}.
- * </li></ul>
+ * {@link TmfUiRefreshHandler#queueUpdate}. If the handler is not currently
+ * executing another update it will be scheduled immediately. Otherwise the
+ * update will be queued.
+ * <p>
+ * The handler will only execute one update at a time. While it is busy, new
+ * requests received from a source that is already in the queue will replace the
+ * previous one (as we assume the latest UI update request is the most
+ * up-to-date and interesting one), preserving the previous request order. New
+ * requests received from other sources will be added to the end of the queue
+ * (keeping only the latest request from each source).
+ * <p>
+ * Once the current update is completed, the oldest request in the queue will be
+ * sent to the UI thread via one single call to {@link Display#syncExec}.
  *
  * @author Alexandre Montplaisir
  * @since 3.1
  */
 public class TmfUiRefreshHandler {
 
-    /** Throttle update requests to this amount of ms */
-    public static final long UPDATE_PERIOD = 1000;
-
     /** Singleton instance */
     private static TmfUiRefreshHandler fInstance = null;
 
-    private final Map<ITmfComponent, Runnable> fUpdates = new HashMap<>();
-    private final Timer fTimer;
-    private TimerTask fCurrentTask;
+    private final Map<Object, Runnable> fUpdates = new LinkedHashMap<>();
+    private Thread fCurrentTask;
 
 
     /**
      * Internal constructor
      */
     private TmfUiRefreshHandler() {
-        fTimer = new Timer();
         fCurrentTask = null;
     }
 
@@ -86,9 +77,8 @@ public class TmfUiRefreshHandler {
      * Cancel all current requests and dispose the handler.
      */
     public synchronized void dispose() {
+        fUpdates.clear();
         fCurrentTask = null;
-        fTimer.cancel();
-        fTimer.purge();
     }
 
     /**
@@ -97,61 +87,44 @@ public class TmfUiRefreshHandler {
      * {@link Display#asyncExec(Runnable)}.
      *
      * @param source
-     *            The component sending the request. Typically callers should
-     *            use "this". Only the latest request per component is actually
-     *            sent.
+     *            The source sending the request. Typically callers should use
+     *            "this". When multiple requests are queued before being
+     *            executed, only the latest request per source is actually sent.
      * @param task
      *            The {@link Runnable} to execute in the UI thread.
      */
-    public synchronized void queueUpdate(ITmfComponent source, Runnable task) {
+    public synchronized void queueUpdate(Object source, Runnable task) {
         fUpdates.put(source, task);
         if (fCurrentTask == null) {
             fCurrentTask = new RunAllUpdates();
-            fTimer.schedule(fCurrentTask, UPDATE_PERIOD);
+            fCurrentTask.start();
         }
     }
 
     /**
-     * Task to empty the current map of updates, and send them to the UI thread.
+     * Task to empty the update queue, and send each task to the UI thread.
      */
-    private class RunAllUpdates extends TimerTask {
+    private class RunAllUpdates extends Thread {
         @Override
         public void run() {
-            /* Extract the currently-queued tasks in a local variable */
-            final Collection<Runnable> updates;
-            synchronized (TmfUiRefreshHandler.this) {
-                updates = ImmutableList.copyOf(fUpdates.values());
-                fUpdates.clear();
-            }
-            /*
-             * Release the lock on "this" before we wait on the UI thread below.
-             * This is to prevent deadlocks in case components send their
-             * "queueUpdate()" via the UI thread.
-             */
-            Display.getDefault().syncExec(new Runnable() {
-                @Override
-                public void run() {
-                    for (Runnable update : updates) {
-                        update.run();
+            while (true) {
+                Runnable nextTask = null;
+                synchronized (TmfUiRefreshHandler.this) {
+                    if (!fUpdates.isEmpty()) {
+                        Object firstKey = fUpdates.keySet().iterator().next();
+                        nextTask = fUpdates.get(firstKey);
+                        fUpdates.remove(firstKey);
+                    }
+                    if (nextTask == null) {
+                        /*
+                         * No updates remaining in the queue, put fCurrentTask
+                         * back to null so that a new task can be scheduled.
+                         */
+                        fCurrentTask = null;
+                        break;
                     }
                 }
-            });
-
-            synchronized (TmfUiRefreshHandler.this) {
-                if (fUpdates.isEmpty()) {
-                    /*
-                     * No updates were queued in the meantime, put fCurrentTask
-                     * back to null so that a new task can be scheduled.
-                     */
-                    fCurrentTask = null;
-                } else {
-                    /*
-                     * Updates were queued during the syncExec, schedule a new
-                     * task to eventually run them.
-                     */
-                    fCurrentTask = new RunAllUpdates();
-                    fTimer.schedule(fCurrentTask, UPDATE_PERIOD);
-                }
+                Display.getDefault().syncExec(nextTask);
             }
         }
     }
