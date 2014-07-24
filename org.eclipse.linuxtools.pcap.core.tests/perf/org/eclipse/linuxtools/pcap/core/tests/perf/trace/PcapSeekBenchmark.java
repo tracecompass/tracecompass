@@ -49,7 +49,7 @@ public class PcapSeekBenchmark {
     private static final Random RND = new Random(1000);
 
     private static final int LOOP_COUNT = 25;
-    private static final int NB_SEEKS = 500;
+    private static final int NB_SEEKS = 1000000;
     private static final String TEST_SUITE_NAME = "Pcap Read & Seek Benchmark (" + NB_SEEKS + " seeks)";
     private static final String TEST_ID = "org.eclipse.linuxtools#" + TEST_SUITE_NAME;
 
@@ -58,7 +58,7 @@ public class PcapSeekBenchmark {
      */
     @Test
     public void testPcapTrace() {
-        readAndSeekTrace(PcapTestTrace.MOSTLY_UDP, "trace-pcap", true);
+        readAndSeekTrace(PcapTestTrace.BENCHMARK_TRACE, "trace-pcap", true);
     }
 
     private static void readAndSeekTrace(PcapTestTrace testTrace, String testName, boolean inGlobalSummary) {

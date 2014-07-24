@@ -43,6 +43,9 @@ public enum PcapTestTrace {
     /** A little-endian trace that contains two packets. */
     SHORT_LITTLE_ENDIAN("../org.eclipse.linuxtools.pcap.core.tests/rsc/Short_LittleEndian.pcap"),
 
+    /** A large trace for benchmarking. */
+    BENCHMARK_TRACE("../org.eclipse.linuxtools.pcap.core.tests/rsc/benchmarkTrace.pcap"),
+
     /** A Kernel trace directory. */
     KERNEL_DIRECTORY("../org.eclipse.linuxtools.pcap.core.tests/rsc/kernel/"),
 

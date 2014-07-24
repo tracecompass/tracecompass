@@ -22,6 +22,7 @@ http://wiki.wireshark.org/SampleCaptures
   <get ignoreerrors="true" maxtime="20" dest="MostlyTCP.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/8/8d/MostlyTCP.pcap.zip" />
   <get ignoreerrors="true" maxtime="20" dest="EmptyPcap.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/c/c1/EmptyPcap.pcap.zip" />
   <get ignoreerrors="true" maxtime="20" dest="BadPcapFile.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/5/5e/BadPcapFile.pcap.zip" />
+  <get ignoreerrors="true" maxtime="60" dest="BenchmarkTrace.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/1/12/BenchmarkTrace.pcap.zip" />
   <get ignoreerrors="true" maxtime="20" dest="sample-ctf-trace-20120412.tar.bz2" skipexisting="true" src="http://lttng.org/files/samples/sample-ctf-trace-20120412.tar.bz2"/>
   <condition property="testSuiteExists">
     <and>
@@ -36,6 +37,7 @@ http://wiki.wireshark.org/SampleCaptures
         <available file="MostlyTCP.pcap.zip"/>
         <available file="EmptyPcap.pcap.zip"/>
         <available file="BadPcapFile.pcap.zip"/>
+        <available file="BenchmarkTrace.pcap.zip"/>
         <available file="sample-ctf-trace-20120412.tar.bz2"/>
     </and>
   </condition>
@@ -49,6 +51,7 @@ http://wiki.wireshark.org/SampleCaptures
     <unzip src="MostlyTCP.pcap.zip" dest="." />
     <unzip src="EmptyPcap.pcap.zip" dest="." />
     <unzip src="BadPcapFile.pcap.zip" dest="." />
+    <unzip src="BenchmarkTrace.pcap.zip" dest="." />
     <bunzip2 src="sample-ctf-trace-20120412.tar.bz2"/>
     <untar src="sample-ctf-trace-20120412.tar" dest="." />
     <echo message="Traces extracted successfully"/>

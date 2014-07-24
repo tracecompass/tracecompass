@@ -27,10 +27,10 @@ import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
 import org.junit.Test;
 
-
 /**
- * Benchmark of the Pcap parser for reading a trace. Note: We should get a bigger trace. One
- * that has WAYYYY more events since this current trace is just parsed too fast.
+ * Benchmark of the Pcap parser for reading a trace. Note: We should get a
+ * bigger trace. One that has WAYYYY more events since this current trace is
+ * just parsed too fast.
  *
  * @author Vincent Perot
  */
@@ -39,13 +39,14 @@ public class PcapReadBenchmark {
     private static final String TEST_SUITE_NAME = "Pcap Read Benchmark";
     private static final String TEST_ID = "org.eclipse.linuxtools#" + TEST_SUITE_NAME;
     private static final int LOOP_COUNT = 25;
+    private static final int RUN_BETWEEN_COMMIT_COUNT = 15;
 
     /**
      * Benchmark reading the pcap trace
      */
     @Test
     public void testPcapTrace() {
-        readTrace(PcapTestTrace.MOSTLY_UDP, "trace-pcap", true);
+        readTrace(PcapTestTrace.BENCHMARK_TRACE, "trace-pcap", true);
     }
 
     private static void readTrace(PcapTestTrace testTrace, String testName, boolean inGlobalSummary) {
@@ -62,17 +63,18 @@ public class PcapReadBenchmark {
         for (int loop = 0; loop < LOOP_COUNT; loop++) {
             pm.start();
             try (PcapFile trace = testTrace.getTrace();) {
-                trace.seekPacket(0);
-                while (trace.hasNextPacket()) {
-                    Packet packet = trace.parseNextPacket();
-                    if (packet == null) {
-                        fail("Test failed at iteration " + loop + " packet " + trace.getCurrentRank());
-                        return;
+                for (int i = 0; i < RUN_BETWEEN_COMMIT_COUNT; i++) {
+                    trace.seekPacket(0);
+                    while (trace.hasNextPacket()) {
+                        Packet packet = trace.parseNextPacket();
+                        if (packet == null) {
+                            fail("Test failed at iteration " + loop + '.' + i + ", at packet " + trace.getCurrentRank());
+                            return;
+                        }
+                        /* Do something with the packet because we are awesome */
+                        packet.getPayload();
                     }
-                    /* Do something with the packet because we are awesome */
-                    packet.getPayload();
                 }
-
             } catch (IOException | BadPcapFileException | BadPacketException e) {
                 fail("Test failed at iteration " + loop + ':' + e.getMessage());
             }
