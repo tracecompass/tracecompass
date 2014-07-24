@@ -12,6 +12,7 @@
  *   Bernd Hufmann - Updated signal handling
  *   Marc-Andre Laperle - Add time zone preference
  *   Geneviève Bastien - Moved state system explorer to use the abstract tree viewer
+ *   Patrick Tasse - Refactoring
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.views.statesystem;
@@ -32,6 +33,7 @@ import org.eclipse.linuxtools.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
+import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
@@ -57,8 +59,9 @@ import org.eclipse.swt.widgets.Display;
 public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
 
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
-    private boolean fFilterStatus = false;
     private static final int DEFAULT_AUTOEXPAND = 2;
+    private boolean fFilterStatus = false;
+    private long fSelection = 0;
 
     /* Order of columns */
     private static final int ATTRIBUTE_NAME_COL = 0;
@@ -78,8 +81,8 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
 
         @Override
         public String getColumnText(Object element, int columnIndex) {
-            if (element instanceof StateSystemEntry) {
-                StateSystemEntry entry = (StateSystemEntry) element;
+            if (element instanceof StateEntry) {
+                StateEntry entry = (StateEntry) element;
                 switch (columnIndex) {
                 case ATTRIBUTE_NAME_COL:
                     return entry.getName();
@@ -104,8 +107,8 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
 
         @Override
         public Color getBackground(Object element, int columnIndex) {
-            if (element instanceof StateSystemEntry) {
-                if (((StateSystemEntry) element).isModified()) {
+            if (element instanceof StateEntry) {
+                if (((StateEntry) element).isModified()) {
                     return Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW);
                 }
             }
@@ -161,214 +164,157 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
 
     @Override
     protected ITmfTreeViewerEntry updateElements(long start, long end, boolean selection) {
+
+        if (selection) {
+            fSelection = start;
+        } else {
+            fSelection = TmfTraceManager.getInstance().getSelectionBeginTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        }
+
         if (getTrace() == null) {
             return null;
         }
 
         ITmfTreeViewerEntry root = getInput();
 
-        if ((!selection) && (root != null)) {
-            return null;
+        if (root == null) {
+            root = createRoot();
+        } else if (fFilterStatus) {
+            clearStateSystemEntries(root);
         }
 
         /*
-         * Build the entries if it is the first time or to show only modified
-         * values
+         * Update the values of the elements of the state systems at the
+         * selection start time
          */
-        if (root == null || fFilterStatus) {
-            root = buildEntries(start);
-        } else if (root instanceof TmfTreeViewerEntry) {
-            /*
-             * Update the values of the elements of the state systems at time
-             * 'start'
-             */
-            updateEntriesList(((TmfTreeViewerEntry)root).getChildren(), start);
-        }
+        boolean changed = updateStateSystemEntries(root, fSelection);
 
-        return root;
+        return selection || changed ? root : null;
     }
 
-    private ITmfTreeViewerEntry buildEntries(long timestamp) {
+    private ITmfTreeViewerEntry createRoot() {
         // 'Fake' root node
-        TmfTreeViewerEntry rootEntry = new TmfTreeViewerEntry(""); //$NON-NLS-1$
+        TmfTreeViewerEntry rootEntry = new TmfTreeViewerEntry("root"); //$NON-NLS-1$
 
-        List<ITmfTreeViewerEntry> children = rootEntry.getChildren();
-        for (final ITmfTrace currentTrace : TmfTraceManager.getTraceSetWithExperiment(getTrace())) {
-            if (currentTrace == null) {
-                continue;
+        for (final ITmfTrace trace : TmfTraceManager.getTraceSetWithExperiment(getTrace())) {
+            if (trace != null) {
+                rootEntry.addChild(createTraceEntry(trace));
             }
-            buildEntriesForTrace(currentTrace, timestamp, children);
         }
         return rootEntry;
     }
 
-    /*
-     * Update the values of the entries. It will also create trace and state
-     * system entries if they do not exist yet.
-     */
-    private void updateEntriesList(List<ITmfTreeViewerEntry> entries, long timestamp) {
-        for (final ITmfTrace trace : TmfTraceManager.getTraceSetWithExperiment(getTrace())) {
-            if (trace == null) {
-                continue;
-            }
-            ITmfTreeViewerEntry traceEntry = null;
-            for (ITmfTreeViewerEntry entry : entries) {
-                if (entry.getName().equals(trace.getName())) {
-                    traceEntry = entry;
-                }
-            }
-            if (traceEntry == null) {
-                traceEntry = buildEntriesForTrace(trace, timestamp, entries);
-            }
-
-            /* Find the state system entries for this trace */
-            Iterable<ITmfAnalysisModuleWithStateSystems> modules = trace.getAnalysisModulesOfClass(ITmfAnalysisModuleWithStateSystems.class);
-            for (ITmfAnalysisModuleWithStateSystems module : modules) {
-                module.schedule();
-                for (ITmfStateSystem ss : module.getStateSystems()) {
-                    if (ss == null) {
-                        continue;
-                    }
-                    ITmfTreeViewerEntry ssEntry = null;
-                    for (ITmfTreeViewerEntry entry : traceEntry.getChildren()) {
-                        if (entry.getName().equals(ss.getSSID())) {
-                            ssEntry = entry;
-                        }
-                    }
-
-                    if (ssEntry == null) {
-                        /* The state system entry has not been built yet */
-                        buildEntriesForStateSystem(ss, timestamp, (TmfTreeViewerEntry) traceEntry);
-                    } else if (ssEntry.hasChildren()) {
-                        /*
-                         * Typical case at this point, update the data from the
-                         * state system
-                         */
-                        updateEntriesForStateSystem(ss, timestamp, (TmfTreeViewerEntry) ssEntry);
-                    } else {
-                        /*
-                         * The state system existed but entries were not filled,
-                         * that would occur if for instance the values were out
-                         * of range at the first query.
-                         */
-                        fillEntriesForStateSystem(ss, timestamp, (TmfTreeViewerEntry) ssEntry);
-                    }
-                }
-            }
-        }
-    }
-
-    @NonNull
-    private ITmfTreeViewerEntry buildEntriesForTrace(@NonNull ITmfTrace trace, long timestamp, @NonNull List<ITmfTreeViewerEntry> rootEntries) {
+    private static TmfTreeViewerEntry createTraceEntry(ITmfTrace trace) {
         TmfTreeViewerEntry traceEntry = new TmfTreeViewerEntry(trace.getName());
-        rootEntries.add(traceEntry);
-
         Iterable<ITmfAnalysisModuleWithStateSystems> modules = trace.getAnalysisModulesOfClass(ITmfAnalysisModuleWithStateSystems.class);
         for (ITmfAnalysisModuleWithStateSystems module : modules) {
             /* Just schedule the module, the data will be filled when available */
             module.schedule();
+            if (module instanceof TmfStateSystemAnalysisModule) {
+                // TODO: add this method to ITmfAnalysisModuleWithStateSystems
+                ((TmfStateSystemAnalysisModule) module).waitForInitialization();
+            }
             for (ITmfStateSystem ss : module.getStateSystems()) {
-                if (ss == null) {
-                    continue;
+                if (ss != null) {
+                    traceEntry.addChild(new StateSystemEntry(ss));
                 }
-                buildEntriesForStateSystem(ss, timestamp, traceEntry);
             }
         }
         return traceEntry;
     }
 
-    private void buildEntriesForStateSystem(ITmfStateSystem ss, long timestamp, TmfTreeViewerEntry traceEntry) {
-        TmfTreeViewerEntry ssEntry = new TmfTreeViewerEntry(ss.getSSID());
-        traceEntry.addChild(ssEntry);
-        fillEntriesForStateSystem(ss, timestamp, ssEntry);
-    }
-
-    private void fillEntriesForStateSystem(ITmfStateSystem ss, long timestamp, TmfTreeViewerEntry ssEntry) {
-        try {
-            addChildren(ss, ss.queryFullState(timestamp), -1, ssEntry, timestamp);
-        } catch (StateSystemDisposedException | TimeRangeException e) {
-            /* Nothing to do */
+    private static void clearStateSystemEntries(ITmfTreeViewerEntry root) {
+        for (ITmfTreeViewerEntry traceEntry : root.getChildren()) {
+            for (ITmfTreeViewerEntry ssEntry : traceEntry.getChildren()) {
+                ssEntry.getChildren().clear();
+            }
         }
     }
 
-    /**
-     * Add children node to an entry. It will create all necessary entries.
-     */
-    private void addChildren(ITmfStateSystem ss, List<ITmfStateInterval> fullState, int rootQuark, TmfTreeViewerEntry root, long timestamp) {
-        try {
-            for (int quark : ss.getSubAttributes(rootQuark, false)) {
-
-                ITmfStateInterval interval = fullState.get(quark);
-
-                StateSystemEntry entry = new StateSystemEntry(ss.getAttributeName(quark), quark, ss.getFullAttributePath(quark),
-                        interval.getStateValue(),
-                        new TmfTimestamp(interval.getStartTime(), ITmfTimestamp.NANOSECOND_SCALE),
-                        new TmfTimestamp(interval.getEndTime(), ITmfTimestamp.NANOSECOND_SCALE));
-
-                /* Add this node's children recursively */
-                addChildren(ss, fullState, quark, entry, timestamp);
-
-                /**
-                 * <pre>
-                 * Do not add this entry to root if
-                 * 1- the filter status is ON
-                 * AND
-                 * 2- the entry has no children
-                 * AND
-                 * 3- the start time is not the current timestamp
-                 * </pre>
-                 */
-                if (!(fFilterStatus && !entry.hasChildren() && (interval.getStartTime() != timestamp))) {
-                    root.addChild(entry);
+    private boolean updateStateSystemEntries(ITmfTreeViewerEntry root, long timestamp) {
+        boolean changed = false;
+        for (ITmfTreeViewerEntry traceEntry : root.getChildren()) {
+            for (ITmfTreeViewerEntry ssEntry : traceEntry.getChildren()) {
+                StateSystemEntry stateSystemEntry = (StateSystemEntry) ssEntry;
+                ITmfStateSystem ss = stateSystemEntry.getSS();
+                try {
+                    List<ITmfStateInterval> fullState = ss.queryFullState(timestamp);
+                    changed |= updateStateEntries(ss, fullState, stateSystemEntry, -1, timestamp);
+                } catch (TimeRangeException e) {
+                    markOutOfRange(stateSystemEntry);
+                    changed = true;
+                } catch (StateSystemDisposedException e) {
+                    /* Ignored */
                 }
             }
+        }
+        return changed;
+    }
 
+    private boolean updateStateEntries(ITmfStateSystem ss, List<ITmfStateInterval> fullState, TmfTreeViewerEntry parent, int parentQuark, long timestamp) {
+        boolean changed = false;
+        try {
+            for (int quark : ss.getSubAttributes(parentQuark, false)) {
+                if (quark >= fullState.size()) {
+                    // attribute was created after the full state query
+                    continue;
+                }
+                ITmfStateInterval interval = fullState.get(quark);
+                StateEntry stateEntry = findStateEntry(parent, quark);
+                if (stateEntry == null) {
+                    boolean modified = fFilterStatus ?
+                            interval.getStartTime() == timestamp :
+                                !interval.getStateValue().isNull();
+                    stateEntry = new StateEntry(ss.getAttributeName(quark), quark, ss.getFullAttributePath(quark),
+                            interval.getStateValue(),
+                            new TmfTimestamp(interval.getStartTime(), ITmfTimestamp.NANOSECOND_SCALE),
+                            new TmfTimestamp(interval.getEndTime(), ITmfTimestamp.NANOSECOND_SCALE),
+                            modified);
+
+                    // update children first to know if parent is really needed
+                    updateStateEntries(ss, fullState, stateEntry, quark, timestamp);
+
+                    /*
+                     * Add this entry to parent if filtering is off, or
+                     * if the entry has children to display, or
+                     * if there is a state change at the current timestamp
+                     */
+                    if (!fFilterStatus || stateEntry.hasChildren() || interval.getStartTime() == timestamp) {
+                        parent.addChild(stateEntry);
+                        changed = true;
+                    }
+                } else {
+                    stateEntry.update(interval.getStateValue(),
+                            new TmfTimestamp(interval.getStartTime(), ITmfTimestamp.NANOSECOND_SCALE),
+                            new TmfTimestamp(interval.getEndTime(), ITmfTimestamp.NANOSECOND_SCALE));
+
+                    // update children recursively
+                    updateStateEntries(ss, fullState, stateEntry, quark, timestamp);
+                }
+
+            }
         } catch (AttributeNotFoundException e) {
             /* Should not happen, we're iterating on known attributes */
-            throw new RuntimeException();
         }
+        return changed;
     }
 
-    private void updateEntriesForStateSystem(ITmfStateSystem ss, long timestamp, TmfTreeViewerEntry ssEntry) {
-        try {
-            updateChildren(ss, ss.queryFullState(timestamp), ssEntry);
-        } catch (StateSystemDisposedException e) {
-        } catch (TimeRangeException e) {
-            /* Mark all entries out of range */
-            markOutOfRange(ssEntry);
-        }
-    }
-
-    /**
-     * Update the values of existing entries.
-     */
-    private void updateChildren(ITmfStateSystem ss, List<ITmfStateInterval> fullState, ITmfTreeViewerEntry root) {
-        for (ITmfTreeViewerEntry entry : root.getChildren()) {
-            if (entry instanceof StateSystemEntry) {
-                /*
-                 * FIXME: if new sub attributes were added since the element was
-                 * built, then then will not be added
-                 */
-                StateSystemEntry ssEntry = (StateSystemEntry) entry;
-                ITmfStateInterval interval = fullState.get(ssEntry.getQuark());
-                if (interval != null) {
-                    ssEntry.update(interval.getStateValue(), new TmfTimestamp(interval.getStartTime(), ITmfTimestamp.NANOSECOND_SCALE),
-                            new TmfTimestamp(interval.getEndTime(), ITmfTimestamp.NANOSECOND_SCALE));
-                }
-
-                /* Update this node's children recursively */
-                updateChildren(ss, fullState, ssEntry);
+    private static StateEntry findStateEntry(TmfTreeViewerEntry parent, int quark) {
+        for (ITmfTreeViewerEntry child : parent.getChildren()) {
+            StateEntry stateEntry = (StateEntry) child;
+            if (stateEntry.getQuark() == quark) {
+                return stateEntry;
             }
         }
+        return null;
     }
-
     /**
      * Set the entries as out of range
      */
-    private void markOutOfRange(ITmfTreeViewerEntry root) {
-        for (ITmfTreeViewerEntry entry : root.getChildren()) {
-            if (entry instanceof StateSystemEntry) {
-                ((StateSystemEntry) entry).setOutOfRange();
+    private static void markOutOfRange(ITmfTreeViewerEntry parent) {
+        for (ITmfTreeViewerEntry entry : parent.getChildren()) {
+            if (entry instanceof StateEntry) {
+                ((StateEntry) entry).setOutOfRange();
 
                 /* Update this node's children recursively */
                 markOutOfRange(entry);
@@ -404,23 +350,37 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
         updateContent(getSelectionBeginTime(), getSelectionEndTime(), true);
     }
 
-    private class StateSystemEntry extends TmfTreeViewerEntry {
+    private static class StateSystemEntry extends TmfTreeViewerEntry {
+        private final @NonNull ITmfStateSystem fSS;
+
+        public StateSystemEntry(@NonNull ITmfStateSystem ss) {
+            super(ss.getSSID());
+            fSS = ss;
+        }
+
+        public @NonNull ITmfStateSystem getSS() {
+            return fSS;
+        }
+    }
+
+    private class StateEntry extends TmfTreeViewerEntry {
 
         private final int fQuark;
         private final String fFullPath;
         private @NonNull TmfTimestamp fStart;
         private @NonNull TmfTimestamp fEnd;
         private ITmfStateValue fValue;
-        private boolean fModified = false;
+        private boolean fModified;
         private boolean fOutOfRange = false;
 
-        public StateSystemEntry(String name, int quark, String fullPath, ITmfStateValue value, @NonNull TmfTimestamp start, @NonNull TmfTimestamp end) {
+        public StateEntry(String name, int quark, String fullPath, ITmfStateValue value, @NonNull TmfTimestamp start, @NonNull TmfTimestamp end, boolean modified) {
             super(name);
             fQuark = quark;
             fFullPath = fullPath;
             fStart = start;
             fEnd = end;
             fValue = value;
+            fModified = modified;
         }
 
         public int getQuark() {

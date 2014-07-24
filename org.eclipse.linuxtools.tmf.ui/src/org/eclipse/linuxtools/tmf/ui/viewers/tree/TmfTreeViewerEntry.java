@@ -99,4 +99,9 @@ public class TmfTreeViewerEntry implements ITmfTreeViewerEntry {
         fChildren.add(child);
     }
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + '[' + fName + ']';
+    }
+
 }

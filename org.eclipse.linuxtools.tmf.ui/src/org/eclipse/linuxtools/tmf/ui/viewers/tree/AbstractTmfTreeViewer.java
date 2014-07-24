@@ -416,6 +416,7 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
                                 contentChanged(rootEntry);
                             } else {
                                 fTreeViewer.refresh();
+                                fTreeViewer.expandToLevel(fTreeViewer.getAutoExpandLevel());
                             }
                             // FIXME should add a bit of padding
                             for (TreeColumn column : fTreeViewer.getTree().getColumns()) {
