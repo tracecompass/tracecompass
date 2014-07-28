@@ -35,7 +35,7 @@ import com.google.common.collect.Multimap;
  * @author Simon Marchi
  */
 @Deprecated
-public class SequenceDeclaration extends Declaration {
+public class SequenceDeclaration extends CompoundDeclaration {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -66,11 +66,7 @@ public class SequenceDeclaration extends Declaration {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
-    /**
-     * Gets the element type
-     *
-     * @return the element type
-     */
+    @Override
     public IDeclaration getElementType() {
         return fElemType;
     }
@@ -84,32 +80,9 @@ public class SequenceDeclaration extends Declaration {
         return fLengthName;
     }
 
-    @Override
-    public long getAlignment() {
-        return getElementType().getAlignment();
-    }
-
-
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-
-    /**
-     * Is the Sequence a string?
-     * @return true, if the elements are chars, false otherwise
-     * @since 3.0
-     */
-    public boolean isString(){
-        IntegerDeclaration elemInt;
-        IDeclaration elementType = getElementType();
-        if (elementType instanceof IntegerDeclaration) {
-            elemInt = (IntegerDeclaration) elementType;
-            if (elemInt.isCharacter()) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     /**
      * @since 3.0

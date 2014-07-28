@@ -22,7 +22,6 @@ import org.eclipse.linuxtools.ctf.core.event.types.CompoundDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinition;
-import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 
@@ -85,31 +84,9 @@ public class SequenceDeclaration extends CompoundDeclaration {
         return fLengthName;
     }
 
-    @Override
-    public long getAlignment() {
-        return getElementType().getAlignment();
-    }
-
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-
-    /**
-     * Is the Sequence a string?
-     *
-     * @return true, if the elements are chars, false otherwise
-     */
-    public boolean isString() {
-        IntegerDeclaration elemInt;
-        IDeclaration elementType = getElementType();
-        if (elementType instanceof IntegerDeclaration) {
-            elemInt = (IntegerDeclaration) elementType;
-            if (elemInt.isCharacter()) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     @Override
     public AbstractArrayDefinition createDefinition(

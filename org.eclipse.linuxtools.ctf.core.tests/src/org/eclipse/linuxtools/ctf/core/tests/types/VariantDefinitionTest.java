@@ -22,6 +22,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.ctf.core.event.io.BitBuffer;
 import org.eclipse.linuxtools.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.linuxtools.ctf.core.event.types.AbstractArrayDefinition;
+import org.eclipse.linuxtools.ctf.core.event.types.CompoundDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.Encoding;
 import org.eclipse.linuxtools.ctf.core.event.types.EnumDeclaration;
@@ -87,7 +88,7 @@ public class VariantDefinitionTest {
         EnumDeclaration enDec = new EnumDeclaration(iDec);
         VariantDeclaration varDec = new VariantDeclaration();
         EnumDeclaration tagDec = new EnumDeclaration(iDec);
-        ArrayDeclaration arrDec = new ArrayDeclaration(2, iDec);
+        CompoundDeclaration arrDec = new ArrayDeclaration(2, iDec);
         FloatDeclaration fDec = new FloatDeclaration(8, 24, ByteOrder.BIG_ENDIAN, 8);
         tagDec.add(0, 1, ENUM_1);
         tagDec.add(2, 3, ENUM_2);

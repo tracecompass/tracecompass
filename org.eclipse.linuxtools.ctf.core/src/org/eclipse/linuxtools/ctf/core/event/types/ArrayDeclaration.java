@@ -32,13 +32,14 @@ import com.google.common.collect.Multimap;
  * can refer to any type not containing the type of the array being declared (no
  * circular dependency). The length is the number of elements in an array.
  *
- * @deprecated use {@link org.eclipse.linuxtools.internal.ctf.core.event.types.ArrayDeclaration}
+ * @deprecated use
+ *             {@link org.eclipse.linuxtools.internal.ctf.core.event.types.ArrayDeclaration}
  * @version 1.0
  * @author Matthew Khouzam
  * @author Simon Marchi
  */
 @Deprecated
-public class ArrayDeclaration extends Declaration {
+public class ArrayDeclaration extends CompoundDeclaration {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -80,10 +81,7 @@ public class ArrayDeclaration extends Declaration {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
-    /**
-     *
-     * @return the type of element in the array
-     */
+    @Override
     public IDeclaration getElementType() {
         return fElemType;
     }
@@ -94,33 +92,6 @@ public class ArrayDeclaration extends Declaration {
      */
     public int getLength() {
         return fLength;
-    }
-
-    /**
-     * Sometimes, strings are encoded as an array of 1-byte integers (each one
-     * being an UTF-8 byte).
-     *
-     * @return true if this array is in fact an UTF-8 string. false if it's a
-     *         "normal" array of generic Definition's.
-     * @since 3.0
-     */
-    public boolean isString() {
-        if (fElemType instanceof IntegerDeclaration) {
-            /*
-             * If the first byte is a "character", we'll consider the whole
-             * array a character string.
-             */
-            IntegerDeclaration elemInt = (IntegerDeclaration) fElemType;
-            if (elemInt.isCharacter()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public long getAlignment() {
-        return getElementType().getAlignment();
     }
 
     // ------------------------------------------------------------------------

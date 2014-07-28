@@ -28,4 +28,25 @@ public abstract class CompoundDeclaration extends Declaration {
      */
     public abstract IDeclaration getElementType();
 
+    @Override
+    public long getAlignment() {
+        return getElementType().getAlignment();
+    }
+
+    /**
+     * Sometimes, strings are encoded as an array of 1-byte integers (each one
+     * being an UTF-8 byte).
+     *
+     * @return true if this array is in fact an UTF-8 string. false if it's a
+     *         "normal" array of generic Definition's.
+     */
+    public boolean isString(){
+        IDeclaration elementType = getElementType();
+        if (elementType instanceof IntegerDeclaration) {
+            IntegerDeclaration elemInt = (IntegerDeclaration) elementType;
+            return elemInt.isCharacter();
+        }
+        return false;
+    }
+
 }

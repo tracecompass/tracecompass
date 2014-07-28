@@ -21,7 +21,6 @@ import org.eclipse.linuxtools.ctf.core.event.types.AbstractArrayDefinition;
 import org.eclipse.linuxtools.ctf.core.event.types.CompoundDeclaration;
 import org.eclipse.linuxtools.ctf.core.event.types.Definition;
 import org.eclipse.linuxtools.ctf.core.event.types.IDeclaration;
-import org.eclipse.linuxtools.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -93,32 +92,6 @@ public final class ArrayDeclaration extends CompoundDeclaration {
      */
     public int getLength() {
         return fLength;
-    }
-
-    /**
-     * Sometimes, strings are encoded as an array of 1-byte integers (each one
-     * being an UTF-8 byte).
-     *
-     * @return true if this array is in fact an UTF-8 string. false if it's a
-     *         "normal" array of generic Definition's.
-     */
-    public boolean isString() {
-        if (fElemType instanceof IntegerDeclaration) {
-            /*
-             * If the first byte is a "character", we'll consider the whole
-             * array a character string.
-             */
-            IntegerDeclaration elemInt = (IntegerDeclaration) fElemType;
-            if (elemInt.isCharacter()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public long getAlignment() {
-        return getElementType().getAlignment();
     }
 
     // ------------------------------------------------------------------------
