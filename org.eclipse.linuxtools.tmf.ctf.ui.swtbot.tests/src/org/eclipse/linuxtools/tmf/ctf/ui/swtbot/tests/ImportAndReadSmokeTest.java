@@ -21,6 +21,7 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.linuxtools.internal.tmf.ui.project.wizards.importtrace.BatchImportTraceWizard;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
+import org.eclipse.linuxtools.tmf.ui.swtbot.tests.SWTBotUtil;
 import org.eclipse.linuxtools.tmf.ui.swtbot.tests.conditions.ConditionHelpers;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
@@ -64,8 +65,9 @@ public class ImportAndReadSmokeTest extends AbstractImportAndReadSmokeTest {
         testHistogramView(getViewPart("Histogram"), tmfEd);
         testPropertyView(getViewPart("Properties"));
         testStatisticsView(getViewPart("Statistics"));
+        fBot.closeAllEditors();
 
-        deleteProject();
+        SWTBotUtil.deleteProject(getProjectName(), fBot);
     }
 
     private static void batchImportOpenWizard() {
@@ -135,5 +137,10 @@ public class ImportAndReadSmokeTest extends AbstractImportAndReadSmokeTest {
     @Override
     protected String getProjectName() {
         return TRACE_PROJECT_NAME;
+    }
+
+    @Override
+    protected boolean supportsFolderStructure() {
+        return false;
     }
 }

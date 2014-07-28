@@ -138,6 +138,9 @@ public class ImportAndReadKernelSmokeTest {
         testHV(getViewPart("Histogram"));
         testCFV((ControlFlowView) getViewPart("Control Flow"));
         testRV((ResourcesView) getViewPart("Resources"));
+
+        fBot.closeAllEditors();
+        SWTBotUtil.deleteProject(TRACE_PROJECT_NAME, fBot);
     }
 
     private static void openTrace() {

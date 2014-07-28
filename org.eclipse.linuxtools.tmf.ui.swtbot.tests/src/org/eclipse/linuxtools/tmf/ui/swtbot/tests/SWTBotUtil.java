@@ -18,6 +18,9 @@ import static org.junit.Assert.fail;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
@@ -28,7 +31,14 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
@@ -80,6 +90,44 @@ public abstract class SWTBotUtil {
                 assertNotNull(project);
             }
         });
+
+        SWTBotUtil.waitForJobs();
+    }
+
+    /**
+     * Deletes a tracing project
+     *
+     * @param projectName
+     *            the name of the tracing project
+     * @param bot
+     *            the workbench bot
+     */
+    public static void deleteProject(String projectName, SWTWorkbenchBot bot) {
+        // Wait for any analysis to complete because it might create supplementary files
+        SWTBotUtil.waitForJobs();
+        try {
+            ResourcesPlugin.getWorkspace().getRoot().getProject(projectName).refreshLocal(IResource.DEPTH_INFINITE, null);
+        } catch (CoreException e) {
+        }
+
+        SWTBotUtil.waitForJobs();
+
+        final SWTBotView projectViewBot = bot.viewById(IPageLayout.ID_PROJECT_EXPLORER);
+        projectViewBot.setFocus();
+
+        SWTBotTree treeBot = bot.tree();
+        SWTBotTreeItem treeItem = treeBot.getTreeItem(projectName);
+        SWTBotMenu contextMenu = treeItem.contextMenu("Delete");
+        contextMenu.click();
+
+        bot.shell("Delete Resources").setFocus();
+        final SWTBotCheckBox checkBox = bot.checkBox();
+        bot.waitUntil(Conditions.widgetIsEnabled(checkBox));
+        checkBox.click();
+
+        final SWTBotButton okButton = bot.button("OK");
+        bot.waitUntil(Conditions.widgetIsEnabled(okButton));
+        okButton.click();
 
         SWTBotUtil.waitForJobs();
     }
