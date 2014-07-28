@@ -19,6 +19,7 @@
 
 package org.eclipse.linuxtools.tmf.ui.views.histogram;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.Separator;
@@ -84,7 +85,7 @@ public class HistogramView extends TmfView {
     /**
      *  The view ID as defined in plugin.xml
      */
-    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.histogram"; //$NON-NLS-1$
+    public static final @NonNull String ID = "org.eclipse.linuxtools.tmf.ui.views.histogram"; //$NON-NLS-1$
 
     private static final Image LINK_IMG = Activator.getDefault().getImageFromPath("/icons/etool16/link.gif"); //$NON-NLS-1$
 

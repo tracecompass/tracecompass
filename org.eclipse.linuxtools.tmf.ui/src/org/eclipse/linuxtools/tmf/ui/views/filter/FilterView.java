@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -55,7 +56,7 @@ import org.xml.sax.SAXException;
 public class FilterView extends TmfView {
 
     /** ID for the Filter view */
-    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.filter"; //$NON-NLS-1$
+    public static final @NonNull String ID = "org.eclipse.linuxtools.tmf.ui.views.filter"; //$NON-NLS-1$
 
     private static final Image SAVE_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/save_button.gif"); //$NON-NLS-1$
     private static final Image ADD_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/add_button.gif"); //$NON-NLS-1$

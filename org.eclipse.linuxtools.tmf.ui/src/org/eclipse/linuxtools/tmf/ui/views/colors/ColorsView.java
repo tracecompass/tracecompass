@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
@@ -66,7 +67,7 @@ import org.eclipse.ui.IActionBars;
 public class ColorsView extends TmfView {
 
     /** ID for the color view */
-    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.colors"; //$NON-NLS-1$
+    public static final @NonNull String ID = "org.eclipse.linuxtools.tmf.ui.views.colors"; //$NON-NLS-1$
 
     private static final Image ADD_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/add_button.gif"); //$NON-NLS-1$
     private static final Image DELETE_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/delete_button.gif"); //$NON-NLS-1$

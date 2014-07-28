@@ -16,6 +16,7 @@
 
 package org.eclipse.linuxtools.tmf.ui.views.statistics;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
@@ -46,7 +47,7 @@ public class TmfStatisticsView extends TmfView {
     /**
      * The ID corresponds to the package in which this class is embedded.
      */
-    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.statistics"; //$NON-NLS-1$
+    public static final @NonNull String ID = "org.eclipse.linuxtools.tmf.ui.views.statistics"; //$NON-NLS-1$
 
     /**
      * The view name.
