@@ -123,6 +123,10 @@ public final class Utils {
         if (!intUuidElem.isUnsignedByte()) {
             throw new CTFReaderException("UUID must be a sequence of unsigned bytes"); //$NON-NLS-1$
         }
+        return getUUID(uuidDef, uuidArray);
+    }
+
+    private static UUID getUUID(AbstractArrayDefinition uuidDef, byte[] uuidArray) throws CTFReaderException {
         for (int i = 0; i < uuidArray.length; i++) {
             IntegerDefinition uuidByteDef = (IntegerDefinition) uuidDef.getDefinitions().get(i);
             if (uuidByteDef == null) {
@@ -150,17 +154,7 @@ public final class Utils {
     @Deprecated
     public static UUID getUUIDfromDefinition(org.eclipse.linuxtools.ctf.core.event.types.ArrayDefinition uuidDef) throws CTFReaderException {
         byte[] uuidArray = new byte[16];
-
-        for (int i = 0; i < uuidArray.length; i++) {
-            IntegerDefinition uuidByteDef = (IntegerDefinition) uuidDef.getElem(i);
-            if (uuidByteDef == null) {
-                throw new CTFReaderException("UUID incomplete, only " + i + " bytes available"); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-            uuidArray[i] = (byte) uuidByteDef.getValue();
-        }
-
-        UUID uuid = Utils.makeUUID(uuidArray);
-        return uuid;
+        return getUUID(uuidDef, uuidArray);
     }
 
     /**
