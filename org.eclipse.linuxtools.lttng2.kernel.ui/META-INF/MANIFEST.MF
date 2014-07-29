@@ -23,3 +23,4 @@ Export-Package: org.eclipse.linuxtools.internal.lttng2.kernel.ui;x-friends:="org
  org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow;x-friends:="org.eclipse.linuxtools.lttng2.kernel.ui.swtbot.tests",
  org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.cpuusage;x-friends:="org.eclipse.linuxtools.lttng2.kernel.ui.swtbot.tests",
  org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources;x-friends:="org.eclipse.linuxtools.lttng2.kernel.ui.swtbot.tests"
+Import-Package: com.google.common.collect

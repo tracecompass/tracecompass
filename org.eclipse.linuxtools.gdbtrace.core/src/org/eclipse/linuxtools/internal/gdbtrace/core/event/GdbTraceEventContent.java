@@ -13,6 +13,7 @@
 
 package org.eclipse.linuxtools.internal.gdbtrace.core.event;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 
@@ -23,9 +24,9 @@ import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 public class GdbTraceEventContent extends TmfEventField {
 
     /** Trace Frame field name */
-    public static final String TRACE_FRAME = "Trace Frame"; //$NON-NLS-1$
+    public static final @NonNull String TRACE_FRAME = "Trace Frame"; //$NON-NLS-1$
     /** Tracepoint field name */
-    public static final String TRACEPOINT = "Tracepoint"; //$NON-NLS-1$
+    public static final @NonNull String TRACEPOINT = "Tracepoint"; //$NON-NLS-1$
 
     // Tracepoint number
     private int fTracepointNumber = 0;

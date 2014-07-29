@@ -15,7 +15,11 @@
 
 package org.eclipse.linuxtools.tmf.ui.widgets.virtualtable;
 
+import java.util.List;
+
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
+import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable.Key;
+import org.eclipse.linuxtools.tmf.ui.viewers.events.columns.TmfEventTableColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.TableEditor;
@@ -893,24 +897,47 @@ public class TmfVirtualTable extends Composite {
 
     /**
      * Method setColumnHeaders.
-     * @param columnData ColumnData[] the columndata array.
+     *
+     * @param columnData
+     *            ColumnData[] the columndata array.
      */
+    @Deprecated
     public void setColumnHeaders(ColumnData columnData[]) {
-        for (int i = 0; i < columnData.length; i++) {
-            TableColumn column = new TableColumn(fTable, columnData[i].alignment, i);
-            column.setText(columnData[i].header);
+        /* No-op */
+    }
+
+    /**
+     * Method setColumnHeaders.
+     *
+     * @param columns
+     *            The configuration elements of every column, in the order they
+     *            should be initially in the table.
+     * @since 3.1
+     */
+    public void createColumns(List<TmfEventTableColumn> columns) {
+        for (TmfEventTableColumn column : columns) {
+
+            /* Set the column's header and properties */
+            TableColumn tableCol = new TableColumn(fTable, SWT.LEFT);
+            tableCol.setText(column.getHeaderName());
+
+            /* Set the column's tooltip, if any */
+            String tooltip = column.getHeaderTooltip();
+            if (tooltip != null) {
+                tableCol.setToolTipText(tooltip);
+            }
+
+            /* Set the column's Field ID (for filtering) */
+            tableCol.setData(Key.FIELD_ID, column.getFilterFieldId());
+
             /*
              * In Linux the table does not receive a control resized event when
              * a table column resize causes the horizontal scroll bar to become
              * visible or invisible, so a resize listener must be added to every
              * table column to properly update the number of fully visible rows.
              */
-            column.addControlListener(fResizeListener);
-            if (columnData[i].width > 0) {
-                column.setWidth(columnData[i].width);
-            } else {
-                column.pack();
-            }
+            tableCol.addControlListener(fResizeListener);
+            tableCol.pack();
         }
     }
 

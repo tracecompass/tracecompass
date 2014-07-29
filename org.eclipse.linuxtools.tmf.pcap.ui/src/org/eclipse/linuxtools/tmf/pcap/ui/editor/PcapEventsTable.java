@@ -8,18 +8,23 @@
  *
  * Contributors:
  *   Vincent Perot - Initial API and implementation
+ *   Alexandre Montplaisir - Update to new TmfEventTableColumn API
  *******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.pcap.ui.editor;
 
+import java.util.Collection;
+
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.pcap.core.event.PcapEvent;
 import org.eclipse.linuxtools.tmf.pcap.core.protocol.TmfProtocol;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
-import org.eclipse.linuxtools.tmf.ui.widgets.virtualtable.ColumnData;
-import org.eclipse.swt.SWT;
+import org.eclipse.linuxtools.tmf.ui.viewers.events.columns.TmfEventTableColumn;
 import org.eclipse.swt.widgets.Composite;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Default event table for pcap traces.
@@ -32,24 +37,102 @@ public class PcapEventsTable extends TmfEventsTable {
     // Table data
     // ------------------------------------------------------------------------
 
-    // Table column names
-    private static final String[] COLUMN_NAMES = new String[] {
-            Messages.PcapEventsTable_Timestamp,
-            Messages.PcapEventsTable_Source,
-            Messages.PcapEventsTable_Destination,
-            Messages.PcapEventsTable_Reference,
-            Messages.PcapEventsTable_Protocol,
-            Messages.PcapEventsTable_Content
-    };
+    @SuppressWarnings("null")
+    private static final @NonNull Collection<TmfEventTableColumn> PCAP_COLUMNS = ImmutableList.of(
+            TmfEventTableColumn.BaseColumns.TIMESTAMP,
+            new PcapSourceColumn(),
+            new PcapDestinationColumn(),
+            TmfEventTableColumn.BaseColumns.REFERENCE,
+            new PcapProtocolColumn(),
+            TmfEventTableColumn.BaseColumns.CONTENTS
+            );
 
-    private static final ColumnData[] COLUMN_DATA = new ColumnData[] {
-            new ColumnData(COLUMN_NAMES[0], 150, SWT.LEFT),
-            new ColumnData(COLUMN_NAMES[1], 120, SWT.LEFT),
-            new ColumnData(COLUMN_NAMES[2], 200, SWT.LEFT),
-            new ColumnData(COLUMN_NAMES[3], 100, SWT.LEFT),
-            new ColumnData(COLUMN_NAMES[4], 100, SWT.LEFT),
-            new ColumnData(COLUMN_NAMES[5], 100, SWT.LEFT)
-    };
+    /**
+     * The "packet source" column for pcap events
+     */
+    private static class PcapSourceColumn extends TmfEventTableColumn {
+
+        public PcapSourceColumn() {
+            super(getString(Messages.PcapEventsTable_Source));
+        }
+
+        @Override
+        public String getItemString(ITmfEvent event) {
+            if (!(event instanceof PcapEvent)) {
+                return EMPTY_STRING;
+            }
+            PcapEvent pcapEvent = (PcapEvent) event;
+            TmfProtocol protocol = pcapEvent.getMostEncapsulatedProtocol();
+
+            return getString(pcapEvent.getSourceEndpoint(protocol));
+        }
+
+        @Override
+        public @Nullable String getFilterFieldId() {
+            return PcapEvent.EVENT_FIELD_PACKET_SOURCE;
+        }
+    }
+
+    /**
+     * The "packet destination" column for pcap events
+     */
+    private static class PcapDestinationColumn extends TmfEventTableColumn {
+
+        public PcapDestinationColumn() {
+            super(getString(Messages.PcapEventsTable_Destination));
+        }
+
+        @Override
+        public String getItemString(ITmfEvent event) {
+            if (!(event instanceof PcapEvent)) {
+                return EMPTY_STRING;
+            }
+            PcapEvent pcapEvent = (PcapEvent) event;
+            TmfProtocol protocol = pcapEvent.getMostEncapsulatedProtocol();
+            return getString(pcapEvent.getDestinationEndpoint(protocol));
+        }
+
+        @Override
+        public @Nullable String getFilterFieldId() {
+            return PcapEvent.EVENT_FIELD_PACKET_DESTINATION;
+        }
+    }
+
+    /**
+     * The "packet protocol" column for pcap events
+     */
+    private static class PcapProtocolColumn extends TmfEventTableColumn {
+
+        public PcapProtocolColumn() {
+            super(getString(Messages.PcapEventsTable_Protocol));
+        }
+
+        @Override
+        public String getItemString(ITmfEvent event) {
+            if (!(event instanceof PcapEvent)) {
+                return EMPTY_STRING;
+            }
+            PcapEvent pcapEvent = (PcapEvent) event;
+            TmfProtocol protocol = pcapEvent.getMostEncapsulatedProtocol();
+
+            @SuppressWarnings("null")
+            @NonNull String proto = protocol.getShortName().toUpperCase();
+            return proto;
+        }
+
+        @Override
+        public @Nullable String getFilterFieldId() {
+            return PcapEvent.EVENT_FIELD_PACKET_PROTOCOL;
+        }
+    }
+
+    /**
+     * Little convenience method to work around the incompatibilities between
+     * null annotations and NLS files...
+     */
+    private static String getString(@Nullable String str) {
+        return (str == null ? EMPTY_STRING : str);
+    }
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -64,32 +147,6 @@ public class PcapEventsTable extends TmfEventsTable {
      *            The size of the rows cache
      */
     public PcapEventsTable(Composite parent, int cacheSize) {
-        super(parent, cacheSize, COLUMN_DATA);
-        fTable.getColumns()[0].setData(Key.FIELD_ID, ITmfEvent.EVENT_FIELD_TIMESTAMP);
-        fTable.getColumns()[1].setData(Key.FIELD_ID, PcapEvent.EVENT_FIELD_PACKET_SOURCE);
-        fTable.getColumns()[2].setData(Key.FIELD_ID, PcapEvent.EVENT_FIELD_PACKET_DESTINATION);
-        fTable.getColumns()[3].setData(Key.FIELD_ID, ITmfEvent.EVENT_FIELD_REFERENCE);
-        fTable.getColumns()[4].setData(Key.FIELD_ID, PcapEvent.EVENT_FIELD_PACKET_PROTOCOL);
-        fTable.getColumns()[5].setData(Key.FIELD_ID, ITmfEvent.EVENT_FIELD_CONTENT);
-    }
-
-    @Override
-    public String[] getItemStrings(@Nullable ITmfEvent event) {
-
-        if (event == null || !(event instanceof PcapEvent)) {
-            return EMPTY_STRING_ARRAY;
-        }
-
-        PcapEvent pcapEvent = (PcapEvent) event;
-        TmfProtocol protocol = pcapEvent.getMostEncapsulatedProtocol();
-
-        return new String[] {
-                pcapEvent.getTimestamp().toString(),
-                pcapEvent.getSourceEndpoint(protocol),
-                pcapEvent.getDestinationEndpoint(protocol),
-                pcapEvent.getReference(),
-                protocol.getShortName().toUpperCase(),
-                pcapEvent.getContent().toString()
-        };
+        super(parent, cacheSize, PCAP_COLUMNS);
     }
 }

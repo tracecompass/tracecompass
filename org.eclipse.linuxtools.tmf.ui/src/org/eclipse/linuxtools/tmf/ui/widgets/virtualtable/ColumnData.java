@@ -11,12 +11,14 @@
  ******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.widgets.virtualtable;
+
 /**
  * ColumnData
- * @author Matthew Khouzam
- * @version 1.0
  *
+ * @author Matthew Khouzam
+ * @deprecated Use {@link org.eclipse.linuxtools.tmf.ui.viewers.events.columns.TmfEventTableColumn} instead.
  */
+@Deprecated
 public class ColumnData {
     /**
      * The title of the column

@@ -12,12 +12,14 @@
 
 package org.eclipse.linuxtools.tmf.ui.tests.experiment.type;
 
-import org.eclipse.linuxtools.internal.tmf.ui.Messages;
+import java.util.Collection;
+
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
-import org.eclipse.linuxtools.tmf.ui.widgets.virtualtable.ColumnData;
-import org.eclipse.swt.SWT;
+import org.eclipse.linuxtools.tmf.ui.viewers.events.columns.TmfEventTableColumn;
 import org.eclipse.swt.widgets.Composite;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Event table stub for experiment type unit tests
@@ -30,24 +32,26 @@ public class TmfEventsTableExperimentStub extends TmfEventsTable {
     // Table data
     // ------------------------------------------------------------------------
 
-    // Table column names
-    private static final String[] COLUMN_NAMES = new String[] {
-            Messages.TmfEventsTable_TimestampColumnHeader,
-            Messages.TmfEventsTable_SourceColumnHeader,
-            Messages.TmfEventsTable_TypeColumnHeader,
-            Messages.TmfEventsTable_ReferenceColumnHeader,
-            "Trace",
-            Messages.TmfEventsTable_ContentColumnHeader
-    };
+    private static final Collection<TmfEventTableColumn> EXPERIMENT_COLUMNS =
+            ImmutableList.<TmfEventTableColumn> of(new SourceTraceColumn());
 
-    private static final ColumnData[] COLUMN_DATA = new ColumnData[] {
-            new ColumnData(COLUMN_NAMES[0], 100, SWT.LEFT),
-            new ColumnData(COLUMN_NAMES[1], 100, SWT.LEFT),
-            new ColumnData(COLUMN_NAMES[2], 100, SWT.LEFT),
-            new ColumnData(COLUMN_NAMES[3], 100, SWT.LEFT),
-            new ColumnData(COLUMN_NAMES[4], 100, SWT.LEFT),
-            new ColumnData(COLUMN_NAMES[5], 100, SWT.LEFT)
-    };
+    private static class SourceTraceColumn extends TmfEventTableColumn {
+
+        public SourceTraceColumn() {
+            super("Trace");
+        }
+
+        @Override
+        public String getItemString(ITmfEvent event) {
+            String ret = event.getTrace().getName();
+            return (ret == null ? EMPTY_STRING : ret);
+        }
+
+        @Override
+        public String getFilterFieldId() {
+            return null;
+        }
+    }
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -62,21 +66,6 @@ public class TmfEventsTableExperimentStub extends TmfEventsTable {
      *            The size of the rows cache
      */
     public TmfEventsTableExperimentStub(Composite parent, int cacheSize) {
-        super(parent, cacheSize, COLUMN_DATA);
-    }
-
-    @Override
-    public String[] getItemStrings(ITmfEvent event) {
-        if (event == null) {
-            return EMPTY_STRING_ARRAY;
-        }
-        return new String[] {
-                event.getTimestamp().toString(),
-                event.getSource(),
-                event.getType().getName(),
-                event.getReference(),
-                event.getTrace().getName(),
-                event.getContent().toString()
-        };
+        super(parent, cacheSize, EXPERIMENT_COLUMNS);
     }
 }

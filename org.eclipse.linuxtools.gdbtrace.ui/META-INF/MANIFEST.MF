@@ -24,4 +24,5 @@ Export-Package: org.eclipse.linuxtools.internal.gdbtrace.ui;x-friends:
  .internal.gdbtrace.ui.views.project.dialogs;x-internal:=true,org.ecli
  pse.linuxtools.internal.gdbtrace.ui.views.project.handlers;x-internal
  :=true
-Import-Package: org.eclipse.cdt.core
+Import-Package: com.google.common.collect,
+ org.eclipse.cdt.core

@@ -12,11 +12,15 @@
 
 package org.eclipse.linuxtools.internal.lttng2.kernel.ui.viewers.events;
 
+import java.util.Collection;
+
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
-import org.eclipse.linuxtools.tmf.ui.widgets.virtualtable.ColumnData;
-import org.eclipse.swt.SWT;
+import org.eclipse.linuxtools.tmf.ui.viewers.events.columns.TmfEventTableColumn;
 import org.eclipse.swt.widgets.Composite;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Events table specific for LTTng 2.0 kernel traces
@@ -24,27 +28,36 @@ import org.eclipse.swt.widgets.Composite;
 public class LTTng2EventsTable extends TmfEventsTable {
 
     // ------------------------------------------------------------------------
-    // Table data
+    // Column definition
     // ------------------------------------------------------------------------
 
-    // Table column names
-    static private final String TIMESTAMP_COLUMN = Messages.EventsTable_timestampColumn;
-    static private final String CHANNEL_COLUMN = Messages.EventsTable_channelColumn;
-    static private final String TYPE_COLUMN = Messages.EventsTable_typeColumn;
-    static private final String CONTENT_COLUMN = Messages.EventsTable_contentColumn;
-    static private final String[] COLUMN_NAMES = new String[] {
-            TIMESTAMP_COLUMN,
-            CHANNEL_COLUMN,
-            TYPE_COLUMN,
-            CONTENT_COLUMN
-    };
+    @SuppressWarnings("null")
+    private static final @NonNull String CHANNEL_HEADER = Messages.EventsTable_channelColumn;
 
-    static private final ColumnData[] COLUMN_DATA = new ColumnData[] {
-            new ColumnData(COLUMN_NAMES[0], 150, SWT.LEFT),
-            new ColumnData(COLUMN_NAMES[1], 120, SWT.LEFT),
-            new ColumnData(COLUMN_NAMES[2], 200, SWT.LEFT),
-            new ColumnData(COLUMN_NAMES[3], 100, SWT.LEFT)
-    };
+    private static final Collection<TmfEventTableColumn> LTTNG_COLUMNS =
+            ImmutableList.<TmfEventTableColumn> of(
+                    TmfEventTableColumn.BaseColumns.TIMESTAMP,
+                    new LttngChannelColumn(),
+                    TmfEventTableColumn.BaseColumns.EVENT_TYPE,
+                    TmfEventTableColumn.BaseColumns.CONTENTS);
+
+    private static class LttngChannelColumn extends TmfEventTableColumn {
+
+        public LttngChannelColumn() {
+            super(CHANNEL_HEADER);
+        }
+
+        @Override
+        public String getItemString(ITmfEvent event) {
+            String ret = event.getReference();
+            return (ret == null ? EMPTY_STRING : ret);
+        }
+
+        @Override
+        public String getFilterFieldId() {
+            return ITmfEvent.EVENT_FIELD_REFERENCE;
+        }
+    }
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -59,23 +72,6 @@ public class LTTng2EventsTable extends TmfEventsTable {
      *            The size of the rows cache
      */
     public LTTng2EventsTable(Composite parent, int cacheSize) {
-        super(parent, cacheSize, COLUMN_DATA);
-        fTable.getColumns()[0].setData(Key.FIELD_ID, ITmfEvent.EVENT_FIELD_TIMESTAMP);
-        fTable.getColumns()[1].setData(Key.FIELD_ID, ITmfEvent.EVENT_FIELD_REFERENCE);
-        fTable.getColumns()[2].setData(Key.FIELD_ID, ITmfEvent.EVENT_FIELD_TYPE);
-        fTable.getColumns()[3].setData(Key.FIELD_ID, ITmfEvent.EVENT_FIELD_CONTENT);
-    }
-
-    @Override
-    public String[] getItemStrings(ITmfEvent event) {
-        if (event == null) {
-            return EMPTY_STRING_ARRAY;
-        }
-        return new String[] {
-                event.getTimestamp().toString(),
-                event.getReference(),
-                event.getType().getName(),
-                event.getContent().toString()
-        };
+        super(parent, cacheSize, LTTNG_COLUMNS);
     }
 }

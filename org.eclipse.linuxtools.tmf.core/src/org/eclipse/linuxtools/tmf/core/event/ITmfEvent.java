@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.tmf.core.event;
 
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
@@ -47,27 +48,27 @@ public interface ITmfEvent extends IAdaptable {
     /**
      * Pre-defined event timestamp attribute (for searching &filtering purposes)
      */
-    public static final String EVENT_FIELD_TIMESTAMP = ":timestamp:"; //$NON-NLS-1$
+    public static final @NonNull String EVENT_FIELD_TIMESTAMP = ":timestamp:"; //$NON-NLS-1$
 
     /**
      * Pre-defined event source attribute (for searching &filtering purposes)
      */
-    public static final String EVENT_FIELD_SOURCE = ":source:"; //$NON-NLS-1$
+    public static final @NonNull String EVENT_FIELD_SOURCE = ":source:"; //$NON-NLS-1$
 
     /**
      * Pre-defined event type attribute (for searching &filtering purposes)
      */
-    public static final String EVENT_FIELD_TYPE = ":type:"; //$NON-NLS-1$
+    public static final @NonNull String EVENT_FIELD_TYPE = ":type:"; //$NON-NLS-1$
 
     /**
      * Pre-defined event content attribute (for searching &filtering purposes)
      */
-    public static final String EVENT_FIELD_CONTENT = ":content:"; //$NON-NLS-1$
+    public static final @NonNull String EVENT_FIELD_CONTENT = ":content:"; //$NON-NLS-1$
 
     /**
      * Pre-defined event reference attribute (for searching &filtering purposes)
      */
-    public static final String EVENT_FIELD_REFERENCE = ":reference:"; //$NON-NLS-1$
+    public static final @NonNull String EVENT_FIELD_REFERENCE = ":reference:"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Getters

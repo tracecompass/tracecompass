@@ -179,11 +179,35 @@ public class CustomEvent extends TmfEvent {
     // ------------------------------------------------------------------------
 
     /**
+     * Get the contents of an event table cell for this event's row.
+     *
+     * @param index
+     *            The ID/index of the field to display. This corresponds to the
+     *            index in the event content.
+     * @return The String to display in the cell
+     * @since 3.1
+     */
+    public String getEventString(int index) {
+        if (fData != null) {
+            processData();
+        }
+        if (index < 0 || index >= fColumnData.length) {
+            return ""; //$NON-NLS-1$
+        }
+
+        return fColumnData[index].getValue().toString();
+    }
+
+    /**
      * Get the contents of the row in the events table corresponding to this
      * event. The order of the elements corresponds to the order of the columns.
      *
      * @return The event row entries
+     * @deprecated This should not be used, since this isn't related to the
+     *             order of columns in the view anymore. You should use
+     *             {@link #getEventString(int)}
      */
+    @Deprecated
     public String[] getEventStrings() {
         if (fData != null) {
             processData();
