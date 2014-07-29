@@ -212,6 +212,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
     /**
      * Return the element path relative to its common element (traces folder,
      * experiments folder or experiment element).
+     *
      * @return The element path
      */
     public String getElementPath() {
@@ -364,11 +365,12 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
         /* Copy the trace */
         try {
             getResource().copy(newPath, IResource.FORCE | IResource.SHALLOW, null);
+            IResource trace = ((IFolder) getParent().getResource()).findMember(newName);
 
             /* Delete any bookmarks file found in copied trace folder */
-            IFolder folder = ((IFolder) getParent().getResource()).getFolder(newName);
-            if (folder.exists()) {
-                for (IResource member : folder.members()) {
+            if (trace instanceof IFolder) {
+                IFolder folderTrace = (IFolder) trace;
+                for (IResource member : folderTrace.members()) {
                     if (TmfTrace.class.getCanonicalName().equals(member.getPersistentProperty(TmfCommonConstants.TRACETYPE))) {
                         member.delete(true, null);
                     } else if (TmfExperiment.class.getCanonicalName().equals(member.getPersistentProperty(TmfCommonConstants.TRACETYPE))) {
@@ -376,7 +378,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
                     }
                 }
             }
-            return folder;
+            return trace;
         } catch (CoreException e) {
 
         }
