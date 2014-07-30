@@ -12,6 +12,9 @@
 
 package org.eclipse.linuxtools.pcap.core.protocol.ipv4;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -55,8 +58,8 @@ public class IPv4Packet extends Packet {
     private final int fTimeToLive;
     private final int fIpDatagramProtocol;
     private final int fHeaderChecksum;
-    private final byte[] fSourceIpAddress;
-    private final byte[] fDestinationIpAddress;
+    private final Inet4Address fSourceIpAddress;
+    private final Inet4Address fDestinationIpAddress;
     private final @Nullable byte[] fOptions;
 
     private @Nullable IPv4Endpoint fSourceEndpoint;
@@ -107,16 +110,29 @@ public class IPv4Packet extends Packet {
         fReservedFlag = isBitSet(storage, 7);
         fDontFragmentFlag = isBitSet(storage, 6);
         fMoreFragmentFlag = isBitSet(storage, 5);
-        fFragmentOffset = ((storage & 0b00011111) << 8) | packet.get();
+        int msb = ((storage & 0b00011111) << 8);
+        int lsb = ConversionHelper.unsignedByteToInt(packet.get());
+        fFragmentOffset = msb + lsb;
 
         fTimeToLive = ConversionHelper.unsignedByteToInt(packet.get());
         fIpDatagramProtocol = ConversionHelper.unsignedByteToInt(packet.get());
         fHeaderChecksum = ConversionHelper.unsignedShortToInt(packet.getShort());
 
-        fSourceIpAddress = new byte[IPv4Values.IP_ADDRESS_SIZE];
-        fDestinationIpAddress = new byte[IPv4Values.IP_ADDRESS_SIZE];
-        packet.get(fSourceIpAddress);
-        packet.get(fDestinationIpAddress);
+        byte[] source = new byte[IPv4Values.IP_ADDRESS_SIZE];
+        byte[] destination = new byte[IPv4Values.IP_ADDRESS_SIZE];
+        packet.get(source);
+        packet.get(destination);
+
+        try {
+            @SuppressWarnings("null")
+            @NonNull Inet4Address sourceIP = (Inet4Address) InetAddress.getByAddress(source);
+            @SuppressWarnings("null")
+            @NonNull Inet4Address destinationIP = (Inet4Address) InetAddress.getByAddress(destination);
+            fSourceIpAddress = sourceIP;
+            fDestinationIpAddress = destinationIP;
+        } catch (UnknownHostException e) {
+            throw new BadPacketException("The IP Address size is not valid!"); //$NON-NLS-1$
+        }
 
         // Get options if there are any
         if (fInternetHeaderLength > IPv4Values.DEFAULT_HEADER_LENGTH) {
@@ -207,7 +223,7 @@ public class IPv4Packet extends Packet {
         // TODO calculate the expected checksum from packet
         String checksumString = "Header Checksum: " + String.format("%s%04x", "0x", fHeaderChecksum); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-        String string = getProtocol().getName() + ", Source: " + ConversionHelper.toIpAddress(fSourceIpAddress) + ", Destination: " + ConversionHelper.toIpAddress(fDestinationIpAddress) + //$NON-NLS-1$ //$NON-NLS-2$
+        String string = getProtocol().getName() + ", Source: " + fSourceIpAddress.getHostAddress() + ", Destination: " + fDestinationIpAddress.getHostAddress() + //$NON-NLS-1$ //$NON-NLS-2$
                 "\nVersion: " + fVersion + ", Identification: " + String.format("%s%04x", "0x", fIdentification) + ", Header Length: " + getHeaderLength() + " bytes, Total Length: " + getTotalLength() + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
                 " bytes\nDifferentiated Services Code Point: " + String.format("%s%02x", "0x", fDSCP) + "; Explicit Congestion Notification: " + String.format("%s%02x", "0x", fExplicitCongestionNotification) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
                 + "\n" + flagString + "\nTime to live: " + fTimeToLive + //$NON-NLS-1$ //$NON-NLS-2$
@@ -359,7 +375,7 @@ public class IPv4Packet extends Packet {
      *
      * @return The source IP address, as a byte array in big-endian.
      */
-    public byte[] getSourceIpAddress() {
+    public Inet4Address getSourceIpAddress() {
         return fSourceIpAddress;
     }
 
@@ -368,7 +384,7 @@ public class IPv4Packet extends Packet {
      *
      * @return The destination IP address, as a byte array in big-endian.
      */
-    public byte[] getDestinationIpAddress() {
+    public Inet4Address getDestinationIpAddress() {
         return fDestinationIpAddress;
     }
 
@@ -434,8 +450,8 @@ public class IPv4Packet extends Packet {
                     .put("Time to live", String.valueOf(fTimeToLive)) //$NON-NLS-1$
                     .put("Protocol", IPProtocolNumberHelper.toString(fIpDatagramProtocol) + " (" + String.valueOf(fIpDatagramProtocol) + ")") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     .put("Checksum", String.format("%s%04x", "0x", fHeaderChecksum)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    .put("Source IP Address", ConversionHelper.toIpAddress(fSourceIpAddress)) //$NON-NLS-1$
-                    .put("Destination IP Address", ConversionHelper.toIpAddress(fDestinationIpAddress)); //$NON-NLS-1$
+                    .put("Source IP Address", fSourceIpAddress.getHostAddress()) //$NON-NLS-1$
+                    .put("Destination IP Address", fDestinationIpAddress.getHostAddress()); //$NON-NLS-1$
             byte[] options = fOptions;
             if (options == null) {
                 builder.put("Options", EMPTY_STRING); //$NON-NLS-1$
@@ -454,15 +470,15 @@ public class IPv4Packet extends Packet {
 
     @Override
     public String getLocalSummaryString() {
-        return "Src: " + ConversionHelper.toIpAddress(fSourceIpAddress) + " , Dst: " + ConversionHelper.toIpAddress(fDestinationIpAddress); //$NON-NLS-1$ //$NON-NLS-2$
+        return "Src: " + fSourceIpAddress.getHostAddress() + " , Dst: " + fDestinationIpAddress.getHostAddress(); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Override
     protected String getSignificationString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(ConversionHelper.toIpAddress(fSourceIpAddress))
+        sb.append(fSourceIpAddress.getHostAddress())
                 .append(" > ") //$NON-NLS-1$
-                .append(ConversionHelper.toIpAddress(fDestinationIpAddress));
+                .append(fDestinationIpAddress.getHostAddress());
 
         String flags = generateFlagString();
         if (!(flags.equals(""))) { //$NON-NLS-1$
@@ -524,7 +540,7 @@ public class IPv4Packet extends Packet {
             result = prime * result;
         }
         result = prime * result + fDSCP;
-        result = prime * result + Arrays.hashCode(fDestinationIpAddress);
+        result = prime * result + fDestinationIpAddress.hashCode();
         result = prime * result + (fDontFragmentFlag ? 1231 : 1237);
         result = prime * result + fExplicitCongestionNotification;
         result = prime * result + fFragmentOffset;
@@ -541,7 +557,7 @@ public class IPv4Packet extends Packet {
             result = prime * result;
         }
         result = prime * result + (fReservedFlag ? 1231 : 1237);
-        result = prime * result + Arrays.hashCode(fSourceIpAddress);
+        result = prime * result + fSourceIpAddress.hashCode();
         result = prime * result + fTimeToLive;
         result = prime * result + fTotalLength;
         result = prime * result + fVersion;
@@ -574,7 +590,7 @@ public class IPv4Packet extends Packet {
         if (fDSCP != other.fDSCP) {
             return false;
         }
-        if (!Arrays.equals(fDestinationIpAddress, other.fDestinationIpAddress)) {
+        if (!(fDestinationIpAddress.equals(other.fDestinationIpAddress))) {
             return false;
         }
         if (fDontFragmentFlag != other.fDontFragmentFlag) {
@@ -617,7 +633,7 @@ public class IPv4Packet extends Packet {
         if (fReservedFlag != other.fReservedFlag) {
             return false;
         }
-        if (!Arrays.equals(fSourceIpAddress, other.fSourceIpAddress)) {
+        if (!(fSourceIpAddress.equals(other.fSourceIpAddress))) {
             return false;
         }
         if (fTimeToLive != other.fTimeToLive) {

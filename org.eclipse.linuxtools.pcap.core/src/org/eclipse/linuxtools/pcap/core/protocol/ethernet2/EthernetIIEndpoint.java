@@ -90,7 +90,7 @@ public class EthernetIIEndpoint extends ProtocolEndpoint {
         if (endpoint == null) {
             return ConversionHelper.toMacAddress(fMacAddress);
         }
-        return (endpoint.toString() == EMPTY_STRING ?
+        return (endpoint.toString().equals(EMPTY_STRING) ?
                 ConversionHelper.toMacAddress(fMacAddress) :
                 endpoint.toString() + '/' + ConversionHelper.toMacAddress(fMacAddress));
 

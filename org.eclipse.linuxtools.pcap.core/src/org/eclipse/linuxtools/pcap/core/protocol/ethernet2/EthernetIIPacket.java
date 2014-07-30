@@ -42,8 +42,11 @@ public class EthernetIIPacket extends Packet {
     private final @Nullable Packet fChildPacket;
     private final @Nullable ByteBuffer fPayload;
 
+    /* We store MAC addresses as byte arrays since
+     * there is no standard java class to store them. */
     private final byte[] fSourceMacAddress;
     private final byte[] fDestinationMacAddress;
+
     private final int fType;
 
     private @Nullable EthernetIIEndpoint fSourceEndpoint;
@@ -121,7 +124,9 @@ public class EthernetIIPacket extends Packet {
      * @return The source MAC address.
      */
     public byte[] getSourceMacAddress() {
-        return fSourceMacAddress;
+        @SuppressWarnings("null")
+        @NonNull byte[] mac = Arrays.copyOf(fSourceMacAddress, fSourceMacAddress.length);
+        return mac;
     }
 
     /**
@@ -130,7 +135,9 @@ public class EthernetIIPacket extends Packet {
      * @return The destination MAC address.
      */
     public byte[] getDestinationMacAddress() {
-        return fDestinationMacAddress;
+        @SuppressWarnings("null")
+        @NonNull byte[] mac = Arrays.copyOf(fDestinationMacAddress, fDestinationMacAddress.length);
+        return mac;
     }
 
     /**

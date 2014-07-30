@@ -161,7 +161,7 @@ public class PacketStreamBuilder {
      * @throws BadPcapFileException
      *             When the PcapFile is not valid.
      */
-    public void parsePcapFile(String file) throws IOException, BadPcapFileException {
+    public synchronized void parsePcapFile(String file) throws IOException, BadPcapFileException {
         try (PcapFile pcapFile = new PcapFile(file);) {
             while (pcapFile.hasNextPacket()) { // not eof
                 PcapPacket packet;

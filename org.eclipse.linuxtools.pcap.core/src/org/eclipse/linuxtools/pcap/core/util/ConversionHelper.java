@@ -18,7 +18,6 @@ import java.util.Date;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.pcap.core.protocol.ethernet2.EthernetIIValues;
-import org.eclipse.linuxtools.pcap.core.protocol.ipv4.IPv4Values;
 
 /**
  * Class for helping with the conversion of data.
@@ -123,27 +122,6 @@ public final class ConversionHelper {
                 String.format("%02x", mac[3]) + separator + //$NON-NLS-1$
                 String.format("%02x", mac[4]) + separator + //$NON-NLS-1$
                 String.format("%02x", mac[5]); //$NON-NLS-1$
-
-    }
-
-    // TODO Add little endian support
-    /**
-     * Generate a string representing the IP address.
-     *
-     * @param ip
-     *            The IP address as a byte array.
-     * @return The string representing the IP address.
-     */
-    public static String toIpAddress(byte[] ip) {
-
-        if (ip.length != IPv4Values.IP_ADDRESS_SIZE) {
-            throw new IllegalArgumentException();
-        }
-        char separator = '.';
-        return Integer.toString(ip[0] & 0xFF) + separator +
-                Integer.toString(ip[1] & 0xFF) + separator +
-                Integer.toString(ip[2] & 0xFF) + separator +
-                Integer.toString(ip[3] & 0xFF);
 
     }
 

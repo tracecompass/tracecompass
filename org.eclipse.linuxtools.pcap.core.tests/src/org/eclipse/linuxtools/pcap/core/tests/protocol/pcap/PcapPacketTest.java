@@ -198,7 +198,7 @@ public class PcapPacketTest {
 
             // Abstract methods Testing
             assertTrue(packet.validate());
-            assertEquals(842182851, packet.hashCode());
+            assertEquals(86567859, packet.hashCode());
             assertFalse(packet.equals(null));
             assertFalse(packet.equals(file.parseNextPacket()));
 

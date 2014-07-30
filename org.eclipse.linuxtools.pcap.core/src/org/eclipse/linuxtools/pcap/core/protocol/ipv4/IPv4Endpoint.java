@@ -12,11 +12,11 @@
 
 package org.eclipse.linuxtools.pcap.core.protocol.ipv4;
 
-import java.util.Arrays;
+import java.net.Inet4Address;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.pcap.core.endpoint.ProtocolEndpoint;
-import org.eclipse.linuxtools.pcap.core.util.ConversionHelper;
 
 /**
  * Class that extends the {@link ProtocolEndpoint} class. It represents the
@@ -26,7 +26,7 @@ import org.eclipse.linuxtools.pcap.core.util.ConversionHelper;
  */
 public class IPv4Endpoint extends ProtocolEndpoint {
 
-    private final byte[] fIPAddress;
+    private final Inet4Address fIPAddress;
 
     /**
      * Constructor of the {@link IPv4Endpoint} class. It takes a packet to get
@@ -57,7 +57,7 @@ public class IPv4Endpoint extends ProtocolEndpoint {
             result = endpoint.hashCode();
         }
 
-        result = prime * result + Arrays.hashCode(fIPAddress);
+        result = prime * result + fIPAddress.hashCode();
         return result;
     }
 
@@ -73,7 +73,7 @@ public class IPv4Endpoint extends ProtocolEndpoint {
         IPv4Endpoint other = (IPv4Endpoint) obj;
 
         // Check on layer
-        boolean localEquals = Arrays.equals(fIPAddress, other.fIPAddress);
+        boolean localEquals = fIPAddress.equals(other.fIPAddress);
         if (!localEquals) {
             return false;
         }
@@ -90,9 +90,11 @@ public class IPv4Endpoint extends ProtocolEndpoint {
     public String toString() {
         ProtocolEndpoint endpoint = getParentEndpoint();
         if (endpoint == null) {
-            return ConversionHelper.toIpAddress(fIPAddress);
+            @SuppressWarnings("null")
+            @NonNull String ret = fIPAddress.getHostAddress();
+            return ret;
         }
-        return endpoint.toString() + '/' + ConversionHelper.toIpAddress(fIPAddress);
+        return endpoint.toString() + '/' + fIPAddress.getHostAddress();
     }
 
 }
