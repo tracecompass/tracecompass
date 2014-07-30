@@ -49,6 +49,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EValidator;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener;
@@ -166,7 +167,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * Empty string array, used by {@link #getItemStrings}.
      * @since 3.0
      */
-    protected static final String[] EMPTY_STRING_ARRAY = new String[0];
+    protected static final @NonNull String[] EMPTY_STRING_ARRAY = new String[0];
 
     private static final Image BOOKMARK_IMAGE = Activator.getDefault().getImageFromPath(
             "icons/elcl16/bookmark_obj.gif"); //$NON-NLS-1$
