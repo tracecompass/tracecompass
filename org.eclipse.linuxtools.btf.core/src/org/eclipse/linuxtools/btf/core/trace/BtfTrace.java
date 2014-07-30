@@ -387,7 +387,7 @@ public class BtfTrace extends TmfTrace implements ITmfEventParser, ITmfPersisten
         ITmfEventField content = type.generateContent(event, sourceInstance, targetInstance);
 
         return new BtfEvent(this, rank,
-                fTsFormat.createTimestamp(timestamp + fTsOffset),
+                fTsFormat.createTimestamp(getTimestampTransform().transform(timestamp + fTsOffset)),
                 source,
                 type,
                 type.getDescription(),
