@@ -13,6 +13,8 @@
 
 package org.eclipse.linuxtools.tmf.core.timestamp;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 /**
  * A utility class to define and manage time ranges.
  *
@@ -31,12 +33,12 @@ public class TmfTimeRange {
     /**
      * The full possible time range
      */
-    public static final TmfTimeRange ETERNITY = new EternityTimeRange();
+    public static final @NonNull TmfTimeRange ETERNITY = new EternityTimeRange();
 
     /**
      * The null time range
      */
-    public static final TmfTimeRange NULL_RANGE = new TmfTimeRange();
+    public static final @NonNull TmfTimeRange NULL_RANGE = new TmfTimeRange();
 
     // ------------------------------------------------------------------------
     // Attributes
