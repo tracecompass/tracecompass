@@ -37,6 +37,7 @@ public class TmfEventPropertySource implements IPropertySource {
     private static final String ID_SOURCE = "event_source"; //$NON-NLS-1$
     private static final String ID_TYPE = "event_type"; //$NON-NLS-1$
     private static final String ID_REFERENCE = "event_reference"; //$NON-NLS-1$
+    private static final String ID_TRACE = "trace_attribute"; //$NON-NLS-1$
     private static final String ID_CONTENT = "event_content"; //$NON-NLS-1$
     private static final String ID_SOURCE_LOOKUP = "event_lookup"; //$NON-NLS-1$
     private static final String ID_MODEL_URI = "model_uri"; //$NON-NLS-1$
@@ -46,6 +47,7 @@ public class TmfEventPropertySource implements IPropertySource {
     private static final String NAME_SOURCE = "Source"; //$NON-NLS-1$
     private static final String NAME_TYPE = "Type"; //$NON-NLS-1$
     private static final String NAME_REFERENCE = "Reference"; //$NON-NLS-1$
+    private static final String NAME_TRACE = "Trace"; //$NON-NLS-1$
     private static final String NAME_CONTENT = "Content"; //$NON-NLS-1$
     private static final String NAME_SOURCE_LOOKUP = "Source Lookup"; //$NON-NLS-1$
     private static final String NAME_MODEL_URI = "Model URI"; //$NON-NLS-1$
@@ -287,6 +289,7 @@ public class TmfEventPropertySource implements IPropertySource {
         descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_SOURCE, NAME_SOURCE));
         descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_TYPE, NAME_TYPE));
         descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_REFERENCE, NAME_REFERENCE));
+        descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_TRACE, NAME_TRACE));
 
         /* Display event fields */
         descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_CONTENT, NAME_CONTENT));
@@ -322,6 +325,8 @@ public class TmfEventPropertySource implements IPropertySource {
             return fEvent.getType().toString();
         } else if (id.equals(ID_REFERENCE) && fEvent.getReference() != null) {
             return fEvent.getReference().toString();
+        } else if (id.equals(ID_TRACE) && fEvent.getTrace() != null) {
+            return fEvent.getTrace().getName();
         } else if (id.equals(ID_MODEL_URI)) {
             return ((ITmfModelLookup)fEvent).getModelUri();
         } else if (id.equals(ID_SOURCE_LOOKUP)) {
