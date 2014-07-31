@@ -91,11 +91,16 @@ public class LTTngControlService implements ILttngControlService {
     // ------------------------------------------------------------------------
 
     @Override
-    public String getVersion() {
+    public String getVersionString() {
         if (fVersion == null) {
             return "Unknown"; //$NON-NLS-1$
         }
         return fVersion.toString();
+    }
+
+    @Override
+    public LttngVersion getVersion() {
+        return fVersion;
     }
 
     /**
@@ -104,6 +109,14 @@ public class LTTngControlService implements ILttngControlService {
      */
     public void setVersion(String version) {
         fVersion = new LttngVersion(version);
+    }
+
+    /**
+     * Sets the version of the LTTng 2.x control service.
+     * @param version - a version to set
+     */
+    public void setVersion(LttngVersion version) {
+        fVersion = version;
     }
 
     @Override

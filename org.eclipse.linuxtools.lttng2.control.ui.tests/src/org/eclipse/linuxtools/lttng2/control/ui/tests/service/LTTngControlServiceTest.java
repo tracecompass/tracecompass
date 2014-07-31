@@ -159,7 +159,7 @@ public class LTTngControlServiceTest {
             fShell.setScenario(SCEN_LTTNG_VERSION);
             ILttngControlService service = LTTngControlServiceFactory.getInstance().getLttngControlService(fShell);
             assertNotNull(service);
-            assertEquals("2.1.0", service.getVersion());
+            assertEquals("2.1.0", service.getVersionString());
         } catch (ExecutionException e) {
             fail("Exeption thrown " + e);
         }
@@ -171,7 +171,7 @@ public class LTTngControlServiceTest {
             fShell.setScenario(SCEN_LTTNG_VERSION_WITH_PROMPT);
             ILttngControlService service = LTTngControlServiceFactory.getInstance().getLttngControlService(fShell);
             assertNotNull(service);
-            assertEquals("2.0.0", service.getVersion());
+            assertEquals("2.0.0", service.getVersionString());
         } catch (ExecutionException e) {
             fail("Exeption thrown " + e);
         }

@@ -49,6 +49,18 @@ public final class Messages extends NLS {
     public static String TraceControl_UnsupportedVersionError;
     public static String TraceControl_GettingVersionError;
 
+    // Xml parsing related failures
+    public static String TraceControl_InvalidSchemaError;
+    public static String TraceControl_XmlDocumentBuilderError;
+    public static String TraceControl_XmlParsingError;
+    public static String TraceControl_XmlValidationError;
+    public static String TraceControl_XmlValidationWarning;
+
+    // Xml machine interface failures
+    public static String TraceControl_MiInvalidNumberOfElementError;
+    public static String TraceControl_MiInvalidProviderError;
+    public static String TraceControl_MiMissingRequiredError;
+
     // Commands
     public static String TraceControl_ErrorTitle;
     public static String TraceControl_RetrieveNodeConfigurationJob;

@@ -1,4 +1,5 @@
 /**********************************************************************
+
  * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
@@ -11,6 +12,7 @@
  *   Bernd Hufmann - Updated for support of LTTng Tools 2.1
  *   Marc-Andre Laperle - Support for creating a live session
  **********************************************************************/
+
 package org.eclipse.linuxtools.internal.lttng2.control.core.model.impl;
 
 import java.util.ArrayList;
@@ -23,10 +25,8 @@ import org.eclipse.linuxtools.internal.lttng2.control.core.model.ISnapshotInfo;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceSessionState;
 
 /**
- * <p>
  * Implementation of the trace session interface (ISessionInfo) to store session
  * related data.
- * </p>
  *
  * @author Bernd Hufmann
  */
@@ -102,7 +102,9 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
     // ------------------------------------------------------------------------
     /**
      * Constructor
-     * @param name - name of base event
+     *
+     * @param name
+     *            - name of base event
      */
     public SessionInfo(String name) {
         super(name);
@@ -110,7 +112,9 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
 
     /**
      * Copy constructor
-     * @param other - the instance to copy
+     *
+     * @param other
+     *            - the instance to copy
      */
     public SessionInfo(SessionInfo other) {
         super(other);
@@ -126,7 +130,7 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
         for (Iterator<IDomainInfo> iterator = other.fDomains.iterator(); iterator.hasNext();) {
             IDomainInfo domain = iterator.next();
             if (domain instanceof DomainInfo) {
-                fDomains.add(new DomainInfo((DomainInfo)domain));
+                fDomains.add(new DomainInfo((DomainInfo) domain));
             } else {
                 fDomains.add(domain);
             }
@@ -149,11 +153,7 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
 
     @Override
     public void setSessionState(String stateName) {
-        if (TraceSessionState.INACTIVE.getInName().equals(stateName)) {
-            fState = TraceSessionState.INACTIVE;
-        } else if (TraceSessionState.ACTIVE.getInName().equals(stateName)) {
-            fState = TraceSessionState.ACTIVE;
-        }
+        fState = TraceSessionState.valueOfString(stateName);
     }
 
     @Override
@@ -242,41 +242,40 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
         fDomains.add(domainInfo);
     }
 
-
     @SuppressWarnings("nls")
     @Override
     public String toString() {
         StringBuffer output = new StringBuffer();
-            output.append("[SessionInfo(");
-            output.append(super.toString());
-            output.append(",Path=");
-            output.append(getSessionPath());
-            output.append(",State=");
-            output.append(fState);
-            output.append(",isStreamedTrace=");
-            output.append(fIsStreamedTrace);
-            output.append(",isSnapshot=");
-            output.append(fIsSnapshot);
+        output.append("[SessionInfo(");
+        output.append(super.toString());
+        output.append(",Path=");
+        output.append(getSessionPath());
+        output.append(",State=");
+        output.append(fState);
+        output.append(",isStreamedTrace=");
+        output.append(fIsStreamedTrace);
+        output.append(",isSnapshot=");
+        output.append(fIsSnapshot);
 
-            if (fSnapshotInfo != null) {
-                output.append(",snapshotInfo=");
-                output.append(fSnapshotInfo.toString());
-            }
-            output.append(",Domains=");
-            for (Iterator<IDomainInfo> iterator = fDomains.iterator(); iterator.hasNext();) {
-                IDomainInfo domain = iterator.next();
-                output.append(domain.toString());
-            }
+        if (fSnapshotInfo != null) {
+            output.append(",snapshotInfo=");
+            output.append(fSnapshotInfo.toString());
+        }
+        output.append(",Domains=");
+        for (Iterator<IDomainInfo> iterator = fDomains.iterator(); iterator.hasNext();) {
+            IDomainInfo domain = iterator.next();
+            output.append(domain.toString());
+        }
 
-            output.append(",NetworkUrl=");
-            output.append(getNetworkUrl());
-            output.append(",ControlUrl=");
-            output.append(getControlUrl());
-            output.append(",DataUrl=");
-            output.append(getDataUrl());
+        output.append(",NetworkUrl=");
+        output.append(getNetworkUrl());
+        output.append(",ControlUrl=");
+        output.append(getControlUrl());
+        output.append(",DataUrl=");
+        output.append(getDataUrl());
 
-            output.append(")]");
-            return output.toString();
+        output.append(")]");
+        return output.toString();
     }
 
     @Override

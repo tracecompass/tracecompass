@@ -35,9 +35,14 @@ import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceLogLevel;
 public interface ILttngControlService {
 
     /**
-     * @return the version string.
+     * @return the LTTng version object
      */
-    String getVersion();
+    LttngVersion getVersion();
+
+    /**
+     * @return the version string
+     */
+    String getVersionString();
 
     /**
      * Checks if given version is supported by this ILTTngControlService implementation.
