@@ -172,6 +172,7 @@ public class TmfRequestExecutor implements Executor {
                 schedule();
             } else if (fActiveTask.getExecType() == ExecutionType.FOREGROUND) {
                 if (fActiveTask.getThread().isCompleted()) {
+                    fActiveTask = null;
                     schedule();
                 } else {
                     if (hasTasks()) {
@@ -183,6 +184,7 @@ public class TmfRequestExecutor implements Executor {
 
             } else if (fActiveTask.getExecType() == ExecutionType.BACKGROUND) {
                 if (fActiveTask.getThread().isCompleted()) {
+                    fActiveTask = null;
                     schedule();
                 } else {
                     if (hasTasks()) {
