@@ -36,7 +36,7 @@
         <artifactId>tycho-surefire-plugin</artifactId>
         <version>${tycho-version}</version>
         <configuration>
-          <argLine>${tycho.testArgLine} -Declipse.perf.dbloc=${perf.database.loc} -Declipse.perf.config=${perf.config}</argLine>
+          <argLine>-Declipse.perf.dbloc=${perf.database.loc} -Declipse.perf.config=${perf.config}</argLine>
           <runOrder>reversealphabetical</runOrder>
           <includes>
               <include>**/RunAllPerfTests.java</include>
