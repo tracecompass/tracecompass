@@ -94,13 +94,7 @@ public class EventInfo extends BaseEventInfo implements IEventInfo {
 
     @Override
     public void setLogLevelType(String shortName) {
-        if (LogLevelType.LOGLEVEL.getShortName().equals(shortName)) {
-            fLogLevelType = LogLevelType.LOGLEVEL;
-        } else if (LogLevelType.LOGLEVEL_ONLY.getShortName().equals(shortName)) {
-            fLogLevelType = LogLevelType.LOGLEVEL_ONLY;
-        } else {
-            fLogLevelType= LogLevelType.LOGLEVEL_NONE;
-        }
+        fLogLevelType = LogLevelType.valueOfString(shortName);
     }
 
 
