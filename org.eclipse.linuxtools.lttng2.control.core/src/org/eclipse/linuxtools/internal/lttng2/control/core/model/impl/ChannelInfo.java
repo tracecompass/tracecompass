@@ -10,6 +10,7 @@
  *   Bernd Hufmann - Initial API and implementation
  *   Simon Delisle - Updated for support of LTTng Tools 2.2
  **********************************************************************/
+
 package org.eclipse.linuxtools.internal.lttng2.control.core.model.impl;
 
 import java.util.ArrayList;
@@ -21,10 +22,8 @@ import org.eclipse.linuxtools.internal.lttng2.control.core.model.IEventInfo;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceEnablement;
 
 /**
- * <p>
  * Implementation of the trace channel interface (IChannelInfo) to store channel
  * related data.
- * </p>
  *
  * @author Bernd Hufmann
  */
@@ -78,13 +77,14 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
      */
     private BufferType fBufferType = BufferType.BUFFER_TYPE_UNKNOWN;
 
-
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
     /**
      * Constructor
-     * @param name - name channel
+     *
+     * @param name
+     *            - name channel
      */
     public ChannelInfo(String name) {
         super(name);
@@ -92,7 +92,9 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
 
     /**
      * Copy constructor
-     * @param other - the instance to copy
+     *
+     * @param other
+     *            - the instance to copy
      */
     public ChannelInfo(ChannelInfo other) {
         super(other);
@@ -109,7 +111,7 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
         for (Iterator<IEventInfo> iterator = other.fEvents.iterator(); iterator.hasNext();) {
             IEventInfo event = iterator.next();
             if (event instanceof EventInfo) {
-                fEvents.add(new EventInfo((EventInfo)event));
+                fEvents.add(new EventInfo((EventInfo) event));
             } else {
                 fEvents.add(event);
             }
@@ -192,12 +194,7 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
 
     @Override
     public void setState(String stateName) {
-        fState = TraceEnablement.ENABLED;
-        if (TraceEnablement.DISABLED.getInName().equals(stateName)) {
-            fState = TraceEnablement.DISABLED;
-        } else if (TraceEnablement.ENABLED.getInName().equals(stateName)) {
-            fState = TraceEnablement.ENABLED;
-        }
+        fState = TraceEnablement.valueOfString(stateName);
     }
 
     @Override
@@ -285,37 +282,37 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
     @Override
     public String toString() {
         StringBuffer output = new StringBuffer();
-            output.append("[ChannelInfo(");
-            output.append(super.toString());
-            output.append(",State=");
-            output.append(fState);
-            output.append(",OverwriteMode=");
-            output.append(fOverwriteMode);
-            output.append(",SubBuffersSize=");
-            output.append(fSubBufferSize);
-            output.append(",NumberOfSubBuffers=");
-            output.append(fNumberOfSubBuffers);
-            output.append(",SwitchTimer=");
-            output.append(fSwitchTimer);
-            output.append(",ReadTimer=");
-            output.append(fReadTimer);
-            output.append(",output=");
-            output.append(fOutputType);
-            if ((fBufferType != null) && !fBufferType.equals(BufferType.BUFFER_TYPE_UNKNOWN) && !fBufferType.equals(BufferType.BUFFER_SHARED)) {
-                output.append(",BufferType=");
-                output.append(fBufferType);
+        output.append("[ChannelInfo(");
+        output.append(super.toString());
+        output.append(",State=");
+        output.append(fState);
+        output.append(",OverwriteMode=");
+        output.append(fOverwriteMode);
+        output.append(",SubBuffersSize=");
+        output.append(fSubBufferSize);
+        output.append(",NumberOfSubBuffers=");
+        output.append(fNumberOfSubBuffers);
+        output.append(",SwitchTimer=");
+        output.append(fSwitchTimer);
+        output.append(",ReadTimer=");
+        output.append(fReadTimer);
+        output.append(",output=");
+        output.append(fOutputType);
+        if ((fBufferType != null) && !fBufferType.equals(BufferType.BUFFER_TYPE_UNKNOWN) && !fBufferType.equals(BufferType.BUFFER_SHARED)) {
+            output.append(",BufferType=");
+            output.append(fBufferType);
+        }
+        output.append(",Events=");
+        if (fEvents.isEmpty()) {
+            output.append("None");
+        } else {
+            for (Iterator<IEventInfo> iterator = fEvents.iterator(); iterator.hasNext();) {
+                IEventInfo event = iterator.next();
+                output.append(event.toString());
             }
-            output.append(",Events=");
-            if (fEvents.isEmpty()) {
-                output.append("None");
-            } else {
-                for (Iterator<IEventInfo> iterator = fEvents.iterator(); iterator.hasNext();) {
-                    IEventInfo event = iterator.next();
-                    output.append(event.toString());
-                }
-            }
-            output.append(")]");
-            return output.toString();
+        }
+        output.append(")]");
+        return output.toString();
     }
 
     @Override
