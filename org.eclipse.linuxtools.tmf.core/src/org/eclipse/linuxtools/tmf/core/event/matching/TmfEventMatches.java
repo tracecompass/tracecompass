@@ -12,32 +12,27 @@
 
 package org.eclipse.linuxtools.tmf.core.event.matching;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
 /**
  * Class that does something with a match.
  *
- * This default implementation of the class just adds it to a list of matches
+ * This default implementation of the class just counts the matches
  *
  * @author Geneviève Bastien
  * @since 3.0
  */
 public class TmfEventMatches implements IMatchProcessingUnit {
 
-    /**
-     * The list of matches found
-     */
-    private final List<TmfEventDependency> fMatches;
+    private int fMatchCount;
 
     /**
      * Constructor
      */
     public TmfEventMatches() {
-        fMatches = new ArrayList<>();
+        fMatchCount = 0;
     }
 
     /**
@@ -46,12 +41,12 @@ public class TmfEventMatches implements IMatchProcessingUnit {
 
     @Override
     public void init(Collection<ITmfTrace> fTraces) {
-
+        fMatchCount = 0;
     }
 
     @Override
     public void addMatch(TmfEventDependency match) {
-        fMatches.add(match);
+        fMatchCount++;
     }
 
     @Override
@@ -61,7 +56,7 @@ public class TmfEventMatches implements IMatchProcessingUnit {
 
     @Override
     public int countMatches() {
-        return fMatches.size();
+        return fMatchCount;
     }
 
     /**
@@ -70,14 +65,16 @@ public class TmfEventMatches implements IMatchProcessingUnit {
      * @param index
      *            The index of the match to get
      * @return The match at index or null or not present
+     * @deprecated Matches are not kept anymore, they use up memory for no real reason
      */
+    @Deprecated
     public TmfEventDependency getMatch(int index) {
-        return fMatches.get(index);
+        return null;
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " [ Number of matches found: " + fMatches.size() + " ]"; //$NON-NLS-1$ //$NON-NLS-2$
+        return getClass().getSimpleName() + " [ Number of matches found: " + fMatchCount + " ]"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
 }
