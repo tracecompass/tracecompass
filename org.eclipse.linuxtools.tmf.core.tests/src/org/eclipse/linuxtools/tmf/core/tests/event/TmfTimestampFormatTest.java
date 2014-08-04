@@ -106,7 +106,7 @@ public class TmfTimestampFormatTest {
      */
     @Test
     public void testGetDefaulTimeFormat() {
-        assertEquals(TmfTimestampFormat.getDefaulTimeFormat().toPattern(), TmfTimePreferences.getTimePattern());
+        assertEquals(TmfTimestampFormat.getDefaulTimeFormat().toPattern(), TmfTimePreferences.getInstance().getTimePattern());
     }
 
     /**
@@ -115,7 +115,7 @@ public class TmfTimestampFormatTest {
      */
     @Test
     public void testGetDefaulIntervalFormat() {
-        assertEquals(TmfTimestampFormat.getDefaulIntervalFormat().toPattern(), TmfTimePreferences.getIntervalPattern());
+        assertEquals(TmfTimestampFormat.getDefaulIntervalFormat().toPattern(), TmfTimePreferences.getInstance().getIntervalPattern());
     }
 
     /**

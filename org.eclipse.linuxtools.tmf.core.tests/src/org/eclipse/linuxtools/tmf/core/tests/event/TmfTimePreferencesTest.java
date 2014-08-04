@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.tmf.core.tests.event;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Map;
 import java.util.TimeZone;
@@ -43,11 +44,19 @@ public class TmfTimePreferencesTest {
     }
 
     /**
+     * Test that getInstance returns an instance
+     */
+    @Test
+    public void testGetInstance() {
+        assertNotNull(TmfTimePreferences.getInstance());
+    }
+
+    /**
      * Test that getTimePattern returns the appropriate time pattern (from the default)
      */
     @Test
     public void testGetTimePattern() {
-        assertEquals(TIME_PATTERN, TmfTimePreferences.getTimePattern());
+        assertEquals(TIME_PATTERN, TmfTimePreferences.getInstance().getTimePattern());
     }
 
     /**
@@ -55,7 +64,7 @@ public class TmfTimePreferencesTest {
      */
     @Test
     public void testGetIntervalPattern() {
-        assertEquals(INTERVAL_PATTERN, TmfTimePreferences.getIntervalPattern());
+        assertEquals(INTERVAL_PATTERN, TmfTimePreferences.getInstance().getIntervalPattern());
     }
 
     /**
@@ -63,7 +72,7 @@ public class TmfTimePreferencesTest {
      */
     @Test
     public void testGetTimeZone() {
-        assertEquals(TimeZone.getDefault(), TmfTimePreferences.getTimeZone());
+        assertEquals(TimeZone.getDefault(), TmfTimePreferences.getInstance().getTimeZone());
     }
 
     /**
@@ -72,7 +81,7 @@ public class TmfTimePreferencesTest {
      */
     @Test
     public void testGetPreferenceMap() {
-        Map<String, String> defaultPreferenceMap = TmfTimePreferences.getDefaultPreferenceMap();
+        Map<String, String> defaultPreferenceMap = TmfTimePreferences.getInstance().getDefaultPreferenceMap();
         assertEquals(ITmfTimePreferencesConstants.TIME_HOUR_FMT, defaultPreferenceMap.get(ITmfTimePreferencesConstants.DATIME));
 
         // Modify the preferences
@@ -84,11 +93,11 @@ public class TmfTimePreferencesTest {
         } catch (BackingStoreException e) {
         }
         // Make sure the modification is in the map
-        Map<String, String> preferenceMap = TmfTimePreferences.getPreferenceMap();
+        Map<String, String> preferenceMap = TmfTimePreferences.getInstance().getPreferenceMap();
         assertEquals(testValue, preferenceMap.get(ITmfTimePreferencesConstants.DATIME));
 
         // Make sure the default is still the same
-        defaultPreferenceMap = TmfTimePreferences.getDefaultPreferenceMap();
+        defaultPreferenceMap = TmfTimePreferences.getInstance().getDefaultPreferenceMap();
         assertEquals(ITmfTimePreferencesConstants.TIME_HOUR_FMT, defaultPreferenceMap.get(ITmfTimePreferencesConstants.DATIME));
     }
 
@@ -97,7 +106,7 @@ public class TmfTimePreferencesTest {
      */
     @Test
     public void testComputeTimePattern() {
-        assertEquals(TIME_PATTERN, TmfTimePreferences.computeTimePattern(TmfTimePreferences.getPreferenceMap()));
+        assertEquals(TIME_PATTERN, TmfTimePreferences.getInstance().computeTimePattern(TmfTimePreferences.getInstance().getPreferenceMap()));
     }
 
 }

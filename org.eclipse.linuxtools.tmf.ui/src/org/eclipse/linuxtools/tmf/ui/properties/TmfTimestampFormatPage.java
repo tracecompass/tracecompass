@@ -153,6 +153,7 @@ public class TmfTimestampFormatPage extends PreferencePage implements IWorkbench
     // General stuff
     private Composite fPage;
     private IPreferenceStore fPreferenceStore;
+    private TmfTimePreferences fTimePreference;
 
     // Example section
     private Composite fExampleSection;
@@ -186,7 +187,8 @@ public class TmfTimestampFormatPage extends PreferencePage implements IWorkbench
      */
     public TmfTimestampFormatPage() {
         fPreferenceStore = getPreferenceStore();
-        fPreferenceMap = TmfTimePreferences.getPreferenceMap();
+        fTimePreference = TmfTimePreferences.getInstance();
+        fPreferenceMap = fTimePreference.getPreferenceMap();
     }
 
     // ------------------------------------------------------------------------
@@ -304,7 +306,7 @@ public class TmfTimestampFormatPage extends PreferencePage implements IWorkbench
         fSSecFieldDelim.loadDefault();
         fCombo.loadDefault();
 
-        fPreferenceMap = TmfTimePreferences.getDefaultPreferenceMap();
+        fPreferenceMap = TmfTimePreferences.getInstance().getDefaultPreferenceMap();
         displayExample();
     }
 
@@ -378,7 +380,7 @@ public class TmfTimestampFormatPage extends PreferencePage implements IWorkbench
 
     private void displayExample() {
         long ts = 1332170682500677380L;
-        String timePattern = TmfTimePreferences.computeTimePattern(fPreferenceMap);
+        String timePattern = fTimePreference.computeTimePattern(fPreferenceMap);
         fPatternDisplay.setText(timePattern);
         fPatternDisplay.redraw();
 
