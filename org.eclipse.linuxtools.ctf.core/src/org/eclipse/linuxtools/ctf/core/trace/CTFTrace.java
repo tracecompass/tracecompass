@@ -102,7 +102,7 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
     /**
      * The clock of the trace
      */
-    private CTFClock fSingleClock;
+    private CTFClock fSingleClock = null;
 
     /**
      * Packet header structure definition
@@ -698,6 +698,9 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
      * @return the clock
      */
     public final CTFClock getClock() {
+        if (fSingleClock != null && fClocks.size() == 1) {
+            return fSingleClock;
+        }
         if (fClocks.size() == 1) {
             fSingleClock = fClocks.get(fClocks.keySet().iterator().next());
             return fSingleClock;
