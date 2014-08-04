@@ -13,13 +13,10 @@
 package org.eclipse.linuxtools.pcap.core.tests.stream;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.eclipse.linuxtools.pcap.core.protocol.Protocol;
 import org.eclipse.linuxtools.pcap.core.stream.PacketStream;
@@ -28,8 +25,6 @@ import org.eclipse.linuxtools.pcap.core.tests.shared.PcapTestTrace;
 import org.eclipse.linuxtools.pcap.core.trace.BadPcapFileException;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableSet;
-
 /**
  * JUnit Class that tests whether packet streams are built correctly.
  *
@@ -37,27 +32,7 @@ import com.google.common.collect.ImmutableSet;
  */
 public class StreamBuildTest {
 
-    // Values taken from wireshark
-    private static final Set<Long> TCP_INDEX_SET_STREAM_7_PACKETS = ImmutableSet.of(
-            // This stream contains 7 packets.
-            17L,
-            23L,
-            25L,
-            26L,
-            27L,
-            35L,
-            36L
-            );
-
-    private static final Set<Long> TCP_INDEX_SET_STREAM_34_PACKETS = new TreeSet<>();
-    static {
-        // This stream contains many packet (34). Some packets doesn't
-        // belong to it like the 17 or the 23.
-        for (Long i = new Long(0); i < 43; i++) {
-            TCP_INDEX_SET_STREAM_34_PACKETS.add(i);
-        }
-        TCP_INDEX_SET_STREAM_34_PACKETS.removeAll(TCP_INDEX_SET_STREAM_7_PACKETS);
-    }
+    private static final double DELTA = 0.001;
 
     /**
      * Test that verify that stream building is done correctly.
@@ -75,13 +50,18 @@ public class StreamBuildTest {
             assertEquals(Protocol.ETHERNET_II, builder.getProtocol());
             // Should do one loop only, so hardcoded values are okay.
             for (PacketStream stream : builder.getStreams()) {
-                assertTrue(stream.toString().contains("Stream eth.0, Number of Packets: 43"));
-                for (int i = 0; i < stream.size(); i++) {
-                    Long id = stream.get(i).getIndex();
-                    String path = stream.get(i).getPath();
-                    assertTrue(id >= 0 && id < 43);
-                    assertEquals(file, path);
-                }
+                assertEquals("Stream eth.0, Number of Packets: 43\n", stream.toString());
+                assertEquals(43, stream.getNbPackets());
+                assertEquals(25091, stream.getNbBytes());
+                assertEquals(20, stream.getNbPacketsAtoB());
+                assertEquals(2323, stream.getNbBytesAtoB());
+                assertEquals(23, stream.getNbPacketsBtoA());
+                assertEquals(22768, stream.getNbBytesBtoA());
+                assertEquals(1084443427311224000L, stream.getStartTime());
+                assertEquals(1084443457704928000L, stream.getStopTime());
+                assertEquals(30.393704, stream.getDuration(), DELTA);
+                assertEquals(76.43030280218561, stream.getBPSAtoB(), DELTA);
+                assertEquals(749.1025114938278, stream.getBPSBtoA(), DELTA);
             }
 
             // Test TCP streams and other constructor
@@ -97,13 +77,17 @@ public class StreamBuildTest {
             assertEquals(Protocol.TCP, stream.getProtocol());
             assertEquals(0, stream.getID());
             assertEquals("tcp.0", stream.getUniqueID());
-            assertEquals(34, stream.size());
-            for (int i = 0; i < stream.size(); i++) {
-                Long id = stream.get(i).getIndex();
-                String path = stream.get(i).getPath();
-                assertTrue(TCP_INDEX_SET_STREAM_34_PACKETS.contains(id));
-                assertEquals(file, path);
-            }
+            assertEquals(34, stream.getNbPackets());
+            assertEquals(20695, stream.getNbBytes());
+            assertEquals(16, stream.getNbPacketsAtoB());
+            assertEquals(1351, stream.getNbBytesAtoB());
+            assertEquals(18, stream.getNbPacketsBtoA());
+            assertEquals(19344, stream.getNbBytesBtoA());
+            assertEquals(1084443427311224000L, stream.getStartTime());
+            assertEquals(1084443457704928000L, stream.getStopTime());
+            assertEquals(30.393704, stream.getDuration(), DELTA);
+            assertEquals(44.449995301658525, stream.getBPSAtoB(), DELTA);
+            assertEquals(636.4476011216008, stream.getBPSBtoA(), DELTA);
 
             stream = builder.getStream(1);
             if (stream == null) {
@@ -113,13 +97,17 @@ public class StreamBuildTest {
             assertEquals(Protocol.TCP, stream.getProtocol());
             assertEquals(1, stream.getID());
             assertEquals("tcp.1", stream.getUniqueID());
-            assertEquals(7, stream.size());
-            for (int i = 0; i < stream.size(); i++) {
-                Long id = stream.get(i).getIndex();
-                String path = stream.get(i).getPath();
-                assertTrue(TCP_INDEX_SET_STREAM_7_PACKETS.contains(id));
-                assertEquals(file, path);
-            }
+            assertEquals(7, stream.getNbPackets());
+            assertEquals(4119, stream.getNbBytes());
+            assertEquals(3, stream.getNbPacketsAtoB());
+            assertEquals(883, stream.getNbBytesAtoB());
+            assertEquals(4, stream.getNbPacketsBtoA());
+            assertEquals(3236, stream.getNbBytesBtoA());
+            assertEquals(1084443430295515000L, stream.getStartTime());
+            assertEquals(1084443432088092000L, stream.getStopTime());
+            assertEquals(1.792577, stream.getDuration(), DELTA);
+            assertEquals(492.58692932019096, stream.getBPSAtoB(), DELTA);
+            assertEquals(1805.2223140205413, stream.getBPSBtoA(), DELTA);
 
             builder.clear();
             assertEquals(0, builder.getNbStreams());

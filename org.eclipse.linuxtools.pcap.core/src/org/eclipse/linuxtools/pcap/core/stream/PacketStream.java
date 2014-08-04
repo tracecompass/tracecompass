@@ -12,13 +12,13 @@
 
 package org.eclipse.linuxtools.pcap.core.stream;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.pcap.core.endpoint.ProtocolEndpointPair;
-import org.eclipse.linuxtools.pcap.core.packet.PacketUniqueID;
+import org.eclipse.linuxtools.pcap.core.packet.Packet;
 import org.eclipse.linuxtools.pcap.core.protocol.Protocol;
 import org.eclipse.linuxtools.pcap.core.protocol.pcap.PcapPacket;
+
+import com.google.common.math.DoubleMath;
 
 // TODO decide if default modifier a good idea. This allows only the
 // stream builder to call that method (and any class that is added to this
@@ -34,11 +34,18 @@ import org.eclipse.linuxtools.pcap.core.protocol.pcap.PcapPacket;
  */
 public class PacketStream {
 
-    private static final String EMPTY_STRING = ""; //$NON-NLS-1$
-    private final List<PacketUniqueID> fListIndex;
+    private static final double SECOND_TO_NANOSECOND = 1000000000.0;
+    private static final double DELTA = 0.000000001;
     private final Protocol fProtocol;
     private final int fId;
     private final ProtocolEndpointPair fEndpointPair;
+
+    private long fNbPacketsAtoB;
+    private long fNbPacketsBtoA;
+    private long fNbBytesAtoB;
+    private long fNbBytesBtoA;
+    private long fStartTime;
+    private long fEndTime;
 
     /**
      * Constructor of a packet stream.
@@ -53,34 +60,57 @@ public class PacketStream {
      */
     PacketStream(Protocol protocol, int id, ProtocolEndpointPair endpointPair) {
         fProtocol = protocol;
-        fListIndex = new ArrayList<>();
         fId = id;
         fEndpointPair = endpointPair;
+        fNbPacketsAtoB = 0;
+        fNbPacketsBtoA = 0;
+        fNbBytesAtoB = 0;
+        fNbBytesBtoA = 0;
+        fStartTime = Long.MAX_VALUE;
+        fEndTime = Long.MIN_VALUE;
     }
 
     /**
-     * Add a packet unique ID to the stream.
+     * Add a packet to the stream.
      *
      * @param packet
-     *            The packet unique ID that must be added.
+     *            The packet that must be added.
      */
     synchronized void add(PcapPacket packet) {
-        fListIndex.add(new PacketUniqueID(packet));
-    }
 
-    /**
-     * Get a packet unique ID in file from the stream.
-     *
-     * @param index
-     *            The index in the stream of the packet to be retrieved.
-     * @return The retrieved packet unique ID.
-     */
-    public synchronized PacketUniqueID get(int index) {
-        PacketUniqueID id = fListIndex.get(index);
-        if (id == null) {
-            throw new IllegalStateException("PacketUniqueID is null!"); //$NON-NLS-1$
+        Packet newPacket = packet.getPacket(fProtocol);
+        if (newPacket == null) {
+            return;
         }
-        return id;
+
+        // Update packet and byte number
+        if (fEndpointPair.getFirstEndpoint().equals(newPacket.getSourceEndpoint()) &&
+                fEndpointPair.getSecondEndpoint().equals(newPacket.getDestinationEndpoint())) {
+            fNbPacketsAtoB++;
+            fNbBytesAtoB += packet.getOriginalLength();
+        } else if (fEndpointPair.getFirstEndpoint().equals(newPacket.getDestinationEndpoint()) &&
+                fEndpointPair.getSecondEndpoint().equals(newPacket.getSourceEndpoint())) {
+            fNbPacketsBtoA++;
+            fNbBytesBtoA += packet.getOriginalLength();
+        } else {
+            throw new IllegalStateException();
+        }
+
+        // Update start and stop time
+        // Stream timestamp is ALWAYS in nanoseconds.
+        long timestamp;
+        switch (packet.getTimestampScale()) {
+        case MICROSECOND:
+            timestamp = packet.getTimestamp() * 1000;
+            break;
+        case NANOSECOND:
+            timestamp = packet.getTimestamp();
+            break;
+        default:
+            throw new IllegalArgumentException("The timestamp precision is not valid!"); //$NON-NLS-1$
+        }
+        fStartTime = Math.min(fStartTime, timestamp);
+        fEndTime = Math.max(fEndTime, timestamp);
     }
 
     /**
@@ -123,27 +153,117 @@ public class PacketStream {
     @Override
     public synchronized String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Stream " + getUniqueID() + ", Number of Packets: " + fListIndex.size() + "\n"); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+        sb.append("Stream " + getUniqueID() + ", Number of Packets: " + getNbPackets() + "\n"); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
 
-        for (int i = 0; i < fListIndex.size(); i++) {
-            sb.append(fListIndex.get(i) + ", "); //$NON-NLS-1$
-        }
-
-        String string = sb.toString();
-        if (string == null) {
-            return EMPTY_STRING;
-        }
+        @SuppressWarnings("null")
+        @NonNull String string = sb.toString();
         return string;
 
     }
 
     /**
-     * Method that returns the number of packets in the stream.
+     * Get the number of packets going from the first endpoint to the second.
      *
-     * @return The number of packets in the stream.
+     * @return The number of packets from A to B.
      */
-    public synchronized int size() {
-        return fListIndex.size();
+    public synchronized long getNbPacketsAtoB() {
+        return fNbPacketsAtoB;
+    }
+
+    /**
+     * Get the number of packets going from the second endpoint to the first.
+     *
+     * @return The number of packets from B to A.
+     */
+    public synchronized long getNbPacketsBtoA() {
+        return fNbPacketsBtoA;
+    }
+
+    /**
+     * Get the total number of packets in this stream.
+     *
+     * @return The total number of packets.
+     */
+    public synchronized long getNbPackets() {
+        return fNbPacketsAtoB + fNbPacketsBtoA;
+    }
+
+    /**
+     * Get the number of bytes going from the first endpoint to the second.
+     *
+     * @return The number of bytes from A to B.
+     */
+    public synchronized long getNbBytesAtoB() {
+        return fNbBytesAtoB;
+    }
+
+    /**
+     * Get the number of bytes going from the second endpoint to the first.
+     *
+     * @return The number of bytes from B to A.
+     */
+    public synchronized long getNbBytesBtoA() {
+        return fNbBytesBtoA;
+    }
+
+    /**
+     * Get the total number of bytes in this stream.
+     *
+     * @return The total number of bytes.
+     */
+    public synchronized long getNbBytes() {
+        return fNbBytesAtoB + fNbBytesBtoA;
+    }
+
+    /**
+     * Get the start time of this stream, in nanoseconds relative to epoch.
+     *
+     * @return The start time.
+     */
+    public synchronized long getStartTime() {
+        return fStartTime;
+    }
+
+    /**
+     * Get the stop time of this stream, in nanoseconds relative to epoch.
+     *
+     * @return The stop time.
+     */
+    public synchronized long getStopTime() {
+        return fEndTime;
+    }
+
+    /**
+     * Get the duration of this stream, in seconds
+     *
+     * @return The duration of this stream.
+     */
+    public synchronized double getDuration() {
+        return (fEndTime - fStartTime) / SECOND_TO_NANOSECOND;
+    }
+
+    /**
+     * Get the the average byte per second from A to B.
+     *
+     * @return the average byte per second from A to B.
+     */
+    public synchronized double getBPSAtoB() {
+        if (DoubleMath.fuzzyEquals(getDuration(), 0, DELTA)) {
+            return 0;
+        }
+        return fNbBytesAtoB / getDuration();
+    }
+
+    /**
+     * Get the the average byte per second from B to A.
+     *
+     * @return the average byte per second from B to A.
+     */
+    public synchronized double getBPSBtoA() {
+        if (DoubleMath.fuzzyEquals(getDuration(), 0, DELTA)) {
+            return 0;
+        }
+        return fNbBytesBtoA / getDuration();
     }
 
 }
