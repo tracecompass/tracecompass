@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.ctf.core.tests.trace;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.Collection;
 import java.util.ListIterator;
 
 import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
@@ -44,7 +43,7 @@ public class CTFStreamInputPacketIndexTest {
     @Before
     public void setUp() throws CTFReaderException {
         fixture = new StreamInputPacketIndex();
-        fixture.addEntry(new StreamInputPacketIndexEntry(1L));
+        fixture.append(new StreamInputPacketIndexEntry(1L));
         entry = new StreamInputPacketIndexEntry(1L);
     }
 
@@ -65,7 +64,8 @@ public class CTFStreamInputPacketIndexTest {
     @Test
     public void testAddEntry_1param() throws CTFReaderException {
         entry.setPacketSizeBits(0);
-        fixture.addEntry(entry);
+        assertNotNull(entry);
+        fixture.append(entry);
     }
 
     /**
@@ -78,7 +78,8 @@ public class CTFStreamInputPacketIndexTest {
     public void testAddEntry_2params() throws CTFReaderException {
         entry.setPacketSizeBits(1);
         entry.setContentSizeBits(0);
-        fixture.addEntry(entry);
+        assertNotNull(entry);
+        fixture.append(entry);
     }
 
     /**
@@ -93,49 +94,8 @@ public class CTFStreamInputPacketIndexTest {
         entry.setPacketSizeBits(1);
         entry.setContentSizeBits(1);
         entry.setTimestampEnd(1L);
-        fixture.addEntry(entry);
-    }
-
-    /**
-     * Run the Collection<StreamInputPacketIndexEntry> getEntries() method test.
-     */
-    @Test
-    public void testGetEntries() {
-        Collection<StreamInputPacketIndexEntry> result = fixture.getEntries();
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-    }
-
-    /**
-     * Run the ListIterator<StreamInputPacketIndexEntry> listIterator() method
-     * test, with no parameter to listIterator().
-     */
-    @Test
-    public void testListIterator_noparam() {
-        ListIterator<StreamInputPacketIndexEntry> result = fixture.listIterator();
-
-        assertNotNull(result);
-        assertEquals(true, result.hasNext());
-        assertEquals(-1, result.previousIndex());
-        assertEquals(false, result.hasPrevious());
-        assertEquals(0, result.nextIndex());
-    }
-
-    /**
-     * Run the ListIterator<StreamInputPacketIndexEntry> listIterator(n) method
-     * test, with n = 1.
-     */
-    @Test
-    public void testListIterator_withparam() {
-        ListIterator<StreamInputPacketIndexEntry> result = fixture.listIterator(1);
-
-        assertNotNull(result);
-        assertEquals(false, result.hasNext());
-        assertEquals(0, result.previousIndex());
-        assertEquals(true, result.hasPrevious());
-        assertEquals(1, result.nextIndex());
-        assertEquals(false, result.hasNext());
+        assertNotNull(entry);
+        fixture.append(entry);
     }
 
     /**

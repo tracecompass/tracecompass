@@ -20,7 +20,7 @@ import java.util.Map;
  * <p>
  * Represents an entry in the index of event packets.
  */
-public class StreamInputPacketIndexEntry {
+public class StreamInputPacketIndexEntry implements Comparable<StreamInputPacketIndexEntry> {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -257,5 +257,22 @@ public class StreamInputPacketIndexEntry {
      */
     public long getTargetId(){
         return fTargetID;
+    }
+
+    @Override
+    public int compareTo(StreamInputPacketIndexEntry o) {
+        if (fTimestampBegin > o.fTimestampBegin) {
+            return 1;
+        }
+        if (fTimestampBegin < o.fTimestampBegin) {
+            return -1;
+        }
+        if (fTimestampEnd > o.fTimestampEnd) {
+            return 1;
+        }
+        if (fTimestampEnd < o.fTimestampEnd) {
+            return -1;
+        }
+        return 0;
     }
 }

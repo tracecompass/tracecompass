@@ -14,15 +14,21 @@
 
 package org.eclipse.tracecompass.internal.ctf.core.trace;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.ListIterator;
-import java.util.Vector;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
 
 /**
  * <b><u>StreamInputPacketIndex</u></b>
  * <p>
- * TODO Implement me. Please.
+ * This is a data structure containing entries, you may append to this and read
+ * it. It is not thread safe.
  */
 public class StreamInputPacketIndex {
 
@@ -34,75 +40,81 @@ public class StreamInputPacketIndex {
      * Entries of the index. They are sorted by increasing begin timestamp.
      * index builder.
      */
-    private final Vector<StreamInputPacketIndexEntry> entries = new Vector<>();
-
-    // ------------------------------------------------------------------------
-    // Getters/Setters/Predicates
-    // ------------------------------------------------------------------------
-
-    /**
-     * Gets the entries
-     *
-     * @return the entries
-     */
-    public Vector<StreamInputPacketIndexEntry> getEntries() {
-        return this.entries;
-    }
-
-    /**
-     * Gets an iterator to the entries
-     *
-     * @return an iterator to the entries
-     */
-    public ListIterator<StreamInputPacketIndexEntry> listIterator() {
-        return this.entries.listIterator();
-    }
-
-    /**
-     * Gets an iterator to the entries at a given position
-     *
-     * @param n
-     *            the position to get
-     * @return the iterator
-     */
-    public ListIterator<StreamInputPacketIndexEntry> listIterator(int n) {
-        return this.entries.listIterator(n);
-    }
+    private final List<StreamInputPacketIndexEntry> fEntries = new ArrayList<>();
 
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
 
     /**
-     * Adds an entry to the index.
+     * Returns the number of elements in this data structure. If this data
+     * structure contains more than {@code Integer.MAX_VALUE} elements, returns
+     * {@code Integer.MAX_VALUE}.
      *
-     * @param entry
-     *            The entry to add
+     * @return the number of elements in this data structure
+     */
+    public int size() {
+        return fEntries.size();
+    }
+
+    /**
+     * Returns {@code true} if this data structure contains no elements.
+     *
+     * @return {@code true} if this data structure contains no elements
+     */
+    public boolean isEmpty() {
+        return fEntries.isEmpty();
+    }
+
+    /**
+     * Adds a collection of entries to the index, the entries must be sorted.
+     *
+     * @param preParsedIndex
+     *            the pre-parsed index file
+     *
      * @throws CTFReaderException
      *             If there was a problem reading the entry
      */
-    public void addEntry(StreamInputPacketIndexEntry entry)
+    public void appendAll(Collection<StreamInputPacketIndexEntry> preParsedIndex)
             throws CTFReaderException {
-        assert (entry.getContentSizeBits() != 0);
+        for (StreamInputPacketIndexEntry sipie : preParsedIndex) {
+            append(checkNotNull(sipie));
+        }
+    }
+
+    /**
+     * Appends the specified element to the end of this data structure
+     *
+     * @param entry
+     *            element to be appended to this index, cannot be null
+     * @return {@code true} (as specified by {@link Collection#add})
+     * @throws CTFReaderException
+     *             If there was a problem reading the entry
+     */
+    public boolean append(@NonNull StreamInputPacketIndexEntry entry)
+            throws CTFReaderException {
 
         /* Validate consistent entry. */
         if (entry.getTimestampBegin() > entry.getTimestampEnd()) {
             throw new CTFReaderException("Packet begin timestamp is after end timestamp"); //$NON-NLS-1$
         }
 
-        /* Validate entries are inserted in monotonic increasing timestamp order. */
-        if (!this.entries.isEmpty()) {
-            if (entry.getTimestampBegin() < this.entries.lastElement()
-                    .getTimestampBegin()) {
-                throw new CTFReaderException("Packets begin timestamp decreasing"); //$NON-NLS-1$
-            }
+        /*
+         * Validate entries are inserted in monotonic increasing timestamp
+         * order.
+         */
+        if (!fEntries.isEmpty() && (entry.getTimestampBegin() < lastElement().getTimestampBegin())) {
+            throw new CTFReaderException("Packets begin timestamp decreasing"); //$NON-NLS-1$
         }
-        this.entries.add(entry);
+
+        fEntries.add(entry);
+        return true;
     }
 
     /**
-     * Returns the first PacketIndexEntry that could include the timestamp,
-     * that is the last packet with a begin timestamp smaller than the given timestamp.
+     * Returns the first PacketIndexEntry that could include the timestamp, that
+     * is the last packet with a begin timestamp smaller than the given
+     * timestamp.
      *
      * @param timestamp
      *            The timestamp to look for.
@@ -113,7 +125,7 @@ public class StreamInputPacketIndex {
         /*
          * Start with min and max covering all the elements.
          */
-        int max = this.entries.size() - 1;
+        int max = fEntries.size() - 1;
         int min = 0;
 
         int guessI;
@@ -122,8 +134,8 @@ public class StreamInputPacketIndex {
         /*
          * If the index is empty, return the iterator at the very beginning.
          */
-        if (this.getEntries().isEmpty()) {
-            return this.getEntries().listIterator();
+        if (isEmpty()) {
+            return fEntries.listIterator();
         }
 
         if (timestamp < 0) {
@@ -136,7 +148,7 @@ public class StreamInputPacketIndex {
              * Guess in the middle of min and max.
              */
             guessI = min + ((max - min) / 2);
-            guessEntry = this.entries.get(guessI);
+            guessEntry = fEntries.get(guessI);
 
             /*
              * If we reached the point where we focus on a single packet, our
@@ -148,19 +160,75 @@ public class StreamInputPacketIndex {
 
             if (timestamp <= guessEntry.getTimestampEnd()) {
                 /*
-                 * If the timestamp is lower or equal to the end of the guess packet,
-                 * then the guess packet becomes the new inclusive max.
+                 * If the timestamp is lower or equal to the end of the guess
+                 * packet, then the guess packet becomes the new inclusive max.
                  */
                 max = guessI;
             } else {
                 /*
-                 * If the timestamp is greater than the end of the guess packet, then
-                 * the new inclusive min is the packet after the guess packet.
+                 * If the timestamp is greater than the end of the guess packet,
+                 * then the new inclusive min is the packet after the guess
+                 * packet.
                  */
                 min = guessI + 1;
             }
         }
 
-        return this.entries.listIterator(guessI);
+        return fEntries.listIterator(guessI);
     }
+
+    /**
+     * Get the last element of the index
+     *
+     * @return the last element in the index
+     */
+    public StreamInputPacketIndexEntry lastElement() {
+        return fEntries.get(fEntries.size() - 1);
+    }
+
+    /**
+     * Returns the element at the specified position in this data structure.
+     *
+     * @param index
+     *            index of the element to return
+     * @return the element at the specified position in this data structure
+     * @throws IndexOutOfBoundsException
+     *             if the index is out of range (
+     *             {@code index < 0 || index >= size()})
+     */
+    public StreamInputPacketIndexEntry getElement(int index) {
+        return fEntries.get(index);
+    }
+
+    /**
+     * Returns the index of the first occurrence of the specified element in
+     * this data structure, or -1 if this data structure does not contain the
+     * element. More formally, returns the lowest index {@code i} such that, for
+     * an entry {@code o}, {@code (o==null ? get(i)==null : o.equals(get(i)))},
+     * or {@code -1} if there is no such index. This will work in log(n) time
+     * since the data structure contains elements in a non-repeating increasing
+     * manner.
+     *
+     * @param element
+     *            element to search for
+     * @return the index of the first occurrence of the specified element in
+     *         this data structure, or -1 if this data structure does not
+     *         contain the element
+     * @throws ClassCastException
+     *             if the type of the specified element is incompatible with
+     *             this data structure (<a
+     *             href="Collection.html#optional-restrictions">optional</a>)
+     * @throws NullPointerException
+     *             if the specified element is null and this data structure does
+     *             not permit null elements (<a
+     *             href="Collection.html#optional-restrictions">optional</a>)
+     */
+    public int indexOf(StreamInputPacketIndexEntry element) {
+        int indexOf = -1;
+        if (element != null) {
+            indexOf = Collections.binarySearch(fEntries, element);
+        }
+        return (indexOf < 0) ? -1 : indexOf;
+    }
+
 }
