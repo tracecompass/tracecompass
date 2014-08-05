@@ -104,4 +104,34 @@ public class TmfFilterNode extends TmfFilterTreeNode {
         }
         return buf.toString();
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((fFilterName == null) ? 0 : fFilterName.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        TmfFilterNode other = (TmfFilterNode) obj;
+        if (fFilterName == null) {
+            if (other.fFilterName != null) {
+                return false;
+            }
+        } else if (!fFilterName.equals(other.fFilterName)) {
+            return false;
+        }
+        return true;
+    }
 }

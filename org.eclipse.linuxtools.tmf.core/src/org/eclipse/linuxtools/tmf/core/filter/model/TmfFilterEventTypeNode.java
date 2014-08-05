@@ -26,6 +26,44 @@ import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 @SuppressWarnings("javadoc")
 public class TmfFilterEventTypeNode extends TmfFilterTreeNode {
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((fName == null) ? 0 : fName.hashCode());
+        result = prime * result + ((fType == null) ? 0 : fType.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        TmfFilterEventTypeNode other = (TmfFilterEventTypeNode) obj;
+        if (fName == null) {
+            if (other.fName != null) {
+                return false;
+            }
+        } else if (!fName.equals(other.fName)) {
+            return false;
+        }
+        if (fType == null) {
+            if (other.fType != null) {
+                return false;
+            }
+        } else if (!fType.equals(other.fType)) {
+            return false;
+        }
+        return true;
+    }
+
     public static final String NODE_NAME = "EVENTTYPE"; //$NON-NLS-1$
     public static final String TYPE_ATTR = "type"; //$NON-NLS-1$
     public static final String NAME_ATTR = "name"; //$NON-NLS-1$

@@ -36,7 +36,7 @@ public class TmfFilterMatchesNode extends TmfFilterTreeNode {
     private boolean fNot = false;
     private String fField;
     private String fRegex;
-    private Pattern fPattern;
+    private transient Pattern fPattern;
 
     /**
      * @param parent
@@ -150,5 +150,47 @@ public class TmfFilterMatchesNode extends TmfFilterTreeNode {
             ret = ".*" + ret + ".*"; //$NON-NLS-1$ //$NON-NLS-2$
         }
         return ret;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((fField == null) ? 0 : fField.hashCode());
+        result = prime * result + (fNot ? 1231 : 1237);
+        result = prime * result + ((fRegex == null) ? 0 : fRegex.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        TmfFilterMatchesNode other = (TmfFilterMatchesNode) obj;
+        if (fField == null) {
+            if (other.fField != null) {
+                return false;
+            }
+        } else if (!fField.equals(other.fField)) {
+            return false;
+        }
+        if (fNot != other.fNot) {
+            return false;
+        }
+        if (fRegex == null) {
+            if (other.fRegex != null) {
+                return false;
+            }
+        } else if (!fRegex.equals(other.fRegex)) {
+            return false;
+        }
+        return true;
     }
 }

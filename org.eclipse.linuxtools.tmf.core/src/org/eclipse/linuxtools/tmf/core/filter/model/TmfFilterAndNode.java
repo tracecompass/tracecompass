@@ -87,4 +87,30 @@ public class TmfFilterAndNode extends TmfFilterTreeNode {
         return buf.toString();
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + (fNot ? 1231 : 1237);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        TmfFilterAndNode other = (TmfFilterAndNode) obj;
+        if (fNot != other.fNot) {
+            return false;
+        }
+        return true;
+    }
+
 }

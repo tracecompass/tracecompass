@@ -51,8 +51,8 @@ public class TmfFilterCompareNode extends TmfFilterTreeNode {
     private int fResult;
     private Type fType = Type.NUM;
     private String fValue;
-    private Number fValueNumber;
-    private TmfTimestamp fValueTimestamp;
+    private transient Number fValueNumber;
+    private transient TmfTimestamp fValueTimestamp;
 
     /**
      * @param parent the parent node
@@ -216,5 +216,55 @@ public class TmfFilterCompareNode extends TmfFilterTreeNode {
         clone.fField = fField;
         clone.setValue(fValue);
         return clone;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((fField == null) ? 0 : fField.hashCode());
+        result = prime * result + (fNot ? 1231 : 1237);
+        result = prime * result + fResult;
+        result = prime * result + ((fType == null) ? 0 : fType.hashCode());
+        result = prime * result + ((fValue == null) ? 0 : fValue.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        TmfFilterCompareNode other = (TmfFilterCompareNode) obj;
+        if (fField == null) {
+            if (other.fField != null) {
+                return false;
+            }
+        } else if (!fField.equals(other.fField)) {
+            return false;
+        }
+        if (fNot != other.fNot) {
+            return false;
+        }
+        if (fResult != other.fResult) {
+            return false;
+        }
+        if (fType != other.fType) {
+            return false;
+        }
+        if (fValue == null) {
+            if (other.fValue != null) {
+                return false;
+            }
+        } else if (!fValue.equals(other.fValue)) {
+            return false;
+        }
+        return true;
     }
 }
