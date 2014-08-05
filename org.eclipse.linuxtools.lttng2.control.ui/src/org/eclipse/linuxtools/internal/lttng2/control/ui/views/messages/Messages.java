@@ -262,6 +262,7 @@ public final class Messages extends NLS {
     public static String TraceControl_KernelDomainDisplayName;
     public static String TraceControl_UstDisplayName;
     public static String TraceControl_UstGlobalDomainDisplayName;
+    public static String TraceControl_UnknownDomainDisplayName;
     public static String TraceControl_JULDomainDisplayName;
     public static String TraceControl_AllSessionsDisplayName;
     public static String TraceControl_SessionDisplayName;

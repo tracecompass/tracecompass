@@ -380,6 +380,10 @@ public interface LTTngControlServiceConstants {
      */
     static final String OVERWRITE_MODE_ATTRIBUTE_FALSE = "0"; //$NON-NLS-1$
     /**
+     * Pattern to match indicating false for overwrite mode in machine interface mode
+     */
+    static final String OVERWRITE_MODE_ATTRIBUTE_FALSE_MI = "DISCARD"; //$NON-NLS-1$
+    /**
      * Pattern to match for channel (sub-buffer size) information (lttng list <session>)
      */
     static final Pattern SUBBUFFER_SIZE_ATTRIBUTE = Pattern.compile("\\s+subbufers\\s+size\\:.*"); //$NON-NLS-1$
