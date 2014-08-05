@@ -650,7 +650,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     @Override
     public void setStartFinishTimeNotify(long time0, long time1) {
         setStartFinishTime(time0, time1);
-        notifyRangeListeners(time0, time1);
+        notifyRangeListeners(fTime0, fTime1);
     }
 
     @Override
