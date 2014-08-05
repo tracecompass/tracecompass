@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,15 +9,15 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *   Bernd Hufmann - Updated for support of LTTng Tools 2.1
+ *   Jonathan Rajotte - Updated for basic support of LTTng 2.6 machine interface
  *******************************************************************************/
+
 package org.eclipse.linuxtools.internal.lttng2.control.ui.views.messages;
 
 import org.eclipse.osgi.util.NLS;
 
 /**
- * <p>
  * Messages file for the trace control package.
- * </p>
  *
  * @author Bernd Hufmann
  */
@@ -60,6 +60,8 @@ public final class Messages extends NLS {
     public static String TraceControl_MiInvalidNumberOfElementError;
     public static String TraceControl_MiInvalidProviderError;
     public static String TraceControl_MiMissingRequiredError;
+    public static String TraceControl_MiInvalidElementError;
+    public static String TraceControl_MiIllegalValueError;
 
     // Commands
     public static String TraceControl_ErrorTitle;
@@ -260,6 +262,7 @@ public final class Messages extends NLS {
     public static String TraceControl_KernelDomainDisplayName;
     public static String TraceControl_UstDisplayName;
     public static String TraceControl_UstGlobalDomainDisplayName;
+    public static String TraceControl_JULDomainDisplayName;
     public static String TraceControl_AllSessionsDisplayName;
     public static String TraceControl_SessionDisplayName;
     public static String TraceControl_DomainDisplayName;
