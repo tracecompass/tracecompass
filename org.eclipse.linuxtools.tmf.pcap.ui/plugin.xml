@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.linuxtools.tmf.ui.tracetypeui">
+      <type
+            icon="icons/pcap.png"
+            tracetype="org.eclipse.linuxtools.tmf.pcap.core.pcaptrace">
+         <eventsTableType
+               class="org.eclipse.linuxtools.tmf.pcap.ui.editor.PcapEventsTable">
+         </eventsTableType>
+      </type>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="org.eclipse.linuxtools.tmf.pcap.ui.view.category.network"
+            name="%category.networking">
+      </category>
+      <view
+            allowMultiple="false"
+            category="org.eclipse.linuxtools.tmf.pcap.ui.view.category.network"
+            class="org.eclipse.linuxtools.tmf.pcap.ui.stream.StreamListView"
+            icon="icons/stream_list_view.gif"
+            id="org.eclipse.linuxtools.tmf.pcap.ui.view.stream.list"
+            name="%view.stream.list"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.eclipse.linuxtools.tmf.pcap.ui.NetworkingPerspectiveFactory"
+            fixed="false"
+            icon="icons/network.png"
+            id="org.eclipse.linuxtools.tmf.pcap.ui.perspective.network"
+            name="%perspective.networking">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.analysis">
+      <output
+            class="org.eclipse.linuxtools.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="org.eclipse.linuxtools.tmf.pcap.ui.view.stream.list">
+         <analysisModuleClass
+               class="org.eclipse.linuxtools.tmf.pcap.core.analysis.StreamListAnalysis">
+         </analysisModuleClass>
+      </output>
+   </extension>
+
+</plugin>

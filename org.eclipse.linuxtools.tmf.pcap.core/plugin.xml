@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.tracetype">
+      <category
+            id="org.eclipse.linuxtools.tmf.pcap.core.category"
+            name="Network">
+      </category>
+      <type
+            category="org.eclipse.linuxtools.tmf.pcap.core.category"
+            event_type="org.eclipse.linuxtools.tmf.core.event.TmfEvent"
+            id="org.eclipse.linuxtools.tmf.pcap.core.pcaptrace"
+            isDirectory="false"
+            name="Pcap Trace"
+            trace_type="org.eclipse.linuxtools.tmf.pcap.core.trace.PcapTrace">
+      </type>
+   </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.analysis">
+      <module
+            analysis_module="org.eclipse.linuxtools.tmf.pcap.core.analysis.StreamListAnalysis"
+            automatic="true"
+            id="org.eclipse.linuxtools.tmf.pcap.core.analysis.stream"
+            name="Stream List">
+         <tracetype
+               applies="true"
+               class="org.eclipse.linuxtools.tmf.pcap.core.trace.PcapTrace">
+         </tracetype>
+         <tracetype
+               applies="true"
+               class="org.eclipse.linuxtools.tmf.core.trace.TmfExperiment">
+         </tracetype>
+      </module>
+   </extension>
+
+</plugin>
