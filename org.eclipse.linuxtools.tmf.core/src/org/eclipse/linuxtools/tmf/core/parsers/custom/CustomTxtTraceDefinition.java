@@ -13,7 +13,6 @@
 
 package org.eclipse.linuxtools.tmf.core.parsers.custom;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -47,11 +46,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 /**
  * Trace definition for custom text traces.
@@ -71,15 +66,16 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
 
     /** Path of the definition file */
     protected static final String CUSTOM_TXT_TRACE_DEFINITIONS_DEFAULT_PATH_NAME =
-            Platform.getInstallLocation().getURL().getPath() +
-            "templates/org.eclipse.linuxtools.tmf.core/" + //$NON-NLS-1$
-            CUSTOM_TXT_TRACE_DEFINITIONS_DEFAULT_FILE_NAME;
+            Platform.getInstallLocation().getURL().getPath() + "templates/org.eclipse.linuxtools.tmf.core/" + //$NON-NLS-1$
+                    CUSTOM_TXT_TRACE_DEFINITIONS_DEFAULT_FILE_NAME;
     /** Path of the definition file */
     protected static final String CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME =
             Activator.getDefault().getStateLocation().addTrailingSeparator().append(CUSTOM_TXT_TRACE_DEFINITIONS_FILE_NAME).toString();
 
-    /** Legacy path to the XML definitions file (in the UI plug-in)
-     * TODO Remove once we feel the transition phase is over. */
+    /**
+     * Legacy path to the XML definitions file (in the UI plug-in) TODO Remove
+     * once we feel the transition phase is over.
+     */
     private static final String CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME_LEGACY =
             Activator.getDefault().getStateLocation().removeLastSegments(1).addTrailingSeparator()
                     .append("org.eclipse.linuxtools.tmf.ui") //$NON-NLS-1$
@@ -155,14 +151,18 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
         /**
          * Default (empty) constructor.
          */
-        public InputLine() {}
+        public InputLine() {
+        }
 
         /**
          * Constructor.
          *
-         * @param cardinality Cardinality of this line.
-         * @param regex Regex
-         * @param columns Columns to use
+         * @param cardinality
+         *            Cardinality of this line.
+         * @param regex
+         *            Regex
+         * @param columns
+         *            Columns to use
          */
         public InputLine(Cardinality cardinality, String regex, List<InputData> columns) {
             this.cardinality = cardinality;
@@ -352,14 +352,18 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
         /**
          * Default (empty) constructor
          */
-        public InputData() {}
+        public InputData() {
+        }
 
         /**
          * Full constructor
          *
-         * @param name Name
-         * @param action Action
-         * @param format Format
+         * @param name
+         *            Name
+         * @param action
+         *            Action
+         * @param format
+         *            Format
          */
         public InputData(String name, int action, String format) {
             this.name = name;
@@ -370,8 +374,10 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
         /**
          * Constructor with default format
          *
-         * @param name Name
-         * @param action Action
+         * @param name
+         *            Name
+         * @param action
+         *            Action
          */
         public InputData(String name, int action) {
             this.name = name;
@@ -457,29 +463,10 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             DocumentBuilder db = dbf.newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
-            EntityResolver resolver = new EntityResolver() {
-                @Override
-                public InputSource resolveEntity(String publicId, String systemId) {
-                    String empty = ""; //$NON-NLS-1$
-                    ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
-                    return new InputSource(bais);
-                }
-            };
-            db.setEntityResolver(resolver);
+            db.setEntityResolver(createEmptyEntityResolver());
 
             // The following catches xml parsing exceptions
-            db.setErrorHandler(new ErrorHandler() {
-                @Override
-                public void error(SAXParseException saxparseexception) throws SAXException {}
-
-                @Override
-                public void warning(SAXParseException saxparseexception) throws SAXException {}
-
-                @Override
-                public void fatalError(SAXParseException saxparseexception) throws SAXException {
-                    throw saxparseexception;
-                }
-            });
+            db.setErrorHandler(createErrorHandler());
 
             Document doc = null;
             File file = new File(path);
@@ -626,7 +613,8 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
     /**
      * Load a specific text trace definition file.
      *
-     * @param path The path to the file to load
+     * @param path
+     *            The path to the file to load
      * @return The loaded trace definitions
      */
     public static CustomTxtTraceDefinition[] loadAll(String path) {
@@ -635,31 +623,10 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             DocumentBuilder db = dbf.newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
-            EntityResolver resolver = new EntityResolver() {
-                @Override
-                public InputSource resolveEntity(String publicId, String systemId) {
-                    String empty = ""; //$NON-NLS-1$
-                    ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
-                    return new InputSource(bais);
-                }
-            };
-            db.setEntityResolver(resolver);
+            db.setEntityResolver(createEmptyEntityResolver());
 
             // The following catches xml parsing exceptions
-            db.setErrorHandler(new ErrorHandler() {
-                @Override
-                public void error(SAXParseException saxparseexception) throws SAXException {
-                }
-
-                @Override
-                public void warning(SAXParseException saxparseexception) throws SAXException {
-                }
-
-                @Override
-                public void fatalError(SAXParseException saxparseexception) throws SAXException {
-                    throw saxparseexception;
-                }
-            });
+            db.setErrorHandler(createErrorHandler());
 
             File file = new File(path);
             if (!file.canRead()) {
@@ -697,7 +664,8 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
     /**
      * Load a single definition.
      *
-     * @param definitionName Name of the definition to load
+     * @param definitionName
+     *            Name of the definition to load
      * @return The loaded trace definition
      */
     public static CustomTxtTraceDefinition load(String definitionName) {
@@ -706,38 +674,17 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             DocumentBuilder db = dbf.newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
-            EntityResolver resolver = new EntityResolver() {
-                @Override
-                public InputSource resolveEntity(String publicId, String systemId) {
-                    String empty = ""; //$NON-NLS-1$
-                    ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
-                    return new InputSource(bais);
-                }
-            };
-            db.setEntityResolver(resolver);
+            db.setEntityResolver(createEmptyEntityResolver());
 
             // The following catches xml parsing exceptions
-            db.setErrorHandler(new ErrorHandler() {
-                @Override
-                public void error(SAXParseException saxparseexception) throws SAXException {
-                }
-
-                @Override
-                public void warning(SAXParseException saxparseexception) throws SAXException {
-                }
-
-                @Override
-                public void fatalError(SAXParseException saxparseexception) throws SAXException {
-                    throw saxparseexception;
-                }
-            });
+            db.setErrorHandler(createErrorHandler());
 
             CustomTxtTraceDefinition value = lookupDefinition(definitionName, db, CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME);
             if (value == null) {
                 return lookupDefinition(definitionName, db, CUSTOM_TXT_TRACE_DEFINITIONS_DEFAULT_PATH_NAME);
             }
             return value;
-        } catch (ParserConfigurationException | SAXException | IOException e ) {
+        } catch (ParserConfigurationException | SAXException | IOException e) {
             Activator.logError("Error loading CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         }
         return null;
@@ -770,7 +717,8 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
     /**
      * Get the definition from a definition element.
      *
-     * @param definitionElement The Element to extract from
+     * @param definitionElement
+     *            The Element to extract from
      * @return The loaded trace definition
      */
     public static CustomTxtTraceDefinition extractDefinition(Element definitionElement) {
@@ -842,7 +790,8 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
     /**
      * Delete a definition from the currently loaded ones.
      *
-     * @param definitionName The name of the definition to delete
+     * @param definitionName
+     *            The name of the definition to delete
      */
     public static void delete(String definitionName) {
         try {
@@ -850,31 +799,10 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             DocumentBuilder db = dbf.newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
-            EntityResolver resolver = new EntityResolver() {
-                @Override
-                public InputSource resolveEntity(String publicId, String systemId) {
-                    String empty = ""; //$NON-NLS-1$
-                    ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
-                    return new InputSource(bais);
-                }
-            };
-            db.setEntityResolver(resolver);
+            db.setEntityResolver(createEmptyEntityResolver());
 
             // The following catches xml parsing exceptions
-            db.setErrorHandler(new ErrorHandler() {
-                @Override
-                public void error(SAXParseException saxparseexception) throws SAXException {
-                }
-
-                @Override
-                public void warning(SAXParseException saxparseexception) throws SAXException {
-                }
-
-                @Override
-                public void fatalError(SAXParseException saxparseexception) throws SAXException {
-                    throw saxparseexception;
-                }
-            });
+            db.setErrorHandler(createErrorHandler());
 
             File file = new File(CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME);
             Document doc = db.parse(file);
@@ -911,18 +839,8 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             // Check if default definition needs to be reloaded
             TmfTraceType.addCustomTraceType(TmfTraceType.CUSTOM_TXT_CATEGORY, definitionName);
 
-        } catch (ParserConfigurationException e) {
+        } catch (ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError | TransformerException e) {
             Activator.logError("Error deleting CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
-        } catch (SAXException e) {
-            Activator.logError("Error deleting CustomTxtTraceDefinition: definitionName= " + definitionName, e); //$NON-NLS-1$
-        } catch (IOException e) {
-            Activator.logError("Error deleting CustomTxtTraceDefinition: definitionName= " + definitionName, e); //$NON-NLS-1$
-        } catch (TransformerConfigurationException e) {
-            Activator.logError("Error deleting CustomTxtTraceDefinition: definitionName= " + definitionName, e); //$NON-NLS-1$
-        } catch (TransformerFactoryConfigurationError e) {
-            Activator.logError("Error deleting CustomTxtTraceDefinition: definitionName= " + definitionName, e); //$NON-NLS-1$
-        } catch (TransformerException e) {
-            Activator.logError("Error deleting CustomTxtTraceDefinition: definitionName= " + definitionName, e); //$NON-NLS-1$
         }
     }
 }

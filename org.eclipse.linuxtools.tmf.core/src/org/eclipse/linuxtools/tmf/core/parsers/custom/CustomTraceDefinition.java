@@ -12,10 +12,16 @@
 
 package org.eclipse.linuxtools.tmf.core.parsers.custom;
 
+import java.io.ByteArrayInputStream;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * Base class for custom trace definitions.
@@ -104,4 +110,44 @@ public abstract class CustomTraceDefinition {
      *            The path to save to
      */
     public abstract void save(String path);
+
+    /**
+     * Creates a new empty entity resolver
+     *
+     * @return a new entity resolver
+     * @since 3.1
+     */
+    protected static EntityResolver createEmptyEntityResolver() {
+        return new EntityResolver() {
+            @Override
+            public InputSource resolveEntity(String publicId, String systemId) {
+                String empty = ""; //$NON-NLS-1$
+                ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
+                return new InputSource(bais);
+            }
+        };
+    }
+
+    /**
+     * Creates an error handler for parse exceptions
+     *
+     * @return a new error handler
+     * @since 3.1
+     */
+    protected static ErrorHandler createErrorHandler() {
+        return new ErrorHandler() {
+            @Override
+            public void error(SAXParseException saxparseexception) throws SAXException {
+            }
+
+            @Override
+            public void warning(SAXParseException saxparseexception) throws SAXException {
+            }
+
+            @Override
+            public void fatalError(SAXParseException saxparseexception) throws SAXException {
+                throw saxparseexception;
+            }
+        };
+    }
 }
