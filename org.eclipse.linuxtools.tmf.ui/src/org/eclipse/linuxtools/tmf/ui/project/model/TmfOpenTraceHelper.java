@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.URIUtil;
+import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.internal.tmf.ui.project.model.TmfImportHelper;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
@@ -340,11 +341,24 @@ public class TmfOpenTraceHelper {
             return;
         }
 
+        // If a trace type is not set then delegate it to the eclipse platform
+        if ((traceElement instanceof TmfTraceElement) && (traceElement.getResource() instanceof IFile) && (traceElement.getTraceType() == null)) {
+            try {
+                boolean activate = OpenStrategy.activateOnOpen();
+                // only local open is supported
+                IDE.openEditor(activePage, file, activate);
+            } catch (PartInitException e) {
+                TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, traceElement.getTypeName()),
+                        NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, traceElement.getElementPath()) + ENDL + ENDL + e.getMessage());
+            }
+            return;
+        }
+
         Thread thread = new Thread() {
             @Override
             public void run() {
-
                 final ITmfTrace trace = openProjectElement(traceElement);
+
                 if (trace == null) {
                     return;
                 }
