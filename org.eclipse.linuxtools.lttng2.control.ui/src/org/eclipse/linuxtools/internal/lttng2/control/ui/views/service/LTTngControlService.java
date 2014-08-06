@@ -431,19 +431,7 @@ public class LTTngControlService implements ILttngControlService {
             return createStreamedSession(sessionInfo, monitor);
         }
 
-        String newName = formatParameter(sessionInfo.getName());
-        String newPath = formatParameter(sessionInfo.getSessionPath());
-
-        StringBuffer command = createCommand(LTTngControlServiceConstants.COMMAND_CREATE_SESSION, newName);
-
-        if (newPath != null && !"".equals(newPath)) { //$NON-NLS-1$
-            command.append(LTTngControlServiceConstants.OPTION_OUTPUT_PATH);
-            command.append(newPath);
-        }
-
-        if (sessionInfo.isSnapshotSession()) {
-            command.append(LTTngControlServiceConstants.OPTION_SNAPSHOT);
-        }
+        StringBuffer command = prepareSessionCreationCommand(sessionInfo);
 
         ICommandResult result = executeCommand(command.toString(), monitor);
 
@@ -496,30 +484,30 @@ public class LTTngControlService implements ILttngControlService {
 
     }
 
-    private ISessionInfo createStreamedSession(ISessionInfo sessionInfo, IProgressMonitor monitor) throws ExecutionException {
-
+    /**
+     * @param sessionInfo
+     * @return
+     */
+    protected StringBuffer prepareSessionCreationCommand(ISessionInfo sessionInfo) {
         String newName = formatParameter(sessionInfo.getName());
+        String newPath = formatParameter(sessionInfo.getSessionPath());
+
         StringBuffer command = createCommand(LTTngControlServiceConstants.COMMAND_CREATE_SESSION, newName);
+
+        if (newPath != null && !"".equals(newPath)) { //$NON-NLS-1$
+            command.append(LTTngControlServiceConstants.OPTION_OUTPUT_PATH);
+            command.append(newPath);
+        }
 
         if (sessionInfo.isSnapshotSession()) {
             command.append(LTTngControlServiceConstants.OPTION_SNAPSHOT);
-        } else if (sessionInfo.isLive()) {
-            command.append(LTTngControlServiceConstants.OPTION_LIVE);
-            if (sessionInfo.getLiveDelay() != LTTngControlServiceConstants.UNUSED_VALUE) {
-                command.append(sessionInfo.getLiveDelay());
-            }
         }
+        return command;
+    }
 
-        if (sessionInfo.getNetworkUrl() != null) {
-            command.append(LTTngControlServiceConstants.OPTION_NETWORK_URL);
-            command.append(sessionInfo.getNetworkUrl());
-        } else {
-            command.append(LTTngControlServiceConstants.OPTION_CONTROL_URL);
-            command.append(sessionInfo.getControlUrl());
+    private ISessionInfo createStreamedSession(ISessionInfo sessionInfo, IProgressMonitor monitor) throws ExecutionException {
 
-            command.append(LTTngControlServiceConstants.OPTION_DATA_URL);
-            command.append(sessionInfo.getDataUrl());
-        }
+        StringBuffer command = prepareStreamedSessionCreationCommand(sessionInfo);
 
         ICommandResult result = executeCommand(command.toString(), monitor);
 
@@ -579,6 +567,36 @@ public class LTTngControlService implements ILttngControlService {
         // and will be set later on when listing the session
 
         return sessionInfo;
+    }
+
+    /**
+     * @param sessionInfo
+     * @return
+     */
+    protected StringBuffer prepareStreamedSessionCreationCommand(ISessionInfo sessionInfo) {
+        String newName = formatParameter(sessionInfo.getName());
+        StringBuffer command = createCommand(LTTngControlServiceConstants.COMMAND_CREATE_SESSION, newName);
+
+        if (sessionInfo.isSnapshotSession()) {
+            command.append(LTTngControlServiceConstants.OPTION_SNAPSHOT);
+        } else if (sessionInfo.isLive()) {
+            command.append(LTTngControlServiceConstants.OPTION_LIVE);
+            if (sessionInfo.getLiveDelay() != LTTngControlServiceConstants.UNUSED_VALUE) {
+                command.append(sessionInfo.getLiveDelay());
+            }
+        }
+
+        if (sessionInfo.getNetworkUrl() != null) {
+            command.append(LTTngControlServiceConstants.OPTION_NETWORK_URL);
+            command.append(sessionInfo.getNetworkUrl());
+        } else {
+            command.append(LTTngControlServiceConstants.OPTION_CONTROL_URL);
+            command.append(sessionInfo.getControlUrl());
+
+            command.append(LTTngControlServiceConstants.OPTION_DATA_URL);
+            command.append(sessionInfo.getDataUrl());
+        }
+        return command;
     }
 
     @Override
