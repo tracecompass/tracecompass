@@ -40,8 +40,6 @@ public class SyslogTrace extends TextTrace<SyslogEvent> {
     /** The corresponding date format of the time stamp. */
     public static final SimpleDateFormat TIMESTAMP_SIMPLEDATEFORMAT = new SimpleDateFormat(
             TIMESTAMP_FORMAT, TmfTimePreferences.getInstance().getLocale());
-    /** The scale of the time stamps. */
-    public static final byte TIMESTAMP_SCALE = ITmfTimestamp.MILLISECOND_SCALE;
     /** The regular expression pattern of the first line of an event. */
     public static final Pattern LINE1_PATTERN = Pattern.compile(
             "\\s*(\\S\\S\\S \\d\\d? \\d\\d:\\d\\d:\\d\\d)\\s*(\\S*)\\s*(\\S*):+\\s*(.*\\S)?"); //$NON-NLS-1$
@@ -76,8 +74,8 @@ public class SyslogTrace extends TextTrace<SyslogEvent> {
                 if (calendar.after(CURRENT)) {
                     calendar.set(Calendar.YEAR, CURRENT.get(Calendar.YEAR) - 1);
                 }
-                long ms = calendar.getTimeInMillis();
-                timestamp = new TmfTimestamp(ms, TIMESTAMP_SCALE);
+                long ns = calendar.getTimeInMillis() * 1000000;
+                timestamp = createTimestamp(ns);
             }
         } catch (ParseException e) {
             timestamp = new TmfTimestamp();

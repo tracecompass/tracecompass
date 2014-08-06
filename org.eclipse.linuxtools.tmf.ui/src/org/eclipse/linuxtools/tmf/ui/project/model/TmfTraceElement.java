@@ -45,6 +45,8 @@ import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
+import org.eclipse.linuxtools.tmf.core.synchronization.TimestampTransformFactory;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTraceProperties;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
@@ -88,6 +90,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
     private static final String sfTraceType = Messages.TmfTraceElement_EventType;
     private static final String sfIsLinked = Messages.TmfTraceElement_IsLinked;
     private static final String sfSourceLocation = Messages.TmfTraceElement_SourceLocation;
+    private static final String sfTimeOffset = Messages.TmfTraceElement_TimeOffset;
     private static final String sfTracePropertiesCategory = Messages.TmfTraceElement_TraceProperties;
 
     private static final ReadOnlyTextPropertyDescriptor sfNameDescriptor = new ReadOnlyTextPropertyDescriptor(sfName, sfName);
@@ -96,9 +99,11 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
     private static final ReadOnlyTextPropertyDescriptor sfTypeDescriptor = new ReadOnlyTextPropertyDescriptor(sfTraceType, sfTraceType);
     private static final ReadOnlyTextPropertyDescriptor sfIsLinkedDescriptor = new ReadOnlyTextPropertyDescriptor(sfIsLinked, sfIsLinked);
     private static final ReadOnlyTextPropertyDescriptor sfSourceLocationDescriptor = new ReadOnlyTextPropertyDescriptor(sfSourceLocation, sfSourceLocation);
+    private static final ReadOnlyTextPropertyDescriptor sfTimeOffsetDescriptor = new ReadOnlyTextPropertyDescriptor(sfTimeOffset, sfTimeOffset);
 
     private static final IPropertyDescriptor[] sfDescriptors = { sfNameDescriptor, sfPathDescriptor, sfLocationDescriptor,
-            sfTypeDescriptor, sfIsLinkedDescriptor, sfSourceLocationDescriptor };
+            sfTypeDescriptor, sfIsLinkedDescriptor, sfSourceLocationDescriptor,
+            sfTimeOffsetDescriptor};
 
     static {
         sfNameDescriptor.setCategory(sfResourcePropertiesCategory);
@@ -107,7 +112,10 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         sfTypeDescriptor.setCategory(sfResourcePropertiesCategory);
         sfIsLinkedDescriptor.setCategory(sfResourcePropertiesCategory);
         sfSourceLocationDescriptor.setCategory(sfResourcePropertiesCategory);
+        sfTimeOffsetDescriptor.setCategory(sfResourcePropertiesCategory);
     }
+
+    private static final TmfTimestampFormat OFFSET_FORMAT = new TmfTimestampFormat("T.SSS SSS SSS s"); //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Static initialization
@@ -455,6 +463,14 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
                 if (helper != null) {
                     return helper.getCategoryName() + " : " + helper.getName(); //$NON-NLS-1$
                 }
+            }
+            return ""; //$NON-NLS-1$
+        }
+
+        if (sfTimeOffset.equals(id)) {
+            long offset = TimestampTransformFactory.getTimestampTransform(getElementUnderTraceFolder().getResource()).transform(0);
+            if (offset != 0) {
+                return OFFSET_FORMAT.format(offset);
             }
             return ""; //$NON-NLS-1$
         }

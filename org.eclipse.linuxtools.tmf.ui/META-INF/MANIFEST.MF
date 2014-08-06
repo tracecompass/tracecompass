@@ -26,6 +26,7 @@ Export-Package: org.eclipse.linuxtools.internal.tmf.ui;x-friends:="org.eclipse.l
  org.eclipse.linuxtools.internal.tmf.ui.parsers.wizards;x-friends:="org.eclipse.linuxtools.tmf.ui.tests",
  org.eclipse.linuxtools.internal.tmf.ui.preferences;x-internal:=true,
  org.eclipse.linuxtools.internal.tmf.ui.project.dialogs;x-internal:=true,
+ org.eclipse.linuxtools.internal.tmf.ui.project.dialogs.offset;x-internal:=true,
  org.eclipse.linuxtools.internal.tmf.ui.project.handlers;x-friends:="org.eclipse.linuxtools.tmf.ui.tests",
  org.eclipse.linuxtools.internal.tmf.ui.project.model;x-friends:="org.eclipse.linuxtools.lttng2.ui,org.eclipse.linuxtools.tmf.ui.tests,org.eclipse.linuxtools.tmf.ctf.ui.tests",
  org.eclipse.linuxtools.internal.tmf.ui.project.operations;x-internal:=true,

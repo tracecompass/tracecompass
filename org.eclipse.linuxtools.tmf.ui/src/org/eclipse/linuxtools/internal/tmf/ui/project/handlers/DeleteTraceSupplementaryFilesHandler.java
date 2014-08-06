@@ -42,6 +42,7 @@ import org.eclipse.linuxtools.tmf.ui.project.model.TmfCommonProjectElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -136,7 +137,7 @@ public class DeleteTraceSupplementaryFilesHandler extends AbstractHandler {
 
                 SubMonitor subMonitor = SubMonitor.convert(monitor, allResourcesToDelete.size());
 
-                for (TmfCommonProjectElement element : resourceMap.keySet()) {
+                for (final TmfCommonProjectElement element : resourceMap.keySet()) {
                     if (monitor.isCanceled()) {
                         throw new OperationCanceledException();
                     }
@@ -145,7 +146,12 @@ public class DeleteTraceSupplementaryFilesHandler extends AbstractHandler {
                     if (!traceResourcesToDelete.isEmpty()) {
                         subMonitor.setTaskName(NLS.bind(Messages.DeleteSupplementaryFiles_DeletionTask, element.getElementPath()));
                         // Delete the selected resources
-                        element.closeEditors();
+                        Display.getDefault().syncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                element.closeEditors();
+                            }
+                        });
                         element.deleteSupplementaryResources(traceResourcesToDelete.toArray(new IResource[0]));
                         projectsToRefresh.add(element.getProject().getResource());
                     }

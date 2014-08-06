@@ -292,7 +292,10 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
     protected abstract Pattern getFirstLinePattern();
 
     /**
-     * Parses the first line data and returns a new event.
+     * Parses the first line data and returns a new event. When constructing the
+     * event, the concrete trace should use the trace's timestamp transform to
+     * create the timestamp, by either transforming the parsed time value
+     * directly or by using the method {@link #createTimestamp(long)}.
      *
      * @param matcher
      *            The matcher

@@ -17,11 +17,6 @@
 package org.eclipse.linuxtools.tmf.core.trace;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -29,15 +24,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
-import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisManager;
@@ -76,6 +68,10 @@ import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
  * A concrete trace must provide its corresponding parser. A common way to
  * accomplish this is by making the concrete class extend TmfTrace and
  * implement ITmfEventParser.
+ * <p>
+ * When constructing an event, the concrete trace should use the trace's
+ * timestamp transform to create the timestamp, by either transforming the
+ * parsed time value directly or by using the method createTimestamp().
  * <p>
  * The concrete class can either specify its own indexer or use the provided
  * TmfCheckpointIndexer (default). In this case, the trace cache size will be
@@ -123,8 +119,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
 
     private final Map<String, IAnalysisModule> fAnalysisModules =
             Collections.synchronizedMap(new LinkedHashMap<String, IAnalysisModule>());
-
-    private static final String SYNCHRONIZATION_FORMULA_FILE = "sync_formula"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Construction
@@ -763,29 +757,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
         }
     }
 
-    /**
-     * Returns the file resource used to store synchronization formula. The file
-     * may not exist.
-     *
-     * @return the synchronization file
-     */
-    private File getSyncFormulaFile() {
-        File file = null;
-        if (fResource instanceof IFolder) {
-            try {
-                String supplDirectory;
-
-                supplDirectory = fResource.getPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER);
-
-                file = new File(supplDirectory + File.separator + SYNCHRONIZATION_FORMULA_FILE);
-
-            } catch (CoreException e) {
-
-            }
-        }
-        return file;
-    }
-
     // ------------------------------------------------------------------------
     // Timestamp transformation functions
     // ------------------------------------------------------------------------
@@ -796,21 +767,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
     @Override
     public ITmfTimestampTransform getTimestampTransform() {
         if (fTsTransform == null) {
-            /* Check if a formula is stored somewhere in the resources */
-            File sync_file = getSyncFormulaFile();
-            if (sync_file != null && sync_file.exists()) {
-
-                try (FileInputStream fis = new FileInputStream(sync_file);
-                        ObjectInputStream ois = new ObjectInputStream(fis);) {
-
-                    fTsTransform = (ITmfTimestampTransform) ois.readObject();
-
-                } catch (ClassNotFoundException | IOException e) {
-                    fTsTransform = TimestampTransformFactory.getDefaultTransform();
-                }
-            } else {
-                fTsTransform = TimestampTransformFactory.getDefaultTransform();
-            }
+            fTsTransform = TimestampTransformFactory.getTimestampTransform(getResource());
         }
         return fTsTransform;
     }
@@ -821,23 +778,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
     @Override
     public void setTimestampTransform(final ITmfTimestampTransform tt) {
         fTsTransform = tt;
-
-        /* Save the timestamp transform to a file */
-        File sync_file = getSyncFormulaFile();
-        if (sync_file != null) {
-            if (sync_file.exists()) {
-                sync_file.delete();
-            }
-
-            /* Save the header of the file */
-            try (FileOutputStream fos = new FileOutputStream(sync_file, false);
-                    ObjectOutputStream oos = new ObjectOutputStream(fos);) {
-
-                oos.writeObject(fTsTransform);
-            } catch (IOException e1) {
-                Activator.logError("Error writing timestamp transform for trace", e1); //$NON-NLS-1$
-            }
-        }
+        TimestampTransformFactory.setTimestampTransform(getResource(), tt);
     }
 
     /**

@@ -11,11 +11,21 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.tmf.core.synchronization;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.math.BigDecimal;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.internal.tmf.core.synchronization.TmfConstantTransform;
 import org.eclipse.linuxtools.internal.tmf.core.synchronization.TmfTimestampTransform;
 import org.eclipse.linuxtools.internal.tmf.core.synchronization.TmfTimestampTransformLinear;
+import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 
 /**
@@ -25,6 +35,8 @@ import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
  * @since 3.1
  */
 public final class TimestampTransformFactory {
+
+    private static final String SYNCHRONIZATION_FORMULA_FILE = "sync_formula"; //$NON-NLS-1$
 
     private TimestampTransformFactory() {
     }
@@ -119,6 +131,78 @@ public final class TimestampTransformFactory {
             return createWithOffset(offset.longValueExact());
         }
         return new TmfTimestampTransformLinear(factor, offset);
+    }
+
+    /**
+     * Returns the file resource used to store synchronization formula. The file
+     * may not exist.
+     *
+     * @param resource
+     *            the trace resource
+     * @return the synchronization file
+     */
+    private static File getSyncFormulaFile(IResource resource) {
+        if (resource == null) {
+            return null;
+        }
+        try {
+            String supplDirectory = resource.getPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER);
+            return new File(supplDirectory + File.separator + SYNCHRONIZATION_FORMULA_FILE);
+        } catch (CoreException e) {
+            /* Ignored */
+        }
+        return null;
+    }
+
+    /**
+     * Returns the timestamp transform for a trace resource
+     *
+     * @param resource
+     *            the trace resource
+     * @return the timestamp transform
+     * @since 3.2
+     */
+    public static ITmfTimestampTransform getTimestampTransform(IResource resource) {
+        File syncFile = getSyncFormulaFile(resource);
+        if (syncFile != null && syncFile.exists()) {
+            /* Read the serialized object from file */
+            try (FileInputStream fis = new FileInputStream(syncFile);
+                    ObjectInputStream ois = new ObjectInputStream(fis);) {
+                return (ITmfTimestampTransform) ois.readObject();
+            } catch (ClassNotFoundException | IOException e) {
+            }
+        }
+        return TimestampTransformFactory.getDefaultTransform();
+    }
+
+    /**
+     * Sets the trace resource's timestamp transform
+     *
+     * @param resource
+     *            the trace resource
+     * @param tt
+     *            The timestamp transform for all timestamps of this trace, or
+     *            null to clear it
+     * @since 3.2
+     */
+    public static void setTimestampTransform(IResource resource, ITmfTimestampTransform tt) {
+        /* Save the timestamp transform to a file */
+        File syncFile = getSyncFormulaFile(resource);
+        if (syncFile != null) {
+            if (syncFile.exists()) {
+                syncFile.delete();
+            }
+            if (tt == null) {
+                return;
+            }
+            /* Write the serialized object to file */
+            try (FileOutputStream fos = new FileOutputStream(syncFile, false);
+                    ObjectOutputStream oos = new ObjectOutputStream(fos);) {
+                oos.writeObject(tt);
+            } catch (IOException e1) {
+                Activator.logError("Error writing timestamp transform for trace", e1); //$NON-NLS-1$
+            }
+        }
     }
 
 }
