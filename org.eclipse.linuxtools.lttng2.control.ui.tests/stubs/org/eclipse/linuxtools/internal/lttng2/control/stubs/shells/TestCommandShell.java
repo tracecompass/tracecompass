@@ -45,6 +45,6 @@ public class TestCommandShell implements ICommandShell {
         if (fIsConnected) {
 
         }
-        return new CommandResult(0, new String[0]);
+        return new CommandResult(0, new String[0], new String[0]);
     }
 }

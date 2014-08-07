@@ -34,6 +34,7 @@ public class CommandResult implements ICommandResult {
      * The output as String array.
      */
     private String[] fOutput = new String[0];
+    private String[] fErrorOutput = new String[0];
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -46,11 +47,16 @@ public class CommandResult implements ICommandResult {
      *            The result of the command
      * @param output
      *            The output, as an array of strings
+     * @param errorOutput
+     *            THe error output as an array of strings
      */
-    public CommandResult(int result, String[] output) {
+    public CommandResult(int result, String[] output, String[] errorOutput) {
         fResult = result;
         if (output != null) {
             fOutput = Arrays.copyOf(output, output.length);
+        }
+        if (errorOutput != null) {
+            fErrorOutput = Arrays.copyOf(errorOutput, errorOutput.length);
         }
     }
 
@@ -78,6 +84,19 @@ public class CommandResult implements ICommandResult {
         fOutput = new String[0];
         if (output != null) {
             fOutput = Arrays.copyOf(output, output.length);
+        }
+    }
+
+    @Override
+    public String[] getErrorOutput() {
+        return Arrays.copyOf(fErrorOutput, fErrorOutput.length);
+    }
+
+    @Override
+    public void setErrorOutput(String[] output) {
+        fErrorOutput = new String[0];
+        if (output != null) {
+            fErrorOutput = Arrays.copyOf(output, output.length);
         }
     }
 }
