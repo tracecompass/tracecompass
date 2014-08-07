@@ -20,7 +20,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ TsTransformTest.class,
-        SyncTest.class })
+        SyncTest.class,
+        TsTransformFactoryTest.class })
 public class AllTests {
 
 }
