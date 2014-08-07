@@ -55,6 +55,17 @@ public class IOStructGen {
     // Attributes
     // ------------------------------------------------------------------------
 
+    private static final @NonNull String MAP = "map"; //$NON-NLS-1$
+    private static final @NonNull String ENCODING = "encoding"; //$NON-NLS-1$
+    private static final @NonNull String BASE = "base"; //$NON-NLS-1$
+    private static final @NonNull String SIZE = "size"; //$NON-NLS-1$
+    private static final @NonNull String SIGNED = "signed"; //$NON-NLS-1$
+    private static final @NonNull String LINE = "line"; //$NON-NLS-1$
+    private static final @NonNull String FILE = "file"; //$NON-NLS-1$
+    private static final @NonNull String IP = "ip"; //$NON-NLS-1$
+    private static final @NonNull String FUNC = "func"; //$NON-NLS-1$
+    private static final @NonNull String NAME = "name"; //$NON-NLS-1$
+    private static final @NonNull String EMPTY_STRING = ""; //$NON-NLS-1$
     private static final int INTEGER_BASE_16 = 16;
     private static final int INTEGER_BASE_10 = 10;
     private static final int INTEGER_BASE_8 = 8;
@@ -206,7 +217,7 @@ public class IOStructGen {
             parseCallsite(callsite);
         }
 
-        if (streams.size() > 0) {
+        if (!streams.isEmpty()) {
             for (CommonTree stream : streams) {
                 parseStream(stream);
             }
@@ -305,17 +316,17 @@ public class IOStructGen {
              * this is to replace the previous quotes with nothing...
              * effectively deleting them
              */
-            final String nullString = ""; //$NON-NLS-1$
+            final String nullString = EMPTY_STRING;
             left = child.getChild(0).getChild(0).getChild(0).getText();
-            if (left.equals("name")) { //$NON-NLS-1$
+            if (left.equals(NAME)) {
                 name = child.getChild(1).getChild(0).getChild(0).getText().replaceAll(regex, nullString);
-            } else if (left.equals("func")) { //$NON-NLS-1$
+            } else if (left.equals(FUNC)) {
                 funcName = child.getChild(1).getChild(0).getChild(0).getText().replaceAll(regex, nullString);
-            } else if (left.equals("ip")) { //$NON-NLS-1$
+            } else if (left.equals(IP)) {
                 ip = Long.decode(child.getChild(1).getChild(0).getChild(0).getText());
-            } else if (left.equals("file")) { //$NON-NLS-1$
+            } else if (left.equals(FILE)) {
                 fileName = child.getChild(1).getChild(0).getChild(0).getText().replaceAll(regex, nullString);
-            } else if (left.equals("line")) { //$NON-NLS-1$
+            } else if (left.equals(LINE)) {
                 lineNumber = Long.parseLong(child.getChild(1).getChild(0).getChild(0).getText());
             }
         }
@@ -1147,7 +1158,7 @@ public class IOStructGen {
          * sequence. For example, int a[3][len] means that we have an array of 3
          * (sequences of length 'len' of (int)).
          */
-        if (lengths.size() > 0) {
+        if (!lengths.isEmpty()) {
             /* We begin at the end */
             Collections.reverse(lengths);
 
@@ -1396,7 +1407,7 @@ public class IOStructGen {
         long alignment = 0;
         int base = DEFAULT_INT_BASE;
         @NonNull
-        String clock = ""; //$NON-NLS-1$
+        String clock = EMPTY_STRING;
 
         Encoding encoding = Encoding.NONE;
 
@@ -1418,19 +1429,19 @@ public class IOStructGen {
                 }
                 String left = concatenateUnaryStrings(leftStrings);
 
-                if (left.equals("signed")) { //$NON-NLS-1$
+                if (left.equals(SIGNED)) {
                     signed = getSigned(rightNode);
                 } else if (left.equals(MetadataStrings.BYTE_ORDER)) {
                     byteOrder = getByteOrder(rightNode);
-                } else if (left.equals("size")) { //$NON-NLS-1$
+                } else if (left.equals(SIZE)) {
                     size = getSize(rightNode);
                 } else if (left.equals(MetadataStrings.ALIGN)) {
                     alignment = getAlignment(rightNode);
-                } else if (left.equals("base")) { //$NON-NLS-1$
+                } else if (left.equals(BASE)) {
                     base = getBase(rightNode);
-                } else if (left.equals("encoding")) { //$NON-NLS-1$
+                } else if (left.equals(ENCODING)) {
                     encoding = getEncoding(rightNode);
-                } else if (left.equals("map")) { //$NON-NLS-1$
+                } else if (left.equals(MAP)) {
                     clock = getClock(rightNode);
                 } else {
                     Activator.log(IStatus.WARNING, Messages.IOStructGen_UnknownIntegerAttributeWarning + " " + left); //$NON-NLS-1$
@@ -1460,7 +1471,7 @@ public class IOStructGen {
     @NonNull
     private static String getClock(CommonTree rightNode) {
         String clock = rightNode.getChild(1).getChild(0).getChild(0).getText();
-        return clock == null ? "" : clock; //$NON-NLS-1$
+        return clock == null ? EMPTY_STRING : clock;
     }
 
     private static StringDeclaration parseString(CommonTree string)
@@ -1491,7 +1502,7 @@ public class IOStructGen {
                     }
                     String left = concatenateUnaryStrings(leftStrings);
 
-                    if (left.equals("encoding")) { //$NON-NLS-1$
+                    if (left.equals(ENCODING)) {
                         encoding = getEncoding(rightNode);
                     } else {
                         throw new ParseException("String: unknown attribute " //$NON-NLS-1$
