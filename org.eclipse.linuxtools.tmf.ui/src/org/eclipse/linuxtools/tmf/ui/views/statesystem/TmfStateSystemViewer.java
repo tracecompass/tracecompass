@@ -193,7 +193,7 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
         TmfTreeViewerEntry rootEntry = new TmfTreeViewerEntry(""); //$NON-NLS-1$
 
         List<ITmfTreeViewerEntry> children = rootEntry.getChildren();
-        for (final ITmfTrace currentTrace : TmfTraceManager.getTraceSet(getTrace())) {
+        for (final ITmfTrace currentTrace : TmfTraceManager.getTraceSetWithExperiment(getTrace())) {
             if (currentTrace == null) {
                 continue;
             }
