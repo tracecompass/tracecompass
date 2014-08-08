@@ -32,7 +32,6 @@ import org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.linuxtools.tmf.ui.tests.experiment.type.TmfEventsEditorStub;
-import org.eclipse.linuxtools.tmf.ui.tests.experiment.type.TmfEventsTableExperimentStub;
 import org.eclipse.linuxtools.tmf.ui.tests.shared.ProjectModelTestData;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
 import org.eclipse.ui.IEditorPart;
@@ -173,7 +172,7 @@ public class TraceAndExperimentTypeTest {
         TmfEventsTable table = editorStub.getNewEventsTable();
 
         assertNotNull(table);
-        assertTrue(table.getClass().equals(TmfEventsTableExperimentStub.class));
+        assertTrue(table.getClass().equals(TmfEventsTable.class));
 
     }
 

@@ -99,9 +99,6 @@
          <defaultEditor
                id="org.eclipse.linuxtools.tmf.ui.editors.events.stub">
          </defaultEditor>
-         <eventsTableType
-               class="org.eclipse.linuxtools.tmf.ui.tests.experiment.type.TmfEventsTableExperimentStub">
-         </eventsTableType>
       </experiment>
    </extension>
 

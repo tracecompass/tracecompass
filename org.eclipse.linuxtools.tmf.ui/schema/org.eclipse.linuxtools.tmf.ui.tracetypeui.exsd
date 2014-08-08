@@ -50,14 +50,15 @@
 
    <element name="type">
       <annotation>
-         <appInfo>
+         <appinfo>
             <meta.element labelAttribute="tracetype"/>
-         </appInfo>
+         </appinfo>
       </annotation>
       <complexType>
          <sequence>
             <element ref="eventsTableType" minOccurs="0" maxOccurs="1"/>
             <element ref="defaultEditor" minOccurs="0" maxOccurs="1"/>
+            <element ref="eventTableColumns" minOccurs="0" maxOccurs="1"/>
          </sequence>
          <attribute name="tracetype" type="string" use="required">
             <annotation>
@@ -84,9 +85,9 @@
 
    <element name="experiment">
       <annotation>
-         <appInfo>
+         <appinfo>
             <meta.element labelAttribute="tracetype"/>
-         </appInfo>
+         </appinfo>
       </annotation>
       <complexType>
          <sequence>
@@ -152,6 +153,30 @@ If omitted, the default events editor will be used.
                   The id of the editor to use for this trace type.
 If empty, the default events editor will be used.
                </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="eventTableColumns">
+      <annotation>
+         <documentation>
+            The event table columns to use with this trace type.
+If omitted, the default columns will be used.
+
+If the &quot;eventsTableType&quot; element is present, we will first try to provide a table of that type (ignoring the contents of &quot;eventTableColumns&quot;). If the requested table type cannot be provided, then we will fall-back to using a default table with the columns defined in &quot;eventTableColumns&quot;.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="class" type="string">
+            <annotation>
+               <documentation>
+                  The fully qualified name of a class that implements &lt;samp&gt;ITmfEventTableColumns&lt;/samp&gt; .
+If empty, the default columns will be used.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.linuxtools.tmf.ui.viewers.events.columns.ITmfEventTableColumns"/>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>

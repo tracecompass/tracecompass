@@ -22,17 +22,26 @@ import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomEvent;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTraceDefinition;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
+import org.eclipse.linuxtools.tmf.ui.viewers.events.columns.ITmfEventTableColumns;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.columns.TmfEventTableColumn;
-import org.eclipse.swt.widgets.Composite;
 
 import com.google.common.collect.ImmutableList;
 
 /**
- * Events table for custom text parsers.
+ * Event table column definition for Custom {Text|XML} traces.
  *
- * @author Patrick Tassé
+ * Since this definition will be different for every single custom trace, this
+ * does not work the same as with {@link ITmfEventTableColumns}.
+ *
+ * Instead, one has to call {@link #generateColumns(CustomTraceDefinition)} with
+ * the CustomTraceDefinition of the the particular trace to display. Then the
+ * returned collection can be passed to the constructor
+ * {@link TmfEventsTable#TmfEventsTable(org.eclipse.swt.widgets.Composite, int, Collection)}
+ * as usual.
+ *
+ * @author Alexandre Montplaisir
  */
-public class CustomEventsTable extends TmfEventsTable {
+public class CustomEventTableColumns {
 
     /**
      * Column for custom events, which uses an integer ID to represent each
@@ -72,20 +81,12 @@ public class CustomEventsTable extends TmfEventsTable {
     }
 
     /**
-     * Constructor.
+     * Get the event table columns for a given trace definition
      *
-     * @param definition
-     *            Trace definition object
-     * @param parent
-     *            Parent composite of the view
-     * @param cacheSize
-     *            How many events to keep in cache
+     * @param definition The {@link CustomTraceDefinition} of the trace for which you want the columns
+     * @return The set of columns for the given trace.
      */
-    public CustomEventsTable(CustomTraceDefinition definition, Composite parent, int cacheSize) {
-        super(parent, cacheSize, generateColumns(definition));
-    }
-
-    private static Collection<CustomEventTableColumn> generateColumns(CustomTraceDefinition definition) {
+    public static Collection<CustomEventTableColumn> generateColumns(CustomTraceDefinition definition) {
         ImmutableList.Builder<CustomEventTableColumn> builder = new ImmutableList.Builder<>();
         List<OutputColumn> outputs = definition.outputs;
         for (int i = 0; i < outputs.size(); i++) {

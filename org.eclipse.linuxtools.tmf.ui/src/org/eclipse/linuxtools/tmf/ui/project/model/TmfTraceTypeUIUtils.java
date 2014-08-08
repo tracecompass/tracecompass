@@ -13,7 +13,10 @@
 
 package org.eclipse.linuxtools.tmf.ui.project.model;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -28,21 +31,29 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomEventTableColumns;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
+import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTxtTrace;
+import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceImportException;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType.TraceElementType;
 import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.util.Pair;
+import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
+import org.eclipse.linuxtools.tmf.ui.viewers.events.columns.ITmfEventTableColumns;
+import org.eclipse.linuxtools.tmf.ui.viewers.events.columns.TmfEventTableColumn;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.osgi.framework.Bundle;
 
 /**
  * Utils class for the UI-specific parts of @link {@link TmfTraceType}.
@@ -70,13 +81,17 @@ public final class TmfTraceTypeUIUtils {
     /** Extension point element 'Events table type' */
     public static final String EVENTS_TABLE_TYPE_ELEM = "eventsTableType"; //$NON-NLS-1$
 
+    /** Extension point element 'Event Table Columns'
+     * @since 3.1 */
+    public static final String EVENT_TABLE_COLUMNS = "eventTableColumns"; //$NON-NLS-1$
+
     /** Extension point attribute 'tracetype' */
     public static final String TRACETYPE_ATTR = "tracetype"; //$NON-NLS-1$
 
     /** Extension point attribute 'icon' */
     public static final String ICON_ATTR = "icon"; //$NON-NLS-1$
 
-    /** Extension point attribute 'class' (attribute of eventsTableType) */
+    /** Extension point attribute 'class' (attribute of other elements) */
     public static final String CLASS_ATTR = "class"; //$NON-NLS-1$
 
     private static final char SEPARATOR = ':';
@@ -365,5 +380,132 @@ public final class TmfTraceTypeUIUtils {
             }
         }
         return null;
+    }
+
+    /**
+     * Get the Event Table type specified by the trace type's extension point,
+     * if there is one.
+     *
+     * @param trace
+     *            The trace for which we want the events table.
+     * @param parent
+     *            The parent composite that the event table will have
+     * @param cacheSize
+     *            The cache size to use with this event table. Should be defined
+     *            by the trace type.
+     * @return The corresponding Event Table, or 'null' if this trace type did
+     *         not specify any.
+     * @since 3.1
+     */
+    public static @Nullable TmfEventsTable getEventTable(ITmfTrace trace, Composite parent, int cacheSize) {
+        final String traceType = getTraceType(trace);
+        if (traceType == null) {
+            return null;
+        }
+
+        for (final IConfigurationElement ce : TmfTraceTypeUIUtils.getTypeUIElements(TraceElementType.TRACE)) {
+            if (ce.getAttribute(TmfTraceTypeUIUtils.TRACETYPE_ATTR).equals(traceType)) {
+                final IConfigurationElement[] eventsTableTypeCE = ce.getChildren(TmfTraceTypeUIUtils.EVENTS_TABLE_TYPE_ELEM);
+
+                if (eventsTableTypeCE.length != 1) {
+                    break;
+                }
+                final String eventsTableType = eventsTableTypeCE[0].getAttribute(TmfTraceTypeUIUtils.CLASS_ATTR);
+                if (eventsTableType.isEmpty()) {
+                    break;
+                }
+                try {
+                    final Bundle bundle = Platform.getBundle(ce.getContributor().getName());
+                    final Class<?> c = bundle.loadClass(eventsTableType);
+                    final Class<?>[] constructorArgs = new Class[] { Composite.class, int.class };
+                    final Constructor<?> constructor = c.getConstructor(constructorArgs);
+                    final Object[] args = new Object[] { parent, cacheSize };
+                    return (TmfEventsTable) constructor.newInstance(args);
+
+                } catch (NoSuchMethodException | ClassNotFoundException | InstantiationException |
+                        IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get the Event Table columns specified by the trace type's extension
+     * point, if there are any.
+     *
+     * @param trace
+     *            The trace for which we want the columns.
+     * @return The corresponding event table columns, or 'null' if this trace
+     *         type did not specify any.
+     * @since 3.1
+     */
+    public static @Nullable Collection<? extends TmfEventTableColumn> getEventTableColumns(ITmfTrace trace) {
+        final String traceType = getTraceType(trace);
+        if (traceType == null) {
+            return null;
+        }
+
+        /*
+         * Custom traces are a special case : the columns are defined by the
+         * trace definition.
+         */
+        if (traceType.startsWith(CustomTxtTrace.class.getCanonicalName())) {
+            return CustomEventTableColumns.generateColumns(((CustomTxtTrace) trace).getDefinition());
+        }
+        if (traceType.startsWith(CustomXmlTrace.class.getCanonicalName())) {
+            return CustomEventTableColumns.generateColumns(((CustomXmlTrace) trace).getDefinition());
+        }
+
+        /* For all other trace types, we will go look into the extension point */
+        for (final IConfigurationElement ce : TmfTraceTypeUIUtils.getTypeUIElements(TraceElementType.TRACE)) {
+            if (ce.getAttribute(TmfTraceTypeUIUtils.TRACETYPE_ATTR).equals(traceType)) {
+                final IConfigurationElement[] eventTableColumnsCE = ce.getChildren(TmfTraceTypeUIUtils.EVENT_TABLE_COLUMNS);
+
+                if (eventTableColumnsCE.length != 1) {
+                    break;
+                }
+                final String eventTableColumnsClass = eventTableColumnsCE[0].getAttribute(TmfTraceTypeUIUtils.CLASS_ATTR);
+                if ((eventTableColumnsClass == null) || (eventTableColumnsClass.isEmpty())) {
+                    break;
+                }
+                try {
+                    final Bundle bundle = Platform.getBundle(ce.getContributor().getName());
+                    final Class<?> c = bundle.loadClass(eventTableColumnsClass);
+                    final Constructor<?> ctor = c.getConstructor();
+                    ITmfEventTableColumns cols = (ITmfEventTableColumns) ctor.newInstance();
+                    return cols.getEventTableColumns();
+
+                } catch (NoSuchMethodException | ClassNotFoundException | InstantiationException |
+                        IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get the trace type (as a String) for the given trace
+     *
+     * @param trace
+     *            The trace object
+     * @return The String representing the trace type, or 'null' if this trace
+     *         does not advertise it.
+     */
+    private static @Nullable String getTraceType(ITmfTrace trace) {
+        IResource res = trace.getResource();
+        if (res == null) {
+            return null;
+        }
+        try {
+            String traceType = res.getPersistentProperty(TmfCommonConstants.TRACETYPE);
+            /* May be null here too */
+            return traceType;
+
+        } catch (CoreException e) {
+            return null;
+        }
     }
 }

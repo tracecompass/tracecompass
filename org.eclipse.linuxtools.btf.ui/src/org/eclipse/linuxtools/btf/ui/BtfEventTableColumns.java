@@ -8,34 +8,35 @@
  *
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
- *   Alexandre Montplaisir - Updated to new Event Table API
+ *   Alexandre Montplaisir - Update to new Event Table API
  *******************************************************************************/
 
 package org.eclipse.linuxtools.btf.ui;
 
 import java.util.Collection;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.btf.core.trace.BtfColumnNames;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
+import org.eclipse.linuxtools.tmf.ui.viewers.events.columns.ITmfEventTableColumns;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.columns.TmfEventTableColumn;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.columns.TmfEventTableFieldColumn;
-import org.eclipse.swt.widgets.Composite;
 
 import com.google.common.collect.ImmutableList;
 
 /**
- * BTF event viewer
+ * Columns to use in the BTF event table
  *
- * @author Matthew Khouzam
+ * @author Alexandre Montplaisir
  */
-public class BtfEventViewer extends TmfEventsTable {
+public class BtfEventTableColumns implements ITmfEventTableColumns {
 
     // ------------------------------------------------------------------------
     // Column definition
     // ------------------------------------------------------------------------
 
-    private static final Collection<TmfEventTableColumn> BTF_COLUMNS = ImmutableList.of(
+    @SuppressWarnings("null")
+    private static final @NonNull Collection<TmfEventTableColumn> BTF_COLUMNS = ImmutableList.of(
             TmfEventTableColumn.BaseColumns.TIMESTAMP,
             new BtfSourceColumn(),
             new BtfSourceInstanceColumn(),
@@ -129,18 +130,11 @@ public class BtfEventViewer extends TmfEventsTable {
     }
 
     // ------------------------------------------------------------------------
-    // Constructor
+    // ITmfEventTableColumns
     // ------------------------------------------------------------------------
 
-    /**
-     * Basic constructor, will use default column data.
-     *
-     * @param parent
-     *            The parent composite UI object
-     * @param cacheSize
-     *            The size of the event table cache
-     */
-    public BtfEventViewer(Composite parent, int cacheSize) {
-        super(parent, cacheSize, BTF_COLUMNS);
+    @Override
+    public Collection<? extends TmfEventTableColumn> getEventTableColumns() {
+        return BTF_COLUMNS;
     }
 }

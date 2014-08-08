@@ -13,8 +13,9 @@
 
 package org.eclipse.linuxtools.tmf.ui.editors;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -25,11 +26,11 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
@@ -38,11 +39,7 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
-import org.eclipse.linuxtools.internal.tmf.ui.parsers.custom.CustomEventsTable;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
-import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTxtTrace;
-import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTrace;
-import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType.TraceElementType;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceClosedSignal;
@@ -60,6 +57,7 @@ import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceTypeUIUtils;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
+import org.eclipse.linuxtools.tmf.ui.viewers.events.columns.TmfEventTableColumn;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
@@ -74,7 +72,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.IGotoMarker;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.properties.IPropertySheetPage;
-import org.osgi.framework.Bundle;
 
 /**
  * Editor for TMF events
@@ -281,88 +278,67 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     }
 
     /**
-     * Create the events table
+     * Create the event table
      *
-     * @param parent the parent composite
-     * @param cacheSize the cache size
-     * @return an events table instance
+     * @param parent
+     *            The parent composite
+     * @param cacheSize
+     *            The cache size
+     * @return The event table instance
      */
-    protected TmfEventsTable createEventsTable(final Composite parent, final int cacheSize) {
-        TmfEventsTable eventsTable = getEventsTable(parent, cacheSize);
-        if (eventsTable == null) {
-            eventsTable = new TmfEventsTable(parent, cacheSize);
-        }
-        return eventsTable;
+    protected @NonNull TmfEventsTable createEventsTable(final Composite parent, final int cacheSize) {
+        return getEventTable(fTrace, parent, cacheSize);
     }
 
-    private TmfEventsTable getEventsTable(final Composite parent, final int cacheSize) {
-        TmfEventsTable eventsTable = null;
-        try {
-            if (fTrace.getResource() == null) {
-                return null;
-            }
-            final String traceType = fTrace.getResource().getPersistentProperty(TmfCommonConstants.TRACETYPE);
-            if (traceType == null) {
-                return null;
-            }
-            if (traceType.startsWith(CustomTxtTrace.class.getCanonicalName())) {
-                return new CustomEventsTable(((CustomTxtTrace) fTrace).getDefinition(), parent, cacheSize);
-            }
-            if (traceType.startsWith(CustomXmlTrace.class.getCanonicalName())) {
-                return new CustomEventsTable(((CustomXmlTrace) fTrace).getDefinition(), parent, cacheSize);
-            }
-            TraceElementType type = TraceElementType.TRACE;
-            if (fTrace instanceof TmfExperiment) {
-                type = TraceElementType.EXPERIMENT;
-            }
-            for (final IConfigurationElement ce : TmfTraceTypeUIUtils.getTypeUIElements(type)) {
-                if (ce.getAttribute(TmfTraceTypeUIUtils.TRACETYPE_ATTR).equals(traceType)) {
-                    final IConfigurationElement[] eventsTableTypeCE = ce.getChildren(TmfTraceTypeUIUtils.EVENTS_TABLE_TYPE_ELEM);
-
-                    if (eventsTableTypeCE.length != 1) {
-                        break;
-                    }
-                    final String eventsTableType = eventsTableTypeCE[0].getAttribute(TmfTraceTypeUIUtils.CLASS_ATTR);
-                    if ((eventsTableType == null) || (eventsTableType.length() == 0)) {
-                        break;
-                    }
-                    final Bundle bundle = Platform.getBundle(ce.getContributor().getName());
-                    final Class<?> c = bundle.loadClass(eventsTableType);
-                    final Class<?>[] constructorArgs = new Class[] { Composite.class, int.class };
-                    final Constructor<?> constructor = c.getConstructor(constructorArgs);
-                    final Object[] args = new Object[] { parent, cacheSize };
-                    eventsTable = (TmfEventsTable) constructor.newInstance(args);
-                    break;
-                }
-            }
-            if (fTrace instanceof TmfExperiment && (eventsTable == null)) {
-                eventsTable = getExperimentEventsTable((TmfExperiment) fTrace, parent, cacheSize);
-            }
-        } catch (final InvalidRegistryObjectException e) {
-            Activator.getDefault().logError("Error getting TmfEventsTable", e); //$NON-NLS-1$
-        } catch (final CoreException e) {
-            Activator.getDefault().logError("Error getting TmfEventsTable", e); //$NON-NLS-1$
-        } catch (final ClassNotFoundException e) {
-            Activator.getDefault().logError("Error getting TmfEventsTable", e); //$NON-NLS-1$
-        } catch (final SecurityException e) {
-            Activator.getDefault().logError("Error getting TmfEventsTable", e); //$NON-NLS-1$
-        } catch (final NoSuchMethodException e) {
-            Activator.getDefault().logError("Error getting TmfEventsTable", e); //$NON-NLS-1$
-        } catch (final IllegalArgumentException e) {
-            Activator.getDefault().logError("Error getting TmfEventsTable", e); //$NON-NLS-1$
-        } catch (final InstantiationException e) {
-            Activator.getDefault().logError("Error getting TmfEventsTable", e); //$NON-NLS-1$
-        } catch (final IllegalAccessException e) {
-            Activator.getDefault().logError("Error getting TmfEventsTable", e); //$NON-NLS-1$
-        } catch (final InvocationTargetException e) {
-            Activator.getDefault().logError("Error getting TmfEventsTable", e); //$NON-NLS-1$
+    /**
+     * Get the event table for the given trace. It will be of the type defined
+     * by the extension point if applicable, else it will be a default table
+     * with the extension-point-defined columns (if any).
+     *
+     * @param trace
+     *            The event table is for this trace
+     * @param parent
+     *            The parent composite of the table
+     * @param cacheSize
+     *            The cache size to use
+     * @return The event table for the trace
+     */
+    private static @NonNull TmfEventsTable getEventTable(ITmfTrace trace,
+            final Composite parent, final int cacheSize) {
+        if (trace instanceof TmfExperiment) {
+            return getExperimentEventTable((TmfExperiment) trace, parent, cacheSize);
         }
-        return eventsTable;
+
+        TmfEventsTable table = TmfTraceTypeUIUtils.getEventTable(trace, parent, cacheSize);
+        if (table != null) {
+            /*
+             * The trace type specified an event table type, we will give it to
+             * them.
+             */
+            return table;
+        }
+
+        /*
+         * The trace type did not specify an event table, we will use a default
+         * table with the columns it asked for (if any).
+         */
+        Collection<? extends TmfEventTableColumn> columns = TmfTraceTypeUIUtils.getEventTableColumns(trace);
+        if (columns != null) {
+            return new TmfEventsTable(parent, cacheSize, columns);
+        }
+
+        /*
+         * No columns were defined either, use a default table with the default
+         * columns.
+         */
+        return new TmfEventsTable(parent, cacheSize);
+
     }
 
     /**
      * Get the events table for an experiment. If all traces in the experiment
-     * are of the same type, use the extension point specified event table
+     * are of the same type, use the same behavior as if it was one trace of
+     * that type.
      *
      * @param experiment
      *            the experiment
@@ -370,12 +346,52 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
      *            the parent Composite
      * @param cacheSize
      *            the event table cache size
-     * @return an events table of the appropriate type
+     * @return An event table of the appropriate type
      */
-    private static TmfEventsTable getExperimentEventsTable(
+    private static @NonNull TmfEventsTable getExperimentEventTable(
             final TmfExperiment experiment, final Composite parent,
             final int cacheSize) {
-        TmfEventsTable eventsTable = null;
+
+        String commonTraceType = getCommonTraceType(experiment);
+        if (commonTraceType != null) {
+            /*
+             * All the traces in this experiment are of the same type, let's
+             * just use the normal table for that type.
+             */
+            return getEventTable(experiment.getTraces()[0], parent, cacheSize);
+        }
+
+        /*
+         * There are different trace types in the experiment, so we are
+         * definitely using a TmfEventsTable. Aggregate the columns from all
+         * trace types.
+         */
+        ITmfTrace[] traces = experiment.getTraces();
+        Set<TmfEventTableColumn> cols = new LinkedHashSet<>();
+
+        for (ITmfTrace trace : traces) {
+            Collection<? extends TmfEventTableColumn> traceCols =
+                    TmfTraceTypeUIUtils.getEventTableColumns(trace);
+            if (traceCols == null) {
+                cols.addAll(TmfEventsTable.DEFAULT_COLUMNS);
+            } else {
+                cols.addAll(traceCols);
+            }
+        }
+
+        return new TmfEventsTable(parent, cacheSize, cols);
+    }
+
+    /**
+     * Check if an experiment contains traces of all the same type. If so,
+     * returns this type as a String. If not, returns null.
+     *
+     * @param experiment
+     *            The experiment
+     * @return The common trace type if there is one, or 'null' if there are
+     *         different types.
+     */
+    private static @Nullable String getCommonTraceType(TmfExperiment experiment) {
         String commonTraceType = null;
         try {
             for (final ITmfTrace trace : experiment.getTraces()) {
@@ -383,60 +399,21 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                 if (resource == null) {
                     return null;
                 }
+
                 final String traceType = resource.getPersistentProperty(TmfCommonConstants.TRACETYPE);
                 if ((commonTraceType != null) && !commonTraceType.equals(traceType)) {
                     return null;
                 }
                 commonTraceType = traceType;
             }
-            if (commonTraceType == null) {
-                return null;
-            }
-            if (commonTraceType.startsWith(CustomTxtTrace.class.getCanonicalName())) {
-                return new CustomEventsTable(((CustomTxtTrace) experiment.getTraces()[0]).getDefinition(), parent, cacheSize);
-            }
-            if (commonTraceType.startsWith(CustomXmlTrace.class.getCanonicalName())) {
-                return new CustomEventsTable(((CustomXmlTrace) experiment.getTraces()[0]).getDefinition(), parent, cacheSize);
-            }
-            for (final IConfigurationElement ce : TmfTraceTypeUIUtils.getTypeUIElements(TraceElementType.TRACE)) {
-                if (ce.getAttribute(TmfTraceTypeUIUtils.TRACETYPE_ATTR).equals(commonTraceType)) {
-                    final IConfigurationElement[] eventsTableTypeCE = ce.getChildren(TmfTraceTypeUIUtils.EVENTS_TABLE_TYPE_ELEM);
-                    if (eventsTableTypeCE.length != 1) {
-                        break;
-                    }
-                    final String eventsTableType = eventsTableTypeCE[0].getAttribute(TmfTraceTypeUIUtils.CLASS_ATTR);
-                    if ((eventsTableType == null) || (eventsTableType.length() == 0)) {
-                        break;
-                    }
-                    final Bundle bundle = Platform.getBundle(ce.getContributor().getName());
-                    final Class<?> c = bundle.loadClass(eventsTableType);
-                    final Class<?>[] constructorArgs = new Class[] { Composite.class, int.class };
-                    final Constructor<?> constructor = c.getConstructor(constructorArgs);
-                    final Object[] args = new Object[] { parent, cacheSize };
-                    eventsTable = (TmfEventsTable) constructor.newInstance(args);
-                    break;
-                }
-            }
-        } catch (final CoreException e) {
-            Activator.getDefault().logError("Error getting TmfEventsTable for experiment", e); //$NON-NLS-1$
-        } catch (final InvalidRegistryObjectException e) {
-            Activator.getDefault().logError("Error getting TmfEventsTable for experiment", e); //$NON-NLS-1$
-        } catch (final SecurityException e) {
-            Activator.getDefault().logError("Error getting TmfEventsTable for experiment", e); //$NON-NLS-1$
-        } catch (final IllegalArgumentException e) {
-            Activator.getDefault().logError("Error getting TmfEventsTable for experiment", e); //$NON-NLS-1$
-        } catch (final ClassNotFoundException e) {
-            Activator.getDefault().logError("Error getting TmfEventsTable for experiment", e); //$NON-NLS-1$
-        } catch (final NoSuchMethodException e) {
-            Activator.getDefault().logError("Error getting TmfEventsTable for experiment", e); //$NON-NLS-1$
-        } catch (final InstantiationException e) {
-            Activator.getDefault().logError("Error getting TmfEventsTable for experiment", e); //$NON-NLS-1$
-        } catch (final IllegalAccessException e) {
-            Activator.getDefault().logError("Error getting TmfEventsTable for experiment", e); //$NON-NLS-1$
-        } catch (final InvocationTargetException e) {
-            Activator.getDefault().logError("Error getting TmfEventsTable for experiment", e); //$NON-NLS-1$
+        } catch (CoreException e) {
+            /*
+             * One of the traces didn't advertise its type, we can't infer
+             * anything.
+             */
+            return null;
         }
-        return eventsTable;
+        return commonTraceType;
     }
 
     @Override

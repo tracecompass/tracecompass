@@ -20,9 +20,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.internal.tmf.pcap.core.event.PcapEvent;
 import org.eclipse.linuxtools.internal.tmf.pcap.core.protocol.TmfPcapProtocol;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
+import org.eclipse.linuxtools.tmf.ui.viewers.events.columns.ITmfEventTableColumns;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.columns.TmfEventTableColumn;
-import org.eclipse.swt.widgets.Composite;
 
 import com.google.common.collect.ImmutableList;
 
@@ -31,7 +30,7 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Vincent Perot
  */
-public class PcapEventsTable extends TmfEventsTable {
+public class PcapEventTableColumns implements ITmfEventTableColumns {
 
     // ------------------------------------------------------------------------
     // Table data
@@ -131,22 +130,15 @@ public class PcapEventsTable extends TmfEventsTable {
      * null annotations and NLS files...
      */
     private static String getString(@Nullable String str) {
-        return (str == null ? EMPTY_STRING : str);
+        return (str == null ? "" : str); //$NON-NLS-1$
     }
 
     // ------------------------------------------------------------------------
-    // Constructor
+    // ITmfEventTableColumns
     // ------------------------------------------------------------------------
 
-    /**
-     * Constructor
-     *
-     * @param parent
-     *            The parent composite
-     * @param cacheSize
-     *            The size of the rows cache
-     */
-    public PcapEventsTable(Composite parent, int cacheSize) {
-        super(parent, cacheSize, PCAP_COLUMNS);
+    @Override
+    public Collection<? extends TmfEventTableColumn> getEventTableColumns() {
+        return PCAP_COLUMNS;
     }
 }
