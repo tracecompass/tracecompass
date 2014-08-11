@@ -121,41 +121,7 @@ public class BaseEventInfo extends TraceInfo implements IBaseEventInfo {
 
     @Override
     public void setLogLevel(String levelName) {
-        if(TraceLogLevel.TRACE_EMERG.getInName().equalsIgnoreCase(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_EMERG;
-        } else if(TraceLogLevel.TRACE_ALERT.getInName().equalsIgnoreCase(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_ALERT;
-        } else if(TraceLogLevel.TRACE_CRIT.getInName().equalsIgnoreCase(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_CRIT;
-        } else if(TraceLogLevel.TRACE_ERR.getInName().equalsIgnoreCase(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_ERR;
-        } else if(TraceLogLevel.TRACE_WARNING.getInName().equalsIgnoreCase(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_WARNING;
-        } else if(TraceLogLevel.TRACE_NOTICE.getInName().equalsIgnoreCase(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_NOTICE;
-        } else if(TraceLogLevel.TRACE_INFO.getInName().equalsIgnoreCase(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_INFO;
-        } else if(TraceLogLevel.TRACE_DEBUG_SYSTEM.getInName().equalsIgnoreCase(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_DEBUG_SYSTEM;
-        } else if(TraceLogLevel.TRACE_DEBUG_PROGRAM.getInName().equalsIgnoreCase(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_DEBUG_PROGRAM;
-        } else if(TraceLogLevel.TRACE_DEBUG_PROCESS.getInName().equalsIgnoreCase(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_DEBUG_PROCESS;
-        } else if(TraceLogLevel.TRACE_DEBUG_MODULE.getInName().equalsIgnoreCase(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_DEBUG_MODULE;
-        } else if(TraceLogLevel.TRACE_DEBUG_UNIT.getInName().equalsIgnoreCase(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_DEBUG_UNIT;
-        } else if(TraceLogLevel.TRACE_DEBUG_FUNCTION.getInName().equalsIgnoreCase(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_DEBUG_FUNCTION;
-        } else if(TraceLogLevel.TRACE_DEBUG_LINE.getInName().equalsIgnoreCase(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_DEBUG_LINE;
-        } else if(TraceLogLevel.TRACE_DEBUG.getInName().equalsIgnoreCase(levelName)) {
-            fLogLevel = TraceLogLevel.TRACE_DEBUG;
-        } else if(TraceLogLevel.LEVEL_UNKNOWN.getInName().equalsIgnoreCase(levelName)) {
-            fLogLevel = TraceLogLevel.LEVEL_UNKNOWN;
-        } else {
-            fLogLevel = TraceLogLevel.TRACE_DEBUG;
-        }
+        fLogLevel = TraceLogLevel.valueOfString(levelName);
     }
 
     @Override

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,13 +8,13 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Jonathan Rajotte - Utility function
  *********************************************************************/
 package org.eclipse.linuxtools.internal.lttng2.control.core.model;
 
+
 /**
- * <p>
  * Log Level enumeration.
- * </p>
  *
  * @author Bernd Hufmann
  */
@@ -71,7 +71,9 @@ public enum TraceLogLevel {
 
     /**
      * Private constructor
-     * @param name the name of state
+     *
+     * @param name
+     *            the name of state
      */
     private TraceLogLevel(String name) {
         fInName = name;
@@ -85,5 +87,28 @@ public enum TraceLogLevel {
      */
     public String getInName() {
         return fInName;
+    }
+
+    // ------------------------------------------------------------------------
+    // Utility
+    // ------------------------------------------------------------------------
+    /**
+     * Return the corresponding {@link TraceLogLevel} to String "name"
+     *
+     * @param name
+     *            String to compare to retrieve the good {@link TraceLogLevel}
+     * @return the corresponding {@link TraceLogLevel}
+     */
+    public static TraceLogLevel valueOfString(String name) {
+        if (name == null) {
+            throw new IllegalArgumentException();
+        }
+        for (TraceLogLevel tllevel : TraceLogLevel.values()) {
+            if (tllevel.getInName().equalsIgnoreCase(name)) {
+                return tllevel;
+            }
+        }
+        // No match
+        return LEVEL_UNKNOWN;
     }
 }

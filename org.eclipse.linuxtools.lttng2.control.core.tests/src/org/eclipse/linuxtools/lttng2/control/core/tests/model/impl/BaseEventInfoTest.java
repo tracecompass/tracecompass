@@ -409,9 +409,9 @@ public class BaseEventInfoTest {
 
         result = fixture.getLogLevel();
         assertNotNull(result);
-        assertEquals("TRACE_DEBUG", result.getInName());
-        assertEquals("TRACE_DEBUG", result.name());
-        assertEquals(14, result.ordinal());
+        assertEquals("LEVEL_UNKNOWN", result.getInName());
+        assertEquals("LEVEL_UNKNOWN", result.name());
+        assertEquals(15, result.ordinal());
     }
 
     /**
