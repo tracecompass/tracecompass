@@ -426,7 +426,7 @@ public interface LTTngControlServiceConstants {
     /**
      * Pattern to match for session command output for "session name not found".
      */
-    static final Pattern SESSION_NOT_FOUND_ERROR_PATTERN = Pattern.compile("\\s*Error:\\s+Session\\s+name\\s+not\\s+found"); //$NON-NLS-1$
+    static final Pattern SESSION_NOT_FOUND_ERROR_PATTERN = Pattern.compile("\\s*Error:\\s+Session\\s+name\\s.*not\\s+found"); //$NON-NLS-1$
     /**
      * Pattern to match introduction line of context list.
      */

@@ -1112,15 +1112,15 @@ public class LTTngControlService implements ILttngControlService {
         String[] output = result.getOutput();
         String[] errorOutput = result.getErrorOutput();
         StringBuffer ret = new StringBuffer();
+        ret.append("Error Ouptut:\n"); //$NON-NLS-1$
+        for (int i = 0; i < errorOutput.length; i++) {
+           ret.append(errorOutput[i]).append("\n"); //$NON-NLS-1$
+        }
         ret.append("Return Value: "); //$NON-NLS-1$
         ret.append(result.getResult());
         ret.append("\n"); //$NON-NLS-1$
         for (int i = 0; i < output.length; i++) {
             ret.append(output[i]).append("\n"); //$NON-NLS-1$
-        }
-        ret.append("Error stream:\n"); //$NON-NLS-1$
-        for (int i = 0; i < errorOutput.length; i++) {
-            ret.append(errorOutput[i]).append("\n"); //$NON-NLS-1$
         }
         return ret.toString();
     }

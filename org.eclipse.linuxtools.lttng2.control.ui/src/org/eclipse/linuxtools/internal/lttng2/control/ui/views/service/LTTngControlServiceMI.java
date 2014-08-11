@@ -715,78 +715,6 @@ public class LTTngControlServiceMI extends LTTngControlService {
         }
     }
 
-    @Override
-    public void enableChannels(String sessionName, List<String> channelNames, boolean isKernel, IChannelInfo info, IProgressMonitor monitor) throws ExecutionException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void disableChannels(String sessionName, List<String> channelNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void enableEvents(String sessionName, String channelName, List<String> eventNames, boolean isKernel, String filterExpression, IProgressMonitor monitor) throws ExecutionException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void enableSyscalls(String sessionName, String channelName, IProgressMonitor monitor) throws ExecutionException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void enableProbe(String sessionName, String channelName, String eventName, boolean isFunction, String probe, IProgressMonitor monitor) throws ExecutionException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void enableLogLevel(String sessionName, String channelName, String eventName, LogLevelType logLevelType, TraceLogLevel level, String filterExpression, IProgressMonitor monitor) throws ExecutionException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void disableEvent(String sessionName, String channelName, List<String> eventNames, boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public List<String> getContextList(IProgressMonitor monitor) throws ExecutionException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void addContexts(String sessionName, String channelName, String eventName, boolean isKernel, List<String> contexts, IProgressMonitor monitor) throws ExecutionException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void calibrate(boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void recordSnapshot(String sessionName, IProgressMonitor monitor) throws ExecutionException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void runCommands(IProgressMonitor monitor, List<String> commands) throws ExecutionException {
-        // TODO Auto-generated method stub
-
-    }
-
     /**
      * @param strings
      *            array of string that make up a command line
@@ -890,12 +818,12 @@ public class LTTngControlServiceMI extends LTTngControlService {
                         // TODO
                         // See bug 334 http://bugs.lttng.org/issues/334 from
                         // LTTng
-                        // For now we emulate the a behavior, and simply put
+                        // For now we emulate the non-mi behavior and simply put
                         // "with filter"
                         eventInfo.setFilterExpression("with filter"); //$NON-NLS-1$
                         break;
                     case MIStrings.EXCLUSION:
-                        // TODO:Currently not supported by tmf
+                        // TODO: Currently not supported by tmf
                         // ExclusionS element is ignored
                         break;
                     default:
