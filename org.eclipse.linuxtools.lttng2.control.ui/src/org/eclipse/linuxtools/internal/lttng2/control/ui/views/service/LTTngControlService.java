@@ -501,8 +501,11 @@ public class LTTngControlService implements ILttngControlService {
     }
 
     /**
+     * Basic generation of command for session creation
+     *
      * @param sessionInfo
-     * @return
+     *            the session to create
+     * @return the basic command for command creation
      */
     protected StringBuffer prepareSessionCreationCommand(ISessionInfo sessionInfo) {
         String newName = formatParameter(sessionInfo.getName());
@@ -586,8 +589,11 @@ public class LTTngControlService implements ILttngControlService {
     }
 
     /**
+     * Basic generation of command for streamed session creation
+     *
      * @param sessionInfo
-     * @return
+     *            the session to create
+     * @return the basic command for command creation
      */
     protected StringBuffer prepareStreamedSessionCreationCommand(ISessionInfo sessionInfo) {
         String newName = formatParameter(sessionInfo.getName());
