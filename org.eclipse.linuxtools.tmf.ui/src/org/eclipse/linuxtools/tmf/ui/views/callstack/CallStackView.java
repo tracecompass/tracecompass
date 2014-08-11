@@ -807,7 +807,7 @@ public class CallStackView extends TmfView {
             if (monitor.isCanceled()) {
                 return;
             }
-            AbstractCallStackAnalysis module = getCallStackModule(trace);
+            AbstractCallStackAnalysis module = getCallStackModule(aTrace);
             if (module == null) {
                 return;
             }
@@ -827,7 +827,7 @@ public class CallStackView extends TmfView {
             fEndTime = Math.max(fEndTime, endTime);
             String[] threadPaths = module.getThreadsPattern();
             List<Integer> threadQuarks = ss.getQuarks(threadPaths);
-            TraceEntry traceEntry = new TraceEntry(trace.getName(), startTime, endTime);
+            TraceEntry traceEntry = new TraceEntry(aTrace.getName(), startTime, endTime);
             traceEntry.sortChildren(fThreadComparator);
             entryList.add(traceEntry);
             for (int i = 0; i < threadQuarks.size(); i++) {
