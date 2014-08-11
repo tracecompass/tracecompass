@@ -27,7 +27,6 @@ import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableSet;
@@ -69,11 +68,7 @@ public class EventMatchingBenchmark {
 
     /**
      * Run the benchmark with 3 bigger traces
-     *
-     * TODO: For now, this test takes a lot of RAM. To run, remove the @Ignore
-     * and set at least 1024Mb RAM, or else there is OutOfMemoryError exception
      */
-    @Ignore
     @Test
     public void testDjangoTraces() {
         assumeTrue(CtfTmfTestTrace.DJANGO_CLIENT.exists());
