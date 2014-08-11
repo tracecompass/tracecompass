@@ -118,7 +118,9 @@ public class CallStackView extends TmfView {
     /**
      * Redraw state enum
      */
-    private enum State { IDLE, BUSY, PENDING }
+    private enum State {
+        IDLE, BUSY, PENDING
+    }
 
     private static final String[] COLUMN_TIMES = new String[] {
             Messages.CallStackView_FunctionColumn,
@@ -152,7 +154,11 @@ public class CallStackView extends TmfView {
     private static final ImageDescriptor SORT_BY_TIME_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_time.gif"); //$NON-NLS-1$
     private static final ImageDescriptor SORT_BY_TIME_REV_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_time_rev.gif"); //$NON-NLS-1$
     private static final String SORT_OPTION_KEY = "sort.option"; //$NON-NLS-1$
-    private enum SortOption { BY_NAME, BY_NAME_REV, BY_ID, BY_ID_REV, BY_TIME, BY_TIME_REV }
+
+    private enum SortOption {
+        BY_NAME, BY_NAME_REV, BY_ID, BY_ID_REV, BY_TIME, BY_TIME_REV
+    }
+
     private SortOption fSortOption;
     private Comparator<ITimeGraphEntry> fThreadComparator = null;
     private Action fSortByNameAction;
@@ -223,7 +229,8 @@ public class CallStackView extends TmfView {
     // The saved time sync. signal used when switching off the pinning of a view
     private TmfTimeSynchSignal fSavedTimeSyncSignal;
 
-    // The saved time range sync. signal used when switching off the pinning of a view
+    // The saved time range sync. signal used when switching off the pinning of
+    // a view
     private TmfRangeSynchSignal fSavedRangeSyncSignal;
 
     // ------------------------------------------------------------------------
@@ -277,39 +284,45 @@ public class CallStackView extends TmfView {
 
     private class ThreadNameComparator implements Comparator<ITimeGraphEntry> {
         private boolean reverse;
+
         public ThreadNameComparator(boolean reverse) {
             this.reverse = reverse;
         }
+
         @Override
         public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
             return reverse ? o2.getName().compareTo(o1.getName()) :
-                o1.getName().compareTo(o2.getName());
+                    o1.getName().compareTo(o2.getName());
         }
     }
 
     private class ThreadIdComparator implements Comparator<ITimeGraphEntry> {
         private boolean reverse;
+
         public ThreadIdComparator(boolean reverse) {
             this.reverse = reverse;
         }
+
         @Override
         public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
             ThreadEntry t1 = (ThreadEntry) o1;
             ThreadEntry t2 = (ThreadEntry) o2;
             return reverse ? Long.compare(t2.getThreadId(), t1.getThreadId()) :
-                Long.compare(t1.getThreadId(), t2.getThreadId());
+                    Long.compare(t1.getThreadId(), t2.getThreadId());
         }
     }
 
     private class ThreadTimeComparator implements Comparator<ITimeGraphEntry> {
         private boolean reverse;
+
         public ThreadTimeComparator(boolean reverse) {
             this.reverse = reverse;
         }
+
         @Override
         public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
             return reverse ? Long.compare(o2.getStartTime(), o1.getStartTime()) :
-                Long.compare(o1.getStartTime(), o2.getStartTime());
+                    Long.compare(o1.getStartTime(), o2.getStartTime());
         }
     }
 
@@ -626,6 +639,7 @@ public class CallStackView extends TmfView {
     // ------------------------------------------------------------------------
     /**
      * Handler for the trace opened signal.
+     *
      * @param signal
      *            The incoming signal
      * @since 2.0
@@ -654,7 +668,8 @@ public class CallStackView extends TmfView {
     /**
      * Trace is closed: clear the data structures and the view
      *
-     * @param signal the signal received
+     * @param signal
+     *            the signal received
      */
     @TmfSignalHandler
     public void traceClosed(final TmfTraceClosedSignal signal) {
@@ -726,13 +741,7 @@ public class CallStackView extends TmfView {
                                 viewer.getTimeGraphControl().fireSelectionChanged();
                                 break;
                             }
-                        } catch (AttributeNotFoundException e) {
-                            Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
-                        } catch (TimeRangeException e) {
-                            Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
-                        } catch (StateSystemDisposedException e) {
-                            Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
-                        } catch (StateValueTypeException e) {
+                        } catch (AttributeNotFoundException | TimeRangeException | StateSystemDisposedException | StateValueTypeException e) {
                             Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
                         }
                     }
@@ -839,7 +848,7 @@ public class CallStackView extends TmfView {
                     String[] callStackPath = module.getCallStackPath();
                     int callStackQuark = ss.getQuarkRelative(threadQuark, callStackPath);
                     String threadName = ss.getAttributeName(threadQuark);
-                    long threadId = ss.querySingleState(ss.getCurrentEndTime() , threadQuark).getStateValue().unboxLong();
+                    long threadId = ss.querySingleState(ss.getCurrentEndTime(), threadQuark).getStateValue().unboxLong();
                     long start = startTime;
                     ITmfStateInterval startInterval = ss.querySingleState(startTime, callStackQuark);
                     if (startInterval.getStateValue().isNull()) {
@@ -1094,7 +1103,7 @@ public class CallStackView extends TmfView {
 
         // Create pin action
         contributePinActionToToolBar();
-        fPinAction.addPropertyChangeListener(new IPropertyChangeListener(){
+        fPinAction.addPropertyChangeListener(new IPropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent event) {
                 if (IAction.CHECKED.equals(event.getProperty()) && !isPinned()) {
@@ -1170,13 +1179,7 @@ public class CallStackView extends TmfView {
                             viewer.getTimeGraphControl().fireSelectionChanged();
                             startZoomThread(viewer.getTime0(), viewer.getTime1());
 
-                        } catch (AttributeNotFoundException e) {
-                            Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
-                        } catch (TimeRangeException e) {
-                            Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
-                        } catch (StateSystemDisposedException e) {
-                            Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
-                        } catch (StateValueTypeException e) {
+                        } catch (AttributeNotFoundException | TimeRangeException | StateSystemDisposedException | StateValueTypeException e) {
                             Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
                         }
                     }
@@ -1221,13 +1224,7 @@ public class CallStackView extends TmfView {
                             viewer.getTimeGraphControl().fireSelectionChanged();
                             startZoomThread(viewer.getTime0(), viewer.getTime1());
 
-                        } catch (AttributeNotFoundException e) {
-                            Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
-                        } catch (TimeRangeException e) {
-                            Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
-                        } catch (StateSystemDisposedException e) {
-                            Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
-                        } catch (StateValueTypeException e) {
+                        } catch (AttributeNotFoundException | TimeRangeException | StateSystemDisposedException | StateValueTypeException e) {
                             Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
                         }
                     }
@@ -1293,8 +1290,8 @@ public class CallStackView extends TmfView {
             }
 
             /*
-             * Start the mapping import in a separate thread (we do not want
-             * to UI thread to do this).
+             * Start the mapping import in a separate thread (we do not want to
+             * UI thread to do this).
              */
             Job job = new Job(Messages.CallStackView_ImportMappingJobName) {
                 @Override
@@ -1484,7 +1481,10 @@ public class CallStackView extends TmfView {
         }
         String ret = fNameMapping.get(address);
         if (ret == null) {
-            /* We didn't find this address in the mapping file, just use the address */
+            /*
+             * We didn't find this address in the mapping file, just use the
+             * address
+             */
             return address;
         }
         return ret;
