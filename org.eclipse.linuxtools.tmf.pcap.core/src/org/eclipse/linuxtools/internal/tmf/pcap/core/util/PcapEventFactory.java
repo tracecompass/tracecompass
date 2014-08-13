@@ -12,6 +12,7 @@
 
 package org.eclipse.linuxtools.internal.tmf.pcap.core.util;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,10 +78,10 @@ public class PcapEventFactory {
         default:
             throw new IllegalArgumentException("The timestamp precision is not valid!"); //$NON-NLS-1$
         }
-        String fileName = pcap.getPath().substring(pcap.getPath().lastIndexOf('/') + 1);
-        if (fileName == null) {
-            fileName = EMPTY_STRING;
-        }
+        Path filePath = pcap.getPath().getFileName();
+        @SuppressWarnings("null") // for .toString()
+        @NonNull String fileName = (filePath == null ? EMPTY_STRING : filePath.toString());
+
         String dataLink = Messages.PcapEventFactory_LinkType + ':' + LinkTypeHelper.toString((int) pcapPacket.getPcapFile().getDataLinkType());
 
         ITmfEventField[] fields = generatePacketFields(pcapPacket);

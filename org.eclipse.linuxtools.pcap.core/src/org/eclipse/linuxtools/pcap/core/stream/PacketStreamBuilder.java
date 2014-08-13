@@ -13,6 +13,7 @@
 package org.eclipse.linuxtools.pcap.core.stream;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -154,15 +155,15 @@ public class PacketStreamBuilder {
      * Method that parse an entire file and build the streams contained in the
      * file.
      *
-     * @param file
+     * @param filePath
      *            The file path.
      * @throws IOException
      *             When an IO error occurs.
      * @throws BadPcapFileException
      *             When the PcapFile is not valid.
      */
-    public synchronized void parsePcapFile(String file) throws IOException, BadPcapFileException {
-        try (PcapFile pcapFile = new PcapFile(file);) {
+    public synchronized void parsePcapFile(Path filePath) throws IOException, BadPcapFileException {
+        try (PcapFile pcapFile = new PcapFile(filePath);) {
             while (pcapFile.hasNextPacket()) { // not eof
                 PcapPacket packet;
                 try {

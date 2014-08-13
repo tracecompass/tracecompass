@@ -43,10 +43,9 @@ public class StreamBuildTest {
         assumeTrue(trace.exists());
 
         try {
-            String file = trace.getPath();
             // Test Ethernet II stream
             PacketStreamBuilder builder = new PacketStreamBuilder(Protocol.ETHERNET_II);
-            builder.parsePcapFile(file);
+            builder.parsePcapFile(trace.getPath());
             assertEquals(Protocol.ETHERNET_II, builder.getProtocol());
             // Should do one loop only, so hardcoded values are okay.
             for (PacketStream stream : builder.getStreams()) {
@@ -66,7 +65,7 @@ public class StreamBuildTest {
 
             // Test TCP streams and other constructor
             builder = new PacketStreamBuilder(Protocol.TCP);
-            builder.parsePcapFile(file);
+            builder.parsePcapFile(trace.getPath());
             assertEquals(Protocol.TCP, builder.getProtocol());
 
             PacketStream stream = builder.getStream(0);

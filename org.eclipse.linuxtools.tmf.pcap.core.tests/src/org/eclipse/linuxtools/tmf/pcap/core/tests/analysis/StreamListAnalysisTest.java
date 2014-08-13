@@ -61,7 +61,7 @@ public class StreamListAnalysisTest {
     public void canExecuteTest() throws TmfTraceException {
         PcapTestTrace trace = PcapTestTrace.MOSTLY_TCP;
         assumeTrue(trace.exists());
-        String path = trace.getPath();
+        String path = trace.getPath().toString();
         try (PcapTrace pcapTrace = new PcapTrace();
                 StreamListAnalysis analysis = new StreamListAnalysis();) {
             analysis.setId(StreamListAnalysis.ID);
@@ -83,7 +83,7 @@ public class StreamListAnalysisTest {
     public void executeAnalysisTest() throws TmfAnalysisException, TmfTraceException {
         PcapTestTrace trace = PcapTestTrace.MOSTLY_TCP;
         assumeTrue(trace.exists());
-        String path = trace.getPath();
+        String path = trace.getPath().toString();
         try (PcapTrace pcapTrace = new PcapTrace();
                 StreamListAnalysis analysis = new StreamListAnalysis();) {
             pcapTrace.initTrace(null, path, null);

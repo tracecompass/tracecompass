@@ -154,8 +154,7 @@ public class TCPPacketTest {
     public void CompleteTCPPacketTest() throws BadPacketException, IOException, BadPcapFileException {
         PcapTestTrace trace = PcapTestTrace.MOSTLY_TCP;
         assumeTrue(trace.exists());
-        String file = trace.getPath();
-        try (PcapFile dummy = new PcapFile(file)) {
+        try (PcapFile dummy = new PcapFile(trace.getPath())) {
             ByteBuffer byteBuffer = fPacket;
             if (byteBuffer == null) {
                 fail("CompleteTCPPacketTest has failed!");

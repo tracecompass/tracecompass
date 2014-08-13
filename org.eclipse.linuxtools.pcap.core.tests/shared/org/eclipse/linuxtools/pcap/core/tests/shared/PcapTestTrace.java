@@ -11,8 +11,10 @@
 
 package org.eclipse.linuxtools.pcap.core.tests.shared;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.pcap.core.trace.BadPcapFileException;
@@ -26,40 +28,42 @@ import org.eclipse.linuxtools.pcap.core.trace.PcapFile;
 public enum PcapTestTrace {
 
     /** A bad pcap file. */
-    BAD_PCAPFILE("../org.eclipse.linuxtools.pcap.core.tests/rsc/BadPcapFile.pcap"),
+    BAD_PCAPFILE("..", "org.eclipse.linuxtools.pcap.core.tests", "rsc", "BadPcapFile.pcap"),
 
     /** A Valid Pcap that is empty. */
-    EMPTY_PCAP("../org.eclipse.linuxtools.pcap.core.tests/rsc/EmptyPcap.pcap"),
+    EMPTY_PCAP("..", "org.eclipse.linuxtools.pcap.core.tests", "rsc", "EmptyPcap.pcap"),
 
     /** A Pcap that mostly contains TCP packets. */
-    MOSTLY_TCP("../org.eclipse.linuxtools.pcap.core.tests/rsc/mostlyTCP.pcap"),
+    MOSTLY_TCP("..", "org.eclipse.linuxtools.pcap.core.tests", "rsc", "mostlyTCP.pcap"),
 
     /** A Pcap that mostly contains UDP packets. */
-    MOSTLY_UDP("../org.eclipse.linuxtools.pcap.core.tests/rsc/mostlyUDP.pcap"),
+    MOSTLY_UDP("..", "org.eclipse.linuxtools.pcap.core.tests", "rsc", "mostlyUDP.pcap"),
 
     /** A big-endian trace that contains two packets. */
-    SHORT_BIG_ENDIAN("../org.eclipse.linuxtools.pcap.core.tests/rsc/Short_BigEndian.pcap"),
+    SHORT_BIG_ENDIAN("..", "org.eclipse.linuxtools.pcap.core.tests", "rsc", "Short_BigEndian.pcap"),
 
     /** A little-endian trace that contains two packets. */
-    SHORT_LITTLE_ENDIAN("../org.eclipse.linuxtools.pcap.core.tests/rsc/Short_LittleEndian.pcap"),
+    SHORT_LITTLE_ENDIAN("..", "org.eclipse.linuxtools.pcap.core.tests", "rsc", "Short_LittleEndian.pcap"),
 
     /** A large trace for benchmarking. */
-    BENCHMARK_TRACE("../org.eclipse.linuxtools.pcap.core.tests/rsc/benchmarkTrace.pcap"),
+    BENCHMARK_TRACE("..", "org.eclipse.linuxtools.pcap.core.tests", "rsc", "benchmarkTrace.pcap"),
 
     /** A Kernel trace directory. */
-    KERNEL_DIRECTORY("../org.eclipse.linuxtools.pcap.core.tests/rsc/kernel/"),
+    KERNEL_DIRECTORY("..", "org.eclipse.linuxtools.pcap.core.tests", "rsc", "kernel"),
 
     /** A Kernel trace file. */
-    KERNEL_TRACE("../org.eclipse.linuxtools.pcap.core.tests/rsc/kernel/channel0_0");
+    KERNEL_TRACE("..", "org.eclipse.linuxtools.pcap.core.tests", "rsc", "kernel", "channel0_0");
 
-    private final @NonNull String fPath;
+    private final @NonNull Path fPath;
 
-    private PcapTestTrace(@NonNull String path) {
+    private PcapTestTrace(@NonNull String first, String... more) {
+        @SuppressWarnings("null")
+        @NonNull Path path = FileSystems.getDefault().getPath(first, more);
         fPath = path;
     }
 
     /** @return The path to the test trace */
-    public @NonNull String getPath() {
+    public @NonNull Path getPath() {
         return fPath;
     }
 
@@ -83,8 +87,7 @@ public enum PcapTestTrace {
      * @return If the trace exists
      */
     public boolean exists() {
-        File file = new File(fPath);
-        if (!file.exists()) {
+        if (Files.notExists(fPath)) {
             return false;
         }
         return true;

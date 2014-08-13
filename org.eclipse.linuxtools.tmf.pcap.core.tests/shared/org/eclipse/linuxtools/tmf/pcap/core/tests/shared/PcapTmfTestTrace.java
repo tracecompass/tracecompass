@@ -62,7 +62,8 @@ public enum PcapTmfTestTrace {
     private @Nullable PcapTmfTraceStub fTrace = null;
 
     private PcapTmfTestTrace() {
-        @NonNull String path = PcapTestTrace.valueOf(this.name()).getPath();
+        @SuppressWarnings("null")
+        @NonNull String path = PcapTestTrace.valueOf(this.name()).getPath().toString();
         fPath = path;
     }
 

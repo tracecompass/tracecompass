@@ -17,6 +17,7 @@ import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 import java.nio.ByteOrder;
+import java.nio.file.Path;
 
 import org.eclipse.linuxtools.pcap.core.packet.BadPacketException;
 import org.eclipse.linuxtools.pcap.core.tests.shared.PcapTestTrace;
@@ -47,11 +48,11 @@ public class PcapFileEndiannessTest {
     public void EndiannessTest() throws IOException, BadPcapFileException, BadPacketException {
         PcapTestTrace trace = PcapTestTrace.SHORT_LITTLE_ENDIAN;
         assumeTrue(trace.exists());
-        String path1 = trace.getPath();
+        Path path1 = trace.getPath();
 
         trace = PcapTestTrace.SHORT_LITTLE_ENDIAN;
         assumeTrue(trace.exists());
-        String path2 = PcapTestTrace.SHORT_BIG_ENDIAN.getPath();
+        Path path2 = PcapTestTrace.SHORT_BIG_ENDIAN.getPath();
 
         try (PcapFile littleEndian = new PcapFile(path1);
                 PcapFile bigEndian = new PcapFile(path2);) {
