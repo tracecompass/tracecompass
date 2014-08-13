@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.linuxtools.tmf.pcap"
+      label="%featureName"
+      version="1.0.0.qualifier"
+      provider-name="%featureProvider"
+      license-feature="org.eclipse.license"
+      license-feature-version="0.0.0">
+
+   <description url="http://www.example.com/description">
+      %description
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <update label="Linux Tools Update Site" url="http://download.eclipse.org/linuxtools/update"/>
+   </url>
+
+   <includes
+         id="org.eclipse.linuxtools.tmf"
+         version="0.0.0"/>
+
+   <requires>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="com.google.guava"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.linuxtools.tmf.core" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.tmf.ui" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.tmf.pcap.core" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.linuxtools.pcap.core" version="1.0.0" match="greaterOrEqual"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.linuxtools.pcap.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.linuxtools.tmf.pcap.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.linuxtools.tmf.pcap.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.linuxtools.tmf.pcap.help"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+</feature>

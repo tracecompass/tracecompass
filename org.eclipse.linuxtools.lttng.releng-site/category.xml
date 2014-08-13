@@ -12,6 +12,9 @@
    <feature url="features/org.eclipse.linuxtools.gdbtrace_0.0.0.qualifier.jar" id="org.eclipse.linuxtools.gdbtrace" version="0.0.0">
       <category name="LTTng"/>
    </feature>
+   <feature url="features/org.eclipse.linuxtools.tmf.pcap_0.0.0.qualifier.jar" id="org.eclipse.linuxtools.tmf.pcap" version="0.0.0">
+      <category name="LTTng"/>
+   </feature>
    <feature url="features/org.eclipse.linuxtools.tracing.rcp_0.0.0.qualifier.jar" id="org.eclipse.linuxtools.tracing.rcp" version="0.0.0">
       <category name="LTTng RCP"/>
    </feature>
