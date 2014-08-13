@@ -62,7 +62,7 @@ public class FieldInfo extends TraceInfo implements IFieldInfo {
 
     @Override
     public void setFieldType(String fieldType) {
-        fFieldType = fieldType;
+        fFieldType = fieldType.toLowerCase();
     }
 
     @Override

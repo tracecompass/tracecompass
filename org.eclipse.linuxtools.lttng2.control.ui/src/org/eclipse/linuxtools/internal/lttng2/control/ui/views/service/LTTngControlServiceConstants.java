@@ -64,11 +64,11 @@ public interface LTTngControlServiceConstants {
     /**
      * The lttng tools machine interface command.
      */
-    static final String CONTROL_COMMAND_MI = CONTROL_COMMAND + " --mi "; //$NON-NLS-1$
+    static final String CONTROL_COMMAND_MI = CONTROL_COMMAND + " --mi"; //$NON-NLS-1$
     /**
      * The lttng tools XML machine interface command.
      */
-    static final String CONTROL_COMMAND_MI_XML = CONTROL_COMMAND_MI + " xml "; //$NON-NLS-1$
+    static final String CONTROL_COMMAND_MI_XML = CONTROL_COMMAND_MI + " xml"; //$NON-NLS-1$
     /**
      * Command: lttng version.
      */
