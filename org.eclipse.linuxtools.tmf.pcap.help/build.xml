@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="org.eclipse.linuxtools.tmf.pcap.help" default="build" basedir=".">
+    <description>
+        Generate Eclipse help content for the Linux Tools Pcap User Guide
+    </description>
+
+   <property name="ug.title" value="Pcap Network Tracing User Guide" />
+
+    <path id="wikitext.tasks.classpath">
+        <!-- Search in the local Eclipse installation directory for the Wikitext plugin -->
+        <fileset dir="${eclipse.home}/plugins" erroronmissingdir="false">
+            <include name="org.eclipse.mylyn.wikitext.*core*.jar" />
+            <include name="com.google.guava_*.jar" />
+        </fileset>
+
+        <!-- For Maven builds: use the compile_classpath -->
+        <pathelement path="${compile_classpath}" />
+    </path>
+
+    <taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/internal/wikitext/mediawiki/core/tasks/tasks.properties" />
+    <taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/wikitext/core/util/anttask/tasks.properties" />
+    <!-- Different location in more recent versions of Mylyn (Luna ?) -->
+    <taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/wikitext/core/ant/tasks.properties" />
+
+    <target name="build" description="Generate Eclipse help content for the Linux Tools Pcap User Guide">
+        <wikitext-to-eclipse-help markupLanguage="MediaWiki"
+            validate="true"
+            failonvalidationerror="true"
+            overwrite="true"
+            multipleOutputFiles="true"
+            navigationimages="true"
+            title="${ug.title}"
+            formatoutput="true"
+            helpPrefix="doc">
+            <fileset dir="doc">
+                <include name="User-Guide.mediawiki" />
+            </fileset>
+            <stylesheet url="book.css" />
+        </wikitext-to-eclipse-help>
+        <antcall target="test" />
+    </target>
+
+   <target name="test" description="Verify that all of the HTML files are well-formed XML">
+        <!--
+        Don't bother with DTD validation: we only care if the files are well-formed.
+        We therefore provide an empty DTD
+        -->
+        <xmlvalidate lenient="true">
+            <fileset dir="doc">
+                <include name="**/*.html" />
+            </fileset>
+            <dtd publicid="-//W3C//DTD XHTML 1.0 Transitional//EN" location=".empty.dtd" />
+        </xmlvalidate>
+    </target>
+
+    <target name ="clean" description="Delete all generated files">
+      <delete failonerror="false">
+        <fileset dir="doc" includes="**/*.html" />
+        <fileset dir="doc" includes="**/*.xml" />
+      </delete>
+    </target>
+
+</project>
