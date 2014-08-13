@@ -129,6 +129,7 @@
     <module>org.eclipse.linuxtools.tmf.pcap.core</module>
     <module>org.eclipse.linuxtools.tmf.pcap.core.tests</module>
     <module>org.eclipse.linuxtools.tmf.pcap.ui</module>
+    <module>org.eclipse.linuxtools.tmf.pcap.ui.swtbot.tests</module>
     <module>org.eclipse.linuxtools.tmf.pcap.help</module>
 
     <module>org.eclipse.linuxtools.tmf.analysis.xml.core</module>
