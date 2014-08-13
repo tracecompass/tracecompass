@@ -102,14 +102,17 @@ public class EventHeaderLargeDeclaration extends Declaration implements IEventHe
         ByteOrder bo = input.getByteOrder();
         input.setByteOrder(fByteOrder);
         int first = (int) input.get(COMPACT_ID, false);
-        int second = (int) input.get(COMPACT_TS, false);
+        long second = input.get(COMPACT_TS, false);
         if (first != EXTENDED_VALUE) {
             input.setByteOrder(bo);
             return new EventHeaderDefinition(this, first, second, COMPACT_TS);
         }
         long timestampLong = input.get(FULL_TS, false);
         input.setByteOrder(bo);
-        return new EventHeaderDefinition(this, second, timestampLong, FULL_TS);
+        if (second > Integer.MAX_VALUE) {
+            throw new CTFReaderException("ID " + second + " larger than " + Integer.MAX_VALUE + " is currently unsupported by the parser"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+        }
+        return new EventHeaderDefinition(this, (int) second, timestampLong, FULL_TS);
     }
 
     @Override
