@@ -335,7 +335,7 @@ public class StreamListView extends TmfView {
         });
 
         // Add items and tables for each protocol
-        for (TmfPcapProtocol protocol : TmfPcapProtocol.getAllProtocols()) {
+        for (TmfPcapProtocol protocol : TmfPcapProtocol.values()) {
             if (protocol.supportsStream()) {
                 CTabItem item = new CTabItem(fTabFolder, SWT.NONE);
                 item.setText(protocol.getName());

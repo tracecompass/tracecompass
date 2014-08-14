@@ -52,7 +52,7 @@ public class StreamListAnalysis extends TmfAbstractAnalysisModule {
     public StreamListAnalysis() {
         super();
         fBuilders = new HashMap<>();
-        for (TmfPcapProtocol protocol : TmfPcapProtocol.getAllProtocols()) {
+        for (TmfPcapProtocol protocol : TmfPcapProtocol.values()) {
             if (protocol.supportsStream()) {
                 fBuilders.put(protocol, new TmfPacketStreamBuilder(protocol));
             }
