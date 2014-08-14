@@ -60,5 +60,5 @@
     </plugins>
   </build>
 
- <groupId>org.eclipse.linuxtools.tmf</groupId>
+ <groupId>org.eclipse.linuxtools.tmf.pcap</groupId>
 </project>
