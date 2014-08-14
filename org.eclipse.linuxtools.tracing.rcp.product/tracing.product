@@ -213,6 +213,7 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
       <feature id="org.eclipse.equinox.p2.extras.feature"/>
       <feature id="org.eclipse.linuxtools.ctf"/>
       <feature id="org.eclipse.linuxtools.tmf.ctf"/>
+      <feature id="org.eclipse.linuxtools.tmf.pcap"/>
    </features>
 
    <configurations>
