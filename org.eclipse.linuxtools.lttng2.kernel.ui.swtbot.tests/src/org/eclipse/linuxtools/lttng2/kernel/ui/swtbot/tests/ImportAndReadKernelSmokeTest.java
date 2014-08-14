@@ -14,12 +14,9 @@
 
 package org.eclipse.linuxtools.lttng2.kernel.ui.swtbot.tests;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.ConsoleAppender;
@@ -46,6 +43,7 @@ import org.eclipse.linuxtools.tmf.ui.swtbot.tests.SWTBotUtil;
 import org.eclipse.linuxtools.tmf.ui.swtbot.tests.conditions.ConditionHelpers;
 import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramView;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
@@ -59,6 +57,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
+import org.hamcrest.Matcher;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -90,7 +89,7 @@ public class ImportAndReadKernelSmokeTest {
         SWTBotUtil.failIfUIThread();
 
         /* set up for swtbot */
-        SWTBotPreferences.TIMEOUT = 300000; /* 300 second timeout */
+        SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
         fBot = new SWTWorkbenchBot();
 
@@ -167,24 +166,8 @@ public class ImportAndReadKernelSmokeTest {
     }
 
     private void openEditor() {
-        final List<IEditorReference> editorRefs = new ArrayList<>();
-        UIThreadRunnable.syncExec(new VoidResult() {
-            @Override
-            public void run() {
-                IEditorReference[] ieds = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
-                editorRefs.addAll(Arrays.asList(ieds));
-            }
-
-        });
-        assertFalse(editorRefs.isEmpty());
-        IEditorPart iep = null;
-        for (IEditorReference ied : editorRefs) {
-            if (ied.getTitle().equals(ctt.getTrace().getName())) {
-                iep = ied.getEditor(true);
-                break;
-            }
-        }
-        assertNotNull(iep);
+        Matcher<IEditorReference> matcher = WidgetMatcherFactory.withPartName(ctt.getTrace().getName());
+        IEditorPart iep = fBot.editor(matcher).getReference().getEditor(true);
         fDesired1 = getEvent(100);
         fDesired2 = getEvent(10000);
         final TmfEventsEditor tmfEd = (TmfEventsEditor) iep;
