@@ -230,7 +230,7 @@ If a trace already exists with the same name in the target trace folder, the use
 
 If one selects '''Rename All''', '''Overwrite All''' or '''Skip All''' the choice will be applied for all traces with a name conflict.
 
-Upon successful importing, the traces will be stored in the target trace folder. If a trace type was associated to a trace, then the corresponding icon will be displayed. If no trace type is detected the unknown icon [[Image:images/unknown_parser.gif]] will be displayed. Linked traces will have a little arrow as decorator on the right bottom corner.
+Upon successful importing, the traces will be stored in the target trace folder. If a trace type was associated to a trace, then the corresponding icon will be displayed. If no trace type is detected the default editor icon associated with this file type will be displayed. Linked traces will have a little arrow as decorator on the right bottom corner.
 
 Note that trace type is an extension point of the '''Tracing and Monitoring Framework (TMF)'''. Depending on the which features are loaded, the list of trace types can vary.
 
@@ -320,7 +320,7 @@ After selecting the trace type, the trace icon will be updated with the correspo
 
 === Opening a Trace or Experiment ===
 
-A trace or experiment can be opened by double-clicking the left mouse button on the trace or experiment in the '''Project Explorer''' view. Alternatively, select the trace or experiment in the in the '''Project Explorer''' view and click the right mouse button. Then select '''Open''' menu item of the context-sensitive menu.
+A trace or experiment can be opened by double-clicking the left mouse button on the trace or experiment in the '''Project Explorer''' view. Alternatively, select the trace or experiment in the in the '''Project Explorer''' view and click the right mouse button. Then select '''Open''' menu item of the context-sensitive menu. If there is no trace type set for a file resource then the file will be opened in the default editor associated with this file type.
 
 [[Image:images/OpenTraceAction.png]]
 
