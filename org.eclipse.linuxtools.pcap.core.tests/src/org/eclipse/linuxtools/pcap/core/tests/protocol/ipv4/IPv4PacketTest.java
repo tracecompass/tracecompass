@@ -26,13 +26,13 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.eclipse.linuxtools.pcap.core.packet.BadPacketException;
-import org.eclipse.linuxtools.pcap.core.protocol.Protocol;
-import org.eclipse.linuxtools.pcap.core.protocol.ipv4.IPv4Endpoint;
-import org.eclipse.linuxtools.pcap.core.protocol.ipv4.IPv4Packet;
+import org.eclipse.linuxtools.internal.pcap.core.packet.BadPacketException;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.ipv4.IPv4Endpoint;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.ipv4.IPv4Packet;
+import org.eclipse.linuxtools.internal.pcap.core.trace.BadPcapFileException;
+import org.eclipse.linuxtools.internal.pcap.core.trace.PcapFile;
 import org.eclipse.linuxtools.pcap.core.tests.shared.PcapTestTrace;
-import org.eclipse.linuxtools.pcap.core.trace.BadPcapFileException;
-import org.eclipse.linuxtools.pcap.core.trace.PcapFile;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -7,7 +7,7 @@
             icon="icons/pcap.png"
             tracetype="org.eclipse.linuxtools.tmf.pcap.core.pcaptrace">
          <eventsTableType
-               class="org.eclipse.linuxtools.tmf.pcap.ui.editor.PcapEventsTable">
+               class="org.eclipse.linuxtools.internal.tmf.pcap.ui.editor.PcapEventsTable">
          </eventsTableType>
       </type>
    </extension>
@@ -20,7 +20,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.tmf.pcap.ui.view.category.network"
-            class="org.eclipse.linuxtools.tmf.pcap.ui.stream.StreamListView"
+            class="org.eclipse.linuxtools.internal.tmf.pcap.ui.stream.StreamListView"
             icon="icons/stream_list_view.gif"
             id="org.eclipse.linuxtools.tmf.pcap.ui.view.stream.list"
             name="%view.stream.list"
@@ -30,7 +30,7 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="org.eclipse.linuxtools.tmf.pcap.ui.NetworkingPerspectiveFactory"
+            class="org.eclipse.linuxtools.internal.tmf.pcap.ui.NetworkingPerspectiveFactory"
             fixed="false"
             icon="icons/network.png"
             id="org.eclipse.linuxtools.tmf.pcap.ui.perspective.network"
@@ -43,7 +43,7 @@
             class="org.eclipse.linuxtools.tmf.ui.analysis.TmfAnalysisViewOutput"
             id="org.eclipse.linuxtools.tmf.pcap.ui.view.stream.list">
          <analysisModuleClass
-               class="org.eclipse.linuxtools.tmf.pcap.core.analysis.StreamListAnalysis">
+               class="org.eclipse.linuxtools.internal.tmf.pcap.core.analysis.StreamListAnalysis">
          </analysisModuleClass>
       </output>
    </extension>

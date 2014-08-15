@@ -19,11 +19,11 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.eclipse.linuxtools.pcap.core.packet.BadPacketException;
-import org.eclipse.linuxtools.pcap.core.protocol.ethernet2.EthernetIIPacket;
+import org.eclipse.linuxtools.internal.pcap.core.packet.BadPacketException;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.ethernet2.EthernetIIPacket;
+import org.eclipse.linuxtools.internal.pcap.core.trace.BadPcapFileException;
+import org.eclipse.linuxtools.internal.pcap.core.trace.PcapFile;
 import org.eclipse.linuxtools.pcap.core.tests.shared.PcapTestTrace;
-import org.eclipse.linuxtools.pcap.core.trace.BadPcapFileException;
-import org.eclipse.linuxtools.pcap.core.trace.PcapFile;
 import org.junit.Before;
 import org.junit.Test;
 

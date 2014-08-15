@@ -3754,9 +3754,9 @@ package org.eclipse.linuxtools.pcap.core.protocol.udp;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
-import org.eclipse.linuxtools.pcap.core.endpoint.ProtocolEndpoint;
-import org.eclipse.linuxtools.pcap.core.packet.BadPacketException;
-import org.eclipse.linuxtools.pcap.core.packet.Packet;
+import org.eclipse.linuxtools.internal.pcap.core.endpoint.ProtocolEndpoint;
+import org.eclipse.linuxtools.internal.pcap.core.packet.BadPacketException;
+import org.eclipse.linuxtools.internal.pcap.core.packet.Packet;
 
 public class UDPPacket extends Packet {
 
@@ -4109,8 +4109,8 @@ We obtain the following unimplemented class:
 <pre>
 package org.eclipse.linuxtools.pcap.core.protocol.udp;
 
-import org.eclipse.linuxtools.pcap.core.endpoint.ProtocolEndpoint;
-import org.eclipse.linuxtools.pcap.core.packet.Packet;
+import org.eclipse.linuxtools.internal.pcap.core.endpoint.ProtocolEndpoint;
+import org.eclipse.linuxtools.internal.pcap.core.packet.Packet;
 
 public class UDPEndpoint extends ProtocolEndpoint {
 

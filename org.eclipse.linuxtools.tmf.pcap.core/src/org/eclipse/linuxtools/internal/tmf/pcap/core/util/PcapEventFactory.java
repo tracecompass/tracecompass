@@ -20,22 +20,22 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.linuxtools.pcap.core.packet.Packet;
-import org.eclipse.linuxtools.pcap.core.protocol.Protocol;
-import org.eclipse.linuxtools.pcap.core.protocol.pcap.PcapPacket;
-import org.eclipse.linuxtools.pcap.core.trace.PcapFile;
-import org.eclipse.linuxtools.pcap.core.util.LinkTypeHelper;
-import org.eclipse.linuxtools.pcap.core.util.PcapTimestampScale;
+import org.eclipse.linuxtools.internal.pcap.core.packet.Packet;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.pcap.PcapPacket;
+import org.eclipse.linuxtools.internal.pcap.core.trace.PcapFile;
+import org.eclipse.linuxtools.internal.pcap.core.util.LinkTypeHelper;
+import org.eclipse.linuxtools.internal.pcap.core.util.PcapTimestampScale;
+import org.eclipse.linuxtools.internal.tmf.pcap.core.event.PcapEvent;
+import org.eclipse.linuxtools.internal.tmf.pcap.core.event.PcapEventField;
+import org.eclipse.linuxtools.internal.tmf.pcap.core.event.PcapEventType;
+import org.eclipse.linuxtools.internal.tmf.pcap.core.event.PcapRootEventField;
+import org.eclipse.linuxtools.internal.tmf.pcap.core.trace.PcapTrace;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
-import org.eclipse.linuxtools.tmf.pcap.core.event.PcapEvent;
-import org.eclipse.linuxtools.tmf.pcap.core.event.PcapEventField;
-import org.eclipse.linuxtools.tmf.pcap.core.event.PcapEventType;
-import org.eclipse.linuxtools.tmf.pcap.core.event.PcapRootEventField;
-import org.eclipse.linuxtools.tmf.pcap.core.trace.PcapTrace;
 
 /**
  * Factory class that helps generating Pcap Events.

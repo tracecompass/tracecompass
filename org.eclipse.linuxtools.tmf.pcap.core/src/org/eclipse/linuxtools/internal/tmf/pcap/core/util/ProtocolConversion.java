@@ -12,8 +12,8 @@
 
 package org.eclipse.linuxtools.internal.tmf.pcap.core.util;
 
-import org.eclipse.linuxtools.pcap.core.protocol.Protocol;
-import org.eclipse.linuxtools.tmf.pcap.core.protocol.TmfProtocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.tmf.pcap.core.protocol.TmfProtocol;
 
 /**
  * Helper class that allows the conversion between Protocol and TmfProtocol.

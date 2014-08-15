@@ -18,8 +18,8 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.linuxtools.pcap.core.protocol.Protocol;
-import org.eclipse.linuxtools.pcap.core.protocol.ProtocolValues;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.ProtocolValues;
 import org.junit.Test;
 
 /**

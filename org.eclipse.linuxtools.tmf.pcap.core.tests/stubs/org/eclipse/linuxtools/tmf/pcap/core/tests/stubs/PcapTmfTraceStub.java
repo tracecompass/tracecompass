@@ -12,10 +12,10 @@
 
 package org.eclipse.linuxtools.tmf.pcap.core.tests.stubs;
 
+import org.eclipse.linuxtools.internal.tmf.pcap.core.trace.PcapTrace;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalManager;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
-import org.eclipse.linuxtools.tmf.pcap.core.trace.PcapTrace;
 
 /**
  * Dummy test pcap trace

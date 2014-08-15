@@ -18,11 +18,11 @@ import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 
-import org.eclipse.linuxtools.pcap.core.protocol.Protocol;
-import org.eclipse.linuxtools.pcap.core.stream.PacketStream;
-import org.eclipse.linuxtools.pcap.core.stream.PacketStreamBuilder;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.stream.PacketStream;
+import org.eclipse.linuxtools.internal.pcap.core.stream.PacketStreamBuilder;
+import org.eclipse.linuxtools.internal.pcap.core.trace.BadPcapFileException;
 import org.eclipse.linuxtools.pcap.core.tests.shared.PcapTestTrace;
-import org.eclipse.linuxtools.pcap.core.trace.BadPcapFileException;
 import org.junit.Test;
 
 /**

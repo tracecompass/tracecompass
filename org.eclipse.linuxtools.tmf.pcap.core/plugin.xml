@@ -13,19 +13,19 @@
             id="org.eclipse.linuxtools.tmf.pcap.core.pcaptrace"
             isDirectory="false"
             name="Pcap Trace"
-            trace_type="org.eclipse.linuxtools.tmf.pcap.core.trace.PcapTrace">
+            trace_type="org.eclipse.linuxtools.internal.tmf.pcap.core.trace.PcapTrace">
       </type>
    </extension>
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
       <module
-            analysis_module="org.eclipse.linuxtools.tmf.pcap.core.analysis.StreamListAnalysis"
+            analysis_module="org.eclipse.linuxtools.internal.tmf.pcap.core.analysis.StreamListAnalysis"
             automatic="true"
             id="org.eclipse.linuxtools.tmf.pcap.core.analysis.stream"
             name="Stream List">
          <tracetype
                applies="true"
-               class="org.eclipse.linuxtools.tmf.pcap.core.trace.PcapTrace">
+               class="org.eclipse.linuxtools.internal.tmf.pcap.core.trace.PcapTrace">
          </tracetype>
          <tracetype
                applies="true"

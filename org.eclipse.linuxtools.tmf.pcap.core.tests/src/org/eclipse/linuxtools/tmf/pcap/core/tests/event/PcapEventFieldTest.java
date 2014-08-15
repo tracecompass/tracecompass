@@ -24,16 +24,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.linuxtools.pcap.core.packet.BadPacketException;
-import org.eclipse.linuxtools.pcap.core.packet.Packet;
-import org.eclipse.linuxtools.pcap.core.protocol.ipv4.IPv4Packet;
+import org.eclipse.linuxtools.internal.pcap.core.packet.BadPacketException;
+import org.eclipse.linuxtools.internal.pcap.core.packet.Packet;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.ipv4.IPv4Packet;
+import org.eclipse.linuxtools.internal.pcap.core.trace.BadPcapFileException;
+import org.eclipse.linuxtools.internal.pcap.core.trace.PcapFile;
+import org.eclipse.linuxtools.internal.tmf.pcap.core.event.PcapEventField;
+import org.eclipse.linuxtools.internal.tmf.pcap.core.event.PcapRootEventField;
 import org.eclipse.linuxtools.pcap.core.tests.shared.PcapTestTrace;
-import org.eclipse.linuxtools.pcap.core.trace.BadPcapFileException;
-import org.eclipse.linuxtools.pcap.core.trace.PcapFile;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
-import org.eclipse.linuxtools.tmf.pcap.core.event.PcapEventField;
-import org.eclipse.linuxtools.tmf.pcap.core.event.PcapRootEventField;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

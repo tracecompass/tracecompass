@@ -20,10 +20,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import org.eclipse.linuxtools.pcap.core.packet.BadPacketException;
+import org.eclipse.linuxtools.internal.pcap.core.packet.BadPacketException;
+import org.eclipse.linuxtools.internal.pcap.core.trace.BadPcapFileException;
+import org.eclipse.linuxtools.internal.pcap.core.trace.PcapFile;
 import org.eclipse.linuxtools.pcap.core.tests.shared.PcapTestTrace;
-import org.eclipse.linuxtools.pcap.core.trace.BadPcapFileException;
-import org.eclipse.linuxtools.pcap.core.trace.PcapFile;
 import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;

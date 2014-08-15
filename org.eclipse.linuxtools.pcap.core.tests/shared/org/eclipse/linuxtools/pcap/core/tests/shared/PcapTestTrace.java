@@ -17,8 +17,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.linuxtools.pcap.core.trace.BadPcapFileException;
-import org.eclipse.linuxtools.pcap.core.trace.PcapFile;
+import org.eclipse.linuxtools.internal.pcap.core.trace.BadPcapFileException;
+import org.eclipse.linuxtools.internal.pcap.core.trace.PcapFile;
 
 /**
  * Here is the list of the available test traces for the Pcap parser.

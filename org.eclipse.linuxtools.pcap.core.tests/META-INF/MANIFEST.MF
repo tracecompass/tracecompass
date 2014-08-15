@@ -23,7 +23,7 @@ Export-Package: org.eclipse.linuxtools.pcap.core.tests,
  org.eclipse.linuxtools.pcap.core.tests.protocol.tcp;x-internal:=true,
  org.eclipse.linuxtools.pcap.core.tests.protocol.udp;x-internal:=true,
  org.eclipse.linuxtools.pcap.core.tests.protocol.unknown;x-internal:=true,
- org.eclipse.linuxtools.pcap.core.tests.shared,
+ org.eclipse.linuxtools.pcap.core.tests.shared;x-friends:="org.eclipse.linuxtools.tmf.pcap.core.tests",
  org.eclipse.linuxtools.pcap.core.tests.stream;x-internal:=true
 Import-Package: com.google.common.collect,
  org.eclipse.test.performance

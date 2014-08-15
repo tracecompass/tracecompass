@@ -15,8 +15,8 @@ package org.eclipse.linuxtools.tmf.pcap.ui.swtbot.tests;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.eclipse.linuxtools.tmf.pcap.ui.NetworkingPerspectiveFactory;
-import org.eclipse.linuxtools.tmf.pcap.ui.stream.StreamListView;
+import org.eclipse.linuxtools.internal.tmf.pcap.ui.NetworkingPerspectiveFactory;
+import org.eclipse.linuxtools.internal.tmf.pcap.ui.stream.StreamListView;
 import org.eclipse.linuxtools.tmf.ui.swtbot.tests.AbstractPerspectiveChecker;
 import org.eclipse.linuxtools.tmf.ui.views.colors.ColorsView;
 import org.eclipse.linuxtools.tmf.ui.views.filter.FilterView;
