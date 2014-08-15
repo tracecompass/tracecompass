@@ -10,8 +10,9 @@
  *   Geneviève Bastien - Initial implementation and API
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.synchronization;
+package org.eclipse.linuxtools.internal.tmf.core.synchronization;
 
+import org.eclipse.linuxtools.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 
 /**
@@ -19,13 +20,7 @@ import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
  * returns the timestamp itself
  *
  * @author Geneviève Bastien
- * @since 3.0
- * @deprecated This class has been moved to internal. Use one of
- *             {@link TimestampTransformFactory} methods to create the timestamp
- *             transform. For the identity, use
- *             {@link TimestampTransformFactory#getDefaultTransform()}
  */
-@Deprecated
 public class TmfTimestampTransform implements ITmfTimestampTransform {
 
     /**

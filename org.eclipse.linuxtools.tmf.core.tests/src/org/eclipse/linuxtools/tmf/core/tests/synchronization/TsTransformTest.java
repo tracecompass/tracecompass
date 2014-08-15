@@ -18,9 +18,9 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.linuxtools.internal.tmf.core.synchronization.TmfTimestampTransform;
+import org.eclipse.linuxtools.internal.tmf.core.synchronization.TmfTimestampTransformLinear;
 import org.eclipse.linuxtools.tmf.core.synchronization.ITmfTimestampTransform;
-import org.eclipse.linuxtools.tmf.core.synchronization.TmfTimestampTransform;
-import org.eclipse.linuxtools.tmf.core.synchronization.TmfTimestampTransformLinear;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.junit.Test;

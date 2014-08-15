@@ -10,11 +10,12 @@
  *   Geneviève Bastien - Initial implementation and API
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.synchronization;
+package org.eclipse.linuxtools.internal.tmf.core.synchronization;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 
+import org.eclipse.linuxtools.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 
@@ -25,13 +26,7 @@ import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
  *
  * @author Geneviève Bastien
  * @since 3.0
- * @deprecated This class has been moved to internal. Use one of
- *             {@link TimestampTransformFactory} methods to create the timestamp
- *             transform. It will return an optimized transform for the
- *             parameters given. To have a linear transform, use methods
- *             <code>createLinear</code> from the factory.
  */
-@Deprecated
 public class TmfTimestampTransformLinear implements ITmfTimestampTransform {
 
     /**
@@ -141,8 +136,8 @@ public class TmfTimestampTransformLinear implements ITmfTimestampTransform {
 
     @Override
     public String toString() {
-        return "TmfTimestampLinear [ alpha = " + fAlpha.toString() + //$NON-NLS-1$
-                ", beta = " + fBeta.toString() + //$NON-NLS-1$
+        return "TmfTimestampLinear [ slope = " + fAlpha.toString() + //$NON-NLS-1$
+                ", offset = " + fBeta.toString() + //$NON-NLS-1$
                 " ]"; //$NON-NLS-1$
     }
 

@@ -125,7 +125,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
                 return refTt.composeWith(traceSync.getTimestampTransform(hostId));
             }
         }
-        return TmfTimestampTransform.IDENTITY;
+        return TimestampTransformFactory.getDefaultTransform();
     }
 
     @Override
@@ -395,9 +395,9 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
         public ITmfTimestampTransform getTimestampTransform(String hostId) {
             if (hostId.equals(fOtherHost) && (fQuality == SyncQuality.ACCURATE || fQuality == SyncQuality.APPROXIMATE || fQuality == SyncQuality.FAIL)) {
                 /* alpha: beta => 1 / fAlpha, -1 * fBeta / fAlpha); */
-                return new TmfTimestampTransformLinear(BigDecimal.ONE.divide(fAlpha, fMc), BigDecimal.valueOf(-1).multiply(fBeta).divide(fAlpha, fMc));
+                return TimestampTransformFactory.createLinear(BigDecimal.ONE.divide(fAlpha, fMc), BigDecimal.valueOf(-1).multiply(fBeta).divide(fAlpha, fMc));
             }
-            return TmfTimestampTransform.IDENTITY;
+            return TimestampTransformFactory.getDefaultTransform();
         }
 
         public SyncQuality getQuality() {

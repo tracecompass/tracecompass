@@ -38,18 +38,18 @@ public class TsTransformFactoryTest {
     private final ITmfTimestamp tn0 = new TmfNanoTimestamp(0);
     private final ITmfTimestamp tn100 = new TmfNanoTimestamp(100);
     private final ITmfTimestamp tn1 = new TmfNanoTimestamp(1);
-    private final ITmfTimestampTransform identity1 = TimestampTransformFactory.create(1.0, new TmfNanoTimestamp(0));
-    private final ITmfTimestampTransform offset1 = TimestampTransformFactory.create(100);
-    private final ITmfTimestampTransform offset2 = TimestampTransformFactory.create(BigDecimal.ONE, new BigDecimal(100));
-    private final ITmfTimestampTransform offset3 = TimestampTransformFactory.create(1.0, 100);
-    private final ITmfTimestampTransform offset4 = TimestampTransformFactory.create(1.0, new TmfNanoTimestamp(100));
+    private final ITmfTimestampTransform identity1 = TimestampTransformFactory.createLinear(1.0, new TmfNanoTimestamp(0));
+    private final ITmfTimestampTransform offset1 = TimestampTransformFactory.createWithOffset(100);
+    private final ITmfTimestampTransform offset2 = TimestampTransformFactory.createLinear(BigDecimal.ONE, new BigDecimal(100));
+    private final ITmfTimestampTransform offset3 = TimestampTransformFactory.createLinear(1.0, 100);
+    private final ITmfTimestampTransform offset4 = TimestampTransformFactory.createLinear(1.0, new TmfNanoTimestamp(100));
 
     /**
      * Test with identity
      */
     @Test
     public void transformIdenity() {
-        final ITmfTimestampTransform identity = TimestampTransformFactory.create(0);
+        final ITmfTimestampTransform identity = TimestampTransformFactory.createWithOffset(0);
         final ITmfTimestampTransform innefficientIdentity = new TmfConstantTransform();
         final ITmfTimestampTransform compositeInnefficientIdentity = identity.composeWith(innefficientIdentity);
         final ITmfTimestampTransform compositeInnefficientIdentity2 = innefficientIdentity.composeWith(innefficientIdentity);
@@ -76,7 +76,7 @@ public class TsTransformFactoryTest {
     @Test
     public void transformOffset() {
         final ITmfTimestampTransform offset = offset1;
-        final ITmfTimestampTransform compositeTransform = offset.composeWith(TimestampTransformFactory.create(new TmfNanoTimestamp(-100)));
+        final ITmfTimestampTransform compositeTransform = offset.composeWith(TimestampTransformFactory.createWithOffset(new TmfNanoTimestamp(-100)));
         assertEquals(tn100, offset.transform(t0));
         assertEquals(tn100, offset.transform(tn0));
         assertEquals(tn0, compositeTransform.transform(tn0));
@@ -92,8 +92,8 @@ public class TsTransformFactoryTest {
      */
     @Test
     public void transformSlope() {
-        final ITmfTimestampTransform slope = TimestampTransformFactory.create(10, 0);
-        final ITmfTimestampTransform slope1 = TimestampTransformFactory.create(10.0, new TmfNanoTimestamp(0));
+        final ITmfTimestampTransform slope = TimestampTransformFactory.createLinear(10, 0);
+        final ITmfTimestampTransform slope1 = TimestampTransformFactory.createLinear(10.0, new TmfNanoTimestamp(0));
         assertEquals(t1e3, slope.transform(t1e2));
         assertEquals(tn100, slope.transform(new TmfNanoTimestamp(10)));
         assertEquals(tn100, slope.transform(slope.transform(tn1)));
@@ -106,18 +106,18 @@ public class TsTransformFactoryTest {
      */
     @Test
     public void testToString() {
-        final String expectedLinear = "TmfTimestampLinear [ alpha = 314.0, beta = 0.0 ]";
-        final String expectedLinearBigDec = "TmfTimestampLinear [ alpha = 314, beta = 0 ]";
+        final String expectedLinear = "TmfTimestampLinear [ slope = 314.0, offset = 0.0 ]";
+        final String expectedLinearBigDec = "TmfTimestampLinear [ slope = 314, offset = 0 ]";
         final String expectedOffset = "TmfConstantTransform [ offset = 314 ]";
         final String expectedIdentity = "TmfTimestampTransform [ IDENTITY ]";
         final String expectedOffset100 = "TmfConstantTransform [ offset = 100 ]";
-        assertEquals(expectedLinear, TimestampTransformFactory.create(314, 0).toString());
-        assertEquals(expectedLinearBigDec, TimestampTransformFactory.create(BigDecimal.valueOf(314), BigDecimal.ZERO).toString());
-        assertEquals(expectedOffset, TimestampTransformFactory.create(1, 314).toString());
-        assertEquals(expectedOffset, TimestampTransformFactory.create(314).toString());
-        assertEquals(expectedOffset, TimestampTransformFactory.create(14).composeWith(TimestampTransformFactory.create(300)).toString());
-        assertEquals(expectedIdentity, TimestampTransformFactory.create(314).composeWith(TimestampTransformFactory.create(-314)).toString());
-        assertEquals(expectedIdentity, TimestampTransformFactory.create(0).toString());
+        assertEquals(expectedLinear, TimestampTransformFactory.createLinear(314, 0).toString());
+        assertEquals(expectedLinearBigDec, TimestampTransformFactory.createLinear(BigDecimal.valueOf(314), BigDecimal.ZERO).toString());
+        assertEquals(expectedOffset, TimestampTransformFactory.createLinear(1, 314).toString());
+        assertEquals(expectedOffset, TimestampTransformFactory.createWithOffset(314).toString());
+        assertEquals(expectedOffset, TimestampTransformFactory.createWithOffset(14).composeWith(TimestampTransformFactory.createWithOffset(300)).toString());
+        assertEquals(expectedIdentity, TimestampTransformFactory.createWithOffset(314).composeWith(TimestampTransformFactory.createWithOffset(-314)).toString());
+        assertEquals(expectedIdentity, TimestampTransformFactory.createWithOffset(0).toString());
         assertEquals(expectedIdentity, identity1.toString());
         assertEquals(expectedOffset100, offset1.toString());
         assertEquals(expectedOffset100, offset2.toString());

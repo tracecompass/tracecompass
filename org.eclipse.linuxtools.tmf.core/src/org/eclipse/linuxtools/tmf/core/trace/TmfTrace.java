@@ -52,7 +52,7 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.linuxtools.tmf.core.synchronization.ITmfTimestampTransform;
-import org.eclipse.linuxtools.tmf.core.synchronization.TmfTimestampTransform;
+import org.eclipse.linuxtools.tmf.core.synchronization.TimestampTransformFactory;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
@@ -805,10 +805,10 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
                     fTsTransform = (ITmfTimestampTransform) ois.readObject();
 
                 } catch (ClassNotFoundException | IOException e) {
-                    fTsTransform = TmfTimestampTransform.IDENTITY;
+                    fTsTransform = TimestampTransformFactory.getDefaultTransform();
                 }
             } else {
-                fTsTransform = TmfTimestampTransform.IDENTITY;
+                fTsTransform = TimestampTransformFactory.getDefaultTransform();
             }
         }
         return fTsTransform;

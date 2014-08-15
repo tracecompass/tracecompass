@@ -14,6 +14,8 @@ package org.eclipse.linuxtools.tmf.core.synchronization;
 import java.math.BigDecimal;
 
 import org.eclipse.linuxtools.internal.tmf.core.synchronization.TmfConstantTransform;
+import org.eclipse.linuxtools.internal.tmf.core.synchronization.TmfTimestampTransform;
+import org.eclipse.linuxtools.internal.tmf.core.synchronization.TmfTimestampTransformLinear;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 
 /**
@@ -28,13 +30,22 @@ public final class TimestampTransformFactory {
     }
 
     /**
+     * Creates the identity timestamp transform
+     *
+     * @return The identity timestamp transform
+     */
+    public static ITmfTimestampTransform getDefaultTransform() {
+        return TmfTimestampTransform.IDENTITY;
+    }
+
+    /**
      * Create an offsetted transform
      *
      * @param offset
      *            the offset in long format, nanosecond scale
      * @return the offsetted transform
      */
-    public static ITmfTimestampTransform create(long offset) {
+    public static ITmfTimestampTransform createWithOffset(long offset) {
         if (offset == 0) {
             return TmfTimestampTransform.IDENTITY;
         }
@@ -48,7 +59,7 @@ public final class TimestampTransformFactory {
      *            the offset in a timestamp with scale
      * @return the offsetted transform
      */
-    public static ITmfTimestampTransform create(ITmfTimestamp offset) {
+    public static ITmfTimestampTransform createWithOffset(ITmfTimestamp offset) {
         if (offset.getValue() == 0) {
             return TmfTimestampTransform.IDENTITY;
         }
@@ -56,7 +67,9 @@ public final class TimestampTransformFactory {
     }
 
     /**
-     * Create an offsetted and sloped transform
+     * Create a timestamp transform corresponding to a linear equation, with
+     * slope and offset. The expected timestamp transform is such that f(t) =
+     * m*x + b, where m is the slope and b the offset.
      *
      * @param factor
      *            the slope
@@ -64,15 +77,17 @@ public final class TimestampTransformFactory {
      *            the offset
      * @return the transform
      */
-    public static ITmfTimestampTransform create(double factor, ITmfTimestamp offset) {
+    public static ITmfTimestampTransform createLinear(double factor, ITmfTimestamp offset) {
         if (factor == 1.0) {
-            return create(offset);
+            return createWithOffset(offset);
         }
         return new TmfTimestampTransformLinear(factor, offset.normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
     }
 
     /**
-     * Create an offsetted and sloped transform
+     * Create a timestamp transform corresponding to a linear equation, with
+     * slope and offset. The expected timestamp transform is such that f(t) =
+     * m*x + b, where m is the slope and b the offset.
      *
      * @param factor
      *            the slope
@@ -80,15 +95,18 @@ public final class TimestampTransformFactory {
      *            the offset in nanoseconds
      * @return the transform
      */
-    public static ITmfTimestampTransform create(double factor, long offset) {
+    public static ITmfTimestampTransform createLinear(double factor, long offset) {
         if (factor == 1.0) {
-            return create(offset);
+            return createWithOffset(offset);
         }
         return new TmfTimestampTransformLinear(factor, offset);
     }
 
     /**
-     * Create an offsetted and sloped transform using bigDecimals
+     * Create a timestamp transform corresponding to a linear equation, with
+     * slope and offset expressed in BigDecimal. The expected timestamp
+     * transform is such that f(t) = m*x + b, where m is the slope and b the
+     * offset.
      *
      * @param factor
      *            the slope
@@ -96,9 +114,9 @@ public final class TimestampTransformFactory {
      *            the offset in nanoseconds
      * @return the transform
      */
-    public static ITmfTimestampTransform create(BigDecimal factor, BigDecimal offset) {
+    public static ITmfTimestampTransform createLinear(BigDecimal factor, BigDecimal offset) {
         if (factor.equals(BigDecimal.ONE)) {
-            return create(offset.longValueExact());
+            return createWithOffset(offset.longValueExact());
         }
         return new TmfTimestampTransformLinear(factor, offset);
     }

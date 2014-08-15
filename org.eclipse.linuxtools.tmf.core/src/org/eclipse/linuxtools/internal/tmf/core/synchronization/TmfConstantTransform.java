@@ -14,8 +14,6 @@ package org.eclipse.linuxtools.internal.tmf.core.synchronization;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.tmf.core.synchronization.ITmfTimestampTransform;
-import org.eclipse.linuxtools.tmf.core.synchronization.TmfTimestampTransform;
-import org.eclipse.linuxtools.tmf.core.synchronization.TmfTimestampTransformLinear;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfNanoTimestamp;
 

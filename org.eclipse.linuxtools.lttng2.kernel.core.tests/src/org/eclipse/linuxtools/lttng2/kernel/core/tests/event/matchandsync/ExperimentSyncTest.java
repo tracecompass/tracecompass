@@ -22,7 +22,7 @@ import org.eclipse.linuxtools.tmf.core.event.matching.TmfEventMatching;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.linuxtools.tmf.core.synchronization.SynchronizationAlgorithm;
-import org.eclipse.linuxtools.tmf.core.synchronization.TmfTimestampTransform;
+import org.eclipse.linuxtools.tmf.core.synchronization.TimestampTransformFactory;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
 import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace;
@@ -75,8 +75,8 @@ public class ExperimentSyncTest {
      */
     @After
     public void cleanUp() {
-        fTraces[0].setTimestampTransform(TmfTimestampTransform.IDENTITY);
-        fTraces[1].setTimestampTransform(TmfTimestampTransform.IDENTITY);
+        fTraces[0].setTimestampTransform(TimestampTransformFactory.getDefaultTransform());
+        fTraces[1].setTimestampTransform(TimestampTransformFactory.getDefaultTransform());
         fTraces[0].dispose();
         fTraces[1].dispose();
     }
@@ -97,8 +97,8 @@ public class ExperimentSyncTest {
             fTraces[0].setTimestampTransform(tt1);
             fTraces[1].setTimestampTransform(tt2);
 
-            assertEquals(tt2, TmfTimestampTransform.IDENTITY);
-            assertEquals("TmfTimestampLinear [ alpha = 0.9999413783703139011056845831168394, beta = 79796507913179.33347660124688298171 ]", tt1.toString());
+            assertEquals(tt2, TimestampTransformFactory.getDefaultTransform());
+            assertEquals("TmfTimestampLinear [ slope = 0.9999413783703139011056845831168394, offset = 79796507913179.33347660124688298171 ]", tt1.toString());
 
             assertEquals(syncAlgo.getTimestampTransform(fTraces[0].getHostId()),fTraces[0].getTimestampTransform());
             assertEquals(syncAlgo.getTimestampTransform(fTraces[1].getHostId()),fTraces[1].getTimestampTransform());
