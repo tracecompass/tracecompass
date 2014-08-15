@@ -83,9 +83,6 @@ import org.eclipse.swt.widgets.TreeItem;
 
 class FilterViewer extends Composite {
 
-    private static final String CUSTOM_TXT_CATEGORY = "Custom Text"; //$NON-NLS-1$
-    private static final String CUSTOM_XML_CATEGORY = "Custom XML"; //$NON-NLS-1$
-
     private TreeViewer fViewer;
 
     private Composite fComposite;
@@ -447,7 +444,7 @@ class FilterViewer extends Composite {
             }
             for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
                 if (def.outputs.size() > 0) {
-                    fieldsList.add("[" + CUSTOM_TXT_CATEGORY + //$NON-NLS-1$
+                    fieldsList.add("[" + TmfTraceType.CUSTOM_TXT_CATEGORY + //$NON-NLS-1$
                             " : " + def.definitionName + "]"); //$NON-NLS-1$ //$NON-NLS-2$
                     for (OutputColumn output : def.outputs) {
                         fieldsList.add(output.name);
@@ -457,7 +454,7 @@ class FilterViewer extends Composite {
             }
             for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
                 if (def.outputs.size() > 0) {
-                    fieldsList.add("[" + CUSTOM_XML_CATEGORY + //$NON-NLS-1$
+                    fieldsList.add("[" + TmfTraceType.CUSTOM_XML_CATEGORY + //$NON-NLS-1$
                             " : " + def.definitionName + "]"); //$NON-NLS-1$ //$NON-NLS-2$
                     for (OutputColumn output : def.outputs) {
                         fieldsList.add(output.name);
@@ -597,11 +594,11 @@ class FilterViewer extends Composite {
                 eventsTypeMap.put(text, ce);
             }
             for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
-                String text = CUSTOM_TXT_CATEGORY + " : " + def.definitionName; //$NON-NLS-1$
+                String text = TmfTraceType.CUSTOM_TXT_CATEGORY + " : " + def.definitionName; //$NON-NLS-1$
                 eventsTypeMap.put(text, def);
             }
             for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
-                String text = CUSTOM_XML_CATEGORY + " : " + def.definitionName; //$NON-NLS-1$
+                String text = TmfTraceType.CUSTOM_XML_CATEGORY + " : " + def.definitionName; //$NON-NLS-1$
                 eventsTypeMap.put(text, def);
             }
             return eventsTypeMap;

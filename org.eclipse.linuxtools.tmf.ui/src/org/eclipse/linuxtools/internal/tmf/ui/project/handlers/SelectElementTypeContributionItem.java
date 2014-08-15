@@ -56,8 +56,6 @@ public class SelectElementTypeContributionItem extends CompoundContributionItem 
     private static final String TYPE_PARAMETER = "org.eclipse.linuxtools.tmf.ui.commandparameter.select_trace_type.type"; //$NON-NLS-1$
     private static final String ICON_PARAMETER = "org.eclipse.linuxtools.tmf.ui.commandparameter.select_trace_type.icon"; //$NON-NLS-1$
     private static final String SELECT_TRACE_TYPE_COMMAND_ID = "org.eclipse.linuxtools.tmf.ui.command.select_trace_type"; //$NON-NLS-1$
-    private static final String CUSTOM_TXT_CATEGORY = "Custom Text"; //$NON-NLS-1$
-    private static final String CUSTOM_XML_CATEGORY = "Custom XML"; //$NON-NLS-1$
     private static final String DEFAULT_TRACE_ICON_PATH = "icons/elcl16/trace.gif"; //$NON-NLS-1$
 
     @Override
@@ -155,15 +153,15 @@ public class SelectElementTypeContributionItem extends CompoundContributionItem 
         CustomTxtTraceDefinition[] customTxtTraceDefinitions = CustomTxtTraceDefinition.loadAll();
         if (customTxtTraceDefinitions.length > 0) {
             ImageDescriptor icon = isSelectedCategory(customTxtTraceDefinitions, selectedTraceTypes) ? SELECTED_ICON : null;
-            MenuManager subMenu = new MenuManager(CUSTOM_TXT_CATEGORY, icon, null);
-            categoriesMap.put(CUSTOM_TXT_CATEGORY, subMenu);
+            MenuManager subMenu = new MenuManager(TmfTraceType.CUSTOM_TXT_CATEGORY, icon, null);
+            categoriesMap.put(TmfTraceType.CUSTOM_TXT_CATEGORY, subMenu);
             list.add(subMenu);
         }
         CustomXmlTraceDefinition[] customXmlTraceDefinitions = CustomXmlTraceDefinition.loadAll();
         if (customXmlTraceDefinitions.length > 0) {
             ImageDescriptor icon = isSelectedCategory(customXmlTraceDefinitions, selectedTraceTypes) ? SELECTED_ICON : null;
-            MenuManager subMenu = new MenuManager(CUSTOM_XML_CATEGORY, icon, null);
-            categoriesMap.put(CUSTOM_XML_CATEGORY, subMenu);
+            MenuManager subMenu = new MenuManager(TmfTraceType.CUSTOM_XML_CATEGORY, icon, null);
+            categoriesMap.put(TmfTraceType.CUSTOM_XML_CATEGORY, subMenu);
             list.add(subMenu);
         }
 
@@ -174,7 +172,7 @@ public class SelectElementTypeContributionItem extends CompoundContributionItem 
             String traceIcon = DEFAULT_TRACE_ICON_PATH;
             String label = def.definitionName;
             boolean selected = selectedTraceTypes.contains(traceTypeId);
-            MenuManager subMenu = categoriesMap.get(CUSTOM_TXT_CATEGORY);
+            MenuManager subMenu = categoriesMap.get(TmfTraceType.CUSTOM_TXT_CATEGORY);
 
             addContributionItem(list, traceBundle, traceTypeId, traceIcon, label, selected, subMenu);
         }
@@ -184,7 +182,7 @@ public class SelectElementTypeContributionItem extends CompoundContributionItem 
             String traceIcon = DEFAULT_TRACE_ICON_PATH;
             String label = def.definitionName;
             boolean selected = selectedTraceTypes.contains(traceTypeId);
-            MenuManager subMenu = categoriesMap.get(CUSTOM_XML_CATEGORY);
+            MenuManager subMenu = categoriesMap.get(TmfTraceType.CUSTOM_XML_CATEGORY);
 
             addContributionItem(list, traceBundle, traceTypeId, traceIcon, label, selected, subMenu);
         }
