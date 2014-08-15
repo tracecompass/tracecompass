@@ -26,6 +26,7 @@ import org.eclipse.linuxtools.internal.lttng2.control.stubs.dialogs.EnableChanne
 import org.eclipse.linuxtools.internal.lttng2.control.stubs.dialogs.GetEventInfoDialogStub;
 import org.eclipse.linuxtools.internal.lttng2.control.stubs.service.TestRemoteSystemProxy;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TargetNodeState;
+import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceChannelOutputType;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceEventType;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceLogLevel;
@@ -202,7 +203,8 @@ public class TraceControlUstProviderTests {
         TraceChannelComponent channel = (TraceChannelComponent) channels[0];
         assertEquals("mychannel", channel.getName());
         assertEquals(2, channel.getNumberOfSubBuffers());
-        assertEquals("mmap()", channel.getOutputType());
+        assertEquals("mmap()", channel.getOutputType().getInName());
+        assertEquals(TraceChannelOutputType.MMAP, channel.getOutputType());
         assertEquals(false, channel.isOverwriteMode());
         assertEquals(100, channel.getReadTimer());
         assertEquals(TraceEnablement.ENABLED, channel.getState());

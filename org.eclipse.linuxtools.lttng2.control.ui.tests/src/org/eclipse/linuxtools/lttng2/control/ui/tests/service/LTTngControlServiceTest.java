@@ -41,6 +41,7 @@ import org.eclipse.linuxtools.internal.lttng2.control.core.model.ISessionInfo;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.ISnapshotInfo;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.IUstProviderInfo;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.LogLevelType;
+import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceChannelOutputType;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceEventType;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceLogLevel;
@@ -306,7 +307,8 @@ public class LTTngControlServiceTest {
             // Verify Kernel's channel0
             assertEquals("channel0", channels[0].getName());
             assertEquals(4, channels[0].getNumberOfSubBuffers());
-            assertEquals("splice()", channels[0].getOutputType());
+            assertEquals("splice()", channels[0].getOutputType().getInName());
+            assertEquals(TraceChannelOutputType.SPLICE, channels[0].getOutputType());
             assertEquals(false, channels[0].isOverwriteMode());
             assertEquals(200, channels[0].getReadTimer());
             assertEquals(TraceEnablement.ENABLED, channels[0].getState());
@@ -330,7 +332,8 @@ public class LTTngControlServiceTest {
             // Verify Kernel's channel1
             assertEquals("channel1", channels[1].getName());
             assertEquals(4, channels[1].getNumberOfSubBuffers());
-            assertEquals("splice()", channels[1].getOutputType());
+            assertEquals("splice()", channels[1].getOutputType().getInName());
+            assertEquals(TraceChannelOutputType.SPLICE, channels[1].getOutputType());
             assertEquals(true, channels[1].isOverwriteMode());
             assertEquals(400, channels[1].getReadTimer());
             assertEquals(TraceEnablement.DISABLED, channels[1].getState());
@@ -349,7 +352,8 @@ public class LTTngControlServiceTest {
             // Verify UST global's mychannel1
             assertEquals("mychannel1", ustChannels[0].getName());
             assertEquals(8, ustChannels[0].getNumberOfSubBuffers());
-            assertEquals("mmap()", ustChannels[0].getOutputType());
+            assertEquals("mmap()", ustChannels[0].getOutputType().getInName());
+            assertEquals(TraceChannelOutputType.MMAP, ustChannels[0].getOutputType());
             assertEquals(true, ustChannels[0].isOverwriteMode());
             assertEquals(100, ustChannels[0].getReadTimer());
             assertEquals(TraceEnablement.DISABLED, ustChannels[0].getState());
@@ -363,7 +367,8 @@ public class LTTngControlServiceTest {
             // Verify UST global's channel0
             assertEquals("channel0", ustChannels[1].getName());
             assertEquals(4, ustChannels[1].getNumberOfSubBuffers());
-            assertEquals("mmap()", ustChannels[1].getOutputType());
+            assertEquals("mmap()", ustChannels[1].getOutputType().getInName());
+            assertEquals(TraceChannelOutputType.MMAP, ustChannels[1].getOutputType());
             assertEquals(false, ustChannels[1].isOverwriteMode());
             assertEquals(200, ustChannels[1].getReadTimer());
             assertEquals(TraceEnablement.ENABLED, ustChannels[1].getState());

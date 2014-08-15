@@ -27,6 +27,7 @@ import org.eclipse.linuxtools.internal.lttng2.control.stubs.dialogs.DestroyConfi
 import org.eclipse.linuxtools.internal.lttng2.control.stubs.dialogs.GetEventInfoDialogStub;
 import org.eclipse.linuxtools.internal.lttng2.control.stubs.service.TestRemoteSystemProxy;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TargetNodeState;
+import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceChannelOutputType;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceEventType;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceLogLevel;
@@ -199,7 +200,8 @@ public class TraceControlKernelProviderTests {
         TraceChannelComponent channel = (TraceChannelComponent) channels[0];
         assertEquals("channel0", channel.getName());
         assertEquals(4, channel.getNumberOfSubBuffers());
-        assertEquals("splice()", channel.getOutputType());
+        assertEquals("splice()", channel.getOutputType().getInName());
+        assertEquals(TraceChannelOutputType.SPLICE, channel.getOutputType());
         assertEquals(false, channel.isOverwriteMode());
         assertEquals(200, channel.getReadTimer());
         assertEquals(TraceEnablement.ENABLED, channel.getState());

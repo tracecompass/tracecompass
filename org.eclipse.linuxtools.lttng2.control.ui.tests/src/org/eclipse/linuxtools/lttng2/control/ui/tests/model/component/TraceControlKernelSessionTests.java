@@ -34,6 +34,7 @@ import org.eclipse.linuxtools.internal.lttng2.control.stubs.dialogs.EnableEvents
 import org.eclipse.linuxtools.internal.lttng2.control.stubs.dialogs.GetEventInfoDialogStub;
 import org.eclipse.linuxtools.internal.lttng2.control.stubs.service.TestRemoteSystemProxy;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TargetNodeState;
+import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceChannelOutputType;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceEventType;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceLogLevel;
@@ -190,7 +191,8 @@ public class TraceControlKernelSessionTests {
         TraceChannelComponent channel = (TraceChannelComponent) channels[0];
         assertEquals("mychannel", channel.getName());
         assertEquals(4, channel.getNumberOfSubBuffers());
-        assertEquals("splice()", channel.getOutputType());
+        assertEquals("splice()", channel.getOutputType().getInName());
+        assertEquals(TraceChannelOutputType.SPLICE, channel.getOutputType());
         assertEquals(true, channel.isOverwriteMode());
         assertEquals(200, channel.getReadTimer());
         assertEquals(TraceEnablement.ENABLED, channel.getState());
@@ -225,7 +227,8 @@ public class TraceControlKernelSessionTests {
         channel = (TraceChannelComponent) channels[1];
         assertEquals("mychannel2", channel.getName());
         assertEquals(2, channel.getNumberOfSubBuffers());
-        assertEquals("splice()", channel.getOutputType());
+        assertEquals("splice()", channel.getOutputType().getInName());
+        assertEquals(TraceChannelOutputType.SPLICE, channel.getOutputType());
         assertEquals(false, channel.isOverwriteMode());
         assertEquals(200, channel.getReadTimer());
         assertEquals(TraceEnablement.ENABLED, channel.getState());

@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.IEventInfo;
+import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceChannelOutputType;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.impl.BufferType;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.impl.ChannelInfo;
@@ -72,7 +73,8 @@ public class ChannelInfoTest {
 
         assertEquals("test", result.getName());
         assertEquals(0, result.getNumberOfSubBuffers());
-        assertEquals("", result.getOutputType());
+        assertEquals("unknown", result.getOutputType().getInName());
+        assertEquals(TraceChannelOutputType.UNKNOWN, result.getOutputType());
         assertEquals(false, result.isOverwriteMode());
         assertEquals(0, result.getReadTimer());
         assertEquals("disabled", result.getState().getInName());
@@ -184,7 +186,7 @@ public class ChannelInfoTest {
         long numSubBuffers = fixture.getNumberOfSubBuffers();
         assertEquals(4, numSubBuffers);
 
-        String outputType = fixture.getOutputType();
+        String outputType = fixture.getOutputType().getInName();
         assertEquals("splice()", outputType);
 
         long subBufferSize = fixture.getSubBufferSize();
@@ -225,7 +227,7 @@ public class ChannelInfoTest {
         numSubBuffers = fixture.getNumberOfSubBuffers();
         assertEquals(7, numSubBuffers);
 
-        outputType = fixture.getOutputType();
+        outputType = fixture.getOutputType().getInName();
         assertEquals("mmap()", outputType);
 
         subBufferSize = fixture.getSubBufferSize();

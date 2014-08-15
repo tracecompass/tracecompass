@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.internal.lttng2.control.stubs.service.TestRemoteSystemProxy;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TargetNodeState;
+import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceChannelOutputType;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceEventType;
 import org.eclipse.linuxtools.internal.lttng2.control.core.model.TraceLogLevel;
@@ -294,7 +295,8 @@ public class TraceControlTreeModelTest {
         TraceChannelComponent channel = (TraceChannelComponent) channels[0];
         assertEquals("channel0", channel.getName());
         assertEquals(4, channel.getNumberOfSubBuffers());
-        assertEquals("splice()", channel.getOutputType());
+        assertEquals("splice()", channel.getOutputType().getInName());
+        assertEquals(TraceChannelOutputType.SPLICE, channel.getOutputType());
         assertEquals(false, channel.isOverwriteMode());
         assertEquals(200, channel.getReadTimer());
         assertEquals(TraceEnablement.ENABLED, channel.getState());
@@ -358,7 +360,8 @@ public class TraceControlTreeModelTest {
         assertEquals("channel1", channels[1].getName());
         channel = (TraceChannelComponent) channels[1];
         assertEquals(4, channel.getNumberOfSubBuffers());
-        assertEquals("splice()", channel.getOutputType());
+        assertEquals("splice()", channel.getOutputType().getInName());
+        assertEquals(TraceChannelOutputType.SPLICE, channel.getOutputType());
         assertEquals(true, channel.isOverwriteMode());
         assertEquals(400, channel.getReadTimer());
         assertEquals(TraceEnablement.DISABLED, channel.getState());
@@ -388,7 +391,8 @@ public class TraceControlTreeModelTest {
         channel = (TraceChannelComponent) ustChannels[0];
         assertEquals("mychannel1", channel.getName());
         assertEquals(8, channel.getNumberOfSubBuffers());
-        assertEquals("mmap()", channel.getOutputType());
+        assertEquals("mmap()", channel.getOutputType().getInName());
+        assertEquals(TraceChannelOutputType.MMAP, channel.getOutputType());
         assertEquals(true, channel.isOverwriteMode());
         assertEquals(100, channel.getReadTimer());
         assertEquals(TraceEnablement.DISABLED, channel.getState());
@@ -410,7 +414,8 @@ public class TraceControlTreeModelTest {
         channel = (TraceChannelComponent) ustChannels[1];
         assertEquals("channel0", channel.getName());
         assertEquals(4, channel.getNumberOfSubBuffers());
-        assertEquals("mmap()", channel.getOutputType());
+        assertEquals("mmap()", channel.getOutputType().getInName());
+        assertEquals(TraceChannelOutputType.MMAP, channel.getOutputType());
         assertEquals(false, channel.isOverwriteMode());
         assertEquals(200, channel.getReadTimer());
         assertEquals(TraceEnablement.ENABLED, channel.getState());
@@ -623,7 +628,7 @@ public class TraceControlTreeModelTest {
         // save original values
         String name = channel.getName();
         int nbSubBuffers = channel.getNumberOfSubBuffers();
-        String type = channel.getOutputType();
+        TraceChannelOutputType type = channel.getOutputType();
         boolean mode = channel.isOverwriteMode();
         long readTimer = channel.getReadTimer();
         TraceEnablement state =  channel.getState();
@@ -638,7 +643,8 @@ public class TraceControlTreeModelTest {
         assertEquals(2, channel.getNumberOfSubBuffers());
 
         channel.setOutputType("splice()");
-        assertEquals("splice()", channel.getOutputType());
+        assertEquals("splice()", channel.getOutputType().getInName());
+        assertEquals(TraceChannelOutputType.SPLICE, channel.getOutputType());
 
         channel.setOverwriteMode(false);
         assertEquals(false, channel.isOverwriteMode());

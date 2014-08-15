@@ -319,7 +319,7 @@ public final class SessionConfigGenerator {
             addElementContent(document, channelElement, SessionConfigStrings.CONFIG_ELEMENT_SWITCH_TIMER_INTERVAL, channel.getSwitchTimer());
             addElementContent(document, channelElement, SessionConfigStrings.CONFIG_ELEMENT_READ_TIMER_INTERVAL, channel.getReadTimer());
 
-            String outputType = channel.getOutputType().startsWith(SessionConfigStrings.CONFIG_OUTPUT_TYPE_MMAP) ?
+            String outputType = channel.getOutputType().getInName().startsWith(SessionConfigStrings.CONFIG_OUTPUT_TYPE_MMAP) ?
                     outputType = SessionConfigStrings.CONFIG_OUTPUT_TYPE_MMAP : SessionConfigStrings.CONFIG_OUTPUT_TYPE_SPLICE;
             addElementContent(document, channelElement, SessionConfigStrings.CONFIG_ELEMENT_OUTPUT_TYPE, outputType);
             addElementContent(document, channelElement, SessionConfigStrings.CONFIG_ELEMENT_TRACEFILE_SIZE, channel.getMaxSizeTraceFiles());
