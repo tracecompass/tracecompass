@@ -57,7 +57,6 @@ public class TimeRangeHistogram extends Histogram {
     public TimeRangeHistogram(HistogramView view, Composite parent) {
         super(view, parent);
         fZoom = new HistogramZoom(this, getStartTime(), getTimeLimit());
-        addMouseWheelListener(fZoom);
     }
 
     // ------------------------------------------------------------------------

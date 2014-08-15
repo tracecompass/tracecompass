@@ -580,6 +580,8 @@ In each histogram, the following keys are handled:
 * '''Right Arrow''': Moves the current event to the next non-empty bar
 * '''Home''': Sets the current time to the first non-empty bar
 * '''End''': Sets the current time to the last non-empty histogram bar
+* '''Plus (+)''': Zoom in
+* '''Minus (-)''': Zoom out
 
 == Statistics View ==
 

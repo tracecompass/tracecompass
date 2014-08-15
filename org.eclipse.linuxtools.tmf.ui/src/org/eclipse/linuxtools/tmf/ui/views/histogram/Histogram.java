@@ -651,6 +651,24 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         fCanvas.removeMouseWheelListener(listener);
     }
 
+    /**
+     * Add a key listener to the histogram
+     * @param listener the key listener
+     * @since 3.1
+     */
+    public void addKeyListener(KeyListener listener) {
+        fCanvas.addKeyListener(listener);
+    }
+
+    /**
+     * Remove a key listener from the histogram
+     * @param listener the key listener
+     * @since 3.1
+     */
+    public void removeKeyListener(KeyListener listener) {
+        fCanvas.removeKeyListener(listener);
+    }
+
     // ------------------------------------------------------------------------
     // Helper functions
     // ------------------------------------------------------------------------
