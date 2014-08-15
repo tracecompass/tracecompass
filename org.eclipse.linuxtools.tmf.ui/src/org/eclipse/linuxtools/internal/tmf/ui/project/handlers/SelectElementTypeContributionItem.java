@@ -13,6 +13,8 @@
 
 package org.eclipse.linuxtools.internal.tmf.ui.project.handlers;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -142,7 +144,28 @@ public class SelectElementTypeContributionItem extends CompoundContributionItem 
             }
         }
 
+        Comparator<IContributionItem> comparator = new Comparator<IContributionItem>() {
+            @Override
+            public int compare(IContributionItem o1, IContributionItem o2) {
+                if (o1 instanceof MenuManager) {
+                    if (o2 instanceof MenuManager) {
+                        MenuManager m1 = (MenuManager) o1;
+                        MenuManager m2 = (MenuManager) o2;
+                        return m1.getMenuText().compareTo(m2.getMenuText());
+                    }
+                    return -1;
+                }
+                if (o2 instanceof MenuManager) {
+                    return 1;
+                }
+                CommandContributionItem c1 = (CommandContributionItem) o1;
+                CommandContributionItem c2 = (CommandContributionItem) o2;
+                return c1.getData().label.compareTo(c2.getData().label);
+            }
+        };
+
         if (forExperiments) {
+            Collections.sort(list, comparator);
             return list.toArray(new IContributionItem[list.size()]);
         }
 
@@ -187,6 +210,7 @@ public class SelectElementTypeContributionItem extends CompoundContributionItem 
             addContributionItem(list, traceBundle, traceTypeId, traceIcon, label, selected, subMenu);
         }
 
+        Collections.sort(list, comparator);
         return list.toArray(new IContributionItem[list.size()]);
     }
 
