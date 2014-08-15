@@ -74,12 +74,7 @@ public class EventInfo extends BaseEventInfo implements IEventInfo {
 
     @Override
     public void setState(String stateName) {
-        fState = TraceEnablement.DISABLED;
-        if (TraceEnablement.DISABLED.getInName().equals(stateName)) {
-            fState = TraceEnablement.DISABLED;
-        } else if (TraceEnablement.ENABLED.getInName().equals(stateName)) {
-            fState = TraceEnablement.ENABLED;
-        }
+        fState = TraceEnablement.valueOfString(stateName);
     }
 
     @Override

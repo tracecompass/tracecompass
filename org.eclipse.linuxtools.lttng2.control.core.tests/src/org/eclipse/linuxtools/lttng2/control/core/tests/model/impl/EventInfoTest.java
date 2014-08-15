@@ -168,6 +168,13 @@ public class EventInfoTest {
         assertEquals("DISABLED", state.toString());
         assertEquals(0, state.ordinal());
 
+        fixture.setState("false");
+        state = fixture.getState();
+        assertEquals("false", state.getInMiName());
+        assertEquals("DISABLED", state.name());
+        assertEquals("DISABLED", state.toString());
+        assertEquals(0, state.ordinal());
+
         fixture.setState("bla");
         state = fixture.getState();
         assertEquals("disabled", state.getInName());
@@ -178,6 +185,13 @@ public class EventInfoTest {
         fixture.setState("enabled");
         state = fixture.getState();
         assertEquals("enabled", state.getInName());
+        assertEquals("ENABLED", state.name());
+        assertEquals("ENABLED", state.toString());
+        assertEquals(1, state.ordinal());
+
+        fixture.setState("true");
+        state = fixture.getState();
+        assertEquals("true", state.getInMiName());
         assertEquals("ENABLED", state.name());
         assertEquals("ENABLED", state.toString());
         assertEquals(1, state.ordinal());
