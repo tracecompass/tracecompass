@@ -21,7 +21,7 @@ import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
  *
  * @author Geneviève Bastien
  */
-public class TmfTimestampTransform implements ITmfTimestampTransform {
+public final class TmfTimestampTransform implements ITmfTimestampTransformInvertible {
 
     /**
      * Generated serial UID
@@ -36,7 +36,7 @@ public class TmfTimestampTransform implements ITmfTimestampTransform {
     /**
      * Default constructor
      */
-    protected TmfTimestampTransform() {
+    private TmfTimestampTransform() {
 
     }
 
@@ -72,6 +72,11 @@ public class TmfTimestampTransform implements ITmfTimestampTransform {
     @Override
     public String toString() {
         return "TmfTimestampTransform [ IDENTITY ]"; //$NON-NLS-1$
+    }
+
+    @Override
+    public ITmfTimestampTransform inverse() {
+        return IDENTITY;
     }
 
 }

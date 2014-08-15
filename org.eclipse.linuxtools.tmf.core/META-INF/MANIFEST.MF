@@ -18,6 +18,7 @@ Export-Package: org.eclipse.linuxtools.internal.tmf.core;x-friends:="org.eclipse
  org.eclipse.linuxtools.internal.tmf.core.statesystem.backends.partial;x-friends:="org.eclipse.linuxtools.statesystem.core.tests",
  org.eclipse.linuxtools.internal.tmf.core.statesystem.mipmap;x-friends:="org.eclipse.linuxtools.tmf.core.tests",
  org.eclipse.linuxtools.internal.tmf.core.synchronization;x-friends:="org.eclipse.linuxtools.tmf.core.tests",
+ org.eclipse.linuxtools.internal.tmf.core.synchronization.graph;x-friends:="org.eclipse.linuxtools.tmf.core.tests",
  org.eclipse.linuxtools.internal.tmf.core.trace;x-friends:="org.eclipse.linuxtools.tmf.core.tests",
  org.eclipse.linuxtools.internal.tmf.core.trace.indexer;x-friends:="org.eclipse.linuxtools.tmf.core.tests",
  org.eclipse.linuxtools.tmf.core,

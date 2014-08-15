@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.internal.tmf.core.synchronization;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.tmf.core.synchronization.ITmfTimestampTransform;
+import org.eclipse.linuxtools.tmf.core.synchronization.TimestampTransformFactory;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfNanoTimestamp;
 
@@ -22,7 +23,7 @@ import org.eclipse.linuxtools.tmf.core.timestamp.TmfNanoTimestamp;
  *
  * @author Matthew Khouzam
  */
-public class TmfConstantTransform implements ITmfTimestampTransform {
+public class TmfConstantTransform implements ITmfTimestampTransformInvertible {
 
     /**
      * Serial ID
@@ -105,6 +106,11 @@ public class TmfConstantTransform implements ITmfTimestampTransform {
         builder.append(fOffset);
         builder.append(" ]"); //$NON-NLS-1$
         return builder.toString();
+    }
+
+    @Override
+    public ITmfTimestampTransform inverse() {
+        return TimestampTransformFactory.createWithOffset(-1 * fOffset);
     }
 
 }
