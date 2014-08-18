@@ -25,7 +25,7 @@ import java.nio.ByteOrder;
 
 import org.eclipse.linuxtools.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.linuxtools.internal.pcap.core.packet.Packet;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.ethernet2.EthernetIIPacket;
 import org.eclipse.linuxtools.internal.pcap.core.trace.BadPcapFileException;
 import org.eclipse.linuxtools.internal.pcap.core.trace.PcapFile;
@@ -98,15 +98,15 @@ public class PacketTest {
             }
 
             Packet packet = new EthernetIIPacket(dummy, null, byteBuffer);
-            assertTrue(packet.hasProtocol(Protocol.ETHERNET_II));
-            assertTrue(packet.hasProtocol(Protocol.UNKNOWN));
-            assertFalse(packet.hasProtocol(Protocol.TCP));
-            assertEquals(Protocol.ETHERNET_II, packet.getProtocol());
+            assertTrue(packet.hasProtocol(PcapProtocol.ETHERNET_II));
+            assertTrue(packet.hasProtocol(PcapProtocol.UNKNOWN));
+            assertFalse(packet.hasProtocol(PcapProtocol.TCP));
+            assertEquals(PcapProtocol.ETHERNET_II, packet.getProtocol());
 
-            assertEquals(packet, packet.getPacket(Protocol.ETHERNET_II));
-            assertNull(packet.getPacket(Protocol.TCP));
-            assertEquals(packet.getChildPacket(), packet.getPacket(Protocol.UNKNOWN));
-            assertEquals(packet.getPacket(Protocol.ETHERNET_II), packet.getMostEcapsulatedPacket());
+            assertEquals(packet, packet.getPacket(PcapProtocol.ETHERNET_II));
+            assertNull(packet.getPacket(PcapProtocol.TCP));
+            assertEquals(packet.getChildPacket(), packet.getPacket(PcapProtocol.UNKNOWN));
+            assertEquals(packet.getPacket(PcapProtocol.ETHERNET_II), packet.getMostEcapsulatedPacket());
 
             assertNull(packet.getParentPacket());
             assertFalse(packet.getPcapFile().equals(null));

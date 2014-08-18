@@ -18,7 +18,7 @@ import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 
-import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.linuxtools.internal.pcap.core.stream.PacketStream;
 import org.eclipse.linuxtools.internal.pcap.core.stream.PacketStreamBuilder;
 import org.eclipse.linuxtools.internal.pcap.core.trace.BadPcapFileException;
@@ -44,9 +44,9 @@ public class StreamBuildTest {
 
         try {
             // Test Ethernet II stream
-            PacketStreamBuilder builder = new PacketStreamBuilder(Protocol.ETHERNET_II);
+            PacketStreamBuilder builder = new PacketStreamBuilder(PcapProtocol.ETHERNET_II);
             builder.parsePcapFile(trace.getPath());
-            assertEquals(Protocol.ETHERNET_II, builder.getProtocol());
+            assertEquals(PcapProtocol.ETHERNET_II, builder.getProtocol());
             // Should do one loop only, so hardcoded values are okay.
             for (PacketStream stream : builder.getStreams()) {
                 assertEquals("Stream eth.0, Number of Packets: 43\n", stream.toString());
@@ -64,16 +64,16 @@ public class StreamBuildTest {
             }
 
             // Test TCP streams and other constructor
-            builder = new PacketStreamBuilder(Protocol.TCP);
+            builder = new PacketStreamBuilder(PcapProtocol.TCP);
             builder.parsePcapFile(trace.getPath());
-            assertEquals(Protocol.TCP, builder.getProtocol());
+            assertEquals(PcapProtocol.TCP, builder.getProtocol());
 
             PacketStream stream = builder.getStream(0);
             if (stream == null) {
                 fail("StreamBuildingTest has failed!");
                 return;
             }
-            assertEquals(Protocol.TCP, stream.getProtocol());
+            assertEquals(PcapProtocol.TCP, stream.getProtocol());
             assertEquals(0, stream.getID());
             assertEquals("tcp.0", stream.getUniqueID());
             assertEquals(34, stream.getNbPackets());
@@ -93,7 +93,7 @@ public class StreamBuildTest {
                 fail("StreamBuildingTest has failed!");
                 return;
             }
-            assertEquals(Protocol.TCP, stream.getProtocol());
+            assertEquals(PcapProtocol.TCP, stream.getProtocol());
             assertEquals(1, stream.getID());
             assertEquals("tcp.1", stream.getUniqueID());
             assertEquals(7, stream.getNbPackets());

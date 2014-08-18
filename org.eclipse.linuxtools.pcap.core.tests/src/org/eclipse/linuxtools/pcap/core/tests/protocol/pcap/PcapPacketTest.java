@@ -24,7 +24,7 @@ import java.nio.ByteOrder;
 import java.util.Map;
 
 import org.eclipse.linuxtools.internal.pcap.core.packet.BadPacketException;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.pcap.PcapEndpoint;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.pcap.PcapPacket;
 import org.eclipse.linuxtools.internal.pcap.core.trace.BadPcapFileException;
@@ -190,10 +190,10 @@ public class PcapPacketTest {
                 return;
             }
             // Protocol Testing
-            assertEquals(Protocol.PCAP, packet.getProtocol());
-            assertTrue(packet.hasProtocol(Protocol.PCAP));
-            assertTrue(packet.hasProtocol(Protocol.UNKNOWN));
-            assertFalse(packet.hasProtocol(Protocol.TCP));
+            assertEquals(PcapProtocol.PCAP, packet.getProtocol());
+            assertTrue(packet.hasProtocol(PcapProtocol.PCAP));
+            assertTrue(packet.hasProtocol(PcapProtocol.UNKNOWN));
+            assertFalse(packet.hasProtocol(PcapProtocol.TCP));
 
             // Abstract methods Testing
             assertTrue(packet.validate());

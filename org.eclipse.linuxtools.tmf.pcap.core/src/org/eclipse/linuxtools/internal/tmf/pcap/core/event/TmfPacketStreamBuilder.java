@@ -16,11 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.linuxtools.internal.pcap.core.packet.Packet;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.pcap.PcapPacket;
 import org.eclipse.linuxtools.internal.pcap.core.stream.PacketStream;
 import org.eclipse.linuxtools.internal.pcap.core.stream.PacketStreamBuilder;
-import org.eclipse.linuxtools.internal.tmf.pcap.core.protocol.TmfProtocol;
+import org.eclipse.linuxtools.internal.tmf.pcap.core.protocol.TmfPcapProtocol;
 import org.eclipse.linuxtools.internal.tmf.pcap.core.util.ProtocolConversion;
 
 /**
@@ -38,7 +38,7 @@ public class TmfPacketStreamBuilder {
      * @param protocol
      *            The protocol of the streams to build.
      */
-    public TmfPacketStreamBuilder(TmfProtocol protocol) {
+    public TmfPacketStreamBuilder(TmfPcapProtocol protocol) {
         fBuilder = new PacketStreamBuilder(ProtocolConversion.unwrap(protocol));
     }
 
@@ -49,7 +49,7 @@ public class TmfPacketStreamBuilder {
      *            The event to add.
      */
     public synchronized void addEventToStream(PcapEvent event) {
-        Packet packet = event.getPacket().getPacket(Protocol.PCAP);
+        Packet packet = event.getPacket().getPacket(PcapProtocol.PCAP);
         if (packet == null || !(packet instanceof PcapPacket)) {
             return;
         }

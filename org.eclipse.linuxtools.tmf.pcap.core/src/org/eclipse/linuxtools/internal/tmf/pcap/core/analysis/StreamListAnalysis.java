@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.internal.tmf.pcap.core.event.PcapEvent;
 import org.eclipse.linuxtools.internal.tmf.pcap.core.event.TmfPacketStreamBuilder;
-import org.eclipse.linuxtools.internal.tmf.pcap.core.protocol.TmfProtocol;
+import org.eclipse.linuxtools.internal.tmf.pcap.core.protocol.TmfPcapProtocol;
 import org.eclipse.linuxtools.internal.tmf.pcap.core.trace.PcapTrace;
 import org.eclipse.linuxtools.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
@@ -44,7 +44,7 @@ public class StreamListAnalysis extends TmfAbstractAnalysisModule {
     public static final String ID = "org.eclipse.linuxtools.tmf.pcap.core.analysis.stream"; //$NON-NLS-1$
 
     private @Nullable ITmfEventRequest fRequest;
-    private final Map<TmfProtocol, TmfPacketStreamBuilder> fBuilders;
+    private final Map<TmfPcapProtocol, TmfPacketStreamBuilder> fBuilders;
 
     /**
      * The default constructor. It initializes all variables.
@@ -52,7 +52,7 @@ public class StreamListAnalysis extends TmfAbstractAnalysisModule {
     public StreamListAnalysis() {
         super();
         fBuilders = new HashMap<>();
-        for (TmfProtocol protocol : TmfProtocol.getAllProtocols()) {
+        for (TmfPcapProtocol protocol : TmfPcapProtocol.getAllProtocols()) {
             if (protocol.supportsStream()) {
                 fBuilders.put(protocol, new TmfPacketStreamBuilder(protocol));
             }
@@ -109,7 +109,7 @@ public class StreamListAnalysis extends TmfAbstractAnalysisModule {
                     return;
                 }
                 PcapEvent event = (PcapEvent) data;
-                for (TmfProtocol protocol : fBuilders.keySet()) {
+                for (TmfPcapProtocol protocol : fBuilders.keySet()) {
                     fBuilders.get(protocol).addEventToStream(event);
                 }
 
@@ -144,7 +144,7 @@ public class StreamListAnalysis extends TmfAbstractAnalysisModule {
      *            The specified protocol.
      * @return The builder.
      */
-    public @Nullable TmfPacketStreamBuilder getBuilder(TmfProtocol protocol) {
+    public @Nullable TmfPacketStreamBuilder getBuilder(TmfPcapProtocol protocol) {
         return fBuilders.get(protocol);
     }
 

@@ -19,7 +19,7 @@ import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.internal.pcap.core.packet.Packet;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.linuxtools.internal.pcap.core.trace.PcapFile;
 import org.eclipse.linuxtools.internal.pcap.core.util.ConversionHelper;
 
@@ -55,7 +55,7 @@ public class UnknownPacket extends Packet {
      *            The entire packet (header and payload).
      */
     public UnknownPacket(PcapFile file, @Nullable Packet parent, ByteBuffer packet) {
-        super(file, parent, Protocol.UNKNOWN);
+        super(file, parent, PcapProtocol.UNKNOWN);
 
         // The endpoints are lazy loaded. They are defined in the get*Endpoint()
         // methods.

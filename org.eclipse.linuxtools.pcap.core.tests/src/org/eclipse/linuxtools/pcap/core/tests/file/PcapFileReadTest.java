@@ -20,7 +20,7 @@ import static org.junit.Assume.assumeTrue;
 import java.io.IOException;
 
 import org.eclipse.linuxtools.internal.pcap.core.packet.BadPacketException;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.pcap.PcapPacket;
 import org.eclipse.linuxtools.internal.pcap.core.trace.BadPcapFileException;
 import org.eclipse.linuxtools.internal.pcap.core.trace.PcapFile;
@@ -62,7 +62,7 @@ public class PcapFileReadTest {
             assertEquals(1, file.getCurrentRank());
             // Verify Pcap packet.
             assertEquals(file, packet.getPcapFile());
-            assertEquals(Protocol.PCAP, packet.getProtocol());
+            assertEquals(PcapProtocol.PCAP, packet.getProtocol());
             assertEquals(0, packet.getIndex());
             assertEquals(1120469540839312L, packet.getTimestamp());
             assertEquals(92, packet.getOriginalLength());
@@ -70,19 +70,19 @@ public class PcapFileReadTest {
             assertEquals(false, packet.isTruncated());
             assertEquals(true, packet.validate());
             // Verify Ethernet Packet
-            if (!packet.hasProtocol(Protocol.ETHERNET_II)) {
+            if (!packet.hasProtocol(PcapProtocol.ETHERNET_II)) {
                 fail("Packet doesn't have ethernet!");
             }
             // Verify IPv4 Packet
-            if (!packet.hasProtocol(Protocol.IPV4)) {
+            if (!packet.hasProtocol(PcapProtocol.IPV4)) {
                 fail("Packet doesn't have IPv4!");
             }
             // Verify UDP Packet
-            if (!packet.hasProtocol(Protocol.UDP)) {
+            if (!packet.hasProtocol(PcapProtocol.UDP)) {
                 fail("Packet doesn't have UDP!");
             }
             // Verify Unknown Packet
-            if (!packet.hasProtocol(Protocol.UNKNOWN)) {
+            if (!packet.hasProtocol(PcapProtocol.UNKNOWN)) {
                 fail("Packet doesn't have payload!");
             }
 
@@ -96,7 +96,7 @@ public class PcapFileReadTest {
 
             // Verify Pcap packet.
             assertEquals(file, packet.getPcapFile());
-            assertEquals(Protocol.PCAP, packet.getProtocol());
+            assertEquals(PcapProtocol.PCAP, packet.getProtocol());
             assertEquals(58, packet.getIndex());
             assertEquals(1120469635045415L, packet.getTimestamp());
             assertEquals(113, packet.getOriginalLength());
@@ -104,19 +104,19 @@ public class PcapFileReadTest {
             assertEquals(false, packet.isTruncated());
             assertEquals(true, packet.validate());
             // Verify Ethernet Packet
-            if (!packet.hasProtocol(Protocol.ETHERNET_II)) {
+            if (!packet.hasProtocol(PcapProtocol.ETHERNET_II)) {
                 fail("Packet doesn't have ethernet!");
             }
             // Verify IPv4 Packet
-            if (!packet.hasProtocol(Protocol.IPV4)) {
+            if (!packet.hasProtocol(PcapProtocol.IPV4)) {
                 fail("Packet doesn't have IPv4!");
             }
             // Verify TCP Packet
-            if (!packet.hasProtocol(Protocol.TCP)) {
+            if (!packet.hasProtocol(PcapProtocol.TCP)) {
                 fail("Packet doesn't have TCP!");
             }
             // Verify Unknown Packet
-            if (!packet.hasProtocol(Protocol.UNKNOWN)) {
+            if (!packet.hasProtocol(PcapProtocol.UNKNOWN)) {
                 fail("Packet doesn't have payload!");
             }
 

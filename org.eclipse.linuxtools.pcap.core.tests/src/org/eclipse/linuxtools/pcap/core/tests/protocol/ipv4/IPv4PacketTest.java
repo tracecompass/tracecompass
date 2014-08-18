@@ -27,7 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.eclipse.linuxtools.internal.pcap.core.packet.BadPacketException;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.ipv4.IPv4Endpoint;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.ipv4.IPv4Packet;
 import org.eclipse.linuxtools.internal.pcap.core.trace.BadPcapFileException;
@@ -164,10 +164,10 @@ public class IPv4PacketTest {
             IPv4Packet packet = new IPv4Packet(dummy, null, byteBuffer);
 
             // Protocol Testing
-            assertEquals(Protocol.IPV4, packet.getProtocol());
-            assertTrue(packet.hasProtocol(Protocol.IPV4));
-            assertTrue(packet.hasProtocol(Protocol.UNKNOWN));
-            assertFalse(packet.hasProtocol(Protocol.TCP));
+            assertEquals(PcapProtocol.IPV4, packet.getProtocol());
+            assertTrue(packet.hasProtocol(PcapProtocol.IPV4));
+            assertTrue(packet.hasProtocol(PcapProtocol.UNKNOWN));
+            assertFalse(packet.hasProtocol(PcapProtocol.TCP));
 
             // Abstract methods Testing
             assertTrue(packet.validate());

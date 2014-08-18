@@ -21,7 +21,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.linuxtools.internal.pcap.core.packet.Packet;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.ipv4.IPv4Packet;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.unknown.UnknownPacket;
 import org.eclipse.linuxtools.internal.pcap.core.trace.PcapFile;
@@ -67,7 +67,7 @@ public class EthernetIIPacket extends Packet {
      *             Thrown when the packet is erroneous.
      */
     public EthernetIIPacket(PcapFile file, @Nullable Packet parent, ByteBuffer packet) throws BadPacketException {
-        super(file, parent, Protocol.ETHERNET_II);
+        super(file, parent, PcapProtocol.ETHERNET_II);
 
         if (packet.array().length <= EthernetIIValues.ETHERNET_II_MIN_SIZE) {
             throw new BadPacketException("An Ethernet II packet can't be smaller than 14 bytes."); //$NON-NLS-1$

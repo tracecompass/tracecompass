@@ -23,7 +23,7 @@ import org.eclipse.linuxtools.internal.tmf.pcap.core.analysis.StreamListAnalysis
 import org.eclipse.linuxtools.internal.tmf.pcap.core.event.PcapEvent;
 import org.eclipse.linuxtools.internal.tmf.pcap.core.event.TmfPacketStream;
 import org.eclipse.linuxtools.internal.tmf.pcap.core.event.TmfPacketStreamBuilder;
-import org.eclipse.linuxtools.internal.tmf.pcap.core.protocol.TmfProtocol;
+import org.eclipse.linuxtools.internal.tmf.pcap.core.protocol.TmfPcapProtocol;
 import org.eclipse.linuxtools.internal.tmf.pcap.core.signal.TmfPacketStreamSelectedSignal;
 import org.eclipse.linuxtools.internal.tmf.pcap.core.trace.PcapTrace;
 import org.eclipse.linuxtools.internal.tmf.pcap.ui.Activator;
@@ -122,7 +122,7 @@ public class StreamListView extends TmfView {
     private static final long WAIT_TIME = 1000;
 
     private @Nullable CTabFolder fTabFolder;
-    private @Nullable Map<TmfProtocol, Table> fTableMap;
+    private @Nullable Map<TmfPcapProtocol, Table> fTableMap;
 
     private @Nullable TmfPacketStream fCurrentStream;
     private @Nullable ITmfTrace fCurrentTrace;
@@ -235,11 +235,11 @@ public class StreamListView extends TmfView {
                 if (display.isDisposed()) {
                     return;
                 }
-                Map<TmfProtocol, Table> tableMap = fTableMap;
+                Map<TmfPcapProtocol, Table> tableMap = fTableMap;
                 if (tableMap == null) {
                     return;
                 }
-                for (TmfProtocol protocol : tableMap.keySet()) {
+                for (TmfPcapProtocol protocol : tableMap.keySet()) {
                     if (!(tableMap.get(protocol).isDisposed())) {
                         tableMap.get(protocol).removeAll();
                     }
@@ -270,13 +270,13 @@ public class StreamListView extends TmfView {
                     return;
                 }
 
-                Map<TmfProtocol, Table> tables = fTableMap;
+                Map<TmfPcapProtocol, Table> tables = fTableMap;
                 if (tables == null) {
                     return;
                 }
-                for (TmfProtocol p : tables.keySet()) {
+                for (TmfPcapProtocol p : tables.keySet()) {
                     @SuppressWarnings("null")
-                    @NonNull TmfProtocol protocol = p;
+                    @NonNull TmfPcapProtocol protocol = p;
                     TmfPacketStreamBuilder builder = analysis.getBuilder(protocol);
                     if (builder != null && !(tables.get(protocol).isDisposed())) {
                         for (TmfPacketStream stream : builder.getStreams()) {
@@ -323,11 +323,11 @@ public class StreamListView extends TmfView {
 
             @Override
             public void widgetSelected(@Nullable SelectionEvent e) {
-                Map<TmfProtocol, Table> tables = fTableMap;
+                Map<TmfPcapProtocol, Table> tables = fTableMap;
                 if (tables == null || e == null) {
                     return;
                 }
-                TmfProtocol protocol = (TmfProtocol) e.item.getData(KEY_PROTOCOL);
+                TmfPcapProtocol protocol = (TmfPcapProtocol) e.item.getData(KEY_PROTOCOL);
                 tables.get(protocol).deselectAll();
                 fCurrentStream = null;
             }
@@ -335,7 +335,7 @@ public class StreamListView extends TmfView {
         });
 
         // Add items and tables for each protocol
-        for (TmfProtocol protocol : TmfProtocol.getAllProtocols()) {
+        for (TmfPcapProtocol protocol : TmfPcapProtocol.getAllProtocols()) {
             if (protocol.supportsStream()) {
                 CTabItem item = new CTabItem(fTabFolder, SWT.NONE);
                 item.setText(protocol.getName());
@@ -363,7 +363,7 @@ public class StreamListView extends TmfView {
 
                 });
 
-                Map<TmfProtocol, Table> tables = fTableMap;
+                Map<TmfPcapProtocol, Table> tables = fTableMap;
                 if (tables == null) {
                     return;
                 }

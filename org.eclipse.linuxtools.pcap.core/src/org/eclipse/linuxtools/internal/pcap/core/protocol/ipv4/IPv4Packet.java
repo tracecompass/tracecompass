@@ -24,7 +24,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.linuxtools.internal.pcap.core.packet.Packet;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.tcp.TCPPacket;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.udp.UDPPacket;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.unknown.UnknownPacket;
@@ -83,7 +83,7 @@ public class IPv4Packet extends Packet {
      *             Thrown when the packet is erroneous.
      */
     public IPv4Packet(PcapFile file, @Nullable Packet parent, ByteBuffer packet) throws BadPacketException {
-        super(file, parent, Protocol.IPV4);
+        super(file, parent, PcapProtocol.IPV4);
 
         // The endpoints are lazy loaded. They are defined in the get*Endpoint()
         // methods.

@@ -21,7 +21,7 @@ import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.internal.pcap.core.packet.Packet;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.pcap.PcapPacket;
 import org.eclipse.linuxtools.internal.pcap.core.trace.PcapFile;
 import org.eclipse.linuxtools.internal.pcap.core.util.LinkTypeHelper;
@@ -47,7 +47,7 @@ public class PcapEventFactory {
     private static final ITmfEventField[] EMPTY_FIELD_ARRAY = new ITmfEventField[0];
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
-    private static final Map<Protocol, TmfEventType> fEventTypes = new HashMap<>();
+    private static final Map<PcapProtocol, TmfEventType> fEventTypes = new HashMap<>();
 
     private PcapEventFactory() {
     }
@@ -104,7 +104,7 @@ public class PcapEventFactory {
         // way to use less intermediate data structures.
         List<ITmfEventField> fieldList = new ArrayList<>();
         List<ITmfEventField> subfieldList = new ArrayList<>();
-        Packet localPacket = packet.getPacket(Protocol.PCAP);
+        Packet localPacket = packet.getPacket(PcapProtocol.PCAP);
 
         while (localPacket != null) {
             subfieldList.clear();

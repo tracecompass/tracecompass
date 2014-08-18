@@ -21,7 +21,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.linuxtools.internal.pcap.core.packet.Packet;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.unknown.UnknownPacket;
 import org.eclipse.linuxtools.internal.pcap.core.trace.PcapFile;
 import org.eclipse.linuxtools.internal.pcap.core.util.ConversionHelper;
@@ -77,7 +77,7 @@ public class TCPPacket extends Packet {
      *             Thrown when the packet is erroneous.
      */
     public TCPPacket(PcapFile file, @Nullable Packet parent, ByteBuffer packet) throws BadPacketException {
-        super(file, parent, Protocol.TCP);
+        super(file, parent, PcapProtocol.TCP);
 
         // The endpoints are lazy loaded. They are defined in the get*Endpoint()
         // methods.

@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.internal.pcap.core.stream;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.internal.pcap.core.endpoint.ProtocolEndpointPair;
 import org.eclipse.linuxtools.internal.pcap.core.packet.Packet;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.pcap.PcapPacket;
 
 import com.google.common.math.DoubleMath;
@@ -36,7 +36,7 @@ public class PacketStream {
 
     private static final double SECOND_TO_NANOSECOND = 1000000000.0;
     private static final double DELTA = 0.000000001;
-    private final Protocol fProtocol;
+    private final PcapProtocol fProtocol;
     private final int fId;
     private final ProtocolEndpointPair fEndpointPair;
 
@@ -58,7 +58,7 @@ public class PacketStream {
      * @param endpointPair
      *            The common endpoints of the packets in this stream.
      */
-    PacketStream(Protocol protocol, int id, ProtocolEndpointPair endpointPair) {
+    PacketStream(PcapProtocol protocol, int id, ProtocolEndpointPair endpointPair) {
         fProtocol = protocol;
         fId = id;
         fEndpointPair = endpointPair;
@@ -118,7 +118,7 @@ public class PacketStream {
      *
      * @return The protocol of this stream.
      */
-    public Protocol getProtocol() {
+    public PcapProtocol getProtocol() {
         return fProtocol;
     }
 

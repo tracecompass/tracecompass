@@ -18,7 +18,7 @@ import java.util.Collection;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.internal.tmf.pcap.core.event.PcapEvent;
-import org.eclipse.linuxtools.internal.tmf.pcap.core.protocol.TmfProtocol;
+import org.eclipse.linuxtools.internal.tmf.pcap.core.protocol.TmfPcapProtocol;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.columns.TmfEventTableColumn;
@@ -62,7 +62,7 @@ public class PcapEventsTable extends TmfEventsTable {
                 return EMPTY_STRING;
             }
             PcapEvent pcapEvent = (PcapEvent) event;
-            TmfProtocol protocol = pcapEvent.getMostEncapsulatedProtocol();
+            TmfPcapProtocol protocol = pcapEvent.getMostEncapsulatedProtocol();
 
             return getString(pcapEvent.getSourceEndpoint(protocol));
         }
@@ -88,7 +88,7 @@ public class PcapEventsTable extends TmfEventsTable {
                 return EMPTY_STRING;
             }
             PcapEvent pcapEvent = (PcapEvent) event;
-            TmfProtocol protocol = pcapEvent.getMostEncapsulatedProtocol();
+            TmfPcapProtocol protocol = pcapEvent.getMostEncapsulatedProtocol();
             return getString(pcapEvent.getDestinationEndpoint(protocol));
         }
 
@@ -113,7 +113,7 @@ public class PcapEventsTable extends TmfEventsTable {
                 return EMPTY_STRING;
             }
             PcapEvent pcapEvent = (PcapEvent) event;
-            TmfProtocol protocol = pcapEvent.getMostEncapsulatedProtocol();
+            TmfPcapProtocol protocol = pcapEvent.getMostEncapsulatedProtocol();
 
             @SuppressWarnings("null")
             @NonNull String proto = protocol.getShortName().toUpperCase();

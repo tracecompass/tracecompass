@@ -13,7 +13,7 @@
 package org.eclipse.linuxtools.internal.tmf.pcap.core.event;
 
 import org.eclipse.linuxtools.internal.pcap.core.stream.PacketStream;
-import org.eclipse.linuxtools.internal.tmf.pcap.core.protocol.TmfProtocol;
+import org.eclipse.linuxtools.internal.tmf.pcap.core.protocol.TmfPcapProtocol;
 import org.eclipse.linuxtools.internal.tmf.pcap.core.util.ProtocolConversion;
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
@@ -69,7 +69,7 @@ public class TmfPacketStream {
      *
      * @return The TmfProtocol of the packet stream.
      */
-    public TmfProtocol getProtocol() {
+    public TmfPcapProtocol getProtocol() {
         return ProtocolConversion.wrap(fPacketStream.getProtocol());
     }
 

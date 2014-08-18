@@ -21,8 +21,8 @@ import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.internal.pcap.core.packet.Packet;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
-import org.eclipse.linuxtools.internal.tmf.pcap.core.protocol.TmfProtocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
+import org.eclipse.linuxtools.internal.tmf.pcap.core.protocol.TmfPcapProtocol;
 import org.eclipse.linuxtools.internal.tmf.pcap.core.util.ProtocolConversion;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
 import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
@@ -50,7 +50,7 @@ public class PcapEvent extends TmfEvent {
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
     private final Packet fPacket;
-    private @Nullable List<TmfProtocol> fList;
+    private @Nullable List<TmfPcapProtocol> fList;
 
     /**
      * Full constructor.
@@ -96,8 +96,8 @@ public class PcapEvent extends TmfEvent {
      *            The specified protocol
      * @return A map containing the fields.
      */
-    public @Nullable Map<String, String> getFields(TmfProtocol protocol) {
-        Protocol p = ProtocolConversion.unwrap(protocol);
+    public @Nullable Map<String, String> getFields(TmfPcapProtocol protocol) {
+        PcapProtocol p = ProtocolConversion.unwrap(protocol);
         Packet packet = fPacket.getPacket(p);
         if (packet == null) {
             return null;
@@ -113,8 +113,8 @@ public class PcapEvent extends TmfEvent {
      *            The specified protocol
      * @return The payload as a ByteBuffer.
      */
-    public @Nullable ByteBuffer getPayload(TmfProtocol protocol) {
-        Protocol p = ProtocolConversion.unwrap(protocol);
+    public @Nullable ByteBuffer getPayload(TmfPcapProtocol protocol) {
+        PcapProtocol p = ProtocolConversion.unwrap(protocol);
         Packet packet = fPacket.getPacket(p);
         if (packet == null) {
             return null;
@@ -130,8 +130,8 @@ public class PcapEvent extends TmfEvent {
      *            The specified protocol
      * @return The source endpoint.
      */
-    public @Nullable String getSourceEndpoint(TmfProtocol protocol) {
-        Protocol p = ProtocolConversion.unwrap(protocol);
+    public @Nullable String getSourceEndpoint(TmfPcapProtocol protocol) {
+        PcapProtocol p = ProtocolConversion.unwrap(protocol);
         Packet packet = fPacket.getPacket(p);
         if (packet == null) {
             return null;
@@ -147,8 +147,8 @@ public class PcapEvent extends TmfEvent {
      *            The specified protocol
      * @return The destination endpoint.
      */
-    public @Nullable String getDestinationEndpoint(TmfProtocol protocol) {
-        Protocol p = ProtocolConversion.unwrap(protocol);
+    public @Nullable String getDestinationEndpoint(TmfPcapProtocol protocol) {
+        PcapProtocol p = ProtocolConversion.unwrap(protocol);
         Packet packet = fPacket.getPacket(p);
         if (packet == null) {
             return null;
@@ -162,7 +162,7 @@ public class PcapEvent extends TmfEvent {
      *
      * @return The most encapsulated TmfProtocol.
      */
-    public TmfProtocol getMostEncapsulatedProtocol() {
+    public TmfPcapProtocol getMostEncapsulatedProtocol() {
         return ProtocolConversion.wrap(fPacket.getMostEcapsulatedPacket().getProtocol());
     }
 
@@ -171,11 +171,11 @@ public class PcapEvent extends TmfEvent {
      *
      * @return A list containing all the TmfProtocol.
      */
-    public List<TmfProtocol> getProtocols() {
+    public List<TmfPcapProtocol> getProtocols() {
         if (fList != null) {
             return fList;
         }
-        List<TmfProtocol> list = new ArrayList<>();
+        List<TmfPcapProtocol> list = new ArrayList<>();
         Packet packet = fPacket;
 
         // Go to start.
@@ -185,7 +185,7 @@ public class PcapEvent extends TmfEvent {
 
         if (packet == null) {
             @SuppressWarnings("null")
-            @NonNull List<TmfProtocol> emptyList = Collections.EMPTY_LIST;
+            @NonNull List<TmfPcapProtocol> emptyList = Collections.EMPTY_LIST;
             fList = emptyList;
             return fList;
         }
@@ -199,7 +199,7 @@ public class PcapEvent extends TmfEvent {
         }
 
         @SuppressWarnings("null")
-        @NonNull ImmutableList<TmfProtocol> immutableList = ImmutableList.copyOf(list);
+        @NonNull ImmutableList<TmfPcapProtocol> immutableList = ImmutableList.copyOf(list);
         fList = immutableList;
         return immutableList;
     }
@@ -227,8 +227,8 @@ public class PcapEvent extends TmfEvent {
      *            The specified protocol.
      * @return The signification as a String.
      */
-    public String toString(TmfProtocol protocol) {
-        Protocol p = ProtocolConversion.unwrap(protocol);
+    public String toString(TmfPcapProtocol protocol) {
+        PcapProtocol p = ProtocolConversion.unwrap(protocol);
         Packet packet = fPacket.getPacket(p);
         if (packet == null) {
             return EMPTY_STRING;

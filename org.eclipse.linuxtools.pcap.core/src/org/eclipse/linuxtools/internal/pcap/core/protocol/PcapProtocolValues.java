@@ -19,7 +19,7 @@ package org.eclipse.linuxtools.internal.pcap.core.protocol;
  *
  * @author Vincent Perot
  */
-public interface ProtocolValues {
+public interface PcapProtocolValues {
 
     /**
      * Layer 0. This layer is not an OSI layer but is used as an helper to store

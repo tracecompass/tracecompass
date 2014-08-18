@@ -20,7 +20,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.linuxtools.internal.pcap.core.packet.Packet;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.ethernet2.EthernetIIPacket;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.unknown.UnknownPacket;
 import org.eclipse.linuxtools.internal.pcap.core.trace.PcapFile;
@@ -72,7 +72,7 @@ public class PcapPacket extends Packet {
      *             Thrown when the Packet is erroneous.
      */
     public PcapPacket(PcapFile file, @Nullable Packet parent, ByteBuffer header, @Nullable ByteBuffer payload, long index) throws BadPacketException {
-        super(file, parent, Protocol.PCAP);
+        super(file, parent, PcapProtocol.PCAP);
 
         if (header.array().length < PcapFileValues.PACKET_HEADER_SIZE) {
             fChildPacket = null;

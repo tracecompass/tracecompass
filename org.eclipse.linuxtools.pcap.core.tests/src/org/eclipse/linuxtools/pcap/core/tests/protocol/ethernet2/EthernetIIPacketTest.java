@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.eclipse.linuxtools.internal.pcap.core.packet.BadPacketException;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.ethernet2.EthernetIIEndpoint;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.ethernet2.EthernetIIPacket;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.ethernet2.EthernetIIValues;
@@ -111,10 +111,10 @@ public class EthernetIIPacketTest {
             EthernetIIPacket packet = new EthernetIIPacket(dummy, null, byteBuffer);
 
             // Protocol Testing
-            assertEquals(Protocol.ETHERNET_II, packet.getProtocol());
-            assertTrue(packet.hasProtocol(Protocol.ETHERNET_II));
-            assertTrue(packet.hasProtocol(Protocol.UNKNOWN));
-            assertFalse(packet.hasProtocol(Protocol.TCP));
+            assertEquals(PcapProtocol.ETHERNET_II, packet.getProtocol());
+            assertTrue(packet.hasProtocol(PcapProtocol.ETHERNET_II));
+            assertTrue(packet.hasProtocol(PcapProtocol.UNKNOWN));
+            assertFalse(packet.hasProtocol(PcapProtocol.TCP));
 
             // Abstract methods Testing
             assertTrue(packet.validate());

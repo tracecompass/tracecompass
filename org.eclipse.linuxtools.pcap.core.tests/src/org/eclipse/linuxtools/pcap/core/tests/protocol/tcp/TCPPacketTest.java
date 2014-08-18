@@ -26,7 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.eclipse.linuxtools.internal.pcap.core.packet.BadPacketException;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.tcp.TCPEndpoint;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.tcp.TCPPacket;
 import org.eclipse.linuxtools.internal.pcap.core.trace.BadPcapFileException;
@@ -163,10 +163,10 @@ public class TCPPacketTest {
             TCPPacket packet = new TCPPacket(dummy, null, byteBuffer);
 
             // Protocol Testing
-            assertEquals(Protocol.TCP, packet.getProtocol());
-            assertTrue(packet.hasProtocol(Protocol.TCP));
-            assertTrue(packet.hasProtocol(Protocol.UNKNOWN));
-            assertFalse(packet.hasProtocol(Protocol.IPV4));
+            assertEquals(PcapProtocol.TCP, packet.getProtocol());
+            assertTrue(packet.hasProtocol(PcapProtocol.TCP));
+            assertTrue(packet.hasProtocol(PcapProtocol.UNKNOWN));
+            assertFalse(packet.hasProtocol(PcapProtocol.IPV4));
 
             // Abstract methods Testing
             assertTrue(packet.validate());

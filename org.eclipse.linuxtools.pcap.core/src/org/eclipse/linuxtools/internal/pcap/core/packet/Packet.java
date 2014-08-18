@@ -18,7 +18,7 @@ import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.linuxtools.internal.pcap.core.endpoint.ProtocolEndpoint;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.ipv4.IPv4Packet;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.unknown.UnknownPacket;
 import org.eclipse.linuxtools.internal.pcap.core.trace.PcapFile;
@@ -43,7 +43,7 @@ public abstract class Packet {
     private final @Nullable Packet fParentPacket;
 
     /** The protocol that this packet uses */
-    private final Protocol fProtocol;
+    private final PcapProtocol fProtocol;
 
     /**
      * Constructor of the Packet Class.
@@ -55,7 +55,7 @@ public abstract class Packet {
      * @param protocol
      *            The protocol of the packet.
      */
-    public Packet(PcapFile file, @Nullable Packet parent, Protocol protocol) {
+    public Packet(PcapFile file, @Nullable Packet parent, PcapProtocol protocol) {
         fPcapFile = file;
         fParentPacket = parent;
         fProtocol = protocol;
@@ -95,7 +95,7 @@ public abstract class Packet {
      *
      * @return The protocol of the packet.
      */
-    public Protocol getProtocol() {
+    public PcapProtocol getProtocol() {
         return fProtocol;
     }
 
@@ -116,7 +116,7 @@ public abstract class Packet {
      *            The specified protocol.
      * @return The packet that respects the protocol.
      */
-    public final @Nullable Packet getPacket(Protocol protocol) {
+    public final @Nullable Packet getPacket(PcapProtocol protocol) {
 
         Packet wantedPacket = this;
 
@@ -148,7 +148,7 @@ public abstract class Packet {
      *            The specified protocol.
      * @return The presence of the protocol.
      */
-    public final boolean hasProtocol(Protocol protocol) {
+    public final boolean hasProtocol(PcapProtocol protocol) {
 
         // TODO Verify inputs
         Packet wantedPacket = this;
@@ -182,9 +182,9 @@ public abstract class Packet {
     public Packet getMostEcapsulatedPacket() {
         @NonNull
         Packet packet = this;
-        while (packet.getProtocol() != Protocol.UNKNOWN) {
+        while (packet.getProtocol() != PcapProtocol.UNKNOWN) {
             Packet childPacket = packet.getChildPacket();
-            if (childPacket == null || childPacket.getProtocol() == Protocol.UNKNOWN) {
+            if (childPacket == null || childPacket.getProtocol() == PcapProtocol.UNKNOWN) {
                 break;
             }
             packet = childPacket;

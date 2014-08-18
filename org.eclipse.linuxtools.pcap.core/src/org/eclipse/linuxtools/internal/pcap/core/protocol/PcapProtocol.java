@@ -21,14 +21,14 @@ import java.util.List;
  *
  * @author Vincent Perot
  */
-public enum Protocol {
+public enum PcapProtocol {
 
     // Layer 0
     /**
      * The Pcap Protocol is not a real protocol but is used as an helper to
      * generate Pcap packets.
      */
-    PCAP("Packet Capture", "pcap", ProtocolValues.LAYER_0, false), //$NON-NLS-1$ //$NON-NLS-2$
+    PCAP("Packet Capture", "pcap", PcapProtocolValues.LAYER_0, false), //$NON-NLS-1$ //$NON-NLS-2$
 
     // Layer 1
     // Should always be empty.
@@ -37,23 +37,23 @@ public enum Protocol {
     /**
      * The description of the Ethernet II Protocol.
      */
-    ETHERNET_II("Ethernet II", "eth", ProtocolValues.LAYER_2, true), //$NON-NLS-1$ //$NON-NLS-2$
+    ETHERNET_II("Ethernet II", "eth", PcapProtocolValues.LAYER_2, true), //$NON-NLS-1$ //$NON-NLS-2$
 
     // Layer 3
     /**
      * The description of the Internet Protocol Version 4.
      */
-    IPV4("Internet Protocol Version 4", "ipv4", ProtocolValues.LAYER_3, true), //$NON-NLS-1$ //$NON-NLS-2$
+    IPV4("Internet Protocol Version 4", "ipv4", PcapProtocolValues.LAYER_3, true), //$NON-NLS-1$ //$NON-NLS-2$
 
     // Layer 4
     /**
      * The description of the Transmission Control Protocol.
      */
-    TCP("Transmission Control Protocol", "tcp", ProtocolValues.LAYER_4, true), //$NON-NLS-1$ //$NON-NLS-2$
+    TCP("Transmission Control Protocol", "tcp", PcapProtocolValues.LAYER_4, true), //$NON-NLS-1$ //$NON-NLS-2$
     /**
      * The description of the User Datagram Protocol.
      */
-    UDP("User Datagram Protocol", "udp", ProtocolValues.LAYER_4, true), //$NON-NLS-1$ //$NON-NLS-2$
+    UDP("User Datagram Protocol", "udp", PcapProtocolValues.LAYER_4, true), //$NON-NLS-1$ //$NON-NLS-2$
 
     // Layer 5
 
@@ -66,7 +66,7 @@ public enum Protocol {
      * a "payload packet". This is considered to be on layer 7 since its always
      * the most encapsulated packet if present.
      */
-    UNKNOWN("Payload", "???", ProtocolValues.LAYER_7, false); //$NON-NLS-1$ //$NON-NLS-2$
+    UNKNOWN("Payload", "???", PcapProtocolValues.LAYER_7, false); //$NON-NLS-1$ //$NON-NLS-2$
 
     // Fields
     private final String fName;
@@ -74,7 +74,7 @@ public enum Protocol {
     private final int fLayer;
     private final boolean fSupportsStream;
 
-    private Protocol(String name, String shortName, int layer, boolean supportsStream) {
+    private PcapProtocol(String name, String shortName, int layer, boolean supportsStream) {
         fName = name;
         fShortName = shortName;
         fLayer = layer;
@@ -128,14 +128,14 @@ public enum Protocol {
      *            The layer of the protocols.
      * @return The protocols on that layer.
      */
-    public static List<Protocol> getProtocolsOnLayer(int layer) {
+    public static List<PcapProtocol> getProtocolsOnLayer(int layer) {
 
-        if (layer > ProtocolValues.LAYER_7 || layer < ProtocolValues.LAYER_0) {
+        if (layer > PcapProtocolValues.LAYER_7 || layer < PcapProtocolValues.LAYER_0) {
             throw new IllegalArgumentException("The layer is invalid."); //$NON-NLS-1$
         }
 
-        List<Protocol> protocolsOnLayer = new ArrayList<>();
-        for (Protocol p : Protocol.values()) {
+        List<PcapProtocol> protocolsOnLayer = new ArrayList<>();
+        for (PcapProtocol p : PcapProtocol.values()) {
             if (p.getLayer() == layer) {
                 protocolsOnLayer.add(p);
             }
@@ -148,7 +148,7 @@ public enum Protocol {
      *
      * @return A list containing all the protocols.
      */
-    public static List<Protocol> getAllProtocols() {
-        return new ArrayList<>(Arrays.asList(Protocol.values()));
+    public static List<PcapProtocol> getAllProtocols() {
+        return new ArrayList<>(Arrays.asList(PcapProtocol.values()));
     }
 }

@@ -25,7 +25,7 @@ import org.eclipse.linuxtools.internal.pcap.core.filter.IPacketFilter;
 import org.eclipse.linuxtools.internal.pcap.core.filter.PacketFilterByProtocol;
 import org.eclipse.linuxtools.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.linuxtools.internal.pcap.core.packet.Packet;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.pcap.PcapPacket;
 import org.eclipse.linuxtools.internal.pcap.core.trace.BadPcapFileException;
 import org.eclipse.linuxtools.internal.pcap.core.trace.PcapFile;
@@ -38,7 +38,7 @@ import org.eclipse.linuxtools.internal.pcap.core.trace.PcapFile;
 public class PacketStreamBuilder {
 
     private final IPacketFilter fPacketFilter;
-    private final Protocol fProtocol;
+    private final PcapProtocol fProtocol;
 
     private final Map<Integer, PacketStream> fStreams;
     private final Map<ProtocolEndpointPair, Integer> fIDs;
@@ -50,7 +50,7 @@ public class PacketStreamBuilder {
      * @param protocol
      *            The protocol of the builder.
      */
-    public PacketStreamBuilder(Protocol protocol) {
+    public PacketStreamBuilder(PcapProtocol protocol) {
         fCurrentId = 0;
         fProtocol = protocol;
         fPacketFilter = new PacketFilterByProtocol(protocol);
@@ -129,7 +129,7 @@ public class PacketStreamBuilder {
      *
      * @return The protocol.
      */
-    public Protocol getProtocol() {
+    public PcapProtocol getProtocol() {
         return fProtocol;
     }
 

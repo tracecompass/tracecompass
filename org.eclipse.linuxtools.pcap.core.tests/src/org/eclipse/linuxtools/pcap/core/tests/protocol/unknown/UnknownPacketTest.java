@@ -23,7 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Map;
 
-import org.eclipse.linuxtools.internal.pcap.core.protocol.Protocol;
+import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.unknown.UnknownEndpoint;
 import org.eclipse.linuxtools.internal.pcap.core.protocol.unknown.UnknownPacket;
 import org.eclipse.linuxtools.internal.pcap.core.trace.BadPcapFileException;
@@ -84,9 +84,9 @@ public class UnknownPacketTest {
             UnknownPacket packet = new UnknownPacket(dummy, null, byteBuffer);
 
             // Protocol Testing
-            assertEquals(Protocol.UNKNOWN, packet.getProtocol());
-            assertTrue(packet.hasProtocol(Protocol.UNKNOWN));
-            assertFalse(packet.hasProtocol(Protocol.UDP));
+            assertEquals(PcapProtocol.UNKNOWN, packet.getProtocol());
+            assertTrue(packet.hasProtocol(PcapProtocol.UNKNOWN));
+            assertFalse(packet.hasProtocol(PcapProtocol.UDP));
 
             // Abstract methods Testing
             assertTrue(packet.validate());

@@ -21,7 +21,7 @@ import static org.junit.Assume.assumeTrue;
 
 import org.eclipse.linuxtools.internal.tmf.pcap.core.analysis.StreamListAnalysis;
 import org.eclipse.linuxtools.internal.tmf.pcap.core.event.TmfPacketStreamBuilder;
-import org.eclipse.linuxtools.internal.tmf.pcap.core.protocol.TmfProtocol;
+import org.eclipse.linuxtools.internal.tmf.pcap.core.protocol.TmfPcapProtocol;
 import org.eclipse.linuxtools.internal.tmf.pcap.core.trace.PcapTrace;
 import org.eclipse.linuxtools.pcap.core.tests.shared.PcapTestTrace;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
@@ -42,7 +42,7 @@ public class StreamListAnalysisTest {
     public void constructorTest() {
         try (StreamListAnalysis analysis = new StreamListAnalysis();) {
             analysis.setId(StreamListAnalysis.ID);
-            for (TmfProtocol protocol : TmfProtocol.getAllProtocols()) {
+            for (TmfPcapProtocol protocol : TmfPcapProtocol.getAllProtocols()) {
                 if (protocol.supportsStream()) {
                     assertNotNull(analysis.getBuilder(protocol));
                 }
@@ -93,28 +93,28 @@ public class StreamListAnalysisTest {
             analysis.waitForCompletion();
 
             // Verify that builders are not empty.
-            TmfPacketStreamBuilder builder = analysis.getBuilder(TmfProtocol.ETHERNET_II);
+            TmfPacketStreamBuilder builder = analysis.getBuilder(TmfPcapProtocol.ETHERNET_II);
             if (builder == null) {
                 fail("The PacketStreamBuilder is null!");
                 return;
             }
             assertEquals(1, builder.getNbStreams());
 
-            builder = analysis.getBuilder(TmfProtocol.IPV4);
+            builder = analysis.getBuilder(TmfPcapProtocol.IPV4);
             if (builder == null) {
                 fail("The PacketStreamBuilder is null!");
                 return;
             }
             assertEquals(3, builder.getNbStreams());
 
-            builder = analysis.getBuilder(TmfProtocol.TCP);
+            builder = analysis.getBuilder(TmfPcapProtocol.TCP);
             if (builder == null) {
                 fail("The PacketStreamBuilder is null!");
                 return;
             }
             assertEquals(2, builder.getNbStreams());
 
-            builder = analysis.getBuilder(TmfProtocol.UDP);
+            builder = analysis.getBuilder(TmfPcapProtocol.UDP);
             if (builder == null) {
                 fail("The PacketStreamBuilder is null!");
                 return;
