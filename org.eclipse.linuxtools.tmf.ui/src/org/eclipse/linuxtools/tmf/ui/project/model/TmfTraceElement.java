@@ -44,6 +44,7 @@ import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlEvent;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
+import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTraceProperties;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
@@ -83,7 +84,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
     private static final String sfName = Messages.TmfTraceElement_Name;
     private static final String sfPath = Messages.TmfTraceElement_Path;
     private static final String sfLocation = Messages.TmfTraceElement_Location;
-    private static final String sfEventType = Messages.TmfTraceElement_EventType;
+    private static final String sfTraceType = Messages.TmfTraceElement_EventType;
     private static final String sfIsLinked = Messages.TmfTraceElement_IsLinked;
     private static final String sfSourceLocation = Messages.TmfTraceElement_SourceLocation;
     private static final String sfTracePropertiesCategory = Messages.TmfTraceElement_TraceProperties;
@@ -91,7 +92,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
     private static final ReadOnlyTextPropertyDescriptor sfNameDescriptor = new ReadOnlyTextPropertyDescriptor(sfName, sfName);
     private static final ReadOnlyTextPropertyDescriptor sfPathDescriptor = new ReadOnlyTextPropertyDescriptor(sfPath, sfPath);
     private static final ReadOnlyTextPropertyDescriptor sfLocationDescriptor = new ReadOnlyTextPropertyDescriptor(sfLocation, sfLocation);
-    private static final ReadOnlyTextPropertyDescriptor sfTypeDescriptor = new ReadOnlyTextPropertyDescriptor(sfEventType, sfEventType);
+    private static final ReadOnlyTextPropertyDescriptor sfTypeDescriptor = new ReadOnlyTextPropertyDescriptor(sfTraceType, sfTraceType);
     private static final ReadOnlyTextPropertyDescriptor sfIsLinkedDescriptor = new ReadOnlyTextPropertyDescriptor(sfIsLinked, sfIsLinked);
     private static final ReadOnlyTextPropertyDescriptor sfSourceLocationDescriptor = new ReadOnlyTextPropertyDescriptor(sfSourceLocation, sfSourceLocation);
 
@@ -447,10 +448,12 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
             return ""; //$NON-NLS-1$
         }
 
-        if (sfEventType.equals(id)) {
+        if (sfTraceType.equals(id)) {
             if (getTraceType() != null) {
-                IConfigurationElement ce = sfTraceTypeAttributes.get(getTraceType());
-                return (ce != null) ? (getCategory(ce) + " : " + ce.getAttribute(TmfTraceType.NAME_ATTR)) : ""; //$NON-NLS-1$ //$NON-NLS-2$
+                TraceTypeHelper helper = TmfTraceType.getTraceTypeHelper(getTraceType());
+                if (helper != null) {
+                    return helper.getCategoryName() + " : " + helper.getName(); //$NON-NLS-1$
+                }
             }
             return ""; //$NON-NLS-1$
         }
@@ -464,17 +467,6 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         }
 
         return null;
-    }
-
-    private static String getCategory(IConfigurationElement ce) {
-        String categoryId = ce.getAttribute(TmfTraceType.CATEGORY_ATTR);
-        if (categoryId != null) {
-            IConfigurationElement category = sfTraceCategories.get(categoryId);
-            if (category != null) {
-                return category.getAttribute(TmfTraceType.NAME_ATTR);
-            }
-        }
-        return "[no category]"; //$NON-NLS-1$
     }
 
     @Override
