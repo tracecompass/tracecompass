@@ -31,6 +31,8 @@ import org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceC
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceControlRoot;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.service.ILttngControlService;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.service.LTTngControlService;
+import org.eclipse.linuxtools.internal.lttng2.control.ui.views.service.LTTngControlServiceConstants;
+import org.eclipse.linuxtools.internal.lttng2.control.ui.views.service.LTTngControlServiceMI;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
@@ -266,6 +268,12 @@ public class TraceControlComponentTest {
 
         TestRemoteSystemProxy proxy = new TestRemoteSystemProxy();
         ILttngControlService service = new LTTngControlService(proxy.createCommandShell());
+        fixture.setControlService(service);
+        result = fixture.getControlService();
+        assertNotNull(service);
+        assertEquals(service, result);
+
+        service = new LTTngControlServiceMI(proxy.createCommandShell(), LTTngControlServiceMI.class.getResource(LTTngControlServiceConstants.MI_XSD_FILENAME));
         fixture.setControlService(service);
         result = fixture.getControlService();
         assertNotNull(service);
