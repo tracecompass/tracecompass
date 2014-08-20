@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Ericsson
+ * Copyright (c) 2013, 2014 Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -69,7 +69,8 @@ public class IntegerDeclarationTest {
     }
 
     /**
-     * Test that IntegerDeclaration throws when constructing a signed 1 bit declaration
+     * Test that IntegerDeclaration throws when constructing a signed 1 bit
+     * declaration
      */
     @Test(expected = java.lang.IllegalArgumentException.class)
     public void testIntegerDeclarationIllegalArgSignedBit() {
@@ -82,7 +83,8 @@ public class IntegerDeclarationTest {
     }
 
     /**
-     * Test that IntegerDeclaration throws when constructing a invalid length declaration
+     * Test that IntegerDeclaration throws when constructing a invalid length
+     * declaration
      */
     @Test(expected = java.lang.IllegalArgumentException.class)
     public void testIntegerDeclarationIllegalArgBadLenght() {
@@ -92,6 +94,45 @@ public class IntegerDeclarationTest {
         ByteOrder byteOrder = ByteOrder.BIG_ENDIAN;
         Encoding encoding = Encoding.ASCII;
         IntegerDeclaration.createDeclaration(len, signed, base, byteOrder, encoding, "", 16);
+    }
+
+    /**
+     * Test the factory part more rigorously to make sure there are no
+     * regressions
+     */
+    @Test
+    public void testIntegerDeclarationBruteForce() {
+        ByteOrder[] bos = { ByteOrder.LITTLE_ENDIAN, ByteOrder.BIG_ENDIAN };
+        Encoding[] encodings = { Encoding.ASCII, Encoding.NONE, Encoding.UTF8 };
+        boolean[] signeds = { true, false }; // not a real word
+        String[] clocks = { "something", "" };
+        int[] bases = { 2, 4, 6, 8, 10, 12, 16 };
+        for (int len = 2; len < 65; len++) {
+            for (ByteOrder bo : bos) {
+                for (boolean signed : signeds) {
+                    for (int base : bases) {
+                        for (Encoding enc : encodings) {
+                            for (String clock : clocks) {
+                                assertNotNull(enc);
+                                assertNotNull(clock);
+                                IntegerDeclaration intDec = IntegerDeclaration.createDeclaration(len, signed, base, bo, enc, clock, 8);
+                                String title = Integer.toString(len) + " " + bo + " " + signed + " " + base + " " + enc;
+                                assertEquals(title, signed, intDec.isSigned());
+                                assertEquals(title, base, intDec.getBase());
+                                // at len 8 le and be are the same
+                                if (len != 8) {
+                                    assertEquals(title, bo, intDec.getByteOrder());
+                                }
+                                assertEquals(title, len, intDec.getLength());
+                                assertEquals(title, len, intDec.getMaximumSize());
+                                assertEquals(title, clock, intDec.getClock());
+                                assertEquals(title, !signed && len == 8, intDec.isUnsignedByte());
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -174,7 +215,6 @@ public class IntegerDeclarationTest {
         boolean result = fixture.isSigned();
         assertEquals(false, result);
     }
-
 
     /**
      * Run the String toString() method test.

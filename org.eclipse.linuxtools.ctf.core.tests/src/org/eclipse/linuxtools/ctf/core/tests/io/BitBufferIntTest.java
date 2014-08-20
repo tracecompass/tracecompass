@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Ericsson
+ * Copyright (c) 2013, 2014 Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -488,6 +488,45 @@ public class BitBufferIntTest {
      */
     @Test
     public void testPutInt_length0() throws CTFReaderException {
+        fixture.position(1);
+        fixture.putInt(0, 1);
+    }
+
+    /**
+     * Test {@link BitBuffer#putInt(int)} Little endian
+     *
+     * @throws CTFReaderException
+     *             Not expected
+     */
+    @Test
+    public void testPutIntLe() throws CTFReaderException {
+        fixture.setByteOrder(ByteOrder.LITTLE_ENDIAN);
+        fixture.position(1);
+        fixture.putInt(1);
+    }
+
+    /**
+     * Test {@link BitBuffer#putInt(int, int)} Little endian
+     *
+     * @throws CTFReaderException
+     *             Not expected
+     */
+    @Test
+    public void testPutIntLe_length1() throws CTFReaderException {
+        fixture.setByteOrder(ByteOrder.LITTLE_ENDIAN);
+        fixture.position(1);
+        fixture.putInt(1, 1);
+    }
+
+    /**
+     * Test {@link BitBuffer#putInt(int, int)} with length = 0. Little endian
+     *
+     * @throws CTFReaderException
+     *             Not expected
+     */
+    @Test
+    public void testPutIntLe_length0() throws CTFReaderException {
+        fixture.setByteOrder(ByteOrder.LITTLE_ENDIAN);
         fixture.position(1);
         fixture.putInt(0, 1);
     }

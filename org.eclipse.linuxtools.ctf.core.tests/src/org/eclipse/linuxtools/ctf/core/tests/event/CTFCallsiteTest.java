@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Ericsson
+ * Copyright (c) 2013, 2014 Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,13 @@
 package org.eclipse.linuxtools.ctf.core.tests.event;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.linuxtools.ctf.core.event.CTFCallsite;
 import org.junit.Test;
@@ -40,6 +44,35 @@ public class CTFCallsiteTest {
     public void constructorTest(){
         CTFCallsite cs = GenerateCS(0x01);
         assertNotNull(cs);
+    }
+
+    /**
+     * Test the getters
+     */
+    @Test
+    public void getterTest(){
+        CTFCallsite cs = GenerateCS(0x01);
+        assertEquals("ip", 1, cs.getIp());
+        assertEquals("ip", "event name", cs.getEventName());
+        assertEquals("ip", "file.java", cs.getFileName());
+        assertEquals("ip", "func name", cs.getFunctionName());
+    }
+
+    /**
+     * Test the hash code
+     */
+    @Test
+    public void hashCodeTest(){
+        CTFCallsite cs = GenerateCS(0x01);
+        Map<CTFCallsite, Object> test = new HashMap<>();
+        test.put(cs, new Object());
+        assertTrue(test.containsKey(cs));
+        assertTrue(test.containsKey(GenerateCS(0x01)));
+        assertFalse(test.containsKey(GenerateCS(0x02)));
+        assertFalse(test.containsKey(new CTFCallsite("event nam", "func name", 1, "file.java", 1)));
+        assertFalse(test.containsKey(new CTFCallsite("event name", "func nam", 1, "file.java", 1)));
+        assertFalse(test.containsKey(new CTFCallsite("event name", "func name", 1, "file.jav", 1)));
+        assertFalse(test.containsKey(new CTFCallsite("event name", "func name", 1, "file.java", 2)));
     }
 
     /**
