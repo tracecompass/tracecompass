@@ -444,7 +444,7 @@ public interface ITmfTrace extends ITmfEventProvider {
      * Creates a timestamp for this trace, using the transformation formula
      *
      * @param ts
-     *            The time in long with which to create the timestamp
+     *            The time in nanoseconds with which to create the timestamp
      * @return The new timestamp
      * @since 3.0
      */
