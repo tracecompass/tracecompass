@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2013 Intel Corporation, Ericsson
+ * Copyright (c) 2007, 2014 Intel Corporation, Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
+import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimePreferences;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
@@ -59,6 +61,12 @@ public class Utils {
          * @since 2.0
          */
         NUMBER,
+
+        /**
+         * Timestamp displayed as cycles
+         * @since 3.1
+         */
+        CYCLES
     }
 
     /**
@@ -80,6 +88,9 @@ public class Utils {
 
     private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss"); //$NON-NLS-1$
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd"); //$NON-NLS-1$
+    private static final long HOURS_PER_DAY = 24;
+    private static final long MIN_PER_HOUR = 60;
+    private static final long SEC_PER_MIN = 60;
     private static final long SEC_IN_NS = 1000000000;
     private static final long MILLISEC_IN_NS = 1000000;
 
@@ -251,8 +262,8 @@ public class Utils {
      * @param rect
      *            The rectangle object which is being drawn
      * @param transp
-     *            Should we transpose the color
-     * @return The X coordinate where we have written
+     *            If true the background will be transparent
+     * @return The width of the written text
      */
     public static int drawText(GC gc, String text, Rectangle rect, boolean transp) {
         Point size = gc.stringExtent(text);
@@ -272,8 +283,8 @@ public class Utils {
      * @param y
      *            the Y coordinate of the starting point
      * @param transp
-     *            Should we transpose the color
-     * @return The X coordinate where we have written
+     *            If true the background will be transparent
+     * @return The width of the written text
      */
     public static int drawText(GC gc, String text, int x, int y, boolean transp) {
         Point size = gc.stringExtent(text);
@@ -334,11 +345,15 @@ public class Utils {
      * @return the formatted time
      */
     public static String formatTime(long time, TimeFormat format, Resolution resolution) {
-        // if format is absolute (Calendar)
-        if (format == TimeFormat.CALENDAR) {
+        switch (format) {
+        case CALENDAR:
             return formatTimeAbs(time, resolution);
-        } else if (format == TimeFormat.NUMBER) {
+        case NUMBER:
             return NumberFormat.getInstance().format(time);
+        case CYCLES:
+            return NumberFormat.getInstance().format(time) + Messages.Utils_ClockCyclesUnit;
+        case RELATIVE:
+        default:
         }
 
         StringBuffer str = new StringBuffer();
@@ -391,6 +406,66 @@ public class Utils {
         // append the Milliseconds, MicroSeconds and NanoSeconds as specified in
         // the Resolution
         str.append(formatNs(time, res));
+        return str.toString();
+    }
+
+    /**
+     * Formats time delta
+     *
+     * @param delta
+     *            The time delta, in ns
+     * @param format
+     *            The time format to use
+     * @param resolution
+     *            The resolution to use
+     * @since 3.1
+     * @return the formatted time delta
+     */
+    public static String formatDelta(long delta, TimeFormat format, Resolution resolution) {
+        if (format == TimeFormat.CALENDAR) {
+            return formatDeltaAbs(delta, resolution);
+        }
+        return formatTime(delta, format, resolution);
+    }
+
+    /**
+     * Formats time delta in ns to Calendar format, only formatting the years,
+     * days, hours or minutes if necessary.
+     *
+     * @param delta
+     *            The time delta, in ns
+     * @param resolution
+     *            The resolution to use
+     * @return the formatted time delta
+     * @since 3.1
+     */
+    public static String formatDeltaAbs(long delta, Resolution resolution) {
+        StringBuffer str = new StringBuffer();
+        if (delta < 0) {
+            str.append('-');
+        }
+        long ns = Math.abs(delta);
+        long seconds = TimeUnit.NANOSECONDS.toSeconds(ns);
+        long minutes = TimeUnit.NANOSECONDS.toMinutes(ns);
+        long hours = TimeUnit.NANOSECONDS.toHours(ns);
+        long days = TimeUnit.NANOSECONDS.toDays(ns);
+        if (days > 0) {
+            str.append(days);
+            str.append("d "); //$NON-NLS-1$
+        }
+        if (hours > 0) {
+            str.append(hours % HOURS_PER_DAY);
+            str.append("h "); //$NON-NLS-1$
+        }
+        if (minutes > 0) {
+            str.append(minutes % MIN_PER_HOUR);
+            str.append("m "); //$NON-NLS-1$
+        }
+        str.append(seconds % SEC_PER_MIN);
+        str.append('.');
+        // append the ms, us and ns as specified in the resolution
+        str.append(formatNs(delta, resolution));
+        str.append("s"); //$NON-NLS-1$
         return str.toString();
     }
 

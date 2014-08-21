@@ -119,6 +119,8 @@ public class Messages extends NLS {
     public static String TmfTimeGraphViewer_FollowArrowBackwardActionNameText;
     public static String TmfTimeGraphViewer_FollowArrowBackwardActionToolTipText;
 
+    public static String Utils_ClockCyclesUnit;
+
     public static String ColorsView_AddActionToolTipText;
     public static String ColorsView_BackgroundButtonText;
     public static String ColorsView_BackgroundDialogText;
