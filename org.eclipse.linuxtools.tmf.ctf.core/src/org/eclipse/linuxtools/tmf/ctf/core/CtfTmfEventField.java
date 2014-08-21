@@ -132,20 +132,26 @@ public abstract class CtfTmfEventField extends TmfEventField {
             Collection<Definition> definitions = arrayDef.getDefinitions();
             elemType = arrDecl.getElementType();
             if (elemType instanceof IntegerDeclaration) {
-                /* Array of integers => CTFIntegerArrayField */
+                /* Array of integers => CTFIntegerArrayField, unless it's a CTFStringField */
                 IntegerDeclaration elemIntType = (IntegerDeclaration) elemType;
-                long[] values = new long[arrayDef.getLength()];
-                for (int i = 0; i < arrayDef.getLength(); i++) {
-                    IDefinition elem = arrayDef.getDefinitions().get(i);
-                    if (elem == null) {
-                        break;
+                /* Are the integers characters and encoded? */
+                if (elemIntType.isCharacter()) {
+                    /* it's a CTFStringField */
+                    field = new CTFStringField(fieldName, arrayDef.toString());
+                } else {
+                    /* it's a CTFIntegerArrayField */
+                    long[] values = new long[arrayDef.getLength()];
+                    for (int i = 0; i < arrayDef.getLength(); i++) {
+                        IDefinition elem = arrayDef.getDefinitions().get(i);
+                        if (elem == null) {
+                            break;
+                        }
+                        values[i] = ((IntegerDefinition) elem).getValue();
                     }
-                    values[i] = ((IntegerDefinition) elem).getValue();
+                    field = new CTFIntegerArrayField(fieldName, values,
+                            elemIntType.getBase(),
+                            elemIntType.isSigned());
                 }
-                field = new CTFIntegerArrayField(fieldName, values,
-                        elemIntType.getBase(),
-                        elemIntType.isSigned());
-
             } else {
                 /* Arrays of elements of any other type */
                 CtfTmfEventField[] elements = new CtfTmfEventField[arrayDef.getLength()];
