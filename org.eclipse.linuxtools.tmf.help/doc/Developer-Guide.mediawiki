@@ -4222,31 +4222,31 @@ Then we implement the methods:
 
 === Registering the UDP protocol ===
 
-The last step is to register the new protocol. There are three places where the protocol has to be registered. First, the parser has to know that a new protocol has been added. This is defined in the enum org.eclipse.linuxtools.pcap.core.protocol.Protocol. Simply add the protocol name here, along with a few arguments:
+The last step is to register the new protocol. There are three places where the protocol has to be registered. First, the parser has to know that a new protocol has been added. This is defined in the enum org.eclipse.linuxtools.pcap.core.protocol.PcapProtocol. Simply add the protocol name here, along with a few arguments:
 * ''String'' '''longname''', which is the long version of name of the protocol. In our case, it is "User Datagram Protocol".
 * ''String'' '''shortName''', which is the shortened name of the protocol. In our case, it is "UDP".
-* ''int'' '''layer''', which is the layer to which the protocol belongs in the OSI model. In our case, this is the layer 4.
+* ''Layer'' '''layer''', which is the layer to which the protocol belongs in the OSI model. In our case, this is the layer 4.
 * ''boolean'' '''supportsStream''', which defines whether or not the protocol supports packet streams. In our case, this is set to true.
 
-Thus, the following line is added in the Protocol enum:
+Thus, the following line is added in the PcapProtocol enum:
 <pre>
-    UDP("User Datagram Protocol", "udp", ProtocolValues.LAYER_4, true),
+    UDP("User Datagram Protocol", "udp", Layer.LAYER_4, true),
 </pre>
 
-Also, TMF has to know about the new protocol. This is defined in org.eclipse.linuxtools.tmf.pcap.core.protocol.TmfProtocol. We simply add it with the '''EXACT SAME NAME''' as in the Protocol enum. Thus, the following line is added in the TmfProtocol enum:
+Also, TMF has to know about the new protocol. This is defined in org.eclipse.linuxtools.tmf.pcap.core.protocol.TmfPcapProtocol. We simply add it, with a reference to the corresponding protocol in PcapProtocol. Thus, the following line is added in the TmfPcapProtocol enum:
 <pre>
-    UDP,
+    UDP(PcapProtocol.UDP),
 </pre>
 
 You will also have to update the ''ProtocolConversion'' class to register the protocol in the switch statements. Thus, for UDP, we add:
 <pre>
     case UDP:
-        return TmfProtocol.UDP;
+        return TmfPcapProtocol.UDP;
 </pre>
 and
 <pre>
     case UDP:
-        return Protocol.UDP;
+        return PcapProtocol.UDP;
 </pre>
 
 Finally, all the protocols that could be the parent of the new protocol (in our case, IPv4 and IPv6) have to be notified of the new protocol. This is done by modifying the findChildPacket() method of the packet class of those protocols. For instance, in IPv4Packet, we add a case in the switch statement of findChildPacket, if the Protocol number matches UDP's protocol number at the network layer:
