@@ -27,10 +27,6 @@
                applies="true"
                class="org.eclipse.linuxtools.internal.tmf.pcap.core.trace.PcapTrace">
          </tracetype>
-         <tracetype
-               applies="true"
-               class="org.eclipse.linuxtools.tmf.core.trace.TmfExperiment">
-         </tracetype>
       </module>
    </extension>
 
