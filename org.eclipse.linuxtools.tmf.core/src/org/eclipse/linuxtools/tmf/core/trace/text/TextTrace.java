@@ -16,6 +16,8 @@ package org.eclipse.linuxtools.tmf.core.trace.text;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -72,9 +74,11 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
     /**
      * {@inheritDoc}
      * <p>
-     * The default implementation computes the confidence as the percentage of
-     * lines in the first 100 lines of the file which match the first line
-     * pattern.
+     * The default implementation computes the confidence as the sum of weighted
+     * values of the first 100 lines of the file which match any of the provided
+     * validation patterns. For each matching line a weighted value between 1.5
+     * and 2.0 is assigned based on the group count of the matching patterns.
+     * The higher the group count, the closer the weighted value will be to 2.0.
      */
     @Override
     public IStatus validate(IProject project, String path) {
@@ -90,11 +94,14 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
             int lineCount = 0;
             double matches = 0.0;
             String line = rafile.getNextLine();
+            List<Pattern> validationPatterns = getValidationPatterns();
             while ((line != null) && (lineCount++ < MAX_LINES)) {
-                Matcher matcher = getFirstLinePattern().matcher(line);
-                if (matcher.matches()) {
-                    int groupCount = matcher.groupCount();
-                    matches += (1.0 + groupCount / ((double) groupCount + 1));
+                for(Pattern pattern : validationPatterns) {
+                    Matcher matcher = pattern.matcher(line);
+                    if (matcher.matches()) {
+                        int groupCount = matcher.groupCount();
+                        matches += (1.0 + groupCount / ((double) groupCount + 1));
+                    }
                 }
                 confidence = (int) (MAX_CONFIDENCE * matches / lineCount);
                 line = rafile.getNextLine();
@@ -304,6 +311,18 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
      *            The line to parse
      */
     protected abstract void parseNextLine(T event, String line);
+
+    /**
+     * Returns a ordered list of validation patterns that will be used in
+     * the default {@link #validate(IProject, String)} method to match
+     * the first 100 to compute the confidence level
+     *
+     * @return collection of patterns to validate against
+     * @since 3.1
+     */
+    protected List<Pattern> getValidationPatterns() {
+        return Collections.singletonList(getFirstLinePattern());
+    }
 
     // ------------------------------------------------------------------------
     // Helper methods
