@@ -61,7 +61,6 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphCombo;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphRangeUpdateEvent;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphSelectionEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphTimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.TimeGraphViewer;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ILinkEvent;
@@ -848,13 +847,6 @@ public abstract class AbstractTimeGraphView extends TmfView {
                 TmfNanoTimestamp startTime = new TmfNanoTimestamp(event.getBeginTime());
                 TmfNanoTimestamp endTime = new TmfNanoTimestamp(event.getEndTime());
                 broadcast(new TmfTimeSynchSignal(AbstractTimeGraphView.this, startTime, endTime));
-            }
-        });
-
-        fTimeGraphWrapper.addSelectionListener(new ITimeGraphSelectionListener() {
-            @Override
-            public void selectionChanged(TimeGraphSelectionEvent event) {
-                // ITimeGraphEntry selection = event.getSelection();
             }
         });
 
