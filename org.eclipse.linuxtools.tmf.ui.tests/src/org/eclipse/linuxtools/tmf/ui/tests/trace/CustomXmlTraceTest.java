@@ -18,6 +18,7 @@ import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTraceDefinition.InputElement;
+import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 import org.junit.Before;
 
 /**
@@ -43,7 +44,7 @@ public abstract class CustomXmlTraceTest {
      */
     @Before
     public void init() {
-        cxtd = new CustomXmlTraceDefinition("test", new InputElement(), new ArrayList<OutputColumn>(), "s");
+        cxtd = new CustomXmlTraceDefinition(TmfTraceType.CUSTOM_XML_CATEGORY, "test", new InputElement(), new ArrayList<OutputColumn>(), "s");
         t = new CustomXmlTrace(cxtd);
     }
 

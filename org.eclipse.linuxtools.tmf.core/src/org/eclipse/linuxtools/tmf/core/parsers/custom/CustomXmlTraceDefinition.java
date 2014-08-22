@@ -84,8 +84,10 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
                     .append("org.eclipse.linuxtools.tmf.ui") //$NON-NLS-1$
                     .append(CUSTOM_XML_TRACE_DEFINITIONS_FILE_NAME).toString();
 
+    // TODO: These strings should not be externalized
     private static final String CUSTOM_XML_TRACE_DEFINITION_ROOT_ELEMENT = Messages.CustomXmlTraceDefinition_definitionRootElement;
     private static final String DEFINITION_ELEMENT = Messages.CustomXmlTraceDefinition_definition;
+    private static final String CATEGORY_ATTRIBUTE = Messages.CustomXmlTraceDefinition_category;
     private static final String NAME_ATTRIBUTE = Messages.CustomXmlTraceDefinition_name;
     private static final String LOG_ENTRY_ATTRIBUTE = Messages.CustomXmlTraceDefinition_logEntry;
     private static final String TIME_STAMP_OUTPUT_FORMAT_ELEMENT = Messages.CustomXmlTraceDefinition_timestampOutputFormat;
@@ -103,24 +105,50 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
      * Default constructor
      */
     public CustomXmlTraceDefinition() {
-        this("", null, new ArrayList<OutputColumn>(), ""); //$NON-NLS-1$ //$NON-NLS-2$
+        this(TmfTraceType.CUSTOM_XML_CATEGORY, "", null, new ArrayList<OutputColumn>(), ""); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /**
      * Full constructor
      *
-     * @param logtype
-     *            Type of trace type
+     * @param traceType
+     *            Name of the trace type
      * @param rootElement
      *            The top-level XML element
      * @param outputs
      *            The list of output columns
      * @param timeStampOutputFormat
      *            The timestamp format to use
+     * @deprecated Use {@link #CustomXmlTraceDefinition(String, String, InputElement, List, String)}
      */
-    public CustomXmlTraceDefinition(String logtype, InputElement rootElement,
+    @Deprecated
+    public CustomXmlTraceDefinition(String traceType, InputElement rootElement,
             List<OutputColumn> outputs, String timeStampOutputFormat) {
-        this.definitionName = logtype;
+        this.definitionName = traceType;
+        this.rootInputElement = rootElement;
+        this.outputs = outputs;
+        this.timeStampOutputFormat = timeStampOutputFormat;
+    }
+
+    /**
+     * Full constructor
+     *
+     * @param category
+     *            Category of the trace type
+     * @param traceType
+     *            Name of the trace type
+     * @param rootElement
+     *            The top-level XML element
+     * @param outputs
+     *            The list of output columns
+     * @param timeStampOutputFormat
+     *            The timestamp format to use
+     * @since 3.1
+     */
+    public CustomXmlTraceDefinition(String category, String traceType, InputElement rootElement,
+            List<OutputColumn> outputs, String timeStampOutputFormat) {
+        this.categoryName = category;
+        this.definitionName = traceType;
         this.rootInputElement = rootElement;
         this.outputs = outputs;
         this.timeStampOutputFormat = timeStampOutputFormat;
@@ -344,17 +372,13 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
 
             Element root = doc.getDocumentElement();
 
-            NodeList nodeList = root.getChildNodes();
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                if (node instanceof Element &&
-                        node.getNodeName().equals(DEFINITION_ELEMENT) &&
-                        definitionName.equals(((Element) node).getAttribute(NAME_ATTRIBUTE))) {
-                    root.removeChild(node);
-                }
+            Element oldDefinitionElement = findDefinitionElement(root, categoryName, definitionName);
+            if (oldDefinitionElement != null) {
+                root.removeChild(oldDefinitionElement);
             }
             Element definitionElement = doc.createElement(DEFINITION_ELEMENT);
             root.appendChild(definitionElement);
+            definitionElement.setAttribute(CATEGORY_ATTRIBUTE, categoryName);
             definitionElement.setAttribute(NAME_ATTRIBUTE, definitionName);
 
             Element formatElement = doc.createElement(TIME_STAMP_OUTPUT_FORMAT_ELEMENT);
@@ -386,7 +410,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
                 writer.write(xmlString);
             }
 
-            TmfTraceType.addCustomTraceType(TmfTraceType.CUSTOM_XML_CATEGORY, definitionName);
+            TmfTraceType.addCustomTraceType(categoryName, definitionName);
 
         } catch (ParserConfigurationException | TransformerFactoryConfigurationError | TransformerException | IOException | SAXException e) {
             Activator.logError("Error saving CustomXmlTraceDefinition: path=" + path, e); //$NON-NLS-1$
@@ -521,8 +545,24 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
      * @param definitionName
      *            Name of the XML trace definition to load
      * @return The loaded trace definition
+     * @deprecated Use {@link #load(String, String)}
      */
+    @Deprecated
     public static CustomXmlTraceDefinition load(String definitionName) {
+        return load(TmfTraceType.CUSTOM_XML_CATEGORY, definitionName);
+    }
+
+    /**
+     * Load the given trace definition.
+     *
+     * @param categoryName
+     *            Category of the definition to load
+     * @param definitionName
+     *            Name of the XML trace definition to load
+     * @return The loaded trace definition
+     * @since 3.1
+     */
+    public static CustomXmlTraceDefinition load(String categoryName, String definitionName) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
@@ -554,9 +594,9 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
                 }
             });
 
-            CustomXmlTraceDefinition value = lookupXmlDefinition(definitionName, db, CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME);
+            CustomXmlTraceDefinition value = lookupXmlDefinition(categoryName, definitionName, db, CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME);
             if (value == null) {
-                value = lookupXmlDefinition(definitionName, db, CUSTOM_XML_TRACE_DEFINITIONS_DEFAULT_PATH_NAME);
+                value = lookupXmlDefinition(categoryName, definitionName, db, CUSTOM_XML_TRACE_DEFINITIONS_DEFAULT_PATH_NAME);
             }
             return value;
         } catch (ParserConfigurationException | SAXException | IOException e) {
@@ -565,7 +605,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
         return null;
     }
 
-    private static CustomXmlTraceDefinition lookupXmlDefinition(String definitionName, DocumentBuilder db, String source) throws SAXException, IOException {
+    private static CustomXmlTraceDefinition lookupXmlDefinition(String categoryName, String definitionName, DocumentBuilder db, String source) throws SAXException, IOException {
         File file = new File(source);
         if (!file.exists()) {
             return null;
@@ -578,13 +618,28 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             return null;
         }
 
+        Element definitionElement = findDefinitionElement(root, categoryName, definitionName);
+        if (definitionElement != null) {
+            return extractDefinition(definitionElement);
+        }
+        return null;
+    }
+
+    private static Element findDefinitionElement(Element root, String categoryName, String definitionName) {
         NodeList nodeList = root.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
-            if (node instanceof Element &&
-                    node.getNodeName().equals(DEFINITION_ELEMENT) &&
-                    definitionName.equals(((Element) node).getAttribute(NAME_ATTRIBUTE))) {
-                return extractDefinition((Element) node);
+            if (node instanceof Element && node.getNodeName().equals(DEFINITION_ELEMENT)) {
+                Element element = (Element) node;
+                String categoryAttribute = element.getAttribute(CATEGORY_ATTRIBUTE);
+                if (categoryAttribute.isEmpty()) {
+                    categoryAttribute = TmfTraceType.CUSTOM_XML_CATEGORY;
+                }
+                String nameAttribute = element.getAttribute(NAME_ATTRIBUTE);
+                if (categoryName.equals(categoryAttribute) &&
+                        definitionName.equals(nameAttribute)) {
+                    return element;
+                }
             }
         }
         return null;
@@ -600,8 +655,12 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
     public static CustomXmlTraceDefinition extractDefinition(Element definitionElement) {
         CustomXmlTraceDefinition def = new CustomXmlTraceDefinition();
 
+        def.categoryName = definitionElement.getAttribute(CATEGORY_ATTRIBUTE);
+        if (def.categoryName.isEmpty()) {
+            def.categoryName = TmfTraceType.CUSTOM_XML_CATEGORY;
+        }
         def.definitionName = definitionElement.getAttribute(NAME_ATTRIBUTE);
-        if (def.definitionName == null) {
+        if (def.definitionName.isEmpty()) {
             return null;
         }
 
@@ -672,12 +731,27 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
     }
 
     /**
-     * Delete the given trace definition from the list of currently loaded ones.
+     * Delete a definition from the currently loaded ones.
      *
      * @param definitionName
-     *            Name of the trace definition to delete
+     *            The name of the definition to delete
+     * @deprecated Use {@link #delete(String, String)}
      */
+    @Deprecated
     public static void delete(String definitionName) {
+        delete(TmfTraceType.CUSTOM_XML_CATEGORY, definitionName);
+    }
+
+    /**
+     * Delete a definition from the currently loaded ones.
+     *
+     * @param categoryName
+     *            The category of the definition to delete
+     * @param definitionName
+     *            The name of the definition to delete
+     * @since 3.1
+     */
+    public static void delete(String categoryName, String definitionName) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
@@ -717,14 +791,9 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
                 return;
             }
 
-            NodeList nodeList = root.getChildNodes();
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                if (node instanceof Element &&
-                        node.getNodeName().equals(DEFINITION_ELEMENT) &&
-                        definitionName.equals(((Element) node).getAttribute(NAME_ATTRIBUTE))) {
-                    root.removeChild(node);
-                }
+            Element definitionElement = findDefinitionElement(root, categoryName, definitionName);
+            if (definitionElement != null) {
+                root.removeChild(definitionElement);
             }
 
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -740,9 +809,9 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
                 writer.write(xmlString);
             }
 
-            TmfTraceType.removeCustomTraceType(TmfTraceType.CUSTOM_XML_CATEGORY, definitionName);
+            TmfTraceType.removeCustomTraceType(categoryName, definitionName);
             // Check if default definition needs to be reloaded
-            TmfTraceType.addCustomTraceType(TmfTraceType.CUSTOM_XML_CATEGORY, definitionName);
+            TmfTraceType.addCustomTraceType(categoryName, definitionName);
 
         } catch (ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError | TransformerException e) {
             Activator.logError("Error deleteing CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$

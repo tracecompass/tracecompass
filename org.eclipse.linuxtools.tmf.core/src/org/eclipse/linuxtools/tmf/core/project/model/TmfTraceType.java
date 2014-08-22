@@ -318,13 +318,13 @@ public final class TmfTraceType {
 
         if (category.equals(CUSTOM_TXT_CATEGORY)) {
             traceTypeId = CustomTxtTrace.class.getCanonicalName() + SEPARATOR + definitionName;
-            CustomTxtTraceDefinition def = CustomTxtTraceDefinition.load(definitionName);
+            CustomTxtTraceDefinition def = CustomTxtTraceDefinition.load(category, definitionName);
             if (def != null) {
                 trace = new CustomTxtTrace(def);
             }
         } else if (category.equals(CUSTOM_XML_CATEGORY)) {
             traceTypeId = CustomXmlTrace.class.getCanonicalName() + SEPARATOR + definitionName;
-            CustomXmlTraceDefinition def = CustomXmlTraceDefinition.load(definitionName);
+            CustomXmlTraceDefinition def = CustomXmlTraceDefinition.load(category, definitionName);
             if (def != null) {
                 trace = new CustomXmlTrace(def);
             }

@@ -83,6 +83,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
 
     private static final String CUSTOM_TXT_TRACE_DEFINITION_ROOT_ELEMENT = Messages.CustomTxtTraceDefinition_definitionRootElement;
     private static final String DEFINITION_ELEMENT = Messages.CustomTxtTraceDefinition_definition;
+    private static final String CATEGORY_ATTRIBUTE = Messages.CustomTxtTraceDefinition_category;
     private static final String NAME_ATTRIBUTE = Messages.CustomTxtTraceDefinition_name;
     private static final String TIME_STAMP_OUTPUT_FORMAT_ELEMENT = Messages.CustomTxtTraceDefinition_timestampOutputFormat;
     private static final String INPUT_LINE_ELEMENT = Messages.CustomTxtTraceDefinition_inputLine;
@@ -99,13 +100,13 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
      * Default constructor.
      */
     public CustomTxtTraceDefinition() {
-        this("", new ArrayList<InputLine>(0), new ArrayList<OutputColumn>(0), ""); //$NON-NLS-1$ //$NON-NLS-2$
+        this(TmfTraceType.CUSTOM_TXT_CATEGORY, "", new ArrayList<InputLine>(0), new ArrayList<OutputColumn>(0), ""); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /**
      * Full constructor.
      *
-     * @param logtype
+     * @param traceType
      *            Name of the trace type
      * @param inputs
      *            List of inputs
@@ -113,10 +114,36 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
      *            List of output columns
      * @param timeStampOutputFormat
      *            The timestamp format to use
+     * @deprecated Use {@link #CustomTxtTraceDefinition(String, String, List, List, String)}
      */
-    public CustomTxtTraceDefinition(String logtype, List<InputLine> inputs,
+    @Deprecated
+    public CustomTxtTraceDefinition(String traceType, List<InputLine> inputs,
             List<OutputColumn> outputs, String timeStampOutputFormat) {
-        this.definitionName = logtype;
+        this.definitionName = traceType;
+        this.inputs = inputs;
+        this.outputs = outputs;
+        this.timeStampOutputFormat = timeStampOutputFormat;
+    }
+
+    /**
+     * Full constructor.
+     *
+     * @param category
+     *            Category of the trace type
+     * @param traceType
+     *            Name of the trace type
+     * @param inputs
+     *            List of inputs
+     * @param outputs
+     *            List of output columns
+     * @param timeStampOutputFormat
+     *            The timestamp format to use
+     * @since 3.1
+     */
+    public CustomTxtTraceDefinition(String category, String traceType, List<InputLine> inputs,
+            List<OutputColumn> outputs, String timeStampOutputFormat) {
+        this.categoryName = category;
+        this.definitionName = traceType;
         this.inputs = inputs;
         this.outputs = outputs;
         this.timeStampOutputFormat = timeStampOutputFormat;
@@ -483,17 +510,13 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
 
             Element root = doc.getDocumentElement();
 
-            NodeList nodeList = root.getChildNodes();
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                if (node instanceof Element &&
-                        node.getNodeName().equals(DEFINITION_ELEMENT) &&
-                        definitionName.equals(((Element) node).getAttribute(NAME_ATTRIBUTE))) {
-                    root.removeChild(node);
-                }
+            Element oldDefinitionElement = findDefinitionElement(root, categoryName, definitionName);
+            if (oldDefinitionElement != null) {
+                root.removeChild(oldDefinitionElement);
             }
             Element definitionElement = doc.createElement(DEFINITION_ELEMENT);
             root.appendChild(definitionElement);
+            definitionElement.setAttribute(CATEGORY_ATTRIBUTE, categoryName);
             definitionElement.setAttribute(NAME_ATTRIBUTE, definitionName);
 
             Element formatElement = doc.createElement(TIME_STAMP_OUTPUT_FORMAT_ELEMENT);
@@ -527,7 +550,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
                 writer.write(xmlString);
             }
 
-            TmfTraceType.addCustomTraceType(TmfTraceType.CUSTOM_TXT_CATEGORY, definitionName);
+            TmfTraceType.addCustomTraceType(categoryName, definitionName);
 
         } catch (ParserConfigurationException e) {
             Activator.logError("Error saving CustomTxtTraceDefinition: path=" + path, e); //$NON-NLS-1$
@@ -667,8 +690,24 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
      * @param definitionName
      *            Name of the definition to load
      * @return The loaded trace definition
+     * @deprecated Use {@link #load(String, String)}
      */
+    @Deprecated
     public static CustomTxtTraceDefinition load(String definitionName) {
+        return load(TmfTraceType.CUSTOM_TXT_CATEGORY, definitionName);
+    }
+
+    /**
+     * Load a single definition.
+     *
+     * @param categoryName
+     *            Category of the definition to load
+     * @param definitionName
+     *            Name of the definition to load
+     * @return The loaded trace definition
+     * @since 3.1
+     */
+    public static CustomTxtTraceDefinition load(String categoryName, String definitionName) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
@@ -679,9 +718,9 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             // The following catches xml parsing exceptions
             db.setErrorHandler(createErrorHandler());
 
-            CustomTxtTraceDefinition value = lookupDefinition(definitionName, db, CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME);
+            CustomTxtTraceDefinition value = lookupDefinition(categoryName, definitionName, db, CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME);
             if (value == null) {
-                return lookupDefinition(definitionName, db, CUSTOM_TXT_TRACE_DEFINITIONS_DEFAULT_PATH_NAME);
+                return lookupDefinition(categoryName, definitionName, db, CUSTOM_TXT_TRACE_DEFINITIONS_DEFAULT_PATH_NAME);
             }
             return value;
         } catch (ParserConfigurationException | SAXException | IOException e) {
@@ -690,7 +729,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
         return null;
     }
 
-    private static CustomTxtTraceDefinition lookupDefinition(String definitionName, DocumentBuilder db, String source) throws SAXException, IOException {
+    private static CustomTxtTraceDefinition lookupDefinition(String categoryName, String definitionName, DocumentBuilder db, String source) throws SAXException, IOException {
         File file = new File(source);
         if (!file.exists()) {
             return null;
@@ -702,13 +741,28 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             return null;
         }
 
+        Element definitionElement = findDefinitionElement(root, categoryName, definitionName);
+        if (definitionElement != null) {
+            return extractDefinition(definitionElement);
+        }
+        return null;
+    }
+
+    private static Element findDefinitionElement(Element root, String categoryName, String definitionName) {
         NodeList nodeList = root.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
-            if (node instanceof Element &&
-                    node.getNodeName().equals(DEFINITION_ELEMENT) &&
-                    definitionName.equals(((Element) node).getAttribute(NAME_ATTRIBUTE))) {
-                return extractDefinition((Element) node);
+            if (node instanceof Element && node.getNodeName().equals(DEFINITION_ELEMENT)) {
+                Element element = (Element) node;
+                String categoryAttribute = element.getAttribute(CATEGORY_ATTRIBUTE);
+                if (categoryAttribute.isEmpty()) {
+                    categoryAttribute = TmfTraceType.CUSTOM_TXT_CATEGORY;
+                }
+                String nameAttribute = element.getAttribute(NAME_ATTRIBUTE);
+                if (categoryName.equals(categoryAttribute) &&
+                        definitionName.equals(nameAttribute)) {
+                    return element;
+                }
             }
         }
         return null;
@@ -724,8 +778,12 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
     public static CustomTxtTraceDefinition extractDefinition(Element definitionElement) {
         CustomTxtTraceDefinition def = new CustomTxtTraceDefinition();
 
+        def.categoryName = definitionElement.getAttribute(CATEGORY_ATTRIBUTE);
+        if (def.categoryName.isEmpty()) {
+            def.categoryName = TmfTraceType.CUSTOM_TXT_CATEGORY;
+        }
         def.definitionName = definitionElement.getAttribute(NAME_ATTRIBUTE);
-        if (def.definitionName == null) {
+        if (def.definitionName.isEmpty()) {
             return null;
         }
 
@@ -792,8 +850,23 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
      *
      * @param definitionName
      *            The name of the definition to delete
+     * @deprecated Use {@link #delete(String, String)}
      */
+    @Deprecated
     public static void delete(String definitionName) {
+        delete(TmfTraceType.CUSTOM_TXT_CATEGORY, definitionName);
+    }
+
+    /**
+     * Delete a definition from the currently loaded ones.
+     *
+     * @param categoryName
+     *            The category of the definition to delete
+     * @param definitionName
+     *            The name of the definition to delete
+     * @since 3.1
+     */
+    public static void delete(String categoryName, String definitionName) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
@@ -812,14 +885,9 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
                 return;
             }
 
-            NodeList nodeList = root.getChildNodes();
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                if (node instanceof Element &&
-                        node.getNodeName().equals(DEFINITION_ELEMENT) &&
-                        definitionName.equals(((Element) node).getAttribute(NAME_ATTRIBUTE))) {
-                    root.removeChild(node);
-                }
+            Element definitionElement = findDefinitionElement(root, categoryName, definitionName);
+            if (definitionElement != null) {
+                root.removeChild(definitionElement);
             }
 
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -835,9 +903,9 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
                 writer.write(xmlString);
             }
 
-            TmfTraceType.removeCustomTraceType(TmfTraceType.CUSTOM_TXT_CATEGORY, definitionName);
+            TmfTraceType.removeCustomTraceType(categoryName, definitionName);
             // Check if default definition needs to be reloaded
-            TmfTraceType.addCustomTraceType(TmfTraceType.CUSTOM_TXT_CATEGORY, definitionName);
+            TmfTraceType.addCustomTraceType(categoryName, definitionName);
 
         } catch (ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError | TransformerException e) {
             Activator.logError("Error deleting CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$

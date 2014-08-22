@@ -23,11 +23,14 @@ public class Messages extends NLS {
 
     public static String CustomTrace_FileNotFound;
 
+    // TODO: These strings should not be externalized
     public static String CustomTraceDefinition_messageTag;
     public static String CustomTraceDefinition_otherTag;
     public static String CustomTraceDefinition_timestampTag;
     public static String CustomTxtTraceDefinition_action;
     public static String CustomTxtTraceDefinition_cardinality;
+    /** @since 3.1 */
+    public static String CustomTxtTraceDefinition_category;
     public static String CustomTxtTraceDefinition_definition;
     public static String CustomTxtTraceDefinition_definitionRootElement;
     public static String CustomTxtTraceDefinition_format;
@@ -41,6 +44,8 @@ public class Messages extends NLS {
     public static String CustomTxtTraceDefinition_timestampOutputFormat;
     public static String CustomXmlTraceDefinition_action;
     public static String CustomXmlTraceDefinition_attribute;
+    /** @since 3.1 */
+    public static String CustomXmlTraceDefinition_category;
     public static String CustomXmlTraceDefinition_definition;
     public static String CustomXmlTraceDefinition_definitionRootElement;
     public static String CustomXmlTraceDefinition_format;
