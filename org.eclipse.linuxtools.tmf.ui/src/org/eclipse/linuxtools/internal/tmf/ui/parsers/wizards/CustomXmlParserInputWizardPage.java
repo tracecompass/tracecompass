@@ -50,6 +50,8 @@ import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTraceDefinition.InputAttribute;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTraceDefinition.InputElement;
+import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
+import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
@@ -118,10 +120,12 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
     private final ISelection selection;
     private CustomXmlTraceDefinition definition;
+    private String editCategoryName;
     private String editDefinitionName;
     private String defaultDescription;
     private ElementNode selectedElement;
     private Composite container;
+    private Text categoryText;
     private Text logtypeText;
     private Text timeStampOutputFormatText;
     private Text timeStampPreviewText;
@@ -168,6 +172,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         this.selection = selection;
         this.definition = definition;
         if (definition != null) {
+            this.editCategoryName = definition.categoryName;
             this.editDefinitionName = definition.definitionName;
         }
     }
@@ -186,11 +191,11 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         headerComposite.setLayout(headerLayout);
         headerComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-        Label logtypeLabel = new Label(headerComposite, SWT.NULL);
-        logtypeLabel.setText(Messages.CustomXmlParserInputWizardPage_logType);
+        Label categoryLabel = new Label(headerComposite, SWT.NULL);
+        categoryLabel.setText(Messages.CustomXmlParserInputWizardPage_category);
 
-        logtypeText = new Text(headerComposite, SWT.BORDER | SWT.SINGLE);
-        logtypeText.setLayoutData(new GridData(120, SWT.DEFAULT));
+        categoryText = new Text(headerComposite, SWT.BORDER | SWT.SINGLE);
+        categoryText.setLayoutData(new GridData(120, SWT.DEFAULT));
 
         Label timeStampFormatLabel = new Label(headerComposite, SWT.NULL);
         timeStampFormatLabel.setText(Messages.CustomXmlParserInputWizardPage_timestampFormat);
@@ -216,8 +221,14 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             }
         });
 
+        Label logtypeLabel = new Label(headerComposite, SWT.NULL);
+        logtypeLabel.setText(Messages.CustomXmlParserInputWizardPage_logType);
+
+        logtypeText = new Text(headerComposite, SWT.BORDER | SWT.SINGLE);
+        logtypeText.setLayoutData(new GridData(120, SWT.DEFAULT));
+        logtypeText.setFocus();
+
         Label timeStampPreviewLabel = new Label(headerComposite, SWT.NULL);
-        timeStampPreviewLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 3, 1));
         timeStampPreviewLabel.setText(Messages.CustomXmlParserInputWizardPage_preview);
 
         timeStampPreviewText = new Text(headerComposite, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
@@ -268,6 +279,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         treeViewer.expandAll();
         elementContainer.layout();
 
+        categoryText.addModifyListener(updateListener);
         logtypeText.addModifyListener(updateListener);
         timeStampOutputFormatText.addModifyListener(updateListener);
 
@@ -607,6 +619,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     }
 
     private void loadDefinition(CustomXmlTraceDefinition def) {
+        categoryText.setText(def.categoryName);
         logtypeText.setText(def.definitionName);
         timeStampOutputFormatText.setText(def.timeStampOutputFormat);
         treeViewer.setInput(def);
@@ -1471,6 +1484,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     }
 
     private void validate() {
+        definition.categoryName = categoryText.getText().trim();
         definition.definitionName = logtypeText.getText().trim();
         definition.timeStampOutputFormat = timeStampOutputFormatText.getText().trim();
 
@@ -1481,14 +1495,28 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
         StringBuffer errors = new StringBuffer();
 
-        if (definition.definitionName.length() == 0) {
+        if (definition.categoryName.length() == 0) {
+            errors.append(Messages.CustomXmlParserInputWizardPage_emptyCategoryError);
+            categoryText.setBackground(COLOR_LIGHT_RED);
+        } else if (definition.definitionName.length() == 0) {
             errors.append(Messages.CustomXmlParserInputWizardPage_emptyLogTypeError);
             logtypeText.setBackground(COLOR_LIGHT_RED);
         } else {
+            categoryText.setBackground(COLOR_TEXT_BACKGROUND);
             logtypeText.setBackground(COLOR_TEXT_BACKGROUND);
-            for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
-                if (definition.definitionName.equals(def.definitionName) &&
-                        (editDefinitionName == null || !editDefinitionName.equals(definition.definitionName))) {
+            if (definition.categoryName.indexOf(':') != -1) {
+                errors.append(Messages.CustomXmlParserInputWizardPage_invalidCategoryError);
+                categoryText.setBackground(COLOR_LIGHT_RED);
+            }
+            if (definition.definitionName.indexOf(':') != -1) {
+                errors.append(Messages.CustomXmlParserInputWizardPage_invalidLogTypeError);
+                logtypeText.setBackground(COLOR_LIGHT_RED);
+            }
+            for (TraceTypeHelper helper : TmfTraceType.getTraceTypeHelpers()) {
+                if (definition.categoryName.equals(helper.getCategoryName()) &&
+                        definition.definitionName.equals(helper.getName()) &&
+                        (editDefinitionName == null || !editDefinitionName.equals(definition.definitionName)) &&
+                        (editCategoryName == null || !editCategoryName.equals(definition.categoryName))) {
                     errors.append(Messages.CustomXmlParserInputWizardPage_duplicatelogTypeError);
                     logtypeText.setBackground(COLOR_LIGHT_RED);
                     break;

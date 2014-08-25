@@ -624,6 +624,10 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
         Set<CustomTxtTraceDefinition> defs = new TreeSet<>(new Comparator<CustomTxtTraceDefinition>() {
             @Override
             public int compare(CustomTxtTraceDefinition o1, CustomTxtTraceDefinition o2) {
+                int result = o1.categoryName.compareTo(o2.categoryName);
+                if (result != 0) {
+                    return result;
+                }
                 return o1.definitionName.compareTo(o2.definitionName);
             }
         });

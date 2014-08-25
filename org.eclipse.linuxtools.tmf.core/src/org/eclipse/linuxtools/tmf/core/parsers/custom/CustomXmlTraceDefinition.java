@@ -481,9 +481,12 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
         }
 
         Set<CustomXmlTraceDefinition> defs = new TreeSet<>(new Comparator<CustomXmlTraceDefinition>() {
-
             @Override
             public int compare(CustomXmlTraceDefinition o1, CustomXmlTraceDefinition o2) {
+                int result = o1.categoryName.compareTo(o2.categoryName);
+                if (result != 0) {
+                    return result;
+                }
                 return o1.definitionName.compareTo(o2.definitionName);
             }
         });

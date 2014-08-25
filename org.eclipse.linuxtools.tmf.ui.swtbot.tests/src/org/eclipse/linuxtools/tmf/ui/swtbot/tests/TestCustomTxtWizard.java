@@ -25,7 +25,6 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
@@ -74,7 +73,9 @@ public class TestCustomTxtWizard {
 
     private static final String MANAGE_CUSTOM_PARSERS_SHELL_TITLE = "Manage Custom Parsers";
     private static final String PROJECT_NAME = "Test";
-    private static final String EXPECTED_TEST_DEFINITION = "<Definition category=\"Custom Text\" name=\"Test\">\n" +
+    private static final String CATEGORY_NAME = "Test Category";
+    private static final String TRACETYPE_NAME = "Test Trace";
+    private static final String EXPECTED_TEST_DEFINITION = "<Definition category=\"Test Category\" name=\"Test Trace\">\n" +
             "<TimeStampOutputFormat>ss</TimeStampOutputFormat>\n" +
             "<InputLine>\n" +
             "<Cardinality max=\"2147483647\" min=\"0\"/>\n" +
@@ -143,7 +144,8 @@ public class TestCustomTxtWizard {
 
         fBot.button("New...").click();
 
-        fBot.textWithLabel("Log type:").setText(PROJECT_NAME);
+        fBot.textWithLabel("Category:").setText(CATEGORY_NAME);
+        fBot.textWithLabel("Trace type:").setText(TRACETYPE_NAME);
         fBot.textWithLabel("Time Stamp format:").setText("ss");
         fBot.comboBox(1).setSelection("Time Stamp");
         fBot.textWithLabel("format:").setText("ss");
@@ -173,13 +175,13 @@ public class TestCustomTxtWizard {
         fBot.button("Highlight All").click();
         fBot.button("Next >").click();
         fBot.button("Finish").click();
-        fBot.list().select(PROJECT_NAME);
-        String xmlPart = extractTestXml(xmlFile, TmfTraceType.CUSTOM_TXT_CATEGORY, PROJECT_NAME);
+        String xmlPart = extractTestXml(xmlFile, CATEGORY_NAME, TRACETYPE_NAME);
         assertEquals(EXPECTED_TEST_DEFINITION, xmlPart);
+        fBot.list().select(CATEGORY_NAME + " : " + TRACETYPE_NAME);
         fBot.button("Delete").click();
         fBot.button("Yes").click();
         fBot.button("Close").click();
-        xmlPart = extractTestXml(xmlFile, TmfTraceType.CUSTOM_TXT_CATEGORY, PROJECT_NAME);
+        xmlPart = extractTestXml(xmlFile, CATEGORY_NAME, TRACETYPE_NAME);
         assertEquals("", xmlPart);
 
         SWTBotUtil.deleteProject(PROJECT_NAME, fBot);
@@ -199,7 +201,7 @@ public class TestCustomTxtWizard {
         try (FileWriter fw = new FileWriter(xmlFile)) {
             String xmlContent = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
                     "<CustomTxtTraceDefinitionList>\n" +
-                    "<Definition name=\"Demo trace\">\n" +
+                    "<Definition category=\"Demo Category\" name=\"Demo trace\">\n" +
                     "<TimeStampOutputFormat>sss</TimeStampOutputFormat>\n" +
                     "<InputLine>\n" +
                     "<Cardinality max=\"2147483647\" min=\"0\"/>\n" +
@@ -242,10 +244,11 @@ public class TestCustomTxtWizard {
         assertNotNull(treeNode);
         treeNode.contextMenu("Manage Custom Parsers...").click();
         fBot.shell(MANAGE_CUSTOM_PARSERS_SHELL_TITLE).setFocus();
-        fBot.list().select("Demo trace");
+        fBot.list().select("Demo Category : Demo trace");
         fBot.button("Edit...").click();
 
-        fBot.textWithLabel("Log type:").setText(PROJECT_NAME);
+        fBot.textWithLabel("Category:").setText(CATEGORY_NAME);
+        fBot.textWithLabel("Trace type:").setText(TRACETYPE_NAME);
         fBot.textWithLabel("Time Stamp format:").setText("ss");
         fBot.comboBox(1).setSelection("Time Stamp");
         fBot.textWithLabel("format:").setText("ss");
@@ -274,13 +277,13 @@ public class TestCustomTxtWizard {
         fBot.button("Highlight All").click();
         fBot.button("Next >").click();
         fBot.button("Finish").click();
-        fBot.list().select(PROJECT_NAME);
-        String xmlPart = extractTestXml(xmlFile, TmfTraceType.CUSTOM_TXT_CATEGORY, PROJECT_NAME);
+        String xmlPart = extractTestXml(xmlFile, CATEGORY_NAME, TRACETYPE_NAME);
         assertEquals(EXPECTED_TEST_DEFINITION, xmlPart);
+        fBot.list().select(CATEGORY_NAME + " : " + TRACETYPE_NAME);
         fBot.button("Delete").click();
         fBot.button("Yes").click();
         fBot.button("Close").click();
-        xmlPart = extractTestXml(xmlFile, TmfTraceType.CUSTOM_TXT_CATEGORY, PROJECT_NAME);
+        xmlPart = extractTestXml(xmlFile, CATEGORY_NAME, TRACETYPE_NAME);
         assertEquals("", xmlPart);
 
         SWTBotUtil.deleteProject(PROJECT_NAME, fBot);
