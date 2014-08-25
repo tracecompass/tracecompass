@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 Ericsson
+ * Copyright (c) 2011, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
+ *   Bernd Hufmann - Add support for event collapsing
  ******************************************************************************/
 
 package org.eclipse.linuxtools.tmf.ui.viewers.events;
@@ -20,12 +21,16 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.linuxtools.internal.tmf.core.filter.TmfCollapseFilter;
 import org.eclipse.linuxtools.internal.tmf.ui.Activator;
 import org.eclipse.linuxtools.tmf.core.component.ITmfEventProvider;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
+import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
 import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
 import org.eclipse.linuxtools.tmf.core.request.ITmfEventRequest;
 import org.eclipse.linuxtools.tmf.core.request.TmfEventRequest;
+import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 
@@ -35,20 +40,34 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * This can help avoid re-reading the trace when the user scrolls a window,
  * for example.
  *
- * @version 1.0
  * @author Patrick Tasse
  */
 public class TmfEventsCache {
 
     /**
-     * The generic TMF Events table cached event
+     * The generic TMF Events table cached event.
      *
-     * @version 1.0
      * @author Patrick Tasse
      */
-    public static class CachedEvent {
+    public static class CachedEvent implements ITmfEvent {
+        /**
+         * Event reference.
+         *
+         * When {@link TmfCollapseFilter} is active then it's event reference
+         * of the first event of repeated events.
+         */
         ITmfEvent event;
+        /**
+         * Events rank.
+         *
+         * When {@link TmfCollapseFilter} is active then it's event rank of the
+         * first event of repeated events.
+         */
         long rank;
+        /**
+         * Number times event is repeated. Updated by using {@link TmfCollapseFilter}
+         */
+        long repeatCount;
 
         /**
          * Constructor for new cached events.
@@ -61,6 +80,62 @@ public class TmfEventsCache {
         public CachedEvent (ITmfEvent iTmfEvent, long rank) {
             this.event = iTmfEvent;
             this.rank = rank;
+        }
+        /**
+         * @since 3.1
+         */
+        @Override
+        public Object getAdapter(Class adapter) {
+            return event.getAdapter(adapter);
+        }
+        /**
+         * @since 3.1
+         */
+        @Override
+        public ITmfTrace getTrace() {
+            return event.getTrace();
+        }
+        /**
+         * @since 3.1
+         */
+        @Override
+        public long getRank() {
+            return event.getRank();
+        }
+        /**
+         * @since 3.1
+         */
+        @Override
+        public ITmfTimestamp getTimestamp() {
+            return event.getTimestamp();
+        }
+        /**
+         * @since 3.1
+         */
+        @Override
+        public String getSource() {
+            return event.getSource();
+        }
+        /**
+         * @since 3.1
+         */
+        @Override
+        public ITmfEventType getType() {
+            return event.getType();
+        }
+        /**
+         * @since 3.1
+         */
+        @Override
+        public ITmfEventField getContent() {
+            return event.getContent();
+        }
+        /**
+         * @since 3.1
+         */
+        @Override
+        public String getReference() {
+            return event.getReference();
         }
     }
 
@@ -187,6 +262,21 @@ public class TmfEventsCache {
         if ((fFilter != null) && ((index % fCacheSize) == 0)) {
             int i = index / fCacheSize;
             fFilterIndex.add(i, Integer.valueOf((int) rank));
+        }
+    }
+
+    /**
+     * Update event repeat count at index
+     *
+     * @param index
+     *            The index this event occupies in the cache
+     *
+     * @since 3.1
+     */
+    public synchronized void updateCollapsedEvent(int index) {
+        int i = index - fCacheStartIndex;
+        if (i < fCache.length) {
+            fCache[i].repeatCount++;
         }
     }
 
@@ -360,6 +450,10 @@ public class TmfEventsCache {
                             }
                             if (fFilter != null) {
                                 fTable.cacheUpdated(false);
+                            }
+                        } else if (((fFilter != null) && !fFilter.matches(event)) && (skipCount <= 0)) { // TODO fix duplicated call to matches()
+                            if ((count > 0) && (fFilter instanceof TmfCollapseFilter)) {
+                                fCache[count - 1].repeatCount++;
                             }
                         }
                         if (count >= fCache.length) {
