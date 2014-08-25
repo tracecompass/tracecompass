@@ -181,7 +181,7 @@ public class ImportHandler extends BaseControlViewHandler {
                                 TraceTypeHelper helper = null;
 
                                 try {
-                                    helper = TmfTraceTypeUIUtils.selectTraceType(file.getLocationURI().getPath(), null, null);
+                                    helper = TmfTraceTypeUIUtils.selectTraceType(file.getLocation().toOSString(), null, null);
                                 } catch (TmfTraceImportException e) {
                                     // the trace did not match any trace type
                                 }
@@ -307,7 +307,7 @@ public class ImportHandler extends BaseControlViewHandler {
                     monitor.setCanceled(true);
                     return;
                 }
-                String destination = folder.getLocation().addTrailingSeparator().append(sources[i].getName()).toString();
+                String destination = folder.getLocation().addTrailingSeparator().append(sources[i].getName()).toOSString();
                 subMonitor.setTaskName(Messages.TraceControl_DownloadTask + ' ' + traceName + '/' + sources[i].getName());
                 fsss.download(sources[i], destination, null, subMonitor.newChild(1));
             }
