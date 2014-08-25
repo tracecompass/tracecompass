@@ -94,8 +94,6 @@ public final class TmfTraceTypeUIUtils {
     /** Extension point attribute 'class' (attribute of other elements) */
     public static final String CLASS_ATTR = "class"; //$NON-NLS-1$
 
-    private static final char SEPARATOR = ':';
-
     private TmfTraceTypeUIUtils() {
     }
 
@@ -116,7 +114,8 @@ public final class TmfTraceTypeUIUtils {
      * Only return the leaves of the trace types. Ignore custom trace types.
      */
     private static boolean isUnique(TraceTypeHelper trace, List<Pair<Integer, TraceTypeHelper>> set) {
-        if (isCustomTraceId(trace.getCanonicalName())) {
+        if (trace.getTraceClass().equals(CustomTxtTrace.class) ||
+                trace.getTraceClass().equals(CustomXmlTrace.class)) {
             return true;
         }
         // check if the trace type is the leaf. we make an instance of the trace
@@ -130,22 +129,6 @@ public final class TmfTraceTypeUIUtils {
             }
         }
         return count == 0;
-    }
-
-    /**
-     * Is the trace type id a custom (user-defined) trace type. These are the
-     * traces like : text and xml defined by the custom trace wizard.
-     *
-     * @param traceTypeId
-     *            the trace type id
-     * @return true if the trace is a custom type
-     */
-    private static boolean isCustomTraceId(String traceTypeId) {
-        TraceTypeHelper traceType = TmfTraceType.getTraceType(traceTypeId);
-        if (traceType != null) {
-            return TmfTraceType.isCustomTrace(traceType.getCategoryName() + SEPARATOR + traceType.getName());
-        }
-        return false;
     }
 
     private static TraceTypeHelper getTraceTypeToSet(List<Pair<Integer, TraceTypeHelper>> candidates, Shell shell) {
@@ -185,7 +168,7 @@ public final class TmfTraceTypeUIUtils {
                 display.sleep();
             }
         }
-        return TmfTraceType.getTraceTypeHelper(candidatesToSet[0]);
+        return TmfTraceType.getTraceType(candidatesToSet[0]);
     }
 
     /**

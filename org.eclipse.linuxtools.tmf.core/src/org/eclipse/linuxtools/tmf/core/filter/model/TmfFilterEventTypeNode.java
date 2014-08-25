@@ -98,14 +98,14 @@ public class TmfFilterEventTypeNode extends TmfFilterTreeNode {
     }
 
     /**
-     * @return TBD
+     * @return the category and trace type name
      */
     public String getName() {
         return fName;
     }
 
     /**
-     * @param name TBD
+     * @param name the category and trace type name
      */
     public void setName(String name) {
         this.fName = name;

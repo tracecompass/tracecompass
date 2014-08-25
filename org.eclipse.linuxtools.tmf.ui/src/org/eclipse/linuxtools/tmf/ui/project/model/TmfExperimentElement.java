@@ -268,7 +268,7 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
         IPath location = resource.getLocation();
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         try {
-            String traceTypeId = trace.getResource().getPersistentProperty(TmfCommonConstants.TRACETYPE);
+            String traceTypeId = TmfTraceType.getTraceTypeId(trace.getResource());
             TraceTypeHelper traceType = TmfTraceType.getTraceType(traceTypeId);
 
             if (resource instanceof IFolder) {

@@ -204,14 +204,14 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
             if (getTraceType() != null) {
                 if (getTraceType().startsWith(CustomTxtTrace.class.getCanonicalName())) {
                     for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
-                        if (getTraceType().equals(CustomTxtTrace.class.getCanonicalName() + ":" + def.definitionName)) { //$NON-NLS-1$
+                        if (getTraceType().equals(CustomTxtTrace.class.getCanonicalName() + ':' + def.categoryName+ ':' + def.definitionName)) {
                             return new CustomTxtTrace(def);
                         }
                     }
                 }
                 if (getTraceType().startsWith(CustomXmlTrace.class.getCanonicalName())) {
                     for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
-                        if (getTraceType().equals(CustomXmlTrace.class.getCanonicalName() + ":" + def.definitionName)) { //$NON-NLS-1$
+                        if (getTraceType().equals(CustomXmlTrace.class.getCanonicalName() + ':' + def.categoryName+ ':' + def.definitionName)) {
                             return new CustomXmlTrace(def);
                         }
                     }
@@ -240,14 +240,14 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
             if (getTraceType() != null) {
                 if (getTraceType().startsWith(CustomTxtTrace.class.getCanonicalName())) {
                     for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
-                        if (getTraceType().equals(CustomTxtTrace.class.getCanonicalName() + ":" + def.definitionName)) { //$NON-NLS-1$
+                        if (getTraceType().equals(CustomTxtTrace.class.getCanonicalName() + ':' + def.categoryName+ ':' + def.definitionName)) {
                             return new CustomTxtEvent(def);
                         }
                     }
                 }
                 if (getTraceType().startsWith(CustomXmlTrace.class.getCanonicalName())) {
                     for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
-                        if (getTraceType().equals(CustomXmlTrace.class.getCanonicalName() + ":" + def.definitionName)) { //$NON-NLS-1$
+                        if (getTraceType().equals(CustomXmlTrace.class.getCanonicalName() + ':' + def.categoryName+ ':' + def.definitionName)) {
                             return new CustomXmlEvent(def);
                         }
                     }
@@ -450,7 +450,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
 
         if (sfTraceType.equals(id)) {
             if (getTraceType() != null) {
-                TraceTypeHelper helper = TmfTraceType.getTraceTypeHelper(getTraceType());
+                TraceTypeHelper helper = TmfTraceType.getTraceType(getTraceType());
                 if (helper != null) {
                     return helper.getCategoryName() + " : " + helper.getName(); //$NON-NLS-1$
                 }
