@@ -664,15 +664,18 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             int rootLineMatches = 0;
             String firstEntryTimeStamp = null;
             String firstEntryTimeStampInputFormat = null;
-            String log = null;
-            event: while (scanner.hasNext()) {
+            String line = null;
+            boolean lineIsNull = true; // needed because of JDT bug with continue at label
+            event: while (scanner.hasNext() || !lineIsNull) {
                 if (rootLineMatches > 0 && !updateAll) {
                     break;
                 }
-                if (log == null) {
-                    log = scanner.next();
+                if (line == null) {
+                    line = scanner.next();
+                    lineIsNull = false;
                 }
-                int length = log.length();
+                int length = line.length();
+                String log = line.replaceAll("\r", ""); //$NON-NLS-1$ //$NON-NLS-2$
                 for (InputLine rootInputLine : definition.inputs) {
                     Pattern pattern;
                     try {
@@ -700,12 +703,17 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                         }
                         rawPos += length + 1; // +1 for \n
                         while (scanner.hasNext()) {
-                            log = scanner.next();
-                            length = log.length();
+                            line = scanner.next();
+                            length = line.length();
+                            log = line.replaceAll("\r", ""); //$NON-NLS-1$ //$NON-NLS-2$
                             boolean processed = false;
                             if (currentInput == null) {
                                 for (InputLine input : definition.inputs) {
-                                    matcher = input.getPattern().matcher(log);
+                                    try {
+                                        matcher = input.getPattern().matcher(log);
+                                    } catch (PatternSyntaxException e) {
+                                        continue;
+                                    }
                                     if (matcher.matches()) {
                                         continue event;
                                     }
@@ -806,7 +814,8 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                     }
                 }
                 rawPos += length + 1; // +1 for \n
-                log = null;
+                line = null;
+                lineIsNull = true;
             }
 
             if (rootLineMatches == 1) {
