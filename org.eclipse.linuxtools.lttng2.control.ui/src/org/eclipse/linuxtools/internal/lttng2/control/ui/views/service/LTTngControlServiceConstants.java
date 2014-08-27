@@ -362,11 +362,11 @@ public interface LTTngControlServiceConstants {
     /**
      * Pattern to match a probe address information (lttng list <session>)
      */
-    static final Pattern PROBE_ADDRESS_PATTERN = Pattern.compile("\\s+(addr)\\:\\s+(0x[0-9a-fA-F]{1,8})"); //$NON-NLS-1$
+    static final Pattern PROBE_ADDRESS_PATTERN = Pattern.compile("\\s+(addr)\\:\\s+(0x[0-9a-fA-F]{1,16})"); //$NON-NLS-1$
     /**
      * Pattern to match a probe OFFSET information (lttng list <session>)
      */
-    static final Pattern PROBE_OFFSET_PATTERN = Pattern.compile("\\s+(offset)\\:\\s+(0x[0-9a-fA-F]{1,8})"); //$NON-NLS-1$
+    static final Pattern PROBE_OFFSET_PATTERN = Pattern.compile("\\s+(offset)\\:\\s+(0x[0-9a-fA-F]{1,16})"); //$NON-NLS-1$
     /**
      * Pattern to match a probe SYMBOL information (lttng list <session>)
      */
