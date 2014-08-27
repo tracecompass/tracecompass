@@ -11,7 +11,7 @@
  *   Francis Giraldeau - Transform computation using synchronization graph
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.core.synchronization;
+package org.eclipse.linuxtools.internal.tmf.core.synchronization;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -46,12 +46,7 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
  * all traces.
  *
  * @author Geneviève Bastien
- * @since 3.0
- * @deprecated This class has been moved to internal. Use one of
- *             {@link SynchronizationAlgorithmFactory#getFullyIncrementalAlgorithm()}
- *             method to get this algorithm.
  */
-@Deprecated
 public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
 
     /**
