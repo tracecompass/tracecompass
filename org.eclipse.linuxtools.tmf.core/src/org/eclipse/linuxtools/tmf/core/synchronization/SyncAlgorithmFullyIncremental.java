@@ -340,20 +340,37 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
              * Lmin = alpha_min T + beta_max
              */
             if ((fLmax[0] != null) || (fLmin[0] != null)) {
-                fAlphamax = fLmax[1].getAlpha(fLmax[0]);
-                fBetamin = fLmax[1].getBeta(fAlphamax);
-                fAlphamin = fLmin[1].getAlpha(fLmin[0]);
-                fBetamax = fLmin[1].getBeta(fAlphamin);
-                fAlpha = fAlphamax.add(fAlphamin).divide(BigDecimal.valueOf(2), fMc);
-                fBeta = fBetamin.add(fBetamax).divide(BigDecimal.valueOf(2), fMc);
-                if ((fLmax[0] == null) || (fLmin[0] == null)) {
-                    setQuality(SyncQuality.APPROXIMATE);
-                }
-                else if (fAlphamax.compareTo(fAlphamin) > 0) {
-                    setQuality(SyncQuality.ACCURATE);
-                } else {
-                    /* Lines intersect, not good */
-                    setQuality(SyncQuality.FAIL);
+                /**
+                 * Do not recalculate synchronization after it is failed. We
+                 * keep the last not failed result.
+                 */
+                if (getQuality() != SyncQuality.FAIL) {
+                    BigDecimal alphamax = fLmax[1].getAlpha(fLmax[0]);
+                    BigDecimal alphamin = fLmin[1].getAlpha(fLmin[0]);
+                    SyncQuality quality = null;
+
+                    if ((fLmax[0] == null) || (fLmin[0] == null)) {
+                        quality = SyncQuality.APPROXIMATE;
+                    }
+                    else if (alphamax.compareTo(alphamin) > 0) {
+                        quality = SyncQuality.ACCURATE;
+                    } else {
+                        /* Lines intersect, not good */
+                        quality = SyncQuality.FAIL;
+                    }
+                    /*
+                     * Only calculate sync if this match does not cause failure
+                     * of synchronization
+                     */
+                    if (quality != SyncQuality.FAIL) {
+                        fAlphamax = alphamax;
+                        fBetamin = fLmax[1].getBeta(fAlphamax);
+                        fAlphamin = alphamin;
+                        fBetamax = fLmin[1].getBeta(fAlphamin);
+                        fAlpha = fAlphamax.add(fAlphamin).divide(BigDecimal.valueOf(2), fMc);
+                        fBeta = fBetamin.add(fBetamax).divide(BigDecimal.valueOf(2), fMc);
+                    }
+                    setQuality(quality);
                 }
             } else if (((fLmax[0] == null) && (fLmin[1] == null))
                     || ((fLmax[1] == null) && (fLmin[0] == null))) {
