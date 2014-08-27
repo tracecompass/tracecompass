@@ -818,20 +818,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 ICommandService cmdService = (ICommandService) activePage.getActiveEditor().getSite().getService(ICommandService.class);
                 try {
                     HashMap<String, Object> parameters = new HashMap<>();
-                    StringBuilder header = new StringBuilder();
-                    boolean needTab = false;
-                    for (TableColumn tc: fTable.getColumns()) {
-                        if (needTab) {
-                            header.append('\t');
-                        }
-                        header.append(tc.getText());
-                        needTab = true;
-                    }
                     Command command = cmdService.getCommand(ExportToTextCommandHandler.COMMAND_ID);
                     ParameterizedCommand cmd = ParameterizedCommand.generateCommand(command,parameters);
                     IEvaluationContext context = handlerService.getCurrentState();
-                    context.addVariable(ExportToTextCommandHandler.TMF_EVENT_TABLE_HEADER_ID, header.toString());
-                    context.addVariable(ExportToTextCommandHandler.TMF_EVENT_TABLE_PARAMETER_ID, TmfEventsTable.this);
+                    context.addVariable(ExportToTextCommandHandler.TMF_EVENT_TABLE_COLUMNS_ID, fColumns);
                     handlerService.executeCommandInContext(cmd, null, context);
                 } catch (ExecutionException e) {
                     displayException(e);
