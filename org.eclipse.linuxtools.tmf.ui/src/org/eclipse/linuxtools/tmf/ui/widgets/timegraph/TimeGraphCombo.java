@@ -681,9 +681,9 @@ public class TimeGraphCombo extends Composite {
                 fTimeGraphViewer.refresh();
                 fInhibitTreeSelection = false;
                 alignTreeItems(true);
-                // Reset selection to first entry
+                // Reset selection
                 if (fFilterDialog.getResult().length > 0) {
-                    setSelection((ITimeGraphEntry) fFilterDialog.getResult()[0]);
+                    setSelection(null);
                 }
             }
         }

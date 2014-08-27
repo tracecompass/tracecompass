@@ -33,6 +33,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -389,7 +390,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
      * this class typically need to override the getColumnText method if they
      * have more than one column to display
      */
-    protected static class TreeLabelProvider implements ITableLabelProvider {
+    protected static class TreeLabelProvider implements ITableLabelProvider, ILabelProvider {
 
         @Override
         public void addListener(ILabelProviderListener listener) {
@@ -420,6 +421,23 @@ public abstract class AbstractTimeGraphView extends TmfView {
                 return entry.getName();
             }
             return new String();
+        }
+
+        /**
+         * @since 3.1
+         */
+        @Override
+        public Image getImage(Object element) {
+            return null;
+        }
+
+        /**
+         * @since 3.1
+         */
+        @Override
+        public String getText(Object element) {
+            TimeGraphEntry entry = (TimeGraphEntry) element;
+            return entry.getName();
         }
 
     }
