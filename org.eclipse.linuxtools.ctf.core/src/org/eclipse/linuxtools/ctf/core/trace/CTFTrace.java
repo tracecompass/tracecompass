@@ -270,7 +270,6 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
         return getStream(streamId).getEventDeclaration((int) id);
     }
 
-
     /**
      * Get an event by it's ID
      *
@@ -477,7 +476,6 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
         return (fPath != null) ? fPath.getPath() : ""; //$NON-NLS-1$
     }
 
-
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -522,7 +520,7 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
                 FileChannel fc = fis.getChannel()) {
             /* Map one memory page of 4 kiB */
             byteBuffer = fc.map(MapMode.READ_ONLY, 0, (int) Math.min(fc.size(), 4096L));
-            if( byteBuffer == null){
+            if (byteBuffer == null) {
                 throw new IllegalStateException("Failed to allocate memory"); //$NON-NLS-1$
             }
         } catch (IOException e) {
@@ -758,6 +756,7 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
 
     /**
      * Gets the current first packet start time
+     *
      * @return the current start time
      * @since 3.0
      */
@@ -773,6 +772,7 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
 
     /**
      * Gets the current last packet end time
+     *
      * @return the current end time
      * @since 3.0
      */
@@ -956,15 +956,21 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
      *             The file must exist
      * @since 3.0
      */
+    // TODO: remove suppress warning
+    @SuppressWarnings("resource")
     public void addStream(long id, File streamFile) throws CTFReaderException {
         CTFStream stream = null;
+        final File file = streamFile;
+        if (file == null) {
+            throw new CTFReaderException("cannot create a stream with no file"); //$NON-NLS-1$
+        }
         if (fStreams.containsKey(id)) {
             stream = fStreams.get(id);
         } else {
             stream = new CTFStream(this);
             fStreams.put(id, stream);
         }
-        stream.addInput(new CTFStreamInput(stream, streamFile));
+        stream.addInput(new CTFStreamInput(stream, file));
     }
 }
 

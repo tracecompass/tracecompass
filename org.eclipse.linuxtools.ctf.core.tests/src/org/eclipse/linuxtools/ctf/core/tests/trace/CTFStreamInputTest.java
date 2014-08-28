@@ -21,6 +21,7 @@ import static org.junit.Assume.assumeTrue;
 import java.io.File;
 import java.io.FilenameFilter;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.ctf.core.event.types.IDefinition;
 import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
@@ -55,9 +56,10 @@ public class CTFStreamInputTest {
         fixture.setTimestampEnd(1L);
     }
 
+    @NonNull
     private static File createFile() {
         File path = new File(testTrace.getPath());
-        return path.listFiles(new FilenameFilter() {
+        final File[] listFiles = path.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 if (name.contains("hann")) {
@@ -65,7 +67,11 @@ public class CTFStreamInputTest {
                 }
                 return false;
             }
-        })[0];
+        });
+        assertNotNull(listFiles);
+        final File returnFile = listFiles[0];
+        assertNotNull(returnFile);
+        return returnFile;
     }
 
     /**

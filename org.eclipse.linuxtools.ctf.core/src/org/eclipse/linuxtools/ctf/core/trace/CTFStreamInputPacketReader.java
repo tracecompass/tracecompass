@@ -13,6 +13,8 @@ package org.eclipse.linuxtools.ctf.core.trace;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel.MapMode;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -217,6 +219,14 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
     // Operations
     // ------------------------------------------------------------------------
 
+    @NonNull
+    private ByteBuffer getByteBufferAt(long position, long size) throws CTFReaderException, IOException {
+        MappedByteBuffer map = fStreamInputReader.getFc().map(MapMode.READ_ONLY, position, size);
+        if (map == null) {
+            throw new CTFReaderException("Failed to allocate mapped byte buffer"); //$NON-NLS-1$
+        }
+        return map;
+    }
     /**
      * Changes the current packet to the given one.
      *
@@ -235,7 +245,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
              */
             ByteBuffer bb = null;
             try {
-                bb = fStreamInputReader.getStreamInput().getByteBufferAt(
+                bb = getByteBufferAt(
                         fCurrentPacket.getOffsetBytes(),
                         (fCurrentPacket.getPacketSizeBits() + 7) / 8);
             } catch (IOException e) {
