@@ -646,7 +646,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
             String traceType = traceResource.getPersistentProperties().get(TmfCommonConstants.TRACETYPE);
             TraceTypeHelper traceTypeHelper = TmfTraceType.getTraceType(traceType);
             if (traceTypeHelper == null) {
-                traceTypeHelper = TmfTraceTypeUIUtils.selectTraceType(traceResource.getLocationURI().getPath(), null, null);
+                traceTypeHelper = TmfTraceTypeUIUtils.selectTraceType(traceResource.getLocation().toOSString(), null, null);
             }
             if (traceTypeHelper != null) {
                 TmfTraceTypeUIUtils.setTraceType(traceResource, traceTypeHelper);
