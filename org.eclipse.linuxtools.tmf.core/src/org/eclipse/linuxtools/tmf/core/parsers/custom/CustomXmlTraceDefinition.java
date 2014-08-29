@@ -460,11 +460,26 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
     }
 
     /**
-     * Load all the XML trace definitions in the default definitions file.
+     * Load all custom XML trace definitions, including the user-defined and
+     * default (built-in) parsers.
      *
      * @return The loaded trace definitions
      */
     public static CustomXmlTraceDefinition[] loadAll() {
+        return loadAll(true);
+    }
+
+    /**
+     * Load all custom XML trace definitions, including the user-defined and,
+     * optionally, the default (built-in) parsers.
+     *
+     * @param includeDefaults
+     *            if true, the default (built-in) parsers are included
+     *
+     * @return The loaded trace definitions
+     * @since 3.1
+     */
+    public static CustomXmlTraceDefinition[] loadAll(boolean includeDefaults) {
         File defaultFile = new File(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME);
         File legacyFile = new File(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME_LEGACY);
 
@@ -491,7 +506,9 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             }
         });
         defs.addAll(Arrays.asList(loadAll(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME)));
-        defs.addAll(Arrays.asList(loadAll(CUSTOM_XML_TRACE_DEFINITIONS_DEFAULT_PATH_NAME)));
+        if (includeDefaults) {
+            defs.addAll(Arrays.asList(loadAll(CUSTOM_XML_TRACE_DEFINITIONS_DEFAULT_PATH_NAME)));
+        }
         return defs.toArray(new CustomXmlTraceDefinition[0]);
     }
 

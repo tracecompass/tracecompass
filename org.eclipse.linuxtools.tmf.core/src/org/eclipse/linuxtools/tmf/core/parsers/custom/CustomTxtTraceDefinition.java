@@ -601,11 +601,26 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
     }
 
     /**
-     * Load the default text trace definitions file.
+     * Load all custom text trace definitions, including the user-defined and
+     * default (built-in) parsers.
      *
      * @return The loaded trace definitions
      */
     public static CustomTxtTraceDefinition[] loadAll() {
+        return loadAll(true);
+    }
+
+    /**
+     * Load all custom text trace definitions, including the user-defined and,
+     * optionally, the default (built-in) parsers.
+     *
+     * @param includeDefaults
+     *            if true, the default (built-in) parsers are included
+     *
+     * @return The loaded trace definitions
+     * @since 3.1
+     */
+    public static CustomTxtTraceDefinition[] loadAll(boolean includeDefaults) {
         File defaultFile = new File(CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME);
         File legacyFile = new File(CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME_LEGACY);
 
@@ -632,7 +647,9 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             }
         });
         defs.addAll(Arrays.asList(loadAll(CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME)));
-        defs.addAll(Arrays.asList(loadAll(CUSTOM_TXT_TRACE_DEFINITIONS_DEFAULT_PATH_NAME)));
+        if (includeDefaults) {
+            defs.addAll(Arrays.asList(loadAll(CUSTOM_TXT_TRACE_DEFINITIONS_DEFAULT_PATH_NAME)));
+        }
         return defs.toArray(new CustomTxtTraceDefinition[0]);
 
     }

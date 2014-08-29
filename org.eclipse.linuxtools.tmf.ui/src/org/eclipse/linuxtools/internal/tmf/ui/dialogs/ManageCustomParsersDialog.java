@@ -301,11 +301,11 @@ public class ManageCustomParsersDialog extends Dialog {
     private void fillParserList() {
         parserList.removeAll();
         if (txtButton.getSelection()) {
-            for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
+            for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll(false)) {
                 parserList.add(def.categoryName + SEP + def.definitionName);
             }
         } else if (xmlButton.getSelection()) {
-            for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
+            for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll(false)) {
                 parserList.add(def.categoryName + SEP + def.definitionName);
             }
         }
