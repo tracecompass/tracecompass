@@ -10,22 +10,20 @@
  *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng.alltests;
+package org.eclipse.linuxtools.tmf.core.tests.perf.synchronization;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * Master test suite for all Linux Tools LTTng performance tests.
+ * Performance tests for the synchronization classes
+ *
+ * @author Geneviève Bastien
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    org.eclipse.linuxtools.ctf.core.tests.perf.AllPerfTests.class,
-    org.eclipse.linuxtools.lttng2.kernel.core.tests.perf.AllPerfTests.class,
-    org.eclipse.linuxtools.pcap.core.tests.perf.AllPerfTests.class,
-    org.eclipse.linuxtools.tmf.core.tests.perf.AllPerfTests.class,
-    org.eclipse.linuxtools.tmf.ctf.core.tests.perf.AllPerfTests.class
+        TimestampTransformBenchmark.class
 })
-public class RunAllPerfTests {
+public class AllPerfTests {
 
 }
