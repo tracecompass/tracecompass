@@ -16,13 +16,13 @@ package org.eclipse.linuxtools.ctf.core.trace;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -517,48 +517,33 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
                     + streamFile.getPath());
         }
 
-        try (FileInputStream fis = new FileInputStream(streamFile);
-                FileChannel fc = fis.getChannel()) {
+        try (FileChannel fc = FileChannel.open(streamFile.toPath(), StandardOpenOption.READ)) {
             /* Map one memory page of 4 kiB */
             byteBuffer = SafeMappedByteBuffer.map(fc, MapMode.READ_ONLY, 0, (int) Math.min(fc.size(), 4096L));
             if (byteBuffer == null) {
                 throw new IllegalStateException("Failed to allocate memory"); //$NON-NLS-1$
             }
+            /* Create a BitBuffer with this mapping and the trace byte order */
+            streamBitBuffer = new BitBuffer(byteBuffer, this.getByteOrder());
+
+            if (fPacketHeaderDecl != null) {
+                /* Read the packet header */
+                fPacketHeaderDef = fPacketHeaderDecl.createDefinition(this, LexicalScope.PACKET_HEADER, streamBitBuffer);
+            }
         } catch (IOException e) {
             /* Shouldn't happen at this stage if every other check passed */
             throw new CTFReaderException(e);
         }
+        if (fPacketHeaderDef != null) {
+            validateMagicNumber(fPacketHeaderDef);
 
-        /* Create a BitBuffer with this mapping and the trace byte order */
-        streamBitBuffer = new BitBuffer(byteBuffer, this.getByteOrder());
-
-        if (fPacketHeaderDecl != null) {
-            /* Read the packet header */
-            fPacketHeaderDef = fPacketHeaderDecl.createDefinition(this, LexicalScope.PACKET_HEADER, streamBitBuffer);
-
-            /* Check the magic number */
-            IntegerDefinition magicDef = (IntegerDefinition) fPacketHeaderDef.lookupDefinition("magic"); //$NON-NLS-1$
-            int magic = (int) magicDef.getValue();
-            if (magic != Utils.CTF_MAGIC) {
-                throw new CTFReaderException("CTF magic mismatch"); //$NON-NLS-1$
-            }
-
-            /* Check UUID */
-            IDefinition lookupDefinition = fPacketHeaderDef.lookupDefinition("uuid"); //$NON-NLS-1$
-            ArrayDefinition uuidDef = (ArrayDefinition) lookupDefinition;
-            if (uuidDef != null) {
-                UUID otheruuid = Utils.getUUIDfromDefinition(uuidDef);
-
-                if (!fUuid.equals(otheruuid)) {
-                    throw new CTFReaderException("UUID mismatch"); //$NON-NLS-1$
-                }
-            }
+            validateUUID(fPacketHeaderDef);
 
             /* Read the stream ID */
             IDefinition streamIDDef = fPacketHeaderDef.lookupDefinition("stream_id"); //$NON-NLS-1$
 
-            if (streamIDDef instanceof IntegerDefinition) { // this doubles as a
-                                                            // null check
+            if (streamIDDef instanceof IntegerDefinition) {
+                /* This doubles as a null check */
                 long streamID = ((IntegerDefinition) streamIDDef).getValue();
                 stream = fStreams.get(streamID);
             } else {
@@ -577,11 +562,29 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
 
         /*
          * Create the stream input and add a reference to the streamInput in the
-         * stream
+         * stream.
          */
         stream.addInput(new CTFStreamInput(stream, streamFile));
-
         return stream;
+    }
+
+    private void validateUUID(StructDefinition packetHeaderDef) throws CTFReaderException {
+        IDefinition lookupDefinition = packetHeaderDef.lookupDefinition("uuid"); //$NON-NLS-1$
+        ArrayDefinition uuidDef = (ArrayDefinition) lookupDefinition;
+        if (uuidDef != null) {
+            UUID otheruuid = Utils.getUUIDfromDefinition(uuidDef);
+            if (!fUuid.equals(otheruuid)) {
+                throw new CTFReaderException("UUID mismatch"); //$NON-NLS-1$
+            }
+        }
+    }
+
+    private static void validateMagicNumber(StructDefinition packetHeaderDef) throws CTFReaderException {
+        IntegerDefinition magicDef = (IntegerDefinition) packetHeaderDef.lookupDefinition("magic"); //$NON-NLS-1$
+        int magic = (int) magicDef.getValue();
+        if (magic != Utils.CTF_MAGIC) {
+            throw new CTFReaderException("CTF magic mismatch"); //$NON-NLS-1$
+        }
     }
 
     // ------------------------------------------------------------------------
