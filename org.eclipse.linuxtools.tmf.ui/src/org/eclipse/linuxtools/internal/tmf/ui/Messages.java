@@ -19,6 +19,9 @@ public class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "org.eclipse.linuxtools.internal.tmf.ui.messages"; //$NON-NLS-1$
 
+    public static String ManageCustomParsersDialog_ConflictMessage;
+    public static String ManageCustomParsersDialog_ConflictRenameButtonLabel;
+    public static String ManageCustomParsersDialog_ConflictSkipButtonLabel;
     public static String ManageCustomParsersDialog_DeleteButtonLabel;
     public static String ManageCustomParsersDialog_DeleteConfirmation;
     public static String ManageCustomParsersDialog_DeleteParserDialogHeader;

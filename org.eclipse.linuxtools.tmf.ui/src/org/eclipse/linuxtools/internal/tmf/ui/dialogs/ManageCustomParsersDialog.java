@@ -24,6 +24,9 @@ import org.eclipse.linuxtools.internal.tmf.ui.parsers.wizards.CustomXmlParserWiz
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTraceDefinition;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTxtTraceDefinition;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTraceDefinition;
+import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
+import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -248,7 +251,10 @@ public class ManageCustomParsersDialog extends Dialog {
                     }
                     if (defs != null && defs.length > 0) {
                         for (CustomTraceDefinition def : defs) {
-                            def.save();
+                            boolean ok = checkNameConflict(def);
+                            if (ok) {
+                                def.save();
+                            }
                         }
                         fillParserList();
                     }
@@ -314,4 +320,48 @@ public class ManageCustomParsersDialog extends Dialog {
         exportButton.setEnabled(false);
     }
 
+    private boolean checkNameConflict(CustomTraceDefinition def) {
+        for (TraceTypeHelper helper : TmfTraceType.getTraceTypeHelpers()) {
+            if (def.categoryName.equals(helper.getCategoryName()) &&
+                    def.definitionName.equals(helper.getName())) {
+                String newName = findAvailableName(def);
+                MessageDialog dialog = new MessageDialog(
+                        getShell(),
+                        null,
+                        null,
+                        NLS.bind(Messages.ManageCustomParsersDialog_ConflictMessage,
+                                new Object[] { def.categoryName, def.definitionName, newName}),
+                        MessageDialog.QUESTION,
+                        new String[] { Messages.ManageCustomParsersDialog_ConflictRenameButtonLabel,
+                            Messages.ManageCustomParsersDialog_ConflictSkipButtonLabel },
+                        0);
+                int result = dialog.open();
+                if (result == 0) {
+                    def.definitionName = newName;
+                    return true;
+                }
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static String findAvailableName(CustomTraceDefinition def) {
+        int i = 2;
+        Iterable<TraceTypeHelper> helpers = TmfTraceType.getTraceTypeHelpers();
+        while (true) {
+            String newName = def.definitionName + '(' + Integer.toString(i++) + ')';
+            boolean available = true;
+            for (TraceTypeHelper helper : helpers) {
+                if (def.categoryName.equals(helper.getCategoryName()) &&
+                        newName.equals(helper.getName())) {
+                    available = false;
+                    break;
+                }
+            }
+            if (available) {
+                return newName;
+            }
+        }
+    }
 }
