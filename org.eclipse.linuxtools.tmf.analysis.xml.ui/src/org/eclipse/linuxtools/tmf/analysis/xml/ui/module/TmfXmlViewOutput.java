@@ -18,6 +18,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
+import org.eclipse.linuxtools.tmf.analysis.xml.ui.module.TmfXmlAnalysisOutputSource.ViewType;
 import org.eclipse.linuxtools.tmf.ui.analysis.TmfAnalysisViewOutput;
 import org.w3c.dom.Element;
 
@@ -34,6 +35,7 @@ import org.w3c.dom.Element;
 public class TmfXmlViewOutput extends TmfAnalysisViewOutput {
 
     private String fLabel = null;
+    private final @NonNull ViewType fViewType;
 
     /**
      * Constructor
@@ -42,7 +44,21 @@ public class TmfXmlViewOutput extends TmfAnalysisViewOutput {
      *            id of the view to display as output
      */
     public TmfXmlViewOutput(String viewid) {
+        this(viewid, ViewType.TIME_GRAPH_VIEW);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param viewid
+     *            id of the view to display as output
+     * @param viewType
+     *            type of view this output is for
+     * @since 1.1
+     */
+    public TmfXmlViewOutput(String viewid, @NonNull ViewType viewType) {
         super(viewid);
+        fViewType = viewType;
     }
 
     @Override
@@ -64,7 +80,7 @@ public class TmfXmlViewOutput extends TmfAnalysisViewOutput {
             if ((viewId == null) || (filePath == null)) {
                 return;
             }
-            Element viewElement = XmlUtils.getElementInFile(filePath, TmfXmlUiStrings.TIME_GRAPH_VIEW, viewId);
+            Element viewElement = XmlUtils.getElementInFile(filePath, fViewType.getXmlElem(), viewId);
             if (viewElement == null) {
                 return;
             }
