@@ -173,7 +173,9 @@ class CtfTraceManager {
     }
 
     public void removeIterator(CtfTmfContext context) {
-        fMap.remove(context);
+        try (CtfIterator removed = fMap.remove(context)) {
+        }
+
         fRandomAccess.remove(context);
     }
 
@@ -213,6 +215,7 @@ class CtfTraceManager {
         fRandomAccess.set(pos, context);
         final CtfIterator elem = fMap.remove(victim);
         fMap.put(context, elem);
+        victim.dispose();
         return elem;
     }
 
