@@ -40,7 +40,7 @@ import org.junit.Test;
 public class AnalysisBenchmark {
 
     private static final String TEST_ID = "org.eclipse.linuxtools#LTTng kernel analysis";
-    private static final int LOOP_COUNT = 10;
+    private static final int LOOP_COUNT = 25;
 
     /**
      * Run the benchmark with "trace2"
@@ -88,5 +88,6 @@ public class AnalysisBenchmark {
 
         }
         pm.commit();
+        testTrace.dispose();
     }
 }

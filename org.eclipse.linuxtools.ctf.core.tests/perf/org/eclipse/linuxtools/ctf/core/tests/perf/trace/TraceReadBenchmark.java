@@ -36,7 +36,7 @@ public class TraceReadBenchmark {
 
     private static final String TEST_SUITE_NAME = "CTF Read Benchmark";
     private static final String TEST_ID = "org.eclipse.linuxtools#" + TEST_SUITE_NAME;
-    private static final int LOOP_COUNT = 25;
+    private static final int LOOP_COUNT = 100;
 
     /**
      * Benchmark reading the trace "kernel"

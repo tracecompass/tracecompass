@@ -62,7 +62,7 @@ public class EventMatchingBenchmark {
         try (CtfTmfTrace trace1 = CtfTmfTestTrace.SYNC_SRC.getTrace();
                 CtfTmfTrace trace2 = CtfTmfTestTrace.SYNC_DEST.getTrace();) {
             Set<ITmfTrace> traces = ImmutableSet.of((ITmfTrace) trace1, trace2);
-            runCpuTest(traces, "Match TCP events", 40);
+            runCpuTest(traces, "Match TCP events", 100);
         }
     }
 
