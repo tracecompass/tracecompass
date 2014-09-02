@@ -14,7 +14,7 @@
 package org.eclipse.tracecompass.internal.tmf.core.synchronization;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -59,7 +59,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
     /** @Serial */
     private final List<ConvexHull> fSyncs;
 
-    private SyncSpanningTree fTree = null;
+    private transient SyncSpanningTree fTree = null;
 
     /**
      * Initialization of the attributes
@@ -211,35 +211,34 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
 
         private static final long serialVersionUID = 8309351175030935291L;
 
-        /**
-         * The list of meaningful points on the upper hull (received by the
-         * reference trace, below in a graph)
-         */
-        private final LinkedList<SyncPoint> fUpperBoundList = new LinkedList<>();
-
-        /**
-         * The list of meaninful points on the lower hull (sent by the reference
-         * trace, above in a graph)
-         */
-        private final LinkedList<SyncPoint> fLowerBoundList = new LinkedList<>();
-
-        /** Points forming the line with maximum slope */
-        private final SyncPoint[] fLmax;
-
-        /** Points forming the line with minimum slope */
-        private final SyncPoint[] fLmin;
+        private final String fReferenceHost;
+        private final String fOtherHost;
 
         /**
          * Slopes and ordinate at origin of respectively fLmin, fLmax and the
          * bisector
          */
         private BigDecimal fAlphamin, fBetamax, fAlphamax, fBetamin, fAlpha, fBeta;
-
         private int fNbMatches, fNbAccurateMatches;
-        private String fReferenceHost = "", fOtherHost = ""; //$NON-NLS-1$//$NON-NLS-2$
         private SyncQuality fQuality;
 
-        private Map<String, Object> fStats = new LinkedHashMap<>();
+        /**
+         * The list of meaningful points on the upper hull (received by the
+         * reference trace, below in a graph)
+         */
+        private transient LinkedList<SyncPoint> fUpperBoundList = new LinkedList<>();
+        /**
+         * The list of meaninful points on the lower hull (sent by the reference
+         * trace, above in a graph)
+         */
+        private transient LinkedList<SyncPoint> fLowerBoundList = new LinkedList<>();
+
+        /** Points forming the line with maximum slope */
+        private transient SyncPoint[] fLmax = new SyncPoint[2];
+        /** Points forming the line with minimum slope */
+        private transient SyncPoint[] fLmin = new SyncPoint[2];
+
+        private transient Map<String, Object> fStats = new LinkedHashMap<>();
 
         /**
          * Initialization of the attributes
@@ -257,8 +256,6 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
                 fReferenceHost = host1;
                 fOtherHost = host2;
             }
-            fLmax = new SyncPoint[2];
-            fLmin = new SyncPoint[2];
             fAlpha = BigDecimal.ONE;
             fAlphamax = BigDecimal.ONE;
             fAlphamin = BigDecimal.ONE;
@@ -516,19 +513,16 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
             return ((fReferenceHost.equals(hostId1) && fOtherHost.equals(hostId2)) || (fReferenceHost.equals(hostId2) && fOtherHost.equals(hostId1)));
         }
 
-        private void writeObject(ObjectOutputStream s)
-                throws IOException {
-            /*
-             * Remove calculation data because most of it is not serializable.
-             * We have the statistics anyway
-             */
-            fUpperBoundList.clear();
-            fLowerBoundList.clear();
-            fLmin[0] = null;
-            fLmin[1] = null;
-            fLmax[0] = null;
-            fLmax[1] = null;
-            s.defaultWriteObject();
+        private void readObject(ObjectInputStream stream)
+                throws IOException, ClassNotFoundException {
+            stream.defaultReadObject();
+
+            /* Initialize transient fields */
+            fUpperBoundList = new LinkedList<>();
+            fLowerBoundList = new LinkedList<>();
+            fLmax = new SyncPoint[2];
+            fLmin = new SyncPoint[2];
+            fStats = new LinkedHashMap<>();
         }
 
         @SuppressWarnings("nls")
@@ -609,15 +603,6 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
         public String toString() {
             return String.format("%s (%s,  %s)", this.getClass().getCanonicalName(), x, y); //$NON-NLS-1$
         }
-    }
-
-    private void writeObject(ObjectOutputStream s)
-            throws IOException {
-        /*
-         * Remove the tree because it is not serializable
-         */
-        fTree = null;
-        s.defaultWriteObject();
     }
 
 }
