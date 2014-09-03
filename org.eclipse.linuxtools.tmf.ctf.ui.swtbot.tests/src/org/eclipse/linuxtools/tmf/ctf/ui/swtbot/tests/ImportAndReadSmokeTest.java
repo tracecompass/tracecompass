@@ -16,6 +16,7 @@ package org.eclipse.linuxtools.tmf.ctf.ui.swtbot.tests;
 
 import static org.junit.Assert.assertNotNull;
 
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -60,7 +61,7 @@ public class ImportAndReadSmokeTest extends AbstractImportAndReadSmokeTest {
         batchImportSelectTrace();
         importFinish();
 
-        TmfEventsEditor tmfEd = openEditor();
+        TmfEventsEditor tmfEd = openEditor(new Path(TRACE_NAME));
 
         testHistogramView(getViewPart("Histogram"), tmfEd);
         testPropertyView(getViewPart("Properties"));
@@ -137,10 +138,5 @@ public class ImportAndReadSmokeTest extends AbstractImportAndReadSmokeTest {
     @Override
     protected String getProjectName() {
         return TRACE_PROJECT_NAME;
-    }
-
-    @Override
-    protected boolean supportsFolderStructure() {
-        return false;
     }
 }
