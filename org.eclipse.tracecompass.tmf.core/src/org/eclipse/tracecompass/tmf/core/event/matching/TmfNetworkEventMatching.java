@@ -108,14 +108,20 @@ public class TmfNetworkEventMatching extends TmfEventMatching {
     }
 
     @Override
-    public void matchEvent(ITmfEvent event, ITmfTrace trace) {
-        if (!(getEventDefinition(event.getTrace()) instanceof ITmfNetworkMatchDefinition)) {
-            return;
+    public synchronized void matchEvent(ITmfEvent event, ITmfTrace trace) {
+        ITmfNetworkMatchDefinition def = null;
+        Direction evType = null;
+        for (ITmfMatchEventDefinition oneDef : getEventDefinitions(event.getTrace())) {
+            if (oneDef instanceof ITmfNetworkMatchDefinition) {
+                def = (ITmfNetworkMatchDefinition) oneDef;
+                evType = def.getDirection(event);
+                if (evType != null) {
+                    break;
+                }
+            }
         }
-        ITmfNetworkMatchDefinition def = (ITmfNetworkMatchDefinition) getEventDefinition(event.getTrace());
 
-        Direction evType = def.getDirection(event);
-        if (evType == null) {
+        if (def == null || evType == null) {
             return;
         }
 

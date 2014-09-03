@@ -25,6 +25,10 @@ import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multimap;
+
 /**
  * Abstract class to extend to match certain type of events in a trace
  *
@@ -58,7 +62,7 @@ public abstract class TmfEventMatching implements ITmfEventMatching {
 
     private static final Map<MatchingType, List<ITmfMatchEventDefinition>> fMatchDefinitions = new HashMap<>();
 
-    private final Map<ITmfTrace, ITmfMatchEventDefinition> fMatchMap = new HashMap<>();
+    private final Multimap<ITmfTrace, ITmfMatchEventDefinition> fMatchMap = HashMultimap.create();
 
     /**
      * Constructor with multiple traces and a match processing object
@@ -95,14 +99,14 @@ public abstract class TmfEventMatching implements ITmfEventMatching {
     }
 
     /**
-     * Returns the match event definition corresponding to the trace
+     * Returns the match event definitions corresponding to the trace
      *
      * @param trace
      *            The trace
      * @return The match event definition object
      */
-    protected ITmfMatchEventDefinition getEventDefinition(ITmfTrace trace) {
-        return fMatchMap.get(trace);
+    protected Collection<ITmfMatchEventDefinition> getEventDefinitions(ITmfTrace trace) {
+        return ImmutableList.copyOf(fMatchMap.get(trace));
     }
 
     /**
@@ -120,7 +124,6 @@ public abstract class TmfEventMatching implements ITmfEventMatching {
             for (ITmfMatchEventDefinition def : deflist) {
                 if (def.canMatchTrace(trace)) {
                     fMatchMap.put(trace, def);
-                    break;
                 }
             }
         }
