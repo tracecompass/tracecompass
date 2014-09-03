@@ -139,7 +139,7 @@ public class CTFEventDefinitionTest {
         } else {
             assertNull(title, ed.getFields());
         }
-        assertTrue(title, ed.toString().startsWith("Event type: null\nTimestamp: 100"));
+        assertTrue(title, ed.toString().startsWith("Event type: null" + System.getProperty("line.separator") + "Timestamp: 100"));
     }
 
 }
