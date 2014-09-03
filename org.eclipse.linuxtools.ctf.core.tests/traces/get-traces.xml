@@ -10,16 +10,20 @@
 
 <project name="Extract Traces" default="main" >
 <target name="main">
-  <echo message="Attempting to download test traces"/>
-  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="sample-ctf-trace-20120412.tar.bz2" src="http://lttng.org/files/samples/sample-ctf-trace-20120412.tar.bz2"/>
-  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="trace2.tar.bz2" src="http://www.dorsal.polymtl.ca/~alexmont/data/trace2.tar.bz2"/>
-  <get ignoreerrors="true" maxtime="20" skipexisting="true" dest="kernel_vm.tar.bz2" src="http://www.dorsal.polymtl.ca/~alexmont/data/kernel_vm.tar.bz2" />
-  <get ignoreerrors="true" maxtime="20" skipexisting="true" dest="synctraces.tar.gz" src="http://www.dorsal.polymtl.ca/~gbastien/traces/synctraces.tar.gz" />
-  <get ignoreerrors="true" maxtime="200" skipexisting="true" dest="django-benchmark.tar.gz" src="http://www.dorsal.polymtl.ca/~gbastien/traces/django-benchmark.tgz" />
-  <get ignoreerrors="true" maxtime="20" skipexisting="true" dest="hello-lost.tar.bz2" src="http://www.dorsal.polymtl.ca/~alexmont/data/hello-lost.tar.bz2" />
-  <get ignoreerrors="true" maxtime="20" skipexisting="true" dest="cyg-profile.tar.bz2" src="http://www.dorsal.polymtl.ca/~alexmont/data/cyg-profile.tar.bz2" />
-  <get ignoreerrors="true" maxtime="20" skipexisting="true" dest="funky_trace.tar.bz2" src="http://www.dorsal.polymtl.ca/~alexmont/data/funky_trace.tar.bz2" />
-  <get ignoreerrors="true" maxtime="200" skipexisting="true" dest="testtraceExp.zip" src="http://secretaire.dorsal.polymtl.ca/~mattkhouzam/testTrace-200Overlap.zip" />
+  <condition property="failedCheckSum">
+    <not>
+      <and>
+        <checksum>
+          <fileset dir="." includes="*.tar.bz2" />
+          <fileset dir="." includes="*.tar.gz" />
+          <fileset dir="." includes="*.zip" />
+        </checksum>
+      </and>
+    </not>
+  </condition>
+	
+  <antcall target="deleteFailedCheckSumTraces"/>
+  <antcall target="downloadTraceFiles"/>
   <exec executable = "git" failifexecutionfails="false" timeout="20000">
     <arg value = "clone"/>
     <arg value = "https://github.com/efficios/ctf-testsuite.git"/>
@@ -45,6 +49,32 @@
   <antcall target="extractTraces"/>
 </target>
 
+<target name="deleteFailedCheckSumTraces" if="failedCheckSum">
+  <echo message="Some traces have failed the checksum tests. Deleting traces."/>
+  <delete verbose="true">
+    <fileset dir="." includes="*.tar.bz2" />
+    <fileset dir="." includes="*.tar.gz" />
+    <fileset dir="." includes="*.zip" />
+  </delete>
+</target>
+
+<target name="warnFailedCheckSum" if="failedCheckSum2">
+  <echo message="WARNING: Some downloaded traces failed the checkum."/>
+</target>
+
+<target name="downloadTraceFiles">
+  <echo message="Attempting to download test traces"/>
+  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="sample-ctf-trace-20120412.tar.bz2" src="http://lttng.org/files/samples/sample-ctf-trace-20120412.tar.bz2"/>
+  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="trace2.tar.bz2" src="http://www.dorsal.polymtl.ca/~alexmont/data/trace2.tar.bz2"/>
+  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="kernel_vm.tar.bz2" src="http://www.dorsal.polymtl.ca/~alexmont/data/kernel_vm.tar.bz2" />
+  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="synctraces.tar.gz" src="http://www.dorsal.polymtl.ca/~gbastien/traces/synctraces.tar.gz" />
+  <get ignoreerrors="true" maxtime="200" skipexisting="true" dest="django-benchmark.tar.gz" src="http://www.dorsal.polymtl.ca/~gbastien/traces/django-benchmark.tgz" />
+  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="hello-lost.tar.bz2" src="http://www.dorsal.polymtl.ca/~alexmont/data/hello-lost.tar.bz2" />
+  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="cyg-profile.tar.bz2" src="http://www.dorsal.polymtl.ca/~alexmont/data/cyg-profile.tar.bz2" />
+  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="funky_trace.tar.bz2" src="http://www.dorsal.polymtl.ca/~alexmont/data/funky_trace.tar.bz2" />
+  <get ignoreerrors="true" maxtime="200" skipexisting="true" dest="testtraceExp.zip" src="http://secretaire.dorsal.polymtl.ca/~mattkhouzam/testTrace-200Overlap.zip" />
+</target>
+
 <target name="pullTestSuite" if="testSuiteExists">
   <exec executable = "git" failifexecutionfails="false" dir="ctf-testsuite" timeout="20000">
     <arg value = "pull"/>
@@ -52,6 +82,18 @@
 </target>
 
 <target name="extractTraces" if="tracesExist">
+    <condition property="failedCheckSum2">
+      <not>
+        <and>
+          <checksum>
+            <fileset dir="." includes="*.tar.bz2" />
+            <fileset dir="." includes="*.tar.gz" />
+            <fileset dir="." includes="*.zip" />
+          </checksum>
+        </and>
+      </not>
+    </condition>
+    <antcall target="warnFailedCheckSum"/>
     <bunzip2 src="sample-ctf-trace-20120412.tar.bz2"/>
     <bunzip2 src="trace2.tar.bz2"/>
     <bunzip2 src="kernel_vm.tar.bz2" />

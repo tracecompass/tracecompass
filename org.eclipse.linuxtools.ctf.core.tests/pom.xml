@@ -86,16 +86,6 @@
             <phase>clean</phase>
             <configuration>
               <filesets>
-                <fileset>
-                  <directory>traces</directory>
-                  <includes>
-                    <include>*.tar*</include>
-                  </includes>
-                  <excludes>
-                    <exclude>*.xml</exclude>
-                    <exclude>*.sh</exclude>
-                  </excludes>
-                </fileset>
                 <fileset><directory>traces/ctf-testsuite</directory></fileset>
                 <fileset><directory>traces/cyg-profile</directory></fileset>
                 <fileset><directory>traces/django-benchmark</directory></fileset>
