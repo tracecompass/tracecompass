@@ -22,7 +22,7 @@
   <name>Linux Tools CTF Core Tests Plug-in</name>
   <groupId>org.eclipse.linuxtools.ctf</groupId>
   <artifactId>org.eclipse.linuxtools.ctf.core.tests</artifactId>
-  <version>3.0.0-SNAPSHOT</version>
+  <version>3.1.0-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
 
   <!-- Do not download the test traces if "maven.test.skip" is set -->

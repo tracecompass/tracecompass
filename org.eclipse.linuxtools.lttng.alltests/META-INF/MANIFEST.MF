@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 3.0.0.qualifier
+Bundle-Version: 3.1.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.linuxtools.lttng.alltests;singleton:=true
 Bundle-ActivationPolicy: lazy
@@ -16,20 +16,20 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.linuxtools.lttng2.control.core.tests;bundle-version="2.1.0",
  org.eclipse.linuxtools.lttng2.control.ui.tests;bundle-version="2.1.0",
  org.eclipse.linuxtools.lttng2.kernel.core.tests;bundle-version="2.1.0",
- org.eclipse.linuxtools.lttng2.kernel.ui.swtbot.tests;bundle-version="3.0.0",
+ org.eclipse.linuxtools.lttng2.kernel.ui.swtbot.tests;bundle-version="3.1.0",
  org.eclipse.linuxtools.lttng2.kernel.ui.tests;bundle-version="2.1.0",
  org.eclipse.linuxtools.lttng2.ust.core.tests;bundle-version="2.1.0",
  org.eclipse.linuxtools.lttng2.ust.ui.tests;bundle-version="2.1.0",
- org.eclipse.linuxtools.statesystem.core.tests;bundle-version="3.0.0",
+ org.eclipse.linuxtools.statesystem.core.tests;bundle-version="3.1.0",
  org.eclipse.linuxtools.tmf.core.tests;bundle-version="2.1.0",
- org.eclipse.linuxtools.tmf.ctf.core.tests;bundle-version="3.0.0",
- org.eclipse.linuxtools.tmf.ctf.ui.swtbot.tests;bundle-version="3.0.0",
- org.eclipse.linuxtools.tmf.ui.swtbot.tests;bundle-version="3.0.0",
+ org.eclipse.linuxtools.tmf.ctf.core.tests;bundle-version="3.1.0",
+ org.eclipse.linuxtools.tmf.ctf.ui.swtbot.tests;bundle-version="3.1.0",
+ org.eclipse.linuxtools.tmf.ui.swtbot.tests;bundle-version="3.1.0",
  org.eclipse.linuxtools.tmf.ui.tests;bundle-version="2.1.0",
- org.eclipse.linuxtools.ctf.parser.tests;bundle-version="3.0.0",
- org.eclipse.linuxtools.btf.core.tests;bundle-version="3.0.0",
- org.eclipse.linuxtools.tmf.analysis.xml.core.tests;bundle-version="1.0.0",
- org.eclipse.linuxtools.tmf.analysis.xml.ui.tests;bundle-version="1.0.0",
+ org.eclipse.linuxtools.ctf.parser.tests;bundle-version="3.1.0",
+ org.eclipse.linuxtools.btf.core.tests;bundle-version="3.1.0",
+ org.eclipse.linuxtools.tmf.analysis.xml.core.tests;bundle-version="1.1.0",
+ org.eclipse.linuxtools.tmf.analysis.xml.ui.tests;bundle-version="1.1.0",
  org.eclipse.linuxtools.pcap.core.tests;bundle-version="1.0.0",
  org.eclipse.linuxtools.tmf.pcap.core.tests;bundle-version="1.0.0",
  org.eclipse.linuxtools.tmf.pcap.ui.swtbot.tests;bundle-version="1.0.0"

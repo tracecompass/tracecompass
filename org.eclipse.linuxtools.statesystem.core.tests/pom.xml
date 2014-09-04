@@ -20,7 +20,7 @@
   </parent>
 
   <artifactId>org.eclipse.linuxtools.statesystem.core.tests</artifactId>
-  <version>3.0.0-SNAPSHOT</version>
+  <version>3.1.0-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
 
   <name>Linux Tools State System Core Tests Plug-in</name>

@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.linuxtools.tracing.rcp"
       label="%featureName"
-      version="1.0.0.qualifier"
+      version="1.1.0.qualifier"
       provider-name="%featureProvider"
       plugin="org.eclipse.linuxtools.tracing.rcp.branding"
       license-feature="org.eclipse.license"
@@ -29,7 +29,7 @@
       <import feature="org.eclipse.equinox.p2.core.feature" version="0.0.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.equinox.p2.extras.feature" version="0.0.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.help" version="0.0.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.linuxtools.tmf" version="2.0.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.linuxtools.tmf" version="3.1.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.platform" version="0.0.0" match="greaterOrEqual"/>
    </requires>
 
