@@ -82,6 +82,11 @@ public class Messages extends NLS {
     public static String TmfTimeFilterDialog_UNCHECK_SUBTREE;
 
     public static String TmfTimeTipHandler_DURATION;
+    public static String TmfTimeTipHandler_LINK_SOURCE;
+    public static String TmfTimeTipHandler_LINK_SOURCE_TIME;
+    public static String TmfTimeTipHandler_LINK_TARGET;
+    public static String TmfTimeTipHandler_LINK_TARGET_TIME;
+    public static String TmfTimeTipHandler_LINK_TIME;
     public static String TmfTimeTipHandler_TRACE_DATE;
     public static String TmfTimeTipHandler_TRACE_EVENT_TIME;
     public static String TmfTimeTipHandler_TRACE_START_TIME;

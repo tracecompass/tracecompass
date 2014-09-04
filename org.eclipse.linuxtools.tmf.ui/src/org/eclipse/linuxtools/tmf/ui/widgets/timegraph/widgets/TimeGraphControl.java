@@ -113,6 +113,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private static final double ZOOM_OUT_FACTOR = 1.25;
 
     private static final int SNAP_WIDTH = 2;
+    private static final int ARROW_HOVER_MAX_DIST = 5;
 
     private static final int NO_STATUS = -1;
 
@@ -1146,6 +1147,41 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
+     * Return the arrow event closest to the given point that is no further than
+     * a maximum distance.
+     *
+     * @param pt
+     *            a point in the widget
+     * @return The closest arrow event, or null if there is none close enough.
+     * @since 3.1
+     */
+    protected ILinkEvent getArrow(Point pt) {
+        if (fHideArrows) {
+            return null;
+        }
+        ILinkEvent linkEvent = null;
+        double minDistance = Double.MAX_VALUE;
+        for (ILinkEvent event : fItemData.fLinks) {
+            Rectangle rect = getArrowRectangle(new Rectangle(0, 0, 0, 0), event);
+            if (rect != null) {
+                int x1 = rect.x;
+                int y1 = rect.y;
+                int x2 = x1 + rect.width;
+                int y2 = y1 + rect.height;
+                double d = Utils.distance(pt.x, pt.y, x1, y1, x2, y2);
+                if (minDistance > d) {
+                    minDistance = d;
+                    linkEvent = event;
+                }
+            }
+        }
+        if (minDistance <= ARROW_HOVER_MAX_DIST) {
+            return linkEvent;
+        }
+        return null;
+    }
+
+    /**
      * @since 2.0
      */
     @Override
@@ -1560,15 +1596,19 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @since 2.1
      */
     protected void drawLink(ILinkEvent event, Rectangle bounds, ITimeDataProvider timeProvider, int nameSpace, GC gc) {
+        drawArrow(getColorScheme(), event, getArrowRectangle(bounds, event), gc);
+    }
+
+    private Rectangle getArrowRectangle(Rectangle bounds, ILinkEvent event) {
         int srcIndex = fItemData.findItemIndex(event.getEntry());
         int destIndex = fItemData.findItemIndex(event.getDestinationEntry());
 
         if ((srcIndex == -1) || (destIndex == -1)) {
-            return;
+            return null;
         }
 
-        Rectangle src = getStatesRect(bounds, srcIndex, nameSpace);
-        Rectangle dst = getStatesRect(bounds, destIndex, nameSpace);
+        Rectangle src = getStatesRect(bounds, srcIndex, fTimeProvider.getNameSpace());
+        Rectangle dst = getStatesRect(bounds, destIndex, fTimeProvider.getNameSpace());
 
         int x0 = getXForTime(event.getTime());
         int x1 = getXForTime(event.getTime() + event.getDuration());
@@ -1581,7 +1621,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
         int y0 = src.y + src.height / 2;
         int y1 = dst.y + dst.height / 2;
-        drawArrow(getColorScheme(), event, new Rectangle(x0, y0, x1 - x0, y1 - y0), gc);
+        return new Rectangle(x0, y0, x1 - x0, y1 - y0);
     }
 
     /**

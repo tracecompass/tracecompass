@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
+import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.NullTimeEvent;
@@ -240,6 +241,42 @@ public class TimeGraphTooltipHandler {
                 }
             }
 
+            private void fillValues(ILinkEvent linkEvent) {
+                addItem(Messages.TmfTimeTipHandler_LINK_SOURCE, linkEvent.getEntry().getName());
+                addItem(Messages.TmfTimeTipHandler_LINK_TARGET, linkEvent.getDestinationEntry().getName());
+
+                // This block receives a list of <String, String> values to be added to the tip table
+                Map<String, String> eventAddOns = fTimeGraphProvider.getEventHoverToolTipInfo(linkEvent);
+                if (eventAddOns != null) {
+                    for (Iterator<String> iter = eventAddOns.keySet().iterator(); iter.hasNext();) {
+                        String message = iter.next();
+                        addItem(message, eventAddOns.get(message));
+                    }
+                }
+                if (fTimeGraphProvider.displayTimesInTooltip()) {
+                    long sourceTime = linkEvent.getTime();
+                    long duration = linkEvent.getDuration();
+                    long targetTime = sourceTime + duration;
+
+                    Resolution res = Resolution.NANOSEC;
+                    TimeFormat tf = fTimeDataProvider.getTimeFormat();
+                    if (tf == TimeFormat.CALENDAR) {
+                        addItem(Messages.TmfTimeTipHandler_TRACE_DATE, Utils.formatDate(sourceTime));
+                    }
+                    if (duration > 0) {
+                        addItem(Messages.TmfTimeTipHandler_LINK_SOURCE_TIME, Utils.formatTime(sourceTime, tf, res));
+                        addItem(Messages.TmfTimeTipHandler_LINK_TARGET_TIME, Utils.formatTime(targetTime, tf, res));
+                        // Duration in relative format in any case
+                        if (tf == TimeFormat.CALENDAR) {
+                            tf = TimeFormat.RELATIVE;
+                        }
+                        addItem(Messages.TmfTimeTipHandler_DURATION, Utils.formatTime(duration, tf, res));
+                    } else {
+                        addItem(Messages.TmfTimeTipHandler_LINK_TIME, Utils.formatTime(sourceTime, tf, res));
+                    }
+                }
+            }
+
             @Override
             public void mouseHover(MouseEvent event) {
                 if ((event.stateMask & SWT.BUTTON_MASK) != 0) {
@@ -248,11 +285,19 @@ public class TimeGraphTooltipHandler {
                 Point pt = new Point(event.x, event.y);
                 TimeGraphControl timeGraphControl = (TimeGraphControl) event.widget;
                 createTooltipShell(timeGraphControl.getShell());
-                ITimeGraphEntry entry = timeGraphControl.getEntry(pt);
                 for (Control child : fTipComposite.getChildren()) {
                     child.dispose();
                 }
-                fillValues(pt, timeGraphControl, entry);
+                if ((event.stateMask & SWT.MODIFIER_MASK) != SWT.SHIFT) {
+                    ILinkEvent linkEvent = timeGraphControl.getArrow(pt);
+                    if (linkEvent != null) {
+                        fillValues(linkEvent);
+                    }
+                }
+                if (fTipComposite.getChildren().length == 0) {
+                    ITimeGraphEntry entry = timeGraphControl.getEntry(pt);
+                    fillValues(pt, timeGraphControl, entry);
+                }
                 if (fTipComposite.getChildren().length == 0) {
                     return;
                 }
