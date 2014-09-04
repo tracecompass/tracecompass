@@ -66,8 +66,22 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
      * The file name of the Synchronization
      *
      * @since 3.0
+     * @deprecated This file name shouldn't be used directly anymore. Instead,
+     *             all synchronization files have been moved to the
+     *             {@link #SYNCHRONIZATION_DIRECTORY} folder.
      */
+    @Deprecated
     public final static String SYNCHRONIZATION_FILE_NAME = "synchronization.bin"; //$NON-NLS-1$
+
+    /**
+     * The name of the directory containing trace synchronization data. This
+     * directory typically will be preserved when traces are synchronized.
+     * Analysis involved in synchronization can put their supplementary files in
+     * there so they are not deleted when synchronized traces are copied.
+     *
+     * @since 3.1
+     */
+    public final static String SYNCHRONIZATION_DIRECTORY = "sync_data"; //$NON-NLS-1$
 
     /**
      * The default index page size
@@ -94,6 +108,7 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
 
     /**
      * Default constructor
+     *
      * @since 3.0
      */
     public TmfExperiment() {
@@ -228,11 +243,7 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
         }
 
         if (resource != null) {
-            try {
-                this.synchronizeTraces();
-            } catch (TmfTraceException e) {
-                Activator.logError("Error synchronizing experiment", e); //$NON-NLS-1$
-            }
+            this.synchronizeTraces();
         }
     }
 
@@ -477,15 +488,48 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
     }
 
     /**
+     * Get the path to the folder in the supplementary file where
+     * synchronization-related data can be kept so they are not deleted when the
+     * experiment is synchronized. If the directory does not exist, it will be
+     * created. A return value of <code>null</code> means either the trace
+     * resource does not exist or supplementary resources cannot be kept.
+     *
+     * @return The path to the folder where synchronization-related
+     *         supplementary files can be kept or <code>null</code> if not
+     *         available.
+     * @since 3.1
+     */
+    public String getSynchronizationFolder() {
+        /* Set up the path to the synchronization file we'll use */
+        IResource resource = this.getResource();
+        String syncDirectory = null;
+
+        try {
+            /* get the directory where the file will be stored. */
+            if (resource != null) {
+                syncDirectory = resource.getPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER);
+                /* Create the synchronization data directory if not present */
+                if (syncDirectory != null) {
+                    syncDirectory = syncDirectory + File.separator + SYNCHRONIZATION_DIRECTORY;
+                    File syncDir = new File(syncDirectory);
+                    syncDir.mkdirs();
+                }
+            }
+        } catch (CoreException e) {
+            return null;
+        }
+
+        return syncDirectory;
+    }
+
+    /**
      * Synchronizes the traces of an experiment. By default it only tries to
      * read a synchronization file if it exists
      *
      * @return The synchronization object
-     * @throws TmfTraceException
-     *             propagate TmfTraceExceptions
      * @since 3.0
      */
-    public synchronized SynchronizationAlgorithm synchronizeTraces() throws TmfTraceException {
+    public synchronized SynchronizationAlgorithm synchronizeTraces() {
         return synchronizeTraces(false);
     }
 
@@ -496,26 +540,13 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
      *            Whether to actually synchronize or just try opening a sync
      *            file
      * @return The synchronization object
-     * @throws TmfTraceException
-     *             propagate TmfTraceExceptions
      * @since 3.0
      */
-    public synchronized SynchronizationAlgorithm synchronizeTraces(boolean doSync) throws TmfTraceException {
+    public synchronized SynchronizationAlgorithm synchronizeTraces(boolean doSync) {
 
-        /* Set up the path to the synchronization file we'll use */
-        IResource resource = this.getResource();
-        String supplDirectory = null;
+        String syncDirectory = getSynchronizationFolder();
 
-        try {
-            /* get the directory where the file will be stored. */
-            if (resource != null) {
-                supplDirectory = resource.getPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER);
-            }
-        } catch (CoreException e) {
-            throw new TmfTraceException(e.toString(), e);
-        }
-
-        final File syncFile = (supplDirectory != null) ? new File(supplDirectory + File.separator + SYNCHRONIZATION_FILE_NAME) : null;
+        final File syncFile = (syncDirectory != null) ? new File(syncDirectory + File.separator + SYNCHRONIZATION_FILE_NAME) : null;
 
         final SynchronizationAlgorithm syncAlgo = SynchronizationManager.synchronizeTraces(syncFile, Arrays.asList(fTraces), doSync);
 

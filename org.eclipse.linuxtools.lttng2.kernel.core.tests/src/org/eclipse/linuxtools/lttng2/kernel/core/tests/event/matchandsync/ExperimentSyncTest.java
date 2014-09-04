@@ -13,13 +13,11 @@
 package org.eclipse.linuxtools.lttng2.kernel.core.tests.event.matchandsync;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 import org.eclipse.linuxtools.lttng2.kernel.core.event.matching.TcpEventMatching;
 import org.eclipse.linuxtools.lttng2.kernel.core.event.matching.TcpLttngEventMatching;
 import org.eclipse.linuxtools.tmf.core.event.matching.TmfEventMatching;
-import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.linuxtools.tmf.core.synchronization.SynchronizationAlgorithm;
 import org.eclipse.linuxtools.tmf.core.synchronization.TimestampTransformFactory;
@@ -77,8 +75,6 @@ public class ExperimentSyncTest {
             assertEquals(syncAlgo.getTimestampTransform(trace1.getHostId()), trace1.getTimestampTransform());
             assertEquals(syncAlgo.getTimestampTransform(trace2.getHostId()), trace2.getTimestampTransform());
 
-        } catch (TmfTraceException e) {
-            fail("Exception thrown in experiment synchronization " + e.getMessage());
         }
     }
 
@@ -111,8 +107,6 @@ public class ExperimentSyncTest {
             assertEquals("TmfTimestampLinear [ slope = 0.9999996313017589597204633828681240, offset = 498490309972.0038068817738527724192 ]", tt2.toString());
             assertEquals("TmfTimestampLinear [ slope = 1.000000119014882262265342419815932, offset = -166652893534.6189900382736187431134 ]", tt3.toString());
 
-        } catch (TmfTraceException e) {
-            fail("Exception thrown in experiment synchronization " + e.getMessage());
         }
     }
 }

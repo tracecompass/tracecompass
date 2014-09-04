@@ -14,8 +14,6 @@ package org.eclipse.linuxtools.tmf.ui.views.synchronization;
 
 import java.util.Map;
 
-import org.eclipse.linuxtools.internal.tmf.ui.Activator;
-import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSynchronizedSignal;
@@ -127,11 +125,7 @@ public class TmfSynchronizationView extends TmfView {
     public void traceSelected(TmfTraceSelectedSignal signal) {
         fAlgoSync = null;
         if (signal.getTrace() instanceof TmfExperiment) {
-            try {
-                fAlgoSync = ((TmfExperiment) signal.getTrace()).synchronizeTraces();
-            } catch (TmfTraceException e) {
-                Activator.getDefault().logError("Error while getting the synchronization data of experiment", e); //$NON-NLS-1$
-            }
+            fAlgoSync = ((TmfExperiment) signal.getTrace()).synchronizeTraces();
         }
         Display.getDefault().asyncExec(new Runnable() {
             @Override

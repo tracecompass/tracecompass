@@ -154,128 +154,121 @@ public class SynchronizeTracesHandler extends AbstractHandler {
                 exp.refreshSupplementaryFolder();
                 final TmfExperiment experiment = new TmfExperiment(ITmfEvent.class, exp.getName(), traces, exp.getResource());
 
-                try {
-                    final SynchronizationAlgorithm syncAlgo = experiment.synchronizeTraces(true);
-                    TmfTraceManager.refreshSupplementaryFiles(experiment);
+                final SynchronizationAlgorithm syncAlgo = experiment.synchronizeTraces(true);
+                TmfTraceManager.refreshSupplementaryFiles(experiment);
 
-                    Display.getDefault().asyncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            List<TmfTraceElement> tracesToAdd = new ArrayList<>();
-                            List<TmfTraceElement> tracesToRemove = new ArrayList<>();
+                Display.getDefault().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<TmfTraceElement> tracesToAdd = new ArrayList<>();
+                        List<TmfTraceElement> tracesToRemove = new ArrayList<>();
+                        /*
+                         * For each trace in the experiment, if there is
+                         * a transform equation, copy the original
+                         * trace, so that a new state system will be
+                         * generated with sync time.
+                         */
+                        for (TmfTraceElement traceel : tl) {
                             /*
-                             * For each trace in the experiment, if there is
-                             * a transform equation, copy the original
-                             * trace, so that a new state system will be
-                             * generated with sync time.
+                             * Find the trace corresponding to this
+                             * element in the experiment
                              */
-                            for (TmfTraceElement traceel : tl) {
+                            ITmfTrace expTrace = null;
+                            for (ITmfTrace t : experiment.getTraces()) {
+                                if (t.getResource().equals(traceel.getResource())) {
+                                    expTrace = t;
+                                    break;
+                                }
+                            }
+                            if ((expTrace != null) && syncAlgo.isTraceSynced(expTrace.getHostId())) {
+
+                                /* Find the original trace */
+                                TmfTraceElement origtrace = traceel.getElementUnderTraceFolder();
+
                                 /*
-                                 * Find the trace corresponding to this
-                                 * element in the experiment
+                                 * Make sure a trace with the
+                                 * new name does not exist
                                  */
-                                ITmfTrace expTrace = null;
-                                for (ITmfTrace t : experiment.getTraces()) {
-                                    if (t.getResource().equals(traceel.getResource())) {
-                                        expTrace = t;
-                                        break;
+                                String newname = traceel.getName();
+                                IContainer parentFolder = origtrace.getResource().getParent();
+                                boolean traceexists;
+                                do {
+                                    traceexists = false;
+                                    newname += "_"; //$NON-NLS-1$
+                                    if (parentFolder.findMember(newname) != null) {
+                                        traceexists = true;
                                     }
+                                } while (traceexists);
+
+                                /* Copy the original trace */
+                                TmfTraceElement newtrace = origtrace.copy(newname);
+                                if (newtrace == null) {
+                                    TraceUtils.displayErrorMsg(Messages.SynchronizeTracesHandler_Title,
+                                            Messages.SynchronizeTracesHandler_Error + CR + CR + String.format(Messages.SynchronizeTracesHandler_CopyProblem, origtrace.getName()));
+                                    continue;
                                 }
-                                if ((expTrace != null) && syncAlgo.isTraceSynced(expTrace.getHostId())) {
 
-                                    /* Find the original trace */
-                                    TmfTraceElement origtrace = traceel.getElementUnderTraceFolder();
+                                /*
+                                 * Instantiate the new trace
+                                 * and set its sync formula
+                                 */
+                                ITmfTrace trace = newtrace.instantiateTrace();
+                                ITmfEvent traceEvent = newtrace.instantiateEvent();
 
-                                    /*
-                                     * Make sure a trace with the
-                                     * new name does not exist
-                                     */
-                                    String newname = traceel.getName();
-                                    IContainer parentFolder = origtrace.getResource().getParent();
-                                    boolean traceexists;
-                                    do {
-                                        traceexists = false;
-                                        newname += "_"; //$NON-NLS-1$
-                                        if (parentFolder.findMember(newname) != null) {
-                                            traceexists = true;
-                                        }
-                                    } while (traceexists);
-
-                                    /* Copy the original trace */
-                                    TmfTraceElement newtrace = origtrace.copy(newname);
-                                    if (newtrace == null) {
-                                        TraceUtils.displayErrorMsg(Messages.SynchronizeTracesHandler_Title,
-                                                Messages.SynchronizeTracesHandler_Error + CR + CR + String.format(Messages.SynchronizeTracesHandler_CopyProblem, origtrace.getName()));
-                                        continue;
-                                    }
-
-                                    /*
-                                     * Instantiate the new trace
-                                     * and set its sync formula
-                                     */
-                                    ITmfTrace trace = newtrace.instantiateTrace();
-                                    ITmfEvent traceEvent = newtrace.instantiateEvent();
-
-                                    try {
-                                        trace.initTrace(newtrace.getResource(), newtrace.getLocation().getPath(), traceEvent.getClass());
-                                    } catch (TmfTraceException e) {
-                                        Activator.getDefault().logError(String.format(Messages.SynchronizeTracesHandler_ErrorSynchingForTrace, exp.getName(), traceel.getName()), e);
-                                        TraceUtils.displayErrorMsg(Messages.SynchronizeTracesHandler_Title, Messages.SynchronizeTracesHandler_Error + CR + CR + e.getMessage());
-                                    }
-                                    trace.setTimestampTransform(syncAlgo.getTimestampTransform(trace));
-                                    TmfTraceManager.refreshSupplementaryFiles(trace);
-                                    trace.dispose();
-
-                                    tracesToAdd.add(newtrace);
-                                    tracesToRemove.add(traceel);
-                                }
-                            }
-                            experiment.dispose();
-
-                            // Move synchronization file temporarily so that
-                            // it doesn't get deleted by the experiment change
-                            IFolder tmpFolder = exp.getTraceSupplementaryFolder("."); //$NON-NLS-1$
-                            IResource syncFile = null;
-                            for (IResource resource : exp.getSupplementaryResources()) {
-                                if (resource.getName().equals(TmfExperiment.SYNCHRONIZATION_FILE_NAME)) {
-                                    try {
-                                        resource.move(tmpFolder.getFile(exp.getName() + '.' + TmfExperiment.SYNCHRONIZATION_FILE_NAME).getFullPath(), false, null);
-                                        syncFile = resource;
-                                        break;
-                                    } catch (CoreException e) {
-                                        Activator.getDefault().logError(String.format(Messages.SynchronizeTracesHandler_ErrorSynchingExperiment, exp.getName()), e);
-                                    }
-                                }
-                            }
-
-                            for (TmfTraceElement trace : tracesToRemove) {
                                 try {
-                                    exp.removeTrace(trace);
-                                } catch (CoreException e) {
-                                    Activator.getDefault().logError(String.format(Messages.SynchronizeTracesHandler_ErrorSynchingForTrace, exp.getName(), trace.getName()), e);
+                                    trace.initTrace(newtrace.getResource(), newtrace.getLocation().getPath(), traceEvent.getClass());
+                                } catch (TmfTraceException e) {
+                                    Activator.getDefault().logError(String.format(Messages.SynchronizeTracesHandler_ErrorSynchingForTrace, exp.getName(), traceel.getName()), e);
                                     TraceUtils.displayErrorMsg(Messages.SynchronizeTracesHandler_Title, Messages.SynchronizeTracesHandler_Error + CR + CR + e.getMessage());
                                 }
-                            }
-                            for (TmfTraceElement trace : tracesToAdd) {
-                                exp.addTrace(trace);
-                            }
+                                trace.setTimestampTransform(syncAlgo.getTimestampTransform(trace));
+                                TmfTraceManager.refreshSupplementaryFiles(trace);
+                                trace.dispose();
 
-                            // Move synchronization file back
-                            IResource resource = tmpFolder.getFile(exp.getName() + '.' + TmfExperiment.SYNCHRONIZATION_FILE_NAME);
-                            if (resource.exists() && syncFile != null) {
+                                tracesToAdd.add(newtrace);
+                                tracesToRemove.add(traceel);
+                            }
+                        }
+                        experiment.dispose();
+
+                        // Move synchronization file temporarily so that
+                        // it doesn't get deleted by the experiment change
+                        IFolder tmpFolder = exp.getTraceSupplementaryFolder(exp.getName() + '.' + TmfExperiment.SYNCHRONIZATION_DIRECTORY);
+                        IResource syncFile = null;
+                        for (IResource resource : exp.getSupplementaryResources()) {
+                            if (resource.getName().equals(TmfExperiment.SYNCHRONIZATION_DIRECTORY)) {
                                 try {
-                                    resource.move(syncFile.getFullPath(), false, null);
+                                    resource.move(tmpFolder.getFullPath(), false, null);
+                                    syncFile = resource;
+                                    break;
                                 } catch (CoreException e) {
                                     Activator.getDefault().logError(String.format(Messages.SynchronizeTracesHandler_ErrorSynchingExperiment, exp.getName()), e);
                                 }
                             }
                         }
-                    });
 
-                } catch (TmfTraceException e) {
-                    Activator.getDefault().logError(String.format(Messages.SynchronizeTracesHandler_ErrorSynchingExperiment, exp.getName()), e);
-                    TraceUtils.displayErrorMsg(Messages.SynchronizeTracesHandler_Title, Messages.SynchronizeTracesHandler_Error + CR + CR + e.getMessage());
-                }
+                        for (TmfTraceElement trace : tracesToRemove) {
+                            try {
+                                exp.removeTrace(trace);
+                            } catch (CoreException e) {
+                                Activator.getDefault().logError(String.format(Messages.SynchronizeTracesHandler_ErrorSynchingForTrace, exp.getName(), trace.getName()), e);
+                                TraceUtils.displayErrorMsg(Messages.SynchronizeTracesHandler_Title, Messages.SynchronizeTracesHandler_Error + CR + CR + e.getMessage());
+                            }
+                        }
+                        for (TmfTraceElement trace : tracesToAdd) {
+                            exp.addTrace(trace);
+                        }
+
+                        // Move synchronization file back
+                        if (tmpFolder.exists() && syncFile != null) {
+                            try {
+                                tmpFolder.move(syncFile.getFullPath(), false, null);
+                            } catch (CoreException e) {
+                                Activator.getDefault().logError(String.format(Messages.SynchronizeTracesHandler_ErrorSynchingExperiment, exp.getName()), e);
+                            }
+                        }
+                    }
+                });
             }
         };
         thread.start();
