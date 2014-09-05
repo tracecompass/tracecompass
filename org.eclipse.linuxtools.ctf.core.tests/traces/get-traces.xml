@@ -10,19 +10,11 @@
 
 <project name="Extract Traces" default="main" >
 <target name="main">
-  <condition property="failedCheckSum">
-    <not>
-      <and>
-        <checksum>
-          <fileset dir="." includes="*.tar.bz2" />
-          <fileset dir="." includes="*.tar.gz" />
-          <fileset dir="." includes="*.zip" />
-        </checksum>
-      </and>
-    </not>
-  </condition>
-	
-  <antcall target="deleteFailedCheckSumTraces"/>
+  <antcall>
+    <target name="checkAnyTraceExists"/>
+    <target name="verifyChecksum"/>
+    <target name="deleteFailedCheckSumTraces"/>
+  </antcall>
   <antcall target="downloadTraceFiles"/>
   <exec executable = "git" failifexecutionfails="false" timeout="20000">
     <arg value = "clone"/>
@@ -49,6 +41,35 @@
   <antcall target="extractTraces"/>
 </target>
 
+<target name="checkAnyTraceExists">
+  <pathconvert property="anyTraceExists" setonempty="false" pathsep=" ">
+    <path>
+      <fileset dir="." includes="*.tar.bz2" />
+      <fileset dir="." includes="*.tar.gz" />
+      <fileset dir="." includes="*.zip" />
+    </path>
+  </pathconvert>
+</target>
+
+<target name="verifyChecksum">
+  <echo message="Verifying: ${anyTraceExists}"/>
+  <condition property="failedCheckSum">
+    <and>
+      <isset property="anyTraceExists"/>
+      <not>
+        <and>
+          <checksum>
+            <fileset dir="." includes="*.tar.bz2" />
+            <fileset dir="." includes="*.tar.gz" />
+            <fileset dir="." includes="*.zip" />
+          </checksum>
+        </and>
+      </not>
+    </and>
+  </condition>
+</target>
+
+
 <target name="deleteFailedCheckSumTraces" if="failedCheckSum">
   <echo message="Some traces have failed the checksum tests. Deleting traces."/>
   <delete verbose="true">
@@ -58,7 +79,7 @@
   </delete>
 </target>
 
-<target name="warnFailedCheckSum" if="failedCheckSum2">
+<target name="warnFailedCheckSum" if="failedCheckSum">
   <echo message="WARNING: Some downloaded traces failed the checkum."/>
 </target>
 
@@ -82,18 +103,11 @@
 </target>
 
 <target name="extractTraces" if="tracesExist">
-    <condition property="failedCheckSum2">
-      <not>
-        <and>
-          <checksum>
-            <fileset dir="." includes="*.tar.bz2" />
-            <fileset dir="." includes="*.tar.gz" />
-            <fileset dir="." includes="*.zip" />
-          </checksum>
-        </and>
-      </not>
-    </condition>
-    <antcall target="warnFailedCheckSum"/>
+    <antcall>
+      <target name="checkAnyTraceExists"/>
+      <target name="verifyChecksum"/>
+      <target name="warnFailedCheckSum"/>
+    </antcall>
     <bunzip2 src="sample-ctf-trace-20120412.tar.bz2"/>
     <bunzip2 src="trace2.tar.bz2"/>
     <bunzip2 src="kernel_vm.tar.bz2" />
