@@ -17,6 +17,7 @@
 
     <properties>
         <productId>org.eclipse.linuxtools.tracing.rcp</productId>
+        <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
     </properties>
 
     <build>
