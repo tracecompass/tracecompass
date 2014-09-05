@@ -21,6 +21,10 @@
    <feature url="features/org.eclipse.linuxtools.tracing.rcp.branding.feature_0.0.0.qualifier.jar" id="org.eclipse.linuxtools.tracing.rcp.branding.feature" version="0.0.0">
       <category name="LTTng RCP"/>
    </feature>
+   <feature url="features/org.eclipse.linuxtools.lttng.testing_1.0.0.qualifier.jar" id="org.eclipse.linuxtools.lttng.testing" version="1.0.0.qualifier">
+      <category name="LTTng Extras"/>
+   </feature>
    <category-def name="LTTng" label="Linux Tracing Toolkit"/>
    <category-def name="LTTng RCP" label="Linux Tracing Toolkit RCP Dependencies"/>
+   <category-def name="LTTng Extras" label="Linux Tracing Toolkit Extras"/>
 </site>

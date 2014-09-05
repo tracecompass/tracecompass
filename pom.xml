@@ -138,6 +138,7 @@
     <module>org.eclipse.linuxtools.tmf.analysis.xml.ui.tests</module>
 
     <module>org.eclipse.linuxtools.lttng.help</module>
+    <module>org.eclipse.linuxtools.lttng.testing</module>
 
     <module>org.eclipse.linuxtools.lttng2.control</module>
     <module>org.eclipse.linuxtools.lttng2.control.core</module>
