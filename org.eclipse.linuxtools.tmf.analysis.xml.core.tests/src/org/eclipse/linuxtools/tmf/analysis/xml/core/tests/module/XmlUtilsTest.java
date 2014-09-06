@@ -19,15 +19,20 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
+import org.eclipse.linuxtools.tmf.analysis.xml.core.tests.Activator;
 import org.eclipse.linuxtools.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
 import org.junit.After;
 import org.junit.Test;
@@ -40,7 +45,7 @@ import org.w3c.dom.Element;
  */
 public class XmlUtilsTest {
 
-    private static final String pathname = "test_xml_files/test_invalid";
+    private static final Path PATH = new Path("test_xml_files/test_invalid");
 
     /**
      * Empty the XML directory after the test
@@ -101,7 +106,21 @@ public class XmlUtilsTest {
      */
     @Test
     public void testXmlValidateInvalid() {
-        File[] validFiles = (new File(pathname)).listFiles();
+        Activator plugin = Activator.getDefault();
+        if (plugin == null) {
+            // Shouldn't happen but at least throw something to get the test to fail early
+            throw new IllegalStateException();
+        }
+        URL location = FileLocator.find(plugin.getBundle(), PATH, null);
+        File file = null;
+        try {
+            IPath path = new Path(FileLocator.toFileURL(location).getPath());
+            file = path.toFile();
+        } catch (IOException e) {
+            throw new IllegalStateException();
+        }
+
+        File[] validFiles = file.listFiles();
         for (File f : validFiles) {
             assertFalse("File " + f.getName(), XmlUtils.xmlValidate(f).isOK());
         }
