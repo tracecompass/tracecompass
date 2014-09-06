@@ -14,6 +14,7 @@
 package org.eclipse.linuxtools.tmf.ctf.ui.swtbot.tests;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.List;
 
@@ -84,6 +85,7 @@ public abstract class AbstractImportAndReadSmokeTest {
     /** Test Class setup */
     @BeforeClass
     public static void init() {
+        assumeTrue(fTrace.exists());
         SWTBotUtil.failIfUIThread();
 
         /* set up for swtbot */
