@@ -721,7 +721,8 @@ The '''New Custom Text Parser''' wizard can be used to create a custom parser fo
 
 Fill out the first wizard page with the following information:
 
-* '''Log type:''' Enter a name for the custom log entries, which is also the name of the custom parser.
+* '''Category:''' Enter a category name for the trace type.
+* '''Trace type:''' Enter a name for the trace type, which is also the name of the custom parser.
 * '''Time Stamp format:''' Enter the date and time pattern that will be used to output the Time Stamp.<br>
 Note: information about date and time patterns can be found here: [../reference/api/org/eclipse/linuxtools/tmf/core/timestamp/TmfTimestampFormat.html TmfTimestampFormat]
 
@@ -788,7 +789,8 @@ The '''New Custom XML Parser''' wizard can be used to create a custom parser for
 
 Fill out the first wizard page with the following information:
 
-* '''Log type:''' Enter a name for the custom log entries, which is also the name of the custom parser.
+* '''Category:''' Enter a category name for the trace type.
+* '''Trace type:''' Enter a name for the trace type, which is also the name of the custom parser.
 * '''Time Stamp format:''' Enter the date and time pattern that will be used to output the Time Stamp.<br>
 
 Note: information about date and time patterns can be found here: [../reference/api/org/eclipse/linuxtools/tmf/core/timestamp/TmfTimestampFormat.html TmfTimestampFormat]
@@ -877,7 +879,7 @@ Select a custom parser from the list and click the '''Delete''' button to remove
 
 * Import...
 
-Click the '''Import...''' button and select a file from the opened file dialog to import all its custom parsers.
+Click the '''Import...''' button and select a file from the opened file dialog to import all its custom parsers. If any parser conflicts with an existing built-in or custom trace type, the user will be prompted to skip or rename the imported parser.
 
 * Export...
 
@@ -890,7 +892,7 @@ Once a custom parser has been created, any [[#Importing Traces to the Project|im
 To do so:
 
 * Select a trace in the '''Project Explorer''' view
-* Right-click the trace and select '''Select Trace Type...''' &gt; '''Custom Text''' or '''Custom XML''' &gt; ''parser name''
+* Right-click the trace and select '''Select Trace Type...''' &gt; ''category name'' &gt; ''parser name''
 * Double-click the trace or right-click it and select '''Open'''
 
 The trace will be opened in an editor showing the events table, and an entry will be added for it in the Time Chart view.
