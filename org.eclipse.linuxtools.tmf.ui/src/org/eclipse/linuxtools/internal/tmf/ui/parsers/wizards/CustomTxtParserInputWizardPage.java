@@ -54,6 +54,7 @@ import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomTxtTraceDefinition.I
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestampFormat;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.TitleEvent;
@@ -968,11 +969,11 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         int line1start = 0;
         String line1 = Messages.CustomTxtParserInputWizardPage_nonMatchingLine;
         int line2start = line1start + line1.length();
-        String line2 = Messages.CustomTxtParserInputWizardPage_matchingLineRoot + cg + ' ' + ucg + ' ' + ut + " \n"; //$NON-NLS-1$
+        String line2 = Messages.CustomTxtParserInputWizardPage_matchingRootLine + ' ' + cg + ' ' + ucg + ' ' + ut + " \n"; //$NON-NLS-1$
         int line3start = line2start + line2.length();
-        String line3 = Messages.CustomTxtParserInputWizardPage_matchingOtherLine + cg + ' ' + ucg + ' ' + ut + " \n"; //$NON-NLS-1$
+        String line3 = Messages.CustomTxtParserInputWizardPage_matchingOtherLine + ' '  + cg + ' ' + ucg + ' ' + ut + " \n"; //$NON-NLS-1$
         int line4start = line3start + line3.length();
-        String line4 = Messages.CustomTxtParserInputWizardPage_matchingOtherLine + cg + ' ' + ucg + ' ' + ut + " \n"; //$NON-NLS-1$
+        String line4 = Messages.CustomTxtParserInputWizardPage_matchingOtherLine + ' ' + cg + ' ' + ucg + ' ' + ut + " \n"; //$NON-NLS-1$
         int line5start = line4start + line4.length();
         String line5 = Messages.CustomTxtParserInputWizardPage_nonMatchingLine;
         int line6start = line5start + line5.length();
@@ -1382,7 +1383,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
 
             inputLabel = new Label(labelComposite, SWT.NULL);
             inputLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-            inputLabel.setText(Messages.CustomTxtParserInputWizardPage_group + inputNumber + ":"); //$NON-NLS-1$
+            inputLabel.setText(NLS.bind(Messages.CustomTxtParserInputWizardPage_group, inputNumber));
 
             tagComposite = new Composite(parent, SWT.FILL);
             GridLayout tagLayout = new GridLayout(4, false);
@@ -1470,7 +1471,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
 
         private void setInputNumber(int inputNumber) {
             this.inputNumber = inputNumber;
-            inputLabel.setText(Messages.CustomTxtParserInputWizardPage_group + inputNumber + ":"); //$NON-NLS-1$
+            inputLabel.setText(NLS.bind(Messages.CustomTxtParserInputWizardPage_group, inputNumber));
             labelComposite.layout();
         }
     }

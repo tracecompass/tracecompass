@@ -53,6 +53,7 @@ import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTraceDefinition.I
 import org.eclipse.linuxtools.tmf.core.project.model.TmfTraceType;
 import org.eclipse.linuxtools.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestampFormat;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.TitleEvent;
@@ -94,6 +95,8 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+
+import com.google.common.base.Joiner;
 
 /**
  * Input wizard page for custom XML trace parsers.
@@ -1493,23 +1496,23 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             treeViewer.refresh();
         }
 
-        StringBuffer errors = new StringBuffer();
+        List<String> errors = new ArrayList<>();
 
         if (definition.categoryName.length() == 0) {
-            errors.append(Messages.CustomXmlParserInputWizardPage_emptyCategoryError);
+            errors.add(Messages.CustomXmlParserInputWizardPage_emptyCategoryError);
             categoryText.setBackground(COLOR_LIGHT_RED);
         } else if (definition.definitionName.length() == 0) {
-            errors.append(Messages.CustomXmlParserInputWizardPage_emptyLogTypeError);
+            errors.add(Messages.CustomXmlParserInputWizardPage_emptyLogTypeError);
             logtypeText.setBackground(COLOR_LIGHT_RED);
         } else {
             categoryText.setBackground(COLOR_TEXT_BACKGROUND);
             logtypeText.setBackground(COLOR_TEXT_BACKGROUND);
             if (definition.categoryName.indexOf(':') != -1) {
-                errors.append(Messages.CustomXmlParserInputWizardPage_invalidCategoryError);
+                errors.add(Messages.CustomXmlParserInputWizardPage_invalidCategoryError);
                 categoryText.setBackground(COLOR_LIGHT_RED);
             }
             if (definition.definitionName.indexOf(':') != -1) {
-                errors.append(Messages.CustomXmlParserInputWizardPage_invalidLogTypeError);
+                errors.add(Messages.CustomXmlParserInputWizardPage_invalidLogTypeError);
                 logtypeText.setBackground(COLOR_LIGHT_RED);
             }
             for (TraceTypeHelper helper : TmfTraceType.getTraceTypeHelpers()) {
@@ -1517,7 +1520,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                         definition.definitionName.equals(helper.getName()) &&
                         (editDefinitionName == null || !editDefinitionName.equals(definition.definitionName)) &&
                         (editCategoryName == null || !editCategoryName.equals(definition.categoryName))) {
-                    errors.append(Messages.CustomXmlParserInputWizardPage_duplicatelogTypeError);
+                    errors.add(Messages.CustomXmlParserInputWizardPage_duplicatelogTypeError);
                     logtypeText.setBackground(COLOR_LIGHT_RED);
                     break;
                 }
@@ -1525,48 +1528,48 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         }
 
         if (definition.rootInputElement == null) {
-            errors.append(Messages.CustomXmlParserInputWizardPage_noDocumentError);
+            errors.add(Messages.CustomXmlParserInputWizardPage_noDocumentError);
         }
 
         if (definition.rootInputElement != null) {
             logEntryFound = false;
             timeStampFound = false;
 
-            errors.append(validateElement(definition.rootInputElement));
+            errors.addAll(validateElement(definition.rootInputElement));
 
             if ((definition.rootInputElement.attributes != null && definition.rootInputElement.attributes.size() != 0)
                     || (definition.rootInputElement.childElements != null && definition.rootInputElement.childElements.size() != 0)
-                    || errors.length() == 0) {
+                    || errors.size() == 0) {
                 if (!logEntryFound) {
-                    errors.append(Messages.CustomXmlParserInputWizardPage_missingLogEntryError);
+                    errors.add(Messages.CustomXmlParserInputWizardPage_missingLogEntryError);
                 }
 
                 if (timeStampFound) {
                     if (timeStampOutputFormatText.getText().trim().length() == 0) {
-                        errors.append(Messages.CustomXmlParserInputWizardPage_missingTimestampFmtError);
+                        errors.add(Messages.CustomXmlParserInputWizardPage_missingTimestampFmtError);
                         timeStampOutputFormatText.setBackground(COLOR_LIGHT_RED);
                     } else {
                         try {
                             new TmfTimestampFormat(timeStampOutputFormatText.getText().trim());
                             timeStampOutputFormatText.setBackground(COLOR_TEXT_BACKGROUND);
                         } catch (IllegalArgumentException e) {
-                            errors.append(Messages.CustomXmlParserInputWizardPage_invalidTimestampFmtError);
+                            errors.add(Messages.CustomXmlParserInputWizardPage_elementInvalidTimestampFmtError);
                             timeStampOutputFormatText.setBackground(COLOR_LIGHT_RED);
                         }
                     }
                 } else {
-                    timeStampPreviewText.setText(Messages.CustomXmlParserInputWizardPage_notimestamporAttributeError);
+                    timeStampPreviewText.setText(Messages.CustomXmlParserInputWizardPage_noTimestampElementOrAttribute);
                 }
             }
         } else {
-            timeStampPreviewText.setText(Messages.CustomXmlParserInputWizardPage_notimestamporAttributeError);
+            timeStampPreviewText.setText(Messages.CustomXmlParserInputWizardPage_noTimestampElementOrAttribute);
         }
 
-        if (errors.length() == 0) {
+        if (errors.size() == 0) {
             setDescription(defaultDescription);
             setPageComplete(true);
         } else {
-            setDescription(errors.toString());
+            setDescription(Joiner.on(' ').join(errors));
             setPageComplete(false);
         }
     }
@@ -1578,15 +1581,15 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
      *            The element to clean up
      * @return The validated element
      */
-    public StringBuffer validateElement(InputElement inputElement) {
-        StringBuffer errors = new StringBuffer();
+    public List<String> validateElement(InputElement inputElement) {
+        List<String> errors = new ArrayList<>();
         ElementNode elementNode = null;
         if (selectedElement != null && selectedElement.inputElement.equals(inputElement)) {
             elementNode = selectedElement;
         }
         if (inputElement == definition.rootInputElement) {
             if (inputElement.elementName.length() == 0) {
-                errors.append(Messages.CustomXmlParserInputWizardPage_missingDocumentElementError);
+                errors.add(Messages.CustomXmlParserInputWizardPage_missingDocumentElementError);
                 if (elementNode != null) {
                     elementNode.elementNameText.setBackground(COLOR_LIGHT_RED);
                 }
@@ -1603,8 +1606,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             if (inputElement.inputName.equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
                 timeStampFound = true;
                 if (inputElement.inputFormat.length() == 0) {
-                    errors.append(Messages.CustomXmlParserInputWizardPage_timestampFormatPrompt
-                            + " (" + Messages.CustomXmlParserInputWizardPage_timestampElementPrompt + " " + getName(inputElement) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    errors.add(NLS.bind(Messages.CustomXmlParserInputWizardPage_elementMissingTimestampFmtError, getName(inputElement)));
                     if (elementNode != null) {
                         elementNode.tagText.setBackground(COLOR_LIGHT_RED);
                     }
@@ -1615,15 +1617,14 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                             elementNode.tagText.setBackground(COLOR_TEXT_BACKGROUND);
                         }
                     } catch (IllegalArgumentException e) {
-                        errors.append(Messages.CustomXmlParserInputWizardPage_invalidTimestampFmtError
-                                + " (" + Messages.CustomXmlParserInputWizardPage_timestampElementPrompt + " " + getName(inputElement) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        errors.add(NLS.bind(Messages.CustomXmlParserInputWizardPage_elementInvalidTimestampFmtError, getName(inputElement)));
                         if (elementNode != null) {
                             elementNode.tagText.setBackground(COLOR_LIGHT_RED);
                         }
                     }
                 }
             } else if (inputElement.inputName.length() == 0) {
-                errors.append(Messages.CustomXmlParserInputWizardPage_missingInputElementNameError);
+                errors.add(NLS.bind(Messages.CustomXmlParserInputWizardPage_elementMissingInputNameError, getName(inputElement)));
                 if (elementNode != null) {
                     elementNode.tagText.setBackground(COLOR_LIGHT_RED);
                 }
@@ -1652,14 +1653,12 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                     }
                 }
                 if (attribute.attributeName.length() == 0) {
-                    errors.append(Messages.CustomXmlParserInputWizardPage_missingAttribute
-                            + " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(inputElement) + ": ?). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    errors.add(NLS.bind(Messages.CustomXmlParserInputWizardPage_attributeMissingNameError, getName(inputElement)));
                     if (elementNode != null) {
                         elementNode.attributes.get(i).attributeNameText.setBackground(COLOR_LIGHT_RED);
                     }
                 } else if (duplicate) {
-                    errors.append(Messages.CustomXmlParserInputWizardPage_duplicateAttributeError
-                            + " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(attribute, inputElement) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    errors.add(NLS.bind(Messages.CustomXmlParserInputWizardPage_attributeDuplicateNameError, getName(attribute, inputElement)));
                     if (elementNode != null) {
                         elementNode.attributes.get(i).attributeNameText.setBackground(COLOR_LIGHT_RED);
                     }
@@ -1667,8 +1666,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 if (attribute.inputName.equals(CustomTraceDefinition.TAG_TIMESTAMP)) {
                     timeStampFound = true;
                     if (attribute.inputFormat.length() == 0) {
-                        errors.append(Messages.CustomXmlParserInputWizardPage_missingTimestampInFmtError
-                                + " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(attribute, inputElement) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        errors.add(NLS.bind(Messages.CustomXmlParserInputWizardPage_attributeMissingTimestampFmtError, getName(attribute, inputElement)));
                         if (elementNode != null) {
                             elementNode.attributes.get(i).tagText.setBackground(COLOR_LIGHT_RED);
                         }
@@ -1679,16 +1677,14 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                                 elementNode.attributes.get(i).tagText.setBackground(COLOR_TEXT_BACKGROUND);
                             }
                         } catch (IllegalArgumentException e) {
-                            errors.append(Messages.CustomXmlParserInputWizardPage_invalidTimestampInFmtError
-                                    + " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(attribute, inputElement) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                            errors.add(NLS.bind(Messages.CustomXmlParserInputWizardPage_attributeInvalidTimestampFmtError, getName(attribute, inputElement)));
                             if (elementNode != null) {
                                 elementNode.attributes.get(i).tagText.setBackground(COLOR_LIGHT_RED);
                             }
                         }
                     }
                 } else if (attribute.inputName.length() == 0) {
-                    errors.append(Messages.CustomXmlParserInputWizardPage_missingDataGroupNameError
-                            + " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(attribute, inputElement) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    errors.add(NLS.bind(Messages.CustomXmlParserInputWizardPage_attributeMissingInputNameError, getName(attribute, inputElement)));
                     if (elementNode != null) {
                         elementNode.attributes.get(i).tagText.setBackground(COLOR_LIGHT_RED);
                     }
@@ -1716,8 +1712,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                     childElementNode = selectedElement;
                 }
                 if (child.elementName.length() == 0) {
-                    errors.append(Messages.CustomXmlParserInputWizardPage_missingElementNameError
-                            + " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(child) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    errors.add(NLS.bind(Messages.CustomXmlParserInputWizardPage_elementMissingNameError, getName(child)));
                     if (childElementNode != null) {
                         childElementNode.elementNameText.setBackground(COLOR_LIGHT_RED);
                     }
@@ -1737,15 +1732,14 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                         }
                     }
                     if (duplicate) {
-                        errors.append(Messages.CustomXmlParserInputWizardPage_duplicateElementNameError
-                                + " (" + Messages.CustomXmlParserInputWizardPage_attributePrompt + " " + getName(child) + "). "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        errors.add(NLS.bind(Messages.CustomXmlParserInputWizardPage_elementDuplicateNameError, getName(child)));
                         if (childElementNode != null) {
                             childElementNode.elementNameText.setBackground(COLOR_LIGHT_RED);
                         }
                     }
                 }
 
-                errors.append(validateElement(child));
+                errors.addAll(validateElement(child));
             }
         }
         return errors;

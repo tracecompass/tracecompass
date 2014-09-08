@@ -27,6 +27,7 @@ import org.eclipse.linuxtools.internal.tmf.ui.Messages;
 import org.eclipse.linuxtools.tmf.core.filter.ITmfFilter;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable;
+import org.eclipse.osgi.util.NLS;
 
 /**
  * This job exports traces to text files.
@@ -71,7 +72,7 @@ public class ExportToTextJob extends Job {
 
     @Override
     public IStatus run(IProgressMonitor monitor) {
-        monitor.beginTask(Messages.ExportToTextJob_Export_trace_to + destination, TOTAL_WORK);
+        monitor.beginTask(NLS.bind(Messages.ExportToTextJob_Export_trace_to, destination), TOTAL_WORK);
         IStatus ret = saveImpl(monitor);
         monitor.done();
         return ret;
