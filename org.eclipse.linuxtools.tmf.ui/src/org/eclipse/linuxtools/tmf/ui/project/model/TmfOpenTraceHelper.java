@@ -254,7 +254,7 @@ public class TmfOpenTraceHelper {
         }
 
         try {
-            trace.initTrace(traceElement.getResource(), traceElement.getLocation().getPath(), traceEvent.getClass(), traceElement.getElementPath());
+            trace.initTrace(traceElement.getResource(), traceElement.getResource().getLocation().toOSString(), traceEvent.getClass(), traceElement.getElementPath());
         } catch (final TmfTraceException e) {
             TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, traceElement.getTypeName()),
                     Messages.TmfOpenTraceHelper_InitError + ENDL + ENDL + e);
