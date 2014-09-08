@@ -12,16 +12,19 @@
 
 package org.eclipse.linuxtools.internal.statesystem.core;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.linuxtools.statesystem.core.exceptions.AttributeNotFoundException;
-import org.eclipse.linuxtools.statesystem.core.exceptions.StateValueTypeException;
-import org.eclipse.linuxtools.statesystem.core.exceptions.TimeRangeException;
-import org.eclipse.linuxtools.statesystem.core.statevalue.TmfStateValue;
 
 /**
  * The Attribute Tree is the /proc-like filesystem used to organize attributes.
@@ -291,26 +294,7 @@ public final class AttributeTree {
                 }
                 prevNode = nextNode;
             }
-            /*
-             * Insert an initial null value for this attribute in the state
-             * system (in case the state provider doesn't set one).
-             */
-            final int newAttrib = attributeList.size() - 1;
-            try {
-                ss.modifyAttribute(ss.getStartTime(), TmfStateValue.nullValue(), newAttrib);
-            } catch (TimeRangeException e) {
-                /* Should not happen, we're inserting at ss's start time */
-                throw new IllegalStateException(e);
-            } catch (AttributeNotFoundException e) {
-                /* Should not happen, we just created this attribute! */
-                throw new IllegalStateException(e);
-            } catch (StateValueTypeException e) {
-                /* Should not happen, there is no existing state value, and the
-                 * one we insert is a null value anyway. */
-                throw new IllegalStateException(e);
-            }
-
-            return newAttrib;
+            return attributeList.size() - 1;
         }
         /*
          * The attribute was already existing, return the quark of that
