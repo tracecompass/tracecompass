@@ -140,4 +140,9 @@ public class LTTngControlServiceMiTest extends LTTngControlServiceTest {
         // TODO This does not use mi feature.And currently the context enabling
         // is wrong for 2.6.
     }
+
+    @Override
+    public void testCreateSnapshotSession2_5() {
+        // not applicable for MI
+    }
 }

@@ -446,7 +446,7 @@ public interface LTTngControlServiceConstants {
     /**
      * Pattern to match for list snapshot information (lttng snapshot list-output)
      */
-    static final Pattern LIST_SNAPSHOT_OUTPUT_PATTERN = Pattern.compile("\\s+\\[(\\d+)\\]\\s+(.*)\\:\\s+(.*)"); //$NON-NLS-1$
+    static final Pattern LIST_SNAPSHOT_OUTPUT_PATTERN = Pattern.compile("\\s+\\[(\\d+)\\]\\s+(\\S*)\\:\\s+(\\S*)(.*)"); //$NON-NLS-1$
     /**
      * Pattern to match snapshot path for network tracing (lttng list <session>)
      * Note: file for protocol is not considered as network trace since local consumer will be used.

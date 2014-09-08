@@ -105,10 +105,12 @@ public class LTTngControlServiceTest {
     private static final String SCEN_CREATE_SESSION_2_1 = "CreateSessionLttng2.1";
     private static final String SCEN_CREATE_SESSION_VERBOSE_2_1 = "CreateSessionLttngVerbose2.1";
     private static final String SCEN_CREATE_SNAPSHOT_SESSION = "CreateSessionSnapshot";
+    private static final String SCEN_CREATE_SNAPSHOT_SESSION_2_5 = "CreateSessionSnapshot2.5";
     private static final String SCEN_CREATE_STREAMED_SNAPSHOT_SESSION = "CreateSessionStreamedSnapshot";
     private static final String SCEN_CREATE_SNAPSHOT_SESSION_ERRORS = "CreateSessionSnapshotErrors";
     protected static final String SCEN_CREATE_LIVE_SESSION = "CreateSessionLive";
     private static final String SCEN_CREATE_LIVE_SESSION_ERRORS = "CreateSessionLiveErrors";
+
 
     // ------------------------------------------------------------------------
     // Test data
@@ -1310,6 +1312,44 @@ public class LTTngControlServiceTest {
     public void testCreateSnapshotSession() {
         try {
             fShell.setScenario(SCEN_CREATE_SNAPSHOT_SESSION);
+            ISessionInfo params = new SessionInfo("mysession");
+            params.setSnapshot(true);
+            ISessionInfo sessionInfo = fService.createSession(params, new NullProgressMonitor());
+            assertNotNull(sessionInfo);
+            assertEquals("mysession", sessionInfo.getName());
+            assertTrue(sessionInfo.isSnapshotSession());
+            assertEquals("", sessionInfo.getSessionPath());
+            assertTrue(!sessionInfo.isStreamedTrace());
+
+            assertEquals(TraceSessionState.INACTIVE, sessionInfo.getSessionState());
+
+            String[] names = fService.getSessionNames(new NullProgressMonitor());
+            assertEquals(names[0], "mysession");
+
+            ISnapshotInfo snapshotInfo = fService.getSnapshotInfo("mysession", new NullProgressMonitor());
+            assertNotNull(snapshotInfo);
+            assertEquals("snapshot-1", snapshotInfo.getName());
+            assertEquals("/home/user/lttng-traces/mysession-20130913-141651", snapshotInfo.getSnapshotPath());
+            assertEquals(1, snapshotInfo.getId());
+            assertTrue(!snapshotInfo.isStreamedSnapshot());
+
+            // we need to set the snapshotInfo to so that the session path is set correctly
+            sessionInfo.setSnapshotInfo(snapshotInfo);
+            assertEquals("/home/user/lttng-traces/mysession-20130913-141651", sessionInfo.getSessionPath());
+
+            fService.recordSnapshot("mysession", new NullProgressMonitor());
+
+            fService.destroySession("mysession", new NullProgressMonitor());
+
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
+
+    @Test
+    public void testCreateSnapshotSession2_5() {
+        try {
+            fShell.setScenario(SCEN_CREATE_SNAPSHOT_SESSION_2_5);
             ISessionInfo params = new SessionInfo("mysession");
             params.setSnapshot(true);
             ISessionInfo sessionInfo = fService.createSession(params, new NullProgressMonitor());
