@@ -737,14 +737,22 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                                     List<InputLine> nextInputs = currentInput.getNextInputs(countMap);
                                     if (nextInputs.size() == 0 || nextInputs.get(nextInputs.size() - 1).getMinCount() == 0) {
                                         for (InputLine input : definition.inputs) {
-                                            matcher = input.getPattern().matcher(log);
+                                            try {
+                                                matcher = input.getPattern().matcher(log);
+                                            } catch (PatternSyntaxException e) {
+                                                continue;
+                                            }
                                             if (matcher.matches()) {
                                                 continue event;
                                             }
                                         }
                                     }
                                     for (InputLine input : nextInputs) {
-                                        matcher = input.getPattern().matcher(log);
+                                        try {
+                                            matcher = input.getPattern().matcher(log);
+                                        } catch (PatternSyntaxException e) {
+                                            continue;
+                                        }
                                         if (matcher.matches()) {
                                             inputText.setStyleRange(new StyleRange(rawPos, length,
                                                     COLOR_BLACK, COLOR_LIGHT_YELLOW, SWT.ITALIC));
@@ -790,8 +798,12 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                                     }
                                 }
                                 if (!processed && currentInput != null) {
-                                    matcher = currentInput.getPattern().matcher(log);
-                                    if (matcher.matches()) {
+                                    matcher = null;
+                                    try {
+                                        matcher = currentInput.getPattern().matcher(log);
+                                    } catch (PatternSyntaxException e) {
+                                    }
+                                    if (matcher != null && matcher.matches()) {
                                         inputText.setStyleRange(new StyleRange(rawPos, length,
                                                 COLOR_BLACK, COLOR_LIGHT_YELLOW, SWT.ITALIC));
                                         updatePreviewLine(currentInput, matcher, data, rawPos, rootLineMatches);
