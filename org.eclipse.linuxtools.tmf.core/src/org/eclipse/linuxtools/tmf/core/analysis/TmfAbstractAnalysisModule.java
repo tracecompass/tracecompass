@@ -47,8 +47,6 @@ import org.eclipse.osgi.util.NLS;
  */
 public abstract class TmfAbstractAnalysisModule extends TmfComponent implements IAnalysisModule {
 
-    @NonNull private static final String UNDEFINED_ID = "undefined"; //$NON-NLS-1$
-
     private String fName, fId;
     private boolean fAutomatic = false, fStarted = false;
     private ITmfTrace fTrace;
@@ -90,8 +88,8 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
     public String getId() {
         String id = fId;
         if (id == null) {
-            Activator.logError("Analysis module getId(): the id should not be null in class " + this.getClass().getSimpleName()); //$NON-NLS-1$
-            return UNDEFINED_ID;
+            id = new String(this.getClass().getCanonicalName());
+            fId = id;
         }
         return id;
     }
