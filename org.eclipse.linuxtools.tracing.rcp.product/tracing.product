@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="Trace Viewer" uid="org.eclipse.linuxtools.tracing.rcp" id="org.eclipse.linuxtools.tracing.rcp.branding.product" application="org.eclipse.linuxtools.tracing.rcp.ui.application" version="1.0.0.qualifier" useFeatures="true" includeLaunchers="true">
+<product name="Trace Viewer" uid="org.eclipse.linuxtools.tracing.rcp" id="org.eclipse.linuxtools.tracing.rcp.branding.product" application="org.eclipse.linuxtools.tracing.rcp.ui.application" version="1.1.0.qualifier" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/org.eclipse.linuxtools.tracing.rcp.branding/icons/alt_about.gif"/>
       <text>
          Linux Tools Trace Viewer
 
-Version: 1.0.0
+Version: 1.1.0
 
 Copyright (c) 2014 Ericsson
 
