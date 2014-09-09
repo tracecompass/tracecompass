@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Ericsson
+ * Copyright (c) 2013, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
+ *   Patrick Tasse - Update for GDB trace validation
  *******************************************************************************/
 
 package org.eclipse.linuxtools.internal.gdbtrace.core.trace;
@@ -32,11 +33,14 @@ public class Messages extends NLS {
     /** File not found */
     public static String GdbTrace_FileNotFound;
 
-    /** Trace must be a file, not a directory or something else part 1*/
+    /** Trace must be a file, not a directory or something else */
     public static String GdbTrace_GdbTracesMustBeAFile;
 
-    /** Trace is not a file. part 2 */
-    public static String GdbTrace_IsNotAFile;
+    /** IOException validating trace file */
+    public static String GdbTrace_IOException;
+
+    /** File is not a GDB trace file */
+    public static String GdbTrace_NotGdbTraceFile;
 
     static {
         // initialize resource bundle

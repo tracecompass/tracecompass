@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 Ericsson
+ * Copyright (c) 2011, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,7 +15,11 @@
 
 package org.eclipse.linuxtools.internal.gdbtrace.core.trace;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Arrays;
 
 import org.eclipse.cdt.dsf.gdb.IGDBLaunchConfigurationConstants;
 import org.eclipse.cdt.dsf.gdb.IGdbDebugPreferenceConstants;
@@ -37,8 +41,10 @@ import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
+import org.eclipse.linuxtools.tmf.core.trace.TraceValidationStatus;
 import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.linuxtools.tmf.core.trace.location.TmfLongLocation;
+import org.eclipse.osgi.util.NLS;
 
 /**
  * GDB Tracepoint extension of TmfTrace. This class implements the necessary
@@ -58,6 +64,8 @@ public class GdbTrace extends TmfTrace implements ITmfEventParser {
     // ------------------------------------------------------------------------
 
     private static final int CACHE_SIZE = 20;
+
+    private static final byte[] HEADER = new byte[] {0x7f, 'T', 'R', 'A', 'C', 'E'};
 
     /** The qualified name for the 'executable' persistent property */
     public static final QualifiedName EXEC_KEY = new QualifiedName(GdbTraceCorePlugin.PLUGIN_ID, "executable"); //$NON-NLS-1$
@@ -86,15 +94,27 @@ public class GdbTrace extends TmfTrace implements ITmfEventParser {
 
     @Override
     public IStatus validate(IProject project, String path) {
-        if (fileExists(path)) {
-            if ((new File(path)).isFile()) {
-                return Status.OK_STATUS;
-            }
+        File file = new File(path);
+        if (!file.exists()) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-                    Messages.GdbTrace_GdbTracesMustBeAFile + ": " + //$NON-NLS-1$
-                            path + " " + Messages.GdbTrace_IsNotAFile); //$NON-NLS-1$
+                    NLS.bind(Messages.GdbTrace_FileNotFound, path));
         }
-        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.GdbTrace_FileNotFound + ": " + path); //$NON-NLS-1$
+        if (!file.isFile()) {
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                    NLS.bind(Messages.GdbTrace_GdbTracesMustBeAFile, path));
+        }
+        try (BufferedInputStream stream = new BufferedInputStream(new FileInputStream(file))) {
+            byte[] buffer = new byte[HEADER.length];
+            int read = stream.read(buffer);
+            if (read != HEADER.length || !Arrays.equals(buffer, HEADER)) {
+                return new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                        NLS.bind(Messages.GdbTrace_NotGdbTraceFile, path));
+            }
+        } catch (IOException e) {
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                    NLS.bind(Messages.GdbTrace_IOException, path), e);
+        }
+        return new TraceValidationStatus(100, GdbTraceCorePlugin.PLUGIN_ID);
     }
 
     @Override
