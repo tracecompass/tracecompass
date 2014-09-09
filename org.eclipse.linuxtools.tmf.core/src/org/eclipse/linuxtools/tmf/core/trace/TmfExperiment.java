@@ -66,22 +66,21 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
      * The file name of the Synchronization
      *
      * @since 3.0
-     * @deprecated This file name shouldn't be used directly anymore. Instead,
-     *             all synchronization files have been moved to the
-     *             {@link #SYNCHRONIZATION_DIRECTORY} folder.
+     * @deprecated This file name shouldn't be used directly anymore. All
+     *             synchronization files have been moved to a folder and you
+     *             should use the {@link #getSynchronizationFolder(boolean)}
+     *             method to return the path to this folder.
      */
     @Deprecated
-    public final static String SYNCHRONIZATION_FILE_NAME = "synchronization.bin"; //$NON-NLS-1$
+    public static final String SYNCHRONIZATION_FILE_NAME = "synchronization.bin"; //$NON-NLS-1$
 
     /**
      * The name of the directory containing trace synchronization data. This
      * directory typically will be preserved when traces are synchronized.
      * Analysis involved in synchronization can put their supplementary files in
      * there so they are not deleted when synchronized traces are copied.
-     *
-     * @since 3.2
      */
-    public final static String SYNCHRONIZATION_DIRECTORY = "sync_data"; //$NON-NLS-1$
+    private static final String SYNCHRONIZATION_DIRECTORY = "sync_data"; //$NON-NLS-1$
 
     /**
      * The default index page size
@@ -346,7 +345,8 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
             final ITmfContext traceContext = fTraces[i].seekEvent(locations[i]);
             context.setContext(i, traceContext);
             traceContext.setRank(ranks[i]);
-            locations[i] = traceContext.getLocation(); // update location after seek
+            // update location after seek
+            locations[i] = traceContext.getLocation();
             context.setEvent(i, fTraces[i].getNext(traceContext));
             rank += ranks[i];
         }
@@ -490,16 +490,24 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
     /**
      * Get the path to the folder in the supplementary file where
      * synchronization-related data can be kept so they are not deleted when the
-     * experiment is synchronized. If the directory does not exist, it will be
-     * created. A return value of <code>null</code> means either the trace
-     * resource does not exist or supplementary resources cannot be kept.
+     * experiment is synchronized. Analysis involved in synchronization can put
+     * their supplementary files in there so they are preserved after
+     * synchronization.
      *
+     * If the directory does not exist, it will be created. A return value of
+     * <code>null</code> means either the trace resource does not exist or
+     * supplementary resources cannot be kept.
+     *
+     * @param absolute
+     *            If <code>true</code>, it returns the absolute path in the file
+     *            system, including the supplementary file path. Otherwise, it
+     *            returns only the directory name.
      * @return The path to the folder where synchronization-related
      *         supplementary files can be kept or <code>null</code> if not
      *         available.
      * @since 3.2
      */
-    public String getSynchronizationFolder() {
+    public String getSynchronizationFolder(boolean absolute) {
         /* Set up the path to the synchronization file we'll use */
         IResource resource = this.getResource();
         String syncDirectory = null;
@@ -507,12 +515,17 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
         try {
             /* get the directory where the file will be stored. */
             if (resource != null) {
-                syncDirectory = resource.getPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER);
+                String fullDirectory = resource.getPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER);
                 /* Create the synchronization data directory if not present */
-                if (syncDirectory != null) {
-                    syncDirectory = syncDirectory + File.separator + SYNCHRONIZATION_DIRECTORY;
-                    File syncDir = new File(syncDirectory);
+                if (fullDirectory != null) {
+                    fullDirectory = fullDirectory + File.separator + SYNCHRONIZATION_DIRECTORY;
+                    File syncDir = new File(fullDirectory);
                     syncDir.mkdirs();
+                }
+                if (absolute) {
+                    syncDirectory = fullDirectory;
+                } else {
+                    syncDirectory = SYNCHRONIZATION_DIRECTORY;
                 }
             }
         } catch (CoreException e) {
@@ -544,7 +557,7 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
      */
     public synchronized SynchronizationAlgorithm synchronizeTraces(boolean doSync) {
 
-        String syncDirectory = getSynchronizationFolder();
+        String syncDirectory = getSynchronizationFolder(true);
 
         final File syncFile = (syncDirectory != null) ? new File(syncDirectory + File.separator + SYNCHRONIZATION_FILE_NAME) : null;
 
@@ -691,7 +704,9 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
                         return 0;
                     }
                     totalCheckpointSize += currentTraceCheckpointSize;
-                    totalCheckpointSize += 8; // each entry in the TmfLocationArray has a rank in addition of the location
+                    // each entry in the TmfLocationArray has a rank in addition
+                    // of the location
+                    totalCheckpointSize += 8;
                 }
             }
         } catch (UnsupportedOperationException e) {

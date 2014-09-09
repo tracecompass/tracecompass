@@ -233,10 +233,10 @@ public class SynchronizeTracesHandler extends AbstractHandler {
 
                         // Move synchronization file temporarily so that
                         // it doesn't get deleted by the experiment change
-                        IFolder tmpFolder = exp.getTraceSupplementaryFolder(exp.getName() + '.' + TmfExperiment.SYNCHRONIZATION_DIRECTORY);
+                        IFolder tmpFolder = exp.getTraceSupplementaryFolder(exp.getName() + '.' + experiment.getSynchronizationFolder(false));
                         IResource syncFile = null;
                         for (IResource resource : exp.getSupplementaryResources()) {
-                            if (resource.getName().equals(TmfExperiment.SYNCHRONIZATION_DIRECTORY)) {
+                            if (resource.getName().equals(experiment.getSynchronizationFolder(false))) {
                                 try {
                                     resource.move(tmpFolder.getFullPath(), false, null);
                                     syncFile = resource;
