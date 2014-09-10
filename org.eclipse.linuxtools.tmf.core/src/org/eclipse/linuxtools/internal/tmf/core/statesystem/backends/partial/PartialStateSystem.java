@@ -72,10 +72,18 @@ public class PartialStateSystem extends StateSystem {
         return realStateSystem;
     }
 
+    // ------------------------------------------------------------------------
+    // Publicized non-API methods
+    // ------------------------------------------------------------------------
+
     @Override
     public void replaceOngoingState(List<ITmfStateInterval> ongoingIntervals) {
-        /* We simply publicize StateSystem's method */
         super.replaceOngoingState(ongoingIntervals);
+    }
+
+    @Override
+    public synchronized void dispose() {
+        super.dispose();
     }
 
     // ------------------------------------------------------------------------

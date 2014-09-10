@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.statesystem.core.ITmfStateSystem;
 import org.eclipse.linuxtools.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.linuxtools.statesystem.core.exceptions.AttributeNotFoundException;
@@ -59,22 +60,22 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
      * A partial history needs the state input plugin to re-generate state
      * between checkpoints.
      */
-    private final ITmfStateProvider partialInput;
+    private final @NonNull ITmfStateProvider partialInput;
 
     /**
      * Fake state system that is used for partially rebuilding the states (when
      * going from a checkpoint to a target query timestamp).
      */
-    private final PartialStateSystem partialSS;
+    private final @NonNull PartialStateSystem partialSS;
 
     /** Reference to the "real" state history that is used for storage */
-    private final IStateHistoryBackend innerHistory;
+    private final @NonNull IStateHistoryBackend innerHistory;
 
     /** Checkpoints map, <Timestamp, Rank in the trace> */
-    private final TreeMap<Long, Long> checkpoints = new TreeMap<>();
+    private final @NonNull TreeMap<Long, Long> checkpoints = new TreeMap<>();
 
     /** Latch tracking if the initial checkpoint registration is done */
-    private final CountDownLatch checkpointsReady = new CountDownLatch(1);
+    private final @NonNull CountDownLatch checkpointsReady = new CountDownLatch(1);
 
     private final long granularity;
 
@@ -183,6 +184,8 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
 
     @Override
     public void dispose() {
+        partialInput.dispose();
+        partialSS.dispose();
         innerHistory.dispose();
     }
 
