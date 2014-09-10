@@ -1641,6 +1641,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
     protected boolean drawArrow(TimeGraphColorScheme colors, ITimeEvent event,
             Rectangle rect, GC gc) {
 
+        if (rect == null) {
+            return false;
+        }
         int colorIdx = fTimeGraphProvider.getStateTableIndex(event);
         if (colorIdx < 0) {
             return false;
