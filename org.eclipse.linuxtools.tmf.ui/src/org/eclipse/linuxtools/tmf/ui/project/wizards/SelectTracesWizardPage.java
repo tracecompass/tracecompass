@@ -16,7 +16,9 @@
 package org.eclipse.linuxtools.tmf.ui.project.wizards;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -151,21 +153,34 @@ public class SelectTracesWizardPage extends WizardPage {
 
             @Override
             public Object[] getElements(Object inputElement) {
-                return super.getChildren(inputElement);
+                return getChildren(inputElement);
             }
 
             @Override
             public synchronized Object[] getChildren(Object parentElement) {
                 // We only care about the content of trace folders
                 if (parentElement instanceof TmfTraceFolder) {
-                    return super.getChildren(parentElement);
+                    Object[] children = super.getChildren(parentElement);
+                    List<ITmfProjectModelElement> filteredChildren = new ArrayList<>();
+                    for (Object child : children) {
+                        if (child instanceof TmfTraceElement) {
+                            TmfTraceElement traceElement = (TmfTraceElement) child;
+                            if (traceElement.getTraceType() != null) {
+                                filteredChildren.add(traceElement);
+                            }
+                        } else if (child instanceof TmfTraceFolder) {
+                            filteredChildren.add((TmfTraceFolder) child);
+                        }
+                    }
+                    return filteredChildren.toArray();
                 }
                 return null;
             }
 
             @Override
             public boolean hasChildren(Object element) {
-                return getChildren(element) != null;
+                Object[] children = getChildren(element);
+                return children != null && children.length > 0;
             }
         };
         fCheckboxTreeViewer.setContentProvider(fContentProvider);
