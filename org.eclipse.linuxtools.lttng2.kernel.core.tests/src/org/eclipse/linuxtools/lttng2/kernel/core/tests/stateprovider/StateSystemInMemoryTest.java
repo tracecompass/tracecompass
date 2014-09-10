@@ -13,19 +13,17 @@
 
 package org.eclipse.linuxtools.lttng2.kernel.core.tests.stateprovider;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.stateprovider.LttngKernelStateProvider;
+import org.eclipse.linuxtools.statesystem.core.ITmfStateSystem;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace;
 import org.junit.After;
-import org.junit.Before;
 
 /**
  * State system tests using the in-memory back-end.
@@ -36,13 +34,8 @@ public class StateSystemInMemoryTest extends StateSystemTest {
 
     private TestLttngKernelAnalysisModule module;
 
-    /**
-     * Initialization
-     */
-    @Before
-    public void initialize() {
-        assumeTrue(testTrace.exists());
-
+    @Override
+    protected ITmfStateSystem initialize() {
         module = new TestLttngKernelAnalysisModule();
         try {
             module.setTrace(testTrace.getTrace());
@@ -51,16 +44,17 @@ public class StateSystemInMemoryTest extends StateSystemTest {
         }
         module.schedule();
         assertTrue(module.waitForCompletion());
-        ssq = module.getStateSystem();
-        assertNotNull(ssq);
+        return module.getStateSystem();
     }
 
     /**
      * Class cleanup
      */
     @After
-    public void cleanupClass() {
-        module.close();
+    public void cleanup() {
+        if (module != null) {
+            module.close();
+        }
     }
 
     private static class TestLttngKernelAnalysisModule extends TmfStateSystemAnalysisModule {
