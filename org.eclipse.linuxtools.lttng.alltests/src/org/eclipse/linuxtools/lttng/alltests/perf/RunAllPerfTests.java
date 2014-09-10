@@ -10,7 +10,7 @@
  *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng.alltests;
+package org.eclipse.linuxtools.lttng.alltests.perf;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

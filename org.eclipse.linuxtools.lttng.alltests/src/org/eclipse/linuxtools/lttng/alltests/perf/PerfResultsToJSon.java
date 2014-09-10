@@ -10,7 +10,7 @@
  *   Marc-Andre Laperle - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng.alltests;
+package org.eclipse.linuxtools.lttng.alltests.perf;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.linuxtools.lttng.alltests.Activator;
 import org.eclipse.test.internal.performance.PerformanceTestPlugin;
 import org.eclipse.test.internal.performance.data.Dim;
 import org.eclipse.test.internal.performance.db.DB;
