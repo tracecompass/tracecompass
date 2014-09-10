@@ -250,7 +250,7 @@ public final class TmfTraceTypeUIUtils {
     }
 
     /**
-     * Set the trace type of a {@Link TraceTypeHelper}. Should only be
+     * Set the trace type of a {@link TraceTypeHelper}. Should only be
      * used internally by this project.
      *
      * @param resource
@@ -265,7 +265,7 @@ public final class TmfTraceTypeUIUtils {
         return setTraceType(resource, traceType, true);
     }
         /**
-         * Set the trace type of a {@Link TraceTypeHelper}. Should only be
+         * Set the trace type of a {@link TraceTypeHelper}. Should only be
          * used internally by this project.
          *
          * @param resource

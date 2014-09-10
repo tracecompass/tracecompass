@@ -61,7 +61,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
 
     private static final MathContext fMc = MathContext.DECIMAL128;
 
-    /** @Serial */
+    /** @serial */
     private final List<ConvexHull> fSyncs;
 
     private SyncSpanningTree fTree = null;

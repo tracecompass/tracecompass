@@ -30,7 +30,7 @@ import org.swtchart.ISeries;
  * position x as well as it highlights the bar of the x position.
  * It only considers the first series of the chart.
  *
- * @autor Bernd Hufmann
+ * @author Bernd Hufmann
  * @since 3.0
  */
 public class TmfHistogramTooltipProvider extends TmfBaseProvider implements MouseTrackListener, MouseMoveListener, PaintListener {
