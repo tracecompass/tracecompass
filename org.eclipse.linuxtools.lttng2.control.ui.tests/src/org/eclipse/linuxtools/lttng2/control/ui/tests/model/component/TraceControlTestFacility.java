@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.ControlView;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.ITraceControlComponent;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PartInitException;
@@ -129,12 +128,13 @@ public class TraceControlTestFacility {
             long endTimeMillis = System.currentTimeMillis() + waitTimeMillis;
             while(System.currentTimeMillis() < endTimeMillis) {
                 if (!display.readAndDispatch()) {
-                    if ("cocoa".equals (SWT.getPlatform ())) {
-                        // The display needs to be woken up because it's possible
-                        // to get in a state where nothing will wake up the UI thread
-                        display.asyncExec(null);
+                    // We do not use Display.sleep because it might never wake up
+                    // if there is no user interaction
+                    try {
+                        Thread.sleep(Math.min(waitTimeMillis, 10));
+                    } catch (final InterruptedException e) {
+                        // Ignored
                     }
-                    display.sleep();
                 }
                 display.update();
             }
