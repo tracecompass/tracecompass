@@ -134,6 +134,7 @@ public abstract class AbstractProviderTest {
     @Test
     public void testOtherUstTrace() {
         /* Initialize the trace and analysis module */
+        File suppDir;
         try (CtfTmfTrace ustTrace = otherUstTrace.getTrace();) {
             try (TestLttngCallStackModule module = new TestLttngCallStackModule();) {
                 try {
@@ -150,11 +151,10 @@ public abstract class AbstractProviderTest {
                 assertTrue(ss.getStartTime() >= ustTrace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
                 assertEquals(0, ss.getNbAttributes());
             }
-            /* Dispose the trace */
-            File suppDir = new File(TmfTraceManager.getSupplementaryFileDir(ustTrace));
-            deleteDirectory(suppDir);
-            assertFalse(suppDir.exists());
+            suppDir = new File(TmfTraceManager.getSupplementaryFileDir(ustTrace));
         }
+        deleteDirectory(suppDir);
+        assertFalse(suppDir.exists());
     }
 
     /**
