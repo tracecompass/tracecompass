@@ -264,8 +264,7 @@ public class PerfResultsToJSon {
         Variations configVariations = PerformanceTestPlugin.getVariations();
         JSONObject osJvmVariants = createOsJvm();
 
-        @SuppressWarnings("rawtypes")
-        Iterator keysIt = osJvmVariants.keys();
+        Iterator<?> keysIt = osJvmVariants.keys();
         while (keysIt.hasNext()) {
             JSONArray overviewSummarySeries = new JSONArray();
 
