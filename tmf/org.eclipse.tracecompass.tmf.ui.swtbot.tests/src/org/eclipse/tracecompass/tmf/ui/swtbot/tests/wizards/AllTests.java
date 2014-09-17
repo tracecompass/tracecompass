@@ -20,7 +20,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    StandardImportGzipTraceTest.class
+    StandardImportGzipTraceTest.class,
+    TestImportExportPackageWizard.class
 })
 public class AllTests {
 }
