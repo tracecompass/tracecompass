@@ -1378,24 +1378,6 @@
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteTraceFolderElementHandler"
-            commandId="org.eclipse.ui.edit.delete">
-         <activeWhen>
-            <and>
-               <count
-                     value="1">
-               </count>
-               <iterate
-                     ifEmpty="false"
-                     operator="or">
-                  <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder">
-                  </instanceof>
-               </iterate>
-            </and>
-         </activeWhen>
-      </handler>
-      <handler
             class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.NewFolderHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.new_folder">
          <activeWhen>
