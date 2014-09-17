@@ -22,9 +22,6 @@ import java.util.List;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow.ControlFlowView;
@@ -36,9 +33,6 @@ import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfEvent;
 import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace;
 import org.eclipse.linuxtools.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfOpenTraceHelper;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.linuxtools.tmf.ui.swtbot.tests.SWTBotUtil;
 import org.eclipse.linuxtools.tmf.ui.swtbot.tests.conditions.ConditionHelpers;
 import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramView;
@@ -70,11 +64,12 @@ import org.junit.runner.RunWith;
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class ImportAndReadKernelSmokeTest {
 
+    private static final String TRACE_TYPE = "org.eclipse.linuxtools.lttng2.kernel.tracetype";
     private static final String KERNEL_PERSPECTIVE_ID = "org.eclipse.linuxtools.lttng2.kernel.ui.perspective";
     private static final String TRACE_PROJECT_NAME = "test";
 
     private static SWTWorkbenchBot fBot;
-    private static CtfTmfTestTrace ctt = CtfTmfTestTrace.SYNTHETIC_TRACE;
+    public static CtfTmfTestTrace ctt = CtfTmfTestTrace.SYNTHETIC_TRACE;
     private ITmfEvent fDesired1;
     private ITmfEvent fDesired2;
 
@@ -132,7 +127,7 @@ public class ImportAndReadKernelSmokeTest {
     @Test
     public void test() {
         SWTBotUtil.createProject(TRACE_PROJECT_NAME);
-        openTrace();
+        SWTBotUtil.openTrace(TRACE_PROJECT_NAME, ctt.getPath(), TRACE_TYPE);
         openEditor();
         testHV(getViewPart("Histogram"));
         testCFV((ControlFlowView) getViewPart("Control Flow"));
@@ -140,29 +135,6 @@ public class ImportAndReadKernelSmokeTest {
 
         fBot.closeAllEditors();
         SWTBotUtil.deleteProject(TRACE_PROJECT_NAME, fBot);
-    }
-
-    private static void openTrace() {
-        final Exception exception[] = new Exception[1];
-        exception[0] = null;
-        UIThreadRunnable.syncExec(new VoidResult() {
-            @Override
-            public void run() {
-                try {
-                    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(TRACE_PROJECT_NAME);
-                    TmfTraceFolder destinationFolder = TmfProjectRegistry.getProject(project, true).getTracesFolder();
-                    TmfOpenTraceHelper.openTraceFromPath(destinationFolder, ctt.getPath(), PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "org.eclipse.linuxtools.lttng2.kernel.tracetype");
-                } catch (CoreException e) {
-                    exception[0] = e;
-                }
-            }
-        });
-        if (exception[0] != null) {
-            fail(exception[0].getMessage());
-        }
-
-        SWTBotUtil.delay(1000);
-        SWTBotUtil.waitForJobs();
     }
 
     private void openEditor() {
