@@ -4,13 +4,13 @@
 <product name="Trace Compass" uid="org.eclipse.tracecompass.rcp" id="org.eclipse.tracecompass.rcp.branding.product" application="org.eclipse.tracecompass.rcp.ui.application" version="0.1.0.qualifier" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
-      <image path="/org.eclipse.tracecompass.tracing.rcp.branding/icons/alt_about.gif"/>
+      <image path="/org.eclipse.tracecompass.rcp.branding/icons/tc_about.gif"/>
       <text>
          Trace Compass
 
 Version: 0.1.0
 
-Copyright (c) 2014 Ericsson
+Copyright (c) 2014 Ericsson and others.
 
 All rights reserved. This program and the accompanying materials are
 made available under the terms of the Eclipse Public License v1.0 which
@@ -37,11 +37,19 @@ http://www.eclipse.org/legal/epl-v10.html
       </vmArgsWin>
    </launcherArgs>
 
-   <windowImages i16="/org.eclipse.tracecompass.rcp.branding/icons/alt_window_16.gif" i32="/org.eclipse.tracecompass.rcp.branding/icons/alt_window_32.gif"/>
+   <windowImages i16="/org.eclipse.tracecompass.rcp.branding/icons/png/tc_icon_16x16.png" i32="/org.eclipse.tracecompass.rcp.branding/icons/png/tc_icon_32x32.png" i48="/org.eclipse.tracecompass.rcp.branding/icons/png/tc_icon_48x48.png" i64="/org.eclipse.tracecompass.rcp.branding/icons/png/tc_icon_64x64.png" i128="/org.eclipse.tracecompass.rcp.branding/icons/png/tc_icon_128x128.png" i256="/org.eclipse.tracecompass.rcp.branding/icons/png/tc_icon_256x256.png"/>
 
+   <splash
+      location="org.eclipse.tracecompass.rcp.branding"
+      startupProgressRect="10,300,480,15"
+      startupMessageRect="7,285,490,0"
+      startupForegroundColor="FFFFFF" />
    <launcher name="tracecompass">
+      <linux icon="../../../../org.eclipse.tracecompass.rcp.branding/icons/xpm/tc_icon_256x256.xpm"/>
+      <macosx icon="../../../../org.eclipse.tracecompass.rcp.branding/icons/icns/tc_icon.icns"/>
       <solaris/>
-      <win useIco="false">
+      <win useIco="true">
+         <ico path="../../../../org.eclipse.tracecompass.rcp.branding/icons/ico/tc_icon.ico"/>
          <bmp/>
       </win>
    </launcher>
@@ -223,5 +231,12 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
       <plugin id="org.eclipse.tracecompass.rcp.ui" autoStart="false" startLevel="5" />
       <plugin id="org.eclipse.update.configurator" autoStart="true" startLevel="3" />
    </configurations>
+
+   <preferencesInfo>
+      <targetfile overwrite="false"/>
+   </preferencesInfo>
+
+   <cssInfo>
+   </cssInfo>
 
 </product>
