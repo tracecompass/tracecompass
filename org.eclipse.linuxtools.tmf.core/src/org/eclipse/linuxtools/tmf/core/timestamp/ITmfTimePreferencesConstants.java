@@ -14,6 +14,7 @@ package org.eclipse.linuxtools.tmf.core.timestamp;
 
 /**
  * @since 2.1
+ * @noimplement This interface is not intended to be implemented by clients.
  */
 @SuppressWarnings({ "javadoc", "nls" })
 public interface ITmfTimePreferencesConstants {
@@ -52,4 +53,6 @@ public interface ITmfTimePreferencesConstants {
     public static final String DELIMITER_DQUOT = "\"";
     /** @since 3.0 */
     public static final String DELIMITER_QUOTE = "''";
+    /** @since 3.1 */
+    public static final String LOCALE = TIME_FORMAT_PREF + ".locale";
 }

@@ -21,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimePreferences;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.linuxtools.tmf.core.trace.text.TextTrace;
@@ -37,7 +38,8 @@ public class SyslogTrace extends TextTrace<SyslogEvent> {
     /** The time stamp format of the trace type. */
     public static final String TIMESTAMP_FORMAT = "MMM dd HH:mm:ss"; //$NON-NLS-1$
     /** The corresponding date format of the time stamp. */
-    public static final SimpleDateFormat TIMESTAMP_SIMPLEDATEFORMAT = new SimpleDateFormat(TIMESTAMP_FORMAT);
+    public static final SimpleDateFormat TIMESTAMP_SIMPLEDATEFORMAT = new SimpleDateFormat(
+            TIMESTAMP_FORMAT, TmfTimePreferences.getInstance().getLocale());
     /** The scale of the time stamps. */
     public static final byte TIMESTAMP_SCALE = ITmfTimestamp.MILLISECOND_SCALE;
     /** The regular expression pattern of the first line of an event. */
