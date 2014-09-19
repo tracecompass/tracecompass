@@ -26,6 +26,7 @@ Export-Package: org.eclipse.linuxtools.internal.tmf.core;x-friends:="org.eclipse
  org.eclipse.linuxtools.tmf.core.callstack,
  org.eclipse.linuxtools.tmf.core.component,
  org.eclipse.linuxtools.tmf.core.event,
+ org.eclipse.linuxtools.tmf.core.event.collapse,
  org.eclipse.linuxtools.tmf.core.event.lookup,
  org.eclipse.linuxtools.tmf.core.event.matching,
  org.eclipse.linuxtools.tmf.core.exceptions,
