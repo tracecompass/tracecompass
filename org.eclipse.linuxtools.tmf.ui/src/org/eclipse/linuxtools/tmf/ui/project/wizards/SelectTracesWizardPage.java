@@ -93,8 +93,11 @@ public class SelectTracesWizardPage extends WizardPage {
     // ------------------------------------------------------------------------
     /**
      * Constructor
-     * @param project The project model element.
-     * @param experiment The experiment model experiment.
+     *
+     * @param project
+     *            The project model element.
+     * @param experiment
+     *            The experiment model experiment.
      */
     protected SelectTracesWizardPage(TmfProjectElement project, TmfExperimentElement experiment) {
         super(""); //$NON-NLS-1$
@@ -203,6 +206,7 @@ public class SelectTracesWizardPage extends WizardPage {
             public String getText(Object element) {
                 return fLabelProvider.getText(element);
             }
+
             @Override
             public Image getImage(Object element) {
                 return fLabelProvider.getImage(element);
@@ -316,6 +320,7 @@ public class SelectTracesWizardPage extends WizardPage {
 
     /**
      * Method to finalize the select operation.
+     *
      * @return <code>true</code> if successful else <code>false</code>
      */
     public boolean performFinish() {
@@ -329,7 +334,8 @@ public class SelectTracesWizardPage extends WizardPage {
             getContainer().run(true, true, new IRunnableWithProgress() {
                 @Override
                 public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-                    // Wrapper to have only one resource changed event at the end of the operation.
+                    // Wrapper to have only one resource changed event at the
+                    // end of the operation.
                     IWorkspaceRunnable workspaceRunnable = new IWorkspaceRunnable() {
                         @Override
                         public void run(IProgressMonitor pm) throws CoreException {
@@ -353,21 +359,20 @@ public class SelectTracesWizardPage extends WizardPage {
             status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.SelectTracesWizardPage_SelectionError, e);
         } catch (InterruptedException e) {
             status = Status.CANCEL_STATUS;
-        } finally {
-            if (!status.isOK()) {
-                if (status.getSeverity() == IStatus.CANCEL) {
-                    setMessage(Messages.SelectTracesWizardPage_SelectionOperationCancelled);
-                    setErrorMessage(null);
-                } else {
-                    if (status.getException() != null) {
-                        MessageDialog.open(MessageDialog.ERROR, getContainer().getShell(),
-                                Messages.SelectTracesWizardPage_InternalErrorTitle, status.getMessage() + ": " + status.getException(), SWT.SHEET); //$NON-NLS-1$
-                    }
-                    setMessage(null);
-                    setErrorMessage(Messages.SelectTracesWizardPage_SelectionError);
+        }
+        if (!status.isOK()) {
+            if (status.getSeverity() == IStatus.CANCEL) {
+                setMessage(Messages.SelectTracesWizardPage_SelectionOperationCancelled);
+                setErrorMessage(null);
+            } else {
+                if (status.getException() != null) {
+                    MessageDialog.open(MessageDialog.ERROR, getContainer().getShell(),
+                            Messages.SelectTracesWizardPage_InternalErrorTitle, status.getMessage() + ": " + status.getException(), SWT.SHEET); //$NON-NLS-1$
                 }
-                return false;
+                setMessage(null);
+                setErrorMessage(Messages.SelectTracesWizardPage_SelectionError);
             }
+            return false;
         }
         setErrorMessage(null);
 
@@ -408,7 +413,8 @@ public class SelectTracesWizardPage extends WizardPage {
                     subMonitor.worked(1);
                 }
 
-                // Remove traces that were unchecked (thus left in fPreviousTraces)
+                // Remove traces that were unchecked (thus left in
+                // fPreviousTraces)
                 keys = fPreviousTraces.keySet();
                 for (String key : keys) {
                     ModalContext.checkCanceled(progressMonitor);
@@ -432,7 +438,7 @@ public class SelectTracesWizardPage extends WizardPage {
                 setStatus(Status.CANCEL_STATUS);
             } catch (Exception e) {
                 Activator.getDefault().logError(Messages.SelectTracesWizardPage_SelectionError, e);
-                setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.SelectTracesWizardPage_SelectionError , e));
+                setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.SelectTracesWizardPage_SelectionError, e));
             }
         }
 

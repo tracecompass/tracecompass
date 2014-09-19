@@ -113,17 +113,17 @@ import org.eclipse.ui.wizards.datatransfer.IImportStructureProvider;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 
 /**
- * A variant of the standard resource import wizard for importing traces
- * to given tracing project. If no project or tracing project was selected
- * the wizard imports it to the default tracing project which is created
- * if necessary.
+ * A variant of the standard resource import wizard for importing traces to
+ * given tracing project. If no project or tracing project was selected the
+ * wizard imports it to the default tracing project which is created if
+ * necessary.
  *
  * In our case traces could be files or a directory structure. This wizard
- * supports both cases. It imports traces for a selected trace type or, if
- * no trace type is selected, it tries to detect the trace type automatically.
- * However, the automatic detection is a best-effort and cannot guarantee
- * that the detection is successful. The reason for this is that there might
- * be multiple trace types that can be assigned to a single trace.
+ * supports both cases. It imports traces for a selected trace type or, if no
+ * trace type is selected, it tries to detect the trace type automatically.
+ * However, the automatic detection is a best-effort and cannot guarantee that
+ * the detection is successful. The reason for this is that there might be
+ * multiple trace types that can be assigned to a single trace.
  *
  *
  * @author Francois Chouinard
@@ -258,8 +258,8 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             }
         }
 
-         //  If no tracing project was selected or trace folder doesn't exist use
-         //  default tracing project
+        // If no tracing project was selected or trace folder doesn't exist use
+        // default tracing project
         if (traceFolder == null) {
             IProject project = TmfProjectRegistry.createProject(
                     TmfCommonConstants.DEFAULT_TRACE_PROJECT_NAME, null, new NullProgressMonitor());
@@ -360,7 +360,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                     if (element.isPopulated()) {
                         return getChildren(element).length > 0;
                     }
-                    //If we have not populated then wait until asked
+                    // If we have not populated then wait until asked
                     return true;
                 }
                 return false;
@@ -805,12 +805,14 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             String archivePath = getSourceArchiveFile() != null ? getSourceArchiveFile().getAbsolutePath() : ""; //$NON-NLS-1$
             if (ArchiveFileManipulations.isTarFile(archivePath)) {
                 if (ensureTarSourceIsValid(archivePath)) {
-                    // We close the file when we dispose the import provider, see disposeSelectionGroupRoot
+                    // We close the file when we dispose the import provider,
+                    // see disposeSelectionGroupRoot
                     TarFile tarFile = getSpecifiedTarSourceFile(archivePath);
                     leveledImportStructureProvider = new FileSystemObjectLeveledImportStructureProvider(new TarLeveledStructureProvider(tarFile), archivePath);
                 }
             } else if (ensureZipSourceIsValid(archivePath)) {
-                // We close the file when we dispose the import provider, see disposeSelectionGroupRoot
+                // We close the file when we dispose the import provider, see
+                // disposeSelectionGroupRoot
                 @SuppressWarnings("resource")
                 ZipFile zipFile = getSpecifiedZipSourceFile(archivePath);
                 leveledImportStructureProvider = new FileSystemObjectLeveledImportStructureProvider(new ZipLeveledStructureProvider(zipFile), archivePath);
@@ -837,6 +839,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
         private IImportStructureProvider fImportProvider;
         private String fArchivePath;
+
         private FileSystemObjectImportStructureProvider(IImportStructureProvider importStructureProvider, String archivePath) {
             fImportProvider = importStructureProvider;
             fArchivePath = archivePath;
@@ -845,7 +848,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         @Override
         public List<IFileSystemObject> getChildren(Object element) {
             @SuppressWarnings("rawtypes")
-            List children = fImportProvider.getChildren(((IFileSystemObject)element).getRawFileSystemObject());
+            List children = fImportProvider.getChildren(((IFileSystemObject) element).getRawFileSystemObject());
             List<IFileSystemObject> adapted = new ArrayList<>(children.size());
             for (Object o : children) {
                 adapted.add(getIFileSystemObject(o));
@@ -871,22 +874,22 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
         @Override
         public InputStream getContents(Object element) {
-            return fImportProvider.getContents(((IFileSystemObject)element).getRawFileSystemObject());
+            return fImportProvider.getContents(((IFileSystemObject) element).getRawFileSystemObject());
         }
 
         @Override
         public String getFullPath(Object element) {
-            return fImportProvider.getFullPath(((IFileSystemObject)element).getRawFileSystemObject());
+            return fImportProvider.getFullPath(((IFileSystemObject) element).getRawFileSystemObject());
         }
 
         @Override
         public String getLabel(Object element) {
-            return fImportProvider.getLabel(((IFileSystemObject)element).getRawFileSystemObject());
+            return fImportProvider.getLabel(((IFileSystemObject) element).getRawFileSystemObject());
         }
 
         @Override
         public boolean isFolder(Object element) {
-            return fImportProvider.isFolder(((IFileSystemObject)element).getRawFileSystemObject());
+            return fImportProvider.isFolder(((IFileSystemObject) element).getRawFileSystemObject());
         }
 
         /**
@@ -1012,7 +1015,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 elementLabel, dummyParent, isContainer, provider);
         result.setFileSystemObject(element);
 
-        //Get the files for the element so as to build the first level
+        // Get the files for the element so as to build the first level
         result.getFiles();
 
         return dummyParent;
@@ -1297,20 +1300,19 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.ImportTraceWizard_ImportProblem, e);
         } catch (InterruptedException e) {
             status = Status.CANCEL_STATUS;
-        } finally {
-            if (!status.isOK()) {
-                if (status.getSeverity() == IStatus.CANCEL) {
-                    setMessage(Messages.ImportTraceWizard_ImportOperationCancelled);
-                    setErrorMessage(null);
-                } else {
-                    if (status.getException() != null) {
-                        displayErrorDialog(status.getMessage() + ": " + status.getException()); //$NON-NLS-1$
-                    }
-                    setMessage(null);
-                    setErrorMessage(Messages.ImportTraceWizard_ImportProblem);
+        }
+        if (!status.isOK()) {
+            if (status.getSeverity() == IStatus.CANCEL) {
+                setMessage(Messages.ImportTraceWizard_ImportOperationCancelled);
+                setErrorMessage(null);
+            } else {
+                if (status.getException() != null) {
+                    displayErrorDialog(status.getMessage() + ": " + status.getException()); //$NON-NLS-1$
                 }
-                return false;
+                setMessage(null);
+                setErrorMessage(Messages.ImportTraceWizard_ImportProblem);
             }
+            return false;
         }
         setErrorMessage(null);
         return true;
@@ -1398,15 +1400,17 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                     public void filterElements(Collection elements, IProgressMonitor monitor) {
                         fileSystemElements.addAll(elements);
                     }
+
                     @Override
                     public void filterElements(Object[] elements, IProgressMonitor monitor) {
                         for (int i = 0; i < elements.length; i++) {
-                            fileSystemElements.add((TraceFileSystemElement)elements[i]);
+                            fileSystemElements.add((TraceFileSystemElement) elements[i]);
                         }
                     }
                 };
 
-                // List fileSystemElements will be filled using the passThroughFilter
+                // List fileSystemElements will be filled using the
+                // passThroughFilter
                 SubMonitor subMonitor = SubMonitor.convert(progressMonitor, 1);
                 fSelectionGroup.getAllCheckedListItems(passThroughFilter, subMonitor);
 
@@ -1457,7 +1461,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                             }
                         }
                     } else {
-                        TraceFileSystemElement parentElement = (TraceFileSystemElement)element.getParent();
+                        TraceFileSystemElement parentElement = (TraceFileSystemElement) element.getParent();
                         String parentPath = parentElement.getFileSystemObject().getAbsolutePath(fBaseSourceContainerPath.toOSString());
                         parentElement.setDestinationContainerPath(computeDestinationContainerPath(new Path(parentPath)));
                         currentPath = parentPath;
@@ -1485,7 +1489,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 String errorMessage = Messages.ImportTraceWizard_ImportProblem + ": " + //$NON-NLS-1$
                         (currentPath != null ? currentPath : ""); //$NON-NLS-1$
                 Activator.getDefault().logError(errorMessage, e);
-                setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, errorMessage , e));
+                setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, errorMessage, e));
             }
         }
 
@@ -1499,7 +1503,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 if (element.isDirectory()) {
                     Object[] array = element.getFiles().getChildren();
                     for (int i = 0; i < array.length; i++) {
-                        subList.add((TraceFileSystemElement)array[i]);
+                        subList.add((TraceFileSystemElement) array[i]);
                     }
                 }
                 subList.add(element);
@@ -1531,7 +1535,8 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
             operation.run(new SubProgressMonitor(progressMonitor, subList.size(), SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
 
-            // Create the new import provider and root element based on the extracted temp folder
+            // Create the new import provider and root element based on the
+            // extracted temp folder
             FileSystemObjectImportStructureProvider importStructureProvider = new FileSystemObjectImportStructureProvider(FileSystemStructureProvider.INSTANCE, null);
             IFileSystemObject rootElement = importStructureProvider.getIFileSystemObject(new File(tempFolder.getLocation().toOSString()));
             TraceFileSystemElement createRootElement = createRootElement(rootElement, importStructureProvider);
@@ -1557,20 +1562,22 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
             AdaptableList folders = rootElement.getFolders();
             for (Object folder : folders.getChildren()) {
-                getAllChildren(result, (TraceFileSystemElement)folder);
+                getAllChildren(result, (TraceFileSystemElement) folder);
             }
         }
 
         private IPath computeDestinationContainerPath(Path resourcePath) {
             IPath destinationContainerPath = fDestinationContainerPath;
 
-            // We need to figure out the new destination path relative to the selected "base" source directory.
+            // We need to figure out the new destination path relative to the
+            // selected "base" source directory.
             // Here for example, the selected source directory is /home/user
             if ((fImportOptionFlags & OPTION_PRESERVE_FOLDER_STRUCTURE) != 0) {
                 // /home/user/bar/foo/trace -> /home/user/bar/foo
                 IPath sourceContainerPath = resourcePath.removeLastSegments(1);
                 if (fBaseSourceContainerPath.equals(resourcePath)) {
-                    // Use resourcePath directory if fBaseSourceContainerPath points to a directory trace
+                    // Use resourcePath directory if fBaseSourceContainerPath
+                    // points to a directory trace
                     sourceContainerPath = resourcePath;
                 }
                 // /home/user/bar/foo, /home/user -> bar/foo
@@ -1677,14 +1684,13 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
                 Object[] array = fileSystemElement.getFiles().getChildren();
                 for (int i = 0; i < array.length; i++) {
-                    subList.add((TraceFileSystemElement)array[i]);
+                    subList.add((TraceFileSystemElement) array[i]);
                 }
                 parentFolder = fileSystemElement;
 
             } else {
                 subList.add(fileSystemElement);
             }
-
 
             ImportProvider fileSystemStructureProvider = new ImportProvider();
 
@@ -1728,8 +1734,8 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             // handle rename
             if (getExistingTrace(tracePath) != null) {
                 if ((fConfirmationMode == ImportConfirmation.RENAME_ALL) ||
-                    (fConfirmationMode == ImportConfirmation.OVERWRITE_ALL) ||
-                    (fConfirmationMode == ImportConfirmation.SKIP_ALL)) {
+                        (fConfirmationMode == ImportConfirmation.OVERWRITE_ALL) ||
+                        (fConfirmationMode == ImportConfirmation.SKIP_ALL)) {
                     return fConfirmationMode;
                 }
 
@@ -1748,12 +1754,12 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             final MessageDialog dialog = new MessageDialog(getContainer()
                     .getShell(), null, null, NLS.bind(Messages.ImportTraceWizard_TraceAlreadyExists, tracePath.makeRelativeTo(fTraceFolderElement.getProject().getPath())),
                     MessageDialog.QUESTION, new String[] {
-                        ImportConfirmation.RENAME.getInName(),
-                        ImportConfirmation.RENAME_ALL.getInName(),
-                        ImportConfirmation.OVERWRITE.getInName(),
-                        ImportConfirmation.OVERWRITE_ALL.getInName(),
-                        ImportConfirmation.SKIP.getInName(),
-                        ImportConfirmation.SKIP_ALL.getInName(),
+                            ImportConfirmation.RENAME.getInName(),
+                            ImportConfirmation.RENAME_ALL.getInName(),
+                            ImportConfirmation.OVERWRITE.getInName(),
+                            ImportConfirmation.OVERWRITE_ALL.getInName(),
+                            ImportConfirmation.SKIP.getInName(),
+                            ImportConfirmation.SKIP_ALL.getInName(),
                     }, 4) {
                 @Override
                 protected int getShellStyle() {
@@ -1787,7 +1793,8 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 return;
             }
 
-            // Not using IFolder on purpose to leave the door open to import directly into an IProject
+            // Not using IFolder on purpose to leave the door open to import
+            // directly into an IProject
             IContainer folder = (IContainer) trace.getParent().getResource();
             int i = 2;
             while (true) {
@@ -1836,8 +1843,9 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     }
 
     /**
-     * The <code>TraceFileSystemElement</code> is a <code>FileSystemElement</code> that knows
-     * if it has been populated or not.
+     * The <code>TraceFileSystemElement</code> is a
+     * <code>FileSystemElement</code> that knows if it has been populated or
+     * not.
      */
     private static class TraceFileSystemElement extends FileSystemElement {
 
@@ -1865,7 +1873,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
         @Override
         public AdaptableList getFiles() {
-            if(!fIsPopulated) {
+            if (!fIsPopulated) {
                 populateElementChildren();
             }
             return super.getFiles();
@@ -1873,7 +1881,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
         @Override
         public AdaptableList getFolders() {
-            if(!fIsPopulated) {
+            if (!fIsPopulated) {
                 populateElementChildren();
             }
             return super.getFolders();
@@ -1881,6 +1889,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
         /**
          * Sets the label for the trace to be used when importing at trace.
+         *
          * @param name
          *            the label for the trace
          */
@@ -1910,14 +1919,15 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         }
 
         /**
-         * Populates the children of the specified parent <code>FileSystemElement</code>
+         * Populates the children of the specified parent
+         * <code>FileSystemElement</code>
          */
         private void populateElementChildren() {
             List<IFileSystemObject> allchildren = fProvider.getChildren(this.getFileSystemObject());
             Object child = null;
             TraceFileSystemElement newelement = null;
             Iterator<IFileSystemObject> iter = allchildren.iterator();
-            while(iter.hasNext()) {
+            while (iter.hasNext()) {
                 child = iter.next();
                 newelement = new TraceFileSystemElement(fProvider.getLabel(child), this, fProvider.isFolder(child), fProvider);
                 newelement.setFileSystemObject(child);
@@ -1944,9 +1954,13 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
      */
     private interface IFileSystemObject {
         String getLabel();
+
         String getAbsolutePath(String parentContainerPath);
+
         String getSourceLocation();
+
         Object getRawFileSystemObject();
+
         boolean exists();
     }
 
@@ -2098,36 +2112,36 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
         @Override
         public String getLabel(Object element) {
-            TraceFileSystemElement resource = (TraceFileSystemElement)element;
+            TraceFileSystemElement resource = (TraceFileSystemElement) element;
             return resource.getLabel();
         }
 
         @Override
         public List getChildren(Object element) {
-            TraceFileSystemElement resource = (TraceFileSystemElement)element;
+            TraceFileSystemElement resource = (TraceFileSystemElement) element;
             Object[] array = resource.getFiles().getChildren();
-                    List<Object> list = new ArrayList<>();
-                    for (int i = 0; i < array.length; i++) {
-                        list.add(array[i]);
-                    }
+            List<Object> list = new ArrayList<>();
+            for (int i = 0; i < array.length; i++) {
+                list.add(array[i]);
+            }
             return list;
         }
 
         @Override
         public InputStream getContents(Object element) {
-            TraceFileSystemElement resource = (TraceFileSystemElement)element;
+            TraceFileSystemElement resource = (TraceFileSystemElement) element;
             return resource.getProvider().getContents(resource.getFileSystemObject());
         }
 
         @Override
         public String getFullPath(Object element) {
-            TraceFileSystemElement resource = (TraceFileSystemElement)element;
+            TraceFileSystemElement resource = (TraceFileSystemElement) element;
             return resource.getProvider().getFullPath(resource.getFileSystemObject());
         }
 
         @Override
         public boolean isFolder(Object element) {
-            TraceFileSystemElement resource = (TraceFileSystemElement)element;
+            TraceFileSystemElement resource = (TraceFileSystemElement) element;
             return resource.isDirectory();
         }
     }
@@ -2158,7 +2172,9 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
         /**
          * Private constructor
-         * @param name the name of state
+         *
+         * @param name
+         *            the name of state
          */
         private ImportConfirmation(String name) {
             fInName = name;
