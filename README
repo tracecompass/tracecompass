@@ -19,16 +19,9 @@ http://wiki.eclipse.org/Linux_Tools_Project/LTTng_Eclipse_Plug-in_Development_En
 
 
 
-To build the plugins manually using Maven, you first need to build the Linux Tools target definition
- (starting from the root of the source tree):
-$ cd releng/org.eclipse.linuxtools.target
+To build the plugins manually using Maven, simply run the following command from
+the top-level directory:
 $ mvn clean install
-Then you can build the LTTng plugins:
-$ cd ../../lttng
-$ mvn clean install
-
-As long as you don't clear the Maven reactor cache (in ~/.m2), you should not
-need to rebuild the target definition.
 
 
 The default command will compile and run the unit tests. Running the tests can
@@ -42,17 +35,18 @@ the 'mvn' command:
 $ mvn clean install -PtracingRcp -Dmaven.test.skip=true
 
 This will build the RCP for all supported architectures. The resulting archives
-will be placed in lttng/org.eclipse.linuxtools.tracing.rcp.product/target/products
+will be placed in org.eclipse.linuxtools.tracing.rcp.product/target/products
 
 
-To build a local p2 update site (LTTng integration only)
-$ mvn clean install -PlttngPackage
+To build a local p2 update site
+$ mvn clean install -PbuildUpdateSite
 
 This will place the p2 update site under the default location
-/var/www/tools/linuxtools/lttng/update-nightly/
+/var/www/tools/tracecompass/nightly/
 
 To change the package location, use:
-$ mvn clean install -PlttngPackage "-DlttngPackageDestination=<package destination>"
+$ mvn clean install -PbuildUpdateSite "-DsiteDestination=<package destination>"
 
-where <package destination> is the absolute path to destination directory on your disk.
+where <package destination> is the absolute path to destination directory on
+your disk.
 
