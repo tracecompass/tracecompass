@@ -27,37 +27,45 @@
   <name>Linux Tools LTTng Repository</name>
   <packaging>eclipse-repository</packaging>
 
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>deploy</id>
-            <phase>install</phase>
-              <goals>
-                <goal>run</goal>
-              </goals>
-              <configuration>
-              <target>
-                <delete includeemptydirs="false">
-                  <fileset
-                    dir="${lttngPackageDestination}">
-                    <include name="**" />
-                  </fileset>
-                </delete>
-                <copy includeemptydirs="false"
-                  todir="${lttngPackageDestination}">
-                  <fileset dir="target/repository">
-                    <include name="**" />
-                  </fileset>
-                </copy>
-              </target>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+<profiles>
+  <profile>
+    <id>buildUpdateSite</id>
+    <properties>
+      <siteDestination>/var/www/tools/tracecompass/nightly/</siteDestination>
+    </properties>
+    <build>
+      <plugins>
+        <plugin>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>deploy</id>
+              <phase>install</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                <target>
+                  <delete includeemptydirs="false">
+                    <fileset
+                      dir="${siteDestination}">
+                      <include name="**" />
+                    </fileset>
+                  </delete>
+                  <copy includeemptydirs="false"
+                    todir="${siteDestination}">
+                    <fileset dir="target/repository">
+                      <include name="**" />
+                    </fileset>
+                  </copy>
+                </target>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </build>
+  </profile>
+</profiles>
 
 </project>
