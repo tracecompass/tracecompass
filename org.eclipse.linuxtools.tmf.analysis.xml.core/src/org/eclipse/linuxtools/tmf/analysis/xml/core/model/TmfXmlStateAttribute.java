@@ -319,4 +319,9 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
         }
     }
 
+    @Override
+    public String toString() {
+        return "TmfXmlStateAttribute " + fType + ": " + fName; //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
 }

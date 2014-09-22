@@ -209,4 +209,9 @@ public class TmfXmlCondition {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "TmfXmlCondition: " + fOperator + " on " + fConditions; //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
 }

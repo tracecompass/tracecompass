@@ -110,6 +110,11 @@ public class TmfXmlStateChange {
         fChange.handleEvent(event);
     }
 
+    @Override
+    public String toString() {
+        return "TmfXmlStateChange: " + fChange; //$NON-NLS-1$
+    }
+
     /* Interface for both private classes to handle the event */
     private interface IXmlStateChange {
         void handleEvent(@NonNull ITmfEvent event) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException;
@@ -164,6 +169,11 @@ public class TmfXmlStateChange {
             }
             toExecute.handleEvent(event);
         }
+
+        @Override
+        public String toString() {
+            return "Condition: " + fCondition; //$NON-NLS-1$
+        }
     }
 
     /**
@@ -197,6 +207,11 @@ public class TmfXmlStateChange {
         @Override
         public void handleEvent(@NonNull ITmfEvent event) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException {
             fValue.handleEvent(event);
+        }
+
+        @Override
+        public String toString() {
+            return "Value: " + fValue; //$NON-NLS-1$
         }
     }
 

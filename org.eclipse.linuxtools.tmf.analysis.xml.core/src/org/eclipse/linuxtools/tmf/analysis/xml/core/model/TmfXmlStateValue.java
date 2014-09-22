@@ -379,12 +379,17 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
             quark = attribute.getAttributeQuark(event, quark);
             /* the query is not valid, we stop the state change */
             if (quark == IXmlStateSystemContainer.ERROR_QUARK) {
-                throw new AttributeNotFoundException();
+                throw new AttributeNotFoundException("Not found XML attribute " + attribute); //$NON-NLS-1$
             }
         }
 
         long ts = event.getTimestamp().getValue();
         fStateValue.handleEvent(event, quark, ts);
+    }
+
+    @Override
+    public String toString() {
+        return "TmfXmlStateValue: " + fStateValue; //$NON-NLS-1$
     }
 
     /**

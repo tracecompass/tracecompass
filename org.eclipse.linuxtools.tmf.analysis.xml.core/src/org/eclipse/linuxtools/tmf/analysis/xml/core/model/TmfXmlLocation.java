@@ -117,4 +117,9 @@ public class TmfXmlLocation {
         return quark;
     }
 
+    @Override
+    public String toString() {
+        return "TmfXmlLocation " + fId + ": " + fPath; //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
 }
