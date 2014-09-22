@@ -24,6 +24,7 @@ import java.util.Date;
 import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.linuxtools.tmf.core.parsers.custom.CustomXmlTraceDefinition;
+import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfTraceIndexer;
 
 /**
@@ -33,7 +34,7 @@ import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfTraceIndexer;
  */
 public class CustomXmlIndexTest extends AbstractCustomTraceIndexTest {
 
-    private static final String TRACE_DIRECTORY = System.getProperty("java.io.tmpdir") + File.separator + "dummyXmlTrace";
+    private static final String TRACE_DIRECTORY = TmfTraceManager.getTemporaryDirPath() + File.separator + "dummyXmlTrace";
     private static final String TRACE_PATH = TRACE_DIRECTORY + File.separator + "test.xml";
     private static final String DEFINITION_PATH = "tracesets" + File.separator + "xml" + File.separator + "testDefinition.xml";
 

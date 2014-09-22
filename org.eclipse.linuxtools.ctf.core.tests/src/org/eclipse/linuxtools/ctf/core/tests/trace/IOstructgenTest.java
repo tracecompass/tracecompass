@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
+import org.eclipse.linuxtools.ctf.core.tests.CtfCoreTestPlugin;
 import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
 import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
 import org.eclipse.linuxtools.internal.ctf.core.event.EventDeclaration;
@@ -273,7 +274,7 @@ public class IOstructgenTest {
     private static final String allDressedTSDL = metadataDecs + environmentMD + clockMD
             + ctfStart + ctfHeaders + ctfBody + enumMd + callsiteMD;
 
-    static final String tempTraceDir = System.getProperty("java.io.tmpdir")
+    static final String tempTraceDir = CtfCoreTestPlugin.getTemporaryDirPath()
             + File.separator + "tempTrace";
 
     private static final int DATA_SIZE = 4096;

@@ -222,7 +222,7 @@ public class TmfTraceManagerTest {
     public void testSupplementaryFileDir() {
         String name1 = trace1.getName();
         String name2 = trace2.getName();
-        String basePath = System.getProperty("java.io.tmpdir") + File.separator;
+        String basePath = TmfTraceManager.getTemporaryDirPath() + File.separator;
 
         String expected1 = basePath + name1 + File.separator;
         String expected2 = basePath + name2 + File.separator;

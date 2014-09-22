@@ -180,7 +180,7 @@ public class LttngKernelTraceGenerator {
      */
     public static void main(String[] args) {
         // not using createTempFile as this is a directory
-        String path = System.getProperty("java.io.tmpdir") + File.separator + TRACE_NAME;
+        String path = CtfCoreTestPlugin.getTemporaryDirPath() + File.separator + TRACE_NAME;
         generateLttngKernelTrace(new File(path));
     }
 
