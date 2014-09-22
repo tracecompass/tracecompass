@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.eclipse.linuxtools.btf.core.tests</name>
+	<name>org.eclipse.tracecompass.btf.core.tests</name>
 	<comment></comment>
 	<projects>
 	</projects>

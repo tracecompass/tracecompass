@@ -17,11 +17,11 @@
     <version>3.2.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>org.eclipse.linuxtools.btf.ui</artifactId>
+  <artifactId>org.eclipse.tracecompass.btf.core</artifactId>
   <version>3.1.0-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
 
-  <name>Best Trace Format UI Plug-in</name>
+  <name>Best Trace Format Plug-in</name>
 
  <build>
     <plugins>
@@ -32,5 +32,5 @@
     </plugins>
   </build>
 
- <groupId>org.eclipse.linuxtools.btf</groupId>
+ <groupId>org.eclipse.tracecompass</groupId>
 </project>

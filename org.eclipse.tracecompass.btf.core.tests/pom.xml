@@ -19,7 +19,7 @@
     <version>3.2.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>org.eclipse.linuxtools.btf.core.tests</artifactId>
+  <artifactId>org.eclipse.tracecompass.btf.core.tests</artifactId>
   <version>3.1.0-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
 
@@ -32,7 +32,7 @@
         <artifactId>tycho-surefire-plugin</artifactId>
         <version>${tycho-version}</version>
         <configuration>
-          <testSuite>org.eclipse.linuxtools.btf.core.tests</testSuite>
+          <testSuite>org.eclipse.tracecompass.btf.core.tests</testSuite>
           <testClass>org.eclipse.linuxtools.btf.core.tests.AllTests</testClass>
           <useUIHarness>false</useUIHarness>
           <useUIThread>false</useUIThread>
@@ -42,5 +42,5 @@
     </plugins>
   </build>
 
- <groupId>org.eclipse.linuxtools.btf</groupId>
+ <groupId>org.eclipse.tracecompass</groupId>
 </project>
