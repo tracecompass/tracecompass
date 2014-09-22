@@ -103,11 +103,11 @@
     <module>org.eclipse.tracecompass.btf.core.tests</module>
     <module>org.eclipse.tracecompass.btf.ui</module>
 
-    <module>org.eclipse.linuxtools.ctf</module>
-    <module>org.eclipse.linuxtools.ctf.core</module>
-    <module>org.eclipse.linuxtools.ctf.core.tests</module>
-    <module>org.eclipse.linuxtools.ctf.parser</module>
-    <module>org.eclipse.linuxtools.ctf.parser.tests</module>
+    <module>org.eclipse.tracecompass.ctf</module>
+    <module>org.eclipse.tracecompass.ctf.core</module>
+    <module>org.eclipse.tracecompass.ctf.core.tests</module>
+    <module>org.eclipse.tracecompass.ctf.parser</module>
+    <module>org.eclipse.tracecompass.ctf.parser.tests</module>
 
     <module>org.eclipse.linuxtools.pcap.core</module>
     <module>org.eclipse.linuxtools.pcap.core.tests</module>
