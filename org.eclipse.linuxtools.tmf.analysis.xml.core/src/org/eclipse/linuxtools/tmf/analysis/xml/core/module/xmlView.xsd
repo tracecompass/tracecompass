@@ -115,6 +115,20 @@
 		<xs:attribute name="path" type="xs:string" use="required" >
 			<xs:annotation>
 				<xs:documentation>The path of the entry in the state system. Wildcards '*' may be used. For example, to display entries from all CPUs, the path could be "CPUs/*" and one series will be created for each sub-attribute of the "CPUs" attribute. Each entry will be used as the base for all child elements, unless specified otherwise.</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="displayType" use="optional" default="absolute" >
+			<xs:annotation>
+				<xs:documentation>Indicate how to display the value, compared with preceding values.</xs:documentation></xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="absolute" >
+						<xs:annotation>
+							<xs:documentation>The value is shown as is.</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="delta" >
+						<xs:annotation>
+							<xs:documentation>The value is the difference between the value at current timestamp and the value at the preceding timestamp.</xs:documentation></xs:annotation></xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="viewStateAttribute">

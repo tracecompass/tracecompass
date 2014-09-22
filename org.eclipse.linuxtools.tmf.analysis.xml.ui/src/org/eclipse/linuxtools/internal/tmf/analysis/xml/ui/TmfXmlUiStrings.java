@@ -36,6 +36,9 @@ public interface TmfXmlUiStrings {
     static final String PARENT_ELEMENT = "parent";
     static final String NAME_ELEMENT = "name";
     static final String ID_ELEMENT = "id";
+    static final String DISPLAY_TYPE = "displayType";
+    static final String DISPLAY_TYPE_ABSOLUTE = "absolute";
+    static final String DISPLAY_TYPE_DELTA = "delta";
 
     /* Generic strings for the XML module */
     static final String XML_OUTPUT_DATA = "xmlOutputData";
