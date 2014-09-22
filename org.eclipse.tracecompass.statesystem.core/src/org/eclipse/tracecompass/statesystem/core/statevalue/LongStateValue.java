@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.statesystem.core.statevalue;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 
 /**
  * A state value containing a long integer (8 bytes).
@@ -37,6 +38,7 @@ final class LongStateValue extends TmfStateValue {
     public boolean isNull() {
         return false;
     }
+
     @Override
     public boolean equals(@Nullable Object object) {
         if (!(object instanceof LongStateValue)) {
@@ -64,4 +66,31 @@ final class LongStateValue extends TmfStateValue {
     public long unboxLong() {
         return value;
     }
+
+    @Override
+    public int compareTo(@Nullable ITmfStateValue other) {
+        if (other == null) {
+            throw new IllegalArgumentException();
+        }
+
+        switch (other.getType()) {
+        case INTEGER:
+            long otherLongValue = ((IntegerStateValue) other).unboxInt();
+            return Long.compare(this.value, otherLongValue);
+        case DOUBLE:
+            double otherDoubleValue = ((DoubleStateValue) other).unboxDouble();
+            return Double.compare(this.value, otherDoubleValue);
+        case LONG:
+            otherLongValue = ((LongStateValue) other).unboxLong();
+            return Long.compare(this.value, otherLongValue);
+        case NULL:
+            return Long.compare(this.value, other.unboxLong());
+        case STRING:
+            throw new StateValueTypeException("A Long state value cannot be compared to a String state value."); //$NON-NLS-1$
+        default:
+            throw new StateValueTypeException("A Long state value cannot be compared to the type " + other.getType()); //$NON-NLS-1$
+        }
+
+    }
+
 }

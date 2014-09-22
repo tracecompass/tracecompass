@@ -20,7 +20,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeExcept
  * @author Alexandre Montplaisir
  * @since 3.0
  */
-public interface ITmfStateValue {
+public interface ITmfStateValue extends Comparable<ITmfStateValue> {
 
     /**
      * The supported types of state values
@@ -95,4 +95,5 @@ public interface ITmfStateValue {
      *             If the contained value cannot be read as a String
      */
     String unboxStr();
+
 }

@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.statesystem.core.statevalue;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 
 /**
  * A state value containing a simple integer.
@@ -71,4 +72,31 @@ final class IntegerStateValue extends TmfStateValue {
         /* It's always safe to up-cast an int into a long */
         return value;
     }
+
+    @Override
+    public int compareTo(@Nullable ITmfStateValue other) {
+        if (other == null) {
+            throw new IllegalArgumentException();
+        }
+
+        switch (other.getType()) {
+        case INTEGER:
+            IntegerStateValue otherIntValue = (IntegerStateValue) other;
+            return Integer.compare(this.value, otherIntValue.value);
+        case DOUBLE:
+            double otherDoubleValue = ((DoubleStateValue) other).unboxDouble();
+            return Double.compare(this.value, otherDoubleValue);
+        case LONG:
+            long otherLongValue = ((LongStateValue) other).unboxLong();
+            return Long.compare(this.value, otherLongValue);
+        case NULL:
+            return Integer.compare(this.value, other.unboxInt());
+        case STRING:
+            throw new StateValueTypeException("An Integer state value cannot be compared to a String state value."); //$NON-NLS-1$
+        default:
+            throw new StateValueTypeException("An Integer state value cannot be compared to the type " + other.getType()); //$NON-NLS-1$
+        }
+
+    }
+
 }
