@@ -4,14 +4,14 @@
 	<modelVersion>4.0.0</modelVersion>
 
     <parent>
-      <groupId>org.eclipse.linuxtools.lttng</groupId>
-      <artifactId>linuxtools-lttng-parent</artifactId>
+      <groupId>org.eclipse.tracecompass</groupId>
+      <artifactId>org.eclipse.tracecompass</artifactId>
       <version>3.2.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.eclipse.linuxtools.lttng</groupId>
-    <artifactId>org.eclipse.linuxtools.lttng.target</artifactId>
-    <name>Linux Tools LTTng Target Platform</name>
+    <groupId>org.eclipse.tracecompass</groupId>
+    <artifactId>org.eclipse.tracecompass.target</artifactId>
+    <name>Trace Compass Target Platform</name>
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
@@ -31,14 +31,14 @@
               <configuration>
                 <artifacts>
                   <artifact>
-                    <file>lttng-eStaging.target</file>
+                    <file>tracecompass-eStaging.target</file>
                     <type>target</type>
-                    <classifier>lttng-eStaging</classifier>
+                    <classifier>tracecompass-eStaging</classifier>
                   </artifact>
                   <artifact>
-                    <file>lttng-e4.4.target</file>
+                    <file>tracecompass-e4.4.target</file>
                     <type>target</type>
-                    <classifier>lttng-e4.4</classifier>
+                    <classifier>tracecompass-e4.4</classifier>
                   </artifact>
                   <!-- More targets could be added here -->
                 </artifacts>

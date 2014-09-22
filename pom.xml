@@ -17,12 +17,12 @@
     <maven>3.0</maven>
   </prerequisites>
 
-  <groupId>org.eclipse.linuxtools.lttng</groupId>
-  <artifactId>linuxtools-lttng-parent</artifactId>
+  <groupId>org.eclipse.tracecompass</groupId>
+  <artifactId>org.eclipse.tracecompass</artifactId>
   <version>3.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Linux Tools LTTng Parent</name>
+  <name>Trace Compass Parent</name>
 
   <licenses>
     <license>
@@ -41,7 +41,7 @@
 <properties>
   <base.test.vmargs>-Xms256m -Xmx1024m -XX:MaxPermSize=256m</base.test.vmargs>
   <tycho-version>0.21.0</tycho-version>
-  <target-platform>lttng-e4.4</target-platform>
+  <target-platform>tracecompass-e4.4</target-platform>
   <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
   <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
   <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
@@ -141,8 +141,8 @@
     <module>org.eclipse.linuxtools.tmf.analysis.xml.ui.tests</module>
 
     <module>org.eclipse.linuxtools.lttng.help</module>
-    <module>org.eclipse.linuxtools.lttng.releng-site</module>
-    <module>org.eclipse.linuxtools.lttng.target</module>
+    <module>org.eclipse.tracecompass.releng-site</module>
+    <module>org.eclipse.tracecompass.target</module>
     <module>org.eclipse.linuxtools.lttng.testing</module>
 
     <module>org.eclipse.linuxtools.lttng2.control</module>
@@ -216,8 +216,8 @@
                     </environments>
                     <target>
                       <artifact>
-                        <groupId>org.eclipse.linuxtools.lttng</groupId>
-                        <artifactId>org.eclipse.linuxtools.lttng.target</artifactId>
+                        <groupId>org.eclipse.tracecompass</groupId>
+                        <artifactId>org.eclipse.tracecompass.target</artifactId>
                         <classifier>${target-platform}</classifier>
                         <version>1.0.0</version>
                       </artifact>

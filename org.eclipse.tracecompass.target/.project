@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.eclipse.linuxtools.lttng.target</name>
+	<name>org.eclipse.tracecompass.target</name>
 	<comment></comment>
 	<projects>
 	</projects>
