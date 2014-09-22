@@ -28,6 +28,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
 import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
@@ -163,6 +164,18 @@ public class TmfXmlTraceStub extends TmfTrace {
         return Status.OK_STATUS;
     }
 
+    private static String getStringValue(@NonNull ITmfEventField content, String fieldName) {
+        ITmfEventField field = content.getField(fieldName);
+        if (field == null) {
+            return EMPTY;
+        }
+        Object val = field.getValue();
+        if (!(val instanceof String)) {
+            return EMPTY;
+        }
+        return (String) val;
+    }
+
     @Override
     public synchronized ITmfEvent getNext(ITmfContext context) {
         final ITmfContext savedContext = new TmfContext(context.getLocation(), context.getRank());
@@ -176,9 +189,12 @@ public class TmfXmlTraceStub extends TmfTrace {
         /* The "values" field contains a | separated list of field values */
         /* the "type" field contains a | separated list of field types */
         ITmfEventField content = event.getContent();
-        String fieldString = (String) content.getField(FIELD_NAMES_FIELD).getValue();
-        String valueString = (String) content.getField(VALUES_FIELD).getValue();
-        String typeString = (String) content.getField(TYPES_FIELD).getValue();
+        if (content == null) {
+            return null;
+        }
+        String fieldString = getStringValue(content, FIELD_NAMES_FIELD);
+        String valueString = getStringValue(content, VALUES_FIELD);
+        String typeString = getStringValue(content, TYPES_FIELD);
 
         String[] fields = fieldString.split(VALUES_SEPARATOR);
         String[] values = valueString.split(VALUES_SEPARATOR);
@@ -224,9 +240,9 @@ public class TmfXmlTraceStub extends TmfTrace {
 
         /* Create a new event with new fields and name */
         ITmfEventType customEventType = event.getType();
-        TmfEventType eventType = new TmfEventType(customEventType.getContext(), (String) content.getField(EVENT_NAME_FIELD).getValue(), customEventType.getRootField());
+        TmfEventType eventType = new TmfEventType(customEventType.getContext(), getStringValue(content, EVENT_NAME_FIELD), customEventType.getRootField());
         ITmfEventField eventFields = new CustomEventContent(content.getName(), content.getValue(), fieldsArray);
-        TmfEvent newEvent = new TmfEvent(this, event.getTimestamp(), (String) content.getField(SOURCE_FIELD).getValue(), eventType, eventFields, event.getReference());
+        TmfEvent newEvent = new TmfEvent(this, event.getTimestamp(), getStringValue(content, SOURCE_FIELD), eventType, eventFields, event.getReference());
         updateAttributes(savedContext, event.getTimestamp());
         context.increaseRank();
 
