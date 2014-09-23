@@ -101,7 +101,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.linuxtools.pcap.core.tests"
+         id="org.eclipse.tracecompass.pcap.core.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"

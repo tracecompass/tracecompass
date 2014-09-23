@@ -36,11 +36,11 @@
       <import plugin="org.eclipse.linuxtools.tmf.core" version="3.1.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.linuxtools.tmf.ui" version="3.1.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.linuxtools.tmf.pcap.core" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.linuxtools.pcap.core" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.tracecompass.pcap.core" version="1.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
-         id="org.eclipse.linuxtools.pcap.core"
+         id="org.eclipse.tracecompass.pcap.core"
          download-size="0"
          install-size="0"
          version="0.0.0"/>
