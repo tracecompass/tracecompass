@@ -112,8 +112,8 @@
     <module>org.eclipse.tracecompass.pcap.core</module>
     <module>org.eclipse.tracecompass.pcap.core.tests</module>
 
-    <module>org.eclipse.linuxtools.statesystem.core</module>
-    <module>org.eclipse.linuxtools.statesystem.core.tests</module>
+    <module>org.eclipse.tracecompass.statesystem.core</module>
+    <module>org.eclipse.tracecompass.statesystem.core.tests</module>
 
     <module>org.eclipse.linuxtools.tmf</module>
     <module>org.eclipse.linuxtools.tmf.core</module>

@@ -12,8 +12,7 @@ Require-Bundle: org.junit,
  org.eclipse.linuxtools.tmf.core,
  org.eclipse.linuxtools.tmf.core.tests,
  org.eclipse.linuxtools.tmf.ctf.core,
- org.eclipse.linuxtools.tmf.ctf.core.tests,
- org.eclipse.linuxtools.statesystem.core
+ org.eclipse.linuxtools.tmf.ctf.core.tests
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: org.junit.runners

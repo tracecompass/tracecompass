@@ -73,7 +73,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.linuxtools.statesystem.core"
+         id="org.eclipse.tracecompass.statesystem.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
