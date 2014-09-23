@@ -3,10 +3,10 @@
    <description>
       Nightly builds of Trace Compass project.
    </description>
-   <feature url="features/org.eclipse.linuxtools.lttng2.kernel_0.0.0.qualifier.jar" id="org.eclipse.linuxtools.lttng2.kernel" version="0.0.0">
+   <feature url="features/org.eclipse.tracecompass.lttng2.kernel_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.lttng2.kernel" version="0.0.0">
       <category name="Trace Compass"/>
    </feature>
-   <feature url="features/org.eclipse.linuxtools.lttng2.ust_0.0.0.qualifier.jar" id="org.eclipse.linuxtools.lttng2.ust" version="0.0.0">
+   <feature url="features/org.eclipse.tracecompass.lttng2.ust_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.lttng2.ust" version="0.0.0">
       <category name="Trace Compass"/>
    </feature>
    <feature url="features/org.eclipse.tracecompass.gdbtrace_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.gdbtrace" version="0.0.0">

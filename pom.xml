@@ -145,24 +145,24 @@
     <module>org.eclipse.tracecompass.target</module>
     <module>org.eclipse.linuxtools.lttng.testing</module>
 
-    <module>org.eclipse.linuxtools.lttng2.control</module>
-    <module>org.eclipse.linuxtools.lttng2.control.core</module>
-    <module>org.eclipse.linuxtools.lttng2.control.core.tests</module>
-    <module>org.eclipse.linuxtools.lttng2.control.ui</module>
-    <module>org.eclipse.linuxtools.lttng2.control.ui.tests</module>
+    <module>org.eclipse.tracecompass.lttng2.control</module>
+    <module>org.eclipse.tracecompass.lttng2.control.core</module>
+    <module>org.eclipse.tracecompass.lttng2.control.core.tests</module>
+    <module>org.eclipse.tracecompass.lttng2.control.ui</module>
+    <module>org.eclipse.tracecompass.lttng2.control.ui.tests</module>
 
-    <module>org.eclipse.linuxtools.lttng2.kernel</module>
-    <module>org.eclipse.linuxtools.lttng2.kernel.core</module>
-    <module>org.eclipse.linuxtools.lttng2.kernel.core.tests</module>
-    <module>org.eclipse.linuxtools.lttng2.kernel.ui</module>
-    <module>org.eclipse.linuxtools.lttng2.kernel.ui.tests</module>
-    <module>org.eclipse.linuxtools.lttng2.kernel.ui.swtbot.tests</module>
+    <module>org.eclipse.tracecompass.lttng2.kernel</module>
+    <module>org.eclipse.tracecompass.lttng2.kernel.core</module>
+    <module>org.eclipse.tracecompass.lttng2.kernel.core.tests</module>
+    <module>org.eclipse.tracecompass.lttng2.kernel.ui</module>
+    <module>org.eclipse.tracecompass.lttng2.kernel.ui.tests</module>
+    <module>org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests</module>
 
-    <module>org.eclipse.linuxtools.lttng2.ust</module>
-    <module>org.eclipse.linuxtools.lttng2.ust.core</module>
-    <module>org.eclipse.linuxtools.lttng2.ust.core.tests</module>
-    <module>org.eclipse.linuxtools.lttng2.ust.ui</module>
-    <module>org.eclipse.linuxtools.lttng2.ust.ui.tests</module>
+    <module>org.eclipse.tracecompass.lttng2.ust</module>
+    <module>org.eclipse.tracecompass.lttng2.ust.core</module>
+    <module>org.eclipse.tracecompass.lttng2.ust.core.tests</module>
+    <module>org.eclipse.tracecompass.lttng2.ust.ui</module>
+    <module>org.eclipse.tracecompass.lttng2.ust.ui.tests</module>
 
     <module>org.eclipse.tracecompass.gdbtrace</module>
     <module>org.eclipse.tracecompass.gdbtrace.core</module>

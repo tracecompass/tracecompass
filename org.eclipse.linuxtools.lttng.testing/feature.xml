@@ -52,49 +52,49 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.linuxtools.lttng2.control.core.tests"
+         id="org.eclipse.tracecompass.lttng2.control.core.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.linuxtools.lttng2.control.ui.tests"
+         id="org.eclipse.tracecompass.lttng2.control.ui.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.linuxtools.lttng2.kernel.core.tests"
+         id="org.eclipse.tracecompass.lttng2.kernel.core.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.linuxtools.lttng2.kernel.ui.swtbot.tests"
+         id="org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.linuxtools.lttng2.kernel.ui.tests"
+         id="org.eclipse.tracecompass.lttng2.kernel.ui.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.linuxtools.lttng2.ust.core.tests"
+         id="org.eclipse.tracecompass.lttng2.ust.core.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.linuxtools.lttng2.ust.ui.tests"
+         id="org.eclipse.tracecompass.lttng2.ust.ui.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"

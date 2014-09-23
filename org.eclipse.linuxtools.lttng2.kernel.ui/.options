@@ -1,7 +1,0 @@
-org.eclipse.linuxtools.lttng.ui/debug=false
-org.eclipse.linuxtools.lttng.ui/info=false
-org.eclipse.linuxtools.lttng.ui/warn=false
-
-org.eclipse.linuxtools.lttng.ui/cfv=false
-org.eclipse.linuxtools.lttng.ui/rv=false
-org.eclipse.linuxtools.lttng.ui/sv=false
