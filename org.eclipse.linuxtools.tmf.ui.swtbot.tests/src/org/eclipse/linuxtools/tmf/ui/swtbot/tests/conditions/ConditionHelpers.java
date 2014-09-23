@@ -16,6 +16,7 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
@@ -85,5 +86,22 @@ public abstract class ConditionHelpers {
      */
     public static ICondition ViewIsClosed(SWTBotView view) {
         return new ViewClosed(view);
+    }
+
+    /**
+     * Wait till table cell has a given content.
+     *
+     * @param table
+     *            the table bot reference
+     * @param content
+     *            the content to check
+     * @param row
+     *            the row of the cell
+     * @param column
+     *            the column of the cell
+     * @return ICondition for verification
+     */
+    public static ICondition isTableCellFilled(SWTBotTable table, String content, int row, int column) {
+        return new TableCellFilled(table, content, row, column);
     }
 }

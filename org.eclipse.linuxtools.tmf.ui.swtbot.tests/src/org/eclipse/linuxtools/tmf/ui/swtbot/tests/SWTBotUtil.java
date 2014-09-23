@@ -23,6 +23,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder;
@@ -30,6 +31,8 @@ import org.eclipse.linuxtools.tmf.ui.swtbot.tests.conditions.ConditionHelpers;
 import org.eclipse.linuxtools.tmf.ui.views.TracingPerspectiveFactory;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
@@ -40,9 +43,12 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
+import org.hamcrest.Matcher;
 
 /**
  * SWTBot Helper functions
@@ -118,7 +124,7 @@ public abstract class SWTBotUtil {
         final SWTBotView projectViewBot = bot.viewById(IPageLayout.ID_PROJECT_EXPLORER);
         projectViewBot.setFocus();
 
-        SWTBotTree treeBot = bot.tree();
+        SWTBotTree treeBot = projectViewBot.bot().tree();
         SWTBotTreeItem treeItem = treeBot.getTreeItem(projectName);
         SWTBotMenu contextMenu = treeItem.contextMenu("Delete");
         contextMenu.click();
@@ -237,5 +243,33 @@ public abstract class SWTBotUtil {
 
         delay(1000);
         waitForJobs();
+    }
+
+    /**
+     * Opens an editor and sets focus to the editor
+     *
+     * @param bot
+     *            the workbench bot
+     * @param editorName
+     *            the editor name
+     * @return the corresponding SWTBotEditor
+     */
+    public static SWTBotEditor openEditor(SWTWorkbenchBot bot, String editorName) {
+        Matcher<IEditorReference> matcher = WidgetMatcherFactory.withPartName(editorName);
+        final SWTBotEditor editorBot = bot.editor(matcher);
+        IEditorPart iep = editorBot.getReference().getEditor(true);
+        final TmfEventsEditor tmfEd = (TmfEventsEditor) iep;
+        editorBot.show();
+        UIThreadRunnable.syncExec(new VoidResult() {
+            @Override
+            public void run() {
+                tmfEd.setFocus();
+            }
+        });
+
+        SWTBotUtil.waitForJobs();
+        SWTBotUtil.delay(1000);
+        assertNotNull(tmfEd);
+        return editorBot;
     }
 }

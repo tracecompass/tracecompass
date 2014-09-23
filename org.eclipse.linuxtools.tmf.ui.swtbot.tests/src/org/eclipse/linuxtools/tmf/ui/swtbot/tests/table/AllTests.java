@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,25 +7,22 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Matthew Khouzam - Initial API and implementation
+ *   Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.tmf.ui.swtbot.tests;
+package org.eclipse.linuxtools.tmf.ui.swtbot.tests.table;
 
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * SWTBot test suite for tmf.ui
- *
- * @author Matthew Khouzam
+ * SWTBot test suite for testing of the TMF events table.
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        TestCustomTxtWizard.class,
-        TestCustomXmlWizard.class,
-        TracingPerspectiveChecker.class,
-        org.eclipse.linuxtools.tmf.ui.swtbot.tests.table.AllTests.class
+        CollapseEventsInTableTest.class,
 })
-public class AllTmfUISWTBotTests {
+@Ignore
+public class AllTests {
 }

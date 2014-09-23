@@ -105,6 +105,14 @@
             name="Test experiment"
             experiment_type="org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfExperimentStub">
       </experiment>
+      <type
+            category="org.eclipse.linuxtools.tmf.core.tests.category"
+            event_type="org.eclipse.linuxtools.tmf.tests.stubs.trace.text.SyslogEvent"
+            id="org.eclipse.linuxtools.tmf.tests.stubs.trace.text.testsyslog"
+            isDirectory="false"
+            name="Test Syslog"
+            trace_type="org.eclipse.linuxtools.tmf.tests.stubs.trace.text.SyslogTrace">
+      </type>
    </extension>
 
 </plugin>
