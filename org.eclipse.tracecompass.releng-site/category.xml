@@ -9,7 +9,7 @@
    <feature url="features/org.eclipse.linuxtools.lttng2.ust_0.0.0.qualifier.jar" id="org.eclipse.linuxtools.lttng2.ust" version="0.0.0">
       <category name="Trace Compass"/>
    </feature>
-   <feature url="features/org.eclipse.linuxtools.gdbtrace_0.0.0.qualifier.jar" id="org.eclipse.linuxtools.gdbtrace" version="0.0.0">
+   <feature url="features/org.eclipse.tracecompass.gdbtrace_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.gdbtrace" version="0.0.0">
       <category name="Trace Compass"/>
    </feature>
    <feature url="features/org.eclipse.linuxtools.tmf.pcap_0.0.0.qualifier.jar" id="org.eclipse.linuxtools.tmf.pcap" version="0.0.0">

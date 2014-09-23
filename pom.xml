@@ -164,12 +164,12 @@
     <module>org.eclipse.linuxtools.lttng2.ust.ui</module>
     <module>org.eclipse.linuxtools.lttng2.ust.ui.tests</module>
 
-    <module>org.eclipse.linuxtools.gdbtrace</module>
-    <module>org.eclipse.linuxtools.gdbtrace.core</module>
-    <module>org.eclipse.linuxtools.gdbtrace.core.tests</module>
-    <module>org.eclipse.linuxtools.gdbtrace.ui</module>
-    <module>org.eclipse.linuxtools.gdbtrace.ui.tests</module>
-    <module>org.eclipse.linuxtools.gdbtrace.help</module>
+    <module>org.eclipse.tracecompass.gdbtrace</module>
+    <module>org.eclipse.tracecompass.gdbtrace.core</module>
+    <module>org.eclipse.tracecompass.gdbtrace.core.tests</module>
+    <module>org.eclipse.tracecompass.gdbtrace.ui</module>
+    <module>org.eclipse.tracecompass.gdbtrace.ui.tests</module>
+    <module>org.eclipse.tracecompass.gdbtrace.help</module>
 
     <module>org.eclipse.linuxtools.tracing.rcp.branding</module>
     <module>org.eclipse.linuxtools.tracing.rcp.branding.feature</module>

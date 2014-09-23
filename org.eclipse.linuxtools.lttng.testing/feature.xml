@@ -45,7 +45,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.linuxtools.gdbtrace.core.tests"
+         id="org.eclipse.tracecompass.gdbtrace.core.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"
