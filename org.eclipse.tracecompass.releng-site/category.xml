@@ -15,10 +15,10 @@
    <feature url="features/org.eclipse.tracecompass.tmf.pcap_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.tmf.pcap" version="0.0.0">
       <category name="Trace Compass"/>
    </feature>
-   <feature url="features/org.eclipse.linuxtools.tracing.rcp_0.0.0.qualifier.jar" id="org.eclipse.linuxtools.tracing.rcp" version="0.0.0">
+   <feature url="features/org.eclipse.tracecompass.rcp_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.rcp" version="0.0.0">
       <category name="Trace Compass RCP"/>
    </feature>
-   <feature url="features/org.eclipse.linuxtools.tracing.rcp.branding.feature_0.0.0.qualifier.jar" id="org.eclipse.linuxtools.tracing.rcp.branding.feature" version="0.0.0">
+   <feature url="features/org.eclipse.tracecompass.rcp.branding.feature_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.rcp.branding.feature" version="0.0.0">
       <category name="Trace Compass RCP"/>
    </feature>
    <feature url="features/org.eclipse.linuxtools.lttng.testing_1.0.0.qualifier.jar" id="org.eclipse.linuxtools.lttng.testing" version="1.0.0.qualifier">

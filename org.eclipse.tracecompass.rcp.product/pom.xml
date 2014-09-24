@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <version>1.1.0</version>
+    <artifactId>tracing</artifactId>
+    <packaging>eclipse-repository</packaging>
+    <name>Trace Compass RCP Product</name>
+
+    <parent>
+      <artifactId>org.eclipse.tracecompass</artifactId>
+      <groupId>org.eclipse.tracecompass</groupId>
+      <version>3.2.0-SNAPSHOT</version>
+    </parent>
+
+    <properties>
+        <productId>org.eclipse.tracecompass.rcp</productId>
+        <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.eclipse.tycho</groupId>
+                <artifactId>tycho-p2-director-plugin</artifactId>
+                <version>${tycho-version}</version>
+                <executions>
+                    <execution>
+                        <id>materialize-products</id>
+                        <goals>
+                            <goal>materialize-products</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>archive-products</id>
+                        <goals>
+                            <goal>archive-products</goal>
+                        </goals>
+                        <configuration>
+                            <formats>
+                                <linux>tar.gz</linux>
+                                <macosx>tar.gz</macosx>
+                                <solaris>zip</solaris>
+                                <win32>zip</win32>
+                            </formats>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <products>
+                        <product>
+                            <archiveFileName>trace-compass-${project.version}-${build.timestamp}</archiveFileName>
+                            <id>${productId}</id>
+                            <rootFolder>trace-compass</rootFolder>
+                        </product>
+                    </products>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <groupId>org.eclipse.tracecompass</groupId>
+</project>

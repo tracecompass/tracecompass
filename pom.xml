@@ -171,11 +171,11 @@
     <module>org.eclipse.tracecompass.gdbtrace.ui.tests</module>
     <module>org.eclipse.tracecompass.gdbtrace.help</module>
 
-    <module>org.eclipse.linuxtools.tracing.rcp.branding</module>
-    <module>org.eclipse.linuxtools.tracing.rcp.branding.feature</module>
-    <module>org.eclipse.linuxtools.tracing.rcp</module>
-    <module>org.eclipse.linuxtools.tracing.rcp.help</module>
-    <module>org.eclipse.linuxtools.tracing.rcp.ui</module>
+    <module>org.eclipse.tracecompass.rcp.branding</module>
+    <module>org.eclipse.tracecompass.rcp.branding.feature</module>
+    <module>org.eclipse.tracecompass.rcp</module>
+    <module>org.eclipse.tracecompass.rcp.help</module>
+    <module>org.eclipse.tracecompass.rcp.ui</module>
 
     <module>org.eclipse.linuxtools.tracing.examples</module>
   </modules>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.tracecompass.rcp"
+      label="%featureName"
+      version="1.1.0.qualifier"
+      provider-name="%featureProvider"
+      plugin="org.eclipse.tracecompass.rcp.branding"
+      license-feature="org.eclipse.license"
+      license-feature-version="0.0.0">
+
+   <description>
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <update label="Linux Tools Update Site" url="http://download.eclipse.org/linuxtools/update"/>
+   </url>
+
+   <requires>
+      <import feature="org.eclipse.e4.rcp" version="0.0.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.equinox.p2.core.feature" version="0.0.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.equinox.p2.extras.feature" version="0.0.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.help" version="0.0.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.tracecompass.tmf" version="3.1.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.platform" version="0.0.0" match="greaterOrEqual"/>
+   </requires>
+
+   <plugin
+         id="org.antlr.runtime"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.tracecompass.rcp.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.tracecompass.rcp.help"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.swtchart"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.guava"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.cdt.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.cdt.core.native"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
