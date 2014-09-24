@@ -115,30 +115,30 @@
     <module>org.eclipse.tracecompass.statesystem.core</module>
     <module>org.eclipse.tracecompass.statesystem.core.tests</module>
 
-    <module>org.eclipse.linuxtools.tmf</module>
-    <module>org.eclipse.linuxtools.tmf.core</module>
-    <module>org.eclipse.linuxtools.tmf.core.tests</module>
-    <module>org.eclipse.linuxtools.tmf.ui</module>
-    <module>org.eclipse.linuxtools.tmf.ui.tests</module>
-    <module>org.eclipse.linuxtools.tmf.ui.swtbot.tests</module>
-    <module>org.eclipse.linuxtools.tmf.help</module>
+    <module>org.eclipse.tracecompass.tmf</module>
+    <module>org.eclipse.tracecompass.tmf.core</module>
+    <module>org.eclipse.tracecompass.tmf.core.tests</module>
+    <module>org.eclipse.tracecompass.tmf.ui</module>
+    <module>org.eclipse.tracecompass.tmf.ui.tests</module>
+    <module>org.eclipse.tracecompass.tmf.ui.swtbot.tests</module>
+    <module>org.eclipse.tracecompass.tmf.help</module>
 
-    <module>org.eclipse.linuxtools.tmf.ctf</module>
-    <module>org.eclipse.linuxtools.tmf.ctf.core</module>
-    <module>org.eclipse.linuxtools.tmf.ctf.core.tests</module>
-    <module>org.eclipse.linuxtools.tmf.ctf.ui.swtbot.tests</module>
+    <module>org.eclipse.tracecompass.tmf.ctf</module>
+    <module>org.eclipse.tracecompass.tmf.ctf.core</module>
+    <module>org.eclipse.tracecompass.tmf.ctf.core.tests</module>
+    <module>org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests</module>
 
-    <module>org.eclipse.linuxtools.tmf.pcap</module>
-    <module>org.eclipse.linuxtools.tmf.pcap.core</module>
-    <module>org.eclipse.linuxtools.tmf.pcap.core.tests</module>
-    <module>org.eclipse.linuxtools.tmf.pcap.ui</module>
-    <module>org.eclipse.linuxtools.tmf.pcap.ui.swtbot.tests</module>
-    <module>org.eclipse.linuxtools.tmf.pcap.help</module>
+    <module>org.eclipse.tracecompass.tmf.pcap</module>
+    <module>org.eclipse.tracecompass.tmf.pcap.core</module>
+    <module>org.eclipse.tracecompass.tmf.pcap.core.tests</module>
+    <module>org.eclipse.tracecompass.tmf.pcap.ui</module>
+    <module>org.eclipse.tracecompass.tmf.pcap.ui.swtbot.tests</module>
+    <module>org.eclipse.tracecompass.tmf.pcap.help</module>
 
-    <module>org.eclipse.linuxtools.tmf.analysis.xml.core</module>
-    <module>org.eclipse.linuxtools.tmf.analysis.xml.core.tests</module>
-    <module>org.eclipse.linuxtools.tmf.analysis.xml.ui</module>
-    <module>org.eclipse.linuxtools.tmf.analysis.xml.ui.tests</module>
+    <module>org.eclipse.tracecompass.tmf.analysis.xml.core</module>
+    <module>org.eclipse.tracecompass.tmf.analysis.xml.core.tests</module>
+    <module>org.eclipse.tracecompass.tmf.analysis.xml.ui</module>
+    <module>org.eclipse.tracecompass.tmf.analysis.xml.ui.tests</module>
 
     <module>org.eclipse.linuxtools.lttng.help</module>
     <module>org.eclipse.tracecompass.releng-site</module>

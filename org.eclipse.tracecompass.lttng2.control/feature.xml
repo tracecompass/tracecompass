@@ -24,7 +24,7 @@
    </url>
 
    <includes
-         id="org.eclipse.linuxtools.tmf.ctf"
+         id="org.eclipse.tracecompass.tmf.ctf"
          version="0.0.0"/>
 
    <requires>
@@ -33,8 +33,8 @@
       <import plugin="org.eclipse.ui.ide"/>
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.tracecompass.lttng2.control.core" version="3.1.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.linuxtools.tmf.core" version="3.1.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.linuxtools.tmf.ui" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.tracecompass.tmf.core" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.tracecompass.tmf.ui" version="3.1.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.help"/>
       <import feature="org.eclipse.rse" version="3.1.100" match="greaterOrEqual"/>
    </requires>

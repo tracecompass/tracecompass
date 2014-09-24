@@ -15,8 +15,8 @@
 # (by copying the contents of tmf.core's settings)
 
 # Plugins from which we will copy the settings
-RUNTIME_REFERENCE="org.eclipse.linuxtools.tmf.core"
-TEST_REFERENCE="org.eclipse.linuxtools.tmf.core.tests"
+RUNTIME_REFERENCE="org.eclipse.tracecompass.tmf.core"
+TEST_REFERENCE="org.eclipse.tracecompass.tmf.core.tests"
 
 RUNTIME_FILES=$RUNTIME_REFERENCE/.settings/*.prefs
 TEST_FILES=$TEST_REFERENCE/.settings/*.prefs

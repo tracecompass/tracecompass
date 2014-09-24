@@ -1,7 +1,0 @@
-2011-06-02  Andrew Overholt  <overholt@redhat.com>
-
-	* build.properties: Include license.html.
-
-2011-02-04  Jeff Johnston  <jjohnstn@redhat.com>
-
-	* feature.properties: Fix license to be consistent with other tools.
