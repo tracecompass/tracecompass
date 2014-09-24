@@ -3463,7 +3463,7 @@ public class AnalysisBenchmark {
 
 For more information, see [http://wiki.eclipse.org/Performance/Automated_Tests The Eclipse Performance Test How-to]
 
-Some rules to help write performance tests are explained in section [[ABC of performance testing | ABC of performance testing]].
+Some rules to help write performance tests are explained in section [[#ABC of performance testing | ABC of performance testing]].
 
 === Run a performance test ===
 

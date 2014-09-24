@@ -170,7 +170,6 @@ In addition to these views, the '''Tracing and Monitoring Framework (TMF)''' fea
 * [[#Colors_View | Colors View]]
 * [[#Filters_View | Filters View]]
 * [[#Time_Chart_View  | Time Chart View]]
-* [[#Environment_Variables_View  | Environment Variables View]]
 * [[#State_System_Explorer_View | State System Explorer View]]
 * [[#Call_Stack_View | Call Stack View]]
 
@@ -668,11 +667,6 @@ When a bookmark is applied in the events table, the ticks corresponding to the b
 When a filter is applied in the events table, the non-matching ticks are removed from the Time Chart view.
 
 The Time Chart only supports traces that are opened in an editor. The use of an editor is specified in the plug-in extension for that trace type, or is enabled by default for custom traces.
-
-== Environment Variables View ==
-A new feature of CTF traces is their ability to store user defined data that is not to be placed in an event. It is generally data that is per-trace specific, such as the tracer version and the trace domain. It will be populated when a trace is loaded if the trace has environment variables. <br>
-[[Image:images/LTTng2EnvironmentsView.png]]<br>
-The above picture shows a trace loaded that was collected with the '''lttng-modules''' version '''2'''.'''0'''.'''0''' tracer. It is a '''kernel''' trace of the '''3.2.0-18-generic''' '''linux''' kernel.
 
 == State System Explorer View ==
 
