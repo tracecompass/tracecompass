@@ -21,7 +21,7 @@ import java.util.Set;
 import org.eclipse.linuxtools.internal.lttng2.ust.core.memoryusage.UstMemoryStrings;
 import org.eclipse.linuxtools.lttng2.control.core.session.SessionConfigStrings;
 import org.eclipse.linuxtools.lttng2.ust.core.analysis.memory.UstMemoryAnalysisModule;
-import org.eclipse.linuxtools.tmf.core.analysis.TmfAnalysisRequirement;
+import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement;
 import org.junit.Before;
 import org.junit.Test;
 

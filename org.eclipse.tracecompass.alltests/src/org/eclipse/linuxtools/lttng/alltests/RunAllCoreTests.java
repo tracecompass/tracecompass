@@ -29,10 +29,13 @@ import org.junit.runners.Suite;
     org.eclipse.linuxtools.lttng2.ust.core.tests.AllTests.class,
     org.eclipse.linuxtools.pcap.core.tests.AllPcapCoreTests.class,
     org.eclipse.linuxtools.statesystem.core.tests.AllTests.class,
-    org.eclipse.linuxtools.tmf.analysis.xml.core.tests.AllAnalysisXmlCoreTests.class,
-    org.eclipse.linuxtools.tmf.core.tests.AllTmfCoreTests.class,
-    org.eclipse.linuxtools.tmf.ctf.core.tests.AllTests.class,
-    org.eclipse.linuxtools.tmf.pcap.core.tests.AllTmfPcapCoreTests.class
+    org.eclipse.tracecompass.tmf.analysis.xml.core.tests.AllAnalysisXmlCoreTests.class,
+    org.eclipse.tracecompass.tmf.core.tests.AllTmfCoreTests.class,
+    org.eclipse.tracecompass.tmf.ctf.core.tests.AllTests.class,
+    org.eclipse.tracecompass.tmf.pcap.core.tests.AllTmfPcapCoreTests.class,
+    org.eclipse.tracecompass.tmf.analysis.xml.core.tests.AllAnalysisXmlCoreTests.class,
+    org.eclipse.tracecompass.tmf.ctf.core.tests.AllTests.class,
+    org.eclipse.tracecompass.tmf.pcap.core.tests.AllTmfPcapCoreTests.class
 })
 public class RunAllCoreTests {
 

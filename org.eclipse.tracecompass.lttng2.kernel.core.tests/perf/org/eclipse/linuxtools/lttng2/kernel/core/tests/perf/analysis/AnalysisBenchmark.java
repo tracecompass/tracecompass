@@ -20,16 +20,16 @@ import java.io.File;
 
 import org.eclipse.linuxtools.lttng2.kernel.core.analysis.LttngKernelAnalysisModule;
 import org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngKernelTrace;
-import org.eclipse.linuxtools.tmf.core.analysis.IAnalysisModule;
-import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
-import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.tests.shared.TmfTestHelper;
-import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
-import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfEvent;
-import org.eclipse.linuxtools.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
+import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
+import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestHelper;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ctf.core.CtfTmfEvent;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.junit.Test;
 
 /**

@@ -14,10 +14,10 @@ package org.eclipse.linuxtools.lttng2.ust.ui.analysis.callstack;
 
 import org.eclipse.linuxtools.internal.lttng2.ust.core.trace.callstack.LttngUstCallStackProvider;
 import org.eclipse.linuxtools.lttng2.ust.core.trace.LttngUstTrace;
-import org.eclipse.linuxtools.tmf.core.exceptions.TmfAnalysisException;
-import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.ui.views.callstack.AbstractCallStackAnalysis;
+import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
+import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ui.views.callstack.AbstractCallStackAnalysis;
 
 /**
  * Call-stack analysis to populate the TMF CallStack View from UST cyg-profile

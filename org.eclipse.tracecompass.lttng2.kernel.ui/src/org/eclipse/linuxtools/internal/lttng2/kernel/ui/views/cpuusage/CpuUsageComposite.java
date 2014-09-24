@@ -30,16 +30,16 @@ import org.eclipse.linuxtools.statesystem.core.exceptions.AttributeNotFoundExcep
 import org.eclipse.linuxtools.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.linuxtools.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.linuxtools.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.ui.viewers.tree.AbstractTmfTreeViewer;
-import org.eclipse.linuxtools.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
-import org.eclipse.linuxtools.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
-import org.eclipse.linuxtools.tmf.ui.viewers.tree.TmfTreeColumnData;
-import org.eclipse.linuxtools.tmf.ui.viewers.tree.TmfTreeColumnData.ITmfColumnPercentageProvider;
-import org.eclipse.linuxtools.tmf.ui.viewers.tree.TmfTreeViewerEntry;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractTmfTreeViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeColumnData;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeColumnData.ITmfColumnPercentageProvider;
 
 /**
  * Tree viewer to display CPU usage information in a specified time range. It

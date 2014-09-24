@@ -42,7 +42,7 @@
         <version>${tycho-version}</version>
         <configuration>
           <testSuite>org.eclipse.tracecompass.tmf.analysis.xml.core.tests</testSuite>
-          <testClass>org.eclipse.linuxtools.tmf.analysis.xml.core.tests.AllAnalysisXmlCoreTests</testClass>
+          <testClass>org.eclipse.tracecompass.tmf.analysis.xml.core.tests.AllAnalysisXmlCoreTests</testClass>
           <useUIHarness>false</useUIHarness>
           <useUIThread>false</useUIThread>
           <product>org.eclipse.sdk.ide</product>

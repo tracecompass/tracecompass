@@ -16,11 +16,11 @@ package org.eclipse.linuxtools.internal.lttng2.ust.core.trace.callstack;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.linuxtools.tmf.core.callstack.CallStackStateProvider;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfEvent;
+import org.eclipse.tracecompass.tmf.core.callstack.CallStackStateProvider;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.CtfTmfEvent;
 
 /**
  * Callstack provider for LTTng-UST traces.

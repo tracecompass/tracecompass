@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
       <source
-            class="org.eclipse.linuxtools.tmf.analysis.xml.ui.module.XmlAnalysisModuleSource">
+            class="org.eclipse.tracecompass.tmf.analysis.xml.ui.module.XmlAnalysisModuleSource">
       </source>
    </extension>
    <extension
@@ -38,13 +38,13 @@
                         operator="and">
                      <or>
                         <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
                         </instanceof>
                         <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder">
                         </instanceof>
                         <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement">
                         </instanceof>
                      </or>
                   </iterate>
@@ -56,7 +56,7 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.handler.ImportXmlHandler"
+            class="org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.handler.ImportXmlHandler"
             commandId="org.eclipse.linuxtools.tmf.analysis.xml.ui.importxml">
          <activeWhen>
             <and>
@@ -68,13 +68,13 @@
                      operator="and">
                   <or>
                      <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
                      </instanceof>
                      <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder">
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder">
                      </instanceof>
                      <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectElement">
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement">
                      </instanceof>
                   </or>
                </iterate>
@@ -87,7 +87,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
-            class="org.eclipse.linuxtools.tmf.analysis.xml.ui.views.timegraph.XmlTimeGraphView"
+            class="org.eclipse.tracecompass.tmf.analysis.xml.ui.views.timegraph.XmlTimeGraphView"
             id="org.eclipse.linuxtools.tmf.analysis.xml.ui.views.timegraph"
             name="%xmltimegraph.view.name"
             restorable="true">
@@ -95,7 +95,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
-            class="org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.views.xychart.XmlXYView"
+            class="org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.xychart.XmlXYView"
             id="org.eclipse.linuxtools.internal.tmf.analysis.xml.ui.views.xyview"
             name="%xmlxychart.view.name"
             restorable="true">

@@ -5,7 +5,7 @@
          point="org.eclipse.linuxtools.tmf.core.tracetype">
       <type
             category="org.eclipse.linuxtools.btf.category"
-            event_type="org.eclipse.linuxtools.tmf.core.event.TmfEvent"
+            event_type="org.eclipse.tracecompass.tmf.core.event.TmfEvent"
             id="org.eclipse.linuxtools.btf.trace"
             isDirectory="false"
             name="BTF Trace"

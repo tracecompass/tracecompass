@@ -19,9 +19,9 @@ import org.eclipse.linuxtools.internal.lttng2.control.ui.views.ControlView;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.PerspectiveFactory;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow.ControlFlowView;
 import org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources.ResourcesView;
-import org.eclipse.linuxtools.tmf.ui.swtbot.tests.AbstractPerspectiveChecker;
-import org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramView;
-import org.eclipse.linuxtools.tmf.ui.views.statistics.TmfStatisticsView;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.AbstractPerspectiveChecker;
+import org.eclipse.tracecompass.tmf.ui.views.histogram.HistogramView;
+import org.eclipse.tracecompass.tmf.ui.views.statistics.TmfStatisticsView;
 import org.eclipse.ui.IPageLayout;
 import org.junit.Before;
 

@@ -12,8 +12,8 @@
 
 package org.eclipse.linuxtools.internal.lttng2.ust.ui.views.memusage;
 
-import org.eclipse.linuxtools.tmf.ui.views.TmfChartView;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 
 /**
  * Memory Usage View

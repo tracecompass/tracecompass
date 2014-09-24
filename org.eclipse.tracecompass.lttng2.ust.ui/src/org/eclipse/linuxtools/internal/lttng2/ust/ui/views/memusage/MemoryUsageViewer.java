@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.linuxtools.internal.lttng2.ust.core.memoryusage.UstMemoryStrings;
-import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.lttng2.ust.core.analysis.memory.UstMemoryAnalysisModule;
 import org.eclipse.linuxtools.statesystem.core.ITmfStateSystem;
 import org.eclipse.linuxtools.statesystem.core.exceptions.AttributeNotFoundException;
@@ -27,9 +26,10 @@ import org.eclipse.linuxtools.statesystem.core.exceptions.StateSystemDisposedExc
 import org.eclipse.linuxtools.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.linuxtools.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.linuxtools.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemAnalysisModule;
-import org.eclipse.linuxtools.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.internal.tmf.core.Activator;
+import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
 
 /**
  * Memory usage view

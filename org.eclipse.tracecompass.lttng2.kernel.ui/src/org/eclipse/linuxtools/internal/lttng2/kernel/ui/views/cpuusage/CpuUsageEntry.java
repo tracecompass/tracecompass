@@ -12,7 +12,7 @@
 
 package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.cpuusage;
 
-import org.eclipse.linuxtools.tmf.ui.viewers.tree.TmfTreeViewerEntry;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
 
 /**
  * Represents an entry in the tree viewer of the CPU usage view. An entry is a

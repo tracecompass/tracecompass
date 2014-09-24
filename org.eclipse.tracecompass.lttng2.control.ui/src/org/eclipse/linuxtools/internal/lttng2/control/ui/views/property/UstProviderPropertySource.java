@@ -13,7 +13,7 @@ package org.eclipse.linuxtools.internal.lttng2.control.ui.views.property;
 
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.UstProviderComponent;
-import org.eclipse.linuxtools.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
+import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 
 /**

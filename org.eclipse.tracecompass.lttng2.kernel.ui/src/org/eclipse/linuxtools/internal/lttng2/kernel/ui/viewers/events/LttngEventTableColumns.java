@@ -15,9 +15,9 @@ package org.eclipse.linuxtools.internal.lttng2.kernel.ui.viewers.events;
 import java.util.Collection;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.ui.viewers.events.columns.ITmfEventTableColumns;
-import org.eclipse.linuxtools.tmf.ui.viewers.events.columns.TmfEventTableColumn;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.ITmfEventTableColumns;
+import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.TmfEventTableColumn;
 
 import com.google.common.collect.ImmutableList;
 

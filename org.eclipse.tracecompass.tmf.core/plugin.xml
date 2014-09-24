@@ -7,26 +7,26 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="org.eclipse.linuxtools.internal.tmf.core.TmfCorePreferenceInitializer">
+            class="org.eclipse.tracecompass.internal.tmf.core.TmfCorePreferenceInitializer">
       </initializer>
    </extension>
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
       <source
-            class="org.eclipse.linuxtools.internal.tmf.core.analysis.TmfAnalysisModuleSourceConfigElement">
+            class="org.eclipse.tracecompass.internal.tmf.core.analysis.TmfAnalysisModuleSourceConfigElement">
       </source>
       <module
-            analysis_module="org.eclipse.linuxtools.tmf.core.statistics.TmfStatisticsModule"
+            analysis_module="org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsModule"
             automatic="true"
             id="org.eclipse.linuxtools.tmf.core.statistics.analysis"
             name="Tmf Statistics Analysis">
          <tracetype
                applies="true"
-               class="org.eclipse.linuxtools.tmf.core.trace.TmfTrace">
+               class="org.eclipse.tracecompass.tmf.core.trace.TmfTrace">
          </tracetype>
          <tracetype
                applies="false"
-               class="org.eclipse.linuxtools.tmf.core.trace.TmfExperiment">
+               class="org.eclipse.tracecompass.tmf.core.trace.TmfExperiment">
          </tracetype>
       </module>
    </extension>
@@ -35,7 +35,7 @@
       <experiment
             id="org.eclipse.linuxtools.tmf.core.experiment.generic"
             name="%experimenttype.type.generic"
-            experiment_type="org.eclipse.linuxtools.tmf.core.trace.TmfExperiment">
+            experiment_type="org.eclipse.tracecompass.tmf.core.trace.TmfExperiment">
       </experiment>
    </extension>
 </plugin>

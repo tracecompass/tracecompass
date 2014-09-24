@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.tracecompass.tmf.analysis.xml.ui.tests;singleton:=true
 Bundle-Version: 1.1.0.qualifier
-Bundle-Activator: org.eclipse.linuxtools.tmf.analysis.xml.ui.tests.Activator
+Bundle-Activator: org.eclipse.tracecompass.tmf.analysis.xml.ui.tests.Activator
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -18,4 +18,4 @@ Require-Bundle: org.eclipse.ui,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: org.junit.runners
-Export-Package: org.eclipse.linuxtools.tmf.analysis.xml.ui.tests
+Export-Package: org.eclipse.tracecompass.tmf.analysis.xml.ui.tests

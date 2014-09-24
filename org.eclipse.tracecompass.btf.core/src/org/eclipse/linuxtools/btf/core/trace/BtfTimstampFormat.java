@@ -12,8 +12,8 @@
 
 package org.eclipse.linuxtools.btf.core.trace;
 
-import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 
 /**
  * Timstamp format of BTF timescale as per v2.1 of the spec

@@ -9,11 +9,11 @@
       </category>
       <type
             category="org.eclipse.linuxtools.tmf.ctf.core.category.ctf"
-            event_type="org.eclipse.linuxtools.tmf.ctf.core.CtfTmfEvent"
+            event_type="org.eclipse.tracecompass.tmf.ctf.core.CtfTmfEvent"
             id="org.eclipse.linuxtools.tmf.ui.type.ctf"
             isDirectory="true"
             name="%tracetype.type.ctf"
-            trace_type="org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace">
+            trace_type="org.eclipse.tracecompass.tmf.ctf.core.CtfTmfTrace">
       </type>
    </extension>
 

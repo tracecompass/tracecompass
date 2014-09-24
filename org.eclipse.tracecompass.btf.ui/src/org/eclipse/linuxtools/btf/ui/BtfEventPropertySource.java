@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.linuxtools.btf.core.event.BtfEvent;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
-import org.eclipse.linuxtools.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
-import org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventPropertySource;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
+import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
+import org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventPropertySource;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 

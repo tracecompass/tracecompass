@@ -14,7 +14,7 @@ package org.eclipse.linuxtools.lttng2.ust.core.tests.trace.callstack;
 
 import static org.junit.Assume.assumeTrue;
 
-import org.eclipse.linuxtools.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.junit.BeforeClass;
 
 /**

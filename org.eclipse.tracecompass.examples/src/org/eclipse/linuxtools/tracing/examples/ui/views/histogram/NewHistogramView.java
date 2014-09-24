@@ -11,9 +11,9 @@
  *******************************************************************************/
 package org.eclipse.linuxtools.tracing.examples.ui.views.histogram;
 
-import org.eclipse.linuxtools.tmf.ui.views.TmfChartView;
 import org.eclipse.linuxtools.tracing.examples.ui.viewers.histogram.NewHistogramViewer;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 
 /**
  * Histogram View based on TmfChartView.

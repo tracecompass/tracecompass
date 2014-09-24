@@ -17,14 +17,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.linuxtools.internal.lttng2.kernel.core.TcpEventStrings;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
-import org.eclipse.linuxtools.tmf.core.event.matching.ITmfNetworkMatchDefinition;
-import org.eclipse.linuxtools.tmf.core.event.matching.TmfEventMatching.MatchingType;
-import org.eclipse.linuxtools.tmf.core.event.matching.TmfNetworkEventMatching.Direction;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.core.trace.TmfEventTypeCollectionHelper;
-import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
+import org.eclipse.tracecompass.tmf.core.event.matching.ITmfNetworkMatchDefinition;
+import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching.MatchingType;
+import org.eclipse.tracecompass.tmf.core.event.matching.TmfNetworkEventMatching.Direction;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfEventTypeCollectionHelper;
+import org.eclipse.tracecompass.tmf.ctf.core.CtfTmfTrace;
 
 import com.google.common.collect.ImmutableSet;
 

@@ -24,9 +24,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.linuxtools.internal.gdbtrace.core.trace.GdbTrace;
 import org.eclipse.linuxtools.internal.gdbtrace.ui.views.project.dialogs.SelectTraceExecutableDialog;
-import org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 

@@ -7,7 +7,7 @@
     <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="org.eclipse.linuxtools.tmf.ui.views.TracingPerspectiveFactory"
+            class="org.eclipse.tracecompass.tmf.ui.views.TracingPerspectiveFactory"
             icon="icons/eview16/tracing_pers.gif"
             id="org.eclipse.linuxtools.tmf.ui.perspective"
             name="%perspective.category.name">
@@ -21,7 +21,7 @@
       </category>
       <view
             category="org.eclipse.linuxtools.tmf.ui.views.category"
-            class="org.eclipse.linuxtools.tmf.ui.views.timechart.TimeChartView"
+            class="org.eclipse.tracecompass.tmf.ui.views.timechart.TimeChartView"
             icon="icons/eview16/timechart_view.gif"
             id="org.eclipse.linuxtools.tmf.ui.views.timechart"
             name="%timechart.view.name"
@@ -30,7 +30,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.tmf.ui.views.category"
-            class="org.eclipse.linuxtools.tmf.ui.views.statesystem.TmfStateSystemExplorer"
+            class="org.eclipse.tracecompass.tmf.ui.views.statesystem.TmfStateSystemExplorer"
             icon="icons/eview16/events_view.gif"
             id="org.eclipse.linuxtools.tmf.ui.views.ssvisualizer"
             name="%ssvisualizer.view.name"
@@ -39,7 +39,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.tmf.ui.views.category"
-            class="org.eclipse.linuxtools.tmf.ui.views.colors.ColorsView"
+            class="org.eclipse.tracecompass.tmf.ui.views.colors.ColorsView"
             icon="icons/eview16/colors_view.gif"
             id="org.eclipse.linuxtools.tmf.ui.views.colors"
             name="%colors.view.name"
@@ -48,7 +48,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.tmf.ui.views.category"
-            class="org.eclipse.linuxtools.tmf.ui.views.filter.FilterView"
+            class="org.eclipse.tracecompass.tmf.ui.views.filter.FilterView"
             icon="icons/eview16/filters_view.gif"
             id="org.eclipse.linuxtools.tmf.ui.views.filter"
             name="%filters.view.name"
@@ -56,7 +56,7 @@
       </view>
       <view
             category="org.eclipse.linuxtools.tmf.ui.views.category"
-            class="org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView"
+            class="org.eclipse.tracecompass.tmf.ui.views.uml2sd.SDView"
             icon="icons/eview16/sequencediagram_view.gif"
             id="org.eclipse.linuxtools.tmf.ui.tmfUml2SDSyncView"
             name="%uml2sd.view.name"
@@ -65,7 +65,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.tmf.ui.views.category"
-            class="org.eclipse.linuxtools.tmf.ui.views.statistics.TmfStatisticsView"
+            class="org.eclipse.tracecompass.tmf.ui.views.statistics.TmfStatisticsView"
             icon="icons/eview16/statistics_view.gif"
             id="org.eclipse.linuxtools.tmf.ui.views.statistics"
             name="%statistics.view.name"
@@ -74,7 +74,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.tmf.ui.views.category"
-            class="org.eclipse.linuxtools.tmf.ui.views.histogram.HistogramView"
+            class="org.eclipse.tracecompass.tmf.ui.views.histogram.HistogramView"
             icon="icons/eview16/histogram.gif"
             id="org.eclipse.linuxtools.tmf.ui.views.histogram"
             name="%histogram.view.name"
@@ -82,7 +82,7 @@
       </view>
       <view
             category="org.eclipse.linuxtools.tmf.ui.views.category"
-            class="org.eclipse.linuxtools.tmf.ui.views.callstack.CallStackView"
+            class="org.eclipse.tracecompass.tmf.ui.views.callstack.CallStackView"
             icon="icons/eview16/callstack_view.gif"
             id="org.eclipse.linuxtools.tmf.ui.views.callstack"
             name="%callstack.view.name"
@@ -91,7 +91,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.tmf.ui.views.category"
-            class="org.eclipse.linuxtools.tmf.ui.views.synchronization.TmfSynchronizationView"
+            class="org.eclipse.tracecompass.tmf.ui.views.synchronization.TmfSynchronizationView"
             icon="icons/eview16/synced.gif"
             id="org.eclipse.linuxtools.tmf.ui.views.synchronization"
             name="%synchronization.view.name"
@@ -101,7 +101,7 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor"
+            class="org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor"
             default="false"
             icon="icons/eview16/events_view.gif"
             id="org.eclipse.linuxtools.tmf.ui.editors.events"
@@ -119,7 +119,7 @@
       </category>
       <wizard
             category="org.eclipse.linuxtools.tmf.ui.wizards.new"
-            class="org.eclipse.linuxtools.tmf.ui.project.wizards.NewTmfProjectWizard"
+            class="org.eclipse.tracecompass.tmf.ui.project.wizards.NewTmfProjectWizard"
             icon="icons/elcl16/new_tracing_prj.gif"
             id="org.eclipse.linuxtools.tmf.ui.views.ui.wizards.newProject"
             name="%project.new.wizard.name"
@@ -131,14 +131,14 @@
       </wizard>
       <wizard
             category="org.eclipse.linuxtools.tmf.ui.wizards.new"
-            class="org.eclipse.linuxtools.internal.tmf.ui.parsers.wizards.CustomTxtParserWizard"
+            class="org.eclipse.tracecompass.internal.tmf.ui.parsers.wizards.CustomTxtParserWizard"
             icon="icons/etool16/customparser_wizard.gif"
             id="org.eclipse.linuxtools.tmf.ui.wizards.custom.text"
             name="%project.new.wizard.custom.text.parser">
       </wizard>
       <wizard
             category="org.eclipse.linuxtools.tmf.ui.wizards.new"
-            class="org.eclipse.linuxtools.internal.tmf.ui.parsers.wizards.CustomXmlParserWizard"
+            class="org.eclipse.tracecompass.internal.tmf.ui.parsers.wizards.CustomXmlParserWizard"
             icon="icons/etool16/customparser_wizard.gif"
             id="org.eclipse.linuxtools.tmf.ui.wizards.custom.xml"
             name="%project.new.wizard.custom.xml.parser">
@@ -152,14 +152,14 @@
       </category>
       <wizard
             category="org.eclipse.linuxtools.tmf.import.category"
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.wizards.importtrace.ImportTraceWizard"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.ImportTraceWizard"
             icon="icons/etool16/import.gif"
             id="org.eclipse.linuxtools.tmf.ui.trace.import.wizard"
             name="%project.import.wizard.name">
       </wizard>
       <wizard
             category="org.eclipse.linuxtools.tmf.import.category"
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg.importexport.ImportTracePackageWizard"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.importexport.ImportTracePackageWizard"
             icon="icons/etool16/import.gif"
             id="org.eclipse.linuxtools.tmf.ui.trace.import.package.wizard"
             name="%project.import.wizard.name.tracepkg">
@@ -170,7 +170,7 @@
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
-               class="org.eclipse.linuxtools.tmf.core.TmfProjectNature">
+               class="org.eclipse.tracecompass.tmf.core.TmfProjectNature">
          </run>
       </runtime>
    </extension>
@@ -186,10 +186,10 @@
          point="org.eclipse.ui.navigator.navigatorContent">
       <navigatorContent
             activeByDefault="true"
-            contentProvider="org.eclipse.linuxtools.tmf.ui.project.model.TmfNavigatorContentProvider"
+            contentProvider="org.eclipse.tracecompass.tmf.ui.project.model.TmfNavigatorContentProvider"
             icon="icons/eview16/tracing_pers.gif"
             id="org.eclipse.linuxtools.tmf.ui.navigator.content"
-            labelProvider="org.eclipse.linuxtools.tmf.ui.project.model.TmfNavigatorLabelProvider"
+            labelProvider="org.eclipse.tracecompass.tmf.ui.project.model.TmfNavigatorLabelProvider"
             name="%navigatorContent.name"
             priority="normal">
          <triggerPoints>
@@ -204,14 +204,14 @@
                   </test>
                </and>
                <instanceof
-                     value="org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement">
+                     value="org.eclipse.tracecompass.tmf.ui.project.model.ITmfProjectModelElement">
                </instanceof>
             </or>
          </triggerPoints>
          <possibleChildren>
             <or>
                <instanceof
-                     value="org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement">
+                     value="org.eclipse.tracecompass.tmf.ui.project.model.ITmfProjectModelElement">
                </instanceof>
                <instanceof
                      value="org.eclipse.core.resources.IResource">
@@ -222,18 +222,18 @@
                suppressedExtensionId="org.eclipse.ui.navigator.resourceContent">
          </override>
          <actionProvider
-               class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.TmfActionProvider"
+               class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.TmfActionProvider"
                id="org.eclipse.linuxtools.tmf.ui.navigator.actions.provider">
             <enablement>
                <or>
                   <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement">
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.ITmfProjectModelElement">
                   </instanceof>
                </or>
             </enablement>
          </actionProvider>
          <dropAssistant
-               class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DropAdapterAssistant"
+               class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.DropAdapterAssistant"
                id="org.eclipse.linuxtools.tmf.ui.navigator.dropAssistant">
             <possibleDropTargets>
                <or>
@@ -247,7 +247,7 @@
                      </test>
                   </and>
                   <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.ITmfProjectModelElement">
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.ITmfProjectModelElement">
                   </instanceof>
                </or>
             </possibleDropTargets>
@@ -265,7 +265,7 @@
                </enablement>
          </commonWizard>
          <commonSorter
-               class="org.eclipse.linuxtools.tmf.ui.project.model.TmfViewerSorter"
+               class="org.eclipse.tracecompass.tmf.ui.project.model.TmfViewerSorter"
                id="org.eclipse.linuxtools.tmf.ui.navigator.viewerSorter">
          </commonSorter>
       </navigatorContent>
@@ -298,7 +298,7 @@
             state="true">
          <enablement>
             <objectClass
-                  name="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                  name="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
             </objectClass>
          </enablement>
       </decorator>
@@ -311,7 +311,7 @@
             state="true">
          <enablement>
             <objectClass
-                  name="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder">
+                  name="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder">
             </objectClass>
          </enablement>
       </decorator>
@@ -325,7 +325,7 @@
          <enablement>
             <and>
                <objectClass
-                     name="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                     name="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
                </objectClass>
                <objectState
                      name="isLinked"
@@ -354,7 +354,7 @@
                   <iterate
                         operator="and">
                      <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
                      </instanceof>
                   </iterate>
                </with>
@@ -379,13 +379,13 @@
                         operator="and">
                      <or>
                         <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
                         </instanceof>
                         <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
                         </instanceof>
                         <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfAnalysisOutputElement">
+                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisOutputElement">
                         </instanceof>
                      </or>
                   </iterate>
@@ -414,7 +414,7 @@
                   <iterate
                         operator="and">
                      <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
                      </instanceof>
                   </iterate>
                </with>
@@ -443,7 +443,7 @@
                         operator="or">
                      <or>
                         <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
                         </instanceof>
                      </or>
                   </iterate>
@@ -480,19 +480,19 @@
                         operator="and">
                      <or>
                         <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
                         </instanceof>
                         <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
                         </instanceof>
                         <and>
                            <not>
                               <instanceof
-                                    value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder">
+                                    value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder">
                               </instanceof>
                            </not>
                            <instanceof
-                                 value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                                 value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
                            </instanceof>
                         </and>
                      </or>
@@ -517,7 +517,7 @@
                               ifEmpty="false"
                               operator="and">
                            <instanceof
-                                 value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                                 value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
                            </instanceof>
                         </iterate>
                         <iterate
@@ -525,11 +525,11 @@
                               operator="and">
                            <or>
                               <instanceof
-                                    value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                                    value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
                               </instanceof>
                               <and>
                                  <instanceof
-                                       value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                                       value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
                                  </instanceof>
                                  <not>
                                     <test
@@ -548,7 +548,7 @@
                                  ifEmpty="false"
                                  operator="and">
                               <instanceof
-                                    value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder">
+                                    value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder">
                               </instanceof>
                            </iterate>
                         </with>
@@ -572,7 +572,7 @@
                         ifEmpty="false"
                         operator="and">
                      <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder">
                      </instanceof>
                   </iterate>
                </with>
@@ -594,7 +594,7 @@
                         operator="and">
                      <and>
                         <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
                         </instanceof>
                         <test
                               forcePluginActivation="true"
@@ -628,7 +628,7 @@
                         ifEmpty="false"
                         operator="and">
                      <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder">
                      </instanceof>
                   </iterate>
                </with>
@@ -650,10 +650,10 @@
                            operator="and">
                         <or>
                            <instanceof
-                                 value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                                 value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
                            </instanceof>
                            <instanceof
-                                 value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                                 value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
                            </instanceof>
                         </or>
                      </iterate>
@@ -687,7 +687,7 @@
                            ifEmpty="false"
                            operator="and">
                         <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
                         </instanceof>
                      </iterate>
                   </and>
@@ -714,7 +714,7 @@
                           ifEmpty="false"
                           operator="and">
                        <instanceof
-                             value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                             value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
                        </instanceof>
                     </iterate>
                     <and>
@@ -724,7 +724,7 @@
                        <iterate
                              operator="and">
                           <instanceof
-                                value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                                value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
                           </instanceof>
                        </iterate>
                     </and>
@@ -751,7 +751,7 @@
                   <iterate
                         operator="and">
                      <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
                      </instanceof>
                   </iterate>
                </with>
@@ -762,7 +762,7 @@
                mnemonic="%command.select_trace_type.mnemonic"
                tooltip="%command.select_trace_type.description">
             <dynamic
-                  class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.SelectElementTypeContributionItem"
+                  class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.SelectElementTypeContributionItem"
                   id="org.eclipse.linuxtools.tmf.ui.command.select_trace_type.dynamic">
             </dynamic>
             <separator
@@ -782,7 +782,7 @@
                         ifEmpty="false"
                         operator="and">
                       <instanceof
-                            value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                            value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
                       </instanceof>
                   </iterate>
                </with>
@@ -793,7 +793,7 @@
                mnemonic="%command.select_experiment_type.mnemonic"
                tooltip="%command.select_experiment_type.description">
             <dynamic
-                  class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.SelectElementTypeContributionItem"
+                  class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.SelectElementTypeContributionItem"
                   id="org.eclipse.linuxtools.tmf.ui.command.select_trace_type.dynamic">
             </dynamic>
             <visibleWhen
@@ -804,7 +804,7 @@
                         ifEmpty="false"
                         operator="and">
                       <instanceof
-                            value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                            value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
                       </instanceof>
                   </iterate>
                </with>
@@ -832,7 +832,7 @@
                         ifEmpty="false"
                         operator="and">
                      <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
                      </instanceof>
                   </iterate>
                </with>
@@ -856,7 +856,7 @@
                         ifEmpty="false"
                         operator="and">
                      <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
                      </instanceof>
                   </iterate>
                </with>
@@ -901,13 +901,13 @@
                         operator="and">
                      <or>
                         <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
                         </instanceof>
                         <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder">
+                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder">
                         </instanceof>
                         <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
                         </instanceof>
                      </or>
                   </iterate>
@@ -932,7 +932,7 @@
                         ifEmpty="false"
                         operator="and">
                      <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfAnalysisElement">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisElement">
                      </instanceof>
                   </iterate>
                </with>
@@ -1148,7 +1148,7 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.file"
-            defaultHandler="org.eclipse.linuxtools.internal.tmf.ui.commands.OpenFileHandler"
+            defaultHandler="org.eclipse.tracecompass.internal.tmf.ui.commands.OpenFileHandler"
             description="%command.OpenFile.description"
             id="org.eclipse.linuxtools.tmf.ui.openFile"
             name="%command.OpenFile.name">
@@ -1169,11 +1169,11 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.ImportTraceHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.ImportTraceHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.import">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.RefreshHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.RefreshHandler"
             commandId="org.eclipse.ui.file.refresh">
          <activeWhen>
             <and>
@@ -1185,13 +1185,13 @@
                      operator="and">
                   <or>
                      <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
                      </instanceof>
                      <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder">
                      </instanceof>
                      <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
                      </instanceof>
                   </or>
                </iterate>
@@ -1199,7 +1199,7 @@
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.OpenTraceHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.OpenTraceHandler"
             commandId="org.eclipse.ui.navigate.openResource">
          <activeWhen>
             <and>
@@ -1209,14 +1209,14 @@
                <iterate
                      operator="and">
                   <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
                   </instanceof>
                </iterate>
             </and>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.OpenExperimentHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.OpenExperimentHandler"
             commandId="org.eclipse.ui.navigate.openResource">
          <activeWhen>
             <and>
@@ -1226,14 +1226,14 @@
                <iterate
                      operator="and">
                   <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
                   </instanceof>
                </iterate>
             </and>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.OpenAnalysisHelpHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.OpenAnalysisHelpHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.analysis_help">
          <activeWhen>
             <and>
@@ -1243,14 +1243,14 @@
                <iterate
                      operator="and">
                   <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfAnalysisElement">
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisElement">
                   </instanceof>
                </iterate>
             </and>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.OpenAnalysisOutputHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.OpenAnalysisOutputHandler"
             commandId="org.eclipse.ui.navigate.openResource">
          <activeWhen>
             <and>
@@ -1260,14 +1260,14 @@
                <iterate
                      operator="and">
                   <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfAnalysisOutputElement">
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisOutputElement">
                   </instanceof>
                </iterate>
             </and>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.CopyTraceHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.CopyTraceHandler"
             commandId="org.eclipse.ui.edit.copy">
          <activeWhen>
             <and>
@@ -1283,7 +1283,7 @@
                <iterate
                      operator="and">
                   <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
                   </instanceof>
                   <not>
                      <test
@@ -1296,7 +1296,7 @@
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.CopyExperimentHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.CopyExperimentHandler"
             commandId="org.eclipse.ui.edit.copy">
          <activeWhen>
             <and>
@@ -1312,14 +1312,14 @@
                <iterate
                      operator="and">
                   <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
                   </instanceof>
                </iterate>
             </and>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.RenameTraceHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.RenameTraceHandler"
             commandId="org.eclipse.ui.edit.rename">
          <activeWhen>
             <and>
@@ -1329,14 +1329,14 @@
                <iterate
                      operator="and">
                   <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
                   </instanceof>
                </iterate>
             </and>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.RenameExperimentHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.RenameExperimentHandler"
             commandId="org.eclipse.ui.edit.rename">
          <activeWhen>
             <and>
@@ -1346,14 +1346,14 @@
                <iterate
                      operator="and">
                   <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
                   </instanceof>
                </iterate>
             </and>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.RenameFolderHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.RenameFolderHandler"
             commandId="org.eclipse.ui.edit.rename">
          <activeWhen>
             <and>
@@ -1365,11 +1365,11 @@
                   <and>
                      <not>
                         <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTracesFolder">
+                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder">
                         </instanceof>
                      </not>
                      <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
                      </instanceof>
                   </and>
                </iterate>
@@ -1377,20 +1377,20 @@
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteExperimentHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.DeleteExperimentHandler"
             commandId="org.eclipse.ui.edit.delete">
          <activeWhen>
             <iterate
                   ifEmpty="false"
                   operator="and">
                <instanceof
-                     value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                     value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
                </instanceof>
             </iterate>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteTraceFolderElementHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.DeleteTraceFolderElementHandler"
             commandId="org.eclipse.ui.edit.delete">
          <activeWhen>
             <iterate
@@ -1398,17 +1398,17 @@
                   operator="and">
                <or>
                   <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
                   </instanceof>
                   <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
                   </instanceof>
                </or>
             </iterate>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.NewFolderHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.NewFolderHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.new_folder">
          <activeWhen>
             <and>
@@ -1419,22 +1419,22 @@
                      ifEmpty="false"
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
                   </instanceof>
                </iterate>
             </and>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.DeleteTraceSupplementaryFilesHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.DeleteTraceSupplementaryFilesHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.delete_suppl_files">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg.importexport.ExportTracePackageHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.importexport.ExportTracePackageHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.exporttracepkg">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg.importexport.ImportTracePackageHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.importexport.ImportTracePackageHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.importtracepkg">
          <activeWhen>
             <and>
@@ -1444,14 +1444,14 @@
                <iterate
                      operator="and">
                   <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
                   </instanceof>
                </iterate>
             </and>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.NewExperimentHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.NewExperimentHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.new_experiment">
          <activeWhen>
             <and>
@@ -1461,14 +1461,14 @@
                <iterate
                      operator="and">
                   <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentFolder">
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder">
                   </instanceof>
                </iterate>
             </and>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.SelectTraceTypeHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.SelectTraceTypeHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.select_trace_type">
          <activeWhen>
             <iterate
@@ -1476,17 +1476,17 @@
                   operator="and">
                <or>
                   <instanceof
-                     value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                     value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
                   </instanceof>
                   <instanceof
-                     value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                     value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
                   </instanceof>
                </or>
             </iterate>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.SelectTracesHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.SelectTracesHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.select_traces">
          <activeWhen>
             <and>
@@ -1496,14 +1496,14 @@
                <iterate
                      operator="and">
                   <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
                   </instanceof>
                </iterate>
             </and>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.SynchronizeTracesHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.SynchronizeTracesHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.synchronize_traces">
          <activeWhen>
             <and>
@@ -1513,25 +1513,25 @@
                <iterate
                      operator="and">
                   <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
                   </instanceof>
                </iterate>
             </and>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.commands.ManageCustomParsersCommandHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.commands.ManageCustomParsersCommandHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.managecustomparsers">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.editors.handlers.AddBookmarkHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.editors.handlers.AddBookmarkHandler"
             commandId="org.eclipse.ui.edit.addBookmark">
          <activeWhen>
             <and>
                <with
                      variable="activePart">
                   <instanceof
-                        value="org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor">
+                        value="org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor">
                   </instanceof>
                </with>
                <count
@@ -1541,66 +1541,66 @@
                      ifEmpty="false"
                      operator="and">
                   <instanceof
-                        value="org.eclipse.linuxtools.tmf.core.event.ITmfEvent">
+                        value="org.eclipse.tracecompass.tmf.core.event.ITmfEvent">
                   </instanceof>
                </iterate>
             </and>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.commands.ExportToTextCommandHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.commands.ExportToTextCommandHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.exportToText">
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.views.filter.CopyHandler"
+            class="org.eclipse.tracecompass.tmf.ui.views.filter.CopyHandler"
             commandId="org.eclipse.ui.edit.copy">
          <activeWhen>
             <with
                   variable="activePart">
                <instanceof
-                     value="org.eclipse.linuxtools.tmf.ui.views.filter.FilterView">
+                     value="org.eclipse.tracecompass.tmf.ui.views.filter.FilterView">
                </instanceof>
             </with>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.views.filter.PasteHandler"
+            class="org.eclipse.tracecompass.tmf.ui.views.filter.PasteHandler"
             commandId="org.eclipse.ui.edit.paste">
          <activeWhen>
             <with
                   variable="activePart">
                <instanceof
-                     value="org.eclipse.linuxtools.tmf.ui.views.filter.FilterView">
+                     value="org.eclipse.tracecompass.tmf.ui.views.filter.FilterView">
                </instanceof>
             </with>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.views.filter.CutHandler"
+            class="org.eclipse.tracecompass.tmf.ui.views.filter.CutHandler"
             commandId="org.eclipse.ui.edit.cut">
          <activeWhen>
             <with
                   variable="activePart">
                <instanceof
-                     value="org.eclipse.linuxtools.tmf.ui.views.filter.FilterView">
+                     value="org.eclipse.tracecompass.tmf.ui.views.filter.FilterView">
                </instanceof>
             </with>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.tmf.ui.views.filter.DeleteHandler"
+            class="org.eclipse.tracecompass.tmf.ui.views.filter.DeleteHandler"
             commandId="org.eclipse.ui.edit.delete">
          <activeWhen>
             <with
                   variable="activePart">
                <instanceof
-                     value="org.eclipse.linuxtools.tmf.ui.views.filter.FilterView">
+                     value="org.eclipse.tracecompass.tmf.ui.views.filter.FilterView">
                </instanceof>
             </with>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.OffsetTraceHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.OffsetTraceHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.offset_traces">
          <activeWhen>
             <with
@@ -1624,7 +1624,7 @@
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.ClearTraceOffsetHandler"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.ClearTraceOffsetHandler"
             commandId="org.eclipse.linuxtools.tmf.ui.command.clear_offset">
          <activeWhen>
             <with
@@ -1710,19 +1710,19 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="org.eclipse.linuxtools.internal.tmf.ui.preferences.TmfTracingPreferencePage"
+            class="org.eclipse.tracecompass.internal.tmf.ui.preferences.TmfTracingPreferencePage"
             id="org.eclipse.linuxtools.tmf.ui.TmfTracingPreferences"
             name="%preference.page.trace.name">
       </page>
       <page
             category="org.eclipse.linuxtools.tmf.ui.TmfTracingPreferences"
-            class="org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewerPage"
+            class="org.eclipse.tracecompass.tmf.ui.views.uml2sd.preferences.SDViewerPage"
             id="org.eclipse.linuxtools.tmf.ui.views.uml2sd.preferences.SDViewerPage"
             name="%preference.page.uml2sd.name">
       </page>
       <page
             category="org.eclipse.linuxtools.tmf.ui.TmfTracingPreferences"
-            class="org.eclipse.linuxtools.tmf.ui.properties.TmfTimestampFormatPage"
+            class="org.eclipse.tracecompass.tmf.ui.properties.TmfTimestampFormatPage"
             id="org.eclipse.linuxtools.tmf.ui.preferences.timestamp.format"
             name="%preferences.page.timestamp.format">
       </page>
@@ -1730,7 +1730,7 @@
    <extension
          point="org.eclipse.linuxtools.tmf.ui.uml2SDLoader">
       <uml2SDLoader
-            class="org.eclipse.linuxtools.tmf.ui.views.uml2sd.loader.TmfUml2SDSyncLoader"
+            class="org.eclipse.tracecompass.tmf.ui.views.uml2sd.loader.TmfUml2SDSyncLoader"
             default="true"
             id="org.eclipse.linuxtools.tmf.ui.views.uml2sd.impl.TmfUml2SDSyncLoader"
             name="TMF UML2SD Loader"
@@ -1750,17 +1750,17 @@
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.handlers.TracePropertyTester"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.TracePropertyTester"
             id="org.eclipse.linuxtools.tmf.ui.tracePropertyTester"
             namespace="org.eclipse.linuxtools.tmf.ui"
             properties="isExperimentTrace,hasSupplementaryFiles,traceType"
-            type="org.eclipse.linuxtools.tmf.ui.project.model.TmfProjectModelElement">
+            type="org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectModelElement">
       </propertyTester>
    </extension>
    <extension
          point="org.eclipse.ui.navigator.linkHelper">
       <linkHelper
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.model.TmfEditorLinkHelper"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.model.TmfEditorLinkHelper"
             id="org.eclipse.linuxtools.internal.tmf.ui.project.model.TmfEditorLinkHelper">
          <editorInputEnablement>
              <instanceof value="org.eclipse.ui.IFileEditorInput"/>
@@ -1768,10 +1768,10 @@
          <selectionEnablement>
              <or>
                 <instanceof
-                      value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                      value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
                 </instanceof>
                 <instanceof
-                      value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                      value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
                 </instanceof>
              </or>
          </selectionEnablement>
@@ -1781,7 +1781,7 @@
          point="org.eclipse.ui.exportWizards">
       <wizard
             category="org.eclipse.linuxtools.tmf.export.category"
-            class="org.eclipse.linuxtools.internal.tmf.ui.project.wizards.tracepkg.importexport.ExportTracePackageWizard"
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.importexport.ExportTracePackageWizard"
             icon="icons/etool16/export.gif"
             id="org.eclipse.linuxtools.tmf.ui.trace.export.package.wizard"
             name="%project.export.wizard.name.tracepkg">
@@ -1794,7 +1794,7 @@
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
       <output
-            class="org.eclipse.linuxtools.tmf.ui.analysis.TmfAnalysisViewOutput"
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
             id="org.eclipse.linuxtools.tmf.ui.views.statistics">
             <analysisId
                id="org.eclipse.linuxtools.tmf.core.statistics.analysis">

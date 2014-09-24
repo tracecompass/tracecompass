@@ -25,7 +25,6 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.Activator;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.messages.Messages;
-import org.eclipse.linuxtools.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -41,6 +40,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
 
 import com.google.common.collect.ImmutableList;
 

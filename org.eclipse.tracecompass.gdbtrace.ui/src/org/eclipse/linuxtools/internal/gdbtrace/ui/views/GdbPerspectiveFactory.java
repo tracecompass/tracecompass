@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.internal.gdbtrace.ui.views;
 
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.linuxtools.internal.gdbtrace.ui.GdbTraceUIPlugin;
-import org.eclipse.linuxtools.tmf.ui.project.wizards.NewTmfProjectWizard;
+import org.eclipse.tracecompass.tmf.ui.project.wizards.NewTmfProjectWizard;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;

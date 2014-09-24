@@ -23,8 +23,8 @@ import org.eclipse.linuxtools.internal.lttng2.kernel.ui.Activator;
 import org.eclipse.linuxtools.lttng2.kernel.core.cpuusage.LttngKernelCpuUsageAnalysis;
 import org.eclipse.linuxtools.statesystem.core.ITmfStateSystem;
 import org.eclipse.linuxtools.statesystem.core.exceptions.StateValueTypeException;
-import org.eclipse.linuxtools.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
 
 /**
  * CPU usage viewer with XY line chart. It displays the total CPU usage and that

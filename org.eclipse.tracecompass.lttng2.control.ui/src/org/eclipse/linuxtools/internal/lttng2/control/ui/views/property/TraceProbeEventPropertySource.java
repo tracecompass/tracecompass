@@ -18,7 +18,7 @@ import java.util.List;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceEventComponent;
 import org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceProbeEventComponent;
-import org.eclipse.linuxtools.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
+import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 
 /**

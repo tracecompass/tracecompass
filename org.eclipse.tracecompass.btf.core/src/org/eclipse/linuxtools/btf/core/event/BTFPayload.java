@@ -15,7 +15,7 @@ package org.eclipse.linuxtools.btf.core.event;
 import java.util.Map;
 
 import org.eclipse.linuxtools.btf.core.Messages;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
+import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;

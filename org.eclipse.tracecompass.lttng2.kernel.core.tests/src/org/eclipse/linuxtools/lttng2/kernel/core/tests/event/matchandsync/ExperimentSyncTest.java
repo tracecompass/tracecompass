@@ -17,14 +17,14 @@ import static org.junit.Assume.assumeTrue;
 
 import org.eclipse.linuxtools.lttng2.kernel.core.event.matching.TcpEventMatching;
 import org.eclipse.linuxtools.lttng2.kernel.core.event.matching.TcpLttngEventMatching;
-import org.eclipse.linuxtools.tmf.core.event.matching.TmfEventMatching;
-import org.eclipse.linuxtools.tmf.core.synchronization.ITmfTimestampTransform;
-import org.eclipse.linuxtools.tmf.core.synchronization.SynchronizationAlgorithm;
-import org.eclipse.linuxtools.tmf.core.synchronization.TimestampTransformFactory;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
-import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace;
-import org.eclipse.linuxtools.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching;
+import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
+import org.eclipse.tracecompass.tmf.core.synchronization.SynchronizationAlgorithm;
+import org.eclipse.tracecompass.tmf.core.synchronization.TimestampTransformFactory;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfExperiment;
+import org.eclipse.tracecompass.tmf.ctf.core.CtfTmfTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

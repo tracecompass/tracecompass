@@ -17,9 +17,9 @@ import java.util.List;
 
 import org.eclipse.linuxtools.btf.core.Messages;
 import org.eclipse.linuxtools.btf.core.trace.BtfColumnNames;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventType;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
+import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
+import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
 
 import com.google.common.collect.ImmutableList;
 

@@ -34,17 +34,17 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.linuxtools.internal.gdbtrace.core.Activator;
 import org.eclipse.linuxtools.internal.gdbtrace.core.GdbTraceCorePlugin;
 import org.eclipse.linuxtools.internal.gdbtrace.core.event.GdbTraceEvent;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
-import org.eclipse.linuxtools.tmf.core.trace.TmfContext;
-import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
-import org.eclipse.linuxtools.tmf.core.trace.TraceValidationStatus;
-import org.eclipse.linuxtools.tmf.core.trace.location.ITmfLocation;
-import org.eclipse.linuxtools.tmf.core.trace.location.TmfLongLocation;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfEventParser;
+import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
+import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
+import org.eclipse.tracecompass.tmf.core.trace.location.TmfLongLocation;
 
 /**
  * GDB Tracepoint extension of TmfTrace. This class implements the necessary

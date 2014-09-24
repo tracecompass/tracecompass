@@ -14,8 +14,8 @@
 package org.eclipse.linuxtools.internal.gdbtrace.core.event;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEventField;
-import org.eclipse.linuxtools.tmf.core.event.TmfEventField;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
+import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 
 /**
  * GDB Trace implementation of TmfEventField

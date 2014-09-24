@@ -21,8 +21,8 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.linuxtools.btf.core.tests.BtfTestPlugin;
 import org.eclipse.linuxtools.btf.core.trace.BtfTrace;
-import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.osgi.framework.Bundle;
 
 /**

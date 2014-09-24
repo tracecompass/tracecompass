@@ -58,21 +58,21 @@
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
       <output
-            class="org.eclipse.linuxtools.tmf.ui.analysis.TmfAnalysisViewOutput"
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
             id="org.eclipse.linuxtools.lttng2.kernel.ui.views.controlflow">
          <analysisId
                id="org.eclipse.linuxtools.lttng2.kernel.analysis">
          </analysisId>
       </output>
       <output
-            class="org.eclipse.linuxtools.tmf.ui.analysis.TmfAnalysisViewOutput"
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
             id="org.eclipse.linuxtools.lttng2.kernel.ui.views.resources">
          <analysisId
                id="org.eclipse.linuxtools.lttng2.kernel.analysis">
          </analysisId>
       </output>
       <output
-            class="org.eclipse.linuxtools.tmf.ui.analysis.TmfAnalysisViewOutput"
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
             id="org.eclipse.linuxtools.lttng2.kernel.ui.views.cpuusage">
          <analysisId
                id="org.eclipse.linuxtools.lttng2.kernel.core.cpuusage">

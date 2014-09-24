@@ -5,11 +5,11 @@
          point="org.eclipse.linuxtools.tmf.core.tracetype">
       <type
             category="org.eclipse.linuxtools.tmf.core.tests.category"
-            event_type="org.eclipse.linuxtools.tmf.ctf.core.CtfTmfEvent"
+            event_type="org.eclipse.tracecompass.tmf.ctf.core.CtfTmfEvent"
             id="org.eclipse.linuxtools.tmf.ctf.core.tests.ctf.tracetype"
             isDirectory="true"
             name="CTF Test Trace"
-            trace_type="org.eclipse.linuxtools.tmf.ctf.core.tests.stubs.CtfTmfTraceStub">
+            trace_type="org.eclipse.tracecompass.tmf.ctf.core.tests.stubs.CtfTmfTraceStub">
       </type>
    </extension>
 

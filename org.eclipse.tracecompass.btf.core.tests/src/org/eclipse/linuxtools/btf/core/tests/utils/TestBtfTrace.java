@@ -15,9 +15,9 @@ package org.eclipse.linuxtools.btf.core.tests.utils;
 import java.io.IOException;
 
 import org.eclipse.linuxtools.btf.core.trace.BtfTrace;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 
 /**
  * Helpers for testing the btf trace. There is a main() top run the code without

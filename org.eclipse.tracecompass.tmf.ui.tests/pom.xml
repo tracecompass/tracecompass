@@ -42,7 +42,7 @@
         <version>${tycho-version}</version>
         <configuration>
           <testSuite>org.eclipse.tracecompass.tmf.ui.tests</testSuite>
-          <testClass>org.eclipse.linuxtools.tmf.ui.tests.AllTmfUITests</testClass>
+          <testClass>org.eclipse.tracecompass.tmf.ui.tests.AllTmfUITests</testClass>
           <useUIHarness>true</useUIHarness>
           <useUIThread>true</useUIThread>
           <argLine>${tycho.testArgLine} ${base.ui.test.vmargs}</argLine>

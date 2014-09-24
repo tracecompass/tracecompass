@@ -14,9 +14,9 @@
 package org.eclipse.linuxtools.internal.gdbtrace.core.event;
 
 import org.eclipse.linuxtools.internal.gdbtrace.core.trace.GdbTrace;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEventType;
-import org.eclipse.linuxtools.tmf.core.event.TmfEvent;
-import org.eclipse.linuxtools.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
+import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 
 /**
  * GDB Trace implementation of TmfEvent

@@ -19,15 +19,15 @@ import java.util.Arrays;
 
 import org.eclipse.linuxtools.lttng2.kernel.core.event.matching.TcpEventMatching;
 import org.eclipse.linuxtools.lttng2.kernel.core.event.matching.TcpLttngEventMatching;
-import org.eclipse.linuxtools.tmf.core.event.matching.TmfEventMatching;
-import org.eclipse.linuxtools.tmf.core.synchronization.SynchronizationAlgorithm;
-import org.eclipse.linuxtools.tmf.core.synchronization.SynchronizationManager;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.ctf.core.CtfTmfTrace;
-import org.eclipse.linuxtools.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
+import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching;
+import org.eclipse.tracecompass.tmf.core.synchronization.SynchronizationAlgorithm;
+import org.eclipse.tracecompass.tmf.core.synchronization.SynchronizationManager;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.CtfTmfTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

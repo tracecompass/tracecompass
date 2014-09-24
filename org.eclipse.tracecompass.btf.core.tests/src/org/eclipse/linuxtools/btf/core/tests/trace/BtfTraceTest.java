@@ -18,9 +18,9 @@ import java.util.Map;
 
 import org.eclipse.linuxtools.btf.core.tests.utils.BtfTestTrace;
 import org.eclipse.linuxtools.btf.core.trace.BtfTrace;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfContext;
-import org.eclipse.linuxtools.tmf.core.trace.TraceValidationStatus;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
+import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

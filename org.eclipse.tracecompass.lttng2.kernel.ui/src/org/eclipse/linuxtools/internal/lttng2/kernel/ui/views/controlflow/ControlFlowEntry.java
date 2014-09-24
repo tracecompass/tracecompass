@@ -14,8 +14,8 @@
 package org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
-import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 
 /**
  * An entry in the Control Flow view
