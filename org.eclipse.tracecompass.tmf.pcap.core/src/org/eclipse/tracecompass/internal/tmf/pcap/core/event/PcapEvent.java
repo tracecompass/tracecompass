@@ -20,8 +20,8 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.linuxtools.internal.pcap.core.packet.Packet;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
+import org.eclipse.tracecompass.internal.pcap.core.packet.Packet;
+import org.eclipse.tracecompass.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.protocol.TmfPcapProtocol;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.util.ProtocolConversion;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;

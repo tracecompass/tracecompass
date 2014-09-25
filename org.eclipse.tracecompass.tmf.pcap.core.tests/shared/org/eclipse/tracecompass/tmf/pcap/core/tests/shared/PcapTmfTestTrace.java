@@ -15,9 +15,9 @@ package org.eclipse.tracecompass.tmf.pcap.core.tests.shared;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.linuxtools.pcap.core.tests.shared.PcapTestTrace;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.event.PcapEvent;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.trace.PcapTrace;
+import org.eclipse.tracecompass.pcap.core.tests.shared.PcapTestTrace;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.pcap.core.tests.stubs.PcapTmfTraceStub;
 

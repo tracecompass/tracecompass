@@ -19,11 +19,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
-import org.eclipse.linuxtools.pcap.core.tests.shared.PcapTestTrace;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.analysis.StreamListAnalysis;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.event.TmfPacketStreamBuilder;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.protocol.TmfPcapProtocol;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.trace.PcapTrace;
+import org.eclipse.tracecompass.pcap.core.tests.shared.PcapTestTrace;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.junit.Test;

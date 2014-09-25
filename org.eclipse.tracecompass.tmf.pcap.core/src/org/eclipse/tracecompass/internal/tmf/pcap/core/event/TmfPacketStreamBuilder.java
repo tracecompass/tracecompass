@@ -15,11 +15,11 @@ package org.eclipse.tracecompass.internal.tmf.pcap.core.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.linuxtools.internal.pcap.core.packet.Packet;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.pcap.PcapPacket;
-import org.eclipse.linuxtools.internal.pcap.core.stream.PacketStream;
-import org.eclipse.linuxtools.internal.pcap.core.stream.PacketStreamBuilder;
+import org.eclipse.tracecompass.internal.pcap.core.packet.Packet;
+import org.eclipse.tracecompass.internal.pcap.core.protocol.PcapProtocol;
+import org.eclipse.tracecompass.internal.pcap.core.protocol.pcap.PcapPacket;
+import org.eclipse.tracecompass.internal.pcap.core.stream.PacketStream;
+import org.eclipse.tracecompass.internal.pcap.core.stream.PacketStreamBuilder;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.protocol.TmfPcapProtocol;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.util.ProtocolConversion;
 

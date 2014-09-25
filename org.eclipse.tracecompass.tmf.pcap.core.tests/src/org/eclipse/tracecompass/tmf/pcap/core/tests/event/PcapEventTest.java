@@ -21,12 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.linuxtools.internal.pcap.core.trace.BadPcapFileException;
-import org.eclipse.linuxtools.internal.pcap.core.trace.PcapFile;
-import org.eclipse.linuxtools.pcap.core.tests.shared.PcapTestTrace;
+import org.eclipse.tracecompass.internal.pcap.core.trace.BadPcapFileException;
+import org.eclipse.tracecompass.internal.pcap.core.trace.PcapFile;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.event.PcapEvent;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.protocol.TmfPcapProtocol;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.trace.PcapTrace;
+import org.eclipse.tracecompass.pcap.core.tests.shared.PcapTestTrace;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.location.TmfLongLocation;

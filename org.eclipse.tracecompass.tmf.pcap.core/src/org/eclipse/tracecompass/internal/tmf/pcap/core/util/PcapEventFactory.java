@@ -20,12 +20,12 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.linuxtools.internal.pcap.core.packet.Packet;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
-import org.eclipse.linuxtools.internal.pcap.core.protocol.pcap.PcapPacket;
-import org.eclipse.linuxtools.internal.pcap.core.trace.PcapFile;
-import org.eclipse.linuxtools.internal.pcap.core.util.LinkTypeHelper;
-import org.eclipse.linuxtools.internal.pcap.core.util.PcapTimestampScale;
+import org.eclipse.tracecompass.internal.pcap.core.packet.Packet;
+import org.eclipse.tracecompass.internal.pcap.core.protocol.PcapProtocol;
+import org.eclipse.tracecompass.internal.pcap.core.protocol.pcap.PcapPacket;
+import org.eclipse.tracecompass.internal.pcap.core.trace.PcapFile;
+import org.eclipse.tracecompass.internal.pcap.core.util.LinkTypeHelper;
+import org.eclipse.tracecompass.internal.pcap.core.util.PcapTimestampScale;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.event.PcapEvent;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.event.PcapEventField;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.event.PcapEventType;

@@ -12,7 +12,7 @@
 
 package org.eclipse.tracecompass.internal.tmf.pcap.core.protocol;
 
-import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
+import org.eclipse.tracecompass.internal.pcap.core.protocol.PcapProtocol;
 
 /**
  * Enumeration as a TMF wrapper of the different Protocols. To register a

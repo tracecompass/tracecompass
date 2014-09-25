@@ -27,7 +27,7 @@ import org.junit.runners.Suite;
     org.eclipse.linuxtools.lttng2.control.core.tests.AllTests.class,
     org.eclipse.linuxtools.lttng2.kernel.core.tests.AllTests.class,
     org.eclipse.linuxtools.lttng2.ust.core.tests.AllTests.class,
-    org.eclipse.linuxtools.pcap.core.tests.AllPcapCoreTests.class,
+    org.eclipse.tracecompass.pcap.core.tests.AllPcapCoreTests.class,
     org.eclipse.tracecompass.statesystem.core.tests.AllTests.class,
     org.eclipse.tracecompass.tmf.analysis.xml.core.tests.AllAnalysisXmlCoreTests.class,
     org.eclipse.tracecompass.tmf.core.tests.AllTmfCoreTests.class,

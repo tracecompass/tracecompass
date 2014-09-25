@@ -12,7 +12,7 @@
 
 package org.eclipse.tracecompass.internal.tmf.pcap.core.util;
 
-import org.eclipse.linuxtools.internal.pcap.core.protocol.PcapProtocol;
+import org.eclipse.tracecompass.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.protocol.TmfPcapProtocol;
 
 /**

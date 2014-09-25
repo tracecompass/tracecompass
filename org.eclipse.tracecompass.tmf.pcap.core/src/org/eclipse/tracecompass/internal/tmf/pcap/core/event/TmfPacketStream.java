@@ -12,7 +12,7 @@
 
 package org.eclipse.tracecompass.internal.tmf.pcap.core.event;
 
-import org.eclipse.linuxtools.internal.pcap.core.stream.PacketStream;
+import org.eclipse.tracecompass.internal.pcap.core.stream.PacketStream;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.protocol.TmfPcapProtocol;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.util.ProtocolConversion;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
