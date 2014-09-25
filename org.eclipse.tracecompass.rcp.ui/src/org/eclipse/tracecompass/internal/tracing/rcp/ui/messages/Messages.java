@@ -9,7 +9,7 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
-package org.eclipse.linuxtools.internal.tracing.rcp.ui.messages;
+package org.eclipse.tracecompass.internal.tracing.rcp.ui.messages;
 
 import org.eclipse.osgi.util.NLS;
 
@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
  * @author Bernd Hufmann
  */
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "org.eclipse.linuxtools.internal.tracing.rcp.ui.messages.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.tracing.rcp.ui.messages.messages"; //$NON-NLS-1$
 
     /** Error title for error during workspace creation */
     public static String Application_WorkspaceCreationError;

@@ -10,14 +10,14 @@
  *   Bernd Hufmann - Initial API and implementation
  *   Matthew Khouzam - Implementation of File->Open
  **********************************************************************/
-package org.eclipse.linuxtools.internal.tracing.rcp.ui;
+package org.eclipse.tracecompass.internal.tracing.rcp.ui;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.linuxtools.internal.tracing.rcp.ui.cli.TracingRCPCliException;
-import org.eclipse.linuxtools.internal.tracing.rcp.ui.cli.CliParser;
+import org.eclipse.tracecompass.internal.tracing.rcp.ui.cli.CliParser;
+import org.eclipse.tracecompass.internal.tracing.rcp.ui.cli.TracingRCPCliException;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 

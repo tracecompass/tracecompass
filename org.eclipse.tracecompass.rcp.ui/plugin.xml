@@ -6,7 +6,7 @@
          point="org.eclipse.core.runtime.applications">
       <application>org.eclipse.linuxtools.tracing.rcp.product
          <run
-               class="org.eclipse.linuxtools.internal.tracing.rcp.ui.Application">
+               class="org.eclipse.tracecompass.internal.tracing.rcp.ui.Application">
          </run>
       </application>
    </extension>

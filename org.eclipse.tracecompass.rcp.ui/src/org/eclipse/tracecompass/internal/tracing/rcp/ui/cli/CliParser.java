@@ -10,12 +10,12 @@
  *   Matthew Khouzam- Initial API and implementation
  **********************************************************************/
 
-package org.eclipse.linuxtools.internal.tracing.rcp.ui.cli;
+package org.eclipse.tracecompass.internal.tracing.rcp.ui.cli;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.linuxtools.internal.tracing.rcp.ui.messages.Messages;
+import org.eclipse.tracecompass.internal.tracing.rcp.ui.messages.Messages;
 
 /**
  * Command line parser
