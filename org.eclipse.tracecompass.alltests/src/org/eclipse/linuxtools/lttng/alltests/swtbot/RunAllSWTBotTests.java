@@ -26,7 +26,7 @@ import org.junit.runners.Suite;
     org.eclipse.tracecompass.tmf.ui.swtbot.tests.AllTmfUISWTBotTests.class,
     org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests.AllTests.class,
     org.eclipse.tracecompass.tmf.pcap.ui.swtbot.tests.AllTests.class,
-    org.eclipse.linuxtools.lttng2.kernel.ui.swtbot.tests.AllTests.class
+    org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests.AllTests.class
 })
 public class RunAllSWTBotTests {
 

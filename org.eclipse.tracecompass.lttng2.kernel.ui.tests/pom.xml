@@ -40,7 +40,7 @@
         <version>${tycho-version}</version>
         <configuration>
           <testSuite>org.eclipse.tracecompass.lttng2.kernel.ui.tests</testSuite>
-          <testClass>org.eclipse.linuxtools.lttng2.kernel.ui.tests.AllTests</testClass>
+          <testClass>org.eclipse.tracecompass.lttng2.kernel.ui.tests.AllTests</testClass>
           <useUIHarness>true</useUIHarness>
           <useUIThread>true</useUIThread>
           <argLine>${tycho.testArgLine} ${base.ui.test.vmargs}</argLine>

@@ -10,7 +10,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.core.runtime,
  org.eclipse.tracecompass.lttng2.control.core;bundle-version="3.1.0"
-Export-Package: org.eclipse.linuxtools.lttng2.control.core.tests;x-friends:="org.eclipse.tracecompass.alltests",
- org.eclipse.linuxtools.lttng2.control.core.tests.model.impl;x-internal:=true,
- org.eclipse.linuxtools.lttng2.control.core.tests.relayd,
- org.eclipse.linuxtools.lttng2.control.core.tests.session
+Export-Package: org.eclipse.tracecompass.lttng2.control.core.tests;x-friends:="org.eclipse.tracecompass.alltests",
+ org.eclipse.tracecompass.lttng2.control.core.tests.model.impl;x-internal:=true,
+ org.eclipse.tracecompass.lttng2.control.core.tests.relayd,
+ org.eclipse.tracecompass.lttng2.control.core.tests.session

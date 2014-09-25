@@ -21,9 +21,9 @@ Import-Package: org.eclipse.rse.core,
  org.eclipse.rse.services.terminals,
  org.eclipse.rse.subsystems.files.core,
  org.eclipse.rse.subsystems.files.core.servicesubsystem
-Export-Package: org.eclipse.linuxtools.internal.lttng2.control.stubs.dialogs;x-internal:=true,
- org.eclipse.linuxtools.internal.lttng2.control.stubs.service;x-internal:=true,
- org.eclipse.linuxtools.internal.lttng2.control.stubs.shells;x-internal:=true,
- org.eclipse.linuxtools.lttng2.control.ui.tests;x-friends:="org.eclipse.tracecompass.alltests",
- org.eclipse.linuxtools.lttng2.control.ui.tests.model.component;x-internal:=true,
- org.eclipse.linuxtools.lttng2.control.ui.tests.service;x-internal:=true
+Export-Package: org.eclipse.tracecompass.internal.lttng2.control.stubs.dialogs;x-internal:=true,
+ org.eclipse.tracecompass.internal.lttng2.control.stubs.service;x-internal:=true,
+ org.eclipse.tracecompass.internal.lttng2.control.stubs.shells;x-internal:=true,
+ org.eclipse.tracecompass.lttng2.control.ui.tests;x-friends:="org.eclipse.tracecompass.alltests",
+ org.eclipse.tracecompass.lttng2.control.ui.tests.model.component;x-internal:=true,
+ org.eclipse.tracecompass.lttng2.control.ui.tests.service;x-internal:=true

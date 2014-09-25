@@ -9,17 +9,17 @@
             id="org.eclipse.linuxtools.lttng2.ust.tracetype"
             isDirectory="true"
             name="%tracetype.type.ust"
-            trace_type="org.eclipse.linuxtools.lttng2.ust.core.trace.LttngUstTrace">
+            trace_type="org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace">
       </type>
    </extension>
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
       <module
-            analysis_module="org.eclipse.linuxtools.lttng2.ust.core.analysis.memory.UstMemoryAnalysisModule"
+            analysis_module="org.eclipse.tracecompass.lttng2.ust.core.analysis.memory.UstMemoryAnalysisModule"
             id="org.eclipse.linuxtools.lttng2.ust.analysis.memory"
             name="Ust Memory">
          <tracetype
-               class="org.eclipse.linuxtools.lttng2.ust.core.trace.LttngUstTrace">
+               class="org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace">
          </tracetype>
       </module>
    </extension>

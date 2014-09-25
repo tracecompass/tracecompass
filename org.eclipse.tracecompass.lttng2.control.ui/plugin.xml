@@ -11,7 +11,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.ControlView"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView"
             icon="icons/eview16/control_view.gif"
             id="org.eclipse.linuxtools.internal.lttng2.ui.views.control"
             name="%control.view.name"
@@ -290,7 +290,7 @@
                   <iterate
                         operator="or">
                      <instanceof
-                           value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent">
+                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent">
                      </instanceof>
                   </iterate>
                </with>
@@ -308,7 +308,7 @@
                   <iterate
                         operator="or">
                      <instanceof
-                           value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent">
+                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent">
                      </instanceof>
                   </iterate>
                </with>
@@ -326,7 +326,7 @@
                   <iterate
                         operator="or">
                      <instanceof
-                           value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceControlComponent">
+                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceControlComponent">
                      </instanceof>
                   </iterate>
                </with>
@@ -344,7 +344,7 @@
                   <iterate
                         operator="or">
                      <instanceof
-                           value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent">
+                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent">
                      </instanceof>
                   </iterate>
                </with>
@@ -362,7 +362,7 @@
                   <iterate
                         operator="or">
                      <instanceof
-                           value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionGroup">
+                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionGroup">
                      </instanceof>
                   </iterate>
                </with>
@@ -380,7 +380,7 @@
                   <iterate
                         operator="or">
                      <instanceof
-                           value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionGroup">
+                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionGroup">
                      </instanceof>
                   </iterate>
                </with>
@@ -398,7 +398,7 @@
                   <iterate
                         operator="or">
                      <instanceof
-                           value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
+                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
                      </instanceof>
                   </iterate>
                </with>
@@ -416,7 +416,7 @@
                   <iterate
                         operator="or">
                      <instanceof
-                           value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
+                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
                      </instanceof>
                   </iterate>
                </with>
@@ -434,7 +434,7 @@
                   <iterate
                         operator="or">
                      <instanceof
-                           value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
+                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
                      </instanceof>
                   </iterate>
                </with>
@@ -457,7 +457,7 @@
                     <iterate
                          operator="or">
                          <instanceof
-                               value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
+                               value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
                          </instanceof>
                       </iterate>
                       <count
@@ -484,14 +484,14 @@
                      <iterate
                            operator="or">
                         <instanceof
-                              value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
+                              value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
                         </instanceof>
                      </iterate>
                      <not>
                         <iterate
                               operator="or">
                            <instanceof
-                                 value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent">
+                                 value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent">
                            </instanceof>
                         </iterate>
                      </not>
@@ -515,7 +515,7 @@
                      <iterate
                            operator="or">
                         <instanceof
-                              value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
+                              value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
                         </instanceof>
                      </iterate>
                      <count
@@ -538,14 +538,14 @@
                      <iterate
                            operator="or">
                         <instanceof
-                              value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent">
+                              value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent">
                         </instanceof>
                      </iterate>
                         <not>
                            <iterate
                                  operator="or">
                               <instanceof
-                                    value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
+                                    value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
                               </instanceof>
                            </iterate>
                         </not>
@@ -569,7 +569,7 @@
                      <iterate
                            operator="or">
                         <instanceof
-                              value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent">
+                              value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent">
                         </instanceof>
                      </iterate>
                      <count
@@ -591,7 +591,7 @@
                   <iterate
                         operator="or">
                      <instanceof
-                           value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent">
+                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent">
                      </instanceof>
                   </iterate>
                </with>
@@ -609,7 +609,7 @@
                   <iterate
                         operator="or">
                      <instanceof
-                           value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent">
+                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent">
                      </instanceof>
                   </iterate>
                </with>
@@ -628,7 +628,7 @@
                   <iterate
                         operator="or">
                      <instanceof
-                           value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.BaseEventComponent">
+                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.BaseEventComponent">
                      </instanceof>
                   </iterate>
                </with>
@@ -647,7 +647,7 @@
                   <iterate
                         operator="or">
                      <instanceof
-                           value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceEventComponent">
+                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceEventComponent">
                      </instanceof>
                   </iterate>
                </with>
@@ -666,7 +666,7 @@
                   <iterate
                         operator="or">
                      <instanceof
-                           value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceEventComponent">
+                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceEventComponent">
                      </instanceof>
                   </iterate>
                </with>
@@ -685,7 +685,7 @@
                      <iterate
                            operator="or">
                         <instanceof
-                              value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent">
+                              value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent">
                         </instanceof>
                      </iterate>
                      <count
@@ -708,7 +708,7 @@
                      <iterate
                            operator="or">
                         <instanceof
-                              value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent">
+                              value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent">
                         </instanceof>
                      </iterate>
                      <count
@@ -731,7 +731,7 @@
                      <iterate
                            operator="or">
                         <instanceof
-                              value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent">
+                              value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent">
                         </instanceof>
                      </iterate>
                      <count
@@ -760,7 +760,7 @@
                         <and>
                            <or>
                               <instanceof
-                                    value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceEventComponent">
+                                    value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceEventComponent">
                               </instanceof>
                            </or>
                            <test
@@ -786,7 +786,7 @@
                      <iterate
                            operator="or">
                         <instanceof
-                              value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent">
+                              value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent">
                         </instanceof>
                      </iterate>
                      <count
@@ -810,7 +810,7 @@
                      <iterate
                            operator="or">
                         <instanceof
-                              value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
+                              value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
                         </instanceof>
                      </iterate>
                      <count
@@ -827,19 +827,19 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.NewConnectionHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.NewConnectionHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.newConnection">
          <activeWhen>
             <with
                   variable="activePart">
                <instanceof
-                     value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.ControlView">
+                     value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView">
                </instanceof>
             </with>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.ConnectHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.ConnectHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.connect">
          <activeWhen>
             <with
@@ -847,14 +847,14 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent">
                   </instanceof>
                </iterate>
             </with>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.DisconnectHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.DisconnectHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.disconnect">
          <activeWhen>
             <with
@@ -862,14 +862,14 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent">
                   </instanceof>
                </iterate>
             </with>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.RefreshHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.RefreshHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.refresh">
          <activeWhen>
             <with
@@ -877,14 +877,14 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceControlComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceControlComponent">
                   </instanceof>
                </iterate>
             </with>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.DeleteHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.DeleteHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.delete">
          <activeWhen>
             <with
@@ -892,14 +892,14 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent">
                   </instanceof>
                </iterate>
             </with>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.CreateSessionHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.CreateSessionHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.createSession">
          <activeWhen>
             <with
@@ -907,14 +907,14 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionGroup">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionGroup">
                   </instanceof>
                </iterate>
             </with>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.ExecuteCommandScriptHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.ExecuteCommandScriptHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.executeScript">
          <activeWhen>
             <with
@@ -922,14 +922,14 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionGroup">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionGroup">
                   </instanceof>
                </iterate>
             </with>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.DestroySessionHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.DestroySessionHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.destroySession">
          <activeWhen>
             <with
@@ -937,14 +937,14 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
                   </instanceof>
                </iterate>
             </with>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.ImportHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.ImportHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.import">
          <activeWhen>
             <with
@@ -953,7 +953,7 @@
                   <iterate
                         operator="or">
                      <instanceof
-                           value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
+                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
                      </instanceof>
                   </iterate>
                   <count
@@ -964,7 +964,7 @@
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.EnableChannelOnSessionHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.EnableChannelOnSessionHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableChannelOnSession">
          <activeWhen>
             <with
@@ -972,14 +972,14 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
                   </instanceof>
                </iterate>
             </with>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.EnableChannelOnDomainHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.EnableChannelOnDomainHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableChannelOnDomain">
          <activeWhen>
             <with
@@ -987,14 +987,14 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent">
                   </instanceof>
                </iterate>
             </with>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.EnableChannelHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.EnableChannelHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableChannel">
          <activeWhen>
             <with
@@ -1002,14 +1002,14 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent">
                   </instanceof>
                </iterate>
             </with>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.DisableChannelHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.DisableChannelHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.disableChannel">
          <activeWhen>
             <with
@@ -1017,7 +1017,7 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent">
                   </instanceof>
                </iterate>
             </with>
@@ -1025,7 +1025,7 @@
       </handler>
       
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.StartHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.StartHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.start">
          <activeWhen>
             <with
@@ -1033,7 +1033,7 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
                   </instanceof>
                </iterate>
             </with>
@@ -1041,7 +1041,7 @@
       </handler>
 
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.StopHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.StopHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.stop">
          <activeWhen>
             <with
@@ -1049,7 +1049,7 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
                   </instanceof>
                </iterate>
             </with>
@@ -1057,7 +1057,7 @@
       </handler>
 
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.SnaphshotHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.SnaphshotHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.snapshot">
          <activeWhen>
             <with
@@ -1065,7 +1065,7 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
                   </instanceof>
                </iterate>
             </with>
@@ -1074,7 +1074,7 @@
 
 
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.AssignEventHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.AssignEventHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.assign.event">
          <activeWhen>
             <with
@@ -1082,7 +1082,7 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.BaseEventComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.BaseEventComponent">
                   </instanceof>
                </iterate>
             </with>
@@ -1090,7 +1090,7 @@
       </handler>
 
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.EnableEventHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.EnableEventHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEvent">
          <activeWhen>
             <with
@@ -1098,7 +1098,7 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceEventComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceEventComponent">
                   </instanceof>
                </iterate>
             </with>
@@ -1106,7 +1106,7 @@
       </handler>
 
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.DisableEventHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.DisableEventHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.disableEvent">
          <activeWhen>
             <with
@@ -1114,7 +1114,7 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceEventComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceEventComponent">
                   </instanceof>
                </iterate>
             </with>
@@ -1122,7 +1122,7 @@
       </handler>
 
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.EnableEventOnChannelHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.EnableEventOnChannelHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEventOnChannel">
          <activeWhen>
             <with
@@ -1130,7 +1130,7 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent">
                   </instanceof>
                </iterate>
             </with>
@@ -1138,7 +1138,7 @@
       </handler>
 
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.EnableEventOnDomainHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.EnableEventOnDomainHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEventOnDomain">
          <activeWhen>
             <with
@@ -1146,14 +1146,14 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent">
                   </instanceof>
                </iterate>
             </with>
          </activeWhen>
       </handler>
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.EnableEventOnSessionHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.EnableEventOnSessionHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.enableEventOnSession">
          <activeWhen>
             <with
@@ -1161,7 +1161,7 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
                   </instanceof>
                </iterate>
             </with>
@@ -1169,7 +1169,7 @@
       </handler>
       
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.AddContextOnDomainHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.AddContextOnDomainHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.addContextOnDomain">
          <activeWhen>
             <with
@@ -1177,7 +1177,7 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent">
                   </instanceof>
                </iterate>
             </with>
@@ -1185,7 +1185,7 @@
       </handler>
 
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.CalibrateHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.CalibrateHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.calibrate">
          <activeWhen>
             <with
@@ -1193,7 +1193,7 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent">
                   </instanceof>
                </iterate>
             </with>
@@ -1201,7 +1201,7 @@
       </handler>
 
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.AddContextOnChannelHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.AddContextOnChannelHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.addContextOnChannel">
          <activeWhen>
             <with
@@ -1209,7 +1209,7 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent">
                   </instanceof>
                </iterate>
             </with>
@@ -1217,7 +1217,7 @@
       </handler>
 
       <handler
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.handlers.AddContextOnEventHandler"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.AddContextOnEventHandler"
             commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.addContextOnEvent">
          <activeWhen>
             <with
@@ -1225,7 +1225,7 @@
                <iterate
                      operator="or">
                   <instanceof
-                        value="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceEventComponent">
+                        value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceEventComponent">
                   </instanceof>
                </iterate>
             </with>
@@ -1251,7 +1251,7 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="org.eclipse.linuxtools.tmf.ui.TmfTracingPreferences"
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.preferences.ControlPreferencePage"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.preferences.ControlPreferencePage"
             id="org.eclipse.linuxtools.internal.lttng2.ui.views.control.preferences"
             name="%preference.page.control.name">
       </page>
@@ -1259,17 +1259,17 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.preferences.ControlPreferenceInitializer">
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.preferences.ControlPreferenceInitializer">
       </initializer>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceControlPropertyTester"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceControlPropertyTester"
             id="org.eclipse.linuxtools.internal.lttng2.ui.views.control.model.propertyTester"
             namespace="org.eclipse.linuxtools.internal.lttng2.ui.views.control.model"
             properties="isAddContextOnEventSupported"
-            type="org.eclipse.linuxtools.internal.lttng2.control.ui.views.model.impl.TraceControlComponent">
+            type="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceControlComponent">
       </propertyTester>
    </extension>
    

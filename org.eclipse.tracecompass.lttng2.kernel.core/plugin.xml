@@ -9,27 +9,27 @@
             id="org.eclipse.linuxtools.lttng2.kernel.tracetype"
             isDirectory="true"
             name="%tracetype.type.kernel"
-            trace_type="org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngKernelTrace">
+            trace_type="org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace">
       </type>
    </extension>
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
       <module
-            analysis_module="org.eclipse.linuxtools.lttng2.kernel.core.analysis.LttngKernelAnalysisModule"
+            analysis_module="org.eclipse.tracecompass.lttng2.kernel.core.analysis.LttngKernelAnalysisModule"
             automatic="true"
             id="org.eclipse.linuxtools.lttng2.kernel.analysis"
             name="%analysis.lttngkernel">
          <tracetype
-               class="org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngKernelTrace">
+               class="org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace">
          </tracetype>
       </module>
       <module
-            analysis_module="org.eclipse.linuxtools.lttng2.kernel.core.cpuusage.LttngKernelCpuUsageAnalysis"
+            analysis_module="org.eclipse.tracecompass.lttng2.kernel.core.cpuusage.LttngKernelCpuUsageAnalysis"
             id="org.eclipse.linuxtools.lttng2.kernel.core.cpuusage"
             name="%cpuusage.lttng.kernel">
          <tracetype
                applies="true"
-               class="org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngKernelTrace">
+               class="org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace">
          </tracetype>
       </module>
    </extension>

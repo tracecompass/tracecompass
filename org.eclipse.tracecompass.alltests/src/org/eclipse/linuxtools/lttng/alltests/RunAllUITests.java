@@ -21,9 +21,9 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     org.eclipse.linuxtools.gdbtrace.ui.tests.AllGdbTraceUITests.class,
-    org.eclipse.linuxtools.lttng2.control.ui.tests.AllTests.class,
-    org.eclipse.linuxtools.lttng2.kernel.ui.tests.AllTests.class,
-    org.eclipse.linuxtools.lttng2.ust.ui.tests.AllTests.class,
+    org.eclipse.tracecompass.lttng2.control.ui.tests.AllTests.class,
+    org.eclipse.tracecompass.lttng2.kernel.ui.tests.AllTests.class,
+    org.eclipse.tracecompass.lttng2.ust.ui.tests.AllTests.class,
     org.eclipse.tracecompass.tmf.analysis.xml.ui.tests.AllAnalysisXmlUiTests.class,
     org.eclipse.tracecompass.tmf.ui.tests.AllTmfUITests.class,
 })

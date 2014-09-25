@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.PerspectiveFactory"
+            class="org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.PerspectiveFactory"
             icon="icons/obj16/garland16.png"
             id="org.eclipse.linuxtools.lttng2.kernel.ui.perspective"
             name="%kernel.perspective.name">
@@ -15,7 +15,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
-            class="org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow.ControlFlowView"
+            class="org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.controlflow.ControlFlowView"
             icon="icons/eview16/control_flow_view.gif"
             id="org.eclipse.linuxtools.lttng2.kernel.ui.views.controlflow"
             name="%controlflow.view.name"
@@ -24,7 +24,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
-            class="org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources.ResourcesView"
+            class="org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.resources.ResourcesView"
             icon="icons/eview16/resources_view.gif"
             id="org.eclipse.linuxtools.lttng2.kernel.ui.views.resources"
             name="%resources.view.name"
@@ -33,7 +33,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
-            class="org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.cpuusage.CpuUsageView"
+            class="org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.cpuusage.CpuUsageView"
             id="org.eclipse.linuxtools.lttng2.kernel.ui.views.cpuusage"
             name="%cpuusage.view.name"
             restorable="true">
@@ -85,7 +85,7 @@
             icon="icons/obj16/garland16.png"
             tracetype="org.eclipse.linuxtools.lttng2.kernel.tracetype">
          <eventTableColumns
-               class="org.eclipse.linuxtools.internal.lttng2.kernel.ui.viewers.events.LttngEventTableColumns">
+               class="org.eclipse.tracecompass.internal.lttng2.kernel.ui.viewers.events.LttngEventTableColumns">
          </eventTableColumns>
       </type>
    </extension>
