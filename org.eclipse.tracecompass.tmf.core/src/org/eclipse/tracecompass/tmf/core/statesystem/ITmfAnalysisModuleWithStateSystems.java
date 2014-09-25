@@ -14,7 +14,7 @@ package org.eclipse.tracecompass.tmf.core.statesystem;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.linuxtools.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 
 /**

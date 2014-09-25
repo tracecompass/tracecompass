@@ -23,16 +23,16 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.linuxtools.statesystem.core.ITmfStateSystem;
-import org.eclipse.linuxtools.statesystem.core.ITmfStateSystemBuilder;
-import org.eclipse.linuxtools.statesystem.core.StateSystemFactory;
-import org.eclipse.linuxtools.statesystem.core.backend.IStateHistoryBackend;
-import org.eclipse.linuxtools.statesystem.core.backend.InMemoryBackend;
-import org.eclipse.linuxtools.statesystem.core.backend.NullBackend;
-import org.eclipse.linuxtools.statesystem.core.backend.historytree.HistoryTreeBackend;
-import org.eclipse.linuxtools.statesystem.core.backend.historytree.ThreadedHistoryTreeBackend;
 import org.eclipse.tracecompass.internal.tmf.core.statesystem.backends.partial.PartialHistoryBackend;
 import org.eclipse.tracecompass.internal.tmf.core.statesystem.backends.partial.PartialStateSystem;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
+import org.eclipse.tracecompass.statesystem.core.StateSystemFactory;
+import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
+import org.eclipse.tracecompass.statesystem.core.backend.InMemoryBackend;
+import org.eclipse.tracecompass.statesystem.core.backend.NullBackend;
+import org.eclipse.tracecompass.statesystem.core.backend.historytree.HistoryTreeBackend;
+import org.eclipse.tracecompass.statesystem.core.backend.historytree.ThreadedHistoryTreeBackend;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
@@ -334,8 +334,8 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
 
         /* 4 */
         @SuppressWarnings("restriction")
-        org.eclipse.linuxtools.internal.statesystem.core.StateSystem realSS =
-        (org.eclipse.linuxtools.internal.statesystem.core.StateSystem) StateSystemFactory.newStateSystem(id, partialBackend);
+        org.eclipse.tracecompass.internal.statesystem.core.StateSystem realSS =
+        (org.eclipse.tracecompass.internal.statesystem.core.StateSystem) StateSystemFactory.newStateSystem(id, partialBackend);
 
         /* 5 */
         pss.assignUpstream(realSS);

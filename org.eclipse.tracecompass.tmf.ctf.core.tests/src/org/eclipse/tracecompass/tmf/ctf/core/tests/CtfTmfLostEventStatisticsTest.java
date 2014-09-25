@@ -21,7 +21,7 @@ import static org.junit.Assume.assumeTrue;
 import java.util.Map;
 
 import org.eclipse.linuxtools.ctf.core.CTFStrings;
-import org.eclipse.linuxtools.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.statistics.ITmfStatistics;
 import org.eclipse.tracecompass.tmf.core.statistics.TmfStateStatistics;

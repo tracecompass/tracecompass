@@ -12,7 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.analysis.xml.core.module;
 
-import org.eclipse.linuxtools.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlLocation;
 
 /**

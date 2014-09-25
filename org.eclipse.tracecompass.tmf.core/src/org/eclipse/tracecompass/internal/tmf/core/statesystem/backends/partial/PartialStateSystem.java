@@ -16,12 +16,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.eclipse.linuxtools.internal.statesystem.core.AttributeTree;
-import org.eclipse.linuxtools.internal.statesystem.core.StateSystem;
-import org.eclipse.linuxtools.statesystem.core.ITmfStateSystem;
-import org.eclipse.linuxtools.statesystem.core.backend.NullBackend;
-import org.eclipse.linuxtools.statesystem.core.exceptions.AttributeNotFoundException;
-import org.eclipse.linuxtools.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.internal.statesystem.core.AttributeTree;
+import org.eclipse.tracecompass.internal.statesystem.core.StateSystem;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.statesystem.core.backend.NullBackend;
+import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
+import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 
 /**
  * State system interface-like extension to use with partial state histories.

@@ -20,7 +20,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.linuxtools.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlEventHandler;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlLocation;

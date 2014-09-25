@@ -17,16 +17,16 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.linuxtools.statesystem.core.ITmfStateSystemBuilder;
-import org.eclipse.linuxtools.statesystem.core.StateSystemFactory;
-import org.eclipse.linuxtools.statesystem.core.backend.IStateHistoryBackend;
-import org.eclipse.linuxtools.statesystem.core.backend.InMemoryBackend;
-import org.eclipse.linuxtools.statesystem.core.exceptions.AttributeNotFoundException;
-import org.eclipse.linuxtools.statesystem.core.exceptions.StateValueTypeException;
-import org.eclipse.linuxtools.statesystem.core.exceptions.TimeRangeException;
-import org.eclipse.linuxtools.statesystem.core.statevalue.ITmfStateValue.Type;
-import org.eclipse.linuxtools.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.internal.tmf.core.statesystem.mipmap.TmfStateSystemOperations;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
+import org.eclipse.tracecompass.statesystem.core.StateSystemFactory;
+import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
+import org.eclipse.tracecompass.statesystem.core.backend.InMemoryBackend;
+import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
+import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
+import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
+import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

@@ -12,8 +12,8 @@
 
 package org.eclipse.linuxtools.internal.lttng2.kernel.core;
 
-import org.eclipse.linuxtools.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.linuxtools.statesystem.core.statevalue.TmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 
 /**
  * State values that are used in the kernel event handler. It's much better to

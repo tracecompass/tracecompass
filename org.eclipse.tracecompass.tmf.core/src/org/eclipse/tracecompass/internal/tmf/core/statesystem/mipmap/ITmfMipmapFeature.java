@@ -12,7 +12,7 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.internal.tmf.core.statesystem.mipmap;
 
-import org.eclipse.linuxtools.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 
 /**
  * Interface to allow additional types of mipmaps to be added. Two functions
