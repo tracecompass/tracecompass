@@ -9,10 +9,10 @@
       </category>
       <type
             category="org.eclipse.linuxtools.gdbtrace.core.category"
-            event_type="org.eclipse.linuxtools.internal.gdbtrace.core.event.GdbTraceEvent"
+            event_type="org.eclipse.tracecompass.internal.gdbtrace.core.event.GdbTraceEvent"
             id="org.eclipse.linuxtools.gdbtrace.ui.type.gdb"
             name="GDB Trace"
-            trace_type="org.eclipse.linuxtools.internal.gdbtrace.core.trace.GdbTrace">
+            trace_type="org.eclipse.tracecompass.internal.gdbtrace.core.trace.GdbTrace">
       </type>
    </extension>
 

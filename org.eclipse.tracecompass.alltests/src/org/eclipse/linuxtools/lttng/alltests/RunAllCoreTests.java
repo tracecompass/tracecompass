@@ -23,7 +23,7 @@ import org.junit.runners.Suite;
     org.eclipse.linuxtools.btf.core.tests.AllTests.class,
     org.eclipse.linuxtools.ctf.core.tests.AllCtfCoreTests.class,
     org.eclipse.linuxtools.ctf.parser.tests.AllCtfParserTests.class,
-    org.eclipse.linuxtools.gdbtrace.core.tests.AllGdbTraceCoreTests.class,
+    org.eclipse.tracecompass.gdbtrace.core.tests.AllGdbTraceCoreTests.class,
     org.eclipse.tracecompass.lttng2.control.core.tests.AllTests.class,
     org.eclipse.tracecompass.lttng2.kernel.core.tests.AllTests.class,
     org.eclipse.tracecompass.lttng2.ust.core.tests.AllTests.class,

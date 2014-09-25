@@ -12,7 +12,7 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="org.eclipse.linuxtools.internal.gdbtrace.ui.views.GdbPerspectiveFactory"
+            class="org.eclipse.tracecompass.internal.gdbtrace.ui.views.GdbPerspectiveFactory"
             icon="icons/obj16/gdb_icon16.png"
             id="org.eclipse.linuxtools.gdbtrace.perspective"
             name="%perspective.name">
@@ -55,7 +55,7 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="org.eclipse.linuxtools.internal.gdbtrace.ui.views.project.handlers.SelectTraceExecutableHandler"
+            class="org.eclipse.tracecompass.internal.gdbtrace.ui.views.project.handlers.SelectTraceExecutableHandler"
             commandId="org.eclipse.linuxtools.gdbtrace.ui.command.project.trace.selectexecutable">
          <activeWhen>
             <iterate
@@ -90,10 +90,10 @@
             icon="icons/obj16/gdb_icon16.png"
             tracetype="org.eclipse.linuxtools.gdbtrace.ui.type.gdb">
          <eventsTableType
-               class="org.eclipse.linuxtools.internal.gdbtrace.ui.views.events.GdbEventsTable">
+               class="org.eclipse.tracecompass.internal.gdbtrace.ui.views.events.GdbEventsTable">
          </eventsTableType>
          <eventTableColumns
-               class="org.eclipse.linuxtools.internal.gdbtrace.ui.views.events.GdbEventTableColumns">
+               class="org.eclipse.tracecompass.internal.gdbtrace.ui.views.events.GdbEventTableColumns">
          </eventTableColumns>
       </type>
    </extension>

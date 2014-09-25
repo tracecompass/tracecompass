@@ -4,7 +4,7 @@ Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.tracecompass.gdbtrace.core;singleton:=true
 Bundle-Version: 3.1.0.qualifier
 Bundle-Localization: plugin
-Bundle-Activator: org.eclipse.linuxtools.internal.gdbtrace.core.GdbTraceCorePlugin
+Bundle-Activator: org.eclipse.tracecompass.internal.gdbtrace.core.GdbTraceCorePlugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.ui.ide,
@@ -17,6 +17,6 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: %Bundle-Vendor
-Export-Package: org.eclipse.linuxtools.internal.gdbtrace.core;x-friends:="org.eclipse.tracecompass.gdbtrace.core.tests",
- org.eclipse.linuxtools.internal.gdbtrace.core.event;x-friends:="org.eclipse.tracecompass.gdbtrace.ui",
- org.eclipse.linuxtools.internal.gdbtrace.core.trace;x-friends:="org.eclipse.tracecompass.gdbtrace.ui"
+Export-Package: org.eclipse.tracecompass.internal.gdbtrace.core;x-friends:="org.eclipse.tracecompass.gdbtrace.core.tests",
+ org.eclipse.tracecompass.internal.gdbtrace.core.event;x-friends:="org.eclipse.tracecompass.gdbtrace.ui",
+ org.eclipse.tracecompass.internal.gdbtrace.core.trace;x-friends:="org.eclipse.tracecompass.gdbtrace.ui"

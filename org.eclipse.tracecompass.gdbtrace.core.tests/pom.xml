@@ -32,7 +32,7 @@
             <version>${tycho-version}</version>
             <configuration>
                 <testSuite>org.eclipse.tracecompass.gdbtrace.core.tests</testSuite>
-                <testClass>org.eclipse.linuxtools.gdbtrace.core.tests.AllGdbTraceCoreTests</testClass>
+                <testClass>org.eclipse.tracecompass.gdbtrace.core.tests.AllGdbTraceCoreTests</testClass>
                 <useUIHarness>false</useUIHarness>
                 <useUIThread>false</useUIThread>
                 <product>org.eclipse.platform.ide</product>

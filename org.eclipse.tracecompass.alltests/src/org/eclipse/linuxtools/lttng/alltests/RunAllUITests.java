@@ -20,7 +20,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    org.eclipse.linuxtools.gdbtrace.ui.tests.AllGdbTraceUITests.class,
+    org.eclipse.tracecompass.gdbtrace.ui.tests.AllGdbTraceUITests.class,
     org.eclipse.tracecompass.lttng2.control.ui.tests.AllTests.class,
     org.eclipse.tracecompass.lttng2.kernel.ui.tests.AllTests.class,
     org.eclipse.tracecompass.lttng2.ust.ui.tests.AllTests.class,
