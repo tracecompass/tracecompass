@@ -20,11 +20,14 @@
 package org.eclipse.linuxtools.tmf.ui.project.model;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -53,10 +56,14 @@ import org.eclipse.linuxtools.tmf.core.trace.TmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
 import org.eclipse.linuxtools.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.linuxtools.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IActionFilter;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource2;
+
+import com.ibm.icu.text.DateFormat;
+import com.ibm.icu.text.NumberFormat;
 
 /**
  * Implementation of trace model element representing a trace. It provides
@@ -91,6 +98,8 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
     private static final String sfIsLinked = Messages.TmfTraceElement_IsLinked;
     private static final String sfSourceLocation = Messages.TmfTraceElement_SourceLocation;
     private static final String sfTimeOffset = Messages.TmfTraceElement_TimeOffset;
+    private static final String sfLastModified = Messages.TmfTraceElement_LastModified;
+    private static final String sfSize = Messages.TmfTraceElement_Size;
     private static final String sfTracePropertiesCategory = Messages.TmfTraceElement_TraceProperties;
 
     private static final ReadOnlyTextPropertyDescriptor sfNameDescriptor = new ReadOnlyTextPropertyDescriptor(sfName, sfName);
@@ -100,10 +109,12 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
     private static final ReadOnlyTextPropertyDescriptor sfIsLinkedDescriptor = new ReadOnlyTextPropertyDescriptor(sfIsLinked, sfIsLinked);
     private static final ReadOnlyTextPropertyDescriptor sfSourceLocationDescriptor = new ReadOnlyTextPropertyDescriptor(sfSourceLocation, sfSourceLocation);
     private static final ReadOnlyTextPropertyDescriptor sfTimeOffsetDescriptor = new ReadOnlyTextPropertyDescriptor(sfTimeOffset, sfTimeOffset);
+    private static final ReadOnlyTextPropertyDescriptor sfLastModifiedDescriptor = new ReadOnlyTextPropertyDescriptor(sfLastModified, sfLastModified);
+    private static final ReadOnlyTextPropertyDescriptor sfSizeDescriptor = new ReadOnlyTextPropertyDescriptor(sfSize, sfSize);
 
     private static final IPropertyDescriptor[] sfDescriptors = { sfNameDescriptor, sfPathDescriptor, sfLocationDescriptor,
             sfTypeDescriptor, sfIsLinkedDescriptor, sfSourceLocationDescriptor,
-            sfTimeOffsetDescriptor};
+            sfTimeOffsetDescriptor, sfLastModifiedDescriptor, sfSizeDescriptor };
 
     static {
         sfNameDescriptor.setCategory(sfResourcePropertiesCategory);
@@ -113,9 +124,13 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         sfIsLinkedDescriptor.setCategory(sfResourcePropertiesCategory);
         sfSourceLocationDescriptor.setCategory(sfResourcePropertiesCategory);
         sfTimeOffsetDescriptor.setCategory(sfResourcePropertiesCategory);
+        sfLastModifiedDescriptor.setCategory(sfResourcePropertiesCategory);
+        sfSizeDescriptor.setCategory(sfResourcePropertiesCategory);
     }
 
     private static final TmfTimestampFormat OFFSET_FORMAT = new TmfTimestampFormat("T.SSS SSS SSS s"); //$NON-NLS-1$
+
+    private static final int FOLDER_MAX_COUNT = 1024;
 
     // ------------------------------------------------------------------------
     // Static initialization
@@ -161,6 +176,22 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
             }
         }
     }
+
+    // ------------------------------------------------------------------------
+    // Classes
+    // ------------------------------------------------------------------------
+
+    private class FileInfo {
+        long lastModified;
+        long size;
+        int count;
+    }
+
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
+
+    private FileInfo fFileInfo;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -457,6 +488,32 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
             return ""; //$NON-NLS-1$
         }
 
+        if (sfLastModified.equals(id)) {
+            FileInfo fileInfo = getFileInfo();
+            if (fileInfo == null) {
+                return ""; //$NON-NLS-1$
+            }
+            long date = fileInfo.lastModified;
+            DateFormat format = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM);
+            return format.format(new Date(date));
+        }
+
+        if (sfSize.equals(id)) {
+            FileInfo fileInfo = getFileInfo();
+            if (fileInfo == null) {
+                return ""; //$NON-NLS-1$
+            }
+            if (getResource() instanceof IFolder) {
+                if (fileInfo.count <= FOLDER_MAX_COUNT) {
+                    return NLS.bind(Messages.TmfTraceElement_FolderSizeString,
+                            NumberFormat.getInstance().format(fileInfo.size), fileInfo.count);
+                }
+                return NLS.bind(Messages.TmfTraceElement_FolderSizeOverflowString,
+                        NumberFormat.getInstance().format(fileInfo.size), FOLDER_MAX_COUNT);
+            }
+            return NLS.bind(Messages.TmfTraceElement_FileSizeString, NumberFormat.getInstance().format(fileInfo.size));
+        }
+
         if (sfTraceType.equals(id)) {
             if (getTraceType() != null) {
                 TraceTypeHelper helper = TmfTraceType.getTraceType(getTraceType());
@@ -484,6 +541,44 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         }
 
         return null;
+    }
+
+    private FileInfo getFileInfo() {
+        /* FileInfo is needed for both 'last modified' and 'size' properties.
+         * It is freshly computed for one, and reused for the other, then
+         * cleared so that the information can be refreshed the next time.
+         */
+        FileInfo fileInfo;
+        if (fFileInfo == null) {
+            try {
+                fileInfo = computeFileInfo(new FileInfo(), getResource());
+            } catch (CoreException e) {
+                return null;
+            }
+            fFileInfo = fileInfo;
+        } else {
+            fileInfo = fFileInfo;
+            fFileInfo = null;
+        }
+        return fileInfo;
+    }
+
+    private FileInfo computeFileInfo(FileInfo fileInfo, IResource resource) throws CoreException {
+        if (fileInfo == null || fileInfo.count > FOLDER_MAX_COUNT) {
+            return fileInfo;
+        }
+        if (resource instanceof IFolder) {
+            IFolder folder = (IFolder) resource;
+            for (IResource member : folder.members()) {
+                computeFileInfo(fileInfo, member);
+            }
+            return fileInfo;
+        }
+        IFileInfo info = EFS.getStore(resource.getLocationURI()).fetchInfo();
+        fileInfo.lastModified = Math.max(fileInfo.lastModified, info.getLastModified());
+        fileInfo.size += info.getLength();
+        fileInfo.count++;
+        return fileInfo;
     }
 
     @Override
