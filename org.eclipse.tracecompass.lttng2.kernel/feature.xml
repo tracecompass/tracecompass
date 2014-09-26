@@ -63,7 +63,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.linuxtools.lttng.help"
+         id="org.eclipse.tracecompass.help"
          download-size="0"
          install-size="0"
          version="0.0.0"/>

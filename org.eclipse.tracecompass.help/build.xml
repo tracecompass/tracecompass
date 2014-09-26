@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="org.eclipse.linuxtools.lttng.help" default="build">
+<project name="org.eclipse.tracecompass.help" default="build">
     <description>
             Generate Eclipse help content for the Linux Tools LTTng user guide
     </description>

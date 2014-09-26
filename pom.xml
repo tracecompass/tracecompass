@@ -140,10 +140,10 @@
     <module>org.eclipse.tracecompass.tmf.analysis.xml.ui</module>
     <module>org.eclipse.tracecompass.tmf.analysis.xml.ui.tests</module>
 
-    <module>org.eclipse.linuxtools.lttng.help</module>
+    <module>org.eclipse.tracecompass.help</module>
     <module>org.eclipse.tracecompass.releng-site</module>
     <module>org.eclipse.tracecompass.target</module>
-    <module>org.eclipse.linuxtools.lttng.testing</module>
+    <module>org.eclipse.tracecompass.testing</module>
 
     <module>org.eclipse.tracecompass.lttng2.control</module>
     <module>org.eclipse.tracecompass.lttng2.control.core</module>
@@ -177,7 +177,7 @@
     <module>org.eclipse.tracecompass.rcp.help</module>
     <module>org.eclipse.tracecompass.rcp.ui</module>
 
-    <module>org.eclipse.linuxtools.tracing.examples</module>
+    <module>org.eclipse.tracecompass.examples</module>
   </modules>
 
     <build>

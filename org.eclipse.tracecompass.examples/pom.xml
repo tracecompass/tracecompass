@@ -17,11 +17,11 @@
     <version>3.2.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>org.eclipse.linuxtools.tracing.examples</artifactId>
+  <artifactId>org.eclipse.tracecompass.examples</artifactId>
   <version>1.1.0-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
 
-  <name>Linux Tools Tracing Examples UI Plug-in</name>
+  <name>Trace Compass Examples Plug-in</name>
 
  <build>
     <plugins>
@@ -32,5 +32,5 @@
     </plugins>
   </build>
 
-  <groupId>org.eclipse.linuxtools.lttng2</groupId>
+  <groupId>org.eclipse.tracecompass</groupId>
 </project>

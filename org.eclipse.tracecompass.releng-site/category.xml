@@ -21,7 +21,7 @@
    <feature url="features/org.eclipse.tracecompass.rcp.branding.feature_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.rcp.branding.feature" version="0.0.0">
       <category name="Trace Compass RCP"/>
    </feature>
-   <feature url="features/org.eclipse.linuxtools.lttng.testing_1.0.0.qualifier.jar" id="org.eclipse.linuxtools.lttng.testing" version="1.0.0.qualifier">
+   <feature url="features/org.eclipse.tracecompass.testing_1.0.0.qualifier.jar" id="org.eclipse.tracecompass.testing" version="1.0.0.qualifier">
       <category name="Trace Compass Extras"/>
    </feature>
    <category-def name="Trace Compass" label="Trace Compass Extras"/>

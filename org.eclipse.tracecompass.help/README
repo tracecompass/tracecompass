@@ -1,5 +1,4 @@
-This describes how to build the documentation found in the o.e.l.lttng.help
-plugin.
+This describes how to build the documentation found in the o.e.t.help plugin.
 
 
 Your Eclipse environment first needs to have the "Mylyn Wikitext" plugin
