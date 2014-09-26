@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
+import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.ILttngRelaydConnector;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.LttngRelaydConnectorFactory;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewerCommands.AttachReturnCode;

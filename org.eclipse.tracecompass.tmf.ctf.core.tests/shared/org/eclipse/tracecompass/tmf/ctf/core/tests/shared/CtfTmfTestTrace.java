@@ -15,7 +15,7 @@ package org.eclipse.tracecompass.tmf.ctf.core.tests.shared;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.linuxtools.ctf.core.tests.shared.CtfTestTrace;
+import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.ctf.core.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.CtfTmfTrace;

@@ -19,12 +19,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.linuxtools.ctf.core.event.CTFCallsite;
-import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
-import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
-import org.eclipse.linuxtools.ctf.core.event.types.ICompositeDefinition;
-import org.eclipse.linuxtools.ctf.core.event.types.IDefinition;
-import org.eclipse.linuxtools.ctf.core.trace.CTFTrace;
+import org.eclipse.tracecompass.ctf.core.event.CTFCallsite;
+import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
+import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
+import org.eclipse.tracecompass.ctf.core.event.types.ICompositeDefinition;
+import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
+import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfCustomAttributes;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;

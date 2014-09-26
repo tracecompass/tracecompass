@@ -22,7 +22,7 @@ import static org.junit.Assume.assumeTrue;
 import java.util.Collection;
 import java.util.Set;
 
-import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;

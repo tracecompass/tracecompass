@@ -19,7 +19,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
-import org.eclipse.linuxtools.ctf.core.trace.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
 import org.eclipse.tracecompass.tmf.ctf.core.CtfIterator;
 import org.eclipse.tracecompass.tmf.ctf.core.CtfLocation;
 import org.eclipse.tracecompass.tmf.ctf.core.CtfLocationInfo;

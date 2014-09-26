@@ -13,7 +13,7 @@
 
 package org.eclipse.tracecompass.tmf.ctf.core;
 
-import org.eclipse.linuxtools.ctf.core.event.CTFCallsite;
+import org.eclipse.tracecompass.ctf.core.event.CTFCallsite;
 import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
 
 /**

@@ -20,7 +20,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    org.eclipse.linuxtools.ctf.core.tests.perf.AllPerfTests.class,
+    org.eclipse.tracecompass.ctf.core.tests.perf.AllPerfTests.class,
     org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.AllPerfTests.class,
     org.eclipse.tracecompass.pcap.core.tests.perf.AllPerfTests.class,
     org.eclipse.tracecompass.tmf.core.tests.perf.AllPerfTests.class,

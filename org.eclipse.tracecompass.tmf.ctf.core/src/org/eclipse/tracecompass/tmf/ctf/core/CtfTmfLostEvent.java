@@ -13,8 +13,8 @@
 package org.eclipse.tracecompass.tmf.ctf.core;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.linuxtools.ctf.core.event.EventDefinition;
-import org.eclipse.linuxtools.ctf.core.event.IEventDeclaration;
+import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
+import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.tmf.core.event.ITmfLostEvent;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 

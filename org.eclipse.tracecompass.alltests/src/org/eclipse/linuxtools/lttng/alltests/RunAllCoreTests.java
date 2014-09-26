@@ -21,8 +21,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     org.eclipse.linuxtools.btf.core.tests.AllTests.class,
-    org.eclipse.linuxtools.ctf.core.tests.AllCtfCoreTests.class,
-    org.eclipse.linuxtools.ctf.parser.tests.AllCtfParserTests.class,
+    org.eclipse.tracecompass.ctf.core.tests.AllCtfCoreTests.class,
+    org.eclipse.tracecompass.ctf.parser.tests.AllCtfParserTests.class,
     org.eclipse.tracecompass.gdbtrace.core.tests.AllGdbTraceCoreTests.class,
     org.eclipse.tracecompass.lttng2.control.core.tests.AllTests.class,
     org.eclipse.tracecompass.lttng2.kernel.core.tests.AllTests.class,
