@@ -33,7 +33,7 @@
         <version>${tycho-version}</version>
         <configuration>
           <testSuite>org.eclipse.tracecompass.btf.core.tests</testSuite>
-          <testClass>org.eclipse.linuxtools.btf.core.tests.AllTests</testClass>
+          <testClass>org.eclipse.tracecompass.btf.core.tests.AllTests</testClass>
           <useUIHarness>false</useUIHarness>
           <useUIThread>false</useUIThread>
           <product>org.eclipse.platform.ide</product>

@@ -9,7 +9,7 @@
             id="org.eclipse.linuxtools.btf.trace"
             isDirectory="false"
             name="BTF Trace"
-            trace_type="org.eclipse.linuxtools.btf.core.trace.BtfTrace">
+            trace_type="org.eclipse.tracecompass.btf.core.trace.BtfTrace">
       </type>
       <category
             id="org.eclipse.linuxtools.btf.category"
@@ -19,13 +19,13 @@
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
       <module
-            analysis_module="org.eclipse.linuxtools.btf.core.analysis.BtfAnalysisModule"
+            analysis_module="org.eclipse.tracecompass.btf.core.analysis.BtfAnalysisModule"
             automatic="true"
             id="org.eclipse.linuxtools.btf.core.analysis"
             name="BTF Analysis">
          <tracetype
                applies="true"
-               class="org.eclipse.linuxtools.btf.core.trace.BtfTrace">
+               class="org.eclipse.tracecompass.btf.core.trace.BtfTrace">
          </tracetype>
       </module>
    </extension>
