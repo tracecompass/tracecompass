@@ -70,7 +70,7 @@
   <profile>
     <id>performance</id>
     <modules>
-      <module>org.eclipse.linuxtools.lttng.alltests</module>
+      <module>org.eclipse.tracecompass.alltests</module>
     </modules>
   </profile>
   <profile>

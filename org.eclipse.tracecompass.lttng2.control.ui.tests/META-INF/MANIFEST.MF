@@ -24,6 +24,6 @@ Import-Package: org.eclipse.rse.core,
 Export-Package: org.eclipse.linuxtools.internal.lttng2.control.stubs.dialogs;x-internal:=true,
  org.eclipse.linuxtools.internal.lttng2.control.stubs.service;x-internal:=true,
  org.eclipse.linuxtools.internal.lttng2.control.stubs.shells;x-internal:=true,
- org.eclipse.linuxtools.lttng2.control.ui.tests;x-friends:="org.eclipse.linuxtools.lttng.alltests",
+ org.eclipse.linuxtools.lttng2.control.ui.tests;x-friends:="org.eclipse.tracecompass.alltests",
  org.eclipse.linuxtools.lttng2.control.ui.tests.model.component;x-internal:=true,
  org.eclipse.linuxtools.lttng2.control.ui.tests.service;x-internal:=true
