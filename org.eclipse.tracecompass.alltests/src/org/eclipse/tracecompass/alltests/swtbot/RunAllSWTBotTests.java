@@ -10,7 +10,7 @@
  *   Marc-Andre Laperle - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng.alltests.swtbot;
+package org.eclipse.tracecompass.alltests.swtbot;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

@@ -9,10 +9,10 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.linuxtools.tracing.examples.ui.views.histogram;
+package org.eclipse.tracecompass.examples.ui.views.histogram;
 
-import org.eclipse.linuxtools.tracing.examples.ui.viewers.histogram.NewHistogramViewer;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.examples.ui.viewers.histogram.NewHistogramViewer;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 
 /**

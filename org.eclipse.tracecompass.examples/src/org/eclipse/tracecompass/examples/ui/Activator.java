@@ -9,7 +9,7 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.linuxtools.tracing.examples.ui;
+package org.eclipse.tracecompass.examples.ui;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;

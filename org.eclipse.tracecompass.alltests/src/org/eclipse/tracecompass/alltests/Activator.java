@@ -10,7 +10,7 @@
  *   Marc-Andre Laperle - Initial implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng.alltests;
+package org.eclipse.tracecompass.alltests;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;

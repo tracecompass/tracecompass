@@ -10,7 +10,7 @@
  *   Alexandre Montplaisir - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.linuxtools.lttng.alltests;
+package org.eclipse.tracecompass.alltests;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

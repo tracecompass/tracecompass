@@ -4,15 +4,15 @@ Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.tracecompass.examples;singleton:=true
 Bundle-Version: 1.1.0.qualifier
 Bundle-Localization: plugin
-Bundle-Activator: org.eclipse.linuxtools.tracing.examples.ui.Activator
+Bundle-Activator: org.eclipse.tracecompass.examples.ui.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.tracecompass.tmf.core;bundle-version="3.1.0",
  org.eclipse.tracecompass.tmf.ui;bundle-version="3.1.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Export-Package: org.eclipse.linuxtools.tracing.examples.ui;x-internal:=true,
- org.eclipse.linuxtools.tracing.examples.ui.viewers.histogram;x-internal:=true,
- org.eclipse.linuxtools.tracing.examples.ui.views.histogram;x-internal:=true
+Export-Package: org.eclipse.tracecompass.examples.ui;x-internal:=true,
+ org.eclipse.tracecompass.examples.ui.viewers.histogram;x-internal:=true,
+ org.eclipse.tracecompass.examples.ui.views.histogram;x-internal:=true
 Bundle-Vendor: %Bundle-Vendor
 Import-Package: org.swtchart

@@ -5,7 +5,7 @@
          point="org.eclipse.ui.views">
             <view
             category="org.eclipse.linuxtools.tmf.ui.views.category"
-            class="org.eclipse.linuxtools.tracing.examples.ui.views.histogram.NewHistogramView"
+            class="org.eclipse.tracecompass.examples.ui.views.histogram.NewHistogramView"
             id="org.eclipse.linuxtools.tracing.examples.ui.views.HistogramView"
             name="%tracing.examples.histogram.view.name"
             restorable="true">

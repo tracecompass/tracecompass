@@ -10,7 +10,7 @@
  *   Alexandre Montplaisir - Initial API and implementation
  *   Bernd Hufmann - Updated to new TMF chart framework
  *******************************************************************************/
-package org.eclipse.linuxtools.tracing.examples.ui.viewers.histogram;
+package org.eclipse.tracecompass.examples.ui.viewers.histogram;
 
 import java.util.Arrays;
 import java.util.List;
