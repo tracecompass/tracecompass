@@ -15,7 +15,6 @@
 package org.eclipse.linuxtools.tmf.core.trace;
 
 import java.io.File;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,6 +28,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.internal.tmf.core.Activator;
 import org.eclipse.linuxtools.tmf.core.TmfCommonConstants;
@@ -493,7 +493,7 @@ public final class TmfTraceManager {
         String property = System.getProperty("osgi.instance.area"); //$NON-NLS-1$
         if (property != null) {
             try {
-                File dir = new File(new URI(property));
+                File dir = URIUtil.toFile(URIUtil.fromString(property));
                 dir = new File(dir.getAbsolutePath() + File.separator + TEMP_DIR_NAME);
                 if (!dir.exists()) {
                     dir.mkdirs();

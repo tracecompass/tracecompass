@@ -13,10 +13,10 @@
 package org.eclipse.linuxtools.ctf.core.tests;
 
 import java.io.File;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.linuxtools.internal.ctf.core.Activator;
 import org.osgi.framework.BundleContext;
 
@@ -94,7 +94,7 @@ public class CtfCoreTestPlugin extends Plugin {
         String property = System.getProperty("osgi.instance.area"); //$NON-NLS-1$
         if (property != null) {
             try {
-                File dir = new File(new URI(property));
+                File dir = URIUtil.toFile(URIUtil.fromString(property));
                 dir = new File(dir.getAbsolutePath() + File.separator + TEMP_DIR_NAME);
                 if (!dir.exists()) {
                     dir.mkdirs();
