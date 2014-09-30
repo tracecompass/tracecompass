@@ -151,6 +151,12 @@ In the end, the extension menu should look like this.
 
 [[Image:images/NTTPluginxmlComplete.png]]<br>
 
+== Other Considerations ==
+The ''org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable'' provides additional features that are active when the event class (defined in '''event type''') implements certain additional interfaces.
+
+=== Collapsing of repetitive events ===
+By implementing the interface ''org.eclipse.linuxtools.tmf.core.event.collapse.ITmfCollapsibleEvent'' the events table will allow to collapse repetitive events by selecting the menu item '''Collapse Events''' after pressing the right mouse button in the table.
+
 == Best Practices ==
 
 * Do not load the whole trace in RAM, it will limit the size of the trace that can be read.
