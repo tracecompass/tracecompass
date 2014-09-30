@@ -18,7 +18,7 @@
   </parent>
 
   <artifactId>org.eclipse.linuxtools.lttng.alltests</artifactId>
-  <version>3.2.0-SNAPSHOT</version>
+  <version>3.1.0-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
 
   <name>Linux Tools LTTng Component All Tests</name>
