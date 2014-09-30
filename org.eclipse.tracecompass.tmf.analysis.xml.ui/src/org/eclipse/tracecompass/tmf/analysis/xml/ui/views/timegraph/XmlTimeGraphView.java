@@ -449,9 +449,17 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
             boolean root = true;
             if (!entry.getParentId().isEmpty()) {
                 XmlEntry parent = entryMap.get(entry.getParentId());
+                /*
+                 * Associate the parent entry only if their time overlap. A
+                 * child entry may start before its parent, for example at the
+                 * beginning of the trace if a parent has not yet appeared in
+                 * the state system. We just want to make sure that the entry
+                 * didn't start after the parent ended or ended before the
+                 * parent started.
+                 */
                 if (parent != null &&
-                        entry.getStartTime() >= parent.getStartTime() &&
-                        entry.getStartTime() <= parent.getEndTime()) {
+                        !(entry.getStartTime() > parent.getEndTime() ||
+                        entry.getEndTime() < parent.getStartTime())) {
                     parent.addChild(entry);
                     root = false;
                 }
