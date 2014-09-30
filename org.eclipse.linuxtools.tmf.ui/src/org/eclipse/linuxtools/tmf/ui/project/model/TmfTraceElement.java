@@ -387,7 +387,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
     private Map<String, String> getTraceProperties() {
         for (ITmfTrace openedTrace : TmfTraceManager.getInstance().getOpenedTraces()) {
             for (ITmfTrace singleTrace : TmfTraceManager.getTraceSet(openedTrace)) {
-                if (this.getLocation().getPath().endsWith(singleTrace.getPath())) {
+                if (getElementUnderTraceFolder().getResource().equals(singleTrace.getResource())) {
                     if (singleTrace instanceof ITmfTraceProperties) {
                         ITmfTraceProperties traceProperties = (ITmfTraceProperties) singleTrace;
                         return traceProperties.getTraceProperties();
