@@ -29,6 +29,8 @@ import org.eclipse.linuxtools.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfEventParser;
 import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
 import org.eclipse.linuxtools.tmf.core.trace.TmfExperiment;
+import org.eclipse.linuxtools.tmf.core.trace.indexer.ITmfTraceIndexer;
+import org.eclipse.linuxtools.tmf.core.trace.indexer.checkpoint.TmfCheckpointIndexer;
 import org.eclipse.linuxtools.tmf.tests.stubs.trace.TmfTraceStub;
 import org.eclipse.linuxtools.tmf.ui.tests.uml2sd.trace.TmfUml2SDTestTrace;
 import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
@@ -303,11 +305,14 @@ public class Uml2SDTestFacility {
         fTrace = setupTrace(fParser);
         fParser.setTrace(fTrace);
 
-//        fTrace = setupTrace(fParser);
-
         final ITmfTrace traces[] = new ITmfTrace[1];
         traces[0] = fTrace;
-        fExperiment = new TmfExperiment(ITmfEvent.class, "TestExperiment", traces);
+        fExperiment = new TmfExperiment(ITmfEvent.class, "TestExperiment", traces) {
+            @Override
+            protected ITmfTraceIndexer createIndexer(int interval) {
+                return new TmfCheckpointIndexer(this, interval);
+            }
+        };
         fTrace.broadcast(new TmfTraceOpenedSignal(this, fExperiment, null));
         fTrace.broadcast(new TmfTraceSelectedSignal(this, fExperiment));
         if (wait) {
