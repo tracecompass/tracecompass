@@ -53,6 +53,6 @@ public interface ITmfTimePreferencesConstants {
     public static final String DELIMITER_DQUOT = "\"";
     /** @since 3.0 */
     public static final String DELIMITER_QUOTE = "''";
-    /** @since 3.1 */
+    /** @since 3.2*/
     public static final String LOCALE = TIME_FORMAT_PREF + ".locale";
 }

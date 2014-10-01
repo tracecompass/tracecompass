@@ -318,7 +318,7 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
      * the first 100 to compute the confidence level
      *
      * @return collection of patterns to validate against
-     * @since 3.1
+     * @since 3.2
      */
     protected List<Pattern> getValidationPatterns() {
         return Collections.singletonList(getFirstLinePattern());

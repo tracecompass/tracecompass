@@ -486,7 +486,7 @@ public final class TmfTraceManager {
      *
      * @return the temporary directory path suitable to be passed to the
      *         java.io.File constructor without a trailing separator
-     * @since 3.1
+     * @since 3.2
      */
     public static String getTemporaryDirPath() {
         // Get the workspace path from the properties

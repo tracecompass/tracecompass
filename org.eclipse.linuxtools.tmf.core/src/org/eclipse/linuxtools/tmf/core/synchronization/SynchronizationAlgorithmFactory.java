@@ -18,7 +18,7 @@ import org.eclipse.linuxtools.internal.tmf.core.synchronization.SyncAlgorithmFul
  * A factory to generate synchronization algorithm to synchronize traces
  *
  * @author Geneviève Bastien
- * @since 3.1
+ * @since 3.2
  */
 public final class SynchronizationAlgorithmFactory {
 

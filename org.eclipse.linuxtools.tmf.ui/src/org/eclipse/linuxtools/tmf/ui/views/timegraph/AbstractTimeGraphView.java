@@ -424,7 +424,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
         }
 
         /**
-         * @since 3.1
+         * @since 3.2
          */
         @Override
         public Image getImage(Object element) {
@@ -432,7 +432,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
         }
 
         /**
-         * @since 3.1
+         * @since 3.2
          */
         @Override
         public String getText(Object element) {

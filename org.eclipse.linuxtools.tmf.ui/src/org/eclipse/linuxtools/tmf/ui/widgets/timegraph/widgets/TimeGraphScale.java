@@ -131,7 +131,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
      * Get the time provider used by this scale
      *
      * @return The time provider
-     * @since 3.1
+     * @since 3.2
      */
     public ITimeDataProvider getTimeProvider() {
         return fTimeProvider;

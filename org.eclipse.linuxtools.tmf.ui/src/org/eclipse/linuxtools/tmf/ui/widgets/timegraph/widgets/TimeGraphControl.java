@@ -1153,7 +1153,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @param pt
      *            a point in the widget
      * @return The closest arrow event, or null if there is none close enough.
-     * @since 3.1
+     * @since 3.2
      */
     protected ILinkEvent getArrow(Point pt) {
         if (fHideArrows) {

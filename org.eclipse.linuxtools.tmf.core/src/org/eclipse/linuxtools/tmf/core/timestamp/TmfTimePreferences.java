@@ -123,7 +123,7 @@ public class TmfTimePreferences {
      * Get the locale
      *
      * @return the locale
-     * @since 3.1
+     * @since 3.2
      */
     public Locale getLocale() {
         return Locale.forLanguageTag(Platform.getPreferencesService().getString(Activator.PLUGIN_ID, ITmfTimePreferencesConstants.LOCALE, Locale.getDefault().toLanguageTag(), null));

@@ -79,7 +79,7 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
      * Analysis involved in synchronization can put their supplementary files in
      * there so they are not deleted when synchronized traces are copied.
      *
-     * @since 3.1
+     * @since 3.2
      */
     public final static String SYNCHRONIZATION_DIRECTORY = "sync_data"; //$NON-NLS-1$
 
@@ -497,7 +497,7 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
      * @return The path to the folder where synchronization-related
      *         supplementary files can be kept or <code>null</code> if not
      *         available.
-     * @since 3.1
+     * @since 3.2
      */
     public String getSynchronizationFolder() {
         /* Set up the path to the synchronization file we'll use */

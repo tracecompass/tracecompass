@@ -16,7 +16,7 @@ package org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets;
  * Time data provider that converts between time data units used internally and
  * time in display units used by the caller.
  *
- * @since 3.1
+ * @since 3.2
  */
 public interface ITimeDataProviderConverter extends ITimeDataProvider {
 

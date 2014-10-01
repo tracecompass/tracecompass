@@ -138,7 +138,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
      *            List of output columns
      * @param timeStampOutputFormat
      *            The timestamp format to use
-     * @since 3.1
+     * @since 3.2
      */
     public CustomTxtTraceDefinition(String category, String traceType, List<InputLine> inputs,
             List<OutputColumn> outputs, String timeStampOutputFormat) {
@@ -618,7 +618,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
      *            if true, the default (built-in) parsers are included
      *
      * @return The loaded trace definitions
-     * @since 3.1
+     * @since 3.2
      */
     public static CustomTxtTraceDefinition[] loadAll(boolean includeDefaults) {
         File defaultFile = new File(CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME);
@@ -726,7 +726,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
      * @param definitionName
      *            Name of the definition to load
      * @return The loaded trace definition
-     * @since 3.1
+     * @since 3.2
      */
     public static CustomTxtTraceDefinition load(String categoryName, String definitionName) {
         try {
@@ -885,7 +885,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
      *            The category of the definition to delete
      * @param definitionName
      *            The name of the definition to delete
-     * @since 3.1
+     * @since 3.2
      */
     public static void delete(String categoryName, String definitionName) {
         try {

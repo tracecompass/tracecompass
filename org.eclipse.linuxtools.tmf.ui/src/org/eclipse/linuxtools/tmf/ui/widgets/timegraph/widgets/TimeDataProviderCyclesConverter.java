@@ -19,7 +19,7 @@ import org.eclipse.linuxtools.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
  * Time Data Provider wrapper that converts nanoseconds to cycles.
  *
  * The user of the wrapper uses cycles, the wrapped provider uses nanoseconds.
- * @since 3.1
+ * @since 3.2
  *
  */
 public class TimeDataProviderCyclesConverter implements ITimeDataProviderConverter {

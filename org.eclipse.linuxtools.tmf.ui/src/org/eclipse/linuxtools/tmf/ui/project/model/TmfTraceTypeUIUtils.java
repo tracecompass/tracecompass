@@ -82,7 +82,7 @@ public final class TmfTraceTypeUIUtils {
     public static final String EVENTS_TABLE_TYPE_ELEM = "eventsTableType"; //$NON-NLS-1$
 
     /** Extension point element 'Event Table Columns'
-     * @since 3.1 */
+     * @since 3.2*/
     public static final String EVENT_TABLE_COLUMNS = "eventTableColumns"; //$NON-NLS-1$
 
     /** Extension point attribute 'tracetype' */
@@ -378,7 +378,7 @@ public final class TmfTraceTypeUIUtils {
      *            by the trace type.
      * @return The corresponding Event Table, or 'null' if this trace type did
      *         not specify any.
-     * @since 3.1
+     * @since 3.2
      */
     public static @Nullable TmfEventsTable getEventTable(ITmfTrace trace, Composite parent, int cacheSize) {
         final String traceType = getTraceType(trace);
@@ -422,7 +422,7 @@ public final class TmfTraceTypeUIUtils {
      *            The trace for which we want the columns.
      * @return The corresponding event table columns, or 'null' if this trace
      *         type did not specify any.
-     * @since 3.1
+     * @since 3.2
      */
     public static @Nullable Collection<? extends TmfEventTableColumn> getEventTableColumns(ITmfTrace trace) {
         final String traceType = getTraceType(trace);

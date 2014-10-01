@@ -40,7 +40,7 @@ import org.eclipse.ui.progress.WorkbenchJob;
  * On the contrary, all the "check" operations act only on what is not filtered.
  *
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
- * @since 3.1
+ * @since 3.2
  */
 public class FilteredCheckboxTree extends FilteredTree implements ICheckable {
 

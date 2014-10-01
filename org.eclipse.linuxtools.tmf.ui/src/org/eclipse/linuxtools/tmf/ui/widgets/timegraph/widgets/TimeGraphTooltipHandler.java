@@ -79,7 +79,7 @@ public class TimeGraphTooltipHandler {
      * @param timeDataProvider
      *            The time data provider
      *
-     * @since 3.1
+     * @since 3.2
      */
     public void setTimeProvider(ITimeDataProvider timeDataProvider) {
         fTimeDataProvider = timeDataProvider;

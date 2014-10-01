@@ -82,56 +82,56 @@ public class TmfEventsCache {
             this.rank = rank;
         }
         /**
-         * @since 3.1
+         * @since 3.2
          */
         @Override
         public Object getAdapter(Class adapter) {
             return event.getAdapter(adapter);
         }
         /**
-         * @since 3.1
+         * @since 3.2
          */
         @Override
         public ITmfTrace getTrace() {
             return event.getTrace();
         }
         /**
-         * @since 3.1
+         * @since 3.2
          */
         @Override
         public long getRank() {
             return event.getRank();
         }
         /**
-         * @since 3.1
+         * @since 3.2
          */
         @Override
         public ITmfTimestamp getTimestamp() {
             return event.getTimestamp();
         }
         /**
-         * @since 3.1
+         * @since 3.2
          */
         @Override
         public String getSource() {
             return event.getSource();
         }
         /**
-         * @since 3.1
+         * @since 3.2
          */
         @Override
         public ITmfEventType getType() {
             return event.getType();
         }
         /**
-         * @since 3.1
+         * @since 3.2
          */
         @Override
         public ITmfEventField getContent() {
             return event.getContent();
         }
         /**
-         * @since 3.1
+         * @since 3.2
          */
         @Override
         public String getReference() {
@@ -271,7 +271,7 @@ public class TmfEventsCache {
      * @param index
      *            The index this event occupies in the cache
      *
-     * @since 3.1
+     * @since 3.2
      */
     public synchronized void updateCollapsedEvent(int index) {
         int i = index - fCacheStartIndex;

@@ -247,7 +247,7 @@ public class CTFStream {
      * Get all the event declarations in this stream.
      *
      * @return The event declarations for this stream
-     * @since 3.1
+     * @since 3.2
      */
     public @NonNull Collection<IEventDeclaration> getEventDeclarations() {
         List<IEventDeclaration> retVal = new ArrayList<>(fEvents);
@@ -265,7 +265,7 @@ public class CTFStream {
      *         'null' if there are no declaration with this ID
      * @throws IllegalArgumentException
      *             If the passed ID is invalid
-     * @since 3.1
+     * @since 3.2
      */
     public @Nullable IEventDeclaration getEventDeclaration(int eventId) {
         int eventIndex = (eventId == EventDeclaration.UNSET_EVENT_ID) ? 0 : eventId;
@@ -335,7 +335,7 @@ public class CTFStream {
      *            list of the events to add
      * @throws CTFReaderException
      *             if the list already contains data
-     * @since 3.1
+     * @since 3.2
      */
     public void addEvents(Collection<IEventDeclaration> events) throws CTFReaderException {
         if (fEventUnsetId) {

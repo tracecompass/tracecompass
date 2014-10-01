@@ -249,7 +249,7 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
      * @param streamId
      *            The ID of the stream from which to read
      * @return The list of event declarations
-     * @since 3.1
+     * @since 3.2
      */
     public Collection<IEventDeclaration> getEventDeclarations(Long streamId) {
         return fStreams.get(streamId).getEventDeclarations();
@@ -279,7 +279,7 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
      * @param id
      *            the ID of the event
      * @return the event declaration
-     * @since 3.1
+     * @since 3.2
      */
     public IEventDeclaration getEventType(long streamId, int id) {
         return getEvents(streamId).get(id);

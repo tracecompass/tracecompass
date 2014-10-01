@@ -50,7 +50,7 @@ public abstract class CustomTraceDefinition {
     public static final String TAG_OTHER = Messages.CustomTraceDefinition_otherTag;
 
     /** Category of this trace definition
-     * @since 3.1*/
+     * @since 3.2 */
     public String categoryName;
 
     /** Name of this trace definition */
