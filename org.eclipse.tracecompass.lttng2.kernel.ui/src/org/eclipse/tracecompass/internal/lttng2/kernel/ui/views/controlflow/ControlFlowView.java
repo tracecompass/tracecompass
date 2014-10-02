@@ -29,6 +29,7 @@ import org.eclipse.tracecompass.internal.lttng2.kernel.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.kernel.ui.Messages;
 import org.eclipse.tracecompass.lttng2.kernel.core.analysis.LttngKernelAnalysisModule;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
@@ -270,7 +271,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
                 List<ITmfStateInterval> execNameIntervals;
                 try {
                     execNameQuark = ssq.getQuarkRelative(threadQuark, Attributes.EXEC_NAME);
-                    execNameIntervals = ssq.queryHistoryRange(execNameQuark, start, end);
+                    execNameIntervals = StateSystemUtils.queryHistoryRange(ssq, execNameQuark, start, end);
                 } catch (AttributeNotFoundException e) {
                     /* No information on this thread (yet?), skip it for now */
                     continue;
@@ -413,7 +414,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
         }
         try {
             int statusQuark = ssq.getQuarkRelative(entry.getThreadQuark(), Attributes.STATUS);
-            List<ITmfStateInterval> statusIntervals = ssq.queryHistoryRange(statusQuark, realStart, realEnd - 1, resolution, monitor);
+            List<ITmfStateInterval> statusIntervals = StateSystemUtils.queryHistoryRange(ssq, statusQuark, realStart, realEnd - 1, resolution, monitor);
             eventList = new ArrayList<>(statusIntervals.size());
             long lastEndTime = -1;
             for (ITmfStateInterval statusInterval : statusIntervals) {
@@ -537,7 +538,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
                     // adjust the query range to include the previous and following intervals
                     long qstart = Math.max(ssq.querySingleState(start, currentThreadQuark).getStartTime() - 1, ssq.getStartTime());
                     long qend = Math.min(ssq.querySingleState(end, currentThreadQuark).getEndTime() + 1, ssq.getCurrentEndTime());
-                    List<ITmfStateInterval> currentThreadIntervals = ssq.queryHistoryRange(currentThreadQuark, qstart, qend, resolution, monitor);
+                    List<ITmfStateInterval> currentThreadIntervals = StateSystemUtils.queryHistoryRange(ssq, currentThreadQuark, qstart, qend, resolution, monitor);
                     int prevThread = 0;
                     long prevEnd = 0;
                     long lastEnd = 0;

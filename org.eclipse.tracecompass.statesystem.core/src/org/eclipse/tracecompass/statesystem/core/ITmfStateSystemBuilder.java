@@ -30,6 +30,8 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
  *
  * @author Alexandre Montplaisir
  * @since 3.0
+ * @noimplement Only the internal StateSystem class should implement this
+ *              interface.
  */
 public interface ITmfStateSystemBuilder extends ITmfStateSystem {
 

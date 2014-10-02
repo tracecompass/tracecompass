@@ -27,6 +27,7 @@ import org.eclipse.tracecompass.internal.lttng2.kernel.ui.Messages;
 import org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.resources.ResourcesEntry.Type;
 import org.eclipse.tracecompass.lttng2.kernel.core.analysis.LttngKernelAnalysisModule;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
@@ -222,7 +223,7 @@ public class ResourcesView extends AbstractTimeGraphView {
         try {
             if (resourcesEntry.getType().equals(Type.CPU)) {
                 int statusQuark = ssq.getQuarkRelative(quark, Attributes.STATUS);
-                List<ITmfStateInterval> statusIntervals = ssq.queryHistoryRange(statusQuark, realStart, realEnd - 1, resolution, monitor);
+                List<ITmfStateInterval> statusIntervals = StateSystemUtils.queryHistoryRange(ssq, statusQuark, realStart, realEnd - 1, resolution, monitor);
                 eventList = new ArrayList<>(statusIntervals.size());
                 long lastEndTime = -1;
                 for (ITmfStateInterval statusInterval : statusIntervals) {
@@ -244,7 +245,7 @@ public class ResourcesView extends AbstractTimeGraphView {
                     lastEndTime = time + duration;
                 }
             } else if (resourcesEntry.getType().equals(Type.IRQ)) {
-                List<ITmfStateInterval> irqIntervals = ssq.queryHistoryRange(quark, realStart, realEnd - 1, resolution, monitor);
+                List<ITmfStateInterval> irqIntervals = StateSystemUtils.queryHistoryRange(ssq, quark, realStart, realEnd - 1, resolution, monitor);
                 eventList = new ArrayList<>(irqIntervals.size());
                 long lastEndTime = -1;
                 boolean lastIsNull = true;
@@ -277,7 +278,7 @@ public class ResourcesView extends AbstractTimeGraphView {
                     lastEndTime = time + duration;
                 }
             } else if (resourcesEntry.getType().equals(Type.SOFT_IRQ)) {
-                List<ITmfStateInterval> softIrqIntervals = ssq.queryHistoryRange(quark, realStart, realEnd - 1, resolution, monitor);
+                List<ITmfStateInterval> softIrqIntervals = StateSystemUtils.queryHistoryRange(ssq, quark, realStart, realEnd - 1, resolution, monitor);
                 eventList = new ArrayList<>(softIrqIntervals.size());
                 long lastEndTime = -1;
                 boolean lastIsNull = true;

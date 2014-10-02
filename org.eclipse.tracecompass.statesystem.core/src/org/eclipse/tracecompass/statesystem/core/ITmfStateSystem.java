@@ -14,13 +14,12 @@ package org.eclipse.tracecompass.statesystem.core;
 
 import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
-import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+
 
 /**
  * This is the read-only interface to the generic state system. It contains all
@@ -28,6 +27,8 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
  *
  * @author Alexandre Montplaisir
  * @since 3.0
+ * @noimplement Only the internal StateSystem class should implement this
+ *              interface.
  */
 public interface ITmfStateSystem {
 
@@ -331,95 +332,5 @@ public interface ITmfStateSystem {
      *             If the query is sent after the state system has been disposed
      */
     ITmfStateInterval querySingleState(long t, int attributeQuark)
-            throws AttributeNotFoundException, StateSystemDisposedException;
-
-    /**
-     * Convenience method to query attribute stacks (created with
-     * pushAttribute()/popAttribute()). This will return the interval that is
-     * currently at the top of the stack, or 'null' if that stack is currently
-     * empty. It works similarly to querySingleState().
-     *
-     * To retrieve the other values in a stack, you can query the sub-attributes
-     * manually.
-     *
-     * @param t
-     *            The timestamp of the query
-     * @param stackAttributeQuark
-     *            The top-level stack-attribute (that was the target of
-     *            pushAttribute() at creation time)
-     * @return The interval that was at the top of the stack, or 'null' if the
-     *         stack was empty.
-     * @throws StateValueTypeException
-     *             If the target attribute is not a valid stack attribute (if it
-     *             has a string value for example)
-     * @throws AttributeNotFoundException
-     *             If the attribute was simply not found
-     * @throws TimeRangeException
-     *             If the given timestamp is invalid
-     * @throws StateSystemDisposedException
-     *             If the query is sent after the state system has been disposed
-     */
-    ITmfStateInterval querySingleStackTop(long t, int stackAttributeQuark)
-            throws  AttributeNotFoundException, StateSystemDisposedException;
-
-    /**
-     * Return a list of state intervals, containing the "history" of a given
-     * attribute between timestamps t1 and t2. The list will be ordered by
-     * ascending time.
-     *
-     * Note that contrary to queryFullState(), the returned list here is in the
-     * "direction" of time (and not in the direction of attributes, as is the
-     * case with queryFullState()).
-     *
-     * @param attributeQuark
-     *            Which attribute this query is interested in
-     * @param t1
-     *            Start time of the range query
-     * @param t2
-     *            Target end time of the query. If t2 is greater than the end of
-     *            the trace, we will return what we have up to the end of the
-     *            history.
-     * @return The List of state intervals that happened between t1 and t2
-     * @throws TimeRangeException
-     *             If t1 is invalid, or if t2 <= t1
-     * @throws AttributeNotFoundException
-     *             If the requested quark does not exist in the model.
-     * @throws StateSystemDisposedException
-     *             If the query is sent after the state system has been disposed
-     */
-    List<ITmfStateInterval> queryHistoryRange(int attributeQuark, long t1, long t2)
-            throws AttributeNotFoundException, StateSystemDisposedException;
-
-    /**
-     * Return the state history of a given attribute, but with at most one
-     * update per "resolution". This can be useful for populating views (where
-     * it's useless to have more than one query per pixel, for example). A
-     * progress monitor can be used to cancel the query before completion.
-     *
-     * @param attributeQuark
-     *            Which attribute this query is interested in
-     * @param t1
-     *            Start time of the range query
-     * @param t2
-     *            Target end time of the query. If t2 is greater than the end of
-     *            the trace, we will return what we have up to the end of the
-     *            history.
-     * @param resolution
-     *            The "step" of this query
-     * @param monitor
-     *            A progress monitor. If the monitor is canceled during a query,
-     *            we will return what has been found up to that point. You can
-     *            use "null" if you do not want to use one.
-     * @return The List of states that happened between t1 and t2
-     * @throws TimeRangeException
-     *             If t1 is invalid, if t2 <= t1, or if the resolution isn't
-     *             greater than zero.
-     * @throws AttributeNotFoundException
-     *             If the attribute doesn't exist
-     * @throws StateSystemDisposedException
-     *             If the query is sent after the state system has been disposed
-     */
-    List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
-            long t1, long t2, long resolution, IProgressMonitor monitor)
             throws AttributeNotFoundException, StateSystemDisposedException;
 }

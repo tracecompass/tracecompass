@@ -63,6 +63,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
@@ -995,7 +996,7 @@ public class CallStackView extends TmfView {
         }
         List<ITimeEvent> eventList = null;
         try {
-            List<ITmfStateInterval> stackIntervals = ss.queryHistoryRange(entry.getQuark(), start, end - 1, resolution, monitor);
+            List<ITmfStateInterval> stackIntervals = StateSystemUtils.queryHistoryRange(ss, entry.getQuark(), start, end - 1, resolution, monitor);
             eventList = new ArrayList<>(stackIntervals.size());
             long lastEndTime = -1;
             boolean lastIsNull = true;

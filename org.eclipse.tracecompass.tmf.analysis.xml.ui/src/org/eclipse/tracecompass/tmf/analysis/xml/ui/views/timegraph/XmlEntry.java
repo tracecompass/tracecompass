@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.TmfXmlUiStrings;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -157,7 +158,7 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
         if (quark != IXmlStateSystemContainer.ERROR_QUARK) {
             try {
                 /* Find the first attribute with a parent */
-                List<ITmfStateInterval> execNameIntervals = fSs.queryHistoryRange(quark, getStartTime(), getEndTime());
+                List<ITmfStateInterval> execNameIntervals = StateSystemUtils.queryHistoryRange(fSs, quark, getStartTime(), getEndTime());
                 for (ITmfStateInterval execNameInterval : execNameIntervals) {
 
                     if (!execNameInterval.getStateValue().isNull()) {

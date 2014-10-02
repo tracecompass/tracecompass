@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.callstack.LttngUstCallStackProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -252,8 +253,10 @@ public abstract class AbstractProviderTest {
             int depth = state.get(stackAttribute).getStateValue().unboxInt();
 
             int stackTop = ss.getQuarkRelative(stackAttribute, String.valueOf(depth));
-            ITmfStateValue top = state.get(stackTop).getStateValue();
-            assertEquals(top, ss.querySingleStackTop(timestamp, stackAttribute).getStateValue());
+            ITmfStateValue expectedValue = state.get(stackTop).getStateValue();
+            ITmfStateInterval interval = StateSystemUtils.querySingleStackTop(ss, timestamp, stackAttribute);
+            assertNotNull(interval);
+            assertEquals(expectedValue, interval.getStateValue());
 
             String[] ret = new String[depth];
             for (int i = 0; i < depth; i++) {

@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
@@ -33,8 +31,8 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.interval.TmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
+import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 
 /**
  * This is the core class of the Generic State System. It contains all the
@@ -611,120 +609,6 @@ public class StateSystem implements ITmfStateSystemBuilder {
                     attributeQuark, TmfStateValue.nullValue());
         }
         return ret;
-    }
-
-    @Override
-    public ITmfStateInterval querySingleStackTop(long t, int stackAttributeQuark)
-            throws StateValueTypeException, AttributeNotFoundException,
-            TimeRangeException, StateSystemDisposedException {
-        ITmfStateValue curStackStateValue = querySingleState(t, stackAttributeQuark).getStateValue();
-
-        if (curStackStateValue.isNull()) {
-            /* There is nothing stored in this stack at this moment */
-            return null;
-        }
-        int curStackDepth = curStackStateValue.unboxInt();
-        if (curStackDepth <= 0) {
-            /*
-             * This attribute is an integer attribute, but it doesn't seem like
-             * it's used as a stack-attribute...
-             */
-            throw new StateValueTypeException();
-        }
-
-        int subAttribQuark = getQuarkRelative(stackAttributeQuark, String.valueOf(curStackDepth));
-        return querySingleState(t, subAttribQuark);
-    }
-
-    @Override
-    public List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
-            long t1, long t2) throws TimeRangeException,
-            AttributeNotFoundException, StateSystemDisposedException {
-        if (isDisposed) {
-            throw new StateSystemDisposedException();
-        }
-
-        List<ITmfStateInterval> intervals;
-        ITmfStateInterval currentInterval;
-        long ts, tEnd;
-
-        /* Make sure the time range makes sense */
-        if (t2 < t1) {
-            throw new TimeRangeException();
-        }
-
-        /* Set the actual, valid end time of the range query */
-        if (t2 > this.getCurrentEndTime()) {
-            tEnd = this.getCurrentEndTime();
-        } else {
-            tEnd = t2;
-        }
-
-        /* Get the initial state at time T1 */
-        intervals = new ArrayList<>();
-        currentInterval = querySingleState(t1, attributeQuark);
-        intervals.add(currentInterval);
-
-        /* Get the following state changes */
-        ts = currentInterval.getEndTime();
-        while (ts != -1 && ts < tEnd) {
-            ts++; /* To "jump over" to the next state in the history */
-            currentInterval = querySingleState(ts, attributeQuark);
-            intervals.add(currentInterval);
-            ts = currentInterval.getEndTime();
-        }
-        return intervals;
-    }
-
-    @Override
-    public List<ITmfStateInterval> queryHistoryRange(int attributeQuark,
-            long t1, long t2, long resolution, IProgressMonitor monitor)
-            throws TimeRangeException, AttributeNotFoundException,
-            StateSystemDisposedException {
-        if (isDisposed) {
-            throw new StateSystemDisposedException();
-        }
-
-        List<ITmfStateInterval> intervals = new LinkedList<>();
-        ITmfStateInterval currentInterval = null;
-        long ts, tEnd;
-
-        IProgressMonitor mon = monitor;
-        if (mon == null) {
-            mon = new NullProgressMonitor();
-        }
-
-        /* Make sure the time range makes sense */
-        if (t2 < t1 || resolution <= 0) {
-            throw new TimeRangeException();
-        }
-
-        /* Set the actual, valid end time of the range query */
-        if (t2 > this.getCurrentEndTime()) {
-            tEnd = this.getCurrentEndTime();
-        } else {
-            tEnd = t2;
-        }
-
-        /*
-         * Iterate over the "resolution points". We skip unneeded queries in the
-         * case the current interval is longer than the resolution.
-         */
-        for (ts = t1; ts <= tEnd;
-                ts += ((currentInterval.getEndTime() - ts) / resolution + 1) * resolution) {
-            if (mon.isCanceled()) {
-                return intervals;
-            }
-            currentInterval = querySingleState(ts, attributeQuark);
-            intervals.add(currentInterval);
-        }
-
-        /* Add the interval at t2, if it wasn't included already. */
-        if (currentInterval != null && currentInterval.getEndTime() < tEnd) {
-            currentInterval = querySingleState(tEnd, attributeQuark);
-            intervals.add(currentInterval);
-        }
-        return intervals;
     }
 
     //--------------------------------------------------------------------------

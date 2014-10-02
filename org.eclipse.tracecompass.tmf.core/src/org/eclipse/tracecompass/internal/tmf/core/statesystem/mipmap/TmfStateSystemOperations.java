@@ -17,14 +17,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
+import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
+
 
 /**
  * This class implements additional statistical operations that can be
@@ -212,7 +214,7 @@ public final class TmfStateSystemOperations {
                         intervals.add(interval);
                     }
                 } else {
-                    for (ITmfStateInterval interval : ss.queryHistoryRange(baseQuark, t1, t2)) {
+                    for (ITmfStateInterval interval : StateSystemUtils.queryHistoryRange(ss, baseQuark, t1, t2)) {
                         if (!interval.getStateValue().isNull()) {
                             intervals.add(interval);
                         }

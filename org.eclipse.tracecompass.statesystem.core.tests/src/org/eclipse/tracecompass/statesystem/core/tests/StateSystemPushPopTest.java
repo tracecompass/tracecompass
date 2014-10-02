@@ -14,6 +14,7 @@
 package org.eclipse.tracecompass.statesystem.core.tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -23,6 +24,7 @@ import java.util.List;
 
 import org.eclipse.tracecompass.internal.statesystem.core.StateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
+import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.backend.historytree.HistoryTreeBackend;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -45,8 +47,6 @@ import org.junit.Test;
 public class StateSystemPushPopTest {
 
     private ITmfStateSystemBuilder ss;
-
-    private ITmfStateInterval interval;
     private int attribute;
 
     private File testHtFile;
@@ -144,7 +144,7 @@ public class StateSystemPushPopTest {
     @Test
     public void testBeginEnd() {
         try {
-            interval = ss.querySingleState(0, attribute);
+            ITmfStateInterval interval = ss.querySingleState(0, attribute);
             assertEquals(0, interval.getStartTime());
             assertEquals(1, interval.getEndTime());
             assertTrue(interval.getStateValue().isNull());
@@ -169,7 +169,7 @@ public class StateSystemPushPopTest {
             final int subAttribute2 = ss.getQuarkRelative(attribute, "2");
 
             /* Test the stack attributes themselves */
-            interval = ss.querySingleState(11, attribute);
+            ITmfStateInterval interval = ss.querySingleState(11, attribute);
             assertEquals(4, interval.getStateValue().unboxInt());
 
             interval = ss.querySingleState(24, attribute);
@@ -185,13 +185,7 @@ public class StateSystemPushPopTest {
             interval = ss.querySingleState(25, subAttribute2);
             assertTrue(interval.getStateValue().isNull()); // Stack depth is 1 at that point.
 
-        } catch (AttributeNotFoundException e) {
-            fail(errMsg + e.toString());
-        } catch (StateValueTypeException e) {
-            fail(errMsg + e.toString());
-        } catch (TimeRangeException e) {
-            fail(errMsg + e.toString());
-        } catch (StateSystemDisposedException e) {
+        } catch (AttributeNotFoundException | TimeRangeException | StateSystemDisposedException e) {
             fail(errMsg + e.toString());
         }
     }
@@ -201,29 +195,31 @@ public class StateSystemPushPopTest {
      */
     @Test
     public void testStackTop() {
+        final ITmfStateSystemBuilder ss2 = ss;
+        assertNotNull(ss2);
+
         try {
-            interval = ss.querySingleStackTop(10, attribute);
+            ITmfStateInterval interval = StateSystemUtils.querySingleStackTop(ss2, 10, attribute);
+            assertNotNull(interval);
             assertEquals(value5, interval.getStateValue());
 
-            interval = ss.querySingleStackTop(9, attribute);
+            interval = StateSystemUtils.querySingleStackTop(ss2, 9, attribute);
+            assertNotNull(interval);
             assertEquals(value4, interval.getStateValue());
 
-            interval = ss.querySingleStackTop(13, attribute);
+            interval = StateSystemUtils.querySingleStackTop(ss2, 13, attribute);
+            assertNotNull(interval);
             assertEquals(value3, interval.getStateValue());
 
-            interval = ss.querySingleStackTop(16, attribute);
+            interval = StateSystemUtils.querySingleStackTop(ss2, 16, attribute);
+            assertNotNull(interval);
             assertEquals(value1, interval.getStateValue());
 
-            interval = ss.querySingleStackTop(25, attribute);
+            interval = StateSystemUtils.querySingleStackTop(ss2, 25, attribute);
+            assertNotNull(interval);
             assertEquals(value1, interval.getStateValue());
 
-        } catch (AttributeNotFoundException e) {
-            fail(errMsg + e.toString());
-        } catch (StateValueTypeException e) {
-            fail(errMsg + e.toString());
-        } catch (TimeRangeException e) {
-            fail(errMsg + e.toString());
-        } catch (StateSystemDisposedException e) {
+        } catch (AttributeNotFoundException | TimeRangeException | StateSystemDisposedException e) {
             fail(errMsg + e.toString());
         }
     }
@@ -233,32 +229,29 @@ public class StateSystemPushPopTest {
      */
     @Test
     public void testEmptyStack() {
+        final ITmfStateSystemBuilder ss2 = ss;
+        assertNotNull(ss2);
+
         try {
             /* At the start */
-            interval = ss.querySingleState(1, attribute);
+            ITmfStateInterval interval = ss.querySingleState(1, attribute);
             assertTrue(interval.getStateValue().isNull());
-            interval = ss.querySingleStackTop(1, attribute);
+            interval = StateSystemUtils.querySingleStackTop(ss2, 1, attribute);
             assertEquals(null, interval);
 
             /* Between the two "stacks" in the state history */
             interval = ss.querySingleState(19, attribute);
             assertTrue(interval.getStateValue().isNull());
-            interval = ss.querySingleStackTop(19, attribute);
+            interval = StateSystemUtils.querySingleStackTop(ss2, 19, attribute);
             assertEquals(null, interval);
 
             /* At the end */
             interval = ss.querySingleState(27, attribute);
             assertTrue(interval.getStateValue().isNull());
-            interval = ss.querySingleStackTop(27, attribute);
+            interval = StateSystemUtils.querySingleStackTop(ss2, 27, attribute);
             assertEquals(null, interval);
 
-        } catch (AttributeNotFoundException e) {
-            fail(errMsg + e.toString());
-        } catch (StateValueTypeException e) {
-            fail(errMsg + e.toString());
-        } catch (TimeRangeException e) {
-            fail(errMsg + e.toString());
-        } catch (StateSystemDisposedException e) {
+        } catch (AttributeNotFoundException | TimeRangeException | StateSystemDisposedException e) {
             fail(errMsg + e.toString());
         }
     }
@@ -299,13 +292,7 @@ public class StateSystemPushPopTest {
             assertTrue(state.get(subAttrib3).getStateValue().isNull());
             assertTrue(state.get(subAttrib4).getStateValue().isNull());
 
-        } catch (AttributeNotFoundException e) {
-            fail(errMsg + e.toString());
-        } catch (StateValueTypeException e) {
-            fail(errMsg + e.toString());
-        } catch (TimeRangeException e) {
-            fail(errMsg + e.toString());
-        } catch (StateSystemDisposedException e) {
+        } catch (AttributeNotFoundException | TimeRangeException | StateSystemDisposedException e) {
             fail(errMsg + e.toString());
         }
     }
