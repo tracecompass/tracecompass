@@ -18,6 +18,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  * This file defines all name in the XML Structure for the State Provider
  *
  * @author Florian Wininger
+ * @noimplement This interface only contains static defines
  */
 @SuppressWarnings({ "javadoc", "nls" })
 @NonNullByDefault
@@ -81,6 +82,11 @@ public interface TmfXmlStrings {
     static final String STACK_PUSH = "push";
     static final String STACK_PEEK = "peek";
     static final String CPU = "cpu";
+
+    /**
+     * @since 1.2
+     */
+    static final String TIMESTAMP = "timestamp";
 
     /* Operator type */
     static final String NOT = "not";

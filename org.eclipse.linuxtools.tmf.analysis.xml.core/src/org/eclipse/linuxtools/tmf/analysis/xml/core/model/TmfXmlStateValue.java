@@ -257,6 +257,10 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
         if (fieldName.equals(TmfXmlStrings.CPU)) {
             return TmfStateValue.newValueInt(Integer.valueOf(event.getSource()));
         }
+        /* Exception also for "TIMESTAMP", returns the timestamp of this event */
+        if (fieldName.equals(TmfXmlStrings.TIMESTAMP)) {
+            return TmfStateValue.newValueLong(event.getTimestamp().getValue());
+        }
         if (content.getField(fieldName) == null) {
             return value;
         }
