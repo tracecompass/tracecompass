@@ -458,25 +458,7 @@
                mnemonic="%command.copy.mnemonic"
                style="push">
             <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <or>
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
-                        </instanceof>
-                        <instanceof
-                              value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
-                        </instanceof>
-                     </or>
-                  </iterate>
-               </with>
+                  checkEnabled="true">
             </visibleWhen>
          </command>
          <command
@@ -1259,6 +1241,12 @@
             commandId="org.eclipse.ui.edit.copy">
          <activeWhen>
             <and>
+               <with
+                     variable="activePart">
+                  <instanceof
+                        value="org.eclipse.ui.navigator.CommonNavigator">
+                  </instanceof>
+               </with>
                <count
                      value="1">
                </count>
@@ -1267,6 +1255,12 @@
                   <instanceof
                         value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
                   </instanceof>
+                  <not>
+                     <test
+                           forcePluginActivation="true"
+                           property="org.eclipse.linuxtools.tmf.ui.isExperimentTrace">
+                     </test>
+                  </not>
                </iterate>
             </and>
          </activeWhen>
@@ -1276,6 +1270,12 @@
             commandId="org.eclipse.ui.edit.copy">
          <activeWhen>
             <and>
+               <with
+                     variable="activePart">
+                  <instanceof
+                        value="org.eclipse.ui.navigator.CommonNavigator">
+                  </instanceof>
+               </with>
                <count
                      value="1">
                </count>
