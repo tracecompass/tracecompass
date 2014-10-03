@@ -29,6 +29,11 @@ public class Messages extends NLS {
     public static String Application_WorkspaceRootPermissionError;
     /** Error message if workspace is already in use */
     public static String Application_WorkspaceInUseError;
+    /** Error message if workspace can't be saved during shutdown */
+    public static String Application_WorkspaceSavingError;
+    /** Error message for internal errors */
+    public static String Application_InternalError;
+
     /** Malformed command */
     public static String CliParser_MalformedCommand;
     /** Unkown command */
