@@ -81,10 +81,6 @@ public interface TmfXmlStrings {
     static final String STACK_PUSH = "push";
     static final String STACK_PEEK = "peek";
     static final String CPU = "cpu";
-    /**
-     * @since 1.1
-     */
-    static final String TIMESTAMP = "timestamp";
 
     /* Operator type */
     static final String NOT = "not";
