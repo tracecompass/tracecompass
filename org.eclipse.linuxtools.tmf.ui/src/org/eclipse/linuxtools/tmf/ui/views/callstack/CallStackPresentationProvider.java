@@ -44,6 +44,8 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
 
     private final CallStackView fView;
 
+    private Integer fAverageCharWidth;
+
     private enum State {
         MULTIPLE (new RGB(100, 100, 100)),
         EXEC     (new RGB(0, 200, 0));
@@ -120,7 +122,10 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
 
     @Override
     public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
-        if (bounds.width <= gc.getFontMetrics().getAverageCharWidth()) {
+        if (fAverageCharWidth == null) {
+            fAverageCharWidth = gc.getFontMetrics().getAverageCharWidth();
+        }
+        if (bounds.width <= fAverageCharWidth) {
             return;
         }
         if (!(event instanceof CallStackEvent)) {
