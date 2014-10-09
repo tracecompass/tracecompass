@@ -55,7 +55,7 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
      * Version number of this state provider. Please bump this if you modify the
      * contents of the generated state history in some way.
      */
-    private static final int VERSION = 7;
+    private static final int VERSION = 8;
 
     private static final int IRQ_HANDLER_ENTRY_INDEX = 1;
     private static final int IRQ_HANDLER_EXIT_INDEX = 2;
@@ -289,9 +289,17 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
                 Integer formerThreadNode = ss.getQuarkRelativeAndAdd(getNodeThreads(ss), prevTid.toString());
                 Integer newCurrentThreadNode = ss.getQuarkRelativeAndAdd(getNodeThreads(ss), nextTid.toString());
 
+                /*
+                 * Empirical observations and look into the linux code have
+                 * shown that the TASK_STATE_MAX flag is used internally and
+                 * |'ed with other states, most often the running state, so it
+                 * is ignored from the prevState value.
+                 */
+                prevState = prevState & ~(LinuxValues.TASK_STATE_MAX);
+
                 /* Set the status of the process that got scheduled out. */
                 quark = ss.getQuarkRelativeAndAdd(formerThreadNode, Attributes.STATUS);
-                if (prevState != 0) {
+                if (prevState != LinuxValues.TASK_STATE_RUNNING) {
                     if (prevState == LinuxValues.TASK_STATE_DEAD) {
                         value = TmfStateValue.nullValue();
                     } else {
