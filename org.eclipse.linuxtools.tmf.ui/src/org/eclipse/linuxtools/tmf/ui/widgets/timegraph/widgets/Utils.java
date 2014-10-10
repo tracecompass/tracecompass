@@ -314,6 +314,10 @@ public class Utils {
      * @since 2.0
      */
     public static int drawText(GC gc, String text, int x, int y, int width, boolean isCentered, boolean isTransparent) {
+        if (width < 1) {
+            return 0;
+        }
+
         int len = text.length();
         int textWidth = 0;
         boolean isReallyCentered = isCentered;
