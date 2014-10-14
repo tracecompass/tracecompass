@@ -29,26 +29,58 @@
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-source-plugin</artifactId>
       </plugin>
+      <!-- Do not delete the existing .java parser files in target/ -->
       <plugin>
-        <groupId>org.antlr</groupId>
-        <artifactId>antlr3-maven-plugin</artifactId>
-        <version>3.5.2</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>antlr</goal>
-            </goals>
-          </execution>
-        </executions>
-        <dependencies>
-          <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr-runtime</artifactId>
-            <version>3.5.2</version>
-          </dependency>
-        </dependencies>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>2.5</version>
+            <configuration>
+              <excludeDefaultDirectories>true</excludeDefaultDirectories>
+              <filesets>
+                <fileset>
+                  <directory>target</directory>
+                  <followSymlinks>false</followSymlinks>
+                  <includes>
+                    <include>*/**</include>
+                  </includes>
+                  <excludes>
+                    <exclude>generated-sources/antlr3/org/eclipse/tracecompass/ctf/parser/CTFLexer.java</exclude>
+                    <exclude>generated-sources/antlr3/org/eclipse/tracecompass/ctf/parser/CTFParser.java</exclude>
+                  </excludes>
+                </fileset>
+              </filesets>
+            </configuration>
       </plugin>
     </plugins>
   </build>
+
+  <!-- Only rebuild the CTF grammar files if the ctf-grammar profile is active -->
+  <profiles>
+    <profile>
+      <id>ctf-grammar</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr3-maven-plugin</artifactId>
+            <version>3.5.2</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>antlr</goal>
+                </goals>
+              </execution>
+            </executions>
+            <dependencies>
+              <dependency>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr-runtime</artifactId>
+                <version>3.5.2</version>
+              </dependency>
+            </dependencies>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>
