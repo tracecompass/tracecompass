@@ -1496,10 +1496,14 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         private Iterator<TraceFileSystemElement> extractSelectedFiles(Iterator<TraceFileSystemElement> fileSystemElementsIter, IFolder tempFolder, IProgressMonitor progressMonitor) throws InterruptedException,
                 InvocationTargetException {
             List<TraceFileSystemElement> subList = new ArrayList<>();
+            Map<IPath, String> sourceLocationMap = new HashMap<>();
             // Collect all the elements
             while (fileSystemElementsIter.hasNext()) {
                 ModalContext.checkCanceled(progressMonitor);
                 TraceFileSystemElement element = fileSystemElementsIter.next();
+                sourceLocationMap.put(new Path(element.getFileSystemObject().getName()).removeTrailingSeparator(), element.getSourceLocation());
+                TraceFileSystemElement parentElement = (TraceFileSystemElement) element.getParent();
+                sourceLocationMap.put(new Path(parentElement.getFileSystemObject().getName()).removeTrailingSeparator(), parentElement.getSourceLocation());
                 if (element.isDirectory()) {
                     Object[] array = element.getFiles().getChildren();
                     for (int i = 0; i < array.length; i++) {
@@ -1543,6 +1547,14 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             List<TraceFileSystemElement> list = new ArrayList<>();
             getAllChildren(list, createRootElement);
             Iterator<TraceFileSystemElement> extractedElementsIter = list.iterator();
+            IPath tempPath = new Path(tempFolder.getLocation().toOSString());
+            for (TraceFileSystemElement element : list) {
+                IPath path = new Path(((File) element.getFileSystemObject().getRawFileSystemObject()).getAbsolutePath()).makeRelativeTo(tempPath);
+                element.setSourceLocation(sourceLocationMap.get(path));
+                TraceFileSystemElement parentElement = (TraceFileSystemElement) element.getParent();
+                IPath parentPath = new Path(((File) parentElement.getFileSystemObject().getRawFileSystemObject()).getAbsolutePath()).makeRelativeTo(tempPath);
+                parentElement.setSourceLocation(sourceLocationMap.get(parentPath));
+            }
             return extractedElementsIter;
         }
 
@@ -1711,7 +1723,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             operation.setVirtualFolders(false);
 
             operation.run(new SubProgressMonitor(monitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
-            String sourceLocation = fileSystemElement.getFileSystemObject().getSourceLocation();
+            String sourceLocation = fileSystemElement.getSourceLocation();
             IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(tracePath);
             if (sourceLocation != null) {
                 resource.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
@@ -1853,6 +1865,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         private String fLabel = null;
         private IPath fDestinationContainerPath;
         private FileSystemObjectImportStructureProvider fProvider;
+        private String fSourceLocation;
 
         public TraceFileSystemElement(String name, FileSystemElement parent, boolean isDirectory, FileSystemObjectImportStructureProvider provider) {
             super(name, parent, isDirectory);
@@ -1944,6 +1957,17 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             Object fileSystemObject = super.getFileSystemObject();
             return (IFileSystemObject) fileSystemObject;
         }
+
+        public String getSourceLocation() {
+            if (fSourceLocation == null) {
+                fSourceLocation = getFileSystemObject().getSourceLocation();
+            }
+            return fSourceLocation;
+        }
+
+        public void setSourceLocation(String sourceLocation) {
+            fSourceLocation = sourceLocation;
+        }
     }
 
     /**
@@ -1954,6 +1978,8 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
      */
     private interface IFileSystemObject {
         String getLabel();
+
+        String getName();
 
         String getAbsolutePath(String parentContainerPath);
 
@@ -1982,6 +2008,11 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 return fFileSystemObject.getPath();
             }
             return name;
+        }
+
+        @Override
+        public String getName() {
+            return fFileSystemObject.getName();
         }
 
         @Override
@@ -2042,6 +2073,11 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         }
 
         @Override
+        public String getName() {
+            return fFileSystemObject.getName();
+        }
+
+        @Override
         public String getAbsolutePath(String parentContainerPath) {
             return new Path(parentContainerPath).append(fFileSystemObject.getName()).toOSString();
         }
@@ -2080,6 +2116,11 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         @Override
         public String getLabel() {
             return new Path(fFileSystemObject.getName()).lastSegment();
+        }
+
+        @Override
+        public String getName() {
+            return fFileSystemObject.getName();
         }
 
         @Override
