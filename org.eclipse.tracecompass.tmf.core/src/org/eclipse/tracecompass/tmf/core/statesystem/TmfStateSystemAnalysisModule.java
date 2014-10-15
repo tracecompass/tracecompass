@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -103,14 +104,16 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         TmfStateSystemAnalysisModule module =
                 trace.getAnalysisModuleOfClass(TmfStateSystemAnalysisModule.class, moduleId);
         if (module != null) {
-            module.schedule();
-            module.waitForInitialization();
-            /*
-             * FIXME If we keep a reference to "module", the compiler expects us to
-             * close it. The Analysis Module's API should be reworked to not expose
-             * these objects directly (utility classes instead?)
-             */
-            return module.getStateSystem();
+            IStatus status = module.schedule();
+            if (status.isOK()) {
+                module.waitForInitialization();
+                /*
+                 * FIXME If we keep a reference to "module", the compiler expects us to
+                 * close it. The Analysis Module's API should be reworked to not expose
+                 * these objects directly (utility classes instead?)
+                 */
+                return module.getStateSystem();
+            }
         }
         return null;
     }
@@ -181,14 +184,21 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
             StateSystemBackendType backend = getBackendType();
             String directory;
             File htFile;
+
+            ITmfTrace trace = getTrace();
+            if (trace == null) {
+                // Analysis was cancelled in the meantime
+                fInitialized.countDown();
+                return false;
+            }
             switch (backend) {
             case FULL:
-                directory = TmfTraceManager.getSupplementaryFileDir(getTrace());
+                directory = TmfTraceManager.getSupplementaryFileDir(trace);
                 htFile = new File(directory + getSsFileName());
                 createFullHistory(id, provider, htFile);
                 break;
             case PARTIAL:
-                directory = TmfTraceManager.getSupplementaryFileDir(getTrace());
+                directory = TmfTraceManager.getSupplementaryFileDir(trace);
                 htFile = new File(directory + getSsFileName());
                 createPartialHistory(id, provider, htFile);
                 break;
@@ -202,6 +212,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
                 break;
             }
         } catch (TmfTraceException e) {
+            fInitialized.countDown();
             return false;
         }
         return !mon.isCanceled();

@@ -104,14 +104,16 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
     protected boolean executeAnalysis(IProgressMonitor monitor) throws TmfAnalysisException {
         ITmfTrace trace = getTrace();
         if (trace == null) {
-            /* This analysis's trace should not be null when this is called */
-            throw new IllegalStateException();
+            /* This analysis was cancelled in the meantime */
+            fInitialized.countDown();
+            return false;
         }
 
         IStatus status1 = totalsModule.schedule();
         IStatus status2 = eventTypesModule.schedule();
         if (!(status1.isOK() && status2.isOK())) {
             cancelSubAnalyses();
+            fInitialized.countDown();
             return false;
         }
 
@@ -123,8 +125,9 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
         ITmfStateSystem eventTypesSS = eventTypesModule.getStateSystem();
 
         if (totalsSS == null || eventTypesSS == null) {
-            /* Better safe than sorry... */
-            throw new IllegalStateException();
+            /* This analysis was cancelled in the meantime */
+            fInitialized.countDown();
+            return false;
         }
 
         fStatistics = new TmfStateStatistics(totalsSS, eventTypesSS);

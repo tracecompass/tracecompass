@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
@@ -357,7 +358,10 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
 
         /* Schedule all state systems */
         for (ITmfAnalysisModuleWithStateSystems module : stateSystemModules) {
-            module.schedule();
+            IStatus status = module.schedule();
+            if (!status.isOK()) {
+                return;
+            }
             if (module instanceof TmfStateSystemAnalysisModule) {
                 ((TmfStateSystemAnalysisModule) module).waitForInitialization();
             }

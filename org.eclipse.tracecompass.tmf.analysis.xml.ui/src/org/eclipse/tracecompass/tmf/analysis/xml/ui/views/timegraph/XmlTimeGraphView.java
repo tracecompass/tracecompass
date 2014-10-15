@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -264,7 +265,10 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
             }
 
             for (ITmfAnalysisModuleWithStateSystems module : stateSystemModules) {
-                module.schedule();
+                IStatus status = module.schedule();
+                if (!status.isOK()) {
+                    return;
+                }
                 if (module instanceof TmfStateSystemAnalysisModule) {
                     ((TmfStateSystemAnalysisModule) module).waitForInitialization();
                 }
