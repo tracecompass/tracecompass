@@ -121,8 +121,8 @@ public class Uml2SDTestFacility {
             }
 
             fSdView = (SDView) view;
-            fLoader = (TmfUml2SDSyncLoader)LoadersManager.getInstance().createLoader(
-                    "org.eclipse.linuxtools.tmf.ui.views.uml2sd.loader.TmfUml2SDSyncLoader", fSdView);
+            fLoader = (TmfUml2SDSyncLoader) LoadersManager.getInstance().createLoader(
+                    "org.eclipse.tracecompass.tmf.ui.views.uml2sd.loader.TmfUml2SDSyncLoader", fSdView);
 
             delay(3000);
             fIsInitialized = true;

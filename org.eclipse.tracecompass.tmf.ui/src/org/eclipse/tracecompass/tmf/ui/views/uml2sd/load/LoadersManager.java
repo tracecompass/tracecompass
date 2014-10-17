@@ -43,14 +43,15 @@ public class LoadersManager {
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-    /**
-     * The loader tag for the extension point.
-     */
-    public static final String LOADER_TAG = "uml2SDLoader"; //$NON-NLS-1$
-    /**
-     * The loader prefix.
-     */
-    public static final String LOADER_PREFIX = LOADER_TAG + "."; //$NON-NLS-1$
+
+    /** Namespace of the extension point */
+    private static final String EXT_NAMESPACE = "org.eclipse.linuxtools.tmf.ui"; //$NON-NLS-1$
+
+    /** The loader tag for the extension point */
+    private static final String LOADER_TAG = "uml2SDLoader"; //$NON-NLS-1$
+
+    /** The loader prefix */
+    private static final String LOADER_PREFIX = LOADER_TAG + "."; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -311,7 +312,7 @@ public class LoadersManager {
         }
 
         ArrayList<IConfigurationElement> ret = new ArrayList<>();
-        IExtensionPoint iep = Platform.getExtensionRegistry().getExtensionPoint(Activator.PLUGIN_ID, LOADER_TAG);
+        IExtensionPoint iep = Platform.getExtensionRegistry().getExtensionPoint(EXT_NAMESPACE, LOADER_TAG);
         if (iep == null) {
             return ret;
         }

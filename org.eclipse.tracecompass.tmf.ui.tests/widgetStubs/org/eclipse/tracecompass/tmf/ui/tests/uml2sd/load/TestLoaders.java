@@ -445,7 +445,7 @@ public class TestLoaders implements IUml2SDLoader, ISDFindProvider, ISDFilterPro
             ImageDescriptor imgage;
             try {
                 URL BASIC_URL = new URL("platform", "localhost", "plugin");
-                URL url = new URL(BASIC_URL, (new StringBuilder("plugin/org.eclipse.linuxtools.tmf.ui/icons/")).append(_name).toString());
+                URL url = new URL(BASIC_URL, (new StringBuilder("plugin/org.eclipse.tracecompass.tmf.ui/icons/")).append(_name).toString());
                 imgage = ImageDescriptor.createFromURL(url);
                 return imgage.createImage();
             } catch (Exception e) {

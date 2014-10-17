@@ -33,8 +33,8 @@ public class LoadersManagerTest {
 
     private final static String SDVIEW_WITH_ONE_LOADER = "org.eclipse.linuxtools.tmf.ui.tests.testSDView1Loader";
     private final static String SDVIEW_WITH_MULTIPLE_LOADER = "org.eclipse.linuxtools.tmf.ui.tests.testSDView2Loaders";
-    private final static String TEST_LOADER_CLASS_NAME = "org.eclipse.linuxtools.tmf.ui.tests.uml2sd.load.TestLoaders";
-    private final static String TMF_UML2SD_LOADER_CLASS_NAME = "org.eclipse.linuxtools.tmf.ui.views.uml2sd.loader.TmfUml2SDSyncLoader";
+    private final static String TEST_LOADER_CLASS_NAME = "org.eclipse.tracecompass.tmf.ui.tests.uml2sd.load.TestLoaders";
+    private final static String TMF_UML2SD_LOADER_CLASS_NAME = "org.eclipse.tracecompass.tmf.ui.views.uml2sd.loader.TmfUml2SDSyncLoader";
 
     private static final String LOADER_TAG = "uml2SDLoader";
     private static final String LOADER_PREFIX = LOADER_TAG + ".";

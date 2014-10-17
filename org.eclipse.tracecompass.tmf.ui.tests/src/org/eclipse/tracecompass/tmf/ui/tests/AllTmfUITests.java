@@ -23,16 +23,12 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    org.eclipse.tracecompass.tmf.ui.tests.histogram.AllTests.class,
-    org.eclipse.tracecompass.tmf.ui.tests.project.model.AllTests.class,
-    org.eclipse.tracecompass.tmf.ui.tests.statistics.AllTests.class,
-    /*
-     * Sequence diagram tests disabled during the move to Trace Compass.
-     * TODO Please fix and re-enable
-     */
-// org.eclipse.tracecompass.tmf.ui.tests.views.uml2sd.dialogs.AllTests.class,
-// org.eclipse.tracecompass.tmf.ui.tests.views.uml2sd.load.AllTests.class,
-// org.eclipse.tracecompass.tmf.ui.tests.views.uml2sd.loader.AllTests.class
+        org.eclipse.tracecompass.tmf.ui.tests.histogram.AllTests.class,
+        org.eclipse.tracecompass.tmf.ui.tests.project.model.AllTests.class,
+        org.eclipse.tracecompass.tmf.ui.tests.statistics.AllTests.class,
+        org.eclipse.tracecompass.tmf.ui.tests.views.uml2sd.dialogs.AllTests.class,
+        org.eclipse.tracecompass.tmf.ui.tests.views.uml2sd.load.AllTests.class,
+        org.eclipse.tracecompass.tmf.ui.tests.views.uml2sd.loader.AllTests.class
 })
 public class AllTmfUITests {
 
