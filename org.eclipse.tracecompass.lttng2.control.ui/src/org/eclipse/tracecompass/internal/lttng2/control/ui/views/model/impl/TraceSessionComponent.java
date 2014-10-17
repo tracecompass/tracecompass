@@ -109,10 +109,12 @@ public class TraceSessionComponent extends TraceControlComponent {
 
     private void copyLiveInfo(ISessionInfo sessionInfo) {
         // Since we can't retrieve this information from the node, we copy it over
-        fSessionInfo.setLive(sessionInfo.isLive());
-        fSessionInfo.setLiveDelay(sessionInfo.getLiveDelay());
-        fSessionInfo.setLivePort(sessionInfo.getLivePort());
-        fSessionInfo.setLiveUrl(sessionInfo.getLiveUrl());
+        if (sessionInfo.getLivePort() != null) {
+            fSessionInfo.setLivePort(sessionInfo.getLivePort());
+        }
+        if (sessionInfo.getLiveUrl() != null) {
+            fSessionInfo.setLiveUrl(sessionInfo.getLiveUrl());
+        }
     }
 
     // ------------------------------------------------------------------------

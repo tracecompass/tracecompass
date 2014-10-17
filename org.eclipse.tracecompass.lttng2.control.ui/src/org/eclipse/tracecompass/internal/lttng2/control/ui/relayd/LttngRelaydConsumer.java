@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -47,6 +49,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.CtfTmfTrace;
  */
 public final class LttngRelaydConsumer {
 
+    private static final Pattern PROTOCOL_HOST_PATTERN = Pattern.compile("(\\S+://)*(\\d+\\.\\d+\\.\\d+\\.\\d+)"); //$NON-NLS-1$
     private static final int SIGNAL_THROTTLE_NANOSEC = 10_000_000;
     private static final String ENCODING_UTF_8 = "UTF-8"; //$NON-NLS-1$
 
@@ -104,7 +107,17 @@ public final class LttngRelaydConsumer {
         }
 
         try {
-            fConnection = new Socket(fConnectionInfo.getHost(), fConnectionInfo.getPort());
+            Matcher matcher = PROTOCOL_HOST_PATTERN.matcher(fConnectionInfo.getHost());
+            String host = null;
+            if (matcher.matches()) {
+                host = matcher.group(2);
+            }
+
+            if (host == null || host.isEmpty()) {
+                throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.LttngRelaydConsumer_ErrorConnecting));
+            }
+
+            fConnection = new Socket(host, fConnectionInfo.getPort());
             fRelayd = LttngRelaydConnectorFactory.getNewConnector(fConnection);
             List<SessionResponse> sessions = fRelayd.getSessions();
             SessionResponse selectedSession = null;

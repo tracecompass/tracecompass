@@ -35,7 +35,12 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
     /**
      * The default network URL when creating a live session.
      */
-    public static final String DEFAULT_LIVE_NETWORK_URK = "net://127.0.0.1"; //$NON-NLS-1$
+    public static final String DEFAULT_LIVE_NETWORK_URL = "net://127.0.0.1"; //$NON-NLS-1$
+
+    /**
+     * The default live port for a live session.
+     */
+    public static final int DEFAULT_LIVE_PORT = 5344;
 
     // ------------------------------------------------------------------------
     // Attributes

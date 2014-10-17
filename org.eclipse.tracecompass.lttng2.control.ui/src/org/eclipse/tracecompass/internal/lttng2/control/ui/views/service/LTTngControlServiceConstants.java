@@ -448,6 +448,10 @@ public interface LTTngControlServiceConstants {
      */
     static final Pattern LIST_SNAPSHOT_OUTPUT_PATTERN = Pattern.compile("\\s+\\[(\\d+)\\]\\s+(\\S*)\\:\\s+(\\S*)(.*)"); //$NON-NLS-1$
     /**
+     * Pattern to match the live timer interval line of session list.
+     */
+    static final Pattern LIST_LIVE_TIMER_INTERVAL_PATTERN = Pattern.compile("\\s*Live\\stimer\\sinterval\\s\\(usec\\):\\s(\\d+)"); //$NON-NLS-1$
+    /**
      * Pattern to match snapshot path for network tracing (lttng list <session>)
      * Note: file for protocol is not considered as network trace since local consumer will be used.
      */

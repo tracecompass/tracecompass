@@ -282,6 +282,19 @@ public class LTTngControlService implements ILttngControlService {
                 }
                 continue;
             }
+            matcher = LTTngControlServiceConstants.LIST_LIVE_TIMER_INTERVAL_PATTERN.matcher(line);
+            if (matcher.matches()) {
+                int liveDelay = Integer.parseInt(matcher.group(1));
+                if (liveDelay > 0) {
+                    sessionInfo.setLive(true);
+                    sessionInfo.setLiveUrl(SessionInfo.DEFAULT_LIVE_NETWORK_URL);
+                    sessionInfo.setLivePort(SessionInfo.DEFAULT_LIVE_PORT);
+                    sessionInfo.setLiveDelay(liveDelay);
+                }
+                index++;
+                continue;
+            }
+
             index++;
         }
 

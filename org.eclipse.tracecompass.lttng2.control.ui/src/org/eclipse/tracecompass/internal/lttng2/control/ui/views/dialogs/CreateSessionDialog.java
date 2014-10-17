@@ -71,21 +71,6 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
     private static final String DEFAULT_TEXT = "<" + Messages.EnableChannelDialog_DefaultMessage + ">"; //$NON-NLS-1$ //$NON-NLS-2$
 
     /**
-     * The default port for the connection to Relayd. This actual value is
-     * needed because this is not an optional argument to a command; this is
-     * what is used to connect directly to Relayd from Java through a socket.
-     * There is also currently no way to know the default value by issuing a
-     * command.
-     */
-    private static final int DEFAULT_LIVE_PORT = 5344;
-
-    /**
-     * The default address for the connection to Relayd. Only local is supported
-     * for now. See above comment for why it's needed.
-     */
-    private static final String DEFAULT_LIVE_URL = "127.0.0.1"; //$NON-NLS-1$
-
-    /**
      * Supported network protocols for streaming
      */
     private enum StreamingProtocol {
@@ -723,7 +708,7 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
             label.setLayoutData(layoutData);
 
             fLiveHostAddressText = new Text(fLiveGroup, SWT.NONE);
-            fLiveHostAddressText.setText(DEFAULT_LIVE_URL);
+            fLiveHostAddressText.setText(SessionInfo.DEFAULT_LIVE_NETWORK_URL);
             fLiveHostAddressText.setEnabled(false);
             fLiveHostAddressText.setToolTipText(Messages.TraceControl_CreateSessionLiveConnectionUrlTooltip);
             layoutData = new GridData(GridData.FILL_HORIZONTAL);
@@ -731,7 +716,7 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
             fLiveHostAddressText.setLayoutData(layoutData);
 
             fLivePortText = new Text(fLiveGroup, SWT.NONE);
-            fLivePortText.setText(Integer.toString(DEFAULT_LIVE_PORT));
+            fLivePortText.setText(Integer.toString(SessionInfo.DEFAULT_LIVE_PORT));
             fLivePortText.setToolTipText(Messages.TraceControl_CreateSessionLiveConnectionPortTooltip);
             layoutData = new GridData(GridData.FILL_HORIZONTAL);
             fLivePortText.setLayoutData(layoutData);
@@ -823,8 +808,8 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
         if (fParent.isLiveSupported() && fLiveButton != null) {
             fIsLive = fLiveButton.getSelection();
             fLiveDelay = LTTngControlServiceConstants.UNUSED_VALUE;
-            fLiveUrl = DEFAULT_LIVE_URL;
-            fLivePort = DEFAULT_LIVE_PORT;
+            fLiveUrl = SessionInfo.DEFAULT_LIVE_NETWORK_URL;
+            fLivePort = SessionInfo.DEFAULT_LIVE_PORT;
         }
 
         if (!"".equals(fSessionPath)) { //$NON-NLS-1$
@@ -922,7 +907,7 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
         }
 
         if (fIsLive && fNetworkUrl == null && fControlUrl == null && fDataUrl == null) {
-            fNetworkUrl = SessionInfo.DEFAULT_LIVE_NETWORK_URK;
+            fNetworkUrl = SessionInfo.DEFAULT_LIVE_NETWORK_URL;
         }
 
         // Check for invalid names

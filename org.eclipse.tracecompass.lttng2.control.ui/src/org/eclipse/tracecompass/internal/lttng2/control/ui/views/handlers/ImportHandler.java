@@ -329,7 +329,7 @@ public class ImportHandler extends BaseControlViewHandler {
                     try {
                         lttngRelaydConsumer.connect();
                     } catch (CoreException e) {
-                        new Status(IStatus.ERROR, Activator.PLUGIN_ID, org.eclipse.tracecompass.internal.lttng2.control.ui.relayd.Messages.LttngRelaydConnectionManager_ConnectionError, e);
+                        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, org.eclipse.tracecompass.internal.lttng2.control.ui.relayd.Messages.LttngRelaydConnectionManager_ConnectionError, e);
                     }
                     initializeTraceResource(connectionInfo, lttngRelaydConsumer.getTracePath(), project);
                     return Status.OK_STATUS;
