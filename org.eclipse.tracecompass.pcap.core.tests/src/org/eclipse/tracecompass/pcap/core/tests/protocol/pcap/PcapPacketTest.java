@@ -21,7 +21,11 @@ import static org.junit.Assume.assumeTrue;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.eclipse.tracecompass.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.PcapProtocol;
@@ -42,18 +46,30 @@ import com.google.common.collect.ImmutableMap;
  */
 public class PcapPacketTest {
 
-    private static final Map<String, String> EXPECTED_FIELDS = ImmutableMap.of(
-            "Frame", "36",
-            "Frame Length", "75 bytes",
-            "Capture Length", "75 bytes",
-            "Capture Time", "2005-07-04 05:33:52.829.277.000"
-            );
+    private static final String EXPECTED_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+    private static final String EXPECTED_GMT_TIME = "2005-07-04 09:33:52.829";
 
+    private static final Map<String, String> EXPECTED_FIELDS;
     private static final String EXPECTED_TOSTRING;
     static {
+
+        // Convert known GMT time to default (local) time zone. The local time
+        // is the expected value.
+        String captureTime = "";
+        try {
+            SimpleDateFormat gmtFormat = new SimpleDateFormat(EXPECTED_DATE_FORMAT);
+            gmtFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+            Date gmtDate = gmtFormat.parse(EXPECTED_GMT_TIME);
+
+            SimpleDateFormat defaultFormat = new SimpleDateFormat(EXPECTED_DATE_FORMAT);
+            captureTime = defaultFormat.format(gmtDate);
+        } catch (ParseException e) {
+            fail("failed to parse date");
+        }
+
         StringBuilder sb = new StringBuilder();
         sb.append("Packet Capture 36: 75 bytes on wire, 75 bytes captured.\n");
-        sb.append("Arrival time: 2005-07-04 05:33:52.829.277.000\n");
+        sb.append("Arrival time: " + captureTime + ".277.000\n");
         sb.append("Ethernet II, Source: 00:e0:ed:01:6e:bd, Destination: 00:30:54:00:34:56, Type: Internet Protocol Version 4 (0x0800)\n");
         sb.append("Internet Protocol Version 4, Source: 192.168.1.2, Destination: 192.168.1.1\n");
         sb.append("Version: 4, Identification: 0x69aa, Header Length: 20 bytes, Total Length: 61 bytes\n");
@@ -66,6 +82,12 @@ public class PcapPacketTest {
         sb.append("Payload: ed d4 01 00 00 01 00 00 00 00 00 00 03 66 74 70 07 65 63 69 74 65 6c 65 03 63 6f 6d 00 00 01 00 01");
 
         EXPECTED_TOSTRING = sb.toString();
+        EXPECTED_FIELDS = ImmutableMap.of(
+                "Frame", "36",
+                "Frame Length", "75 bytes",
+                "Capture Length", "75 bytes",
+                "Capture Time", captureTime + ".277.000"
+                );
     }
 
     private ByteBuffer fPayload;
