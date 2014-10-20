@@ -15,8 +15,8 @@
 # installed on your system, you can use this script to generate the Java CTF
 # parser files.
 
-SRC=src/main/antlr3/org/eclipse/linuxtools/ctf/parser
-DEST=target/generated-sources/antlr3/org/eclipse/linuxtools/ctf/parser
+SRC=src/main/antlr3/org/eclipse/tracecompass/ctf/parser
+DEST=target/generated-sources/antlr3/org/eclipse/tracecompass/ctf/parser
 
 antlr3 $SRC/CTFLexer.g -fo $DEST
 antlr3 $SRC/CTFParser.g -fo $DEST
