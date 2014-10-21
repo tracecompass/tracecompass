@@ -22,7 +22,6 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfEventParser;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -112,7 +111,7 @@ public class TmfEventParserStub implements ITmfEventParser {
 
                 final TmfEventField root = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, content.toString(), null);
                 final ITmfEvent event = new TmfEvent(fEventStream,
-                        new TmfTimestamp(ts, -3),     // millisecs
+                        fEventStream.createTimestamp(ts * 1000000L),
                         source, fTypes[typeIndex], root, String.valueOf(reference));
                 return event;
             } catch (final EOFException e) {

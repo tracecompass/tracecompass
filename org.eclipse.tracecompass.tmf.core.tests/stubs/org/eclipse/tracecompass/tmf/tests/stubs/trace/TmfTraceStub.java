@@ -126,6 +126,37 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser, ITmfPersi
     }
 
     /**
+     * Constructor to specify the resource, parser and indexer. The streaming
+     * interval will be 0.
+     *
+     * @param resource
+     *            The trace resource
+     * @param path
+     *            The path to the trace file
+     * @param cacheSize
+     *            The cache size
+     * @param waitForCompletion
+     *            Do we block the caller until the trace is indexed, or not.
+     * @param parser
+     *            The trace parser. If left 'null', it will use a
+     *            {@link TmfEventParserStub}.
+     * @throws TmfTraceException
+     *             If an error occurred opening the trace
+     */
+    public TmfTraceStub(final IResource resource,
+            final String path,
+            final int cacheSize,
+            final boolean waitForCompletion,
+            final ITmfEventParser parser) throws TmfTraceException {
+        super(resource, ITmfEvent.class, path, cacheSize, 0, null);
+        setupTrace(path);
+        setParser((parser != null) ? parser : new TmfEventParserStub(this));
+        if (waitForCompletion) {
+            indexTrace(true);
+        }
+    }
+
+    /**
      * Copy constructor
      *
      * @param trace
@@ -300,6 +331,11 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser, ITmfPersi
             fLock.unlock();
         }
         return null;
+    }
+
+    @Override
+    public ITmfTimestamp createTimestamp(long ts) {
+        return new TmfTimestamp(getTimestampTransform().transform(ts) / 1000000L, ITmfTimestamp.MILLISECOND_SCALE);
     }
 
     @Override
