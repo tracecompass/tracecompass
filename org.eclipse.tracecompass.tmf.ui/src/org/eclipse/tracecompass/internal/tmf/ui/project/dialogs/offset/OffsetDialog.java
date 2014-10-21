@@ -96,8 +96,8 @@ public class OffsetDialog extends Dialog {
     private FilteredTree fViewer;
 
     private boolean fAdvancedMode = true;
-    private TreeColumn fRefTimeColumn;
     private TreeViewerColumn fButtonViewerColumn;
+    private TreeColumn fRefTimeColumn;
     private TreeColumn fTargetTimeColumn;
 
     private abstract class ColumnEditingSupport extends EditingSupport {
@@ -341,16 +341,6 @@ public class OffsetDialog extends Dialog {
             }
         });
 
-        column = createTreeViewerColumn(Messages.OffsetDialog_ReferenceTime, SWT.RIGHT);
-        column.setLabelProvider(new ColumnLabelProvider() {
-            @Override
-            public String getText(Object element) {
-                return super.getText(fRefTimeMap.get(element));
-            }
-        });
-        column.setEditingSupport(new RefTimeEditingSupport(fViewer.getViewer(), textCellEditor));
-        fRefTimeColumn = column.getColumn();
-
         column = createTreeViewerColumn(Messages.OffsetDialog_OffsetTime, SWT.RIGHT);
         column.setLabelProvider(new ColumnLabelProvider() {
             @Override
@@ -373,6 +363,16 @@ public class OffsetDialog extends Dialog {
         column.getColumn().setWidth(TREE_EDITOR_MIN_WIDTH);
         column.getColumn().setResizable(false);
         fButtonViewerColumn = column;
+
+        column = createTreeViewerColumn(Messages.OffsetDialog_ReferenceTime, SWT.RIGHT);
+        column.setLabelProvider(new ColumnLabelProvider() {
+            @Override
+            public String getText(Object element) {
+                return super.getText(fRefTimeMap.get(element));
+            }
+        });
+        column.setEditingSupport(new RefTimeEditingSupport(fViewer.getViewer(), textCellEditor));
+        fRefTimeColumn = column.getColumn();
 
         column = createTreeViewerColumn(Messages.OffsetDialog_TargetTime, SWT.RIGHT);
         column.setLabelProvider(new ColumnLabelProvider() {
@@ -427,7 +427,7 @@ public class OffsetDialog extends Dialog {
             });
             treeEditor.grabHorizontal = true;
             treeEditor.minimumWidth = TREE_EDITOR_MIN_WIDTH;
-            treeEditor.setEditor(applyButton, treeItem, 3);
+            treeEditor.setEditor(applyButton, treeItem, 2);
             treeItem.setData(EDITOR_KEY, applyButton);
         }
 
@@ -487,19 +487,19 @@ public class OffsetDialog extends Dialog {
             Control editor = (Control) treeItem.getData(EDITOR_KEY);
             editor.setVisible(false);
         }
+        fTargetTimeColumn.setWidth(0);
+        fTargetTimeColumn.setResizable(false);
         fRefTimeColumn.setWidth(0);
         fRefTimeColumn.setResizable(false);
         fButtonViewerColumn.getColumn().setWidth(0);
-        fTargetTimeColumn.setWidth(0);
-        fTargetTimeColumn.setResizable(false);
         fAdvancedMessageLabel.setText("");  //$NON-NLS-1$
     }
 
     private void setAdvancedMode() {
         fAdvancedMode = true;
+        fButtonViewerColumn.getColumn().setWidth(TREE_EDITOR_MIN_WIDTH);
         fRefTimeColumn.setWidth((Integer) fRefTimeColumn.getData(WIDTH_KEY));
         fRefTimeColumn.setResizable(true);
-        fButtonViewerColumn.getColumn().setWidth(TREE_EDITOR_MIN_WIDTH);
         fTargetTimeColumn.setWidth((Integer) fTargetTimeColumn.getData(WIDTH_KEY));
         fTargetTimeColumn.setResizable(true);
         for (TreeItem treeItem : fViewer.getViewer().getTree().getItems()) {
