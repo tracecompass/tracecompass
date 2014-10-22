@@ -33,11 +33,6 @@ public interface ITmfEventType {
     // ------------------------------------------------------------------------
 
     /**
-     * The default event type content
-     */
-    public static final String DEFAULT_CONTEXT_ID = "TmfContext"; //$NON-NLS-1$
-
-    /**
      * The default event type name
      */
     public static final String DEFAULT_TYPE_ID = "TmfType"; //$NON-NLS-1$
@@ -45,11 +40,6 @@ public interface ITmfEventType {
     // ------------------------------------------------------------------------
     // Getters
     // ------------------------------------------------------------------------
-
-    /**
-     * @return the event type context
-     */
-    String getContext();
 
     /**
      * @return the event type ID

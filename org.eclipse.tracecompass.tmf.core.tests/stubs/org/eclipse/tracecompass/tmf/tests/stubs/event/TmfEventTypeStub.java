@@ -33,6 +33,6 @@ public class TmfEventTypeStub extends TmfEventType {
     private static ITmfEventField ROOT = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, null,  FIELDS);
 
     public TmfEventTypeStub() {
-        super("UnitTest", "TmfEventTypeStub", ROOT);
+        super("TmfEventTypeStub", ROOT);
     }
 }

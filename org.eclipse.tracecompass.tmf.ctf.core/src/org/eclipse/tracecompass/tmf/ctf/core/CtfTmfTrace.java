@@ -17,6 +17,7 @@ package org.eclipse.tracecompass.tmf.ctf.core;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,9 +36,7 @@ import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
 import org.eclipse.tracecompass.internal.tmf.ctf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
-import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
-import org.eclipse.tracecompass.tmf.core.event.TmfEventTypeManager;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -83,6 +82,9 @@ public class CtfTmfTrace extends TmfTrace
     // -------------------------------------------
     // Fields
     // -------------------------------------------
+
+    private final Map<String, CtfTmfEventType> fContainedEventTypes =
+            Collections.synchronizedMap(new HashMap<String, CtfTmfEventType>());
 
     /* Reference to the CTF Trace */
     private CTFTrace fTrace;
@@ -134,7 +136,7 @@ public class CtfTmfTrace extends TmfTrace
              */
             try (CtfIterator iter = CtfIteratorManager.getIterator(this, ctx)) {
                 for (IEventDeclaration ied : iter.getEventDeclarations()) {
-                    CtfTmfEventType ctfTmfEventType = CtfTmfEventType.get(this, ied.getName());
+                    CtfTmfEventType ctfTmfEventType = fContainedEventTypes.get(ied.getName());
                     if (ctfTmfEventType == null) {
                         List<ITmfEventField> content = new ArrayList<>();
                         /* Should only return null the first time */
@@ -147,7 +149,8 @@ public class CtfTmfTrace extends TmfTrace
                                 content.toArray(new ITmfEventField[content.size()])
                                 );
 
-                        ctfTmfEventType = new CtfTmfEventType(ied.getName(), this, contentTree);
+                        ctfTmfEventType = new CtfTmfEventType(ied.getName(), contentTree);
+                        fContainedEventTypes.put(ctfTmfEventType.getName(), ctfTmfEventType);
                     }
                 }
             }
@@ -388,10 +391,19 @@ public class CtfTmfTrace extends TmfTrace
      * @since 3.0
      */
     @Override
-    public Set<ITmfEventType> getContainedEventTypes() {
-        TmfEventTypeManager instance = TmfEventTypeManager.getInstance();
-        Set<ITmfEventType> eventTypes = instance.getTypes(CtfTmfEventType.computeContextName(this));
-        return ImmutableSet.copyOf(eventTypes);
+    public Set<CtfTmfEventType> getContainedEventTypes() {
+        return ImmutableSet.copyOf(fContainedEventTypes.values());
+    }
+
+    /**
+     * Register an event type to this trace.
+     *
+     * Package-visible so that {@link CtfTmfEvent#getType} can call it.
+     *
+     * FIXME This could probably be made cleaner?
+     */
+    void registerEventType(CtfTmfEventType eventType) {
+        fContainedEventTypes.put(eventType.getName(), eventType);
     }
 
     // -------------------------------------------

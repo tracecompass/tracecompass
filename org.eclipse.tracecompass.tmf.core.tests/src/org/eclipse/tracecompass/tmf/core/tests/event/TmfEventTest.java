@@ -30,7 +30,6 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
-import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
@@ -55,12 +54,11 @@ public class TmfEventTest {
 
     private final String fSource = "Source";
 
-    private final String fContext = ITmfEventType.DEFAULT_CONTEXT_ID;
     private final String fTypeId = "TestType";
     private final String fLabel1 = "AString";
     private final String fLabel2 = "AnInteger";
     private final String[] fLabels = new String[] { fLabel1, fLabel2 };
-    private final TmfEventType fType = new TmfEventType(fContext, fTypeId, TmfEventField.makeRoot(fLabels));
+    private final TmfEventType fType = new TmfEventType(fTypeId, TmfEventField.makeRoot(fLabels));
 
     private final Object fValue1a = "Some string";
     private final Object fValue1b = Integer.valueOf(10);
@@ -336,7 +334,7 @@ public class TmfEventTest {
 
         final String typeId = "OtherTestType";
         final String[] labels = new String[] { fLabel2, fLabel1 };
-        final TmfEventType newType = new TmfEventType(fContext, typeId, TmfEventField.makeRoot(labels));
+        final TmfEventType newType = new TmfEventType(typeId, TmfEventField.makeRoot(labels));
 
         event2 = new TmfEvent(null, 0, fTimestamp1, fSource, newType, fContent1, fReference1);
         assertFalse("equals", event1.equals(event2));

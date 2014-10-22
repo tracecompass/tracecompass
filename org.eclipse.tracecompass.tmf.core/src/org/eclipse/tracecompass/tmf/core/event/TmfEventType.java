@@ -31,7 +31,6 @@ public class TmfEventType implements ITmfEventType {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final String fContext;
     private final String fTypeId;
     private final ITmfEventField fRootField;
 
@@ -43,26 +42,21 @@ public class TmfEventType implements ITmfEventType {
      * Default constructor
      */
     public TmfEventType() {
-        this(DEFAULT_CONTEXT_ID, DEFAULT_TYPE_ID, null);
+        this(DEFAULT_TYPE_ID, null);
     }
 
     /**
      * Full constructor
      *
-     * @param context the type context
      * @param typeId the type name
      * @param root the root field
      */
-    public TmfEventType(final String context, final String typeId, final ITmfEventField root) {
-        if (context == null || typeId == null) {
+    public TmfEventType(final String typeId, final ITmfEventField root) {
+        if (typeId == null) {
             throw new IllegalArgumentException();
         }
-        fContext = context;
         fTypeId = typeId;
         fRootField = root;
-
-        // Register to the event type manager
-        TmfEventTypeManager.getInstance().add(context, this);
     }
 
     /**
@@ -74,7 +68,6 @@ public class TmfEventType implements ITmfEventType {
         if (type == null) {
             throw new IllegalArgumentException();
         }
-        fContext = type.getContext();
         fTypeId  = type.getName();
         fRootField = type.getRootField();
     }
@@ -82,11 +75,6 @@ public class TmfEventType implements ITmfEventType {
     // ------------------------------------------------------------------------
     // ITmfEventType
     // ------------------------------------------------------------------------
-
-    @Override
-    public String getContext() {
-        return fContext;
-    }
 
     @Override
     public String getName() {
@@ -114,7 +102,6 @@ public class TmfEventType implements ITmfEventType {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + fContext.hashCode();
         result = prime * result + fTypeId.hashCode();
         return result;
     }
@@ -131,9 +118,6 @@ public class TmfEventType implements ITmfEventType {
             return false;
         }
         final TmfEventType other = (TmfEventType) obj;
-        if (!fContext.equals(other.fContext)) {
-            return false;
-        }
         if (!fTypeId.equals(other.fTypeId)) {
             return false;
         }
@@ -143,7 +127,7 @@ public class TmfEventType implements ITmfEventType {
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-        return "TmfEventType [fContext=" + fContext + ", fTypeId=" + fTypeId + "]";
+        return "TmfEventType [fTypeId=" + fTypeId + "]";
     }
 
 }

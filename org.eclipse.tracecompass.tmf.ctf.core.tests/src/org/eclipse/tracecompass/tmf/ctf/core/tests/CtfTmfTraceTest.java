@@ -200,7 +200,7 @@ public class CtfTmfTraceTest {
      */
     @Test
     public void testGetContainedEventTypes() {
-        Set<ITmfEventType> result = fixture.getContainedEventTypes();
+        Set<? extends ITmfEventType> result = fixture.getContainedEventTypes();
         assertNotNull(result);
         assertFalse(result.isEmpty());
     }
@@ -365,7 +365,7 @@ public class CtfTmfTraceTest {
      */
     @Test
     public void testEventLookup() {
-        Set<ITmfEventType> eventTypes = fixture.getContainedEventTypes();
+        Set<? extends ITmfEventType> eventTypes = fixture.getContainedEventTypes();
         Set<String> eventNames = TmfEventTypeCollectionHelper.getEventNames(eventTypes);
         assertTrue(eventNames.contains("sched_switch"));
         assertFalse(eventNames.contains("Sched_switch"));

@@ -12,7 +12,6 @@
 
 package org.eclipse.tracecompass.tmf.tests.stubs.trace.text;
 
-import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
 
@@ -45,7 +44,7 @@ public class SyslogEventType extends TmfEventType {
      * Default Constructor
      */
     public SyslogEventType() {
-        super(ITmfEventType.DEFAULT_CONTEXT_ID, TYPE_ID, TmfEventField.makeRoot(LABELS));
+        super(TYPE_ID, TmfEventField.makeRoot(LABELS));
     }
 
 }

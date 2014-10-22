@@ -45,7 +45,6 @@ public class TmfTreeContentProviderTest {
 
     private static final String fTestName = "TreeContentProviderTest";
 
-    private final String fContext = "UnitTest";
     private final String fTypeId1 = "Some type1";
     private final String fTypeId2 = "Some type2";
 
@@ -58,8 +57,8 @@ public class TmfTreeContentProviderTest {
 
     private final String fSource = "Source";
 
-    private final TmfEventType fType1 = new TmfEventType(fContext, fTypeId1, TmfEventField.makeRoot(fLabels));
-    private final TmfEventType fType2 = new TmfEventType(fContext, fTypeId2, TmfEventField.makeRoot(fLabels));
+    private final TmfEventType fType1 = new TmfEventType(fTypeId1, TmfEventField.makeRoot(fLabels));
+    private final TmfEventType fType2 = new TmfEventType(fTypeId2, TmfEventField.makeRoot(fLabels));
 
     private final String fReference = "Some reference";
 

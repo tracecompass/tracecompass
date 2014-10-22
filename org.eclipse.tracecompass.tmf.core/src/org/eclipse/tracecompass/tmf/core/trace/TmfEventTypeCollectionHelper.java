@@ -38,7 +38,7 @@ public final class TmfEventTypeCollectionHelper {
      * @return a set of the names of these events, if some names are clashing
      *         they will only appear once
      */
-    public static Set<String> getEventNames(Iterable<ITmfEventType> eventTypes) {
+    public static Set<String> getEventNames(Iterable<? extends ITmfEventType> eventTypes) {
         Set<String> retSet = new HashSet<>();
         for (ITmfEventType eventType : eventTypes) {
             retSet.add(eventType.getName());

@@ -27,12 +27,6 @@ public class PcapEventType extends TmfEventType {
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
     /**
-     * The default Context ID for a PcapEvent
-     */
-    @SuppressWarnings("null")
-    public static final @NonNull String DEFAULT_PCAP_CONTEXT_ID = Messages.PcapEventType_DefaultContext == null ? EMPTY_STRING : Messages.PcapEventType_DefaultContext;
-
-    /**
      * The default Pcap Type ID for a PcapEvent
      */
     @SuppressWarnings("null")
@@ -54,7 +48,7 @@ public class PcapEventType extends TmfEventType {
      *            the root field
      */
     public PcapEventType(final String typeId, final @Nullable ITmfEventField root) {
-        super(DEFAULT_PCAP_CONTEXT_ID, typeId, root);
+        super(typeId, root);
     }
 
     /**

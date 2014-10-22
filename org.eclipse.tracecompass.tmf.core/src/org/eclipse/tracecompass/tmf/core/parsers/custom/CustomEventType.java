@@ -24,8 +24,6 @@ import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
  */
 public abstract class CustomEventType extends TmfEventType {
 
-    private static String CONTEXT_ID = "CustomEventType"; //$NON-NLS-1$
-
     /**
      * Constructor
      *
@@ -33,7 +31,7 @@ public abstract class CustomEventType extends TmfEventType {
      *            Trace definition
      */
     public CustomEventType(CustomTraceDefinition definition) {
-        super(CONTEXT_ID, definition.definitionName, getRootField(definition));
+        super(definition.definitionName, getRootField(definition));
     }
 
     private static ITmfEventField getRootField(CustomTraceDefinition definition) {

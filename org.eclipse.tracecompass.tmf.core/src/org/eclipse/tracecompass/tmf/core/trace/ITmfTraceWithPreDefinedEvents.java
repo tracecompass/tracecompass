@@ -54,6 +54,6 @@ public interface ITmfTraceWithPreDefinedEvents {
      *
      * @return The set of events that might be present in the trace
      */
-    Set<ITmfEventType> getContainedEventTypes();
+    Set<? extends ITmfEventType> getContainedEventTypes();
 
 }

@@ -19,7 +19,6 @@ import static org.junit.Assert.fail;
 
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
-import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
@@ -32,7 +31,6 @@ import org.junit.Test;
  */
 public class TmfAsyncSequenceDiagramEventTest {
 
-    private final String fContext = ITmfEventType.DEFAULT_CONTEXT_ID;
     private final String fTypeId  = "Some type";
     private final String fLabel0  = "label1";
     private final String fLabel1  = "label2";
@@ -41,7 +39,7 @@ public class TmfAsyncSequenceDiagramEventTest {
     private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, (byte) 2, 5);
     private final TmfTimestamp fTimestamp2 = new TmfTimestamp(12350, (byte) 2, 5);
     private final String       fSource     = "Source";
-    private final TmfEventType fType       = new TmfEventType(fContext, fTypeId, TmfEventField.makeRoot(fLabels));
+    private final TmfEventType fType       = new TmfEventType(fTypeId, TmfEventField.makeRoot(fLabels));
     private final String       fReference  = "Some reference";
 
     private final ITmfEvent fEvent1;

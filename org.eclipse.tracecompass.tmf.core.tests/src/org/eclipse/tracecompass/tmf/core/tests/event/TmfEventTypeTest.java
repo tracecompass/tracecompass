@@ -38,9 +38,6 @@ public class TmfEventTypeTest {
     // Variables
     // ------------------------------------------------------------------------
 
-    private final String fContext1 = "JUnit context 1";
-    private final String fContext2 = "JUnit context 2";
-
     private final String fTypeId1 = "Some type";
     private final String fTypeId2 = "Some other type";
 
@@ -52,10 +49,10 @@ public class TmfEventTypeTest {
     private final String[] fLabels1 = new String[] { fLabel0, fLabel1 };
     private final String[] fLabels2 = new String[] { fLabel1, fLabel0, fLabel2 };
 
-    private final ITmfEventType fType0 = new TmfEventType(fContext1, fTypeId1, TmfEventField.makeRoot(fLabels0));
-    private final ITmfEventType fType1 = new TmfEventType(fContext1, fTypeId2, TmfEventField.makeRoot(fLabels1));
-    private final ITmfEventType fType2 = new TmfEventType(fContext2, fTypeId1, TmfEventField.makeRoot(fLabels2));
-    private final ITmfEventType fType3 = new TmfEventType(fContext2, fTypeId2, TmfEventField.makeRoot(fLabels1));
+    private final ITmfEventType fType0 = new TmfEventType(fTypeId1, TmfEventField.makeRoot(fLabels0));
+    private final ITmfEventType fType1 = new TmfEventType(fTypeId2, TmfEventField.makeRoot(fLabels1));
+    private final ITmfEventType fType2 = new TmfEventType(fTypeId1, TmfEventField.makeRoot(fLabels2));
+    private final ITmfEventType fType3 = new TmfEventType(fTypeId2, TmfEventField.makeRoot(fLabels1));
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -64,7 +61,6 @@ public class TmfEventTypeTest {
     @Test
     public void testDefaultConstructor() {
         final ITmfEventType type = new TmfEventType();
-        assertEquals("getContext", ITmfEventType.DEFAULT_CONTEXT_ID, type.getContext());
         assertEquals("getName", ITmfEventType.DEFAULT_TYPE_ID, type.getName());
         assertNull("getRootField", type.getRootField());
         assertEquals("getFieldNames", 0, type.getFieldNames().size());
@@ -72,24 +68,21 @@ public class TmfEventTypeTest {
 
     @Test
     public void testFullConstructor() {
-        final ITmfEventType type0 = new TmfEventType(fContext1, fTypeId1, TmfEventField.makeRoot(fLabels0));
-        assertEquals("getContext", fContext1, type0.getContext());
+        final ITmfEventType type0 = new TmfEventType(fTypeId1, TmfEventField.makeRoot(fLabels0));
         assertEquals("getName", fTypeId1, type0.getName());
         assertEquals("getRootField", TmfEventField.makeRoot(fLabels0), type0.getRootField());
         final Collection<String> labels0 = type0.getFieldNames();
         assertEquals("getFieldNames length", fLabels0.length, labels0.size());
         assertArrayEquals(fLabels0, labels0.toArray(new String[labels0.size()]));
 
-        final ITmfEventType type1 = new TmfEventType(fContext1, fTypeId1, TmfEventField.makeRoot(fLabels1));
-        assertEquals("getContext", fContext1, type1.getContext());
+        final ITmfEventType type1 = new TmfEventType(fTypeId1, TmfEventField.makeRoot(fLabels1));
         assertEquals("getName", fTypeId1, type1.getName());
         assertEquals("getRootField", TmfEventField.makeRoot(fLabels1), type1.getRootField());
         final Collection<String> labels1 = type1.getFieldNames();
         assertEquals("getFieldNames length", fLabels1.length, labels1.size());
         assertArrayEquals(fLabels1, labels1.toArray(new String[labels1.size()]));
 
-        final ITmfEventType type2 = new TmfEventType(fContext2, fTypeId2, TmfEventField.makeRoot(fLabels2));
-        assertEquals("getContext", fContext2, type2.getContext());
+        final ITmfEventType type2 = new TmfEventType(fTypeId2, TmfEventField.makeRoot(fLabels2));
         assertEquals("getName", fTypeId2, type2.getName());
         assertEquals("getRootField", TmfEventField.makeRoot(fLabels2), type2.getRootField());
         final Collection<String> labels2 = type2.getFieldNames();
@@ -97,27 +90,16 @@ public class TmfEventTypeTest {
         assertArrayEquals(fLabels2, labels2.toArray(new String[labels2.size()]));
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testConstructorCornerCases() {
-        try {
-            new TmfEventType(null, fTypeId1, null);
-            fail("TmfEventType: null context");
-        } catch (final IllegalArgumentException e) {
-        }
-
-        try {
-            new TmfEventType(fContext1, null, null);
-            fail("TmfEventType: null type");
-        } catch (final IllegalArgumentException e) {
-        }
+        new TmfEventType(null, null);
     }
 
     @Test
     public void testCopyConstructor() {
-        final TmfEventType original = new TmfEventType(fContext1, fTypeId1, TmfEventField.makeRoot(fLabels1));
+        final TmfEventType original = new TmfEventType(fTypeId1, TmfEventField.makeRoot(fLabels1));
         final TmfEventType copy = new TmfEventType(original);
 
-        assertEquals("getContext", fContext1, copy.getContext());
         assertEquals("getName", fTypeId1, copy.getName());
         assertEquals("getRootField", TmfEventField.makeRoot(fLabels1), copy.getRootField());
         final Collection<String> labels1 = copy.getFieldNames();
@@ -220,13 +202,12 @@ public class TmfEventTypeTest {
 
     @Test
     public void testToString() {
-        final String expected1 = "TmfEventType [fContext=" + ITmfEventType.DEFAULT_CONTEXT_ID +
-                ", fTypeId=" + ITmfEventType.DEFAULT_TYPE_ID + "]";
+        final String expected1 = "TmfEventType [fTypeId=" + ITmfEventType.DEFAULT_TYPE_ID + "]";
         final TmfEventType type1 = new TmfEventType();
         assertEquals("toString", expected1, type1.toString());
 
-        final String expected2 = "TmfEventType [fContext=" + fContext1 + ", fTypeId=" + fTypeId1 + "]";
-        final TmfEventType type2 = new TmfEventType(fContext1, fTypeId1, TmfEventField.makeRoot(fLabels1));
+        final String expected2 = "TmfEventType [fTypeId=" + fTypeId1 + "]";
+        final TmfEventType type2 = new TmfEventType(fTypeId1, TmfEventField.makeRoot(fLabels1));
         assertEquals("toString", expected2, type2.toString());
     }
 
