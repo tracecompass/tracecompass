@@ -177,18 +177,6 @@ public interface IStateHistoryBackend {
             StateSystemDisposedException;
 
     /**
-     * Simple check to make sure the requested timestamps are within the borders
-     * of this state history. This is used internally, but could also be used by
-     * the request sender (to check before sending in a lot of requests for
-     * example).
-     *
-     * @param t
-     *            The queried timestamp
-     * @return True if the timestamp is within range, false if not.
-     */
-    boolean checkValidTime(long t);
-
-    /**
      * Debug method to print the contents of the history backend.
      *
      * @param writer

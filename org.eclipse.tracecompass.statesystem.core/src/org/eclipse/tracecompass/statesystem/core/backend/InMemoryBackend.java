@@ -171,8 +171,7 @@ public class InMemoryBackend implements IStateHistoryBackend {
         throw new AttributeNotFoundException();
     }
 
-    @Override
-    public boolean checkValidTime(long t) {
+    private boolean checkValidTime(long t) {
         if (t >= startTime && t <= latestTime) {
             return true;
         }

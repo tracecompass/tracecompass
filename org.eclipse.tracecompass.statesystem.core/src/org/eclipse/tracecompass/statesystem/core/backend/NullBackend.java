@@ -105,17 +105,6 @@ public class NullBackend implements IStateHistoryBackend {
         return null;
     }
 
-    /**
-     * Null back-ends cannot run queries.
-     *
-     * @return Always returns false.
-     */
-    @Override
-    public boolean checkValidTime(long t) {
-        /* Cannot do past queries */
-        return false;
-    }
-
     @Override
     public void debugPrint(PrintWriter writer) {
         writer.println("Null history backend"); //$NON-NLS-1$

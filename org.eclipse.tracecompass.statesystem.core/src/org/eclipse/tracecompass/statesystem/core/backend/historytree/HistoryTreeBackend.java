@@ -214,8 +214,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         return getRelevantInterval(t, attributeQuark);
     }
 
-    @Override
-    public boolean checkValidTime(long t) {
+    private boolean checkValidTime(long t) {
         return (t >= sht.getTreeStart() && t <= sht.getTreeEnd());
     }
 

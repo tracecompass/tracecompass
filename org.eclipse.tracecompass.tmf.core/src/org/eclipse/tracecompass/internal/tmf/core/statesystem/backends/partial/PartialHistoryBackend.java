@@ -261,8 +261,7 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public boolean checkValidTime(long t) {
+    private boolean checkValidTime(long t) {
         return (t >= getStartTime() && t <= getEndTime());
     }
 
