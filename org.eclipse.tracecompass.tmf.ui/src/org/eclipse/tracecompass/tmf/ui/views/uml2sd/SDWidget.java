@@ -545,7 +545,8 @@ public class SDWidget extends ScrollView implements SelectionListener,
     public void setSite(ViewPart viewSite) {
         fSite = viewSite;
         fSite.getSite().setSelectionProvider(fSelProvider);
-        IContextService service = (IContextService) fSite.getSite().getWorkbenchWindow().getService(IContextService.class);
+        Object serviceObject = fSite.getSite().getWorkbenchWindow().getService(IContextService.class);
+        IContextService service = (IContextService) serviceObject;
         service.activateContext("org.eclipse.linuxtools.tmf.ui.view.uml2sd.context"); //$NON-NLS-1$
         service.activateContext(IContextIds.CONTEXT_ID_WINDOW);
     }

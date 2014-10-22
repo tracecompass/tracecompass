@@ -831,8 +831,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             @Override
             public void run() {
                 IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-                IHandlerService handlerService = (IHandlerService) activePage.getActiveEditor().getSite().getService(IHandlerService.class);
-                ICommandService cmdService = (ICommandService) activePage.getActiveEditor().getSite().getService(ICommandService.class);
+                Object handlerServiceObject = activePage.getActiveEditor().getSite().getService(IHandlerService.class);
+                IHandlerService handlerService = (IHandlerService) handlerServiceObject;
+                Object cmdServiceObject = activePage.getActiveEditor().getSite().getService(ICommandService.class);
+                ICommandService cmdService = (ICommandService) cmdServiceObject;
                 try {
                     HashMap<String, Object> parameters = new HashMap<>();
                     Command command = cmdService.getCommand(ExportToTextCommandHandler.COMMAND_ID);
