@@ -75,6 +75,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
@@ -430,6 +432,27 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             column.pack();
             if (col instanceof TmfMarginColumn) {
                 column.setResizable(false);
+                column.addControlListener(new ControlAdapter() {
+                    /*
+                     * Make sure that the margin column is always first
+                     */
+                    @Override
+                    public void controlMoved(ControlEvent e) {
+                        int[] order = fTable.getColumnOrder();
+                        if (order[0] == MARGIN_COLUMN_INDEX) {
+                            return;
+                        }
+                        for (int i = order.length - 1; i > 0; i--) {
+                            if (order[i] == MARGIN_COLUMN_INDEX) {
+                                order[i] = order[i - 1];
+                                order[i - 1] = MARGIN_COLUMN_INDEX;
+                            }
+                        }
+                        fTable.setColumnOrder(order);
+                    }
+                });
+            } else {
+                column.setMoveable(true);
             }
         }
 
@@ -841,8 +864,13 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     ParameterizedCommand cmd = ParameterizedCommand.generateCommand(command, parameters);
 
                     IEvaluationContext context = handlerService.getCurrentState();
-                    // Omit the margin column
-                    List<TmfEventTableColumn> exportColumns = fColumns.subList(EVENT_COLUMNS_START_INDEX, fColumns.size());
+                    List<TmfEventTableColumn> exportColumns = new ArrayList<>();
+                    for (int i : fTable.getColumnOrder()) {
+                        // Omit the margin column
+                        if (i >= EVENT_COLUMNS_START_INDEX) {
+                            exportColumns.add(fColumns.get(i));
+                        }
+                    }
                     context.addVariable(ExportToTextCommandHandler.TMF_EVENT_TABLE_COLUMNS_ID, exportColumns);
 
                     handlerService.executeCommandInContext(cmd, null, context);
@@ -2040,7 +2068,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * @since 3.0
      */
     public String[] getItemStrings(ITmfEvent event) {
-        return getItemStrings(fColumns, event);
+        List<TmfEventTableColumn> columns = new ArrayList<>();
+        for (int i : fTable.getColumnOrder()) {
+            columns.add(fColumns.get(i));
+        }
+        return getItemStrings(columns, event);
     }
 
     /**

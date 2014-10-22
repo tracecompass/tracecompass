@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 Ericsson
+ * Copyright (c) 2010, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -92,6 +92,7 @@ public class TmfVirtualTable extends Composite {
 
     private boolean fResetTopIndex = false;      // Flag to trigger reset of top index
     private ControlAdapter fResizeListener;      // Resize listener to update visible rows
+    private ControlAdapter fColumnMoveListener;  // Column move listener to redraw column headers
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -170,6 +171,14 @@ public class TmfVirtualTable extends Composite {
             }
         };
         fTable.addControlListener(fResizeListener);
+
+        fColumnMoveListener = new ControlAdapter() {
+            @Override
+            public void controlMoved(ControlEvent e) {
+                fTable.setHeaderVisible(false);
+                fTable.setHeaderVisible(true);
+            }
+        };
 
         // Implement a "fake" tooltip
         final String TOOLTIP_DATA_KEY = "_TABLEITEM"; //$NON-NLS-1$
@@ -640,6 +649,13 @@ public class TmfVirtualTable extends Composite {
          */
         column.addControlListener(fResizeListener);
 
+        /*
+         * Work around a display glitch (probably a GTK glitch) where
+         * the moved column's header becomes invisible and unselectable
+         * until you focus on another one.
+         */
+        column.addControlListener(fColumnMoveListener);
+
         return column;
     }
 
@@ -848,6 +864,36 @@ public class TmfVirtualTable extends Composite {
      */
     public TableColumn[] getColumns() {
         return fTable.getColumns();
+    }
+
+    /**
+     * Returns an array of zero-relative integers that map
+     * the creation order of the receiver's columns to the
+     * order in which they are currently being displayed.
+     * <p>
+     * Specifically, the indices of the returned array represent
+     * the current visual order of the columns, and the contents
+     * of the array represent the creation order of the columns.
+     *
+     * @return the current visual order of the receiver's columns
+     */
+    public int[] getColumnOrder() {
+        return fTable.getColumnOrder();
+    }
+
+    /**
+     * Sets the order that the columns in the receiver should
+     * be displayed in to the given argument which is described
+     * in terms of the zero-relative ordering of when the columns
+     * were added.
+     * <p>
+     * Specifically, the contents of the array represent the
+     * original position of each column at the time its creation.
+     *
+     * @param order the new order to display the columns
+     */
+    public void setColumnOrder(int[] order) {
+        fTable.setColumnOrder(order);
     }
 
     /**
