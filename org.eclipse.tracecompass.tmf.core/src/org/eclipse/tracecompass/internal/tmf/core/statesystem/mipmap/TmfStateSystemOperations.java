@@ -281,16 +281,13 @@ public final class TmfStateSystemOperations {
                 currentLevelInterval = ss.querySingleState(range.getFirst(), levelQuark);
             }
 
-            if (currentLevelInterval != null && isFullyOverlapped(range, currentLevelInterval)) {
+            if (isFullyOverlapped(range, currentLevelInterval)) {
                 if (!currentLevelInterval.getStateValue().isNull()) {
                     intervals.add(currentLevelInterval);
                 }
                 range = updateTimeRange(range, currentLevelInterval);
             } else {
                 if (level == 0) {
-                    if (currentLevelInterval == null) {
-                        return;
-                    }
                     if (!currentLevelInterval.getStateValue().isNull()) {
                         intervals.add(currentLevelInterval);
                     }

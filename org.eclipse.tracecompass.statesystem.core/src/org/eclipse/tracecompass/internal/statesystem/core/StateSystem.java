@@ -29,7 +29,6 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.statesystem.core.interval.TmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
@@ -552,15 +551,13 @@ public class StateSystem implements ITmfStateSystemBuilder {
             throw new StateSystemDisposedException();
         }
 
-        List<ITmfStateInterval> stateInfo = new ArrayList<>(getNbAttributes());
+        final int nbAttr = getNbAttributes();
+        List<ITmfStateInterval> stateInfo = new ArrayList<>(nbAttr);
 
         /* Bring the size of the array to the current number of attributes */
-        for (int i = 0; i < getNbAttributes(); i++) {
+        for (int i = 0; i < nbAttr; i++) {
             stateInfo.add(null);
         }
-
-        /* Query the storage backend */
-        backend.doQuery(stateInfo, t);
 
         /*
          * If we are currently building the history, also query the "ongoing"
@@ -570,14 +567,15 @@ public class StateSystem implements ITmfStateSystemBuilder {
             transState.doQuery(stateInfo, t);
         }
 
+        /* Query the storage backend */
+        backend.doQuery(stateInfo, t);
+
         /*
          * We should have previously inserted an interval for every attribute.
-         * If we do happen do see a 'null' object here, just replace it with a a
-         * dummy internal with a null value, to avoid NPE's further up.
          */
-        for (int i = 0; i < stateInfo.size(); i++) {
-            if (stateInfo.get(i) == null) {
-                stateInfo.set(i, new TmfStateInterval(t, t, i, TmfStateValue.nullValue()));
+        for (ITmfStateInterval interval : stateInfo) {
+            if (interval == null) {
+                throw new IllegalStateException("Incoherent interval storage"); //$NON-NLS-1$
             }
         }
         return stateInfo;
@@ -600,13 +598,12 @@ public class StateSystem implements ITmfStateSystemBuilder {
             ret = backend.doSingularQuery(t, attributeQuark);
         }
 
-        /*
-         * Return a fake interval if we could not find anything in the history.
-         * We do NOT want to return 'null' here.
-         */
         if (ret == null) {
-            return new TmfStateInterval(t, this.getCurrentEndTime(),
-                    attributeQuark, TmfStateValue.nullValue());
+            /*
+             * If we did our job correctly, there should be intervals for every
+             * possible attribute, over all the valid time range.
+             */
+            throw new IllegalStateException("Incoherent interval storage"); //$NON-NLS-1$
         }
         return ret;
     }

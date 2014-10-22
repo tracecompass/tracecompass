@@ -14,12 +14,16 @@ package org.eclipse.tracecompass.statesystem.core.backend.historytree;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.statesystem.core.Activator;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTInterval;
+import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
+import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 
@@ -33,8 +37,8 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
         implements Runnable {
 
-    private BlockingQueue<HTInterval> intervalQueue;
-    private final Thread shtThread;
+    private final @NonNull BlockingQueue<HTInterval> intervalQueue;
+    private final @NonNull Thread shtThread;
 
     /**
      * New state history constructor
@@ -172,24 +176,23 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
 
     @Override
     public void run() {
-        if (intervalQueue == null) {
-            Activator.getDefault().logError("Cannot start the storage backend without its interval queue."); //$NON-NLS-1$
-            return;
-        }
         HTInterval currentInterval;
         try {
             currentInterval = intervalQueue.take();
             while (currentInterval.getStartTime() != -1) {
                 /* Send the interval to the History Tree */
-                sht.insertInterval(currentInterval);
+                getSHT().insertInterval(currentInterval);
                 currentInterval = intervalQueue.take();
             }
-            assert (currentInterval.getAttribute() == -1);
+            if (currentInterval.getAttribute() != -1) {
+                /* Make sure this is the "poison pill" we are waiting for */
+                throw new IllegalStateException();
+            }
             /*
              * We've been told we're done, let's write down everything and quit.
              * The end time of this "signal interval" is actually correct.
              */
-            sht.closeTree(currentInterval.getEndTime());
+            getSHT().closeTree(currentInterval.getEndTime());
             return;
         } catch (InterruptedException e) {
             /* We've been interrupted abnormally */
@@ -198,6 +201,69 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
             /* This also should not happen */
             Activator.getDefault().logError("Error starting the state system", e); //$NON-NLS-1$
         }
+    }
+
+    // ------------------------------------------------------------------------
+    // Query methods
+    // ------------------------------------------------------------------------
+
+    @Override
+    public void doQuery(List<ITmfStateInterval> currentStateInfo, long t)
+            throws TimeRangeException, StateSystemDisposedException {
+        super.doQuery(currentStateInfo, t);
+
+        if (isFinishedBuilding) {
+            /*
+             * The history tree is the only place to look for intervals once
+             * construction is finished.
+             */
+            return;
+        }
+
+        /*
+         * It is possible we may have missed some intervals due to them being in
+         * the queue while the query was ongoing. Go over the results to see if
+         * we missed any.
+         */
+        for (int i = 0; i < currentStateInfo.size(); i++) {
+            if (currentStateInfo.get(i) == null) {
+                /* Query the missing interval via "unicast" */
+                ITmfStateInterval interval = doSingularQuery(t, i);
+                currentStateInfo.set(i, interval);
+            }
+        }
+    }
+
+    @Override
+    public ITmfStateInterval doSingularQuery(long t, int attributeQuark)
+            throws TimeRangeException, StateSystemDisposedException {
+        ITmfStateInterval ret = super.doSingularQuery(t, attributeQuark);
+        if (ret != null) {
+            return ret;
+        }
+
+        /*
+         * We couldn't find the interval in the history tree. It's possible that
+         * it is currently in the intervalQueue. Look for it there. Note that
+         * ArrayBlockingQueue's iterator() is thread-safe (no need to lock the
+         * queue).
+         */
+        for (ITmfStateInterval interval : intervalQueue) {
+            if (interval.getAttribute() == attributeQuark && interval.intersects(t)) {
+                return interval;
+            }
+        }
+
+        /*
+         * If we missed it again, it's because it got inserted in the tree
+         * *while we were iterating* on the queue. One last pass in the tree
+         * should find it.
+         *
+         * This case is really rare, which is why we do a second pass at the
+         * end if needed, instead of systematically checking in the queue first
+         * (which is slow).
+         */
+        return super.doSingularQuery(t, attributeQuark);
     }
 
 }

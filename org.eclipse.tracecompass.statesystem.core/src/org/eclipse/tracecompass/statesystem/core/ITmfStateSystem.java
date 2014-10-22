@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.statesystem.core;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -306,7 +307,7 @@ public interface ITmfStateSystem {
      * @throws StateSystemDisposedException
      *             If the query is sent after the state system has been disposed
      */
-    List<ITmfStateInterval> queryFullState(long t)
+    @NonNull List<ITmfStateInterval> queryFullState(long t)
             throws StateSystemDisposedException;
 
     /**
@@ -331,6 +332,6 @@ public interface ITmfStateSystem {
      * @throws StateSystemDisposedException
      *             If the query is sent after the state system has been disposed
      */
-    ITmfStateInterval querySingleState(long t, int attributeQuark)
+    @NonNull ITmfStateInterval querySingleState(long t, int attributeQuark)
             throws AttributeNotFoundException, StateSystemDisposedException;
 }

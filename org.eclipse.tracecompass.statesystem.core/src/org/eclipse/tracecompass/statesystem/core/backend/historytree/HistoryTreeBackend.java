@@ -42,14 +42,11 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
 
     /**
      * The history tree that sits underneath.
-     *
-     * Using default visibility to only allow {@link ThreadedHistoryTreeBackend}
-     * to see it.
      */
-    final HistoryTree sht;
+    private final HistoryTree sht;
 
     /** Indicates if the history tree construction is done */
-    protected boolean isFinishedBuilding = false;
+    protected volatile boolean isFinishedBuilding = false;
 
     /**
      * Constructor for new history files. Use this when creating a new history
@@ -117,6 +114,15 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
             throws IOException {
         sht = new HistoryTree(existingStateFile, providerVersion);
         isFinishedBuilding = true;
+    }
+
+    /**
+     * Get the History Tree built by this backend.
+     *
+     * @return The history tree
+     */
+    protected HistoryTree getSHT() {
+        return sht;
     }
 
     @Override
@@ -243,11 +249,6 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         } catch (ClosedChannelException e) {
             throw new StateSystemDisposedException(e);
         }
-        /*
-         * Since we should now have intervals at every attribute/timestamp
-         * combination, it should NOT be null here.
-         */
-        assert (interval != null);
         return interval;
     }
 
