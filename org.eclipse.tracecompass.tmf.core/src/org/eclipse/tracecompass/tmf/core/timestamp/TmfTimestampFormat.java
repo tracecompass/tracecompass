@@ -248,7 +248,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
      * The default constructor (uses the default pattern)
      */
     public TmfTimestampFormat() {
-        this(TmfTimePreferences.getInstance().getTimePattern());
+        this(TmfTimePreferences.getTimePattern());
     }
 
     /**
@@ -308,10 +308,10 @@ public class TmfTimestampFormat extends SimpleDateFormat {
      */
     public static void updateDefaultFormats() {
         fDefaultTimeFormat = new TmfTimestampFormat(
-                TmfTimePreferences.getInstance().getTimePattern(),
-                TmfTimePreferences.getInstance().getTimeZone(),
-                TmfTimePreferences.getInstance().getLocale());
-        fDefaultIntervalFormat = new TmfTimestampFormat(TmfTimePreferences.getInstance().getIntervalPattern());
+                TmfTimePreferences.getTimePattern(),
+                TmfTimePreferences.getTimeZone(),
+                TmfTimePreferences.getLocale());
+        fDefaultIntervalFormat = new TmfTimestampFormat(TmfTimePreferences.getIntervalPattern());
     }
 
     /**
@@ -320,9 +320,9 @@ public class TmfTimestampFormat extends SimpleDateFormat {
     public static TmfTimestampFormat getDefaulTimeFormat() {
         if (fDefaultTimeFormat == null) {
             fDefaultTimeFormat = new TmfTimestampFormat(
-                    TmfTimePreferences.getInstance().getTimePattern(),
-                    TmfTimePreferences.getInstance().getTimeZone(),
-                    TmfTimePreferences.getInstance().getLocale());
+                    TmfTimePreferences.getTimePattern(),
+                    TmfTimePreferences.getTimeZone(),
+                    TmfTimePreferences.getLocale());
         }
         return fDefaultTimeFormat;
     }
@@ -332,7 +332,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
      */
     public static TmfTimestampFormat getDefaulIntervalFormat() {
         if (fDefaultIntervalFormat == null) {
-            fDefaultIntervalFormat = new TmfTimestampFormat(TmfTimePreferences.getInstance().getIntervalPattern());
+            fDefaultIntervalFormat = new TmfTimestampFormat(TmfTimePreferences.getIntervalPattern());
         }
         return fDefaultIntervalFormat;
     }

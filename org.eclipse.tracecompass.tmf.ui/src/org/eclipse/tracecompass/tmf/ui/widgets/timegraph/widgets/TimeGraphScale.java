@@ -606,7 +606,7 @@ abstract class TimeDraw {
      * Updates the timezone using the preferences.
      */
     public static void updateTimeZone() {
-        final TimeZone timeZone = TmfTimePreferences.getInstance().getTimeZone();
+        final TimeZone timeZone = TmfTimePreferences.getTimeZone();
         for (SimpleDateFormat sdf : formatArray) {
             sdf.setTimeZone(timeZone);
         }

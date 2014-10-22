@@ -39,7 +39,7 @@ public class SyslogTrace extends TextTrace<SyslogEvent> {
     public static final String TIMESTAMP_FORMAT = "MMM dd HH:mm:ss"; //$NON-NLS-1$
     /** The corresponding date format of the time stamp. */
     public static final SimpleDateFormat TIMESTAMP_SIMPLEDATEFORMAT = new SimpleDateFormat(
-            TIMESTAMP_FORMAT, TmfTimePreferences.getInstance().getLocale());
+            TIMESTAMP_FORMAT, TmfTimePreferences.getLocale());
     /** The regular expression pattern of the first line of an event. */
     public static final Pattern LINE1_PATTERN = Pattern.compile(
             "\\s*(\\S\\S\\S \\d\\d? \\d\\d:\\d\\d:\\d\\d)\\s*(\\S*)\\s*(\\S*):+\\s*(.*\\S)?"); //$NON-NLS-1$
