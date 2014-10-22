@@ -67,9 +67,9 @@ public class ImportAndReadKernelSmokeTest {
     private static final String TRACE_TYPE = "org.eclipse.linuxtools.lttng2.kernel.tracetype";
     private static final String KERNEL_PERSPECTIVE_ID = "org.eclipse.linuxtools.lttng2.kernel.ui.perspective";
     private static final String TRACE_PROJECT_NAME = "test";
+    private static final CtfTmfTestTrace CTT = CtfTmfTestTrace.SYNTHETIC_TRACE;
 
     private static SWTWorkbenchBot fBot;
-    public static CtfTmfTestTrace ctt = CtfTmfTestTrace.SYNTHETIC_TRACE;
     private ITmfEvent fDesired1;
     private ITmfEvent fDesired2;
 
@@ -127,7 +127,7 @@ public class ImportAndReadKernelSmokeTest {
     @Test
     public void test() {
         SWTBotUtil.createProject(TRACE_PROJECT_NAME);
-        SWTBotUtil.openTrace(TRACE_PROJECT_NAME, ctt.getPath(), TRACE_TYPE);
+        SWTBotUtil.openTrace(TRACE_PROJECT_NAME, CTT.getPath(), TRACE_TYPE);
         openEditor();
         testHV(getViewPart("Histogram"));
         testCFV((ControlFlowView) getViewPart("Control Flow"));
@@ -138,7 +138,7 @@ public class ImportAndReadKernelSmokeTest {
     }
 
     private void openEditor() {
-        Matcher<IEditorReference> matcher = WidgetMatcherFactory.withPartName(ctt.getTrace().getName());
+        Matcher<IEditorReference> matcher = WidgetMatcherFactory.withPartName(CTT.getTrace().getName());
         IEditorPart iep = fBot.editor(matcher).getReference().getEditor(true);
         fDesired1 = getEvent(100);
         fDesired2 = getEvent(10000);
