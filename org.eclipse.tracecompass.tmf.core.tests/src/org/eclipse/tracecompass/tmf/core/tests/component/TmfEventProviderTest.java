@@ -303,8 +303,8 @@ public class TmfEventProviderTest {
      */
     @Test
     public void testGetSyntheticEvents_TimeRange() {
-        TmfTimestamp start = new TmfTimestamp(1, (byte) -3, 0);
-        TmfTimestamp end = new TmfTimestamp(1000, (byte) -3, 0);
+        TmfTimestamp start = new TmfTimestamp(1, (byte) -3);
+        TmfTimestamp end = new TmfTimestamp(1000, (byte) -3);
         TmfTimeRange range = new TmfTimeRange(start, end);
         try {
             getSyntheticData(range, -1);

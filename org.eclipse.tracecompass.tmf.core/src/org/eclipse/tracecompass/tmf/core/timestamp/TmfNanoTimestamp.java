@@ -37,7 +37,7 @@ public class TmfNanoTimestamp extends TmfTimestamp {
      * @param value the timestamp value
      */
     public TmfNanoTimestamp(final long value) {
-        super(value, ITmfTimestamp.NANOSECOND_SCALE, 0);
+        super(value, ITmfTimestamp.NANOSECOND_SCALE);
     }
 
     /**
@@ -50,7 +50,7 @@ public class TmfNanoTimestamp extends TmfTimestamp {
      *            The timestamp to copy
      */
     public TmfNanoTimestamp(final ITmfTimestamp timestamp) {
-        super(timestamp.normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue(), ITmfTimestamp.NANOSECOND_SCALE, 0);
+        super(timestamp.normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue(), ITmfTimestamp.NANOSECOND_SCALE);
     }
 
     // ------------------------------------------------------------------------
@@ -66,12 +66,12 @@ public class TmfNanoTimestamp extends TmfTimestamp {
     }
 
     @Override
-    public int compareTo(final ITmfTimestamp ts, final boolean withinPrecision) {
+    public int compareTo(final ITmfTimestamp ts) {
         if (ts instanceof TmfNanoTimestamp) {
             final long delta = getValue() - ts.getValue();
             return (delta == 0) ? 0 : (delta > 0) ? 1 : -1;
         }
-        return super.compareTo(ts, withinPrecision);
+        return super.compareTo(ts);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class TmfNanoTimestamp extends TmfTimestamp {
         }
         final TmfNanoTimestamp ts = (TmfNanoTimestamp) other;
 
-        return compareTo(ts, false) == 0;
+        return compareTo(ts) == 0;
     }
 
 }

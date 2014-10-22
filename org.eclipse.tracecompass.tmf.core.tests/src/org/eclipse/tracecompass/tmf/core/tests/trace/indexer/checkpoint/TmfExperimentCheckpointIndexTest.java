@@ -127,7 +127,7 @@ public class TmfExperimentCheckpointIndexTest {
             ITmfContext context = fExperiment.seekEvent(location);
             ITmfEvent event = fExperiment.parseEvent(context);
             assertTrue(context.getRank() == i * pageSize);
-            assertTrue((checkpoint.getTimestamp().compareTo(event.getTimestamp(), false) == 0));
+            assertTrue((checkpoint.getTimestamp().compareTo(event.getTimestamp()) == 0));
         }
     }
 
@@ -178,7 +178,7 @@ public class TmfExperimentCheckpointIndexTest {
             ITmfContext context = experiment.seekEvent(location);
             ITmfEvent event = experiment.parseEvent(context);
             assertTrue(context.getRank() == i * pageSize);
-            assertTrue((checkpoint.getTimestamp().compareTo(event.getTimestamp(), false) == 0));
+            assertTrue((checkpoint.getTimestamp().compareTo(event.getTimestamp()) == 0));
             assertEquals("Checkpoint value", i * pageSize + 1, checkpoint.getTimestamp().getValue());
         }
 

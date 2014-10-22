@@ -39,7 +39,7 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
      * @param value the timestamp value
      */
     public TmfSimpleTimestamp(final long value) {
-        super(value, 0, 0);
+        super(value, 0);
     }
 
     /**
@@ -52,7 +52,7 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
      *            The timestamp to copy
      */
     public TmfSimpleTimestamp(final ITmfTimestamp timestamp) {
-        super(timestamp.normalize(0, ITmfTimestamp.SECOND_SCALE).getValue(), 0, 0);
+        super(timestamp.normalize(0, ITmfTimestamp.SECOND_SCALE).getValue(), 0);
     }
 
     // ------------------------------------------------------------------------
@@ -68,12 +68,12 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
     }
 
     @Override
-    public int compareTo(final ITmfTimestamp ts, final boolean withinPrecision) {
+    public int compareTo(final ITmfTimestamp ts) {
         if (ts instanceof TmfSimpleTimestamp) {
             final long delta = getValue() - ts.getValue();
             return (delta == 0) ? 0 : (delta > 0) ? 1 : -1;
         }
-        return super.compareTo(ts, withinPrecision);
+        return super.compareTo(ts);
     }
 
     @Override
@@ -106,7 +106,7 @@ public class TmfSimpleTimestamp extends TmfTimestamp {
         }
         final TmfSimpleTimestamp ts = (TmfSimpleTimestamp) other;
 
-        return compareTo(ts, false) == 0;
+        return compareTo(ts) == 0;
     }
 
 }

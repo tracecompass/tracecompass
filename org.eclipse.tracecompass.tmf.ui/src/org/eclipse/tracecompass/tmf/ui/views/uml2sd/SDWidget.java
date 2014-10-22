@@ -1261,7 +1261,7 @@ public class SDWidget extends ScrollView implements SelectionListener,
                 ITmfTimestamp lastTime = ((ITimeRange) fToolTipNode).getEndTime();
 
                 if (firstTime != null) {
-                    if (lastTime != null && firstTime.compareTo(lastTime, true) != 0) {
+                    if (lastTime != null && firstTime.compareTo(lastTime) != 0) {
                         postfix.append("start: "); //$NON-NLS-1$
                         postfix.append(firstTime.toString());
                         postfix.append("\n"); //$NON-NLS-1$

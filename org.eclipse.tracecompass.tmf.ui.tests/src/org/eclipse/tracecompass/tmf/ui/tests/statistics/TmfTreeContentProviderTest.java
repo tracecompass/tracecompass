@@ -52,8 +52,8 @@ public class TmfTreeContentProviderTest {
     private final String fLabel1 = "label2";
     private final String[] fLabels = new String[] { fLabel0, fLabel1 };
 
-    private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, (byte) 2, 5);
-    private final TmfTimestamp fTimestamp2 = new TmfTimestamp(12350, (byte) 2, 5);
+    private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, (byte) 2);
+    private final TmfTimestamp fTimestamp2 = new TmfTimestamp(12350, (byte) 2);
 
     private final String fSource = "Source";
 

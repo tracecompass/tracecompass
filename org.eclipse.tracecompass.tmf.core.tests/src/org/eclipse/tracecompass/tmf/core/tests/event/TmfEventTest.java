@@ -67,7 +67,7 @@ public class TmfEventTest {
     private final ITmfEventField[] fFields1 = new ITmfEventField[] { fField1a, fField1b };
     private final String fRawContent1 = fField1a.toString() + fField1b.toString();
     private final ITmfEventField fContent1 = new TmfEventField(fRawContent1, null, fFields1);
-    private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, 2, 5);
+    private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, 2);
     private final String fReference1 = "Some reference";
     private final ITmfEvent fEvent1 = new TmfEvent(null, 0, fTimestamp1, fSource, fType, fContent1, fReference1);
 
@@ -78,7 +78,7 @@ public class TmfEventTest {
     private final ITmfEventField[] fFields2 = new ITmfEventField[] { fField2a, fField2b };
     private final String fRawContent2 = fField2a.toString() + fField2b.toString();
     private final ITmfEventField fContent2 = new TmfEventField(fRawContent2, null, fFields2);
-    private final TmfTimestamp fTimestamp2 = new TmfTimestamp(12350, 2, 5);
+    private final TmfTimestamp fTimestamp2 = new TmfTimestamp(12350, 2);
     private final String fReference2 = "Some other reference";
     private final ITmfEvent fEvent2 = new TmfEvent(null, 1, fTimestamp2, fSource, fType, fContent2, fReference2);
 

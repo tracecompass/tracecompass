@@ -116,7 +116,7 @@ public class TmfTimeRange {
      * @return True if [startTime] <= [ts] <= [endTime]
      */
     public boolean contains(final ITmfTimestamp ts) {
-        return (fStartTime.compareTo(ts, true) <= 0) && (fEndTime.compareTo(ts, true) >= 0);
+        return (fStartTime.compareTo(ts) <= 0) && (fEndTime.compareTo(ts) >= 0);
     }
 
     /**
@@ -129,7 +129,7 @@ public class TmfTimeRange {
     public boolean contains(final TmfTimeRange range) {
         final ITmfTimestamp startTime = range.getStartTime();
         final ITmfTimestamp endTime = range.getEndTime();
-        return (fStartTime.compareTo(startTime, true) <= 0) && (fEndTime.compareTo(endTime, true) >= 0);
+        return (fStartTime.compareTo(startTime) <= 0) && (fEndTime.compareTo(endTime) >= 0);
     }
 
     // ------------------------------------------------------------------------
@@ -143,13 +143,13 @@ public class TmfTimeRange {
      * @return the intersection time range, or null if no intersection exists
      */
     public TmfTimeRange getIntersection(final TmfTimeRange range) {
-        if (fStartTime.compareTo(range.fEndTime, true) > 0 || fEndTime.compareTo(range.fStartTime, true) < 0) {
+        if (fStartTime.compareTo(range.fEndTime) > 0 || fEndTime.compareTo(range.fStartTime) < 0) {
             return null; // no intersection
         }
 
-        return new TmfTimeRange(fStartTime.compareTo(range.fStartTime, true) < 0
+        return new TmfTimeRange(fStartTime.compareTo(range.fStartTime) < 0
                 ? range.fStartTime
-                : fStartTime, fEndTime.compareTo(range.fEndTime, true) > 0
+                : fStartTime, fEndTime.compareTo(range.fEndTime) > 0
                         ? range.fEndTime
                         : fEndTime);
     }

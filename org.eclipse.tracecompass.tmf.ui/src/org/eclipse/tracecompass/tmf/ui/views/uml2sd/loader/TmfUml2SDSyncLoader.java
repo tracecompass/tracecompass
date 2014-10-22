@@ -1008,10 +1008,10 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                     for (int i = 0; i < fFrame.syncMessageCount(); i++) {
                         if (fFrame.getSyncMessage(i) instanceof TmfSyncMessage) {
                             syncMessage = (TmfSyncMessage) fFrame.getSyncMessage(i);
-                            if (syncMessage.getStartTime().compareTo(fCurrentTime, false) == 0) {
+                            if (syncMessage.getStartTime().compareTo(fCurrentTime) == 0) {
                                 isExactTime = true;
                                 break;
-                            } else if ((syncMessage.getStartTime().compareTo(fCurrentTime, false) > 0) && (prevMessage != null)) {
+                            } else if ((syncMessage.getStartTime().compareTo(fCurrentTime) > 0) && (prevMessage != null)) {
                                 syncMessage = prevMessage;
                                 break;
                             }
@@ -1120,7 +1120,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
             size = fCheckPoints.size();
             for (page = 0; page < size; page++) {
                 TmfTimeRange timeRange = fCheckPoints.get(page);
-                if (timeRange.getEndTime().compareTo(time, false) >= 0) {
+                if (timeRange.getEndTime().compareTo(time) >= 0) {
                     break;
                 }
             }
@@ -1175,7 +1175,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
         try {
             TmfTimeRange currentRange = TmfTraceManager.getInstance().getCurrentRange();
             long offset = fTrace == null ? 0 : currentRange.getEndTime().getDelta(currentRange.getStartTime()).normalize(0, startTime.getScale()).getValue();
-            TmfTimestamp initialEndOfWindow = new TmfTimestamp(startTime.getValue() + offset, startTime.getScale(), startTime.getPrecision());
+            TmfTimestamp initialEndOfWindow = new TmfTimestamp(startTime.getValue() + offset, startTime.getScale());
             return new TmfTimeRange(startTime, initialEndOfWindow);
         }
         finally {

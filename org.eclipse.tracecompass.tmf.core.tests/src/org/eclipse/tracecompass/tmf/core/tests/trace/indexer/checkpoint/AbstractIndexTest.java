@@ -260,7 +260,7 @@ public abstract class AbstractIndexTest {
             TmfContext context = new TmfContext(checkpoint.getLocation(), i * pageSize);
             ITmfEvent event = fTrace.parseEvent(context);
             assertEquals(context.getRank(), i * pageSize);
-            assertTrue((checkpoint.getTimestamp().compareTo(event.getTimestamp(), false) == 0));
+            assertTrue((checkpoint.getTimestamp().compareTo(event.getTimestamp()) == 0));
         }
     }
 

@@ -436,7 +436,7 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
             final ITmfEvent event = expContext.getEvent(i);
             if (event != null && event.getTimestamp() != null) {
                 final ITmfTimestamp otherTS = event.getTimestamp();
-                if (otherTS.compareTo(timestamp, true) < 0) {
+                if (otherTS.compareTo(timestamp) < 0) {
                     trace = i;
                     timestamp = otherTS;
                 }
@@ -632,7 +632,7 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
                                 endTimestamp = trace.getEndTime();
                             }
                         }
-                        if (safeTimestamp != null && (lastSafeTimestamp == null || safeTimestamp.compareTo(lastSafeTimestamp, false) > 0)) {
+                        if (safeTimestamp != null && (lastSafeTimestamp == null || safeTimestamp.compareTo(lastSafeTimestamp) > 0)) {
                             timeRange = new TmfTimeRange(startTimestamp, safeTimestamp);
                             lastSafeTimestamp = safeTimestamp;
                         } else {

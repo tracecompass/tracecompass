@@ -36,8 +36,8 @@ public class TmfAsyncSequenceDiagramEventTest {
     private final String fLabel1  = "label2";
     private final String[] fLabels  = new String[] { fLabel0, fLabel1 };
 
-    private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, (byte) 2, 5);
-    private final TmfTimestamp fTimestamp2 = new TmfTimestamp(12350, (byte) 2, 5);
+    private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, (byte) 2);
+    private final TmfTimestamp fTimestamp2 = new TmfTimestamp(12350, (byte) 2);
     private final String       fSource     = "Source";
     private final TmfEventType fType       = new TmfEventType(fTypeId, TmfEventField.makeRoot(fLabels));
     private final String       fReference  = "Some reference";
@@ -109,8 +109,8 @@ public class TmfAsyncSequenceDiagramEventTest {
         try {
             event = new TmfAsyncSequenceDiagramEvent(fEvent1, fEvent2, "sender", "receiver", "signal");
             // success
-            assertEquals("testTmfAsyncSequenceDiagramEvent", 0, event.getStartTime().compareTo(fTimestamp1, true));
-            assertEquals("testTmfAsyncSequenceDiagramEvent", 0, event.getEndTime().compareTo(fTimestamp2, true));
+            assertEquals("testTmfAsyncSequenceDiagramEvent", 0, event.getStartTime().compareTo(fTimestamp1));
+            assertEquals("testTmfAsyncSequenceDiagramEvent", 0, event.getEndTime().compareTo(fTimestamp2));
             assertEquals("testTmfAsyncSequenceDiagramEvent", "sender", event.getSender());
             assertEquals("testTmfAsyncSequenceDiagramEvent", "receiver", event.getReceiver());
             assertEquals("testTmfAsyncSequenceDiagramEvent", "signal", event.getName());

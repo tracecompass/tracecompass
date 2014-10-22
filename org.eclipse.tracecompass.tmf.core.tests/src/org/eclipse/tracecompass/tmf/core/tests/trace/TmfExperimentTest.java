@@ -389,7 +389,7 @@ public class TmfExperimentTest {
         long cacheSize = fExperiment.getCacheSize();
 
         // Position trace at event rank 0
-        ITmfContext context = fExperiment.seekEvent(new TmfTimestamp(1, SCALE, 0));
+        ITmfContext context = fExperiment.seekEvent(new TmfTimestamp(1, SCALE));
         assertEquals("Context rank", 0, context.getRank());
 
         ITmfEvent event = fExperiment.getNext(context);
@@ -397,7 +397,7 @@ public class TmfExperimentTest {
         assertEquals("Context rank", 1, context.getRank());
 
         // Position trace at event rank [cacheSize]
-        context = fExperiment.seekEvent(new TmfTimestamp(cacheSize + 1, SCALE, 0));
+        context = fExperiment.seekEvent(new TmfTimestamp(cacheSize + 1, SCALE));
         assertEquals("Event rank", cacheSize, context.getRank());
 
         event = fExperiment.getNext(context);
@@ -405,7 +405,7 @@ public class TmfExperimentTest {
         assertEquals("Context rank", cacheSize + 1, context.getRank());
 
         // Position trace at event rank [4 * cacheSize]
-        context = fExperiment.seekEvent(new TmfTimestamp(4 * cacheSize + 1, SCALE, 0));
+        context = fExperiment.seekEvent(new TmfTimestamp(4 * cacheSize + 1, SCALE));
         assertEquals("Context rank", 4 * cacheSize, context.getRank());
 
         event = fExperiment.getNext(context);
@@ -416,7 +416,7 @@ public class TmfExperimentTest {
     @Test
     public void testSeekTimestampNotOnCacheBoundary() {
         // Position trace at event rank 1 (TS = 2)
-        ITmfContext context = fExperiment.seekEvent(new TmfTimestamp(2, SCALE, 0));
+        ITmfContext context = fExperiment.seekEvent(new TmfTimestamp(2, SCALE));
         assertEquals("Context rank", 1, context.getRank());
 
         ITmfEvent event = fExperiment.getNext(context);
@@ -424,7 +424,7 @@ public class TmfExperimentTest {
         assertEquals("Context rank", 2, context.getRank());
 
         // Position trace at event rank 9 (TS = 10)
-        context = fExperiment.seekEvent(new TmfTimestamp(10, SCALE, 0));
+        context = fExperiment.seekEvent(new TmfTimestamp(10, SCALE));
         assertEquals("Context rank", 9, context.getRank());
 
         event = fExperiment.getNext(context);
@@ -432,7 +432,7 @@ public class TmfExperimentTest {
         assertEquals("Context rank", 10, context.getRank());
 
         // Position trace at event rank 999 (TS = 1000)
-        context = fExperiment.seekEvent(new TmfTimestamp(1000, SCALE, 0));
+        context = fExperiment.seekEvent(new TmfTimestamp(1000, SCALE));
         assertEquals("Context rank", 999, context.getRank());
 
         event = fExperiment.getNext(context);
@@ -440,7 +440,7 @@ public class TmfExperimentTest {
         assertEquals("Context rank", 1000, context.getRank());
 
         // Position trace at event rank 1001 (TS = 1002)
-        context = fExperiment.seekEvent(new TmfTimestamp(1002, SCALE, 0));
+        context = fExperiment.seekEvent(new TmfTimestamp(1002, SCALE));
         assertEquals("Context rank", 1001, context.getRank());
 
         event = fExperiment.getNext(context);
@@ -448,7 +448,7 @@ public class TmfExperimentTest {
         assertEquals("Context rank", 1002, context.getRank());
 
         // Position trace at event rank 4500 (TS = 4501)
-        context = fExperiment.seekEvent(new TmfTimestamp(4501, SCALE, 0));
+        context = fExperiment.seekEvent(new TmfTimestamp(4501, SCALE));
         assertEquals("Context rank", 4500, context.getRank());
 
         event = fExperiment.getNext(context);
@@ -459,7 +459,7 @@ public class TmfExperimentTest {
     @Test
     public void testSeekTimestampOutOfScope() {
         // Position trace at beginning
-        ITmfContext context = fExperiment.seekEvent(new TmfTimestamp(-1, SCALE, 0));
+        ITmfContext context = fExperiment.seekEvent(new TmfTimestamp(-1, SCALE));
         assertEquals("Event rank", 0, context.getRank());
 
         ITmfEvent event = fExperiment.getNext(context);
@@ -467,7 +467,7 @@ public class TmfExperimentTest {
         assertEquals("Event rank", 1, context.getRank());
 
         // Position trace at event passed the end
-        context = fExperiment.seekEvent(new TmfTimestamp(NB_EVENTS + 1, SCALE, 0));
+        context = fExperiment.seekEvent(new TmfTimestamp(NB_EVENTS + 1, SCALE));
         event = fExperiment.getNext(context);
         assertNull("Event location", event);
         assertEquals("Event rank", ITmfContext.UNKNOWN_RANK, context.getRank());
@@ -589,7 +589,7 @@ public class TmfExperimentTest {
         final int NB_READS = 20;
 
         // On lower bound, returns the first event (ts = 1)
-        final ITmfContext context = fExperiment.seekEvent(new TmfTimestamp(INITIAL_TS, SCALE, 0));
+        final ITmfContext context = fExperiment.seekEvent(new TmfTimestamp(INITIAL_TS, SCALE));
 
         validateContextRanks(context);
 
@@ -615,7 +615,7 @@ public class TmfExperimentTest {
         final int NB_READS = 20;
 
         // On lower bound, returns the first event (ts = 2)
-        final ITmfContext context = fExperiment.seekEvent(new TmfTimestamp(INITIAL_TS, SCALE, 0));
+        final ITmfContext context = fExperiment.seekEvent(new TmfTimestamp(INITIAL_TS, SCALE));
 
         validateContextRanks(context);
 
@@ -642,7 +642,7 @@ public class TmfExperimentTest {
         final int NB_READS = 20;
 
         // On lower bound, returns the first event (ts = 500)
-        final ITmfContext context = fExperiment.seekEvent(new TmfTimestamp(INITIAL_TS, SCALE, 0));
+        final ITmfContext context = fExperiment.seekEvent(new TmfTimestamp(INITIAL_TS, SCALE));
 
         validateContextRanks(context);
 

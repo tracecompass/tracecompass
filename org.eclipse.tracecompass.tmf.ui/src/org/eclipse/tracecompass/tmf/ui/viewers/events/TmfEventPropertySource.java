@@ -60,10 +60,8 @@ public class TmfEventPropertySource implements IPropertySource {
     private class TimestampPropertySource implements IPropertySource {
         private static final String ID_TIMESTAMP_VALUE = "timestamp_value"; //$NON-NLS-1$
         private static final String ID_TIMESTAMP_SCALE = "timestamp_scale"; //$NON-NLS-1$
-        private static final String ID_TIMESTAMP_PRECISION = "timestamp_precision"; //$NON-NLS-1$
         private static final String NAME_TIMESTAMP_VALUE = "value"; //$NON-NLS-1$
         private static final String NAME_TIMESTAMP_SCALE = "scale"; //$NON-NLS-1$
-        private static final String NAME_TIMESTAMP_PRECISION = "precision"; //$NON-NLS-1$
 
         private ITmfTimestamp fTimestamp;
 
@@ -78,10 +76,9 @@ public class TmfEventPropertySource implements IPropertySource {
 
         @Override
         public IPropertyDescriptor[] getPropertyDescriptors() {
-            IPropertyDescriptor[] descriptors = new IPropertyDescriptor[3];
+            IPropertyDescriptor[] descriptors = new IPropertyDescriptor[2];
             descriptors[0] = new ReadOnlyTextPropertyDescriptor(ID_TIMESTAMP_VALUE, NAME_TIMESTAMP_VALUE);
             descriptors[1] = new ReadOnlyTextPropertyDescriptor(ID_TIMESTAMP_SCALE, NAME_TIMESTAMP_SCALE);
-            descriptors[2] = new ReadOnlyTextPropertyDescriptor(ID_TIMESTAMP_PRECISION, NAME_TIMESTAMP_PRECISION);
             return descriptors;
         }
 
@@ -91,8 +88,6 @@ public class TmfEventPropertySource implements IPropertySource {
                 return Long.toString(fTimestamp.getValue());
             } else if (id.equals(ID_TIMESTAMP_SCALE)) {
                 return Integer.toString(fTimestamp.getScale());
-            } else if (id.equals(ID_TIMESTAMP_PRECISION)) {
-                return Integer.toString(fTimestamp.getPrecision());
             }
             return null;
         }

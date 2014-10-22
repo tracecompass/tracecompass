@@ -173,7 +173,7 @@ public class TmfUml2SDSyncLoaderFindTest {
         assertTrue(selection.get(0) instanceof TmfSyncMessage);
         msg = (TmfSyncMessage) selection.get(0);
         assertEquals("find", TC_002_MESSAGE_NAME, msg.getName());
-        assertEquals("find", 0, TC_002_TIME_VALUE.compareTo(msg.getStartTime(), false));
+        assertEquals("find", 0, TC_002_TIME_VALUE.compareTo(msg.getStartTime()));
         assertEquals("find", TC_002_START_OCCURRANCE, msg.getStartOccurrence());
         assertEquals("find", TC_002_END_OCCURRANCE, msg.getEndOccurrence());
         assertEquals("find", TC_002_START_LIFELINE, msg.getStartLifeline().getName());
@@ -208,7 +208,7 @@ public class TmfUml2SDSyncLoaderFindTest {
         assertTrue(selection.get(0) instanceof TmfSyncMessage);
         msg = (TmfSyncMessage) selection.get(0);
         assertEquals("find", TC_003_MESSAGE_NAME, msg.getName());
-        assertEquals("find", 0, TC_003_TIME_VALUE.compareTo(msg.getStartTime(), false));
+        assertEquals("find", 0, TC_003_TIME_VALUE.compareTo(msg.getStartTime()));
         assertEquals("find", TC_003_START_OCCURRANCE, msg.getStartOccurrence());
         assertEquals("find", TC_003_END_OCCURRANCE, msg.getEndOccurrence());
         assertEquals("find", TC_003_START_LIFELINE, msg.getStartLifeline().getName());
@@ -246,7 +246,7 @@ public class TmfUml2SDSyncLoaderFindTest {
         assertTrue(selection.get(0) instanceof TmfSyncMessage);
         msg = (TmfSyncMessage) selection.get(0);
         assertEquals("find", TC_004_MESSAGE_NAME, msg.getName());
-        assertEquals("find", 0, TC_004_TIME_VALUE.compareTo(msg.getStartTime(), false));
+        assertEquals("find", 0, TC_004_TIME_VALUE.compareTo(msg.getStartTime()));
         assertEquals("find", TC_004_START_OCCURRANCE, msg.getStartOccurrence());
         assertEquals("find", TC_004_END_OCCURRANCE, msg.getEndOccurrence());
         assertEquals("find", TC_004_START_LIFELINE, msg.getStartLifeline().getName());

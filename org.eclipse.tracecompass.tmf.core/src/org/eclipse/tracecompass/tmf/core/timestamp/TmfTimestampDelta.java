@@ -66,17 +66,6 @@ public class TmfTimestampDelta extends TmfTimestamp {
         super(timestamp);
     }
 
-    /**
-     * Full constructor
-     *
-     * @param value the timestamp value
-     * @param scale the timestamp scale
-     * @param precision the timestamp precision
-     */
-    public TmfTimestampDelta(long value, int scale, int precision) {
-        super(value, scale, precision);
-    }
-
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -84,7 +73,7 @@ public class TmfTimestampDelta extends TmfTimestamp {
     @Override
     public ITmfTimestamp normalize(final long offset, final int scale) {
         ITmfTimestamp nts = super.normalize(offset, scale);
-        return new TmfTimestampDelta(nts.getValue(), nts.getScale(), nts.getPrecision());
+        return new TmfTimestampDelta(nts.getValue(), nts.getScale());
     }
 
     @Override
@@ -95,7 +84,7 @@ public class TmfTimestampDelta extends TmfTimestamp {
     @Override
     public String toString(TmfTimestampFormat format) {
         if (getValue() < 0) {
-            TmfTimestampDelta tmpTs = new TmfTimestampDelta(-getValue(), getScale(), getPrecision());
+            TmfTimestampDelta tmpTs = new TmfTimestampDelta(-getValue(), getScale());
             return "-" + tmpTs.toString(format); //$NON-NLS-1$
         }
         TmfTimestampFormat deltaFormat = new TmfTimestampFormat(format.toPattern());

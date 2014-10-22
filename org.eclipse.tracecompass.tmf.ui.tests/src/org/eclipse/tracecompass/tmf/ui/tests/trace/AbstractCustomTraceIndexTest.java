@@ -170,7 +170,7 @@ public abstract class AbstractCustomTraceIndexTest {
             TmfContext context = new TmfContext(checkpoint.getLocation(), i * pageSize);
             ITmfEvent event = ((ITmfEventParser)fTrace).parseEvent(context);
             assertTrue(context.getRank() == i * pageSize);
-            assertTrue((checkpoint.getTimestamp().compareTo(event.getTimestamp(), false) == 0));
+            assertTrue((checkpoint.getTimestamp().compareTo(event.getTimestamp()) == 0));
         }
     }
 

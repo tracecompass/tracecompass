@@ -31,7 +31,7 @@ public final class CtfTmfTimestamp extends TmfTimestamp {
      *            The timestamp value (in nanoseconds)
      */
     public CtfTmfTimestamp(long timestamp) {
-        super(timestamp, ITmfTimestamp.NANOSECOND_SCALE, 0);
+        super(timestamp, ITmfTimestamp.NANOSECOND_SCALE);
     }
 
 }

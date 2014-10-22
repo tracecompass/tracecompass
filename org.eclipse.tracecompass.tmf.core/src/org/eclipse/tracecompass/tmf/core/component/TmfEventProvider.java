@@ -373,7 +373,7 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
         boolean requestCompleted = isCompleted2(request, nbRead);
         if (!requestCompleted) {
             ITmfTimestamp endTime = request.getRange().getEndTime();
-            return event.getTimestamp().compareTo(endTime, false) > 0;
+            return event.getTimestamp().compareTo(endTime) > 0;
         }
         return requestCompleted;
     }

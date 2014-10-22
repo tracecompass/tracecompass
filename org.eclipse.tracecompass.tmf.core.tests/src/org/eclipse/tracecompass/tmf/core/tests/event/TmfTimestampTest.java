@@ -42,13 +42,13 @@ public class TmfTimestampTest {
     private final ITmfTimestamp ts0 = new TmfTimestamp();
     private final ITmfTimestamp ts1 = new TmfTimestamp(12345,  0);
     private final ITmfTimestamp ts2 = new TmfTimestamp(12345, -1);
-    private final ITmfTimestamp ts3 = new TmfTimestamp(12345,  2, 5);
-    private final ITmfTimestamp ts4 = new TmfTimestamp(12345, -3, 0);
-    private final ITmfTimestamp ts5 = new TmfTimestamp(12345, -6, 0);
-    private final ITmfTimestamp ts6 = new TmfTimestamp(12345, -9, 0);
-    private final ITmfTimestamp ts7 = new TmfTimestamp(-12345, -3, 0);
-    private final ITmfTimestamp ts8 = new TmfTimestamp(-12345, -6, 0);
-    private final ITmfTimestamp ts9 = new TmfTimestamp(-12345, -9, 0);
+    private final ITmfTimestamp ts3 = new TmfTimestamp(12345,  2);
+    private final ITmfTimestamp ts4 = new TmfTimestamp(12345, -3);
+    private final ITmfTimestamp ts5 = new TmfTimestamp(12345, -6);
+    private final ITmfTimestamp ts6 = new TmfTimestamp(12345, -9);
+    private final ITmfTimestamp ts7 = new TmfTimestamp(-12345, -3);
+    private final ITmfTimestamp ts8 = new TmfTimestamp(-12345, -6);
+    private final ITmfTimestamp ts9 = new TmfTimestamp(-12345, -9);
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -58,42 +58,36 @@ public class TmfTimestampTest {
     public void testDefaultConstructor() {
         assertEquals("getValue", 0, ts0.getValue());
         assertEquals("getscale", 0, ts0.getScale());
-        assertEquals("getPrecision", 0, ts0.getPrecision());
     }
 
     @Test
     public void testValueConstructor() {
         assertEquals("getValue", 12345, ts1.getValue());
         assertEquals("getscale", 0, ts1.getScale());
-        assertEquals("getPrecision", 0, ts1.getPrecision());
     }
 
     @Test
     public void testValueScaleConstructor() {
         assertEquals("getValue", 12345, ts2.getValue());
         assertEquals("getscale", -1, ts2.getScale());
-        assertEquals("getPrecision", 0, ts2.getPrecision());
     }
 
     @Test
     public void testFullConstructor() {
         assertEquals("getValue", 12345, ts3.getValue());
         assertEquals("getscale", 2, ts3.getScale());
-        assertEquals("getPrecision", 5, ts3.getPrecision());
     }
 
     @Test
     public void testCopyConstructor() {
-        final ITmfTimestamp ts = new TmfTimestamp(12345, 2, 5);
+        final ITmfTimestamp ts = new TmfTimestamp(12345, 2);
         final ITmfTimestamp copy = new TmfTimestamp(ts);
 
         assertEquals("getValue", ts.getValue(), copy.getValue());
         assertEquals("getscale", ts.getScale(), copy.getScale());
-        assertEquals("getPrecision", ts.getPrecision(), copy.getPrecision());
 
         assertEquals("getValue", 12345, copy.getValue());
         assertEquals("getscale", 2, copy.getScale());
-        assertEquals("getPrecision", 5, copy.getPrecision());
     }
 
     @Test(expected=IllegalArgumentException.class)
@@ -106,7 +100,6 @@ public class TmfTimestampTest {
         final ITmfTimestamp ts = new TmfTimestamp(TmfTimestamp.BIG_BANG);
         assertEquals("getValue", TmfTimestamp.BIG_BANG.getValue(), ts.getValue());
         assertEquals("getscale", TmfTimestamp.BIG_BANG.getScale(), ts.getScale());
-        assertEquals("getPrecision", TmfTimestamp.BIG_BANG.getPrecision(), ts.getPrecision());
     }
 
     @Test
@@ -114,7 +107,6 @@ public class TmfTimestampTest {
         final ITmfTimestamp ts = new TmfTimestamp(TmfTimestamp.BIG_CRUNCH);
         assertEquals("getValue", TmfTimestamp.BIG_CRUNCH.getValue(), ts.getValue());
         assertEquals("getscale", TmfTimestamp.BIG_CRUNCH.getScale(), ts.getScale());
-        assertEquals("getPrecision", TmfTimestamp.BIG_CRUNCH.getPrecision(), ts.getPrecision());
     }
 
     @Test
@@ -122,7 +114,6 @@ public class TmfTimestampTest {
         final ITmfTimestamp ts = new TmfTimestamp(TmfTimestamp.ZERO);
         assertEquals("getValue", TmfTimestamp.ZERO.getValue(), ts.getValue());
         assertEquals("getscale", TmfTimestamp.ZERO.getScale(), ts.getScale());
-        assertEquals("getPrecision", TmfTimestamp.ZERO.getPrecision(), ts.getPrecision());
     }
 
     // ------------------------------------------------------------------------
@@ -254,22 +245,18 @@ public class TmfTimestampTest {
         ITmfTimestamp ts = ts0.normalize(0, 0);
         assertEquals("getValue", 0, ts.getValue());
         assertEquals("getscale", 0, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
 
         ts = ts0.normalize(12345, 0);
         assertEquals("getValue", 12345, ts.getValue());
         assertEquals("getscale", 0, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
 
         ts = ts0.normalize(10, 0);
         assertEquals("getValue", 10, ts.getValue());
         assertEquals("getscale", 0, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
 
         ts = ts0.normalize(-10, 0);
         assertEquals("getValue", -10, ts.getValue());
         assertEquals("getscale", 0, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
     }
 
     @Test
@@ -279,17 +266,14 @@ public class TmfTimestampTest {
         ITmfTimestamp ts = ref.normalize(-4, 0);
         assertEquals("getValue", Long.MIN_VALUE + 1, ts.getValue());
         assertEquals("getscale", 0, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
 
         ts = ref.normalize(-5, 0);
         assertEquals("getValue", Long.MIN_VALUE, ts.getValue());
         assertEquals("getscale", 0, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
 
         ts = ref.normalize(-6, 0);
         assertEquals("getValue", Long.MIN_VALUE, ts.getValue());
         assertEquals("getscale", 0, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
     }
 
     @Test
@@ -299,17 +283,14 @@ public class TmfTimestampTest {
         ITmfTimestamp ts = ref.normalize(4, 0);
         assertEquals("getValue", Long.MAX_VALUE - 1, ts.getValue());
         assertEquals("getscale", 0, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
 
         ts = ref.normalize(5, 0);
         assertEquals("getValue", Long.MAX_VALUE, ts.getValue());
         assertEquals("getscale", 0, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
 
         ts = ref.normalize(6, 0);
         assertEquals("getValue", Long.MAX_VALUE, ts.getValue());
         assertEquals("getscale", 0, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
     }
 
     @Test
@@ -317,12 +298,10 @@ public class TmfTimestampTest {
         ITmfTimestamp ts = ts0.normalize(0, 10);
         assertEquals("getValue", 0, ts.getValue());
         assertEquals("getscale", 10, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
 
         ts = ts0.normalize(0, -10);
         assertEquals("getValue", 0, ts.getValue());
         assertEquals("getscale", -10, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
     }
 
     @Test
@@ -361,7 +340,6 @@ public class TmfTimestampTest {
         final ITmfTimestamp ts = ts0.normalize(0, 0);
         assertEquals("getValue", 0, ts.getValue());
         assertEquals("getscale", 0, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
     }
 
     @Test
@@ -371,22 +349,18 @@ public class TmfTimestampTest {
         ITmfTimestamp ts = ts0.normalize(0, SCALE);
         assertEquals("getValue", 0, ts.getValue());
         assertEquals("getscale", SCALE, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
 
         ts = ts0.normalize(12345, SCALE);
         assertEquals("getValue", 12345, ts.getValue());
         assertEquals("getscale", SCALE, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
 
         ts = ts0.normalize(10, SCALE);
         assertEquals("getValue", 10, ts.getValue());
         assertEquals("getscale", SCALE, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
 
         ts = ts0.normalize(-10, SCALE);
         assertEquals("getValue", -10, ts.getValue());
         assertEquals("getscale", SCALE, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
     }
 
     @Test
@@ -395,23 +369,19 @@ public class TmfTimestampTest {
         ITmfTimestamp ts = ts1.normalize(0, SCALE);
         assertEquals("getValue", 123, ts.getValue());
         assertEquals("getscale", SCALE, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
 
         ts = ts1.normalize(12345, SCALE);
         assertEquals("getValue", 12468, ts.getValue());
         assertEquals("getscale", SCALE, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
 
         SCALE = -2;
         ts = ts1.normalize(0, SCALE);
         assertEquals("getValue", 1234500, ts.getValue());
         assertEquals("getscale", SCALE, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
 
         ts = ts1.normalize(67, SCALE);
         assertEquals("getValue", 1234567, ts.getValue());
         assertEquals("getscale", SCALE, ts.getScale());
-        assertEquals("getPrecision", 0, ts.getPrecision());
     }
 
     // ------------------------------------------------------------------------
@@ -420,10 +390,10 @@ public class TmfTimestampTest {
 
     @Test
     public void testBasicCompareTo() {
-        final ITmfTimestamp t1 = new TmfTimestamp(900, 0, 50);
-        final ITmfTimestamp t2 = new TmfTimestamp(1000, 0, 50);
-        final ITmfTimestamp t3 = new TmfTimestamp(1100, 0, 50);
-        final ITmfTimestamp t4 = new TmfTimestamp(1000, 0, 75);
+        final ITmfTimestamp t1 = new TmfTimestamp(900, 0);
+        final ITmfTimestamp t2 = new TmfTimestamp(1000, 0);
+        final ITmfTimestamp t3 = new TmfTimestamp(1100, 0);
+        final ITmfTimestamp t4 = new TmfTimestamp(1000, 0);
 
         assertTrue(t1.compareTo(t1) == 0);
 
@@ -447,11 +417,11 @@ public class TmfTimestampTest {
         final ITmfTimestamp ts0c = new TmfTimestamp(ts0.getValue() + 1, ts0.getScale());
         final ITmfTimestamp ts0d = new TmfTimestamp(ts0.getValue() + 1, ts0.getScale() + 1);
 
-        assertTrue("compareTo", ts0.compareTo(ts0, false) == 0);
-        assertTrue("compareTo", ts0.compareTo(ts0a, false) == 0);
-        assertTrue("compareTo", ts0.compareTo(ts0b, false) == 0);
-        assertTrue("compareTo", ts0.compareTo(ts0c, false) == -1);
-        assertTrue("compareTo", ts0.compareTo(ts0d, false) == -1);
+        assertTrue("compareTo", ts0.compareTo(ts0) == 0);
+        assertTrue("compareTo", ts0.compareTo(ts0a) == 0);
+        assertTrue("compareTo", ts0.compareTo(ts0b) == 0);
+        assertTrue("compareTo", ts0.compareTo(ts0c) == -1);
+        assertTrue("compareTo", ts0.compareTo(ts0d) == -1);
     }
 
     @Test
@@ -460,14 +430,14 @@ public class TmfTimestampTest {
         final ITmfTimestamp ts0b = new TmfTimestamp(0, Integer.MAX_VALUE);
         final ITmfTimestamp ts0c = new TmfTimestamp(Long.MAX_VALUE, Integer.MAX_VALUE);
 
-        assertTrue("compareTo", ts0a.compareTo(ts0b, false) == 1);
-        assertTrue("compareTo", ts0a.compareTo(ts0c, false) == -1);
+        assertTrue("compareTo", ts0a.compareTo(ts0b) == 1);
+        assertTrue("compareTo", ts0a.compareTo(ts0c) == -1);
 
-        assertTrue("compareTo", ts0b.compareTo(ts0a, false) == -1);
-        assertTrue("compareTo", ts0b.compareTo(ts0c, false) == -1);
+        assertTrue("compareTo", ts0b.compareTo(ts0a) == -1);
+        assertTrue("compareTo", ts0b.compareTo(ts0c) == -1);
 
-        assertTrue("compareTo", ts0c.compareTo(ts0a, false) == 1);
-        assertTrue("compareTo", ts0c.compareTo(ts0b, false) == 1);
+        assertTrue("compareTo", ts0c.compareTo(ts0a) == 1);
+        assertTrue("compareTo", ts0c.compareTo(ts0b) == 1);
     }
 
     @Test
@@ -476,86 +446,63 @@ public class TmfTimestampTest {
         final ITmfTimestamp ts0b = new TmfTimestamp(0, Integer.MAX_VALUE);
         final ITmfTimestamp ts0c = new TmfTimestamp(Long.MIN_VALUE, Integer.MAX_VALUE);
 
-        assertTrue("compareTo", ts0a.compareTo(ts0b, false) == -1);
-        assertTrue("compareTo", ts0a.compareTo(ts0c, false) == 1);
+        assertTrue("compareTo", ts0a.compareTo(ts0b) == -1);
+        assertTrue("compareTo", ts0a.compareTo(ts0c) == 1);
 
-        assertTrue("compareTo", ts0b.compareTo(ts0a, false) == 1);
-        assertTrue("compareTo", ts0b.compareTo(ts0c, false) == 1);
+        assertTrue("compareTo", ts0b.compareTo(ts0a) == 1);
+        assertTrue("compareTo", ts0b.compareTo(ts0c) == 1);
 
-        assertTrue("compareTo", ts0c.compareTo(ts0a, false) == -1);
-        assertTrue("compareTo", ts0c.compareTo(ts0b, false) == -1);
+        assertTrue("compareTo", ts0c.compareTo(ts0a) == -1);
+        assertTrue("compareTo", ts0c.compareTo(ts0b) == -1);
     }
 
     @Test
     public void testCompareToCornerCases4() {
-        assertTrue("compareTo", ts0.compareTo(null, false) == 1);
-        assertTrue("compareTo", ts0.compareTo(null, true) == 1);
+        assertTrue("compareTo", ts0.compareTo(null) == 1);
     }
 
     @Test
     public void testCompareToSameScale() {
-        final ITmfTimestamp t1 = new TmfTimestamp(900, 0, 50);
-        final ITmfTimestamp t2 = new TmfTimestamp(1000, 0, 50);
-        final ITmfTimestamp t3 = new TmfTimestamp(1100, 0, 50);
-        final ITmfTimestamp t4 = new TmfTimestamp(1000, 0, 75);
+        final ITmfTimestamp t1 = new TmfTimestamp(900, 0);
+        final ITmfTimestamp t2 = new TmfTimestamp(1000, 0);
+        final ITmfTimestamp t3 = new TmfTimestamp(1100, 0);
+        final ITmfTimestamp t4 = new TmfTimestamp(1000, 0);
 
-        assertTrue(t1.compareTo(t1, false) == 0);
+        assertTrue(t1.compareTo(t1) == 0);
 
-        assertTrue("CompareTo", t1.compareTo(t2, false) < 0);
-        assertTrue("CompareTo", t1.compareTo(t3, false) < 0);
-        assertTrue("CompareTo", t1.compareTo(t4, false) < 0);
+        assertTrue("CompareTo", t1.compareTo(t2) < 0);
+        assertTrue("CompareTo", t1.compareTo(t3) < 0);
+        assertTrue("CompareTo", t1.compareTo(t4) < 0);
 
-        assertTrue("CompareTo", t2.compareTo(t1, false) > 0);
-        assertTrue("CompareTo", t2.compareTo(t3, false) < 0);
-        assertTrue("CompareTo", t2.compareTo(t4, false) == 0);
+        assertTrue("CompareTo", t2.compareTo(t1) > 0);
+        assertTrue("CompareTo", t2.compareTo(t3) < 0);
+        assertTrue("CompareTo", t2.compareTo(t4) == 0);
 
-        assertTrue("CompareTo", t3.compareTo(t1, false) > 0);
-        assertTrue("CompareTo", t3.compareTo(t2, false) > 0);
-        assertTrue("CompareTo", t3.compareTo(t4, false) > 0);
+        assertTrue("CompareTo", t3.compareTo(t1) > 0);
+        assertTrue("CompareTo", t3.compareTo(t2) > 0);
+        assertTrue("CompareTo", t3.compareTo(t4) > 0);
     }
 
     @Test
     public void testCompareToDifferentScale() {
-        final ITmfTimestamp t1 = new TmfTimestamp(9000, -1, 50);
-        final ITmfTimestamp t2 = new TmfTimestamp(1000, 0, 50);
-        final ITmfTimestamp t3 = new TmfTimestamp(110, 1, 50);
-        final ITmfTimestamp t4 = new TmfTimestamp(1, 3, 75);
+        final ITmfTimestamp t1 = new TmfTimestamp(9000, -1);
+        final ITmfTimestamp t2 = new TmfTimestamp(1000, 0);
+        final ITmfTimestamp t3 = new TmfTimestamp(110, 1);
+        final ITmfTimestamp t4 = new TmfTimestamp(1, 3);
 
-        assertTrue("CompareTo", t1.compareTo(t1, false) == 0);
+        assertTrue("CompareTo", t1.compareTo(t1) == 0);
 
-        assertTrue("CompareTo", t1.compareTo(t2, false) < 0);
-        assertTrue("CompareTo", t1.compareTo(t3, false) < 0);
-        assertTrue("CompareTo", t1.compareTo(t4, false) < 0);
+        assertTrue("CompareTo", t1.compareTo(t2) < 0);
+        assertTrue("CompareTo", t1.compareTo(t3) < 0);
+        assertTrue("CompareTo", t1.compareTo(t4) < 0);
 
-        assertTrue("CompareTo", t2.compareTo(t1, false) > 0);
-        assertTrue("CompareTo", t2.compareTo(t3, false) < 0);
-        assertTrue("CompareTo", t2.compareTo(t4, false) == 0);
+        assertTrue("CompareTo", t2.compareTo(t1) > 0);
+        assertTrue("CompareTo", t2.compareTo(t3) < 0);
+        assertTrue("CompareTo", t2.compareTo(t4) == 0);
 
-        assertTrue("CompareTo", t3.compareTo(t1, false) > 0);
-        assertTrue("CompareTo", t3.compareTo(t2, false) > 0);
-        assertTrue("CompareTo", t3.compareTo(t4, false) > 0);
-    }
-
-    @Test
-    public void testCompareToWithinPrecision() {
-        final ITmfTimestamp t1 = new TmfTimestamp(900, 0, 50);
-        final ITmfTimestamp t2 = new TmfTimestamp(1000, 0, 50);
-        final ITmfTimestamp t3 = new TmfTimestamp(1100, 0, 50);
-        final ITmfTimestamp t4 = new TmfTimestamp(1000, 0, 75);
-
-        assertTrue("CompareTo", t1.compareTo(t1, true) == 0);
-
-        assertTrue("CompareTo", t1.compareTo(t2, true) == 0);
-        assertTrue("CompareTo", t1.compareTo(t3, true) < 0);
-        assertTrue("CompareTo", t1.compareTo(t4, true) == 0);
-
-        assertTrue("CompareTo", t2.compareTo(t1, true) == 0);
-        assertTrue("CompareTo", t2.compareTo(t3, true) == 0);
-        assertTrue("CompareTo", t2.compareTo(t4, true) == 0);
-
-        assertTrue("CompareTo", t3.compareTo(t1, true) > 0);
-        assertTrue("CompareTo", t3.compareTo(t2, true) == 0);
-        assertTrue("CompareTo", t3.compareTo(t4, true) == 0);
+        assertTrue("CompareTo", t3.compareTo(t1) > 0);
+        assertTrue("CompareTo", t3.compareTo(t2) > 0);
+        assertTrue("CompareTo", t3.compareTo(t4) > 0);
     }
 
     @Test
@@ -565,21 +512,21 @@ public class TmfTimestampTest {
         final ITmfTimestamp t3 = new TmfTimestamp(1, 100);
         final ITmfTimestamp t4 = new TmfTimestamp(1000, -100);
 
-        assertTrue("CompareTo", t1.compareTo(t2, false) < 0);
-        assertTrue("CompareTo", t1.compareTo(t3, false) < 0);
-        assertTrue("CompareTo", t1.compareTo(t4, false) < 0);
+        assertTrue("CompareTo", t1.compareTo(t2) < 0);
+        assertTrue("CompareTo", t1.compareTo(t3) < 0);
+        assertTrue("CompareTo", t1.compareTo(t4) < 0);
 
-        assertTrue("CompareTo", t2.compareTo(t1, false) > 0);
-        assertTrue("CompareTo", t2.compareTo(t3, false) < 0);
-        assertTrue("CompareTo", t2.compareTo(t4, false) < 0);
+        assertTrue("CompareTo", t2.compareTo(t1) > 0);
+        assertTrue("CompareTo", t2.compareTo(t3) < 0);
+        assertTrue("CompareTo", t2.compareTo(t4) < 0);
 
-        assertTrue("CompareTo", t3.compareTo(t1, false) > 0);
-        assertTrue("CompareTo", t3.compareTo(t2, false) > 0);
-        assertTrue("CompareTo", t3.compareTo(t4, false) > 0);
+        assertTrue("CompareTo", t3.compareTo(t1) > 0);
+        assertTrue("CompareTo", t3.compareTo(t2) > 0);
+        assertTrue("CompareTo", t3.compareTo(t4) > 0);
 
-        assertTrue("CompareTo", t4.compareTo(t1, false) > 0);
-        assertTrue("CompareTo", t4.compareTo(t2, false) > 0);
-        assertTrue("CompareTo", t4.compareTo(t3, false) < 0);
+        assertTrue("CompareTo", t4.compareTo(t1) > 0);
+        assertTrue("CompareTo", t4.compareTo(t2) > 0);
+        assertTrue("CompareTo", t4.compareTo(t3) < 0);
     }
 
     @Test
@@ -587,11 +534,11 @@ public class TmfTimestampTest {
         final ITmfTimestamp ts0a = new TmfTimestamp(0, Integer.MAX_VALUE);
         final ITmfTimestamp ts0b = new TmfTimestamp(1, Integer.MAX_VALUE);
 
-        assertTrue("CompareTo", ts0a.compareTo(ts0, false) == 0);
-        assertTrue("CompareTo", ts0.compareTo(ts0a, false) == 0);
+        assertTrue("CompareTo", ts0a.compareTo(ts0) == 0);
+        assertTrue("CompareTo", ts0.compareTo(ts0a) == 0);
 
-        assertTrue("CompareTo", ts0b.compareTo(ts0, false) == 1);
-        assertTrue("CompareTo", ts0.compareTo(ts0b, false) == -1);
+        assertTrue("CompareTo", ts0b.compareTo(ts0) == 1);
+        assertTrue("CompareTo", ts0.compareTo(ts0b) == -1);
     }
 
     // ------------------------------------------------------------------------
@@ -606,7 +553,7 @@ public class TmfTimestampTest {
         ITmfTimestamp exp = new TmfTimestamp(5, 9);
 
         ITmfTimestamp delta = t0.getDelta(t1);
-        assertEquals("getDelta", 0, delta.compareTo(exp, false));
+        assertEquals("getDelta", 0, delta.compareTo(exp));
 
         // Delta for same scale and precision (delta < 0)
         t0 = new TmfTimestamp(5, 9);
@@ -614,7 +561,7 @@ public class TmfTimestampTest {
         exp = new TmfTimestamp(-5, 9);
 
         delta = t0.getDelta(t1);
-        assertEquals("getDelta", 0, delta.compareTo(exp, false));
+        assertEquals("getDelta", 0, delta.compareTo(exp));
 
         // Delta for different scale and same precision (delta > 0)
         t0 = new TmfTimestamp(5, 9);
@@ -622,7 +569,7 @@ public class TmfTimestampTest {
         exp = new TmfTimestamp(4, 9);
 
         delta = t0.getDelta(t1);
-        assertEquals("getDelta", 0, delta.compareTo(exp, false));
+        assertEquals("getDelta", 0, delta.compareTo(exp));
 
         // Delta for different scale and same precision (delta > 0)
         t0 = new TmfTimestamp(5, 9);
@@ -630,7 +577,7 @@ public class TmfTimestampTest {
         exp = new TmfTimestamp(5, 9);
 
         delta = t0.getDelta(t1);
-        assertEquals("getDelta", 0, delta.compareTo(exp, false));
+        assertEquals("getDelta", 0, delta.compareTo(exp));
 
         // Delta for different scale and same precision
         t0 = new TmfTimestamp(10, 9);
@@ -638,33 +585,22 @@ public class TmfTimestampTest {
         exp = new TmfTimestamp(10, 9);
 
         delta = t0.getDelta(t1);
-        assertEquals("getDelta", 0, delta.compareTo(exp, false));
+        assertEquals("getDelta", 0, delta.compareTo(exp));
 
-        // Delta for same scale and different precision
-        t0 = new TmfTimestamp(10, 9, 1);
-        t1 = new TmfTimestamp(5, 9, 2);
-        exp = new TmfTimestamp(5, 9, 3);
-
-        delta = t0.getDelta(t1);
-        assertEquals("getDelta", 0, delta.compareTo(exp, true));
-        assertEquals("precision", 3, delta.getPrecision());
-
-        // Delta for same scale and different precision
-        t0 = new TmfTimestamp(5, 9, 2);
-        t1 = new TmfTimestamp(10, 9, 1);
-        exp = new TmfTimestamp(-5, 9, 3);
+        // Delta for same scale
+        t0 = new TmfTimestamp(10, 9);
+        t1 = new TmfTimestamp(5, 9);
+        exp = new TmfTimestamp(5, 9);
 
         delta = t0.getDelta(t1);
-        assertEquals("getDelta", 0, delta.compareTo(exp, true));
-        assertEquals("precision", 3, delta.getPrecision());
+        assertEquals("getDelta", 0, delta.compareTo(exp));
 
-        // Delta for different scale and different precision
-        t0 = new TmfTimestamp(5, 9, 2);
-        t1 = new TmfTimestamp(10, 8, 1);
-        exp = new TmfTimestamp(4, 9, 3);
+        // Delta for different scale
+        t0 = new TmfTimestamp(5, 9);
+        t1 = new TmfTimestamp(10, 8);
+        exp = new TmfTimestamp(4, 9);
         delta = t0.getDelta(t1);
-        assertEquals("getDelta", 0, delta.compareTo(exp, true));
-        assertEquals("precision", 2, delta.getPrecision());
+        assertEquals("getDelta", 0, delta.compareTo(exp));
     }
 
 }

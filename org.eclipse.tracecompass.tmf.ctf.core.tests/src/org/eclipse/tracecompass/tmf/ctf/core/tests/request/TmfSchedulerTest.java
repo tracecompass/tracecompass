@@ -90,7 +90,8 @@ public class TmfSchedulerTest {
 
         long foregroundStartTime = fStartTime + ((fEndTime - fStartTime) / 4);
         long foregroundEndTime = fStartTime + ((fEndTime - fStartTime) / 2);
-        fForegroundTimeRange = new TmfTimeRange(new TmfTimestamp(foregroundStartTime, ITmfTimestamp.NANOSECOND_SCALE, 0), new TmfTimestamp(foregroundEndTime, ITmfTimestamp.NANOSECOND_SCALE, 0));
+        fForegroundTimeRange = new TmfTimeRange(new TmfTimestamp(foregroundStartTime, ITmfTimestamp.NANOSECOND_SCALE),
+                new TmfTimestamp(foregroundEndTime, ITmfTimestamp.NANOSECOND_SCALE));
     }
 
     /**
@@ -302,7 +303,8 @@ public class TmfSchedulerTest {
     @Test
     public void preemptedForegroundRequest() {
         ForegroundRequest foreground9 = new ForegroundRequest(TmfTimeRange.ETERNITY);
-        TmfTimeRange shortTimeRange = new TmfTimeRange(new TmfTimestamp(fStartTime, ITmfTimestamp.NANOSECOND_SCALE, 0), new TmfTimestamp(fStartTime + ((fEndTime - fStartTime) / 16), ITmfTimestamp.NANOSECOND_SCALE, 0));
+        TmfTimeRange shortTimeRange = new TmfTimeRange(new TmfTimestamp(fStartTime, ITmfTimestamp.NANOSECOND_SCALE),
+                new TmfTimestamp(fStartTime + ((fEndTime - fStartTime) / 16), ITmfTimestamp.NANOSECOND_SCALE));
         ForegroundRequest shortForeground = new ForegroundRequest(shortTimeRange);
         fixture.sendRequest(foreground9);
         try {

@@ -138,7 +138,7 @@ public class TmfUml2SDSyncLoaderTimeTest {
         assertTrue(selection.get(0) instanceof TmfSyncMessage);
         msg = (TmfSyncMessage) selection.get(0);
         assertEquals("synchToTime", TC_001_MESSAGE_NAME, msg.getName());
-        assertEquals("synchToTime", 0, TC_001_TIME_VALUE.compareTo(msg.getStartTime(), false));
+        assertEquals("synchToTime", 0, TC_001_TIME_VALUE.compareTo(msg.getStartTime()));
         assertEquals("synchToTime", TC_001_START_OCCURRANCE, msg.getStartOccurrence());
         assertEquals("synchToTime", TC_001_END_OCCURRANCE, msg.getEndOccurrence());
         assertEquals("synchToTime", TC_001_START_LIFELINE, msg.getStartLifeline().getName());
@@ -163,7 +163,7 @@ public class TmfUml2SDSyncLoaderTimeTest {
         assertTrue("synchToTime", selection.get(0) instanceof TmfSyncMessage);
         msg = (TmfSyncMessage) selection.get(0);
         assertEquals("synchToTime", TC_002_MESSAGE_NAME, msg.getName());
-        assertEquals(0, TC_002_TIME_VALUE.compareTo(msg.getStartTime(), false));
+        assertEquals(0, TC_002_TIME_VALUE.compareTo(msg.getStartTime()));
         assertEquals("synchToTime", TC_002_START_OCCURRANCE, msg.getStartOccurrence());
         assertEquals("synchToTime", TC_002_END_OCCURRANCE, msg.getEndOccurrence());
         assertEquals(TC_002_START_LIFELINE, msg.getStartLifeline().getName());
@@ -184,7 +184,7 @@ public class TmfUml2SDSyncLoaderTimeTest {
         fFacility.getTrace().broadcast(new TmfTimeSynchSignal(this, TC_003_TIME_VALUE));
         fFacility.getLoader().waitForCompletion();
         fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
-        assertEquals("synchToTime", 0, TC_003_TIME_VALUE.compareTo(fFacility.getLoader().getCurrentTime(), false));
+        assertEquals("synchToTime", 0, TC_003_TIME_VALUE.compareTo(fFacility.getLoader().getCurrentTime()));
         assertEquals("synchToTime", TC_003_PAGE_VALUE, fFacility.getLoader().currentPage());
         selection = fFacility.getSdView().getSDWidget().getSelection();
         assertNotNull("synchToTime", selection);
@@ -281,7 +281,7 @@ public class TmfUml2SDSyncLoaderTimeTest {
         fFacility.getTrace().broadcast(new TmfRangeSynchSignal(this, range));
         assertEquals("synchToTimeRange", TC_008_PAGE_VALUE, fFacility.getLoader().currentPage());
         assertNotNull("synchToTimeRange", fFacility.getLoader().getCurrentTime());
-        assertEquals("synchToTimeRange", 0, TC_008_TIME_VALUE.compareTo(fFacility.getLoader().getCurrentTime(), false));
+        assertEquals("synchToTimeRange", 0, TC_008_TIME_VALUE.compareTo(fFacility.getLoader().getCurrentTime()));
         selection = fFacility.getSdView().getSDWidget().getSelection();
         // We actually don't want something to be selected!!!
         assertNotNull("synchToTimeRange", selection);
@@ -302,7 +302,7 @@ public class TmfUml2SDSyncLoaderTimeTest {
         fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         assertEquals("synchToTimeRange", TC_009_PAGE_VALUE, fFacility.getLoader().currentPage());
         assertNotNull("synchToTimeRange", fFacility.getLoader().getCurrentTime());
-        assertEquals("synchToTimeRange", 0, TC_009_TIME_VALUE.compareTo(fFacility.getLoader().getCurrentTime(), false));
+        assertEquals("synchToTimeRange", 0, TC_009_TIME_VALUE.compareTo(fFacility.getLoader().getCurrentTime()));
         selection = fFacility.getSdView().getSDWidget().getSelection();
         // We actually don't want something to be selected!!!
         assertNotNull("synchToTimeRange", selection);

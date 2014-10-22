@@ -472,11 +472,11 @@ public class BasicFrame extends GraphNode {
         for (int i = 0; i < timeArray.size(); i++) {
             SDTimeEvent m = timeArray.get(i);
 
-            if (m.getTime().compareTo(fMaxSDTime, true) > 0) {
+            if (m.getTime().compareTo(fMaxSDTime) > 0) {
                 fMaxSDTime = m.getTime();
             }
 
-            if ((m.getTime().compareTo(fMinSDTime, true) < 0) || fInitSDMin) {
+            if ((m.getTime().compareTo(fMinSDTime) < 0) || fInitSDMin) {
                 fMinSDTime = m.getTime();
                 fInitSDMin = false;
             }
@@ -532,18 +532,18 @@ public class BasicFrame extends GraphNode {
         ITmfTimestamp delta = m2.getTime().getDelta(m1.getTime());
         if (fComputeMinMax) {
             fMinTime = delta;
-            if (fMinTime.compareTo(TmfTimestamp.ZERO, false) < 0) {
-                fMinTime = new TmfTimestamp(0, m1.getTime().getScale(), m1.getTime().getPrecision());
+            if (fMinTime.compareTo(TmfTimestamp.ZERO) < 0) {
+                fMinTime = new TmfTimestamp(0, m1.getTime().getScale());
             }
             fMaxTime = fMinTime;
             setComputeMinMax(false);
         }
 
-        if ((delta.compareTo(fMinTime, true) < 0) && (delta.compareTo(TmfTimestamp.ZERO, false) > 0)) {
+        if ((delta.compareTo(fMinTime) < 0) && (delta.compareTo(TmfTimestamp.ZERO) > 0)) {
             fMinTime = delta;
         }
 
-        if ((delta.compareTo(fMaxTime, true) > 0) && (delta.compareTo(TmfTimestamp.ZERO, false) > 0)) {
+        if ((delta.compareTo(fMaxTime) > 0) && (delta.compareTo(TmfTimestamp.ZERO) > 0)) {
             fMaxTime = delta;
         }
     }

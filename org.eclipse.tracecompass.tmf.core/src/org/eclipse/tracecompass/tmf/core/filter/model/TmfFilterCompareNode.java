@@ -184,12 +184,12 @@ public class TmfFilterCompareNode extends TmfFilterTreeNode {
             if (fValueTimestamp != null) {
                 if (value instanceof TmfTimestamp) {
                     TmfTimestamp valueTimestamp = (TmfTimestamp) value;
-                    return (valueTimestamp.compareTo(fValueTimestamp, false) == fResult) ^ fNot;
+                    return (valueTimestamp.compareTo(fValueTimestamp) == fResult) ^ fNot;
                 }
                 try {
                     TmfTimestamp valueTimestamp = new TmfTimestamp((long) (1E9 * NumberFormat
                                     .getInstance().parse(value.toString()).doubleValue()));
-                    return (valueTimestamp.compareTo(fValueTimestamp, false) == fResult) ^ fNot;
+                    return (valueTimestamp.compareTo(fValueTimestamp) == fResult) ^ fNot;
                 } catch (ParseException e) {
                 }
             }

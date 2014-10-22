@@ -56,7 +56,7 @@ public class MinMaxDialog extends Dialog {
      */
     private Text fScaleText;
     /**
-     * Text field for precision.
+     * Text field for precision (legacy, value will be ignored).
      */
     private Text fPrecisionText;
     /**
@@ -137,7 +137,7 @@ public class MinMaxDialog extends Dialog {
 
         fPrecisionText = new Text(g1, SWT.SINGLE | SWT.BORDER);
         fPrecisionText.setLayoutData(newGridData(2));
-        fPrecisionText.setText(String.valueOf(fSdWidget.getFrame().getMinTime().getPrecision()));
+        fPrecisionText.setText(String.valueOf(0));
 
         return parent;
     }
@@ -147,15 +147,13 @@ public class MinMaxDialog extends Dialog {
         long min = 0;
         long max = 0;
         int scale = 0;
-        int precision = 0;
         try {
             min = Long.parseLong(fMinText.getText());
             max = Long.parseLong(fMaxText.getText());
             scale = Integer.parseInt(fScaleText.getText());
-            precision = Integer.parseInt(fPrecisionText.getText());
 
-            fSdWidget.getFrame().setMax(new TmfTimestamp(max, scale, precision));
-            fSdWidget.getFrame().setMin(new TmfTimestamp(min, scale, precision));
+            fSdWidget.getFrame().setMax(new TmfTimestamp(max, scale));
+            fSdWidget.getFrame().setMin(new TmfTimestamp(min, scale));
 
             fSdWidget.redraw();
 
@@ -177,7 +175,7 @@ public class MinMaxDialog extends Dialog {
                 fMinText.setText(String.valueOf(fSdWidget.getFrame().getMinTime().getValue()));
                 fMaxText.setText(String.valueOf(fSdWidget.getFrame().getMaxTime().getValue()));
                 fScaleText.setText(String.valueOf(fSdWidget.getFrame().getMinTime().getScale()));
-                fPrecisionText.setText(String.valueOf(fSdWidget.getFrame().getMinTime().getPrecision()));
+                fPrecisionText.setText(String.valueOf(0));
                 fMaxText.getParent().layout(true);
             }
 

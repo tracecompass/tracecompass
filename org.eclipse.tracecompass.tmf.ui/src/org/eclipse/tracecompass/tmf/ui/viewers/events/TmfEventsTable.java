@@ -2445,10 +2445,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
                     // Verify if the event is within the trace range and adjust if necessary
                     ITmfTimestamp timestamp = ts;
-                    if (timestamp.compareTo(fTrace.getStartTime(), true) == -1) {
+                    if (timestamp.compareTo(fTrace.getStartTime()) == -1) {
                         timestamp = fTrace.getStartTime();
                     }
-                    if (timestamp.compareTo(fTrace.getEndTime(), true) == 1) {
+                    if (timestamp.compareTo(fTrace.getEndTime()) == 1) {
                         timestamp = fTrace.getEndTime();
                     }
 

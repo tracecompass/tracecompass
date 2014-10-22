@@ -124,7 +124,7 @@ public class TmfCheckpoint implements ITmfCheckpoint {
     public int compareTo(final ITmfCheckpoint other) {
         int comp = 0;
         if ((fTimestamp != null) && (other.getTimestamp() != null)) {
-            comp = fTimestamp.compareTo(other.getTimestamp(), false);
+            comp = fTimestamp.compareTo(other.getTimestamp());
             if (comp != 0) {
                 return comp;
             }

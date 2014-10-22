@@ -579,7 +579,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
         ITmfLocation previousLocation = context.getLocation();
         long previousRank = context.getRank();
         ITmfEvent event = getNext(context);
-        while (event != null && event.getTimestamp().compareTo(timestamp, false) < 0) {
+        while (event != null && event.getTimestamp().compareTo(timestamp) < 0) {
             previousLocation = context.getLocation();
             previousRank = context.getRank();
             event = getNext(context);
@@ -630,10 +630,10 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
      * @since 2.0
      */
     protected synchronized void updateAttributes(final ITmfContext context, final ITmfTimestamp timestamp) {
-        if (fStartTime.equals(TmfTimestamp.BIG_BANG) || (fStartTime.compareTo(timestamp, false) > 0)) {
+        if (fStartTime.equals(TmfTimestamp.BIG_BANG) || (fStartTime.compareTo(timestamp) > 0)) {
             fStartTime = timestamp;
         }
-        if (fEndTime.equals(TmfTimestamp.BIG_CRUNCH) || (fEndTime.compareTo(timestamp, false) < 0)) {
+        if (fEndTime.equals(TmfTimestamp.BIG_CRUNCH) || (fEndTime.compareTo(timestamp) < 0)) {
             fEndTime = timestamp;
         }
         if (context.hasValidRank()) {

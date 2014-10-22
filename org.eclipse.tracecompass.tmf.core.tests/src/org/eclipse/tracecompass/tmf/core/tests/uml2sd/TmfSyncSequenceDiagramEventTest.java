@@ -36,7 +36,7 @@ public class TmfSyncSequenceDiagramEventTest {
     private final String fLabel1  = "label2";
     private final String[] fLabels  = new String[] { fLabel0, fLabel1 };
 
-    private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, (byte) 2, 5);
+    private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, (byte) 2);
     private final String       fSource     = "Source";
     private final TmfEventType fType       = new TmfEventType(fTypeId, TmfEventField.makeRoot(fLabels));
     private final String       fReference  = "Some reference";
@@ -93,7 +93,7 @@ public class TmfSyncSequenceDiagramEventTest {
         try {
             event = new TmfSyncSequenceDiagramEvent(fEvent1, "sender", "receiver", "signal");
             // success
-            assertEquals("testTmfSyncSequenceDiagramEvent", 0, event.getStartTime().compareTo(fTimestamp1, true));
+            assertEquals("testTmfSyncSequenceDiagramEvent", 0, event.getStartTime().compareTo(fTimestamp1));
             assertEquals("testTmfSyncSequenceDiagramEvent", "sender", event.getSender());
             assertEquals("testTmfSyncSequenceDiagramEvent", "receiver", event.getReceiver());
             assertEquals("testTmfSyncSequenceDiagramEvent", "signal", event.getName());

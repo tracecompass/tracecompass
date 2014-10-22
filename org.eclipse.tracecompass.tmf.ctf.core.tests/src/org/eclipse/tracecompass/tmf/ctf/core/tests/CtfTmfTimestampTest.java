@@ -46,7 +46,6 @@ public class CtfTmfTimestampTest {
 
         assertNotNull(result);
         assertEquals(df.format(d) + " 000 001", result.toString());
-        assertEquals(0, result.getPrecision());
         assertEquals(-9, result.getScale());
         assertEquals(1L, result.getValue());
     }

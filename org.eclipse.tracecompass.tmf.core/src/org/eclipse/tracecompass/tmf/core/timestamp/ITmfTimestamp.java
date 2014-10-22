@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
+ *   Alexandre Montplaisir - Removed concept of precision
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.core.timestamp;
@@ -77,11 +78,6 @@ public interface ITmfTimestamp extends Comparable<ITmfTimestamp> {
      */
     int getScale();
 
-    /**
-     * @return the timestamp precision (measurement tolerance)
-     */
-    int getPrecision();
-
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -94,15 +90,6 @@ public interface ITmfTimestamp extends Comparable<ITmfTimestamp> {
      * @return a new 'adjusted' ITmfTimestamp
      */
     ITmfTimestamp normalize(long offset, int scale);
-
-    /**
-     * Compares [this] and [ts] within timestamp precision
-     *
-     * @param ts the other timestamp
-     * @param withinPrecision consider the precision when testing for equality
-     * @return -1, 0 or 1 (less than, equals, greater than)
-     */
-    int compareTo(ITmfTimestamp ts, boolean withinPrecision);
 
     /**
      * Returns the difference between [this] and [ts] as a timestamp

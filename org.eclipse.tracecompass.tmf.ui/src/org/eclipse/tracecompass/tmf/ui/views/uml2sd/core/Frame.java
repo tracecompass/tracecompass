@@ -560,7 +560,7 @@ public class Frame extends BasicFrame {
             bounds[1] = null;
             for (int i = 0; i < timeArray.size(); i++) {
                 SDTimeEvent m = timeArray.get(i);
-                if (m.getTime().compareTo(dateToFind, true) > 0) {
+                if (m.getTime().compareTo(dateToFind) > 0) {
                     bounds[1] = m.getGraphNode();
                     if (i > 0) {
                         bounds[0] = timeArray.get(i - 1).getGraphNode();
