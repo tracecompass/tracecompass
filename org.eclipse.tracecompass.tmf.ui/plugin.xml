@@ -1610,13 +1610,13 @@
                      operator="and">
                   <or>
                      <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
                      </instanceof>
                      <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
                      </instanceof>
                      <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
                      </instanceof>
                   </or>
                </iterate>
@@ -1634,13 +1634,13 @@
                      operator="and">
                   <or>
                      <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceElement">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
                      </instanceof>
                      <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfExperimentElement">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
                      </instanceof>
                      <instanceof
-                           value="org.eclipse.linuxtools.tmf.ui.project.model.TmfTraceFolder">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder">
                      </instanceof>
                   </or>
                </iterate>
