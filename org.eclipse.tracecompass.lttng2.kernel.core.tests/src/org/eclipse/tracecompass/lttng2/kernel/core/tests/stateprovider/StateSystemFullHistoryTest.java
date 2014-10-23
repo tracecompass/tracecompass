@@ -71,7 +71,7 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
     @After
     public void cleanup() {
         if (module != null) {
-            module.close();
+            module.dispose();
         }
         if (stateFile != null) {
             stateFile.delete();
@@ -91,21 +91,22 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
      */
     @Test
     public void testBuild() {
-        try (TestLttngKernelAnalysisModule module2 =
-                new TestLttngKernelAnalysisModule(BENCHMARK_FILE_NAME);) {
-            try {
-                module2.setTrace(testTrace.getTrace());
-            } catch (TmfAnalysisException e) {
-                fail();
-            }
-            module2.schedule();
-            assertTrue(module2.waitForCompletion());
-            ITmfStateSystem ssb2 = module2.getStateSystem();
-
-            assertNotNull(ssb2);
-            assertEquals(startTime, ssb2.getStartTime());
-            assertEquals(endTime, ssb2.getCurrentEndTime());
+        TestLttngKernelAnalysisModule module2 = new TestLttngKernelAnalysisModule(BENCHMARK_FILE_NAME);
+        try {
+            module2.setTrace(testTrace.getTrace());
+        } catch (TmfAnalysisException e) {
+            module2.dispose();
+            fail();
         }
+        module2.schedule();
+        assertTrue(module2.waitForCompletion());
+        ITmfStateSystem ssb2 = module2.getStateSystem();
+
+        assertNotNull(ssb2);
+        assertEquals(startTime, ssb2.getStartTime());
+        assertEquals(endTime, ssb2.getCurrentEndTime());
+
+        module2.dispose();
     }
 
     /**
@@ -114,20 +115,22 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
     @Test
     public void testOpenExistingStateFile() {
         /* 'newStateFile' should have already been created */
-        try (TestLttngKernelAnalysisModule module2 = new TestLttngKernelAnalysisModule(TEST_FILE_NAME);) {
-            try {
-                module2.setTrace(testTrace.getTrace());
-            } catch (TmfAnalysisException e) {
-                fail();
-            }
-            module2.schedule();
-            assertTrue(module2.waitForCompletion());
-            ITmfStateSystem ssb2 = module2.getStateSystem();
-
-            assertNotNull(ssb2);
-            assertEquals(startTime, ssb2.getStartTime());
-            assertEquals(endTime, ssb2.getCurrentEndTime());
+        TestLttngKernelAnalysisModule module2 = new TestLttngKernelAnalysisModule(TEST_FILE_NAME);
+        try {
+            module2.setTrace(testTrace.getTrace());
+        } catch (TmfAnalysisException e) {
+            module2.dispose();
+            fail();
         }
+        module2.schedule();
+        assertTrue(module2.waitForCompletion());
+        ITmfStateSystem ssb2 = module2.getStateSystem();
+
+        assertNotNull(ssb2);
+        assertEquals(startTime, ssb2.getStartTime());
+        assertEquals(endTime, ssb2.getCurrentEndTime());
+
+        module2.dispose();
     }
 
     @NonNullByDefault

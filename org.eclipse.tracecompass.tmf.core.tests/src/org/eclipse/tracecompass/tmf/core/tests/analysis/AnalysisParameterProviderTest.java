@@ -61,7 +61,9 @@ public class AnalysisParameterProviderTest {
         ITmfTrace trace = TmfTestTrace.A_TEST_10K.getTrace();
         /* Make sure the value is set to null */
         IAnalysisModuleHelper helper = TmfAnalysisManager.getAnalysisModule(AnalysisManagerTest.MODULE_PARAM);
-        try (IAnalysisModule module = helper.newModule(trace);) {
+        IAnalysisModule module = null;
+        try {
+            module = helper.newModule(trace);
 
             assertEquals(10, module.getParameter(TestAnalysis.PARAM_TEST));
 
@@ -74,7 +76,10 @@ public class AnalysisParameterProviderTest {
 
         } catch (TmfAnalysisException e) {
             fail(e.getMessage());
-            return;
+        } finally {
+            if (module != null) {
+                module.dispose();
+            }
         }
     }
 

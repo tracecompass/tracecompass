@@ -58,19 +58,21 @@ public class GenerateTestValues {
         /* Prepare the files */
         File logFile = File.createTempFile("TestValues", ".java");
         try (final CtfTmfTrace trace = testTrace.getTrace();
-                PrintWriter writer = new PrintWriter(new FileWriter(logFile), true);
-                /* Build and query the state system */
-                TmfStateSystemAnalysisModule module = new TmfStateSystemAnalysisModule() {
-                    @Override
-                    protected ITmfStateProvider createStateProvider() {
-                        return new LttngKernelStateProvider(trace);
-                    }
+                PrintWriter writer = new PrintWriter(new FileWriter(logFile), true);) {
 
-                    @Override
-                    protected String getSsFileName() {
-                        return "test-values";
-                    }
-                };) {
+            /* Build and query the state system */
+            TmfStateSystemAnalysisModule module = new TmfStateSystemAnalysisModule() {
+                @Override
+                protected ITmfStateProvider createStateProvider() {
+                    return new LttngKernelStateProvider(trace);
+                }
+
+                @Override
+                protected String getSsFileName() {
+                    return "test-values";
+                }
+            };
+
             module.setTrace(trace);
             module.setId("test-values");
             module.schedule();
@@ -134,6 +136,7 @@ public class GenerateTestValues {
             writer.println("}");
             writer.println();
 
+            module.dispose();
         }
         System.exit(0);
     }

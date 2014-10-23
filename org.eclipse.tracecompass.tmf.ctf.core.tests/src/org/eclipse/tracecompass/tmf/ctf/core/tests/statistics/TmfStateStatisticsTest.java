@@ -82,8 +82,8 @@ public class TmfStateStatisticsTest extends TmfStatisticsTest {
      */
     @After
     public void tearDown() {
-        fTotalsMod.close();
-        fEventTypesMod.close();
+        fTotalsMod.dispose();
+        fEventTypesMod.dispose();
         fTrace.dispose();
     }
 }

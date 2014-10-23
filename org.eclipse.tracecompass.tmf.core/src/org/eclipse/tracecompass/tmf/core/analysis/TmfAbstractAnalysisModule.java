@@ -251,11 +251,6 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
     }
 
     @Override
-    public void close() {
-        dispose();
-    }
-
-    @Override
     public void dispose() {
         super.dispose();
         cancel();

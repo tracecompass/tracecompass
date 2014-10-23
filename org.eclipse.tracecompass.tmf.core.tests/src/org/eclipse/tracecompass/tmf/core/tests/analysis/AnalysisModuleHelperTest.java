@@ -137,29 +137,45 @@ public class AnalysisModuleHelperTest {
     public void testNewModule() {
         /* Test analysis module with traceStub */
         Exception exception = null;
-        try (IAnalysisModule module = fModule.newModule(TmfTestTrace.A_TEST_10K.getTrace());) {
+        IAnalysisModule module = null;
+        try {
+            module = fModule.newModule(TmfTestTrace.A_TEST_10K.getTrace());
             assertNotNull(module);
             assertTrue(module instanceof TestAnalysis);
         } catch (TmfAnalysisException e) {
             exception = e;
+        } finally {
+            if (module != null) {
+                module.dispose();
+            }
         }
         assertNull(exception);
 
         /* TestAnalysis2 module with trace, should return an exception */
-        try (IAnalysisModule module = fModuleOther.newModule(TmfTestTrace.A_TEST_10K.getTrace());) {
+        try {
+            module = fModuleOther.newModule(TmfTestTrace.A_TEST_10K.getTrace());
         } catch (TmfAnalysisException e) {
             exception = e;
+        } finally {
+            if (module != null) {
+                module.dispose();
+            }
         }
         assertNotNull(exception);
         assertEquals(NLS.bind(Messages.TmfAnalysisModuleHelper_AnalysisDoesNotApply, fModuleOther.getName()), exception.getMessage());
 
         /* TestAnalysis2 module with a TraceStub2 */
         exception = null;
-        try (IAnalysisModule module = fModuleOther.newModule(fTrace);) {
+        try {
+            module = fModuleOther.newModule(fTrace);
             assertNotNull(module);
             assertTrue(module instanceof TestAnalysis2);
         } catch (TmfAnalysisException e) {
             exception = e;
+        } finally {
+            if (module != null) {
+                module.dispose();
+            }
         }
         assertNull(exception);
     }
@@ -176,7 +192,9 @@ public class AnalysisModuleHelperTest {
          * able to set the parameter
          */
         IAnalysisModuleHelper helper = TmfAnalysisManager.getAnalysisModule(AnalysisManagerTest.MODULE_PARAM);
-        try (IAnalysisModule module = helper.newModule(trace);) {
+        IAnalysisModule module = null;
+        try {
+            module = helper.newModule(trace);
             assertNull(module.getParameter(TestAnalysis.PARAM_TEST));
             module.setParameter(TestAnalysis.PARAM_TEST, 1);
             assertEquals(1, module.getParameter(TestAnalysis.PARAM_TEST));
@@ -184,11 +202,16 @@ public class AnalysisModuleHelperTest {
         } catch (TmfAnalysisException e1) {
             fail(e1.getMessage());
             return;
+        } finally {
+            if (module != null) {
+                module.dispose();
+            }
         }
 
         /* This module has a parameter with default value */
         helper = TmfAnalysisManager.getAnalysisModule(AnalysisManagerTest.MODULE_PARAM_DEFAULT);
-        try (IAnalysisModule module = helper.newModule(trace);) {
+        try {
+            module = helper.newModule(trace);
             assertEquals(3, module.getParameter(TestAnalysis.PARAM_TEST));
             module.setParameter(TestAnalysis.PARAM_TEST, 1);
             assertEquals(1, module.getParameter(TestAnalysis.PARAM_TEST));
@@ -196,6 +219,10 @@ public class AnalysisModuleHelperTest {
         } catch (TmfAnalysisException e1) {
             fail(e1.getMessage());
             return;
+        } finally {
+            if (module != null) {
+                module.dispose();
+            }
         }
 
         /*
@@ -204,8 +231,8 @@ public class AnalysisModuleHelperTest {
          */
         helper = TmfAnalysisManager.getAnalysisModule(AnalysisManagerTest.MODULE_SECOND);
         Exception exception = null;
-        try (IAnalysisModule module = helper.newModule(fTrace);) {
-
+        try {
+            module = helper.newModule(fTrace);
             assertNull(module.getParameter(TestAnalysis.PARAM_TEST));
 
             try {
@@ -216,6 +243,10 @@ public class AnalysisModuleHelperTest {
         } catch (TmfAnalysisException e1) {
             fail(e1.getMessage());
             return;
+        } finally {
+            if (module != null) {
+                module.dispose();
+            }
         }
         assertNotNull(exception);
     }

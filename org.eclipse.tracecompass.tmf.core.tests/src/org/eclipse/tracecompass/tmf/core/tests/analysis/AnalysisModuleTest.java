@@ -55,34 +55,35 @@ public class AnalysisModuleTest {
      */
     @Test
     public void testGettersSetters() {
-        try (IAnalysisModule module = new TestAnalysis();) {
+        IAnalysisModule module = new TestAnalysis();
 
-            module.setName(MODULE_GENERIC_NAME);
-            module.setId(MODULE_GENERIC_ID);
-            assertEquals(MODULE_GENERIC_ID, module.getId());
-            assertEquals(MODULE_GENERIC_NAME, module.getName());
+        module.setName(MODULE_GENERIC_NAME);
+        module.setId(MODULE_GENERIC_ID);
+        assertEquals(MODULE_GENERIC_ID, module.getId());
+        assertEquals(MODULE_GENERIC_NAME, module.getName());
 
-            module.setAutomatic(false);
-            assertFalse(module.isAutomatic());
-            module.setAutomatic(true);
-            assertTrue(module.isAutomatic());
-            module.addParameter(TestAnalysis.PARAM_TEST);
-            assertNull(module.getParameter(TestAnalysis.PARAM_TEST));
-            module.setParameter(TestAnalysis.PARAM_TEST, 1);
-            assertEquals(1, module.getParameter(TestAnalysis.PARAM_TEST));
+        module.setAutomatic(false);
+        assertFalse(module.isAutomatic());
+        module.setAutomatic(true);
+        assertTrue(module.isAutomatic());
+        module.addParameter(TestAnalysis.PARAM_TEST);
+        assertNull(module.getParameter(TestAnalysis.PARAM_TEST));
+        module.setParameter(TestAnalysis.PARAM_TEST, 1);
+        assertEquals(1, module.getParameter(TestAnalysis.PARAM_TEST));
 
-            /* Try to set and get wrong parameter */
-            String wrongParam = "abc";
-            Exception exception = null;
-            try {
-                module.setParameter(wrongParam, 1);
-            } catch (RuntimeException e) {
-                exception = e;
-                assertEquals(NLS.bind(Messages.TmfAbstractAnalysisModule_InvalidParameter, wrongParam, module.getName()), e.getMessage());
-            }
-            assertNotNull(exception);
-            assertNull(module.getParameter(wrongParam));
+        /* Try to set and get wrong parameter */
+        String wrongParam = "abc";
+        Exception exception = null;
+        try {
+            module.setParameter(wrongParam, 1);
+        } catch (RuntimeException e) {
+            exception = e;
+            assertEquals(NLS.bind(Messages.TmfAbstractAnalysisModule_InvalidParameter, wrongParam, module.getName()), e.getMessage());
         }
+        assertNotNull(exception);
+        assertNull(module.getParameter(wrongParam));
+
+        module.dispose();
     }
 
     private static TestAnalysis setUpAnalysis() {
@@ -102,27 +103,28 @@ public class AnalysisModuleTest {
      */
     @Test
     public void testWaitForCompletionSuccess() {
-        try (TestAnalysis module = setUpAnalysis();) {
+        TestAnalysis module = setUpAnalysis();
 
-            IStatus status = module.schedule();
-            assertEquals(IStatus.ERROR, status.getSeverity());
+        IStatus status = module.schedule();
+        assertEquals(IStatus.ERROR, status.getSeverity());
 
-            /* Set a stub trace for analysis */
-            try {
-                module.setTrace(TmfTestTrace.A_TEST_10K.getTrace());
-            } catch (TmfAnalysisException e) {
-                fail(e.getMessage());
-            }
-
-            /* Default execution, with output 1 */
-            module.setParameter(TestAnalysis.PARAM_TEST, 1);
-            status = module.schedule();
-            assertEquals(Status.OK_STATUS, status);
-            boolean completed = module.waitForCompletion();
-
-            assertTrue(completed);
-            assertEquals(1, module.getAnalysisOutput());
+        /* Set a stub trace for analysis */
+        try {
+            module.setTrace(TmfTestTrace.A_TEST_10K.getTrace());
+        } catch (TmfAnalysisException e) {
+            fail(e.getMessage());
         }
+
+        /* Default execution, with output 1 */
+        module.setParameter(TestAnalysis.PARAM_TEST, 1);
+        status = module.schedule();
+        assertEquals(Status.OK_STATUS, status);
+        boolean completed = module.waitForCompletion();
+
+        assertTrue(completed);
+        assertEquals(1, module.getAnalysisOutput());
+
+        module.dispose();
     }
 
     /**
@@ -130,47 +132,50 @@ public class AnalysisModuleTest {
      */
     @Test
     public void testWaitForCompletionCancelled() {
-        try (TestAnalysis module = setUpAnalysis();) {
+        TestAnalysis module = setUpAnalysis();
 
-            /* Set a stub trace for analysis */
-            ITmfTrace trace = TmfTestTrace.A_TEST_10K.getTrace();
-            try {
-                module.setTrace(trace);
-            } catch (TmfAnalysisException e) {
-                fail(e.getMessage());
-            }
-
-            module.setParameter(TestAnalysis.PARAM_TEST, 0);
-            IStatus status = module.schedule();
-            assertEquals(Status.OK_STATUS, status);
-            boolean completed = module.waitForCompletion();
-
-            assertFalse(completed);
-            assertEquals(0, module.getAnalysisOutput());
+        /* Set a stub trace for analysis */
+        ITmfTrace trace = TmfTestTrace.A_TEST_10K.getTrace();
+        try {
+            module.setTrace(trace);
+        } catch (TmfAnalysisException e) {
+            fail(e.getMessage());
         }
+
+        module.setParameter(TestAnalysis.PARAM_TEST, 0);
+        IStatus status = module.schedule();
+        assertEquals(Status.OK_STATUS, status);
+        boolean completed = module.waitForCompletion();
+
+        assertFalse(completed);
+        assertEquals(0, module.getAnalysisOutput());
+
+        module.dispose();
     }
 
     /**
-     * Test the {@link TmfAbstractAnalysisModule#setTrace(ITmfTrace)} method with wrong trace
+     * Test the {@link TmfAbstractAnalysisModule#setTrace(ITmfTrace)} method
+     * with wrong trace
      */
     @Test
     public void testSetWrongTrace() {
-        try (IAnalysisModule module = new TestAnalysis2();) {
+        IAnalysisModule module = new TestAnalysis2();
 
-            module.setName(MODULE_GENERIC_NAME);
-            module.setId(MODULE_GENERIC_ID);
-            assertEquals(MODULE_GENERIC_ID, module.getId());
-            assertEquals(MODULE_GENERIC_NAME, module.getName());
+        module.setName(MODULE_GENERIC_NAME);
+        module.setId(MODULE_GENERIC_ID);
+        assertEquals(MODULE_GENERIC_ID, module.getId());
+        assertEquals(MODULE_GENERIC_NAME, module.getName());
 
-            Exception exception = null;
-            try {
-                module.setTrace(TmfTestTrace.A_TEST_10K.getTrace());
-            } catch (TmfAnalysisException e) {
-                exception = e;
-            }
-            assertNotNull(exception);
-            assertEquals(NLS.bind(Messages.TmfAbstractAnalysisModule_AnalysisCannotExecute, module.getName()), exception.getMessage());
+        Exception exception = null;
+        try {
+            module.setTrace(TmfTestTrace.A_TEST_10K.getTrace());
+        } catch (TmfAnalysisException e) {
+            exception = e;
         }
+        assertNotNull(exception);
+        assertEquals(NLS.bind(Messages.TmfAbstractAnalysisModule_AnalysisCannotExecute, module.getName()), exception.getMessage());
+
+        module.dispose();
     }
 
     /**
@@ -178,28 +183,29 @@ public class AnalysisModuleTest {
      */
     @Test
     public void testCancel() {
-        try (TestAnalysis module = setUpAnalysis();) {
+        TestAnalysis module = setUpAnalysis();
 
-            module.setParameter(TestAnalysis.PARAM_TEST, 999);
-            try {
-                module.setTrace(TmfTestTrace.A_TEST_10K.getTrace());
-            } catch (TmfAnalysisException e) {
-                fail(e.getMessage());
-            }
-
-            assertEquals(Status.OK_STATUS, module.schedule());
-
-            /* Give the job a chance to start */
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                fail(e.getMessage());
-            }
-
-            module.cancel();
-            assertFalse(module.waitForCompletion());
-            assertEquals(-1, module.getAnalysisOutput());
+        module.setParameter(TestAnalysis.PARAM_TEST, 999);
+        try {
+            module.setTrace(TmfTestTrace.A_TEST_10K.getTrace());
+        } catch (TmfAnalysisException e) {
+            fail(e.getMessage());
         }
+
+        assertEquals(Status.OK_STATUS, module.schedule());
+
+        /* Give the job a chance to start */
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        }
+
+        module.cancel();
+        assertFalse(module.waitForCompletion());
+        assertEquals(-1, module.getAnalysisOutput());
+
+        module.dispose();
     }
 
     /**
@@ -208,28 +214,28 @@ public class AnalysisModuleTest {
      */
     @Test
     public void testParameterChanged() {
-        try (TestAnalysis module = setUpAnalysis();) {
+        TestAnalysis module = setUpAnalysis();
 
-            try {
-                module.setTrace(TmfTestTrace.A_TEST_10K.getTrace());
-            } catch (TmfAnalysisException e) {
-                fail(e.getMessage());
-            }
-
-            /* Check exception if no wrong parameter name */
-            Exception exception = null;
-            try {
-                module.notifyParameterChanged("aaa");
-            } catch (RuntimeException e) {
-                exception = e;
-            }
-            assertNotNull(exception);
-
-            /*
-             * Cannot test anymore of this method, need a parameter provider to
-             * do this
-             */
+        try {
+            module.setTrace(TmfTestTrace.A_TEST_10K.getTrace());
+        } catch (TmfAnalysisException e) {
+            fail(e.getMessage());
         }
+
+        /* Check exception if no wrong parameter name */
+        Exception exception = null;
+        try {
+            module.notifyParameterChanged("aaa");
+        } catch (RuntimeException e) {
+            exception = e;
+        }
+        assertNotNull(exception);
+
+        /*
+         * Cannot test anymore of this method, need a parameter provider to do
+         * this
+         */
+        module.dispose();
     }
 
     /**
@@ -237,21 +243,22 @@ public class AnalysisModuleTest {
      */
     @Test
     public void testHelper() {
-        try (TestAnalysis module = setUpAnalysis();) {
+        TestAnalysis module = setUpAnalysis();
 
-            try {
-                module.setTrace(TmfTestTrace.A_TEST_10K.getTrace());
-            } catch (TmfAnalysisException e) {
-                fail(e.getMessage());
-            }
-
-            module.setParameter(TestAnalysis.PARAM_TEST, 1);
-            boolean res = TmfTestHelper.executeAnalysis(module);
-            assertTrue(res);
-
-            module.setParameter(TestAnalysis.PARAM_TEST, 0);
-            res = TmfTestHelper.executeAnalysis(module);
-            assertFalse(res);
+        try {
+            module.setTrace(TmfTestTrace.A_TEST_10K.getTrace());
+        } catch (TmfAnalysisException e) {
+            fail(e.getMessage());
         }
+
+        module.setParameter(TestAnalysis.PARAM_TEST, 1);
+        boolean res = TmfTestHelper.executeAnalysis(module);
+        assertTrue(res);
+
+        module.setParameter(TestAnalysis.PARAM_TEST, 0);
+        res = TmfTestHelper.executeAnalysis(module);
+        assertFalse(res);
+
+        module.dispose();
     }
 }

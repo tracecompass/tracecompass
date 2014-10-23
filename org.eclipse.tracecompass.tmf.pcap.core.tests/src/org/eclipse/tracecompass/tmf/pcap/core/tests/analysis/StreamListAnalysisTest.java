@@ -40,15 +40,16 @@ public class StreamListAnalysisTest {
      */
     @Test
     public void constructorTest() {
-        try (StreamListAnalysis analysis = new StreamListAnalysis();) {
-            analysis.setId(StreamListAnalysis.ID);
-            for (TmfPcapProtocol protocol : TmfPcapProtocol.values()) {
-                if (protocol.supportsStream()) {
-                    assertNotNull(analysis.getBuilder(protocol));
-                }
+        StreamListAnalysis analysis = new StreamListAnalysis();
+        analysis.setId(StreamListAnalysis.ID);
+        for (TmfPcapProtocol protocol : TmfPcapProtocol.values()) {
+            if (protocol.supportsStream()) {
+                assertNotNull(analysis.getBuilder(protocol));
             }
-            assertFalse(analysis.isFinished());
         }
+        assertFalse(analysis.isFinished());
+
+        analysis.dispose();
     }
 
     /**
@@ -62,11 +63,13 @@ public class StreamListAnalysisTest {
         PcapTestTrace trace = PcapTestTrace.MOSTLY_TCP;
         assumeTrue(trace.exists());
         String path = trace.getPath().toString();
-        try (PcapTrace pcapTrace = new PcapTrace();
-                StreamListAnalysis analysis = new StreamListAnalysis();) {
+        try (PcapTrace pcapTrace = new PcapTrace();) {
+            StreamListAnalysis analysis = new StreamListAnalysis();
             analysis.setId(StreamListAnalysis.ID);
             pcapTrace.initTrace(null, path, null);
             assertTrue(analysis.canExecute(pcapTrace));
+
+            analysis.dispose();
         }
     }
 
@@ -84,8 +87,9 @@ public class StreamListAnalysisTest {
         PcapTestTrace trace = PcapTestTrace.MOSTLY_TCP;
         assumeTrue(trace.exists());
         String path = trace.getPath().toString();
-        try (PcapTrace pcapTrace = new PcapTrace();
-                StreamListAnalysis analysis = new StreamListAnalysis();) {
+        try (PcapTrace pcapTrace = new PcapTrace();) {
+            StreamListAnalysis analysis = new StreamListAnalysis();
+
             pcapTrace.initTrace(null, path, null);
             analysis.setId(StreamListAnalysis.ID);
             analysis.setTrace(pcapTrace);
@@ -120,6 +124,8 @@ public class StreamListAnalysisTest {
                 return;
             }
             assertEquals(1, builder.getNbStreams());
+
+            analysis.dispose();
         }
     }
 

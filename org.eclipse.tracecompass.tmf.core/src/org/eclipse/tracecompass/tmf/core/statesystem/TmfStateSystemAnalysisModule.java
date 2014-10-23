@@ -107,11 +107,6 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
             IStatus status = module.schedule();
             if (status.isOK()) {
                 module.waitForInitialization();
-                /*
-                 * FIXME If we keep a reference to "module", the compiler expects us to
-                 * close it. The Analysis Module's API should be reworked to not expose
-                 * these objects directly (utility classes instead?)
-                 */
                 return module.getStateSystem();
             }
         }

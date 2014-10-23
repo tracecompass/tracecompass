@@ -108,8 +108,8 @@ public class CtfTmfLostEventStatisticsTest {
     @After
     public void tearDown() {
         fStats.dispose();
-        fTotalsMod.close();
-        fEventTypesMod.close();
+        fTotalsMod.dispose();
+        fEventTypesMod.dispose();
         fTrace.dispose();
     }
 

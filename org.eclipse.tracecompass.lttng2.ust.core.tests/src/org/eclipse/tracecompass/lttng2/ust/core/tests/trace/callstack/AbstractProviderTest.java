@@ -116,7 +116,7 @@ public abstract class AbstractProviderTest {
      */
     @After
     public void tearDown() {
-        fModule.close();
+        fModule.dispose();
         if (fTrace != null) {
             fTrace.dispose();
             File suppDir = new File(TmfTraceManager.getSupplementaryFileDir(fTrace));
@@ -137,7 +137,9 @@ public abstract class AbstractProviderTest {
         /* Initialize the trace and analysis module */
         File suppDir;
         try (CtfTmfTrace ustTrace = otherUstTrace.getTrace();) {
-            try (TestLttngCallStackModule module = new TestLttngCallStackModule();) {
+            TestLttngCallStackModule module = null;
+            try {
+                module = new TestLttngCallStackModule();
                 try {
                     module.setTrace(ustTrace);
                 } catch (TmfAnalysisException e) {
@@ -151,6 +153,10 @@ public abstract class AbstractProviderTest {
                 assertNotNull(ss);
                 assertTrue(ss.getStartTime() >= ustTrace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
                 assertEquals(0, ss.getNbAttributes());
+            } finally {
+                if (module != null) {
+                    module.dispose();
+                }
             }
             suppDir = new File(TmfTraceManager.getSupplementaryFileDir(ustTrace));
         }
