@@ -5,7 +5,7 @@
          id="product"
          point="org.eclipse.core.runtime.products">
       <product
-            application="org.eclipse.linuxtools.tracing.rcp.ui.application"
+            application="org.eclipse.tracecompass.rcp.ui.application"
             name="Trace Compass">
             <property
                   name="appName"
@@ -21,7 +21,7 @@
             </property>
             <property
                   name="aboutImage"
-                  value="icons/alt_about.gif">
+                  value="/org.eclipse.tracecompass.tracing.rcp.branding/icons/alt_about.gif">
             </property>
             <property
                   name="aboutText"
