@@ -75,6 +75,7 @@ public class LTTngControlServiceTest {
     private static final String SCEN_LTTNG_VERSION_WITH_PROMPT = "LttngVersionWithPrompt";
     private static final String SCEN_LTTNG_UNSUPPORTED_VERSION = "LttngUnsupportedVersion";
     private static final String SCEN_LTTNG_NO_VERSION = "LttngNoVersion";
+    private static final String SCEN_LTTNG_COMPILED_VERSION = "LttngVersionCompiled";
     private static final String SCEN_NO_SESSION_AVAILABLE = "NoSessionAvailable";
     private static final String SCEN_GET_SESSION_NAMES1 = "GetSessionNames1";
     private static final String SCEN_GET_SESSION_NAME_NOT_EXIST = "GetSessionNameNotExist";
@@ -229,6 +230,19 @@ public class LTTngControlServiceTest {
             // success
         }
     }
+
+    @Test
+    public void testVersionCompiled() {
+        try {
+            fShell.setScenario(SCEN_LTTNG_COMPILED_VERSION);
+            ILttngControlService service = LTTngControlServiceFactory.getInstance().getLttngControlService(fShell);
+            assertNotNull(service);
+            assertEquals("2.5.0", service.getVersionString());
+        } catch (ExecutionException e) {
+            fail("Exeption thrown " + e);
+        }
+    }
+
 
     @Test
     public void testLttngNotInstalled() {

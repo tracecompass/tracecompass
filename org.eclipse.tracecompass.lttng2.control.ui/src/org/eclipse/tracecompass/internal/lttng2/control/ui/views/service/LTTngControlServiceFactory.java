@@ -129,6 +129,7 @@ public class LTTngControlServiceFactory {
             int index = 0;
             while (index < result.getOutput().length) {
                 String line = result.getOutput()[index];
+                line = line.replace("-", ".");  //$NON-NLS-1$//$NON-NLS-2$
                 Matcher versionMatcher = LTTngControlServiceConstants.VERSION_PATTERN.matcher(line);
                 if (versionMatcher.matches()) {
                     String version = versionMatcher.group(1).trim();

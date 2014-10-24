@@ -284,7 +284,7 @@ public interface LTTngControlServiceConstants {
     /**
      * Pattern to match the version.
      */
-    static final Pattern VERSION_PATTERN = Pattern.compile(".*lttng\\s+version\\s+(\\d+\\.\\d+\\.\\d+).*"); //$NON-NLS-1$
+    static final Pattern VERSION_PATTERN = Pattern.compile(".*lttng\\s+version\\s+.*(\\d+\\.\\d+\\.\\d+).*"); //$NON-NLS-1$
     /**
      * Pattern to match for error output
      */
