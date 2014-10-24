@@ -12,16 +12,18 @@
 
 package org.eclipse.tracecompass.lttng2.ust.core.tests;
 
+import org.eclipse.tracecompass.tmf.core.tests.shared.DebugSuite;
 import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 
 /**
  * Runner for the lttng2.kernel unit tests.
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
+@RunWith(DebugSuite.class)
+@DebugSuite.SuiteClasses({
     ActivatorTest.class,
     org.eclipse.tracecompass.lttng2.ust.core.tests.analysis.memory.AllTests.class,
     org.eclipse.tracecompass.lttng2.ust.core.tests.trace.callstack.AllTests.class
 })
-public class AllTests { }
+public class AllTests {
+
+}

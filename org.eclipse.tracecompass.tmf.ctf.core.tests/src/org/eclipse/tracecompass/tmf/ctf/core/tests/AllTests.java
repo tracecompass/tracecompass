@@ -13,8 +13,8 @@
 
 package org.eclipse.tracecompass.tmf.ctf.core.tests;
 
+import org.eclipse.tracecompass.tmf.core.tests.shared.DebugSuite;
 import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 
 /**
  * The class <code>TestAll</code> builds a suite that can be used to run all
@@ -23,8 +23,8 @@ import org.junit.runners.Suite;
  *
  * @author ematkho
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
+@RunWith(DebugSuite.class)
+@DebugSuite.SuiteClasses({
     CtfIteratorTest.class,
     CtfLocationDataTest.class,
     CtfLocationTest.class,

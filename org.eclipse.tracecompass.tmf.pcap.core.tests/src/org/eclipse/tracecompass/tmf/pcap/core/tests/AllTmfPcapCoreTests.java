@@ -12,8 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.pcap.core.tests;
 
+import org.eclipse.tracecompass.tmf.core.tests.shared.DebugSuite;
 import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 
 /**
  * The class <code>AllTmfPcapCoreTests</code> builds a suite to run all the
@@ -21,8 +21,8 @@ import org.junit.runners.Suite;
  *
  * @author Vincent Perot
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
+@RunWith(DebugSuite.class)
+@DebugSuite.SuiteClasses({
         org.eclipse.tracecompass.tmf.pcap.core.tests.analysis.AllTests.class,
         org.eclipse.tracecompass.tmf.pcap.core.tests.event.AllTests.class,
         org.eclipse.tracecompass.tmf.pcap.core.tests.trace.AllTests.class

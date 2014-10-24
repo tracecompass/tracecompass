@@ -13,14 +13,14 @@
 
 package org.eclipse.tracecompass.tmf.core.tests;
 
+import org.eclipse.tracecompass.tmf.core.tests.shared.DebugSuite;
 import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 
 /**
  * Master test suite for TMF Core.
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
+@RunWith(DebugSuite.class)
+@DebugSuite.SuiteClasses({
     TmfCorePluginTest.class,
     org.eclipse.tracecompass.tmf.core.tests.analysis.AllTests.class,
     org.eclipse.tracecompass.tmf.core.tests.component.AllTests.class,
