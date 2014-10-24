@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
  * Messages for the offset dialog
  */
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "org.eclipse.linuxtools.internal.tmf.ui.project.dialogs.offset.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.tmf.ui.project.dialogs.offset.messages"; //$NON-NLS-1$
 
     /**
      * Advanced mode button
