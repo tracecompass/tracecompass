@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ***************************************************************************
+* Copyright (c) 2014 École Polytechnique de Montréal
+*
+* All rights reserved. This program and the accompanying materials are
+* made available under the terms of the Eclipse Public License v1.0 which
+* accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+	* Naser Ezzati - Initial API and implementation
+*************************************************************************** -->
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
+
+	<stateProvider id="kernel.linux.sp" version="1">
+		<head>
+			<traceType id="org.eclipse.linuxtools.lttng2.kernel.tracetype" />
+			<label value="Test Condition Operators" />
+		</head>
+
+		<!-- StateValues -->
+		<definedValue name="PROCESS_STATUS_UNKNOWN" value="0" />
+		<definedValue name="PROCESS_STATUS_WAIT_BLOCKED" value="1" />
+		<definedValue name="PROCESS_STATUS_RUN_USERMODE" value="2" />
+		<definedValue name="PROCESS_STATUS_RUN_SYSCALL" value="3" />
+		<definedValue name="PROCESS_STATUS_INTERRUPTED" value="5000" />
+		<definedValue name="PROCESS_STATUS_WAIT_FOR_CPU" value="10" />
+
+		<location id="CurrentThread">
+			<stateAttribute type="constant" value="Threads" />
+			<stateAttribute type="eventField" value="next_tid" />
+		</location>
+
+		<eventHandler eventName="sched_switch">
+			<stateChange>
+				<if>
+					<condition operator="ne"> <!-- operator can also be "eq", "ge", "gt", "le", "lt" -->
+						<field name="prev_state" />
+						<stateValue type="long" value="0" />
+					</condition>
+				</if>
+				<then>
+					<stateAttribute type="constant" value="Threads" />
+					<stateAttribute type="eventField" value="prev_tid" />
+					<stateAttribute type="constant" value="Status" />
+					<stateValue type="int" value="$PROCESS_STATUS_WAIT_BLOCKED" />
+				</then>
+				<else>
+					<stateAttribute type="constant" value="Threads" />
+					<stateAttribute type="eventField" value="prev_tid" />
+					<stateAttribute type="constant" value="Status" />
+					<stateValue type="int" value="$PROCESS_STATUS_WAIT_FOR_CPU" />
+				</else>
+			</stateChange>
+
+			<stateChange>
+				<if>
+						<condition operator="gt">
+							<field name="next_tid" />
+							<stateValue type="long" value="0" />
+						</condition>
+				</if>
+				<then>
+					<if>
+						<condition> <!-- when the operation attribute is not set it is considered as "eq" (equal) -->
+							<stateAttribute type="location" value="newCurrentThread" />
+							<stateAttribute type="constant" value="System_call" />
+							<stateValue type="null" />
+						</condition>
+					</if>
+					<then>
+						<stateAttribute type="location" value="CurrentCPU" />
+						<stateAttribute type="constant" value="Status" />
+						<stateValue type="int" value="$CPU_STATUS_RUN_USERMODE" />
+					</then>
+					<else>
+						<stateAttribute type="location" value="CurrentCPU" />
+						<stateAttribute type="constant" value="Status" />
+						<stateValue type="int" value="$CPU_STATUS_RUN_SYSCALL" />
+					</else>
+				</then>
+			</stateChange>
+
+			<stateChange>
+				<if>
+					<condition>  <!-- when the operation attribute is not set it is considered as "eq" (equal) -->
+						<stateAttribute type="location" value="CurrentThread" />
+						<stateAttribute type="constant" value="System_call" />
+						<stateValue type="null" />
+					</condition>
+				</if>
+				<then>
+					<stateAttribute type="location" value="CurrentThread" />
+					<stateAttribute type="constant" value="Status" />
+					<stateValue type="int" value="$PROCESS_STATUS_RUN_USERMODE" />
+				</then>
+				<else>
+					<stateAttribute type="location" value="CurrentThread" />
+					<stateAttribute type="constant" value="Status" />
+					<stateValue type="int" value="$PROCESS_STATUS_RUN_SYSCALL" />
+				</else>
+			</stateChange>
+		</eventHandler>
+		<eventHandler eventName="irq_handler_exit">
+			<stateChange>
+				<stateAttribute type="location" value="CurrentIRQ" />
+				<stateValue type="null" />
+			</stateChange>
+			<stateChange>
+				<if>
+					<condition operator="eq">
+						<stateAttribute type="location" value="CurrentThread" />
+						<stateAttribute type="constant" value="System_call" />
+						<stateValue type="null" />
+					</condition>
+				</if>
+				<then>
+					<stateAttribute type="location" value="CurrentThread" />
+					<stateAttribute type="constant" value="Status" />
+					<stateValue type="int" value="$PROCESS_STATUS_RUN_USERMODE" />
+				</then>
+				<else>
+					<stateAttribute type="location" value="CurrentThread" />
+					<stateAttribute type="constant" value="Status" />
+					<stateValue type="int" value="$PROCESS_STATUS_RUN_SYSCALL" />
+				</else>
+			</stateChange>
+		</eventHandler>
+	</stateProvider>
+</tmfxml>

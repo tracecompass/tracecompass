@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ***************************************************************************
+* Copyright (c) 2014 École Polytechnique de Montréal
+*
+* All rights reserved. This program and the accompanying materials are
+* made available under the terms of the Eclipse Public License v1.0 which
+* accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+	* Naser Ezzati - Initial API and implementation
+*************************************************************************** -->
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
+
+	<stateProvider id="invalid.condition.operator" version="1">
+
+		<eventHandler eventName="some_event">
+			<stateChange>
+				<if>
+					<!-- Invalid condition operator -->
+					<condition operator="an_invalid_operator">
+						<field name="a" />
+						<stateValue type="long" value="0" />
+					</condition>
+				</if>
+				<then>
+					<stateAttribute type="constant" value="b" />
+					<stateValue type="int" value="1" />
+				</then>
+			</stateChange>
+		</eventHandler>
+
+	</stateProvider>
+</tmfxml>

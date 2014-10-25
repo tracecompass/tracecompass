@@ -93,4 +93,14 @@ public interface TmfXmlStrings {
     static final String AND = "and";
     static final String OR = "or";
 
+    static final String OPERATOR = "operator";
+
+    /* Comparison/Condition operator types */
+    static final String EQ = "eq";
+    static final String NE = "ne";
+    static final String GE = "ge";
+    static final String GT = "gt";
+    static final String LE = "le";
+    static final String LT = "lt";
+
 }

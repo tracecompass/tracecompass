@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Florian Wininger - Initial API and implementation
+ *   Naser Ezzati - Add the comparison operators
  ******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.analysis.xml.core.model;
@@ -47,14 +48,25 @@ public class TmfXmlCondition {
 
     private final List<TmfXmlCondition> fConditions = new ArrayList<>();
     private final ITmfXmlStateValue fStateValue;
-    private final ConditionOperator fOperator;
+    private final LogicalOperator fOperator;
     private final IXmlStateSystemContainer fContainer;
+    private final ConditionOperator fConditionOperator;
 
-    private enum ConditionOperator {
+    private enum LogicalOperator {
         NONE,
         NOT,
         AND,
         OR,
+    }
+
+    private enum ConditionOperator {
+        NONE,
+        EQ,
+        NE,
+        GE,
+        GT,
+        LE,
+        LT
     }
 
     /**
@@ -89,7 +101,35 @@ public class TmfXmlCondition {
 
         switch (rootNode.getNodeName()) {
         case TmfXmlStrings.CONDITION:
-            fOperator = ConditionOperator.NONE;
+            fOperator = LogicalOperator.NONE;
+            /* Read comparison type */
+            String equationType = rootNode.getAttribute(TmfXmlStrings.OPERATOR);
+
+            switch (equationType) {
+            case TmfXmlStrings.EQ:
+                fConditionOperator = ConditionOperator.EQ;
+                break;
+            case TmfXmlStrings.NE:
+                fConditionOperator = ConditionOperator.NE;
+                break;
+            case TmfXmlStrings.GE:
+                fConditionOperator = ConditionOperator.GE;
+                break;
+            case TmfXmlStrings.GT:
+                fConditionOperator = ConditionOperator.GT;
+                break;
+            case TmfXmlStrings.LE:
+                fConditionOperator = ConditionOperator.LE;
+                break;
+            case TmfXmlStrings.LT:
+                fConditionOperator = ConditionOperator.LT;
+                break;
+            case TmfXmlStrings.NULL:
+                fConditionOperator = ConditionOperator.EQ;
+                break;
+            default:
+                throw new IllegalArgumentException("TmfXmlCondition: invalid comparison operator."); //$NON-NLS-1$
+            }
             /* The last element is a state value node */
             Element stateValueElement = childElements.remove(childElements.size() - 1);
 
@@ -112,20 +152,23 @@ public class TmfXmlCondition {
             }
             break;
         case TmfXmlStrings.NOT:
-            fOperator = ConditionOperator.NOT;
+            fOperator = LogicalOperator.NOT;
             fStateValue = null;
+            fConditionOperator = ConditionOperator.NONE;
             fConditions.add(modelFactory.createCondition(childElements.get(0), fContainer));
             break;
         case TmfXmlStrings.AND:
-            fOperator = ConditionOperator.AND;
+            fOperator = LogicalOperator.AND;
             fStateValue = null;
+            fConditionOperator = ConditionOperator.NONE;
             for (Element condition : childElements) {
                 fConditions.add(modelFactory.createCondition(condition, fContainer));
             }
             break;
         case TmfXmlStrings.OR:
-            fOperator = ConditionOperator.OR;
+            fOperator = LogicalOperator.OR;
             fStateValue = null;
+            fConditionOperator = ConditionOperator.NONE;
             for (Element condition : childElements) {
                 fConditions.add(modelFactory.createCondition(condition, fContainer));
             }
@@ -176,7 +219,7 @@ public class TmfXmlCondition {
             ITmfStateValue valueState = (quark != IXmlStateSystemContainer.ROOT_QUARK) ? ss.queryOngoingState(quark) :
                     filter.getEventFieldValue(event);
 
-            return valueXML.equals(valueState);
+            return compare(valueState, valueXML, fConditionOperator);
 
         } else if (!fConditions.isEmpty()) {
             /* Verify a condition tree */
@@ -212,6 +255,42 @@ public class TmfXmlCondition {
     @Override
     public String toString() {
         return "TmfXmlCondition: " + fOperator + " on " + fConditions; //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
+    /**
+     * Compare two ITmfStateValues based on the given comparison operator
+     *
+     * @param source
+     *            the state value to compare to
+     * @param dest
+     *            the state value to be compared with
+     * @param comparisonOperator
+     *            the operator to compare the inputs
+     * @return the boolean result of the comparison
+     */
+    public boolean compare(ITmfStateValue source, ITmfStateValue dest, ConditionOperator comparisonOperator) {
+        if (source == null || dest == null) {
+            throw new IllegalArgumentException();
+        }
+
+        switch (comparisonOperator) {
+        case EQ:
+            return (source.compareTo(dest) == 0);
+        case NE:
+            return (source.compareTo(dest) != 0);
+        case GE:
+            return (source.compareTo(dest) >= 0);
+        case GT:
+            return (source.compareTo(dest) > 0);
+        case LE:
+            return (source.compareTo(dest) <= 0);
+        case LT:
+            return (source.compareTo(dest) < 0);
+        case NONE:
+        default:
+            throw new IllegalArgumentException("TmfXmlCondition: invalid comparison operator."); //$NON-NLS-1$
+        }
+
     }
 
 }
