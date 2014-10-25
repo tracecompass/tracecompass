@@ -223,6 +223,23 @@ public abstract class SWTBotUtil {
      *            org.eclipse.linuxtools.btf.trace)
      */
     public static void openTrace(final String projectName, final String tracePath, final String traceType) {
+        openTrace(projectName, tracePath, traceType, true);
+    }
+
+    /**
+     * Open a trace, this does not perform any validation though
+     *
+     * @param projectName
+     *            The project name
+     * @param tracePath
+     *            the path of the trace file (absolute or relative)
+     * @param traceType
+     *            the trace canonical string (eg:
+     *            org.eclipse.linuxtools.btf.trace)
+     * @param delay
+     *            delay and wait for jobs
+     */
+    public static void openTrace(final String projectName, final String tracePath, final String traceType, boolean delay) {
         final Exception exception[] = new Exception[1];
         exception[0] = null;
         UIThreadRunnable.syncExec(new VoidResult() {
@@ -241,8 +258,10 @@ public abstract class SWTBotUtil {
             fail(exception[0].getMessage());
         }
 
-        delay(1000);
-        waitForJobs();
+        if (delay) {
+            delay(1000);
+            waitForJobs();
+        }
     }
 
     /**

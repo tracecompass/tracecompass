@@ -21,7 +21,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     ImportAndReadKernelSmokeTest.class,
-    KernelPerspectiveChecker.class
+    KernelPerspectiveChecker.class,
+    OpenTraceStressTest.class
 })
 public class AllTests {
 
