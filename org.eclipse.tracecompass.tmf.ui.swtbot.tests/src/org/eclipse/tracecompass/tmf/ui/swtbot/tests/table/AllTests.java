@@ -12,7 +12,6 @@
 
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests.table;
 
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -23,6 +22,5 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
         CollapseEventsInTableTest.class,
 })
-@Ignore
 public class AllTests {
 }
