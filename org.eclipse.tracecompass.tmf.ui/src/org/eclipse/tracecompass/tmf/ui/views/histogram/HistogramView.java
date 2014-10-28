@@ -164,7 +164,18 @@ public class HistogramView extends TmfView {
         fSelectionStartControl.dispose();
         fSelectionEndControl.dispose();
         fTimeSpanControl.dispose();
+        disposeLegendImages();
+
         super.dispose();
+    }
+
+    private void disposeLegendImages() {
+        if (fLegendImages != null) {
+            for (Image i: fLegendImages) {
+                i.dispose();
+            }
+        }
+        fLegendImages = null;
     }
 
     // ------------------------------------------------------------------------
@@ -580,12 +591,7 @@ public class HistogramView extends TmfView {
         for (Control c: fLegendArea.getChildren()) {
             c.dispose();
         }
-        if (fLegendImages != null) {
-            for (Image i: fLegendImages) {
-                i.dispose();
-            }
-        }
-        fLegendImages = null;
+        disposeLegendImages();
         fLegendArea.layout();
         fLegendArea.getParent().layout();
     }
@@ -760,12 +766,7 @@ public class HistogramView extends TmfView {
         for (Control c: fLegendArea.getChildren()) {
             c.dispose();
         }
-        if (fLegendImages != null) {
-            for (Image i: fLegendImages) {
-                i.dispose();
-            }
-        }
-        fLegendImages = null;
+        disposeLegendImages();
         if (fFullTraceHistogram.showTraces()) {
             ITmfTrace[] traces = TmfTraceManager.getTraceSet(fTrace);
             fLegendImages = new Image[traces.length];
