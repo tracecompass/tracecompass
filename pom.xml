@@ -62,7 +62,7 @@
 
 <profiles>
   <profile>
-    <id>tracingRcp</id>
+    <id>build-rcp</id>
       <modules>
         <module>org.eclipse.tracecompass.rcp.product</module>
       </modules>

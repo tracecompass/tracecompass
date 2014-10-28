@@ -29,7 +29,7 @@
 
 <profiles>
   <profile>
-    <id>buildUpdateSite</id>
+    <id>build-update-site</id>
     <properties>
       <siteDestination>/var/www/tools/tracecompass/nightly/</siteDestination>
     </properties>
