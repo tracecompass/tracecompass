@@ -24,7 +24,7 @@ import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching.Matchin
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfNetworkEventMatching.Direction;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfEventTypeCollectionHelper;
-import org.eclipse.tracecompass.tmf.ctf.core.CtfTmfTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 
 import com.google.common.collect.ImmutableSet;
 

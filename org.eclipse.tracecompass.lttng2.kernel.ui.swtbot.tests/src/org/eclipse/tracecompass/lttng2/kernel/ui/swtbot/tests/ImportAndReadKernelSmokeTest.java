@@ -38,9 +38,9 @@ import org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.resources.Resour
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimeSynchSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
-import org.eclipse.tracecompass.tmf.ctf.core.CtfTmfEvent;
-import org.eclipse.tracecompass.tmf.ctf.core.CtfTmfTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.SWTBotUtil;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.conditions.ConditionHelpers;

@@ -17,31 +17,24 @@ import org.eclipse.tracecompass.tmf.core.tests.shared.DebugSuite;
 import org.junit.runner.RunWith;
 
 /**
- * The class <code>TestAll</code> builds a suite that can be used to run all
- * of the tests within its package as well as within any subpackages of its
+ * The class <code>TestAll</code> builds a suite that can be used to run all of
+ * the tests within its package as well as within any subpackages of its
  * package.
  *
  * @author ematkho
  */
 @RunWith(DebugSuite.class)
 @DebugSuite.SuiteClasses({
-    CtfIteratorTest.class,
-    CtfLocationDataTest.class,
-    CtfLocationTest.class,
-    CtfTmfContextTest.class,
-    CtfTmfEventFieldTest.class,
-    CtfTmfEventTest.class,
-    CtfTmfEventTypeTest.class,
-    CtfTmfLostEventsTest.class,
-    CtfTmfTimestampTest.class,
-    CtfTmfTraceTest.class,
-    EventContextTest.class,
-    FunkyTraceTest.class,
+        org.eclipse.tracecompass.tmf.ctf.core.tests.context.AllTests.class,
+        org.eclipse.tracecompass.tmf.ctf.core.tests.event.AllTests.class,
+        org.eclipse.tracecompass.tmf.ctf.core.tests.iterator.AllTests.class,
+        org.eclipse.tracecompass.tmf.ctf.core.tests.timestamp.AllTests.class,
+        org.eclipse.tracecompass.tmf.ctf.core.tests.trace.AllTests.class,
 
-    /* Tests in other packages (that are there because of CTF) */
-    org.eclipse.tracecompass.tmf.ctf.core.tests.request.AllTests.class,
-    org.eclipse.tracecompass.tmf.ctf.core.tests.statistics.AllTests.class,
-    org.eclipse.tracecompass.tmf.ctf.core.tests.tracemanager.AllTests.class
+        /* Tests in other packages (that are there because of CTF) */
+        org.eclipse.tracecompass.tmf.ctf.core.tests.temp.request.AllTests.class,
+        org.eclipse.tracecompass.tmf.ctf.core.tests.temp.statistics.AllTests.class,
+        org.eclipse.tracecompass.tmf.ctf.core.tests.temp.tracemanager.AllTests.class
 })
 public class AllTests {
 

@@ -20,7 +20,7 @@ import org.eclipse.tracecompass.tmf.core.callstack.CallStackStateProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ctf.core.CtfTmfEvent;
+import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 
 /**
  * Callstack provider for LTTng-UST traces.

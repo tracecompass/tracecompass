@@ -26,7 +26,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
-import org.eclipse.tracecompass.tmf.ctf.core.CtfTmfEvent;
+import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 
 /**
  * State provider to track the memory of the threads using the UST libc wrapper
