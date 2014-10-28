@@ -1,20 +1,21 @@
-This directory contains the source code for the LTTng integration plugins for
-Eclipse, which includes the generic Tracing and Monitoring Framework (TMF).
+This source tree contains the source code for the Trace Compass plugins for
+Eclipse.
 
 The plugins are categorized as follows:
-org.eclipse.linuxtools.ctf.*          Common Trace Format (CTF) reader library
-org.eclipse.linuxtools.gdbtrace.*     Support for reading and viewing GDB traces
-org.eclipse.linuxtools.lttng2.*       LTTng 2.x integration
-org.eclipse.linuxtools.tmf.*          Tracing and Monitoring Framework
-org.eclipse.linuxtools.statesystem.*  State System library
-org.eclipse.linuxtools.tracing.rcp.*  Code specific to the RCP version
+org.eclipse.tracecompass.ctf.*          Common Trace Format (CTF) reader library
+org.eclipse.tracecompass.gdbtrace.*     Support for reading and viewing GDB traces
+org.eclipse.tracecompass.lttng2.*       LTTng 2.x integration
+org.eclipse.tracecompass.tmf.*          Core framework
+org.eclipse.tracecompass.statesystem.*  State System library
+org.eclipse.tracecompass.rcp.*  Code specific to the RCP version
 
 See the plugins.svg file for a diagram showing the dependencies between the
 different plugins.
 
 
-To set up the environment to build TMF from within Eclipse, see this wiki page:
-http://wiki.eclipse.org/Linux_Tools_Project/LTTng_Eclipse_Plug-in_Development_Environment_Setup
+To set up the environment to build Trace Compass from within Eclipse, see this
+wiki page:
+http://wiki.eclipse.org/Trace_Compass/Development_Environment_Setup
 
 
 
@@ -35,7 +36,7 @@ the 'mvn' command:
 $ mvn clean install -Pbuild-rcp -Dmaven.test.skip=true
 
 This will build the RCP for all supported architectures. The resulting archives
-will be placed in org.eclipse.linuxtools.tracing.rcp.product/target/products
+will be placed in org.eclipse.tracecompass.rcp.product/target/products
 
 
 To build a local p2 update site
