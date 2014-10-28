@@ -152,7 +152,8 @@ public class SynchronizeTracesHandler extends AbstractHandler {
                  * better to do this on experiment's element constructor?
                  */
                 exp.refreshSupplementaryFolder();
-                final TmfExperiment experiment = new TmfExperiment(ITmfEvent.class, exp.getName(), traces, exp.getResource());
+                final TmfExperiment experiment = new TmfExperiment(ITmfEvent.class,
+                        exp.getName(), traces, TmfExperiment.DEFAULT_INDEX_PAGE_SIZE, exp.getResource());
 
                 final SynchronizationAlgorithm syncAlgo = experiment.synchronizeTraces(true);
                 TmfTraceManager.refreshSupplementaryFiles(experiment);

@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.trace.TmfExperimentContext;
 import org.eclipse.tracecompass.internal.tmf.core.trace.TmfExperimentLocation;
@@ -101,79 +102,45 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
      */
     private boolean fInitialized = false;
 
+
     // ------------------------------------------------------------------------
     // Construction
     // ------------------------------------------------------------------------
 
     /**
-     * Default constructor
+     * Default constructor. Should not be used directly, but is needed for
+     * extension points.
      *
-     * @since 3.0
+     * @deprecated Do not call this directly (but do not remove it either!)
      */
+    @Deprecated
     public TmfExperiment() {
         super();
     }
 
     /**
-     * Constructor with parameters
-     *
-     * @param type
-     *            the event type
-     * @param id
-     *            the experiment id
-     * @param traces
-     *            the experiment set of traces
-     */
-    public TmfExperiment(final Class<? extends ITmfEvent> type, final String id, final ITmfTrace[] traces) {
-        this(type, id, traces, DEFAULT_INDEX_PAGE_SIZE, null);
-    }
-
-    /**
-     * Constructor of experiment taking type, path, traces and resource
-     *
-     * @param type
-     *            the event type
-     * @param id
-     *            the experiment id
-     * @param traces
-     *            the experiment set of traces
-     * @param resource
-     *            the resource associated to the experiment
-     */
-    public TmfExperiment(final Class<? extends ITmfEvent> type, final String id, final ITmfTrace[] traces, IResource resource) {
-        this(type, id, traces, DEFAULT_INDEX_PAGE_SIZE, resource);
-    }
-
-    /**
-     * @param type
-     *            the event type
-     * @param path
-     *            the experiment path
-     * @param traces
-     *            the experiment set of traces
-     * @param indexPageSize
-     *            the experiment index page size
-     */
-    public TmfExperiment(final Class<? extends ITmfEvent> type, final String path, final ITmfTrace[] traces, final int indexPageSize) {
-        this(type, path, traces, indexPageSize, null);
-    }
-
-    /**
-     * Full constructor of an experiment, taking the type, path, traces,
+     * Constructor of an experiment, taking the type, path, traces,
      * indexPageSize and resource
      *
      * @param type
-     *            the event type
+     *            The event type
      * @param path
-     *            the experiment path
+     *            The experiment path
      * @param traces
-     *            the experiment set of traces
+     *            The experiment set of traces
      * @param indexPageSize
-     *            the experiment index page size
+     *            The experiment index page size. You can use
+     *            {@link TmfExperiment#DEFAULT_INDEX_PAGE_SIZE} for a default
+     *            value.
      * @param resource
-     *            the resource associated to the experiment
+     *            The resource associated to the experiment. You can use 'null'
+     *            for no resources (tests, etc.)
      */
-    public TmfExperiment(final Class<? extends ITmfEvent> type, final String path, final ITmfTrace[] traces, final int indexPageSize, IResource resource) {
+    public TmfExperiment(final Class<? extends ITmfEvent> type,
+            final String path,
+            final ITmfTrace[] traces,
+            final int indexPageSize,
+            final @Nullable IResource resource) {
         initExperiment(type, path, traces, indexPageSize, resource);
     }
 
@@ -211,6 +178,7 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
 
     @Override
     public void initTrace(final IResource resource, final String path, final Class<? extends ITmfEvent> type) {
+        /* Do nothing for experiments */
     }
 
     /**
@@ -229,7 +197,12 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
      *            the resource associated to the experiment
      * @since 3.0
      */
-    public void initExperiment(final Class<? extends ITmfEvent> type, final String path, final ITmfTrace[] traces, final int indexPageSize, IResource resource) {
+    public void initExperiment(final Class<? extends ITmfEvent> type,
+            final String path,
+            final ITmfTrace[] traces,
+            final int indexPageSize,
+            final @Nullable IResource resource) {
+
         setCacheSize(indexPageSize);
         setStreamingInterval(0);
         setParser(this);

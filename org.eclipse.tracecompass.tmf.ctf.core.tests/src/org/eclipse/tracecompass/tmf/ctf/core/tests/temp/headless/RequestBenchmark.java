@@ -58,7 +58,8 @@ public class RequestBenchmark extends TmfEventRequest {
             traces[0] = new CtfTmfTrace();
             traces[0].initTrace(null, TRACE_PATH, CtfTmfEvent.class);
             /* Create our new experiment */
-            fExperiment = new TmfExperiment(CtfTmfEvent.class, "Headless", traces);
+            fExperiment = new TmfExperiment(CtfTmfEvent.class, "Headless", traces,
+                    TmfExperiment.DEFAULT_INDEX_PAGE_SIZE, null);
 
             /*
              * We will issue a request for each "pass". TMF will then process

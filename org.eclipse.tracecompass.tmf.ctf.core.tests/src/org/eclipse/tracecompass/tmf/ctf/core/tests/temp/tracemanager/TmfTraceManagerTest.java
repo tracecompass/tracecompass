@@ -695,7 +695,8 @@ public class TmfTraceManagerTest {
 
     private static TmfExperiment createExperiment(ITmfTrace t1, ITmfTrace t2) {
         ITmfTrace[] traces = new ITmfTrace[] { t1, t2 };
-        TmfExperiment exp = new TmfExperiment(ITmfEvent.class, "test-exp", traces);
+        TmfExperiment exp = new TmfExperiment(ITmfEvent.class, "test-exp", traces,
+                TmfExperiment.DEFAULT_INDEX_PAGE_SIZE, null);
         exp.indexTrace(true);
         // Deregister experiment from signal manager so that it doesn't
         // interfere with the TmfTraceManager tests

@@ -307,7 +307,8 @@ public class Uml2SDTestFacility {
 
         final ITmfTrace traces[] = new ITmfTrace[1];
         traces[0] = fTrace;
-        fExperiment = new TmfExperiment(ITmfEvent.class, "TestExperiment", traces) {
+        fExperiment = new TmfExperiment(ITmfEvent.class, "TestExperiment",
+                traces, TmfExperiment.DEFAULT_INDEX_PAGE_SIZE, null) {
             @Override
             protected ITmfTraceIndexer createIndexer(int interval) {
                 return new TmfCheckpointIndexer(this, interval);

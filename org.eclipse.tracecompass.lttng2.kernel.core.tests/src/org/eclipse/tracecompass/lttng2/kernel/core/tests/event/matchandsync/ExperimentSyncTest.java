@@ -59,7 +59,7 @@ public class ExperimentSyncTest {
                 CtfTmfTrace trace2 = CtfTmfTestTrace.SYNC_DEST.getTrace();) {
 
             ITmfTrace[] traces = { trace1, trace2 };
-            TmfExperiment experiment = new TmfExperiment(traces[0].getEventType(), EXPERIMENT, traces, BLOCK_SIZE);
+            TmfExperiment experiment = new TmfExperiment(traces[0].getEventType(), EXPERIMENT, traces, BLOCK_SIZE, null);
 
             SynchronizationAlgorithm syncAlgo = experiment.synchronizeTraces(true);
 
@@ -91,7 +91,7 @@ public class ExperimentSyncTest {
                 CtfTmfTrace trace2 = CtfTmfTestTrace.DJANGO_DB.getTrace();
                 CtfTmfTrace trace3 = CtfTmfTestTrace.DJANGO_HTTPD.getTrace();) {
             ITmfTrace[] traces = { trace1, trace2, trace3 };
-            TmfExperiment experiment = new TmfExperiment(traces[0].getEventType(), EXPERIMENT, traces, BLOCK_SIZE);
+            TmfExperiment experiment = new TmfExperiment(traces[0].getEventType(), EXPERIMENT, traces, BLOCK_SIZE, null);
 
             SynchronizationAlgorithm syncAlgo = experiment.synchronizeTraces(true);
 

@@ -116,12 +116,14 @@ public class TmfExperimentTest {
 
     @Test
     public void testSimpleTmfExperimentConstructor() {
-        TmfExperiment experiment = new TmfExperiment(ITmfEvent.class, EXPERIMENT, fTestTraces);
+        TmfExperiment experiment = new TmfExperiment(ITmfEvent.class, EXPERIMENT,
+                fTestTraces, TmfExperiment.DEFAULT_INDEX_PAGE_SIZE, null);
         assertEquals("GetId", EXPERIMENT, experiment.getName());
         assertEquals("GetCacheSize", TmfExperiment.DEFAULT_INDEX_PAGE_SIZE, experiment.getCacheSize());
         experiment.dispose();
 
-        experiment = new TmfExperiment(ITmfEvent.class, EXPERIMENT, null);
+        experiment = new TmfExperiment(ITmfEvent.class, EXPERIMENT, null,
+                TmfExperiment.DEFAULT_INDEX_PAGE_SIZE, null);
         experiment.dispose();
     }
 
@@ -152,8 +154,7 @@ public class TmfExperimentTest {
          * calling the full constructor
          */
 
-        TmfExperimentStub experiment = new TmfExperimentStub();
-        experiment.initExperiment(ITmfEvent.class, EXPERIMENT, fTestTraces, 5000, null);
+        TmfExperimentStub experiment = new TmfExperimentStub(EXPERIMENT, fTestTraces, 5000);
         experiment.getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, true);
 
         assertEquals("GetId", EXPERIMENT, fExperiment.getName());
@@ -217,7 +218,8 @@ public class TmfExperimentTest {
 
     @Test
     public void testSeekNoTrace() {
-        TmfExperiment experiment = new TmfExperiment(ITmfEvent.class, EXPERIMENT, null);
+        TmfExperiment experiment = new TmfExperiment(ITmfEvent.class, EXPERIMENT,
+                null, TmfExperiment.DEFAULT_INDEX_PAGE_SIZE, null);
         ITmfContext context = experiment.seekEvent((TmfExperimentLocation) null);
         assertNull("seekEvent", context);
         experiment.dispose();
