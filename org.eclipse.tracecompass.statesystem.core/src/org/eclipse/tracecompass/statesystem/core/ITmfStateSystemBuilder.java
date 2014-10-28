@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.statesystem.core;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -105,7 +106,7 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      * @throws AttributeNotFoundException
      *             If the requested attribute is invalid
      */
-    void updateOngoingState(ITmfStateValue newValue, int attributeQuark)
+    void updateOngoingState(@NonNull ITmfStateValue newValue, int attributeQuark)
             throws AttributeNotFoundException;
 
     /**

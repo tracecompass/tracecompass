@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -26,8 +26,8 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.interval.TmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
+import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 
 /**
  * The Transient State is used to build intervals from punctual state changes.
@@ -41,10 +41,11 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
  *
  * @author Alexandre Montplaisir
  */
+@NonNullByDefault
 public class TransientState {
 
     /* Indicates where to insert state changes that we generate */
-    @NonNull private final IStateHistoryBackend backend;
+    private final IStateHistoryBackend backend;
 
     private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock(false);
 
@@ -62,7 +63,7 @@ public class TransientState {
      * @param backend
      *            The back-end in which to insert the generated state intervals
      */
-    public TransientState(@NonNull IStateHistoryBackend backend) {
+    public TransientState(IStateHistoryBackend backend) {
         this.backend = backend;
         isActive = true;
         ongoingStateInfo = new ArrayList<>();
@@ -94,7 +95,11 @@ public class TransientState {
         rwl.readLock().lock();
         try {
             checkValidAttribute(quark);
-            return ongoingStateInfo.get(quark);
+            ITmfStateValue ret = ongoingStateInfo.get(quark);
+            if (ret == null) {
+                throw new IllegalStateException("Null interval stored in transient state"); //$NON-NLS-1$
+            }
+            return ret;
         } finally {
             rwl.readLock().unlock();
         }
@@ -175,8 +180,7 @@ public class TransientState {
      * @return The corresponding TmfStateInterval object if we could find it in
      *         this transient state, or null if we couldn't.
      */
-    @Nullable
-    public ITmfStateInterval getIntervalAt(long time, int quark) {
+    public @Nullable ITmfStateInterval getIntervalAt(long time, int quark) {
         rwl.readLock().lock();
         try {
             checkValidAttribute(quark);
@@ -270,9 +274,11 @@ public class TransientState {
      */
     public void processStateChange(long eventTime, ITmfStateValue value, int quark)
             throws TimeRangeException, AttributeNotFoundException, StateValueTypeException {
-        rwl.writeLock().lock();
-        assert (this.isActive);
+        if (!this.isActive) {
+            return;
+        }
 
+        rwl.writeLock().lock();
         try {
             Type expectedSvType = stateValueTypes.get(quark);
             checkValidAttribute(quark);
@@ -350,8 +356,9 @@ public class TransientState {
 
             for (int i = 0; i < stateInfo.size(); i++) {
                 /*
-                 * We build a dummy interval with end time = -1 to put in the
-                 * answer to the query.
+                 * We build a dummy interval whose end time =
+                 * "current transient state end time" to put in the answer to
+                 * the query.
                  */
                 final ITmfStateInterval interval = getIntervalAt(t, i);
                 if (interval != null) {
@@ -374,10 +381,12 @@ public class TransientState {
      *            change)
      */
     public void closeTransientState(long endTime) {
+        if (!this.isActive) {
+            return;
+        }
+
         rwl.writeLock().lock();
         try {
-            assert (this.isActive);
-
             for (int i = 0; i < ongoingStateInfo.size(); i++) {
                 if (ongoingStateStartTimes.get(i) > endTime) {
                     /*

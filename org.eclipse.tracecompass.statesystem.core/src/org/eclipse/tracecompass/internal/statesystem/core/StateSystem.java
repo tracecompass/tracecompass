@@ -370,6 +370,13 @@ public class StateSystem implements ITmfStateSystemBuilder {
     public void modifyAttribute(long t, ITmfStateValue value, int attributeQuark)
             throws TimeRangeException, AttributeNotFoundException,
             StateValueTypeException {
+        if (value == null) {
+            /*
+             * TODO Replace with @NonNull parameter (will require fixing all the
+             * state providers!)
+             */
+            throw new IllegalArgumentException();
+        }
         transState.processStateChange(t, value, attributeQuark);
     }
 
@@ -481,22 +488,25 @@ public class StateSystem implements ITmfStateSystemBuilder {
     @Override
     public void removeAttribute(long t, int attributeQuark)
             throws TimeRangeException, AttributeNotFoundException {
-        assert (attributeQuark >= 0);
-        List<Integer> childAttributes;
+        if (attributeQuark < 0) {
+            throw new IllegalArgumentException();
+        }
 
         /*
-         * "Nullify our children first, recursively. We pass 'false' because we
+         * Nullify our children first, recursively. We pass 'false' because we
          * handle the recursion ourselves.
          */
-        childAttributes = getSubAttributes(attributeQuark, false);
+        List<Integer> childAttributes = getSubAttributes(attributeQuark, false);
         for (int childNodeQuark : childAttributes) {
-            assert (attributeQuark != childNodeQuark);
+            if (attributeQuark == childNodeQuark) {
+                /* Something went very wrong when building out attribute tree */
+                throw new IllegalStateException();
+            }
             removeAttribute(t, childNodeQuark);
         }
         /* Nullify ourselves */
         try {
-            transState.processStateChange(t, TmfStateValue.nullValue(),
-                    attributeQuark);
+            transState.processStateChange(t, TmfStateValue.nullValue(), attributeQuark);
         } catch (StateValueTypeException e) {
             /*
              * Will not happen since we're inserting null values only, but poor
@@ -536,7 +546,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
      * @param newStateIntervals
      *            The new List of state values to use as ongoing state info
      */
-    protected void replaceOngoingState(List<ITmfStateInterval> newStateIntervals) {
+    protected void replaceOngoingState(@NonNull List<ITmfStateInterval> newStateIntervals) {
         transState.replaceOngoingState(newStateIntervals);
     }
 
@@ -624,7 +634,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
      * @param writer
      *            The PrintWriter in which to print the output
      */
-    public void debugPrint(PrintWriter writer) {
+    public void debugPrint(@NonNull PrintWriter writer) {
         getAttributeTree().debugPrint(writer);
         transState.debugPrint(writer);
         backend.debugPrint(writer);

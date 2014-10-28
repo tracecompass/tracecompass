@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -151,7 +152,7 @@ public interface IStateHistoryBackend {
      * @throws StateSystemDisposedException
      *             If the state system is disposed while a request is ongoing.
      */
-    void doQuery(List<ITmfStateInterval> currentStateInfo, long t)
+    void doQuery(@NonNull List<ITmfStateInterval> currentStateInfo, long t)
             throws TimeRangeException, StateSystemDisposedException;
 
     /**
