@@ -146,7 +146,7 @@ public class CtfTmfContext implements ITmfContext {
 
     @Override
     public void dispose() {
-        CtfIteratorCEO.removeIterator(fTrace, this);
+        fTrace.getIteratorManager().removeIterator(this);
     }
 
     /**
@@ -174,18 +174,6 @@ public class CtfTmfContext implements ITmfContext {
         return getIterator().seek(location);
     }
 
-    @Override
-    public CtfTmfContext clone() {
-        CtfTmfContext ret = null;
-        try {
-            ret = (CtfTmfContext) super.clone();
-            /* Fields are immutable, no need to deep-copy them */
-        } catch (CloneNotSupportedException e) {
-            /* Should not happen, we're calling Object.clone() */
-        }
-        return ret;
-    }
-
     // -------------------------------------------
     // Private helpers
     // -------------------------------------------
@@ -197,6 +185,6 @@ public class CtfTmfContext implements ITmfContext {
      * @return an iterator
      */
     private CtfIterator getIterator() {
-        return CtfIteratorCEO.getIterator(fTrace, this);
+        return fTrace.getIteratorManager().getIterator(this);
     }
 }

@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.ctf.core.trace;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -51,7 +52,8 @@ public class CTFTraceReader implements AutoCloseable {
     /**
      * Vector of all the trace file readers.
      */
-    private final List<CTFStreamInputReader> fStreamInputReaders = new ArrayList<>();
+    private final List<CTFStreamInputReader> fStreamInputReaders =
+            Collections.synchronizedList(new ArrayList<CTFStreamInputReader>());
 
     /**
      * Priority queue to order the trace file readers by timestamp.
@@ -133,16 +135,18 @@ public class CTFTraceReader implements AutoCloseable {
      */
     @Override
     public void close() {
-        for (CTFStreamInputReader reader : fStreamInputReaders) {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    Activator.logError(e.getMessage(), e);
+        synchronized (fStreamInputReaders) {
+            for (CTFStreamInputReader reader : fStreamInputReaders) {
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        Activator.logError(e.getMessage(), e);
+                    }
                 }
             }
+            fStreamInputReaders.clear();
         }
-        fStreamInputReaders.clear();
     }
 
     // ------------------------------------------------------------------------

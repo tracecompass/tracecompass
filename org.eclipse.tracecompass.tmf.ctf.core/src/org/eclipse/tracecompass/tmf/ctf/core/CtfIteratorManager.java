@@ -15,35 +15,46 @@ package org.eclipse.tracecompass.tmf.ctf.core;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * A trace iterator manager
+ * A CTF trace iterator manager.
+ *
+ * Each instance of {@link CtfTmfTrace} should possess one of these, which will
+ * manage the iterators that are opened to read that trace. This will allow
+ * controlling the number of opened file handles per trace.
  *
  * @author Matthew Khouzam
  */
-class CtfIteratorManager {
+public class CtfIteratorManager {
     /*
      * Cache size. Under 1023 on linux32 systems. Number of file handles
      * created.
      */
     private final static int MAX_SIZE = 100;
-    /*
-     * The map of the cache.
-     */
+
+    /** The map of the cache */
     private final HashMap<CtfTmfContext, CtfIterator> fMap;
-    /*
-     * An array pointing to the same cache. this allows fast "random" accesses.
-     */
+
+    /** An array pointing to the same cache. this allows fast "random" accesses */
     private final ArrayList<CtfTmfContext> fRandomAccess;
-    /*
-     * The parent trace
-     */
+
+    /** Lock for when we access the two previous data structures */
+    private final Lock fAccessLock = new ReentrantLock();
+
+    /** The parent trace */
     private final CtfTmfTrace fTrace;
-    /*
-     * Random number generator
-     */
+
+    /** Random number generator */
     private final Random fRnd;
 
+    /**
+     * Constructor
+     *
+     * @param trace
+     *            The trace whose iterators this manager will manage
+     */
     public CtfIteratorManager(CtfTmfTrace trace) {
         fMap = new HashMap<>();
         fRandomAccess = new ArrayList<>();
@@ -70,38 +81,55 @@ class CtfIteratorManager {
         /*
          * if the element is in the map, we don't need to do anything else.
          */
-        CtfIterator retVal = fMap.get(context);
-        if (retVal == null) {
-            /*
-             * Assign an iterator to a context, this means we will need to seek
-             * at the end.
-             */
-            if (fRandomAccess.size() < MAX_SIZE) {
-                /*
-                 * if we're not full yet, just add an element.
-                 */
-                retVal = fTrace.createIterator();
-                addElement(context, retVal);
+        CtfIterator iter = fMap.get(context);
+        if (iter == null) {
 
-            } else {
+            fAccessLock.lock();
+            try {
                 /*
-                 * if we're full, randomly replace an element
+                 * Assign an iterator to a context.
                  */
-                retVal = replaceRandomElement(context);
-            }
-            if (context.getLocation() != null) {
-                final CtfLocationInfo location = (CtfLocationInfo) context.getLocation().getLocationInfo();
-                retVal.seek(location);
+                if (fRandomAccess.size() < MAX_SIZE) {
+                    /*
+                     * if we're not full yet, just add an element.
+                     */
+                    iter = fTrace.createIterator();
+                    addElement(context, iter);
+
+                } else {
+                    /*
+                     * if we're full, randomly replace an element
+                     */
+                    iter = replaceRandomElement(context);
+                }
+                if (context.getLocation() != null) {
+                    final CtfLocationInfo location = (CtfLocationInfo) context.getLocation().getLocationInfo();
+                    iter.seek(location);
+                }
+            } finally {
+                fAccessLock.unlock();
             }
         }
-        return retVal;
+        return iter;
     }
 
+    /**
+     * Remove an iterator from this manager
+     *
+     * @param context
+     *            The context of the iterator to remove
+     */
     public void removeIterator(CtfTmfContext context) {
-        try (CtfIterator removed = fMap.remove(context)) {
-        }
+        fAccessLock.lock();
+        try {
+            /* The try below is only to auto-call CtfIterator.close() */
+            try (CtfIterator removed = fMap.remove(context)) {
+            }
+            fRandomAccess.remove(context);
 
-        fRandomAccess.remove(context);
+        } finally {
+            fAccessLock.unlock();
+        }
     }
 
     /**
@@ -114,8 +142,14 @@ class CtfIteratorManager {
      */
     private void addElement(final CtfTmfContext context,
             final CtfIterator elem) {
-        fMap.put(context, elem);
-        fRandomAccess.add(context);
+        fAccessLock.lock();
+        try {
+            fMap.put(context, elem);
+            fRandomAccess.add(context);
+
+        } finally {
+            fAccessLock.unlock();
+        }
     }
 
     /**
@@ -125,8 +159,7 @@ class CtfIteratorManager {
      *            the context to swap in
      * @return the iterator of the removed elements.
      */
-    private CtfIterator replaceRandomElement(
-            final CtfTmfContext context) {
+    private CtfIterator replaceRandomElement(final CtfTmfContext context) {
         /*
          * This needs some explanation too: We need to select a random victim
          * and remove it. The order of the elements is not important, so instead
@@ -134,21 +167,37 @@ class CtfIteratorManager {
          * complexity, we pick an random number. The element is swapped out of
          * the array and removed and replaced in the hashmap.
          */
-        final int size = fRandomAccess.size();
-        final int pos = fRnd.nextInt(size);
-        final CtfTmfContext victim = fRandomAccess.get(pos);
-        fRandomAccess.set(pos, context);
-        final CtfIterator elem = fMap.remove(victim);
-        fMap.put(context, elem);
-        victim.dispose();
-        return elem;
+        fAccessLock.lock(); // just in case, should only be called when already locked
+        try {
+            final int size = fRandomAccess.size();
+            final int pos = fRnd.nextInt(size);
+            final CtfTmfContext victim = fRandomAccess.get(pos);
+            fRandomAccess.set(pos, context);
+            final CtfIterator elem = fMap.remove(victim);
+            fMap.put(context, elem);
+            victim.dispose();
+            return elem;
+
+        } finally {
+            fAccessLock.unlock();
+        }
     }
 
-    void clear() {
-        for (CtfIterator iterator : fMap.values()) {
-            iterator.dispose();
+    /**
+     * Dispose this iterator manager, which will close all the remaining
+     * iterators.
+     */
+    public void dispose() {
+        fAccessLock.lock();
+        try {
+            for (CtfIterator iterator : fMap.values()) {
+                iterator.dispose();
+            }
+            fMap.clear();
+            fRandomAccess.clear();
+
+        } finally {
+            fAccessLock.unlock();
         }
-        fMap.clear();
-        fRandomAccess.clear();
     }
 }

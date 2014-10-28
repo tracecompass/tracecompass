@@ -86,6 +86,9 @@ public class CtfTmfTrace extends TmfTrace
     private final Map<String, CtfTmfEventType> fContainedEventTypes =
             Collections.synchronizedMap(new HashMap<String, CtfTmfEventType>());
 
+    private final CtfIteratorManager fIteratorManager =
+            new CtfIteratorManager(this);
+
     /* Reference to the CTF Trace */
     private CTFTrace fTrace;
 
@@ -117,7 +120,6 @@ public class CtfTmfTrace extends TmfTrace
 
         try {
             this.fTrace = new CTFTrace(path);
-            CtfIteratorCEO.addTrace(this);
             CtfTmfContext ctx;
             /* Set the start and (current) end times for this trace */
             ctx = (CtfTmfContext) seekEvent(0L);
@@ -134,7 +136,7 @@ public class CtfTmfTrace extends TmfTrace
              * Register every event type. When you call getType, it will
              * register a trace to that type in the TmfEventTypeManager
              */
-            try (CtfIterator iter = CtfIteratorCEO.getIterator(this, ctx)) {
+            try (CtfIterator iter = fIteratorManager.getIterator(ctx)) {
                 for (IEventDeclaration ied : iter.getEventDeclarations()) {
                     CtfTmfEventType ctfTmfEventType = fContainedEventTypes.get(ied.getName());
                     if (ctfTmfEventType == null) {
@@ -164,6 +166,15 @@ public class CtfTmfTrace extends TmfTrace
         }
     }
 
+    /**
+     * Return the iterator manager of this trace
+     *
+     * @return The iterator manager
+     */
+    public CtfIteratorManager getIteratorManager() {
+        return fIteratorManager;
+    }
+
     @Override
     public void close() {
         dispose();
@@ -171,7 +182,7 @@ public class CtfTmfTrace extends TmfTrace
 
     @Override
     public synchronized void dispose() {
-        CtfIteratorCEO.removeTrace(this);
+        fIteratorManager.dispose();
         if (fTrace != null) {
             fTrace.close();
             fTrace = null;
@@ -232,8 +243,8 @@ public class CtfTmfTrace extends TmfTrace
         context.setLocation(curLocation);
         context.seek(curLocation.getLocationInfo());
         final CtfLocationInfo currentTime = ((CtfLocationInfo) context.getLocation().getLocationInfo());
-        final long startTime = getIterator(this, context).getStartTime();
-        final long endTime = getIterator(this, context).getEndTime();
+        final long startTime = fIteratorManager.getIterator(context).getStartTime();
+        final long endTime = fIteratorManager.getIterator(context).getEndTime();
         return ((double) currentTime.getTimestamp() - startTime)
                 / (endTime - startTime);
     }
@@ -269,7 +280,7 @@ public class CtfTmfTrace extends TmfTrace
         }
         context.setLocation(currentLocation);
         if (location == null) {
-            long timestamp = getIterator(this, context).getCurrentTimestamp();
+            long timestamp = fIteratorManager.getIterator(context).getCurrentTimestamp();
             currentLocation = new CtfLocation(timestamp, 0);
         }
         if (context.getRank() != 0) {
@@ -430,10 +441,6 @@ public class CtfTmfTrace extends TmfTrace
     // -------------------------------------------
     // Helpers
     // -------------------------------------------
-
-    private static CtfIterator getIterator(CtfTmfTrace trace, CtfTmfContext context) {
-        return CtfIteratorCEO.getIterator(trace, context);
-    }
 
     /**
      * Get an iterator to the trace
