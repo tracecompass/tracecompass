@@ -117,7 +117,7 @@ public class CtfTmfTrace extends TmfTrace
 
         try {
             this.fTrace = new CTFTrace(path);
-            CtfIteratorManager.addTrace(this);
+            CtfIteratorCEO.addTrace(this);
             CtfTmfContext ctx;
             /* Set the start and (current) end times for this trace */
             ctx = (CtfTmfContext) seekEvent(0L);
@@ -134,7 +134,7 @@ public class CtfTmfTrace extends TmfTrace
              * Register every event type. When you call getType, it will
              * register a trace to that type in the TmfEventTypeManager
              */
-            try (CtfIterator iter = CtfIteratorManager.getIterator(this, ctx)) {
+            try (CtfIterator iter = CtfIteratorCEO.getIterator(this, ctx)) {
                 for (IEventDeclaration ied : iter.getEventDeclarations()) {
                     CtfTmfEventType ctfTmfEventType = fContainedEventTypes.get(ied.getName());
                     if (ctfTmfEventType == null) {
@@ -171,7 +171,7 @@ public class CtfTmfTrace extends TmfTrace
 
     @Override
     public synchronized void dispose() {
-        CtfIteratorManager.removeTrace(this);
+        CtfIteratorCEO.removeTrace(this);
         if (fTrace != null) {
             fTrace.close();
             fTrace = null;
@@ -432,7 +432,7 @@ public class CtfTmfTrace extends TmfTrace
     // -------------------------------------------
 
     private static CtfIterator getIterator(CtfTmfTrace trace, CtfTmfContext context) {
-        return CtfIteratorManager.getIterator(trace, context);
+        return CtfIteratorCEO.getIterator(trace, context);
     }
 
     /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 Ericsson
+ * Copyright (c) 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -7,9 +7,9 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Matthew Khouzam - Initial API and implementation
- *   Simon Delisle - Added a method to remove the iterator
+ *   Alexandre Montplaisir - Renamed/extracted from CtfTraceManager
  *******************************************************************************/
+
 package org.eclipse.tracecompass.tmf.ctf.core;
 
 import java.util.ArrayList;
@@ -17,86 +17,11 @@ import java.util.HashMap;
 import java.util.Random;
 
 /**
- * Ctf Iterator Manager, allows mapping of iterators (a limited resource) to
- * contexts (many many resources).
- *
- * @author Matthew Khouzam
- * @version 1.0
- * @since 1.1
- */
-public abstract class CtfIteratorManager {
-    /*
-     * A side note synchronized works on the whole object, Therefore add and
-     * remove will be thread safe.
-     */
-
-    /*
-     * The map of traces to trace managers.
-     */
-    private static HashMap<CtfTmfTrace, CtfTraceManager> map = new HashMap<>();
-
-    /**
-     * Registers a trace to the iterator manager, the trace can now get
-     * iterators.
-     *
-     * @param trace
-     *            the trace to register.
-     */
-    public static synchronized void addTrace(final CtfTmfTrace trace) {
-        map.put(trace, new CtfTraceManager(trace));
-    }
-
-    /**
-     * Removes a trace to the iterator manager.
-     *
-     * @param trace
-     *            the trace to register.
-     */
-    public static synchronized void removeTrace(final CtfTmfTrace trace) {
-        CtfTraceManager mgr = map.remove(trace);
-        if (mgr != null) {
-            mgr.clear();
-        }
-    }
-
-    /**
-     * Get an iterator for a given trace and context.
-     *
-     * @param trace
-     *            the trace
-     * @param ctx
-     *            the context
-     * @return the iterator
-     * @since 2.0
-     */
-    public static synchronized CtfIterator getIterator(final CtfTmfTrace trace,
-            final CtfTmfContext ctx) {
-        return map.get(trace).getIterator(ctx);
-    }
-
-    /**
-     * Remove an iterator for a given trace and context
-     *
-     * @param trace
-     *            the trace
-     * @param ctx
-     *            the context
-     * @since 2.1
-     */
-    public static synchronized void removeIterator(final CtfTmfTrace trace, final CtfTmfContext ctx) {
-        CtfTraceManager traceManager = map.get(trace);
-        if (traceManager != null) {
-            traceManager.removeIterator(ctx);
-        }
-    }
-}
-
-/**
- * A trace manager
+ * A trace iterator manager
  *
  * @author Matthew Khouzam
  */
-class CtfTraceManager {
+class CtfIteratorManager {
     /*
      * Cache size. Under 1023 on linux32 systems. Number of file handles
      * created.
@@ -119,7 +44,7 @@ class CtfTraceManager {
      */
     private final Random fRnd;
 
-    public CtfTraceManager(CtfTmfTrace trace) {
+    public CtfIteratorManager(CtfTmfTrace trace) {
         fMap = new HashMap<>();
         fRandomAccess = new ArrayList<>();
         fRnd = new Random(System.nanoTime());
