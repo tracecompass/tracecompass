@@ -32,7 +32,7 @@ import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfPersistentlyIndexable
  */
 public abstract class AbstractFileCheckpointCollection implements ICheckpointCollection {
 
-    private static final int VERSION = 1;
+    private static final int VERSION = 2;
     private static final int SUB_VERSION_NONE = -1;
 
     /**
