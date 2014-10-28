@@ -19,6 +19,7 @@ import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
@@ -79,19 +80,20 @@ public enum TmfTestTrace {
      *
      * @return A {@link ITmfTrace} reference to this trace
      */
-    public ITmfTrace getTrace() {
+    public @NonNull ITmfTrace getTrace() {
         if (fTrace != null) {
             fTrace.dispose();
         }
         final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(fDirectory + File.separator + fPath), null);
         try {
             File test = new File(FileLocator.toFileURL(location).toURI());
-            fTrace = new TmfTraceStub(test.toURI().getPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null);
-
+            ITmfTrace trace = new TmfTraceStub(test.toURI().getPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null);
+            fTrace = trace;
+            return trace;
         } catch (URISyntaxException | IOException | TmfTraceException  e) {
             throw new IllegalStateException(e);
         }
-        return fTrace;
+
     }
 
     /**

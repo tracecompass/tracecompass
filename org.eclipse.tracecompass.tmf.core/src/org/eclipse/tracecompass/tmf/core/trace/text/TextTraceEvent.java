@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.core.trace.text;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
@@ -58,7 +59,7 @@ public abstract class TextTraceEvent extends TmfEvent {
      * @param other
      *            The event to copy
      */
-    public TextTraceEvent(final TextTraceEvent other) {
+    public TextTraceEvent(final @NonNull TextTraceEvent other) {
         super(other);
     }
 

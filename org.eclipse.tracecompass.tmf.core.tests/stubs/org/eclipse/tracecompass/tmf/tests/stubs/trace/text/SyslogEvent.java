@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.tmf.tests.stubs.trace.text;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.collapse.ITmfCollapsibleEvent;
@@ -40,7 +41,7 @@ public class SyslogEvent extends TextTraceEvent implements ITmfCollapsibleEvent 
      *             the event to copy
      *
      */
-    public SyslogEvent(final SyslogEvent other) {
+    public SyslogEvent(final @NonNull SyslogEvent other) {
         super(other);
     }
 
@@ -77,11 +78,7 @@ public class SyslogEvent extends TextTraceEvent implements ITmfCollapsibleEvent 
 
         final SyslogEvent other = (SyslogEvent) otherEvent;
 
-        if (getTrace() == null) {
-            if (other.getTrace() != null) {
-                return false;
-            }
-        } else if (!getTrace().equals(other.getTrace())) {
+        if (!getTrace().equals(other.getTrace())) {
             return false;
         }
 

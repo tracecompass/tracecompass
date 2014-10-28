@@ -77,7 +77,7 @@ public interface ITmfEvent extends IAdaptable {
     /**
      * @return the trace that 'owns' the event
      */
-    ITmfTrace getTrace();
+    @NonNull ITmfTrace getTrace();
 
     /**
      * @return the event rank within the parent trace

@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.tests.stubs.event;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 
@@ -24,10 +25,10 @@ import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 public class TmfSyntheticEventStub extends TmfEvent {
 
 
-    public TmfSyntheticEventStub(final ITmfEvent event) {
+    public TmfSyntheticEventStub(final @NonNull ITmfEvent event) {
         super(event);
     }
-    public TmfSyntheticEventStub(final TmfSyntheticEventStub other) {
+    public TmfSyntheticEventStub(final @NonNull TmfSyntheticEventStub other) {
         super(other);
     }
 

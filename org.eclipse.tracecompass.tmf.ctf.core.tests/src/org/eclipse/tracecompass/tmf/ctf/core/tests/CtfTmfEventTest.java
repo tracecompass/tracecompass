@@ -32,7 +32,6 @@ import org.eclipse.tracecompass.tmf.ctf.core.CtfTmfEventFactory;
 import org.eclipse.tracecompass.tmf.ctf.core.CtfTmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -50,14 +49,6 @@ public class CtfTmfEventTest {
     private CtfTmfEvent fixture;
 
     /**
-     * Test class initialization
-     */
-    @BeforeClass
-    public static void initialize() {
-        nullEvent = CtfTmfEventFactory.getNullEvent();
-    }
-
-    /**
      * Perform pre-test initialization.
      *
      * @throws CTFReaderException
@@ -70,6 +61,7 @@ public class CtfTmfEventTest {
                 CtfIterator tr = new CtfIterator(trace);) {
             tr.advance();
             fixture = tr.getCurrentEvent();
+            nullEvent = CtfTmfEventFactory.getNullEvent(trace);
         }
     }
 
@@ -209,12 +201,12 @@ public class CtfTmfEventTest {
     }
 
     /**
-     * Test the {@link CtfTmfEventFactory#getNullEvent()} method, and the
-     * nullEvent's values.
+     * Test the {@link CtfTmfEventFactory#getNullEvent(CtfTmfTrace)} method, and
+     * the nullEvent's values.
      */
     @Test
     public void testNullEvent() {
-        CtfTmfEvent nullEvent2 = CtfTmfEventFactory.getNullEvent();
+        CtfTmfEvent nullEvent2 = CtfTmfEventFactory.getNullEvent(fixture.getTrace());
         assertSame(nullEvent2, nullEvent);
         assertNotNull(nullEvent);
         assertEquals(-1, nullEvent.getCPU());

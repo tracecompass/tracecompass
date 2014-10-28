@@ -18,6 +18,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.filter.TmfCollapseFilter;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
@@ -26,9 +27,11 @@ import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.collapse.ITmfCollapsibleEvent;
+import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.junit.After;
 import org.junit.Test;
 
 /**
@@ -39,6 +42,8 @@ import org.junit.Test;
 @SuppressWarnings("javadoc")
 public class TmfCollapseFilterTest {
 
+    private static final TmfTestTrace STUB_TRACE = TmfTestTrace.A_TEST_10K;
+
     // ------------------------------------------------------------------------
     // Variables
     // ------------------------------------------------------------------------
@@ -48,10 +53,16 @@ public class TmfCollapseFilterTest {
     private CollapsibleEvent fCollapsibleEvent3 = new CollapsibleEvent(false);
     private NonCollapsibleEvent fNonCollapsibleEvent1 = new NonCollapsibleEvent();
     private TmfCollapseFilter fFilter = new TmfCollapseFilter();
+    private @NonNull ITmfTrace fTrace = STUB_TRACE.getTrace();
 
     // ------------------------------------------------------------------------
     // matches
     // ------------------------------------------------------------------------
+
+    @After
+    public void disposeTrace() {
+        fTrace.dispose();
+    }
 
     @Test
     public void testMatches() {
@@ -83,32 +94,32 @@ public class TmfCollapseFilterTest {
         assertNotEquals("clone()", fFilter, fFilter.clone());
     }
 
-    @Test(expected=UnsupportedOperationException.class)
+    @Test(expected = UnsupportedOperationException.class)
     public void testGetChild() {
         fFilter.getChild(0);
     }
 
-    @Test(expected=UnsupportedOperationException.class)
+    @Test(expected = UnsupportedOperationException.class)
     public void testRemove() {
         fFilter.remove();
     }
 
-    @Test(expected=UnsupportedOperationException.class)
+    @Test(expected = UnsupportedOperationException.class)
     public void testRemoveChild() {
         fFilter.removeChild(null);
     }
 
-    @Test(expected=UnsupportedOperationException.class)
+    @Test(expected = UnsupportedOperationException.class)
     public void testAddChild() {
         fFilter.addChild(null);
     }
 
-    @Test(expected=UnsupportedOperationException.class)
+    @Test(expected = UnsupportedOperationException.class)
     public void testReplaceChild() {
         fFilter.replaceChild(0, null);
     }
 
-    @Test(expected=UnsupportedOperationException.class)
+    @Test(expected = UnsupportedOperationException.class)
     public void testGetValidChildren() {
         fFilter.getValidChildren();
     }
@@ -120,13 +131,15 @@ public class TmfCollapseFilterTest {
     private class CollapsibleEvent extends TmfEvent implements ITmfCollapsibleEvent {
 
         private final boolean fIsCollapsible;
+
         CollapsibleEvent(boolean isCollapsible) {
-            super();
+            super(fTrace);
             fIsCollapsible = isCollapsible;
         }
+
         @Override
         public boolean isCollapsibleWith(ITmfEvent otherEvent) {
-            return ((CollapsibleEvent)otherEvent).fIsCollapsible;
+            return ((CollapsibleEvent) otherEvent).fIsCollapsible;
         }
     }
 
@@ -136,30 +149,37 @@ public class TmfCollapseFilterTest {
         public Object getAdapter(Class adapter) {
             return null;
         }
+
         @Override
         public ITmfTrace getTrace() {
-            return null;
+            return fTrace;
         }
+
         @Override
         public long getRank() {
             return 0;
         }
+
         @Override
         public ITmfTimestamp getTimestamp() {
             return new TmfNanoTimestamp(100);
         }
+
         @Override
         public String getSource() {
             return "";
         }
+
         @Override
         public ITmfEventType getType() {
             return new TmfEventType();
         }
+
         @Override
         public ITmfEventField getContent() {
             return new TmfEventField("testField", "test", null);
         }
+
         @Override
         public String getReference() {
             return "remote";

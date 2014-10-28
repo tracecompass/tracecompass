@@ -16,6 +16,7 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
@@ -78,7 +79,7 @@ public class CustomEvent extends TmfEvent {
      * @param other
      *            The TmfEvent to copy
      */
-    public CustomEvent(CustomTraceDefinition definition, TmfEvent other) {
+    public CustomEvent(CustomTraceDefinition definition, @NonNull TmfEvent other) {
         super(other);
         fDefinition = definition;
         fData = new HashMap<>();

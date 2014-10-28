@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.tmf.core.parsers.custom;
 
 import java.util.regex.Matcher;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
@@ -49,7 +50,7 @@ public class CustomTxtEvent extends CustomEvent {
      * @param other
      *            The TmfEvent object to copy
      */
-    public CustomTxtEvent(CustomTxtTraceDefinition definition, TmfEvent other) {
+    public CustomTxtEvent(CustomTxtTraceDefinition definition, @NonNull TmfEvent other) {
         super(definition, other);
     }
 

@@ -320,7 +320,7 @@ public class TmfEventPropertySource implements IPropertySource {
             return fEvent.getType().toString();
         } else if (id.equals(ID_REFERENCE) && fEvent.getReference() != null) {
             return fEvent.getReference().toString();
-        } else if (id.equals(ID_TRACE) && fEvent.getTrace() != null) {
+        } else if (id.equals(ID_TRACE)) {
             return fEvent.getTrace().getName();
         } else if (id.equals(ID_MODEL_URI)) {
             return ((ITmfModelLookup)fEvent).getModelUri();

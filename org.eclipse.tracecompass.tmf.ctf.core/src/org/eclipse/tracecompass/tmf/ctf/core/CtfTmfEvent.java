@@ -93,14 +93,17 @@ public class CtfTmfEvent extends TmfEvent
 
     /**
      * Inner constructor to create "null" events. Don't use this directly in
-     * normal usage, use {@link CtfTmfEventFactory#getNullEvent()} to get an
-     * instance of an empty event.
+     * normal usage, use {@link CtfTmfEventFactory#getNullEvent(CtfTmfTrace)} to
+     * get an instance of an empty event.
      *
-     * This needs to be public however because it's used in extension points,
-     * and the framework will use this constructor to get the class type.
+     * There is no need to give higher visibility to this method than package
+     * visible.
+     *
+     * @param trace
+     *            The trace associated with this event
      */
-    public CtfTmfEvent() {
-        super(null,
+    CtfTmfEvent(CtfTmfTrace trace) {
+        super(trace,
                 ITmfContext.UNKNOWN_RANK,
                 new CtfTmfTimestamp(-1),
                 null,
@@ -112,6 +115,15 @@ public class CtfTmfEvent extends TmfEvent
         fEventName = EMPTY_CTF_EVENT_NAME;
         fEventDeclaration = null;
         fEvent = EventDefinition.NULL_EVENT;
+    }
+
+    /**
+     * Default constructor. Do not use directly, but it needs to be present
+     * because it's used in extension points, and the framework will use this
+     * constructor to get the class type.
+     */
+    public CtfTmfEvent() {
+        this(null);
     }
 
     // ------------------------------------------------------------------------
@@ -154,9 +166,7 @@ public class CtfTmfEvent extends TmfEvent
 
         /* Register the event type in the owning trace, but only if there is one */
         CtfTmfTrace trace = getTrace();
-        if (trace != null) {
-            trace.registerEventType(ctfTmfEventType);
-        }
+        trace.registerEventType(ctfTmfEventType);
 
         return ctfTmfEventType;
     }
@@ -193,9 +203,6 @@ public class CtfTmfEvent extends TmfEvent
     public CtfTmfCallsite getCallsite() {
         CTFCallsite callsite = null;
         CtfTmfTrace trace = getTrace();
-        if (trace == null) {
-            return null;
-        }
         CTFTrace ctfTrace = trace.getCTFTrace();
         /* Should not happen, but it is a good check */
         if (ctfTrace == null) {

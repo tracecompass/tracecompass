@@ -16,6 +16,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.component.TmfProviderManager;
 import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.component.TmfEventProvider;
@@ -67,7 +68,7 @@ public class TmfSyntheticEventProviderStub extends TmfEventProvider {
     }
 
     // Queue 2 synthetic events per base event
-    private void handleIncomingData(final ITmfEvent e) {
+    private void handleIncomingData(final @NonNull ITmfEvent e) {
         queueResult(new TmfSyntheticEventStub(e));
         queueResult(new TmfSyntheticEventStub(e));
     }

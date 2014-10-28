@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.ctf.core;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
@@ -72,7 +73,7 @@ public final class CtfTmfEventFactory {
                  * right type. The event claims to be a "lost event", but is
                  * malformed. Log it and return a null event instead.
                  */
-                return getNullEvent();
+                return getNullEvent(originTrace);
             }
             long nbLostEvents = ((IntegerDefinition) nbLostEventsDef).getValue();
             long duration = ((IntegerDefinition) durationDef).getValue();
@@ -108,11 +109,13 @@ public final class CtfTmfEventFactory {
     /**
      * Get an instance of a null event.
      *
+     * @param trace
+     *            A trace to associate with this null event
      * @return An empty event
      */
-    public static CtfTmfEvent getNullEvent() {
+    public static CtfTmfEvent getNullEvent(@NonNull CtfTmfTrace trace) {
         if (nullEvent == null) {
-            nullEvent = new CtfTmfEvent();
+            nullEvent = new CtfTmfEvent(trace);
         }
         return nullEvent;
     }

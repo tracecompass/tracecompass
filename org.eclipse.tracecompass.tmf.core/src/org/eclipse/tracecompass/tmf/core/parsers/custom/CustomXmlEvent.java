@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.core.parsers.custom;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
@@ -45,7 +46,7 @@ public class CustomXmlEvent extends CustomEvent {
      * @param other
      *            Other TmfEvent to copy
      */
-    public CustomXmlEvent(CustomXmlTraceDefinition definition, TmfEvent other) {
+    public CustomXmlEvent(CustomXmlTraceDefinition definition, @NonNull TmfEvent other) {
         super(definition, other);
     }
 

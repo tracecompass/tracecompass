@@ -15,6 +15,7 @@
 package org.eclipse.tracecompass.tmf.core.event;
 
 import org.eclipse.core.runtime.PlatformObject;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -51,22 +52,44 @@ public class TmfEvent extends PlatformObject implements ITmfEvent {
     /**
      * Default constructor. All fields have their default value (null) and the
      * event rank is set to TmfContext.UNKNOWN_RANK.
+     *
+     * Note: This constructor with no parameter must be present for children
+     * classes functionnalities. It is preferable to use one of the constructors
+     * that specifies a trace sine the {@link #getTrace()} method will return a
+     * non null value and will throw an exception if the trace is null.
      */
     public TmfEvent() {
         this(null, ITmfContext.UNKNOWN_RANK, null, null, null, null, null);
     }
 
     /**
-     * Standard constructor. The event rank will be set to TmfContext.UNKNOWN_RANK.
+     * Default constructor. All fields have their default value (null) and the
+     * event rank is set to TmfContext.UNKNOWN_RANK.
      *
-     * @param trace the parent trace
-     * @param timestamp the event timestamp
-     * @param source the event source
-     * @param type the event type
-     * @param content the event content (payload)
-     * @param reference the event reference
-     * @since 2.0
+     * @param trace
+     *            The trace associated with this event
+     */
+    public TmfEvent(@NonNull ITmfTrace trace) {
+        this(trace, ITmfContext.UNKNOWN_RANK, null, null, null, null, null);
+    }
 
+    /**
+     * Standard constructor. The event rank will be set to
+     * TmfContext.UNKNOWN_RANK.
+     *
+     * @param trace
+     *            the parent trace
+     * @param timestamp
+     *            the event timestamp
+     * @param source
+     *            the event source
+     * @param type
+     *            the event type
+     * @param content
+     *            the event content (payload)
+     * @param reference
+     *            the event reference
+     * @since 2.0
      */
     public TmfEvent(final ITmfTrace trace, final ITmfTimestamp timestamp, final String source,
             final ITmfEventType type, final ITmfEventField content, final String reference)
@@ -77,13 +100,20 @@ public class TmfEvent extends PlatformObject implements ITmfEvent {
     /**
      * Full constructor
      *
-     * @param trace the parent trace
-     * @param rank the event rank (in the trace)
-     * @param timestamp the event timestamp
-     * @param source the event source
-     * @param type the event type
-     * @param content the event content (payload)
-     * @param reference the event reference
+     * @param trace
+     *            the parent trace
+     * @param rank
+     *            the event rank (in the trace)
+     * @param timestamp
+     *            the event timestamp
+     * @param source
+     *            the event source
+     * @param type
+     *            the event type
+     * @param content
+     *            the event content (payload)
+     * @param reference
+     *            the event reference
      * @since 2.0
      */
     public TmfEvent(final ITmfTrace trace, final long rank, final ITmfTimestamp timestamp, final String source,
@@ -103,10 +133,7 @@ public class TmfEvent extends PlatformObject implements ITmfEvent {
      *
      * @param event the original event
      */
-    public TmfEvent(final ITmfEvent event) {
-        if (event == null) {
-            throw new IllegalArgumentException();
-        }
+    public TmfEvent(final @NonNull ITmfEvent event) {
         fTrace = event.getTrace();
         fRank = event.getRank();
         fTimestamp = event.getTimestamp();
@@ -122,7 +149,11 @@ public class TmfEvent extends PlatformObject implements ITmfEvent {
 
     @Override
     public ITmfTrace getTrace() {
-        return fTrace;
+        ITmfTrace trace = fTrace;
+        if (trace == null) {
+            throw new IllegalStateException("Null traces are only allowed on special kind of events and getTrace() should not be called on them"); //$NON-NLS-1$
+        }
+        return trace;
     }
 
     @Override
