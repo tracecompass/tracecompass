@@ -421,7 +421,7 @@ public interface ITmfTrace extends ITmfEventProvider {
      * @return The host id of this trace
      * @since 3.0
      */
-    String getHostId();
+    @NonNull String getHostId();
 
     // ------------------------------------------------------------------------
     // Timestamp transformation functions

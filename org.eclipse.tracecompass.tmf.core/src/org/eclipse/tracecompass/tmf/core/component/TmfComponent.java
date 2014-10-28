@@ -87,7 +87,7 @@ public abstract class TmfComponent implements ITmfComponent {
     // ------------------------------------------------------------------------
 
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return fName;
     }
 

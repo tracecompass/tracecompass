@@ -234,7 +234,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
         fPath = path;
         fResource = resource;
         String traceName = getName();
-        if (traceName == null || traceName.isEmpty()) {
+        if (traceName.isEmpty()) {
             traceName = (resource != null) ? resource.getName() : new Path(path).lastSegment();
         }
         if (fParser == null) {

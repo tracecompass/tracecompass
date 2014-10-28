@@ -45,22 +45,22 @@ public class XmlStateSystemModule extends TmfStateSystemAnalysisModule {
 
     @Override
     public String getName() {
-        String name = getId();
+        String id = getId();
         IPath xmlFile = fXmlFile;
         if (xmlFile == null) {
-            return name;
+            return id;
         }
-        Element doc = XmlUtils.getElementInFile(xmlFile.makeAbsolute().toString(), TmfXmlStrings.STATE_PROVIDER, getId());
+        Element doc = XmlUtils.getElementInFile(xmlFile.makeAbsolute().toString(), TmfXmlStrings.STATE_PROVIDER, id);
         /* Label may be available in XML header */
         List<Element> head = XmlUtils.getChildElements(doc, TmfXmlStrings.HEAD);
+        String name = null;
         if (head.size() == 1) {
             List<Element> labels = XmlUtils.getChildElements(head.get(0), TmfXmlStrings.LABEL);
             if (!labels.isEmpty()) {
                 name = labels.get(0).getAttribute(TmfXmlStrings.VALUE);
             }
         }
-
-        return name;
+        return (name == null) ? id : name;
     }
 
     /**

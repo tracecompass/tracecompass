@@ -70,7 +70,11 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
 
     @Override
     public String getName() {
-        return fName;
+        String name = fName;
+        if (name == null) {
+            return ""; //$NON-NLS-1$
+        }
+        return name;
     }
 
     @Override
