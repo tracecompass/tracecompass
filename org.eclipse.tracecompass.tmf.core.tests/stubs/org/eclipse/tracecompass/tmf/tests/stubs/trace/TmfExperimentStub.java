@@ -15,7 +15,7 @@ package org.eclipse.tracecompass.tmf.tests.stubs.trace;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfExperiment;
+import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
 
 /**

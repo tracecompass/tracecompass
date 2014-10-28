@@ -10,7 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.tmf.core.trace;
+package org.eclipse.tracecompass.internal.tmf.core.trace.experiment;
 
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;

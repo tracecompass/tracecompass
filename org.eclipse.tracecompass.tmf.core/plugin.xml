@@ -26,7 +26,7 @@
          </tracetype>
          <tracetype
                applies="false"
-               class="org.eclipse.tracecompass.tmf.core.trace.TmfExperiment">
+               class="org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment">
          </tracetype>
       </module>
    </extension>
@@ -35,7 +35,7 @@
       <experiment
             id="org.eclipse.linuxtools.tmf.core.experiment.generic"
             name="%experimenttype.type.generic"
-            experiment_type="org.eclipse.tracecompass.tmf.core.trace.TmfExperiment">
+            experiment_type="org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment">
       </experiment>
    </extension>
 </plugin>

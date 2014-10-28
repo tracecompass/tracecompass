@@ -29,7 +29,7 @@ import java.util.Vector;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.tracecompass.internal.tmf.core.trace.TmfExperimentContext;
+import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfExperimentContext;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;

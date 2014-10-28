@@ -21,8 +21,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.nio.ByteBuffer;
 
-import org.eclipse.tracecompass.internal.tmf.core.trace.TmfExperimentLocation;
-import org.eclipse.tracecompass.internal.tmf.core.trace.TmfLocationArray;
+import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfExperimentLocation;
+import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfLocationArray;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.tracecompass.tmf.core.trace.location.TmfLocation;

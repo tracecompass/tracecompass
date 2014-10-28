@@ -12,7 +12,7 @@
  *   Patrick Tasse - Updated for removal of context clone
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.tmf.core.trace;
+package org.eclipse.tracecompass.internal.tmf.core.trace.experiment;
 
 import java.util.ArrayList;
 import java.util.List;

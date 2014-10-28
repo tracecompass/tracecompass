@@ -15,7 +15,7 @@
  *                       Added the initExperiment method and default constructor
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.core.trace;
+package org.eclipse.tracecompass.tmf.core.trace.experiment;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -29,9 +29,9 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
-import org.eclipse.tracecompass.internal.tmf.core.trace.TmfExperimentContext;
-import org.eclipse.tracecompass.internal.tmf.core.trace.TmfExperimentLocation;
-import org.eclipse.tracecompass.internal.tmf.core.trace.TmfLocationArray;
+import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfExperimentContext;
+import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfExperimentLocation;
+import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfLocationArray;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
@@ -45,6 +45,11 @@ import org.eclipse.tracecompass.tmf.core.synchronization.SynchronizationManager;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfEventParser;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfPersistentlyIndexable;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.TmfBTreeTraceIndexer;

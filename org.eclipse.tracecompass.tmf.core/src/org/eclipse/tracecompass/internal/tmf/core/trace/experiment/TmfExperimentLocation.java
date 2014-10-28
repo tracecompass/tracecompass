@@ -12,7 +12,7 @@
  * Patrick Tasse - Updated for ranks in experiment location
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.tmf.core.trace;
+package org.eclipse.tracecompass.internal.tmf.core.trace.experiment;
 
 import java.nio.ByteBuffer;
 
