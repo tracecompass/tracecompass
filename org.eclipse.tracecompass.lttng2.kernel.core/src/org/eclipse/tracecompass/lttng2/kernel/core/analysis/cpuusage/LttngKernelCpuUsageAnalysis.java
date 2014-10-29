@@ -115,7 +115,7 @@ public class LttngKernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
         if (trace == null || cpuSs == null) {
             return map;
         }
-        ITmfStateSystem kernelSs = TmfStateSystemAnalysisModule.getStateSystem(trace, LttngKernelAnalysis.ID);
+        ITmfStateSystem kernelSs = TmfStateSystemAnalysisModule.getStateSystemByModuleClass(trace, LttngKernelAnalysis.class);
         if (kernelSs == null) {
             return map;
         }

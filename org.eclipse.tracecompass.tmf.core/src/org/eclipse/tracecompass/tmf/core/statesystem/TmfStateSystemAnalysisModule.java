@@ -93,7 +93,6 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         PARTIAL
     }
 
-
     /**
      * Retrieve a state system belonging to trace, by passing the ID of the
      * relevant analysis module.
@@ -111,6 +110,36 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
     public static @Nullable ITmfStateSystem getStateSystem(ITmfTrace trace, String moduleId) {
         TmfStateSystemAnalysisModule module =
                 TmfTraceUtils.getAnalysisModuleOfClass(trace, TmfStateSystemAnalysisModule.class, moduleId);
+        if (module != null) {
+            IStatus status = module.schedule();
+            if (status.isOK()) {
+                module.waitForInitialization();
+                return module.getStateSystem();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Retrieve a state system belonging to trace, by passing the class of the
+     * relevant analysis module. If many modules of the same class exists, the
+     * state system of the first one will be returned.
+     *
+     * This will start the execution of the analysis module, and start the
+     * construction of the state system, if needed.
+     *
+     * @param trace
+     *            The trace for which you want the state system
+     * @param clazz
+     *            The class of the state system module to retrieve
+     * @return The state system, or null if there was no match
+     */
+    public static @Nullable ITmfStateSystem getStateSystemByModuleClass(ITmfTrace trace, Class<? extends TmfStateSystemAnalysisModule> clazz) {
+        TmfStateSystemAnalysisModule module = null;
+        for (TmfStateSystemAnalysisModule mod : TmfTraceUtils.getAnalysisModulesOfClass(trace, clazz)) {
+            module = mod;
+            break;
+        }
         if (module != null) {
             IStatus status = module.schedule();
             if (status.isOK()) {
