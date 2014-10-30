@@ -434,7 +434,7 @@ public class HistogramDataModel implements IHistogramDataModel {
      * @see org.eclipse.tracecompass.tmf.ui.views.distribution.model.IBaseDistributionModel#clear()
      */
     @Override
-    public void clear() {
+    public synchronized void clear() {
         Arrays.fill(fBuckets, null);
         Arrays.fill(fLostEventsBuckets, 0);
         fNbEvents = 0;
@@ -489,7 +489,7 @@ public class HistogramDataModel implements IHistogramDataModel {
      * @since 3.0
      */
     @Override
-    public void countEvent(long eventCount, long timestamp, ITmfTrace trace) {
+    public synchronized void countEvent(long eventCount, long timestamp, ITmfTrace trace) {
 
         // Validate
         if (timestamp < 0) {
@@ -521,14 +521,16 @@ public class HistogramDataModel implements IHistogramDataModel {
         } else {
 
             // get offset for adjustment
-            int offset = getOffset(timestamp);
+            long preMergeOffset = getOffset(timestamp);
 
             // Compact as needed
-            while ((fLastBucket + offset) >= fNbBuckets) {
+            while ((fLastBucket + preMergeOffset) >= fNbBuckets) {
                 mergeBuckets();
-                offset = getOffset(timestamp);
+                preMergeOffset = getOffset(timestamp);
             }
 
+            // after merging the offset should be less than number of buckets
+            int offset = (int) preMergeOffset;
             moveBuckets(offset);
 
             fLastBucket = fLastBucket + offset;
@@ -707,8 +709,8 @@ public class HistogramDataModel implements IHistogramDataModel {
         }
     }
 
-    private int getOffset(long timestamp) {
-        int offset = (int) ((fFirstBucketTime - timestamp) / fBucketDuration);
+    private long getOffset(long timestamp) {
+        long offset = (fFirstBucketTime - timestamp) / fBucketDuration;
         if (((fFirstBucketTime - timestamp) % fBucketDuration) != 0) {
             offset++;
         }

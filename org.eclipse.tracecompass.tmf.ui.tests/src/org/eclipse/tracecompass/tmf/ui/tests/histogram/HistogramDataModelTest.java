@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 Ericsson
+ * Copyright (c) 2011, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -200,6 +200,27 @@ public class HistogramDataModelTest {
         assertArrayEqualsInt(1, result.fData);
 
         testModelConsistency(model, nbBuckets, nbBuckets, 1, startTime, startTime, startTime + nbBuckets- 1, startTime + nbBuckets);
+    }
+
+    /**
+     * Test methods for {@link HistogramDataModel#countEvent(long,long,ITmfTrace)} and
+     * {@link HistogramDataModel#scaleTo(int,int,int)}.
+     */
+    @Test
+    public void testCountEvent_6() {
+        final int nbBuckets = 2;
+        final long interval = 4294967296L;
+        final int maxHeight = 10;
+
+        HistogramDataModel model = new HistogramDataModel(nbBuckets);
+        model.countEvent(0, 1 * interval, null);
+        model.countEvent(1, 0 * interval, null);
+
+        HistogramScaledData result = model.scaleTo(nbBuckets, maxHeight, 1);
+
+        assertArrayEqualsInt(1, result.fData);
+
+        testModelConsistency(model, nbBuckets, nbBuckets, interval, 0L, 0L, interval, nbBuckets * interval);
     }
 
     /**
@@ -680,7 +701,7 @@ public class HistogramDataModelTest {
         }
     }
 
-    private static void testModelConsistency(HistogramDataModel model, int numberOfBuckets,int nbEvents, int bucketduration,int firstBucketTime, int startTime, int endTime, int timeLimit) {
+    private static void testModelConsistency(HistogramDataModel model, int numberOfBuckets, int nbEvents, long bucketduration, long firstBucketTime, long startTime, long endTime, long timeLimit) {
         assertEquals(numberOfBuckets, model.getNbBuckets());
         assertEquals(nbEvents, model.getNbEvents());
         assertEquals(bucketduration, model.getBucketDuration());
