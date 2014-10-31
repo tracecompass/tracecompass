@@ -1,4 +1,4 @@
-org.eclipse.linuxtools.tmf.core/component=false
-org.eclipse.linuxtools.tmf.core/request=false
-org.eclipse.linuxtools.tmf.core/signal=false
-org.eclipse.linuxtools.tmf.core/event=false
+org.eclipse.tracecompass.tmf.core/component=false
+org.eclipse.tracecompass.tmf.core/request=false
+org.eclipse.tracecompass.tmf.core/signal=false
+org.eclipse.tracecompass.tmf.core/event=false
