@@ -13,6 +13,7 @@
 
 package org.eclipse.tracecompass.lttng2.ust.core.analysis.memory;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.memoryusage.MemoryUsageStateProvider;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.memoryusage.UstMemoryStrings;
 import org.eclipse.tracecompass.lttng2.control.core.session.SessionConfigStrings;
@@ -50,7 +51,7 @@ public class UstMemoryAnalysisModule extends TmfStateSystemAnalysisModule {
             );
 
     /** The requirements as an immutable set */
-    private static final ImmutableSet<TmfAnalysisRequirement> REQUIREMENTS;
+    private static final @NonNull ImmutableSet<TmfAnalysisRequirement> REQUIREMENTS;
 
     static {
         /* Initialize the requirements for the analysis: domain and events */
@@ -66,7 +67,9 @@ public class UstMemoryAnalysisModule extends TmfStateSystemAnalysisModule {
         TmfAnalysisRequirement domainReq = new TmfAnalysisRequirement(SessionConfigStrings.CONFIG_ELEMENT_DOMAIN);
         domainReq.addValue(SessionConfigStrings.CONFIG_DOMAIN_TYPE_UST, ValuePriorityLevel.MANDATORY);
 
-        REQUIREMENTS = ImmutableSet.of(domainReq, eventsReq);
+        @SuppressWarnings("null")
+        @NonNull ImmutableSet<TmfAnalysisRequirement> reqSet = ImmutableSet.of(domainReq, eventsReq);
+        REQUIREMENTS = reqSet;
     }
 
     @Override

@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
@@ -282,7 +283,10 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
      */
     protected IStatus executeAnalysis() {
         MultiStatus status = new MultiStatus(Activator.PLUGIN_ID, IStatus.OK, null, null);
-        Map<String, IAnalysisModuleHelper> modules = TmfAnalysisManager.getAnalysisModules(this.getClass());
+
+        @SuppressWarnings("null")
+        @NonNull Class<? extends TmfTrace> className = this.getClass();
+        Map<String, IAnalysisModuleHelper> modules = TmfAnalysisManager.getAnalysisModules(className);
         for (IAnalysisModuleHelper helper : modules.values()) {
             try {
                 IAnalysisModule module = helper.newModule(this);

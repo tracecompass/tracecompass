@@ -97,10 +97,11 @@ public abstract class AbstractProviderTest {
     public void setUp() {
         CtfTmfTestTrace testTrace = getTestTrace();
 
-        fTrace = testTrace.getTrace();
+        CtfTmfTrace trace = testTrace.getTrace();
+        fTrace = trace;
         fModule = new TestLttngCallStackModule();
         try {
-            fModule.setTrace(fTrace);
+            fModule.setTrace(trace);
         } catch (TmfAnalysisException e) {
             fail();
         }

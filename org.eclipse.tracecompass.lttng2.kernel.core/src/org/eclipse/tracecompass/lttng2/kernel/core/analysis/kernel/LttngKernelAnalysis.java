@@ -70,7 +70,7 @@ public class LttngKernelAnalysis extends TmfStateSystemAnalysisModule {
             );
 
     /** The requirements as an immutable set */
-    private static final ImmutableSet<TmfAnalysisRequirement> REQUIREMENTS;
+    private static final @NonNull ImmutableSet<TmfAnalysisRequirement> REQUIREMENTS;
 
     static {
         /* initialize the requirement: domain and events */
@@ -80,7 +80,10 @@ public class LttngKernelAnalysis extends TmfStateSystemAnalysisModule {
         TmfAnalysisRequirement eventReq = new TmfAnalysisRequirement(SessionConfigStrings.CONFIG_ELEMENT_EVENT, REQUIRED_EVENTS, ValuePriorityLevel.MANDATORY);
         eventReq.addValues(OPTIONAL_EVENTS, ValuePriorityLevel.OPTIONAL);
 
-        REQUIREMENTS = ImmutableSet.of(domainReq, eventReq);
+
+        @SuppressWarnings("null")
+        @NonNull ImmutableSet<TmfAnalysisRequirement> reqSet = ImmutableSet.of(domainReq, eventReq);
+        REQUIREMENTS = reqSet;
     }
 
     @Override
@@ -106,7 +109,9 @@ public class LttngKernelAnalysis extends TmfStateSystemAnalysisModule {
 
     @Override
     protected String getFullHelpText() {
-        return Messages.LttngKernelAnalysisModule_Help;
+        @SuppressWarnings("null")
+        @NonNull String helpText = Messages.LttngKernelAnalysisModule_Help;
+        return helpText;
     }
 
     @Override

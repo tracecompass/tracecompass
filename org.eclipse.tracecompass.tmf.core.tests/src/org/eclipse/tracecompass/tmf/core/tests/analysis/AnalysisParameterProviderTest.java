@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.tmf.core.tests.analysis;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.util.List;
@@ -61,6 +62,7 @@ public class AnalysisParameterProviderTest {
         ITmfTrace trace = TmfTestTrace.A_TEST_10K.getTrace();
         /* Make sure the value is set to null */
         IAnalysisModuleHelper helper = TmfAnalysisManager.getAnalysisModule(AnalysisManagerTest.MODULE_PARAM);
+        assertNotNull(helper);
         IAnalysisModule module = null;
         try {
             module = helper.newModule(trace);

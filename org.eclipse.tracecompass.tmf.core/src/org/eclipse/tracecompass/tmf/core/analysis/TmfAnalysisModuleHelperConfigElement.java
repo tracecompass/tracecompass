@@ -58,12 +58,20 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
 
     @Override
     public String getId() {
-        return fCe.getAttribute(TmfAnalysisModuleSourceConfigElement.ID_ATTR);
+        String id = fCe.getAttribute(TmfAnalysisModuleSourceConfigElement.ID_ATTR);
+        if (id == null) {
+            throw new IllegalStateException();
+        }
+        return id;
     }
 
     @Override
     public String getName() {
-        return fCe.getAttribute(TmfAnalysisModuleSourceConfigElement.NAME_ATTR);
+        String name = fCe.getAttribute(TmfAnalysisModuleSourceConfigElement.NAME_ATTR);
+        if (name == null) {
+            throw new IllegalStateException();
+        }
+        return name;
     }
 
     @Override
@@ -179,10 +187,14 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
         /* Get the module's parameters */
         final IConfigurationElement[] parametersCE = fCe.getChildren(TmfAnalysisModuleSourceConfigElement.PARAMETER_ELEM);
         for (IConfigurationElement element : parametersCE) {
-            module.addParameter(element.getAttribute(TmfAnalysisModuleSourceConfigElement.NAME_ATTR));
+            String paramName = element.getAttribute(TmfAnalysisModuleSourceConfigElement.NAME_ATTR);
+            if (paramName == null) {
+                continue;
+            }
+            module.addParameter(paramName);
             String defaultValue = element.getAttribute(TmfAnalysisModuleSourceConfigElement.DEFAULT_VALUE_ATTR);
             if (defaultValue != null) {
-                module.setParameter(element.getAttribute(TmfAnalysisModuleSourceConfigElement.NAME_ATTR), defaultValue);
+                module.setParameter(paramName, defaultValue);
             }
         }
         module.setTrace(trace);

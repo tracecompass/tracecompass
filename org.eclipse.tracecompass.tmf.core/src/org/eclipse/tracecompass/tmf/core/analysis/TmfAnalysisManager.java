@@ -18,6 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.analysis.TmfAnalysisModuleSources;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -29,6 +32,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * @author Geneviève Bastien
  * @since 3.0
  */
+@NonNullByDefault
 public class TmfAnalysisManager {
 
     private static final Map<String, IAnalysisModuleHelper> fAnalysisModules = new HashMap<>();
@@ -112,7 +116,9 @@ public class TmfAnalysisManager {
                 }
             }
         }
-        return Collections.unmodifiableMap(fAnalysisModules);
+        @SuppressWarnings("null")
+        @NonNull Map<String, IAnalysisModuleHelper> map = Collections.unmodifiableMap(fAnalysisModules);
+        return map;
     }
 
     /**
@@ -132,7 +138,9 @@ public class TmfAnalysisManager {
                 map.put(module.getId(), module);
             }
         }
-        return Collections.unmodifiableMap(map);
+        @SuppressWarnings("null")
+        @NonNull Map<String, IAnalysisModuleHelper> retMap = Collections.unmodifiableMap(map);
+        return retMap;
     }
 
     /**
@@ -142,7 +150,7 @@ public class TmfAnalysisManager {
      *            Id of the analysis module to get
      * @return The {@link IAnalysisModuleHelper}
      */
-    public static IAnalysisModuleHelper getAnalysisModule(String id) {
+    public static @Nullable IAnalysisModuleHelper getAnalysisModule(String id) {
         Map<String, IAnalysisModuleHelper> map = getAnalysisModules();
         return map.get(id);
     }

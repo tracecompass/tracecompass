@@ -64,8 +64,9 @@ public abstract class TmfAbstractAnalysisParamProvider implements IAnalysisParam
      *            Name of the modified parameter
      */
     protected void notifyParameterChanged(String name) {
-        if (fModule != null) {
-            fModule.notifyParameterChanged(name);
+        IAnalysisModule module = fModule;
+        if (module != null && name != null) {
+            module.notifyParameterChanged(name);
         }
     }
 }

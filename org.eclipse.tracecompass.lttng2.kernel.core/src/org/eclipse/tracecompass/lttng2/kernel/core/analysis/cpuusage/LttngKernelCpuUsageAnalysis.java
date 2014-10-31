@@ -75,11 +75,15 @@ public class LttngKernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
 
     @Override
     protected boolean executeAnalysis(IProgressMonitor monitor) {
+        ITmfTrace trace = getTrace();
+        if (trace == null) {
+            throw new IllegalStateException();
+        }
         /*
          * This analysis depends on the LTTng kernel analysis, so we'll start
          * that build at the same time
          */
-        LttngKernelAnalysis module = getTrace().getAnalysisModuleOfClass(LttngKernelAnalysis.class, LttngKernelAnalysis.ID);
+        LttngKernelAnalysis module = trace.getAnalysisModuleOfClass(LttngKernelAnalysis.class, LttngKernelAnalysis.ID);
         if (module != null) {
             module.schedule();
         }

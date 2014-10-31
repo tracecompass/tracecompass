@@ -77,14 +77,15 @@ public class CtfTmfLostEventStatisticsTest {
      */
     @Before
     public void setUp() {
-        fTrace = lostEventsTrace.getTrace();
+        ITmfTrace trace = lostEventsTrace.getTrace();
+        fTrace = trace;
 
         /* Prepare the two analysis-backed state systems */
         fTotalsMod = new TmfStatisticsTotalsModule();
         fEventTypesMod = new TmfStatisticsEventTypesModule();
         try {
-            fTotalsMod.setTrace(fTrace);
-            fEventTypesMod.setTrace(fTrace);
+            fTotalsMod.setTrace(trace);
+            fEventTypesMod.setTrace(trace);
         } catch (TmfAnalysisException e) {
             fail();
         }

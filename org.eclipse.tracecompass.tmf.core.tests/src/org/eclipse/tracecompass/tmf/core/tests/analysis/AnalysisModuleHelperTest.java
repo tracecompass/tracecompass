@@ -166,8 +166,10 @@ public class AnalysisModuleHelperTest {
 
         /* TestAnalysis2 module with a TraceStub2 */
         exception = null;
+        ITmfTrace trace = fTrace;
+        assertNotNull(trace);
         try {
-            module = fModuleOther.newModule(fTrace);
+            module = fModuleOther.newModule(trace);
             assertNotNull(module);
             assertTrue(module instanceof TestAnalysis2);
         } catch (TmfAnalysisException e) {
@@ -192,6 +194,7 @@ public class AnalysisModuleHelperTest {
          * able to set the parameter
          */
         IAnalysisModuleHelper helper = TmfAnalysisManager.getAnalysisModule(AnalysisManagerTest.MODULE_PARAM);
+        assertNotNull(helper);
         IAnalysisModule module = null;
         try {
             module = helper.newModule(trace);
@@ -210,6 +213,7 @@ public class AnalysisModuleHelperTest {
 
         /* This module has a parameter with default value */
         helper = TmfAnalysisManager.getAnalysisModule(AnalysisManagerTest.MODULE_PARAM_DEFAULT);
+        assertNotNull(helper);
         try {
             module = helper.newModule(trace);
             assertEquals(3, module.getParameter(TestAnalysis.PARAM_TEST));
@@ -230,9 +234,12 @@ public class AnalysisModuleHelperTest {
          * error
          */
         helper = TmfAnalysisManager.getAnalysisModule(AnalysisManagerTest.MODULE_SECOND);
+        assertNotNull(helper);
         Exception exception = null;
+        trace = fTrace;
+        assertNotNull(trace);
         try {
-            module = helper.newModule(fTrace);
+            module = helper.newModule(trace);
             assertNull(module.getParameter(TestAnalysis.PARAM_TEST));
 
             try {

@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.core.analysis;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 /**
  * This class listens when new analysis modules are created and registers an
  * output if the module corresponds to the output specifications
@@ -23,7 +25,7 @@ public class TmfNewAnalysisOutputListener implements ITmfNewAnalysisModuleListen
 
     private final String fAnalysisId;
     private final Class<? extends IAnalysisModule> fAnalysisModuleClass;
-    private final IAnalysisOutput fOutput;
+    private final @NonNull IAnalysisOutput fOutput;
 
     /**
      * Constructor
@@ -36,7 +38,7 @@ public class TmfNewAnalysisOutputListener implements ITmfNewAnalysisModuleListen
      * @param moduleClass
      *            The module class this output applies to
      */
-    public TmfNewAnalysisOutputListener(IAnalysisOutput output, String analysisId, Class<? extends IAnalysisModule> moduleClass) {
+    public TmfNewAnalysisOutputListener(@NonNull IAnalysisOutput output, String analysisId, Class<? extends IAnalysisModule> moduleClass) {
         fOutput = output;
         fAnalysisId = analysisId;
         fAnalysisModuleClass = moduleClass;

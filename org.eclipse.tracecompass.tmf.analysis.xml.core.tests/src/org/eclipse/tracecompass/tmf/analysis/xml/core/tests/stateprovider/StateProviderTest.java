@@ -62,7 +62,8 @@ public class StateProviderTest {
     public void setupTest() {
         /* Initialize the trace */
         assumeTrue(CtfTmfTestTrace.KERNEL.exists());
-        fTrace = CtfTmfTestTrace.KERNEL.getTrace();
+        ITmfTrace trace = CtfTmfTestTrace.KERNEL.getTrace();
+        fTrace = trace;
 
         /* Initialize the state provider module */
         Document doc = null;
@@ -86,12 +87,13 @@ public class StateProviderTest {
         Element node = (Element) stateproviderNodes.item(0);
         fModule = new XmlStateSystemModule();
         String moduleId = node.getAttribute(TmfXmlStrings.ID);
+        assertNotNull(moduleId);
         fModule.setId(moduleId);
 
         fModule.setXmlFile(new Path(TmfXmlTestFiles.VALID_FILE.getFile().getAbsolutePath()));
 
         try {
-            fModule.setTrace(fTrace);
+            fModule.setTrace(trace);
             fModule.schedule();
         } catch (TmfAnalysisException e) {
             fail("Cannot set trace " + e.getMessage());
@@ -103,7 +105,7 @@ public class StateProviderTest {
      */
     @After
     public void cleanupTest() {
-        CtfTmfTestTrace.KERNEL.dispose();
+        fTrace.dispose();
     }
 
     /**

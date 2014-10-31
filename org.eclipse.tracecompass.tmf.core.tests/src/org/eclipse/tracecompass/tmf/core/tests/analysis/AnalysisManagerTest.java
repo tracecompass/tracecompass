@@ -13,10 +13,12 @@
 package org.eclipse.tracecompass.tmf.core.tests.analysis;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleSource;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
@@ -34,13 +36,13 @@ import org.junit.Test;
 public class AnalysisManagerTest {
 
     /** Id of analysis module with parameter */
-    public static final String MODULE_PARAM = "org.eclipse.linuxtools.tmf.core.tests.analysis.test";
+    public static final @NonNull String MODULE_PARAM = "org.eclipse.linuxtools.tmf.core.tests.analysis.test";
     /** ID of analysis module with parameter and default value */
-    public static final String MODULE_PARAM_DEFAULT = "org.eclipse.linuxtools.tmf.core.tests.analysis.test2";
+    public static final @NonNull String MODULE_PARAM_DEFAULT = "org.eclipse.linuxtools.tmf.core.tests.analysis.test2";
     /** ID of analysis module for trace 2 classes only */
-    public static final String MODULE_SECOND = "org.eclipse.linuxtools.tmf.core.tests.analysis.testother";
+    public static final @NonNull String MODULE_SECOND = "org.eclipse.linuxtools.tmf.core.tests.analysis.testother";
     /** Id of analysis module with requirements */
-    public static final String MODULE_REQ = "org.eclipse.linuxtools.tmf.core.tests.analysis.reqtest";
+    public static final @NonNull String MODULE_REQ = "org.eclipse.linuxtools.tmf.core.tests.analysis.reqtest";
 
     private ITmfTrace fTrace;
 
@@ -85,14 +87,18 @@ public class AnalysisManagerTest {
     public void testListForTraces() {
         /* Generic TmfTrace */
         ITmfTrace trace = TmfTestTrace.A_TEST_10K.getTrace();
-        Map<String, IAnalysisModuleHelper> map = TmfAnalysisManager.getAnalysisModules(trace.getClass());
+        Class<? extends ITmfTrace> traceClass = trace.getClass();
+        assertNotNull(traceClass);
+        Map<String, IAnalysisModuleHelper> map = TmfAnalysisManager.getAnalysisModules(traceClass);
 
         assertTrue(map.containsKey(MODULE_PARAM));
         assertTrue(map.containsKey(MODULE_PARAM_DEFAULT));
         assertFalse(map.containsKey(MODULE_SECOND));
 
         /* TmfTraceStub2 class */
-        map = TmfAnalysisManager.getAnalysisModules(fTrace.getClass());
+        traceClass = fTrace.getClass();
+        assertNotNull(traceClass);
+        map = TmfAnalysisManager.getAnalysisModules(traceClass);
 
         assertTrue(map.containsKey(MODULE_PARAM));
         assertTrue(map.containsKey(MODULE_PARAM_DEFAULT));
@@ -107,12 +113,16 @@ public class AnalysisManagerTest {
         /* Make sure that modules in the new source are not in the list already */
         /* Generic TmfTrace */
         ITmfTrace trace = TmfTestTrace.A_TEST_10K.getTrace();
-        Map<String, IAnalysisModuleHelper> map = TmfAnalysisManager.getAnalysisModules(trace.getClass());
+        Class<? extends ITmfTrace> traceClass = trace.getClass();
+        assertNotNull(traceClass);
+        Map<String, IAnalysisModuleHelper> map = TmfAnalysisManager.getAnalysisModules(traceClass);
 
         assertFalse(map.containsKey(AnalysisModuleTestHelper.moduleStubEnum.TEST.name()));
 
         /* TmfTraceStub2 class */
-        map = TmfAnalysisManager.getAnalysisModules(fTrace.getClass());
+        Class<? extends ITmfTrace> ftraceClass = fTrace.getClass();
+        assertNotNull(ftraceClass);
+        map = TmfAnalysisManager.getAnalysisModules(ftraceClass);
 
         assertFalse(map.containsKey(AnalysisModuleTestHelper.moduleStubEnum.TEST2.name()));
 
@@ -120,10 +130,10 @@ public class AnalysisManagerTest {
         TmfAnalysisManager.registerModuleSource(new AnalysisModuleSourceStub());
 
         /* Now make sure the modules are present */
-        map = TmfAnalysisManager.getAnalysisModules(trace.getClass());
+        map = TmfAnalysisManager.getAnalysisModules(traceClass);
         assertTrue(map.containsKey(AnalysisModuleTestHelper.moduleStubEnum.TEST.name()));
 
-        map = TmfAnalysisManager.getAnalysisModules(fTrace.getClass());
+        map = TmfAnalysisManager.getAnalysisModules(ftraceClass);
         assertTrue(map.containsKey(AnalysisModuleTestHelper.moduleStubEnum.TEST2.name()));
     }
 

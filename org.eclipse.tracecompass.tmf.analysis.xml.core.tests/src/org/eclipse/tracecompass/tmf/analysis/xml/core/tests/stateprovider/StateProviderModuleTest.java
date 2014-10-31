@@ -89,6 +89,7 @@ public class StateProviderModuleTest {
         Element node = (Element) stateproviderNodes.item(0);
         fModule = new XmlStateSystemModule();
         String moduleId = node.getAttribute(TmfXmlStrings.ID);
+        assertNotNull(moduleId);
         fModule.setId(moduleId);
         assertEquals(ANALYSIS_ID, fModule.getId());
 
@@ -113,6 +114,7 @@ public class StateProviderModuleTest {
         Element node = (Element) stateproviderNodes.item(0);
         fModule = new XmlStateSystemModule();
         String moduleId = node.getAttribute(TmfXmlStrings.ID);
+        assertNotNull(moduleId);
         fModule.setId(moduleId);
 
         fModule.setXmlFile(new Path(TmfXmlTestFiles.VALID_FILE.getFile().getAbsolutePath()));

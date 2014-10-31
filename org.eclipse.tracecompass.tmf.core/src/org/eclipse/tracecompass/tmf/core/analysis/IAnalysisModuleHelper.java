@@ -35,14 +35,14 @@ public interface IAnalysisModuleHelper extends IAnalysisRequirementProvider {
      *
      * @return The id of the module
      */
-    String getId();
+    @NonNull String getId();
 
     /**
      * Gets the name of the analysis module
      *
      * @return The id of the module
      */
-    String getName();
+    @NonNull String getName();
 
     /**
      * Gets whether the analysis should be run automatically at trace opening
@@ -133,6 +133,6 @@ public interface IAnalysisModuleHelper extends IAnalysisRequirementProvider {
      * @throws TmfAnalysisException
      *             Exceptions that occurred when setting trace
      */
-    IAnalysisModule newModule(ITmfTrace trace) throws TmfAnalysisException;
+    IAnalysisModule newModule(@NonNull ITmfTrace trace) throws TmfAnalysisException;
 
 }

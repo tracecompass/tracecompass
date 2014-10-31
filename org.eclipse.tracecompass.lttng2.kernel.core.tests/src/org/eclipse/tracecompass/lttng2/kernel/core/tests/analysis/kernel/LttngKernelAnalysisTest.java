@@ -31,6 +31,7 @@ import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestHelper;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
@@ -91,8 +92,10 @@ public class LttngKernelAnalysisTest {
     @Test
     public void testAnalysisExecution() {
         fKernelAnalysisModule.setId("test");
+        ITmfTrace trace = fTrace;
+        assertNotNull(trace);
         try {
-            fKernelAnalysisModule.setTrace(fTrace);
+            fKernelAnalysisModule.setTrace(trace);
         } catch (TmfAnalysisException e) {
             fail(e.getMessage());
         }

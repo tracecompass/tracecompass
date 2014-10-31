@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.tmf.tests.stubs.analysis;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
@@ -21,12 +22,12 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  */
 public class TestAnalysis extends TmfAbstractAnalysisModule {
 
-    private int output = 0;
-
     /**
      * Test parameter. If set, simulate cancellation
      */
-    public static final String PARAM_TEST = "test";
+    public static final @NonNull String PARAM_TEST = "test";
+
+    private int fOutput = 0;
 
     /**
      * Constructor
@@ -47,7 +48,7 @@ public class TestAnalysis extends TmfAbstractAnalysisModule {
         }
         /* If PARAM_TEST is set to 0, simulate cancellation */
         if ((Integer) getParameter(PARAM_TEST) == 0) {
-            output = 0;
+            fOutput = 0;
             return false;
         } else if ((Integer) getParameter(PARAM_TEST) == 999) {
             /* just stay in an infinite loop until cancellation */
@@ -56,13 +57,17 @@ public class TestAnalysis extends TmfAbstractAnalysisModule {
             }
             return !monitor.isCanceled();
         }
-        output = (Integer) getParameter(PARAM_TEST);
+        Object obj = getParameter(PARAM_TEST);
+        if (obj == null) {
+            throw new IllegalStateException();
+        }
+        fOutput = (Integer) obj;
         return true;
     }
 
     @Override
     protected void canceling() {
-        output = -1;
+        fOutput = -1;
     }
 
     @Override
@@ -85,7 +90,7 @@ public class TestAnalysis extends TmfAbstractAnalysisModule {
      * @return The analysis output
      */
     public int getAnalysisOutput() {
-        return output;
+        return fOutput;
     }
 
 }

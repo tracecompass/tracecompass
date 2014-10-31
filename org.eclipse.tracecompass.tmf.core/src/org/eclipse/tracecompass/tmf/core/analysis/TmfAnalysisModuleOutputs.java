@@ -74,6 +74,10 @@ public class TmfAnalysisModuleOutputs {
             if (elementName.equals(OUTPUT_ELEM)) {
                 try {
                     IAnalysisOutput output = (IAnalysisOutput) ce.createExecutableExtension(CLASS_ATTR);
+                    if (output == null) {
+                        Activator.logWarning("An output could not be created"); //$NON-NLS-1$
+                        continue;
+                    }
                     ITmfNewAnalysisModuleListener listener = null;
                     for (IConfigurationElement childCe : ce.getChildren()) {
                         if (childCe.getName().equals(ANALYSIS_ID_ELEM)) {

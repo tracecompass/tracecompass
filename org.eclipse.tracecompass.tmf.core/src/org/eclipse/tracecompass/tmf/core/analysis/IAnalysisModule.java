@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.core.analysis;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.component.ITmfComponent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -54,7 +55,7 @@ public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProv
      * @param name
      *            name of the module
      */
-    void setName(String name);
+    void setName(@NonNull String name);
 
     /**
      * Sets the id of the module
@@ -62,15 +63,14 @@ public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProv
      * @param id
      *            id of the module
      */
-    void setId(String id);
+    void setId(@NonNull String id);
 
     /**
      * Gets the id of the analysis module
      *
      * @return The id of the module
      */
-    @NonNull
-    String getId();
+    @NonNull String getId();
 
     /**
      * Sets whether this analysis should be run automatically at trace opening
@@ -99,7 +99,7 @@ public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProv
      *            The trace to run the analysis on
      * @throws TmfAnalysisException
      */
-    void setTrace(ITmfTrace trace) throws TmfAnalysisException;
+    void setTrace(@NonNull ITmfTrace trace) throws TmfAnalysisException;
 
     /**
      * Add a parameter to this module
@@ -107,7 +107,7 @@ public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProv
      * @param name
      *            Name of the parameter
      */
-    void addParameter(String name);
+    void addParameter(@NonNull String name);
 
     /**
      * Sets the value of a parameter
@@ -118,7 +118,7 @@ public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProv
      *            The value (subclasses may type-check it)
      * @throws RuntimeException
      */
-    void setParameter(String name, Object value);
+    void setParameter(@NonNull String name, @Nullable Object value);
 
     /**
      * Gets the value of a parameter
@@ -127,7 +127,7 @@ public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProv
      *            Name of the parameter
      * @return The value of a parameter
      */
-    Object getParameter(String name);
+    @Nullable Object getParameter(@NonNull String name);
 
     // -----------------------------------------------------
     // Functionalities
@@ -152,14 +152,14 @@ public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProv
      * @return An IStatus indicating if the execution of the analysis could be
      *         scheduled successfully or not.
      */
-    IStatus schedule();
+    @NonNull IStatus schedule();
 
     /**
      * Gets a list of outputs
      *
      * @return The list of {@link IAnalysisOutput}
      */
-    Iterable<IAnalysisOutput> getOutputs();
+    @NonNull Iterable<IAnalysisOutput> getOutputs();
 
     /**
      * Registers an output for this analysis
@@ -167,7 +167,7 @@ public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProv
      * @param output
      *            The {@link IAnalysisOutput} object
      */
-    void registerOutput(IAnalysisOutput output);
+    void registerOutput(@NonNull IAnalysisOutput output);
 
     /**
      * Block the calling thread until this analysis has completed (or has been
@@ -194,7 +194,7 @@ public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProv
      *         scheduled to run at all. In all cases, the quality or
      *         availability of the output(s) and results is not guaranteed.
      */
-    boolean waitForCompletion(IProgressMonitor monitor);
+    boolean waitForCompletion(@NonNull IProgressMonitor monitor);
 
     /**
      * Cancels the current analysis
@@ -218,7 +218,7 @@ public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProv
      *
      * @return The generic help text
      */
-    String getHelpText();
+    @NonNull String getHelpText();
 
     /**
      * Gets a help text specific for a given trace
@@ -230,7 +230,7 @@ public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProv
      *            The trace to analyze
      * @return A help text with information on a specific trace
      */
-    String getHelpText(ITmfTrace trace);
+    @NonNull String getHelpText(@NonNull ITmfTrace trace);
 
     /**
      * Notify the module that the value of a parameter has changed
@@ -238,5 +238,5 @@ public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProv
      * @param name
      *            The of the parameter that changed
      */
-    void notifyParameterChanged(String name);
+    void notifyParameterChanged(@NonNull String name);
 }

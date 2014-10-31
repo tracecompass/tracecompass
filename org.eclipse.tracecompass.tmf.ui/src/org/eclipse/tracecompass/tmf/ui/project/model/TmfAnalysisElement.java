@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
@@ -46,7 +47,7 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
         }
     };
 
-    private final String fAnalysisId;
+    private final @NonNull String fAnalysisId;
     private boolean fCanExecute = true;
 
     /**
@@ -61,7 +62,7 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
      * @param id
      *            The analysis module id
      */
-    protected TmfAnalysisElement(String name, IResource resource, ITmfProjectModelElement parent, String id) {
+    protected TmfAnalysisElement(String name, IResource resource, ITmfProjectModelElement parent, @NonNull String id) {
         super(name, resource, parent);
         fAnalysisId = id;
         parent.addChild(this);
