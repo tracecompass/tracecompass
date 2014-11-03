@@ -111,11 +111,22 @@ public class ManifestReader {
      */
     public static TracePackageElement[] loadElementsFromManifest(InputStream inputStream) throws IOException, SAXException, ParserConfigurationException {
 
+        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream);
+        Element rootElement = doc.getDocumentElement();
+        return loadElementsFromNode(rootElement);
+    }
+
+    /**
+     * Load package elements from a manifest (XML element)
+     *
+     * @param rootElement
+     *            the root element to start loading from
+     * @return the loaded elements
+     */
+    public static TracePackageElement[] loadElementsFromNode(Element rootElement) {
         List<TracePackageElement> packageElements = new ArrayList<>();
         TracePackageElement element = null;
-        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream);
-
-        NodeList traceElements = doc.getDocumentElement().getElementsByTagName(ITracePackageConstants.TRACE_ELEMENT);
+        NodeList traceElements = rootElement.getElementsByTagName(ITracePackageConstants.TRACE_ELEMENT);
         for (int i = 0; i < traceElements.getLength(); i++) {
             Node traceNode = traceElements.item(i);
             if (traceNode.getNodeType() == Node.ELEMENT_NODE) {
