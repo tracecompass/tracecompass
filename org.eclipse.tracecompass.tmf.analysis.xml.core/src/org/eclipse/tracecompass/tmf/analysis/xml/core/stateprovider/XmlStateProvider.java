@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -87,19 +88,23 @@ public class XmlStateProvider extends AbstractTmfStateProvider implements IXmlSt
         }
 
         /* parser for the locations */
-        NodeList locationNodes = doc.getElementsByTagName(TmfXmlStrings.LOCATION);
+        List<Element> childElements = XmlUtils.getChildElements(doc, TmfXmlStrings.LOCATION);
         Set<TmfXmlLocation> locations = new HashSet<>();
-        for (int i = 0; i < locationNodes.getLength(); i++) {
-            Element element = (Element) locationNodes.item(i);
+        for (Element element : childElements) {
+            if (element == null) {
+                continue;
+            }
             TmfXmlLocation location = modelFactory.createLocation(element, this);
             locations.add(location);
         }
         fLocations = Collections.unmodifiableSet(locations);
 
         /* parser for the event handlers */
-        NodeList nodes = doc.getElementsByTagName(TmfXmlStrings.EVENT_HANDLER);
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Element element = (Element) nodes.item(i);
+        childElements = XmlUtils.getChildElements(doc, TmfXmlStrings.EVENT_HANDLER);
+        for (Element element : childElements) {
+            if (element == null) {
+                continue;
+            }
             TmfXmlEventHandler handler = modelFactory.createEventHandler(element, this);
             fEventHandlers.add(handler);
         }

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -106,7 +107,7 @@ public class TmfXmlStateChange {
      * @throws StateValueTypeException
      *             Pass through the exception it received
      */
-    public void handleEvent(@NonNull ITmfEvent event) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException {
+    public void handleEvent(ITmfEvent event) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException {
         fChange.handleEvent(event);
     }
 
@@ -117,7 +118,7 @@ public class TmfXmlStateChange {
 
     /* Interface for both private classes to handle the event */
     private interface IXmlStateChange {
-        void handleEvent(@NonNull ITmfEvent event) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException;
+        void handleEvent(ITmfEvent event) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException;
     }
 
     /**
@@ -126,13 +127,16 @@ public class TmfXmlStateChange {
     private class XmlConditionalChange implements IXmlStateChange {
         private final TmfXmlCondition fCondition;
         private final TmfXmlStateChange fThenChange;
-        private final TmfXmlStateChange fElseChange;
+        private final @Nullable TmfXmlStateChange fElseChange;
 
         public XmlConditionalChange(ITmfXmlModelFactory modelFactory, Element statechange) {
             /*
              * The if node exists, it has been verified before calling this
              */
             Node ifNode = statechange.getElementsByTagName(TmfXmlStrings.IF).item(0);
+            if (ifNode == null) {
+                throw new IllegalArgumentException();
+            }
             fCondition = modelFactory.createCondition((Element) ifNode, fContainer);
 
             Node thenNode = statechange.getElementsByTagName(TmfXmlStrings.THEN).item(0);
@@ -190,6 +194,9 @@ public class TmfXmlStateChange {
              * to reach to value to set
              */
             Element stateValueElement = childElements.remove(childElements.size() - 1);
+            if (stateValueElement == null) {
+                throw new IllegalStateException();
+            }
             List<ITmfXmlStateAttribute> attributes = new ArrayList<>();
             for (Element element : childElements) {
                 if (!element.getNodeName().equals(TmfXmlStrings.STATE_ATTRIBUTE)) {

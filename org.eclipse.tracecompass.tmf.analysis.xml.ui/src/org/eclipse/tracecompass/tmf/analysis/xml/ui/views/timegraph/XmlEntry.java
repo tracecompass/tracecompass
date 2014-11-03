@@ -150,6 +150,9 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
 
     /** Return the state value of the first interval with a non-null value */
     private String getFirstValue(Element stateAttribute) {
+        if (stateAttribute == null) {
+            throw new IllegalArgumentException();
+        }
 
         ITmfXmlModelFactory factory = TmfXmlReadOnlyModelFactory.getInstance();
         ITmfXmlStateAttribute display = factory.createStateAttribute(stateAttribute, this);

@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.analysis.xml.core.model;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
@@ -56,11 +57,18 @@ public class TmfXmlLocation {
      *            The state system container this location belongs to
      */
     public TmfXmlLocation(ITmfXmlModelFactory modelFactory, Element location, IXmlStateSystemContainer container) {
-        fId = location.getAttribute(TmfXmlStrings.ID);
+        String id = location.getAttribute(TmfXmlStrings.ID);
+        if (id == null) {
+            throw new IllegalArgumentException();
+        }
+        fId = id;
         fContainer = container;
 
         List<Element> childElements = XmlUtils.getChildElements(location);
         for (Element attribute : childElements) {
+            if (attribute == null) {
+                continue;
+            }
             ITmfXmlStateAttribute xAttribute = modelFactory.createStateAttribute(attribute, fContainer);
             fPath.add(xAttribute);
         }
@@ -86,7 +94,7 @@ public class TmfXmlLocation {
      *            the attribute tree
      * @return The quark at the leaf of the path
      */
-    public int getLocationQuark(ITmfEvent event, int startQuark) {
+    public int getLocationQuark(@Nullable ITmfEvent event, int startQuark) {
         int quark = startQuark;
         for (ITmfXmlStateAttribute attrib : fPath) {
             quark = attrib.getAttributeQuark(event, quark);

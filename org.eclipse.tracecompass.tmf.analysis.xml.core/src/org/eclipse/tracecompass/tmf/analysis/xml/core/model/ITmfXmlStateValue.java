@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.tmf.analysis.xml.core.model;
 
 import java.util.List;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
@@ -51,7 +50,7 @@ public interface ITmfXmlStateValue {
      *            The current event
      * @return the value of the event field
      */
-    ITmfStateValue getEventFieldValue(@NonNull ITmfEvent event);
+    ITmfStateValue getEventFieldValue(ITmfEvent event);
 
     /**
      * Get the list of state attributes, the path to the state value
@@ -73,6 +72,6 @@ public interface ITmfXmlStateValue {
      * @throws StateValueTypeException
      *             Pass through the exception it received
      */
-    void handleEvent(@NonNull ITmfEvent event) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException;
+    void handleEvent(ITmfEvent event) throws AttributeNotFoundException, StateValueTypeException, TimeRangeException;
 
 }

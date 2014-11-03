@@ -76,12 +76,12 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         this(modelFactory, node, container, new ArrayList<ITmfXmlStateAttribute>(), eventField);
     }
 
-    private TmfXmlReadWriteStateValue(ITmfXmlModelFactory modelFactory, Element node, IXmlStateSystemContainer container, List<ITmfXmlStateAttribute> attributes, String eventField) {
+    private TmfXmlReadWriteStateValue(ITmfXmlModelFactory modelFactory, Element node, IXmlStateSystemContainer container, List<ITmfXmlStateAttribute> attributes, @Nullable String eventField) {
         super(modelFactory, node, container, attributes, eventField);
     }
 
     @Override
-    protected ITmfStateSystemBuilder getStateSystem() {
+    protected @Nullable ITmfStateSystemBuilder getStateSystem() {
         return (ITmfStateSystemBuilder) super.getStateSystem();
     }
 
@@ -91,6 +91,9 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         /* Process the XML Element state value */
         String type = node.getAttribute(TmfXmlStrings.TYPE);
         String value = getSsContainer().getAttributeValue(node.getAttribute(TmfXmlStrings.VALUE));
+        if (value == null) {
+            throw new IllegalStateException();
+        }
 
         switch (type) {
         case TmfXmlStrings.TYPE_INT: {
@@ -134,6 +137,9 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
             List<Element> children = XmlUtils.getChildElements(node);
             List<ITmfXmlStateAttribute> childAttributes = new ArrayList<>();
             for (Element child : children) {
+                if (child == null) {
+                    continue;
+                }
                 ITmfXmlStateAttribute queryAttribute = modelFactory.createStateAttribute(child, getSsContainer());
                 childAttributes.add(queryAttribute);
             }
@@ -167,24 +173,32 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
 
         @Override
         protected void processValue(int quark, long timestamp, ITmfStateValue value) throws AttributeNotFoundException, TimeRangeException, StateValueTypeException {
+            ITmfStateSystemBuilder ss = getStateSystem();
+            if (ss == null) {
+                throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
+            }
             switch (getStackType()) {
             case POP:
-                getStateSystem().popAttribute(timestamp, quark);
+                ss.popAttribute(timestamp, quark);
                 break;
             case PUSH:
-                getStateSystem().pushAttribute(timestamp, value, quark);
+                ss.pushAttribute(timestamp, value, quark);
                 break;
             case NULL:
             case PEEK:
             default:
-                getStateSystem().modifyAttribute(timestamp, value, quark);
+                ss.modifyAttribute(timestamp, value, quark);
                 break;
             }
         }
 
         @Override
         protected void incrementValue(ITmfEvent event, int quark, long timestamp) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
-            getStateSystem().incrementAttribute(timestamp, quark);
+            ITmfStateSystemBuilder ss = getStateSystem();
+            if (ss == null) {
+                throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
+            }
+            ss.incrementAttribute(timestamp, quark);
         }
     }
 
@@ -223,13 +237,16 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         }
 
         @Override
-        public ITmfStateValue getValue(ITmfEvent event) {
+        public ITmfStateValue getValue(@Nullable ITmfEvent event) {
             return fValue;
         }
 
         @Override
         public void incrementValue(ITmfEvent event, int quark, long timestamp) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
             ITmfStateSystem ss = getStateSystem();
+            if (ss == null) {
+                throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
+            }
             ITmfStateValue value = incrementByType(quark, timestamp, ss, fValue);
             if (value != null) {
                 processValue(quark, timestamp, value);
@@ -250,7 +267,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         }
 
         @Override
-        public ITmfStateValue getValue(ITmfEvent event) {
+        public ITmfStateValue getValue(@Nullable ITmfEvent event) {
             if (event == null) {
                 Activator.logWarning("XML State value: requested an event field, but event is null"); //$NON-NLS-1$
                 return TmfStateValue.nullValue();
@@ -261,6 +278,9 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         @Override
         public void incrementValue(ITmfEvent event, int quark, long timestamp) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
             ITmfStateSystem ss = getSsContainer().getStateSystem();
+            if (ss == null) {
+                throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
+            }
             ITmfStateValue incrementValue = getValue(event);
             ITmfStateValue value = incrementByType(quark, timestamp, ss, incrementValue);
             if (value != null) {
@@ -275,7 +295,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
     private class TmfXmlStateValueEventName extends TmfXmlStateValueTypeReadWrite {
 
         @Override
-        public ITmfStateValue getValue(ITmfEvent event) {
+        public ITmfStateValue getValue(@Nullable ITmfEvent event) {
             if (event == null) {
                 Activator.logWarning("XML State value: request event name, but event is null"); //$NON-NLS-1$
                 return TmfStateValue.nullValue();
@@ -289,7 +309,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
     private class TmfXmlStateValueDelete extends TmfXmlStateValueTypeReadWrite {
 
         @Override
-        public ITmfStateValue getValue(ITmfEvent event) throws AttributeNotFoundException {
+        public ITmfStateValue getValue(@Nullable ITmfEvent event) throws AttributeNotFoundException {
             return TmfStateValue.nullValue();
         }
 
@@ -315,11 +335,14 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         }
 
         @Override
-        public ITmfStateValue getValue(ITmfEvent event) throws AttributeNotFoundException {
+        public ITmfStateValue getValue(@Nullable ITmfEvent event) throws AttributeNotFoundException {
             /* Query the state system for the value */
             ITmfStateValue value = TmfStateValue.nullValue();
             int quarkQuery = IXmlStateSystemContainer.ROOT_QUARK;
             ITmfStateSystem ss = getStateSystem();
+            if (ss == null) {
+                throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
+            }
 
             for (ITmfXmlStateAttribute attribute : fQueryValue) {
                 quarkQuery = attribute.getAttributeQuark(event, quarkQuery);
@@ -334,6 +357,9 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
              */
             if (quarkQuery != IXmlStateSystemContainer.ERROR_QUARK) {
                 value = ss.queryOngoingState(quarkQuery);
+                if (value == null) {
+                    throw new IllegalStateException();
+                }
             }
             return value;
         }
@@ -341,6 +367,10 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         @Override
         public void incrementValue(ITmfEvent event, int quark, long timestamp) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
             ITmfStateSystem ss = getStateSystem();
+            if (ss == null) {
+                throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
+            }
+
             ITmfStateValue incrementValue = getValue(event);
             ITmfStateValue value = incrementByType(quark, timestamp, ss, incrementValue);
             if (value != null) {

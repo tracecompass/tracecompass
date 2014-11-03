@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.analysis.xml.core.model.readwrite;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlStateAttribute;
@@ -44,18 +45,26 @@ public class TmfXmlReadWriteStateAttribute extends TmfXmlStateAttribute {
     }
 
     @Override
-    protected ITmfStateSystemBuilder getStateSystem() {
+    protected @Nullable ITmfStateSystemBuilder getStateSystem() {
         return (ITmfStateSystemBuilder) super.getStateSystem();
     }
 
     @Override
     protected int getQuarkAbsoluteAndAdd(String... path) throws AttributeNotFoundException {
-        return getStateSystem().getQuarkAbsoluteAndAdd(path);
+        ITmfStateSystemBuilder ss = getStateSystem();
+        if (ss == null) {
+            throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
+        }
+        return ss.getQuarkAbsoluteAndAdd(path);
     }
 
     @Override
     protected int getQuarkRelativeAndAdd(int startNodeQuark, String... path) throws AttributeNotFoundException {
-        return getStateSystem().getQuarkRelativeAndAdd(startNodeQuark, path);
+        ITmfStateSystemBuilder ss = getStateSystem();
+        if (ss == null) {
+            throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
+        }
+        return ss.getQuarkRelativeAndAdd(startNodeQuark, path);
     }
 
 }

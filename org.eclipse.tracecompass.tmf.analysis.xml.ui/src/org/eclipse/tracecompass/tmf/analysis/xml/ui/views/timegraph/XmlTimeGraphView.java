@@ -377,7 +377,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
     }
 
     private XmlEntry processEntry(@NonNull Element entryElement, @NonNull Element displayEl,
-            XmlEntry parentEntry, int quark, ITmfStateSystem ss) {
+            @NonNull XmlEntry parentEntry, int quark, ITmfStateSystem ss) {
         /*
          * Get the start time and end time of this entry from the display
          * attribute

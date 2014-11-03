@@ -14,7 +14,7 @@ package org.eclipse.tracecompass.tmf.analysis.xml.core.model.readwrite;
 
 import java.util.List;
 
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.ITmfXmlStateAttribute;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.ITmfXmlStateValue;
@@ -32,14 +32,13 @@ import org.w3c.dom.Element;
  */
 public class TmfXmlReadWriteModelFactory implements ITmfXmlModelFactory {
 
-    private static ITmfXmlModelFactory fInstance = null;
+    private static @Nullable ITmfXmlModelFactory fInstance = null;
 
     /**
      * Get the instance of this model creator
      *
      * @return The {@link TmfXmlReadWriteModelFactory} instance
      */
-    @NonNull
     public static synchronized ITmfXmlModelFactory getInstance() {
         ITmfXmlModelFactory instance = fInstance;
         if (instance == null) {

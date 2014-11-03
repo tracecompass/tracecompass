@@ -15,16 +15,15 @@ package org.eclipse.tracecompass.tmf.analysis.xml.core.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 /**
  * This Class implements an EventHandler in the XML-defined state system
@@ -62,12 +61,19 @@ public class TmfXmlEventHandler {
      */
     public TmfXmlEventHandler(ITmfXmlModelFactory modelFactory, Element node, IXmlStateSystemContainer parent) {
         fParent = parent;
-        fName = node.getAttribute(TmfXmlStrings.HANDLER_EVENT_NAME);
+        String name = node.getAttribute(TmfXmlStrings.HANDLER_EVENT_NAME);
+        if (name == null) {
+            throw new IllegalArgumentException();
+        }
+        fName = name;
 
-        NodeList nodesChanges = node.getElementsByTagName(TmfXmlStrings.STATE_CHANGE);
+        List<Element> childElements = XmlUtils.getChildElements(node, TmfXmlStrings.STATE_CHANGE);
         /* load state changes */
-        for (int i = 0; i < nodesChanges.getLength(); i++) {
-            TmfXmlStateChange stateChange = modelFactory.createStateChange((Element) nodesChanges.item(i), fParent);
+        for (Element childElem : childElements) {
+            if (childElem == null) {
+                continue;
+            }
+            TmfXmlStateChange stateChange = modelFactory.createStateChange(childElem, fParent);
             fStateChangeList.add(stateChange);
         }
     }
@@ -94,7 +100,7 @@ public class TmfXmlEventHandler {
      * @param event
      *            The trace event to handle
      */
-    public void handleEvent(@NonNull ITmfEvent event) {
+    public void handleEvent(ITmfEvent event) {
         if (!appliesToEvent(event)) {
             return;
         }

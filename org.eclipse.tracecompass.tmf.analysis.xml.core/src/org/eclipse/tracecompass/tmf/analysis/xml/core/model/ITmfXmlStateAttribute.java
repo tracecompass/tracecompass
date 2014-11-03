@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.analysis.xml.core.model;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 
@@ -52,5 +53,5 @@ public interface ITmfXmlStateAttribute {
      * @return the quark described by attribute or
      *         {@link IXmlStateSystemContainer#ERROR_QUARK} if quark cannot be found
      */
-    int getAttributeQuark(ITmfEvent event, int startQuark);
+    int getAttributeQuark(@Nullable ITmfEvent event, int startQuark);
 }

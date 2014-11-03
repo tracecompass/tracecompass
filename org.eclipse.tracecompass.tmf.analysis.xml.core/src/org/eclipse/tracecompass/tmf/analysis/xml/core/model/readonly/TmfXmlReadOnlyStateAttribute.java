@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.analysis.xml.core.model.readonly;
 
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlStateAttribute;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
@@ -44,12 +45,20 @@ public class TmfXmlReadOnlyStateAttribute extends TmfXmlStateAttribute {
 
     @Override
     protected int getQuarkAbsoluteAndAdd(String... path) throws AttributeNotFoundException {
-        return getStateSystem().getQuarkAbsolute(path);
+        ITmfStateSystem ss = getStateSystem();
+        if (ss == null) {
+            throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
+        }
+        return ss.getQuarkAbsolute(path);
     }
 
     @Override
     protected int getQuarkRelativeAndAdd(int startNodeQuark, String... path) throws AttributeNotFoundException {
-        return getStateSystem().getQuarkRelative(startNodeQuark, path);
+        ITmfStateSystem ss = getStateSystem();
+        if (ss == null) {
+            throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
+        }
+        return ss.getQuarkRelative(startNodeQuark, path);
     }
 
 }

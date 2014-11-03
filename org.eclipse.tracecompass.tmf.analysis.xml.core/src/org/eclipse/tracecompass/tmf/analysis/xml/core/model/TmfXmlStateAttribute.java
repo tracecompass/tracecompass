@@ -64,7 +64,7 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
     private final StateAttributeType fType;
 
     /** Attribute's name */
-    private final String fName;
+    private final @Nullable String fName;
 
     /** List of attributes for a query */
     private final List<ITmfXmlStateAttribute> fQueryList = new LinkedList<>();
@@ -100,6 +100,9 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
         case TmfXmlStrings.TYPE_QUERY:
             List<Element> childElements = XmlUtils.getChildElements(attribute);
             for (Element subAttributeNode : childElements) {
+                if (subAttributeNode == null) {
+                    continue;
+                }
                 ITmfXmlStateAttribute subAttribute = modelFactory.createStateAttribute(subAttributeNode, fContainer);
                 fQueryList.add(subAttribute);
             }
@@ -180,7 +183,7 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
      *
      * @return The state system associated with this state attribute
      */
-    protected ITmfStateSystem getStateSystem() {
+    protected @Nullable ITmfStateSystem getStateSystem() {
         return fContainer.getStateSystem();
     }
 
@@ -204,6 +207,9 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
     @Override
     public int getAttributeQuark(@Nullable ITmfEvent event, int startQuark) {
         ITmfStateSystem ss = getStateSystem();
+        if (ss == null) {
+            throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
+        }
 
         try {
             switch (fType) {
@@ -223,7 +229,11 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
                     return quark;
                 }
                 /* special case if field is CPU which is not in the field */
-                if (fName.equals(TmfXmlStrings.CPU)) {
+                String name = fName;
+                if (name == null) {
+                    throw new IllegalStateException();
+                }
+                if (name.equals(TmfXmlStrings.CPU)) {
                     /* See if the event advertises a CPU aspect */
                     Iterable<TmfCpuAspect> cpuAspects = TmfTraceUtils.getEventAspectsOfClass(
                             event.getTrace(), TmfCpuAspect.class);

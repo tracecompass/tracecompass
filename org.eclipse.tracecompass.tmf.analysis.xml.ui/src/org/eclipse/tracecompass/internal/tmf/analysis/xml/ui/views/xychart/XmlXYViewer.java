@@ -396,12 +396,18 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
             return;
         }
         Element displayElement = displayElements.get(0);
+        if (displayElement == null) {
+            throw new IllegalStateException();
+        }
         fDisplay = fFactory.createStateAttribute(displayElement, entry);
 
         /* Get the series name element to use */
         List<Element> seriesNameElements = XmlUtils.getChildElements(entryElement, TmfXmlUiStrings.NAME_ELEMENT);
         if (!seriesNameElements.isEmpty()) {
             Element seriesNameElement = seriesNameElements.get(0);
+            if (seriesNameElement == null) {
+                throw new IllegalStateException();
+            }
             fSeriesName = fFactory.createStateAttribute(seriesNameElement, entry);
         }
 
