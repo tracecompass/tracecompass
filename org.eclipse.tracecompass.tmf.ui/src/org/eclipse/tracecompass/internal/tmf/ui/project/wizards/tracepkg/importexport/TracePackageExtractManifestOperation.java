@@ -132,7 +132,7 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
         List<TracePackageElement> packageElements = new ArrayList<>();
         for (String traceFileName : traceFileNames) {
             TracePackageTraceElement traceElement = new TracePackageTraceElement(null, traceFileName, null);
-            traceElement.setChildren(new TracePackageElement[] { new TracePackageFilesElement(traceElement, traceFileName) });
+            new TracePackageFilesElement(traceElement, traceFileName);
             packageElements.add(traceElement);
         }
 

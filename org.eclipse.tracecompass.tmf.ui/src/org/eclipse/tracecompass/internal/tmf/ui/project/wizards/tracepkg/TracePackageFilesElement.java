@@ -26,7 +26,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 public class TracePackageFilesElement extends TracePackageElement {
 
     private static final String TRACE_ICON_PATH = "icons/elcl16/trace.gif"; //$NON-NLS-1$
-    private final String fFileName;
+    private String fFileName;
     private final IResource fResource;
     private long fSize = -1;
 
@@ -102,6 +102,15 @@ public class TracePackageFilesElement extends TracePackageElement {
      */
     public String getFileName() {
         return fFileName;
+    }
+
+    /**
+     * Set the file name for this trace file or folder
+     *
+     * @param fileName the file name for this trace file or folder
+     */
+    public void setFileName(String fileName) {
+        fFileName = fileName;
     }
 
 }

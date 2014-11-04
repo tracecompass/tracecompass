@@ -27,8 +27,8 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 public class TracePackageTraceElement extends TracePackageElement {
 
     private final TmfTraceElement fTraceElement;
-    private final String fImportName;
-    private final String fTraceType;
+    private String fImportName;
+    private String fTraceType;
 
     /**
      * Construct an instance associated to a TmfTraceElement. For exporting.
@@ -128,6 +128,15 @@ public class TracePackageTraceElement extends TracePackageElement {
     }
 
     /**
+     * Set the import name.
+     *
+     * @param importName the import name.
+     */
+    public void setImportName(String importName) {
+        fImportName = importName;
+    }
+
+    /**
      * @return the import name
      */
     public String getImportName() {
@@ -139,6 +148,15 @@ public class TracePackageTraceElement extends TracePackageElement {
      */
     public String getTraceType() {
         return fTraceType;
+    }
+
+    /**
+     * Set the trace type of this trace.
+     *
+     * @param traceType the trace type of this trace
+     */
+    public void setTraceType(String traceType) {
+        fTraceType = traceType;
     }
 
     @Override
