@@ -177,7 +177,7 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
                     + " Type=" + type + " Index=" + getIndex() + " NbReq=" + getNbRequested()
                     + " Range=" + getRange()
                     + " DataType=" + getDataType().getSimpleName();
-            TmfCoreTracer.traceRequest(this, message);
+            TmfCoreTracer.traceRequest(fRequestId, message);
         }
     }
 
@@ -282,7 +282,7 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
     @Override
     public void handleStarted() {
         if (TmfCoreTracer.isRequestTraced()) {
-            TmfCoreTracer.traceRequest(this, "STARTED"); //$NON-NLS-1$
+            TmfCoreTracer.traceRequest(getRequestId(), "STARTED"); //$NON-NLS-1$
         }
     }
 
@@ -303,28 +303,28 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
             handleSuccess();
         }
         if (TmfCoreTracer.isRequestTraced()) {
-            TmfCoreTracer.traceRequest(this, "COMPLETED (" + fNbRead + " events read)"); //$NON-NLS-1$ //$NON-NLS-2$
+            TmfCoreTracer.traceRequest(getRequestId(), "COMPLETED (" + fNbRead + " events read)"); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
     @Override
     public void handleSuccess() {
         if (TmfCoreTracer.isRequestTraced()) {
-            TmfCoreTracer.traceRequest(this, "SUCCEEDED"); //$NON-NLS-1$
+            TmfCoreTracer.traceRequest(getRequestId(), "SUCCEEDED"); //$NON-NLS-1$
         }
     }
 
     @Override
     public void handleFailure() {
         if (TmfCoreTracer.isRequestTraced()) {
-            TmfCoreTracer.traceRequest(this, "FAILED"); //$NON-NLS-1$
+            TmfCoreTracer.traceRequest(getRequestId(), "FAILED"); //$NON-NLS-1$
         }
     }
 
     @Override
     public void handleCancel() {
         if (TmfCoreTracer.isRequestTraced()) {
-            TmfCoreTracer.traceRequest(this, "CANCELLED"); //$NON-NLS-1$
+            TmfCoreTracer.traceRequest(getRequestId(), "CANCELLED"); //$NON-NLS-1$
         }
     }
 

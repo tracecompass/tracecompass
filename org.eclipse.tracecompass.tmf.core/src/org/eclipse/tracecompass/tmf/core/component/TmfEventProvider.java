@@ -271,8 +271,8 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
                     request.getExecType());
             coalescedRequest.addRequest(request);
             if (TmfCoreTracer.isRequestTraced()) {
-                TmfCoreTracer.traceRequest(request, "COALESCED with " + coalescedRequest.getRequestId()); //$NON-NLS-1$
-                TmfCoreTracer.traceRequest(coalescedRequest, "now contains " + coalescedRequest.getSubRequestIds()); //$NON-NLS-1$
+                TmfCoreTracer.traceRequest(request.getRequestId(), "COALESCED with " + coalescedRequest.getRequestId()); //$NON-NLS-1$
+                TmfCoreTracer.traceRequest(coalescedRequest.getRequestId(), "now contains " + coalescedRequest.getSubRequestIds()); //$NON-NLS-1$
             }
             fPendingCoalescedRequests.add(coalescedRequest);
         }
@@ -291,8 +291,8 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
                 if (coalescedRequest.isCompatible(request)) {
                     coalescedRequest.addRequest(request);
                     if (TmfCoreTracer.isRequestTraced()) {
-                        TmfCoreTracer.traceRequest(request, "COALESCED with " + coalescedRequest.getRequestId()); //$NON-NLS-1$
-                        TmfCoreTracer.traceRequest(coalescedRequest, "now contains " + coalescedRequest.getSubRequestIds()); //$NON-NLS-1$
+                        TmfCoreTracer.traceRequest(request.getRequestId(), "COALESCED with " + coalescedRequest.getRequestId()); //$NON-NLS-1$
+                        TmfCoreTracer.traceRequest(coalescedRequest.getRequestId(), "now contains " + coalescedRequest.getSubRequestIds()); //$NON-NLS-1$
                     }
                     return;
                 }
@@ -339,7 +339,7 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
         TmfEventThread thread = new TmfEventThread(this, request);
 
         if (TmfCoreTracer.isRequestTraced()) {
-            TmfCoreTracer.traceRequest(request, "QUEUED"); //$NON-NLS-1$
+            TmfCoreTracer.traceRequest(request.getRequestId(), "QUEUED"); //$NON-NLS-1$
         }
 
         fExecutor.execute(thread);

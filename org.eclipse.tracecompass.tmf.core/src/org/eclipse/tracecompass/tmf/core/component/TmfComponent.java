@@ -52,7 +52,7 @@ public abstract class TmfComponent implements ITmfComponent {
      *            the component name
      */
     public void init(String name) {
-        TmfCoreTracer.traceComponent(this, "created"); //$NON-NLS-1$
+        TmfCoreTracer.traceComponent(name, "created"); //$NON-NLS-1$
         fName = name;
         TmfSignalManager.register(this);
     }
@@ -101,7 +101,7 @@ public abstract class TmfComponent implements ITmfComponent {
     @Override
     public void dispose() {
         TmfSignalManager.deregister(this);
-        TmfCoreTracer.traceComponent(this, "disposed"); //$NON-NLS-1$
+        TmfCoreTracer.traceComponent(fName, "disposed"); //$NON-NLS-1$
     }
 
     @Override

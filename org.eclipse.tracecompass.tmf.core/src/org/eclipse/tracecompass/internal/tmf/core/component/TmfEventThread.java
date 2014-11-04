@@ -157,7 +157,7 @@ public class TmfEventThread implements Runnable {
     @Override
     public void run() {
 
-        TmfCoreTracer.traceRequest(fRequest, "is being serviced by " + fProvider.getName()); //$NON-NLS-1$
+        TmfCoreTracer.traceRequest(fRequest.getRequestId(), "is being serviced by " + fProvider.getName()); //$NON-NLS-1$
 
         // Extract the generic information
         fRequest.start();
@@ -175,7 +175,7 @@ public class TmfEventThread implements Runnable {
         try {
             // Get the ordered events
             ITmfEvent event = fProvider.getNext(context);
-            TmfCoreTracer.traceRequest(fRequest, "read first event"); //$NON-NLS-1$
+            TmfCoreTracer.traceRequest(fRequest.getRequestId(), "read first event"); //$NON-NLS-1$
 
             while (event != null && !fProvider.isCompleted(fRequest, event, nbRead)) {
 
@@ -228,7 +228,7 @@ public class TmfEventThread implements Runnable {
      */
     public void suspend() {
         fIsPaused = true;
-        TmfCoreTracer.traceRequest(fRequest, "SUSPENDED"); //$NON-NLS-1$
+        TmfCoreTracer.traceRequest(fRequest.getRequestId(), "SUSPENDED"); //$NON-NLS-1$
     }
 
     /**
@@ -239,7 +239,7 @@ public class TmfEventThread implements Runnable {
         synchronized (fSynchObject) {
             fSynchObject.notifyAll();
         }
-        TmfCoreTracer.traceRequest(fRequest, "RESUMED"); //$NON-NLS-1$
+        TmfCoreTracer.traceRequest(fRequest.getRequestId(), "RESUMED"); //$NON-NLS-1$
     }
 
     /**

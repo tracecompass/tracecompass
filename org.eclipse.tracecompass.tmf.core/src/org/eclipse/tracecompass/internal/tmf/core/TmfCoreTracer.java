@@ -17,7 +17,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.tracecompass.tmf.core.component.ITmfComponent;
 import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
@@ -202,18 +201,32 @@ public class TmfCoreTracer {
     // TMF Core specific trace formatters
     // ------------------------------------------------------------------------
 
-    @SuppressWarnings("javadoc")
-    public static void traceComponent(ITmfComponent component, String msg) {
+    /**
+     * Trace an event happening in a component.
+     *
+     * @param componentName
+     *            The name of the component being traced
+     * @param msg
+     *            The message to record for this component
+     */
+    public static void traceComponent(String componentName, String msg) {
         if (COMPONENT_CLASS_ENABLED) {
-            String message = ("[CMP] Cmp=" + component.getName() + " " + msg);
+            String message = ("[CMP] Cmp=" + componentName + " " + msg);
             trace(message);
         }
     }
 
-    @SuppressWarnings("javadoc")
-    public static void traceRequest(ITmfEventRequest request, String msg) {
+    /**
+     * Trace an event happening in an event request.
+     *
+     * @param requestId
+     *            The request ID of the request being traced
+     * @param msg
+     *            The message to record for this component
+     */
+    public static void traceRequest(int requestId, String msg) {
         if (REQUEST_CLASS_ENABLED) {
-            String message = ("[REQ] Req=" + request.getRequestId() + " " + msg);
+            String message = ("[REQ] Req=" + requestId + " " + msg);
             trace(message);
         }
     }

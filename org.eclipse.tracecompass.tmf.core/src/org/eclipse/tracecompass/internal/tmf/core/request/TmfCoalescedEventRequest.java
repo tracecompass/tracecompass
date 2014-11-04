@@ -83,7 +83,7 @@ public class TmfCoalescedEventRequest extends TmfEventRequest {
                     + " Type=" + type + " Index=" + getIndex() + " NbReq=" + getNbRequested()
                     + " Range=" + getRange()
                     + " DataType=" + getDataType().getSimpleName();
-            TmfCoreTracer.traceRequest(this, message);
+            TmfCoreTracer.traceRequest(getRequestId(), message);
         }
     }
 
