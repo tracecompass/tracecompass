@@ -21,6 +21,7 @@ import static org.junit.Assert.fail;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.Messages;
@@ -39,8 +40,8 @@ import org.junit.Test;
  */
 public class AnalysisModuleTest {
 
-    private static String MODULE_GENERIC_ID = "test.id";
-    private static String MODULE_GENERIC_NAME = "Test analysis";
+    private static final @NonNull String MODULE_GENERIC_ID = "test.id";
+    private static final @NonNull String MODULE_GENERIC_NAME = "Test analysis";
 
     /**
      * Some tests use traces, let's clean them here

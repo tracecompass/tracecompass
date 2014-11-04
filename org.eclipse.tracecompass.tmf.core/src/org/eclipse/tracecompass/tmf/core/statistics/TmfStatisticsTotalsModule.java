@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.core.statistics;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -38,9 +39,9 @@ public class TmfStatisticsTotalsModule extends TmfStateSystemAnalysisModule {
     /**
      * The ID of this analysis module (which is also the ID of the state system)
      */
-    public static final String ID = "org.eclipse.linuxtools.tmf.statistics.totals"; //$NON-NLS-1$
+    public static final @NonNull String ID = "org.eclipse.linuxtools.tmf.statistics.totals"; //$NON-NLS-1$
 
-    private static final String NAME = "TMF Statistics, event totals"; //$NON-NLS-1$
+    private static final @NonNull String NAME = "TMF Statistics, event totals"; //$NON-NLS-1$
 
     /**
      * Constructor

@@ -203,6 +203,9 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
 
     @Override
     public void initTrace(final IResource resource, final String path, final Class<? extends ITmfEvent> type, String name) throws TmfTraceException {
+        if (name == null) {
+            throw new IllegalArgumentException();
+        }
         setName(name);
         initTrace(resource, path, type);
     }
