@@ -256,8 +256,21 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
         cancel();
     }
 
-    private void execute(final ITmfTrace trace) {
+    /**
+     * Get an iterable list of all analyzes this analysis depends on. These
+     * analyzes will be scheduled before this analysis starts and the current
+     * analysis will not be considered completed until all the dependent
+     * analyzes are finished.
+     *
+     * @return An iterable list of analysis this analyzes depends on.
+     */
+    protected Iterable<IAnalysisModule> getDependentAnalyses() {
+        @SuppressWarnings("null")
+        @NonNull Set<IAnalysisModule> emptySet = Collections.EMPTY_SET;
+        return emptySet;
+    }
 
+    private void execute(final ITmfTrace trace) {
         /*
          * TODO: The analysis in a job should be done at the analysis manager
          * level instead of depending on this abstract class implementation,
@@ -277,6 +290,12 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
             fStarted = true;
         }
 
+        /* Execute dependent analyses before creating the job for this one */
+        final Iterable<IAnalysisModule> dependentAnalyses = getDependentAnalyses();
+        for (IAnalysisModule module : dependentAnalyses) {
+            module.schedule();
+        }
+
         /*
          * Actual analysis will be run on a separate thread
          */
@@ -293,6 +312,9 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
                     mon.beginTask("", IProgressMonitor.UNKNOWN); //$NON-NLS-1$
                     broadcast(new TmfStartAnalysisSignal(TmfAbstractAnalysisModule.this, TmfAbstractAnalysisModule.this));
                     fAnalysisCancelled = !executeAnalysis(mon);
+                    for (IAnalysisModule module : dependentAnalyses) {
+                        module.waitForCompletion(mon);
+                    }
                 } catch (TmfAnalysisException e) {
                     Activator.logError("Error executing analysis with trace " + trace.getName(), e); //$NON-NLS-1$
                 } finally {

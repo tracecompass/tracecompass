@@ -19,6 +19,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
@@ -129,7 +133,8 @@ public class AnalysisModuleTest {
     }
 
     /**
-     * Test suite for {@link TmfAbstractAnalysisModule#waitForCompletion} with cancellation
+     * Test suite for {@link TmfAbstractAnalysisModule#waitForCompletion} with
+     * cancellation
      */
     @Test
     public void testWaitForCompletionCancelled() {
@@ -261,5 +266,76 @@ public class AnalysisModuleTest {
         assertFalse(res);
 
         module.dispose();
+    }
+
+    /**
+     * Test the {@link TmfAbstractAnalysisModule} also executes the dependent
+     * analyses
+     */
+    @Test
+    public void testDependentAnalyses() {
+
+        ITmfTrace trace = TmfTestTrace.A_TEST_10K.getTrace();
+        int paramAndResult = 5;
+
+        /* Setup the dependent module */
+        final String suffix = " dep";
+        final TestAnalysis depModule = new TestAnalysis() {
+
+            @Override
+            protected boolean executeAnalysis(IProgressMonitor monitor) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    return false;
+                }
+                return super.executeAnalysis(monitor);
+            }
+
+        };
+        depModule.setName(MODULE_GENERIC_NAME + suffix);
+        depModule.setId(MODULE_GENERIC_ID + suffix);
+        depModule.addParameter(TestAnalysis.PARAM_TEST);
+        depModule.setParameter(TestAnalysis.PARAM_TEST, paramAndResult);
+
+        /* Prepare the main analysis with a dependent analysis */
+        TestAnalysis module = new TestAnalysis() {
+
+            @Override
+            protected Iterable<IAnalysisModule> getDependentAnalyses() {
+                Set<IAnalysisModule> modules = new HashSet<>();
+                modules.add(depModule);
+                return modules;
+            }
+
+        };
+
+        module.setName(MODULE_GENERIC_NAME);
+        module.setId(MODULE_GENERIC_ID);
+        module.addParameter(TestAnalysis.PARAM_TEST);
+        module.setParameter(TestAnalysis.PARAM_TEST, paramAndResult);
+
+        try {
+            depModule.setTrace(trace);
+            module.setTrace(trace);
+        } catch (TmfAnalysisException e) {
+            fail(e.getMessage());
+        }
+
+        /* Verify none of the module has run */
+        assertEquals(0, module.getAnalysisOutput());
+        assertEquals(0, depModule.getAnalysisOutput());
+
+        module.schedule();
+        assertTrue(module.waitForCompletion());
+        assertEquals(paramAndResult, module.getAnalysisOutput());
+
+        /* Make sure the dependent analysis has run and completed */
+        assertEquals(paramAndResult, depModule.getAnalysisOutput());
+
+        module.dispose();
+        depModule.dispose();
+        trace.dispose();
+
     }
 }

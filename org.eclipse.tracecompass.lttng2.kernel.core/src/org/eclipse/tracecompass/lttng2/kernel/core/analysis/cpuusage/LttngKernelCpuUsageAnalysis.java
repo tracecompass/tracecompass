@@ -13,11 +13,12 @@
 package org.eclipse.tracecompass.lttng2.kernel.core.analysis.cpuusage;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Activator;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Attributes;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.IKernelAnalysisEventLayout;
@@ -30,6 +31,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -74,20 +76,22 @@ public class LttngKernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
     }
 
     @Override
-    protected boolean executeAnalysis(IProgressMonitor monitor) {
+    protected Iterable<IAnalysisModule> getDependentAnalyses() {
+        Set<IAnalysisModule> modules = new HashSet<>();
+
         ITmfTrace trace = getTrace();
         if (trace == null) {
             throw new IllegalStateException();
         }
         /*
-         * This analysis depends on the LTTng kernel analysis, so we'll start
-         * that build at the same time
+         * This analysis depends on the LTTng kernel analysis, so it's added to
+         * dependent modules.
          */
-        LttngKernelAnalysis module = trace.getAnalysisModuleOfClass(LttngKernelAnalysis.class, LttngKernelAnalysis.ID);
-        if (module != null) {
-            module.schedule();
+        Iterable<LttngKernelAnalysis> kernelModules = trace.getAnalysisModulesOfClass(LttngKernelAnalysis.class);
+        if (kernelModules.iterator().hasNext()) {
+            modules.add(kernelModules.iterator().next());
         }
-        return super.executeAnalysis(monitor);
+        return modules;
     }
 
     /**
