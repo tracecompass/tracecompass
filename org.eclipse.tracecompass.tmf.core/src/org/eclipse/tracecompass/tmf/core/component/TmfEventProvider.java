@@ -163,6 +163,11 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
     @Override
     public void sendRequest(final ITmfEventRequest request) {
         synchronized (fLock) {
+
+            if (TmfCoreTracer.isRequestTraced()) {
+                TmfCoreTracer.traceRequest(request.getRequestId(), "SENT to provider " + getName()); //$NON-NLS-1$
+            }
+
             if (request.getExecType() == ExecutionType.FOREGROUND) {
                 if ((fSignalDepth > 0) || (fRequestPendingCounter > 0)) {
                     coalesceEventRequest(request);
