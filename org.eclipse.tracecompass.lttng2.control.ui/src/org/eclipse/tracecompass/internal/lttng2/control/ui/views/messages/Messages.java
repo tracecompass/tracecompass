@@ -10,6 +10,7 @@
  *   Bernd Hufmann - Initial API and implementation
  *   Bernd Hufmann - Updated for support of LTTng Tools 2.1
  *   Jonathan Rajotte - Updated for basic support of LTTng 2.6 machine interface
+ *   Markus Schorn - Bug 448058: Use org.eclipse.remote in favor of RSE
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages;
@@ -71,6 +72,8 @@ public final class Messages extends NLS {
     public static String TraceControl_RetrieveNodeConfigurationFailure;
     public static String TraceControl_ListSessionFailure;
     public static String TraceControl_EclipseCommandFailure;
+    public static String TraceControl_NewNodeCreateButtonText;
+
     public static String TraceControl_NewNodeCreationFailure;
     public static String TraceControl_CreateSessionJob;
     public static String TraceControl_CreateSessionFailure;
@@ -292,6 +295,8 @@ public final class Messages extends NLS {
     public static String TraceControl_DomainNamePropertyName;
     public static String TraceControl_BufferTypePropertyName;
     public static String TraceControl_ChannelNamePropertyName;
+    public static String TraceControl_OpenConnectionTo;
+
     public static String TraceControl_OverwriteModePropertyName;
     public static String TraceControl_SubBufferSizePropertyName;
     public static String TraceControl_NbSubBuffersPropertyName;
@@ -332,6 +337,8 @@ public final class Messages extends NLS {
     public static String TraceControl_ExecuteScriptDialogTitle;
     public static String TraceControl_ExecuteScriptBrowseText;
     public static String TraceControl_ExecuteScriptSelectLabel;
+
+    public static String TraceControl_UnknownNode;
 
     static {
         // initialize resource bundle

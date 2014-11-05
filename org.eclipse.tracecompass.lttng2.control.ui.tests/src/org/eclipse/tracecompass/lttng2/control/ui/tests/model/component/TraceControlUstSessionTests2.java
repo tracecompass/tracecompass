@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2013 Ericsson
+ * Copyright (c) 2013, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Markus Schorn - Bug 448058: Use org.eclipse.remote in favor of RSE
  **********************************************************************/
 
 package org.eclipse.tracecompass.lttng2.control.ui.tests.model.component;
@@ -21,10 +22,9 @@ import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.rse.core.RSECorePlugin;
-import org.eclipse.rse.core.model.IHost;
-import org.eclipse.rse.core.model.ISystemProfile;
-import org.eclipse.rse.core.model.ISystemRegistry;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnectionManager;
+import org.eclipse.remote.core.RemoteServices;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TargetNodeState;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BufferType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.ChannelInfo;
@@ -110,10 +110,8 @@ public class TraceControlUstSessionTests2 {
 
         ITraceControlComponent root = fFacility.getControlView().getTraceControlRoot();
 
-        ISystemRegistry registry = RSECorePlugin.getTheSystemRegistry();
-        ISystemProfile profile =  registry.createSystemProfile("myProfile", true);
-        IHost host = registry.createLocalHost(profile, "myProfile", "user");
-
+        IRemoteConnectionManager cm = RemoteServices.getLocalServices().getConnectionManager();
+        IRemoteConnection host = cm.getConnection(IRemoteConnectionManager.LOCAL_CONNECTION_NAME);
         TargetNodeComponent node = new TargetNodeComponent("myNode", root, host, fProxy);
 
         root.addChild(node);

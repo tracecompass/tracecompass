@@ -39,14 +39,12 @@ http://www.eclipse.org/legal/epl-v10.html
 
    <windowImages i16="/org.eclipse.tracecompass.rcp.branding/icons/alt_window_16.gif" i32="/org.eclipse.tracecompass.rcp.branding/icons/alt_window_32.gif"/>
 
-
    <launcher name="tracecompass">
       <solaris/>
       <win useIco="false">
          <bmp/>
       </win>
    </launcher>
-
 
    <vm>
       <linux include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7</linux>
@@ -194,24 +192,15 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
       <feature id="org.eclipse.tracecompass.lttng2.ust"/>
       <feature id="org.eclipse.tracecompass.lttng2.control"/>
       <feature id="org.eclipse.equinox.p2.core.feature"/>
-      <feature id="org.eclipse.rse.local"/>
-      <feature id="org.eclipse.rse.dstore"/>
-      <feature id="org.eclipse.rse.telnet"/>
       <feature id="org.eclipse.platform"/>
-      <feature id="org.eclipse.tm.terminal"/>
       <feature id="org.eclipse.help"/>
       <feature id="org.eclipse.emf.ecore"/>
       <feature id="org.eclipse.equinox.p2.rcp.feature"/>
       <feature id="org.eclipse.equinox.p2.user.ui"/>
       <feature id="org.eclipse.tracecompass.tmf"/>
-      <feature id="org.eclipse.rse.ssh"/>
-      <feature id="org.eclipse.rse.core"/>
-      <feature id="org.eclipse.rse.ftp"/>
       <feature id="org.eclipse.rcp"/>
       <feature id="org.eclipse.e4.rcp"/>
-      <feature id="org.eclipse.rse"/>
       <feature id="org.eclipse.emf.common"/>
-      <feature id="org.eclipse.rse.terminals"/>
       <feature id="org.eclipse.equinox.p2.extras.feature"/>
       <feature id="org.eclipse.tracecompass.ctf"/>
       <feature id="org.eclipse.tracecompass.tmf.ctf"/>
@@ -222,6 +211,7 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
       <feature id="org.eclipse.ecf.filetransfer.ssl.feature"/>
       <feature id="org.eclipse.ecf.core.feature"/>
       <feature id="org.eclipse.ecf.filetransfer.feature"/>
+      <feature id="org.eclipse.remote"/>
    </features>
 
    <configurations>

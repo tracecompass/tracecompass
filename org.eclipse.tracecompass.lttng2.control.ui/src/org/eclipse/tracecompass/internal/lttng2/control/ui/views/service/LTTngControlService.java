@@ -11,6 +11,7 @@
  *   Bernd Hufmann - Updated for support of LTTng Tools 2.1
  *   Simon Delisle - Updated for support of LTTng Tools 2.2
  *   Marc-Andre Laperle - Support for creating a live session
+ *   Markus Schorn - Bug 448058: Use org.eclipse.remote in favor of RSE
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.service;
 
@@ -1575,8 +1576,7 @@ public class LTTngControlService implements ILttngControlService {
             ControlCommandLogger.log(command);
         }
 
-        ICommandResult result = fCommandShell.executeCommand(
-                command.toString(), monitor);
+        ICommandResult result = fCommandShell.executeCommand(command, monitor);
 
         if (ControlPreferences.getInstance().isLoggingEnabled()) {
             ControlCommandLogger.log(formatOutput(result));

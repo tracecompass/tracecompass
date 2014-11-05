@@ -1233,20 +1233,6 @@
       </handler>
       
    </extension>
-
-    <extension
-          point="org.eclipse.rse.core.systemTypes">
-       <systemType
-             description="%trace.control.rse.system.type.description"
-             icon="icons/obj16/systemlttng2.gif"
-             iconLive="icons/obj16/systemlttng2-live.gif"
-             id="org.eclipse.linuxtools.internal.lttng2.ui.control.systemType"
-             label="%trace.control.rse.system.type.name"
-             name="org.eclipse.linuxtools.internal.lttng2.ui.control.systemType"
-             subsystemConfigurationIds="ssh.shells;ssh.files;ssh.terminals;processes.shell.linux">
-       </systemType>
-    </extension>
-
    <extension
          point="org.eclipse.ui.preferencePages">
       <page

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2013 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,11 +8,11 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Markus Schorn - Bug 448058: Use org.eclipse.remote in favor of RSE
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs;
 
-import org.eclipse.rse.core.model.IHost;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceControlComponent;
+import org.eclipse.remote.core.IRemoteConnection;
 
 /**
  * <p>
@@ -26,38 +26,12 @@ public interface INewConnectionDialog {
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
-    /**
-     * @return the connection name (alias).
-     */
-    String getConnectionName();
 
     /**
-     * @return the host name (IP address or DNS name)
+     * Returns the selected connection.
+     * @return the selected connection, or <code>null</code>.
      */
-    String getHostName();
-
-    /**
-     * @return port of IP connection to be used
-     */
-    int getPort();
-
-    /**
-     * Sets the trace control root
-     * @param parent - the trace control parent
-     */
-    void setTraceControlParent(ITraceControlComponent parent);
-
-    /**
-     * Sets the available hosts to select.
-     * @param hosts - the available hosts
-     */
-    void setHosts(IHost[] hosts);
-
-    /**
-     * Set the port of the IP connection to be used.
-     * @param port - the IP port to set
-     */
-    void setPort(int port);
+    IRemoteConnection getConnection();
 
     // ------------------------------------------------------------------------
     // Operations

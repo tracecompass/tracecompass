@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2013 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,7 +7,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Bernd Hufmann - Initial API and implementation
+ *   Bernd Hufmann - Initial API and implementation
+ *   Markus Schorn - Bug 448058: Use org.eclipse.remote in favor of RSE
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.property;
 
@@ -100,7 +101,7 @@ public class TargetNodePropertySource extends BasePropertySource {
             return fTargetNode.getName();
         }
         if (TARGET_NODE_ADDRESS_PROPERTY_ID.equals(id)) {
-            return fTargetNode.getHostName();
+            return fTargetNode.getRemoteConnection().getAddress();
         }
         if (TARGET_NODE_STATE_PROPERTY_ID.equals(id)) {
             return fTargetNode.getTargetNodeState().name();

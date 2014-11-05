@@ -10,16 +10,23 @@
  *   Bernd Hufmann - Initial API and implementation
  *   Bernd Hufmann - Updated for support of streamed traces
  *   Patrick Tasse - Add support for source location
+ *   Markus Schorn - Bug 448058: Use org.eclipse.remote in favor of RSE
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -41,10 +48,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.rse.services.clientserver.messages.SystemMessageException;
-import org.eclipse.rse.services.files.IFileService;
-import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFile;
-import org.eclipse.rse.subsystems.files.core.subsystems.IRemoteFileSubSystem;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
@@ -190,19 +193,9 @@ public class ImportHandler extends BaseControlViewHandler {
                                     status.add(TmfTraceTypeUIUtils.setTraceType(file, helper));
                                 }
 
-                                try {
-                                    final String scheme = "sftp"; //$NON-NLS-1$
-                                    String host = remoteFile.getImportFile().getHost().getName();
-                                    int port = remoteFile.getImportFile().getParentRemoteFileSubSystem().getConnectorService().getPort();
-                                    String path = remoteFile.getImportFile().getAbsolutePath();
-                                    if (file instanceof IFolder) {
-                                        path += IPath.SEPARATOR;
-                                    }
-                                    URI uri = new URI(scheme, null, host, port, path, null, null);
-                                    String sourceLocation = URIUtil.toUnencodedString(uri);
-                                    file.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
-                                } catch (URISyntaxException e) {
-                                }
+                                URI uri = remoteFile.getImportFile().toURI();
+                                String sourceLocation = URIUtil.toUnencodedString(uri);
+                                file.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
                             }
                         } catch (ExecutionException e) {
                             status.add(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ImportFailure, e));
@@ -278,7 +271,7 @@ public class ImportHandler extends BaseControlViewHandler {
     private static void downloadTrace(ImportFileInfo trace, IProject project, IProgressMonitor monitor)
             throws ExecutionException {
         try {
-            IRemoteFileSubSystem fsss = trace.getImportFile().getParentRemoteFileSubSystem();
+            IFileStore importRoot = trace.getImportFile();
 
             IFolder traceFolder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
             if (!traceFolder.exists()) {
@@ -298,23 +291,46 @@ public class ImportHandler extends BaseControlViewHandler {
                 folder.create(true, true, null);
             }
 
-            IRemoteFile[] sources = fsss.list(trace.getImportFile(), IFileService.FILE_TYPE_FILES, new NullProgressMonitor());
+            IFileStore[] sources = importRoot.childStores(EFS.NONE, new NullProgressMonitor());
             SubMonitor subMonitor = SubMonitor.convert(monitor, sources.length);
             subMonitor.beginTask(Messages.TraceControl_DownloadTask, sources.length);
 
-            for (int i = 0; i < sources.length; i++) {
+            for (IFileStore source : sources) {
                 if (subMonitor.isCanceled()) {
                     monitor.setCanceled(true);
                     return;
                 }
-                String destination = folder.getLocation().addTrailingSeparator().append(sources[i].getName()).toOSString();
-                subMonitor.setTaskName(Messages.TraceControl_DownloadTask + ' ' + traceName + '/' + sources[i].getName());
-                fsss.download(sources[i], destination, null, subMonitor.newChild(1));
+                SubMonitor childMonitor = subMonitor.newChild(1);
+                IFileInfo info = source.fetchInfo();
+                if (!info.isDirectory()) {
+                    IPath destination = folder.getLocation().addTrailingSeparator().append(source.getName());
+                    subMonitor.setTaskName(Messages.TraceControl_DownloadTask + ' ' + traceName + '/' + source.getName());
+                    try (InputStream in = source.openInputStream(EFS.NONE, new NullProgressMonitor())) {
+                        copy(in, destination, childMonitor, info.getLength());
+                    }
+                }
             }
-        } catch (SystemMessageException e) {
+        } catch (IOException e) {
             throw new ExecutionException(e.toString(), e);
         } catch (CoreException e) {
             throw new ExecutionException(e.toString(), e);
+        }
+    }
+
+    private static void copy(InputStream in, IPath destination, SubMonitor monitor, long length) throws IOException {
+        try (OutputStream out = new FileOutputStream(destination.toFile())) {
+            monitor.setWorkRemaining((int) (length / 1024));
+            byte[] buf = new byte[1024 * 16];
+            int counter = 0;
+            for (;;) {
+                int n = in.read(buf);
+                if (n <= 0) {
+                    return;
+                }
+                out.write(buf, 0, n);
+                counter = (counter % 1024) + n;
+                monitor.worked(counter / 1024);
+            }
         }
     }
 

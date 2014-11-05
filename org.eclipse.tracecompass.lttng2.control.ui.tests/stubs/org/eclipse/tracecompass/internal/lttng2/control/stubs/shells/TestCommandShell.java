@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Markus Schorn - Bug 448058: Use org.eclipse.remote in favor of RSE
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.stubs.shells;
 
@@ -37,11 +38,6 @@ public class TestCommandShell implements ICommandShell {
 
     @Override
     public ICommandResult executeCommand(String command, IProgressMonitor monitor) throws ExecutionException {
-        return executeCommand(command, monitor, true);
-    }
-
-    @Override
-    public ICommandResult executeCommand(String command, IProgressMonitor monitor, boolean checkReturnValue) throws ExecutionException {
         if (fIsConnected) {
 
         }

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2013 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,35 +8,56 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Markus Schorn - Bug 448058: Use org.eclipse.remote in favor of RSE
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs;
 
-import java.util.Arrays;
+import static java.text.MessageFormat.format;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.rse.core.model.IHost;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnectionWorkingCopy;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.RemoteServices;
+import org.eclipse.remote.ui.IRemoteUIConnectionManager;
+import org.eclipse.remote.ui.IRemoteUIConnectionWizard;
+import org.eclipse.remote.ui.IRemoteUIServices;
+import org.eclipse.remote.ui.RemoteUIServices;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.events.VerifyListener;
-import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceControlComponent;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote.IRemoteSystemProxy;
 
 /**
  * <p>
@@ -50,10 +71,85 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-    /**
-     * The icon file for this dialog box.
-     */
-    public static final String TARGET_NEW_CONNECTION_ICON_FILE = "icons/elcl16/target_add.gif"; //$NON-NLS-1$
+    private static final String TARGET_NEW_CONNECTION_ICON_FILE = "icons/elcl16/target_add.gif"; //$NON-NLS-1$
+    private static final String PROVIDERS_ICON_FILE = "icons/obj16/providers.gif"; //$NON-NLS-1$
+    private static final String CONNECTION_ICON_FILE = "icons/obj16/target_connected.gif"; //$NON-NLS-1$
+
+    private static final class ConnectionContentProvider implements ITreeContentProvider {
+        private static final Object[] NO_CHILDREN = {};
+        private static List<IRemoteServices> fProviders;
+
+        @Override
+        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+        }
+
+        @Override
+        public void dispose() {
+        }
+
+        @Override
+        public Object[] getElements(Object inputElement) {
+            List<Object> children = new ArrayList<>();
+            children.addAll(RemoteServices.getLocalServices().getConnectionManager().getConnections());
+
+            List<IRemoteServices> result = getProviders();
+            children.addAll(result);
+            return children.toArray();
+        }
+
+        private static List<IRemoteServices> getProviders() {
+            if (fProviders == null) {
+                IExtensionRegistry registry = Platform.getExtensionRegistry();
+                IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.remote.core", "remoteServices"); //$NON-NLS-1$ //$NON-NLS-2$
+                List<IRemoteServices> result = new ArrayList<>();
+                if (extensionPoint != null) {
+                    Set<String> handled = new HashSet<>();
+                    handled.add(RemoteServices.getLocalServices().getId());
+                    for (IConfigurationElement ce : extensionPoint.getConfigurationElements()) {
+                        String id = ce.getAttribute("id"); //$NON-NLS-1$
+                        if (handled.add(id)) {
+                            IRemoteServices service = RemoteServices.getRemoteServices(id);
+                            if (service != null) {
+                                result.add(service);
+                            }
+                        }
+                    }
+                    Collections.sort(result);
+                }
+                fProviders = Collections.unmodifiableList(result);
+            }
+            return fProviders;
+        }
+
+        @Override
+        public Object[] getChildren(Object parentElement) {
+            if (parentElement instanceof IRemoteServices) {
+                return getConnections((IRemoteServices) parentElement);
+            }
+            return NO_CHILDREN;
+        }
+
+        private static IRemoteConnection[] getConnections(IRemoteServices parentElement) {
+            List<IRemoteConnection> connectionList = parentElement.getConnectionManager().getConnections();
+            IRemoteConnection[] result = connectionList.toArray(new IRemoteConnection[connectionList.size()]);
+            Arrays.sort(result);
+            return result;
+        }
+
+        @Override
+        public Object getParent(Object element) {
+            if (element instanceof IRemoteConnection) {
+                return ((IRemoteConnection) element).getRemoteServices();
+            }
+            return null;
+        }
+
+        @Override
+        public boolean hasChildren(Object element) {
+            return getChildren(element).length > 0;
+        }
+
+    }
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -61,43 +157,18 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
     /**
      * The host combo box.
      */
-    private CCombo fExistingHostsCombo = null;
+    private TreeViewer fConnectionTree = null;
     /**
-     * The check box button for enabling/disabling the text input.
+     * The push button for creating a new connection.
      */
-    private Button fButton = null;
+    private Button fNewButton = null;
     /**
-     * The text widget for the node name (alias)
+     * The push button for editing a connection.
      */
-    private Text fConnectionNameText = null;
-    /**
-     * The text widget for the node address (IP or DNS name)
-     */
-    private Text fHostNameText = null;
-    /**
-     * The text widget for the IP port
-     */
-    private Text fPortText = null;
-    /**
-     * The parent where the new node should be added.
-     */
-    private ITraceControlComponent fParent;
-    /**
-     * The node name (alias) string.
-     */
-    private String fConnectionName = null;
-    /**
-     * The node address (IP or DNS name) string.
-     */
-    private String fHostName = null;
-    /**
-     * The IP port of the connection.
-     */
-    private int fPort = IRemoteSystemProxy.INVALID_PORT_NUMBER;
-    /**
-     * Input list of existing RSE hosts available for selection.
-     */
-    private IHost[] fExistingHosts = new IHost[0];
+    private Button fEditButton = null;
+
+    private IRemoteConnection fConnection;
+
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -114,42 +185,6 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
     }
 
     // ------------------------------------------------------------------------
-    // Accessors
-    // ------------------------------------------------------------------------
-
-    @Override
-    public String getConnectionName() {
-        return fConnectionName;
-    }
-
-    @Override
-    public String getHostName() {
-        return fHostName;
-    }
-
-    @Override
-    public int getPort() {
-        return fPort;
-    }
-
-    @Override
-    public void setTraceControlParent(ITraceControlComponent parent) {
-        fParent = parent;
-    }
-
-    @Override
-    public void setHosts(IHost[] hosts) {
-        if (hosts != null) {
-            fExistingHosts = Arrays.copyOf(hosts, hosts.length);
-        }
-    }
-
-    @Override
-    public void setPort(int port) {
-        fPort = port;
-    }
-
-    // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
 
@@ -161,129 +196,185 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
     }
 
     @Override
-    protected Control createDialogArea(Composite parent) {
+    protected Control createContents(Composite parent) {
+        Control result = super.createContents(parent);
+        fConnectionTree.setAutoExpandLevel(2);
+        fConnectionTree.setInput(this);
 
+        List<IRemoteServices> providers = ConnectionContentProvider.getProviders();
+        if (!providers.isEmpty()) {
+            IRemoteServices provider = providers.get(0);
+            IRemoteConnection[] connections = ConnectionContentProvider.getConnections(provider);
+            if (connections.length > 0) {
+                fConnectionTree.setSelection(new StructuredSelection(connections[0]));
+            } else {
+                fConnectionTree.setSelection(new StructuredSelection(provider));
+            }
+        } else {
+            onSelectionChanged();
+        }
+        return result;
+    }
+
+    @Override
+    protected Control createDialogArea(Composite parent) {
         // Main dialog panel
+        GridData gd;
         Composite dialogComposite = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(1, true);
         dialogComposite.setLayout(layout);
         dialogComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
+        Label label = new Label(dialogComposite, SWT.NONE);
+        label.setText(Messages.TraceControl_NewNodeExistingConnectionGroupName);
+        label.setLayoutData(gd = new GridData());
+        gd.widthHint = label.computeSize(-1, -1).x + convertWidthInCharsToPixels(4);
         // Existing connections group
-        Group comboGroup = new Group(dialogComposite, SWT.SHADOW_NONE);
-        comboGroup.setText(Messages.TraceControl_NewNodeExistingConnectionGroupName);
-        layout = new GridLayout(2, true);
-        comboGroup.setLayout(layout);
-        GridData data = new GridData(GridData.FILL_HORIZONTAL);
-        comboGroup.setLayoutData(data);
-
-        fExistingHostsCombo = new CCombo(comboGroup, SWT.READ_ONLY);
-        fExistingHostsCombo.setToolTipText(Messages.TraceControl_NewNodeComboToolTip);
-        fExistingHostsCombo.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, true, false, 2, 1));
-
-        String items[] = new String[fExistingHosts.length];
-        for (int i = 0; i < items.length; i++) {
-            items[i] = String.valueOf(fExistingHosts[i].getAliasName() + " - " + fExistingHosts[i].getHostName()); //$NON-NLS-1$
-        }
-
-        fExistingHostsCombo.setItems(items);
-        fExistingHostsCombo.setEnabled(fExistingHosts.length > 0);
-
-        // Node information grop
-        Group textGroup = new Group(dialogComposite, SWT.SHADOW_NONE);
-        layout = new GridLayout(3, true);
-        textGroup.setLayout(layout);
-        data = new GridData(GridData.FILL_HORIZONTAL);
-        textGroup.setLayoutData(data);
-
-        fButton = new Button(textGroup, SWT.CHECK);
-        fButton.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, true, false, 3, 1));
-        fButton.setText(Messages.TraceControl_NewNodeEditButtonName);
-        fButton.setEnabled(fExistingHosts.length > 0);
-
-        Label connectionNameLabel = new Label(textGroup, SWT.RIGHT);
-        connectionNameLabel.setText(Messages.TraceControl_NewNodeConnectionNameLabel);
-        fConnectionNameText = new Text(textGroup, SWT.NONE);
-        fConnectionNameText.setToolTipText(Messages.TraceControl_NewNodeConnectionNameTooltip);
-        fConnectionNameText.setEnabled(fExistingHosts.length == 0);
-
-        Label hostNameLabel = new Label(textGroup, SWT.RIGHT);
-        hostNameLabel.setText(Messages.TraceControl_NewNodeHostNameLabel);
-        fHostNameText = new Text(textGroup, SWT.NONE);
-        fHostNameText.setToolTipText(Messages.TraceControl_NewNodeHostNameTooltip);
-        fHostNameText.setEnabled(fExistingHosts.length == 0);
-
-        Label portLabel = new Label(textGroup, SWT.RIGHT);
-        portLabel.setText(Messages.TraceControl_NewNodePortLabel);
-        fPortText = new Text(textGroup, SWT.NONE);
-        fPortText.setToolTipText(Messages.TraceControl_NewNodePortTooltip);
-        fPortText.setEnabled(fExistingHosts.length == 0);
-        fPortText.addVerifyListener(new VerifyListener() {
+        fConnectionTree = new TreeViewer(dialogComposite);
+        fConnectionTree.getTree().setLayoutData(gd = new GridData(SWT.FILL, SWT.FILL, true, true));
+        gd.widthHint = convertWidthInCharsToPixels(40);
+        gd.heightHint = convertHeightInCharsToPixels(10);
+        fConnectionTree.setLabelProvider(new LabelProvider() {
             @Override
-            public void verifyText(VerifyEvent e) {
-                // only numbers are allowed.
-                e.doit = e.text.matches("[0-9]*"); //$NON-NLS-1$
-            }
-        });
+            public String getText(Object element) {
+                if (element instanceof IRemoteConnection) {
+                    IRemoteConnection rc = (IRemoteConnection) element;
+                    if (rc.getRemoteServices() == RemoteServices.getLocalServices()) {
+                        return rc.getName();
+                    }
 
-        fButton.addSelectionListener(new SelectionListener() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (fButton.getSelection()) {
-                    fExistingHostsCombo.deselectAll();
-                    fExistingHostsCombo.setEnabled(false);
-                    fConnectionNameText.setEnabled(true);
-                    fHostNameText.setEnabled(true);
-                    fPortText.setEnabled(true);
-                } else {
-                    fExistingHostsCombo.setEnabled(true);
-                    fConnectionNameText.setEnabled(false);
-                    fHostNameText.setEnabled(false);
-                    fPortText.setEnabled(false);
+                    return format("{0} [{1}]", rc.getName(), rc.getAddress()); //$NON-NLS-1$
+                } else if (element instanceof IRemoteServices) {
+                    IRemoteServices rs = (IRemoteServices) element;
+                    return rs.getName();
                 }
+                return Messages.TraceControl_UnknownNode;
             }
 
             @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
+            public Image getImage(Object element) {
+                if (element instanceof IRemoteConnection) {
+                    return Activator.getDefault().loadIcon(CONNECTION_ICON_FILE);
+                }
+                return Activator.getDefault().loadIcon(PROVIDERS_ICON_FILE);
+            }
+        });
+        fConnectionTree.setContentProvider(new ConnectionContentProvider());
+        fConnectionTree.addSelectionChangedListener(new ISelectionChangedListener() {
+            @Override
+            public void selectionChanged(SelectionChangedEvent event) {
+                onSelectionChanged();
+            }
+        });
+        fConnectionTree.addDoubleClickListener(new IDoubleClickListener() {
+            @Override
+            public void doubleClick(DoubleClickEvent event) {
+                okPressed();
             }
         });
 
-        fExistingHostsCombo.addSelectionListener(new SelectionListener() {
+        Composite buttons = new Composite(dialogComposite, SWT.NONE);
+        layout = new GridLayout(3, true);
+        layout.marginHeight = layout.marginWidth = 0;
+        buttons.setLayout(layout);
+        buttons.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
+
+        new Label(buttons, SWT.NONE);
+
+        fEditButton = new Button(buttons, SWT.PUSH);
+        fEditButton.setText(Messages.TraceControl_NewNodeEditButtonName);
+        setButtonLayoutData(fEditButton);
+        fEditButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                int index = fExistingHostsCombo.getSelectionIndex();
-                fConnectionNameText.setText(fExistingHosts[index].getAliasName());
-                fHostNameText.setText(fExistingHosts[index].getHostName());
-                fPortText.setText(""); //$NON-NLS-1$
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
+                onEditConnection();
             }
         });
 
-        // layout widgets
-        data = new GridData(GridData.FILL_HORIZONTAL);
-        fHostNameText.setText("666.666.666.666"); //$NON-NLS-1$
-        Point minSize = fHostNameText.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-        int widthHint = minSize.x + 5;
-        data.widthHint = widthHint;
-        data.horizontalSpan = 2;
-        fConnectionNameText.setLayoutData(data);
-
-        data = new GridData(GridData.FILL_HORIZONTAL);
-        data.widthHint = widthHint;
-        data.horizontalSpan = 2;
-        fHostNameText.setLayoutData(data);
-
-        data = new GridData(GridData.FILL_HORIZONTAL);
-        data.widthHint = widthHint;
-        data.horizontalSpan = 2;
-        fPortText.setLayoutData(data);
-
-        fHostNameText.setText(""); //$NON-NLS-1$
+        fNewButton = new Button(buttons, SWT.PUSH);
+        fNewButton.setText(Messages.TraceControl_NewNodeCreateButtonText);
+        setButtonLayoutData(fNewButton);
+        fNewButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                onNewConnection();
+            }
+        });
 
         return dialogComposite;
+    }
+
+    private void onSelectionChanged() {
+        setConnection();
+        getButton(OK).setEnabled(fConnection != null);
+        fEditButton.setEnabled(canEdit(fConnection));
+        fNewButton.setEnabled(getServiceForCreation() != null);
+    }
+
+    private IRemoteServices getServiceForCreation() {
+        Object o = ((IStructuredSelection) fConnectionTree.getSelection()).getFirstElement();
+        IRemoteServices result = null;
+        if (o instanceof IRemoteServices) {
+            result = (IRemoteServices) o;
+        } else if (o instanceof IRemoteConnection) {
+            result = ((IRemoteConnection) o).getRemoteServices();
+        } else {
+            return null;
+        }
+
+        if ((result.getCapabilities() & IRemoteServices.CAPABILITY_ADD_CONNECTIONS) == 0) {
+            return null;
+        }
+
+        return result;
+    }
+
+    private static boolean canEdit(IRemoteConnection conn) {
+        if (conn == null) {
+            return false;
+        }
+        IRemoteServices rs = conn.getRemoteServices();
+        return (rs.getCapabilities() & IRemoteServices.CAPABILITY_EDIT_CONNECTIONS) != 0;
+    }
+
+
+    private void onNewConnection() {
+        IRemoteServices rs = getServiceForCreation();
+        if (rs != null) {
+            IRemoteUIServices uiService = RemoteUIServices.getRemoteUIServices(rs);
+            if (uiService != null) {
+                IRemoteUIConnectionWizard wiz = uiService.getUIConnectionManager().getConnectionWizard(getShell());
+                if (wiz != null) {
+                    IRemoteConnectionWorkingCopy wc = wiz.open();
+                    if (wc != null) {
+                        IRemoteConnection conn = wc.save();
+                        if (conn != null) {
+                            fConnectionTree.refresh();
+                            fConnectionTree.setSelection(new StructuredSelection(conn), true);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void onEditConnection() {
+        setConnection();
+        if (fConnection != null) {
+            IRemoteUIServices ui = RemoteUIServices.getRemoteUIServices(fConnection.getRemoteServices());
+            if (ui != null) {
+                IRemoteUIConnectionManager connManager = ui.getUIConnectionManager();
+                if (connManager != null) {
+                    IRemoteUIConnectionWizard wiz = connManager.getConnectionWizard(getShell());
+                    wiz.setConnection(fConnection.getWorkingCopy());
+                    IRemoteConnectionWorkingCopy result = wiz.open();
+                    if (result != null) {
+                        result.save();
+                        fConnectionTree.refresh();
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -294,28 +385,19 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
 
     @Override
     protected void okPressed() {
-        // Validate input data
-        fConnectionName = fConnectionNameText.getText();
-        fHostName = fHostNameText.getText();
-        fPort = (fPortText.getText().length() > 0) ? Integer.parseInt(fPortText.getText()) : IRemoteSystemProxy.INVALID_PORT_NUMBER;
+        setConnection();
+        if (fConnection != null) {
+            super.okPressed();
+        }
+    }
 
-        if (!"".equals(fHostName)) { //$NON-NLS-1$
-            // If no node name is specified use the node address as name
-            if ("".equals(fConnectionName)) { //$NON-NLS-1$
-                fConnectionName = fHostName;
-            }
-            // Check if node with name already exists in parent
-            if(fParent.containsChild(fConnectionName)) {
-                MessageDialog.openError(getShell(),
-                        Messages.TraceControl_NewDialogTitle,
-                        Messages.TraceControl_AlreadyExistsError + " (" + fConnectionName + ")");  //$NON-NLS-1$//$NON-NLS-2$
-                return;
-            }
-        }
-        else {
-            return;
-        }
-        // validation successful -> call super.okPressed()
-        super.okPressed();
+    private void setConnection() {
+        Object o = ((IStructuredSelection) fConnectionTree.getSelection()).getFirstElement();
+        fConnection = o instanceof IRemoteConnection ? (IRemoteConnection)o : null;
+    }
+
+    @Override
+    public IRemoteConnection getConnection() {
+        return fConnection;
     }
 }

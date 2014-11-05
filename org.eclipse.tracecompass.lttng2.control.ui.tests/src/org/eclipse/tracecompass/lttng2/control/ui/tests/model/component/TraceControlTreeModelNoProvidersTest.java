@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2013 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,6 +9,7 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *   Alexandre Montplaisir - Port to JUnit4
+ *   Markus Schorn - Bug 448058: Use org.eclipse.remote in favor of RSE
  **********************************************************************/
 
 package org.eclipse.tracecompass.lttng2.control.ui.tests.model.component;
@@ -24,10 +25,9 @@ import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.rse.core.RSECorePlugin;
-import org.eclipse.rse.core.model.IHost;
-import org.eclipse.rse.core.model.ISystemProfile;
-import org.eclipse.rse.core.model.ISystemRegistry;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnectionManager;
+import org.eclipse.remote.core.RemoteServices;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TargetNodeState;
 import org.eclipse.tracecompass.internal.lttng2.control.stubs.service.TestRemoteSystemProxy;
@@ -93,34 +93,31 @@ public class TraceControlTreeModelNoProvidersTest {
 
     /**
      * Run the TraceControlComponent.
-     *
-     * @throws Exception
-     *             This will fail the test
      */
     @Test
-    public void testTraceControlComponents() throws Exception {
+    public void testTraceControlComponents() {
 
         fProxy.setTestFile(fTestFile);
         fProxy.setScenario(SCEN_LIST_INFO_TEST);
 
         ITraceControlComponent root = TraceControlTestFacility.getInstance().getControlView().getTraceControlRoot();
 
-        ISystemRegistry registry = RSECorePlugin.getTheSystemRegistry();
-        ISystemProfile profile =  registry.createSystemProfile("myProfile", true);
-        IHost host = registry.createLocalHost(profile, "myProfile", "user");
+        IRemoteConnectionManager cm = RemoteServices.getLocalServices().getConnectionManager();
+        IRemoteConnection host = cm.getConnection(IRemoteConnectionManager.LOCAL_CONNECTION_NAME);
 
         TargetNodeComponent node = new TargetNodeComponent(TARGET_NODE_NAME, root, host, fProxy);
 
         root.addChild(node);
         node.connect();
 
+        TraceControlTestFacility.getInstance().waitForConnect(node);
         TraceControlTestFacility.getInstance().waitForJobs();
 
         // ------------------------------------------------------------------------
         // Verify Parameters of TargetNodeComponent
         // ------------------------------------------------------------------------
-        assertEquals("LOCALHOST", node.getHostName()); // assigned in createLocalHost() above
-        assertEquals("LOCALHOST", node.getToolTip()); // assigned in createLocalHost() above
+        assertEquals("localhost", node.getRemoteConnection().getAddress()); // assigned in createLocalHost() above
+        assertEquals("Local", node.getToolTip()); // assigned in createLocalHost() above
         Image connectedImage = node.getImage();
         assertNotNull(connectedImage);
         assertEquals(TargetNodeState.CONNECTED, node.getTargetNodeState());
@@ -129,8 +126,6 @@ public class TraceControlTreeModelNoProvidersTest {
         assertTrue(service instanceof LTTngControlService);
         node.setControlService(service);
         assertTrue(node.getControlService() instanceof LTTngControlService);
-
-        assertTrue(node.isPassiveCommunicationsListener());
 
         // ------------------------------------------------------------------------
         // Verify Children of TargetNodeComponent

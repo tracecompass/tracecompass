@@ -13,14 +13,8 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.tracecompass.lttng2.control.core;bundle-version="0.1.0",
- org.eclipse.tracecompass.lttng2.control.ui;bundle-version="0.1.0"
-Import-Package: org.eclipse.rse.core,
- org.eclipse.rse.core.model,
- org.eclipse.rse.core.subsystems,
- org.eclipse.rse.services.shells,
- org.eclipse.rse.services.terminals,
- org.eclipse.rse.subsystems.files.core,
- org.eclipse.rse.subsystems.files.core.servicesubsystem
+ org.eclipse.tracecompass.lttng2.control.ui;bundle-version="0.1.0",
+ org.eclipse.remote.core
 Export-Package: org.eclipse.tracecompass.internal.lttng2.control.stubs.dialogs;x-internal:=true,
  org.eclipse.tracecompass.internal.lttng2.control.stubs.service;x-internal:=true,
  org.eclipse.tracecompass.internal.lttng2.control.stubs.shells;x-internal:=true,
