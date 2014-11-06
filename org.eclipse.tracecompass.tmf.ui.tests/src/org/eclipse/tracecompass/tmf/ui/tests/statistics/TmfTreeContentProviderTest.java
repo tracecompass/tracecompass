@@ -56,12 +56,8 @@ public class TmfTreeContentProviderTest {
     private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, (byte) 2);
     private final TmfTimestamp fTimestamp2 = new TmfTimestamp(12350, (byte) 2);
 
-    private final String fSource = "Source";
-
     private final TmfEventType fType1 = new TmfEventType(fTypeId1, TmfEventField.makeRoot(fLabels));
     private final TmfEventType fType2 = new TmfEventType(fTypeId2, TmfEventField.makeRoot(fLabels));
-
-    private final String fReference = "Some reference";
 
     private final ITmfEvent fEvent1;
     private final ITmfEvent fEvent2;
@@ -82,10 +78,10 @@ public class TmfTreeContentProviderTest {
      */
     public TmfTreeContentProviderTest() {
         fContent1 = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, "Some content", null);
-        fEvent1 = new TmfEvent(null, ITmfContext.UNKNOWN_RANK, fTimestamp1, fSource, fType1, fContent1, fReference);
+        fEvent1 = new TmfEvent(null, ITmfContext.UNKNOWN_RANK, fTimestamp1, fType1, fContent1);
 
         fContent2 = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, "Some other content", null);
-        fEvent2 = new TmfEvent(null, ITmfContext.UNKNOWN_RANK, fTimestamp2, fSource, fType2, fContent2, fReference);
+        fEvent2 = new TmfEvent(null, ITmfContext.UNKNOWN_RANK, fTimestamp2, fType2, fContent2);
 
         fStatsData = new TmfStatisticsTree();
 

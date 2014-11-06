@@ -77,7 +77,7 @@ public class TmfProviderManagerTest {
 
     private class TmfEvent3 extends TmfEvent {
         private TmfEvent3() {
-            super(null, ITmfContext.UNKNOWN_RANK, null, null, null, null, null);
+            super(null, ITmfContext.UNKNOWN_RANK, null, null, null);
         }
     }
 

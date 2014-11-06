@@ -62,7 +62,7 @@ public class TestBtfTrace {
         if (event == null) {
             System.out.println("null");
         } else {
-            System.out.println(event.getRank() + " " + event.getTimestamp().getValue() + " " + event.getSource() + " " + event.getType().getName() + " " + event.getContent().toString());
+            System.out.println(event.getRank() + " " + event.getTimestamp().getValue() + " " + event.getType().getName() + " " + event.getContent().toString());
         }
     }
 

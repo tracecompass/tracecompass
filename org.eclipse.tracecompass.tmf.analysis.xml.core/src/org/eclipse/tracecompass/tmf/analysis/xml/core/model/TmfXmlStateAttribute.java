@@ -221,9 +221,10 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
                     return quark;
                 }
                 /* special case if field is CPU which is not in the field */
-                if (fName.equals(TmfXmlStrings.CPU)) {
-                    quark = getQuarkRelativeAndAdd(startQuark, event.getSource());
-                } else {
+                /* FIXME Disabled until we can use event criteria */
+//                if (fName.equals(TmfXmlStrings.CPU)) {
+//                    quark = getQuarkRelativeAndAdd(startQuark, event.getSource());
+//                } else {
                     final ITmfEventField content = event.getContent();
                     /* stop if the event field doesn't exist */
                     if (content.getField(fName) == null) {
@@ -242,7 +243,7 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
                         Integer fieldInterger = (Integer) field;
                         quark = getQuarkRelativeAndAdd(startQuark, fieldInterger.toString());
                     }
-                }
+//                }
                 return quark;
             }
             case QUERY: {

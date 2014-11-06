@@ -27,6 +27,8 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 public class BtfEvent extends TmfEvent {
 
     private final String fDescription;
+    private final String fSource;
+    private final String fReference;
 
     /**
      * Standard constructor.
@@ -48,10 +50,18 @@ public class BtfEvent extends TmfEvent {
      * @param reference
      *            the event reference
      */
-    public BtfEvent(final ITmfTrace trace, long rank, final ITmfTimestamp timestamp, final String source,
-            final ITmfEventType type, String description, final ITmfEventField content, final String reference) {
-        super(trace, rank, timestamp, source, type, content, reference);
+    public BtfEvent(final ITmfTrace trace,
+            final long rank,
+            final ITmfTimestamp timestamp,
+            final String source,
+            final ITmfEventType type,
+            final String description,
+            final ITmfEventField content,
+            final String reference) {
+        super(trace, rank, timestamp, type, content);
         fDescription = description;
+        fSource = source;
+        fReference = reference;
     }
 
     /**
@@ -63,4 +73,21 @@ public class BtfEvent extends TmfEvent {
         return fDescription;
     }
 
+    /**
+     * Returns the source of this event.
+     *
+     * @return This event's source
+     */
+    public String getSource() {
+        return fSource;
+    }
+
+    /**
+     * Returns the reference of this event.
+     *
+     * @return This event's reference
+     */
+    public String getReference() {
+        return fReference;
+    }
 }

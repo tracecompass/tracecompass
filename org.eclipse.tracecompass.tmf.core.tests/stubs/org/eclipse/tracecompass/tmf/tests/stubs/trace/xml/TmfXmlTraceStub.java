@@ -74,7 +74,6 @@ public class TmfXmlTraceStub extends TmfTrace {
     /* XML elements and attributes names */
     private static final String EVENT_NAME_FIELD = "Message"; //$NON-NLS-1$
     private static final String FIELD_NAMES_FIELD = "fields"; //$NON-NLS-1$
-    private static final String SOURCE_FIELD = "source"; //$NON-NLS-1$
     private static final String VALUES_FIELD = "values"; //$NON-NLS-1$
     private static final String TYPES_FIELD = "type"; //$NON-NLS-1$
     private static final String VALUES_SEPARATOR = " \\| "; //$NON-NLS-1$
@@ -242,7 +241,9 @@ public class TmfXmlTraceStub extends TmfTrace {
         ITmfEventType customEventType = event.getType();
         TmfEventType eventType = new TmfEventType(getStringValue(content, EVENT_NAME_FIELD), customEventType.getRootField());
         ITmfEventField eventFields = new CustomEventContent(content.getName(), content.getValue(), fieldsArray);
-        TmfEvent newEvent = new TmfEvent(this, ITmfContext.UNKNOWN_RANK, event.getTimestamp(), getStringValue(content, SOURCE_FIELD), eventType, eventFields, event.getReference());
+        // FIXME We used to use getSource() to get the CPU. Now this will have
+        // to be done differently.
+        TmfEvent newEvent = new TmfEvent(this, ITmfContext.UNKNOWN_RANK, event.getTimestamp(), eventType, eventFields);
         updateAttributes(savedContext, event.getTimestamp());
         context.increaseRank();
 

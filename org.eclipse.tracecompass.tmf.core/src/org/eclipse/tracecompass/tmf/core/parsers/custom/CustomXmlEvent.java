@@ -59,15 +59,12 @@ public class CustomXmlEvent extends CustomEvent {
      *            Parent trace object
      * @param timestamp
      *            Timestamp of the event
-     * @param source
-     *            Source of the event
      * @param type
      *            Event type
-     * @param reference
-     *            Reference of the event
      */
-    public CustomXmlEvent(CustomXmlTraceDefinition definition, ITmfTrace parentTrace, ITmfTimestamp timestamp, String source, TmfEventType type, String reference) {
-        super(definition, parentTrace, timestamp, source, type, reference);
+    public CustomXmlEvent(CustomXmlTraceDefinition definition,
+            ITmfTrace parentTrace, ITmfTimestamp timestamp, TmfEventType type) {
+        super(definition, parentTrace, timestamp, type);
     }
 
     @Override

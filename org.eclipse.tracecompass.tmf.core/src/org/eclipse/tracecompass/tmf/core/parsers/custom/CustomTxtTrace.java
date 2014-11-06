@@ -385,7 +385,7 @@ public class CustomTxtTrace extends TmfTrace implements ITmfEventParser, ITmfPer
      * @return The first event
      */
     public CustomTxtEvent parseFirstLine(final CustomTxtTraceContext context) {
-        final CustomTxtEvent event = new CustomTxtEvent(fDefinition, this, TmfTimestamp.ZERO, "", fEventType, ""); //$NON-NLS-1$ //$NON-NLS-2$
+        final CustomTxtEvent event = new CustomTxtEvent(fDefinition, this, TmfTimestamp.ZERO, fEventType);
         event.processGroups(context.inputLine, context.firstLineMatcher);
         event.setContent(new CustomEventContent(event, new StringBuffer(context.firstLine)));
         return event;

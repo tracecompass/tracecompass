@@ -39,9 +39,7 @@ public class TmfSyncEventStub extends TmfEvent {
         super(trace,
                 ITmfContext.UNKNOWN_RANK,
                 timestamp,
-                stub,
                 new TmfEventTypeStub(),
-                new TmfEventField(stub, stub, null),
-                stub);
+                new TmfEventField(stub, stub, null));
     }
 }

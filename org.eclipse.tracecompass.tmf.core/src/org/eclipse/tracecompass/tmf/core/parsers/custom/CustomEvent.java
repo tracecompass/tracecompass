@@ -68,7 +68,7 @@ public class CustomEvent extends TmfEvent {
      *            The trace definition to which this event belongs
      */
     public CustomEvent(CustomTraceDefinition definition) {
-        super(null, ITmfContext.UNKNOWN_RANK, null, null, null, null, null);
+        super(null, ITmfContext.UNKNOWN_RANK, null, null, null);
         fDefinition = definition;
         fData = new HashMap<>();
     }
@@ -101,18 +101,13 @@ public class CustomEvent extends TmfEvent {
      *            Parent trace object
      * @param timestamp
      *            Timestamp of this event
-     * @param source
-     *            Source of the event
      * @param type
      *            Event type
-     * @param reference
-     *            Event reference
      */
     public CustomEvent(CustomTraceDefinition definition, ITmfTrace parentTrace,
-            ITmfTimestamp timestamp, String source, TmfEventType type,
-            String reference) {
+            ITmfTimestamp timestamp, TmfEventType type) {
         /* Do not use upstream's fields for stuff we override */
-        super(parentTrace, ITmfContext.UNKNOWN_RANK, null, source, null, null, reference);
+        super(parentTrace, ITmfContext.UNKNOWN_RANK, null, null, null);
         fDefinition = definition;
         fData = new HashMap<>();
 

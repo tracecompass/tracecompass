@@ -50,6 +50,8 @@ public class PcapEvent extends TmfEvent {
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
     private final Packet fPacket;
+    private final String fSource;
+    private final String fReference;
 
     /**
      * Lazy-loaded field representing all the protocols in this event
@@ -85,8 +87,28 @@ public class PcapEvent extends TmfEvent {
             String reference,
             Packet packet) {
 
-        super(trace, rank, timestamp, source, type, content, reference);
+        super(trace, rank, timestamp, type, content);
         fPacket = packet;
+        fSource = source;
+        fReference = reference;
+    }
+
+    /**
+     * Return this event's source.
+     *
+     * @return The event's source
+     */
+    public String getSource() {
+        return fSource;
+    }
+
+    /**
+     * Return this event's reference
+     *
+     * @return The event's reference
+     */
+    public String getReference() {
+        return fReference;
     }
 
     /**

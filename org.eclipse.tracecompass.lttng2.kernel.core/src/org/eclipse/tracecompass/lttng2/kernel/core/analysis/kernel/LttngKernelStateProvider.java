@@ -28,6 +28,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -140,11 +141,11 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
     }
 
     @Override
-    protected void eventHandle(ITmfEvent event) {
-        /*
-         * AbstractStateChangeInput should have already checked for the correct
-         * class type
-         */
+    protected void eventHandle(ITmfEvent uncheckedEvent) {
+        if (!(uncheckedEvent instanceof CtfTmfEvent)) {
+            return;
+        }
+        final CtfTmfEvent event = (CtfTmfEvent) uncheckedEvent;
 
         final String eventName = event.getType().getName();
         final long ts = event.getTimestamp().getValue();

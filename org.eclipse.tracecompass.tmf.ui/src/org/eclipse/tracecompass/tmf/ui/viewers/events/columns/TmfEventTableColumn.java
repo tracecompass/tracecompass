@@ -15,8 +15,6 @@ package org.eclipse.tracecompass.tmf.ui.viewers.events.columns;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.events.columns.TmfContentsColumn;
-import org.eclipse.tracecompass.internal.tmf.ui.viewers.events.columns.TmfReferenceColumn;
-import org.eclipse.tracecompass.internal.tmf.ui.viewers.events.columns.TmfSourceColumn;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.events.columns.TmfTimestampColumn;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.events.columns.TmfTypeColumn;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -48,14 +46,8 @@ public abstract class TmfEventTableColumn {
         /** Column showing the event timestamp */
         TmfEventTableColumn TIMESTAMP = new TmfTimestampColumn();
 
-        /** Column showing the event's source */
-        TmfEventTableColumn SOURCE = new TmfSourceColumn();
-
         /** Column showing the event type */
         TmfEventTableColumn EVENT_TYPE = new TmfTypeColumn();
-
-        /** Column showing the event reference */
-        TmfEventTableColumn REFERENCE = new TmfReferenceColumn();
 
         /** Column showing the aggregated event contents (fields) */
         TmfEventTableColumn CONTENTS = new TmfContentsColumn();

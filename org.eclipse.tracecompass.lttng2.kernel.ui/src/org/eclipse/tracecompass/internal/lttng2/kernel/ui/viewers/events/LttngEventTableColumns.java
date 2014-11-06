@@ -16,6 +16,7 @@ import java.util.Collection;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.ITmfEventTableColumns;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.TmfEventTableColumn;
 
@@ -49,7 +50,10 @@ public class LttngEventTableColumns implements ITmfEventTableColumns {
 
         @Override
         public String getItemString(ITmfEvent event) {
-            String ret = event.getReference();
+            if (!(event instanceof CtfTmfEvent)) {
+                return EMPTY_STRING;
+            }
+            String ret = ((CtfTmfEvent) event).getReference();
             return (ret == null ? EMPTY_STRING : ret);
         }
 

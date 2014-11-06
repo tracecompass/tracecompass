@@ -479,7 +479,7 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser, ITmfPer
      * @return The extracted event
      */
     public CustomXmlEvent extractEvent(final Element element, final InputElement inputElement) {
-        final CustomXmlEvent event = new CustomXmlEvent(fDefinition, this, TmfTimestamp.ZERO, "", fEventType, ""); //$NON-NLS-1$ //$NON-NLS-2$
+        final CustomXmlEvent event = new CustomXmlEvent(fDefinition, this, TmfTimestamp.ZERO, fEventType);
         event.setContent(new CustomEventContent(event, new StringBuffer()));
         parseElement(element, event, inputElement);
         return event;

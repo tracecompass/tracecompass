@@ -63,17 +63,12 @@ public class CustomTxtEvent extends CustomEvent {
      *            Parent trace object
      * @param timestamp
      *            Timestamp of this event
-     * @param source
-     *            Source of this event
      * @param type
      *            Event type
-     * @param reference
-     *            Reference if this event
      */
     public CustomTxtEvent(CustomTxtTraceDefinition definition,
-            ITmfTrace parentTrace, ITmfTimestamp timestamp, String source,
-            TmfEventType type, String reference) {
-        super(definition, parentTrace, timestamp, source, type, reference);
+            ITmfTrace parentTrace, ITmfTimestamp timestamp, TmfEventType type) {
+        super(definition, parentTrace, timestamp, type);
     }
 
     @Override

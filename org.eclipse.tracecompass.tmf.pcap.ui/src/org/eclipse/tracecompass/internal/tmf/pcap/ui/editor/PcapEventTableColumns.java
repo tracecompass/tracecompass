@@ -41,7 +41,7 @@ public class PcapEventTableColumns implements ITmfEventTableColumns {
             TmfEventTableColumn.BaseColumns.TIMESTAMP,
             new PcapSourceColumn(),
             new PcapDestinationColumn(),
-            TmfEventTableColumn.BaseColumns.REFERENCE,
+            new PcapReferenceColumn(),
             new PcapProtocolColumn(),
             TmfEventTableColumn.BaseColumns.CONTENTS
             );
@@ -94,6 +94,29 @@ public class PcapEventTableColumns implements ITmfEventTableColumns {
         @Override
         public @Nullable String getFilterFieldId() {
             return PcapEvent.EVENT_FIELD_PACKET_DESTINATION;
+        }
+    }
+
+    /**
+     * The "packet reference" column for pcap events
+     */
+    private static class PcapReferenceColumn extends TmfEventTableColumn {
+
+        public PcapReferenceColumn() {
+            super(getString(Messages.PcapEventsTable_Reference));
+        }
+
+        @Override
+        public String getItemString(ITmfEvent event) {
+            if (!(event instanceof PcapEvent)) {
+                return EMPTY_STRING;
+            }
+            return ((PcapEvent) event).getReference();
+        }
+
+        @Override
+        public @Nullable String getFilterFieldId() {
+            return ITmfEvent.EVENT_FIELD_REFERENCE;
         }
     }
 

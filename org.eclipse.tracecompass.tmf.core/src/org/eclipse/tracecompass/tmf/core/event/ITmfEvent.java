@@ -91,11 +91,6 @@ public interface ITmfEvent extends IAdaptable {
     ITmfTimestamp getTimestamp();
 
     /**
-     * @return the event source
-     */
-    String getSource();
-
-    /**
      * @return the event type
      */
     ITmfEventType getType();
@@ -104,10 +99,4 @@ public interface ITmfEvent extends IAdaptable {
      * @return the event content
      */
     ITmfEventField getContent();
-
-    /**
-     * @return the event reference
-     */
-    String getReference();
-
 }

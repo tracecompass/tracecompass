@@ -26,6 +26,13 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 public class GdbTraceEvent extends TmfEvent {
 
     // ------------------------------------------------------------------------
+    // Fields
+    // ------------------------------------------------------------------------
+
+    private final String fSource;
+    private final String fReference;
+
+    // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
@@ -33,7 +40,9 @@ public class GdbTraceEvent extends TmfEvent {
      * Default constructor
      */
     public GdbTraceEvent() {
-        super(null, ITmfContext.UNKNOWN_RANK, null, null, null, null, null);
+        super(null, ITmfContext.UNKNOWN_RANK, null, null, null);
+        fSource = null;
+        fReference = null;
     }
 
     /**
@@ -54,7 +63,27 @@ public class GdbTraceEvent extends TmfEvent {
      */
     public GdbTraceEvent(GdbTrace trace, ITmfTimestamp timestamp, String source,
             ITmfEventType type, GdbTraceEventContent content, String reference) {
-        super(trace, ITmfContext.UNKNOWN_RANK, timestamp, source, type, content, reference);
+        super(trace, ITmfContext.UNKNOWN_RANK, timestamp, type, content);
+        fSource = source;
+        fReference = reference;
+    }
+
+    /**
+     * Return the event's source
+     *
+     * @return The event source
+     */
+    public String getSource() {
+        return fSource;
+    }
+
+    /**
+     * Return the event's reference
+     *
+     * @return The event reference
+     */
+    public String getReference() {
+        return fReference;
     }
 
     @Override

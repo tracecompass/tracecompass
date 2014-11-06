@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.btf.ui;
 import java.util.Collection;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.btf.core.event.BtfEvent;
 import org.eclipse.tracecompass.btf.core.trace.BtfColumnNames;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.ITmfEventTableColumns;
@@ -58,7 +59,10 @@ public class BtfEventTableColumns implements ITmfEventTableColumns {
 
         @Override
         public String getItemString(ITmfEvent event) {
-            String ret = event.getSource();
+            if (!(event instanceof BtfEvent)) {
+                return EMPTY_STRING;
+            }
+            String ret = ((BtfEvent) event).getSource();
             return (ret == null ? EMPTY_STRING : ret);
         }
 
@@ -90,7 +94,10 @@ public class BtfEventTableColumns implements ITmfEventTableColumns {
 
         @Override
         public String getItemString(ITmfEvent event) {
-            String ret = event.getReference();
+            if (!(event instanceof BtfEvent)) {
+                return EMPTY_STRING;
+            }
+            String ret = ((BtfEvent) event).getReference();
             return (ret == null ? EMPTY_STRING : ret);
         }
 

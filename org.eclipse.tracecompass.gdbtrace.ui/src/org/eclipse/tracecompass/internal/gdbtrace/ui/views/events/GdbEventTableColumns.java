@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.gdbtrace.ui.views.events;
 import java.util.Collection;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.gdbtrace.core.event.GdbTraceEvent;
 import org.eclipse.tracecompass.internal.gdbtrace.core.event.GdbTraceEventContent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.ITmfEventTableColumns;
@@ -61,7 +62,10 @@ public class GdbEventTableColumns implements ITmfEventTableColumns {
 
         @Override
         public String getItemString(ITmfEvent event) {
-            String ret = event.getReference();
+            if (!(event instanceof GdbTraceEvent)) {
+                return EMPTY_STRING;
+            }
+            String ret = ((GdbTraceEvent) event).getReference();
             return (ret == null ? EMPTY_STRING : ret);
         }
 

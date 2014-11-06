@@ -142,14 +142,7 @@ public abstract class TmfFilterTreeNode implements ITmfFilterTreeNode, Cloneable
         }
         else if (ITmfEvent.EVENT_FIELD_TIMESTAMP.equals(field)) {
             value = event.getTimestamp().toString();
-        }
-        else if (ITmfEvent.EVENT_FIELD_SOURCE.equals(field)) {
-            value = event.getSource();
-        }
-        else if (ITmfEvent.EVENT_FIELD_REFERENCE.equals(field)) {
-            value = event.getReference();
-        }
-        else {
+        } else {
             if (field == null) {
                 return null;
             }

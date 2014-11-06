@@ -46,12 +46,8 @@ public class TmfLostEvent extends TmfEvent implements ITmfLostEvent {
      *            the event rank (in the trace)
      * @param timestamp
      *            the event timestamp
-     * @param source
-     *            the event source
      * @param type
      *            the event type
-     * @param reference
-     *            the event reference
      * @param timeRange
      *            the 'problematic' time range
      * @param nbLostEvents
@@ -61,12 +57,10 @@ public class TmfLostEvent extends TmfEvent implements ITmfLostEvent {
     public TmfLostEvent(final ITmfTrace trace,
             final long rank,
             final ITmfTimestamp timestamp,
-            final String source,
             final ITmfEventType type,
-            final String reference,
             final TmfTimeRange timeRange,
             final long nbLostEvents) {
-        super(trace, rank, timestamp, source, type, null, reference);
+        super(trace, rank, timestamp, type, null);
         fTimeRange = timeRange;
         fNbLostEvents = nbLostEvents;
     }

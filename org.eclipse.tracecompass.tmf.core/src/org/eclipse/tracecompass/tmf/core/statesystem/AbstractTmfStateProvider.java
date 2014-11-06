@@ -164,14 +164,14 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
     /** Fake event indicating the build is over, and the provider should close */
     private static class EndEvent extends TmfEvent {
         public EndEvent() {
-            super(null, ITmfContext.UNKNOWN_RANK, null, null, null, null, null);
+            super(null, ITmfContext.UNKNOWN_RANK, null, null, null);
         }
     }
 
     /** Fake event indicating we want to clear the current queue */
     private static class EmptyQueueEvent extends TmfEvent {
         public EmptyQueueEvent() {
-            super(null, ITmfContext.UNKNOWN_RANK, null, null, null, null, null);
+            super(null, ITmfContext.UNKNOWN_RANK, null, null, null);
         }
     }
 

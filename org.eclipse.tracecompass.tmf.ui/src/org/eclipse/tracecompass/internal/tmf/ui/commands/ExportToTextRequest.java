@@ -80,11 +80,7 @@ public class ExportToTextRequest extends TmfEventRequest {
                 } else { // fallback to default formatting
                     fWriter.write(event.getTimestamp().toString());
                     fWriter.write('\t');
-                    fWriter.write(event.getSource());
-                    fWriter.write('\t');
                     fWriter.write(event.getType().getName());
-                    fWriter.write('\t');
-                    fWriter.write(event.getReference());
                     fWriter.write('\t');
                     ITmfEventField content = event.getContent();
                     Object value = content.getValue();

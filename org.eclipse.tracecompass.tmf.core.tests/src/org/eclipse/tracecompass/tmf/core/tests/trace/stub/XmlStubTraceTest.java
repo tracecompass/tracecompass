@@ -128,9 +128,6 @@ public class XmlStubTraceTest {
         switch (event.getType().getName()) {
         case EVENT_A: {
             ITmfEventField content = event.getContent();
-            if (!event.getSource().equals("1")) {
-                return new Status(IStatus.ERROR, TmfCoreTestPlugin.PLUGIN_ID, "Events of type A should have source 1 but was " + event.getSource());
-            }
             if (content.getField(FIELD_A) == null) {
                 return new Status(IStatus.ERROR, TmfCoreTestPlugin.PLUGIN_ID, String.format("Field %s does not exist in event %s", FIELD_A, EVENT_A));
             }
@@ -138,9 +135,6 @@ public class XmlStubTraceTest {
         }
         case EVENT_B: {
             ITmfEventField content = event.getContent();
-            if (!event.getSource().equals("2")) {
-                return new Status(IStatus.ERROR, TmfCoreTestPlugin.PLUGIN_ID, "Events of type B should have source 2 but was " + event.getSource());
-            }
             if (content.getField(FIELD_B) == null) {
                 return new Status(IStatus.ERROR, TmfCoreTestPlugin.PLUGIN_ID, String.format("Field %s does not exist in event %s", FIELD_B, EVENT_B));
             }

@@ -152,15 +152,9 @@ public class CollapseEventsInTableTest {
         assertEquals("first timestamp", "Jan 1 06:06:06", filterString);
 
         filterString = tableBot.cell(7, 2);
-        assertEquals("source", "", filterString);
-
-        filterString = tableBot.cell(7, 3);
         assertEquals("type", "Syslog", filterString);
 
-        filterString = tableBot.cell(7, 4);
-        assertEquals("file", "", filterString);
-
-        filterString = tableBot.cell(7, 5);
+        filterString = tableBot.cell(7, 3);
         assertEquals("content", "Timestamp=Jan 1 06:06:06, Host=HostF, Logger=LoggerF, Message=Message F", filterString);
 
         filterString = tableBot.cell(8, 0);
@@ -169,7 +163,7 @@ public class CollapseEventsInTableTest {
         filterString = tableBot.cell(8, 1);
         assertEquals("first timestamp (2nd collapse)", "Jan 1 06:06:21", filterString);
 
-        filterString = tableBot.cell(8, 5);
+        filterString = tableBot.cell(8, 3);
         assertEquals("content", "Timestamp=Jan 1 06:06:21, Host=HostF, Logger=LoggerF, Message=Message D", filterString);
 
         /* Clear Filter */

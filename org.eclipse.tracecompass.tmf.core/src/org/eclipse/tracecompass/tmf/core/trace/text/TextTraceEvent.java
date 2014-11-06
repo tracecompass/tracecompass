@@ -36,22 +36,16 @@ public abstract class TextTraceEvent extends TmfEvent {
      *            The parent trace
      * @param timestamp
      *            The event timestamp
-     * @param source
-     *            The event source
      * @param type
      *            The event type
      * @param content
      *            The event content (payload)
-     * @param reference
-     *            The event reference
      */
     public TextTraceEvent(TextTrace<? extends TextTraceEvent> parentTrace,
             final ITmfTimestamp timestamp,
-            final String source,
             final ITmfEventType type,
-            final TextTraceEventContent content,
-            final String reference) {
-        super(parentTrace, ITmfContext.UNKNOWN_RANK, timestamp, source, type, content, reference);
+            final TextTraceEventContent content) {
+        super(parentTrace, ITmfContext.UNKNOWN_RANK, timestamp, type, content);
     }
 
     /**

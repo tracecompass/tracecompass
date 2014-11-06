@@ -91,9 +91,9 @@ public class TmfEventParserStub implements ITmfEventParser {
                 stream.seek(location);
 
                 final long ts        = stream.readLong();
-                final String source  = stream.readUTF();
+                stream.readUTF(); /* Previously source, now unused */
                 final String type    = stream.readUTF();
-                final int reference  = stream.readInt();
+                stream.readInt(); /* Previously reference, now unused */
                 final int typeIndex  = Integer.parseInt(type.substring(typePrefix.length()));
                 final String[] fields = new String[typeIndex];
                 for (int i = 0; i < typeIndex; i++) {
@@ -113,7 +113,7 @@ public class TmfEventParserStub implements ITmfEventParser {
                 final ITmfEvent event = new TmfEvent(fEventStream,
                         ITmfContext.UNKNOWN_RANK,
                         fEventStream.createTimestamp(ts * 1000000L),
-                        source, fTypes[typeIndex], root, String.valueOf(reference));
+                        fTypes[typeIndex], root);
                 return event;
             } catch (final EOFException e) {
             } catch (final IOException e) {

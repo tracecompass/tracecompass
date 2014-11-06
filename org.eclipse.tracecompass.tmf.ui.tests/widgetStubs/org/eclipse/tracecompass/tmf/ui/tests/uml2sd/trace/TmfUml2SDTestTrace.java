@@ -76,9 +76,9 @@ public class TmfUml2SDTestTrace implements ITmfEventParser {
             stream.seek(location);
 
             long ts        = stream.readLong();
-            String source  = stream.readUTF();
+            stream.readUTF(); /* Previously source, now unused */
             String type    = stream.readUTF();
-            String reference = stream.readUTF();
+            stream.readUTF(); /* Previously reference, now unused */
             String sender = stream.readUTF();
             String receiver = stream.readUTF();
             String signal = stream.readUTF();
@@ -100,7 +100,7 @@ public class TmfUml2SDTestTrace implements ITmfEventParser {
             fields[2] = new TmfEventField("signal", signal, null);
 
             ITmfEventField tmfContent = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, content, fields);
-            ITmfEvent tmfEvent = new TmfEvent(fEventStream, ITmfContext.UNKNOWN_RANK, new TmfTimestamp(ts, -9), source, tmfEventType, tmfContent, reference);
+            ITmfEvent tmfEvent = new TmfEvent(fEventStream, ITmfContext.UNKNOWN_RANK, new TmfTimestamp(ts, -9), tmfEventType, tmfContent);
 
             return tmfEvent;
         } catch (final EOFException e) {

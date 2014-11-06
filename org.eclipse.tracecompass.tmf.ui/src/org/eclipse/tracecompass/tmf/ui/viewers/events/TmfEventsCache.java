@@ -113,13 +113,6 @@ public class TmfEventsCache {
          * @since 3.2
          */
         @Override
-        public String getSource() {
-            return event.getSource();
-        }
-        /**
-         * @since 3.2
-         */
-        @Override
         public ITmfEventType getType() {
             return event.getType();
         }
@@ -129,13 +122,6 @@ public class TmfEventsCache {
         @Override
         public ITmfEventField getContent() {
             return event.getContent();
-        }
-        /**
-         * @since 3.2
-         */
-        @Override
-        public String getReference() {
-            return event.getReference();
         }
     }
 

@@ -134,7 +134,7 @@ public class TmfCollapseFilterTest {
         private final boolean fIsCollapsible;
 
         CollapsibleEvent(boolean isCollapsible) {
-            super(fTrace, ITmfContext.UNKNOWN_RANK, null, null, null, null, null);
+            super(fTrace, ITmfContext.UNKNOWN_RANK, null, null, null);
             fIsCollapsible = isCollapsible;
         }
 
@@ -167,11 +167,6 @@ public class TmfCollapseFilterTest {
         }
 
         @Override
-        public String getSource() {
-            return "";
-        }
-
-        @Override
         public ITmfEventType getType() {
             return new TmfEventType();
         }
@@ -179,11 +174,6 @@ public class TmfCollapseFilterTest {
         @Override
         public ITmfEventField getContent() {
             return new TmfEventField("testField", "test", null);
-        }
-
-        @Override
-        public String getReference() {
-            return "remote";
         }
     }
 }

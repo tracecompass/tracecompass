@@ -31,7 +31,7 @@ public class SyslogEvent extends TextTraceEvent implements ITmfCollapsibleEvent 
      * Default constructor
      */
     public SyslogEvent() {
-        super(null, null, null, new SyslogEventType(), null, null);
+        super(null, null, new SyslogEventType(), null);
     }
 
     /**
@@ -52,18 +52,14 @@ public class SyslogEvent extends TextTraceEvent implements ITmfCollapsibleEvent 
      *            the parent trace
      * @param timestamp
      *            the event timestamp
-     * @param source
-     *            the event source
      * @param type
      *            the event type
      * @param content
      *            the event content (payload)
-     * @param reference
-     *            the event reference
      */
-    public SyslogEvent(SyslogTrace parentTrace, final ITmfTimestamp timestamp, final String source,
-            final ITmfEventType type, final TextTraceEventContent content, final String reference) {
-        super(parentTrace, timestamp, source, type, content, reference);
+    public SyslogEvent(SyslogTrace parentTrace, final ITmfTimestamp timestamp,
+            final ITmfEventType type, final TextTraceEventContent content) {
+        super(parentTrace, timestamp, type, content);
     }
 
     @Override

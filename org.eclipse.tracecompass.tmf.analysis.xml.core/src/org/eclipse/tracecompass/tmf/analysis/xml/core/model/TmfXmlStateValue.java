@@ -253,10 +253,10 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
         final ITmfEventField content = event.getContent();
 
         /* Exception for "CPU", returns the source of this event */
-        /* FIXME : Nameclash if a eventfield have "cpu" for name. */
-        if (fieldName.equals(TmfXmlStrings.CPU)) {
-            return TmfStateValue.newValueInt(Integer.valueOf(event.getSource()));
-        }
+        /* FIXME Disabled until we can use event criteria instead */
+//        if (fieldName.equals(TmfXmlStrings.CPU)) {
+//            return TmfStateValue.newValueInt(Integer.valueOf(event.getSource()));
+//        }
         /* Exception also for "TIMESTAMP", returns the timestamp of this event */
         if (fieldName.equals(TmfXmlStrings.TIMESTAMP)) {
             return TmfStateValue.newValueLong(event.getTimestamp().getValue());

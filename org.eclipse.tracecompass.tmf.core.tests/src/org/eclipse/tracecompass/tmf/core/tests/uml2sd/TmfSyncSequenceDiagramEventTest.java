@@ -38,9 +38,7 @@ public class TmfSyncSequenceDiagramEventTest {
     private final String[] fLabels  = new String[] { fLabel0, fLabel1 };
 
     private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, (byte) 2);
-    private final String       fSource     = "Source";
     private final TmfEventType fType       = new TmfEventType(fTypeId, TmfEventField.makeRoot(fLabels));
-    private final String       fReference  = "Some reference";
 
     private final ITmfEvent fEvent1;
     private final TmfEventField fContent1;
@@ -50,7 +48,7 @@ public class TmfSyncSequenceDiagramEventTest {
      */
     public TmfSyncSequenceDiagramEventTest() {
         fContent1 = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, "Some content", null);
-        fEvent1 = new TmfEvent(null, ITmfContext.UNKNOWN_RANK, fTimestamp1, fSource, fType, fContent1, fReference);
+        fEvent1 = new TmfEvent(null, ITmfContext.UNKNOWN_RANK, fTimestamp1, fType, fContent1);
     }
 
     /**

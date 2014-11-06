@@ -209,9 +209,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      */
     public static final Collection<TmfEventTableColumn> DEFAULT_COLUMNS = ImmutableList.of(
             TmfEventTableColumn.BaseColumns.TIMESTAMP,
-            TmfEventTableColumn.BaseColumns.SOURCE,
             TmfEventTableColumn.BaseColumns.EVENT_TYPE,
-            TmfEventTableColumn.BaseColumns.REFERENCE,
             TmfEventTableColumn.BaseColumns.CONTENTS
             );
 
