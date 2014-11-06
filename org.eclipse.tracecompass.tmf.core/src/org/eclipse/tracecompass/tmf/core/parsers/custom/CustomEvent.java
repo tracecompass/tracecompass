@@ -27,6 +27,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -67,6 +68,7 @@ public class CustomEvent extends TmfEvent {
      *            The trace definition to which this event belongs
      */
     public CustomEvent(CustomTraceDefinition definition) {
+        super(null, ITmfContext.UNKNOWN_RANK, null, null, null, null, null);
         fDefinition = definition;
         fData = new HashMap<>();
     }
@@ -110,7 +112,7 @@ public class CustomEvent extends TmfEvent {
             ITmfTimestamp timestamp, String source, TmfEventType type,
             String reference) {
         /* Do not use upstream's fields for stuff we override */
-        super(parentTrace, null, source, null, null, reference);
+        super(parentTrace, ITmfContext.UNKNOWN_RANK, null, source, null, null, reference);
         fDefinition = definition;
         fData = new HashMap<>();
 

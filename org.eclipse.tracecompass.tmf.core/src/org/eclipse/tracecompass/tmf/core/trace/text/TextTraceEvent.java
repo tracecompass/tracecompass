@@ -16,6 +16,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 
 /**
  * Class to store the common functionality of text trace events.
@@ -50,7 +51,7 @@ public abstract class TextTraceEvent extends TmfEvent {
             final ITmfEventType type,
             final TextTraceEventContent content,
             final String reference) {
-        super(parentTrace, timestamp, source, type, content, reference);
+        super(parentTrace, ITmfContext.UNKNOWN_RANK, timestamp, source, type, content, reference);
     }
 
     /**

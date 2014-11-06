@@ -242,7 +242,7 @@ public class TmfXmlTraceStub extends TmfTrace {
         ITmfEventType customEventType = event.getType();
         TmfEventType eventType = new TmfEventType(getStringValue(content, EVENT_NAME_FIELD), customEventType.getRootField());
         ITmfEventField eventFields = new CustomEventContent(content.getName(), content.getValue(), fieldsArray);
-        TmfEvent newEvent = new TmfEvent(this, event.getTimestamp(), getStringValue(content, SOURCE_FIELD), eventType, eventFields, event.getReference());
+        TmfEvent newEvent = new TmfEvent(this, ITmfContext.UNKNOWN_RANK, event.getTimestamp(), getStringValue(content, SOURCE_FIELD), eventType, eventFields, event.getReference());
         updateAttributes(savedContext, event.getTimestamp());
         context.increaseRank();
 

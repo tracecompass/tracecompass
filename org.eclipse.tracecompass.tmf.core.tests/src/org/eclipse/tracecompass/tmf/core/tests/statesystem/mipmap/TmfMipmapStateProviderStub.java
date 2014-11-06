@@ -28,6 +28,7 @@ import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 
 /**
  * A mipmap state provider for test
@@ -110,7 +111,7 @@ class TmfMipmapStateProviderStub extends AbstractTmfMipmapStateProvider {
         ITmfTimestamp timestamp = new TmfNanoTimestamp(time);
         ITmfEventType eventType = new TmfEventType(MIPMAP_ID, null);
         ITmfEventField content = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, value, null);
-        ITmfEvent event = new TmfEvent(null, timestamp, null, eventType, content, null);
+        ITmfEvent event = new TmfEvent(null, ITmfContext.UNKNOWN_RANK, timestamp, null, eventType, content, null);
         return event;
     }
 }

@@ -20,6 +20,7 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -161,9 +162,18 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
     // ------------------------------------------------------------------------
 
     /** Fake event indicating the build is over, and the provider should close */
-    private static class EndEvent extends TmfEvent {}
+    private static class EndEvent extends TmfEvent {
+        public EndEvent() {
+            super(null, ITmfContext.UNKNOWN_RANK, null, null, null, null, null);
+        }
+    }
+
     /** Fake event indicating we want to clear the current queue */
-    private static class EmptyQueueEvent extends TmfEvent {}
+    private static class EmptyQueueEvent extends TmfEvent {
+        public EmptyQueueEvent() {
+            super(null, ITmfContext.UNKNOWN_RANK, null, null, null, null, null);
+        }
+    }
 
     private static final EndEvent END_EVENT = new EndEvent();
     private static final EmptyQueueEvent EMPTY_QUEUE_EVENT = new EmptyQueueEvent();

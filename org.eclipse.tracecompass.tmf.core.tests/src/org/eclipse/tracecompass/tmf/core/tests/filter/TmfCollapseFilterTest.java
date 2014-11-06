@@ -30,6 +30,7 @@ import org.eclipse.tracecompass.tmf.core.event.collapse.ITmfCollapsibleEvent;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.junit.After;
 import org.junit.Test;
@@ -133,7 +134,7 @@ public class TmfCollapseFilterTest {
         private final boolean fIsCollapsible;
 
         CollapsibleEvent(boolean isCollapsible) {
-            super(fTrace);
+            super(fTrace, ITmfContext.UNKNOWN_RANK, null, null, null, null, null);
             fIsCollapsible = isCollapsible;
         }
 

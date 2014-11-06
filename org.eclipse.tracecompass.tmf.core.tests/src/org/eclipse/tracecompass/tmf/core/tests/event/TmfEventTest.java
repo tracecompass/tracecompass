@@ -92,7 +92,7 @@ public class TmfEventTest {
 
     @Test
     public void testDefaultConstructor() {
-        final ITmfEvent event = new TmfEvent(fTrace);
+        final ITmfEvent event = new TmfEvent(fTrace, ITmfContext.UNKNOWN_RANK, null, null, null, null, null);
         assertNotNull("getTrace", event.getTrace());
         assertEquals("getRank", ITmfContext.UNKNOWN_RANK, event.getRank());
         assertNull("getTimestamp", event.getTimestamp());
@@ -123,7 +123,7 @@ public class TmfEventTest {
 
     @Test
     public void testNoRankConstructor() {
-        final ITmfEvent event = new TmfEvent(fTrace, fTimestamp1, fSource, fType, fContent1, fReference1);
+        final ITmfEvent event = new TmfEvent(fTrace, ITmfContext.UNKNOWN_RANK, fTimestamp1, fSource, fType, fContent1, fReference1);
         assertNotNull("getTrace", event.getTrace());
         assertEquals("getRank", ITmfContext.UNKNOWN_RANK, event.getRank());
         assertEquals("getTimestamp", fTimestamp1, event.getTimestamp());
@@ -165,8 +165,8 @@ public class TmfEventTest {
 
     @Test
     public void testHashCode() {
-        ITmfEvent event1 = new TmfEvent(fTrace);
-        ITmfEvent event2 = new TmfEvent(fTrace);
+        ITmfEvent event1 = new TmfEvent(fTrace, ITmfContext.UNKNOWN_RANK, null, null, null, null, null);
+        ITmfEvent event2 = new TmfEvent(fTrace, ITmfContext.UNKNOWN_RANK, null, null, null, null, null);
 
         assertTrue("hashCode", event1.hashCode() == event2.hashCode());
 

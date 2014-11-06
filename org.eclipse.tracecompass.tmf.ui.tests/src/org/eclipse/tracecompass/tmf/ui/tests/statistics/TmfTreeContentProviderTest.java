@@ -28,6 +28,7 @@ import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.Messages;
 import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfStatisticsTree;
 import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfStatisticsTreeNode;
@@ -81,10 +82,10 @@ public class TmfTreeContentProviderTest {
      */
     public TmfTreeContentProviderTest() {
         fContent1 = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, "Some content", null);
-        fEvent1 = new TmfEvent(null, fTimestamp1, fSource, fType1, fContent1, fReference);
+        fEvent1 = new TmfEvent(null, ITmfContext.UNKNOWN_RANK, fTimestamp1, fSource, fType1, fContent1, fReference);
 
         fContent2 = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, "Some other content", null);
-        fEvent2 = new TmfEvent(null, fTimestamp2, fSource, fType2, fContent2, fReference);
+        fEvent2 = new TmfEvent(null, ITmfContext.UNKNOWN_RANK, fTimestamp2, fSource, fType2, fContent2, fReference);
 
         fStatsData = new TmfStatisticsTree();
 

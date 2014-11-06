@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 Ericsson
+ * Copyright (c) 2009, 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -7,9 +7,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Francois Chouinard - Initial API and implementation
- *     Francois Chouinard - Updated as per TMF Event Model 1.0
- *     Alexandre Montplaisir - Made immutable
+ *     Francois Chouinard - Initial API and implementation, updated as per TMF Event Model 1.0
+ *     Alexandre Montplaisir - Made immutable, consolidated constructors
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.core.event;
@@ -50,51 +49,16 @@ public class TmfEvent extends PlatformObject implements ITmfEvent {
     // ------------------------------------------------------------------------
 
     /**
-     * Default constructor. All fields have their default value (null) and the
-     * event rank is set to TmfContext.UNKNOWN_RANK.
+     * Default constructor. Is required for extension points, but should not be
+     * used normally.
      *
-     * Note: This constructor with no parameter must be present for children
-     * classes functionnalities. It is preferable to use one of the constructors
-     * that specifies a trace sine the {@link #getTrace()} method will return a
-     * non null value and will throw an exception if the trace is null.
+     * @deprecated Do not use, extension-point use only. Use
+     *             {@link #TmfEvent(ITmfTrace, long, ITmfTimestamp, String, ITmfEventType, ITmfEventField, String)}
+     *             instead.
      */
+    @Deprecated
     public TmfEvent() {
         this(null, ITmfContext.UNKNOWN_RANK, null, null, null, null, null);
-    }
-
-    /**
-     * Default constructor. All fields have their default value (null) and the
-     * event rank is set to TmfContext.UNKNOWN_RANK.
-     *
-     * @param trace
-     *            The trace associated with this event
-     */
-    public TmfEvent(@NonNull ITmfTrace trace) {
-        this(trace, ITmfContext.UNKNOWN_RANK, null, null, null, null, null);
-    }
-
-    /**
-     * Standard constructor. The event rank will be set to
-     * TmfContext.UNKNOWN_RANK.
-     *
-     * @param trace
-     *            the parent trace
-     * @param timestamp
-     *            the event timestamp
-     * @param source
-     *            the event source
-     * @param type
-     *            the event type
-     * @param content
-     *            the event content (payload)
-     * @param reference
-     *            the event reference
-     * @since 2.0
-     */
-    public TmfEvent(final ITmfTrace trace, final ITmfTimestamp timestamp, final String source,
-            final ITmfEventType type, final ITmfEventField content, final String reference)
-    {
-        this(trace, ITmfContext.UNKNOWN_RANK, timestamp, source, type, content, reference);
     }
 
     /**
@@ -103,7 +67,8 @@ public class TmfEvent extends PlatformObject implements ITmfEvent {
      * @param trace
      *            the parent trace
      * @param rank
-     *            the event rank (in the trace)
+     *            the event rank (in the trace). You can use
+     *            {@link ITmfContext#UNKNOWN_RANK} as default value
      * @param timestamp
      *            the event timestamp
      * @param source
@@ -116,9 +81,13 @@ public class TmfEvent extends PlatformObject implements ITmfEvent {
      *            the event reference
      * @since 2.0
      */
-    public TmfEvent(final ITmfTrace trace, final long rank, final ITmfTimestamp timestamp, final String source,
-            final ITmfEventType type, final ITmfEventField content, final String reference)
-    {
+    public TmfEvent(final ITmfTrace trace,
+            final long rank,
+            final ITmfTimestamp timestamp,
+            final String source,
+            final ITmfEventType type,
+            final ITmfEventField content,
+            final String reference) {
         fTrace = trace;
         fRank = rank;
         fTimestamp = timestamp;

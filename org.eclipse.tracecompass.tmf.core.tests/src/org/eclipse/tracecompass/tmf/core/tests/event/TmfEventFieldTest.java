@@ -28,6 +28,7 @@ import java.util.Collection;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.junit.Test;
 
 /**
@@ -288,7 +289,7 @@ public class TmfEventFieldTest {
     public void testNonEqualsValue() {
         final String fieldName = "myfield";
         final Object value1 = new String("test-string");
-        final Object value2 = new TmfEvent();
+        final Object value2 = new TmfEvent(null, ITmfContext.UNKNOWN_RANK, null, null, null, null, null);
         final TmfEventField[] fields = { fField1, fField2 };
 
         final TmfEventField field1 = new TmfEventField(fieldName, value1, fields);

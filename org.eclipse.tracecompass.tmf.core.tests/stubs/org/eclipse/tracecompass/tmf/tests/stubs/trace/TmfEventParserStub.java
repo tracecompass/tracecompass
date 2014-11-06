@@ -111,6 +111,7 @@ public class TmfEventParserStub implements ITmfEventParser {
 
                 final TmfEventField root = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, content.toString(), null);
                 final ITmfEvent event = new TmfEvent(fEventStream,
+                        ITmfContext.UNKNOWN_RANK,
                         fEventStream.createTimestamp(ts * 1000000L),
                         source, fTypes[typeIndex], root, String.valueOf(reference));
                 return event;
