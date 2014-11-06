@@ -215,6 +215,9 @@
 					<xs:enumeration value="eventField" >
 						<xs:annotation>
 							<xs:documentation>This type identifies the attribute by the value of an event field. Note that the event field corresponds to the attribute name, not its value. For example, if the event has a field called "current_cpu" with a value of "2", "2" would be the attribute name we want.</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="eventName" >
+						<xs:annotation>
+							<xs:documentation>This type identifies the attribute as the name of an event.</xs:documentation></xs:annotation></xs:enumeration>
 					<xs:enumeration value="location" >
 						<xs:annotation>
 							<xs:documentation>This type indicates that the path to the attribute is at the specified location. Location simply avoids having to write full path to an attribute each time it is being used, but the location itself is a sequence of stateAttribute elements. For example, if we previously defined a location named "CurrentThead" for path "CPUs/{current_cpu}/CurrentThread", we can use a stateAttribute of type location with "CurrentThread" value.</xs:documentation></xs:annotation></xs:enumeration>
