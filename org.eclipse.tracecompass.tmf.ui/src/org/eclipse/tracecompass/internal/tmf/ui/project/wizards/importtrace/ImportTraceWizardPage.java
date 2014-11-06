@@ -51,7 +51,6 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.ModalContext;
@@ -59,7 +58,6 @@ import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.FocusAdapter;
@@ -88,7 +86,6 @@ import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
-import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceTypeUIUtils;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
@@ -1373,7 +1370,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         private IPath fBaseSourceContainerPath;
         private boolean fImportFromArchive;
         private int fImportOptionFlags;
-        private ImportConfirmation fConfirmationMode = ImportConfirmation.SKIP;
+        private ImportConflictHandler fConflictHandler;
 
         private TraceValidateAndImportOperation(String traceId, IPath baseSourceContainerPath, IPath destinationContainerPath, boolean importFromArchive, int importOptionFlags) {
             fTraceType = traceId;
@@ -1384,7 +1381,9 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
             boolean overwriteExistingResources = (importOptionFlags & OPTION_OVERWRITE_EXISTING_RESOURCES) != 0;
             if (overwriteExistingResources) {
-                fConfirmationMode = ImportConfirmation.OVERWRITE_ALL;
+                fConflictHandler = new ImportConflictHandler(getContainer().getShell(), fTraceFolderElement, ImportConfirmation.OVERWRITE_ALL);
+            } else {
+                fConflictHandler = new ImportConflictHandler(getContainer().getShell(), fTraceFolderElement, ImportConfirmation.SKIP);
             }
         }
 
@@ -1666,30 +1665,19 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         private IResource importResource(TraceFileSystemElement fileSystemElement, IProgressMonitor monitor)
                 throws InvocationTargetException, InterruptedException, CoreException {
 
-            ImportConfirmation mode = checkForNameClashes(fileSystemElement);
-            switch (mode) {
-            case RENAME:
-            case RENAME_ALL:
-                rename(fileSystemElement);
-                break;
-            case OVERWRITE:
-            case OVERWRITE_ALL:
-                delete(fileSystemElement, monitor);
-                break;
-            case CONTINUE:
-                break;
-            case SKIP:
-            case SKIP_ALL:
-            default:
+            IPath tracePath = getInitialDestinationPath(fileSystemElement);
+            String newName = fConflictHandler.checkAndHandleNameClash(tracePath, monitor);
+            if (newName == null) {
                 return null;
             }
+            fileSystemElement.setLabel(newName);
 
             List<TraceFileSystemElement> subList = new ArrayList<>();
 
             FileSystemElement parentFolder = fileSystemElement.getParent();
 
             IPath containerPath = fileSystemElement.getDestinationContainerPath();
-            IPath tracePath = containerPath.addTrailingSeparator().append(fileSystemElement.getLabel());
+            tracePath = containerPath.addTrailingSeparator().append(fileSystemElement.getLabel());
             boolean createLinksInWorkspace = (fImportOptionFlags & OPTION_CREATE_LINKS_IN_WORKSPACE) != 0;
             if (fileSystemElement.isDirectory() && !createLinksInWorkspace) {
                 containerPath = tracePath;
@@ -1740,103 +1728,12 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             return false;
         }
 
-        private ImportConfirmation checkForNameClashes(TraceFileSystemElement fileSystemElement) throws InterruptedException {
-            IPath tracePath = getInitialDestinationPath(fileSystemElement);
-
-            // handle rename
-            if (getExistingTrace(tracePath) != null) {
-                if ((fConfirmationMode == ImportConfirmation.RENAME_ALL) ||
-                        (fConfirmationMode == ImportConfirmation.OVERWRITE_ALL) ||
-                        (fConfirmationMode == ImportConfirmation.SKIP_ALL)) {
-                    return fConfirmationMode;
-                }
-
-                int returnCode = promptForOverwrite(tracePath);
-                if (returnCode < 0) {
-                    // Cancel
-                    throw new InterruptedException();
-                }
-                fConfirmationMode = ImportConfirmation.values()[returnCode];
-                return fConfirmationMode;
-            }
-            return ImportConfirmation.CONTINUE;
-        }
-
-        private int promptForOverwrite(IPath tracePath) {
-            final MessageDialog dialog = new MessageDialog(getContainer()
-                    .getShell(), null, null, NLS.bind(Messages.ImportTraceWizard_TraceAlreadyExists, tracePath.makeRelativeTo(fTraceFolderElement.getProject().getPath())),
-                    MessageDialog.QUESTION, new String[] {
-                            ImportConfirmation.RENAME.getInName(),
-                            ImportConfirmation.RENAME_ALL.getInName(),
-                            ImportConfirmation.OVERWRITE.getInName(),
-                            ImportConfirmation.OVERWRITE_ALL.getInName(),
-                            ImportConfirmation.SKIP.getInName(),
-                            ImportConfirmation.SKIP_ALL.getInName(),
-                    }, 4) {
-                @Override
-                protected int getShellStyle() {
-                    return super.getShellStyle() | SWT.SHEET;
-                }
-            };
-
-            final int[] returnValue = new int[1];
-            getShell().getDisplay().syncExec(new Runnable() {
-
-                @Override
-                public void run() {
-                    returnValue[0] = dialog.open();
-                }
-            });
-            return returnValue[0];
-        }
-
         /**
          * @return the initial destination path, before rename, if any
          */
         private IPath getInitialDestinationPath(TraceFileSystemElement fileSystemElement) {
             IPath traceFolderPath = fileSystemElement.getDestinationContainerPath();
             return traceFolderPath.append(fileSystemElement.getFileSystemObject().getLabel());
-        }
-
-        private void rename(TraceFileSystemElement fileSystemElement) {
-            IPath tracePath = getInitialDestinationPath(fileSystemElement);
-            TmfTraceElement trace = getExistingTrace(tracePath);
-            if (trace == null) {
-                return;
-            }
-
-            // Not using IFolder on purpose to leave the door open to import
-            // directly into an IProject
-            IContainer folder = (IContainer) trace.getParent().getResource();
-            int i = 2;
-            while (true) {
-                String name = trace.getName() + '(' + Integer.toString(i++) + ')';
-                IResource resource = folder.findMember(name);
-                if (resource == null) {
-                    fileSystemElement.setLabel(name);
-                    return;
-                }
-            }
-        }
-
-        private void delete(TraceFileSystemElement fileSystemElement, IProgressMonitor monitor) throws CoreException {
-            IPath tracePath = getInitialDestinationPath(fileSystemElement);
-            TmfTraceElement trace = getExistingTrace(tracePath);
-            if (trace == null) {
-                return;
-            }
-
-            trace.delete(monitor);
-        }
-
-        private TmfTraceElement getExistingTrace(IPath tracePath) {
-            List<TmfTraceElement> traces = fTraceFolderElement.getTraces();
-            for (TmfTraceElement t : traces) {
-                if (t.getPath().equals(tracePath)) {
-                    return t;
-                }
-            }
-            return null;
         }
 
         /**
@@ -2184,51 +2081,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         public boolean isFolder(Object element) {
             TraceFileSystemElement resource = (TraceFileSystemElement) element;
             return resource.isDirectory();
-        }
-    }
-
-    private enum ImportConfirmation {
-        // ------------------------------------------------------------------------
-        // Enum definition
-        // ------------------------------------------------------------------------
-        RENAME(Messages.ImportTraceWizard_ImportConfigurationRename),
-        RENAME_ALL(Messages.ImportTraceWizard_ImportConfigurationRenameAll),
-        OVERWRITE(Messages.ImportTraceWizard_ImportConfigurationOverwrite),
-        OVERWRITE_ALL(Messages.ImportTraceWizard_ImportConfigurationOverwriteAll),
-        SKIP(Messages.ImportTraceWizard_ImportConfigurationSkip),
-        SKIP_ALL(Messages.ImportTraceWizard_ImportConfigurationSkipAll),
-        CONTINUE("CONTINUE"); //$NON-NLS-1$
-
-        // ------------------------------------------------------------------------
-        // Attributes
-        // ------------------------------------------------------------------------
-        /**
-         * Name of enum
-         */
-        private final String fInName;
-
-        // ------------------------------------------------------------------------
-        // Constuctors
-        // ------------------------------------------------------------------------
-
-        /**
-         * Private constructor
-         *
-         * @param name
-         *            the name of state
-         */
-        private ImportConfirmation(String name) {
-            fInName = name;
-        }
-
-        // ------------------------------------------------------------------------
-        // Accessors
-        // ------------------------------------------------------------------------
-        /**
-         * @return state name
-         */
-        public String getInName() {
-            return fInName;
         }
     }
 }
