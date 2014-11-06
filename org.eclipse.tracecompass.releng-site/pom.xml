@@ -31,7 +31,7 @@
   <profile>
     <id>build-update-site</id>
     <properties>
-      <siteDestination>/var/www/tools/tracecompass/nightly/</siteDestination>
+      <siteDestination>/home/data/httpd/download.eclipse.org/tracecompass/master/nightly/</siteDestination>
     </properties>
     <build>
       <plugins>
