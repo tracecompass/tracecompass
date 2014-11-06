@@ -140,24 +140,6 @@ public final class Utils {
     }
 
     /**
-     * Gets a UUID from an array defintion
-     *
-     * @param uuidDef
-     *            the array defintions, must contain integer bytes
-     * @return the UUID
-     * @throws CTFReaderException
-     *             if the definition contains less than 16 elements
-     * @since 3.1
-     * @deprecated use
-     *             {@link Utils#getUUIDfromDefinition(AbstractArrayDefinition uuidDef)}
-     */
-    @Deprecated
-    public static UUID getUUIDfromDefinition(org.eclipse.tracecompass.ctf.core.event.types.ArrayDefinition uuidDef) throws CTFReaderException {
-        byte[] uuidArray = new byte[16];
-        return getUUID(uuidDef, uuidArray);
-    }
-
-    /**
      * Creates a UUID object from an array of 16 bytes.
      *
      * @param bytes

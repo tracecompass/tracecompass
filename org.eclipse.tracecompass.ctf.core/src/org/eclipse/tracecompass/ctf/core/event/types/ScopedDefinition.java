@@ -74,21 +74,6 @@ public abstract class ScopedDefinition extends Definition implements IDefinition
         return (AbstractArrayDefinition) ((def instanceof AbstractArrayDefinition) ? def : null);
     }
 
-    /**
-     * Lookup an array in a struct. If the name returns a non-array (like an
-     * int) then the method returns null
-     *
-     * @param name
-     *            the name of the array
-     * @return the array or null.
-     * @deprecated use {@link ScopedDefinition#lookupArrayDefinition(String)}
-     */
-    @Deprecated
-    @Nullable
-    public ArrayDefinition lookupArray(String name) {
-        Definition def = lookupDefinition(name);
-        return (ArrayDefinition) ((def instanceof ArrayDefinition) ? def : null);
-    }
 
     /**
      * Lookup an enum in a struct. If the name returns a non-enum (like an int)
@@ -118,24 +103,6 @@ public abstract class ScopedDefinition extends Definition implements IDefinition
     public IntegerDefinition lookupInteger(String name) {
         Definition def = lookupDefinition(name);
         return (IntegerDefinition) ((def instanceof IntegerDefinition) ? def : null);
-    }
-
-    /**
-     * Lookup a sequence in a struct. If the name returns a non-sequence (like
-     * an int) then the method returns null
-     *
-     * @param name
-     *            the name of the sequence
-     * @return the sequence or null if a definition is not found or it does not
-     *         match the desired datatype.
-     * @since 3.0
-     * @deprecated use {@link ScopedDefinition#lookupArrayDefinition(String)}
-     */
-    @Deprecated
-    @Nullable
-    public SequenceDefinition lookupSequence(String name) {
-        Definition def = lookupDefinition(name);
-        return (SequenceDefinition) ((def instanceof SequenceDefinition) ? def : null);
     }
 
     /**
