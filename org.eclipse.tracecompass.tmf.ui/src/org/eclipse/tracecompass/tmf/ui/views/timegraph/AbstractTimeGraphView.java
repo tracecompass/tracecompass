@@ -33,6 +33,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -85,6 +86,9 @@ import org.eclipse.ui.IActionBars;
  * @since 2.1
  */
 public abstract class AbstractTimeGraphView extends TmfView {
+
+    /** Constant indicating that all levels of the time graph should be expanded */
+    protected static final int ALL_LEVELS = AbstractTreeViewer.ALL_LEVELS;
 
     /**
      * Redraw state enum
@@ -160,6 +164,8 @@ public abstract class AbstractTimeGraphView extends TmfView {
     /** The filter label provider, or null if filter is not used */
     private TreeLabelProvider fFilterLabelProvider;
 
+    private int fAutoExpandLevel = ALL_LEVELS;
+
     // ------------------------------------------------------------------------
     // Classes
     // ------------------------------------------------------------------------
@@ -187,6 +193,8 @@ public abstract class AbstractTimeGraphView extends TmfView {
         void redraw();
 
         void update();
+
+        void setAutoExpandLevel(int level);
 
     }
 
@@ -251,6 +259,11 @@ public abstract class AbstractTimeGraphView extends TmfView {
         public void update() {
             viewer.getControl().update();
         }
+
+        @Override
+        public void setAutoExpandLevel(int level) {
+            viewer.setAutoExpandLevel(level);
+        }
     }
 
     private class TimeGraphComboWrapper implements ITimeGraphWrapper {
@@ -313,6 +326,11 @@ public abstract class AbstractTimeGraphView extends TmfView {
         @Override
         public void update() {
             combo.update();
+        }
+
+        @Override
+        public void setAutoExpandLevel(int level) {
+            combo.setAutoExpandLevel(level);
         }
 
         TimeGraphCombo getTimeGraphCombo() {
@@ -718,6 +736,28 @@ public abstract class AbstractTimeGraphView extends TmfView {
     }
 
     /**
+     * Sets the auto-expand level to be used for the input of the view. The
+     * value 0 means that there is no auto-expand; 1 means that top-level
+     * elements are expanded, but not their children; 2 means that top-level
+     * elements are expanded, and their children, but not grand-children; and so
+     * on.
+     * <p>
+     * The value {@link #ALL_LEVELS} means that all subtrees should be expanded.
+     * </p>
+     *
+     * @param level
+     *            non-negative level, or <code>ALL_LEVELS</code> to expand all
+     *            levels of the tree
+     */
+    protected void setAutoExpandLevel(int level) {
+        fAutoExpandLevel = level;
+        ITimeGraphWrapper tgWrapper = fTimeGraphWrapper;
+        if (tgWrapper != null) {
+            tgWrapper.setAutoExpandLevel(level);
+        }
+    }
+
+    /**
      * Gets the entry list for a trace
      *
      * @param trace
@@ -844,6 +884,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
         }
 
         fTimeGraphWrapper.setTimeGraphProvider(fPresentation);
+        fTimeGraphWrapper.setAutoExpandLevel(fAutoExpandLevel);
 
         fTimeGraphWrapper.getTimeGraphViewer().addRangeListener(new ITimeGraphRangeListener() {
             @Override
