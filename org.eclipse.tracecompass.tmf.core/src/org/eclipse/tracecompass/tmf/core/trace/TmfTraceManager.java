@@ -18,6 +18,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -32,6 +33,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
@@ -47,6 +49,8 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Central trace manager for TMF. It tracks the currently opened traces and
@@ -151,7 +155,7 @@ public final class TmfTraceManager {
      * @return The active trace set
      * @see #getTraceSet(ITmfTrace)
      */
-    public synchronized ITmfTrace[] getActiveTraceSet() {
+    public synchronized @NonNull Collection<ITmfTrace> getActiveTraceSet() {
         final ITmfTrace trace = fCurrentTrace;
         return getTraceSet(trace);
     }
@@ -201,17 +205,17 @@ public final class TmfTraceManager {
      *
      * @param trace
      *            The trace or experiment
-     * @return The corresponding trace set
+     * @return The corresponding trace set.
      */
-    public static ITmfTrace[] getTraceSet(ITmfTrace trace) {
+    public static @NonNull Collection<ITmfTrace> getTraceSet(ITmfTrace trace) {
         if (trace == null) {
-            return null;
+            return NonNullUtils.checkNotNull(ImmutableSet.<ITmfTrace> of());
         }
         List<ITmfTrace> traces = trace.getChildren(ITmfTrace.class);
         if (traces.size() > 0) {
-            return traces.toArray(new ITmfTrace[traces.size()]);
+            return NonNullUtils.checkNotNull(ImmutableSet.copyOf(traces));
         }
-        return new ITmfTrace[] { trace };
+        return NonNullUtils.checkNotNull(ImmutableSet.of(trace));
     }
 
     /**
@@ -222,19 +226,19 @@ public final class TmfTraceManager {
      *
      * @param trace
      *            The trace or experiment
-     * @return The corresponding trace set, including the experiment
+     * @return The corresponding trace set, including the experiment.
      * @since 3.1
      */
-    public static @NonNull Set<ITmfTrace> getTraceSetWithExperiment(ITmfTrace trace) {
+    public static @NonNull Collection<ITmfTrace> getTraceSetWithExperiment(ITmfTrace trace) {
         if (trace == null) {
-            return checkNotNull(Collections.EMPTY_SET);
+            return checkNotNull(ImmutableSet.<ITmfTrace> of());
         }
         if (trace instanceof TmfExperiment) {
             TmfExperiment exp = (TmfExperiment) trace;
             List<ITmfTrace> traces = exp.getTraces();
             Set<ITmfTrace> alltraces = new LinkedHashSet<>(traces);
             alltraces.add(exp);
-            return alltraces;
+            return NonNullUtils.checkNotNull(ImmutableSet.copyOf(alltraces));
         }
         return checkNotNull(Collections.singleton(trace));
     }

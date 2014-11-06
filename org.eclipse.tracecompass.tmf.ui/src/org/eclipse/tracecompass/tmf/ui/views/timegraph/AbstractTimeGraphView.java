@@ -16,10 +16,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.timegraph;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -1130,7 +1127,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
      * @since 3.0
      */
     protected @NonNull Iterable<ITmfTrace> getTracesToBuild(@NonNull ITmfTrace trace) {
-        return checkNotNull(Arrays.asList(TmfTraceManager.getTraceSet(trace)));
+        return TmfTraceManager.getTraceSet(trace);
     }
 
     /**

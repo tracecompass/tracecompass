@@ -464,11 +464,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
      */
     private int getSelectionValue(long time) {
         int thread = -1;
-        ITmfTrace[] traces = TmfTraceManager.getTraceSet(getTrace());
-        if (traces == null) {
-            return thread;
-        }
-        for (ITmfTrace trace : traces) {
+        for (ITmfTrace trace : TmfTraceManager.getTraceSet(getTrace())) {
             if (thread > 0) {
                 break;
             }
@@ -523,12 +519,11 @@ public class ControlFlowView extends AbstractTimeGraphView {
     @Override
     protected List<ILinkEvent> getLinkList(long startTime, long endTime, long resolution, IProgressMonitor monitor) {
         List<ILinkEvent> list = new ArrayList<>();
-        ITmfTrace[] traces = TmfTraceManager.getTraceSet(getTrace());
         List<TimeGraphEntry> entryList = getEntryList(getTrace());
-        if (traces == null || entryList == null) {
+        if (entryList == null) {
             return list;
         }
-        for (ITmfTrace trace : traces) {
+        for (ITmfTrace trace : TmfTraceManager.getTraceSet(getTrace())) {
             if (trace == null) {
                 continue;
             }

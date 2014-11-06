@@ -20,6 +20,7 @@
 package org.eclipse.tracecompass.tmf.ui.views.histogram;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -27,6 +28,9 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+
+import com.google.common.base.Function;
+import com.google.common.collect.FluentIterable;
 
 /**
  * Histogram-independent data model.
@@ -259,13 +263,10 @@ public class HistogramDataModel implements IHistogramDataModel {
     public void setTrace(ITmfTrace trace) {
         this.fTrace = trace;
         fTraceMap.clear();
-        ITmfTrace[] traces = TmfTraceManager.getTraceSet(fTrace);
-        if (traces != null) {
-            int i = 0;
-            for (ITmfTrace tr : traces) {
-                fTraceMap.put(tr, i);
-                i++;
-            }
+        int i = 0;
+        for (ITmfTrace tr : TmfTraceManager.getTraceSet(fTrace)) {
+            fTraceMap.put(tr, i);
+            i++;
         }
     }
 
@@ -284,17 +285,14 @@ public class HistogramDataModel implements IHistogramDataModel {
      * @since 3.0
      */
     public String[] getTraceNames() {
-        ITmfTrace[] traces = TmfTraceManager.getTraceSet(fTrace);
-        if (traces == null) {
-            return new String[0];
-        }
-        String[] traceNames = new String[traces.length];
-        int i = 0;
-        for (ITmfTrace tr : traces) {
-            traceNames[i] = tr.getName();
-            i++;
-        }
-        return traceNames;
+        FluentIterable<ITmfTrace> traces = FluentIterable.from(TmfTraceManager.getTraceSet(fTrace));
+        FluentIterable<String> traceNames = traces.transform(new Function<ITmfTrace, String>() {
+            @Override
+            public String apply(ITmfTrace input) {
+                return input.getName();
+            }
+        });
+        return traceNames.toArray(String.class);
     }
 
     /**
@@ -303,11 +301,11 @@ public class HistogramDataModel implements IHistogramDataModel {
      * @since 3.0
      */
     public int getNbTraces() {
-        ITmfTrace[] traces = TmfTraceManager.getTraceSet(fTrace);
-        if (traces == null) {
+        Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(fTrace);
+        if (traces.isEmpty()) {
             return 1; //
         }
-        return traces.length;
+        return traces.size();
     }
 
     /**

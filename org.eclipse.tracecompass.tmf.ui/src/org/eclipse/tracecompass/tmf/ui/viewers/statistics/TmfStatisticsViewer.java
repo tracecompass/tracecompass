@@ -14,6 +14,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.statistics;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -502,8 +503,8 @@ public class TmfStatisticsViewer extends TmfViewer {
             // Checks if the trace is already in the statistics tree.
             int numNodeTraces = statisticsTreeNode.getNbChildren();
 
-            ITmfTrace[] traces = TmfTraceManager.getTraceSet(fTrace);
-            int numTraces = traces.length;
+            Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(fTrace);
+            int numTraces = traces.size();
 
             if (numTraces == numNodeTraces) {
                 boolean same = true;
@@ -511,8 +512,8 @@ public class TmfStatisticsViewer extends TmfViewer {
                  * Checks if the experiment contains the same traces as when
                  * previously selected.
                  */
-                for (int i = 0; i < numTraces; i++) {
-                    String traceName = traces[i].getName();
+                for (ITmfTrace trace : traces) {
+                    String traceName = trace.getName();
                     if (!statisticsTreeNode.containsChild(traceName)) {
                         same = false;
                         break;

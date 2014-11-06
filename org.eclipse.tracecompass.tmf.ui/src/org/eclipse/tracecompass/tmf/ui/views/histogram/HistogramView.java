@@ -19,6 +19,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.histogram;
 
+import java.util.Collection;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -750,9 +752,9 @@ public class HistogramView extends TmfView {
 
         fTimeSpanControl.setValue(duration);
 
-        ITmfTrace[] traces = TmfTraceManager.getTraceSet(fTrace);
-        if (traces != null) {
-            this.showTraceAction.setEnabled(traces.length < fFullTraceHistogram.getMaxNbTraces());
+        Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(fTrace);
+        if (!traces.isEmpty()) {
+            this.showTraceAction.setEnabled(traces.size() < fFullTraceHistogram.getMaxNbTraces());
         }
         updateLegendArea();
 
@@ -768,8 +770,8 @@ public class HistogramView extends TmfView {
         }
         disposeLegendImages();
         if (fFullTraceHistogram.showTraces()) {
-            ITmfTrace[] traces = TmfTraceManager.getTraceSet(fTrace);
-            fLegendImages = new Image[traces.length];
+            Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(fTrace);
+            fLegendImages = new Image[traces.size()];
             int traceIndex = 0;
             for (ITmfTrace trace : traces) {
                 fLegendImages[traceIndex] = new Image(fLegendArea.getDisplay(), 16, 16);

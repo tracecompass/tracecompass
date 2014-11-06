@@ -993,8 +993,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 // only show collapse filter if at least one trace can be collapsed
                 boolean isCollapsible = false;
                 if (fTrace != null) {
-                    ITmfTrace traces[] = TmfTraceManager.getTraceSet(fTrace);
-                    for (ITmfTrace trace : traces) {
+                    for (ITmfTrace trace : TmfTraceManager.getTraceSet(fTrace)) {
                         Class <? extends ITmfEvent> eventClass = trace.getEventType();
                         isCollapsible = ITmfCollapsibleEvent.class.isAssignableFrom(eventClass);
                         if (isCollapsible) {

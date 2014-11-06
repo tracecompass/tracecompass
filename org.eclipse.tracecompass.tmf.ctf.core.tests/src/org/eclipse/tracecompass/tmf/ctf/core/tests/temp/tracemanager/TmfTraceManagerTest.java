@@ -13,14 +13,14 @@
 
 package org.eclipse.tracecompass.tmf.ctf.core.tests.temp.tracemanager;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
-import java.util.Set;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.signal.TmfRangeSynchSignal;
@@ -173,11 +173,11 @@ public class TmfTraceManagerTest {
         openTrace(trace2);
         selectTrace(trace2);
 
-        ITmfTrace[] expected = new ITmfTrace[] { trace2 };
-        ITmfTrace[] actual = tm.getActiveTraceSet();
+        Collection<ITmfTrace> expected = Collections.singleton(trace2);
+        Collection<ITmfTrace> actual = tm.getActiveTraceSet();
 
-        assertEquals(1, actual.length);
-        assertArrayEquals(expected, actual);
+        assertEquals(1, actual.size());
+        assertEquals(expected, actual);
     }
 
     /**
@@ -189,11 +189,11 @@ public class TmfTraceManagerTest {
         openTrace(trace1);
         openTrace(exp);
 
-        ITmfTrace[] expected = new ITmfTrace[] { trace1, trace2 };
-        ITmfTrace[] actual = tm.getActiveTraceSet();
+        Collection<ITmfTrace> expected = ImmutableSet.of(trace1, trace2);
+        Collection<ITmfTrace> actual = tm.getActiveTraceSet();
 
-        assertEquals(2, actual.length);
-        assertArrayEquals(expected, actual);
+        assertEquals(2, actual.size());
+        assertEquals(expected, actual);
     }
 
     /**
@@ -202,8 +202,8 @@ public class TmfTraceManagerTest {
     @Test
     public void testTraceSetWithExperiment() {
         /* Test with a trace */
-        Set<ITmfTrace> expected = ImmutableSet.of(trace1);
-        Set<ITmfTrace> actual = TmfTraceManager.getTraceSetWithExperiment(trace1);
+        Collection<ITmfTrace> expected = Collections.singleton(trace1);
+        Collection<ITmfTrace> actual = TmfTraceManager.getTraceSetWithExperiment(trace1);
         assertEquals(1, actual.size());
         assertEquals(expected, actual);
 

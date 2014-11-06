@@ -706,8 +706,7 @@ public class CallStackView extends TmfView {
     @TmfSignalHandler
     public void traceClosed(final TmfTraceClosedSignal signal) {
         synchronized (fBuildThreadMap) {
-            ITmfTrace[] traces = TmfTraceManager.getTraceSet(signal.getTrace());
-            for (ITmfTrace trace : traces) {
+            for (ITmfTrace trace : TmfTraceManager.getTraceSet(signal.getTrace())) {
                 BuildThread buildThread = fBuildThreadMap.remove(trace);
                 if (buildThread != null) {
                     buildThread.cancel();
@@ -833,8 +832,7 @@ public class CallStackView extends TmfView {
                 fEndTime = Long.MIN_VALUE;
                 refresh();
                 synchronized (fBuildThreadMap) {
-                    ITmfTrace[] traces = TmfTraceManager.getTraceSet(fTrace);
-                    for (ITmfTrace trace : traces) {
+                    for (ITmfTrace trace : TmfTraceManager.getTraceSet(fTrace)) {
                         BuildThread buildThread = new BuildThread(trace, fTrace);
                         fBuildThreadMap.put(trace, buildThread);
                         buildThread.start();
