@@ -48,7 +48,9 @@ public class StringDeclaration extends Declaration {
 
     /**
      * Generate an encoded string declaration
-     * @param encoding the encoding, utf8 or ascii
+     *
+     * @param encoding
+     *            the encoding, utf8 or ascii
      */
     public StringDeclaration(Encoding encoding) {
         fEncoding = encoding;
@@ -79,6 +81,7 @@ public class StringDeclaration extends Declaration {
     public int getMaximumSize() {
         return Integer.MAX_VALUE;
     }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -105,10 +108,51 @@ public class StringDeclaration extends Declaration {
         }
         return sb.toString();
     }
+
     @Override
     public String toString() {
         /* Only used for debugging */
         return "[declaration] string[" + Integer.toHexString(hashCode()) + ']'; //$NON-NLS-1$
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = prime;
+        if (fEncoding != null) {
+            switch (fEncoding) {
+            case ASCII:
+                result += 1;
+                break;
+            case NONE:
+                result += 2;
+                break;
+            case UTF8:
+                result += 3;
+                break;
+            default:
+                break;
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        StringDeclaration other = (StringDeclaration) obj;
+        if (fEncoding != other.fEncoding) {
+            return false;
+        }
+        return true;
     }
 
 }

@@ -58,7 +58,7 @@ public final class ArrayDeclaration extends CompoundDeclaration {
      *
      * TODO: investigate performance
      */
-    private final ArrayListMultimap<String, String> fChildrenNames = ArrayListMultimap.create();
+    private final transient ArrayListMultimap<String, String> fChildrenNames = ArrayListMultimap.create();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -118,8 +118,7 @@ public final class ArrayDeclaration extends CompoundDeclaration {
         return "[declaration] array[" + Integer.toHexString(hashCode()) + ']'; //$NON-NLS-1$
     }
 
-    @NonNull
-    private List<Definition> read(@NonNull BitBuffer input, @Nullable IDefinitionScope definitionScope, String fieldName) throws CTFReaderException {
+    private @NonNull List<Definition> read(@NonNull BitBuffer input, @Nullable IDefinitionScope definitionScope, String fieldName) throws CTFReaderException {
         Builder<Definition> definitions = new ImmutableList.Builder<>();
         if (!fChildrenNames.containsKey(fieldName)) {
             for (int i = 0; i < fLength; i++) {
@@ -144,6 +143,36 @@ public final class ArrayDeclaration extends CompoundDeclaration {
     public int getMaximumSize() {
         long val = (long) fLength * fElemType.getMaximumSize();
         return (int) Math.min(Integer.MAX_VALUE, val);
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + fElemType.hashCode();
+        result = prime * result + fLength;
+        return result;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        ArrayDeclaration other = (ArrayDeclaration) obj;
+        if (!fElemType.equals(other.fElemType)) {
+            return false;
+        }
+        if (fLength != other.fLength) {
+            return false;
+        }
+        return true;
     }
 
 }

@@ -12,9 +12,12 @@
 
 package org.eclipse.tracecompass.ctf.core.event.types;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -232,7 +235,10 @@ public class StructDeclaration extends Declaration {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + fFieldMap.entrySet().hashCode();
+        for (Entry<String, IDeclaration> field : fFieldMap.entrySet()) {
+            result = prime * result + field.getKey().hashCode();
+            result = prime * result + field.getValue().hashCode();
+        }
         result = (prime * result) + (int) (fMaxAlign ^ (fMaxAlign >>> 32));
         return result;
     }
@@ -249,9 +255,30 @@ public class StructDeclaration extends Declaration {
             return false;
         }
         StructDeclaration other = (StructDeclaration) obj;
-        if (!fFieldMap.entrySet().equals(other.fFieldMap.entrySet())) {
+        if (fFieldMap.size() != other.fFieldMap.size()) {
             return false;
         }
+
+        List<String> localFieldNames = new ArrayList<>();
+        localFieldNames.addAll(fFieldMap.keySet());
+
+        List<IDeclaration> localDecs = new ArrayList<>();
+        localDecs.addAll(fFieldMap.values());
+
+        List<String> otherFieldNames = new ArrayList<>();
+        otherFieldNames.addAll(other.fFieldMap.keySet());
+
+        List<IDeclaration> otherDecs = new ArrayList<>();
+        otherDecs.addAll(other.fFieldMap.values());
+
+        //check fields in order
+        for (int i = 0; i < fFieldMap.size(); i++) {
+            if ((!localFieldNames.get(i).equals(otherFieldNames.get(i))) ||
+                    (!otherDecs.get(i).equals(localDecs.get(i)))) {
+                return false;
+            }
+        }
+
         if (fMaxAlign != other.fMaxAlign) {
             return false;
         }

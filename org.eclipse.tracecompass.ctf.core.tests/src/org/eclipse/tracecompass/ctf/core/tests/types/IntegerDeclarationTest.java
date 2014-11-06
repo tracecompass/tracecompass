@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.ctf.core.tests.types;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.math.BigInteger;
@@ -277,4 +278,48 @@ public class IntegerDeclarationTest {
         IntegerDeclaration unsigned64bit = IntegerDeclaration.createDeclaration(64, false, 1, ByteOrder.BIG_ENDIAN, Encoding.ASCII, "", 32);
         assertEquals(BigInteger.ZERO, unsigned64bit.getMinValue());
     }
+
+    /**
+     * Test the hashcode
+     */
+    @Test
+    public void hashcodeTest() {
+        assertEquals(234767053, IntegerDeclaration.createDeclaration(8, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 8).hashCode());
+    }
+
+    /**
+     * Test the equals
+     */
+    @Test
+    public void equalsTest() {
+        IntegerDeclaration a = IntegerDeclaration.createDeclaration(32, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 32);
+        IntegerDeclaration b = IntegerDeclaration.createDeclaration(8, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 32);
+        IntegerDeclaration c = IntegerDeclaration.createDeclaration(32, true, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 32);
+        IntegerDeclaration d = IntegerDeclaration.createDeclaration(32, false, 16, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 32);
+        IntegerDeclaration e = IntegerDeclaration.createDeclaration(32, false, 10, ByteOrder.LITTLE_ENDIAN, Encoding.NONE, "", 32);
+        IntegerDeclaration f = IntegerDeclaration.createDeclaration(32, false, 10, ByteOrder.BIG_ENDIAN, Encoding.UTF8, "", 32);
+        IntegerDeclaration g = IntegerDeclaration.createDeclaration(32, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "hi", 32);
+        IntegerDeclaration h = IntegerDeclaration.createDeclaration(32, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 16);
+        IntegerDeclaration i = IntegerDeclaration.createDeclaration(32, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 32);
+        assertNotEquals(a, null);
+        assertNotEquals(a, new Object());
+        assertNotEquals(a, b);
+        assertNotEquals(a, c);
+        assertNotEquals(a, d);
+        assertNotEquals(a, e);
+        assertNotEquals(a, f);
+        assertNotEquals(a, g);
+        assertNotEquals(a, h);
+        assertEquals(a, i);
+        assertNotEquals(b, a);
+        assertNotEquals(c, a);
+        assertNotEquals(d, a);
+        assertNotEquals(e, a);
+        assertNotEquals(f, a);
+        assertNotEquals(g, a);
+        assertNotEquals(h, a);
+        assertEquals(i, a);
+        assertEquals(a, a);
+    }
+
 }

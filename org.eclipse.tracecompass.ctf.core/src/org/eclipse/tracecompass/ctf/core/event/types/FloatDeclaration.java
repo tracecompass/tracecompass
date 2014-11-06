@@ -181,4 +181,43 @@ public final class FloatDeclaration extends Declaration implements ISimpleDataty
         ret *= expPow;
         return ret;
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (fAlignement ^ (fAlignement >>> 32));
+        result = prime * result + (fByteOrder.equals(ByteOrder.BIG_ENDIAN) ? 4321 : 1234);
+        result = prime * result + fExponent;
+        result = prime * result + fMantissa;
+        return result;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        FloatDeclaration other = (FloatDeclaration) obj;
+        if (fAlignement != other.fAlignement) {
+            return false;
+        }
+        if (!fByteOrder.equals(other.fByteOrder)) {
+            return false;
+        }
+        if (fExponent != other.fExponent) {
+            return false;
+        }
+        if (fMantissa != other.fMantissa) {
+            return false;
+        }
+        return true;
+    }
+
 }

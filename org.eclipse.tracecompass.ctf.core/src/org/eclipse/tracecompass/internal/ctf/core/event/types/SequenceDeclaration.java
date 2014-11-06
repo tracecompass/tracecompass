@@ -136,8 +136,7 @@ public class SequenceDeclaration extends CompoundDeclaration {
             definitions.add(fElemType.createDefinition(definitionScope, elemName, input));
         }
         @SuppressWarnings("null")
-        @NonNull
-        ImmutableList<Definition> build = definitions.build();
+        @NonNull ImmutableList<Definition> build = definitions.build();
         return new ArrayDefinition(this, definitionScope, fieldName, build);
     }
 
@@ -150,6 +149,36 @@ public class SequenceDeclaration extends CompoundDeclaration {
     @Override
     public int getMaximumSize() {
         return Integer.MAX_VALUE;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + fElemType.hashCode();
+        result = prime * result + fLengthName.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        SequenceDeclaration other = (SequenceDeclaration) obj;
+        if (!fElemType.equals(other.fElemType)) {
+            return false;
+        }
+        if (!fLengthName.equals(other.fLengthName)) {
+            return false;
+        }
+        return true;
     }
 
 }

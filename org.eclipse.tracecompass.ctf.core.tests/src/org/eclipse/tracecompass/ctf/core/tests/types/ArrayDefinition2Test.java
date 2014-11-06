@@ -11,7 +11,7 @@
 
 package org.eclipse.tracecompass.ctf.core.tests.types;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -86,7 +86,7 @@ public class ArrayDefinition2Test {
         return temp;
     }
 
-    private ArrayDefinition setUpDeclaration(IDeclaration decl,
+    private ArrayDefinition setUpDeclaration(@NonNull IDeclaration decl,
             @NonNull List<Definition> defs) {
         CompoundDeclaration ad = new ArrayDeclaration(0, decl);
         ArrayDefinition temp = new ArrayDefinition(ad, this.trace, "Testx", defs);

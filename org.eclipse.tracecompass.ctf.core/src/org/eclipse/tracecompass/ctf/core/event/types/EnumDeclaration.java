@@ -151,7 +151,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
         public EnumTable() {
         }
 
-        public boolean add(long low, long high, @Nullable String label) {
+        public synchronized boolean add(long low, long high, @Nullable String label) {
             LabelAndRange newRange = new LabelAndRange(low, high, label);
 
             for (LabelAndRange r : ranges) {
@@ -172,13 +172,46 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
          *            the value to query
          * @return the label corresponding to that value
          */
-        public @Nullable String query(long value) {
+        public synchronized @Nullable String query(long value) {
             for (LabelAndRange r : ranges) {
                 if (r.intersects(value)) {
                     return r.getLabel();
                 }
             }
             return null;
+        }
+
+        @Override
+        public synchronized int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            for (LabelAndRange range : ranges) {
+                result = prime * result + range.hashCode();
+            }
+            return result;
+        }
+
+        @Override
+        public synchronized boolean equals(@Nullable Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            EnumTable other = (EnumTable) obj;
+            if (ranges.size() != other.ranges.size()) {
+                return false;
+            }
+            for (int i = 0; i < ranges.size(); i++) {
+                if (!ranges.get(i).equals(other.ranges.get(i))) {
+                    return false;
+                }
+            }
+            return true;
         }
 
     }
@@ -193,8 +226,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
          *
          * @return the label
          */
-        @Nullable
-        public String getLabel() {
+        public @Nullable String getLabel() {
             return fLabel;
         }
 
@@ -212,12 +244,90 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
             return this.intersects(other.low)
                     || this.intersects(other.high);
         }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            final String label = fLabel;
+            result = prime * result + ((label == null) ? 0 : label.hashCode());
+            result = prime * result + (int) (high ^ (high >>> 32));
+            result = prime * result + (int) (low ^ (low >>> 32));
+            return result;
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            LabelAndRange other = (LabelAndRange) obj;
+            final String label = fLabel;
+            if (label == null) {
+                if (other.fLabel != null) {
+                    return false;
+                }
+            } else if (!label.equals(other.fLabel)) {
+                return false;
+            }
+            if (high != other.high) {
+                return false;
+            }
+            if (low != other.low) {
+                return false;
+            }
+            return true;
+        }
     }
 
     @Override
     public String toString() {
         /* Only used for debugging */
         return "[declaration] enum[" + Integer.toHexString(hashCode()) + ']'; //$NON-NLS-1$
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = prime + fContainerType.hashCode();
+        for (String label : fLabels) {
+            result = prime * result + label.hashCode();
+        }
+        result = prime * result + fTable.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        EnumDeclaration other = (EnumDeclaration) obj;
+        if (!fContainerType.equals(other.fContainerType)) {
+            return false;
+        }
+        if (fLabels.size() != other.fLabels.size()) {
+            return false;
+        }
+        if (!fLabels.containsAll(other.fLabels)) {
+            return false;
+        }
+        if (!fTable.equals(other.fTable)) {
+            return false;
+        }
+        return true;
     }
 
 }

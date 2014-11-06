@@ -13,6 +13,7 @@ package org.eclipse.tracecompass.ctf.core.tests.types;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -87,8 +88,6 @@ public class ArrayDeclaration2Test {
         assertNotNull(result);
     }
 
-
-
     /**
      * Run the Declaration getElementType() method test.
      */
@@ -140,5 +139,35 @@ public class ArrayDeclaration2Test {
         String right = result.substring(0, left.length());
 
         assertEquals(left, right);
+    }
+
+    /**
+     * Test the hashcode
+     */
+    @Test
+    public void hashcodeTest() {
+        assertEquals(2016, fixture.hashCode());
+        assertEquals(new ArrayDeclaration(1, new StringDeclaration()).hashCode(), fixture.hashCode());
+    }
+
+    /**
+     * Test the equals
+     */
+    @Test
+    public void equalsTest() {
+        ArrayDeclaration a = new ArrayDeclaration(1, IntegerDeclaration.INT_32B_DECL);
+        ArrayDeclaration b = new ArrayDeclaration(2, IntegerDeclaration.INT_32B_DECL);
+        ArrayDeclaration c = new ArrayDeclaration(1, new StringDeclaration());
+        ArrayDeclaration d = new ArrayDeclaration(1, IntegerDeclaration.INT_32B_DECL);
+        assertNotEquals(a, null);
+        assertNotEquals(a, new Object());
+        assertNotEquals(a, b);
+        assertNotEquals(a, c);
+        assertEquals(a, d);
+        assertEquals(a, a);
+        assertNotEquals(b, a);
+        assertNotEquals(c, a);
+        assertEquals(d, a);
+        assertEquals(a, a);
     }
 }

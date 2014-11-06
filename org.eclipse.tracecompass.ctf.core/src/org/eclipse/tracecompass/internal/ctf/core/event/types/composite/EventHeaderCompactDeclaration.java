@@ -243,4 +243,31 @@ public class EventHeaderCompactDeclaration extends Declaration implements IEvent
         }
         return bo;
     }
+
+@Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (fByteOrder.equals(ByteOrder.BIG_ENDIAN) ? 4321 : 1234);
+        return result;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        EventHeaderCompactDeclaration other = (EventHeaderCompactDeclaration) obj;
+        if (!fByteOrder.equals(other.fByteOrder)) {
+            return false;
+        }
+        return true;
+    }
+
 }

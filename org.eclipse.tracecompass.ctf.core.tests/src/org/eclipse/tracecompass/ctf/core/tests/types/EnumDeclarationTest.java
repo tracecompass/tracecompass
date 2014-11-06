@@ -12,6 +12,7 @@
 package org.eclipse.tracecompass.ctf.core.tests.types;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -120,4 +121,52 @@ public class EnumDeclarationTest {
         String left = "[declaration] enum[";
         assertEquals(left, result.substring(0, left.length()));
     }
+
+    /**
+     * Test the hashcode
+     */
+    @Test
+    public void hashcodeTest() {
+        assertEquals(-709790042, fixture.hashCode());
+        EnumDeclaration a = new EnumDeclaration(IntegerDeclaration.INT_8_DECL);
+        a.add(0, 1, "hello");
+        a.add(2, 3, "kitty");
+        assertEquals(-82535941, a.hashCode());
+        EnumDeclaration b = new EnumDeclaration(IntegerDeclaration.createDeclaration(1, false, 1,
+                ByteOrder.BIG_ENDIAN, Encoding.ASCII, "", 8));
+        assertEquals(b.hashCode(), fixture.hashCode());
+        assertNotEquals(a.hashCode(), fixture.hashCode());
+    }
+
+    /**
+     * Test the equals
+     */
+    @Test
+    public void equalsTest() {
+        EnumDeclaration a = new EnumDeclaration(IntegerDeclaration.INT_8_DECL);
+        EnumDeclaration b = new EnumDeclaration(IntegerDeclaration.INT_8_DECL);
+        b.add(2, 19, "hi");
+        EnumDeclaration c = new EnumDeclaration(IntegerDeclaration.INT_32B_DECL);
+        EnumDeclaration d = new EnumDeclaration(IntegerDeclaration.INT_8_DECL);
+        assertNotEquals(a, null);
+        assertNotEquals(a, new Object());
+        assertNotEquals(a, b);
+        assertNotEquals(a, c);
+        assertNotEquals(b, c);
+        assertEquals(a, d);
+        assertNotEquals(b, a);
+        assertNotEquals(c, a);
+        assertNotEquals(c, b);
+        assertEquals(d, a);
+        a.add(2, 19, "hi");
+        assertEquals(a, a);
+        assertEquals(a, b);
+        assertEquals(b, a);
+        assertNotEquals(a, d);
+        assertNotEquals(d, a);
+        d.add(2, 22, "hi");
+        assertNotEquals(a, d);
+        assertNotEquals(d, a);
+    }
+
 }

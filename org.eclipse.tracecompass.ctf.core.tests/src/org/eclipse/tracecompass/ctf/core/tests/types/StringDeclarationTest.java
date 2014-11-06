@@ -12,6 +12,7 @@
 package org.eclipse.tracecompass.ctf.core.tests.types;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.nio.ByteBuffer;
@@ -114,5 +115,40 @@ public class StringDeclarationTest {
         String right = result.substring(0, left.length());
 
         assertEquals(left, right);
+    }
+
+    /**
+     * Test the hashcode
+     */
+    @Test
+    public void hashcodeTest() {
+        assertEquals(32, fixture.hashCode());
+        StringDeclaration a = new StringDeclaration(Encoding.ASCII);
+        StringDeclaration b = new StringDeclaration();
+        StringDeclaration c = new StringDeclaration(Encoding.UTF8);
+        StringDeclaration d = new StringDeclaration(Encoding.ASCII);
+        assertNotEquals(a.hashCode(), b.hashCode());
+        assertNotEquals(a.hashCode(), c.hashCode());
+        assertEquals(a.hashCode(), d.hashCode());
+    }
+
+    /**
+     * Test the equals
+     */
+    @Test
+    public void equalsTest() {
+        StringDeclaration a = new StringDeclaration(Encoding.ASCII);
+        StringDeclaration b = new StringDeclaration();
+        StringDeclaration c = new StringDeclaration(Encoding.UTF8);
+        StringDeclaration d = new StringDeclaration(Encoding.ASCII);
+        assertNotEquals(a, null);
+        assertNotEquals(a, new Object());
+        assertNotEquals(a, b);
+        assertNotEquals(a, c);
+        assertEquals(a, d);
+        assertNotEquals(b, a);
+        assertNotEquals(c, a);
+        assertEquals(d, a);
+        assertEquals(a, a);
     }
 }

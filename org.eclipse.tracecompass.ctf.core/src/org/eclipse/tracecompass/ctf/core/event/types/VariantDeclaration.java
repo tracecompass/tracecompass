@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
@@ -184,6 +185,78 @@ public class VariantDeclaration extends Declaration {
     public String toString() {
         /* Only used for debugging */
         return "[declaration] variant[" + Integer.toHexString(hashCode()) + ']'; //$NON-NLS-1$
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((fDeclarationToPopulate == null) ? 0 : fDeclarationToPopulate.hashCode());
+        if (fFields == null) {
+            result = prime * result;
+        } else {
+            for (Entry<String, IDeclaration> field : fFields.entrySet()) {
+                result = prime * result + field.getValue().hashCode();
+            }
+        }
+        result = prime * result + ((fPrevDefinitionScope == null) ? 0 : fPrevDefinitionScope.hashCode());
+        result = prime * result + ((fTag == null) ? 0 : fTag.hashCode());
+        result = prime * result + ((fTagDef == null) ? 0 : fTagDef.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        VariantDeclaration other = (VariantDeclaration) obj;
+        if (fDeclarationToPopulate == null) {
+            if (other.fDeclarationToPopulate != null) {
+                return false;
+            }
+        } else if (!fDeclarationToPopulate.equals(other.fDeclarationToPopulate)) {
+            return false;
+        }
+        // do not check the order of the fields
+
+        if (fFields == null) {
+            if (other.fFields != null) {
+                return false;
+            }
+        } else {
+            if( !fFields.equals(other.fFields)) {
+                return false;
+            }
+        }
+        if (fPrevDefinitionScope == null) {
+            if (other.fPrevDefinitionScope != null) {
+                return false;
+            }
+        } else if (!fPrevDefinitionScope.equals(other.fPrevDefinitionScope)) {
+            return false;
+        }
+        if (fTag == null) {
+            if (other.fTag != null) {
+                return false;
+            }
+        } else if (!fTag.equals(other.fTag)) {
+            return false;
+        }
+        if (fTagDef == null) {
+            if (other.fTagDef != null) {
+                return false;
+            }
+        } else if (!fTagDef.equals(other.fTagDef)) {
+            return false;
+        }
+        return true;
     }
 
 }

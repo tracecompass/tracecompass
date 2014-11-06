@@ -12,6 +12,7 @@
 package org.eclipse.tracecompass.ctf.core.tests.types;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -20,6 +21,7 @@ import java.nio.ByteBuffer;
 
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
+import org.eclipse.tracecompass.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StringDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
@@ -79,7 +81,7 @@ public class StructDeclarationTest {
     public void testCreateDefinition() throws CTFReaderException {
         String fieldName = "";
         ByteBuffer allocate = ByteBuffer.allocate(100);
-        if( allocate == null){
+        if (allocate == null) {
             throw new IllegalStateException("Failed to allocate memory");
         }
         BitBuffer bb = new BitBuffer(allocate);
@@ -137,5 +139,60 @@ public class StructDeclarationTest {
         String trunc = result.substring(0, 21);
 
         assertEquals("[declaration] struct[", trunc);
+    }
+
+    /**
+     * Test the hashcode
+     */
+    @Test
+    public void hashcodeTest() {
+        assertEquals(32, fixture.hashCode());
+        StructDeclaration a = new StructDeclaration(8);
+        fixture.addField("hello", a);
+        a.addField("Time", IntegerDeclaration.INT_32B_DECL);
+        assertEquals(-864123628, fixture.hashCode());
+        StructDeclaration b = new StructDeclaration(8);
+        StructDeclaration c = new StructDeclaration(8);
+        b.addField("hello", c);
+        c.addField("Time", IntegerDeclaration.INT_32B_DECL);
+        assertEquals(b.hashCode(), fixture.hashCode());
+        c.addField("Space", IntegerDeclaration.INT_32L_DECL);
+        assertNotEquals(b.hashCode(), fixture.hashCode());
+    }
+
+    /**
+     * Test the equals
+     */
+    @Test
+    public void equalsTest() {
+        StructDeclaration a = new StructDeclaration(8);
+        StructDeclaration b = new StructDeclaration(16);
+        StructDeclaration c = new StructDeclaration(8);
+        StructDeclaration d = new StructDeclaration(8);
+        StructDeclaration e = new StructDeclaration(8);
+        StructDeclaration f = new StructDeclaration(8);
+        c.addField("hi", new StringDeclaration());
+        assertNotEquals(a, null);
+        assertNotEquals(a, new Object());
+        assertNotEquals(a, b);
+        assertNotEquals(a, c);
+        assertEquals(a, d);
+        assertNotEquals(b, a);
+        assertNotEquals(c, a);
+        assertEquals(d, a);
+        assertEquals(a, a);
+        a.addField("hi", new StringDeclaration());
+        f.addField("hi", new StringDeclaration());
+        e.addField("hello", new StringDeclaration());
+        assertEquals(a, c);
+        assertEquals(c, a);
+        assertNotEquals(a, d);
+        d.addField("hi", IntegerDeclaration.INT_32B_DECL);
+        assertNotEquals(a, d);
+        a.addField("hello", new StringDeclaration());
+        e.addField("hi", new StringDeclaration());
+        f.addField("hello", IntegerDeclaration.INT_32B_DECL);
+        assertNotEquals(a, e);
+        assertNotEquals(a, f);
     }
 }

@@ -471,4 +471,67 @@ public class IntegerDeclaration extends Declaration implements ISimpleDatatypeDe
         return bits;
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (fAlignment ^ (fAlignment >>> 32));
+        result = prime * result + fBase;
+        result = prime * result + (fByteOrder.equals(ByteOrder.BIG_ENDIAN) ? 4321 : 1234);
+        result = prime * result + (fClock.hashCode());
+        switch (fEncoding) {
+        case ASCII:
+            result = prime * result + 1;
+            break;
+        case NONE:
+            result = prime * result + 2;
+            break;
+        case UTF8:
+            result = prime * result + 3;
+            break;
+        default:
+            result = prime * result + 4;
+            break;
+        }
+        result = prime * result + fLength;
+        result = prime * result + (fSigned ? 1231 : 1237);
+        return result;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        IntegerDeclaration other = (IntegerDeclaration) obj;
+        if (fAlignment != other.fAlignment) {
+            return false;
+        }
+        if (fBase != other.fBase) {
+            return false;
+        }
+        if (!fByteOrder.equals(other.fByteOrder)) {
+            return false;
+        }
+        if (!fClock.equals(other.fClock)) {
+            return false;
+        }
+        if (fEncoding != other.fEncoding) {
+            return false;
+        }
+        if (fLength != other.fLength) {
+            return false;
+        }
+        if (fSigned != other.fSigned) {
+            return false;
+        }
+        return true;
+    }
+
 }
