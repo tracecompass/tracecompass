@@ -14,11 +14,11 @@
   <parent>
     <artifactId>org.eclipse.tracecompass</artifactId>
     <groupId>org.eclipse.tracecompass</groupId>
-    <version>3.2.0-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>org.eclipse.tracecompass.examples</artifactId>
-  <version>1.1.0-SNAPSHOT</version>
+  <version>0.1.0-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
 
   <name>Trace Compass Examples Plug-in</name>

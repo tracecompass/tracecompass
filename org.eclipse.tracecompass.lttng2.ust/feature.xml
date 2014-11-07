@@ -3,7 +3,7 @@
 <feature
       id="org.eclipse.tracecompass.lttng2.ust"
       label="%featureName"
-      version="3.2.0.qualifier"
+      version="0.1.0.qualifier"
       provider-name="%featureProvider"
       license-feature="org.eclipse.license"
       license-feature-version="0.0.0">
@@ -37,11 +37,11 @@
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.tracecompass.ctf.core" version="3.1.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.tracecompass.tmf.core" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.tracecompass.ctf.core" version="0.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.tracecompass.tmf.core" version="0.1.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.ui.ide"/>
-      <import plugin="org.eclipse.tracecompass.tmf.ui" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.tracecompass.tmf.ui" version="0.1.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.help"/>
    </requires>
 

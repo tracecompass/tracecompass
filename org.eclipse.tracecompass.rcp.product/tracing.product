@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="Trace Compass" uid="org.eclipse.tracecompass.rcp" id="org.eclipse.tracecompass.rcp.branding.product" application="org.eclipse.tracecompass.rcp.ui.application" version="1.1.0.qualifier" useFeatures="true" includeLaunchers="true">
+<product name="Trace Compass" uid="org.eclipse.tracecompass.rcp" id="org.eclipse.tracecompass.rcp.branding.product" application="org.eclipse.tracecompass.rcp.ui.application" version="0.1.0.qualifier" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/org.eclipse.tracecompass.tracing.rcp.branding/icons/alt_about.gif"/>
       <text>
          Trace Compass
 
-Version: 1.1.0
+Version: 0.1.0
 
 Copyright (c) 2014 Ericsson
 
@@ -39,12 +39,14 @@ http://www.eclipse.org/legal/epl-v10.html
 
    <windowImages i16="/org.eclipse.tracecompass.rcp.branding/icons/alt_window_16.gif" i32="/org.eclipse.tracecompass.rcp.branding/icons/alt_window_32.gif"/>
 
+
    <launcher name="tracecompass">
       <solaris/>
       <win useIco="false">
          <bmp/>
       </win>
    </launcher>
+
 
    <vm>
       <linux include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7</linux>
@@ -227,8 +229,8 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="1" />
       <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
-      <plugin id="org.eclipse.tracecompass.rcp.ui" autoStart="false" startLevel="5" />
       <plugin id="org.eclipse.osgi" autoStart="true" startLevel="-1" />
+      <plugin id="org.eclipse.tracecompass.rcp.ui" autoStart="false" startLevel="5" />
       <plugin id="org.eclipse.update.configurator" autoStart="true" startLevel="3" />
    </configurations>
 

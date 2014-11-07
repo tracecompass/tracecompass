@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 3.1.0.qualifier
+Bundle-Version: 0.1.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.ctf.core.tests;singleton:=true
 Bundle-Activator: org.eclipse.tracecompass.ctf.core.tests.CtfCoreTestPlugin
@@ -10,7 +10,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.core.runtime;bundle-version="3.8.0",
- org.eclipse.tracecompass.ctf.core;bundle-version="3.1.0"
+ org.eclipse.tracecompass.ctf.core;bundle-version="0.1.0"
 Export-Package: org.eclipse.tracecompass.ctf.core.tests;x-friends:="org.eclipse.tracecompass.alltests",
  org.eclipse.tracecompass.ctf.core.tests.ctftestsuite;x-internal:=true,
  org.eclipse.tracecompass.ctf.core.tests.event;x-internal:=true,

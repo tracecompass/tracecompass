@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.tracecompass.gdbtrace"
       label="%featureName"
-      version="3.2.0.qualifier"
+      version="0.1.0.qualifier"
       provider-name="%featureProvider"
       license-feature="org.eclipse.license"
       license-feature-version="0.0.0">
@@ -37,9 +37,9 @@
       <import plugin="org.eclipse.cdt.dsf"/>
       <import plugin="org.eclipse.cdt.dsf.gdb"/>
       <import plugin="org.eclipse.cdt.dsf.gdb.ui"/>
-      <import plugin="org.eclipse.tracecompass.tmf.core" version="3.1.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.tracecompass.tmf.ui" version="3.1.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.tracecompass.gdbtrace.core" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.tracecompass.tmf.core" version="0.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.tracecompass.tmf.ui" version="0.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.tracecompass.gdbtrace.core" version="0.1.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
