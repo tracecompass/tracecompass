@@ -155,4 +155,9 @@ public class StringDeclaration extends Declaration {
         return true;
     }
 
+    @Override
+    public boolean isBinaryEquivalent(IDeclaration other) {
+        return equals(other);
+    }
+
 }

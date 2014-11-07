@@ -220,4 +220,8 @@ public final class FloatDeclaration extends Declaration implements ISimpleDataty
         return true;
     }
 
+    @Override
+    public boolean isBinaryEquivalent(@Nullable IDeclaration obj) {
+        return equals(obj);
+    }
 }

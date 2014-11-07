@@ -175,4 +175,25 @@ public final class ArrayDeclaration extends CompoundDeclaration {
         return true;
     }
 
+    @Override
+    public boolean isBinaryEquivalent(@Nullable IDeclaration obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        ArrayDeclaration other = (ArrayDeclaration) obj;
+        if (!fElemType.isBinaryEquivalent(other.fElemType)) {
+            return false;
+        }
+        if (fLength != other.fLength) {
+            return false;
+        }
+        return true;
+    }
+
 }

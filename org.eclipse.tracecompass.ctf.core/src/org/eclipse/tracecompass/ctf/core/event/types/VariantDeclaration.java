@@ -184,7 +184,13 @@ public class VariantDeclaration extends Declaration {
     @Override
     public String toString() {
         /* Only used for debugging */
-        return "[declaration] variant[" + Integer.toHexString(hashCode()) + ']'; //$NON-NLS-1$
+        StringBuilder sb = new StringBuilder();
+        sb.append("[declaration] variant["); //$NON-NLS-1$
+        for (Entry<String, IDeclaration> field : fFields.entrySet()) {
+            sb.append(field.getKey()).append(':').append(field.getValue());
+        }
+        sb.append(']');
+        return sb.toString();
     }
 
     @Override
@@ -255,6 +261,39 @@ public class VariantDeclaration extends Declaration {
             }
         } else if (!fTagDef.equals(other.fTagDef)) {
             return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isBinaryEquivalent(IDeclaration obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        VariantDeclaration other = (VariantDeclaration) obj;
+        if (fFields == null) {
+            if (other.fFields != null) {
+                return false;
+            }
+        } else {
+            if (fFields.size() != other.fFields.size()) {
+                return false;
+            }
+            for (Entry<String, IDeclaration> field : fFields.entrySet()) {
+                if (!other.fFields.containsKey(field.getKey())) {
+                    return false;
+                }
+                IDeclaration field2 = other.fFields.get(field.getKey());
+                if (!field2.isBinaryEquivalent(field.getValue())) {
+                    return false;
+                }
+            }
         }
         return true;
     }

@@ -228,7 +228,13 @@ public class StructDeclaration extends Declaration {
     @Override
     public String toString() {
         /* Only used for debugging */
-        return "[declaration] struct[" + Integer.toHexString(hashCode()) + ']'; //$NON-NLS-1$
+        StringBuilder sb = new StringBuilder();
+        sb.append("[declaration] struct["); //$NON-NLS-1$
+        for (Entry<String, IDeclaration> field : fFieldMap.entrySet()) {
+            sb.append(field.getKey()).append(':').append(field.getValue());
+        }
+        sb.append(']');
+        return sb.toString();
     }
 
     @Override
@@ -275,6 +281,37 @@ public class StructDeclaration extends Declaration {
         for (int i = 0; i < fFieldMap.size(); i++) {
             if ((!localFieldNames.get(i).equals(otherFieldNames.get(i))) ||
                     (!otherDecs.get(i).equals(localDecs.get(i)))) {
+                return false;
+            }
+        }
+
+        if (fMaxAlign != other.fMaxAlign) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isBinaryEquivalent(IDeclaration obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof StructDeclaration)) {
+            return false;
+        }
+        StructDeclaration other = (StructDeclaration) obj;
+        if (fFieldMap.size() != other.fFieldMap.size()) {
+            return false;
+        }
+        List<IDeclaration> localDecs = new ArrayList<>();
+        localDecs.addAll(fFieldMap.values());
+        List<IDeclaration> otherDecs = new ArrayList<>();
+        otherDecs.addAll(other.fFieldMap.values());
+        for (int i = 0; i < fFieldMap.size(); i++) {
+            if (!otherDecs.get(i).isBinaryEquivalent(localDecs.get(i))) {
                 return false;
             }
         }

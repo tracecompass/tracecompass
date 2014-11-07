@@ -56,7 +56,7 @@ public class StructDeclarationTest {
         assertNotNull(fixture);
         assertEquals(1L, fixture.getMaxAlign());
 
-        String regex = "^\\[declaration\\] struct\\[[0-9a-f]{1,8}\\]$";
+        String regex = "^\\[declaration\\] struct\\[*.\\]$";
         assertTrue(fixture.toString().matches(regex));
     }
 

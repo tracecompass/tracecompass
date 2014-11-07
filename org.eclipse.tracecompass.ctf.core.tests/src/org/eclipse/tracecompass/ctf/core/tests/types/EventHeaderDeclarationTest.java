@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
+import org.eclipse.tracecompass.ctf.core.event.types.Encoding;
 import org.eclipse.tracecompass.ctf.core.event.types.EnumDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.FloatDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDeclaration;
@@ -75,12 +76,15 @@ public class EventHeaderDeclarationTest {
          */
 
         StructDeclaration base = new StructDeclaration(8);
-        base.addField("id", new EnumDeclaration(IntegerDeclaration.UINT_5B_DECL));
+        EnumDeclaration enumDec = new EnumDeclaration(IntegerDeclaration.createDeclaration(5, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 1));
+        enumDec.add(0, 30, "compact");
+        enumDec.add(31, 31, "extended");
+        base.addField("id", enumDec);
         VariantDeclaration variantV = new VariantDeclaration();
-        StructDeclaration compact = new StructDeclaration(8);
-        compact.addField("timestamp", IntegerDeclaration.UINT_27B_DECL);
+        StructDeclaration compact = new StructDeclaration(1);
+        compact.addField("timestamp", IntegerDeclaration.createDeclaration(27, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 1));
         variantV.addField("compact", compact);
-        StructDeclaration large = new StructDeclaration(8);
+        StructDeclaration large = new StructDeclaration(1);
         large.addField("id", IntegerDeclaration.UINT_32B_DECL);
         large.addField("timestamp", IntegerDeclaration.UINT_64B_DECL);
         variantV.addField("extended", large);
@@ -107,7 +111,10 @@ public class EventHeaderDeclarationTest {
          */
 
         base = new StructDeclaration(8);
-        base.addField("id", new EnumDeclaration(IntegerDeclaration.UINT_16B_DECL));
+        enumDec = new EnumDeclaration(IntegerDeclaration.createDeclaration(16, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 1));
+        enumDec.add(0, 65534, "compact");
+        enumDec.add(65535, 65535, "extended");
+        base.addField("id", enumDec);
         variantV = new VariantDeclaration();
         compact = new StructDeclaration(8);
         compact.addField("timestamp", IntegerDeclaration.UINT_32B_DECL);
@@ -227,7 +234,7 @@ public class EventHeaderDeclarationTest {
      */
     @Test
     public void validateCompact() {
-        assertEquals(true, EventHeaderCompactDeclaration.isCompactEventHeader(declarations.get(VALID_COMPACT)));
+        assertEquals(true, EventHeaderCompactDeclaration.getEventHeader(ByteOrder.BIG_ENDIAN).isCompactEventHeader(declarations.get(VALID_COMPACT)));
     }
 
     /**
@@ -239,7 +246,7 @@ public class EventHeaderDeclarationTest {
             if (i == VALID_COMPACT) {
                 continue;
             }
-            assertEquals(false, EventHeaderCompactDeclaration.isCompactEventHeader(declarations.get(i)));
+            assertEquals(false, EventHeaderCompactDeclaration.getEventHeader(ByteOrder.BIG_ENDIAN).isCompactEventHeader(declarations.get(i)));
         }
     }
 
@@ -248,7 +255,7 @@ public class EventHeaderDeclarationTest {
      */
     @Test
     public void validateLarge() {
-        assertEquals(true, EventHeaderLargeDeclaration.isLargeEventHeader(declarations.get(VALID_LARGE)));
+        assertEquals(true, EventHeaderLargeDeclaration.getEventHeader(ByteOrder.BIG_ENDIAN).isLargeEventHeader(declarations.get(VALID_LARGE)));
     }
 
     /**
@@ -260,7 +267,7 @@ public class EventHeaderDeclarationTest {
             if (i == VALID_LARGE) {
                 continue;
             }
-            assertEquals(false, EventHeaderLargeDeclaration.isLargeEventHeader(declarations.get(i)));
+            assertEquals(false, EventHeaderLargeDeclaration.getEventHeader(ByteOrder.BIG_ENDIAN).isLargeEventHeader(declarations.get(i)));
         }
     }
 

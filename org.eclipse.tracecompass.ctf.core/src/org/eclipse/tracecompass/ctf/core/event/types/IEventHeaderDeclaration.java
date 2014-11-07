@@ -38,4 +38,8 @@ public interface IEventHeaderDeclaration extends IDeclaration {
      * Compact header (not to be confused with compact vs large)
      */
     String COMPACT = "compact"; //$NON-NLS-1$
+    /**
+     * Name of the variant according to the spec
+     */
+    String VARIANT_NAME = "v"; //$NON-NLS-1$
 }

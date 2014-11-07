@@ -181,4 +181,25 @@ public class SequenceDeclaration extends CompoundDeclaration {
         return true;
     }
 
+    @Override
+    public boolean isBinaryEquivalent(@Nullable IDeclaration obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        SequenceDeclaration other = (SequenceDeclaration) obj;
+        if (!fElemType.isBinaryEquivalent(other.fElemType)) {
+            return false;
+        }
+        if (!fLengthName.equals(other.fLengthName)) {
+            return false;
+        }
+        return true;
+    }
+
 }

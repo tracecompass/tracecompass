@@ -79,9 +79,20 @@ public interface IDeclaration {
     int getMaximumSize();
 
     @Override
-    public abstract int hashCode();
+    int hashCode();
 
     @Override
-    public abstract boolean equals(Object other);
+    boolean equals(Object other);
+
+    /**
+     * Are the two declarations equivalent on a binary level. eg: an 8 bit little
+     * endian and big endian int.
+     *
+     * @param other
+     *            the other {@link IDeclaration}
+     * @return true if the binary CTF stream will generate the same value with
+     *         the two streams
+     */
+    boolean isBinaryEquivalent(IDeclaration other);
 
 }

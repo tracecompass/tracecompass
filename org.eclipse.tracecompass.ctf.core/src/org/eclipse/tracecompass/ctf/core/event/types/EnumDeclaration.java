@@ -289,7 +289,18 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
     @Override
     public String toString() {
         /* Only used for debugging */
-        return "[declaration] enum[" + Integer.toHexString(hashCode()) + ']'; //$NON-NLS-1$
+        StringBuilder sb = new StringBuilder();
+        sb.append("[declaration] enum["); //$NON-NLS-1$
+        for (String label : fLabels) {
+            sb.append("label:").append(label).append(' '); //$NON-NLS-1$
+        }
+        sb.append("type:").append(fContainerType.toString()); //$NON-NLS-1$
+        sb.append(']');
+        String string = sb.toString();
+        if (string == null) {
+            throw new IllegalStateException();
+        }
+        return string;
     }
 
     @Override
@@ -316,6 +327,33 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
         }
         EnumDeclaration other = (EnumDeclaration) obj;
         if (!fContainerType.equals(other.fContainerType)) {
+            return false;
+        }
+        if (fLabels.size() != other.fLabels.size()) {
+            return false;
+        }
+        if (!fLabels.containsAll(other.fLabels)) {
+            return false;
+        }
+        if (!fTable.equals(other.fTable)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isBinaryEquivalent(@Nullable IDeclaration obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        EnumDeclaration other = (EnumDeclaration) obj;
+        if (!fContainerType.isBinaryEquivalent(other.fContainerType)) {
             return false;
         }
         if (fLabels.size() != other.fLabels.size()) {

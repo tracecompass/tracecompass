@@ -1260,12 +1260,14 @@ public class IOStructGen {
             declaration = parseStruct(firstChild);
             StructDeclaration structDeclaration = (StructDeclaration) declaration;
             IDeclaration idEnumDecl = structDeclaration.getFields().get("id"); //$NON-NLS-1$
-            if (EventHeaderCompactDeclaration.isCompactEventHeader(structDeclaration)) {
-                ByteOrder bo = ((EnumDeclaration) idEnumDecl).getContainerType().getByteOrder();
-                declaration = EventHeaderCompactDeclaration.getEventHeader(bo);
-            } else if (EventHeaderLargeDeclaration.isLargeEventHeader(structDeclaration)) {
-                ByteOrder bo = ((EnumDeclaration) idEnumDecl).getContainerType().getByteOrder();
-                declaration = EventHeaderLargeDeclaration.getEventHeader(bo);
+            if (idEnumDecl instanceof EnumDeclaration) {
+                EnumDeclaration enumDeclaration = (EnumDeclaration) idEnumDecl;
+                ByteOrder bo = enumDeclaration.getContainerType().getByteOrder();
+                if (EventHeaderCompactDeclaration.getEventHeader(bo).isCompactEventHeader(structDeclaration)) {
+                    declaration = EventHeaderCompactDeclaration.getEventHeader(bo);
+                } else if (EventHeaderLargeDeclaration.getEventHeader(bo).isLargeEventHeader(structDeclaration)) {
+                    declaration = EventHeaderLargeDeclaration.getEventHeader(bo);
+                }
             }
             break;
         case CTFParser.VARIANT:
