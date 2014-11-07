@@ -105,25 +105,25 @@ public class IntegerDeclaration extends Declaration implements ISimpleDatatypeDe
      *
      * @since 3.1
      */
-    public static final IntegerDeclaration UINT_5B_DECL = new IntegerDeclaration(5, false, ByteOrder.BIG_ENDIAN);
+    public static final IntegerDeclaration UINT_5B_DECL = new IntegerDeclaration(5, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 1); //$NON-NLS-1$
     /**
      * Unsigned 5 bit int, used for event headers
      *
      * @since 3.1
      */
-    public static final IntegerDeclaration UINT_5L_DECL = new IntegerDeclaration(5, false, ByteOrder.LITTLE_ENDIAN);
+    public static final IntegerDeclaration UINT_5L_DECL = new IntegerDeclaration(5, false, 10, ByteOrder.LITTLE_ENDIAN, Encoding.NONE, "", 1); //$NON-NLS-1$
     /**
      * Unsigned 5 bit int, used for event headers
      *
      * @since 3.1
      */
-    public static final IntegerDeclaration UINT_27B_DECL = new IntegerDeclaration(27, false, ByteOrder.BIG_ENDIAN);
+    public static final IntegerDeclaration UINT_27B_DECL = new IntegerDeclaration(27, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 1); //$NON-NLS-1$
     /**
      * Unsigned 5 bit int, used for event headers
      *
      * @since 3.1
      */
-    public static final IntegerDeclaration UINT_27L_DECL = new IntegerDeclaration(27, false, ByteOrder.LITTLE_ENDIAN);
+    public static final IntegerDeclaration UINT_27L_DECL = new IntegerDeclaration(27, false, 10, ByteOrder.LITTLE_ENDIAN, Encoding.NONE, "", 1); //$NON-NLS-1$
     /**
      * Unsigned 16 bit int, used for event headers
      *
@@ -174,57 +174,64 @@ public class IntegerDeclaration extends Declaration implements ISimpleDatatypeDe
      */
     public static IntegerDeclaration createDeclaration(int len, boolean signed, int base,
             @Nullable ByteOrder byteOrder, Encoding encoding, String clock, long alignment) {
-        if (encoding.equals(Encoding.NONE) && (alignment == 8) && (clock.equals("")) && base == 10) { //$NON-NLS-1$
-            switch (len) {
-            case 5:
-                if (!signed) {
-                    if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
-                        return UINT_5B_DECL;
+        if (encoding.equals(Encoding.NONE) && (clock.equals("")) && base == 10) { //$NON-NLS-1$
+            if (alignment == 8) {
+                switch (len) {
+                case 8:
+                    return signed ? INT_8_DECL : UINT_8_DECL;
+                case 16:
+                    if (!signed) {
+                        if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
+                            return UINT_16B_DECL;
+                        }
+                        return UINT_16L_DECL;
                     }
-                    return UINT_5L_DECL;
-                }
-                break;
-            case 8:
-                return signed ? INT_8_DECL : UINT_8_DECL;
-            case 16:
-                if (!signed) {
-                    if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
-                        return UINT_16B_DECL;
+                    break;
+                case 32:
+                    if (signed) {
+                        if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
+                            return INT_32B_DECL;
+                        }
+                        return INT_32L_DECL;
                     }
-                    return UINT_16L_DECL;
-                }
-                break;
-            case 27:
-                if (!signed) {
                     if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
-                        return UINT_27B_DECL;
+                        return UINT_32B_DECL;
                     }
-                    return UINT_27L_DECL;
-                }
-                break;
-            case 32:
-                if (signed) {
+                    return UINT_32L_DECL;
+                case 64:
+                    if (signed) {
+                        if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
+                            return INT_64B_DECL;
+                        }
+                        return INT_64L_DECL;
+                    }
                     if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
-                        return INT_32B_DECL;
+                        return UINT_64B_DECL;
                     }
-                    return INT_32L_DECL;
+                    return UINT_64L_DECL;
+                default:
                 }
-                if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
-                    return UINT_32B_DECL;
-                }
-                return UINT_32L_DECL;
-            case 64:
-                if (signed) {
-                    if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
-                        return INT_64B_DECL;
+            } else if (alignment == 1) {
+                switch (len) {
+                case 5:
+                    if (!signed) {
+                        if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
+                            return UINT_5B_DECL;
+                        }
+                        return UINT_5L_DECL;
                     }
-                    return INT_64L_DECL;
+                    break;
+                case 27:
+                    if (!signed) {
+                        if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
+                            return UINT_27B_DECL;
+                        }
+                        return UINT_27L_DECL;
+                    }
+                    break;
+                default:
+                    break;
                 }
-                if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
-                    return UINT_64B_DECL;
-                }
-                return UINT_64L_DECL;
-            default:
             }
         }
         return new IntegerDeclaration(len, signed, base, byteOrder, encoding, clock, alignment);
@@ -381,7 +388,7 @@ public class IntegerDeclaration extends Declaration implements ISimpleDatatypeDe
 
     @Override
     public String toString() {
-        return "[declaration] integer[length:" + fLength + (fSigned?" ":" un")+"signed" + " base:" + fBase + " byteOrder:" + fByteOrder + " encoding:" + fEncoding + " alignment:" + fAlignment + "  clock:" + fClock + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
+        return "[declaration] integer[length:" + fLength + (fSigned ? " " : " un") + "signed" + " base:" + fBase + " byteOrder:" + fByteOrder + " encoding:" + fEncoding + " alignment:" + fAlignment + "  clock:" + fClock + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
     }
 
     /**
