@@ -36,6 +36,7 @@
       <available file="hello-lost.tar.bz2" />
       <available file="cyg-profile.tar.bz2" />
       <available file="funky_trace.tar.bz2" />
+      <available file="bug446190.tar.bz2" />
     </and>
   </condition>
   <antcall target="extractTraces"/>
@@ -94,6 +95,7 @@
   <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="cyg-profile.tar.bz2" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/cyg-profile.tar.bz2" />
   <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="funky_trace.tar.bz2" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/funky_trace.tar.bz2" />
   <get ignoreerrors="true" maxtime="200" skipexisting="true" dest="testtraceExp.zip" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/testtraceExp.zip" />
+  <get ignoreerrors="true" maxtime="200" skipexisting="true" dest="bug446190.tar.bz2" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/bug446190.tar.bz2" />
 </target>
 
 <target name="pullTestSuite" if="testSuiteExists">
@@ -116,6 +118,7 @@
     <bunzip2 src="hello-lost.tar.bz2" />
     <bunzip2 src="cyg-profile.tar.bz2" />
     <bunzip2 src="funky_trace.tar.bz2" />
+    <bunzip2 src="bug446190.tar.bz2"/>
     <unzip src="testtraceExp.zip" dest="./exp" />
 
     <untar src="sample-ctf-trace-20120412.tar" dest="." />
@@ -126,6 +129,7 @@
     <untar src="hello-lost.tar" dest="." />
     <untar src="cyg-profile.tar" dest="." />
     <untar src="funky_trace.tar" dest="." />
+    <untar src="bug446190.tar" dest="." />
 
     <echo message="Traces extracted successfully"/>
 </target>
