@@ -24,10 +24,12 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Attributes;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.StateValues;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.kernel.ui.Messages;
 import org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.resources.ResourcesEntry.Type;
 import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelAnalysis;
+import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -36,6 +38,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -330,7 +333,15 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                                 attribute = Attributes.EXEC_NAME;
                             } else if (status == StateValues.CPU_STATUS_RUN_SYSCALL) {
                                 attribute = Attributes.SYSTEM_CALL;
-                                beginIndex = 4; // skip the 'sys_'
+                                /*
+                                 * Remove the "sys_" or "syscall_entry_" or similar from what we
+                                 * draw in the rectangle. This depends on the trace's event layout.
+                                 */
+                                ITmfTrace trace = entry.getTrace();
+                                if (trace instanceof LttngKernelTrace) {
+                                    IKernelAnalysisEventLayout layout = ((LttngKernelTrace) trace).getEventLayout();
+                                    beginIndex = layout.eventSyscallEntryPrefix().length();
+                                }
                             }
                             if (attribute != null) {
                                 int quark = ss.getQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThreadId), attribute);

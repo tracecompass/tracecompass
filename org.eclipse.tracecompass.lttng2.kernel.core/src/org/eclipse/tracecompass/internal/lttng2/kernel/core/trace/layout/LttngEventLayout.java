@@ -19,8 +19,8 @@ import org.eclipse.jdt.annotation.NonNull;
 import com.google.common.collect.ImmutableList;
 
 /**
- * This file defines all the known event and field names for LTTng 2.0 kernel
- * traces.
+ * This file defines all the known event and field names for LTTng kernel
+ * traces, for versions of lttng-modules up to 2.5.
  *
  * These should not be externalized, since they need to match exactly what the
  * tracer outputs. If you want to localize them in a view, you should do a
@@ -32,7 +32,6 @@ import com.google.common.collect.ImmutableList;
 public class LttngEventLayout implements IKernelAnalysisEventLayout {
 
     /* Event names */
-    private static final String EXIT_SYSCALL = "exit_syscall";
     private static final String IRQ_HANDLER_ENTRY = "irq_handler_entry";
     private static final String IRQ_HANDLER_EXIT = "irq_handler_exit";
     private static final String SOFTIRQ_ENTRY = "softirq_entry";
@@ -48,8 +47,9 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     private static final String SCHED_PROCESS_FREE = "sched_process_free";
     private static final String STATEDUMP_PROCESS_STATE = "lttng_statedump_process_state";
 
-    private static final String SYSCALL_PREFIX = "sys_";
-    private static final String COMPAT_SYSCALL_PREFIX = "compat_sys_";
+    private static final String SYSCALL_ENTRY_PREFIX = "sys_";
+    private static final String COMPAT_SYSCALL_ENTRY_PREFIX = "compat_sys_";
+    private static final String SYSCALL_EXIT_PREFIX = "exit_syscall";
 
     /* Field names */
     private static final String IRQ = "irq";
@@ -64,7 +64,7 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     private static final String CHILD_TID = "child_tid";
 
     /** All instances are the same. Only provide a static instance getter */
-    private LttngEventLayout() {
+    protected LttngEventLayout() {
     }
 
     private static final IKernelAnalysisEventLayout INSTANCE = new LttngEventLayout();
@@ -139,19 +139,20 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     public String eventStatedumpProcessState() {
         return STATEDUMP_PROCESS_STATE;
     }
-    @Override
-    public String eventSyscallExit() {
-        return EXIT_SYSCALL;
-    }
 
     @Override
     public String eventSyscallEntryPrefix() {
-        return SYSCALL_PREFIX;
+        return SYSCALL_ENTRY_PREFIX;
     }
 
     @Override
     public String eventCompatSyscallEntryPrefix() {
-        return COMPAT_SYSCALL_PREFIX;
+        return COMPAT_SYSCALL_ENTRY_PREFIX;
+    }
+
+    @Override
+    public String eventSyscallExitPrefix() {
+        return SYSCALL_EXIT_PREFIX;
     }
 
     // ------------------------------------------------------------------------

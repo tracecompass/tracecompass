@@ -14,6 +14,7 @@
 package org.eclipse.tracecompass.lttng2.kernel.core.trace;
 
 import java.nio.BufferOverflowException;
+import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -27,6 +28,7 @@ import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.IKernel
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEventLayout;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.Lttng26EventLayout;
 import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 
@@ -42,7 +44,8 @@ public class LttngKernelTrace extends CtfTmfTrace {
      * Supported Linux kernel tracers
      */
     private enum OriginTracer {
-        LTTNG(LttngEventLayout.getInstance());
+        LTTNG(LttngEventLayout.getInstance()),
+        LTTNG26(Lttng26EventLayout.getInstance());
 
         private final @NonNull IKernelAnalysisEventLayout fLayout;
 
@@ -84,13 +87,24 @@ public class LttngKernelTrace extends CtfTmfTrace {
     @Override
     public void initTrace(IResource resource, String path,
             Class<? extends ITmfEvent> eventType) throws TmfTraceException {
+        super.initTrace(resource, path, eventType);
+
         /*
          * Set the 'fOriginTracer' in accordance to what is found in the
          * metadata
          */
-        fOriginTracer = OriginTracer.LTTNG;
+        Map<String, String> traceEnv = this.getCTFTrace().getEnvironment();
+        String tracerName = traceEnv.get("tracer_name"); //$NON-NLS-1$
+        String tracerMajor = traceEnv.get("tracer_major"); //$NON-NLS-1$
+        String tracerMinor = traceEnv.get("tracer_minor"); //$NON-NLS-1$
 
-        super.initTrace(resource, path, eventType);
+        if ("\"lttng-modules\"".equals(tracerName) && //$NON-NLS-1$
+                tracerMajor != null && (Integer.valueOf(tracerMajor) >= 2) &&
+                tracerMinor != null && (Integer.valueOf(tracerMinor) >= 6)) {
+            fOriginTracer = OriginTracer.LTTNG26;
+        } else {
+            fOriginTracer = OriginTracer.LTTNG;
+        }
     }
 
     /**

@@ -50,9 +50,8 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
      * Version number of this state provider. Please bump this if you modify the
      * contents of the generated state history in some way.
      */
-    private static final int VERSION = 4;
+    private static final int VERSION = 5;
 
-    private static final int SYSCALL_EXIT_INDEX = 0;
     private static final int IRQ_HANDLER_ENTRY_INDEX = 1;
     private static final int IRQ_HANDLER_EXIT_INDEX = 2;
     private static final int SOFT_IRQ_ENTRY_INDEX = 3;
@@ -99,7 +98,6 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
     private static Map<String, Integer> buildEventNames(IKernelAnalysisEventLayout layout) {
         ImmutableMap.Builder<String, Integer> builder = ImmutableMap.builder();
 
-        builder.put(layout.eventSyscallExit(), SYSCALL_EXIT_INDEX);
         builder.put(layout.eventIrqHandlerEntry(), IRQ_HANDLER_ENTRY_INDEX);
         builder.put(layout.eventIrqHandlerExit(), IRQ_HANDLER_EXIT_INDEX);
         builder.put(layout.eventSoftIrqEntry(), SOFT_IRQ_ENTRY_INDEX);
@@ -168,25 +166,6 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             Integer idx = fEventNames.get(eventName);
             int intval = (idx == null ? -1 : idx.intValue());
             switch (intval) {
-
-            case SYSCALL_EXIT_INDEX:
-            {
-                /* Clear the current system call on the process */
-                quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.SYSTEM_CALL);
-                value = TmfStateValue.nullValue();
-                ss.modifyAttribute(ts, value, quark);
-
-                /* Put the process' status back to user mode */
-                quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
-                value = StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE;
-                ss.modifyAttribute(ts, value, quark);
-
-                /* Put the CPU's status back to user mode */
-                quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
-                value = StateValues.CPU_STATUS_RUN_USERMODE_VALUE;
-                ss.modifyAttribute(ts, value, quark);
-            }
-                break;
 
             case IRQ_HANDLER_ENTRY_INDEX:
             {
@@ -470,10 +449,6 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             {
                 if (eventName.startsWith(fLayout.eventSyscallEntryPrefix())
                         || eventName.startsWith(fLayout.eventCompatSyscallEntryPrefix())) {
-                    /*
-                     * This is a replacement for the old sys_enter event. Now
-                     * syscall names are listed into the event type
-                     */
 
                     /* Assign the new system call to the process */
                     quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.SYSTEM_CALL);
@@ -489,7 +464,25 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
                     quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
                     value = StateValues.CPU_STATUS_RUN_SYSCALL_VALUE;
                     ss.modifyAttribute(ts, value, quark);
+
+                } else if (eventName.startsWith(fLayout.eventSyscallExitPrefix())) {
+
+                    /* Clear the current system call on the process */
+                    quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.SYSTEM_CALL);
+                    value = TmfStateValue.nullValue();
+                    ss.modifyAttribute(ts, value, quark);
+
+                    /* Put the process' status back to user mode */
+                    quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATUS);
+                    value = StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE;
+                    ss.modifyAttribute(ts, value, quark);
+
+                    /* Put the CPU's status back to user mode */
+                    quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
+                    value = StateValues.CPU_STATUS_RUN_USERMODE_VALUE;
+                    ss.modifyAttribute(ts, value, quark);
                 }
+
             }
                 break;
             } // End of big switch

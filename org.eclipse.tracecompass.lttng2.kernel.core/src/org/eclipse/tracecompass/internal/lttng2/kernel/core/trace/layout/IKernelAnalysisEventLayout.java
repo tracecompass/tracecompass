@@ -55,7 +55,7 @@ public interface IKernelAnalysisEventLayout {
     String eventStatedumpProcessState();
     String eventSyscallEntryPrefix();
     String eventCompatSyscallEntryPrefix();
-    String eventSyscallExit();
+    String eventSyscallExitPrefix();
 
     // ------------------------------------------------------------------------
     // Event field names
