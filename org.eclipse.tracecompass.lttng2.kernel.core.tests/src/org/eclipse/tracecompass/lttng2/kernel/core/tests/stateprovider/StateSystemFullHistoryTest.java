@@ -31,7 +31,8 @@ import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModul
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
-import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -45,12 +46,21 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
     private static final @NonNull String TEST_FILE_NAME = "test.ht";
     private static final @NonNull String BENCHMARK_FILE_NAME = "test.benchmark.ht";
 
-    private File stateFile;
-    private File stateFileBenchmark;
-    private TestLttngKernelAnalysisModule module;
+    private static File stateFile;
+    private static File stateFileBenchmark;
+    private static TestLttngKernelAnalysisModule module;
 
-    @Override
-    protected ITmfStateSystem initialize() {
+    /**
+     * Test class setup
+     */
+    @BeforeClass
+    public static void initialize() {
+        if (!testTrace.exists()) {
+            traceIsPresent = false;
+            return;
+        }
+        traceIsPresent = true;
+
         stateFile = createStateFile(TEST_FILE_NAME);
         stateFileBenchmark = createStateFile(BENCHMARK_FILE_NAME);
 
@@ -62,14 +72,15 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
         }
         module.schedule();
         assertTrue(module.waitForCompletion());
-        return module.getStateSystem();
+
+        fixture = module.getStateSystem();
     }
 
     /**
      * Clean-up
      */
-    @After
-    public void cleanup() {
+    @AfterClass
+    public static void cleanup() {
         if (module != null) {
             module.dispose();
         }
@@ -79,6 +90,11 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
         if (stateFileBenchmark != null) {
             stateFileBenchmark.delete();
         }
+        if (fixture != null) {
+            fixture.dispose();
+        }
+        module = null;
+        fixture = null;
     }
 
     // ------------------------------------------------------------------------

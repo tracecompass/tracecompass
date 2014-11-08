@@ -17,13 +17,13 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.stateprovider.LttngKernelStateProvider;
-import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
-import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
 /**
  * State system tests using the in-memory back-end.
@@ -32,10 +32,19 @@ import org.junit.After;
  */
 public class StateSystemInMemoryTest extends StateSystemTest {
 
-    private TestLttngKernelAnalysisModule module;
+    private static TestLttngKernelAnalysisModule module;
 
-    @Override
-    protected ITmfStateSystem initialize() {
+    /**
+     * Test class setup
+     */
+    @BeforeClass
+    public static void initialize() {
+        if (!testTrace.exists()) {
+            traceIsPresent = false;
+            return;
+        }
+        traceIsPresent = true;
+
         module = new TestLttngKernelAnalysisModule();
         try {
             module.setTrace(testTrace.getTrace());
@@ -44,17 +53,23 @@ public class StateSystemInMemoryTest extends StateSystemTest {
         }
         module.schedule();
         assertTrue(module.waitForCompletion());
-        return module.getStateSystem();
+
+        fixture = module.getStateSystem();
     }
 
     /**
      * Class cleanup
      */
-    @After
-    public void cleanup() {
+    @AfterClass
+    public static void cleanup() {
         if (module != null) {
             module.dispose();
         }
+        if (fixture != null) {
+            fixture.dispose();
+        }
+        module = null;
+        fixture = null;
     }
 
     private static class TestLttngKernelAnalysisModule extends TmfStateSystemAnalysisModule {

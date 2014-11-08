@@ -30,7 +30,6 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -65,27 +64,17 @@ public abstract class StateSystemTest {
     /** Number of nanoseconds in one second */
     private static final long NANOSECS_PER_SEC = 1000000000L;
 
-    private ITmfStateSystem fixture;
-
+    protected static ITmfStateSystem fixture;
+    protected static boolean traceIsPresent = false;
 
     /**
-     * Class set-up
+     * Test set-up
      */
     @Before
     public void setUp() {
-        assumeTrue(testTrace.exists());
-        fixture = this.initialize();
+        assumeTrue(traceIsPresent);
+        /* Subclasses should set-up 'fixture' */
         assertNotNull(fixture);
-    }
-
-    protected abstract ITmfStateSystem initialize();
-
-    @After
-    public void tearDown() {
-        if (fixture != null) {
-            fixture.dispose();
-        }
-        fixture = null;
     }
 
     @Test

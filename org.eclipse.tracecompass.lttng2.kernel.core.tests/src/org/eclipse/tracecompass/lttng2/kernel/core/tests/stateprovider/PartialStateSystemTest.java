@@ -21,7 +21,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.stateprovider.LttngKernelStateProvider;
-import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
@@ -29,7 +28,8 @@ import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModul
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
-import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -41,11 +41,20 @@ public class PartialStateSystemTest extends StateSystemTest {
 
     private static final @NonNull String TEST_FILE_NAME = "test-partial";
 
-    private File stateFile;
-    private TestLttngKernelAnalysisModule module;
+    private static File stateFile;
+    private static TestLttngKernelAnalysisModule module;
 
-    @Override
-    protected ITmfStateSystem initialize() {
+    /**
+     * Test class setup
+     */
+    @BeforeClass
+    public static void initialize() {
+        if (!testTrace.exists()) {
+            traceIsPresent = false;
+            return;
+        }
+        traceIsPresent = true;
+
         stateFile = new File(TmfTraceManager.getSupplementaryFileDir(testTrace.getTrace()) + TEST_FILE_NAME);
         if (stateFile.exists()) {
             stateFile.delete();
@@ -59,20 +68,26 @@ public class PartialStateSystemTest extends StateSystemTest {
         }
         module.schedule();
         assertTrue(module.waitForCompletion());
-        return module.getStateSystem();
+
+        fixture = module.getStateSystem();
     }
 
     /**
      * Class clean-up
      */
-    @After
-    public void cleanup() {
+    @AfterClass
+    public static void cleanup() {
         if (module != null) {
             module.dispose();
         }
         if (stateFile != null) {
             stateFile.delete();
         }
+        if (fixture != null) {
+            fixture.dispose();
+        }
+        module = null;
+        fixture = null;
     }
 
     /**
