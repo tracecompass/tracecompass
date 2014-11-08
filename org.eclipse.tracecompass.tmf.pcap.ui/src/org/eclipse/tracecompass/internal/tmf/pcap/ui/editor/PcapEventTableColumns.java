@@ -20,6 +20,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.event.PcapEvent;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.protocol.TmfPcapProtocol;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.ITmfEventTableColumns;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.TmfEventTableColumn;
 
@@ -38,25 +39,31 @@ public class PcapEventTableColumns implements ITmfEventTableColumns {
 
     @SuppressWarnings("null")
     private static final @NonNull Collection<TmfEventTableColumn> PCAP_COLUMNS = ImmutableList.of(
-            TmfEventTableColumn.BaseColumns.TIMESTAMP,
-            new PcapSourceColumn(),
-            new PcapDestinationColumn(),
-            new PcapReferenceColumn(),
-            new PcapProtocolColumn(),
-            TmfEventTableColumn.BaseColumns.CONTENTS
+            new TmfEventTableColumn(ITmfEventAspect.BaseAspects.TIMESTAMP),
+            new TmfEventTableColumn(new PcapSourceAspect()),
+            new TmfEventTableColumn(new PcapDestinationAspect()),
+            new TmfEventTableColumn(new PcapReferenceAspect()),
+            new TmfEventTableColumn(new PcapProtocolAspect()),
+            new TmfEventTableColumn(ITmfEventAspect.BaseAspects.CONTENTS)
             );
 
     /**
      * The "packet source" column for pcap events
      */
-    private static class PcapSourceColumn extends TmfEventTableColumn {
+    private static class PcapSourceAspect implements ITmfEventAspect {
 
-        public PcapSourceColumn() {
-            super(getString(Messages.PcapEventsTable_Source));
+        @Override
+        public String getName() {
+            return getString(Messages.PcapEventsTable_Source);
         }
 
         @Override
-        public String getItemString(ITmfEvent event) {
+        public String getHelpText() {
+            return EMPTY_STRING;
+        }
+
+        @Override
+        public String resolve(ITmfEvent event) {
             if (!(event instanceof PcapEvent)) {
                 return EMPTY_STRING;
             }
@@ -67,7 +74,7 @@ public class PcapEventTableColumns implements ITmfEventTableColumns {
         }
 
         @Override
-        public @Nullable String getFilterFieldId() {
+        public @NonNull String getFilterId() {
             return PcapEvent.EVENT_FIELD_PACKET_SOURCE;
         }
     }
@@ -75,14 +82,20 @@ public class PcapEventTableColumns implements ITmfEventTableColumns {
     /**
      * The "packet destination" column for pcap events
      */
-    private static class PcapDestinationColumn extends TmfEventTableColumn {
+    private static class PcapDestinationAspect implements ITmfEventAspect {
 
-        public PcapDestinationColumn() {
-            super(getString(Messages.PcapEventsTable_Destination));
+        @Override
+        public String getName() {
+            return getString(Messages.PcapEventsTable_Destination);
         }
 
         @Override
-        public String getItemString(ITmfEvent event) {
+        public String getHelpText() {
+            return EMPTY_STRING;
+        }
+
+        @Override
+        public String resolve(ITmfEvent event) {
             if (!(event instanceof PcapEvent)) {
                 return EMPTY_STRING;
             }
@@ -92,7 +105,7 @@ public class PcapEventTableColumns implements ITmfEventTableColumns {
         }
 
         @Override
-        public @Nullable String getFilterFieldId() {
+        public @NonNull String getFilterId() {
             return PcapEvent.EVENT_FIELD_PACKET_DESTINATION;
         }
     }
@@ -100,14 +113,20 @@ public class PcapEventTableColumns implements ITmfEventTableColumns {
     /**
      * The "packet reference" column for pcap events
      */
-    private static class PcapReferenceColumn extends TmfEventTableColumn {
+    private static class PcapReferenceAspect implements ITmfEventAspect {
 
-        public PcapReferenceColumn() {
-            super(getString(Messages.PcapEventsTable_Reference));
+        @Override
+        public String getName() {
+            return getString(Messages.PcapEventsTable_Reference);
         }
 
         @Override
-        public String getItemString(ITmfEvent event) {
+        public String getHelpText() {
+            return EMPTY_STRING;
+        }
+
+        @Override
+        public String resolve(ITmfEvent event) {
             if (!(event instanceof PcapEvent)) {
                 return EMPTY_STRING;
             }
@@ -115,7 +134,7 @@ public class PcapEventTableColumns implements ITmfEventTableColumns {
         }
 
         @Override
-        public @Nullable String getFilterFieldId() {
+        public @Nullable String getFilterId() {
             return ITmfEvent.EVENT_FIELD_REFERENCE;
         }
     }
@@ -123,14 +142,20 @@ public class PcapEventTableColumns implements ITmfEventTableColumns {
     /**
      * The "packet protocol" column for pcap events
      */
-    private static class PcapProtocolColumn extends TmfEventTableColumn {
+    private static class PcapProtocolAspect implements ITmfEventAspect {
 
-        public PcapProtocolColumn() {
-            super(getString(Messages.PcapEventsTable_Protocol));
+        @Override
+        public String getName() {
+            return getString(Messages.PcapEventsTable_Protocol);
         }
 
         @Override
-        public String getItemString(ITmfEvent event) {
+        public String getHelpText() {
+            return EMPTY_STRING;
+        }
+
+        @Override
+        public String resolve(ITmfEvent event) {
             if (!(event instanceof PcapEvent)) {
                 return EMPTY_STRING;
             }
@@ -143,7 +168,7 @@ public class PcapEventTableColumns implements ITmfEventTableColumns {
         }
 
         @Override
-        public @Nullable String getFilterFieldId() {
+        public @Nullable String getFilterId() {
             return PcapEvent.EVENT_FIELD_PACKET_PROTOCOL;
         }
     }

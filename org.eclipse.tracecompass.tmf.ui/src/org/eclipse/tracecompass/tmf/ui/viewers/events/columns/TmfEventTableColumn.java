@@ -12,12 +12,11 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.events.columns;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.tmf.ui.viewers.events.columns.TmfContentsColumn;
-import org.eclipse.tracecompass.internal.tmf.ui.viewers.events.columns.TmfTimestampColumn;
-import org.eclipse.tracecompass.internal.tmf.ui.viewers.events.columns.TmfTypeColumn;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 
 /**
  * A column in the
@@ -29,70 +28,32 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  * {@link org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventsTable#TmfEventsTable(org.eclipse.swt.widgets.Composite, int, java.util.Collection)}
  *
  * @author Alexandre Montplaisir
+ * @noextend This class should not be extended directly. You should instead
+ *           implement an {@link ITmfEventAspect}.
  * @since 3.1
  */
 @NonNullByDefault
-public abstract class TmfEventTableColumn {
-
-    // ------------------------------------------------------------------------
-    // Class attributes
-    // ------------------------------------------------------------------------
-
-    /**
-     * The base set of columns, which can apply to any trace type.
-     */
-    public static interface BaseColumns {
-
-        /** Column showing the event timestamp */
-        TmfEventTableColumn TIMESTAMP = new TmfTimestampColumn();
-
-        /** Column showing the event type */
-        TmfEventTableColumn EVENT_TYPE = new TmfTypeColumn();
-
-        /** Column showing the aggregated event contents (fields) */
-        TmfEventTableColumn CONTENTS = new TmfContentsColumn();
-    }
-
-    /**
-     * Static definition of an empty string. Return this instead of returning
-     * 'null'!
-     */
-    protected static final String EMPTY_STRING = ""; //$NON-NLS-1$
+public class TmfEventTableColumn {
 
     // ------------------------------------------------------------------------
     // Fields
     // ------------------------------------------------------------------------
 
-    private final String fHeaderName;
-    private final @Nullable String fHeaderTooltip;
+    private final ITmfEventAspect fAspect;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
     /**
-     * Constructor with no tooltip.
+     * Constructor
      *
-     * @param headerName
-     *            The name (title) of this column. Should ideally be short.
+     * @param aspect
+     *            The {@link ITmfEventAspect} to be used to populate this
+     *            column.
      */
-    public TmfEventTableColumn(String headerName) {
-        fHeaderName = headerName;
-        fHeaderTooltip = null;
-    }
-
-    /**
-     * Constructor with a tooltip.
-     *
-     * @param headerName
-     *            The name (title) of this column. Should ideally be short.
-     * @param headerTooltip
-     *            The tooltip text for the column header. Use 'null' for no
-     *            tooltip.
-     */
-    public TmfEventTableColumn(String headerName, @Nullable String headerTooltip) {
-        fHeaderName = headerName;
-        fHeaderTooltip = headerTooltip;
+    public TmfEventTableColumn(ITmfEventAspect aspect) {
+        fAspect = aspect;
     }
 
     // ------------------------------------------------------------------------
@@ -105,7 +66,7 @@ public abstract class TmfEventTableColumn {
      * @return The column's title
      */
     public String getHeaderName() {
-        return fHeaderName;
+        return fAspect.getName();
     }
 
     /**
@@ -114,31 +75,24 @@ public abstract class TmfEventTableColumn {
      * @return The header's tooltip
      */
     public @Nullable String getHeaderTooltip() {
-        return fHeaderTooltip;
+        return fAspect.getHelpText();
     }
-
-    // ------------------------------------------------------------------------
-    // Abstract methods
-    // ------------------------------------------------------------------------
 
     /**
      * Get the string that should be displayed in this column's cell for a given
      * trace event. Basically, this defines "what to print in this column for
      * this event".
-     * <p>
-     * Note to implementers:
-     * <p>
-     * This method takes an {@link ITmfEvent}, because any type of event could
-     * potentially be present in the table at the time. Do not assume that you
-     * will only receive events of your trace type. You'd probably want to
-     * return an empty string for event that don't match your expected class
-     * type here.
      *
      * @param event
      *            The trace event whose element we want to display
      * @return The string to display in the column for this event
      */
-    public abstract String getItemString(ITmfEvent event);
+    public String getItemString(ITmfEvent event) {
+        /* resolve() is NonNull. toString() is not, but should never return null */
+        @SuppressWarnings("null")
+        @NonNull String ret = fAspect.resolve(event).toString();
+        return ret;
+    }
 
     /**
      * Return the FILTER_ID used by the filters to search this column.
@@ -147,5 +101,38 @@ public abstract class TmfEventTableColumn {
      *         ID (which will mean this column will probably not be
      *         searchable/filterable.)
      */
-    public abstract @Nullable String getFilterFieldId();
+    public @Nullable String getFilterFieldId() {
+        return fAspect.getFilterId();
+    }
+
+    // ------------------------------------------------------------------------
+    // hashCode/equals (so that equivalent columns can be merged together)
+    // ------------------------------------------------------------------------
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + fAspect.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof TmfEventTableColumn)) {
+            return false;
+        }
+        TmfEventTableColumn other = (TmfEventTableColumn) obj;
+        if (!fAspect.equals(other.fAspect)) {
+            /* Aspects can also define how they can be "equal" to one another */
+            return false;
+        }
+        return true;
+    }
 }

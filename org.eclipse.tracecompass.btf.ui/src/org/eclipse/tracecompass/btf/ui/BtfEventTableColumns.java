@@ -19,9 +19,10 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.btf.core.event.BtfEvent;
 import org.eclipse.tracecompass.btf.core.trace.BtfColumnNames;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfEventFieldAspect;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.ITmfEventTableColumns;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.TmfEventTableColumn;
-import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.TmfEventTableFieldColumn;
 
 import com.google.common.collect.ImmutableList;
 
@@ -38,27 +39,33 @@ public class BtfEventTableColumns implements ITmfEventTableColumns {
 
     @SuppressWarnings("null")
     private static final @NonNull Collection<TmfEventTableColumn> BTF_COLUMNS = ImmutableList.of(
-            TmfEventTableColumn.BaseColumns.TIMESTAMP,
-            new BtfSourceColumn(),
-            new BtfSourceInstanceColumn(),
-            TmfEventTableColumn.BaseColumns.EVENT_TYPE,
-            new BtfTargetColumn(),
-            new BtfTargetInstanceColumn(),
-            new BtfEventColumn(),
-            new BtfNotesColumn()
+            new TmfEventTableColumn(ITmfEventAspect.BaseAspects.TIMESTAMP),
+            new TmfEventTableColumn(new BtfSourceAspect()),
+            new TmfEventTableColumn(new BtfSourceInstanceAspect()),
+            new TmfEventTableColumn(ITmfEventAspect.BaseAspects.EVENT_TYPE),
+            new TmfEventTableColumn(new BtfTargetAspect()),
+            new TmfEventTableColumn(new BtfTargetInstanceAspect()),
+            new TmfEventTableColumn(new BtfEventAspect()),
+            new TmfEventTableColumn(new BtfNotesAspect())
             );
 
     /**
-     * The "source" column, whose value comes from {@link ITmfEvent#getSource()}
+     * The "source" aspect, whose value comes from {@link ITmfEvent#getSource()}
      */
-    private static class BtfSourceColumn extends TmfEventTableColumn {
+    private static class BtfSourceAspect implements ITmfEventAspect {
 
-        public BtfSourceColumn() {
-            super(BtfColumnNames.SOURCE.toString(), null);
+        @Override
+        public String getName() {
+            return BtfColumnNames.SOURCE.toString();
         }
 
         @Override
-        public String getItemString(ITmfEvent event) {
+        public String getHelpText() {
+            return EMPTY_STRING;
+        }
+
+        @Override
+        public String resolve(ITmfEvent event) {
             if (!(event instanceof BtfEvent)) {
                 return EMPTY_STRING;
             }
@@ -67,33 +74,40 @@ public class BtfEventTableColumns implements ITmfEventTableColumns {
         }
 
         @Override
-        public String getFilterFieldId() {
+        public String getFilterId() {
             return ITmfEvent.EVENT_FIELD_SOURCE;
         }
     }
 
     /**
-     * The "source instance" column, whose value comes from the field of the
+     * The "source instance" aspect, whose value comes from the field of the
      * same name.
      */
-    private static class BtfSourceInstanceColumn extends TmfEventTableFieldColumn {
-        public BtfSourceInstanceColumn() {
-            super(BtfColumnNames.SOURCE_INSTANCE.toString());
+    private static class BtfSourceInstanceAspect extends TmfEventFieldAspect {
+        public BtfSourceInstanceAspect() {
+            super(BtfColumnNames.SOURCE_INSTANCE.toString(),
+                    BtfColumnNames.SOURCE_INSTANCE.toString());
         }
     }
 
     /**
-     * The "target" column, taking its value from
+     * The "target" aspect, taking its value from
      * {@link ITmfEvent#getReference()}.
      */
-    private static class BtfTargetColumn extends TmfEventTableColumn {
+    private static class BtfTargetAspect implements ITmfEventAspect {
 
-        public BtfTargetColumn() {
-            super(BtfColumnNames.TARGET.toString());
+        @Override
+        public String getName() {
+             return BtfColumnNames.TARGET.toString();
         }
 
         @Override
-        public String getItemString(ITmfEvent event) {
+        public String getHelpText() {
+            return EMPTY_STRING;
+        }
+
+        @Override
+        public String resolve(ITmfEvent event) {
             if (!(event instanceof BtfEvent)) {
                 return EMPTY_STRING;
             }
@@ -102,27 +116,29 @@ public class BtfEventTableColumns implements ITmfEventTableColumns {
         }
 
         @Override
-        public String getFilterFieldId() {
+        public String getFilterId() {
             return ITmfEvent.EVENT_FIELD_REFERENCE;
         }
     }
 
     /**
-     * The "target instance" column, whose value comes from the field of the
+     * The "target instance" aspect, whose value comes from the field of the
      * same name.
      */
-    private static class BtfTargetInstanceColumn extends TmfEventTableFieldColumn {
-        public BtfTargetInstanceColumn() {
-            super(BtfColumnNames.TARGET_INSTANCE.toString());
+    private static class BtfTargetInstanceAspect extends TmfEventFieldAspect {
+        public BtfTargetInstanceAspect() {
+            super(BtfColumnNames.TARGET_INSTANCE.toString(),
+                    BtfColumnNames.TARGET_INSTANCE.toString());
         }
     }
 
     /**
-     * The "event" column, whose value comes from the field of the same name.
+     * The "event" aspect, whose value comes from the field of the same name.
      */
-    private static class BtfEventColumn extends TmfEventTableFieldColumn {
-        public BtfEventColumn() {
-            super(BtfColumnNames.EVENT.toString());
+    private static class BtfEventAspect extends TmfEventFieldAspect {
+        public BtfEventAspect() {
+            super(BtfColumnNames.EVENT.toString(),
+                    BtfColumnNames.EVENT.toString());
         }
     }
 
@@ -130,9 +146,10 @@ public class BtfEventTableColumns implements ITmfEventTableColumns {
      * The "notes" column, whose value comes from the field of the same name, if
      * present.
      */
-    private static class BtfNotesColumn extends TmfEventTableFieldColumn {
-        public BtfNotesColumn() {
-            super(BtfColumnNames.NOTES.toString());
+    private static class BtfNotesAspect extends TmfEventFieldAspect {
+        public BtfNotesAspect() {
+            super(BtfColumnNames.NOTES.toString(),
+                    BtfColumnNames.NOTES.toString());
         }
     }
 

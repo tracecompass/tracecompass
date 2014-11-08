@@ -18,9 +18,10 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.gdbtrace.core.event.GdbTraceEvent;
 import org.eclipse.tracecompass.internal.gdbtrace.core.event.GdbTraceEventContent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfEventFieldAspect;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.ITmfEventTableColumns;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.TmfEventTableColumn;
-import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.TmfEventTableFieldColumn;
 
 import com.google.common.collect.ImmutableList;
 
@@ -37,31 +38,39 @@ public class GdbEventTableColumns implements ITmfEventTableColumns {
 
     @SuppressWarnings("null")
     static final @NonNull Collection<TmfEventTableColumn> GDB_COLUMNS = ImmutableList.of(
-            new GdbTraceFrameColumn(),
-            new GdbTracepointColumn(),
-            new GdbFileColumn()
+            new TmfEventTableColumn(new GdbTraceFrameAspect()),
+            new TmfEventTableColumn(new GdbTracepointAspect()),
+            new TmfEventTableColumn(new GdbFileAspect())
             );
 
-    private static class GdbTraceFrameColumn extends TmfEventTableFieldColumn {
-        public GdbTraceFrameColumn() {
-            super(GdbTraceEventContent.TRACE_FRAME);
+    private static class GdbTraceFrameAspect extends TmfEventFieldAspect {
+        public GdbTraceFrameAspect() {
+            super(GdbTraceEventContent.TRACE_FRAME,
+                    GdbTraceEventContent.TRACE_FRAME);
         }
     }
 
-    private static class GdbTracepointColumn extends TmfEventTableFieldColumn {
-        public GdbTracepointColumn() {
-            super(GdbTraceEventContent.TRACEPOINT);
+    private static class GdbTracepointAspect extends TmfEventFieldAspect {
+        public GdbTracepointAspect() {
+            super(GdbTraceEventContent.TRACEPOINT,
+                    GdbTraceEventContent.TRACEPOINT);
         }
     }
 
-    private static class GdbFileColumn extends TmfEventTableColumn {
+    private static class GdbFileAspect implements ITmfEventAspect {
 
-        public GdbFileColumn() {
-            super("File"); //$NON-NLS-1$
+        @Override
+        public String getName() {
+            return "File"; //$NON-NLS-1$
         }
 
         @Override
-        public String getItemString(ITmfEvent event) {
+        public String getHelpText() {
+            return EMPTY_STRING;
+        }
+
+        @Override
+        public String resolve(ITmfEvent event) {
             if (!(event instanceof GdbTraceEvent)) {
                 return EMPTY_STRING;
             }
@@ -70,7 +79,7 @@ public class GdbEventTableColumns implements ITmfEventTableColumns {
         }
 
         @Override
-        public String getFilterFieldId() {
+        public String getFilterId() {
             return ITmfEvent.EVENT_FIELD_REFERENCE;
         }
     }

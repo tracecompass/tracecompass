@@ -27,6 +27,7 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.core;x-friends:="org.eclip
  org.eclipse.tracecompass.tmf.core.callstack,
  org.eclipse.tracecompass.tmf.core.component,
  org.eclipse.tracecompass.tmf.core.event,
+ org.eclipse.tracecompass.tmf.core.event.aspect,
  org.eclipse.tracecompass.tmf.core.event.collapse,
  org.eclipse.tracecompass.tmf.core.event.lookup,
  org.eclipse.tracecompass.tmf.core.event.matching,

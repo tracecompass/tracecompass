@@ -30,8 +30,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.virtualtable.ColumnData;
  *             {@link TmfEventsTable#TmfEventsTable(Composite, int, java.util.Collection)}
  *             , by passing
  *             {@link org.eclipse.tracecompass.tmf.ui.viewers.events.columns.TmfEventTableColumn}
- *             or
- *             {@link org.eclipse.tracecompass.tmf.ui.viewers.events.columns.TmfEventTableFieldColumn}
  *             .
  */
 @Deprecated

@@ -112,6 +112,8 @@ import org.eclipse.tracecompass.internal.tmf.ui.dialogs.MultiLineInputDialog;
 import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfEventFieldAspect;
 import org.eclipse.tracecompass.tmf.core.event.collapse.ITmfCollapsibleEvent;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfModelLookup;
@@ -138,7 +140,6 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventsCache.CachedEvent;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.TmfEventTableColumn;
-import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.TmfEventTableFieldColumn;
 import org.eclipse.tracecompass.tmf.ui.views.colors.ColorSetting;
 import org.eclipse.tracecompass.tmf.ui.views.colors.ColorSettingsManager;
 import org.eclipse.tracecompass.tmf.ui.views.colors.IColorSettingsListener;
@@ -208,9 +209,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * @since 3.2
      */
     public static final Collection<TmfEventTableColumn> DEFAULT_COLUMNS = ImmutableList.of(
-            TmfEventTableColumn.BaseColumns.TIMESTAMP,
-            TmfEventTableColumn.BaseColumns.EVENT_TYPE,
-            TmfEventTableColumn.BaseColumns.CONTENTS
+            new TmfEventTableColumn(ITmfEventAspect.BaseAspects.TIMESTAMP),
+            new TmfEventTableColumn(ITmfEventAspect.BaseAspects.EVENT_TYPE),
+            new TmfEventTableColumn(ITmfEventAspect.BaseAspects.CONTENTS)
             );
 
     /**
@@ -364,9 +365,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
         ImmutableList.Builder<TmfEventTableColumn> builder = new ImmutableList.Builder<>();
         for (org.eclipse.tracecompass.tmf.ui.widgets.virtualtable.ColumnData col : columnData) {
-            String header = col.header;
-            if (header != null) {
-                builder.add(new TmfEventTableFieldColumn(header));
+            String fieldName = col.header;
+            if (fieldName != null) {
+                builder.add(new TmfEventTableColumn(new TmfEventFieldAspect(fieldName, fieldName)));
             }
         }
         return builder.build();
@@ -2541,31 +2542,42 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     }
 
     /**
-    * Margin column for images and special text (e.g. collapse count)
-    */
-   private static final class TmfMarginColumn extends TmfEventTableColumn {
+     * Margin column for images and special text (e.g. collapse count)
+     */
+    private static final class TmfMarginColumn extends TmfEventTableColumn {
 
-       private static final @NonNull String HEADER = EMPTY_STRING;
+        private static final @NonNull ITmfEventAspect MARGIN_ASPECT = new ITmfEventAspect() {
 
-       /**
-        * Constructor
-        */
-       public TmfMarginColumn() {
-           super(HEADER);
-       }
+            @Override
+            public String getName() {
+                return EMPTY_STRING;
+            }
 
-       @Override
-       public String getItemString(ITmfEvent event) {
-           if (!(event instanceof CachedEvent) || ((CachedEvent) event).repeatCount == 0) {
-               return EMPTY_STRING;
-           }
-           return "+" + ((CachedEvent) event).repeatCount; //$NON-NLS-1$
-       }
+            @Override
+            public String resolve(ITmfEvent event) {
+                if (!(event instanceof CachedEvent) || ((CachedEvent) event).repeatCount == 0) {
+                    return EMPTY_STRING;
+                }
+                return "+" + ((CachedEvent) event).repeatCount; //$NON-NLS-1$
+            }
 
-       @Override
-       public String getFilterFieldId() {
-           return null;
-       }
-   }
+            @Override
+            public String getHelpText() {
+                return EMPTY_STRING;
+            }
+
+            @Override
+            public String getFilterId() {
+                return null;
+            }
+        };
+
+        /**
+         * Constructor
+         */
+        public TmfMarginColumn() {
+            super(MARGIN_ASPECT);
+        }
+    }
 
 }

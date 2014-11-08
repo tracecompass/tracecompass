@@ -35,7 +35,6 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.ui;x-friends:="org.eclipse
  org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace;x-friends:="org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests,org.eclipse.tracecompass.tmf.ui,org.eclipse.tracecompass.lttng2.control.ui",
  org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.importexport;x-internal:=true,
- org.eclipse.tracecompass.internal.tmf.ui.viewers.events.columns;x-internal:=true,
  org.eclipse.tracecompass.tmf.ui,
  org.eclipse.tracecompass.tmf.ui.analysis,
  org.eclipse.tracecompass.tmf.ui.editors,

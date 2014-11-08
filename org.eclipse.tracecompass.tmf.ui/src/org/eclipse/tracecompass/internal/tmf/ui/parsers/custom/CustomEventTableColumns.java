@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomEvent;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
@@ -47,26 +48,37 @@ public class CustomEventTableColumns {
      * Column for custom events, which uses an integer ID to represent each
      * column.
      */
-    private static final class CustomEventTableColumn extends TmfEventTableColumn {
+    private static final class CustomEventFieldAspect implements ITmfEventAspect {
 
+        private final @NonNull String fName;
         private final int fIndex;
 
         /**
          * Constructor
          *
          * @param name
-         *            The name (title) of this column
+         *            The name (title) of this aspect
          * @param idx
-         *            The index of this column, which should be the index of the
-         *            field in the event's content to display.
+         *            The "index" of this aspect, which should be the index of
+         *            the field in the event's content to display.
          */
-        public CustomEventTableColumn(@NonNull String name, int idx) {
-            super(name);
+        public CustomEventFieldAspect(@NonNull String name, int idx) {
+            fName = name;
             fIndex = idx;
         }
 
         @Override
-        public String getItemString(ITmfEvent event) {
+        public String getName() {
+            return fName;
+        }
+
+        @Override
+        public String getHelpText() {
+            return EMPTY_STRING;
+        }
+
+        @Override
+        public String resolve(ITmfEvent event) {
             if (event instanceof CustomEvent) {
                 String ret = ((CustomEvent) event).getEventString(fIndex);
                 return (ret == null ? EMPTY_STRING : ret);
@@ -75,8 +87,8 @@ public class CustomEventTableColumns {
         }
 
         @Override
-        public String getFilterFieldId() {
-            return getHeaderName();
+        public String getFilterId() {
+            return fName;
         }
     }
 
@@ -86,13 +98,13 @@ public class CustomEventTableColumns {
      * @param definition The {@link CustomTraceDefinition} of the trace for which you want the columns
      * @return The set of columns for the given trace.
      */
-    public static Collection<CustomEventTableColumn> generateColumns(CustomTraceDefinition definition) {
-        ImmutableList.Builder<CustomEventTableColumn> builder = new ImmutableList.Builder<>();
+    public static Collection<TmfEventTableColumn> generateColumns(CustomTraceDefinition definition) {
+        ImmutableList.Builder<TmfEventTableColumn> builder = new ImmutableList.Builder<>();
         List<OutputColumn> outputs = definition.outputs;
         for (int i = 0; i < outputs.size(); i++) {
             String name = outputs.get(i).name;
             if (name != null) {
-                builder.add(new CustomEventTableColumn(name, i));
+                builder.add(new TmfEventTableColumn(new CustomEventFieldAspect(name, i)));
             }
         }
         return builder.build();
