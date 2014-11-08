@@ -136,7 +136,7 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     }
 
     @Override
-    public String eventStatedumpProcessState() {
+    public @NonNull String eventStatedumpProcessState() {
         return STATEDUMP_PROCESS_STATE;
     }
 
