@@ -14,12 +14,15 @@
 package org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.LttngStrings;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.IKernelAnalysisEventLayout;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEventLayout;
 import org.eclipse.tracecompass.lttng2.control.core.session.SessionConfigStrings;
+import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement.ValuePriorityLevel;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -46,22 +49,24 @@ public class LttngKernelAnalysis extends TmfStateSystemAnalysisModule {
     private static final ImmutableSet<String> REQUIRED_EVENTS = ImmutableSet.of();
 
     private static final ImmutableSet<String> OPTIONAL_EVENTS = ImmutableSet.of(
-            LttngStrings.EXIT_SYSCALL,
-            LttngStrings.IRQ_HANDLER_ENTRY,
-            LttngStrings.IRQ_HANDLER_EXIT,
-            LttngStrings.SOFTIRQ_ENTRY,
-            LttngStrings.SOFTIRQ_EXIT,
-            LttngStrings.SOFTIRQ_RAISE,
-            LttngStrings.SCHED_PROCESS_FORK,
-            LttngStrings.SCHED_PROCESS_EXIT,
-            LttngStrings.SCHED_PROCESS_FREE,
-            LttngStrings.SCHED_SWITCH,
-            LttngStrings.STATEDUMP_PROCESS_STATE,
-            LttngStrings.SCHED_WAKEUP,
-            LttngStrings.SCHED_WAKEUP_NEW,
-
-            /* FIXME Add the prefix for syscalls */
-            LttngStrings.SYSCALL_PREFIX
+            // FIXME These cannot be declared statically anymore, they depend on
+            // the OriginTracer of the kernel trace.
+//            LttngStrings.EXIT_SYSCALL,
+//            LttngStrings.IRQ_HANDLER_ENTRY,
+//            LttngStrings.IRQ_HANDLER_EXIT,
+//            LttngStrings.SOFTIRQ_ENTRY,
+//            LttngStrings.SOFTIRQ_EXIT,
+//            LttngStrings.SOFTIRQ_RAISE,
+//            LttngStrings.SCHED_PROCESS_FORK,
+//            LttngStrings.SCHED_PROCESS_EXIT,
+//            LttngStrings.SCHED_PROCESS_FREE,
+//            LttngStrings.SCHED_SWITCH,
+//            LttngStrings.STATEDUMP_PROCESS_STATE,
+//            LttngStrings.SCHED_WAKEUP,
+//            LttngStrings.SCHED_WAKEUP_NEW,
+//
+//            /* FIXME Add the prefix for syscalls */
+//            LttngStrings.SYSCALL_PREFIX
             );
 
     /** The requirements as an immutable set */
@@ -79,9 +84,18 @@ public class LttngKernelAnalysis extends TmfStateSystemAnalysisModule {
     }
 
     @Override
-    @NonNull
-    protected ITmfStateProvider createStateProvider() {
-        return new LttngKernelStateProvider(getTrace());
+    protected @NonNull ITmfStateProvider createStateProvider() {
+        ITmfTrace trace = getTrace();
+        IKernelAnalysisEventLayout layout;
+
+        if (trace instanceof LttngKernelTrace) {
+            layout = ((LttngKernelTrace) trace).getEventLayout();
+        } else {
+            /* Fall-back to the base LttngEventLayout */
+            layout = LttngEventLayout.getInstance();
+        }
+
+        return new LttngKernelStateProvider(trace, layout);
     }
 
     @Override

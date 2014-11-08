@@ -16,9 +16,10 @@ package org.eclipse.tracecompass.lttng2.kernel.core.analysis.cpuusage;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Activator;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Attributes;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.LttngStrings;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
@@ -48,16 +49,20 @@ public class LttngKernelCpuUsageStateProvider extends AbstractTmfStateProvider {
     /* For each CPU, maps the last time a thread was scheduled in */
     private final Map<String, Long> fLastStartTimes = new HashMap<>();
     private final long fTraceStart;
+    private final @NonNull IKernelAnalysisEventLayout fLayout;
 
     /**
      * Constructor
      *
      * @param trace
      *            The trace from which to get the CPU usage
+     * @param layout
+     *            The event layout to use for this state provider.
      */
-    public LttngKernelCpuUsageStateProvider(ITmfTrace trace) {
+    public LttngKernelCpuUsageStateProvider(ITmfTrace trace, @NonNull IKernelAnalysisEventLayout layout) {
         super(trace, ITmfEvent.class, "LTTng Kernel CPU usage"); //$NON-NLS-1$
         fTraceStart = trace.getStartTime().getValue();
+        fLayout = layout;
     }
 
     // ------------------------------------------------------------------------
@@ -71,14 +76,14 @@ public class LttngKernelCpuUsageStateProvider extends AbstractTmfStateProvider {
 
     @Override
     public LttngKernelCpuUsageStateProvider getNewInstance() {
-        return new LttngKernelCpuUsageStateProvider(this.getTrace());
+        return new LttngKernelCpuUsageStateProvider(this.getTrace(), this.fLayout);
     }
 
     @Override
     protected void eventHandle(ITmfEvent event) {
         final String eventName = event.getType().getName();
 
-        if (eventName.equals(LttngStrings.SCHED_SWITCH)) {
+        if (eventName.equals(fLayout.eventSchedSwitch())) {
             /*
              * Fields: string prev_comm, int32 prev_tid, int32 prev_prio, int64
              * prev_state, string next_comm, int32 next_tid, int32 next_prio
@@ -88,7 +93,7 @@ public class LttngKernelCpuUsageStateProvider extends AbstractTmfStateProvider {
             long ts = event.getTimestamp().getValue();
             String cpu = event.getSource();
 
-            Long prevTid = (Long) content.getField(LttngStrings.PREV_TID).getValue();
+            Long prevTid = (Long) content.getField(fLayout.fieldPrevTid()).getValue();
 
             try {
                 Integer currentCPUNode = ss.getQuarkRelativeAndAdd(getNodeCPUs(), cpu);

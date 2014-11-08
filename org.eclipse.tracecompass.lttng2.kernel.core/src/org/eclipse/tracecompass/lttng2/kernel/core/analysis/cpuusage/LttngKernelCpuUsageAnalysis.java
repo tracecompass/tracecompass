@@ -20,7 +20,10 @@ import java.util.Map.Entry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Activator;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Attributes;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.IKernelAnalysisEventLayout;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEventLayout;
 import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelAnalysis;
+import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -52,7 +55,17 @@ public class LttngKernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
 
     @Override
     protected ITmfStateProvider createStateProvider() {
-        return new LttngKernelCpuUsageStateProvider(getTrace());
+        ITmfTrace trace = getTrace();
+        IKernelAnalysisEventLayout layout;
+
+        if (trace instanceof LttngKernelTrace) {
+            layout = ((LttngKernelTrace) trace).getEventLayout();
+        } else {
+            /* Fall-back to the base LttngEventLayout */
+            layout = LttngEventLayout.getInstance();
+        }
+
+        return new LttngKernelCpuUsageStateProvider(trace, layout);
     }
 
     @Override

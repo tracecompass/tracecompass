@@ -16,11 +16,17 @@ package org.eclipse.tracecompass.lttng2.kernel.core.trace;
 import java.nio.BufferOverflowException;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Activator;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.IKernelAnalysisEventLayout;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEventLayout;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 
@@ -29,17 +35,62 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
  * traces.
  *
  * @author Alexandre Montplaisir
- * @since 2.0
  */
 public class LttngKernelTrace extends CtfTmfTrace {
 
+    /**
+     * Supported Linux kernel tracers
+     */
+    private enum OriginTracer {
+        LTTNG(LttngEventLayout.getInstance());
+
+        private final @NonNull IKernelAnalysisEventLayout fLayout;
+
+        private OriginTracer(@NonNull IKernelAnalysisEventLayout layout) {
+            fLayout = layout;
+        }
+    }
+
+    /**
+     * CTF metadata identifies trace type and tracer version pretty well, we are
+     * quite confident in the inferred trace type.
+     */
     private static final int CONFIDENCE = 100;
+
+    /** The tracer which originated this trace */
+    private OriginTracer fOriginTracer = null;
 
     /**
      * Default constructor
      */
     public LttngKernelTrace() {
         super();
+    }
+
+    /**
+     * Return the kernel event layout (event and field names) used in this
+     * trace.
+     *
+     * @return The event layout
+     */
+    public @NonNull IKernelAnalysisEventLayout getEventLayout() {
+        OriginTracer tracer = fOriginTracer;
+        if (tracer == null) {
+            throw new IllegalStateException("Cannot get the layout of a non-initialized trace!"); //$NON-NLS-1$
+        }
+        return tracer.fLayout;
+    }
+
+    @Override
+    public void initTrace(IResource resource, String path,
+            Class<? extends ITmfEvent> eventType) throws TmfTraceException {
+        /*
+         * Set the 'fOriginTracer' in accordance to what is found in the
+         * metadata
+         */
+        fOriginTracer = OriginTracer.LTTNG;
+
+        super.initTrace(resource, path, eventType);
     }
 
     /**

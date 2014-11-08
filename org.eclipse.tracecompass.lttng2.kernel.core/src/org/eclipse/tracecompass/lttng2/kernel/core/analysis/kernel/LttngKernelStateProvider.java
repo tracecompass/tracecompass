@@ -12,9 +12,12 @@
 
 package org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel;
 
+import java.util.Map;
+
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Attributes;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.LttngStrings;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.StateValues;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
@@ -25,6 +28,8 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * This is the state change input plugin for TMF's state system which handles
@@ -37,11 +42,36 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  */
 public class LttngKernelStateProvider extends AbstractTmfStateProvider {
 
+    // ------------------------------------------------------------------------
+    // Static fields
+    // ------------------------------------------------------------------------
+
     /**
      * Version number of this state provider. Please bump this if you modify the
      * contents of the generated state history in some way.
      */
     private static final int VERSION = 4;
+
+    private static final int SYSCALL_EXIT_INDEX = 0;
+    private static final int IRQ_HANDLER_ENTRY_INDEX = 1;
+    private static final int IRQ_HANDLER_EXIT_INDEX = 2;
+    private static final int SOFT_IRQ_ENTRY_INDEX = 3;
+    private static final int SOFT_IRQ_EXIT_INDEX = 4;
+    private static final int SOFT_IRQ_RAISE_INDEX = 5;
+    private static final int SCHED_SWITCH_INDEX = 6;
+    private static final int SCHED_PROCESS_FORK_INDEX = 7;
+    private static final int SCHED_PROCESS_EXIT_INDEX = 8;
+    private static final int SCHED_PROCESS_FREE_INDEX = 9;
+    private static final int STATEDUMP_PROCESS_STATE_INDEX = 10;
+    private static final int SCHED_WAKEUP_INDEX = 11;
+
+
+    // ------------------------------------------------------------------------
+    // Fields
+    // ------------------------------------------------------------------------
+
+    private final Map<String, Integer> fEventNames;
+    private final @NonNull IKernelAnalysisEventLayout fLayout;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -52,9 +82,40 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
      *
      * @param trace
      *            The LTTng 2.0 kernel trace directory
+     * @param layout
+     *            The event layout to use for this state provider. Usually
+     *            depending on the tracer implementation.
      */
-    public LttngKernelStateProvider(ITmfTrace trace) {
-        super(trace, ITmfEvent.class, "LTTng Kernel"); //$NON-NLS-1$
+    public LttngKernelStateProvider(ITmfTrace trace, @NonNull IKernelAnalysisEventLayout layout) {
+        super(trace, ITmfEvent.class, "Kernel"); //$NON-NLS-1$
+        fLayout = layout;
+        fEventNames = buildEventNames(layout);
+    }
+
+    // ------------------------------------------------------------------------
+    // Event names management
+    // ------------------------------------------------------------------------
+
+    private static Map<String, Integer> buildEventNames(IKernelAnalysisEventLayout layout) {
+        ImmutableMap.Builder<String, Integer> builder = ImmutableMap.builder();
+
+        builder.put(layout.eventSyscallExit(), SYSCALL_EXIT_INDEX);
+        builder.put(layout.eventIrqHandlerEntry(), IRQ_HANDLER_ENTRY_INDEX);
+        builder.put(layout.eventIrqHandlerExit(), IRQ_HANDLER_EXIT_INDEX);
+        builder.put(layout.eventSoftIrqEntry(), SOFT_IRQ_ENTRY_INDEX);
+        builder.put(layout.eventSoftIrqExit(), SOFT_IRQ_EXIT_INDEX);
+        builder.put(layout.eventSoftIrqRaise(), SOFT_IRQ_RAISE_INDEX);
+        builder.put(layout.eventSchedSwitch(), SCHED_SWITCH_INDEX);
+        builder.put(layout.eventSchedProcessFork(), SCHED_PROCESS_FORK_INDEX);
+        builder.put(layout.eventSchedProcessExit(), SCHED_PROCESS_EXIT_INDEX);
+        builder.put(layout.eventSchedProcessFree(), SCHED_PROCESS_FREE_INDEX);
+        builder.put(layout.eventStatedumpProcessState(), STATEDUMP_PROCESS_STATE_INDEX);
+
+        for (String eventSchedWakeup : layout.eventsSchedWakeup()) {
+            builder.put(eventSchedWakeup, SCHED_WAKEUP_INDEX);
+        }
+
+        return builder.build();
     }
 
     // ------------------------------------------------------------------------
@@ -74,7 +135,7 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
 
     @Override
     public LttngKernelStateProvider getNewInstance() {
-        return new LttngKernelStateProvider(this.getTrace());
+        return new LttngKernelStateProvider(this.getTrace(), fLayout);
     }
 
     @Override
@@ -104,10 +165,11 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
              * Feed event to the history system if it's known to cause a state
              * transition.
              */
-            switch (eventName) {
+            Integer idx = fEventNames.get(eventName);
+            int intval = (idx == null ? -1 : idx.intValue());
+            switch (intval) {
 
-            case LttngStrings.EXIT_SYSCALL:
-            /* Fields: int64 ret */
+            case SYSCALL_EXIT_INDEX:
             {
                 /* Clear the current system call on the process */
                 quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.SYSTEM_CALL);
@@ -126,10 +188,9 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             }
                 break;
 
-            case LttngStrings.IRQ_HANDLER_ENTRY:
-            /* Fields: int32 irq, string name */
+            case IRQ_HANDLER_ENTRY_INDEX:
             {
-                Integer irqId = ((Long) event.getContent().getField(LttngStrings.IRQ).getValue()).intValue();
+                Integer irqId = ((Long) event.getContent().getField(fLayout.fieldIrq()).getValue()).intValue();
 
                 /* Mark this IRQ as active in the resource tree.
                  * The state value = the CPU on which this IRQ is sitting */
@@ -149,10 +210,9 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             }
                 break;
 
-            case LttngStrings.IRQ_HANDLER_EXIT:
-            /* Fields: int32 irq, int32 ret */
+            case IRQ_HANDLER_EXIT_INDEX:
             {
-                Integer irqId = ((Long) event.getContent().getField(LttngStrings.IRQ).getValue()).intValue();
+                Integer irqId = ((Long) event.getContent().getField(fLayout.fieldIrq()).getValue()).intValue();
 
                 /* Put this IRQ back to inactive in the resource tree */
                 quark = ss.getQuarkRelativeAndAdd(getNodeIRQs(), irqId.toString());
@@ -167,10 +227,9 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             }
                 break;
 
-            case LttngStrings.SOFTIRQ_ENTRY:
-            /* Fields: int32 vec */
+            case SOFT_IRQ_ENTRY_INDEX:
             {
-                Integer softIrqId = ((Long) event.getContent().getField(LttngStrings.VEC).getValue()).intValue();
+                Integer softIrqId = ((Long) event.getContent().getField(fLayout.fieldVec()).getValue()).intValue();
 
                 /* Mark this SoftIRQ as active in the resource tree.
                  * The state value = the CPU on which this SoftIRQ is processed */
@@ -190,10 +249,9 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             }
                 break;
 
-            case LttngStrings.SOFTIRQ_EXIT:
-            /* Fields: int32 vec */
+            case SOFT_IRQ_EXIT_INDEX:
             {
-                Integer softIrqId = ((Long) event.getContent().getField(LttngStrings.VEC).getValue()).intValue();
+                Integer softIrqId = ((Long) event.getContent().getField(fLayout.fieldVec()).getValue()).intValue();
 
                 /* Put this SoftIRQ back to inactive (= -1) in the resource tree */
                 quark = ss.getQuarkRelativeAndAdd(getNodeSoftIRQs(), softIrqId.toString());
@@ -208,10 +266,10 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             }
                 break;
 
-            case LttngStrings.SOFTIRQ_RAISE:
+            case SOFT_IRQ_RAISE_INDEX:
             /* Fields: int32 vec */
             {
-                Integer softIrqId = ((Long) event.getContent().getField(LttngStrings.VEC).getValue()).intValue();
+                Integer softIrqId = ((Long) event.getContent().getField(fLayout.fieldVec()).getValue()).intValue();
 
                 /* Mark this SoftIRQ as *raised* in the resource tree.
                  * State value = -2 */
@@ -221,17 +279,13 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             }
                 break;
 
-            case LttngStrings.SCHED_SWITCH:
-            /*
-             * Fields: string prev_comm, int32 prev_tid, int32 prev_prio, int64 prev_state,
-             *         string next_comm, int32 next_tid, int32 next_prio
-             */
+            case SCHED_SWITCH_INDEX:
             {
                 ITmfEventField content = event.getContent();
-                Integer prevTid = ((Long) content.getField(LttngStrings.PREV_TID).getValue()).intValue();
-                Long prevState = (Long) content.getField(LttngStrings.PREV_STATE).getValue();
-                String nextProcessName = (String) content.getField(LttngStrings.NEXT_COMM).getValue();
-                Integer nextTid = ((Long) content.getField(LttngStrings.NEXT_TID).getValue()).intValue();
+                Integer prevTid = ((Long) content.getField(fLayout.fieldPrevTid()).getValue()).intValue();
+                Long prevState = (Long) content.getField(fLayout.fieldPrevState()).getValue();
+                String nextProcessName = (String) content.getField(fLayout.fieldNextComm()).getValue();
+                Integer nextTid = ((Long) content.getField(fLayout.fieldNextTid()).getValue()).intValue();
 
                 Integer formerThreadNode = ss.getQuarkRelativeAndAdd(getNodeThreads(), prevTid.toString());
                 Integer newCurrentThreadNode = ss.getQuarkRelativeAndAdd(getNodeThreads(), nextTid.toString());
@@ -279,17 +333,15 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             }
                 break;
 
-            case LttngStrings.SCHED_PROCESS_FORK:
-            /* Fields: string parent_comm, int32 parent_tid,
-             *         string child_comm, int32 child_tid */
+            case SCHED_PROCESS_FORK_INDEX:
             {
                 ITmfEventField content = event.getContent();
                 // String parentProcessName = (String) event.getFieldValue("parent_comm");
-                String childProcessName = (String) content.getField(LttngStrings.CHILD_COMM).getValue();
+                String childProcessName = (String) content.getField(fLayout.fieldChildComm()).getValue();
                 // assert ( parentProcessName.equals(childProcessName) );
 
-                Integer parentTid = ((Long) content.getField(LttngStrings.PARENT_TID).getValue()).intValue();
-                Integer childTid = ((Long) content.getField(LttngStrings.CHILD_TID).getValue()).intValue();
+                Integer parentTid = ((Long) content.getField(fLayout.fieldParentTid()).getValue()).intValue();
+                Integer childTid = ((Long) content.getField(fLayout.fieldChildTid()).getValue()).intValue();
 
                 Integer parentTidNode = ss.getQuarkRelativeAndAdd(getNodeThreads(), parentTid.toString());
                 Integer childTidNode = ss.getQuarkRelativeAndAdd(getNodeThreads(), childTid.toString());
@@ -317,26 +369,19 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
                      * Maybe we were missing info about the parent? At least we
                      * will set the child right. Let's suppose "sys_clone".
                      */
-                    value = TmfStateValue.newValueString(LttngStrings.SYS_CLONE);
+                    value = TmfStateValue.newValueString(fLayout.eventSyscallEntryPrefix() + IKernelAnalysisEventLayout.INITIAL_SYSCALL_NAME);
                 }
                 quark = ss.getQuarkRelativeAndAdd(childTidNode, Attributes.SYSTEM_CALL);
                 ss.modifyAttribute(ts, value, quark);
             }
                 break;
 
-            case LttngStrings.SCHED_PROCESS_EXIT:
-            /* Fields: string comm, int32 tid, int32 prio */
+            case SCHED_PROCESS_EXIT_INDEX:
                 break;
 
-            case LttngStrings.SCHED_PROCESS_FREE:
-            /* Fields: string comm, int32 tid, int32 prio */
-            /*
-             * A sched_process_free will always happen after the sched_switch
-             * that will remove the process from the cpu for the last time. So
-             * this is when we should delete everything wrt to the process.
-             */
+            case SCHED_PROCESS_FREE_INDEX:
             {
-                Integer tid = ((Long) event.getContent().getField(LttngStrings.TID).getValue()).intValue();
+                Integer tid = ((Long) event.getContent().getField(fLayout.fieldTid()).getValue()).intValue();
                 /*
                  * Remove the process and all its sub-attributes from the
                  * current state
@@ -346,17 +391,15 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             }
                 break;
 
-            case LttngStrings.STATEDUMP_PROCESS_STATE:
-            /* Fields:
-             * int32 type, int32 mode, int32 pid, int32 submode, int32 vpid,
-             * int32 ppid, int32 tid, string name, int32 status, int32 vtid */
+            case STATEDUMP_PROCESS_STATE_INDEX:
+                /* LTTng-specific */
             {
                 ITmfEventField content = event.getContent();
-                int tid = ((Long) content.getField(LttngStrings.TID).getValue()).intValue();
-                int pid = ((Long) content.getField(LttngStrings.PID).getValue()).intValue();
-                int ppid = ((Long) content.getField(LttngStrings.PPID).getValue()).intValue();
-                int status = ((Long) content.getField(LttngStrings.STATUS).getValue()).intValue();
-                String name = (String) content.getField(LttngStrings.NAME).getValue();
+                int tid = ((Long) content.getField("tid").getValue()).intValue(); //$NON-NLS-1$
+                int pid = ((Long) content.getField("pid").getValue()).intValue(); //$NON-NLS-1$
+                int ppid = ((Long) content.getField("ppid").getValue()).intValue(); //$NON-NLS-1$
+                int status = ((Long) content.getField("status").getValue()).intValue(); //$NON-NLS-1$
+                String name = (String) content.getField("name").getValue(); //$NON-NLS-1$
                 /*
                  * "mode" could be interesting too, but it doesn't seem to be
                  * populated with anything relevant for now.
@@ -401,13 +444,9 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             }
                 break;
 
-            case LttngStrings.SCHED_WAKEUP:
-            case LttngStrings.SCHED_WAKEUP_NEW:
-            /* Fields (same fields for both types):
-             * string comm, int32 pid, int32 prio, int32 success,
-             * int32 target_cpu */
+            case SCHED_WAKEUP_INDEX:
             {
-                final int tid = ((Long) event.getContent().getField(LttngStrings.TID).getValue()).intValue();
+                final int tid = ((Long) event.getContent().getField(fLayout.fieldTid()).getValue()).intValue();
                 final int threadNode = ss.getQuarkRelativeAndAdd(getNodeThreads(), String.valueOf(tid));
 
                 /*
@@ -429,8 +468,8 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
             default:
             /* Other event types not covered by the main switch */
             {
-                if (eventName.startsWith(LttngStrings.SYSCALL_PREFIX)
-                        || eventName.startsWith(LttngStrings.COMPAT_SYSCALL_PREFIX)) {
+                if (eventName.startsWith(fLayout.eventSyscallEntryPrefix())
+                        || eventName.startsWith(fLayout.eventCompatSyscallEntryPrefix())) {
                     /*
                      * This is a replacement for the old sys_enter event. Now
                      * syscall names are listed into the event type

@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.lttng2.kernel.core.tests.analysis.kernel.states
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeTrue;
 
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEventLayout;
 import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
@@ -38,8 +39,7 @@ public class LttngKernelStateProviderTest {
     @BeforeClass
     public static void initialize() {
         assumeTrue(testTrace.exists());
-        input = new LttngKernelStateProvider(testTrace.getTrace());
-
+        input = new LttngKernelStateProvider(testTrace.getTrace(), LttngEventLayout.getInstance());
     }
 
     /**

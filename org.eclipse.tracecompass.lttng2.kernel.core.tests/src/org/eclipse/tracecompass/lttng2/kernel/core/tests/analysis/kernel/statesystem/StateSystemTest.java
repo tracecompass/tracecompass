@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.lttng2.kernel.core.tests.analysis.kernel.states
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
@@ -100,7 +99,7 @@ public abstract class StateSystemTest {
             quark = fixture.getQuarkAbsolute(Attributes.THREADS, "1432", Attributes.SYSTEM_CALL);
             interval = list.get(quark);
             valueStr = interval.getStateValue().unboxStr();
-            assertTrue(valueStr.equals("sys_poll"));
+            assertEquals("sys_poll", valueStr);
 
         } catch (AttributeNotFoundException | StateSystemDisposedException e) {
             fail();

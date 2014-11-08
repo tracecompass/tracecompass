@@ -17,6 +17,7 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.List;
 
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEventLayout;
 import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelStateProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -64,7 +65,7 @@ public class GenerateTestValues {
             TmfStateSystemAnalysisModule module = new TmfStateSystemAnalysisModule() {
                 @Override
                 protected ITmfStateProvider createStateProvider() {
-                    return new LttngKernelStateProvider(trace);
+                    return new LttngKernelStateProvider(trace, LttngEventLayout.getInstance());
                 }
 
                 @Override
