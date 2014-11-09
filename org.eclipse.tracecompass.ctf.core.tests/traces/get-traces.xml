@@ -85,15 +85,15 @@
 
 <target name="downloadTraceFiles">
   <echo message="Attempting to download test traces"/>
-  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="sample-ctf-trace-20120412.tar.bz2" src="http://lttng.org/files/samples/sample-ctf-trace-20120412.tar.bz2"/>
-  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="trace2.tar.bz2" src="http://www.dorsal.polymtl.ca/~alexmont/data/trace2.tar.bz2"/>
-  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="kernel_vm.tar.bz2" src="http://www.dorsal.polymtl.ca/~alexmont/data/kernel_vm.tar.bz2" />
-  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="synctraces.tar.gz" src="http://www.dorsal.polymtl.ca/~gbastien/traces/synctraces.tar.gz" />
-  <get ignoreerrors="true" maxtime="200" skipexisting="true" dest="django-benchmark.tar.gz" src="http://www.dorsal.polymtl.ca/~gbastien/traces/django-benchmark.tgz" />
-  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="hello-lost.tar.bz2" src="http://www.dorsal.polymtl.ca/~alexmont/data/hello-lost.tar.bz2" />
-  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="cyg-profile.tar.bz2" src="http://www.dorsal.polymtl.ca/~alexmont/data/cyg-profile.tar.bz2" />
-  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="funky_trace.tar.bz2" src="http://www.dorsal.polymtl.ca/~alexmont/data/funky_trace.tar.bz2" />
-  <get ignoreerrors="true" maxtime="200" skipexisting="true" dest="testtraceExp.zip" src="http://secretaire.dorsal.polymtl.ca/~mattkhouzam/testTrace-200Overlap.zip" />
+  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="sample-ctf-trace-20120412.tar.bz2" src="http://archive.eclipse.org/tracecompass/test-traces/sample-ctf-trace-20120412.tar.bz2"/>
+  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="trace2.tar.bz2" src="http://archive.eclipse.org/tracecompass/test-traces/trace2.tar.bz2"/>
+  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="kernel_vm.tar.bz2" src="http://archive.eclipse.org/tracecompass/test-traces/kernel_vm.tar.bz2" />
+  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="synctraces.tar.gz" src="http://archive.eclipse.org/tracecompass/test-traces/synctraces.tar.gz" />
+  <get ignoreerrors="true" maxtime="200" skipexisting="true" dest="django-benchmark.tar.gz" src="http://archive.eclipse.org/tracecompass/test-traces/django-benchmark.tar.gz" />
+  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="hello-lost.tar.bz2" src="http://archive.eclipse.org/tracecompass/test-traces/hello-lost.tar.bz2" />
+  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="cyg-profile.tar.bz2" src="http://archive.eclipse.org/tracecompass/test-traces/cyg-profile.tar.bz2" />
+  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="funky_trace.tar.bz2" src="http://archive.eclipse.org/tracecompass/test-traces/funky_trace.tar.bz2" />
+  <get ignoreerrors="true" maxtime="200" skipexisting="true" dest="testtraceExp.zip" src="http://archive.eclipse.org/tracecompass/test-traces/testtraceExp.zip" />
 </target>
 
 <target name="pullTestSuite" if="testSuiteExists">
