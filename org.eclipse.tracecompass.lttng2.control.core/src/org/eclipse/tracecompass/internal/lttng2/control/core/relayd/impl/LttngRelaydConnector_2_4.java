@@ -103,7 +103,7 @@ public class LttngRelaydConnector_2_4 implements ILttngRelaydConnector {
          * only flush if you read after
          */
 
-        AttachSessionRequest attachRequest = new AttachSessionRequest(lttngViewerSession.getId(), SeekCommand.VIEWER_SEEK_BEGINNING);
+        AttachSessionRequest attachRequest = new AttachSessionRequest(lttngViewerSession.getId(), SeekCommand.VIEWER_SEEK_LAST);
         fOutNet.write(attachRequest.serialize());
         fOutNet.flush();
 
