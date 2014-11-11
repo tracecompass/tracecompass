@@ -33,6 +33,7 @@ import org.eclipse.tracecompass.btf.core.event.BtfEvent;
 import org.eclipse.tracecompass.btf.core.event.BtfEventType;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceContext;
@@ -434,6 +435,11 @@ public class BtfTrace extends TmfTrace implements ITmfEventParser, ITmfPersisten
     @Override
     public Map<String, String> getTraceProperties() {
         return ImmutableMap.copyOf(fProperties);
+    }
+
+    @Override
+    public Iterable<ITmfEventAspect> getEventAspects() {
+        return BtfEventAspects.getAspects();
     }
 
     @Override

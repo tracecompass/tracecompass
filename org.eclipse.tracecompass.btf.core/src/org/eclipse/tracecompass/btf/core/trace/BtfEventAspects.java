@@ -11,18 +11,13 @@
  *   Alexandre Montplaisir - Update to new Event Table API
  *******************************************************************************/
 
-package org.eclipse.tracecompass.btf.ui;
-
-import java.util.Collection;
+package org.eclipse.tracecompass.btf.core.trace;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.btf.core.event.BtfEvent;
-import org.eclipse.tracecompass.btf.core.trace.BtfColumnNames;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfEventFieldAspect;
-import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.ITmfEventTableColumns;
-import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.TmfEventTableColumn;
 
 import com.google.common.collect.ImmutableList;
 
@@ -31,22 +26,20 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Alexandre Montplaisir
  */
-public class BtfEventTableColumns implements ITmfEventTableColumns {
+public final class BtfEventAspects {
 
-    // ------------------------------------------------------------------------
-    // Column definition
-    // ------------------------------------------------------------------------
+    private BtfEventAspects() {}
 
     @SuppressWarnings("null")
-    private static final @NonNull Collection<TmfEventTableColumn> BTF_COLUMNS = ImmutableList.of(
-            new TmfEventTableColumn(ITmfEventAspect.BaseAspects.TIMESTAMP),
-            new TmfEventTableColumn(new BtfSourceAspect()),
-            new TmfEventTableColumn(new BtfSourceInstanceAspect()),
-            new TmfEventTableColumn(ITmfEventAspect.BaseAspects.EVENT_TYPE),
-            new TmfEventTableColumn(new BtfTargetAspect()),
-            new TmfEventTableColumn(new BtfTargetInstanceAspect()),
-            new TmfEventTableColumn(new BtfEventAspect()),
-            new TmfEventTableColumn(new BtfNotesAspect())
+    private static final @NonNull Iterable<ITmfEventAspect> BTF_ASPECTS = ImmutableList.of(
+            ITmfEventAspect.BaseAspects.TIMESTAMP,
+            new BtfSourceAspect(),
+            new BtfSourceInstanceAspect(),
+            ITmfEventAspect.BaseAspects.EVENT_TYPE,
+            new BtfTargetAspect(),
+            new BtfTargetInstanceAspect(),
+            new BtfEventAspect(),
+            new BtfNotesAspect()
             );
 
     /**
@@ -153,12 +146,12 @@ public class BtfEventTableColumns implements ITmfEventTableColumns {
         }
     }
 
-    // ------------------------------------------------------------------------
-    // ITmfEventTableColumns
-    // ------------------------------------------------------------------------
-
-    @Override
-    public Collection<? extends TmfEventTableColumn> getEventTableColumns() {
-        return BTF_COLUMNS;
+    /**
+     * Return the event aspects defined for BTF traces.
+     *
+     * @return The aspects
+     */
+    public static Iterable<ITmfEventAspect> getAspects() {
+        return BTF_ASPECTS;
     }
 }

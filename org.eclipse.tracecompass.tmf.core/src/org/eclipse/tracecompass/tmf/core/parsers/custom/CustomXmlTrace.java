@@ -27,7 +27,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
+import org.eclipse.tracecompass.internal.tmf.core.parsers.custom.CustomEventAspects;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -132,6 +134,11 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser, ITmfPer
     @Override
     public ITmfTraceIndexer getIndexer() {
         return super.getIndexer();
+    }
+
+    @Override
+    public Iterable<ITmfEventAspect> getEventAspects() {
+        return CustomEventAspects.generateAspects(fDefinition);
     }
 
     @Override

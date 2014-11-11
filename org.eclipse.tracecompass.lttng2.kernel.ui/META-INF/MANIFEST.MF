@@ -19,7 +19,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.tracecompass.lttng2.control.ui;bundle-version="0.1.0",
  org.eclipse.tracecompass.lttng2.kernel.core;bundle-version="0.1.0"
 Export-Package: org.eclipse.tracecompass.internal.lttng2.kernel.ui;x-friends:="org.eclipse.tracecompass.lttng2.kernel.ui.tests",
- org.eclipse.tracecompass.internal.lttng2.kernel.ui.viewers.events;x-internal:=true,
  org.eclipse.tracecompass.internal.lttng2.kernel.ui.views;x-friends:="org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.controlflow;x-friends:="org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.cpuusage;x-friends:="org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests",

@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.tracecompass.internal.gdbtrace.core.event.GdbTraceEvent;
 import org.eclipse.tracecompass.internal.gdbtrace.core.event.GdbTraceEventContent;
+import org.eclipse.tracecompass.internal.gdbtrace.core.trace.GdbEventAspects;
 import org.eclipse.tracecompass.internal.gdbtrace.core.trace.GdbTrace;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimeSynchSignal;
@@ -58,7 +59,7 @@ public class GdbEventsTable extends TmfEventsTable {
      *            the cache size
      */
     public GdbEventsTable(Composite parent, int cacheSize) {
-        super(parent, cacheSize, GdbEventTableColumns.GDB_COLUMNS);
+        super(parent, cacheSize, GdbEventAspects.getAspects());
         // Set the alignment of the first two columns
         fTable.getColumns()[0].setAlignment(SWT.RIGHT);
         fTable.getColumns()[1].setAlignment(SWT.RIGHT);

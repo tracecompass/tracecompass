@@ -31,14 +31,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.tracecompass.internal.tmf.core.parsers.custom.CustomEventAspects;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
-import org.eclipse.tracecompass.internal.tmf.ui.parsers.custom.CustomEventTableColumns;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition;
+import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTraceDefinition;
-import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.checkpoint.TmfCheckpointIndexer;
@@ -107,7 +107,7 @@ public class CustomXmlParserOutputWizardPage extends WizardPage {
         tableLayout.marginHeight = 0;
         tableLayout.marginWidth = 0;
         tableContainer.setLayout(tableLayout);
-        previewTable = new TmfEventsTable(tableContainer, 0, CustomEventTableColumns.generateColumns(new CustomXmlTraceDefinition()));
+        previewTable = new TmfEventsTable(tableContainer, 0, CustomEventAspects.generateAspects(new CustomXmlTraceDefinition()));
         previewTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         if (wizard.definition != null) {
@@ -234,7 +234,7 @@ public class CustomXmlParserOutputWizardPage extends WizardPage {
             };
             trace.getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, false);
             previewTable.dispose();
-            previewTable = new TmfEventsTable(tableContainer, CACHE_SIZE, CustomEventTableColumns.generateColumns(definition));
+            previewTable = new TmfEventsTable(tableContainer, CACHE_SIZE, CustomEventAspects.generateAspects(definition));
             previewTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
             previewTable.setTrace(trace, true);
         } catch (final TmfTraceException e) {

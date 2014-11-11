@@ -10,9 +10,7 @@
  *   Alexandre Montplaisir - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.gdbtrace.ui.views.events;
-
-import java.util.Collection;
+package org.eclipse.tracecompass.internal.gdbtrace.core.trace;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.gdbtrace.core.event.GdbTraceEvent;
@@ -20,8 +18,6 @@ import org.eclipse.tracecompass.internal.gdbtrace.core.event.GdbTraceEventConten
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfEventFieldAspect;
-import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.ITmfEventTableColumns;
-import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.TmfEventTableColumn;
 
 import com.google.common.collect.ImmutableList;
 
@@ -30,17 +26,15 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Alexandre Montplaisir
  */
-public class GdbEventTableColumns implements ITmfEventTableColumns {
+public final class GdbEventAspects {
 
-    // ------------------------------------------------------------------------
-    // Column definition
-    // ------------------------------------------------------------------------
+    private GdbEventAspects() {}
 
     @SuppressWarnings("null")
-    static final @NonNull Collection<TmfEventTableColumn> GDB_COLUMNS = ImmutableList.of(
-            new TmfEventTableColumn(new GdbTraceFrameAspect()),
-            new TmfEventTableColumn(new GdbTracepointAspect()),
-            new TmfEventTableColumn(new GdbFileAspect())
+    private static final @NonNull Iterable<ITmfEventAspect> GDB_ASPECTS = ImmutableList.of(
+            new GdbTraceFrameAspect(),
+            new GdbTracepointAspect(),
+            new GdbFileAspect()
             );
 
     private static class GdbTraceFrameAspect extends TmfEventFieldAspect {
@@ -84,12 +78,12 @@ public class GdbEventTableColumns implements ITmfEventTableColumns {
         }
     }
 
-    // ------------------------------------------------------------------------
-    // ITmfEventTableColumns
-    // ------------------------------------------------------------------------
-
-    @Override
-    public Collection<? extends TmfEventTableColumn> getEventTableColumns() {
-        return GDB_COLUMNS;
+    /**
+     * Get the event aspects specific to GDB traces.
+     *
+     * @return The set of aspects
+     */
+    public static Iterable<ITmfEventAspect> getAspects() {
+        return GDB_ASPECTS;
     }
 }

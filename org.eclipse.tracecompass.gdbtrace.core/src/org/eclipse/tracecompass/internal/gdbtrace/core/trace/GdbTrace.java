@@ -36,6 +36,7 @@ import org.eclipse.tracecompass.internal.gdbtrace.core.Activator;
 import org.eclipse.tracecompass.internal.gdbtrace.core.GdbTraceCorePlugin;
 import org.eclipse.tracecompass.internal.gdbtrace.core.event.GdbTraceEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
@@ -164,6 +165,11 @@ public class GdbTrace extends TmfTrace implements ITmfEventParser {
     // ------------------------------------------------------------------------
     // TmfTrace
     // ------------------------------------------------------------------------
+
+    @Override
+    public Iterable<ITmfEventAspect> getEventAspects() {
+        return GdbEventAspects.getAspects();
+    }
 
     @Override
     public synchronized TmfContext seekEvent(ITmfLocation location) {

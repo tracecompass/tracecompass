@@ -9,19 +9,19 @@
  *     Patrick Tassé - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.kernel.ui.viewers.events;
+package org.eclipse.tracecompass.internal.lttng2.kernel.core.event.aspect;
 
 import org.eclipse.osgi.util.NLS;
 
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.lttng2.kernel.ui.viewers.events.messages"; //$NON-NLS-1$
-    public static String EventsTable_channelColumn;
-    public static String EventsTable_timestampColumn;
-    public static String EventsTable_typeColumn;
-    public static String EventsTable_contentColumn;
+
+    private static final String BUNDLE_NAME =
+            "org.eclipse.tracecompass.internal.lttng2.kernel.core.event.aspect.messages"; //$NON-NLS-1$
+
+    public static String AspectName_Channel;
+
     static {
-        // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
     }
 

@@ -84,9 +84,6 @@
       <type
             icon="icons/obj16/garland16.png"
             tracetype="org.eclipse.linuxtools.lttng2.kernel.tracetype">
-         <eventTableColumns
-               class="org.eclipse.tracecompass.internal.lttng2.kernel.ui.viewers.events.LttngEventTableColumns">
-         </eventTableColumns>
       </type>
    </extension>
 </plugin>

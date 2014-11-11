@@ -6,9 +6,6 @@
       <type
             icon="icons/btf.png"
             tracetype="org.eclipse.linuxtools.btf.trace">
-         <eventTableColumns
-               class="org.eclipse.tracecompass.btf.ui.BtfEventTableColumns">
-         </eventTableColumns>
       </type>
    </extension>
 </plugin>

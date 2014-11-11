@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
@@ -31,8 +32,13 @@ import org.eclipse.tracecompass.internal.pcap.core.trace.PcapFile;
 import org.eclipse.tracecompass.internal.pcap.core.util.LinkTypeHelper;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.event.PcapEvent;
+import org.eclipse.tracecompass.internal.tmf.pcap.core.event.aspect.PcapDestinationAspect;
+import org.eclipse.tracecompass.internal.tmf.pcap.core.event.aspect.PcapProtocolAspect;
+import org.eclipse.tracecompass.internal.tmf.pcap.core.event.aspect.PcapReferenceAspect;
+import org.eclipse.tracecompass.internal.tmf.pcap.core.event.aspect.PcapSourceAspect;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.util.PcapEventFactory;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfEventParser;
@@ -43,6 +49,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.tracecompass.tmf.core.trace.location.TmfLongLocation;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -54,6 +61,16 @@ import com.google.common.collect.ImmutableMap;
  * @author Vincent Perot
  */
 public class PcapTrace extends TmfTrace implements ITmfEventParser, ITmfTraceProperties, AutoCloseable {
+
+    @SuppressWarnings("null")
+    private static final @NonNull Collection<ITmfEventAspect> PCAP_ASPECTS = ImmutableList.of(
+            ITmfEventAspect.BaseAspects.TIMESTAMP,
+            new PcapSourceAspect(),
+            new PcapDestinationAspect(),
+            new PcapReferenceAspect(),
+            new PcapProtocolAspect(),
+            ITmfEventAspect.BaseAspects.CONTENTS
+            );
 
     @SuppressWarnings("null")
     private static final @NonNull Map<String, String> EMPTY_MAP = ImmutableMap.of();
@@ -104,6 +121,11 @@ public class PcapTrace extends TmfTrace implements ITmfEventParser, ITmfTracePro
         } catch (IOException | BadPcapFileException e) {
             throw new TmfTraceException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public Iterable<ITmfEventAspect> getEventAspects() {
+        return PCAP_ASPECTS;
     }
 
     @Override

@@ -136,6 +136,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventsCache.CachedEvent;
@@ -202,17 +203,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private static final int MARGIN_COLUMN_INDEX = 0;
     private static final int FILTER_SUMMARY_INDEX = 1;
     private static final int EVENT_COLUMNS_START_INDEX = MARGIN_COLUMN_INDEX + 1;
-
-    /**
-     * Default set of columns to use for trace types that do not specify
-     * anything
-     * @since 3.2
-     */
-    public static final Collection<TmfEventTableColumn> DEFAULT_COLUMNS = ImmutableList.of(
-            new TmfEventTableColumn(ITmfEventAspect.BaseAspects.TIMESTAMP),
-            new TmfEventTableColumn(ITmfEventAspect.BaseAspects.EVENT_TYPE),
-            new TmfEventTableColumn(ITmfEventAspect.BaseAspects.CONTENTS)
-            );
 
     /**
      * The events table search/filter keys
@@ -333,7 +323,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      *            The size of the event table cache
      */
     public TmfEventsTable(final Composite parent, final int cacheSize) {
-        this(parent, cacheSize, DEFAULT_COLUMNS);
+        this(parent, cacheSize, TmfTrace.BASE_ASPECTS);
     }
 
     /**
@@ -360,14 +350,14 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     }
 
     @Deprecated
-    private static Collection<TmfEventTableColumn> convertFromColumnData(
+    private static Iterable<ITmfEventAspect> convertFromColumnData(
             org.eclipse.tracecompass.tmf.ui.widgets.virtualtable.ColumnData[] columnData) {
 
-        ImmutableList.Builder<TmfEventTableColumn> builder = new ImmutableList.Builder<>();
+        ImmutableList.Builder<ITmfEventAspect> builder = new ImmutableList.Builder<>();
         for (org.eclipse.tracecompass.tmf.ui.widgets.virtualtable.ColumnData col : columnData) {
             String fieldName = col.header;
             if (fieldName != null) {
-                builder.add(new TmfEventTableColumn(new TmfEventFieldAspect(fieldName, fieldName)));
+                builder.add(new TmfEventFieldAspect(fieldName, fieldName));
             }
         }
         return builder.build();
@@ -380,16 +370,17 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      *            The parent composite UI object
      * @param cacheSize
      *            The size of the event table cache
-     * @param columns
-     *            The columns to use in this table.
+     * @param aspects
+     *            The event aspects to display in this table. One column per
+     *            aspect will be created.
      *            <p>
      *            The iteration order of this collection will correspond to the
-     *            initial ordering of this series of columns in the table.
+     *            initial ordering of the columns in the table.
      *            </p>
      * @since 3.1
      */
     public TmfEventsTable(final Composite parent, int cacheSize,
-            Collection<? extends TmfEventTableColumn> columns) {
+            Iterable<ITmfEventAspect> aspects) {
         super("TmfEventsTable"); //$NON-NLS-1$
 
         fComposite = new Composite(parent, SWT.NONE);
@@ -415,8 +406,12 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         fTable.setLinesVisible(true);
 
         // Setup the columns
-        if (columns != null) {
-            fColumns.addAll(columns);
+        if (aspects != null) {
+            for (ITmfEventAspect aspect : aspects) {
+                if (aspect != null) {
+                    fColumns.add(new TmfEventTableColumn(aspect));
+                }
+            }
         }
 
         TmfMarginColumn collapseCol = new TmfMarginColumn();

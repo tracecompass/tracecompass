@@ -10,44 +10,38 @@
  *   Alexandre Montplaisir - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.kernel.ui.viewers.events;
-
-import java.util.Collection;
+package org.eclipse.tracecompass.internal.lttng2.kernel.core.event.aspect;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
-import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.ITmfEventTableColumns;
-import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.TmfEventTableColumn;
 
 import com.google.common.collect.ImmutableList;
 
 /**
- * Event table columns for LTTng 2.x kernel traces
+ * Event aspects for LTTng kernel traces.
+ *
+ * @author Alexandre Montplaisir
  */
-public class LttngEventTableColumns implements ITmfEventTableColumns {
+public final class LttngEventAspects {
 
-    // ------------------------------------------------------------------------
-    // Column definition
-    // ------------------------------------------------------------------------
+    private LttngEventAspects() {}
 
     @SuppressWarnings("null")
-    private static final @NonNull String CHANNEL_HEADER = Messages.EventsTable_channelColumn;
-
-    @SuppressWarnings("null")
-    private static final @NonNull Collection<TmfEventTableColumn> LTTNG_COLUMNS =
-            ImmutableList.<TmfEventTableColumn> of(
-                    new TmfEventTableColumn(ITmfEventAspect.BaseAspects.TIMESTAMP),
-                    new TmfEventTableColumn(new LttngChannelAspect()),
-                    new TmfEventTableColumn(ITmfEventAspect.BaseAspects.EVENT_TYPE),
-                    new TmfEventTableColumn(ITmfEventAspect.BaseAspects.CONTENTS));
+    private static final @NonNull Iterable<ITmfEventAspect> LTTNG_ASPECTS =
+            ImmutableList.of(
+                    ITmfEventAspect.BaseAspects.TIMESTAMP,
+                    new LttngChannelAspect(),
+                    ITmfEventAspect.BaseAspects.EVENT_TYPE,
+                    ITmfEventAspect.BaseAspects.CONTENTS);
 
     private static class LttngChannelAspect implements ITmfEventAspect {
 
         @Override
         public String getName() {
-            return CHANNEL_HEADER;
+            String ret = Messages.AspectName_Channel;
+            return (ret == null ? EMPTY_STRING : ret);
         }
 
         @Override
@@ -70,12 +64,12 @@ public class LttngEventTableColumns implements ITmfEventTableColumns {
         }
     }
 
-    // ------------------------------------------------------------------------
-    // Constructor
-    // ------------------------------------------------------------------------
-
-    @Override
-    public Collection<? extends TmfEventTableColumn> getEventTableColumns() {
-        return LTTNG_COLUMNS;
+    /**
+     * Get the event aspects defined for LTTng kernel traces.
+     *
+     * @return The set of aspects
+     */
+    public static Iterable<ITmfEventAspect> getAspects() {
+        return LTTNG_ASPECTS;
     }
 }

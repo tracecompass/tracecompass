@@ -6,9 +6,6 @@
       <type
             icon="icons/pcap.png"
             tracetype="org.eclipse.linuxtools.tmf.pcap.core.pcaptrace">
-         <eventTableColumns
-               class="org.eclipse.tracecompass.internal.tmf.pcap.ui.editor.PcapEventTableColumns">
-         </eventTableColumns>
       </type>
    </extension>
    <extension

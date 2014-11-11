@@ -16,7 +16,6 @@ package org.eclipse.tracecompass.tmf.ui.project.model;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -40,19 +39,16 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.tracecompass.internal.tmf.ui.parsers.custom.CustomEventTableColumns;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTrace;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceImportException;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
-import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType.TraceElementType;
+import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventsTable;
-import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.ITmfEventTableColumns;
-import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.TmfEventTableColumn;
 import org.osgi.framework.Bundle;
 
 /**
@@ -404,61 +400,6 @@ public final class TmfTraceTypeUIUtils {
                     final Constructor<?> constructor = c.getConstructor(constructorArgs);
                     final Object[] args = new Object[] { parent, cacheSize };
                     return (TmfEventsTable) constructor.newInstance(args);
-
-                } catch (NoSuchMethodException | ClassNotFoundException | InstantiationException |
-                        IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                    return null;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Get the Event Table columns specified by the trace type's extension
-     * point, if there are any.
-     *
-     * @param trace
-     *            The trace for which we want the columns.
-     * @return The corresponding event table columns, or 'null' if this trace
-     *         type did not specify any.
-     * @since 3.2
-     */
-    public static @Nullable Collection<? extends TmfEventTableColumn> getEventTableColumns(ITmfTrace trace) {
-        final String traceType = getTraceType(trace);
-        if (traceType == null) {
-            return null;
-        }
-
-        /*
-         * Custom traces are a special case : the columns are defined by the
-         * trace definition.
-         */
-        if (traceType.startsWith(CustomTxtTrace.class.getCanonicalName())) {
-            return CustomEventTableColumns.generateColumns(((CustomTxtTrace) trace).getDefinition());
-        }
-        if (traceType.startsWith(CustomXmlTrace.class.getCanonicalName())) {
-            return CustomEventTableColumns.generateColumns(((CustomXmlTrace) trace).getDefinition());
-        }
-
-        /* For all other trace types, we will go look into the extension point */
-        for (final IConfigurationElement ce : TmfTraceTypeUIUtils.getTypeUIElements(TraceElementType.TRACE)) {
-            if (ce.getAttribute(TmfTraceTypeUIUtils.TRACETYPE_ATTR).equals(traceType)) {
-                final IConfigurationElement[] eventTableColumnsCE = ce.getChildren(TmfTraceTypeUIUtils.EVENT_TABLE_COLUMNS);
-
-                if (eventTableColumnsCE.length != 1) {
-                    break;
-                }
-                final String eventTableColumnsClass = eventTableColumnsCE[0].getAttribute(TmfTraceTypeUIUtils.CLASS_ATTR);
-                if ((eventTableColumnsClass == null) || (eventTableColumnsClass.isEmpty())) {
-                    break;
-                }
-                try {
-                    final Bundle bundle = Platform.getBundle(ce.getContributor().getName());
-                    final Class<?> c = bundle.loadClass(eventTableColumnsClass);
-                    final Constructor<?> ctor = c.getConstructor();
-                    ITmfEventTableColumns cols = (ITmfEventTableColumns) ctor.newInstance();
-                    return cols.getEventTableColumns();
 
                 } catch (NoSuchMethodException | ClassNotFoundException | InstantiationException |
                         IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {

@@ -13,7 +13,6 @@
 
 package org.eclipse.tracecompass.tmf.ui.editors;
 
-import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -42,6 +41,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
@@ -59,7 +59,6 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceTypeUIUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventsTable;
-import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.TmfEventTableColumn;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
@@ -319,12 +318,12 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         }
 
         /*
-         * The trace type did not specify an event table, we will use a default
-         * table with the columns it asked for (if any).
+         * The trace type did not specify an event table, we will use a standard
+         * table with the trace's advertised aspects (if any).
          */
-        Collection<? extends TmfEventTableColumn> columns = TmfTraceTypeUIUtils.getEventTableColumns(trace);
-        if (columns != null) {
-            return new TmfEventsTable(parent, cacheSize, columns);
+        Iterable<ITmfEventAspect> aspects = trace.getEventAspects();
+        if (aspects != null) {
+            return new TmfEventsTable(parent, cacheSize, aspects);
         }
 
         /*
@@ -367,19 +366,20 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
          * trace types.
          */
         ITmfTrace[] traces = experiment.getTraces();
-        Set<TmfEventTableColumn> cols = new LinkedHashSet<>();
+        Set<ITmfEventAspect> aspects = new LinkedHashSet<>();
 
         for (ITmfTrace trace : traces) {
-            Collection<? extends TmfEventTableColumn> traceCols =
-                    TmfTraceTypeUIUtils.getEventTableColumns(trace);
-            if (traceCols == null) {
-                cols.addAll(TmfEventsTable.DEFAULT_COLUMNS);
+            Iterable<ITmfEventAspect> traceAspects = trace.getEventAspects();
+            if (traceAspects == null) {
+                aspects.addAll(TmfTrace.BASE_ASPECTS);
             } else {
-                cols.addAll(traceCols);
+                for (ITmfEventAspect aspect : traceAspects) {
+                    aspects.add(aspect);
+                }
             }
         }
 
-        return new TmfEventsTable(parent, cacheSize, cols);
+        return new TmfEventsTable(parent, cacheSize, aspects);
     }
 
     /**

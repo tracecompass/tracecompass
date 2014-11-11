@@ -17,6 +17,7 @@
 package org.eclipse.tracecompass.tmf.core.trace;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -36,6 +37,7 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
 import org.eclipse.tracecompass.tmf.core.component.TmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
@@ -53,6 +55,8 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.checkpoint.TmfCheckpointIndexer;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Abstract implementation of ITmfTrace.
@@ -88,7 +92,21 @@ import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, ITmfTraceCompleteness {
 
     // ------------------------------------------------------------------------
-    // Attributes
+    // Class attributes
+    // ------------------------------------------------------------------------
+
+    /**
+     * Basic aspects that should be valid for all trace types.
+     */
+    public static final Collection<ITmfEventAspect> BASE_ASPECTS =
+            ImmutableList.of(
+                    ITmfEventAspect.BaseAspects.TIMESTAMP,
+                    ITmfEventAspect.BaseAspects.EVENT_TYPE,
+                    ITmfEventAspect.BaseAspects.CONTENTS
+                    );
+
+    // ------------------------------------------------------------------------
+    // Instance attributes
     // ------------------------------------------------------------------------
 
     // The resource used for persistent properties for this trace
@@ -349,6 +367,12 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
             }
         }
         return modules;
+    }
+
+    @Override
+    public Iterable<ITmfEventAspect> getEventAspects() {
+        /* By default we provide only the base aspects valid for all trace types */
+        return BASE_ASPECTS;
     }
 
     /**

@@ -11,4 +11,4 @@
  *******************************************************************************/
 
 @org.eclipse.jdt.annotation.NonNullByDefault
-package org.eclipse.tracecompass.internal.tmf.pcap.ui.editor;
+package org.eclipse.tracecompass.internal.tmf.pcap.core.event.aspect;
