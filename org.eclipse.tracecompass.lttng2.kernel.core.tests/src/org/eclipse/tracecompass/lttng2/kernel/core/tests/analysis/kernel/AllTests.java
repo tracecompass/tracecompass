@@ -10,7 +10,7 @@
  *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.lttng2.kernel.core.tests.analysis;
+package org.eclipse.tracecompass.lttng2.kernel.core.tests.analysis.kernel;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

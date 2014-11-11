@@ -25,8 +25,8 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Attributes;
-import org.eclipse.tracecompass.lttng2.kernel.core.analysis.LttngKernelAnalysisModule;
-import org.eclipse.tracecompass.lttng2.kernel.core.cpuusage.LttngKernelCpuUsageAnalysis;
+import org.eclipse.tracecompass.lttng2.kernel.core.analysis.cpuusage.LttngKernelCpuUsageAnalysis;
+import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelAnalysis;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -266,7 +266,7 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
         if (trace == null) {
             return tid;
         }
-        ITmfStateSystem kernelSs = TmfStateSystemAnalysisModule.getStateSystem(trace, LttngKernelAnalysisModule.ID);
+        ITmfStateSystem kernelSs = TmfStateSystemAnalysisModule.getStateSystem(trace, LttngKernelAnalysis.ID);
         if (kernelSs == null) {
             return tid;
         }

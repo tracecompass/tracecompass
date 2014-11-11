@@ -10,7 +10,7 @@
  *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.lttng2.kernel.core.analysis;
+package org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel;
 
 import org.eclipse.osgi.util.NLS;
 

@@ -11,11 +11,10 @@
  *   Mathieu Rail - Provide the requirements of the analysis
  *******************************************************************************/
 
-package org.eclipse.tracecompass.lttng2.kernel.core.analysis;
+package org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.LttngStrings;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.stateprovider.LttngKernelStateProvider;
 import org.eclipse.tracecompass.lttng2.control.core.session.SessionConfigStrings;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement.ValuePriorityLevel;
@@ -30,7 +29,7 @@ import com.google.common.collect.ImmutableSet;
  * @author Geneviève Bastien
  * @since 3.0
  */
-public class LttngKernelAnalysisModule extends TmfStateSystemAnalysisModule {
+public class LttngKernelAnalysis extends TmfStateSystemAnalysisModule {
 
     /**
      * The file name of the History Tree

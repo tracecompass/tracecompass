@@ -15,9 +15,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.tmf.ctf.core,
  org.eclipse.tracecompass.lttng2.control.core
 Export-Package: org.eclipse.tracecompass.internal.lttng2.kernel.core;x-friends:="org.eclipse.tracecompass.lttng2.kernel.ui,org.eclipse.tracecompass.lttng2.kernel.core.tests",
- org.eclipse.tracecompass.internal.lttng2.kernel.core.stateprovider;x-friends:="org.eclipse.tracecompass.lttng2.kernel.ui,org.eclipse.tracecompass.lttng2.kernel.core.tests",
- org.eclipse.tracecompass.lttng2.kernel.core.analysis,
- org.eclipse.tracecompass.lttng2.kernel.core.cpuusage,
+ org.eclipse.tracecompass.lttng2.kernel.core.analysis.cpuusage,
+ org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel,
  org.eclipse.tracecompass.lttng2.kernel.core.event.matching,
  org.eclipse.tracecompass.lttng2.kernel.core.trace
 Import-Package: com.google.common.collect

@@ -21,7 +21,7 @@ import java.io.File;
 import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
-import org.eclipse.tracecompass.lttng2.kernel.core.analysis.LttngKernelAnalysisModule;
+import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelAnalysis;
 import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
@@ -65,7 +65,7 @@ public class AnalysisBenchmark {
         for (int i = 0; i < LOOP_COUNT; i++) {
             IAnalysisModule module = null;
             try (LttngKernelTrace trace = new LttngKernelTrace()) {
-                module = new LttngKernelAnalysisModule();
+                module = new LttngKernelAnalysis();
                 module.setId("test");
                 trace.initTrace(null, testTrace.getPath(), CtfTmfEvent.class);
                 module.setTrace(trace);

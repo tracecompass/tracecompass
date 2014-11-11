@@ -27,7 +27,7 @@ import org.eclipse.tracecompass.internal.lttng2.kernel.core.StateValues;
 import org.eclipse.tracecompass.internal.lttng2.kernel.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.kernel.ui.Messages;
 import org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.resources.ResourcesEntry.Type;
-import org.eclipse.tracecompass.lttng2.kernel.core.analysis.LttngKernelAnalysisModule;
+import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelAnalysis;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -162,7 +162,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
             ResourcesEntry entry = (ResourcesEntry) event.getEntry();
 
             if (tcEvent.hasValue()) {
-                ITmfStateSystem ss = TmfStateSystemAnalysisModule.getStateSystem(entry.getTrace(), LttngKernelAnalysisModule.ID);
+                ITmfStateSystem ss = TmfStateSystemAnalysisModule.getStateSystem(entry.getTrace(), LttngKernelAnalysis.ID);
                 if (ss == null) {
                     return retMap;
                 }
@@ -301,7 +301,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
             return;
         }
 
-        ITmfStateSystem ss = TmfStateSystemAnalysisModule.getStateSystem(entry.getTrace(), LttngKernelAnalysisModule.ID);
+        ITmfStateSystem ss = TmfStateSystemAnalysisModule.getStateSystem(entry.getTrace(), LttngKernelAnalysis.ID);
         if (ss == null) {
             return;
         }

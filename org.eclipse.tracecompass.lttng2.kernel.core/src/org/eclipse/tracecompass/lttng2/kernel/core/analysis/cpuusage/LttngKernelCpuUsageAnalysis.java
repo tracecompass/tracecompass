@@ -10,7 +10,7 @@
  *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.lttng2.kernel.core.cpuusage;
+package org.eclipse.tracecompass.lttng2.kernel.core.analysis.cpuusage;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.Map.Entry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Activator;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Attributes;
-import org.eclipse.tracecompass.lttng2.kernel.core.analysis.LttngKernelAnalysisModule;
+import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelAnalysis;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -52,7 +52,7 @@ public class LttngKernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
 
     @Override
     protected ITmfStateProvider createStateProvider() {
-        return new LttngKernelCpuStateProvider(getTrace());
+        return new LttngKernelCpuUsageStateProvider(getTrace());
     }
 
     @Override
@@ -66,7 +66,7 @@ public class LttngKernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
          * This analysis depends on the LTTng kernel analysis, so we'll start
          * that build at the same time
          */
-        LttngKernelAnalysisModule module = getTrace().getAnalysisModuleOfClass(LttngKernelAnalysisModule.class, LttngKernelAnalysisModule.ID);
+        LttngKernelAnalysis module = getTrace().getAnalysisModuleOfClass(LttngKernelAnalysis.class, LttngKernelAnalysis.ID);
         if (module != null) {
             module.schedule();
         }
@@ -91,7 +91,7 @@ public class LttngKernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
         if (trace == null || cpuSs == null) {
             return map;
         }
-        ITmfStateSystem kernelSs = TmfStateSystemAnalysisModule.getStateSystem(trace, LttngKernelAnalysisModule.ID);
+        ITmfStateSystem kernelSs = TmfStateSystemAnalysisModule.getStateSystem(trace, LttngKernelAnalysis.ID);
         if (kernelSs == null) {
             return map;
         }

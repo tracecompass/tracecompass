@@ -10,7 +10,7 @@
  *   Alexandre Montplaisir - Initial API and implementation
  ******************************************************************************/
 
-package org.eclipse.tracecompass.lttng2.kernel.core.tests.stateprovider;
+package org.eclipse.tracecompass.lttng2.kernel.core.tests.analysis.kernel.statesystem;
 
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;

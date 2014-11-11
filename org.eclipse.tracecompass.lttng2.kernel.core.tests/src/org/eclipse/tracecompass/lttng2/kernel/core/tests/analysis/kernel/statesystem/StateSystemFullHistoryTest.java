@@ -1,5 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2012, 2014 Ericsson
+ *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
@@ -10,8 +11,10 @@
  *   Bernd Hufmann - Use state system analysis module instead of factory
  ******************************************************************************/
 
-package org.eclipse.tracecompass.lttng2.kernel.core.tests.stateprovider;
+package org.eclipse.tracecompass.lttng2.kernel.core.tests.analysis.kernel.statesystem;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -20,8 +23,8 @@ import java.io.File;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.stateprovider.LttngKernelStateProvider;
-import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
+import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelStateProvider;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
@@ -33,15 +36,18 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * State system tests using a partial history.
+ * State system tests using a full history back-end and the LTTng kernel state
+ * input.
  *
  * @author Alexandre Montplaisir
  */
-public class PartialStateSystemTest extends StateSystemTest {
+public class StateSystemFullHistoryTest extends StateSystemTest {
 
-    private static final @NonNull String TEST_FILE_NAME = "test-partial";
+    private static final @NonNull String TEST_FILE_NAME = "test.ht";
+    private static final @NonNull String BENCHMARK_FILE_NAME = "test.benchmark.ht";
 
     private static File stateFile;
+    private static File stateFileBenchmark;
     private static TestLttngKernelAnalysisModule module;
 
     /**
@@ -55,10 +61,8 @@ public class PartialStateSystemTest extends StateSystemTest {
         }
         traceIsPresent = true;
 
-        stateFile = new File(TmfTraceManager.getSupplementaryFileDir(testTrace.getTrace()) + TEST_FILE_NAME);
-        if (stateFile.exists()) {
-            stateFile.delete();
-        }
+        stateFile = createStateFile(TEST_FILE_NAME);
+        stateFileBenchmark = createStateFile(BENCHMARK_FILE_NAME);
 
         module = new TestLttngKernelAnalysisModule(TEST_FILE_NAME);
         try {
@@ -73,7 +77,7 @@ public class PartialStateSystemTest extends StateSystemTest {
     }
 
     /**
-     * Class clean-up
+     * Clean-up
      */
     @AfterClass
     public static void cleanup() {
@@ -83,6 +87,9 @@ public class PartialStateSystemTest extends StateSystemTest {
         if (stateFile != null) {
             stateFile.delete();
         }
+        if (stateFileBenchmark != null) {
+            stateFileBenchmark.delete();
+        }
         if (fixture != null) {
             fixture.dispose();
         }
@@ -90,66 +97,56 @@ public class PartialStateSystemTest extends StateSystemTest {
         fixture = null;
     }
 
+    // ------------------------------------------------------------------------
+    // Tests specific to a full-history
+    // ------------------------------------------------------------------------
+
     /**
-     * Partial histories cannot get the intervals' end times. The fake value that
-     * is returned is equal to the query's timestamp. So override this here
-     * so that {@link #testFullQueryThorough} keeps working.
+     * Rebuild independently so we can benchmark it. Too bad JUnit doesn't allow
+     * us to @Test the @BeforeClass...
      */
-    @Override
-    protected long getEndTimes(int idx) {
-        return interestingTimestamp1;
+    @Test
+    public void testBuild() {
+        TestLttngKernelAnalysisModule module2 = new TestLttngKernelAnalysisModule(BENCHMARK_FILE_NAME);
+        try {
+            module2.setTrace(testTrace.getTrace());
+        } catch (TmfAnalysisException e) {
+            module2.dispose();
+            fail();
+        }
+        module2.schedule();
+        assertTrue(module2.waitForCompletion());
+        ITmfStateSystem ssb2 = module2.getStateSystem();
+
+        assertNotNull(ssb2);
+        assertEquals(startTime, ssb2.getStartTime());
+        assertEquals(endTime, ssb2.getCurrentEndTime());
+
+        module2.dispose();
     }
 
-    // ------------------------------------------------------------------------
-    // Skip tests using single-queries (unsupported in partial history)
-    // ------------------------------------------------------------------------
+    /**
+     * Test re-opening the existing file.
+     */
+    @Test
+    public void testOpenExistingStateFile() {
+        /* 'newStateFile' should have already been created */
+        TestLttngKernelAnalysisModule module2 = new TestLttngKernelAnalysisModule(TEST_FILE_NAME);
+        try {
+            module2.setTrace(testTrace.getTrace());
+        } catch (TmfAnalysisException e) {
+            module2.dispose();
+            fail();
+        }
+        module2.schedule();
+        assertTrue(module2.waitForCompletion());
+        ITmfStateSystem ssb2 = module2.getStateSystem();
 
-    @Override
-    @Test(expected = UnsupportedOperationException.class)
-    public void testSingleQuery1() {
-        super.testSingleQuery1();
-    }
+        assertNotNull(ssb2);
+        assertEquals(startTime, ssb2.getStartTime());
+        assertEquals(endTime, ssb2.getCurrentEndTime());
 
-    @Override
-    @Test(expected = UnsupportedOperationException.class)
-    public void testRangeQuery1() {
-        super.testRangeQuery1();
-    }
-
-    @Override
-    @Test(expected = UnsupportedOperationException.class)
-    public void testRangeQuery2() {
-        super.testRangeQuery2();
-    }
-
-    @Override
-    @Test(expected = UnsupportedOperationException.class)
-    public void testRangeQuery3() {
-        super.testRangeQuery3();
-    }
-
-    @Override
-    @Test(expected = UnsupportedOperationException.class)
-    public void testSingleQueryInvalidTime1() throws TimeRangeException {
-        super.testSingleQueryInvalidTime1();
-    }
-
-    @Override
-    @Test(expected = UnsupportedOperationException.class)
-    public void testSingleQueryInvalidTime2() throws TimeRangeException {
-        super.testSingleQueryInvalidTime2();
-    }
-
-    @Override
-    @Test(expected = UnsupportedOperationException.class)
-    public void testRangeQueryInvalidTime1() throws TimeRangeException {
-        super.testRangeQueryInvalidTime1();
-    }
-
-    @Override
-    @Test(expected = UnsupportedOperationException.class)
-    public void testRangeQueryInvalidTime2() throws TimeRangeException {
-        super.testRangeQueryInvalidTime2();
+        module2.dispose();
     }
 
     @NonNullByDefault
@@ -182,13 +179,21 @@ public class PartialStateSystemTest extends StateSystemTest {
 
         @Override
         protected StateSystemBackendType getBackendType() {
-            return StateSystemBackendType.PARTIAL;
+            return StateSystemBackendType.FULL;
         }
 
         @Override
         protected String getSsFileName() {
             return htFileName;
         }
-
     }
+
+    private static File createStateFile(String name) {
+        File file = new File(TmfTraceManager.getSupplementaryFileDir(testTrace.getTrace()) + name);
+        if (file.exists()) {
+            file.delete();
+        }
+        return file;
+    }
+
 }

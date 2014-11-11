@@ -10,14 +10,14 @@
  *   Alexandre Montplaisir - Initial API and implementation
  ******************************************************************************/
 
-package org.eclipse.tracecompass.lttng2.kernel.core.tests.stateprovider;
+package org.eclipse.tracecompass.lttng2.kernel.core.tests.analysis.kernel.statesystem;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.List;
 
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.stateprovider.LttngKernelStateProvider;
+import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelStateProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;

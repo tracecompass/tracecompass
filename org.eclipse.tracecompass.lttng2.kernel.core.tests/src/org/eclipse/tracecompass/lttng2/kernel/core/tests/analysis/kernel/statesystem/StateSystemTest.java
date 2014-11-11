@@ -10,7 +10,7 @@
  *
  *******************************************************************************/
 
-package org.eclipse.tracecompass.lttng2.kernel.core.tests.stateprovider;
+package org.eclipse.tracecompass.lttng2.kernel.core.tests.analysis.kernel.statesystem;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

@@ -25,7 +25,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Attributes;
 import org.eclipse.tracecompass.internal.lttng2.kernel.ui.Messages;
 import org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.resources.ResourcesEntry.Type;
-import org.eclipse.tracecompass.lttng2.kernel.core.analysis.LttngKernelAnalysisModule;
+import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelAnalysis;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -100,7 +100,7 @@ public class ResourcesView extends AbstractTimeGraphView {
         if (trace == null) {
             return;
         }
-        ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(trace, LttngKernelAnalysisModule.ID);
+        ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(trace, LttngKernelAnalysis.ID);
         if (ssq == null) {
             return;
         }
@@ -208,7 +208,7 @@ public class ResourcesView extends AbstractTimeGraphView {
             long startTime, long endTime, long resolution,
             IProgressMonitor monitor) {
         ResourcesEntry resourcesEntry = (ResourcesEntry) entry;
-        ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(resourcesEntry.getTrace(), LttngKernelAnalysisModule.ID);
+        ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(resourcesEntry.getTrace(), LttngKernelAnalysis.ID);
         if (ssq == null) {
             return null;
         }

@@ -10,7 +10,7 @@
  *
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.kernel.core.stateprovider;
+package org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel;
 
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Attributes;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.LttngStrings;

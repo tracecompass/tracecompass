@@ -10,7 +10,7 @@
  *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.lttng2.kernel.core.tests.analysis;
+package org.eclipse.tracecompass.lttng2.kernel.core.tests.analysis.kernel;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.LttngStrings;
 import org.eclipse.tracecompass.lttng2.control.core.session.SessionConfigStrings;
-import org.eclipse.tracecompass.lttng2.kernel.core.analysis.LttngKernelAnalysisModule;
+import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelAnalysis;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
@@ -41,14 +41,14 @@ import org.junit.Test;
 import com.google.common.collect.ImmutableSet;
 
 /**
- * Test the {@link LttngKernelAnalysisModule} class
+ * Test the {@link LttngKernelAnalysis} class
  *
  * @author Geneviève Bastien
  */
 public class LttngKernelAnalysisTest {
 
     private ITmfTrace fTrace;
-    private LttngKernelAnalysisModule fKernelAnalysisModule;
+    private LttngKernelAnalysis fKernelAnalysisModule;
 
     /**
      * Class setup
@@ -63,7 +63,7 @@ public class LttngKernelAnalysisTest {
      */
     @Before
     public void setUp() {
-        fKernelAnalysisModule = new LttngKernelAnalysisModule();
+        fKernelAnalysisModule = new LttngKernelAnalysis();
         fTrace = CtfTmfTestTrace.KERNEL.getTrace();
     }
 
@@ -121,7 +121,7 @@ public class LttngKernelAnalysisTest {
     }
 
     /**
-     * Test for {@link LttngKernelAnalysisModule#getAnalysisRequirements()}
+     * Test for {@link LttngKernelAnalysis#getAnalysisRequirements()}
      */
     @Test
     public void testGetAnalysisRequirements() {

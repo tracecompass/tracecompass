@@ -11,7 +11,7 @@
  *   Geneviève Bastien - Revision of the initial implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.lttng2.kernel.core.cpuusage;
+package org.eclipse.tracecompass.lttng2.kernel.core.analysis.cpuusage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +41,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * @author François Rajotte
  * @since 3.0
  */
-public class LttngKernelCpuStateProvider extends AbstractTmfStateProvider {
+public class LttngKernelCpuUsageStateProvider extends AbstractTmfStateProvider {
 
     private static final int VERSION = 1;
 
@@ -55,7 +55,7 @@ public class LttngKernelCpuStateProvider extends AbstractTmfStateProvider {
      * @param trace
      *            The trace from which to get the CPU usage
      */
-    public LttngKernelCpuStateProvider(ITmfTrace trace) {
+    public LttngKernelCpuUsageStateProvider(ITmfTrace trace) {
         super(trace, ITmfEvent.class, "LTTng Kernel CPU usage"); //$NON-NLS-1$
         fTraceStart = trace.getStartTime().getValue();
     }
@@ -70,8 +70,8 @@ public class LttngKernelCpuStateProvider extends AbstractTmfStateProvider {
     }
 
     @Override
-    public LttngKernelCpuStateProvider getNewInstance() {
-        return new LttngKernelCpuStateProvider(this.getTrace());
+    public LttngKernelCpuUsageStateProvider getNewInstance() {
+        return new LttngKernelCpuUsageStateProvider(this.getTrace());
     }
 
     @Override
