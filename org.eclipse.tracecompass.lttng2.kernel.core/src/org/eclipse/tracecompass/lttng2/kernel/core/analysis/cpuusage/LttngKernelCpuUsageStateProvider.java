@@ -97,7 +97,7 @@ public class LttngKernelCpuUsageStateProvider extends AbstractTmfStateProvider {
 
             ITmfEventField content = event.getContent();
             long ts = event.getTimestamp().getValue();
-            String cpu = event.getSource();
+            String cpu = String.valueOf(event.getCPU());
 
             Long prevTid = (Long) content.getField(fLayout.fieldPrevTid()).getValue();
 

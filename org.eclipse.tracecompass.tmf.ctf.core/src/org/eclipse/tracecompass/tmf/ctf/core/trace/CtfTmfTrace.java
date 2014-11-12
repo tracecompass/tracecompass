@@ -17,6 +17,7 @@ package org.eclipse.tracecompass.tmf.ctf.core.trace;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.eclipse.tracecompass.internal.tmf.ctf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -58,10 +60,13 @@ import org.eclipse.tracecompass.tmf.ctf.core.context.CtfLocationInfo;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfTmfContext;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEventType;
+import org.eclipse.tracecompass.tmf.ctf.core.event.aspect.CtfChannelAspect;
+import org.eclipse.tracecompass.tmf.ctf.core.event.aspect.CtfCpuAspect;
 import org.eclipse.tracecompass.tmf.ctf.core.timestamp.CtfTmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.iterator.CtfIterator;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.iterator.CtfIteratorManager;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -77,12 +82,25 @@ public class CtfTmfTrace extends TmfTrace
     // -------------------------------------------
     // Constants
     // -------------------------------------------
+
     /**
      * Default cache size for CTF traces
      */
     protected static final int DEFAULT_CACHE_SIZE = 50000;
 
-    /*
+    /**
+     * Event aspects available for all CTF traces
+     */
+    private static final Collection<ITmfEventAspect> CTF_ASPECTS =
+            ImmutableList.of(
+                    ITmfEventAspect.BaseAspects.TIMESTAMP,
+                    new CtfChannelAspect(),
+                    new CtfCpuAspect(),
+                    ITmfEventAspect.BaseAspects.EVENT_TYPE,
+                    ITmfEventAspect.BaseAspects.CONTENTS
+                    );
+
+    /**
      * The Ctf clock unique identifier field
      */
     private static final String CLOCK_HOST_PROPERTY = "uuid"; //$NON-NLS-1$
@@ -228,6 +246,11 @@ public class CtfTmfTrace extends TmfTrace
         }
 
         return status;
+    }
+
+    @Override
+    public Iterable<ITmfEventAspect> getEventAspects() {
+        return CTF_ASPECTS;
     }
 
     /**

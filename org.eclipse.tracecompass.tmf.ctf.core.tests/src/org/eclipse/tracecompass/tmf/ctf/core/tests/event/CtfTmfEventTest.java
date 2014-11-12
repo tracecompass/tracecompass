@@ -169,12 +169,12 @@ public class CtfTmfEventTest {
             assertEquals("kernel", trace.getName());
         }
         String reference = fixture.getReference();
-        String source = fixture.getSource();
+        int cpu = fixture.getCPU();
         ITmfEventType type = fixture.getType();
         assertEquals(ITmfContext.UNKNOWN_RANK, rank);
 
         assertEquals("channel0_1", reference);
-        assertEquals("1", source);
+        assertEquals(1, cpu);
         assertEquals("lttng_statedump_vm_map", type.toString());
     }
 

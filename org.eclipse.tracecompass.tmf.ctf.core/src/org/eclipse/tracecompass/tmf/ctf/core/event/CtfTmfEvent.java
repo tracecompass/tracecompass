@@ -64,7 +64,6 @@ public class CtfTmfEvent extends TmfEvent
     private final String fEventName;
     private final IEventDeclaration fEventDeclaration;
     private final @NonNull EventDefinition fEvent;
-    private final String fSource;
     private final String fReference;
 
     /** Lazy-loaded field containing the event's payload */
@@ -99,7 +98,6 @@ public class CtfTmfEvent extends TmfEvent
         fTypeId = declaration.getId().longValue();
         fEventName = declaration.getName();
         fEvent = eventDefinition;
-        fSource = String.valueOf(cpu);
         fReference = fileName;
     }
 
@@ -125,7 +123,6 @@ public class CtfTmfEvent extends TmfEvent
         fEventName = EMPTY_CTF_EVENT_NAME;
         fEventDeclaration = null;
         fEvent = EventDefinition.NULL_EVENT;
-        fSource = null;
         fReference = null;
     }
 
@@ -161,15 +158,6 @@ public class CtfTmfEvent extends TmfEvent
      */
     public long getID() {
         return fTypeId;
-    }
-
-    /**
-     * Return this event's source CPU.
-     *
-     * @return The source CPU
-     */
-    public String getSource() {
-        return fSource;
     }
 
     /**
