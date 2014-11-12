@@ -13,9 +13,6 @@
 
 package org.eclipse.tracecompass.tmf.ui.editors;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
@@ -71,6 +68,9 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.IGotoMarker;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.properties.IPropertySheetPage;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 
 /**
  * Editor for TMF events
@@ -286,7 +286,27 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
      * @return The event table instance
      */
     protected @NonNull TmfEventsTable createEventsTable(final Composite parent, final int cacheSize) {
-        return getEventTable(fTrace, parent, cacheSize);
+        ITmfTrace trace = fTrace;
+
+        /*
+         * Check if the trace (or experiment type) defines a specific event
+         * table in its extension point.
+         */
+        TmfEventsTable table = TmfTraceTypeUIUtils.getEventTable(trace, parent, cacheSize);
+        if (table != null) {
+            return table;
+        }
+
+        /*
+         * Use the aspects defined by the trace type (or each trace type in an
+         * experiment) to build a table consisting of these.
+         */
+        Iterable<ITmfEventAspect> aspects = getTraceAspects(trace);
+        if (Iterables.isEmpty(aspects)) {
+            /* Couldn't find any event aspects, use a default table */
+            return new TmfEventsTable(parent, cacheSize);
+        }
+        return new TmfEventsTable(parent, cacheSize, aspects);
     }
 
     /**
@@ -302,26 +322,11 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
      *            The cache size to use
      * @return The event table for the trace
      */
-    private static @NonNull TmfEventsTable getEventTable(ITmfTrace trace,
-            final Composite parent, final int cacheSize) {
+    private static @NonNull Iterable<ITmfEventAspect> getTraceAspects(ITmfTrace trace) {
         if (trace instanceof TmfExperiment) {
-            return getExperimentEventTable((TmfExperiment) trace, parent, cacheSize);
+            return getExperimentAspects((TmfExperiment) trace);
         }
-
-        TmfEventsTable table = TmfTraceTypeUIUtils.getEventTable(trace, parent, cacheSize);
-        if (table != null) {
-            /*
-             * The trace type specified an event table type, we will give it to
-             * them.
-             */
-            return table;
-        }
-
-        /*
-         * The trace type did not specify an event table, we will use a standard
-         * table with the trace's advertised aspects (if any).
-         */
-        return new TmfEventsTable(parent, cacheSize, trace.getEventAspects());
+        return trace.getEventAspects();
     }
 
     /**
@@ -337,9 +342,13 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
      *            the event table cache size
      * @return An event table of the appropriate type
      */
-    private static @NonNull TmfEventsTable getExperimentEventTable(
-            final TmfExperiment experiment, final Composite parent,
-            final int cacheSize) {
+    private static @NonNull Iterable<ITmfEventAspect> getExperimentAspects(
+            final TmfExperiment experiment) {
+        ITmfTrace[] traces = experiment.getTraces();
+        ImmutableSet.Builder<ITmfEventAspect> builder = new ImmutableSet.Builder<>();
+
+        /* For experiments, we'll add a "trace name" aspect/column */
+        builder.add(ITmfEventAspect.BaseAspects.TRACE_NAME);
 
         String commonTraceType = getCommonTraceType(experiment);
         if (commonTraceType != null) {
@@ -347,25 +356,23 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
              * All the traces in this experiment are of the same type, let's
              * just use the normal table for that type.
              */
-            return getEventTable(experiment.getTraces()[0], parent, cacheSize);
-        }
+            builder.addAll(traces[0].getEventAspects());
 
-        /*
-         * There are different trace types in the experiment, so we are
-         * definitely using a TmfEventsTable. Aggregate the columns from all
-         * trace types.
-         */
-        ITmfTrace[] traces = experiment.getTraces();
-        Set<ITmfEventAspect> aspects = new LinkedHashSet<>();
-
-        for (ITmfTrace trace : traces) {
-            Iterable<ITmfEventAspect> traceAspects = trace.getEventAspects();
-            for (ITmfEventAspect aspect : traceAspects) {
-                aspects.add(aspect);
+        } else {
+            /*
+             * There are different trace types in the experiment, so we are
+             * definitely using a TmfEventsTable. Aggregate the columns from all
+             * trace types.
+             */
+            for (ITmfTrace trace : traces) {
+                Iterable<ITmfEventAspect> traceAspects = trace.getEventAspects();
+                builder.addAll(traceAspects);
             }
         }
 
-        return new TmfEventsTable(parent, cacheSize, aspects);
+        @SuppressWarnings("null")
+        @NonNull Iterable<ITmfEventAspect> ret = builder.build();
+        return ret;
     }
 
     /**

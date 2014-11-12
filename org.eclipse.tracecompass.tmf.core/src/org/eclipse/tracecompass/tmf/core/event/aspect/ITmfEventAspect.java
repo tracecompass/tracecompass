@@ -123,6 +123,32 @@ public interface ITmfEventAspect {
                 return ITmfEvent.EVENT_FIELD_CONTENT;
             }
         };
+
+        /**
+         * Aspect for the trace's name (for experiments with many traces)
+         */
+        ITmfEventAspect TRACE_NAME = new ITmfEventAspect() {
+            @Override
+            public String getName() {
+                return Messages.getMessage(Messages.AspectName_TraceName);
+            }
+
+            @Override
+            public String getHelpText() {
+                return Messages.getMessage(Messages.AspectHelpText_TraceName);
+            }
+
+            @Override
+            public String resolve(ITmfEvent event) {
+                String ret = event.getTrace().getName();
+                return (ret == null ? EMPTY_STRING : ret);
+            }
+
+            @Override
+            public @Nullable String getFilterId() {
+                return null;
+            }
+        };
     }
 
     /**

@@ -23,10 +23,12 @@ public class Messages extends NLS {
     public static @Nullable String AspectName_Timestamp;
     public static @Nullable String AspectName_EventType;
     public static @Nullable String AspectName_Contents;
+    public static @Nullable String AspectName_TraceName;
     public static @Nullable String AspectName_CPU;
 
     public static @Nullable String AspectHelpText_EventType;
     public static @Nullable String AspectHelpText_Contents;
+    public static @Nullable String AspectHelpText_TraceName;
     public static @Nullable String AspectHelpText_CPU;
     public static @Nullable String AspectHelpText_Statesystem;
 
