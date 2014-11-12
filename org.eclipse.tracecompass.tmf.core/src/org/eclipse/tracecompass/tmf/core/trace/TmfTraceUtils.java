@@ -13,11 +13,14 @@
 package org.eclipse.tracecompass.tmf.core.trace;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 
 /**
  * Utility methods for ITmfTrace's.
@@ -71,5 +74,27 @@ public final class TmfTraceUtils {
             }
         }
         return modules;
+    }
+
+    /**
+     * Return the list of event aspects exposed by the given trace that match a
+     * given class.
+     *
+     * @param trace
+     *            The trace for which you want the event aspects
+     * @param aspectClass
+     *            The returned aspects must be of this class (or a subtype)
+     * @return The event aspects that match the given class
+     */
+    public static @NonNull <T extends ITmfEventAspect> Iterable<T> getEventAspectsOfClass(
+            ITmfTrace trace, Class<T> aspectClass) {
+        Iterable<ITmfEventAspect> aspects = trace.getEventAspects();
+        List<T> ret = new LinkedList<>();
+        for (ITmfEventAspect aspect : aspects) {
+            if (aspectClass.isAssignableFrom(aspect.getClass())) {
+                ret.add(aspectClass.cast(aspect));
+            }
+        }
+        return ret;
     }
 }

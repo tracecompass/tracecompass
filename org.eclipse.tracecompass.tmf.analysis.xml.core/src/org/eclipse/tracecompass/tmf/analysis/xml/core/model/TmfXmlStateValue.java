@@ -26,7 +26,11 @@ import org.eclipse.tracecompass.tmf.analysis.xml.core.module.IXmlStateSystemCont
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.w3c.dom.Element;
+
+import com.google.common.primitives.Ints;
 
 /**
  * This Class implements a State Value in the XML-defined state system, along
@@ -252,11 +256,19 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
 
         final ITmfEventField content = event.getContent();
 
-        /* Exception for "CPU", returns the source of this event */
-        /* FIXME Disabled until we can use event criteria instead */
-//        if (fieldName.equals(TmfXmlStrings.CPU)) {
-//            return TmfStateValue.newValueInt(Integer.valueOf(event.getSource()));
-//        }
+        /* Exception for "CPU", returns the source CPU of this event */
+        if (fieldName.equals(TmfXmlStrings.CPU)) {
+            /* See if the event advertises a CPU aspect */
+            Iterable<TmfCpuAspect> cpuAspects = TmfTraceUtils.getEventAspectsOfClass(
+                    event.getTrace(), TmfCpuAspect.class);
+            for (TmfCpuAspect aspect : cpuAspects) {
+                /* We will just pick the first valid one we find */
+                String cpu = aspect.resolve(event);
+                if (Ints.tryParse(cpu) != null) {
+                    return TmfStateValue.newValueInt(Integer.valueOf(cpu));
+                }
+            }
+        }
         /* Exception also for "TIMESTAMP", returns the timestamp of this event */
         if (fieldName.equals(TmfXmlStrings.TIMESTAMP)) {
             return TmfStateValue.newValueLong(event.getTimestamp().getValue());
