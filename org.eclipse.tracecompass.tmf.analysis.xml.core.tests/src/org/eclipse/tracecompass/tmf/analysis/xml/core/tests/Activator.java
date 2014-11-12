@@ -12,6 +12,12 @@
 
 package org.eclipse.tracecompass.tmf.analysis.xml.core.tests;
 
+import java.io.IOException;
+import java.net.URL;
+
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
@@ -53,6 +59,31 @@ public class Activator extends Plugin {
      */
     public static Activator getDefault() {
         return plugin;
+    }
+
+    /**
+     * Gets the absolute path from a path relative to this plugin's root
+     *
+     * @param relativePath
+     *            The path relative to this plugin
+     * @return The absolute path corresponding to this relative path
+     */
+    public static IPath getAbsolutePath(Path relativePath) {
+        Activator plugin2 = getDefault();
+        if (plugin2 == null) {
+            /*
+             * Shouldn't happen but at least throw something to get the test to
+             * fail early
+             */
+            return null;
+        }
+        URL location = FileLocator.find(plugin2.getBundle(), relativePath, null);
+        try {
+            IPath path = new Path(FileLocator.toFileURL(location).getPath());
+            return path;
+        } catch (IOException e) {
+            return null;
+        }
     }
 
 }

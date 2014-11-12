@@ -73,10 +73,10 @@ public class XmlAnalysisModuleSourceTest {
         XmlAnalysisModuleSource module = new XmlAnalysisModuleSource();
 
         Iterable<IAnalysisModuleHelper> modules = module.getAnalysisModules();
-        assertFalse(findModule(modules, SS_MODULE));
+        assertFalse("Module present", findModule(modules, SS_MODULE));
 
         /* Test that the builtin module is present */
-        assertTrue(findModule(modules, BUILTIN_MODULE));
+        assertTrue("builtin module present", findModule(modules, BUILTIN_MODULE));
 
         /* use the valid XML test file */
         File testXmlFile = TmfXmlTestFiles.VALID_FILE.getFile();
@@ -88,9 +88,9 @@ public class XmlAnalysisModuleSourceTest {
         XmlAnalysisModuleSource.notifyModuleChange();
         modules = module.getAnalysisModules();
 
-        assertTrue(modules.iterator().hasNext());
-        assertTrue(findModule(modules, SS_MODULE));
-        assertTrue(findModule(modules, BUILTIN_MODULE));
+        assertTrue("Modules available from source", modules.iterator().hasNext());
+        assertTrue("Module present after add file", findModule(modules, SS_MODULE));
+        assertTrue("Builtin module present after add file", findModule(modules, BUILTIN_MODULE));
     }
 
     private static boolean findModule(Iterable<IAnalysisModuleHelper> modules, String moduleName) {

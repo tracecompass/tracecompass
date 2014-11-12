@@ -67,7 +67,7 @@ public class XmlStateSystemModule extends TmfStateSystemAnalysisModule {
      * Sets the file path of the XML file containing the state provider
      *
      * @param file
-     *            The full path to the XML file
+     *            The absolute path to the XML file
      */
     public void setXmlFile(IPath file) {
         fXmlFile = file;

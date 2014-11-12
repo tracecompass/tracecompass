@@ -18,12 +18,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
-import java.io.IOException;
 import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -40,7 +35,6 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  * Test suite for the xml state providers
@@ -66,19 +60,7 @@ public class StateProviderTest {
         fTrace = trace;
 
         /* Initialize the state provider module */
-        Document doc = null;
-        try {
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            doc = dBuilder.parse(TmfXmlTestFiles.VALID_FILE.getFile());
-            doc.getDocumentElement().normalize();
-        } catch (ParserConfigurationException e) {
-            fail("Xml document parse exception");
-        } catch (SAXException e) {
-            fail("Exception parsing xml file");
-        } catch (IOException e) {
-            fail("File io exception");
-        }
+        Document doc = TmfXmlTestFiles.VALID_FILE.getXmlDocument();
         assertNotNull(doc);
 
         /* get State Providers modules */

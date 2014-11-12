@@ -19,13 +19,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
@@ -47,24 +44,6 @@ public class XmlUtilsTest {
 
     private static final Path PATH_INVALID = new Path("test_xml_files/test_invalid");
     private static final Path PATH_VALID = new Path("test_xml_files/test_valid");
-
-    private static IPath getAbsolutePath(Path relativePath) {
-        Activator plugin = Activator.getDefault();
-        if (plugin == null) {
-            /*
-             * Shouldn't happen but at least throw something to get the test to
-             * fail early
-             */
-            throw new IllegalStateException();
-        }
-        URL location = FileLocator.find(plugin.getBundle(), relativePath, null);
-        try {
-            IPath path = new Path(FileLocator.toFileURL(location).getPath());
-            return path;
-        } catch (IOException e) {
-            throw new IllegalStateException();
-        }
-    }
 
     /**
      * Empty the XML directory after the test
@@ -125,7 +104,7 @@ public class XmlUtilsTest {
      */
     @Test
     public void testXmlValidateInvalid() {
-        IPath path = getAbsolutePath(PATH_INVALID);
+        IPath path = Activator.getAbsolutePath(PATH_INVALID);
         File file = path.toFile();
 
         File[] invalidFiles = file.listFiles();
@@ -140,7 +119,7 @@ public class XmlUtilsTest {
      */
     @Test
     public void testXmlValidateValid() {
-        IPath path = getAbsolutePath(PATH_VALID);
+        IPath path = Activator.getAbsolutePath(PATH_VALID);
         File file = path.toFile();
 
         File[] validFiles = file.listFiles();

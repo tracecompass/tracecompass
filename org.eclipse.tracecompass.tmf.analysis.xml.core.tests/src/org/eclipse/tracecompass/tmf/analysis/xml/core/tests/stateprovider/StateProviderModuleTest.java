@@ -18,15 +18,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
@@ -37,7 +29,6 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  * Test suite for the XmlStateSystemModule Test. It tests the reading of the
@@ -53,33 +44,13 @@ public class StateProviderModuleTest {
 
     private XmlStateSystemModule fModule;
 
-    private static Document getXmlDocumentFromFile(File file) {
-        /* Initialize the state provider module */
-        try {
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-
-            Document doc = dBuilder.parse(file);
-
-            doc.getDocumentElement().normalize();
-            return doc;
-        } catch (ParserConfigurationException e) {
-            fail("Xml document parse exception");
-        } catch (SAXException e) {
-            fail("Exception parsing xml file");
-        } catch (IOException e) {
-            fail("File io exception");
-        }
-        return null;
-    }
-
     /**
      * Test the module construction
      */
     @Test
     public void testModuleConstruction() {
 
-        Document doc = getXmlDocumentFromFile(TmfXmlTestFiles.VALID_FILE.getFile());
+        Document doc = TmfXmlTestFiles.VALID_FILE.getXmlDocument();
         assertNotNull(doc);
 
         /* get State Providers modules */
@@ -93,7 +64,7 @@ public class StateProviderModuleTest {
         fModule.setId(moduleId);
         assertEquals(ANALYSIS_ID, fModule.getId());
 
-        fModule.setXmlFile(new Path(TmfXmlTestFiles.VALID_FILE.getFile().getAbsolutePath()));
+        fModule.setXmlFile(TmfXmlTestFiles.VALID_FILE.getPath());
 
         assertEquals(ANALYSIS_NAME, fModule.getName());
     }
@@ -105,7 +76,7 @@ public class StateProviderModuleTest {
     public void testModuleExecution() {
         assumeTrue(CtfTmfTestTrace.KERNEL.exists());
 
-        Document doc = getXmlDocumentFromFile(TmfXmlTestFiles.VALID_FILE.getFile());
+        Document doc = TmfXmlTestFiles.VALID_FILE.getXmlDocument();
         assertNotNull(doc);
 
         /* get State Providers modules */
@@ -117,7 +88,7 @@ public class StateProviderModuleTest {
         assertNotNull(moduleId);
         fModule.setId(moduleId);
 
-        fModule.setXmlFile(new Path(TmfXmlTestFiles.VALID_FILE.getFile().getAbsolutePath()));
+        fModule.setXmlFile(TmfXmlTestFiles.VALID_FILE.getPath());
 
         try (CtfTmfTrace trace = CtfTmfTestTrace.KERNEL.getTrace();) {
             fModule.setTrace(trace);
