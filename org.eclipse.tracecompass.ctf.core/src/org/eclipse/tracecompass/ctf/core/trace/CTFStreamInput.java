@@ -44,8 +44,7 @@ import org.eclipse.tracecompass.internal.ctf.core.trace.StreamInputPacketIndexEn
  *
  * @since 3.0
  */
-// TODO: remove AutoCloseable
-public class CTFStreamInput implements IDefinitionScope, AutoCloseable {
+public class CTFStreamInput implements IDefinitionScope {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -100,10 +99,6 @@ public class CTFStreamInput implements IDefinitionScope, AutoCloseable {
         fStream = stream;
         fFile = file;
         fIndex = new StreamInputPacketIndex();
-    }
-
-    @Override
-    public void close() throws IOException {
     }
 
     // ------------------------------------------------------------------------

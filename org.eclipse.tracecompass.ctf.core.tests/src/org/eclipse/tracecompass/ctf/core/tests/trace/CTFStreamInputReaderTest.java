@@ -71,7 +71,7 @@ public class CTFStreamInputReaderTest {
                         new StructDeclaration(0),
                         null,
                         "packet",
-                        wrap( "field" ),
+                        wrap("field"),
                         new Definition[] { new StringDefinition(new StringDeclaration(), null, "field", "test") }),
                 null)
                 );
@@ -114,8 +114,8 @@ public class CTFStreamInputReaderTest {
      */
     @Test(expected = CTFReaderException.class)
     public void testStreamInputReader_invalid() throws CTFReaderException, IOException {
-        try (CTFStreamInput streamInput = new CTFStreamInput(new CTFStream(new CTFTrace("")), new File(""));
-                CTFStreamInputReader result = new CTFStreamInputReader(streamInput)) {
+        CTFStreamInput streamInput = new CTFStreamInput(new CTFStream(new CTFTrace("")), new File(""));
+        try (CTFStreamInputReader result = new CTFStreamInputReader(streamInput)) {
             assertNotNull(result);
         }
     }

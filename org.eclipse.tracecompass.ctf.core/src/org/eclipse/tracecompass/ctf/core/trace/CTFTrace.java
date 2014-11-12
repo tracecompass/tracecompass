@@ -949,8 +949,6 @@ public class CTFTrace implements IDefinitionScope {
      *             The file must exist
      * @since 3.0
      */
-    // TODO: remove suppress warning
-    @SuppressWarnings("resource")
     public void addStream(long id, File streamFile) throws CTFReaderException {
         CTFStream stream = null;
         final File file = streamFile;

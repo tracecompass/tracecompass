@@ -17,7 +17,6 @@ import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -30,7 +29,6 @@ import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInput;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.internal.ctf.core.event.EventDeclaration;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.exceptions.ParseException;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -70,11 +68,6 @@ public class CTFStreamTest {
         fixture.setId(1L);
         fInput = new CTFStreamInput(new CTFStream(testTrace.getTrace()), createFile());
         fixture.addInput(fInput);
-    }
-
-    @After
-    public void tearDown() throws IOException {
-        fInput.close();
     }
 
     @NonNull
