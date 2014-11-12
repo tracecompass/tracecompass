@@ -12,7 +12,8 @@ Require-Bundle: org.junit,
  org.eclipse.tracecompass.tmf.core,
  org.eclipse.tracecompass.tmf.core.tests,
  org.eclipse.tracecompass.tmf.ctf.core,
- org.eclipse.tracecompass.tmf.ctf.core.tests
+ org.eclipse.tracecompass.tmf.ctf.core.tests,
+ org.eclipse.tracecompass.statesystem.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: org.junit.runners

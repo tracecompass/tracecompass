@@ -207,14 +207,16 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
             switch (fValue.getType()) {
             case LONG: {
                 long incrementLong = fValue.unboxLong();
-                long currentValue = ss.queryOngoingState(quark).unboxLong();
+                ITmfStateValue currentState = ss.queryOngoingState(quark);
+                long currentValue = (currentState.isNull() ? 0 : currentState.unboxLong());
                 ITmfStateValue value = TmfStateValue.newValueLong(incrementLong + currentValue);
                 processValue(quark, timestamp, value);
                 return;
             }
             case INTEGER: {
                 int increment = fValue.unboxInt();
-                int currentValue = ss.queryOngoingState(quark).unboxInt();
+                ITmfStateValue currentState = ss.queryOngoingState(quark);
+                int currentValue = (currentState.isNull() ? 0 : currentState.unboxInt());
                 ITmfStateValue value = TmfStateValue.newValueInt(increment + currentValue);
                 processValue(quark, timestamp, value);
                 break;

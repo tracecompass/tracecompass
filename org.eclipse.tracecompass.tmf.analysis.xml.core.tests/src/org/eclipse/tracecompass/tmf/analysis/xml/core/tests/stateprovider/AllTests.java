@@ -21,6 +21,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+        StateProviderModelTest.class,
         StateProviderTest.class,
         StateProviderModuleTest.class })
 public class AllTests {

@@ -36,7 +36,9 @@ public enum TmfXmlTestFiles {
     /** A valid XML test file */
     VALID_FILE("test_xml_files/test_valid/test_valid.xml"),
     /** An invalid test file */
-    INVALID_FILE("test_xml_files/test_invalid/test_invalid.xml");
+    INVALID_FILE("test_xml_files/test_invalid/test_invalid.xml"),
+    /** A valid file for state attribute tests */
+    ATTRIBUTE_FILE("test_xml_files/test_valid/test_attributes.xml");
 
     private final String fPath;
 
