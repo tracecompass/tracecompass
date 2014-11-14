@@ -141,4 +141,15 @@
             sequence="F1">
       </key>
    </extension>
+   <extension
+         point="org.eclipse.ui.splashHandlers">
+      <splashHandler
+            class="org.eclipse.tracecompass.internal.tracing.rcp.ui.SplashHandler"
+            id="org.eclipse.tracecompass.rcp.ui.splashHandler">
+      </splashHandler>
+      <splashHandlerProductBinding
+            productId="org.eclipse.tracecompass.rcp.branding.product"
+            splashId="org.eclipse.tracecompass.rcp.ui.splashHandler">
+      </splashHandlerProductBinding>
+   </extension>
 </plugin>

@@ -34,6 +34,9 @@ public class Messages extends NLS {
     /** Error message for internal errors */
     public static String Application_InternalError;
 
+    /** Version string */
+    public static String SplahScreen_VersionString;
+
     /** Malformed command */
     public static String CliParser_MalformedCommand;
     /** Unkown command */

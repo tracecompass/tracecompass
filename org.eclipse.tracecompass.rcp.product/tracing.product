@@ -40,10 +40,7 @@ http://www.eclipse.org/legal/epl-v10.html
    <windowImages i16="/org.eclipse.tracecompass.rcp.branding/icons/png/tc_icon_16x16.png" i32="/org.eclipse.tracecompass.rcp.branding/icons/png/tc_icon_32x32.png" i48="/org.eclipse.tracecompass.rcp.branding/icons/png/tc_icon_48x48.png" i64="/org.eclipse.tracecompass.rcp.branding/icons/png/tc_icon_64x64.png" i128="/org.eclipse.tracecompass.rcp.branding/icons/png/tc_icon_128x128.png" i256="/org.eclipse.tracecompass.rcp.branding/icons/png/tc_icon_256x256.png"/>
 
    <splash
-      location="org.eclipse.tracecompass.rcp.branding"
-      startupProgressRect="10,300,480,15"
-      startupMessageRect="7,285,490,0"
-      startupForegroundColor="FFFFFF" />
+      location="org.eclipse.tracecompass.rcp.branding" />
    <launcher name="tracecompass">
       <linux icon="../../../../org.eclipse.tracecompass.rcp.branding/icons/xpm/tc_icon_256x256.xpm"/>
       <macosx icon="../../../../org.eclipse.tracecompass.rcp.branding/icons/icns/tc_icon.icns"/>
