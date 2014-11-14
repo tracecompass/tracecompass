@@ -25,7 +25,7 @@ import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlLocation;
 public interface IXmlStateSystemContainer extends ITmfXmlTopLevelElement {
 
     /** Root quark, to get values at the root of the state system */
-    static final int ROOT_QUARK = -1;
+    int ROOT_QUARK = -1;
     /**
      * Error quark, value taken when a state system quark query is in error.
      *
@@ -33,7 +33,7 @@ public interface IXmlStateSystemContainer extends ITmfXmlTopLevelElement {
      * return errors, so it has the same value as root quark, but maybe it can
      * be changed to something else -2? A quark can never be negative
      */
-    static final int ERROR_QUARK = -1;
+    int ERROR_QUARK = -1;
 
     /**
      * Get the state system managed by this XML object

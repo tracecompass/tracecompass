@@ -22,90 +22,90 @@ public interface MetadataStrings {
 
     /** None */
 
-    static final String NONE = "none";
+    String NONE = "none";
     /** Ascii */
-    static final String ASCII = "ASCII";
+    String ASCII = "ASCII";
     /** UTF8 */
-    static final String UTF8 = "UTF8";
+    String UTF8 = "UTF8";
     /** b (for binary like b11010010 */
-    static final String BIN = "b";
+    String BIN = "b";
     /** Binary */
-    static final String BINARY = "binary";
+    String BINARY = "binary";
     /** Octal like o177 */
-    static final String OCTAL_CTE = "o";
+    String OCTAL_CTE = "o";
     /** Octal like oct177 */
-    static final String OCT = "oct";
+    String OCT = "oct";
     /** Octal like octal177 */
-    static final String OCTAL = "octal";
+    String OCTAL = "octal";
     /** Pointer (memory address for all the hardcore Java gurus out there)*/
-    static final String POINTER = "p";
+    String POINTER = "p";
     /** X for hex */
-    static final String X2 = "X";
+    String X2 = "X";
     /** x for hex */
-    static final String X = "x";
+    String X = "x";
     /** hex */
-    static final String HEX = "hex";
+    String HEX = "hex";
     /** Hexadecimal */
-    static final String HEXADECIMAL = "hexadecimal";
+    String HEXADECIMAL = "hexadecimal";
     /** unsigned like in 10000ul */
-    static final String UNSIGNED_CTE = "u";
+    String UNSIGNED_CTE = "u";
     /** Decimal */
-    static final String DEC_CTE = "d";
+    String DEC_CTE = "d";
     /** Integer like 1000i */
-    static final String INT_MOD = "i";
+    String INT_MOD = "i";
     /** Decimal */
-    static final String DEC = "dec";
+    String DEC = "dec";
     /** Decimal */
-    static final String DECIMAL = "decimal";
+    String DECIMAL = "decimal";
     /** native for byteorders*/
-    static final String NATIVE = "native";
+    String NATIVE = "native";
     /** network for byteorders*/
-    static final String NETWORK = "network";
+    String NETWORK = "network";
     /** Big endian */
-    static final String BE = "be";
+    String BE = "be";
     /** Little endian */
-    static final String LE = "le";
+    String LE = "le";
     /** Alignment of a field */
-    static final String ALIGN = "align";
+    String ALIGN = "align";
     /** Mantissa digits */
-    static final String MANT_DIG = "mant_dig";
+    String MANT_DIG = "mant_dig";
     /** Exponent digits */
-    static final String EXP_DIG = "exp_dig";
+    String EXP_DIG = "exp_dig";
     /** Loglevel */
-    static final String LOGLEVEL2 = "loglevel";
+    String LOGLEVEL2 = "loglevel";
     /** Name */
-    static final String NAME2 = "name";
+    String NAME2 = "name";
     /** Event context */
-    static final String EVENT_CONTEXT = "event.context";
+    String EVENT_CONTEXT = "event.context";
     /** Fields */
-    static final String FIELDS_STRING = "fields";
+    String FIELDS_STRING = "fields";
     /** context */
-    static final String CONTEXT = "context";
+    String CONTEXT = "context";
     /** Stream ID */
-    static final String STREAM_ID = "stream_id";
+    String STREAM_ID = "stream_id";
     /** Packet context */
-    static final String PACKET_CONTEXT = "packet.context";
+    String PACKET_CONTEXT = "packet.context";
     /** ID */
-    static final String ID = "id";
+    String ID = "id";
     /** Packet Header */
-    static final String PACKET_HEADER = "packet.header";
+    String PACKET_HEADER = "packet.header";
     /** Event Header */
-    static final String EVENT_HEADER = "event.header";
+    String EVENT_HEADER = "event.header";
     /** Byte order */
-    static final String BYTE_ORDER = "byte_order";
+    String BYTE_ORDER = "byte_order";
     /** UUID */
-    static final String UUID_STRING = "uuid";
+    String UUID_STRING = "uuid";
     /** False */
-    static final String FALSE2 = "FALSE";
+    String FALSE2 = "FALSE";
     /** False */
-    static final String FALSE = "false";
+    String FALSE = "false";
     /** True */
-    static final String TRUE2 = "TRUE";
+    String TRUE2 = "TRUE";
     /** True */
-    static final String TRUE = "true";
+    String TRUE = "true";
     /** Minor (Version)*/
-    static final String MINOR = "minor";
+    String MINOR = "minor";
     /** Major (Version)*/
-    static final String MAJOR = "major";
+    String MAJOR = "major";
 
 }

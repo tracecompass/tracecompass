@@ -41,7 +41,7 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      * ignore the version check and open an existing file even if the versions
      * don't match.
      */
-    static final int IGNORE_PROVIDER_VERSION = -42;
+    int IGNORE_PROVIDER_VERSION = -42;
 
     /**
      * @name Read/write quark-getting methods

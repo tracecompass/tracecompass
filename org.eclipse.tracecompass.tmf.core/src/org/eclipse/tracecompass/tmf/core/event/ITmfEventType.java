@@ -35,7 +35,7 @@ public interface ITmfEventType {
     /**
      * The default event type name
      */
-    public static final String DEFAULT_TYPE_ID = "TmfType"; //$NON-NLS-1$
+    String DEFAULT_TYPE_ID = "TmfType"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Getters
