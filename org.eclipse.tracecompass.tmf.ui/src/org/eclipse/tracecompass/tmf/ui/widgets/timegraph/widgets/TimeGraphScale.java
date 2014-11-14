@@ -50,6 +50,28 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeForma
 public class TimeGraphScale extends TimeGraphBaseControl implements
         MouseListener, MouseMoveListener {
 
+    private static final int BASE_10 = 10;
+    private static final int X_OFFSET = 4;
+    private static final int Y_OFFSET = 4;
+
+    private static final int MIN_SECOND_FACTOR = 20;
+    private static final int SECOND_FACTOR = 30;
+    private static final int MAX_SECOND_FACTOR = 30;
+
+    private static final int MIN_MINUTE_FACTOR = 10;
+    private static final int MINUTE_FACTOR = 15;
+    private static final int MAX_MINUTE_FACTOR = 30;
+
+    private static final int MIN_HOUR_FACTOR = 3;
+    private static final int HOUR_FACTOR = 6;
+    private static final int MAX_HOUR_FACTOR = 12;
+
+    private static final int MAX_DAY_FACTOR = 10;
+
+    private static final int MAX_MONTH_FACTOR = 6;
+    private static final int MONTH_FACTOR = 6;
+    private static final int MIN_MONTH_FACTOR = 3;
+
     private static final long MICROSEC_IN_NS = 1000;
     private static final long MILLISEC_IN_NS = 1000000;
     private static final long SEC_IN_NS = 1000000000;
@@ -179,24 +201,24 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         double minDelta = (pixelsPerNanoSec == 0) ? YEAR_IN_NS : width / pixelsPerNanoSec;
         long unit = 1;
         if (fTimeProvider != null && fTimeProvider.getTimeFormat() == TimeFormat.CALENDAR) {
-            if (minDelta > 6 * MONTH_IN_NS) {
+            if (minDelta > MAX_MONTH_FACTOR * MONTH_IN_NS) {
                 unit = YEAR_IN_NS;
-            } else if (minDelta > 3 * MONTH_IN_NS) {
-                unit = 6 * MONTH_IN_NS;
-            } else if (minDelta > 10 * DAY_IN_NS) {
+            } else if (minDelta > MIN_MONTH_FACTOR * MONTH_IN_NS) {
+                unit = MONTH_FACTOR * MONTH_IN_NS;
+            } else if (minDelta > MAX_DAY_FACTOR * DAY_IN_NS) {
                 unit = MONTH_IN_NS;
-            } else if (minDelta > 12 * HOUR_IN_NS) {
+            } else if (minDelta > MAX_HOUR_FACTOR * HOUR_IN_NS) {
                 unit = DAY_IN_NS;
-            } else if (minDelta > 3 * HOUR_IN_NS) {
-                unit = 6 * HOUR_IN_NS;
-            } else if (minDelta > 30 * MIN_IN_NS) {
+            } else if (minDelta > MIN_HOUR_FACTOR * HOUR_IN_NS) {
+                unit = HOUR_FACTOR * HOUR_IN_NS;
+            } else if (minDelta > MAX_MINUTE_FACTOR * MIN_IN_NS) {
                 unit = HOUR_IN_NS;
-            } else if (minDelta > 10 * MIN_IN_NS) {
-                unit = 15 * MIN_IN_NS;
-            } else if (minDelta > 30 * SEC_IN_NS) {
+            } else if (minDelta > MIN_MINUTE_FACTOR * MIN_IN_NS) {
+                unit = MINUTE_FACTOR * MIN_IN_NS;
+            } else if (minDelta > MAX_SECOND_FACTOR * SEC_IN_NS) {
                 unit = MIN_IN_NS;
-            } else if (minDelta > 20 * SEC_IN_NS) {
-                unit = 30 * SEC_IN_NS;
+            } else if (minDelta > MIN_SECOND_FACTOR * SEC_IN_NS) {
+                unit = SECOND_FACTOR * SEC_IN_NS;
             } else if (minDelta <= 1) {
                 timeDelta = 1;
                 return timeDelta;
@@ -206,15 +228,15 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         long pow10 = (long) log;
         double remainder = log - pow10;
         if (remainder < LOG10_1) {
-            timeDelta = (long) Math.pow(10, pow10) * unit;
+            timeDelta = (long) Math.pow(BASE_10, pow10) * unit;
         } else if (remainder < LOG10_2) {
-            timeDelta = 2 * (long) Math.pow(10, pow10) * unit;
+            timeDelta = 2 * (long) Math.pow(BASE_10, pow10) * unit;
         } else if (remainder < LOG10_3 && unit >= HOUR_IN_NS && unit < YEAR_IN_NS) {
-            timeDelta = 3 * (long) Math.pow(10, pow10) * unit;
+            timeDelta = 3 * (long) Math.pow(BASE_10, pow10) * unit;
         } else if (remainder < LOG10_5) {
-            timeDelta = 5 * (long) Math.pow(10, pow10) * unit;
+            timeDelta = 5 * (long) Math.pow(BASE_10, pow10) * unit;
         } else {
-            timeDelta = 10 * (long) Math.pow(10, pow10) * unit;
+            timeDelta = 10 * (long) Math.pow(BASE_10, pow10) * unit;
         }
         if (timeDelta <= 0) {
             timeDelta = 1;
@@ -290,11 +312,11 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
 
         // draw top left area
         rect0.width = leftSpace;
-        rect0.x += 4;
-        rect0.width -= 4;
+        rect0.x += X_OFFSET;
+        rect0.width -= X_OFFSET;
         Rectangle absHeaderRect = new Rectangle(rect0.x, rect0.y, rect0.width, rect0.height);
-        rect0.x -= 4;
-        rect0.width += 4;
+        rect0.x -= X_OFFSET;
+        rect0.width += X_OFFSET;
 
         // prepare and draw right rect of the timescale
         rect0.x += leftSpace;
@@ -340,7 +362,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
 
         // draw time scale ticks
         rect0.y = rect.y;
-        rect0.height = rect.height - 4;
+        rect0.height = rect.height - Y_OFFSET;
         rect0.width = labelWidth;
 
         long time;
@@ -365,7 +387,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
                 break;
             }
             if (x >= rect.x + leftSpace) {
-                gc.drawLine(x, y, x, y + 4);
+                gc.drawLine(x, y, x, y + Y_OFFSET);
                 rect0.x = x;
                 if (x + rect0.width <= rect.x + rect.width) {
                     timeDraw.draw(gc, time, rect0);

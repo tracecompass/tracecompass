@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.tmf.ui.views.uml2sd.drawings.impl;
 
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.drawings.IColor;
 
@@ -50,6 +51,16 @@ public class ColorImpl implements IColor {
      */
     public ColorImpl(Display display, int r, int g, int b) {
         fColor = new Color(display, r, g, b);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param display The display to use
+     * @param color the RGB color
+     */
+    public ColorImpl(Display display, RGB color) {
+        fColor = new Color(display, color.red, color.green, color.blue);
     }
 
     /**

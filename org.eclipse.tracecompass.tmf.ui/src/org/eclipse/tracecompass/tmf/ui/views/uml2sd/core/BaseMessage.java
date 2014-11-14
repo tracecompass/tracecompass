@@ -32,6 +32,10 @@ import org.eclipse.tracecompass.tmf.ui.views.uml2sd.preferences.SDViewPref;
  */
 public abstract class BaseMessage extends GraphNode {
 
+    private static final int ARROW_LENGTH = 7;
+    private static final double ARROW_ANGLE = 0.75;
+    private static final Double ARROW_HEAD_Y = Double.valueOf(Math.sin(ARROW_ANGLE) * ARROW_LENGTH);
+    private static final Double ARROW_HEAD_X = Double.valueOf(Math.cos(ARROW_ANGLE) * ARROW_LENGTH);
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -438,8 +442,8 @@ public abstract class BaseMessage extends GraphNode {
             // Draw the message main line
             context.drawLine(x, y, x + width, y + height);
             // Draw the two little lines which make a arrow part of the message
-            Double xt = Double.valueOf(Math.cos(0.75) * 7);
-            Double yt = Double.valueOf(Math.sin(0.75) * 7);
+            Double xt = ARROW_HEAD_X;
+            Double yt = ARROW_HEAD_Y;
             if (context.getLineStyle() == context.getLineSolidStyle()) {
                 IColor backcolor = context.getBackground();
                 context.setBackground(context.getForeground());
@@ -494,8 +498,8 @@ public abstract class BaseMessage extends GraphNode {
             // Part 5
             context.drawLine(x, y + height + Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT, x + Metrics.INTERNAL_MESSAGE_WIDTH / 2, y + height + Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT);
 
-            Double xt = Double.valueOf(Math.cos(0.75) * 7);
-            Double yt = Double.valueOf(Math.sin(0.75) * 7);
+            Double xt = ARROW_HEAD_X;
+            Double yt = ARROW_HEAD_Y;
 
             fX = x;
             fY = y;
@@ -556,10 +560,10 @@ public abstract class BaseMessage extends GraphNode {
             if (spaceBTWStartEnd < 0) {
                 sign = -1;
             }
-            Double x1 = Double.valueOf(sign * Math.cos(angle - 0.75) * 7);
-            Double y1 = Double.valueOf(sign * Math.sin(angle - 0.75) * 7);
-            Double x2 = Double.valueOf(sign * Math.cos(angle + 0.75) * 7);
-            Double y2 = Double.valueOf(sign * Math.sin(angle + 0.75) * 7);
+            Double x1 = Double.valueOf(sign * Math.cos(angle - ARROW_ANGLE) * ARROW_LENGTH);
+            Double y1 = Double.valueOf(sign * Math.sin(angle - ARROW_ANGLE) * ARROW_LENGTH);
+            Double x2 = Double.valueOf(sign * Math.cos(angle + ARROW_ANGLE) * ARROW_LENGTH);
+            Double y2 = Double.valueOf(sign * Math.sin(angle + ARROW_ANGLE) * ARROW_LENGTH);
 
             fX = getX();
             fY = y + height - y2.intValue();

@@ -34,14 +34,28 @@ import org.eclipse.tracecompass.tmf.ui.views.uml2sd.drawings.impl.FontImpl;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.util.Messages;
 
 /**
- * This is the Sequence Diagram preference handler. This class is responsible for accessing the current user preferences
- * selection This class also provider getters for each modifiable preferences.
+ * This is the Sequence Diagram preference handler. This class is responsible
+ * for accessing the current user preferences selection This class also provider
+ * getters for each modifiable preferences.
  *
  * @version 1.0
  * @author sveyrier
  */
 public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
 
+    private static final RGB DEFAULT_TIME_COMP_RGB = new RGB(218, 232, 238);
+    private static final RGB DEFAULT_RGB = new RGB(134, 176, 212);
+    private static final RGB DEFAULT_LIFELINE_HEADER_RGB = new RGB(129, 127, 137);
+    private static final RGB DEFAULT_FRAME_RGB = new RGB(0, 0, 0);
+    private static final RGB DEFAULT_LIFELINE_RGB = new RGB(129, 129, 129);
+    private static final RGB FOREGROUND_LIFELINE_RGB = new RGB(129, 129, 129);
+    private static final RGB FOREGROUND_FRAME_RGB = new RGB(81, 153, 200);
+    private static final RGB FOREGROUND_LIFELINE_HEADER_RGB = new RGB(129, 127, 137);
+    private static final RGB FOREGROUND_RGB = new RGB(134, 176, 212);
+    private static final RGB BACKGROUND_DEFAULT_RGB = new RGB(255, 255, 255);
+    private static final RGB BACKGROUND_LIFELINE_HEADER_RGB = new RGB(245, 244, 244);
+    private static final RGB BACKGROUND_LIFELINE_RGB = new RGB(220, 220, 220);
+    private static final RGB BACKGROUND_FRAME_RGB = new RGB(201, 222, 233);
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
@@ -64,7 +78,8 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
     /**
      * A 2nd array of preference names
      */
-    private static final String[] FONT_LIST2 = { Messages.SequenceDiagram_Lifeline, Messages.SequenceDiagram_ExecutionOccurrence, Messages.SequenceDiagram_SyncMessage, Messages.SequenceDiagram_SyncMessageReturn, Messages.SequenceDiagram_AsyncMessage, Messages.SequenceDiagram_AsyncMessageReturn, Messages.SequenceDiagram_Frame, Messages.SequenceDiagram_LifelineHeader, Messages.SequenceDiagram_FrameTitle };
+    private static final String[] FONT_LIST2 = { Messages.SequenceDiagram_Lifeline, Messages.SequenceDiagram_ExecutionOccurrence, Messages.SequenceDiagram_SyncMessage, Messages.SequenceDiagram_SyncMessageReturn,
+            Messages.SequenceDiagram_AsyncMessage, Messages.SequenceDiagram_AsyncMessageReturn, Messages.SequenceDiagram_Frame, Messages.SequenceDiagram_LifelineHeader, Messages.SequenceDiagram_FrameTitle };
     /**
      * Array of background color preference names
      */
@@ -79,6 +94,7 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
     private static final String[] PREF_TEXT_COLOR_LIST = { PREF_LIFELINE, PREF_SYNC_MESS, PREF_SYNC_MESS_RET, PREF_ASYNC_MESS, PREF_ASYNC_MESS_RET, PREF_LIFELINE_HEADER, PREF_FRAME_NAME };
     /**
      * Temporary tag
+     *
      * @since 2.0
      */
     public static final String TEMP_TAG = "_TEMP";//$NON-NLS-1$
@@ -126,8 +142,8 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
     // ------------------------------------------------------------------------
 
     /**
-     * Builds the Sequence Diagram preference handler: - Define the preference default values. - Load the currently used
-     * preferences setting
+     * Builds the Sequence Diagram preference handler: - Define the preference
+     * default values. - Load the currently used preferences setting
      */
     protected SDViewPref() {
         fPrefStore = Activator.getDefault().getPreferenceStore();
@@ -158,13 +174,13 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
         for (int i = 0; i < PREF_BACK_COLOR_LIST.length; i++) {
             IColor color;
             if ((PREF_BACK_COLOR_LIST[i].equals(PREF_EXEC)) || PREF_BACK_COLOR_LIST[i].equals(PREF_FRAME_NAME)) {
-                color = new ColorImpl(Display.getDefault(), 201, 222, 233);
+                color = new ColorImpl(Display.getDefault(), BACKGROUND_FRAME_RGB);
             } else if (PREF_BACK_COLOR_LIST[i].equals(PREF_LIFELINE)) {
-                color = new ColorImpl(Display.getDefault(), 220, 220, 220);
+                color = new ColorImpl(Display.getDefault(), BACKGROUND_LIFELINE_RGB);
             } else if (PREF_BACK_COLOR_LIST[i].equals(PREF_LIFELINE_HEADER)) {
-                color = new ColorImpl(Display.getDefault(), 245, 244, 244);
+                color = new ColorImpl(Display.getDefault(), BACKGROUND_LIFELINE_HEADER_RGB);
             } else {
-                color = new ColorImpl(Display.getDefault(), 255, 255, 255);
+                color = new ColorImpl(Display.getDefault(), BACKGROUND_DEFAULT_RGB);
             }
             PreferenceConverter.setDefault(fPrefStore, PREF_BACK_COLOR_LIST[i] + BACK_COLOR_POSTFIX, ((Color) color.getColor()).getRGB());
             PreferenceConverter.setDefault(fPrefStore, PREF_BACK_COLOR_LIST[i] + BACK_COLOR_POSTFIX + TEMP_TAG, ((Color) color.getColor()).getRGB());
@@ -174,13 +190,13 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
         for (int i = 0; i < PREF_FORE_COLOR_LIST.length; i++) {
             IColor color;
             if (PREF_FORE_COLOR_LIST[i].equals(PREF_LIFELINE)) {
-                color = new ColorImpl(Display.getDefault(), 129, 129, 129);
+                color = new ColorImpl(Display.getDefault(), FOREGROUND_LIFELINE_RGB);
             } else if (PREF_FORE_COLOR_LIST[i].equals(PREF_FRAME_NAME)) {
-                color = new ColorImpl(Display.getDefault(), 81, 153, 200);
+                color = new ColorImpl(Display.getDefault(), FOREGROUND_FRAME_RGB);
             } else if (PREF_FORE_COLOR_LIST[i].equals(PREF_LIFELINE_HEADER)) {
-                color = new ColorImpl(Display.getDefault(), 129, 127, 137);
+                color = new ColorImpl(Display.getDefault(), FOREGROUND_LIFELINE_HEADER_RGB);
             } else {
-                color = new ColorImpl(Display.getDefault(), 134, 176, 212);
+                color = new ColorImpl(Display.getDefault(), FOREGROUND_RGB);
             }
             PreferenceConverter.setDefault(fPrefStore, PREF_FORE_COLOR_LIST[i] + FORE_COLOR_POSTFIX, ((Color) color.getColor()).getRGB());
             PreferenceConverter.setDefault(fPrefStore, PREF_FORE_COLOR_LIST[i] + FORE_COLOR_POSTFIX + TEMP_TAG, ((Color) color.getColor()).getRGB());
@@ -190,20 +206,20 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
         for (int i = 0; i < PREF_TEXT_COLOR_LIST.length; i++) {
             IColor color;
             if (PREF_TEXT_COLOR_LIST[i].equals(PREF_LIFELINE)) {
-                color = new ColorImpl(Display.getDefault(), 129, 129, 129);
+                color = new ColorImpl(Display.getDefault(), DEFAULT_LIFELINE_RGB);
             } else if (PREF_TEXT_COLOR_LIST[i].equals(PREF_FRAME_NAME)) {
-                color = new ColorImpl(Display.getDefault(), 0, 0, 0);
+                color = new ColorImpl(Display.getDefault(), DEFAULT_FRAME_RGB);
             } else if (PREF_TEXT_COLOR_LIST[i].equals(PREF_LIFELINE_HEADER)) {
-                color = new ColorImpl(Display.getDefault(), 129, 127, 137);
+                color = new ColorImpl(Display.getDefault(), DEFAULT_LIFELINE_HEADER_RGB);
             } else {
-                color = new ColorImpl(Display.getDefault(), 134, 176, 212);
+                color = new ColorImpl(Display.getDefault(), DEFAULT_RGB);
             }
             PreferenceConverter.setDefault(fPrefStore, PREF_TEXT_COLOR_LIST[i] + TEXT_COLOR_POSTFIX, ((Color) color.getColor()).getRGB());
             PreferenceConverter.setDefault(fPrefStore, PREF_TEXT_COLOR_LIST[i] + TEXT_COLOR_POSTFIX + TEMP_TAG, ((Color) color.getColor()).getRGB());
             color.dispose();
         }
 
-        IColor color = new ColorImpl(Display.getDefault(), 218, 232, 238);
+        IColor color = new ColorImpl(Display.getDefault(), DEFAULT_TIME_COMP_RGB);
         PreferenceConverter.setDefault(fPrefStore, PREF_TIME_COMP, ((Color) color.getColor()).getRGB());
         color.dispose();
 
@@ -317,8 +333,9 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
     }
 
     /**
-     * Return true if the user do not want to take external time (basically found and lost messages with time) into
-     * account in the min max computation
+     * Return true if the user do not want to take external time (basically
+     * found and lost messages with time) into account in the min max
+     * computation
      *
      * @return true if checked false otherwise
      */
@@ -337,7 +354,8 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
     }
 
     /**
-     * Builds the new colors and fonts according the current user selection when the OK or Apply button is clicked
+     * Builds the new colors and fonts according the current user selection when
+     * the OK or Apply button is clicked
      */
     private void buildFontsAndColors() {
 

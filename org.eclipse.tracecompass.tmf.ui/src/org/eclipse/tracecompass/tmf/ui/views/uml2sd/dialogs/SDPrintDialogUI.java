@@ -253,6 +253,9 @@ public class SDPrintDialogUI {
      */
     private class LocalSD extends SDWidget {
 
+        private final RGB FOCUS_COLOR = new RGB(0, 0, 128);
+        private final RGB NON_FOCUS_COLOR = new RGB(221, 208, 200);
+
         /**
          * Constructor
          * @param c Parent composite
@@ -315,10 +318,10 @@ public class SDPrintDialogUI {
                     Image toDel = over;
                     if (fOverviewCanvas.isFocusControl()) {
                         over = new Image(super.getShell().getDisplay(), drawRegionSelected(toDel, new Rectangle(contentsToViewX((int) (row * stepX * fOverviewCanvas.getZoomValue())), contentsToViewY((int) (line * stepY * fOverviewCanvas.getZoomValue())),
-                                ((int) (stepX * fOverviewCanvas.getZoomValue())), ((int) (stepY * fOverviewCanvas.getZoomValue()))), new RGB(0, 0, 128)));
+                                ((int) (stepX * fOverviewCanvas.getZoomValue())), ((int) (stepY * fOverviewCanvas.getZoomValue()))), FOCUS_COLOR));
                     } else {
                         over = new Image(super.getShell().getDisplay(), drawRegionSelected(toDel, new Rectangle(contentsToViewX((int) (row * stepX * fOverviewCanvas.getZoomValue())), contentsToViewY((int) (line * stepY * fOverviewCanvas.getZoomValue())),
-                                ((int) (stepX * fOverviewCanvas.getZoomValue())), ((int) (stepY * fOverviewCanvas.getZoomValue()))), new RGB(221, 208, 200)));
+                                ((int) (stepX * fOverviewCanvas.getZoomValue())), ((int) (stepY * fOverviewCanvas.getZoomValue()))), NON_FOCUS_COLOR));
                     }
                     toDel.dispose();
                 }
@@ -340,7 +343,7 @@ public class SDPrintDialogUI {
 
                 Image toDel = over;
                 over = new Image(super.getShell().getDisplay(), drawRegionSelected(toDel, new Rectangle(contentsToViewX((int) (row * stepX * fOverviewCanvas.getZoomValue())), contentsToViewY((int) (line * stepY * fOverviewCanvas.getZoomValue())),
-                        ((int) (stepX * fOverviewCanvas.getZoomValue())), ((int) (stepY * fOverviewCanvas.getZoomValue()))), new RGB(221, 208, 200)));
+                        ((int) (stepX * fOverviewCanvas.getZoomValue())), ((int) (stepY * fOverviewCanvas.getZoomValue()))), NON_FOCUS_COLOR));
                 toDel.dispose();
             }
 
@@ -380,7 +383,7 @@ public class SDPrintDialogUI {
 
             if (!isEnabled()) {
                 Image toDel = d;
-                d = new Image(super.getShell().getDisplay(), drawRegionSelected(d, new Rectangle(0, 0, lw, lh), new RGB(221, 208, 200)));
+                d = new Image(super.getShell().getDisplay(), drawRegionSelected(d, new Rectangle(0, 0, lw, lh), NON_FOCUS_COLOR));
                 toDel.dispose();
             }
 
