@@ -13,6 +13,8 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.component;
 
+import java.util.concurrent.CountDownLatch;
+
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
@@ -55,13 +57,12 @@ public class TmfEventThread implements Runnable {
      */
     private final TmfEventThread  fThread;
 
+    private volatile CountDownLatch fLatch = new CountDownLatch(1);
+
     /**
      * The thread execution state
      */
     private volatile boolean isCompleted = false;
-
-    /** The synchronization object */
-    private final Object fSynchObject = new Object();
 
     /** The flag for suspending a thread */
     private volatile boolean fIsPaused = false;
@@ -185,15 +186,9 @@ public class TmfEventThread implements Runnable {
                 }
 
                 // Pause execution if requested
-
                 while (fIsPaused) {
-                    synchronized (fSynchObject) {
-                        try {
-                            fSynchObject.wait();
-                        } catch (InterruptedException e) {
-                            // continue
-                        }
-                    }
+                    CountDownLatch latch = fLatch;
+                    latch.await();
                 }
 
                 // To avoid an unnecessary read passed the last event requested
@@ -236,9 +231,11 @@ public class TmfEventThread implements Runnable {
      */
     public void resume() {
         fIsPaused = false;
-        synchronized (fSynchObject) {
-            fSynchObject.notifyAll();
-        }
+
+        CountDownLatch oldLatch = fLatch;
+        fLatch = new CountDownLatch(1);
+        oldLatch.countDown();
+
         TmfCoreTracer.traceRequest(fRequest.getRequestId(), "RESUMED"); //$NON-NLS-1$
     }
 
