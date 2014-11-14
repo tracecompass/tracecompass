@@ -60,6 +60,17 @@ import com.google.common.collect.ImmutableMap;
  */
 public class BtfTrace extends TmfTrace implements ITmfEventParser, ITmfPersistentlyIndexable, ITmfTraceProperties, AutoCloseable {
 
+    private static final int TIMESTAMP_NUM = 0;
+    private static final int SOURCE_NUM = 1;
+    private static final int SOURCE_INSTANCE_NUM = 2;
+    private static final int TYPE_NUM = 3;
+    private static final int TARGET_INSTANCE_NUM = 5;
+    private static final int TARGET_NUM = 4;
+    private static final int EVENT_NUM = 6;
+    private static final int MAX_FIELDS = 7;
+
+    private static final long MICROSECONDS_IN_A_SECOND = 1000000L;
+
     private static final String VERSION = "#version"; //$NON-NLS-1$
     private static final String CREATOR = "#creator"; //$NON-NLS-1$
     private static final String CREATIONDATE = "#creationDate"; //$NON-NLS-1$
@@ -138,7 +149,7 @@ public class BtfTrace extends TmfTrace implements ITmfEventParser, ITmfPersisten
 
                 try {
                     Date dateTime = ISO8601DATEFORMAT.parse(fCreationDate);
-                    fTsOffset = dateTime.getTime() * 1000000L;
+                    fTsOffset = dateTime.getTime() * MICROSECONDS_IN_A_SECOND;
                 } catch (ParseException e) {
                     Activator.logWarning("Creation date error: " + e.getMessage()); //$NON-NLS-1$
                 }
@@ -375,14 +386,14 @@ public class BtfTrace extends TmfTrace implements ITmfEventParser, ITmfPersisten
         if (line == null) {
             return null;
         }
-        String[] tokens = line.split(",", 7); //$NON-NLS-1$
-        long timestamp = Long.parseLong(tokens[0]);
-        String source = tokens[1];
-        long sourceInstance = Long.parseLong(tokens[2]);
-        BtfEventType type = BtfEventTypeFactory.parse(tokens[3]);
-        String target = tokens[4];
-        long targetInstance = Long.parseLong(tokens[5]);
-        String event = tokens[6];
+        String[] tokens = line.split(",", MAX_FIELDS); //$NON-NLS-1$
+        long timestamp = Long.parseLong(tokens[TIMESTAMP_NUM]);
+        String source = tokens[SOURCE_NUM];
+        long sourceInstance = Long.parseLong(tokens[SOURCE_INSTANCE_NUM]);
+        BtfEventType type = BtfEventTypeFactory.parse(tokens[TYPE_NUM]);
+        String target = tokens[TARGET_NUM];
+        long targetInstance = Long.parseLong(tokens[TARGET_INSTANCE_NUM]);
+        String event = tokens[EVENT_NUM];
 
         ITmfEventField content = type.generateContent(event, sourceInstance, targetInstance);
 
