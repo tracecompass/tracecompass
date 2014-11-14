@@ -276,7 +276,7 @@ public class EventHeaderDeclarationTest {
         buffer.putInt(0x80000042);
         byte[] validCompact1 = buffer.array();
 
-        EventHeaderCompactDeclaration decl = new EventHeaderCompactDeclaration(ByteOrder.BIG_ENDIAN);
+        EventHeaderCompactDeclaration decl = EventHeaderCompactDeclaration.getEventHeader(ByteOrder.BIG_ENDIAN);
         final ByteBuffer input = ByteBuffer.wrap(validCompact1);
         assertNotNull(input);
         EventHeaderDefinition def = decl.createDefinition(null, "bla", new BitBuffer(input));
@@ -299,7 +299,7 @@ public class EventHeaderDeclarationTest {
         buffer.putLong(TIMESTAMP);
         byte[] validCompact2 = buffer.array();
 
-        EventHeaderCompactDeclaration decl = new EventHeaderCompactDeclaration(ByteOrder.BIG_ENDIAN);
+        EventHeaderCompactDeclaration decl = EventHeaderCompactDeclaration.getEventHeader(ByteOrder.BIG_ENDIAN);
         final ByteBuffer input = ByteBuffer.wrap(validCompact2);
         assertNotNull(input);
         EventHeaderDefinition def = decl.createDefinition(null, "bla", new BitBuffer(input));
@@ -321,7 +321,7 @@ public class EventHeaderDeclarationTest {
         buffer.putInt(TIMESTAMP);
         byte[] validLarge1 = buffer.array();
 
-        EventHeaderLargeDeclaration decl = new EventHeaderLargeDeclaration(ByteOrder.BIG_ENDIAN);
+        EventHeaderLargeDeclaration decl = EventHeaderLargeDeclaration.getEventHeader(ByteOrder.BIG_ENDIAN);
         final ByteBuffer input = ByteBuffer.wrap(validLarge1);
         assertNotNull(input);
         EventHeaderDefinition def = decl.createDefinition(null, "bla", new BitBuffer(input));
@@ -346,7 +346,7 @@ public class EventHeaderDeclarationTest {
         buffer.putLong(TIMESTAMP);
         byte[] validLarge2 = buffer.array();
 
-        EventHeaderLargeDeclaration decl = new EventHeaderLargeDeclaration(ByteOrder.BIG_ENDIAN);
+        EventHeaderLargeDeclaration decl = EventHeaderLargeDeclaration.getEventHeader(ByteOrder.BIG_ENDIAN);
         final ByteBuffer input = ByteBuffer.wrap(validLarge2);
         assertNotNull(input);
         EventHeaderDefinition def = decl.createDefinition(null, "bla", new BitBuffer(input));
@@ -362,7 +362,7 @@ public class EventHeaderDeclarationTest {
      */
     @Test
     public void testMaxSizes() {
-        assertEquals(112, (new EventHeaderLargeDeclaration(ByteOrder.BIG_ENDIAN)).getMaximumSize());
-        assertEquals(104, (new EventHeaderCompactDeclaration(ByteOrder.BIG_ENDIAN)).getMaximumSize());
+        assertEquals(112, (EventHeaderLargeDeclaration.getEventHeader(ByteOrder.BIG_ENDIAN)).getMaximumSize());
+        assertEquals(104, (EventHeaderCompactDeclaration.getEventHeader(ByteOrder.BIG_ENDIAN)).getMaximumSize());
     }
 }

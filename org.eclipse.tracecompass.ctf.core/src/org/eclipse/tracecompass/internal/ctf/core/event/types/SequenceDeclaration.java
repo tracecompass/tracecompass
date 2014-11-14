@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.event.types.AbstractArrayDefinition;
@@ -47,7 +48,7 @@ public class SequenceDeclaration extends CompoundDeclaration {
 
     private final IDeclaration fElemType;
     private final String fLengthName;
-    private final Multimap<String, String> fPaths = ArrayListMultimap.create();
+    private final transient Multimap<String, String> fPaths = ArrayListMultimap.create();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -61,7 +62,7 @@ public class SequenceDeclaration extends CompoundDeclaration {
      * @param elemType
      *            The element type
      */
-    public SequenceDeclaration(String lengthName, IDeclaration elemType) {
+    public SequenceDeclaration(@Nullable String lengthName, IDeclaration elemType) {
         fElemType = elemType;
         fLengthName = lengthName;
     }
@@ -90,7 +91,7 @@ public class SequenceDeclaration extends CompoundDeclaration {
 
     @Override
     public AbstractArrayDefinition createDefinition(
-            IDefinitionScope definitionScope, String fieldName, BitBuffer input) throws CTFReaderException {
+            @Nullable IDefinitionScope definitionScope, String fieldName, BitBuffer input) throws CTFReaderException {
         IDefinition lenDef = null;
 
         if (definitionScope != null) {
@@ -130,11 +131,13 @@ public class SequenceDeclaration extends CompoundDeclaration {
         Builder<Definition> definitions = new ImmutableList.Builder<>();
         for (int i = 0; i < length; i++) {
             @SuppressWarnings("null")
-            @NonNull String elemName = paths.get(i);
+            @NonNull
+            String elemName = paths.get(i);
             definitions.add(fElemType.createDefinition(definitionScope, elemName, input));
         }
         @SuppressWarnings("null")
-        @NonNull ImmutableList<Definition> build = definitions.build();
+        @NonNull
+        ImmutableList<Definition> build = definitions.build();
         return new ArrayDefinition(this, definitionScope, fieldName, build);
     }
 

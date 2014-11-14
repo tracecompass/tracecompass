@@ -13,6 +13,8 @@ package org.eclipse.tracecompass.ctf.core.event.types;
 
 import java.nio.ByteOrder;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
@@ -25,6 +27,7 @@ import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
  * @version 1.0
  * @author Matthew Khouzam
  */
+@NonNullByDefault
 public final class FloatDeclaration extends Declaration implements ISimpleDatatypeDeclaration {
 
     // ------------------------------------------------------------------------
@@ -52,11 +55,15 @@ public final class FloatDeclaration extends Declaration implements ISimpleDataty
      * @param alignment
      *            The alignment. Should be &ge; 1
      */
-    public FloatDeclaration(int exponent, int mantissa, ByteOrder byteOrder,
+    public FloatDeclaration(int exponent, int mantissa, @Nullable ByteOrder byteOrder,
             long alignment) {
         fMantissa = mantissa;
         fExponent = exponent;
-        fByteOrder = byteOrder;
+        ByteOrder byteOrder2 = (byteOrder == null) ? ByteOrder.nativeOrder() : byteOrder;
+        if (byteOrder2 == null) {
+            throw new IllegalStateException("ByteOrder cannot be null"); //$NON-NLS-1$
+        }
+        fByteOrder = byteOrder2;
         fAlignement = Math.max(alignment, 1);
 
     }
@@ -107,7 +114,7 @@ public final class FloatDeclaration extends Declaration implements ISimpleDataty
      * @since 3.0
      */
     @Override
-    public FloatDefinition createDefinition(IDefinitionScope definitionScope,
+    public FloatDefinition createDefinition(@Nullable IDefinitionScope definitionScope,
             String fieldName, BitBuffer input) throws CTFReaderException {
         ByteOrder byteOrder = input.getByteOrder();
         input.setByteOrder(fByteOrder);

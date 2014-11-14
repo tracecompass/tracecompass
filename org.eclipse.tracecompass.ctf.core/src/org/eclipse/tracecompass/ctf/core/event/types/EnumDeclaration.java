@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
@@ -92,7 +93,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
      * @since 3.0
      */
     @Override
-    public EnumDefinition createDefinition(IDefinitionScope definitionScope, String fieldName, BitBuffer input) throws CTFReaderException {
+    public EnumDefinition createDefinition(@Nullable IDefinitionScope definitionScope, String fieldName, BitBuffer input) throws CTFReaderException {
         alignRead(input);
         IntegerDefinition value = getContainerType().createDefinition(definitionScope, fieldName, input);
         return new EnumDefinition(this, definitionScope, fieldName, value);
@@ -112,7 +113,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
      *            the name of the value.
      * @return was the value be added? true == success
      */
-    public boolean add(long low, long high, String label) {
+    public boolean add(long low, long high, @Nullable String label) {
         fLabels.add(label);
         return fTable.add(low, high, label);
     }
@@ -125,7 +126,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
      *            the value to lookup
      * @return the label of that value, can be null
      */
-    public String query(long value) {
+    public @Nullable String query(long value) {
         return fTable.query(value);
     }
 
@@ -150,7 +151,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
         public EnumTable() {
         }
 
-        public boolean add(long low, long high, String label) {
+        public boolean add(long low, long high, @Nullable String label) {
             LabelAndRange newRange = new LabelAndRange(low, high, label);
 
             for (LabelAndRange r : ranges) {
@@ -171,7 +172,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
          *            the value to query
          * @return the label corresponding to that value
          */
-        public String query(long value) {
+        public @Nullable String query(long value) {
             for (LabelAndRange r : ranges) {
                 if (r.intersects(value)) {
                     return r.getLabel();
@@ -185,18 +186,19 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
     private static class LabelAndRange {
 
         private final long low, high;
-        private final String fLabel;
+        private final @Nullable String fLabel;
 
         /**
          * Get the label
          *
          * @return the label
          */
+        @Nullable
         public String getLabel() {
             return fLabel;
         }
 
-        public LabelAndRange(long low, long high, String str) {
+        public LabelAndRange(long low, long high, @Nullable String str) {
             this.low = low;
             this.high = high;
             this.fLabel = str;
