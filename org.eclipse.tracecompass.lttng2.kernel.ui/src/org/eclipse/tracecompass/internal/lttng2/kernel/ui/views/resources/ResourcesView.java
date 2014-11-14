@@ -222,7 +222,16 @@ public class ResourcesView extends AbstractTimeGraphView {
 
         try {
             if (resourcesEntry.getType().equals(Type.CPU)) {
-                int statusQuark = ssq.getQuarkRelative(quark, Attributes.STATUS);
+                int statusQuark;
+                try {
+                    statusQuark = ssq.getQuarkRelative(quark, Attributes.STATUS);
+                } catch (AttributeNotFoundException e) {
+                    /*
+                     * The sub-attribute "status" is not available. May happen
+                     * if the trace does not have sched_switch events enabled.
+                     */
+                    return null;
+                }
                 List<ITmfStateInterval> statusIntervals = StateSystemUtils.queryHistoryRange(ssq, statusQuark, realStart, realEnd - 1, resolution, monitor);
                 eventList = new ArrayList<>(statusIntervals.size());
                 long lastEndTime = -1;
