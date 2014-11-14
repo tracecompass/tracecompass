@@ -11,11 +11,9 @@
 
 package org.eclipse.tracecompass.ctf.core.event.scope;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -175,7 +173,7 @@ public class LexicalScope implements Comparable<LexicalScope> {
     private int hash = 0;
     private final String fName;
     private final String fPath;
-    private final Map<String, LexicalScope> fChildren;
+    private final Map<String, LexicalScope> fChildren = new ConcurrentHashMap<>();
 
     /**
      * The scope constructor
@@ -206,10 +204,6 @@ public class LexicalScope implements Comparable<LexicalScope> {
         } else {
             fPath = ""; //$NON-NLS-1$
         }
-        @NonNull
-        Map<String, LexicalScope> children =
-                Collections.synchronizedMap(new HashMap<String, LexicalScope>());
-        fChildren = children;
     }
 
     /**
