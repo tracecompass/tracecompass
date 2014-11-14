@@ -2463,8 +2463,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 }
 
                 @Override
-                public void handleCompleted() {
-                    super.handleCompleted();
+                public void handleSuccess() {
+                    super.handleSuccess();
                     if (fTrace == null) {
                         return;
                     }
