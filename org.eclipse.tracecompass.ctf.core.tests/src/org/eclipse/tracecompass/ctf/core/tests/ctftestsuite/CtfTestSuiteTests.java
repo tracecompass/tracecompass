@@ -90,9 +90,7 @@ public class CtfTestSuiteTests {
         addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("stress", "metadata", "fail")), false);
         addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("stress", "metadata", "pass")), true);
         addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("stress", "stream", "fail")), false);
-
-        //FIXME Layout of the following directory is now different
-        //addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("stress", "stream", "pass")), true);
+        addDirsOneLevelDeepFrom(dirs, BASE_PATH.resolve(Paths.get("stress", "stream", "pass")), true);
 
         return dirs;
     }
@@ -110,6 +108,27 @@ public class CtfTestSuiteTests {
             }
         } catch (IOException e) {
             /* Something is wrong with the layout of the test suite? */
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Some test traces are not in pass/trace1, pass/trace2, etc. but rather
+     * pass/test1/trace1, pass/test1/trace2, etc.
+     *
+     * This methods adds the directories one level "down" instead of the very
+     * next level.
+     */
+    private static void addDirsOneLevelDeepFrom(List<Object[]> dirs, Path path,
+            boolean expectSuccess) {
+        if (!Files.exists(path)) {
+            return;
+        }
+        try (DirectoryStream<Path> ds = Files.newDirectoryStream(path, DIR_FILTER);) {
+            for (Path p : ds) {
+                addDirsFrom(dirs, p, expectSuccess);
+            }
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
