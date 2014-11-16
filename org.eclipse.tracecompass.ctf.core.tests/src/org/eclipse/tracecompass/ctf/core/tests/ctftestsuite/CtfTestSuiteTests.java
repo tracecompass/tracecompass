@@ -15,7 +15,11 @@ package org.eclipse.tracecompass.ctf.core.tests.ctftestsuite;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,7 +48,7 @@ public class CtfTestSuiteTests {
     @Rule
     public TestRule globalTimeout = new Timeout(10000);
 
-    private static final String BASE_PATH = "traces/ctf-testsuite/tests/1.8/";
+    private static final Path BASE_PATH = Paths.get("traces", "ctf-testsuite", "tests", "1.8");
 
     /**
      * Test we know are currently failing. Ignore them so we can at least run
@@ -52,9 +56,9 @@ public class CtfTestSuiteTests {
      *
      * TODO Actually fix them!
      */
-    private static final String[] IGNORED_TESTS = {
-            "regression/metadata/pass/sequence-typedef-length",
-            "regression/metadata/pass/array-of-struct"
+    private static final Path[] IGNORED_TESTS = {
+            BASE_PATH.resolve(Paths.get("regression", "metadata", "pass", "sequence-typedef-length")),
+            BASE_PATH.resolve(Paths.get("regression", "metadata", "pass", "array-of-struct"))
     };
 
     private final String fTracePath;
@@ -73,49 +77,60 @@ public class CtfTestSuiteTests {
     public static Iterable<Object[]> getTracePaths() {
         final List<Object[]> dirs = new LinkedList<>();
 
-        addDirsFrom(dirs, BASE_PATH + "fuzzing/metadata/fail", false);
-        addDirsFrom(dirs, BASE_PATH + "fuzzing/metadata/pass", true);
-        addDirsFrom(dirs, BASE_PATH + "fuzzing/stream/fail", false);
-        addDirsFrom(dirs, BASE_PATH + "fuzzing/stream/pass", true);
+        addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("fuzzing", "metadata", "fail")), false);
+        addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("fuzzing", "metadata", "pass")), true);
+        addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("fuzzing", "stream", "fail")), false);
+        addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("fuzzing", "stream", "pass")), true);
 
-        addDirsFrom(dirs, BASE_PATH + "regression/metadata/fail", false);
-        addDirsFrom(dirs, BASE_PATH + "regression/metadata/pass", true);
-        addDirsFrom(dirs, BASE_PATH + "regression/stream/fail", false);
-        addDirsFrom(dirs, BASE_PATH + "regression/stream/pass", true);
+        addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("regression", "metadata", "fail")), false);
+        addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("regression", "metadata", "pass")), true);
+        addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("regression", "stream", "fail")), false);
+        addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("regression", "stream", "pass")), true);
 
-        addDirsFrom(dirs, BASE_PATH + "stress/metadata/fail", false);
-        addDirsFrom(dirs, BASE_PATH + "stress/metadata/pass", true);
-        addDirsFrom(dirs, BASE_PATH + "stress/stream/fail", false);
-        addDirsFrom(dirs, BASE_PATH + "stress/stream/pass", true);
+        addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("stress", "metadata", "fail")), false);
+        addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("stress", "metadata", "pass")), true);
+        addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("stress", "stream", "fail")), false);
+
+        //FIXME Layout of the following directory is now different
+        //addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("stress", "stream", "pass")), true);
 
         return dirs;
     }
 
-    private static void addDirsFrom(List<Object[]> dirs, String path, boolean expectSuccess) {
-        File[] traceDirs = (new File(path)).listFiles();
-        if (traceDirs == null) {
+    private static void addDirsFrom(List<Object[]> dirs, Path path, boolean expectSuccess) {
+        if (!Files.exists(path)) {
+            /* Some planned directories may not exist yet in the test suite */
             return;
         }
-        for (File traceDir : traceDirs) {
-            /* Skip the "run.sh" files and blacklisted tests */
-            if (!traceDir.isDirectory() || testIsBlacklisted(traceDir.getPath())) {
-                continue;
+        try (DirectoryStream<Path> ds = Files.newDirectoryStream(path, DIR_FILTER);) {
+            for (Path p : ds) {
+                /* Add this test case to the list of tests to run */
+                Object array[] = new Object[] { p.toString(), expectSuccess };
+                dirs.add(array);
             }
-
-            /* Add this test case to the list of tests to run */
-            Object array[] = new Object[] { traceDir.getPath(), expectSuccess };
-            dirs.add(array);
+        } catch (IOException e) {
+            /* Something is wrong with the layout of the test suite? */
+            e.printStackTrace();
         }
     }
 
-    private static boolean testIsBlacklisted(String fullPath) {
-        for (String ignoredTest : IGNORED_TESTS) {
-            if (fullPath.contains(new File(ignoredTest).getPath())) {
-                return true;
-            }
-        }
-        return false;
-    }
+    private static final DirectoryStream.Filter<Path> DIR_FILTER =
+            new DirectoryStream.Filter<Path>() {
+                @Override
+                public boolean accept(Path entry) {
+                    /* Only accept directories and non-blacklisted tests */
+                    if (!Files.isDirectory(entry)) {
+                        return false;
+                    }
+                    for (Path ignoredTestPath : IGNORED_TESTS) {
+                        if (entry.equals(ignoredTestPath)) {
+                            System.err.println("Skipping test " + entry.toString() + " as requested.");
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            };
 
     // ------------------------------------------------------------------------
     // Test constructor
