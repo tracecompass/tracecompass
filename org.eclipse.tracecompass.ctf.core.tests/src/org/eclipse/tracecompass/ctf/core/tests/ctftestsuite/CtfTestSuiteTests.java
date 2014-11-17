@@ -58,7 +58,8 @@ public class CtfTestSuiteTests {
      */
     private static final Path[] IGNORED_TESTS = {
             BASE_PATH.resolve(Paths.get("regression", "metadata", "pass", "sequence-typedef-length")),
-            BASE_PATH.resolve(Paths.get("regression", "metadata", "pass", "array-of-struct"))
+            BASE_PATH.resolve(Paths.get("regression", "metadata", "pass", "array-of-struct")),
+            BASE_PATH.resolve(Paths.get("regression", "stream", "pass", "integer-large-size"))
     };
 
     private final String fTracePath;
@@ -88,7 +89,7 @@ public class CtfTestSuiteTests {
         addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("regression", "stream", "pass")), true);
 
         addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("stress", "metadata", "fail")), false);
-        addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("stress", "metadata", "pass")), true);
+        addDirsOneLevelDeepFrom(dirs, BASE_PATH.resolve(Paths.get("stress", "metadata", "pass")), true);
         addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("stress", "stream", "fail")), false);
         addDirsOneLevelDeepFrom(dirs, BASE_PATH.resolve(Paths.get("stress", "stream", "pass")), true);
 
