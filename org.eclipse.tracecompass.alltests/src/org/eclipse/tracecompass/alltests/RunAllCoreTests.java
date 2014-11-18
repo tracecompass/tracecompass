@@ -32,9 +32,6 @@ import org.junit.runners.Suite;
     org.eclipse.tracecompass.tmf.analysis.xml.core.tests.AllAnalysisXmlCoreTests.class,
     org.eclipse.tracecompass.tmf.core.tests.AllTmfCoreTests.class,
     org.eclipse.tracecompass.tmf.ctf.core.tests.AllTests.class,
-    org.eclipse.tracecompass.tmf.pcap.core.tests.AllTmfPcapCoreTests.class,
-    org.eclipse.tracecompass.tmf.analysis.xml.core.tests.AllAnalysisXmlCoreTests.class,
-    org.eclipse.tracecompass.tmf.ctf.core.tests.AllTests.class,
     org.eclipse.tracecompass.tmf.pcap.core.tests.AllTmfPcapCoreTests.class
 })
 public class RunAllCoreTests {
