@@ -193,7 +193,6 @@ public class CtfTmfTrace extends TmfTrace
     public synchronized void dispose() {
         fIteratorManager.dispose();
         if (fTrace != null) {
-            fTrace.close();
             fTrace = null;
         }
         super.dispose();
@@ -208,7 +207,8 @@ public class CtfTmfTrace extends TmfTrace
     @Override
     public IStatus validate(final IProject project, final String path) {
         IStatus status = new TraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID);
-        try (final CTFTrace temp = new CTFTrace(path);) {
+        try {
+            final CTFTrace temp = new CTFTrace(path);
             if (!temp.majorIsSet()) {
                 status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_MajorNotSet);
             } else {
@@ -527,7 +527,8 @@ public class CtfTmfTrace extends TmfTrace
             sessionName = getResource().getPersistentProperty(CtfConstants.LIVE_SESSION_NAME);
         } catch (CoreException e) {
             Activator.getDefault().logError(e.getMessage(), e);
-            // Something happened to the resource, assume we won't get any more data from it
+            // Something happened to the resource, assume we won't get any more
+            // data from it
             return true;
         }
         return host == null || port == null || sessionName == null;

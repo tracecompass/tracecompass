@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Ericsson
+ * Copyright (c) 2013, 2014 Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -217,7 +217,7 @@ public class EventDeclarationTest {
      */
     @Test
     public void testGetId() {
-        assertEquals(1,fixture.id());
+        assertEquals(1, fixture.id());
     }
 
     /**
@@ -315,59 +315,57 @@ public class EventDeclarationTest {
      */
     @Test
     public void testEventDefinition() throws CTFReaderException {
-        try (CTFTrace trace = testTrace.getTrace();) {
-            EventDefinition ed = null;
-            try (CTFTraceReader tr = new CTFTraceReader(trace);) {
-                tr.advance();
-                ed = tr.getCurrentEventDef();
-            }
-
-            assertNotNull(ed);
-            assertNotNull(ed.getScopePath());
-            assertNotNull(ed.getDeclaration());
-            assertNotNull(ed.getFields());
-            assertNull(ed.getContext());
-            assertNotNull(ed.getPacketContext());
-            assertNotNull(ed.getCPU());
-            assertNotNull(ed.getStreamInputReader());
-            assertNull(ed.lookupDefinition("context"));
-            assertNotNull(ed.lookupDefinition("fields"));
-            assertNull(ed.lookupDefinition("other"));
-            assertNotNull(ed.toString());
+        CTFTrace trace = testTrace.getTrace();
+        EventDefinition ed = null;
+        try (CTFTraceReader tr = new CTFTraceReader(trace);) {
+            tr.advance();
+            ed = tr.getCurrentEventDef();
         }
+
+        assertNotNull(ed);
+        assertNotNull(ed.getScopePath());
+        assertNotNull(ed.getDeclaration());
+        assertNotNull(ed.getFields());
+        assertNull(ed.getContext());
+        assertNotNull(ed.getPacketContext());
+        assertNotNull(ed.getCPU());
+        assertNotNull(ed.getStreamInputReader());
+        assertNull(ed.lookupDefinition("context"));
+        assertNotNull(ed.lookupDefinition("fields"));
+        assertNull(ed.lookupDefinition("other"));
+        assertNotNull(ed.toString());
     }
 
     EventDeclaration e1;
     EventDeclaration e2;
 
-
     @Test
-    public void testEquals1(){
+    public void testEquals1() {
         e1 = new EventDeclaration();
         assertFalse(e1.equals(null));
     }
 
     @Test
-    public void testEquals2(){
+    public void testEquals2() {
         e1 = EventDeclaration.getLostEventDeclaration();
         assertFalse(e1.equals(new Long(23L)));
     }
 
     @Test
-    public void testEquals3(){
+    public void testEquals3() {
         e1 = EventDeclaration.getLostEventDeclaration();
-        assertEquals(e1,e1);
+        assertEquals(e1, e1);
     }
 
     @Test
-    public void testEquals4(){
+    public void testEquals4() {
         e1 = EventDeclaration.getLostEventDeclaration();
         e2 = EventDeclaration.getLostEventDeclaration();
-        assertEquals(e1,e2);
+        assertEquals(e1, e2);
     }
 
     @Test
-    public void testEquals5(){
+    public void testEquals5() {
         e1 = EventDeclaration.getLostEventDeclaration();
         e2 = new EventDeclaration();
         assertFalse(e1.equals(e2));

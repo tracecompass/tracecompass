@@ -60,7 +60,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.types.ArrayDefinition;
  * @author Matthew Khouzam
  * @version $Revision: 1.0 $
  */
-public class CTFTrace implements IDefinitionScope, AutoCloseable {
+public class CTFTrace implements IDefinitionScope {
 
     @Override
     public String toString() {
@@ -212,17 +212,6 @@ public class CTFTrace implements IDefinitionScope, AutoCloseable {
                 addStream(s);
             }
         }
-    }
-
-    /**
-     * Dispose the trace
-     *
-     * FIXME Not needed anymore, class doesn't need to be AutoCloseable.
-     *
-     * @since 3.0
-     */
-    @Override
-    public void close() {
     }
 
     // ------------------------------------------------------------------------

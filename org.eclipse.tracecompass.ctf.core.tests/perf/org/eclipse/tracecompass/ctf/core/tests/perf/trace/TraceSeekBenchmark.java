@@ -32,14 +32,13 @@ import org.junit.Test;
 
 /**
  * Tests for performance regressions of the ctf reader. It only tests the ctf
- * reader, not tmf.
- * <br>
+ * reader, not tmf. <br>
  * This test runs in 3 passes.
  * <ul>
  * <li>first it opens a trace</li>
  * <li>then it reads the trace completely</li>
- * <li>then it randomly (seeded) seeks NB_SEEKS locations in the trace and reads one
- * event at each position.</li>
+ * <li>then it randomly (seeded) seeks NB_SEEKS locations in the trace and reads
+ * one event at each position.</li>
  * </ul>
  *
  * @author Matthew Khouzam
@@ -56,13 +55,16 @@ public class TraceSeekBenchmark {
 
     /**
      * Run the benchmark scenario for the trace "kernel"
+     *
+     * @throws CTFReaderException
+     *             Should not happen
      */
     @Test
-    public void testKernelTrace() {
+    public void testKernelTrace() throws CTFReaderException {
         readAndSeekTrace(CtfTestTrace.KERNEL, "trace-kernel", true);
     }
 
-    private static void readAndSeekTrace(CtfTestTrace testTrace, String testName, boolean inGlobalSummary) {
+    private static void readAndSeekTrace(CtfTestTrace testTrace, String testName, boolean inGlobalSummary) throws CTFReaderException {
         assumeTrue(testTrace.exists());
 
         Performance perf = Performance.getDefault();
@@ -74,8 +76,8 @@ public class TraceSeekBenchmark {
         }
 
         for (int loop = 0; loop < LOOP_COUNT; loop++) {
-            try (CTFTrace trace = testTrace.getTrace();
-                    CTFTraceReader traceReader = new CTFTraceReader(trace);) {
+            CTFTrace trace = testTrace.getTrace();
+            try (CTFTraceReader traceReader = new CTFTraceReader(trace);) {
 
                 /* Read the whole trace to find out the start and end times */
                 EventDefinition firstEvent = traceReader.getCurrentEventDef();

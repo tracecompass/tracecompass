@@ -30,7 +30,6 @@ import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.internal.ctf.core.event.EventDeclaration;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.IOStructGen;
-import org.junit.After;
 import org.junit.Test;
 
 /**
@@ -411,14 +410,6 @@ public class IOstructgenTest {
             e.printStackTrace();
         }
 
-    }
-
-    /**
-     * Close trace
-     */
-    @After
-    public void tearDown(){
-        trace.close();
     }
 
     /**

@@ -178,17 +178,19 @@ public class CtfTestSuiteTests {
      */
     @Test
     public void testTrace() {
-        try (/* Instantiate the trace (which implies parsing the metadata) */
-                CTFTrace trace = new CTFTrace(fTracePath);
-                /* Read the trace until the end */
-                CTFTraceReader reader = new CTFTraceReader(trace);) {
+        try {
+            /* Instantiate the trace (which implies parsing the metadata) */
+            CTFTrace trace = new CTFTrace(fTracePath);
+            /* Read the trace until the end */
+            try (CTFTraceReader reader = new CTFTraceReader(trace);) {
 
-            reader.getCurrentEventDef();
-            while (reader.advance()) {
-                assertNotNull(reader.getCurrentEventDef());
+                reader.getCurrentEventDef();
+                while (reader.advance()) {
+                    assertNotNull(reader.getCurrentEventDef());
+                }
+
+                checkIfWeShoudlSucceed();
             }
-
-            checkIfWeShoudlSucceed();
         } catch (CTFReaderException e) {
             checkIfWeShouldFail(e);
         } catch (OutOfMemoryError e) {

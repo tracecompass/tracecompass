@@ -67,16 +67,17 @@ public class TraceReadBenchmark {
 
         for (int loop = 0; loop < LOOP_COUNT; loop++) {
             pm.start();
-            try (CTFTrace trace = testTrace.getTrace();
-                    CTFTraceReader traceReader = new CTFTraceReader(trace);) {
+            try {
+                CTFTrace trace = testTrace.getTrace();
+                try (CTFTraceReader traceReader = new CTFTraceReader(trace);) {
 
-                while (traceReader.hasMoreEvents()) {
-                    EventDefinition ed = traceReader.getCurrentEventDef();
-                    /* Do something with the event */
-                    ed.getCPU();
-                    traceReader.advance();
+                    while (traceReader.hasMoreEvents()) {
+                        EventDefinition ed = traceReader.getCurrentEventDef();
+                        /* Do something with the event */
+                        ed.getCPU();
+                        traceReader.advance();
+                    }
                 }
-
             } catch (CTFReaderException e) {
                 /* Should not happen if assumeTrue() passed above */
                 fail("Test failed at iteration " + loop + ':' + e.getMessage());

@@ -49,8 +49,9 @@ public class LttngUstTrace extends CtfTmfTrace {
      * CTF trace in the "ust" domain.
      */
     @Override
-    public IStatus validate(final IProject project, final String path)  {
-        try (CTFTrace temp = new CTFTrace(path);) {
+    public IStatus validate(final IProject project, final String path) {
+        try {
+            CTFTrace temp = new CTFTrace(path);
             /* Make sure the domain is "ust" in the trace's env vars */
             String dom = temp.getEnvironment().get("domain"); //$NON-NLS-1$
             if (dom != null && dom.equals("\"ust\"")) { //$NON-NLS-1$

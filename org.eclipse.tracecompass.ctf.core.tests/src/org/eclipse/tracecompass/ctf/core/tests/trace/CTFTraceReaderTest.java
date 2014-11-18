@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Ericsson
+ * Copyright (c) 2013, 2014 Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -58,8 +58,8 @@ public class CTFTraceReaderTest {
      */
     @Test
     public void testOpen_existing() throws CTFReaderException {
-        try (CTFTrace trace = testTrace.getTrace();
-                CTFTraceReader result = new CTFTraceReader(trace);) {
+        CTFTrace trace = testTrace.getTrace();
+        try (CTFTraceReader result = new CTFTraceReader(trace);) {
             assertNotNull(result);
         }
     }
@@ -72,8 +72,8 @@ public class CTFTraceReaderTest {
      */
     @Test(expected = org.eclipse.tracecompass.ctf.core.trace.CTFReaderException.class)
     public void testOpen_nonexisting() throws CTFReaderException {
-        try (CTFTrace trace = new CTFTrace("badfile.bad");
-                CTFTraceReader result = new CTFTraceReader(trace);) {
+        CTFTrace trace = new CTFTrace("badfile.bad");
+        try (CTFTraceReader result = new CTFTraceReader(trace);) {
             assertNotNull(result);
         }
     }
@@ -86,15 +86,17 @@ public class CTFTraceReaderTest {
      */
     @Test(expected = org.eclipse.tracecompass.ctf.core.trace.CTFReaderException.class)
     public void testOpen_invalid() throws CTFReaderException {
-        try (CTFTrace trace = new CTFTrace("");
-                CTFTraceReader result = new CTFTraceReader(trace);) {
+        CTFTrace trace = new CTFTrace("");
+        try (CTFTraceReader result = new CTFTraceReader(trace);) {
             assertNotNull(result);
         }
     }
 
     /**
      * Run the boolean advance() method test. Test advancing normally.
-     * @throws CTFReaderException error
+     *
+     * @throws CTFReaderException
+     *             error
      */
     @Test
     public void testAdvance_normal() throws CTFReaderException {
@@ -105,7 +107,9 @@ public class CTFTraceReaderTest {
     /**
      * Run the boolean advance() method test. Test advancing when we're at the
      * end, so we expect that there is no more events.
-     * @throws CTFReaderException error
+     *
+     * @throws CTFReaderException
+     *             error
      */
     @Test
     public void testAdvance_end() throws CTFReaderException {
@@ -130,7 +134,9 @@ public class CTFTraceReaderTest {
 
     /**
      * Run the CTFTraceReader copy constructor test.
-     * @throws CTFReaderException error
+     *
+     * @throws CTFReaderException
+     *             error
      */
     @Test
     public void testCopyFrom() throws CTFReaderException {
@@ -177,7 +183,9 @@ public class CTFTraceReaderTest {
     /**
      * Run the getCurrentEventDef() method test. Get the last event's
      * definition.
-     * @throws CTFReaderException error
+     *
+     * @throws CTFReaderException
+     *             error
      */
     @Test
     public void testGetCurrentEventDef_last() throws CTFReaderException {
@@ -206,7 +214,9 @@ public class CTFTraceReaderTest {
 
     /**
      * Run the void goToLastEvent() method test.
-     * @throws CTFReaderException error
+     *
+     * @throws CTFReaderException
+     *             error
      */
     @Test
     public void testGoToLastEvent() throws CTFReaderException {
@@ -229,7 +239,9 @@ public class CTFTraceReaderTest {
 
     /**
      * Run the void printStats() method test with no 'width' parameter.
-     * @throws CTFReaderException error
+     *
+     * @throws CTFReaderException
+     *             error
      */
     @Test
     public void testPrintStats_noparam() throws CTFReaderException {
@@ -239,7 +251,9 @@ public class CTFTraceReaderTest {
 
     /**
      * Run the void printStats(int) method test with width = 0.
-     * @throws CTFReaderException error
+     *
+     * @throws CTFReaderException
+     *             error
      */
     @Test
     public void testPrintStats_width0() throws CTFReaderException {
@@ -249,7 +263,9 @@ public class CTFTraceReaderTest {
 
     /**
      * Run the void printStats(int) method test with width = 1.
-     * @throws CTFReaderException error
+     *
+     * @throws CTFReaderException
+     *             error
      */
     @Test
     public void testPrintStats_width1() throws CTFReaderException {
@@ -259,7 +275,9 @@ public class CTFTraceReaderTest {
 
     /**
      * Run the void printStats(int) method test with width = 2.
-     * @throws CTFReaderException error
+     *
+     * @throws CTFReaderException
+     *             error
      */
     @Test
     public void testPrintStats_width2() throws CTFReaderException {
@@ -269,7 +287,9 @@ public class CTFTraceReaderTest {
 
     /**
      * Run the void printStats(int) method test with width = 10.
-     * @throws CTFReaderException error
+     *
+     * @throws CTFReaderException
+     *             error
      */
     @Test
     public void testPrintStats_width10() throws CTFReaderException {
@@ -279,7 +299,9 @@ public class CTFTraceReaderTest {
 
     /**
      * Run the void printStats(int) method test with width = 100.
-     * @throws CTFReaderException error
+     *
+     * @throws CTFReaderException
+     *             error
      */
     @Test
     public void testPrintStats_100() throws CTFReaderException {
@@ -291,7 +313,9 @@ public class CTFTraceReaderTest {
 
     /**
      * Run the boolean seek(long) method test.
-     * @throws CTFReaderException error
+     *
+     * @throws CTFReaderException
+     *             error
      */
     @Test
     public void testSeek() throws CTFReaderException {
@@ -299,8 +323,6 @@ public class CTFTraceReaderTest {
         boolean result = fixture.seek(timestamp);
         assertTrue(result);
     }
-
-
 
     /**
      * @return

@@ -126,7 +126,8 @@ public class LttngKernelTrace extends CtfTmfTrace {
          * Make sure the trace is openable as a CTF trace. We do this here
          * instead of calling super.validate() to keep the reference to "temp".
          */
-        try (CTFTrace temp = new CTFTrace(path);) {
+        try {
+            CTFTrace temp = new CTFTrace(path);
             /* Make sure the domain is "kernel" in the trace's env vars */
             String dom = temp.getEnvironment().get("domain"); //$NON-NLS-1$
             if (dom != null && dom.startsWith("\"kernel")) { //$NON-NLS-1$
