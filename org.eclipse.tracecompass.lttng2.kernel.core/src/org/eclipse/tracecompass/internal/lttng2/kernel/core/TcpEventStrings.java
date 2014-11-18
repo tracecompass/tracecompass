@@ -15,9 +15,9 @@ package org.eclipse.tracecompass.internal.lttng2.kernel.core;
 /**
  * This file defines all the known event and field names used to trace socket
  * connection for both the addons module method (
- * {@link org.eclipse.tracecompass.lttng2.kernel.core.event.matching.TcpEventMatching}
+ * {@link org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpEventMatching}
  * ) and the net_data_experimental branch (
- * {@link org.eclipse.tracecompass.lttng2.kernel.core.event.matching.TcpLttngEventMatching}
+ * {@link org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpLttngEventMatching}
  * ).
  *
  * These events should be eventually mainlined and when this happens, this class

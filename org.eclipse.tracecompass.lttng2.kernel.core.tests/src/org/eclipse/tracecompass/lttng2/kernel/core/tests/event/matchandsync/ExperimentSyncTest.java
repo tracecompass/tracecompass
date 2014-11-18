@@ -15,8 +15,8 @@ package org.eclipse.tracecompass.lttng2.kernel.core.tests.event.matchandsync;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeTrue;
 
-import org.eclipse.tracecompass.lttng2.kernel.core.event.matching.TcpEventMatching;
-import org.eclipse.tracecompass.lttng2.kernel.core.event.matching.TcpLttngEventMatching;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpEventMatching;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpLttngEventMatching;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.tracecompass.tmf.core.synchronization.SynchronizationAlgorithm;

@@ -24,8 +24,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.tracecompass.lttng2.kernel.core.event.matching.TcpEventMatching;
-import org.eclipse.tracecompass.lttng2.kernel.core.event.matching.TcpLttngEventMatching;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpEventMatching;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpLttngEventMatching;
 import org.eclipse.tracecompass.tmf.core.event.matching.IMatchProcessingUnit;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfNetworkEventMatching;

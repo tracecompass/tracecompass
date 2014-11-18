@@ -15,8 +15,8 @@ package org.eclipse.tracecompass.internal.lttng2.kernel.core;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.tracecompass.lttng2.kernel.core.event.matching.TcpEventMatching;
-import org.eclipse.tracecompass.lttng2.kernel.core.event.matching.TcpLttngEventMatching;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpEventMatching;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpLttngEventMatching;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching;
 import org.osgi.framework.BundleContext;
 

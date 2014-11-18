@@ -10,7 +10,7 @@
  *   Geneviève Bastien - Initial implementation and API
  *******************************************************************************/
 
-package org.eclipse.tracecompass.lttng2.kernel.core.event.matching;
+package org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +23,8 @@ import org.eclipse.tracecompass.tmf.core.event.matching.ITmfNetworkMatchDefiniti
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching.MatchingType;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfNetworkEventMatching.Direction;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceWithPreDefinedEvents;
 import org.eclipse.tracecompass.tmf.core.trace.TmfEventTypeCollectionHelper;
-import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -38,7 +38,6 @@ import com.google.common.collect.ImmutableSet;
  * TMF, no code from this module is being used here
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class TcpEventMatching implements ITmfNetworkMatchDefinition {
 
@@ -94,10 +93,10 @@ public class TcpEventMatching implements ITmfNetworkMatchDefinition {
 
     @Override
     public boolean canMatchTrace(ITmfTrace trace) {
-        if (!(trace instanceof CtfTmfTrace)) {
-            return false;
+        if (!(trace instanceof ITmfTraceWithPreDefinedEvents)) {
+            return true;
         }
-        CtfTmfTrace ktrace = (CtfTmfTrace) trace;
+        ITmfTraceWithPreDefinedEvents ktrace = (ITmfTraceWithPreDefinedEvents) trace;
 
         Set<String> traceEvents = TmfEventTypeCollectionHelper.getEventNames(ktrace.getContainedEventTypes());
         traceEvents.retainAll(REQUIRED_EVENTS);
