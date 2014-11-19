@@ -1835,6 +1835,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 if (rect.width == 1) {
                     gc.drawPoint(rect.x, rect.y - 2);
                 }
+                fTimeGraphProvider.postDrawEvent(event, rect, gc);
                 return false;
             }
             Color stateColor = null;
