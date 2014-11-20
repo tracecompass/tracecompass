@@ -9,15 +9,17 @@
  *     Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.ctf.core.tests.trace;
+package org.eclipse.tracecompass.ctf.core.tests.perf.trace;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import java.util.Random;
 import java.util.TreeSet;
 
+import org.eclipse.test.performance.Dimension;
+import org.eclipse.test.performance.Performance;
+import org.eclipse.test.performance.PerformanceMeter;
 import org.eclipse.tracecompass.ctf.core.CTFReaderException;
 import org.eclipse.tracecompass.ctf.core.event.CTFCallsite;
 import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
@@ -31,6 +33,9 @@ import org.junit.Test;
  * @author Matthew Khouzam
  */
 public class CTFTraceCallsitePerformanceTest {
+
+    private static final String TEST_SUITE_NAME = "CTF Callsite Benchmark";
+    private static final String TEST_ID = "org.eclipse.linuxtools#" + TEST_SUITE_NAME;
 
     private static final CtfTestTrace testTrace = CtfTestTrace.KERNEL;
 
@@ -59,18 +64,23 @@ public class CTFTraceCallsitePerformanceTest {
 
     /**
      * main, launches the tests.
-     * @param args not read
+     *
+     * @param args
+     *            not read
      */
     public static void main(String[] args) {
         new org.junit.runner.JUnitCore().run(CTFTraceCallsitePerformanceTest.class);
     }
 
-
     /**
      * sets up the test by making a new trace.
-     * @throws CTFReaderException an exception from the reader
-     * @throws SecurityException an exception from accessing files illegally
-     * @throws IllegalArgumentException an exception for passing bad values
+     *
+     * @throws CTFReaderException
+     *             an exception from the reader
+     * @throws SecurityException
+     *             an exception from accessing files illegally
+     * @throws IllegalArgumentException
+     *             an exception for passing bad values
      */
     @Before
     public void setup() throws CTFReaderException, SecurityException,
@@ -94,7 +104,7 @@ public class CTFTraceCallsitePerformanceTest {
         return array[rnd.nextInt(array.length)];
     }
 
-    private long testMain() {
+    private void testMain(PerformanceMeter pm) {
         TreeSet<CTFCallsite> l = fTrace.getCallsiteCandidates(callsites[0]);
         CTFCallsite cs = fTrace.getCallsite(1);
         CTFCallsite cs1 = fTrace.getCallsite(callsites[0]);
@@ -104,21 +114,22 @@ public class CTFTraceCallsitePerformanceTest {
         assertNotNull(cs1);
         assertNotNull(cs2);
         /* performance test */
-        long start = System.nanoTime();
+        pm.start();
         perfTest();
-        long end = System.nanoTime();
-        long diff = end - start;
-        assertTrue(diff > 0);
-        return diff;
+        pm.stop();
     }
 
     /**
      * @param callsiteSize
      */
     private void test(int callsiteSize) {
+        String testName = "Test" + callsiteSize + " callsites";
         addCallsites(callsiteSize);
-        long ns = testMain();
-        System.out.println( "perf ( " + callsiteSize + ", " + ns + ")");
+        Performance perf = Performance.getDefault();
+        PerformanceMeter pm = perf.createPerformanceMeter(TEST_ID + '#' + testName);
+        perf.tagAsSummary(pm, TEST_SUITE_NAME + ':' + callsiteSize + " callsites", Dimension.CPU_TIME);
+        testMain(pm);
+        pm.commit();
     }
 
     private void perfTest() {
@@ -132,6 +143,7 @@ public class CTFTraceCallsitePerformanceTest {
      */
     @Test
     public void test1KCallsites() {
+
         test(1000);
     }
 
@@ -199,4 +211,3 @@ public class CTFTraceCallsitePerformanceTest {
         test(2000000);
     }
 }
-
