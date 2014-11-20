@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.tests.stubs.trace.xml;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 
 /**
@@ -24,9 +25,9 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.messages"; //$NON-NLS-1$
 
-    public static String TmfDevelopmentTrace_FileNotFound;
-    public static String TmfDevelopmentTrace_IoError;
-    public static String TmfDevelopmentTrace_ValidationError;
+    public static @Nullable String TmfDevelopmentTrace_FileNotFound;
+    public static @Nullable String TmfDevelopmentTrace_IoError;
+    public static @Nullable String TmfDevelopmentTrace_ValidationError;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

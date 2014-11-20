@@ -1,17 +1,29 @@
 <trace>
-<event timestamp="1" name="A" source="1">
+<event timestamp="0" name="set_aspects">
+<field name="cpu" value="1" type="int" />
+<field name="test" value="abc" type="string" />
+</event>
+<event timestamp="1" name="A">
+<field name="cpu" value="1" type="int" />
+<field name="test" value="abc" type="string" />
 <field name="b" value="1" type="int" />
 <field name="d" value="3" type="int" />
 </event>
-<event timestamp="3" name="B" source="2">
+<event timestamp="3" name="B">
+<field name="cpu" value="1" type="int" />
+<field name="test" value="abc" type="string" />
 <field name="f" value="c" type="string" />
 <field name="g" value="e" type="string" />
 </event>
-<event timestamp="4" name="A" source="1">
+<event timestamp="4" name="A">
+<field name="cpu" value="2" type="int" />
+<field name="test" value="def" type="string" />
 <field name="b" value="3" type="int" />
 <field name="d" value="7" type="int" />
 </event>
-<event timestamp="5" name="B" source="2">
+<event timestamp="5" name="B">
+<field name="cpu" value="1" type="int" />
+<field name="test" value="def" type="string" />
 <field name="f" value="c" type="string" />
 <field name="g" value="e" type="string" />
 </event>

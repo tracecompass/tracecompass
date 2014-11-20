@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.tmf.core.tests.trace.stub;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -29,11 +30,14 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub;
 import org.junit.Test;
@@ -122,6 +126,60 @@ public class XmlStubTraceTest {
             fail(e.getMessage());
         }
         assertEquals(4, req.getCount());
+    }
+
+    /**
+     * Test the presence and resolve of the aspects for this trace
+     */
+    @Test
+    public void testAspects() {
+        TmfXmlTraceStub trace = new TmfXmlTraceStub();
+        IStatus status = trace.validate(null, getAbsolutePath(VALID_FILE).toOSString());
+        if (!status.isOK()) {
+            fail(status.getException().getMessage());
+        }
+
+        try {
+            trace.initTrace(null, getAbsolutePath(VALID_FILE).toOSString(), TmfEvent.class);
+        } catch (TmfTraceException e1) {
+            fail(e1.getMessage());
+        }
+
+        ITmfEventAspect cpuAspect = null;
+        ITmfEventAspect testAspect = null;
+        int aspectCount = 0;
+        for (ITmfEventAspect aspect : trace.getEventAspects()) {
+            aspectCount++;
+            if (aspect instanceof TmfCpuAspect) {
+                cpuAspect = aspect;
+            } else if (aspect.getName().equals("test")) {
+                testAspect = aspect;
+            }
+        }
+        /* Check the presence of the cpu and test aspects */
+        assertEquals("Number of aspects", 5, aspectCount);
+        assertNotNull(cpuAspect);
+        assertNotNull(testAspect);
+
+        ITmfContext ctx;
+        ctx = trace.seekEvent(0L);
+        assertNotNull(ctx);
+        ITmfEvent event = trace.getNext(ctx);
+        assertNotNull(event);
+        assertEquals("Cpu aspect of event 1", 1, cpuAspect.resolve(event));
+        assertEquals("Test aspect of event 1", "abc", testAspect.resolve(event));
+        event = trace.getNext(ctx);
+        assertNotNull(event);
+        assertEquals("Cpu aspect of event 2", 1, cpuAspect.resolve(event));
+        assertEquals("Test aspect of event 2", "abc", testAspect.resolve(event));
+        event = trace.getNext(ctx);
+        assertNotNull(event);
+        assertEquals("Cpu aspect of event 3", 2, cpuAspect.resolve(event));
+        assertEquals("Test aspect of event 3", "def", testAspect.resolve(event));
+        event = trace.getNext(ctx);
+        assertNotNull(event);
+        assertEquals("Cpu aspect of event 4", 1, cpuAspect.resolve(event));
+        assertEquals("Test aspect of event 4", "def", testAspect.resolve(event));
     }
 
     private static IStatus testEvent(ITmfEvent event) {

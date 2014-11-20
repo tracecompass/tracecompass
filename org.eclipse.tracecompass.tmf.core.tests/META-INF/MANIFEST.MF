@@ -18,4 +18,5 @@ Export-Package: org.eclipse.tracecompass.tmf.core.tests,
  org.eclipse.tracecompass.tmf.core.tests.shared,
  org.eclipse.tracecompass.tmf.tests.stubs.trace,
  org.eclipse.tracecompass.tmf.tests.stubs.trace.xml
-Import-Package: com.google.common.collect
+Import-Package: com.google.common.collect,
+ com.google.common.primitives;version="15.0.0"

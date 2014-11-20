@@ -8,9 +8,6 @@
 <Attribute name="name">
 <InputData action="0" format="" name="Message"/>
 </Attribute>
-<Attribute name="source">
-<InputData action="0" format="" name="source"/>
-</Attribute>
 <Attribute name="timestamp">
 <InputData action="0" format="T" name="Time Stamp"/>
 </Attribute>
