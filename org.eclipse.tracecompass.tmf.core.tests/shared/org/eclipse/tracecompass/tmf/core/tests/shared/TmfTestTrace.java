@@ -44,11 +44,11 @@ public enum TmfTestTrace {
     /** And oh! a fifth trace */
     R_TEST_10K("R-Test-10K");
 
-    private final String fPath;
+    private final @NonNull String fPath;
     private final String fDirectory = "../org.eclipse.tracecompass.tmf.core.tests/testfiles";
     private ITmfTrace fTrace = null;
 
-    private TmfTestTrace(String file) {
+    private TmfTestTrace(@NonNull String file) {
         fPath = file;
     }
 
@@ -57,7 +57,7 @@ public enum TmfTestTrace {
      *
      * @return The path of this trace
      */
-    public String getPath() {
+    public @NonNull String getPath() {
         return fPath;
     }
 

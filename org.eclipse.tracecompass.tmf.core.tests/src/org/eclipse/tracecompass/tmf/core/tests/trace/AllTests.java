@@ -24,6 +24,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     TmfContextTest.class,
     TmfExperimentTest.class,
+    TmfExperimentUtilsTest.class,
     TmfMultiTraceExperimentTest.class,
     TmfTraceTest.class
 })
