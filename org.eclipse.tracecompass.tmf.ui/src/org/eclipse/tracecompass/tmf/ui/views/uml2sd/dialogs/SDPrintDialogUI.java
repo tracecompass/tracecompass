@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation, Ericsson
+ * Copyright (c) 2005, 2014 IBM Corporation, Ericsson
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM - Initial API and implementation
  *     Bernd Hufmann - Updated for TMF
+ *     Matthew Khouzam - Minor refactor
  **********************************************************************/
 
 package org.eclipse.tracecompass.tmf.ui.views.uml2sd.dialogs;
@@ -59,6 +60,10 @@ import org.eclipse.tracecompass.tmf.ui.views.uml2sd.util.Messages;
  * @author sveyrier
  */
 public class SDPrintDialogUI {
+
+    private static final RGB FOCUS_COLOR = new RGB(0, 0, 128);
+    private static final RGB NON_FOCUS_COLOR = new RGB(221, 208, 200);
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -99,7 +104,7 @@ public class SDPrintDialogUI {
      */
     private Text fToPage;
     /**
-     *  The sequence diagram widget reference.
+     * The sequence diagram widget reference.
      */
     private SDWidget fSdView;
     /**
@@ -248,18 +253,20 @@ public class SDPrintDialogUI {
     // Helper Class
     // ------------------------------------------------------------------------
     /**
-     * Local sequence diagram widget used to display overview of sequence diagram to print.
+     * Local sequence diagram widget used to display overview of sequence
+     * diagram to print.
+     *
      * @version 1.0
      */
     private class LocalSD extends SDWidget {
 
-        private final RGB FOCUS_COLOR = new RGB(0, 0, 128);
-        private final RGB NON_FOCUS_COLOR = new RGB(221, 208, 200);
-
         /**
          * Constructor
-         * @param c Parent composite
-         * @param s Style bits
+         *
+         * @param c
+         *            Parent composite
+         * @param s
+         *            Style bits
          */
         public LocalSD(Composite c, int s) {
             super(c, s);
@@ -288,11 +295,16 @@ public class SDPrintDialogUI {
         /**
          * Creates page selection images.
          *
-         * @param img - Overview image
-         * @param width -The width value
-         * @param stepX - Step X
-         * @param height - Height value
-         * @param stepY - Step Y
+         * @param img
+         *            - Overview image
+         * @param width
+         *            -The width value
+         * @param stepX
+         *            - Step X
+         * @param height
+         *            - Height value
+         * @param stepY
+         *            - Step Y
          * @return new image
          */
         protected Image createPagesSelectionImages(Image img, int width, float stepX, int height, float stepY) {
@@ -317,11 +329,13 @@ public class SDPrintDialogUI {
 
                     Image toDel = over;
                     if (fOverviewCanvas.isFocusControl()) {
-                        over = new Image(super.getShell().getDisplay(), drawRegionSelected(toDel, new Rectangle(contentsToViewX((int) (row * stepX * fOverviewCanvas.getZoomValue())), contentsToViewY((int) (line * stepY * fOverviewCanvas.getZoomValue())),
-                                ((int) (stepX * fOverviewCanvas.getZoomValue())), ((int) (stepY * fOverviewCanvas.getZoomValue()))), FOCUS_COLOR));
+                        over = new Image(super.getShell().getDisplay(), drawRegionSelected(toDel,
+                                new Rectangle(contentsToViewX((int) (row * stepX * fOverviewCanvas.getZoomValue())), contentsToViewY((int) (line * stepY * fOverviewCanvas.getZoomValue())),
+                                        ((int) (stepX * fOverviewCanvas.getZoomValue())), ((int) (stepY * fOverviewCanvas.getZoomValue()))), FOCUS_COLOR));
                     } else {
-                        over = new Image(super.getShell().getDisplay(), drawRegionSelected(toDel, new Rectangle(contentsToViewX((int) (row * stepX * fOverviewCanvas.getZoomValue())), contentsToViewY((int) (line * stepY * fOverviewCanvas.getZoomValue())),
-                                ((int) (stepX * fOverviewCanvas.getZoomValue())), ((int) (stepY * fOverviewCanvas.getZoomValue()))), NON_FOCUS_COLOR));
+                        over = new Image(super.getShell().getDisplay(), drawRegionSelected(toDel,
+                                new Rectangle(contentsToViewX((int) (row * stepX * fOverviewCanvas.getZoomValue())), contentsToViewY((int) (line * stepY * fOverviewCanvas.getZoomValue())),
+                                        ((int) (stepX * fOverviewCanvas.getZoomValue())), ((int) (stepY * fOverviewCanvas.getZoomValue()))), NON_FOCUS_COLOR));
                     }
                     toDel.dispose();
                 }
@@ -704,7 +718,7 @@ public class SDPrintDialogUI {
                     fPageNum = 1;
                     fFirstPage = 1;
                 } else if ((fOverviewCanvas.isEnabled() && (e.widget == fPageList)) &&
-                           (fPagesList == null || fPagesList.length <= 0)) {
+                        (fPagesList == null || fPagesList.length <= 0)) {
 
                     fPagesList = new int[1];
                     fPagesList[0] = 1;
@@ -745,7 +759,8 @@ public class SDPrintDialogUI {
     /**
      * Creates new grid data object.
      *
-     * @param span horizontal span.
+     * @param span
+     *            horizontal span.
      * @return grid data
      */
     protected GridData newGridData(int span) {
@@ -757,7 +772,8 @@ public class SDPrintDialogUI {
     /**
      * Creates the dialog area.
      *
-     * @param parent The parent composite
+     * @param parent
+     *            The parent composite
      * @return dialog control
      */
     public Control createDialogArea(Composite parent) {
@@ -971,6 +987,7 @@ public class SDPrintDialogUI {
 
     /**
      * Get number of pages for selection.
+     *
      * @return number of pages for selection.
      */
     public int getPagesForSelection() {
@@ -1018,9 +1035,13 @@ public class SDPrintDialogUI {
 
     /**
      * Draws region that was selected
-     * @param img The corresponding image
-     * @param r The selected rectangle.
-     * @param color The color to use for selection
+     *
+     * @param img
+     *            The corresponding image
+     * @param r
+     *            The selected rectangle.
+     * @param color
+     *            The color to use for selection
      * @return image data reference
      */
     public ImageData drawRegionSelected(Image img, Rectangle r, RGB color) {
@@ -1038,8 +1059,11 @@ public class SDPrintDialogUI {
 
     /**
      * Combines two RGB colors.
-     * @param front The front color
-     * @param back The back color
+     *
+     * @param front
+     *            The front color
+     * @param back
+     *            The back color
      * @return new RGB color
      */
     public static RGB combine(RGB front, RGB back) {
@@ -1229,7 +1253,8 @@ public class SDPrintDialogUI {
     /**
      * Returns whether to print selected pages.
      *
-     * @return <code>true</code> for selected pages only else <code>false</code>.
+     * @return <code>true</code> for selected pages only else <code>false</code>
+     *         .
      */
     public boolean printSelection() {
         return fPrintSelection;
@@ -1238,7 +1263,8 @@ public class SDPrintDialogUI {
     /**
      * Returns whether to print range of pages.
      *
-     * @return <code>true</code> for range of pages only else <code>false</code>.
+     * @return <code>true</code> for range of pages only else <code>false</code>
+     *         .
      */
     public boolean printRange() {
         return fPrintRange;
@@ -1321,7 +1347,8 @@ public class SDPrintDialogUI {
     /**
      * Sets the shell.
      *
-     * @param shell The shell reference.
+     * @param shell
+     *            The shell reference.
      */
     public void setShell(Shell shell) {
         fShell = shell;
@@ -1380,7 +1407,8 @@ public class SDPrintDialogUI {
     /**
      * Sets parent wizard page
      *
-     * @param parent The parent wizard page
+     * @param parent
+     *            The parent wizard page
      */
     public void setParentWizardPage(WizardPage parent) {
         fParentWizardPage = parent;
@@ -1389,7 +1417,8 @@ public class SDPrintDialogUI {
     /**
      * Sets the parent dialog box.
      *
-     * @param parent The parent dialog box.
+     * @param parent
+     *            The parent dialog box.
      */
     public void setParentDialog(SDPrintDialog parent) {
         fParentDialog = parent;
