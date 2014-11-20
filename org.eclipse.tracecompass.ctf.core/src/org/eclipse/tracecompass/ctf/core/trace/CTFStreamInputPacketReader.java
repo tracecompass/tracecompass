@@ -248,9 +248,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
              */
             ByteBuffer bb = null;
             try {
-                bb = getByteBufferAt(
-                        fCurrentPacket.getOffsetBytes(),
-                        (fCurrentPacket.getPacketSizeBits() + BITS_PER_BYTE - 1) / BITS_PER_BYTE);
+                bb = getByteBufferAt(fCurrentPacket.getOffsetBytes(), (fCurrentPacket.getPacketSizeBits() + BITS_PER_BYTE - 1) / BITS_PER_BYTE);
             } catch (IOException e) {
                 throw new CTFReaderException(e.getMessage(), e);
             }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson, Ecole Polytechnique de Montreal and others
+ * Copyright (c) 2011, 2015 Ericsson, Ecole Polytechnique de Montreal and others
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -15,6 +15,13 @@ package org.eclipse.tracecompass.internal.ctf.core.trace;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.tracecompass.ctf.core.event.types.EnumDefinition;
+import org.eclipse.tracecompass.ctf.core.event.types.FloatDefinition;
+import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
+import org.eclipse.tracecompass.ctf.core.event.types.IntegerDefinition;
+import org.eclipse.tracecompass.ctf.core.event.types.StringDefinition;
+import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
+
 /**
  * <b><u>StreamInputPacketIndexEntry</u></b>
  * <p>
@@ -22,50 +29,52 @@ import java.util.Map;
  */
 public class StreamInputPacketIndexEntry {
 
+    private static final int UNKNOWN = -1;
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
     /**
-     * Offset of the packet in the file, in bytes
+     * Position of the start of the packet header in the file, in bits
+     */
+    private final long fOffsetBits;
+
+    /**
+     * Position of the start of the packet header in the file, in bytes
      */
     private final long fOffsetBytes;
 
     /**
-     * Offset of the data in the packet, in bits
-     */
-    private long fDataOffsetBits = 0;
-
-    /**
      * Packet size, in bits
      */
-    private long fPacketSizeBits = 0;
+    private final long fPacketSizeBits;
 
     /**
      * Content size, in bits
      */
-    private long fContentSizeBits = 0;
+    private final long fContentSizeBits;
 
     /**
      * Begin timestamp
      */
-    private long fTimestampBegin = 0;
+    private final long fTimestampBegin;
 
     /**
      * End timestamp
      */
-    private long fTimestampEnd = 0;
+    private final long fTimestampEnd;
 
     /**
      * How many lost events are there?
      */
-    private long fLostEvents = 0;
+    private final long fLostEvents;
 
     /**
      * Which target is being traced
      */
-    private String fTarget;
-    private long fTargetID;
+    private final String fTarget;
+    private final long fTargetID;
 
     /**
      * Attributes of this index entry
@@ -79,12 +88,114 @@ public class StreamInputPacketIndexEntry {
     /**
      * Constructs an index entry.
      *
-     * @param offset
-     *            The offset of the packet in the file, in bytes.
+     * @param dataOffsetBits
+     *            offset in the file for the start of data in bits
+     * @param fileSizeBytes
+     *            number of bytes in a file
      */
 
-    public StreamInputPacketIndexEntry(long offset) {
-        fOffsetBytes = offset;
+    public StreamInputPacketIndexEntry(long dataOffsetBits, long fileSizeBytes) {
+        fContentSizeBits = (fileSizeBytes * Byte.SIZE);
+        fPacketSizeBits = (fileSizeBytes * Byte.SIZE);
+        fOffsetBits = dataOffsetBits;
+        fOffsetBytes = dataOffsetBits / Byte.SIZE;
+        fLostEvents = 0;
+        fTarget = ""; //$NON-NLS-1$
+        fTargetID = 0;
+        fTimestampBegin = Long.MIN_VALUE;
+        fTimestampEnd = Long.MAX_VALUE;
+    }
+
+    /**
+     * full Constructor
+     *
+     * @param dataOffsetBits
+     *            offset in the file for the start of data in bits
+     * @param streamPacketContextDef
+     *            packet context
+     * @param fileSizeBytes
+     *            number of bytes in a file
+     * @param lostSoFar
+     *            number of lost events so far
+     */
+    public StreamInputPacketIndexEntry(long dataOffsetBits, StructDefinition streamPacketContextDef, long fileSizeBytes, long lostSoFar) {
+        for (String field : streamPacketContextDef.getDeclaration().getFieldsList()) {
+            IDefinition id = streamPacketContextDef.lookupDefinition(field);
+            if (id instanceof IntegerDefinition) {
+                addAttribute(field, ((IntegerDefinition) id).getValue());
+            } else if (id instanceof FloatDefinition) {
+                addAttribute(field, ((FloatDefinition) id).getValue());
+            } else if (id instanceof EnumDefinition) {
+                addAttribute(field, ((EnumDefinition) id).getValue());
+            } else if (id instanceof StringDefinition) {
+                addAttribute(field, ((StringDefinition) id).getValue());
+            }
+        }
+
+        Long contentSize = (Long) this.lookupAttribute("content_size"); //$NON-NLS-1$
+        Long packetSize = (Long) this.lookupAttribute("packet_size"); //$NON-NLS-1$
+        Long tsBegin = (Long) this.lookupAttribute("timestamp_begin"); //$NON-NLS-1$
+        Long tsEnd = (Long) this.lookupAttribute("timestamp_end"); //$NON-NLS-1$
+        String device = (String) this.lookupAttribute("device"); //$NON-NLS-1$
+        // LTTng Specific
+        Long cpuId = (Long) this.lookupAttribute("cpu_id"); //$NON-NLS-1$
+        Long lostEvents = (Long) this.lookupAttribute("events_discarded"); //$NON-NLS-1$
+
+        /* Read the content size in bits */
+        if (contentSize != null) {
+            fContentSizeBits = (contentSize.longValue());
+        } else if (packetSize != null) {
+            fContentSizeBits = (packetSize.longValue());
+        } else {
+            fContentSizeBits = (fileSizeBytes * Byte.SIZE);
+        }
+
+        /* Read the packet size in bits */
+        if (packetSize != null) {
+            fPacketSizeBits = (packetSize.longValue());
+        } else if (this.getContentSizeBits() != 0) {
+            fPacketSizeBits = (getContentSizeBits());
+        } else {
+            fPacketSizeBits = (fileSizeBytes * Byte.SIZE);
+        }
+
+        /* Read the begin timestamp */
+        if (tsBegin != null) {
+            fTimestampBegin = (tsBegin.longValue());
+        } else {
+            fTimestampBegin = Long.MIN_VALUE;
+        }
+
+        /* Read the end timestamp */
+        if (tsEnd != null) {
+            // check if tsEnd == unsigned long max value
+            if (tsEnd == -1) {
+                tsEnd = Long.MAX_VALUE;
+            }
+            fTimestampEnd = (tsEnd.longValue());
+        } else {
+            fTimestampEnd = Long.MAX_VALUE;
+        }
+
+        if (device != null) {
+            fTarget = device;
+            fTargetID = Integer.parseInt(device.replaceAll("[\\D]", "")); //$NON-NLS-1$ //$NON-NLS-2$ // slow
+        } else if (cpuId != null) {
+            fTarget = ("CPU" + cpuId.toString()); //$NON-NLS-1$
+            fTargetID = cpuId;
+        } else {
+            fTarget = null;
+            fTargetID = UNKNOWN;
+        }
+
+        if (lostEvents != null) {
+            fLostEvents = (lostEvents - lostSoFar);
+        } else {
+            fLostEvents = 0;
+        }
+
+        fOffsetBits = dataOffsetBits;
+        fOffsetBytes = dataOffsetBits / Byte.SIZE;
     }
 
     // ------------------------------------------------------------------------
@@ -99,13 +210,13 @@ public class StreamInputPacketIndexEntry {
      *            The timestamp to check.
      * @return True if the packet includes the timestamp.
      */
-    boolean includes(long ts) {
+    public boolean includes(long ts) {
         return (ts >= fTimestampBegin) && (ts <= fTimestampEnd);
     }
 
     @Override
     public String toString() {
-        return "StreamInputPacketIndexEntry [offsetBytes=" + fOffsetBytes //$NON-NLS-1$
+        return "StreamInputPacketIndexEntry [offsetBits=" + fOffsetBits //$NON-NLS-1$
                 + ", timestampBegin=" + fTimestampBegin + ", timestampEnd=" //$NON-NLS-1$ //$NON-NLS-2$
                 + fTimestampEnd + "]"; //$NON-NLS-1$
     }
@@ -117,23 +228,8 @@ public class StreamInputPacketIndexEntry {
     /**
      * @return the offsetBytes
      */
-    public long getOffsetBytes() {
-        return fOffsetBytes;
-    }
-
-    /**
-     * @return the dataOffsetBits
-     */
-    public long getDataOffsetBits() {
-        return fDataOffsetBits;
-    }
-
-    /**
-     * @param dataOffsetBits
-     *            the dataOffsetBits to set
-     */
-    public void setDataOffsetBits(long dataOffsetBits) {
-        fDataOffsetBits = dataOffsetBits;
+    public long getOffsetBits() {
+        return fOffsetBits;
     }
 
     /**
@@ -144,26 +240,10 @@ public class StreamInputPacketIndexEntry {
     }
 
     /**
-     * @param packetSizeBits
-     *            the packetSizeBits to set
-     */
-    public void setPacketSizeBits(long packetSizeBits) {
-        fPacketSizeBits = packetSizeBits;
-    }
-
-    /**
      * @return the contentSizeBits
      */
     public long getContentSizeBits() {
         return fContentSizeBits;
-    }
-
-    /**
-     * @param contentSizeBits
-     *            the contentSizeBits to set
-     */
-    public void setContentSizeBits(long contentSizeBits) {
-        fContentSizeBits = contentSizeBits;
     }
 
     /**
@@ -174,14 +254,6 @@ public class StreamInputPacketIndexEntry {
     }
 
     /**
-     * @param timestampBegin
-     *            the timestampBegin to set
-     */
-    public void setTimestampBegin(long timestampBegin) {
-        fTimestampBegin = timestampBegin;
-    }
-
-    /**
      * @return the timestampEnd
      */
     public long getTimestampEnd() {
@@ -189,26 +261,10 @@ public class StreamInputPacketIndexEntry {
     }
 
     /**
-     * @param timestampEnd
-     *            the timestampEnd to set
-     */
-    public void setTimestampEnd(long timestampEnd) {
-        fTimestampEnd = timestampEnd;
-    }
-
-    /**
      * @return the lostEvents in this packet
      */
     public long getLostEvents() {
         return fLostEvents;
-    }
-
-    /**
-     * @param lostEvents
-     *            the lostEvents to set
-     */
-    public void setLostEvents(long lostEvents) {
-        fLostEvents = lostEvents;
     }
 
     /**
@@ -242,20 +298,17 @@ public class StreamInputPacketIndexEntry {
     }
 
     /**
-     * Assign a target to this index entry
-     *
-     * @param target
-     *            The target to assign
-     */
-    public void setTarget(String target) {
-        fTarget = target;
-        fTargetID = Integer.parseInt(target.replaceAll("[\\D]", "")); //$NON-NLS-1$ //$NON-NLS-2$ // slow
-    }
-
-    /**
      * @return The ID of the target
      */
     public long getTargetId() {
         return fTargetID;
+    }
+
+    /**
+     * Get the offset of the packet in bytes
+     * @return The offset of the packet in bytes
+     */
+    public long getOffsetBytes() {
+        return fOffsetBytes;
     }
 }
