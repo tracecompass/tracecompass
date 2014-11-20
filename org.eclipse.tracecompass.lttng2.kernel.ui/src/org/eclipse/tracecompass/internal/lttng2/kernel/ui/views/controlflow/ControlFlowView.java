@@ -29,6 +29,7 @@ import org.eclipse.tracecompass.internal.lttng2.kernel.core.Attributes;
 import org.eclipse.tracecompass.internal.lttng2.kernel.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.kernel.ui.Messages;
 import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelAnalysis;
+import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelThreadInformationProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -40,6 +41,7 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -413,13 +415,12 @@ public class ControlFlowView extends AbstractTimeGraphView {
         if (realEnd <= realStart) {
             return null;
         }
-        ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(entry.getTrace(), LttngKernelAnalysis.ID);
-        if (ssq == null) {
+        LttngKernelAnalysis kernelAnalysis = TmfTraceUtils.getAnalysisModuleOfClass(entry.getTrace(), LttngKernelAnalysis.class, LttngKernelAnalysis.ID);
+        if (kernelAnalysis == null) {
             return null;
         }
         try {
-            int statusQuark = ssq.getQuarkRelative(entry.getThreadQuark(), Attributes.STATUS);
-            List<ITmfStateInterval> statusIntervals = StateSystemUtils.queryHistoryRange(ssq, statusQuark, realStart, realEnd - 1, resolution, monitor);
+            List<ITmfStateInterval> statusIntervals = LttngKernelThreadInformationProvider.getStatusIntervalsForThread(kernelAnalysis, entry.getThreadId(), realStart, realEnd, resolution, monitor);
             eventList = new ArrayList<>(statusIntervals.size());
             long lastEndTime = -1;
             for (ITmfStateInterval statusInterval : statusIntervals) {
@@ -440,10 +441,8 @@ public class ControlFlowView extends AbstractTimeGraphView {
                 eventList.add(new TimeEvent(entry, time, duration, status));
                 lastEndTime = time + duration;
             }
-        } catch (AttributeNotFoundException | TimeRangeException e) {
-            e.printStackTrace();
-        } catch (StateSystemDisposedException e) {
-            /* Ignored */
+        } catch (TimeRangeException e) {
+            Activator.getDefault().logError(e.getMessage());
         }
         return eventList;
     }

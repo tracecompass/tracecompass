@@ -171,7 +171,7 @@ public interface ITmfStateSystem {
      * @throws AttributeNotFoundException
      *             If the quark was not existing or invalid.
      */
-    List<Integer> getSubAttributes(int quark, boolean recursive)
+    @NonNull List<Integer> getSubAttributes(int quark, boolean recursive)
             throws AttributeNotFoundException;
 
     /**

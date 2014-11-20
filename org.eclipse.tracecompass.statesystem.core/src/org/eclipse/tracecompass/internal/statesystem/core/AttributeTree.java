@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 
 /**
@@ -317,7 +318,7 @@ public final class AttributeTree {
      *             If 'attributeQuark' is invalid, or if there is no attrbiute
      *             associated to it.
      */
-    public List<Integer> getSubAttributes(int attributeQuark, boolean recursive)
+    public @NonNull List<Integer> getSubAttributes(int attributeQuark, boolean recursive)
             throws AttributeNotFoundException {
         List<Integer> listOfChildren = new ArrayList<>();
         Attribute startingAttribute;
