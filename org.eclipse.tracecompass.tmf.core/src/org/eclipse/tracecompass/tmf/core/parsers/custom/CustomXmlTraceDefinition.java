@@ -101,7 +101,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
     private static final String OUTPUT_COLUMN_ELEMENT = Messages.CustomXmlTraceDefinition_outputColumn;
 
     /** Top-level input element */
-    public InputElement rootInputElement;
+    public CustomXmlInputElement rootInputElement;
 
     /**
      * Default constructor
@@ -121,10 +121,11 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
      *            The list of output columns
      * @param timeStampOutputFormat
      *            The timestamp format to use
-     * @deprecated Use {@link #CustomXmlTraceDefinition(String, String, InputElement, List, String)}
+     * @deprecated Use
+     *             {@link #CustomXmlTraceDefinition(String, String, CustomXmlInputElement, List, String)}
      */
     @Deprecated
-    public CustomXmlTraceDefinition(String traceType, InputElement rootElement,
+    public CustomXmlTraceDefinition(String traceType, CustomXmlInputElement rootElement,
             List<OutputColumn> outputs, String timeStampOutputFormat) {
         this.definitionName = traceType;
         this.rootInputElement = rootElement;
@@ -147,199 +148,13 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
      *            The timestamp format to use
      * @since 3.2
      */
-    public CustomXmlTraceDefinition(String category, String traceType, InputElement rootElement,
+    public CustomXmlTraceDefinition(String category, String traceType, CustomXmlInputElement rootElement,
             List<OutputColumn> outputs, String timeStampOutputFormat) {
         this.categoryName = category;
         this.definitionName = traceType;
         this.rootInputElement = rootElement;
         this.outputs = outputs;
         this.timeStampOutputFormat = timeStampOutputFormat;
-    }
-
-    /**
-     * Wrapper for input XML elements
-     */
-    public static class InputElement {
-
-        /** Name of the element */
-        public String elementName;
-
-        /** Indicates if this is a log entry */
-        public boolean logEntry;
-
-        /** Name of the input element */
-        public String inputName;
-
-        /** Input action */
-        public int inputAction;
-
-        /** Input format */
-        public String inputFormat;
-
-        /** XML attributes of this element */
-        public List<InputAttribute> attributes;
-
-        /** Parent element */
-        public InputElement parentElement;
-
-        /** Following element in the file */
-        public InputElement nextElement;
-
-        /** Child elements */
-        public List<InputElement> childElements;
-
-        /**
-         * Default (empty) constructor
-         */
-        public InputElement() {
-        }
-
-        /**
-         * Constructor
-         *
-         * @param elementName
-         *            Element name
-         * @param logEntry
-         *            If this element is a log entry
-         * @param inputName
-         *            Name of the the input
-         * @param inputAction
-         *            Input action
-         * @param inputFormat
-         *            Input format
-         * @param attributes
-         *            XML attributes of this element
-         */
-        public InputElement(String elementName, boolean logEntry,
-                String inputName, int inputAction, String inputFormat,
-                List<InputAttribute> attributes) {
-            this.elementName = elementName;
-            this.logEntry = logEntry;
-            this.inputName = inputName;
-            this.inputAction = inputAction;
-            this.inputFormat = inputFormat;
-            this.attributes = attributes;
-        }
-
-        /**
-         * Add a XML attribute to the element
-         *
-         * @param attribute
-         *            The attribute to add
-         */
-        public void addAttribute(InputAttribute attribute) {
-            if (attributes == null) {
-                attributes = new ArrayList<>(1);
-            }
-            attributes.add(attribute);
-        }
-
-        /**
-         * Add a child element to this one.
-         *
-         * @param input
-         *            The input element to add as child
-         */
-        public void addChild(InputElement input) {
-            if (childElements == null) {
-                childElements = new ArrayList<>(1);
-            } else if (childElements.size() > 0) {
-                InputElement last = childElements.get(childElements.size() - 1);
-                last.nextElement = input;
-            }
-            childElements.add(input);
-            input.parentElement = this;
-        }
-
-        /**
-         * Set the following input element.
-         *
-         * @param input
-         *            The input element to add as next element
-         */
-        public void addNext(InputElement input) {
-            if (parentElement != null) {
-                int index = parentElement.childElements.indexOf(this);
-                parentElement.childElements.add(index + 1, input);
-                InputElement next = nextElement;
-                nextElement = input;
-                input.nextElement = next;
-            }
-            input.parentElement = this.parentElement;
-        }
-
-        /**
-         * Move this element up in its parent's list of children.
-         */
-        public void moveUp() {
-            if (parentElement != null) {
-                int index = parentElement.childElements.indexOf(this);
-                if (index > 0) {
-                    parentElement.childElements.add(index - 1, parentElement.childElements.remove(index));
-                    parentElement.childElements.get(index).nextElement = nextElement;
-                    nextElement = parentElement.childElements.get(index);
-                }
-            }
-        }
-
-        /**
-         * Move this element down in its parent's list of children.
-         */
-        public void moveDown() {
-            if (parentElement != null) {
-                int index = parentElement.childElements.indexOf(this);
-                if (index < parentElement.childElements.size() - 1) {
-                    parentElement.childElements.add(index + 1, parentElement.childElements.remove(index));
-                    nextElement = parentElement.childElements.get(index).nextElement;
-                    parentElement.childElements.get(index).nextElement = this;
-                }
-            }
-        }
-
-    }
-
-    /**
-     * Wrapper for XML element attributes
-     */
-    public static class InputAttribute {
-
-        /** Name of the XML attribute */
-        public String attributeName;
-
-        /** Input name */
-        public String inputName;
-
-        /** Input action */
-        public int inputAction;
-
-        /** Input format */
-        public String inputFormat;
-
-        /**
-         * Default (empty) constructor
-         */
-        public InputAttribute() {
-        }
-
-        /**
-         * Constructor
-         *
-         * @param attributeName
-         *            Name of the XML attribute
-         * @param inputName
-         *            Input name
-         * @param inputAction
-         *            Input action
-         * @param inputFormat
-         *            Input format
-         */
-        public InputAttribute(String attributeName, String inputName,
-                int inputAction, String inputFormat) {
-            this.attributeName = attributeName;
-            this.inputName = inputName;
-            this.inputAction = inputAction;
-            this.inputFormat = inputFormat;
-        }
     }
 
     @Override
@@ -419,41 +234,41 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
         }
     }
 
-    private Element createInputElementElement(InputElement inputElement, Document doc) {
+    private Element createInputElementElement(CustomXmlInputElement inputElement, Document doc) {
         Element inputElementElement = doc.createElement(INPUT_ELEMENT_ELEMENT);
-        inputElementElement.setAttribute(NAME_ATTRIBUTE, inputElement.elementName);
+        inputElementElement.setAttribute(NAME_ATTRIBUTE, inputElement.getElementName());
 
-        if (inputElement.logEntry) {
-            inputElementElement.setAttribute(LOG_ENTRY_ATTRIBUTE, Boolean.toString(inputElement.logEntry));
+        if (inputElement.isLogEntry()) {
+            inputElementElement.setAttribute(LOG_ENTRY_ATTRIBUTE, Boolean.toString(inputElement.isLogEntry()));
         }
 
-        if (inputElement.parentElement != null) {
+        if (inputElement.getParentElement() != null) {
             Element inputDataElement = doc.createElement(INPUT_DATA_ELEMENT);
             inputElementElement.appendChild(inputDataElement);
-            inputDataElement.setAttribute(NAME_ATTRIBUTE, inputElement.inputName);
-            inputDataElement.setAttribute(ACTION_ATTRIBUTE, Integer.toString(inputElement.inputAction));
-            if (inputElement.inputFormat != null) {
-                inputDataElement.setAttribute(FORMAT_ATTRIBUTE, inputElement.inputFormat);
+            inputDataElement.setAttribute(NAME_ATTRIBUTE, inputElement.getInputName());
+            inputDataElement.setAttribute(ACTION_ATTRIBUTE, Integer.toString(inputElement.getInputAction()));
+            if (inputElement.getInputFormat() != null) {
+                inputDataElement.setAttribute(FORMAT_ATTRIBUTE, inputElement.getInputFormat());
             }
         }
 
-        if (inputElement.attributes != null) {
-            for (InputAttribute attribute : inputElement.attributes) {
+        if (inputElement.getAttributes() != null) {
+            for (CustomXmlInputAttribute attribute : inputElement.getAttributes()) {
                 Element inputAttributeElement = doc.createElement(ATTRIBUTE_ELEMENT);
                 inputElementElement.appendChild(inputAttributeElement);
-                inputAttributeElement.setAttribute(NAME_ATTRIBUTE, attribute.attributeName);
+                inputAttributeElement.setAttribute(NAME_ATTRIBUTE, attribute.getAttributeName());
                 Element inputDataElement = doc.createElement(INPUT_DATA_ELEMENT);
                 inputAttributeElement.appendChild(inputDataElement);
-                inputDataElement.setAttribute(NAME_ATTRIBUTE, attribute.inputName);
-                inputDataElement.setAttribute(ACTION_ATTRIBUTE, Integer.toString(attribute.inputAction));
-                if (attribute.inputFormat != null) {
-                    inputDataElement.setAttribute(FORMAT_ATTRIBUTE, attribute.inputFormat);
+                inputDataElement.setAttribute(NAME_ATTRIBUTE, attribute.getInputName());
+                inputDataElement.setAttribute(ACTION_ATTRIBUTE, Integer.toString(attribute.getInputAction()));
+                if (attribute.getInputFormat() != null) {
+                    inputDataElement.setAttribute(FORMAT_ATTRIBUTE, attribute.getInputFormat());
                 }
             }
         }
 
-        if (inputElement.childElements != null) {
-            for (InputElement childInputElement : inputElement.childElements) {
+        if (inputElement.getChildElements() != null) {
+            for (CustomXmlInputElement childInputElement : inputElement.getChildElements()) {
                 inputElementElement.appendChild(createInputElementElement(childInputElement, doc));
             }
         }
@@ -710,7 +525,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
                 Element formatElement = (Element) node;
                 def.timeStampOutputFormat = formatElement.getTextContent();
             } else if (nodeName.equals(INPUT_ELEMENT_ELEMENT)) {
-                InputElement inputElement = extractInputElement((Element) node);
+                CustomXmlInputElement inputElement = extractInputElement((Element) node);
                 if (inputElement != null) {
                     if (def.rootInputElement == null) {
                         def.rootInputElement = inputElement;
@@ -728,38 +543,41 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
         return def;
     }
 
-    private static InputElement extractInputElement(Element inputElementElement) {
-        InputElement inputElement = new InputElement();
-        inputElement.elementName = inputElementElement.getAttribute(NAME_ATTRIBUTE);
-        inputElement.logEntry = (Boolean.toString(true).equals(inputElementElement.getAttribute(LOG_ENTRY_ATTRIBUTE))) ? true : false;
+    private static CustomXmlInputElement extractInputElement(Element inputElementElement) {
+        CustomXmlInputElement inputElement = new CustomXmlInputElement();
+        inputElement.setElementName(inputElementElement.getAttribute(NAME_ATTRIBUTE));
+        inputElement.setLogEntry((Boolean.toString(true).equals(inputElementElement.getAttribute(LOG_ENTRY_ATTRIBUTE))) ? true : false);
         NodeList nodeList = inputElementElement.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
             String nodeName = node.getNodeName();
             if (nodeName.equals(INPUT_DATA_ELEMENT)) {
                 Element inputDataElement = (Element) node;
-                inputElement.inputName = inputDataElement.getAttribute(NAME_ATTRIBUTE);
-                inputElement.inputAction = Integer.parseInt(inputDataElement.getAttribute(ACTION_ATTRIBUTE));
-                inputElement.inputFormat = inputDataElement.getAttribute(FORMAT_ATTRIBUTE);
+                inputElement.setInputName(inputDataElement.getAttribute(NAME_ATTRIBUTE));
+                inputElement.setInputAction(Integer.parseInt(inputDataElement.getAttribute(ACTION_ATTRIBUTE)));
+                inputElement.setInputFormat(inputDataElement.getAttribute(FORMAT_ATTRIBUTE));
             } else if (nodeName.equals(ATTRIBUTE_ELEMENT)) {
                 Element attributeElement = (Element) node;
-                InputAttribute attribute = new InputAttribute();
-                attribute.attributeName = attributeElement.getAttribute(NAME_ATTRIBUTE);
+
+                String attributeName = attributeElement.getAttribute(NAME_ATTRIBUTE);
+                String inputName = null;
+                int inputAction = 0;
+                String inputFormat = null;
                 NodeList attributeNodeList = attributeElement.getChildNodes();
                 for (int j = 0; j < attributeNodeList.getLength(); j++) {
                     Node attributeNode = attributeNodeList.item(j);
                     String attributeNodeName = attributeNode.getNodeName();
                     if (attributeNodeName.equals(INPUT_DATA_ELEMENT)) {
                         Element inputDataElement = (Element) attributeNode;
-                        attribute.inputName = inputDataElement.getAttribute(NAME_ATTRIBUTE);
-                        attribute.inputAction = Integer.parseInt(inputDataElement.getAttribute(ACTION_ATTRIBUTE));
-                        attribute.inputFormat = inputDataElement.getAttribute(FORMAT_ATTRIBUTE);
+                        inputName = inputDataElement.getAttribute(NAME_ATTRIBUTE);
+                        inputAction = Integer.parseInt(inputDataElement.getAttribute(ACTION_ATTRIBUTE));
+                        inputFormat = inputDataElement.getAttribute(FORMAT_ATTRIBUTE);
                     }
                 }
-                inputElement.addAttribute(attribute);
+                inputElement.addAttribute(new CustomXmlInputAttribute(attributeName, inputName, inputAction, inputFormat));
             } else if (nodeName.equals(INPUT_ELEMENT_ELEMENT)) {
                 Element childInputElementElement = (Element) node;
-                InputElement childInputElement = extractInputElement(childInputElementElement);
+                CustomXmlInputElement childInputElement = extractInputElement(childInputElementElement);
                 if (childInputElement != null) {
                     inputElement.addChild(childInputElement);
                 }

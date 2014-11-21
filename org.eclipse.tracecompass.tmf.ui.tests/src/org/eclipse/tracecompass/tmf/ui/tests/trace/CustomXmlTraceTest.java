@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
-import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTraceDefinition.InputElement;
+import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlInputElement;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.junit.Before;
 
@@ -44,7 +44,7 @@ public abstract class CustomXmlTraceTest {
      */
     @Before
     public void init() {
-        cxtd = new CustomXmlTraceDefinition(TmfTraceType.CUSTOM_XML_CATEGORY, "test", new InputElement(), new ArrayList<OutputColumn>(), "s");
+        cxtd = new CustomXmlTraceDefinition(TmfTraceType.CUSTOM_XML_CATEGORY, "test", new CustomXmlInputElement(), new ArrayList<OutputColumn>(), "s");
         t = new CustomXmlTrace(cxtd);
     }
 

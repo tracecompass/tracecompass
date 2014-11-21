@@ -30,8 +30,6 @@ import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
-import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTraceDefinition.InputAttribute;
-import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTraceDefinition.InputElement;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfEventParser;
@@ -70,7 +68,7 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser, ITmfPer
 
     private final CustomXmlTraceDefinition fDefinition;
     private final CustomXmlEventType fEventType;
-    private final InputElement fRecordInputElement;
+    private final CustomXmlInputElement fRecordInputElement;
     private BufferedRandomAccessFile fFile;
 
     /**
@@ -151,7 +149,7 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser, ITmfPer
             long rawPos = fFile.getFilePointer();
             String line = fFile.getNextLine();
             while (line != null) {
-                final int idx = indexOfElement(fRecordInputElement.elementName, line, 0);
+                final int idx = indexOfElement(fRecordInputElement.getElementName(), line, 0);
                 if (idx != -1) {
                     context.setLocation(new TmfLongLocation(rawPos + idx));
                     return context;
@@ -244,9 +242,9 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser, ITmfPer
 
         CustomXmlEvent event = null;
         try {
-            if (fFile.getFilePointer() != (Long) context.getLocation().getLocationInfo() + 1)
-            {
-                fFile.seek((Long) context.getLocation().getLocationInfo() + 1); // +1 is for the <
+            // Below +1 for the <
+            if (fFile.getFilePointer() != (Long) context.getLocation().getLocationInfo() + 1) {
+                fFile.seek((Long) context.getLocation().getLocationInfo() + 1);
             }
             final StringBuffer elementBuffer = new StringBuffer("<"); //$NON-NLS-1$
             readElement(elementBuffer, fFile);
@@ -258,7 +256,7 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser, ITmfPer
             long rawPos = fFile.getFilePointer();
             String line = fFile.getNextLine();
             while (line != null) {
-                final int idx = indexOfElement(fRecordInputElement.elementName, line, 0);
+                final int idx = indexOfElement(fRecordInputElement.getElementName(), line, 0);
                 if (idx != -1) {
                     context.setLocation(new TmfLongLocation(rawPos + idx));
                     return event;
@@ -293,10 +291,12 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser, ITmfPer
             // The following catches xml parsing exceptions
             db.setErrorHandler(new ErrorHandler() {
                 @Override
-                public void error(final SAXParseException saxparseexception) throws SAXException {}
+                public void error(final SAXParseException saxparseexception) throws SAXException {
+                }
 
                 @Override
-                public void warning(final SAXParseException saxparseexception) throws SAXException {}
+                public void warning(final SAXParseException saxparseexception) throws SAXException {
+                }
 
                 @Override
                 public void fatalError(final SAXParseException saxparseexception) throws SAXException {
@@ -455,12 +455,12 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser, ITmfPer
      *            The main element to check for.
      * @return The record element
      */
-    public InputElement getRecordInputElement(final InputElement inputElement) {
-        if (inputElement.logEntry) {
+    public CustomXmlInputElement getRecordInputElement(final CustomXmlInputElement inputElement) {
+        if (inputElement.isLogEntry()) {
             return inputElement;
-        } else if (inputElement.childElements != null) {
-            for (final InputElement childInputElement : inputElement.childElements) {
-                final InputElement recordInputElement = getRecordInputElement(childInputElement);
+        } else if (inputElement.getChildElements() != null) {
+            for (final CustomXmlInputElement childInputElement : inputElement.getChildElements()) {
+                final CustomXmlInputElement recordInputElement = getRecordInputElement(childInputElement);
                 if (recordInputElement != null) {
                     return recordInputElement;
                 }
@@ -478,29 +478,29 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser, ITmfPer
      *            The input element
      * @return The extracted event
      */
-    public CustomXmlEvent extractEvent(final Element element, final InputElement inputElement) {
+    public CustomXmlEvent extractEvent(final Element element, final CustomXmlInputElement inputElement) {
         final CustomXmlEvent event = new CustomXmlEvent(fDefinition, this, TmfTimestamp.ZERO, fEventType);
         event.setContent(new CustomEventContent(event, new StringBuffer()));
         parseElement(element, event, inputElement);
         return event;
     }
 
-    private void parseElement(final Element element, final CustomXmlEvent event, final InputElement inputElement) {
-        if (inputElement.inputName != null && !inputElement.inputName.equals(CustomXmlTraceDefinition.TAG_IGNORE)) {
-            event.parseInput(parseElement(element, new StringBuffer()).toString(), inputElement.inputName, inputElement.inputAction, inputElement.inputFormat);
+    private void parseElement(final Element element, final CustomXmlEvent event, final CustomXmlInputElement inputElement) {
+        if (inputElement.getInputName() != null && !inputElement.getInputName().equals(CustomXmlTraceDefinition.TAG_IGNORE)) {
+            event.parseInput(parseElement(element, new StringBuffer()).toString(), inputElement.getInputName(), inputElement.getInputAction(), inputElement.getInputFormat());
         }
-        if (inputElement.attributes != null) {
-            for (final InputAttribute attribute : inputElement.attributes) {
-                event.parseInput(element.getAttribute(attribute.attributeName), attribute.inputName, attribute.inputAction, attribute.inputFormat);
+        if (inputElement.getAttributes() != null) {
+            for (final CustomXmlInputAttribute attribute : inputElement.getAttributes()) {
+                event.parseInput(element.getAttribute(attribute.getAttributeName()), attribute.getInputName(), attribute.getInputAction(), attribute.getInputFormat());
             }
         }
         final NodeList childNodes = element.getChildNodes();
-        if (inputElement.childElements != null) {
+        if (inputElement.getChildElements() != null) {
             for (int i = 0; i < childNodes.getLength(); i++) {
                 final Node node = childNodes.item(i);
                 if (node instanceof Element) {
-                    for (final InputElement child : inputElement.childElements) {
-                        if (node.getNodeName().equals(child.elementName)) {
+                    for (final CustomXmlInputElement child : inputElement.getChildElements()) {
+                        if (node.getNodeName().equals(child.getElementName())) {
                             parseElement((Element) node, event, child);
                             break;
                         }
@@ -538,7 +538,7 @@ public class CustomXmlTrace extends TmfTrace implements ITmfEventParser, ITmfPer
             long rawPos = 0;
             String line = rafile.getNextLine();
             while ((line != null) && (lineCount++ < MAX_LINES)) {
-                final int idx = indexOfElement(fRecordInputElement.elementName, line, 0);
+                final int idx = indexOfElement(fRecordInputElement.getElementName(), line, 0);
                 if (idx != -1) {
                     rafile.seek(rawPos + idx + 1); // +1 is for the <
                     final StringBuffer elementBuffer = new StringBuffer("<"); //$NON-NLS-1$
