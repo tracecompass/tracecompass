@@ -97,7 +97,8 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
     /**
      * Basic aspects that should be valid for all trace types.
      */
-    public static final Collection<ITmfEventAspect> BASE_ASPECTS =
+    @SuppressWarnings("null")
+    public static final @NonNull Collection<ITmfEventAspect> BASE_ASPECTS =
             ImmutableList.of(
                     ITmfEventAspect.BaseAspects.TIMESTAMP,
                     ITmfEventAspect.BaseAspects.EVENT_TYPE,

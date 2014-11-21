@@ -260,9 +260,12 @@ public interface ITmfTrace extends ITmfEventProvider {
     /**
      * Return the pre-defined set of event aspects exposed by this trace.
      *
+     * It should not be null, but could be empty. You are suggested to use at
+     * least the ones defined in {@link TmfTrace#BASE_ASPECTS}.
+     *
      * @return The event aspects for this trace
      */
-    Iterable<ITmfEventAspect> getEventAspects();
+    @NonNull Iterable<ITmfEventAspect> getEventAspects();
 
     // ------------------------------------------------------------------------
     // Trace characteristics getters

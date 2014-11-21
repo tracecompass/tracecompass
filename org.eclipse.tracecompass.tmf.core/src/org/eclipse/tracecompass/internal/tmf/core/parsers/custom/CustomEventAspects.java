@@ -92,7 +92,7 @@ public class CustomEventAspects {
      *            want the aspects
      * @return The set of event aspects for the given trace
      */
-    public static Iterable<ITmfEventAspect> generateAspects(CustomTraceDefinition definition) {
+    public static @NonNull Iterable<ITmfEventAspect> generateAspects(CustomTraceDefinition definition) {
         ImmutableList.Builder<ITmfEventAspect> builder = new ImmutableList.Builder<>();
         List<OutputColumn> outputs = definition.outputs;
         for (int i = 0; i < outputs.size(); i++) {
@@ -101,6 +101,8 @@ public class CustomEventAspects {
                 builder.add(new CustomEventFieldAspect(name, i));
             }
         }
-        return builder.build();
+        @SuppressWarnings("null")
+        @NonNull Iterable<ITmfEventAspect> ret = builder.build();
+        return ret;
     }
 }

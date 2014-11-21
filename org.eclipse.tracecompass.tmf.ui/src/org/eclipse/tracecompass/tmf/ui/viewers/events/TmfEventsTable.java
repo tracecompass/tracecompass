@@ -350,7 +350,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     }
 
     @Deprecated
-    private static Iterable<ITmfEventAspect> convertFromColumnData(
+    private static @NonNull Iterable<ITmfEventAspect> convertFromColumnData(
             org.eclipse.tracecompass.tmf.ui.widgets.virtualtable.ColumnData[] columnData) {
 
         ImmutableList.Builder<ITmfEventAspect> builder = new ImmutableList.Builder<>();
@@ -360,7 +360,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 builder.add(new TmfEventFieldAspect(fieldName, fieldName));
             }
         }
-        return builder.build();
+        @SuppressWarnings("null")
+        @NonNull Iterable<ITmfEventAspect> ret = builder.build();
+        return ret;
     }
 
     /**
@@ -380,7 +382,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * @since 3.1
      */
     public TmfEventsTable(final Composite parent, int cacheSize,
-            Iterable<ITmfEventAspect> aspects) {
+            @NonNull Iterable<ITmfEventAspect> aspects) {
         super("TmfEventsTable"); //$NON-NLS-1$
 
         fComposite = new Composite(parent, SWT.NONE);
@@ -406,11 +408,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         fTable.setLinesVisible(true);
 
         // Setup the columns
-        if (aspects != null) {
-            for (ITmfEventAspect aspect : aspects) {
-                if (aspect != null) {
-                    fColumns.add(new TmfEventTableColumn(aspect));
-                }
+        for (ITmfEventAspect aspect : aspects) {
+            if (aspect != null) {
+                fColumns.add(new TmfEventTableColumn(aspect));
             }
         }
 

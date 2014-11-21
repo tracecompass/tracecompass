@@ -27,6 +27,7 @@ import java.util.Iterator;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
@@ -63,7 +64,7 @@ public class TmfTraceUtilsTest {
 
     private static class TmfTraceStubWithAspects extends TmfTraceStub {
 
-        private static final Collection<ITmfEventAspect> EVENT_ASPECTS;
+        private static final @NonNull Collection<ITmfEventAspect> EVENT_ASPECTS;
         static {
             ImmutableList.Builder<ITmfEventAspect> builder = ImmutableList.builder();
             builder.add(new TmfCpuAspect() {
@@ -77,7 +78,9 @@ public class TmfTraceUtilsTest {
                 }
             });
             builder.addAll(TmfTrace.BASE_ASPECTS);
-            EVENT_ASPECTS = builder.build();
+            @SuppressWarnings("null")
+            @NonNull Collection<ITmfEventAspect> ret = builder.build();
+            EVENT_ASPECTS = ret;
         }
 
         public TmfTraceStubWithAspects(String path) throws TmfTraceException {

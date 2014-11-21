@@ -83,7 +83,7 @@ public final class GdbEventAspects {
      *
      * @return The set of aspects
      */
-    public static Iterable<ITmfEventAspect> getAspects() {
+    public static @NonNull Iterable<ITmfEventAspect> getAspects() {
         return GDB_ASPECTS;
     }
 }

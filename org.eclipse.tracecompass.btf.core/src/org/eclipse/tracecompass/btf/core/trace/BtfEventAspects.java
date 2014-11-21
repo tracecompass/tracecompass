@@ -151,7 +151,7 @@ public final class BtfEventAspects {
      *
      * @return The aspects
      */
-    public static Iterable<ITmfEventAspect> getAspects() {
+    public static @NonNull Iterable<ITmfEventAspect> getAspects() {
         return BTF_ASPECTS;
     }
 }

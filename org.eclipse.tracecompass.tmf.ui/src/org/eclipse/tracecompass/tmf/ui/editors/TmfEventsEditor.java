@@ -321,17 +321,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
          * The trace type did not specify an event table, we will use a standard
          * table with the trace's advertised aspects (if any).
          */
-        Iterable<ITmfEventAspect> aspects = trace.getEventAspects();
-        if (aspects != null) {
-            return new TmfEventsTable(parent, cacheSize, aspects);
-        }
-
-        /*
-         * No columns were defined either, use a default table with the default
-         * columns.
-         */
-        return new TmfEventsTable(parent, cacheSize);
-
+        return new TmfEventsTable(parent, cacheSize, trace.getEventAspects());
     }
 
     /**
@@ -370,12 +360,8 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
 
         for (ITmfTrace trace : traces) {
             Iterable<ITmfEventAspect> traceAspects = trace.getEventAspects();
-            if (traceAspects == null) {
-                aspects.addAll(TmfTrace.BASE_ASPECTS);
-            } else {
-                for (ITmfEventAspect aspect : traceAspects) {
-                    aspects.add(aspect);
-                }
+            for (ITmfEventAspect aspect : traceAspects) {
+                aspects.add(aspect);
             }
         }
 
