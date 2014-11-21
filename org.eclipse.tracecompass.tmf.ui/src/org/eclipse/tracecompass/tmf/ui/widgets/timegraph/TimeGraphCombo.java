@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -95,7 +96,7 @@ public class TimeGraphCombo extends Composite {
     private TreeViewer fTreeViewer;
 
     /** The time viewer */
-    private TimeGraphViewer fTimeGraphViewer;
+    private @NonNull TimeGraphViewer fTimeGraphViewer;
 
     /** The selection listener map */
     private final Map<ITimeGraphSelectionListener, SelectionListenerWrapper> fSelectionListenerMap = new HashMap<>();
@@ -640,7 +641,7 @@ public class TimeGraphCombo extends Composite {
      *
      * @return the time graph viewer
      */
-    public TimeGraphViewer getTimeGraphViewer() {
+    public @NonNull TimeGraphViewer getTimeGraphViewer() {
         return fTimeGraphViewer;
     }
 

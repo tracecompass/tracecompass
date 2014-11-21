@@ -97,9 +97,6 @@ public class ResourcesView extends AbstractTimeGraphView {
 
     @Override
     protected void buildEventList(ITmfTrace trace, ITmfTrace parentTrace, IProgressMonitor monitor) {
-        if (trace == null) {
-            return;
-        }
         ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(trace, LttngKernelAnalysis.ID);
         if (ssq == null) {
             return;

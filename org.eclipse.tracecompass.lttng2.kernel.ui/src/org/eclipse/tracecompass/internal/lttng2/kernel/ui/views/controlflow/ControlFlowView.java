@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
@@ -223,9 +224,6 @@ public class ControlFlowView extends AbstractTimeGraphView {
 
     @Override
     protected void buildEventList(final ITmfTrace trace, ITmfTrace parentTrace, IProgressMonitor monitor) {
-        if (trace == null) {
-            return;
-        }
         ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(trace, LttngKernelAnalysis.ID);
         if (ssq == null) {
             return;
@@ -374,7 +372,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
         removeFromEntryList(parentTrace, rootListToRemove);
     }
 
-    private void buildStatusEvents(ITmfTrace trace, ControlFlowEntry entry, IProgressMonitor monitor, long start, long end) {
+    private void buildStatusEvents(ITmfTrace trace, ControlFlowEntry entry, @NonNull IProgressMonitor monitor, long start, long end) {
         if (start < entry.getEndTime() && end > entry.getStartTime()) {
             ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(entry.getTrace(), LttngKernelAnalysis.ID);
             if (ssq == null) {

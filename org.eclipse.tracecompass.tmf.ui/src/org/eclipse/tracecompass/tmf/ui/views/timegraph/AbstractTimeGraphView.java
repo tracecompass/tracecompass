@@ -27,6 +27,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -461,11 +462,11 @@ public abstract class AbstractTimeGraphView extends TmfView {
     }
 
     private class BuildThread extends Thread {
-        private final ITmfTrace fBuildTrace;
-        private final ITmfTrace fParentTrace;
-        private final IProgressMonitor fMonitor;
+        private final @NonNull ITmfTrace fBuildTrace;
+        private final @NonNull ITmfTrace fParentTrace;
+        private final @NonNull IProgressMonitor fMonitor;
 
-        public BuildThread(final ITmfTrace trace, final ITmfTrace parentTrace, final String name) {
+        public BuildThread(final @NonNull ITmfTrace trace, final @NonNull ITmfTrace parentTrace, final String name) {
             super(name + " build"); //$NON-NLS-1$
             fBuildTrace = trace;
             fParentTrace = parentTrace;
@@ -486,13 +487,13 @@ public abstract class AbstractTimeGraphView extends TmfView {
     }
 
     private class ZoomThread extends Thread {
-        private final List<TimeGraphEntry> fZoomEntryList;
+        private final @NonNull List<TimeGraphEntry> fZoomEntryList;
         private final long fZoomStartTime;
         private final long fZoomEndTime;
         private final long fResolution;
-        private final IProgressMonitor fMonitor;
+        private final @NonNull  IProgressMonitor fMonitor;
 
-        public ZoomThread(List<TimeGraphEntry> entryList, long startTime, long endTime, String name) {
+        public ZoomThread(@NonNull List<TimeGraphEntry> entryList, long startTime, long endTime, String name) {
             super(name + " zoom"); //$NON-NLS-1$
             fZoomEntryList = entryList;
             fZoomStartTime = startTime;
@@ -503,12 +504,12 @@ public abstract class AbstractTimeGraphView extends TmfView {
 
         @Override
         public void run() {
-            if (fZoomEntryList == null) {
-                return;
-            }
             for (TimeGraphEntry entry : fZoomEntryList) {
                 if (fMonitor.isCanceled()) {
                     return;
+                }
+                if (entry == null) {
+                    break;
                 }
                 zoom(entry, fMonitor);
             }
@@ -520,7 +521,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
             }
         }
 
-        private void zoom(TimeGraphEntry entry, IProgressMonitor monitor) {
+        private void zoom(@NonNull TimeGraphEntry entry, @NonNull IProgressMonitor monitor) {
             if (fZoomStartTime <= fStartTime && fZoomEndTime >= fEndTime) {
                 entry.setZoomedEventList(null);
             } else {
@@ -893,9 +894,6 @@ public abstract class AbstractTimeGraphView extends TmfView {
                 final long endTime = event.getEndTime();
                 TmfTimeRange range = new TmfTimeRange(new TmfNanoTimestamp(startTime), new TmfNanoTimestamp(endTime));
                 broadcast(new TmfRangeSynchSignal(AbstractTimeGraphView.this, range));
-                if (fZoomThread != null) {
-                    fZoomThread.cancel();
-                }
                 startZoomThread(startTime, endTime);
             }
         });
@@ -1089,9 +1087,16 @@ public abstract class AbstractTimeGraphView extends TmfView {
         setStartTime(Long.MAX_VALUE);
         setEndTime(Long.MIN_VALUE);
         refresh();
+        ITmfTrace viewTrace = fTrace;
+        if (viewTrace == null) {
+            return;
+        }
         synchronized (fBuildThreadMap) {
-            for (ITmfTrace trace : getTracesToBuild(fTrace)) {
-                BuildThread buildThread = new BuildThread(trace, fTrace, getName());
+            for (ITmfTrace trace : getTracesToBuild(viewTrace)) {
+                if (trace == null) {
+                    break;
+                }
+                BuildThread buildThread = new BuildThread(trace, viewTrace, getName());
                 fBuildThreadMap.put(trace, buildThread);
                 buildThread.start();
             }
@@ -1122,8 +1127,10 @@ public abstract class AbstractTimeGraphView extends TmfView {
      * @return List of traces with data to display
      * @since 3.0
      */
-    protected Iterable<ITmfTrace> getTracesToBuild(ITmfTrace trace) {
-        return Arrays.asList(TmfTraceManager.getTraceSet(trace));
+    protected @NonNull Iterable<ITmfTrace> getTracesToBuild(@NonNull ITmfTrace trace) {
+        @SuppressWarnings("null")
+        @NonNull List<ITmfTrace> list = Arrays.asList(TmfTraceManager.getTraceSet(trace));
+        return list;
     }
 
     /**
@@ -1139,7 +1146,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
      *            The progress monitor object
      * @since 3.0
      */
-    protected abstract void buildEventList(ITmfTrace trace, ITmfTrace parentTrace, IProgressMonitor monitor);
+    protected abstract void buildEventList(@NonNull ITmfTrace trace, @NonNull ITmfTrace parentTrace, @NonNull IProgressMonitor monitor);
 
     /**
      * Gets the list of event for an entry in a given timerange
@@ -1156,9 +1163,9 @@ public abstract class AbstractTimeGraphView extends TmfView {
      *            The progress monitor object
      * @return The list of events for the entry
      */
-    protected abstract @Nullable List<ITimeEvent> getEventList(TimeGraphEntry entry,
+    protected abstract @Nullable List<ITimeEvent> getEventList(@NonNull TimeGraphEntry entry,
             long startTime, long endTime, long resolution,
-            IProgressMonitor monitor);
+            @NonNull IProgressMonitor monitor);
 
     /**
      * Gets the list of links (displayed as arrows) for a trace in a given
@@ -1175,8 +1182,8 @@ public abstract class AbstractTimeGraphView extends TmfView {
      * @return The list of link events
      * @since 2.1
      */
-    protected List<ILinkEvent> getLinkList(long startTime, long endTime,
-            long resolution, IProgressMonitor monitor) {
+    protected @Nullable List<ILinkEvent> getLinkList(long startTime, long endTime,
+            long resolution, @NonNull IProgressMonitor monitor) {
         return new ArrayList<>();
     }
 
@@ -1270,7 +1277,11 @@ public abstract class AbstractTimeGraphView extends TmfView {
         if (fZoomThread != null) {
             fZoomThread.cancel();
         }
-        fZoomThread = new ZoomThread(fEntryList, startTime, endTime, getName());
+        final List<TimeGraphEntry> entryList = fEntryList;
+        if (entryList == null) {
+            return;
+        }
+        fZoomThread = new ZoomThread(entryList, startTime, endTime, getName());
         fZoomThread.start();
     }
 

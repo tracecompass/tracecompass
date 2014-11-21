@@ -424,7 +424,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
                 entryStart, entryEnd, EntryDisplayType.DISPLAY, ss, entryElement);
     }
 
-    private void buildStatusEvent(XmlEntry traceEntry, IProgressMonitor monitor, long start, long end) {
+    private void buildStatusEvent(XmlEntry traceEntry, @NonNull IProgressMonitor monitor, long start, long end) {
         long resolution = (end - start) / getDisplayWidth();
         long startTime = Math.max(start, traceEntry.getStartTime());
         long endTime = Math.min(end + 1, traceEntry.getEndTime());
