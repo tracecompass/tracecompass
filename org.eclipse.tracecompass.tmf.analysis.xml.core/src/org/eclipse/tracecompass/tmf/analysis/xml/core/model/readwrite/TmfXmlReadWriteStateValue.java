@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.analysis.xml.core.model.readwrite;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
@@ -187,6 +188,31 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         }
     }
 
+    private static @Nullable ITmfStateValue incrementByType(int quark, long timestamp, ITmfStateSystem ss, ITmfStateValue stateValue) throws AttributeNotFoundException {
+        ITmfStateValue value = null;
+        switch (stateValue.getType()) {
+        case LONG: {
+            long incrementLong = stateValue.unboxLong();
+            ITmfStateValue currentState = ss.queryOngoingState(quark);
+            long currentValue = (currentState.isNull() ? 0 : currentState.unboxLong());
+            value = TmfStateValue.newValueLong(incrementLong + currentValue);
+            return value;
+        }
+        case INTEGER: {
+            int increment = stateValue.unboxInt();
+            ITmfStateValue currentState = ss.queryOngoingState(quark);
+            int currentValue = (currentState.isNull() ? 0 : currentState.unboxInt());
+            value = TmfStateValue.newValueInt(increment + currentValue);
+            return value;
+        }
+        case DOUBLE:
+        case NULL:
+        case STRING:
+        default:
+        }
+        return value;
+    }
+
     /* This state value uses a constant value, defined in the XML */
     private class TmfXmlStateValueTmf extends TmfXmlStateValueTypeReadWrite {
 
@@ -204,31 +230,14 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         @Override
         public void incrementValue(ITmfEvent event, int quark, long timestamp) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
             ITmfStateSystem ss = getStateSystem();
-            switch (fValue.getType()) {
-            case LONG: {
-                long incrementLong = fValue.unboxLong();
-                ITmfStateValue currentState = ss.queryOngoingState(quark);
-                long currentValue = (currentState.isNull() ? 0 : currentState.unboxLong());
-                ITmfStateValue value = TmfStateValue.newValueLong(incrementLong + currentValue);
+            ITmfStateValue value = incrementByType(quark, timestamp, ss, fValue);
+            if (value != null) {
                 processValue(quark, timestamp, value);
-                return;
-            }
-            case INTEGER: {
-                int increment = fValue.unboxInt();
-                ITmfStateValue currentState = ss.queryOngoingState(quark);
-                int currentValue = (currentState.isNull() ? 0 : currentState.unboxInt());
-                ITmfStateValue value = TmfStateValue.newValueInt(increment + currentValue);
-                processValue(quark, timestamp, value);
-                break;
-            }
-            case DOUBLE:
-            case NULL:
-            case STRING:
-            default:
+            } else {
                 Activator.logWarning("TmfXmlStateValue: The increment value is not a number type"); //$NON-NLS-1$
-                break;
             }
         }
+
     }
 
     /* The state value uses the value of an event field */
@@ -253,27 +262,11 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         public void incrementValue(ITmfEvent event, int quark, long timestamp) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
             ITmfStateSystem ss = getSsContainer().getStateSystem();
             ITmfStateValue incrementValue = getValue(event);
-            switch (incrementValue.getType()) {
-            case INTEGER: {
-                int increment = incrementValue.unboxInt();
-                int currentValue = ss.queryOngoingState(quark).unboxInt();
-                ITmfStateValue value = TmfStateValue.newValueInt(increment + currentValue);
+            ITmfStateValue value = incrementByType(quark, timestamp, ss, incrementValue);
+            if (value != null) {
                 processValue(quark, timestamp, value);
-                break;
-            }
-            case LONG: {
-                long incrementLong = incrementValue.unboxLong();
-                long currentValue = ss.queryOngoingState(quark).unboxLong();
-                ITmfStateValue value = TmfStateValue.newValueLong(incrementLong + currentValue);
-                processValue(quark, timestamp, value);
-                break;
-            }
-            case DOUBLE:
-            case NULL:
-            case STRING:
-            default:
+            } else {
                 Activator.logWarning(String.format("TmfXmlStateValue: The event field increment %s is not a number type but a %s", fFieldName, incrementValue.getType())); //$NON-NLS-1$
-                break;
             }
         }
     }
@@ -349,27 +342,11 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         public void incrementValue(ITmfEvent event, int quark, long timestamp) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
             ITmfStateSystem ss = getStateSystem();
             ITmfStateValue incrementValue = getValue(event);
-            switch (incrementValue.getType()) {
-            case INTEGER: {
-                int increment = incrementValue.unboxInt();
-                int currentValue = ss.queryOngoingState(quark).unboxInt();
-                ITmfStateValue value = TmfStateValue.newValueInt(increment + currentValue);
+            ITmfStateValue value = incrementByType(quark, timestamp, ss, incrementValue);
+            if (value != null) {
                 processValue(quark, timestamp, value);
-                break;
-            }
-            case LONG: {
-                long incrementLong = incrementValue.unboxLong();
-                long currentValue = ss.queryOngoingState(quark).unboxLong();
-                ITmfStateValue value = TmfStateValue.newValueLong(incrementLong + currentValue);
-                processValue(quark, timestamp, value);
-                break;
-            }
-            case DOUBLE:
-            case NULL:
-            case STRING:
-            default:
+            } else {
                 Activator.logWarning("TmfXmlStateValue: The query result increment is not a number type"); //$NON-NLS-1$
-                break;
             }
         }
     }
