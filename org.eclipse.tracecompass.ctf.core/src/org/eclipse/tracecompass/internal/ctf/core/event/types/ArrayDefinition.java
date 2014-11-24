@@ -78,11 +78,7 @@ public final class ArrayDefinition extends AbstractArrayDefinition {
         return fDefinitions;
     }
 
-    /**
-     * Get the the number of elements in the array
-     *
-     * @return how many elements in the array
-     */
+    @Override
     public int getLength() {
         return fDefinitions.size();
     }

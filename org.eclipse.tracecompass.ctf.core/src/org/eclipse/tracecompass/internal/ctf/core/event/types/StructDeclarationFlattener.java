@@ -91,9 +91,8 @@ public final class StructDeclarationFlattener {
         } else if (dec instanceof ArrayDeclaration) {
             ArrayDeclaration ad = (ArrayDeclaration) dec;
             int lastIndexOf = path.lastIndexOf('.');
-
             String name = (lastIndexOf > 0) ? path.substring(lastIndexOf) : path;
-            if (((ArrayDeclaration) dec).isString()) {
+            if (ad.isAlignedBytes()) {
                 flatStruct.addField(path, dec);
             } else {
                 for (int i = 0; i < ad.getLength(); i++) {

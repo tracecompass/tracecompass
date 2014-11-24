@@ -117,7 +117,7 @@ public class SequenceDeclaration extends CompoundDeclaration {
             throw new CTFException("Sequence length too long " + length); //$NON-NLS-1$
         }
 
-        if (isString()) {
+        if (isAlignedBytes()) {
             // Don't create "useless" definitions
             byte[] data = new byte[(int) length];
             input.get(data);

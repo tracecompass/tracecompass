@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.tracecompass.ctf.core.event.types.AbstractArrayDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.CompoundDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.Definition;
 import org.eclipse.tracecompass.ctf.core.event.types.EnumDefinition;
@@ -33,8 +34,6 @@ import org.eclipse.tracecompass.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StringDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.VariantDefinition;
-import org.eclipse.tracecompass.internal.ctf.core.event.types.ArrayDefinition;
-import org.eclipse.tracecompass.internal.ctf.core.event.types.ByteArrayDefinition;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.ctf.core.CtfEnumPair;
@@ -120,8 +119,8 @@ public abstract class CtfTmfEventField extends TmfEventField {
             FloatDefinition floatDef = (FloatDefinition) fieldDef;
             field = new CTFFloatField(fieldName, floatDef.getValue());
 
-        } else if (fieldDef instanceof ArrayDefinition) {
-            ArrayDefinition arrayDef = (ArrayDefinition) fieldDef;
+        } else if (fieldDef instanceof AbstractArrayDefinition) {
+            AbstractArrayDefinition arrayDef = (AbstractArrayDefinition) fieldDef;
             IDeclaration decl = arrayDef.getDeclaration();
             if (!(decl instanceof CompoundDeclaration)) {
                 throw new IllegalArgumentException("Array definitions should only come from sequence or array declarations"); //$NON-NLS-1$
@@ -131,7 +130,10 @@ public abstract class CtfTmfEventField extends TmfEventField {
             Collection<Definition> definitions = arrayDef.getDefinitions();
             elemType = arrDecl.getElementType();
             if (elemType instanceof IntegerDeclaration) {
-                /* Array of integers => CTFIntegerArrayField, unless it's a CTFStringField */
+                /*
+                 * Array of integers => CTFIntegerArrayField, unless it's a
+                 * CTFStringField
+                 */
                 IntegerDeclaration elemIntType = (IntegerDeclaration) elemType;
                 /* Are the integers characters and encoded? */
                 if (elemIntType.isCharacter()) {
@@ -139,8 +141,9 @@ public abstract class CtfTmfEventField extends TmfEventField {
                     field = new CTFStringField(fieldName, arrayDef.toString());
                 } else {
                     /* it's a CTFIntegerArrayField */
-                    long[] values = new long[arrayDef.getLength()];
-                    for (int i = 0; i < arrayDef.getLength(); i++) {
+                    int size = arrayDef.getDefinitions().size();
+                    long[] values = new long[size];
+                    for (int i = 0; i < size; i++) {
                         IDefinition elem = arrayDef.getDefinitions().get(i);
                         if (elem == null) {
                             break;
@@ -165,10 +168,6 @@ public abstract class CtfTmfEventField extends TmfEventField {
 
                 field = new CTFArrayField(fieldName, elements);
             }
-        } else if (fieldDef instanceof ByteArrayDefinition) {
-            /* This is an array of ascii bytes, a.k.a. a String! */
-            field = new CTFStringField(fieldName, fieldDef.toString());
-
         } else if (fieldDef instanceof ICompositeDefinition) {
             ICompositeDefinition strDef = (ICompositeDefinition) fieldDef;
 

@@ -40,6 +40,7 @@ import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
+import org.eclipse.tracecompass.ctf.core.event.types.AbstractArrayDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.Definition;
 import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDefinition;
@@ -48,7 +49,7 @@ import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
 import org.eclipse.tracecompass.internal.ctf.core.SafeMappedByteBuffer;
 import org.eclipse.tracecompass.internal.ctf.core.event.CTFCallsiteComparator;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.exceptions.ParseException;
-import org.eclipse.tracecompass.internal.ctf.core.event.types.ArrayDefinition;
+
 
 /**
  * A CTF trace on the file system.
@@ -512,7 +513,7 @@ public class CTFTrace implements IDefinitionScope {
 
     private void validateUUID(StructDefinition packetHeaderDef) throws CTFException {
         IDefinition lookupDefinition = packetHeaderDef.lookupDefinition("uuid"); //$NON-NLS-1$
-        ArrayDefinition uuidDef = (ArrayDefinition) lookupDefinition;
+        AbstractArrayDefinition uuidDef = (AbstractArrayDefinition) lookupDefinition;
         if (uuidDef != null) {
             UUID otheruuid = Utils.getUUIDfromDefinition(uuidDef);
             if (!fUuid.equals(otheruuid)) {
