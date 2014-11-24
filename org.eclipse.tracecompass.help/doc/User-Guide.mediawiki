@@ -119,7 +119,7 @@ The Eclipse LTTng controls the LTTng tracer through an ''ssh'' connection, if th
 
 Therefore, the target system (where the tracer runs) needs to run an ''ssh'' server as well as ''sftp'' server (for file transfer) to which you have permission to connect.
 
-On the host side (where Eclipse is running), you also need to have Eclipse RSE (Remote System Explorer) installed to handle the SSH connection and transport. The RSE can be installed the standard way (''Help'' > ''Install New Software...'' > ''General Purpose Tools'' > ''Remote System Explorer End-User Runtime'').
+On the host side (where Eclipse is running), you also need to have Eclipse Remote Services installed to handle the SSH connection and transport. The Remote Services can be installed the standard way (''Help'' > ''Install New Software...'' > ''General Purpose Tools'' > ''Remote Services'').
 
 == Installation Verification ==
 
@@ -882,7 +882,7 @@ The trace will be opened in an editor showing the events table, and an entry wil
 
 = LTTng Tracer Control =
 
-The LTTng Tracer Control in Eclipse for the LTTng Tracer toolchain version v2.0 (or later) is done using SSH and requires an SSH server to be running on the remote host. For the SSH connection the SSH implementation of RSE is used. For that a new System Type was defined using the corresponding RSE extension. The functions to control the LTTng tracer (e.g. start and stop), either locally or remotely, are available from a dedicated Control View.
+The LTTng Tracer Control in Eclipse for the LTTng Tracer toolchain version v2.0 (or later) is done using SSH and requires an SSH server to be running on the remote host. For the SSH connection the SSH implementation of Remote Services is used. The functions to control the LTTng tracer (e.g. start and stop), either locally or remotely, are available from a dedicated Control View.
 
 In the following sections the LTTng 2.0 tracer control integration in Eclipse is described. Please refer to the LTTng 2.0 tracer control command line manual for more details and descriptions about all commands and their command line parameters [[#References | References]].
 
@@ -897,19 +897,19 @@ To connect to a remote host, select the '''New Connection''' button in the Contr
 
 [[Image:images/LTTngControlViewConnect.png]]
 
-A new display will show for entering the remote host information. A drop down menu will filled with all existing host information which were used before. To enter the host information either select one of the hosts in the drop down menu or enter the host information manually.
+A new dialog is opened for selecting a remote connection. You can also edit or define a remote connection from here.
 
 [[Image:images/LTTng2NewConnection.png]]
 
-To use an existing connection definition, select the relevant entry in the drop-down menu and then select '''Ok'''.
+To define a new remote host using the default SSH service, select '''Buit-in SSH''' and then select '''Create...'''. This will start the standard '''New Connection''' wizard provided by the Remote Services plugin. Similar, to edit the definition of a remote connection, select '''Edit...''' and use the '''Edit Connection''' wizard provided by the SSH service. In case you have installed an additional adapter for the Remote Services, you can choose to define a remote connection based on this adapter.
+
+[[Image:images/LTTng2NewRemoteConnection.png]]
+
+To use an existing connection definition, select the relevant entry in the tree and then select '''Ok'''.
 
 [[Image:images/LTTng2SelectConnection.png]]
 
-To enter the host information manually select first the button '''Edit connection information'''. Then the text fields '''Connection Name''', '''Host Name''' and '''Port Number''' will be enabled. The '''Host Name''' holds the IP address or DNS name of the remote system. The '''Connection Name''' is the alias name to be displayed in the Control View. The '''Port Number''' is the port number to be used for the IP connection. This parameter is optional and if it is omitted the default port will be used. Enter the relevant information and then select '''Ok'''.
-
-[[Image:images/LTTng2EditConnection.png]]
-
-A new display will show for providing the user name and password. This display only opens if no password had been saved before. Enter user name and password in the '''Enter Password''' dialog box and select '''Ok'''.
+A new display will show for providing the user name and password. This display only opens if no password had been saved before. Enter user name and password in the '''Password Required''' dialog box and select '''Ok'''.
 
 [[Image:images/LTTng2EnterPassword.png]]
 
