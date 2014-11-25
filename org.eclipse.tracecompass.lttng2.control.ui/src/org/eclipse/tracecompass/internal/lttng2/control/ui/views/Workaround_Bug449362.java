@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.ui.IStartup;
 
 /**
@@ -26,10 +27,17 @@ class Workaround_Bug449362 {
 
     private static boolean fTriggeredRSEStartup = false;
 
+    private Workaround_Bug449362() {
+        // utility class
+    }
+
     /**
      * Trigger the startup of RSE, if necessary.
-     * @param adapterID the id of the adapter that will be initialized
-     * @return <code>false</code> if the startup cannot be triggered, although it should be.
+     *
+     * @param adapterID
+     *            the id of the adapter that will be initialized
+     * @return <code>false</code> if the startup cannot be triggered, although
+     *         it should be.
      */
     public static boolean triggerRSEStartup(String adapterID) {
         if (fTriggeredRSEStartup || !RSE_ADAPTER_ID.equals(adapterID)) {
@@ -51,6 +59,7 @@ class Workaround_Bug449362 {
                         return true;
                     }
                 } catch (CoreException e) {
+                    Activator.getDefault().logError(e.getMessage(), e);
                 }
             }
         }

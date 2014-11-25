@@ -68,12 +68,42 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messag
  */
 public class NewConnectionDialog extends Dialog implements INewConnectionDialog {
 
+    private static final int BUTTONS_NUMBER_OF_COLUMNS = 3;
+    private static final int LABEL_WIDTH_CHARS = 4;
+    private static final int CONNECTIONTREE_HEIGHT_CHARS = 10;
+    private static final int CONNECTIONTREE_WIDTH_CHARS = 40;
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
     private static final String TARGET_NEW_CONNECTION_ICON_FILE = "icons/elcl16/target_add.gif"; //$NON-NLS-1$
     private static final String PROVIDERS_ICON_FILE = "icons/obj16/providers.gif"; //$NON-NLS-1$
     private static final String CONNECTION_ICON_FILE = "icons/obj16/target_connected.gif"; //$NON-NLS-1$
+
+    private final class ConnectionTreeLabelProvider extends LabelProvider {
+        @Override
+        public String getText(Object element) {
+            if (element instanceof IRemoteConnection) {
+                IRemoteConnection rc = (IRemoteConnection) element;
+                if (rc.getRemoteServices() == RemoteServices.getLocalServices()) {
+                    return rc.getName();
+                }
+
+                return format("{0} [{1}]", rc.getName(), rc.getAddress()); //$NON-NLS-1$
+            } else if (element instanceof IRemoteServices) {
+                IRemoteServices rs = (IRemoteServices) element;
+                return rs.getName();
+            }
+            return Messages.TraceControl_UnknownNode;
+        }
+
+        @Override
+        public Image getImage(Object element) {
+            if (element instanceof IRemoteConnection) {
+                return Activator.getDefault().loadIcon(CONNECTION_ICON_FILE);
+            }
+            return Activator.getDefault().loadIcon(PROVIDERS_ICON_FILE);
+        }
+    }
 
     private static final class ConnectionContentProvider implements ITreeContentProvider {
         private static final Object[] NO_CHILDREN = {};
@@ -169,7 +199,6 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
 
     private IRemoteConnection fConnection;
 
-
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -227,38 +256,16 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
 
         Label label = new Label(dialogComposite, SWT.NONE);
         label.setText(Messages.TraceControl_NewNodeExistingConnectionGroupName);
-        label.setLayoutData(gd = new GridData());
-        gd.widthHint = label.computeSize(-1, -1).x + convertWidthInCharsToPixels(4);
+        gd = new GridData();
+        label.setLayoutData(gd );
+        gd.widthHint = label.computeSize(-1, -1).x + convertWidthInCharsToPixels(LABEL_WIDTH_CHARS);
         // Existing connections group
         fConnectionTree = new TreeViewer(dialogComposite);
-        fConnectionTree.getTree().setLayoutData(gd = new GridData(SWT.FILL, SWT.FILL, true, true));
-        gd.widthHint = convertWidthInCharsToPixels(40);
-        gd.heightHint = convertHeightInCharsToPixels(10);
-        fConnectionTree.setLabelProvider(new LabelProvider() {
-            @Override
-            public String getText(Object element) {
-                if (element instanceof IRemoteConnection) {
-                    IRemoteConnection rc = (IRemoteConnection) element;
-                    if (rc.getRemoteServices() == RemoteServices.getLocalServices()) {
-                        return rc.getName();
-                    }
-
-                    return format("{0} [{1}]", rc.getName(), rc.getAddress()); //$NON-NLS-1$
-                } else if (element instanceof IRemoteServices) {
-                    IRemoteServices rs = (IRemoteServices) element;
-                    return rs.getName();
-                }
-                return Messages.TraceControl_UnknownNode;
-            }
-
-            @Override
-            public Image getImage(Object element) {
-                if (element instanceof IRemoteConnection) {
-                    return Activator.getDefault().loadIcon(CONNECTION_ICON_FILE);
-                }
-                return Activator.getDefault().loadIcon(PROVIDERS_ICON_FILE);
-            }
-        });
+        gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        fConnectionTree.getTree().setLayoutData(gd);
+        gd.widthHint = convertWidthInCharsToPixels(CONNECTIONTREE_WIDTH_CHARS);
+        gd.heightHint = convertHeightInCharsToPixels(CONNECTIONTREE_HEIGHT_CHARS);
+        fConnectionTree.setLabelProvider(new ConnectionTreeLabelProvider());
         fConnectionTree.setContentProvider(new ConnectionContentProvider());
         fConnectionTree.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
@@ -274,8 +281,9 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         });
 
         Composite buttons = new Composite(dialogComposite, SWT.NONE);
-        layout = new GridLayout(3, true);
-        layout.marginHeight = layout.marginWidth = 0;
+        layout = new GridLayout(BUTTONS_NUMBER_OF_COLUMNS, true);
+        layout.marginHeight = 0;
+        layout.marginWidth = 0;
         buttons.setLayout(layout);
         buttons.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 
@@ -337,7 +345,6 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         return (rs.getCapabilities() & IRemoteServices.CAPABILITY_EDIT_CONNECTIONS) != 0;
     }
 
-
     private void onNewConnection() {
         IRemoteServices rs = getServiceForCreation();
         if (rs != null) {
@@ -393,7 +400,7 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
 
     private void setConnection() {
         Object o = ((IStructuredSelection) fConnectionTree.getSelection()).getFirstElement();
-        fConnection = o instanceof IRemoteConnection ? (IRemoteConnection)o : null;
+        fConnection = o instanceof IRemoteConnection ? (IRemoteConnection) o : null;
     }
 
     @Override

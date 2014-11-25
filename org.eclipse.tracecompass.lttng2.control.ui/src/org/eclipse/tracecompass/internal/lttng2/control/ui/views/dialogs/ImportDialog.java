@@ -135,7 +135,9 @@ public class ImportDialog extends Dialog implements IImportDialog {
     // ------------------------------------------------------------------------
     /**
      * Constructor
-     * @param shell - a shell for the display of the dialog
+     *
+     * @param shell
+     *            - a shell for the display of the dialog
      */
     public ImportDialog(Shell shell) {
         super(shell);
@@ -242,7 +244,7 @@ public class ImportDialog extends Dialog implements IImportDialog {
                 // Invalid LTTng 2.0 project
                 MessageDialog.openError(getShell(),
                         Messages.TraceControl_ImportDialogTitle,
-                        Messages.TraceControl_ImportDialogInvalidTracingProject + " (" + TmfTracesFolder.TRACES_FOLDER_NAME + ")");  //$NON-NLS-1$//$NON-NLS-2$
+                        Messages.TraceControl_ImportDialogInvalidTracingProject + " (" + TmfTracesFolder.TRACES_FOLDER_NAME + ")"); //$NON-NLS-1$//$NON-NLS-2$
                 return;
             }
 
@@ -267,7 +269,8 @@ public class ImportDialog extends Dialog implements IImportDialog {
                     ImportFileInfo info = new ImportFileInfo(trace, trace.getName(), destinationFolder, overwriteAll);
                     IFolder folder = destinationFolder.getFolder(trace.getName());
 
-                    // Verify if trace directory already exists (and not overwrite)
+                    // Verify if trace directory already exists (and not
+                    // overwrite)
                     if (folder.exists() && !overwriteAll) {
 
                         // Ask user for overwrite or new name
@@ -304,6 +307,29 @@ public class ImportDialog extends Dialog implements IImportDialog {
     // Helper methods and classes
     // ------------------------------------------------------------------------
 
+    private final class FolderCheckStateListener implements ICheckStateListener {
+        @Override
+        public void checkStateChanged(CheckStateChangedEvent event) {
+            Object elem = event.getElement();
+            if (elem instanceof IFileStore) {
+                IFileStore element = (IFileStore) elem;
+                IFileInfo info = element.fetchInfo();
+                if (!info.isDirectory()) {
+                    // A trick to keep selection of a file in sync with the
+                    // directory
+                    boolean p = fFolderViewer.getChecked((element.getParent()));
+                    fFolderViewer.setChecked(element, p);
+                } else {
+                    fFolderViewer.setSubtreeChecked(event.getElement(), event.getChecked());
+                    if (!event.getChecked()) {
+                        fFolderViewer.setChecked(element.getParent(), false);
+                    }
+                }
+                updateOKButtonEnablement();
+            }
+        }
+    }
+
     /**
      * Helper class for the contents of a folder in a tracing project
      *
@@ -318,6 +344,7 @@ public class ImportDialog extends Dialog implements IImportDialog {
                     return store.childStores(EFS.NONE, new NullProgressMonitor());
                 }
             } catch (CoreException e) {
+                Activator.getDefault().logError(e.getMessage(), e);
             }
             return new Object[0];
         }
@@ -347,10 +374,13 @@ public class ImportDialog extends Dialog implements IImportDialog {
     }
 
     /**
-     * Creates a dialog composite with an error message which can be used
-     * when an exception occurred during creation time of the dialog box.
-     * @param parent - a parent composite
-     * @param e - a error causing exception
+     * Creates a dialog composite with an error message which can be used when
+     * an exception occurred during creation time of the dialog box.
+     *
+     * @param parent
+     *            - a parent composite
+     * @param e
+     *            - a error causing exception
      */
     private void createErrorComposite(Composite parent, Throwable e) {
         fIsError = true;
@@ -398,6 +428,7 @@ public class ImportDialog extends Dialog implements IImportDialog {
             public String getText(Object element) {
                 return ((IFileStore) element).getName();
             }
+
             @Override
             public Image getImage(Object element) {
                 if (((IFileStore) element).fetchInfo().isDirectory()) {
@@ -407,31 +438,12 @@ public class ImportDialog extends Dialog implements IImportDialog {
             }
         });
 
-        fFolderViewer.addCheckStateListener(new ICheckStateListener() {
-            @Override
-            public void checkStateChanged(CheckStateChangedEvent event) {
-                Object elem = event.getElement();
-                if (elem instanceof IFileStore) {
-                    IFileStore element = (IFileStore) elem;
-                    IFileInfo info = element.fetchInfo();
-                    if (!info.isDirectory()) {
-                        // A trick to keep selection of a file in sync with the directory
-                        boolean p = fFolderViewer.getChecked((element.getParent()));
-                        fFolderViewer.setChecked(element, p);
-                    } else {
-                        fFolderViewer.setSubtreeChecked(event.getElement(), event.getChecked());
-                        if (!event.getChecked()) {
-                            fFolderViewer.setChecked(element.getParent(), false);
-                        }
-                    }
-                    updateOKButtonEnablement();
-                }
-            }
-        });
+        fFolderViewer.addCheckStateListener(new FolderCheckStateListener());
         fFolderViewer.setInput(remoteFolder);
 
         fFolderChildren = remoteFolder.childStores(EFS.NONE, new NullProgressMonitor());
-        // children can be null if there the path doesn't exist. This happens when a trace
+        // children can be null if there the path doesn't exist. This happens
+        // when a trace
         // session hadn't been started and no output was created.
         setFolderChildrenChecked(true);
 
@@ -490,4 +502,4 @@ public class ImportDialog extends Dialog implements IImportDialog {
         // Use Path class to remove unnecessary slashes
         return new Path(path).removeTrailingSeparator().toString();
     }
- }
+}

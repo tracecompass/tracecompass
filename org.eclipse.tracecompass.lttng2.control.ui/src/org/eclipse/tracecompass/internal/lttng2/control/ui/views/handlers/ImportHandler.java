@@ -87,6 +87,10 @@ import org.eclipse.ui.PlatformUI;
  */
 public class ImportHandler extends BaseControlViewHandler {
 
+    private static final int BUFFER_IN_KB = 16;
+
+    private static final int BYTES_PER_KB = 1024;
+
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
@@ -319,8 +323,8 @@ public class ImportHandler extends BaseControlViewHandler {
 
     private static void copy(InputStream in, IPath destination, SubMonitor monitor, long length) throws IOException {
         try (OutputStream out = new FileOutputStream(destination.toFile())) {
-            monitor.setWorkRemaining((int) (length / 1024));
-            byte[] buf = new byte[1024 * 16];
+            monitor.setWorkRemaining((int) (length / BYTES_PER_KB));
+            byte[] buf = new byte[BYTES_PER_KB * BUFFER_IN_KB];
             int counter = 0;
             for (;;) {
                 int n = in.read(buf);
@@ -328,8 +332,8 @@ public class ImportHandler extends BaseControlViewHandler {
                     return;
                 }
                 out.write(buf, 0, n);
-                counter = (counter % 1024) + n;
-                monitor.worked(counter / 1024);
+                counter = (counter % BYTES_PER_KB) + n;
+                monitor.worked(counter / BYTES_PER_KB);
             }
         }
     }

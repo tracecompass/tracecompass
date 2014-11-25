@@ -16,8 +16,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 
 class InputReader {
+    private static final int JOIN_TIMEOUT = 300;
+    private static final int BYTES_PER_KB = 1024;
     private final InputStreamReader fReader;
     private final Thread fThread;
     private final StringBuilder fResult;
@@ -29,13 +32,15 @@ class InputReader {
         fThread = new Thread() {
             @Override
             public void run() {
-                final char[] buffer = new char[1024];
-                int read;
+                final char[] buffer = new char[BYTES_PER_KB];
                 try {
-                    while (!fDone && (read = fReader.read(buffer)) > 0) {
+                    int read = fReader.read(buffer);
+                    while (!fDone && (read) > 0) {
                         fResult.append(buffer, 0, read);
+                        read = fReader.read(buffer);
                     }
                 } catch (IOException e) {
+                    Activator.getDefault().logError(e.getMessage(), e);
                 }
             }
         };
@@ -44,7 +49,7 @@ class InputReader {
 
     public void waitFor(IProgressMonitor monitor) throws InterruptedException {
         while (fThread.isAlive() && (monitor == null || !monitor.isCanceled())) {
-            fThread.join(300);
+            fThread.join(JOIN_TIMEOUT);
         }
     }
 
