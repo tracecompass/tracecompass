@@ -284,7 +284,10 @@ public class IntegerDeclarationTest {
      */
     @Test
     public void hashcodeTest() {
-        assertEquals(234767053, IntegerDeclaration.createDeclaration(8, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 8).hashCode());
+        IntegerDeclaration a = IntegerDeclaration.createDeclaration(32, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 32);
+        IntegerDeclaration i = IntegerDeclaration.createDeclaration(32, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 32);
+        assertEquals(a.hashCode(), i.hashCode());
+        assertEquals(a.hashCode(), a.hashCode());
     }
 
     /**

@@ -29,7 +29,7 @@ public class StreamInputPacketIndexEntry {
     /**
      * Offset of the packet in the file, in bytes
      */
-    final private long fOffsetBytes;
+    private final long fOffsetBytes;
 
     /**
      * Offset of the data in the packet, in bits

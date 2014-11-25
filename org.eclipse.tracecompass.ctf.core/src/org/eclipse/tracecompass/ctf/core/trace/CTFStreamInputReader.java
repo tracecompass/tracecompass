@@ -375,7 +375,7 @@ public class CTFStreamInputReader implements AutoCloseable {
         /*
          * if the trace is empty.
          */
-        if ((len == 0) || (fPacketReader.hasMoreEvents() == false)) {
+        if ((len == 0) || (!fPacketReader.hasMoreEvents())) {
             /*
              * This means the trace is empty. abort.
              */

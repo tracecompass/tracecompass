@@ -55,7 +55,7 @@ import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
  * @author Matthew Khouzam
  */
 @NonNullByDefault
-public class EventHeaderCompactDeclaration extends Declaration implements IEventHeaderDeclaration {
+public final class EventHeaderCompactDeclaration extends Declaration implements IEventHeaderDeclaration {
 
     private static final int BASE_10 = 10;
     /**
@@ -124,10 +124,10 @@ public class EventHeaderCompactDeclaration extends Declaration implements IEvent
         ref.addField(ID, id);
         VariantDeclaration v = new VariantDeclaration();
         StructDeclaration compact = new StructDeclaration(ALIGN_ON_1);
-        compact.addField(TIMESTAMP, IntegerDeclaration.createDeclaration(27, false, BASE_10, fByteOrder, Encoding.NONE, CLOCK, ALIGN_ON_1));
+        compact.addField(TIMESTAMP, IntegerDeclaration.createDeclaration(COMPACT_TS, false, BASE_10, fByteOrder, Encoding.NONE, CLOCK, ALIGN_ON_1));
         StructDeclaration extended = new StructDeclaration(ALIGN_ON_8);
-        extended.addField(ID, IntegerDeclaration.createDeclaration(32, false, BASE_10, fByteOrder, Encoding.NONE, CLOCK, ALIGN_ON_8));
-        extended.addField(TIMESTAMP, IntegerDeclaration.createDeclaration(64, false, BASE_10, fByteOrder, Encoding.NONE, CLOCK, ALIGN_ON_8));
+        extended.addField(ID, IntegerDeclaration.createDeclaration(ID_SIZE, false, BASE_10, fByteOrder, Encoding.NONE, CLOCK, ALIGN_ON_8));
+        extended.addField(TIMESTAMP, IntegerDeclaration.createDeclaration(FULL_TS, false, BASE_10, fByteOrder, Encoding.NONE, CLOCK, ALIGN_ON_8));
         v.addField(COMPACT, compact);
         v.addField(EXTENDED, extended);
         ref.addField(VARIANT_NAME, v);

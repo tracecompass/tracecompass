@@ -38,6 +38,8 @@ import com.google.common.collect.ImmutableSet.Builder;
  */
 public class CTFTraceReader implements AutoCloseable {
 
+    private static final int LINE_LENGTH = 60;
+
     private static final int MIN_PRIO_SIZE = 16;
 
     // ------------------------------------------------------------------------
@@ -450,7 +452,7 @@ public class CTFTraceReader implements AutoCloseable {
      * Prints the event count stats.
      */
     public void printStats() {
-        printStats(60);
+        printStats(LINE_LENGTH);
     }
 
     /**

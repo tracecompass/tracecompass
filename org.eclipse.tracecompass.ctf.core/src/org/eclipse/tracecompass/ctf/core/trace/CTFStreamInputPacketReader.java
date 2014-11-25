@@ -54,6 +54,8 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
     // Attributes
     // ------------------------------------------------------------------------
 
+    private static final int BITS_PER_BYTE = Byte.SIZE;
+
     /** BitBuffer used to read the trace file. */
     @Nullable
     private BitBuffer fBitBuffer;
@@ -227,6 +229,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
         }
         return map;
     }
+
     /**
      * Changes the current packet to the given one.
      *
@@ -247,7 +250,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
             try {
                 bb = getByteBufferAt(
                         fCurrentPacket.getOffsetBytes(),
-                        (fCurrentPacket.getPacketSizeBits() + 7) / 8);
+                        (fCurrentPacket.getPacketSizeBits() + BITS_PER_BYTE - 1) / BITS_PER_BYTE);
             } catch (IOException e) {
                 throw new CTFReaderException(e.getMessage(), e);
             }
@@ -467,7 +470,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
         /*
          * If the timestamp length is 64 bits, it is a full timestamp.
          */
-        if (len == 64) {
+        if (len == Long.SIZE) {
             fLastTimestamp = value;
             return fLastTimestamp;
         }

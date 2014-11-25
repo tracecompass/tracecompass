@@ -14,7 +14,7 @@ package org.eclipse.tracecompass.internal.ctf.core.event.metadata;
 import org.eclipse.osgi.util.NLS;
 
 @SuppressWarnings("javadoc")
-public class Messages extends NLS {
+public final class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.ctf.core.event.metadata.messages"; //$NON-NLS-1$
 

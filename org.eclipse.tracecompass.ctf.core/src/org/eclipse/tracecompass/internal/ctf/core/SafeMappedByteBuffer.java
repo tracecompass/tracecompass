@@ -28,6 +28,8 @@ public class SafeMappedByteBuffer {
 
     private static final boolean IS_WIN32 = System.getProperty("os.name").startsWith("Windows");  //$NON-NLS-1$//$NON-NLS-2$
 
+    private SafeMappedByteBuffer(){}
+
     /**
      * Maps a region of this channel's file directly into memory. On Windows,
      * this will allocate a new ByteBuffer and read the file.

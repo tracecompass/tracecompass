@@ -108,7 +108,7 @@ public final class Utils {
      * @since 3.1
      */
     public static UUID getUUIDfromDefinition(AbstractArrayDefinition uuidDef) throws CTFReaderException {
-        byte[] uuidArray = new byte[16];
+        byte[] uuidArray = new byte[UUID_LEN];
         IDeclaration declaration = uuidDef.getDeclaration();
         if (!(declaration instanceof CompoundDeclaration)) {
             throw new CTFReaderException("UUID must be a sequence of unsigned bytes"); //$NON-NLS-1$
@@ -152,9 +152,11 @@ public final class Utils {
 
         assert (bytes.length == Utils.UUID_LEN);
 
-        for (int i = 0; i < 8; i++) {
-            low = (low << 8) | (bytes[i + 8] & 0xFF);
-            high = (high << 8) | (bytes[i] & 0xFF);
+        final int bitsPerByte = Byte.SIZE;
+        int bitMask = (1 << bitsPerByte) - 1;
+        for (int i = 0; i < bitsPerByte; i++) {
+            low = (low << bitsPerByte) | (bytes[i + bitsPerByte] & bitMask);
+            high = (high << bitsPerByte) | (bytes[i] & bitMask);
         }
 
         UUID uuid = new UUID(high, low);

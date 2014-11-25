@@ -187,7 +187,7 @@ public final class FloatDeclaration extends Declaration implements ISimpleDataty
         final int prime = 31;
         int result = 1;
         result = prime * result + (int) (fAlignement ^ (fAlignement >>> 32));
-        result = prime * result + (fByteOrder.equals(ByteOrder.BIG_ENDIAN) ? 4321 : 1234);
+        result = prime * result + fByteOrder.toString().hashCode(); // don't evaluate object but string
         result = prime * result + fExponent;
         result = prime * result + fMantissa;
         return result;

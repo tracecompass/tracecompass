@@ -2585,28 +2585,27 @@ public class IOStructGen {
             }
             throw new ParseException("Invalid value for base"); //$NON-NLS-1$
         } else if (isUnaryString(firstChild)) {
-            String strval = concatenateUnaryStrings(rightNode.getChildren());
-
-            if (strval.equals(MetadataStrings.DECIMAL)
-                    || strval.equals(MetadataStrings.DEC)
-                    || strval.equals(MetadataStrings.DEC_CTE)
-                    || strval.equals(MetadataStrings.INT_MOD)
-                    || strval.equals(MetadataStrings.UNSIGNED_CTE)) {
+            switch (concatenateUnaryStrings(rightNode.getChildren())) {
+            case MetadataStrings.DECIMAL:
+            case MetadataStrings.DEC:
+            case MetadataStrings.DEC_CTE:
+            case MetadataStrings.INT_MOD:
+            case MetadataStrings.UNSIGNED_CTE:
                 return INTEGER_BASE_10;
-            } else if (strval.equals(MetadataStrings.HEXADECIMAL)
-                    || strval.equals(MetadataStrings.HEX)
-                    || strval.equals(MetadataStrings.X)
-                    || strval.equals(MetadataStrings.X2)
-                    || strval.equals(MetadataStrings.POINTER)) {
+            case MetadataStrings.HEXADECIMAL:
+            case MetadataStrings.HEX:
+            case MetadataStrings.X:
+            case MetadataStrings.X2:
+            case MetadataStrings.POINTER:
                 return INTEGER_BASE_16;
-            } else if (strval.equals(MetadataStrings.OCTAL)
-                    || strval.equals(MetadataStrings.OCT)
-                    || strval.equals(MetadataStrings.OCTAL_CTE)) {
+            case MetadataStrings.OCT:
+            case MetadataStrings.OCTAL:
+            case MetadataStrings.OCTAL_CTE:
                 return INTEGER_BASE_8;
-            } else if (strval.equals(MetadataStrings.BINARY)
-                    || strval.equals(MetadataStrings.BIN)) {
+            case MetadataStrings.BIN:
+            case MetadataStrings.BINARY:
                 return INTEGER_BASE_2;
-            } else {
+            default:
                 throw new ParseException("Invalid value for base"); //$NON-NLS-1$
             }
         } else {

@@ -55,7 +55,7 @@ import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
  * @author Matthew Khouzam
  */
 @NonNullByDefault
-public class EventHeaderLargeDeclaration extends Declaration implements IEventHeaderDeclaration {
+public final class EventHeaderLargeDeclaration extends Declaration implements IEventHeaderDeclaration {
 
     private static final int ALIGN_ON_1 = 1;
     private static final int BASE_10 = 10;
@@ -130,7 +130,7 @@ public class EventHeaderLargeDeclaration extends Declaration implements IEventHe
         ref.addField(VARIANT_NAME, v);
         fReferenceStructs.add(ref);
         ref = new StructDeclaration(ALIGN_ON_8);
-        id = new EnumDeclaration(IntegerDeclaration.createDeclaration(16, false, BASE_10, fByteOrder, Encoding.NONE, CLOCK, ALIGN_ON_8));
+        id = new EnumDeclaration(IntegerDeclaration.createDeclaration(COMPACT_ID, false, BASE_10, fByteOrder, Encoding.NONE, CLOCK, ALIGN_ON_8));
         id.add(0, EXTENDED_VALUE - 1, COMPACT);
         id.add(EXTENDED_VALUE, EXTENDED_VALUE, EXTENDED);
         ref.addField(ID, id);
@@ -146,8 +146,8 @@ public class EventHeaderLargeDeclaration extends Declaration implements IEventHe
         fReferenceStructs.add(ref);
         ref = new StructDeclaration(ALIGN_ON_8);
         id = new EnumDeclaration(IntegerDeclaration.createDeclaration(COMPACT_ID, false, BASE_10, fByteOrder, Encoding.NONE, CLOCK, COMPACT_ID));
-        id.add(0, 65534, COMPACT);
-        id.add(65535, 65535, EXTENDED);
+        id.add(0, EXTENDED_VALUE - 1, COMPACT);
+        id.add(EXTENDED_VALUE, EXTENDED_VALUE, EXTENDED);
         ref.addField(ID, id);
         v = new VariantDeclaration();
         compact = new StructDeclaration(ALIGN_ON_1);

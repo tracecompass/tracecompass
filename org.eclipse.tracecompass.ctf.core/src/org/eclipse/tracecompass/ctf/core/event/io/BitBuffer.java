@@ -36,16 +36,13 @@ public final class BitBuffer {
     // ------------------------------------------------------------------------
 
     /* default bit width */
-    /** 8 bits to a char */
-    public static final int BIT_CHAR = 8;
-    /** 16 bits to a short */
-    public static final int BIT_SHORT = 16;
-    /** 32 bits to an int */
-    public static final int BIT_INT = 32;
-    /** 32 bits to a float */
-    public static final int BIT_FLOAT = 32;
-    /** 64 bits to a long */
-    public static final int BIT_LONG = 64;
+    private static final int BIT_CHAR = Byte.SIZE; // yum
+    private static final int BYTE_MASK = (1 << BIT_CHAR) - 1;
+    private static final int BIT_SHORT = Short.SIZE;
+    private static final int SHORT_MASK = (1 << BIT_SHORT) - 1;
+    private static final int BIT_INT = Integer.SIZE;
+    private static final long INT_MASK = (1L << BIT_INT) - 1;
+    private static final int BIT_LONG = Long.SIZE;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -163,7 +160,7 @@ public final class BitBuffer {
             long b = getInt(highShift, false);
             long retVal;
             /* Cast the signed-extended int into a unsigned int. */
-            a &= 0xFFFFFFFFL;
+            a &= INT_MASK;
             b &= (1L << highShift) - 1L;
 
             retVal = (fByteOrder == ByteOrder.BIG_ENDIAN) ? ((a << highShift) | b) : ((b << BIT_INT) | a);
@@ -175,7 +172,7 @@ public final class BitBuffer {
             return retVal;
         }
         long retVal = getInt(length, signed);
-        return (signed ? retVal : (retVal & 0xFFFFFFFFL));
+        return (signed ? retVal : (retVal & INT_MASK));
     }
 
     /**
@@ -195,9 +192,9 @@ public final class BitBuffer {
      * @since 3.1
      */
     public void get(@NonNull byte[] dst) {
-        fBuffer.position((int) (fPosition / 8));
+        fBuffer.position((int) (fPosition / BIT_CHAR));
         fBuffer.get(dst);
-        fPosition += dst.length * 8;
+        fPosition += dst.length * BIT_CHAR;
     }
 
     /**
@@ -246,25 +243,25 @@ public final class BitBuffer {
             switch (length) {
             case BitBuffer.BIT_CHAR:
                 // Byte
-                val = fBuffer.get((int) (fPosition / 8));
+                val = fBuffer.get((int) (fPosition / BIT_CHAR));
                 if (!signed) {
-                    val = val & 0xff;
+                    val = val & BYTE_MASK;
                 }
                 gotIt = true;
                 break;
 
             case BitBuffer.BIT_SHORT:
                 // Word
-                val = fBuffer.getShort((int) (fPosition / 8));
+                val = fBuffer.getShort((int) (fPosition / BIT_CHAR));
                 if (!signed) {
-                    val = val & 0xffff;
+                    val = val & SHORT_MASK;
                 }
                 gotIt = true;
                 break;
 
             case BitBuffer.BIT_INT:
                 // Double word
-                val = fBuffer.getInt((int) (fPosition / 8));
+                val = fBuffer.getInt((int) (fPosition / BIT_CHAR));
                 gotIt = true;
                 break;
 
@@ -298,7 +295,7 @@ public final class BitBuffer {
         int value = 0;
 
         currByte = startByte;
-        cache = fBuffer.get(currByte) & 0xFF;
+        cache = fBuffer.get(currByte) & BYTE_MASK;
         boolean isNeg = (cache & (1 << (BIT_CHAR - (index % BIT_CHAR) - 1))) != 0;
         if (signed && isNeg) {
             value = ~0;
@@ -324,19 +321,19 @@ public final class BitBuffer {
         }
         for (; currByte < (endByte - 1); currByte++) {
             value <<= BIT_CHAR;
-            value |= fBuffer.get(currByte) & 0xFF;
+            value |= fBuffer.get(currByte) & BYTE_MASK;
         }
         lshift = (int) (end % BIT_CHAR);
         if (lshift > 0) {
             mask = ~((~0) << lshift);
-            cmask = fBuffer.get(currByte) & 0xFF;
+            cmask = fBuffer.get(currByte) & BYTE_MASK;
             cmask >>>= BIT_CHAR - lshift;
             cmask &= mask;
             value <<= lshift;
             value |= cmask;
         } else {
             value <<= BIT_CHAR;
-            value |= fBuffer.get(currByte) & 0xFF;
+            value |= fBuffer.get(currByte) & BYTE_MASK;
         }
         return value;
     }
@@ -352,7 +349,7 @@ public final class BitBuffer {
         int value = 0;
 
         currByte = endByte - 1;
-        cache = fBuffer.get(currByte) & 0xFF;
+        cache = fBuffer.get(currByte) & BYTE_MASK;
         mod = (int) (end % BIT_CHAR);
         lshift = (mod > 0) ? mod : BIT_CHAR;
         boolean isNeg = (cache & (1 << (lshift - 1))) != 0;
@@ -379,19 +376,19 @@ public final class BitBuffer {
         }
         for (; currByte >= (startByte + 1); currByte--) {
             value <<= BIT_CHAR;
-            value |= fBuffer.get(currByte) & 0xFF;
+            value |= fBuffer.get(currByte) & BYTE_MASK;
         }
         lshift = (int) (index % BIT_CHAR);
         if (lshift > 0) {
             mask = ~((~0) << (BIT_CHAR - lshift));
-            cmask = fBuffer.get(currByte) & 0xFF;
+            cmask = fBuffer.get(currByte) & BYTE_MASK;
             cmask >>>= lshift;
             cmask &= mask;
             value <<= (BIT_CHAR - lshift);
             value |= cmask;
         } else {
             value <<= BIT_CHAR;
-            value |= fBuffer.get(currByte) & 0xFF;
+            value |= fBuffer.get(currByte) & BYTE_MASK;
         }
         return value;
     }
@@ -484,7 +481,7 @@ public final class BitBuffer {
              * already cleared
              */
             cmask &= ~mask;
-            int b = fBuffer.get(startByte) & 0xFF;
+            int b = fBuffer.get(startByte) & BYTE_MASK;
             fBuffer.put(startByte, (byte) ((b & mask) | cmask));
             return;
         }
@@ -497,7 +494,7 @@ public final class BitBuffer {
             mask = ~((~0) << lshift);
             cmask = correctedValue << lshift;
             cmask &= ~mask;
-            int b = fBuffer.get(currByte) & 0xFF;
+            int b = fBuffer.get(currByte) & BYTE_MASK;
             fBuffer.put(currByte, (byte) ((b & mask) | cmask));
             correctedValue >>>= cshift;
             currByte--;
@@ -512,7 +509,7 @@ public final class BitBuffer {
         if ((index % BIT_CHAR) > 0) {
             mask = (~0) << (BIT_CHAR - (index % BIT_CHAR));
             cmask = correctedValue & ~mask;
-            int b = fBuffer.get(currByte) & 0xFF;
+            int b = fBuffer.get(currByte) & BYTE_MASK;
             fBuffer.put(currByte, (byte) ((b & mask) | cmask));
         } else {
             fBuffer.put(currByte, (byte) correctedValue);
@@ -551,7 +548,7 @@ public final class BitBuffer {
              * already cleared
              */
             cmask &= ~mask;
-            int b = fBuffer.get(startByte) & 0xFF;
+            int b = fBuffer.get(startByte) & BYTE_MASK;
             fBuffer.put(startByte, (byte) ((b & mask) | cmask));
             return;
         }
@@ -563,7 +560,7 @@ public final class BitBuffer {
             mask = ~((~0) << cshift);
             cmask = correctedValue << cshift;
             cmask &= ~mask;
-            int b = fBuffer.get(currByte) & 0xFF;
+            int b = fBuffer.get(currByte) & BYTE_MASK;
             fBuffer.put(currByte, (byte) ((b & mask) | cmask));
             correctedValue >>>= BIT_CHAR - cshift;
             currByte++;
@@ -578,7 +575,7 @@ public final class BitBuffer {
         if ((end % BIT_CHAR) > 0) {
             mask = (~0) << (end % BIT_CHAR);
             cmask = correctedValue & ~mask;
-            int b = fBuffer.get(currByte) & 0xFF;
+            int b = fBuffer.get(currByte) & BYTE_MASK;
             fBuffer.put(currByte, (byte) ((b & mask) | cmask));
         } else {
             fBuffer.put(currByte, (byte) correctedValue);
@@ -630,7 +627,6 @@ public final class BitBuffer {
      * @since 3.0
      */
     public void position(long newPosition) throws CTFReaderException {
-
 
         if (newPosition > fBitCapacity) {
             throw new CTFReaderException("Out of bounds exception on a position move, attempting to access position: " + newPosition); //$NON-NLS-1$

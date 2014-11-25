@@ -60,7 +60,7 @@ public interface IDeclaration {
      * @return the path of the definition
      * @since 3.0
      */
-    public @NonNull LexicalScope getPath(IDefinitionScope definitionScope, @NonNull String fieldName);
+    @NonNull LexicalScope getPath(IDefinitionScope definitionScope, @NonNull String fieldName);
 
     /**
      * The minimum alignment. if the field is 32 bits, the definition will pad
@@ -85,8 +85,8 @@ public interface IDeclaration {
     boolean equals(Object other);
 
     /**
-     * Are the two declarations equivalent on a binary level. eg: an 8 bit little
-     * endian and big endian int.
+     * Are the two declarations equivalent on a binary level. eg: an 8 bit
+     * little endian and big endian int.
      *
      * @param other
      *            the other {@link IDeclaration}

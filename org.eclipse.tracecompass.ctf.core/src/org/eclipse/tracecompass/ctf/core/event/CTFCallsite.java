@@ -22,7 +22,11 @@ package org.eclipse.tracecompass.ctf.core.event;
  */
 public class CTFCallsite implements Comparable<CTFCallsite> {
 
-    private static final long MASK32 = 0x00000000ffffffffL;
+    // Integer size
+    private static final int INT_BITS = Integer.SIZE;
+
+    // a bitmask for the size of an integer
+    private static final long INT_MASK = (1L << INT_BITS) - 1;
 
     /**
      * The event name
@@ -126,15 +130,15 @@ public class CTFCallsite implements Comparable<CTFCallsite> {
          *
          * To get the low int: we bitwise and with the mask.
          */
-        long otherHigh = (other >> 32) & MASK32;
-        long otherLow = other & MASK32;
-        long ownHigh = (fIp >> 32) & MASK32;
-        long ownLow = fIp & MASK32;
+        long otherHigh = (other >> INT_BITS) & INT_MASK;
+        long otherLow = other & INT_MASK;
+        long ownHigh = (fIp >> INT_BITS) & INT_MASK;
+        long ownLow = fIp & INT_MASK;
         /* are the high values different, if so ignore the lower values */
         if (ownHigh > otherHigh) {
             return 1;
         }
-        if (ownHigh < otherHigh ) {
+        if (ownHigh < otherHigh) {
             return -1;
         }
         /* the high values are the same, compare the lower values */
@@ -159,7 +163,6 @@ public class CTFCallsite implements Comparable<CTFCallsite> {
         result = prime * result + (int) (fLineNumber ^ (fLineNumber >>> 32));
         return result;
     }
-
 
     @Override
     public boolean equals(Object obj) {

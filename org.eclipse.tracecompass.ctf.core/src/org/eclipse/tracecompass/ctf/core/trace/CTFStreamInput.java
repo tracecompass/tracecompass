@@ -50,6 +50,8 @@ public class CTFStreamInput implements IDefinitionScope {
     // Attributes
     // ------------------------------------------------------------------------
 
+    private static final int BITS_PER_BYTE = Byte.SIZE;
+
     /**
      * The associated Stream
      */
@@ -238,7 +240,7 @@ public class CTFStreamInput implements IDefinitionScope {
         }
 
         if (packetIndex.getPacketSizeBits() > ((fileSizeBytes - packetIndex
-                .getOffsetBytes()) * 8)) {
+                .getOffsetBytes()) * BITS_PER_BYTE)) {
             throw new CTFReaderException("Not enough data remaining in the file for the size of this packet"); //$NON-NLS-1$
         }
 
@@ -260,7 +262,7 @@ public class CTFStreamInput implements IDefinitionScope {
     private static long computeNextOffset(
             StreamInputPacketIndexEntry packetIndex) {
         return packetIndex.getOffsetBytes()
-                + ((packetIndex.getPacketSizeBits() + 7) / 8);
+                + ((packetIndex.getPacketSizeBits() + BITS_PER_BYTE - 1) / BITS_PER_BYTE);
     }
 
     private long readPacketHeader(long fileSizeBytes,
@@ -378,8 +380,8 @@ public class CTFStreamInput implements IDefinitionScope {
          * If there is no packet context, infer the content and packet size from
          * the file size (assume that there is only one packet and no padding)
          */
-        packetIndex.setContentSizeBits(fileSizeBytes * 8);
-        packetIndex.setPacketSizeBits(fileSizeBytes * 8);
+        packetIndex.setContentSizeBits(fileSizeBytes * BITS_PER_BYTE);
+        packetIndex.setPacketSizeBits(fileSizeBytes * BITS_PER_BYTE);
     }
 
     private void parsePacketContext(long fileSizeBytes,
@@ -420,7 +422,7 @@ public class CTFStreamInput implements IDefinitionScope {
         } else if (packetSize != null) {
             packetIndex.setContentSizeBits(packetSize.longValue());
         } else {
-            packetIndex.setContentSizeBits((int) (fileSizeBytes * 8));
+            packetIndex.setContentSizeBits((int) (fileSizeBytes * BITS_PER_BYTE));
         }
 
         /* Read the packet size in bits */
@@ -429,7 +431,7 @@ public class CTFStreamInput implements IDefinitionScope {
         } else if (packetIndex.getContentSizeBits() != 0) {
             packetIndex.setPacketSizeBits(packetIndex.getContentSizeBits());
         } else {
-            packetIndex.setPacketSizeBits((int) (fileSizeBytes * 8));
+            packetIndex.setPacketSizeBits((int) (fileSizeBytes * BITS_PER_BYTE));
         }
 
         /* Read the begin timestamp */

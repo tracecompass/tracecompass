@@ -26,16 +26,16 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 public interface CTFStrings {
 
     /** Event name for lost events */
-    static final String LOST_EVENT_NAME = "Lost event";
+    String LOST_EVENT_NAME = "Lost event";
 
     /**
      * Name of the field in lost events indicating how many actual events were
      * lost
      */
-    static final String LOST_EVENTS_FIELD = "Lost events";
+    String LOST_EVENTS_FIELD = "Lost events";
 
     /**
      * Name of the field in lost events indicating the time range
      */
-    static final String LOST_EVENTS_DURATION = "duration";
+    String LOST_EVENTS_DURATION = "duration";
 }

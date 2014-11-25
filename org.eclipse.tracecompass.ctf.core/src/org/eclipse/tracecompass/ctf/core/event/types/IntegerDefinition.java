@@ -33,6 +33,10 @@ public final class IntegerDefinition extends SimpleDatatypeDefinition {
     // Attributes
     // ------------------------------------------------------------------------
 
+    private static final int INT_BASE_10 = 10;
+    private static final int INT_BASE_16 = 16;
+    private static final int INT_BASE_8 = 8;
+    private static final int INT_BASE_2 = 2;
     private final long fValue;
 
     // ------------------------------------------------------------------------
@@ -111,20 +115,20 @@ public final class IntegerDefinition extends SimpleDatatypeDefinition {
      * @return formatted number string
      * @since 3.0
      */
-    public static final String formatNumber(long value, int base, boolean signed) {
+    public static String formatNumber(long value, int base, boolean signed) {
         String s;
         /* Format the number correctly according to the integer's base */
         switch (base) {
-        case 2:
+        case INT_BASE_2:
             s = "0b" + Long.toBinaryString(value); //$NON-NLS-1$
             break;
-        case 8:
+        case INT_BASE_8:
             s = "0" + Long.toOctalString(value); //$NON-NLS-1$
             break;
-        case 16:
+        case INT_BASE_16:
             s = "0x" + Long.toHexString(value); //$NON-NLS-1$
             break;
-        case 10:
+        case INT_BASE_10:
         default:
             /* For non-standard base, we'll just print it as a decimal number */
             if (!signed && value < 0) {

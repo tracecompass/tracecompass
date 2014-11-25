@@ -50,6 +50,8 @@ public class Metadata {
     // Constants
     // ------------------------------------------------------------------------
 
+    private static final int BITS_PER_BYTE = Byte.SIZE;
+
     /**
      * Name of the metadata file in the trace directory
      */
@@ -364,11 +366,11 @@ public class Metadata {
         }
 
         /* Extract the text from the packet */
-        int payloadSize = ((header.getContentSize() / 8) - METADATA_PACKET_HEADER_SIZE);
+        int payloadSize = ((header.getContentSize() / BITS_PER_BYTE) - METADATA_PACKET_HEADER_SIZE);
         if (payloadSize < 0) {
             throw new CTFReaderException("Invalid metadata packet payload size."); //$NON-NLS-1$
         }
-        int skipSize = (header.getPacketSize() - header.getContentSize()) / 8;
+        int skipSize = (header.getPacketSize() - header.getContentSize()) / BITS_PER_BYTE;
 
         /* Read the payload + the padding in a ByteBuffer */
         ByteBuffer payloadByteBuffer = ByteBuffer.allocateDirect(payloadSize
@@ -395,6 +397,7 @@ public class Metadata {
 
     private static class MetadataPacketHeader {
 
+        private static final int UUID_SIZE = 16;
         private final int fMagic;
         private final UUID fUuid;
         private final int fChecksum;
@@ -409,7 +412,7 @@ public class Metadata {
         public MetadataPacketHeader(ByteBuffer headerByteBuffer) {
             /* Read from the ByteBuffer */
             fMagic = headerByteBuffer.getInt();
-            byte[] uuidBytes = new byte[16];
+            byte[] uuidBytes = new byte[UUID_SIZE];
             headerByteBuffer.get(uuidBytes);
             fUuid = Utils.makeUUID(uuidBytes);
             fChecksum = headerByteBuffer.getInt();

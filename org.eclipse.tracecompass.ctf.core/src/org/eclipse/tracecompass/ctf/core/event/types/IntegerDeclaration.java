@@ -34,12 +34,20 @@ import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
  * @author Simon Marchi
  */
 @NonNullByDefault
-public class IntegerDeclaration extends Declaration implements ISimpleDatatypeDeclaration {
+public final class IntegerDeclaration extends Declaration implements ISimpleDatatypeDeclaration {
 
     // ------------------------------------------------------------------------
     // Helpers
     // ------------------------------------------------------------------------
 
+    private static final int SIZE_64 = 64;
+    private static final int SIZE_32 = 32;
+    private static final int SIZE_27 = 27;
+    private static final int SIZE_16 = 16;
+    private static final int SIZE_8 = 8;
+    private static final int SIZE_5 = 5;
+    private static final int BYTE_ALIGN = 8;
+    private static final int BASE_10 = 10;
     /**
      * unsigned int 32 bits big endian
      *
@@ -174,56 +182,59 @@ public class IntegerDeclaration extends Declaration implements ISimpleDatatypeDe
      */
     public static IntegerDeclaration createDeclaration(int len, boolean signed, int base,
             @Nullable ByteOrder byteOrder, Encoding encoding, String clock, long alignment) {
-        if (encoding.equals(Encoding.NONE) && (clock.equals("")) && base == 10) { //$NON-NLS-1$
-            if (alignment == 8) {
+        if (encoding.equals(Encoding.NONE) && (clock.equals("")) && base == BASE_10) { //$NON-NLS-1$
+            if (alignment == BYTE_ALIGN) {
                 switch (len) {
-                case 8:
+                case SIZE_8:
                     return signed ? INT_8_DECL : UINT_8_DECL;
-                case 16:
+                case SIZE_16:
                     if (!signed) {
-                        if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
+                        if (isBigEndian(byteOrder)) {
                             return UINT_16B_DECL;
                         }
                         return UINT_16L_DECL;
                     }
                     break;
-                case 32:
+                case SIZE_32:
                     if (signed) {
-                        if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
+                        if (isBigEndian(byteOrder)) {
                             return INT_32B_DECL;
                         }
                         return INT_32L_DECL;
                     }
-                    if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
+                    if (isBigEndian(byteOrder)) {
                         return UINT_32B_DECL;
                     }
                     return UINT_32L_DECL;
-                case 64:
+                case SIZE_64:
                     if (signed) {
-                        if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
+                        if (isBigEndian(byteOrder)) {
                             return INT_64B_DECL;
                         }
                         return INT_64L_DECL;
                     }
-                    if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
+                    if (isBigEndian(byteOrder)) {
                         return UINT_64B_DECL;
                     }
                     return UINT_64L_DECL;
+
                 default:
+
                 }
+
             } else if (alignment == 1) {
                 switch (len) {
-                case 5:
+                case SIZE_5:
                     if (!signed) {
-                        if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
+                        if (isBigEndian(byteOrder)) {
                             return UINT_5B_DECL;
                         }
                         return UINT_5L_DECL;
                     }
                     break;
-                case 27:
+                case SIZE_27:
                     if (!signed) {
-                        if (byteOrder != null && byteOrder.equals(ByteOrder.BIG_ENDIAN)) {
+                        if (isBigEndian(byteOrder)) {
                             return UINT_27B_DECL;
                         }
                         return UINT_27L_DECL;
@@ -235,6 +246,10 @@ public class IntegerDeclaration extends Declaration implements ISimpleDatatypeDe
             }
         }
         return new IntegerDeclaration(len, signed, base, byteOrder, encoding, clock, alignment);
+    }
+
+    private static boolean isBigEndian(@Nullable ByteOrder byteOrder) {
+        return (byteOrder != null) && byteOrder.equals(ByteOrder.BIG_ENDIAN);
     }
 
     /**
@@ -276,7 +291,7 @@ public class IntegerDeclaration extends Declaration implements ISimpleDatatypeDe
     }
 
     private IntegerDeclaration(int len, boolean signed, @Nullable ByteOrder byteOrder) {
-        this(len, signed, 10, byteOrder, Encoding.NONE, "", 8); //$NON-NLS-1$
+        this(len, signed, BASE_10, byteOrder, Encoding.NONE, "", BYTE_ALIGN); //$NON-NLS-1$
     }
 
     // ------------------------------------------------------------------------
@@ -325,7 +340,7 @@ public class IntegerDeclaration extends Declaration implements ISimpleDatatypeDe
      * @return is the integer a char
      */
     public boolean isCharacter() {
-        return (fLength == 8) && (fEncoding != Encoding.NONE);
+        return (fLength == SIZE_8) && (fEncoding != Encoding.NONE);
     }
 
     /**
@@ -335,7 +350,7 @@ public class IntegerDeclaration extends Declaration implements ISimpleDatatypeDe
      * @since 3.1
      */
     public boolean isUnsignedByte() {
-        return (fLength == 8) && (!fSigned);
+        return (fLength == SIZE_8) && (!fSigned);
     }
 
     /**
@@ -461,7 +476,7 @@ public class IntegerDeclaration extends Declaration implements ISimpleDatatypeDe
             input.setByteOrder(getByteOrder());
         }
 
-        if (length > 64) {
+        if (length > SIZE_64) {
             throw new CTFReaderException("Cannot read an integer with over 64 bits. Length given: " + length); //$NON-NLS-1$
         }
 
@@ -483,22 +498,9 @@ public class IntegerDeclaration extends Declaration implements ISimpleDatatypeDe
         int result = 1;
         result = prime * result + (int) (fAlignment ^ (fAlignment >>> 32));
         result = prime * result + fBase;
-        result = prime * result + (fByteOrder.equals(ByteOrder.BIG_ENDIAN) ? 4321 : 1234);
-        result = prime * result + (fClock.hashCode());
-        switch (fEncoding) {
-        case ASCII:
-            result = prime * result + 1;
-            break;
-        case NONE:
-            result = prime * result + 2;
-            break;
-        case UTF8:
-            result = prime * result + 3;
-            break;
-        default:
-            result = prime * result + 4;
-            break;
-        }
+        result = prime * result + fByteOrder.toString().hashCode();
+        result = prime * result + fClock.hashCode();
+        result = prime * result + fEncoding.hashCode();
         result = prime * result + fLength;
         result = prime * result + (fSigned ? 1231 : 1237);
         return result;
@@ -516,10 +518,7 @@ public class IntegerDeclaration extends Declaration implements ISimpleDatatypeDe
             return false;
         }
         IntegerDeclaration other = (IntegerDeclaration) obj;
-        if (fAlignment != other.fAlignment) {
-            return false;
-        }
-        if (fBase != other.fBase) {
+        if (!isBinaryEquivalent(other)) {
             return false;
         }
         if (!fByteOrder.equals(other.fByteOrder)) {
@@ -531,10 +530,7 @@ public class IntegerDeclaration extends Declaration implements ISimpleDatatypeDe
         if (fEncoding != other.fEncoding) {
             return false;
         }
-        if (fLength != other.fLength) {
-            return false;
-        }
-        if (fSigned != other.fSigned) {
+        if (fBase != other.fBase) {
             return false;
         }
         return true;
@@ -552,6 +548,10 @@ public class IntegerDeclaration extends Declaration implements ISimpleDatatypeDe
             return false;
         }
         IntegerDeclaration other = (IntegerDeclaration) obj;
+        return isBinaryEquivalent(other);
+    }
+
+    private boolean isBinaryEquivalent(IntegerDeclaration other) {
         if (fAlignment != other.fAlignment) {
             return false;
         }
@@ -565,7 +565,7 @@ public class IntegerDeclaration extends Declaration implements ISimpleDatatypeDe
         // no need for encoding
         // no need for clock
         // byte inversion is ok on byte order if the element is one byte long
-        if ((fLength != 8) && !fByteOrder.equals(other.fByteOrder)) {
+        if ((fLength != BYTE_ALIGN) && !fByteOrder.equals(other.fByteOrder)) {
             return false;
         }
         return true;

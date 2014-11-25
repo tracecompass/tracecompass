@@ -29,10 +29,15 @@ import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
  */
 public class StringDeclaration extends Declaration {
 
+    private static final StringDeclaration STRING_DEC_UTF8 = new StringDeclaration(Encoding.UTF8);
+    private static final StringDeclaration STRING_DEC_ASCII = new StringDeclaration(Encoding.ASCII);
+    private static final StringDeclaration STRING_DEC_NO_ENC = new StringDeclaration(Encoding.NONE);
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
+    private static final int BITS_PER_BYTE = Byte.SIZE;
     private final Encoding fEncoding;
 
     // ------------------------------------------------------------------------
@@ -56,6 +61,28 @@ public class StringDeclaration extends Declaration {
         fEncoding = encoding;
     }
 
+    /**
+     * Create a StringDeclaration
+     *
+     * @param encoding
+     *            the {@link Encoding}
+     * @return a {@link StringDeclaration}
+     * @throws IllegalArgumentException
+     *             if the encoding is not recognized.
+     */
+    public static StringDeclaration getStringDeclaration(Encoding encoding) {
+        switch (encoding) {
+        case ASCII:
+            return STRING_DEC_ASCII;
+        case NONE:
+            return STRING_DEC_NO_ENC;
+        case UTF8:
+            return STRING_DEC_UTF8;
+        default:
+            throw new IllegalArgumentException("Unrecognized encoding: " + encoding); //$NON-NLS-1$
+        }
+    }
+
     // ------------------------------------------------------------------------
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
@@ -71,7 +98,7 @@ public class StringDeclaration extends Declaration {
     @Override
     public long getAlignment() {
         // See ctf 4.2.5: Strings are always aligned on byte size.
-        return 8;
+        return BITS_PER_BYTE;
     }
 
     /**
@@ -101,10 +128,10 @@ public class StringDeclaration extends Declaration {
         alignRead(input);
 
         StringBuilder sb = new StringBuilder();
-        char c = (char) input.get(8, false);
+        char c = (char) input.get(BITS_PER_BYTE, false);
         while (c != 0) {
             sb.append(c);
-            c = (char) input.get(8, false);
+            c = (char) input.get(BITS_PER_BYTE, false);
         }
         return sb.toString();
     }
