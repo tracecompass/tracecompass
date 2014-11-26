@@ -30,6 +30,7 @@ import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterContainsNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEqualsNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEventTypeNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesFieldNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterOrNode;
@@ -114,11 +115,11 @@ public class TmfFilterXMLWriter {
             element.setAttribute(TmfFilterEqualsNode.VALUE_ATTR, node.getValue());
             element.setAttribute(TmfFilterEqualsNode.IGNORECASE_ATTR, Boolean.toString(node.isIgnoreCase()));
 
-        } else if (treenode instanceof TmfFilterMatchesNode) {
+        } else if (treenode instanceof TmfFilterMatchesFieldNode) {
 
-            TmfFilterMatchesNode node = (TmfFilterMatchesNode) treenode;
+            TmfFilterMatchesFieldNode node = (TmfFilterMatchesFieldNode) treenode;
             element.setAttribute(TmfFilterMatchesNode.NOT_ATTR, Boolean.toString(node.isNot()));
-            element.setAttribute(TmfFilterMatchesNode.FIELD_ATTR, node.getField());
+            element.setAttribute(TmfFilterMatchesFieldNode.FIELD_ATTR, node.getField());
             element.setAttribute(TmfFilterMatchesNode.REGEX_ATTR, node.getRegex());
 
         } else if (treenode instanceof TmfFilterCompareNode) {

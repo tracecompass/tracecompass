@@ -17,13 +17,13 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAndNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode.Type;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterContainsNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEqualsNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEventTypeNode;
-import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesFieldNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterOrNode;
-import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode.Type;
 
 /**
  * This is the Label Provider for our Filter Tree
@@ -100,9 +100,9 @@ public class FilterTreeLabelProvider implements ILabelProvider {
                     node.getNodeName() +
                     (node.getValue() != null && node.getValue().length() > 0 ? " \"" + node.getValue() + "\"" : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-        } else if (element instanceof TmfFilterMatchesNode) {
+        } else if (element instanceof TmfFilterMatchesFieldNode) {
 
-            TmfFilterMatchesNode node = (TmfFilterMatchesNode) element;
+            TmfFilterMatchesFieldNode node = (TmfFilterMatchesFieldNode) element;
             label = (node.isNot() ? "NOT " : "") + //$NON-NLS-1$ //$NON-NLS-2$
                     (node.getField() != null ? node.getField() + " " : "") + //$NON-NLS-1$ //$NON-NLS-2$
                     node.getNodeName() +

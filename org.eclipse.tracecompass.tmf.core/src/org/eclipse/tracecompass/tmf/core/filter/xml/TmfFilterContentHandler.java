@@ -22,6 +22,7 @@ import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterContainsNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEqualsNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEventTypeNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesFieldNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterOrNode;
@@ -124,14 +125,14 @@ public class TmfFilterContentHandler extends DefaultHandler {
                 ((TmfFilterEqualsNode) node).setIgnoreCase(true);
             }
 
-        } else if (localName.equals(TmfFilterMatchesNode.NODE_NAME)) {
+        } else if (localName.equals(TmfFilterMatchesFieldNode.NODE_NAME)) {
 
-            node = new TmfFilterMatchesNode(null);
+            node = new TmfFilterMatchesFieldNode(null);
             String value = atts.getValue(TmfFilterMatchesNode.NOT_ATTR);
             if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
                 ((TmfFilterMatchesNode) node).setNot(true);
             }
-            ((TmfFilterMatchesNode) node).setField(atts.getValue(TmfFilterMatchesNode.FIELD_ATTR));
+            ((TmfFilterMatchesFieldNode) node).setField(atts.getValue(TmfFilterMatchesFieldNode.FIELD_ATTR));
             ((TmfFilterMatchesNode) node).setRegex(atts.getValue(TmfFilterMatchesNode.REGEX_ATTR));
 
         } else if (localName.equals(TmfFilterCompareNode.NODE_NAME)) {

@@ -39,7 +39,7 @@ public abstract class TmfFilterTreeNode implements ITmfFilterTreeNode, Cloneable
             TmfFilterOrNode.NODE_NAME,
             TmfFilterContainsNode.NODE_NAME,
             TmfFilterEqualsNode.NODE_NAME,
-            TmfFilterMatchesNode.NODE_NAME,
+            TmfFilterMatchesFieldNode.NODE_NAME,
             TmfFilterCompareNode.NODE_NAME
     };
 

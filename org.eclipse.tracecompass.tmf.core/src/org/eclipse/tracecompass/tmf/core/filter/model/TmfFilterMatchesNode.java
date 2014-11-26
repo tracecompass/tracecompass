@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-
 /**
  * Filter node for the regex match
  *
@@ -26,15 +24,13 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  * @author Patrick Tasse
  */
 @SuppressWarnings("javadoc")
-public class TmfFilterMatchesNode extends TmfFilterTreeNode {
+public abstract class TmfFilterMatchesNode extends TmfFilterTreeNode {
 
-    public static final String NODE_NAME = "MATCHES"; //$NON-NLS-1$
     public static final String NOT_ATTR = "not"; //$NON-NLS-1$
-    public static final String FIELD_ATTR = "field"; //$NON-NLS-1$
     public static final String REGEX_ATTR = "regex"; //$NON-NLS-1$
 
     private boolean fNot = false;
-    private String fField;
+
     private String fRegex;
     private transient Pattern fPattern;
 
@@ -62,21 +58,6 @@ public class TmfFilterMatchesNode extends TmfFilterTreeNode {
     }
 
     /**
-     * @return the field name
-     */
-    public String getField() {
-        return fField;
-    }
-
-    /**
-     * @param field
-     *            the field name
-     */
-    public void setField(String field) {
-        this.fField = field;
-    }
-
-    /**
      * @return the regular expression
      */
     public String getRegex() {
@@ -98,24 +79,8 @@ public class TmfFilterMatchesNode extends TmfFilterTreeNode {
         }
     }
 
-    @Override
-    public String getNodeName() {
-        return NODE_NAME;
-    }
-
-    @Override
-    public boolean matches(ITmfEvent event) {
-        if (fPattern == null) {
-            return false ^ fNot;
-        }
-
-        Object value = getFieldValue(event, fField);
-        if (value == null) {
-            return false ^ fNot;
-        }
-        String valueString = value.toString();
-
-        return fPattern.matcher(valueString).matches() ^ fNot;
+    protected Pattern getPattern() {
+        return fPattern;
     }
 
     @Override
@@ -124,14 +89,8 @@ public class TmfFilterMatchesNode extends TmfFilterTreeNode {
     }
 
     @Override
-    public String toString() {
-        return fField + (fNot ? " not" : "") + " matches \"" + fRegex + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-    }
-
-    @Override
     public ITmfFilterTreeNode clone() {
         TmfFilterMatchesNode clone = (TmfFilterMatchesNode) super.clone();
-        clone.fField = fField;
         clone.setRegex(fRegex);
         return clone;
     }
@@ -156,7 +115,6 @@ public class TmfFilterMatchesNode extends TmfFilterTreeNode {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((fField == null) ? 0 : fField.hashCode());
         result = prime * result + (fNot ? 1231 : 1237);
         result = prime * result + ((fRegex == null) ? 0 : fRegex.hashCode());
         return result;
@@ -174,13 +132,6 @@ public class TmfFilterMatchesNode extends TmfFilterTreeNode {
             return false;
         }
         TmfFilterMatchesNode other = (TmfFilterMatchesNode) obj;
-        if (fField == null) {
-            if (other.fField != null) {
-                return false;
-            }
-        } else if (!fField.equals(other.fField)) {
-            return false;
-        }
         if (fNot != other.fNot) {
             return false;
         }

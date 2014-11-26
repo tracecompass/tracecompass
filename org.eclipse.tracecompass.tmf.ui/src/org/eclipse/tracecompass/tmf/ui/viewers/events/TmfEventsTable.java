@@ -121,6 +121,7 @@ import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfSourceLookup;
 import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAndNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesFieldNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
@@ -1377,7 +1378,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                             tableEditor.getEditor().dispose();
                             return false;
                         }
-                        final TmfFilterMatchesNode filter = new TmfFilterMatchesNode(null);
+                        final TmfFilterMatchesFieldNode filter = new TmfFilterMatchesFieldNode(null);
                         String fieldId = (String) column.getData(Key.FIELD_ID);
                         if (fieldId == null) {
                             fieldId = column.getText();

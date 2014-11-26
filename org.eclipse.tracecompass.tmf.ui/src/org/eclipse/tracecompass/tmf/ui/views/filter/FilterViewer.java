@@ -65,21 +65,21 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAndNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode.Type;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterContainsNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEqualsNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEventTypeNode;
-import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesFieldNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterOrNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterRootNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterTreeNode;
-import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode.Type;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition;
+import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtEvent;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlEvent;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTraceDefinition;
-import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 
 class FilterViewer extends Composite {
@@ -231,8 +231,8 @@ class FilterViewer extends Composite {
                         newNode = new TmfFilterContainsNode(node);
                     } else if (TmfFilterEqualsNode.NODE_NAME.equals(child)) {
                         newNode = new TmfFilterEqualsNode(node);
-                    } else if (TmfFilterMatchesNode.NODE_NAME.equals(child)) {
-                        newNode = new TmfFilterMatchesNode(node);
+                    } else if (TmfFilterMatchesFieldNode.NODE_NAME.equals(child)) {
+                        newNode = new TmfFilterMatchesFieldNode(node);
                     } else if (TmfFilterCompareNode.NODE_NAME.equals(child)) {
                         newNode = new TmfFilterCompareNode(node);
                     }
@@ -271,8 +271,8 @@ class FilterViewer extends Composite {
             new FilterContainsNodeComposite(fComposite, (TmfFilterContainsNode) node);
         } else if (node instanceof TmfFilterEqualsNode) {
             new FilterEqualsNodeComposite(fComposite, (TmfFilterEqualsNode) node);
-        } else if (node instanceof TmfFilterMatchesNode) {
-            new FilterMatchesNodeComposite(fComposite, (TmfFilterMatchesNode) node);
+        } else if (node instanceof TmfFilterMatchesFieldNode) {
+            new FilterMatchesNodeComposite(fComposite, (TmfFilterMatchesFieldNode) node);
         } else if (node instanceof TmfFilterCompareNode) {
             new FilterCompareNodeComposite(fComposite, (TmfFilterCompareNode) node);
         } else {
@@ -840,12 +840,12 @@ class FilterViewer extends Composite {
     }
 
     private class FilterMatchesNodeComposite extends FilterBaseNodeComposite {
-        TmfFilterMatchesNode fNode;
+        TmfFilterMatchesFieldNode fNode;
         Button fNotButton;
         Combo fFieldCombo;
         Text fRegexText;
 
-        FilterMatchesNodeComposite(Composite parent, TmfFilterMatchesNode node) {
+        FilterMatchesNodeComposite(Composite parent, TmfFilterMatchesFieldNode node) {
             super(parent);
             fNode = node;
 
