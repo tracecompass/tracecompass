@@ -12,8 +12,6 @@
 
 package org.eclipse.tracecompass.tmf.core.event.aspect;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 
@@ -61,11 +59,6 @@ public interface ITmfEventAspect {
                 String ret = event.getTimestamp().toString();
                 return (ret == null ? EMPTY_STRING : ret);
             }
-
-            @Override
-            public @NonNull String getFilterId() {
-                return ITmfEvent.EVENT_FIELD_TIMESTAMP;
-            }
         };
 
         /**
@@ -91,11 +84,6 @@ public interface ITmfEventAspect {
                 String typeName = type.getName();
                 return (typeName == null ? EMPTY_STRING : typeName);
             }
-
-            @Override
-            public @NonNull String getFilterId() {
-                return ITmfEvent.EVENT_FIELD_TYPE;
-            }
         };
 
         /**
@@ -117,11 +105,6 @@ public interface ITmfEventAspect {
                 String ret = event.getContent().toString();
                 return (ret == null ? EMPTY_STRING : ret);
             }
-
-            @Override
-            public @NonNull String getFilterId() {
-                return ITmfEvent.EVENT_FIELD_CONTENT;
-            }
         };
 
         /**
@@ -142,11 +125,6 @@ public interface ITmfEventAspect {
             public String resolve(ITmfEvent event) {
                 String ret = event.getTrace().getName();
                 return (ret == null ? EMPTY_STRING : ret);
-            }
-
-            @Override
-            public @Nullable String getFilterId() {
-                return null;
             }
         };
     }
@@ -190,15 +168,4 @@ public interface ITmfEventAspect {
      * @return The resulting tidbit of information for this event.
      */
     Object resolve(ITmfEvent event);
-
-    /**
-     * The filter ID of this aspect. This is currently used by the Filter View,
-     * and to filter on columns in the event table.
-     *
-     * TODO Remove this, replace with calls to {@link #resolve(ITmfEvent)}
-     * instead.
-     *
-     * @return The filter_id
-     */
-    @Nullable String getFilterId();
 }

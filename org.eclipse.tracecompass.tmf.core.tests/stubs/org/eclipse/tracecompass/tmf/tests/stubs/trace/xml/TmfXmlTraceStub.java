@@ -299,11 +299,6 @@ public class TmfXmlTraceStub extends TmfTrace {
         }
 
         @Override
-        public @Nullable String getFilterId() {
-            return getName();
-        }
-
-        @Override
         public Integer resolve(ITmfEvent event) {
             Integer cpu = Ints.tryParse(fAspect.resolve(event));
             if (cpu == null) {

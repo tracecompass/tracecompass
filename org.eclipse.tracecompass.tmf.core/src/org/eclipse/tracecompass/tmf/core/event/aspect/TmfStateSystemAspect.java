@@ -81,10 +81,4 @@ public class TmfStateSystemAspect implements ITmfEventAspect {
             return EMPTY_STRING;
         }
     }
-
-    @Override
-    public @Nullable String getFilterId() {
-        return null;
-    }
-
 }

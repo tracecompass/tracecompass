@@ -60,11 +60,6 @@ public class TmfEventFieldAspect implements ITmfEventAspect {
         return (fieldValue == null ? EMPTY_STRING : fieldValue);
     }
 
-    @Override
-    public @Nullable String getFilterId() {
-        return null;
-    }
-
     // ------------------------------------------------------------------------
     // hashCode/equals
     // Typically we want identical field aspects to be merged together.

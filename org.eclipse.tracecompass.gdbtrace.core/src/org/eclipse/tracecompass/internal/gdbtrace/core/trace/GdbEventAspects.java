@@ -73,11 +73,6 @@ public final class GdbEventAspects {
             String ret = ((GdbTraceEvent) event).getReference();
             return (ret == null ? EMPTY_STRING : ret);
         }
-
-        @Override
-        public String getFilterId() {
-            return ITmfEvent.EVENT_FIELD_REFERENCE;
-        }
     }
 
     /**

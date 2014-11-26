@@ -13,7 +13,6 @@
 
 package org.eclipse.tracecompass.internal.tmf.pcap.core.event.aspect;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.event.PcapEvent;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.protocol.TmfPcapProtocol;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -49,10 +48,5 @@ public class PcapSourceAspect implements ITmfEventAspect {
 
         String ret = pcapEvent.getSourceEndpoint(protocol);
         return (ret == null ? EMPTY_STRING : ret);
-    }
-
-    @Override
-    public @NonNull String getFilterId() {
-        return PcapEvent.EVENT_FIELD_PACKET_SOURCE;
     }
 }

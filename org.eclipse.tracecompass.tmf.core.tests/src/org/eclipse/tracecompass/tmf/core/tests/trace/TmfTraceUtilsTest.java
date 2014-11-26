@@ -69,10 +69,6 @@ public class TmfTraceUtilsTest {
             ImmutableList.Builder<ITmfEventAspect> builder = ImmutableList.builder();
             builder.add(new TmfCpuAspect() {
                 @Override
-                public String getFilterId() {
-                    return null;
-                }
-                @Override
                 public Integer resolve(ITmfEvent event) {
                     return 1;
                 }

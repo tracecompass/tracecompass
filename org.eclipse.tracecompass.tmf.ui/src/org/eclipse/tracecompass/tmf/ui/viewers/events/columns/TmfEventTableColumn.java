@@ -93,14 +93,12 @@ public class TmfEventTableColumn {
     }
 
     /**
-     * Return the FILTER_ID used by the filters to search this column.
+     * Get the event aspect assigned to this column
      *
-     * @return The filter ID for this column, or 'null' to not provide a filter
-     *         ID (which will mean this column will probably not be
-     *         searchable/filterable.)
+     * @return The event aspect
      */
-    public @Nullable String getFilterFieldId() {
-        return fAspect.getFilterId();
+    public ITmfEventAspect getEventAspect() {
+        return fAspect;
     }
 
     // ------------------------------------------------------------------------

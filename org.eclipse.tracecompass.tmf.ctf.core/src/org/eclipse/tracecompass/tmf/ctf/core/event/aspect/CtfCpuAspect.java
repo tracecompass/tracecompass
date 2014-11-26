@@ -31,10 +31,4 @@ public class CtfCpuAspect extends TmfCpuAspect {
         int cpu = ((CtfTmfEvent) event).getCPU();
         return cpu;
     }
-
-    @Override
-    public String getFilterId() {
-        return null;
-    }
-
 }

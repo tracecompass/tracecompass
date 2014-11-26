@@ -13,7 +13,6 @@
 
 package org.eclipse.tracecompass.internal.tmf.pcap.core.event.aspect;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.event.PcapEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
@@ -41,10 +40,5 @@ public class PcapReferenceAspect implements ITmfEventAspect {
             return EMPTY_STRING;
         }
         return ((PcapEvent) event).getReference();
-    }
-
-    @Override
-    public @Nullable String getFilterId() {
-        return ITmfEvent.EVENT_FIELD_REFERENCE;
     }
 }
