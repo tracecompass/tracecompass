@@ -19,14 +19,16 @@ import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 
+import org.eclipse.tracecompass.internal.statesystem.core.Activator;
+
 /**
  * This class abstracts inputs/outputs of the HistoryTree nodes.
  *
  * It contains all the methods and descriptors to handle reading/writing nodes
  * to the tree-file on disk and all the caching mechanisms.
  *
- * This abstraction is mainly for code isolation/clarification purposes.
- * Every HistoryTree must contain 1 and only 1 HT_IO element.
+ * This abstraction is mainly for code isolation/clarification purposes. Every
+ * HistoryTree must contain 1 and only 1 HT_IO element.
  *
  * @author Alexandre Montplaisir
  *
@@ -42,17 +44,17 @@ class HT_IO {
     private final FileChannel fcOut;
 
     // TODO test/benchmark optimal cache size
-    private final int CACHE_SIZE = 256;
+    private static final int CACHE_SIZE = 256;
     private final HTNode fNodeCache[] = new HTNode[CACHE_SIZE];
 
     /**
      * Standard constructor
      *
      * @param config
-     *             The configuration object for the StateHistoryTree
+     *            The configuration object for the StateHistoryTree
      * @param newFile
      *            Flag indicating that the file must be created from scratch
-
+     *
      * @throws IOException
      *             An exception can be thrown when file cannot be accessed
      */
@@ -102,7 +104,7 @@ class HT_IO {
         int offset = seqNumber & (CACHE_SIZE - 1);
         HTNode readNode = fNodeCache[offset];
         if (readNode != null && readNode.getSequenceNumber() == seqNumber) {
-          return readNode;
+            return readNode;
         }
 
         /* Lookup on disk */
@@ -117,7 +119,7 @@ class HT_IO {
             throw e;
         } catch (IOException e) {
             /* Other types of IOExceptions shouldn't happen at this point though */
-            e.printStackTrace();
+            Activator.getDefault().logError(e.getMessage(), e);
             return null;
         }
     }
@@ -134,7 +136,7 @@ class HT_IO {
             node.writeSelf(fcOut);
         } catch (IOException e) {
             /* If we were able to open the file, we should be fine now... */
-            e.printStackTrace();
+            Activator.getDefault().logError(e.getMessage(), e);
         }
     }
 
@@ -150,7 +152,7 @@ class HT_IO {
              */
             seekFCToNodePos(fcIn, nodeOffset);
         } catch (IOException e) {
-            e.printStackTrace();
+            Activator.getDefault().logError(e.getMessage(), e);
         }
         return fis;
     }
@@ -160,7 +162,7 @@ class HT_IO {
             fis.close();
             fos.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            Activator.getDefault().logError(e.getMessage(), e);
         }
     }
 
@@ -170,7 +172,7 @@ class HT_IO {
         File historyTreeFile = fConfig.getStateFile();
         if (!historyTreeFile.delete()) {
             /* We didn't succeed in deleting the file */
-            //TODO log it?
+            Activator.getDefault().logError("Failed to delete" + historyTreeFile.getName()); //$NON-NLS-1$
         }
     }
 
@@ -178,9 +180,12 @@ class HT_IO {
      * Seek the given FileChannel to the position corresponding to the node that
      * has seqNumber
      *
-     * @param fc the channel to seek
-     * @param seqNumber the node sequence number to seek the channel to
+     * @param fc
+     *            the channel to seek
+     * @param seqNumber
+     *            the node sequence number to seek the channel to
      * @throws IOException
+     *             If some other I/O error occurs
      */
     private void seekFCToNodePos(FileChannel fc, int seqNumber)
             throws IOException {
@@ -189,7 +194,7 @@ class HT_IO {
          * doesn't get truncated
          */
         fc.position(HistoryTree.TREE_HEADER_SIZE
-                + ((long) seqNumber)  * fConfig.getBlockSize());
+                + ((long) seqNumber) * fConfig.getBlockSize());
     }
 
 }
