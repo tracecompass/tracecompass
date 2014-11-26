@@ -96,12 +96,11 @@ public class LttngKernelTrace extends CtfTmfTrace {
          * metadata
          */
         Map<String, String> traceEnv = this.getCTFTrace().getEnvironment();
-        String domain = traceEnv.get("domain"); //$NON-NLS-1$
         String tracerName = traceEnv.get("tracer_name"); //$NON-NLS-1$
         String tracerMajor = traceEnv.get("tracer_major"); //$NON-NLS-1$
         String tracerMinor = traceEnv.get("tracer_minor"); //$NON-NLS-1$
 
-        if ("\"kernel-perf\"".equals(domain)) { //$NON-NLS-1$
+        if ("\"perf\"".equals(tracerName)) { //$NON-NLS-1$
             fOriginTracer = OriginTracer.PERF;
 
         } else if ("\"lttng-modules\"".equals(tracerName) && //$NON-NLS-1$
@@ -130,7 +129,7 @@ public class LttngKernelTrace extends CtfTmfTrace {
             CTFTrace temp = new CTFTrace(path);
             /* Make sure the domain is "kernel" in the trace's env vars */
             String dom = temp.getEnvironment().get("domain"); //$NON-NLS-1$
-            if (dom != null && dom.startsWith("\"kernel")) { //$NON-NLS-1$
+            if (dom != null && dom.equals("\"kernel\"")) { //$NON-NLS-1$
                 return new TraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID);
             }
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.LttngKernelTrace_DomainError);
