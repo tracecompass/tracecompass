@@ -107,7 +107,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
      */
     private DrawableToolTip fTooltip = null;
     /**
-     *  Array of colors for displaying wight of time deltas.
+     * Array of colors for displaying wight of time deltas.
      */
     private ColorImpl[] fColors;
     /**
@@ -135,11 +135,11 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
      */
     private IColor fLifelineColor = null;
     /**
-     *  The next graph node y coordinate.
+     * The next graph node y coordinate.
      */
     private int fNextNodeY = 0;
     /**
-     *  The previous graph node y coordinate.
+     * The previous graph node y coordinate.
      */
     private int fPrevNodeY = 0;
 
@@ -149,8 +149,10 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
     /**
      * Standard constructor
      *
-     * @param parent The parent composite
-     * @param s The style bits
+     * @param parent
+     *            The parent composite
+     * @param s
+     *            The style bits
      */
     public TimeCompressionBar(Composite parent, int s) {
         super(parent, s | SWT.NO_BACKGROUND, false);
@@ -207,7 +209,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
                     e.detail = ACC.ROLE_LABEL;
                     break;
                 default:
-                   break;
+                    break;
                 }
             }
 
@@ -249,7 +251,8 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
     /**
      * Sets the focus widget
      *
-     * @param newFocusShape widget reference to set
+     * @param newFocusShape
+     *            widget reference to set
      */
     void setFocus(int newFocusShape) {
         fFocusedWidget = newFocusShape;
@@ -263,7 +266,8 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
     /**
      * Sets the current frame.
      *
-     * @param theFrame The frame to set
+     * @param theFrame
+     *            The frame to set
      */
     public void setFrame(Frame theFrame) {
         fFrame = theFrame;
@@ -289,12 +293,8 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         }
         for (int i = firstVisible; i < fFrame.syncMessageCount(); i = i + messageArraysStep) {
             SyncMessage m = fFrame.getSyncMessage(i);
-            if (m.hasTimeInfo()) {
-                SDTimeEvent t = new SDTimeEvent(m.getStartTime(), m.getEventOccurrence(), m);
-                fNodeList.add(t);
-                if (m.getY() * fZoomValue > getContentsY() + getVisibleHeight()) {
-                    break;
-                }
+            if (addMessageIfVisible(m)) {
+                break;
             }
         }
 
@@ -304,12 +304,8 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         }
         for (int i = firstVisible; i < fFrame.syncMessageReturnCount(); i = i + messageArraysStep) {
             SyncMessage m = fFrame.getSyncMessageReturn(i);
-            if (m.hasTimeInfo()) {
-                SDTimeEvent t = new SDTimeEvent(m.getStartTime(), m.getEventOccurrence(), m);
-                fNodeList.add(t);
-                if (m.getY() * fZoomValue > getContentsY() + getVisibleHeight()) {
-                    break;
-                }
+            if (addMessageIfVisible(m)) {
+                break;
             }
         }
 
@@ -318,15 +314,9 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
             firstVisible = firstVisible - 1;
         }
         for (int i = firstVisible; i < fFrame.asyncMessageCount(); i = i + messageArraysStep) {
-            AsyncMessage m = fFrame.getAsyncMessage(i);
-            if (m.hasTimeInfo()) {
-                SDTimeEvent t = new SDTimeEvent(m.getStartTime(), m.getStartOccurrence(), m);
-                fNodeList.add(t);
-                t = new SDTimeEvent(m.getEndTime(), m.getEndOccurrence(), m);
-                fNodeList.add(t);
-                if (m.getY() * fZoomValue > getContentsY() + getVisibleHeight()) {
-                    break;
-                }
+            BaseMessage m = fFrame.getAsyncMessage(i);
+            if (addMessageIfVisible(m)) {
+                break;
             }
         }
 
@@ -336,14 +326,8 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         }
         for (int i = firstVisible; i < fFrame.asyncMessageReturnCount(); i = i + messageArraysStep) {
             AsyncMessageReturn m = fFrame.getAsyncMessageReturn(i);
-            if (m.hasTimeInfo()) {
-                SDTimeEvent t = new SDTimeEvent(m.getStartTime(), m.getStartOccurrence(), m);
-                fNodeList.add(t);
-                t = new SDTimeEvent(m.getEndTime(), m.getEndOccurrence(), m);
-                fNodeList.add(t);
-                if (m.getY() * fZoomValue > getContentsY() + getVisibleHeight()) {
-                    break;
-                }
+            if (addMessageIfVisible(m)) {
+                break;
             }
         }
 
@@ -396,36 +380,9 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
             if (color.getColor() instanceof Color) {
                 gcim.setBackground((Color) color.getColor());
             }
-            int y1 = ((GraphNode) m1.getGraphNode()).getY();
-            int y2 = ((GraphNode) m2.getGraphNode()).getY();
-            if (m1.getGraphNode() instanceof AsyncMessage) {
-                AsyncMessage as = (AsyncMessage) m1.getGraphNode();
-                if (as.getEndTime() == m1.getTime()) {
-                    y1 += as.getHeight();
-                }
-            }
-            if (m2.getGraphNode() instanceof AsyncMessage) {
-                AsyncMessage as = (AsyncMessage) m2.getGraphNode();
-                if (as.getEndTime() == m2.getTime()) {
-                    y2 += as.getHeight();
-                }
-            }
-            if (m1.getGraphNode() instanceof ExecutionOccurrence) {
-
-                ExecutionOccurrence eo = (ExecutionOccurrence) m1.getGraphNode();
-                if (m1.getEvent() == eo.getEndOccurrence()) {
-                    y1 += eo.getHeight();
-                }
-
-                if (m2.getGraphNode() instanceof ExecutionOccurrence) {
-
-                    ExecutionOccurrence eo2 = (ExecutionOccurrence) m2.getGraphNode();
-                    if (m2.getEvent() == eo2.getEndOccurrence()) {
-                        y2 += eo2.getHeight();
-                    }
-
-                }
-            }
+            PairOfYs poy = adjustHeights(m1, m2);
+            int y1 = poy.getY1();
+            int y2 = poy.getY2();
             gcim.fillRectangle(contentsToViewX(0), contentsToViewY(Math.round(y1 * fZoomValue)), 10, Math.round((y2 - y1) * fZoomValue) + 1);
             if (messageArraysStep == 1) {
                 Color backupColor = gcim.getForeground();
@@ -445,6 +402,54 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
         gcim.dispose();
         dbuffer.dispose();
         gc.dispose();
+    }
+
+    private boolean addMessageIfVisible(BaseMessage m) {
+        if (m instanceof ITimeRange) {
+            ITimeRange timeRange = (ITimeRange) m;
+            if (timeRange.hasTimeInfo()) {
+                SDTimeEvent t = new SDTimeEvent(timeRange.getStartTime(), m.getStartOccurrence(), timeRange);
+                fNodeList.add(t);
+                if (m instanceof AsyncMessage) {
+                    t = new SDTimeEvent(timeRange.getEndTime(), m.getEndOccurrence(), timeRange);
+                    fNodeList.add(t);
+                }
+                return isNotVisible(m);
+            }
+        }
+        return false;
+    }
+
+    private boolean isNotVisible(BaseMessage m) {
+        return m.getY() * fZoomValue > getContentsY() + getVisibleHeight();
+    }
+
+    private static int addHeightIfAsynchronousMessage(SDTimeEvent timeEvent, int yPos) {
+        if (timeEvent.getGraphNode() instanceof AsyncMessage) {
+            AsyncMessage as = (AsyncMessage) timeEvent.getGraphNode();
+            if (as.getEndTime() == timeEvent.getTime()) {
+                return yPos + as.getHeight();
+            }
+        }
+        return yPos;
+    }
+
+    private static int addHeight(SDTimeEvent timeEvent, int yPos) {
+        ExecutionOccurrence eo = (ExecutionOccurrence) timeEvent.getGraphNode();
+        if (timeEvent.getEvent() == eo.getEndOccurrence()) {
+            return yPos + eo.getHeight();
+        }
+        return yPos;
+    }
+
+    private static int addHeightIfExecutionOccurence(SDTimeEvent timeWidget, int yPos) {
+        if (timeWidget.getGraphNode() instanceof ExecutionOccurrence) {
+            ExecutionOccurrence eo2 = (ExecutionOccurrence) timeWidget.getGraphNode();
+            if (timeWidget.getEvent() == eo2.getEndOccurrence()) {
+                return yPos + eo2.getHeight();
+            }
+        }
+        return yPos;
     }
 
     /**
@@ -507,45 +512,13 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
                 SDTimeEvent m1 = fNodeList.get(i);
                 SDTimeEvent m2 = fNodeList.get(i + 1);
 
-                if ((SDViewPref.getInstance().excludeExternalTime()) && ((m1.getGraphNode() instanceof BaseMessage) && (m2.getGraphNode() instanceof BaseMessage))) {
-                    BaseMessage mes1 = (BaseMessage) m1.getGraphNode();
-                    BaseMessage mes2 = (BaseMessage) m2.getGraphNode();
-                    if ((mes2.getStartLifeline() == null) || (mes1.getEndLifeline() == null)) {
-                        continue;
-                    }
+                if (skipIfLifelineIsNull(m1, m2)) {
+                    continue;
                 }
+                PairOfYs poy = adjustHeights(m1, m2);
 
-                int y1 = ((GraphNode) m1.getGraphNode()).getY();
-                int y2 = ((GraphNode) m2.getGraphNode()).getY();
-
-                if (m1.getGraphNode() instanceof AsyncMessage) {
-                    AsyncMessage as = (AsyncMessage) m1.getGraphNode();
-                    if (as.getEndTime() == m1.getTime()) {
-                        y1 += as.getHeight();
-                    }
-                }
-                if (m2.getGraphNode() instanceof AsyncMessage) {
-                    AsyncMessage as = (AsyncMessage) m2.getGraphNode();
-                    if (as.getEndTime() == m2.getTime()) {
-                        y2 += as.getHeight();
-                    }
-                }
-                if (m1.getGraphNode() instanceof ExecutionOccurrence) {
-                    ExecutionOccurrence eo = (ExecutionOccurrence) m1.getGraphNode();
-                    if (m1.getEvent() == eo.getEndOccurrence()) {
-                        y1 += eo.getHeight();
-                    }
-
-                    if (m2.getGraphNode() instanceof ExecutionOccurrence) {
-
-                        ExecutionOccurrence eo2 = (ExecutionOccurrence) m2.getGraphNode();
-                        if (m2.getEvent() == eo2.getEndOccurrence()) {
-                            y2 += eo2.getHeight();
-                        }
-                    }
-                }
-                int m1Y = Math.round(y1 * fZoomValue);
-                int m2Y = Math.round(y2 * fZoomValue);
+                int m1Y = Math.round(poy.getY1() * fZoomValue);
+                int m2Y = Math.round(poy.getY2() * fZoomValue);
                 if ((m1Y < e.y) && (m2Y >= e.y)) {
                     ITmfTimestamp delta = m2.getTime().getDelta(m1.getTime());
                     fTooltip.showToolTip(delta, fMinTime, fMaxTime);
@@ -676,11 +649,14 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
     }
 
     /**
-     * Force the time compression bar to highlight the event occurrences between the two given messages. The event
-     * occurrences are highlighted on the first message's end lifeline
+     * Force the time compression bar to highlight the event occurrences between
+     * the two given messages. The event occurrences are highlighted on the
+     * first message's end lifeline
      *
-     * @param mes1 the first message
-     * @param mes2 the second message
+     * @param mes1
+     *            the first message
+     * @param mes2
+     *            the second message
      */
     public void highlightRegionSync(final BaseMessage mes1, final BaseMessage mes2) {
         getDisplay().syncExec(new Runnable() {
@@ -698,7 +674,8 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
     /**
      * Sets the zoom value.
      *
-     * @param value The zoom value to set.
+     * @param value
+     *            The zoom value to set.
      */
     public void setZoom(float value) {
         fZoomValue = value;
@@ -706,9 +683,11 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
     }
 
     /**
-     * Adds a listener to the time compression listener list to be notified about selected deltas.
+     * Adds a listener to the time compression listener list to be notified
+     * about selected deltas.
      *
-     * @param listener The listener to add
+     * @param listener
+     *            The listener to add
      */
     public void addTimeCompressionListener(ITimeCompressionListener listener) {
         if (!fListenerList.contains(listener)) {
@@ -719,7 +698,8 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
     /**
      * Removes a time compression listener.
      *
-     * @param listener The listener to remove.
+     * @param listener
+     *            The listener to remove.
      */
     public void removeSelectionChangedListener(ITimeCompressionListener listener) {
         fListenerList.remove(listener);
@@ -759,44 +739,14 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
             for (int i = 0; i < fNodeList.size() - 1 && i < 1; i++) {
                 SDTimeEvent m1 = fNodeList.get(i);
                 SDTimeEvent m2 = fNodeList.get(i + 1);
-                if ((SDViewPref.getInstance().excludeExternalTime()) && ((m1.getGraphNode() instanceof BaseMessage) && (m2.getGraphNode() instanceof BaseMessage))) {
-                    BaseMessage mes1 = (BaseMessage) m1.getGraphNode();
-                    BaseMessage mes2 = (BaseMessage) m2.getGraphNode();
-                    if ((mes2.getStartLifeline() == null) || (mes1.getEndLifeline() == null)) {
-                        continue;
-                    }
+                if (skipIfLifelineIsNull(m1, m2)) {
+                    continue;
                 }
 
-                int y1 = ((GraphNode) m1.getGraphNode()).getY();
-                int y2 = ((GraphNode) m2.getGraphNode()).getY();
-                if (m1.getGraphNode() instanceof AsyncMessage) {
-                    AsyncMessage as = (AsyncMessage) m1.getGraphNode();
-                    if (as.getEndTime() == m1.getTime()) {
-                        y1 += as.getHeight();
-                    }
-                }
-                if (m2.getGraphNode() instanceof AsyncMessage) {
-                    AsyncMessage as = (AsyncMessage) m2.getGraphNode();
-                    if (as.getEndTime() == m2.getTime()) {
-                        y2 += as.getHeight();
-                    }
-                }
-                if (m1.getGraphNode() instanceof ExecutionOccurrence) {
-                    ExecutionOccurrence eo = (ExecutionOccurrence) m1.getGraphNode();
-                    if (m1.getEvent() == eo.getEndOccurrence()) {
-                        y1 += eo.getHeight();
-                    }
+                PairOfYs poy = adjustHeights(m1, m2);
 
-                    if (m2.getGraphNode() instanceof ExecutionOccurrence) {
-
-                        ExecutionOccurrence eo2 = (ExecutionOccurrence) m2.getGraphNode();
-                        if (m2.getEvent() == eo2.getEndOccurrence()) {
-                            y2 += eo2.getHeight();
-                        }
-                    }
-                }
-                fPrevNodeY = Math.round(y1 * fZoomValue);
-                fNextNodeY = Math.round(y2 * fZoomValue);
+                fPrevNodeY = Math.round(poy.getY1() * fZoomValue);
+                fNextNodeY = Math.round(poy.getY2() * fZoomValue);
             }
         }
 
@@ -827,8 +777,10 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
     /**
      * Selects the time delta for given delta y coordinate and direction.
      *
-     * @param dy The delta in y coordinate.
-     * @param direction 0 no direction, 1 = down, 2 = up
+     * @param dy
+     *            The delta in y coordinate.
+     * @param direction
+     *            0 no direction, 1 = down, 2 = up
      */
     protected void selectTimeDelta(int dy, int direction) {
         SDTimeEvent lastM1 = null;
@@ -840,43 +792,14 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
             for (int i = 0; i < fNodeList.size() - 1; i++) {
                 SDTimeEvent m1 = fNodeList.get(i);
                 SDTimeEvent m2 = fNodeList.get(i + 1);
-                if ((SDViewPref.getInstance().excludeExternalTime()) && ((m1.getGraphNode() instanceof BaseMessage) && (m2.getGraphNode() instanceof BaseMessage))) {
-                    BaseMessage mes1 = (BaseMessage) m1.getGraphNode();
-                    BaseMessage mes2 = (BaseMessage) m2.getGraphNode();
-                    if ((mes2.getStartLifeline() == null) || (mes1.getEndLifeline() == null)) {
-                        continue;
-                    }
+                if (skipIfLifelineIsNull(m1, m2)) {
+                    continue;
                 }
 
-                int y1 = ((GraphNode) m1.getGraphNode()).getY();
-                int y2 = ((GraphNode) m2.getGraphNode()).getY();
-                if (m1.getGraphNode() instanceof AsyncMessage) {
-                    AsyncMessage as = (AsyncMessage) m1.getGraphNode();
-                    if (as.getEndTime() == m1.getTime()) {
-                        y1 += as.getHeight();
-                    }
-                }
-                if (m2.getGraphNode() instanceof AsyncMessage) {
-                    AsyncMessage as = (AsyncMessage) m2.getGraphNode();
-                    if (as.getEndTime() == m2.getTime()) {
-                        y2 += as.getHeight();
-                    }
-                }
-                if (m1.getGraphNode() instanceof ExecutionOccurrence) {
-                    ExecutionOccurrence eo = (ExecutionOccurrence) m1.getGraphNode();
-                    if (m1.getEvent() == eo.getEndOccurrence()) {
-                        y1 += eo.getHeight();
-                    }
+                PairOfYs poy = adjustHeights(m1, m2);
 
-                    if (m2.getGraphNode() instanceof ExecutionOccurrence) {
-                        ExecutionOccurrence eo2 = (ExecutionOccurrence) m2.getGraphNode();
-                        if (m2.getEvent() == eo2.getEndOccurrence()) {
-                            y2 += eo2.getHeight();
-                        }
-                    }
-                }
-                int m1Y = Math.round(y1 * fZoomValue);
-                int m2Y = Math.round(y2 * fZoomValue);
+                int m1Y = Math.round(poy.getY1() * fZoomValue);
+                int m2Y = Math.round(poy.getY2() * fZoomValue);
 
                 if ((m1Y < dy) && (m2Y > dy) || (!done && m2Y > dy && direction == 1 && lastM1 != null) || (!done && m1Y > dy && direction == 2 && lastM1 != null)) {
                     if (m1Y > dy && direction == 2) {
@@ -965,46 +888,12 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
             for (int i = 0; i < fNodeList.size() - 1; i++) {
                 SDTimeEvent m1 = fNodeList.get(i);
                 SDTimeEvent m2 = fNodeList.get(i + 1);
-
-                if ((SDViewPref.getInstance().excludeExternalTime()) && ((m1.getGraphNode() instanceof BaseMessage) && (m2.getGraphNode() instanceof BaseMessage))) {
-                    BaseMessage mes1 = (BaseMessage) m1.getGraphNode();
-                    BaseMessage mes2 = (BaseMessage) m2.getGraphNode();
-                    if ((mes2.getStartLifeline() == null) || (mes1.getEndLifeline() == null)) {
-                        continue;
-                    }
+                if (skipIfLifelineIsNull(m1, m2)) {
+                    continue;
                 }
-
-                int y1 = ((GraphNode) m1.getGraphNode()).getY();
-                int y2 = ((GraphNode) m2.getGraphNode()).getY();
-
-                if (m1.getGraphNode() instanceof AsyncMessage) {
-                    AsyncMessage as = (AsyncMessage) m1.getGraphNode();
-                    if (as.getEndTime() == m1.getTime()) {
-                        y1 += as.getHeight();
-                    }
-                }
-                if (m2.getGraphNode() instanceof AsyncMessage) {
-                    AsyncMessage as = (AsyncMessage) m2.getGraphNode();
-                    if (as.getEndTime() == m2.getTime()) {
-                        y2 += as.getHeight();
-                    }
-                }
-                if (m1.getGraphNode() instanceof ExecutionOccurrence) {
-                    ExecutionOccurrence eo = (ExecutionOccurrence) m1.getGraphNode();
-                    if (m1.getEvent() == eo.getEndOccurrence()) {
-                        y1 += eo.getHeight();
-                    }
-
-                    if (m2.getGraphNode() instanceof ExecutionOccurrence) {
-
-                        ExecutionOccurrence eo2 = (ExecutionOccurrence) m2.getGraphNode();
-                        if (m2.getEvent() == eo2.getEndOccurrence()) {
-                            y2 += eo2.getHeight();
-                        }
-                    }
-                }
-                int m1Y = Math.round(y1 * fZoomValue);
-                int m2Y = Math.round(y2 * fZoomValue);
+                PairOfYs poy = adjustHeights(m1, m2);
+                int m1Y = Math.round(poy.getY1() * fZoomValue);
+                int m2Y = Math.round(poy.getY2() * fZoomValue);
                 if ((m1Y < fPrevNodeY + 1) && (m2Y >= fPrevNodeY + 1)) {
                     ITmfTimestamp delta = m2.getTime().getDelta(m1.getTime());
                     fTooltip.showToolTip(delta, fMinTime, fMaxTime);
@@ -1012,6 +901,48 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
                 }
             }
         }
+    }
+
+    private static PairOfYs adjustHeights(SDTimeEvent m1, SDTimeEvent m2) {
+        int y1 = ((GraphNode) m1.getGraphNode()).getY();
+        int y2 = ((GraphNode) m2.getGraphNode()).getY();
+
+        y1 = addHeightIfAsynchronousMessage(m1, y1);
+        y2 = addHeightIfAsynchronousMessage(m2, y2);
+        if (m1.getGraphNode() instanceof ExecutionOccurrence) {
+            y1 = addHeight(m1, y1);
+            y2 = addHeightIfExecutionOccurence(m2, y2);
+        }
+        return new PairOfYs(y1, y2);
+    }
+
+    private static class PairOfYs {
+        private final int fY1, fY2;
+
+        public PairOfYs(int y1, int y2) {
+            fY1 = y1;
+            fY2 = y2;
+        }
+
+        public int getY1() {
+            return fY1;
+        }
+
+        public int getY2() {
+            return fY2;
+        }
+
+    }
+
+    private static boolean skipIfLifelineIsNull(SDTimeEvent m1, SDTimeEvent m2) {
+        if ((SDViewPref.getInstance().excludeExternalTime()) && ((m1.getGraphNode() instanceof BaseMessage) && (m2.getGraphNode() instanceof BaseMessage))) {
+            BaseMessage mes1 = (BaseMessage) m1.getGraphNode();
+            BaseMessage mes2 = (BaseMessage) m2.getGraphNode();
+            if ((mes2.getStartLifeline() == null) || (mes1.getEndLifeline() == null)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
