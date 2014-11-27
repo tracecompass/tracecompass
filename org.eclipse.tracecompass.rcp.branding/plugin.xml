@@ -17,7 +17,7 @@
             </property>
             <property
                   name="aboutImage"
-                  value="icons/tc_about.gif">
+                  value="icons/tc_about.png">
             </property>
             <property
                   name="aboutText"
