@@ -416,7 +416,7 @@ public class CTFStreamInput implements IDefinitionScope {
 
         /* Read the content size in bits */
         if (contentSize != null) {
-            packetIndex.setContentSizeBits(contentSize.intValue());
+            packetIndex.setContentSizeBits(contentSize.longValue());
         } else if (packetSize != null) {
             packetIndex.setContentSizeBits(packetSize.longValue());
         } else {
@@ -425,7 +425,7 @@ public class CTFStreamInput implements IDefinitionScope {
 
         /* Read the packet size in bits */
         if (packetSize != null) {
-            packetIndex.setPacketSizeBits(packetSize.intValue());
+            packetIndex.setPacketSizeBits(packetSize.longValue());
         } else if (packetIndex.getContentSizeBits() != 0) {
             packetIndex.setPacketSizeBits(packetIndex.getContentSizeBits());
         } else {

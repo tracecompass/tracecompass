@@ -93,7 +93,7 @@ public final class BitBuffer {
         fBuffer = buf;
         setByteOrder(order);
         resetPosition();
-        fBitCapacity = fBuffer.capacity() * BIT_CHAR;
+        fBitCapacity = (long) fBuffer.capacity() * BIT_CHAR;
     }
 
     private void resetPosition() {
