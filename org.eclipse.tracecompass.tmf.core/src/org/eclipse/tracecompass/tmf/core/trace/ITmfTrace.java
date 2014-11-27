@@ -243,46 +243,15 @@ public interface ITmfTrace extends ITmfEventProvider {
      *            The analysis module ID
      * @return The {@link IAnalysisModule} object, or null if an analysis with
      *         the given ID does no exist.
-     * @since 3.0
      */
-    @Nullable
-    IAnalysisModule getAnalysisModule(String id);
+    @Nullable IAnalysisModule getAnalysisModule(String id);
 
     /**
      * Get a list of all analysis modules currently available for this trace.
      *
      * @return An iterable view of the analysis modules
-     * @since 3.0
      */
-    @NonNull
-    Iterable<IAnalysisModule> getAnalysisModules();
-
-    /**
-     * Get an analysis module belonging to this trace, with the specified ID and
-     * class.
-     *
-     * @param moduleClass
-     *            Returned modules must extend this class
-     * @param id
-     *            The ID of the analysis module
-     * @return The analysis module with specified class and ID, or null if no
-     *         such module exists.
-     * @since 3.0
-     */
-    @Nullable
-    <T extends IAnalysisModule> T getAnalysisModuleOfClass(Class<T> moduleClass, String id);
-
-    /**
-     * Return the analysis modules that are of a given class. Module are already
-     * casted to the requested class.
-     *
-     * @param moduleClass
-     *            Returned modules must extend this class
-     * @return List of modules of class moduleClass
-     * @since 3.0
-     */
-    @NonNull
-    <T> Iterable<T> getAnalysisModulesOfClass(Class<T> moduleClass);
+    @NonNull Iterable<IAnalysisModule> getAnalysisModules();
 
     // ------------------------------------------------------------------------
     // Aspect getters

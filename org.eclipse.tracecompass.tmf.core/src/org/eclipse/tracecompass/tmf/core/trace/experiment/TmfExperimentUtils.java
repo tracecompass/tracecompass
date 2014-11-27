@@ -19,6 +19,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 /**
  * This utility class contains some utility methods to retrieve specific traces
@@ -86,7 +87,7 @@ public final class TmfExperimentUtils {
      */
     public static @Nullable <T extends IAnalysisModule> T getAnalysisModuleOfClassForHost(TmfExperiment experiment, String hostId, Class<T> moduleClass) {
         for (ITmfTrace trace : getTracesFromHost(experiment, hostId)) {
-            for (T module : trace.getAnalysisModulesOfClass(moduleClass)) {
+            for (T module : TmfTraceUtils.getAnalysisModulesOfClass(trace, moduleClass)) {
                 return module;
             }
         }

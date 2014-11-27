@@ -22,6 +22,7 @@ import org.eclipse.tracecompass.tmf.core.statistics.ITmfStatistics;
 import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.barcharts.TmfBarChartViewer;
 import org.swtchart.Chart;
 import org.swtchart.IAxis;
@@ -75,7 +76,7 @@ public class NewHistogramViewer extends TmfBarChartViewer {
                     for (ITmfTrace trace : TmfTraceManager.getTraceSet(getTrace())) {
                         /* Retrieve the statistics object */
                         final TmfStatisticsModule statsMod =
-                               trace.getAnalysisModuleOfClass(TmfStatisticsModule.class, TmfStatisticsModule.ID);
+                               TmfTraceUtils.getAnalysisModuleOfClass(trace, TmfStatisticsModule.class, TmfStatisticsModule.ID);
                         if (statsMod == null) {
                             /* No statistics module available for this trace */
                             continue;

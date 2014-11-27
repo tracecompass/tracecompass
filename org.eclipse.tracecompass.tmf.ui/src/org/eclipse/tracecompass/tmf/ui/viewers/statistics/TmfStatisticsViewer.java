@@ -49,6 +49,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 import org.eclipse.tracecompass.tmf.ui.TmfUiRefreshHandler;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
@@ -642,7 +643,7 @@ public class TmfStatisticsViewer extends TmfViewer {
             }
 
             /* Retrieve the statistics object */
-            final TmfStatisticsModule statsMod = aTrace.getAnalysisModuleOfClass(TmfStatisticsModule.class, TmfStatisticsModule.ID);
+            final TmfStatisticsModule statsMod = TmfTraceUtils.getAnalysisModuleOfClass(aTrace, TmfStatisticsModule.class, TmfStatisticsModule.ID);
             if (statsMod == null) {
                 /* No statistics module available for this trace */
                 continue;

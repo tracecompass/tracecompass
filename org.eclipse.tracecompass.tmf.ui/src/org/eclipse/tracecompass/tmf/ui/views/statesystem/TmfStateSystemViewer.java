@@ -42,6 +42,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractTmfTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
@@ -206,7 +207,7 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
 
     private static TmfTreeViewerEntry createTraceEntry(ITmfTrace trace) {
         TmfTreeViewerEntry traceEntry = new TmfTreeViewerEntry(trace.getName());
-        Iterable<ITmfAnalysisModuleWithStateSystems> modules = trace.getAnalysisModulesOfClass(ITmfAnalysisModuleWithStateSystems.class);
+        Iterable<ITmfAnalysisModuleWithStateSystems> modules = TmfTraceUtils.getAnalysisModulesOfClass(trace, ITmfAnalysisModuleWithStateSystems.class);
         for (ITmfAnalysisModuleWithStateSystems module : modules) {
             /* Just schedule the module, the data will be filled when available */
             module.schedule();

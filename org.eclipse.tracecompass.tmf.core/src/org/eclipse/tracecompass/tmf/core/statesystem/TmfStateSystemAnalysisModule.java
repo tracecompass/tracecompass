@@ -45,6 +45,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceCompleteness;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 
 /**
@@ -109,7 +110,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
      */
     public static @Nullable ITmfStateSystem getStateSystem(ITmfTrace trace, String moduleId) {
         TmfStateSystemAnalysisModule module =
-                trace.getAnalysisModuleOfClass(TmfStateSystemAnalysisModule.class, moduleId);
+                TmfTraceUtils.getAnalysisModuleOfClass(trace, TmfStateSystemAnalysisModule.class, moduleId);
         if (module != null) {
             IStatus status = module.schedule();
             if (status.isOK()) {

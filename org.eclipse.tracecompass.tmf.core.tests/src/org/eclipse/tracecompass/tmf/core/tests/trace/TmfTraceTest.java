@@ -34,8 +34,8 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
+import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
@@ -439,7 +439,7 @@ public class TmfTraceTest {
     // ------------------------------------------------------------------------
 
     @Test
-    public void testGetModulesByClass() {
+    public void testGetModules() {
         /* There should not be any modules at this point */
         Iterable<IAnalysisModule> modules = fTrace.getAnalysisModules();
         assertFalse(modules.iterator().hasNext());
@@ -448,22 +448,26 @@ public class TmfTraceTest {
         fTrace.traceOpened(new TmfTraceOpenedSignal(this, fTrace, null));
 
         modules = fTrace.getAnalysisModules();
-        Iterable<TestAnalysis> testModules = fTrace.getAnalysisModulesOfClass(TestAnalysis.class);
         assertTrue(modules.iterator().hasNext());
-        assertTrue(testModules.iterator().hasNext());
 
         /*
          * Make sure all modules of type TestAnalysis are returned in the second
          * call
          */
+        int count = 0;
         for (IAnalysisModule module : modules) {
             if (module instanceof TestAnalysis) {
+                count++;
                 IAnalysisModule otherModule = fTrace.getAnalysisModule(module.getId());
                 assertNotNull(otherModule);
-                assertTrue(otherModule.equals(module));
+                assertEquals(otherModule, module);
             }
         }
-
+        /*
+         * FIXME: The exact count depends on the context the test is run (full
+         * test suite or this file only), but there must be at least 2 modules
+         */
+        assertTrue(count >= 2);
     }
 
     // ------------------------------------------------------------------------

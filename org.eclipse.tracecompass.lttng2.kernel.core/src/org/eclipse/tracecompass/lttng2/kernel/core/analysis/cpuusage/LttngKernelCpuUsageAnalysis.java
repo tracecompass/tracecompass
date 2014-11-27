@@ -35,6 +35,7 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 /**
  * This analysis module computes the CPU usage of a system from a kernel trace.
@@ -87,9 +88,11 @@ public class LttngKernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
          * This analysis depends on the LTTng kernel analysis, so it's added to
          * dependent modules.
          */
-        Iterable<LttngKernelAnalysis> kernelModules = trace.getAnalysisModulesOfClass(LttngKernelAnalysis.class);
-        if (kernelModules.iterator().hasNext()) {
-            modules.add(kernelModules.iterator().next());
+        Iterable<LttngKernelAnalysis> kernelModules = TmfTraceUtils.getAnalysisModulesOfClass(trace, LttngKernelAnalysis.class);
+        for (LttngKernelAnalysis kernelModule : kernelModules) {
+            /* Only add the first one we find, if there is one */
+            modules.add(kernelModule);
+            break;
         }
         return modules;
     }

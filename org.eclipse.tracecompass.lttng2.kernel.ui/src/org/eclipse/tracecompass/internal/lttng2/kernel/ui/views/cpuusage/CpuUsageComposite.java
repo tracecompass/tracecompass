@@ -35,6 +35,7 @@ import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractTmfTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
@@ -194,7 +195,7 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
 
     @Override
     public void initializeDataSource() {
-        fModule = getTrace().getAnalysisModuleOfClass(LttngKernelCpuUsageAnalysis.class, LttngKernelCpuUsageAnalysis.ID);
+        fModule = TmfTraceUtils.getAnalysisModuleOfClass(getTrace(), LttngKernelCpuUsageAnalysis.class, LttngKernelCpuUsageAnalysis.ID);
         if (fModule == null) {
             return;
         }

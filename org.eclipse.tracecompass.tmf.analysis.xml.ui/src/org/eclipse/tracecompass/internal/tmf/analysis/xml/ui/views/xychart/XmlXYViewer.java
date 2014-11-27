@@ -43,6 +43,7 @@ import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlString
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
 import org.w3c.dom.Element;
 
@@ -337,12 +338,12 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
             /*
              * No analysis specified, take all state system analysis modules
              */
-            for (ITmfAnalysisModuleWithStateSystems module : trace.getAnalysisModulesOfClass(ITmfAnalysisModuleWithStateSystems.class)) {
+            for (ITmfAnalysisModuleWithStateSystems module : TmfTraceUtils.getAnalysisModulesOfClass(trace, ITmfAnalysisModuleWithStateSystems.class)) {
                 stateSystemModules.add(module);
             }
         } else {
             for (String moduleId : analysisIds) {
-                ITmfAnalysisModuleWithStateSystems module = trace.getAnalysisModuleOfClass(ITmfAnalysisModuleWithStateSystems.class, moduleId);
+                ITmfAnalysisModuleWithStateSystems module = TmfTraceUtils.getAnalysisModuleOfClass(trace, ITmfAnalysisModuleWithStateSystems.class, moduleId);
                 if (module != null) {
                     stateSystemModules.add(module);
                 }

@@ -50,6 +50,7 @@ import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithState
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider2;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
@@ -253,12 +254,12 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
                 /*
                  * No analysis specified, take all state system analysis modules
                  */
-                for (ITmfAnalysisModuleWithStateSystems module : aTrace.getAnalysisModulesOfClass(ITmfAnalysisModuleWithStateSystems.class)) {
+                for (ITmfAnalysisModuleWithStateSystems module : TmfTraceUtils.getAnalysisModulesOfClass(aTrace, ITmfAnalysisModuleWithStateSystems.class)) {
                     stateSystemModules.add(module);
                 }
             } else {
                 for (String moduleId : analysisIds) {
-                    ITmfAnalysisModuleWithStateSystems module = aTrace.getAnalysisModuleOfClass(ITmfAnalysisModuleWithStateSystems.class, moduleId);
+                    ITmfAnalysisModuleWithStateSystems module = TmfTraceUtils.getAnalysisModuleOfClass(aTrace, ITmfAnalysisModuleWithStateSystems.class, moduleId);
                     if (module != null) {
                         stateSystemModules.add(module);
                     }

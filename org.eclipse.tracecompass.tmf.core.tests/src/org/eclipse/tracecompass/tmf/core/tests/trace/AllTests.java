@@ -26,6 +26,7 @@ import org.junit.runners.Suite;
     TmfExperimentTest.class,
     TmfExperimentUtilsTest.class,
     TmfMultiTraceExperimentTest.class,
-    TmfTraceTest.class
+    TmfTraceTest.class,
+    TmfTraceUtilsTest.class
 })
 public class AllTests {}

@@ -53,6 +53,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 import org.eclipse.tracecompass.tmf.ui.views.filter.FilterManager;
@@ -189,7 +190,7 @@ public class StreamListView extends TmfView {
                 if (trace == null || (!(trace instanceof PcapTrace))) {
                     return;
                 }
-                StreamListAnalysis analysis = trace.getAnalysisModuleOfClass(StreamListAnalysis.class, StreamListAnalysis.ID);
+                StreamListAnalysis analysis = TmfTraceUtils.getAnalysisModuleOfClass(trace, StreamListAnalysis.class, StreamListAnalysis.ID);
                 if (analysis == null) {
                     return;
                 }
@@ -265,7 +266,7 @@ public class StreamListView extends TmfView {
                     return;
                 }
 
-                StreamListAnalysis analysis = trace.getAnalysisModuleOfClass(StreamListAnalysis.class, StreamListAnalysis.ID);
+                StreamListAnalysis analysis = TmfTraceUtils.getAnalysisModuleOfClass(trace, StreamListAnalysis.class, StreamListAnalysis.ID);
                 if (analysis == null) {
                     return;
                 }

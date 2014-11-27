@@ -84,6 +84,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampDelta;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.editors.ITmfTraceEditor;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphContentProvider;
@@ -1320,7 +1321,7 @@ public class CallStackView extends TmfView {
          * will search using the analysis type.
          */
         Iterable<AbstractCallStackAnalysis> modules =
-                trace.getAnalysisModulesOfClass(AbstractCallStackAnalysis.class);
+                TmfTraceUtils.getAnalysisModulesOfClass(trace, AbstractCallStackAnalysis.class);
         Iterator<AbstractCallStackAnalysis> it = modules.iterator();
         if (!it.hasNext()) {
             /* This trace does not provide a call-stack analysis */

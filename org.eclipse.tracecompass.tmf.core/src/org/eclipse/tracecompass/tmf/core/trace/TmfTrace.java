@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
@@ -337,36 +336,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
             Set<IAnalysisModule> modules = new HashSet<>(fAnalysisModules.values());
             return modules;
         }
-    }
-
-    /**
-     * @since 3.0
-     */
-    @Override
-    public <T extends IAnalysisModule> T getAnalysisModuleOfClass(Class<T> moduleClass, String id) {
-        Iterable<T> modules = getAnalysisModulesOfClass(moduleClass);
-        for (T module : modules) {
-            if (id.equals(module.getId())) {
-                return module;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @since 3.0
-     */
-    @Override
-    public <T> Iterable<T> getAnalysisModulesOfClass(Class<T> moduleClass) {
-        Set<T> modules = new HashSet<>();
-        synchronized (fAnalysisModules) {
-            for (Entry<String, IAnalysisModule> entry : fAnalysisModules.entrySet()) {
-                if (moduleClass.isAssignableFrom(entry.getValue().getClass())) {
-                    modules.add(moduleClass.cast(entry.getValue()));
-                }
-            }
-        }
-        return modules;
     }
 
     @Override

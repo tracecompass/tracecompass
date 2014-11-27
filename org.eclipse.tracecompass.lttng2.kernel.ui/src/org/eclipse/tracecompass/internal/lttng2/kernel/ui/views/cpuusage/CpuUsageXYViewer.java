@@ -24,6 +24,7 @@ import org.eclipse.tracecompass.internal.lttng2.kernel.ui.Activator;
 import org.eclipse.tracecompass.lttng2.kernel.core.analysis.cpuusage.LttngKernelCpuUsageAnalysis;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
 
 /**
@@ -63,7 +64,7 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
     @Override
     protected void initializeDataSource() {
         if (getTrace() != null) {
-            fModule = getTrace().getAnalysisModuleOfClass(LttngKernelCpuUsageAnalysis.class, LttngKernelCpuUsageAnalysis.ID);
+            fModule = TmfTraceUtils.getAnalysisModuleOfClass(getTrace(), LttngKernelCpuUsageAnalysis.class, LttngKernelCpuUsageAnalysis.ID);
             if (fModule == null) {
                 return;
             }
