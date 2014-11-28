@@ -12,8 +12,10 @@
 package org.eclipse.tracecompass.ctf.core.tests.types;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -160,6 +162,13 @@ public class SequenceDeclaration2Test {
         assertNotEquals(c, a);
         assertEquals(d, a);
         assertEquals(a, a);
+        assertFalse(a.isBinaryEquivalent(b));
+        assertFalse(a.isBinaryEquivalent(c));
+        assertTrue(a.isBinaryEquivalent(d));
+        assertFalse(b.isBinaryEquivalent(a));
+        assertFalse(c.isBinaryEquivalent(a));
+        assertTrue(d.isBinaryEquivalent(a));
+        assertTrue(a.isBinaryEquivalent(a));
     }
 
 }
