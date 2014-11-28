@@ -60,5 +60,61 @@
             </plugin>
         </plugins>
     </build>
-    <groupId>org.eclipse.tracecompass</groupId>
+
+  <profiles>
+    <profile>
+      <id>deploy-rcp</id>
+      <properties>
+        <rcpDestination>/home/data/httpd/download.eclipse.org/tracecompass/rcp/nightly/</rcpDestination>
+        <productDir>target/products</productDir> <!-- Should not be overriden! -->
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>deploy</id>
+                <phase>install</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <!-- Delete the current contents of the destination -->
+                    <symlink action="delete" link="${rcpDestination}/trace-compass-latest-linux.gtk.x86_64.tar.gz" />
+                    <symlink action="delete" link="${rcpDestination}/trace-compass-latest-linux.gtk.x86.tar.gz" />
+                    <symlink action="delete" link="${rcpDestination}/trace-compass-latest-macosx.cocoa.x86_64.tar.gz" />
+                    <symlink action="delete" link="${rcpDestination}/trace-compass-latest-win32.win32.x86_64.zip" />
+                    <symlink action="delete" link="${rcpDestination}/trace-compass-latest-win32.win32.x86.zip" />
+                    <delete includeemptydirs="false">
+                      <fileset dir="${rcpDestination}">
+                        <include name="**" />
+                      </fileset>
+                    </delete>
+
+                    <!-- Copy the archives to the destination -->
+                    <copy includeemptydirs="false" todir="${rcpDestination}">
+                      <fileset dir="${productDir}">
+                        <include name="trace-compass-*" />
+                      </fileset>
+                    </copy>
+
+                    <!-- Re-create the symlinks pointing to the latest archives -->
+                    <symlink link="${rcpDestination}/trace-compass-latest-linux.gtk.x86_64.tar.gz"    resource="trace-compass-${project.version}-${build.timestamp}-linux.gtk.x86_64.tar.gz" />
+                    <symlink link="${rcpDestination}/trace-compass-latest-linux.gtk.x86.tar.gz"       resource="trace-compass-${project.version}-${build.timestamp}-linux.gtk.x86.tar.gz" />
+                    <symlink link="${rcpDestination}/trace-compass-latest-macosx.cocoa.x86_64.tar.gz" resource="trace-compass-${project.version}-${build.timestamp}-macosx.cocoa.x86_64.tar.gz" />
+                    <symlink link="${rcpDestination}/trace-compass-latest-win32.win32.x86_64.zip"     resource="trace-compass-${project.version}-${build.timestamp}-win32.win32.x86_64.zip" />
+                    <symlink link="${rcpDestination}/trace-compass-latest-win32.win32.x86.zip"        resource="trace-compass-${project.version}-${build.timestamp}-win32.win32.x86.zip" />
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <groupId>org.eclipse.tracecompass</groupId>
 </project>
