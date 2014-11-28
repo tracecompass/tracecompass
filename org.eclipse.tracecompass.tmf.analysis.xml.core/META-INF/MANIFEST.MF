@@ -16,4 +16,3 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.analysis.xml.core;x-friend
  org.eclipse.tracecompass.tmf.analysis.xml.core.model.readwrite,
  org.eclipse.tracecompass.tmf.analysis.xml.core.module,
  org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider
-Import-Package: com.google.common.primitives

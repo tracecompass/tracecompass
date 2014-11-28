@@ -73,8 +73,8 @@ public class TmfTraceUtilsTest {
                     return null;
                 }
                 @Override
-                public String resolve(ITmfEvent event) {
-                    return "1";
+                public Integer resolve(ITmfEvent event) {
+                    return 1;
                 }
             });
             builder.addAll(TmfTrace.BASE_ASPECTS);

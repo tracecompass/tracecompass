@@ -32,8 +32,6 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.w3c.dom.Element;
 
-import com.google.common.primitives.Ints;
-
 /**
  * This Class implements a single attribute value in the XML-defined state
  * system.
@@ -230,9 +228,9 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
                     Iterable<TmfCpuAspect> cpuAspects = TmfTraceUtils.getEventAspectsOfClass(
                             event.getTrace(), TmfCpuAspect.class);
                     for (TmfCpuAspect aspect : cpuAspects) {
-                        String cpu = aspect.resolve(event);
-                        if (Ints.tryParse(cpu) != null) {
-                            quark = getQuarkRelativeAndAdd(startQuark, cpu);
+                        Integer cpu = aspect.resolve(event);
+                        if (!cpu.equals(TmfCpuAspect.CPU_UNAVAILABLE)) {
+                            quark = getQuarkRelativeAndAdd(startQuark, cpu.toString());
                             break;
                         }
                     }

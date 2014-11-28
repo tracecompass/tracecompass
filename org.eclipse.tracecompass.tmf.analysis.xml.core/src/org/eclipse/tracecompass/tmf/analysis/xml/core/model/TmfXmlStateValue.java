@@ -30,8 +30,6 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.w3c.dom.Element;
 
-import com.google.common.primitives.Ints;
-
 /**
  * This Class implements a State Value in the XML-defined state system, along
  * with the path to get to the value (either a list of state attributes or an
@@ -263,9 +261,9 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
                     event.getTrace(), TmfCpuAspect.class);
             for (TmfCpuAspect aspect : cpuAspects) {
                 /* We will just pick the first valid one we find */
-                String cpu = aspect.resolve(event);
-                if (Ints.tryParse(cpu) != null) {
-                    return TmfStateValue.newValueInt(Integer.valueOf(cpu));
+                Integer cpu = aspect.resolve(event);
+                if (!cpu.equals(TmfCpuAspect.CPU_UNAVAILABLE)) {
+                    return TmfStateValue.newValueInt(cpu.intValue());
                 }
             }
         }
