@@ -21,7 +21,7 @@ import org.eclipse.ui.IStartup;
 /**
  * Collection of workarounds needed for dealing with the RSE adapter.
  */
-class Workaround_Bug449362 {
+public class Workaround_Bug449362 {
 
     private static final String RSE_ADAPTER_ID = "org.eclipse.ptp.remote.RSERemoteServices"; //$NON-NLS-1$
 

@@ -13,11 +13,16 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers;
 
+import java.util.Map;
+
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.window.Window;
 import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteServices;
+import org.eclipse.remote.core.RemoteServices;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
+import org.eclipse.tracecompass.internal.lttng2.control.ui.views.Workaround_Bug449362;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.INewConnectionDialog;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.TraceControlDialogFactory;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceControlComponent;
@@ -29,12 +34,29 @@ import org.eclipse.ui.PlatformUI;
 
 /**
  * <p>
- * Command handler for creation new connection for trace control.
+ * Command handler for creation of a new connection for trace control.
+ * <br> By supplying arguments for the parameters with id {@link #PARAMETER_REMOTE_SERVICES_ID} and
+ * {@link #PARAMETER_CONNECTION_NAME}, the caller can specify the remote connection that will
+ * be added to the trace control. In case one of the optional arguments is not supplied, the handler
+ * opens a dialog for selecting a remote connection.
  * </p>
  *
  * @author Bernd Hufmann
  */
 public class NewConnectionHandler extends BaseControlViewHandler {
+
+    /**
+     * Id of the parameter for the remote services id.
+     * @see NewConnectionHandler
+     * @see IRemoteServices#getId()
+     */
+    public static final String PARAMETER_REMOTE_SERVICES_ID = "org.eclipse.linuxtools.lttng2.control.ui.remoteServicesIdParameter"; //$NON-NLS-1$
+    /**
+     * Id of the parameter for the name of the remote connection.
+     * @see NewConnectionHandler
+     * @see IRemoteServices#getName()
+     */
+    public static final String PARAMETER_CONNECTION_NAME = "org.eclipse.linuxtools.lttng2.control.ui.connectionNameParameter"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -54,24 +76,17 @@ public class NewConnectionHandler extends BaseControlViewHandler {
             return false;
         }
 
-        // Open dialog box for the node name and address
-        final INewConnectionDialog dialog = TraceControlDialogFactory.getInstance().getNewConnectionDialog();
-
-        if (dialog.open() != Window.OK) {
-            return null;
-        }
-
-        IRemoteConnection host = dialog.getConnection();
-        if (host != null) {
+        IRemoteConnection connection = getConnection(event.getParameters());
+        if (connection != null) {
             fLock.lock();
             try {
                 // successful creation of host
                 TargetNodeComponent node = null;
-                if (!fRoot.containsChild(host.getName())) {
-                    node = new TargetNodeComponent(host.getName(), fRoot, host);
+                if (!fRoot.containsChild(connection.getName())) {
+                    node = new TargetNodeComponent(connection.getName(), fRoot, connection);
                     fRoot.addChild(node);
                 } else {
-                    node = (TargetNodeComponent)fRoot.getChild(host.getName());
+                    node = (TargetNodeComponent)fRoot.getChild(connection.getName());
                 }
 
                 node.connect();
@@ -79,6 +94,31 @@ public class NewConnectionHandler extends BaseControlViewHandler {
                 fLock.unlock();
             }
         }
+        return null;
+    }
+
+    private static IRemoteConnection getConnection(Map<?,?> parameters) {
+        // First check whether arguments have been supplied
+        Object remoteServicesId = parameters.get(PARAMETER_REMOTE_SERVICES_ID);
+        Object connectionName = parameters.get(PARAMETER_CONNECTION_NAME);
+        if (remoteServicesId != null && connectionName != null) {
+            if (!Workaround_Bug449362.triggerRSEStartup(remoteServicesId.toString())) {
+                // Skip the connection in order to avoid an infinite loop
+            } else {
+                IRemoteServices rs = RemoteServices.getRemoteServices(remoteServicesId.toString());
+                if (rs != null) {
+                    return rs.getConnectionManager().getConnection(connectionName.toString());
+                }
+            }
+            return null;
+        }
+
+        // Without the arguments, open dialog box for the node name and address
+        final INewConnectionDialog dialog = TraceControlDialogFactory.getInstance().getNewConnectionDialog();
+        if (dialog.open() == Window.OK) {
+            return dialog.getConnection();
+        }
+
         return null;
     }
 

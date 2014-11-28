@@ -31,6 +31,16 @@
             description="%commands.control.new.description"
             id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.newConnection"
             name="%commands.control.new">
+         <commandParameter
+               id="org.eclipse.linuxtools.lttng2.control.ui.remoteServicesIdParameter"
+               name="%commandParameter.remoteServicesId.name"
+               optional="true">
+         </commandParameter>
+         <commandParameter
+               id="org.eclipse.linuxtools.lttng2.control.ui.connectionNameParameter"
+               name="%commandParameter.connectionName.name"
+               optional="true">
+         </commandParameter>
       </command>
       <command
             categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
