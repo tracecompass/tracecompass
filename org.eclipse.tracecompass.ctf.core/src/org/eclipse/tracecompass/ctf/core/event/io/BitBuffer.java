@@ -640,24 +640,6 @@ public final class BitBuffer {
     }
 
     /**
-     * Sets the byte buffer
-     *
-     * @param buf
-     *            the byte buffer
-     */
-    @Deprecated
-    public void setByteBuffer(ByteBuffer buf) {
-        /*
-         * to avoid "The method setByteBuffer(ByteBuffer) from the type
-         * BitBuffer can be declared as static"
-         */
-        long data = fPosition;
-        fPosition = data;
-        throw new UnsupportedOperationException("Bytebuffers are now final"); //$NON-NLS-1$
-
-    }
-
-    /**
      * Gets the byte buffer
      *
      * @return The byte buffer

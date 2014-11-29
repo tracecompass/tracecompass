@@ -154,7 +154,6 @@ public class CTFTrace implements IDefinitionScope {
      */
     public CTFTrace(String path) throws CTFReaderException {
         this(new File(path));
-
     }
 
     /**
@@ -218,19 +217,6 @@ public class CTFTrace implements IDefinitionScope {
     // ------------------------------------------------------------------------
 
     /**
-     * Gets an event declaration hash map for a given streamID
-     *
-     * @param streamId
-     *            The ID of the stream from which to read
-     * @return The Hash map with the event declarations
-     * @deprecated use {@link CTFTrace#getEventDeclarations(Long)}
-     */
-    @Deprecated
-    public Map<Long, IEventDeclaration> getEvents(Long streamId) {
-        return fStreams.get(streamId).getEvents();
-    }
-
-    /**
      * Gets an event declaration list for a given streamID
      *
      * @param streamId
@@ -239,34 +225,6 @@ public class CTFTrace implements IDefinitionScope {
      */
     public Collection<IEventDeclaration> getEventDeclarations(Long streamId) {
         return fStreams.get(streamId).getEventDeclarations();
-    }
-
-    /**
-     * Get an event by it's ID
-     *
-     * @param streamId
-     *            The ID of the stream from which to read
-     * @param id
-     *            the ID of the event
-     * @return the event declaration
-     * @deprecated use {@link CTFTrace#getEventType(long, int)} instead
-     */
-    @Deprecated
-    public IEventDeclaration getEventType(long streamId, long id) {
-        return getStream(streamId).getEventDeclaration((int) id);
-    }
-
-    /**
-     * Get an event by it's ID
-     *
-     * @param streamId
-     *            The ID of the stream from which to read
-     * @param id
-     *            the ID of the event
-     * @return the event declaration
-     */
-    public IEventDeclaration getEventType(long streamId, int id) {
-        return getEvents(streamId).get(id);
     }
 
     /**
