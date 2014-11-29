@@ -18,6 +18,7 @@ import java.nio.ByteBuffer;
 
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
+import org.eclipse.tracecompass.ctf.core.event.types.Encoding;
 import org.eclipse.tracecompass.ctf.core.event.types.StringDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StringDefinition;
 import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
@@ -45,7 +46,7 @@ public class StringDefinitionTest {
     @Before
     public void setUp() throws CTFReaderException {
         String name = "testString";
-        StringDeclaration stringDec = new StringDeclaration();
+        StringDeclaration stringDec = StringDeclaration.getStringDeclaration(Encoding.UTF8);
         ByteBuffer byteBuffer = ByteBuffer.allocate(100);
         if (byteBuffer == null) {
             throw new IllegalStateException("Failed to allocate memory");
@@ -64,7 +65,7 @@ public class StringDefinitionTest {
      */
     @Test
     public void testStringDefinition() {
-        StringDeclaration declaration = new StringDeclaration();
+        StringDeclaration declaration = StringDeclaration.getStringDeclaration(Encoding.UTF8);
         IDefinitionScope definitionScope = null;
         String fieldName = "";
 

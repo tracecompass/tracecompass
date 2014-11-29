@@ -105,7 +105,7 @@ public class CTFEventFieldTest {
      */
     @Test
     public void testParseField_simple() throws CTFReaderException {
-        final StringDeclaration elemType = new StringDeclaration();
+        final StringDeclaration elemType = StringDeclaration.getStringDeclaration(Encoding.UTF8);
         byte[] bytes = { 'T', 'e', 's', 't', '\0' };
         ByteBuffer bb = testMemory(ByteBuffer.wrap(bytes));
         IDefinition fieldDef = elemType.createDefinition(null, fieldName, new BitBuffer(bb));
@@ -131,7 +131,7 @@ public class CTFEventFieldTest {
     @Test
     public void testParseField_simple3() {
         StringDefinition fieldDef = new StringDefinition(
-                new StringDeclaration(), null, fieldName, "Hello World");
+                StringDeclaration.getStringDeclaration(Encoding.UTF8), null, fieldName, "Hello World");
 
         String other = "\"Hello World\"";
         assertNotNull(fieldDef);

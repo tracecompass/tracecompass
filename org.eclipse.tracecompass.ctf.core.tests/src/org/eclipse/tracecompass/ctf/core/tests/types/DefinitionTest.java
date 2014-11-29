@@ -16,6 +16,7 @@ import static org.junit.Assert.assertNotNull;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.event.types.Definition;
+import org.eclipse.tracecompass.ctf.core.event.types.Encoding;
 import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StringDeclaration;
@@ -37,16 +38,16 @@ public class DefinitionTest {
     static class DefTest extends Definition {
 
         @NonNull
-        private static final StringDeclaration STRINGDEF = new StringDeclaration();
+        private static final StringDeclaration STRINGDEC = StringDeclaration.getStringDeclaration(Encoding.UTF8);
 
         public DefTest(IDefinitionScope definitionScope, @NonNull String fieldName) {
-            super(DefTest.STRINGDEF, definitionScope, fieldName);
+            super(DefTest.STRINGDEC, definitionScope, fieldName);
         }
 
         @Override
         @NonNull
         public IDeclaration getDeclaration() {
-            return DefTest.STRINGDEF;
+            return DefTest.STRINGDEC;
         }
 
     }

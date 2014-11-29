@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 import java.nio.ByteBuffer;
 
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
+import org.eclipse.tracecompass.ctf.core.event.types.Encoding;
 import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StringDeclaration;
@@ -66,7 +67,7 @@ public class StructDeclarationTest {
     @Test
     public void testAddField() {
         String name = "";
-        IDeclaration declaration = new StringDeclaration();
+        IDeclaration declaration = StringDeclaration.getStringDeclaration(Encoding.UTF8);
         fixture.addField(name, declaration);
     }
 
@@ -170,7 +171,7 @@ public class StructDeclarationTest {
         StructDeclaration d = new StructDeclaration(8);
         StructDeclaration e = new StructDeclaration(8);
         StructDeclaration f = new StructDeclaration(8);
-        c.addField("hi", new StringDeclaration());
+        c.addField("hi", StringDeclaration.getStringDeclaration(Encoding.UTF8));
         assertNotEquals(a, null);
         assertNotEquals(a, new Object());
         assertNotEquals(a, b);
@@ -180,16 +181,16 @@ public class StructDeclarationTest {
         assertNotEquals(c, a);
         assertEquals(d, a);
         assertEquals(a, a);
-        a.addField("hi", new StringDeclaration());
-        f.addField("hi", new StringDeclaration());
-        e.addField("hello", new StringDeclaration());
+        a.addField("hi", StringDeclaration.getStringDeclaration(Encoding.UTF8));
+        f.addField("hi", StringDeclaration.getStringDeclaration(Encoding.UTF8));
+        e.addField("hello", StringDeclaration.getStringDeclaration(Encoding.UTF8));
         assertEquals(a, c);
         assertEquals(c, a);
         assertNotEquals(a, d);
         d.addField("hi", IntegerDeclaration.INT_32B_DECL);
         assertNotEquals(a, d);
-        a.addField("hello", new StringDeclaration());
-        e.addField("hi", new StringDeclaration());
+        a.addField("hello", StringDeclaration.getStringDeclaration(Encoding.UTF8));
+        e.addField("hi", StringDeclaration.getStringDeclaration(Encoding.UTF8));
         f.addField("hello", IntegerDeclaration.INT_32B_DECL);
         assertNotEquals(a, e);
         assertNotEquals(a, f);

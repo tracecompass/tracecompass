@@ -12,6 +12,9 @@
 
 package org.eclipse.tracecompass.ctf.core.event.types;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
@@ -27,6 +30,7 @@ import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
  * @author Matthew Khouzam
  * @author Simon Marchi
  */
+@NonNullByDefault
 public class StringDeclaration extends Declaration {
 
     private static final StringDeclaration STRING_DEC_UTF8 = new StringDeclaration(Encoding.UTF8);
@@ -45,27 +49,30 @@ public class StringDeclaration extends Declaration {
     // ------------------------------------------------------------------------
 
     /**
-     * Generate a UTF8 string declaration
-     */
-    public StringDeclaration() {
-        fEncoding = Encoding.UTF8;
-    }
-
-    /**
      * Generate an encoded string declaration
      *
      * @param encoding
      *            the encoding, utf8 or ascii
      */
-    public StringDeclaration(Encoding encoding) {
+    private StringDeclaration(Encoding encoding) {
         fEncoding = encoding;
+    }
+
+    /**
+     * Create a StringDeclaration with the default UTF-8 encoding
+     *
+     * @return a {@link StringDeclaration} with UTF-8 encoding
+     */
+    public static StringDeclaration getStringDeclaration() {
+        return STRING_DEC_UTF8;
     }
 
     /**
      * Create a StringDeclaration
      *
      * @param encoding
-     *            the {@link Encoding}
+     *            the {@link Encoding} can be Encoding.UTF8, Encoding.ASCII or
+     *            other
      * @return a {@link StringDeclaration}
      * @throws IllegalArgumentException
      *             if the encoding is not recognized.
@@ -117,7 +124,7 @@ public class StringDeclaration extends Declaration {
      * @since 3.0
      */
     @Override
-    public StringDefinition createDefinition(IDefinitionScope definitionScope,
+    public StringDefinition createDefinition(@Nullable IDefinitionScope definitionScope,
             String fieldName, BitBuffer input) throws CTFReaderException {
         String value = read(input);
         return new StringDefinition(this, definitionScope, fieldName, value);
@@ -133,7 +140,7 @@ public class StringDeclaration extends Declaration {
             sb.append(c);
             c = (char) input.get(BITS_PER_BYTE, false);
         }
-        return sb.toString();
+        return NonNullUtils.checkNotNull(sb.toString());
     }
 
     @Override
@@ -146,26 +153,24 @@ public class StringDeclaration extends Declaration {
     public int hashCode() {
         final int prime = 31;
         int result = prime;
-        if (fEncoding != null) {
-            switch (fEncoding) {
-            case ASCII:
-                result += 1;
-                break;
-            case NONE:
-                result += 2;
-                break;
-            case UTF8:
-                result += 3;
-                break;
-            default:
-                break;
-            }
+        switch (fEncoding) {
+        case ASCII:
+            result += 1;
+            break;
+        case NONE:
+            result += 2;
+            break;
+        case UTF8:
+            result += 3;
+            break;
+        default:
+            break;
         }
         return result;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (this == obj) {
             return true;
         }
@@ -183,7 +188,7 @@ public class StringDeclaration extends Declaration {
     }
 
     @Override
-    public boolean isBinaryEquivalent(IDeclaration other) {
+    public boolean isBinaryEquivalent(@Nullable IDeclaration other) {
         return equals(other);
     }
 

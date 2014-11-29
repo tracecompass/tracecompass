@@ -42,7 +42,7 @@ public class StringDeclarationTest {
      */
     @Before
     public void setUp() {
-        fixture = new StringDeclaration(Encoding.ASCII);
+        fixture = StringDeclaration.getStringDeclaration(Encoding.ASCII);
     }
 
     /**
@@ -50,7 +50,7 @@ public class StringDeclarationTest {
      */
     @Test
     public void testStringDeclaration() {
-        StringDeclaration result = new StringDeclaration();
+        StringDeclaration result = StringDeclaration.getStringDeclaration(Encoding.UTF8);
 
         assertNotNull(result);
         String string = "[declaration] string[";
@@ -63,7 +63,7 @@ public class StringDeclarationTest {
     @Test
     public void testStringDeclaration_2() {
         Encoding encoding = Encoding.ASCII;
-        StringDeclaration result = new StringDeclaration(encoding);
+        StringDeclaration result = StringDeclaration.getStringDeclaration(encoding);
 
         assertNotNull(result);
         String string = "[declaration] string[";
@@ -123,13 +123,13 @@ public class StringDeclarationTest {
     @Test
     public void hashcodeTest() {
         assertEquals(32, fixture.hashCode());
-        StringDeclaration a = new StringDeclaration(Encoding.ASCII);
-        StringDeclaration b = new StringDeclaration();
-        StringDeclaration c = new StringDeclaration(Encoding.UTF8);
-        StringDeclaration d = new StringDeclaration(Encoding.ASCII);
-        assertNotEquals(a.hashCode(), b.hashCode());
-        assertNotEquals(a.hashCode(), c.hashCode());
+        StringDeclaration a = StringDeclaration.getStringDeclaration(Encoding.ASCII);
+        StringDeclaration b = StringDeclaration.getStringDeclaration();
+        StringDeclaration c = StringDeclaration.getStringDeclaration(Encoding.UTF8);
+        StringDeclaration d = StringDeclaration.getStringDeclaration(Encoding.ASCII);
+        assertEquals(b.hashCode(), c.hashCode());
         assertEquals(a.hashCode(), d.hashCode());
+        assertEquals(a.hashCode(), a.hashCode());
     }
 
     /**
@@ -137,10 +137,10 @@ public class StringDeclarationTest {
      */
     @Test
     public void equalsTest() {
-        StringDeclaration a = new StringDeclaration(Encoding.ASCII);
-        StringDeclaration b = new StringDeclaration();
-        StringDeclaration c = new StringDeclaration(Encoding.UTF8);
-        StringDeclaration d = new StringDeclaration(Encoding.ASCII);
+        StringDeclaration a = StringDeclaration.getStringDeclaration(Encoding.ASCII);
+        StringDeclaration b = StringDeclaration.getStringDeclaration(Encoding.UTF8);
+        StringDeclaration c = StringDeclaration.getStringDeclaration(Encoding.UTF8);
+        StringDeclaration d = StringDeclaration.getStringDeclaration(Encoding.ASCII);
         assertNotEquals(a, null);
         assertNotEquals(a, new Object());
         assertNotEquals(a, b);

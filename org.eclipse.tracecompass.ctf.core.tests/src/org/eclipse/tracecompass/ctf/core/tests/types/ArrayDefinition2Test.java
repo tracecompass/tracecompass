@@ -80,7 +80,7 @@ public class ArrayDefinition2Test {
     }
 
     private ArrayDefinition createStringArray() {
-        StringDeclaration strDecl = new StringDeclaration();
+        StringDeclaration strDecl = StringDeclaration.getStringDeclaration(Encoding.UTF8);
         List<Definition> defs = createDefs();
         ArrayDefinition temp = setUpDeclaration(strDecl, defs);
         return temp;
@@ -111,7 +111,7 @@ public class ArrayDefinition2Test {
         for (int i = 0; i < size; i++) {
             String content = "test" + i;
             defs.add(new StringDefinition(
-                    new StringDeclaration(Encoding.UTF8), null, content, content));
+                    StringDeclaration.getStringDeclaration(Encoding.UTF8), null, content, content));
         }
         return defs;
     }
@@ -137,7 +137,7 @@ public class ArrayDefinition2Test {
     @Test
     public void testArrayDefinition_newDeclaration() {
         CompoundDeclaration declaration = new ArrayDeclaration(0,
-                new StringDeclaration());
+                StringDeclaration.getStringDeclaration(Encoding.UTF8));
         IDefinitionScope definitionScope = getDefinitionScope();
 
         String fieldName = "";

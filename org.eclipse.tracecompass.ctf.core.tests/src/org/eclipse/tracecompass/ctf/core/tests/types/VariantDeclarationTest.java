@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.event.types.Definition;
+import org.eclipse.tracecompass.ctf.core.event.types.Encoding;
 import org.eclipse.tracecompass.ctf.core.event.types.EnumDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.EnumDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
@@ -89,7 +90,7 @@ public class VariantDeclarationTest {
                 "tag",
                 "tag",
                 new StringDefinition(
-                        new StringDeclaration(),
+                        StringDeclaration.getStringDeclaration(Encoding.UTF8),
                         null,
                         "f",
                         "tag"
@@ -124,7 +125,7 @@ public class VariantDeclarationTest {
     public void testAddField() {
         fixture.setTag("");
         String tag = "";
-        IDeclaration declaration = new StringDeclaration();
+        IDeclaration declaration = StringDeclaration.getStringDeclaration(Encoding.UTF8);
         fixture.addField(tag, declaration);
     }
 
@@ -224,9 +225,9 @@ public class VariantDeclarationTest {
     public void equalsTest() {
         VariantDeclaration a = new VariantDeclaration();
         VariantDeclaration b = new VariantDeclaration();
-        b.addField("hi", new StringDeclaration());
+        b.addField("hi", StringDeclaration.getStringDeclaration(Encoding.UTF8));
         VariantDeclaration c = new VariantDeclaration();
-        c.addField("hi", new StringDeclaration());
+        c.addField("hi", StringDeclaration.getStringDeclaration(Encoding.UTF8));
         VariantDeclaration d = new VariantDeclaration();
         assertNotEquals(a, null);
         assertNotEquals(a, new Object());
@@ -247,7 +248,7 @@ public class VariantDeclarationTest {
         assertEquals(b, c);
         b.addField("hello", IntegerDeclaration.INT_32B_DECL);
         d.addField("hello", IntegerDeclaration.INT_32B_DECL);
-        d.addField("hi", new StringDeclaration());
+        d.addField("hi", StringDeclaration.getStringDeclaration(Encoding.UTF8));
         d.setTag("hi");
         assertEquals(b, d);
         assertEquals(d, b);
@@ -260,10 +261,10 @@ public class VariantDeclarationTest {
     public void equalsOutOfOrderTest() {
         VariantDeclaration a = new VariantDeclaration();
         VariantDeclaration b = new VariantDeclaration();
-        b.addField("hi", new StringDeclaration());
+        b.addField("hi", StringDeclaration.getStringDeclaration(Encoding.UTF8));
         b.addField("hello", new VariantDeclaration());
         a.addField("hello", new VariantDeclaration());
-        a.addField("hi", new StringDeclaration());
+        a.addField("hi", StringDeclaration.getStringDeclaration(Encoding.UTF8));
         assertEquals(b, a);
     }
 
@@ -274,8 +275,8 @@ public class VariantDeclarationTest {
     public void equalsAddTwiceTest() {
         VariantDeclaration a = new VariantDeclaration();
         VariantDeclaration b = new VariantDeclaration();
-        b.addField("hi", new StringDeclaration());
-        a.addField("hi", new StringDeclaration());
+        b.addField("hi", StringDeclaration.getStringDeclaration(Encoding.UTF8));
+        a.addField("hi", StringDeclaration.getStringDeclaration(Encoding.UTF8));
         assertEquals(b, a);
         b.addField("hi", new VariantDeclaration());
         assertNotEquals(b, a);

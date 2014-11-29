@@ -57,7 +57,7 @@ public class SequenceDeclaration2Test {
 
     @Before
     public void setUp() {
-        fixture = new SequenceDeclaration(FIELD_NAME, new StringDeclaration());
+        fixture = new SequenceDeclaration(FIELD_NAME, StringDeclaration.getStringDeclaration(Encoding.UTF8));
         byte array[] = { 't', 'e', 's', 't', '\0', 't', 'h', 'i', 's', '\0' };
         ByteBuffer byb = ByteBuffer.wrap(array);
         if (byb == null) {
@@ -72,7 +72,7 @@ public class SequenceDeclaration2Test {
     @Test
     public void testSequenceDeclaration() {
         String lengthName = "";
-        IDeclaration elemType = new StringDeclaration();
+        IDeclaration elemType = StringDeclaration.getStringDeclaration(Encoding.UTF8);
 
         SequenceDeclaration result = new SequenceDeclaration(lengthName, elemType);
         assertNotNull(result);
@@ -137,7 +137,7 @@ public class SequenceDeclaration2Test {
         assertEquals(-1140774256, fixture.hashCode());
         SequenceDeclaration a = new SequenceDeclaration("Hi", IntegerDeclaration.INT_32B_DECL);
         SequenceDeclaration b = new SequenceDeclaration("Hello", IntegerDeclaration.INT_32B_DECL);
-        SequenceDeclaration c = new SequenceDeclaration("Hi", new StringDeclaration());
+        SequenceDeclaration c = new SequenceDeclaration("Hi", StringDeclaration.getStringDeclaration(Encoding.UTF8));
         SequenceDeclaration d = new SequenceDeclaration("Hi", IntegerDeclaration.INT_32B_DECL);
         assertNotEquals(a.hashCode(), b.hashCode());
         assertNotEquals(a.hashCode(), c.hashCode());
@@ -151,7 +151,7 @@ public class SequenceDeclaration2Test {
     public void equalsTest() {
         SequenceDeclaration a = new SequenceDeclaration("Hi", IntegerDeclaration.INT_32B_DECL);
         SequenceDeclaration b = new SequenceDeclaration("Hello", IntegerDeclaration.INT_32B_DECL);
-        SequenceDeclaration c = new SequenceDeclaration("Hi", new StringDeclaration());
+        SequenceDeclaration c = new SequenceDeclaration("Hi", StringDeclaration.getStringDeclaration(Encoding.UTF8));
         SequenceDeclaration d = new SequenceDeclaration("Hi", IntegerDeclaration.INT_32B_DECL);
         assertNotEquals(a, null);
         assertNotEquals(a, new Object());

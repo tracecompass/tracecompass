@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.Definition;
+import org.eclipse.tracecompass.ctf.core.event.types.Encoding;
 import org.eclipse.tracecompass.ctf.core.event.types.StringDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StringDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
@@ -72,7 +73,7 @@ public class CTFStreamInputReaderTest {
                         null,
                         "packet",
                         wrap("field"),
-                        new Definition[] { new StringDefinition(new StringDeclaration(), null, "field", "test") }),
+                        new Definition[] { new StringDefinition(StringDeclaration.getStringDeclaration(Encoding.UTF8), null, "field", "test") }),
                 null)
                 );
     }

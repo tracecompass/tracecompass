@@ -228,7 +228,7 @@ public class EventHeaderDeclarationTest {
         variantV.addField("compact", compact);
         large = new StructDeclaration(8);
         large.addField("id", IntegerDeclaration.UINT_32B_DECL);
-        large.addField("timestamp", new StringDeclaration());
+        large.addField("timestamp", StringDeclaration.getStringDeclaration(Encoding.UTF8));
         variantV.addField("extended", large);
         base.addField("v", variantV);
         declarations.add(base);
@@ -243,7 +243,7 @@ public class EventHeaderDeclarationTest {
         variantV.addField("surprise!", compact);
         large = new StructDeclaration(8);
         large.addField("id", IntegerDeclaration.UINT_32B_DECL);
-        large.addField("timestamp", new StringDeclaration());
+        large.addField("timestamp", StringDeclaration.getStringDeclaration(Encoding.UTF8));
         variantV.addField("extended", large);
         base.addField("v", variantV);
         declarations.add(base);
@@ -258,7 +258,7 @@ public class EventHeaderDeclarationTest {
         variantV.addField("surprise!", compact);
         large = new StructDeclaration(8);
         large.addField("id", IntegerDeclaration.UINT_32B_DECL);
-        large.addField("timestamp", new StringDeclaration());
+        large.addField("timestamp", StringDeclaration.getStringDeclaration(Encoding.UTF8));
         variantV.addField("extended", large);
         base.addField("v", variantV);
         declarations.add(base);

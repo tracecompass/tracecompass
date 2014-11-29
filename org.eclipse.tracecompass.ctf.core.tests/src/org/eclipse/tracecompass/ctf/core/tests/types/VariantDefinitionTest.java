@@ -84,7 +84,7 @@ public class VariantDefinitionTest {
         StructDeclaration smallStruct = new StructDeclaration(8);
         IntegerDeclaration iDec = IntegerDeclaration.createDeclaration(32, false, 32, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 8);
         IntegerDeclaration lenDec = IntegerDeclaration.createDeclaration(8, false, 8, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 8);
-        StringDeclaration strDec = new StringDeclaration();
+        StringDeclaration strDec = StringDeclaration.getStringDeclaration(Encoding.UTF8);
         EnumDeclaration enDec = new EnumDeclaration(iDec);
         VariantDeclaration varDec = new VariantDeclaration();
         EnumDeclaration tagDec = new EnumDeclaration(iDec);
@@ -134,7 +134,7 @@ public class VariantDefinitionTest {
         VariantDeclaration variantDeclaration = new VariantDeclaration();
         variantDeclaration.addField("", new EnumDeclaration(IntegerDeclaration.INT_32B_DECL));
         variantDeclaration.addField("a", IntegerDeclaration.INT_64B_DECL);
-        declaration.addField(ENUM_3, new StringDeclaration());
+        declaration.addField(ENUM_3, StringDeclaration.getStringDeclaration(Encoding.UTF8));
         variantDeclaration.setTag("a");
 
         byte[] bytes = new byte[128];
