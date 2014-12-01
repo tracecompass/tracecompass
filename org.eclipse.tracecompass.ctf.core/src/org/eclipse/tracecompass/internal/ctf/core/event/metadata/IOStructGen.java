@@ -49,6 +49,8 @@ import org.eclipse.tracecompass.internal.ctf.core.event.types.StructDeclarationF
 import org.eclipse.tracecompass.internal.ctf.core.event.types.composite.EventHeaderCompactDeclaration;
 import org.eclipse.tracecompass.internal.ctf.core.event.types.composite.EventHeaderLargeDeclaration;
 
+import com.google.common.collect.Iterables;
+
 /**
  * IOStructGen
  */
@@ -160,12 +162,8 @@ public class IOStructGen {
         List<CommonTree> children = root.getChildren();
 
         CommonTree traceNode = null;
-        List<CommonTree> streams = new ArrayList<>();
+        boolean hasStreams = false;
         List<CommonTree> events = new ArrayList<>();
-        List<CommonTree> declarations = new ArrayList<>();
-        List<CommonTree> environments = new ArrayList<>();
-        List<CommonTree> clocks = new ArrayList<>();
-        List<CommonTree> callsites = new ArrayList<>();
 
         /* Create a new declaration scope with no parent. */
         pushScope();
@@ -174,80 +172,59 @@ public class IOStructGen {
             final int type = child.getType();
             switch (type) {
             case CTFParser.DECLARATION:
-                declarations.add(child);
+                parseRootDeclaration(child);
                 break;
             case CTFParser.TRACE:
                 if (traceNode != null) {
                     throw new ParseException("Only one trace block is allowed"); //$NON-NLS-1$
                 }
                 traceNode = child;
+                parseTrace(traceNode);
                 break;
             case CTFParser.STREAM:
-                streams.add(child);
+                parseStream(child);
+                hasStreams = true;
                 break;
             case CTFParser.EVENT:
                 events.add(child);
                 break;
             case CTFParser.CLOCK:
-                clocks.add(child);
+                parseClock(child);
                 break;
             case CTFParser.ENV:
-                environments.add(child);
+                parseEnvironment(child);
                 break;
             case CTFParser.CALLSITE:
-                callsites.add(child);
+                parseCallsite(child);
                 break;
             default:
                 childTypeError(child);
             }
         }
-        for (CommonTree decl : declarations) {
-            parseRootDeclaration(decl);
-        }
         if (traceNode == null) {
             throw new ParseException("Missing trace block"); //$NON-NLS-1$
         }
-
-        parseTrace(traceNode);
-
-        for (CommonTree environment : environments) {
-            parseEnvironment(environment);
-        }
-        for (CommonTree clock : clocks) {
-            parseClock(clock);
-        }
-        for (CommonTree callsite : callsites) {
-            parseCallsite(callsite);
-        }
-
-        if (!streams.isEmpty()) {
-            for (CommonTree stream : streams) {
-                parseStream(stream);
-            }
-        } else {
-            /* Add an empty stream that will have a null id */
-            fTrace.addStream(new CTFStream(fTrace));
-        }
-
-        for (CommonTree event : events) {
-            parseEvent(event);
-        }
+        parseEvents(events, hasStreams);
         popScope();
         fHasBeenParsed = true;
     }
 
-    private void parseIncompleteRoot(CommonTree root) throws ParseException {
-        List<CommonTree> children = root.getChildren();
+    private void parseEvents(List<CommonTree> events, boolean hasStreams) throws ParseException {
+        if (!hasStreams && !events.isEmpty()) {
+            /* Add an empty stream that will have a null id */
+            fTrace.addStream(new CTFStream(fTrace));
+        }
+        for (CommonTree event : events) {
+            parseEvent(event);
+        }
+    }
 
+    private void parseIncompleteRoot(CommonTree root) throws ParseException {
         if (!fHasBeenParsed) {
             throw new ParseException("You need to run generate first"); //$NON-NLS-1$
         }
-        List<CommonTree> streams = new ArrayList<>();
+        List<CommonTree> children = root.getChildren();
         List<CommonTree> events = new ArrayList<>();
-        List<CommonTree> declarations = new ArrayList<>();
-        List<CommonTree> environments = new ArrayList<>();
-        List<CommonTree> clocks = new ArrayList<>();
-        List<CommonTree> callsites = new ArrayList<>();
         /* Create a new declaration scope with no parent. */
         pushScope();
 
@@ -255,50 +232,30 @@ public class IOStructGen {
             final int type = child.getType();
             switch (type) {
             case CTFParser.DECLARATION:
-                declarations.add(child);
+                parseRootDeclaration(child);
                 break;
             case CTFParser.TRACE:
                 throw new ParseException("Trace block defined here, please use generate and not generateFragment to parse this fragment"); //$NON-NLS-1$
             case CTFParser.STREAM:
-                streams.add(child);
+                parseStream(child);
                 break;
             case CTFParser.EVENT:
                 events.add(child);
                 break;
             case CTFParser.CLOCK:
-                clocks.add(child);
+                parseClock(child);
                 break;
             case CTFParser.ENV:
-                environments.add(child);
+                parseEnvironment(child);
                 break;
             case CTFParser.CALLSITE:
-                callsites.add(child);
+                parseCallsite(child);
                 break;
             default:
                 childTypeError(child);
             }
         }
-        for (CommonTree decl : declarations) {
-            parseRootDeclaration(decl);
-        }
-
-        for (CommonTree environment : environments) {
-            parseEnvironment(environment);
-        }
-        for (CommonTree clock : clocks) {
-            parseClock(clock);
-        }
-        for (CommonTree callsite : callsites) {
-            parseCallsite(callsite);
-        }
-
-        for (CommonTree stream : streams) {
-            parseStream(stream);
-        }
-
-        for (CommonTree event : events) {
-            parseEvent(event);
-        }
+        parseEvents(events, !Iterables.isEmpty(fTrace.getStreams()));
         popScope();
     }
 

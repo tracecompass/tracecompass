@@ -644,7 +644,7 @@ public class CTFTrace implements IDefinitionScope {
          * If the stream we try to add has the null key, it must be the only
          * one. Thus, if the streams container is not empty, it is not valid.
          */
-        if ((stream.getId() == null) && (fStreams.size() != 0)) {
+        if ((stream.getId() == null) && (!fStreams.isEmpty())) {
             throw new ParseException("Stream without id with multiple streams"); //$NON-NLS-1$
         }
 
