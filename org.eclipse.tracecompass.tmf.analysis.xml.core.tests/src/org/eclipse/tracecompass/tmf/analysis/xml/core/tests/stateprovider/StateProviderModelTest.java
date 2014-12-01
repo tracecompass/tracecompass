@@ -50,8 +50,6 @@ import org.w3c.dom.NodeList;
 public class StateProviderModelTest {
 
     private static final @NonNull String testTrace1 = "test_traces/testTrace1.xml";
-    /* Factor to convert seconds to nanoseconds */
-    private static final long TO_NS = 1000000000L;
 
     private static @NonNull ITmfTrace initializeTrace(String traceFile) {
         /* Initialize the trace */
@@ -87,12 +85,12 @@ public class StateProviderModelTest {
 
     private static void verifyStateIntervals(String testId, @NonNull ITmfStateSystem ss, Integer quark, int[] expectedStarts, ITmfStateValue[] expectedValues) throws AttributeNotFoundException, StateSystemDisposedException {
         int expectedCount = expectedStarts.length - 1;
-        List<ITmfStateInterval> intervals = StateSystemUtils.queryHistoryRange(ss, quark, expectedStarts[0] * TO_NS, expectedStarts[expectedCount] * TO_NS);
+        List<ITmfStateInterval> intervals = StateSystemUtils.queryHistoryRange(ss, quark, expectedStarts[0], expectedStarts[expectedCount]);
         assertEquals(testId + ": Interval count", expectedCount, intervals.size());
         for (int i = 0; i < expectedCount; i++) {
             ITmfStateInterval interval = intervals.get(i);
-            assertEquals(testId + ": Start time of interval " + i, expectedStarts[i] * TO_NS, interval.getStartTime());
-            long actualEnd = (i == expectedCount - 1) ? (expectedStarts[i + 1] * TO_NS) : (expectedStarts[i + 1] * TO_NS) - 1;
+            assertEquals(testId + ": Start time of interval " + i, expectedStarts[i], interval.getStartTime());
+            long actualEnd = (i == expectedCount - 1) ? (expectedStarts[i + 1]) : (expectedStarts[i + 1]) - 1;
             assertEquals(testId + ": End time of interval " + i, actualEnd, interval.getEndTime());
             assertEquals(testId + ": Expected value of interval " + i, expectedValues[i], interval.getStateValue());
         }
