@@ -18,16 +18,8 @@
    <feature url="features/org.eclipse.tracecompass.tmf.pcap_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.tmf.pcap" version="0.0.0">
       <category name="Trace Compass"/>
    </feature>
-   <feature url="features/org.eclipse.tracecompass.rcp_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.rcp" version="0.0.0">
-      <category name="Trace Compass RCP"/>
-   </feature>
-   <feature url="features/org.eclipse.tracecompass.rcp.branding.feature_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.rcp.branding.feature" version="0.0.0">
-      <category name="Trace Compass RCP"/>
-   </feature>
-   <feature url="features/org.eclipse.tracecompass.testing_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.testing" version="0.0.0">
-      <category name="Trace Compass Extras"/>
-   </feature>
+   <feature url="features/org.eclipse.tracecompass.rcp_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.rcp" version="0.0.0"/>
+   <feature url="features/org.eclipse.tracecompass.rcp.branding.feature_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.rcp.branding.feature" version="0.0.0"/>
+   <feature url="features/org.eclipse.tracecompass.testing_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.testing" version="0.0.0"/>
    <category-def name="Trace Compass" label="Trace Compass Main Features"/>
-   <category-def name="Trace Compass RCP" label="Trace Compass Extras RCP Dependencies"/>
-   <category-def name="Trace Compass Extras" label="Trace Compass Extras"/>
 </site>
