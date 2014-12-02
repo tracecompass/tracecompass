@@ -14,10 +14,11 @@
 
 package org.eclipse.tracecompass.ctf.core.event.types;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.math.BigInteger;
 import java.nio.ByteOrder;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
@@ -280,10 +281,7 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
         fSigned = signed;
         fBase = base;
 
-        @SuppressWarnings("null")
-        @NonNull
-        ByteOrder actualByteOrder = (byteOrder == null ? ByteOrder.nativeOrder() : byteOrder);
-        fByteOrder = actualByteOrder;
+        fByteOrder = (byteOrder == null ? checkNotNull(ByteOrder.nativeOrder()) : byteOrder);
 
         fEncoding = encoding;
         fClock = clock;
@@ -422,11 +420,7 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
          * For a given N significant bits, compute the maximal value which is (1
          * << N) - 1.
          */
-
-        @SuppressWarnings("null")
-        @NonNull
-        BigInteger ret = BigInteger.ONE.shiftLeft(significantBits).subtract(BigInteger.ONE);
-        return ret;
+        return checkNotNull(BigInteger.ONE.shiftLeft(significantBits).subtract(BigInteger.ONE));
     }
 
     /**
@@ -437,10 +431,7 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
      */
     public BigInteger getMinValue() {
         if (!fSigned) {
-            @SuppressWarnings("null")
-            @NonNull
-            BigInteger ret = BigInteger.ZERO;
-            return ret;
+            return checkNotNull(BigInteger.ZERO);
         }
 
         /*
@@ -452,10 +443,7 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
          * For a given N significant bits, compute the minimal value which is -
          * (1 << N).
          */
-        @SuppressWarnings("null")
-        @NonNull
-        BigInteger ret = BigInteger.ONE.shiftLeft(significantBits).negate();
-        return ret;
+        return checkNotNull(BigInteger.ONE.shiftLeft(significantBits).negate());
     }
 
     private long read(BitBuffer input) throws CTFReaderException {

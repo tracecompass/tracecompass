@@ -24,6 +24,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.tracecompass.internal.tmf.core.component.TmfEventThread;
 import org.eclipse.tracecompass.internal.tmf.core.component.TmfProviderManager;
@@ -563,10 +564,9 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
         return null;
     }
 
-    @SuppressWarnings("null")
     @Override
     public ITmfEventProvider getChild(int index) {
-        return fChildren.get(index);
+        return NonNullUtils.checkNotNull(fChildren.get(index));
     }
 
     @Override

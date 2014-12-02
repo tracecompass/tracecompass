@@ -16,8 +16,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Map;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.tracecompass.internal.pcap.core.packet.Packet;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.PcapProtocol;
@@ -53,7 +53,7 @@ public class PcapPacket extends Packet {
     private @Nullable PcapEndpoint fSourceEndpoint;
     private @Nullable PcapEndpoint fDestinationEndpoint;
 
-    private @Nullable ImmutableMap<String, String> fFields;
+    private @Nullable Map<String, String> fFields;
 
     /**
      * Constructor of the Pcap Packet class.
@@ -260,17 +260,16 @@ public class PcapPacket extends Packet {
     // TODO microsec
     @Override
     public Map<String, String> getFields() {
-        ImmutableMap<String, String> map = fFields;
+        Map<String, String> map = fFields;
         if (map == null) {
-            @SuppressWarnings("null")
-            @NonNull ImmutableMap<String, String> newMap = ImmutableMap.<String, String> builder()
-                    .put("Frame", String.valueOf(fPacketIndex)) //$NON-NLS-1$
-                    .put("Frame Length", String.valueOf(fOriginalLength) + " bytes") //$NON-NLS-1$ //$NON-NLS-2$
-                    .put("Capture Length", String.valueOf(fIncludedLength) + " bytes") //$NON-NLS-1$ //$NON-NLS-2$
-                    .put("Capture Time", ConversionHelper.toGMTTime(fTimestamp, getTimestampScale())) //$NON-NLS-1$
-                    .build();
-            fFields = newMap;
-            return newMap;
+            ImmutableMap.Builder<String, String> builder = ImmutableMap.<String, String> builder();
+            builder.put("Frame", String.valueOf(fPacketIndex)); //$NON-NLS-1$
+            builder.put("Frame Length", String.valueOf(fOriginalLength) + " bytes"); //$NON-NLS-1$ //$NON-NLS-2$
+            builder.put("Capture Length", String.valueOf(fIncludedLength) + " bytes"); //$NON-NLS-1$ //$NON-NLS-2$
+            builder.put("Capture Time", ConversionHelper.toGMTTime(fTimestamp, getTimestampScale())); //$NON-NLS-1$
+
+            fFields = NonNullUtils.checkNotNull(builder.build());
+            return fFields;
         }
         return map;
     }

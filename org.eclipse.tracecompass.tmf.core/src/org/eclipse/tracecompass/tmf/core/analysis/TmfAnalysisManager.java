@@ -12,18 +12,20 @@
 
 package org.eclipse.tracecompass.tmf.core.analysis;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.analysis.TmfAnalysisModuleSources;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Manages the available analysis helpers from different sources and their
@@ -116,9 +118,7 @@ public class TmfAnalysisManager {
                 }
             }
         }
-        @SuppressWarnings("null")
-        @NonNull Map<String, IAnalysisModuleHelper> map = Collections.unmodifiableMap(fAnalysisModules);
-        return map;
+        return checkNotNull(ImmutableMap.copyOf(fAnalysisModules));
     }
 
     /**
@@ -138,9 +138,7 @@ public class TmfAnalysisManager {
                 map.put(module.getId(), module);
             }
         }
-        @SuppressWarnings("null")
-        @NonNull Map<String, IAnalysisModuleHelper> retMap = Collections.unmodifiableMap(map);
-        return retMap;
+        return checkNotNull(ImmutableMap.copyOf(map));
     }
 
     /**

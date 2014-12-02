@@ -21,5 +21,6 @@
    <feature url="features/org.eclipse.tracecompass.rcp_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.rcp" version="0.0.0"/>
    <feature url="features/org.eclipse.tracecompass.rcp.branding.feature_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.rcp.branding.feature" version="0.0.0"/>
    <feature url="features/org.eclipse.tracecompass.testing_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.testing" version="0.0.0"/>
+   <bundle id="org.eclipse.tracecompass.common.core" version="0.1.0.qualifier"/>
    <category-def name="Trace Compass" label="Trace Compass Main Features"/>
 </site>

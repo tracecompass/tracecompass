@@ -16,6 +16,8 @@
 
 package org.eclipse.tracecompass.tmf.core.trace;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
@@ -97,13 +99,12 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
     /**
      * Basic aspects that should be valid for all trace types.
      */
-    @SuppressWarnings("null")
     public static final @NonNull Collection<ITmfEventAspect> BASE_ASPECTS =
-            ImmutableList.of(
+            checkNotNull(ImmutableList.of(
                     ITmfEventAspect.BaseAspects.TIMESTAMP,
                     ITmfEventAspect.BaseAspects.EVENT_TYPE,
                     ITmfEventAspect.BaseAspects.CONTENTS
-                    );
+                    ));
 
     // ------------------------------------------------------------------------
     // Instance attributes
@@ -302,8 +303,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
     protected IStatus executeAnalysis() {
         MultiStatus status = new MultiStatus(Activator.PLUGIN_ID, IStatus.OK, null, null);
 
-        @SuppressWarnings("null")
-        @NonNull Class<? extends TmfTrace> className = this.getClass();
+        Class<? extends TmfTrace> className = checkNotNull(this.getClass());
         Map<String, IAnalysisModuleHelper> modules = TmfAnalysisManager.getAnalysisModules(className);
         for (IAnalysisModuleHelper helper : modules.values()) {
             try {

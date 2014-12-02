@@ -12,9 +12,10 @@
 
 package org.eclipse.tracecompass.internal.pcap.core.protocol.ipv4;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.net.Inet4Address;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.pcap.core.endpoint.ProtocolEndpoint;
 
@@ -90,9 +91,7 @@ public class IPv4Endpoint extends ProtocolEndpoint {
     public String toString() {
         ProtocolEndpoint endpoint = getParentEndpoint();
         if (endpoint == null) {
-            @SuppressWarnings("null")
-            @NonNull String ret = fIPAddress.getHostAddress();
-            return ret;
+            return checkNotNull(fIPAddress.getHostAddress());
         }
         return endpoint.toString() + '/' + fIPAddress.getHostAddress();
     }

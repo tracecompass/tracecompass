@@ -12,9 +12,10 @@
 
 package org.eclipse.tracecompass.internal.ctf.core.event.types;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.List;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
@@ -44,7 +45,7 @@ public final class ArrayDefinition extends AbstractArrayDefinition {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final ImmutableList<Definition> fDefinitions;
+    private final List<Definition> fDefinitions;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -67,9 +68,7 @@ public final class ArrayDefinition extends AbstractArrayDefinition {
             String fieldName,
             List<Definition> definitions) {
         super(declaration, definitionScope, fieldName);
-        @SuppressWarnings("null")
-        @NonNull ImmutableList<Definition> list = ImmutableList.copyOf(definitions);
-        fDefinitions = list;
+        fDefinitions = checkNotNull(ImmutableList.copyOf(definitions));
     }
 
     // ------------------------------------------------------------------------
@@ -101,8 +100,6 @@ public final class ArrayDefinition extends AbstractArrayDefinition {
         Joiner joiner = Joiner.on(", ").skipNulls(); //$NON-NLS-1$
         b.append(joiner.join(fDefinitions));
         b.append(']');
-        @SuppressWarnings("null")
-        @NonNull String ret = b.toString();
-        return ret;
+        return checkNotNull(b.toString());
     }
 }

@@ -15,9 +15,9 @@ package org.eclipse.tracecompass.internal.ctf.core.event.types;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.event.types.AbstractArrayDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.CompoundDeclaration;
@@ -72,10 +72,8 @@ public final class ByteArrayDefinition extends AbstractArrayDefinition {
                 byte fieldValue = fContent[i];
                 builder.add(new IntegerDefinition(charDecl, getDefinitionScope(), fieldName, fieldValue));
             }
-            @SuppressWarnings("null")
-            @NonNull List<Definition> ret = builder.build();
-            fDefs = ret;
-            return ret;
+            fDefs = NonNullUtils.checkNotNull(builder.build());
+            return fDefs;
         }
 
         return defs;

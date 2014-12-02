@@ -10,6 +10,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
+ org.eclipse.tracecompass.common.core,
  org.eclipse.tracecompass.statesystem.core;visibility:=reexport
 Export-Package: org.eclipse.tracecompass.internal.tmf.core;x-friends:="org.eclipse.tracecompass.tmf.core.tests,org.eclipse.tracecompass.tmf.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.tmf.core.analysis;x-friends:="org.eclipse.tracecompass.tmf.core.tests",

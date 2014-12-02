@@ -13,6 +13,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.editors;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -371,10 +373,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                 builder.addAll(traceAspects);
             }
         }
-
-        @SuppressWarnings("null")
-        @NonNull Iterable<ITmfEventAspect> ret = builder.build();
-        return ret;
+        return checkNotNull(builder.build());
     }
 
     /**

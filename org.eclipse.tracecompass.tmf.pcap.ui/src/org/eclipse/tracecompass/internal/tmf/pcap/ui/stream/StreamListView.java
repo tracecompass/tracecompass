@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -275,9 +274,10 @@ public class StreamListView extends TmfView {
                 if (tables == null) {
                     return;
                 }
-                for (TmfPcapProtocol p : tables.keySet()) {
-                    @SuppressWarnings("null")
-                    @NonNull TmfPcapProtocol protocol = p;
+                for (TmfPcapProtocol protocol : tables.keySet()) {
+                    if (protocol == null) {
+                        throw new IllegalStateException();
+                    }
                     TmfPacketStreamBuilder builder = analysis.getBuilder(protocol);
                     if (builder != null && !(tables.get(protocol).isDisposed())) {
                         for (TmfPacketStream stream : builder.getStreams()) {

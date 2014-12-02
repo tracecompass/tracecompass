@@ -14,6 +14,8 @@
 
 package org.eclipse.tracecompass.tmf.ctf.core.trace;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -92,15 +94,14 @@ public class CtfTmfTrace extends TmfTrace
     /**
      * Event aspects available for all CTF traces
      */
-    @SuppressWarnings("null")
     private static final @NonNull Collection<ITmfEventAspect> CTF_ASPECTS =
-            ImmutableList.of(
+            checkNotNull(ImmutableList.of(
                     ITmfEventAspect.BaseAspects.TIMESTAMP,
                     new CtfChannelAspect(),
                     new CtfCpuAspect(),
                     ITmfEventAspect.BaseAspects.EVENT_TYPE,
                     ITmfEventAspect.BaseAspects.CONTENTS
-                    );
+                    ));
 
     /**
      * The Ctf clock unique identifier field

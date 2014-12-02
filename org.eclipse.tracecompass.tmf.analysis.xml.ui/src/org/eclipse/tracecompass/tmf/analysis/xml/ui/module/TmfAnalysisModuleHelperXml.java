@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.analysis.xml.ui.module;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -74,9 +76,7 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper {
          * The attribute ID cannot be null because the XML has been validated
          * and it is mandatory
          */
-        @SuppressWarnings("null")
-        @NonNull String id = fSourceElement.getAttribute(TmfXmlStrings.ID);
-        return id;
+        return checkNotNull(fSourceElement.getAttribute(TmfXmlStrings.ID));
     }
 
     @Override

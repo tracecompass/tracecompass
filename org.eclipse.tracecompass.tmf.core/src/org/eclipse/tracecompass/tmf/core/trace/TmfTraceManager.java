@@ -14,6 +14,8 @@
 
 package org.eclipse.tracecompass.tmf.core.trace;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Collections;
@@ -127,8 +129,7 @@ public final class TmfTraceManager {
     /**
      * Gets the filter applied to the current trace
      *
-     * @return
-     *          a filter, or <code>null</code>
+     * @return a filter, or <code>null</code>
      * @since 2.2
      */
     public synchronized ITmfFilter getCurrentFilter() {
@@ -226,9 +227,7 @@ public final class TmfTraceManager {
      */
     public static @NonNull Set<ITmfTrace> getTraceSetWithExperiment(ITmfTrace trace) {
         if (trace == null) {
-            @SuppressWarnings("null")
-            @NonNull Set<ITmfTrace> emptySet = Collections.EMPTY_SET;
-            return emptySet;
+            return checkNotNull(Collections.EMPTY_SET);
         }
         if (trace instanceof TmfExperiment) {
             TmfExperiment exp = (TmfExperiment) trace;
@@ -237,9 +236,7 @@ public final class TmfTraceManager {
             alltraces.add(exp);
             return alltraces;
         }
-        @SuppressWarnings("null")
-        @NonNull Set<ITmfTrace> singleton = Collections.singleton(trace);
-        return singleton;
+        return checkNotNull(Collections.singleton(trace));
     }
 
     /**
@@ -327,7 +324,6 @@ public final class TmfTraceManager {
         fCurrentTrace = trace;
     }
 
-
     /**
      * Handler for the TmfTraceSelectedSignal.
      *
@@ -405,8 +401,8 @@ public final class TmfTraceManager {
     /**
      * Signal handler for the TmfRangeSynchSignal signal.
      *
-     * The current window time range of *all* valid traces will be updated
-     * to the new requested times.
+     * The current window time range of *all* valid traces will be updated to
+     * the new requested times.
      *
      * @param signal
      *            The incoming signal

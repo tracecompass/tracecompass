@@ -15,6 +15,8 @@
 
 package org.eclipse.tracecompass.ctf.core.event.io;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -63,9 +65,8 @@ public final class BitBuffer {
     /**
      * Default constructor, makes a big-endian buffer
      */
-    @SuppressWarnings("null")
     public BitBuffer() {
-        this(ByteBuffer.allocateDirect(0), ByteOrder.BIG_ENDIAN);
+        this(checkNotNull(ByteBuffer.allocateDirect(0)), ByteOrder.BIG_ENDIAN);
     }
 
     /**

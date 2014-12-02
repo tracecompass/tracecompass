@@ -12,7 +12,8 @@
 
 package org.eclipse.tracecompass.internal.tmf.pcap.ui;
 
-import org.eclipse.jdt.annotation.NonNull;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.pcap.ui.stream.StreamListView;
 import org.eclipse.tracecompass.tmf.ui.project.wizards.NewTmfProjectWizard;
@@ -39,12 +40,9 @@ public class NetworkingPerspectiveFactory implements IPerspectiveFactory {
     public static final String ID = "org.eclipse.linuxtools.tmf.pcap.ui.perspective.network"; //$NON-NLS-1$
 
     // Views
-    @SuppressWarnings("null")
-    private static final @NonNull String PROJECT_VIEW_ID = IPageLayout.ID_PROJECT_EXPLORER;
-    @SuppressWarnings("null")
-    private static final @NonNull String PROPERTIES_VIEW_ID = IPageLayout.ID_PROP_SHEET;
-    @SuppressWarnings("null")
-    private static final @NonNull String BOOKMARKS_VIEW_ID = IPageLayout.ID_BOOKMARKS;
+    private static final String PROJECT_VIEW_ID = checkNotNull(IPageLayout.ID_PROJECT_EXPLORER);
+    private static final String PROPERTIES_VIEW_ID = checkNotNull(IPageLayout.ID_PROP_SHEET);
+    private static final String BOOKMARKS_VIEW_ID = checkNotNull(IPageLayout.ID_BOOKMARKS);
     private static final String FILTER_VIEW_ID = FilterView.ID;
     private static final String HISTOGRAM_VIEW_ID = HistogramView.ID;
     private static final String STATISTICS_VIEW_ID = TmfStatisticsView.ID;

@@ -12,12 +12,13 @@
 
 package org.eclipse.tracecompass.internal.pcap.core.protocol.tcp;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.tracecompass.internal.pcap.core.packet.Packet;
@@ -62,7 +63,7 @@ public class TCPPacket extends Packet {
     private @Nullable TCPEndpoint fSourceEndpoint;
     private @Nullable TCPEndpoint fDestinationEndpoint;
 
-    private @Nullable ImmutableMap<String, String> fFields;
+    private @Nullable Map<String, String> fFields;
 
     /**
      * Constructor of the TCP Packet class.
@@ -421,7 +422,7 @@ public class TCPPacket extends Packet {
 
     @Override
     public Map<String, String> getFields() {
-        ImmutableMap<String, String> map = fFields;
+        Map<String, String> map = fFields;
         if (map == null) {
             Builder<String, String> builder = ImmutableMap.<String, String> builder()
                     .put("Source Port", String.valueOf(fSourcePort)) //$NON-NLS-1$
@@ -448,10 +449,8 @@ public class TCPPacket extends Packet {
                 builder.put("Options", ConversionHelper.bytesToHex(options, true)); //$NON-NLS-1$
 
             }
-            @SuppressWarnings("null")
-            @NonNull ImmutableMap<String, String> newMap = builder.build();
-            fFields = newMap;
-            return newMap;
+            fFields = checkNotNull(builder.build());
+            return fFields;
         }
         return map;
     }

@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.analysis.xml.core.model;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -146,8 +148,7 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
         /*
          * Stack Actions : allow to define a stack with PUSH/POP/PEEK methods
          */
-        @SuppressWarnings("null")
-        @NonNull String stack = node.getAttribute(TmfXmlStrings.ATTRIBUTE_STACK);
+        String stack = checkNotNull(node.getAttribute(TmfXmlStrings.ATTRIBUTE_STACK));
         fStackType = ValueTypeStack.getTypeFromString(stack);
     }
 

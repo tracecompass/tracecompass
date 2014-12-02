@@ -12,8 +12,8 @@
 
 package org.eclipse.tracecompass.internal.tmf.pcap.core.event;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
 
@@ -24,13 +24,10 @@ import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
  */
 public class PcapEventType extends TmfEventType {
 
-    private static final String EMPTY_STRING = ""; //$NON-NLS-1$
-
     /**
      * The default Pcap Type ID for a PcapEvent
      */
-    @SuppressWarnings("null")
-    public static final @NonNull String DEFAULT_PCAP_TYPE_ID = Messages.PcapEventType_DefaultTypeID == null ? EMPTY_STRING : Messages.PcapEventType_DefaultTypeID;
+    public static final String DEFAULT_PCAP_TYPE_ID = NonNullUtils.nullToEmptyString(Messages.PcapEventType_DefaultTypeID);
 
     /**
      * Default constructor

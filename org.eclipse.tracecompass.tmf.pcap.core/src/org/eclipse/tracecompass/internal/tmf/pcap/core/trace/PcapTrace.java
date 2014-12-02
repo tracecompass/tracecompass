@@ -12,18 +12,20 @@
 
 package org.eclipse.tracecompass.internal.tmf.pcap.core.trace;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.pcap.PcapPacket;
@@ -62,22 +64,20 @@ import com.google.common.collect.ImmutableMap;
  */
 public class PcapTrace extends TmfTrace implements ITmfEventParser, ITmfTraceProperties, AutoCloseable {
 
-    @SuppressWarnings("null")
-    private static final @NonNull Collection<ITmfEventAspect> PCAP_ASPECTS = ImmutableList.of(
-            ITmfEventAspect.BaseAspects.TIMESTAMP,
-            new PcapSourceAspect(),
-            new PcapDestinationAspect(),
-            new PcapReferenceAspect(),
-            new PcapProtocolAspect(),
-            ITmfEventAspect.BaseAspects.CONTENTS
-            );
+    private static final Collection<ITmfEventAspect> PCAP_ASPECTS =
+            checkNotNull(ImmutableList.of(
+                    ITmfEventAspect.BaseAspects.TIMESTAMP,
+                    new PcapSourceAspect(),
+                    new PcapDestinationAspect(),
+                    new PcapReferenceAspect(),
+                    new PcapProtocolAspect(),
+                    ITmfEventAspect.BaseAspects.CONTENTS
+                    ));
 
-    @SuppressWarnings("null")
-    private static final @NonNull Map<String, String> EMPTY_MAP = ImmutableMap.of();
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
     private static final int CONFIDENCE = 50;
     private @Nullable PcapFile fPcapFile;
-    private @Nullable ImmutableMap<String, String> fTraceProperties = null;
+    private @Nullable Map<String, String> fTraceProperties = null;
 
     @Override
     public synchronized ITmfLocation getCurrentLocation() {
@@ -114,8 +114,7 @@ public class PcapTrace extends TmfTrace implements ITmfEventParser, ITmfTracePro
         if (path == null) {
             throw new TmfTraceException("No path has been specified."); //$NON-NLS-1$
         }
-        @SuppressWarnings("null")
-        @NonNull Path filePath = FileSystems.getDefault().getPath(path);
+        Path filePath = checkNotNull(Paths.get(path));
         try {
             fPcapFile = new PcapFile(filePath);
         } catch (IOException | BadPcapFileException e) {
@@ -211,8 +210,7 @@ public class PcapTrace extends TmfTrace implements ITmfEventParser, ITmfTracePro
         if (path == null) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, EMPTY_STRING);
         }
-        @SuppressWarnings("null")
-        @NonNull Path filePath = FileSystems.getDefault().getPath(path);
+        Path filePath = checkNotNull(Paths.get(path));
         try (PcapFile file = new PcapFile(filePath)) {
         } catch (IOException | BadPcapFileException e) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.toString());
@@ -244,22 +242,20 @@ public class PcapTrace extends TmfTrace implements ITmfEventParser, ITmfTracePro
     public synchronized Map<String, String> getTraceProperties() {
         PcapFile pcap = fPcapFile;
         if (pcap == null) {
-            return EMPTY_MAP;
+            return checkNotNull(Collections.<String, String> emptyMap());
         }
 
-        ImmutableMap<String, String> properties = fTraceProperties;
+        Map<String, String> properties = fTraceProperties;
         if (properties == null) {
-            @SuppressWarnings("null")
-            @NonNull ImmutableMap<String, String> newProperties = ImmutableMap.<String, String> builder()
-                    .put(Messages.PcapTrace_Version, String.format("%d%c%d", pcap.getMajorVersion(), '.', pcap.getMinorVersion())) //$NON-NLS-1$
-                    .put(Messages.PcapTrace_TimeZoneCorrection, pcap.getTimeZoneCorrection() + " s") //$NON-NLS-1$
-                    .put(Messages.PcapTrace_TimestampAccuracy, String.valueOf(pcap.getTimeAccuracy()))
-                    .put(Messages.PcapTrace_MaxSnapLength, pcap.getSnapLength() + " bytes") //$NON-NLS-1$
-                    .put(Messages.PcapTrace_LinkLayerHeaderType, LinkTypeHelper.toString((int) pcap.getDataLinkType()) + " (" + pcap.getDataLinkType() + ")") //$NON-NLS-1$ //$NON-NLS-2$
-                    .put(Messages.PcapTrace_FileEndianness, pcap.getByteOrder().toString())
-                    .build();
-            fTraceProperties = newProperties;
-            return newProperties;
+            ImmutableMap.Builder<String, String> builder = ImmutableMap.<String, String> builder();
+            builder.put(Messages.PcapTrace_Version, String.format("%d%c%d", pcap.getMajorVersion(), '.', pcap.getMinorVersion())); //$NON-NLS-1$
+            builder.put(Messages.PcapTrace_TimeZoneCorrection, pcap.getTimeZoneCorrection() + " s"); //$NON-NLS-1$
+            builder.put(Messages.PcapTrace_TimestampAccuracy, String.valueOf(pcap.getTimeAccuracy()));
+            builder.put(Messages.PcapTrace_MaxSnapLength, pcap.getSnapLength() + " bytes"); //$NON-NLS-1$
+            builder.put(Messages.PcapTrace_LinkLayerHeaderType, LinkTypeHelper.toString((int) pcap.getDataLinkType()) + " (" + pcap.getDataLinkType() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+            builder.put(Messages.PcapTrace_FileEndianness, pcap.getByteOrder().toString());
+
+            return checkNotNull(builder.build());
 
         }
 

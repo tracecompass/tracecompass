@@ -13,6 +13,8 @@
 
 package org.eclipse.tracecompass.tmf.tests.stubs.analysis;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.Collections;
 
 import org.eclipse.core.runtime.Platform;
@@ -64,9 +66,7 @@ public class AnalysisModuleTestHelper implements IAnalysisModuleHelper {
 
     @Override
     public String getName() {
-        @SuppressWarnings("null")
-        @NonNull String name = fModule.name();
-        return name;
+        return checkNotNull(fModule.name());
     }
 
     @Override

@@ -13,6 +13,8 @@
 
 package org.eclipse.tracecompass.tmf.core.statesystem;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -21,7 +23,6 @@ import java.util.concurrent.CountDownLatch;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.statesystem.backends.partial.PartialHistoryBackend;
@@ -485,9 +486,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
             this.sci = sp;
 
             // sci.getTrace() will eventually return a @NonNull
-            @SuppressWarnings("null")
-            @NonNull ITmfTrace tr = sci.getTrace();
-            trace = tr;
+            trace = checkNotNull(sci.getTrace());
 
         }
 
@@ -557,9 +556,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
 
     @Override
     public Iterable<ITmfStateSystem> getStateSystems() {
-        @SuppressWarnings("null")
-        @NonNull Iterable<ITmfStateSystem> ret = Collections.singleton((ITmfStateSystem) fStateSystem);
-        return ret;
+        return checkNotNull(Collections.<ITmfStateSystem> singleton(fStateSystem));
     }
 
     /**

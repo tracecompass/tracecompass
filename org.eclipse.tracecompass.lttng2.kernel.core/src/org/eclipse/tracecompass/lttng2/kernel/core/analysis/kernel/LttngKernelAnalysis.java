@@ -13,7 +13,12 @@
 
 package org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
+import java.util.Set;
+
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEventLayout;
 import org.eclipse.tracecompass.lttng2.control.core.session.SessionConfigStrings;
@@ -70,7 +75,7 @@ public class LttngKernelAnalysis extends TmfStateSystemAnalysisModule {
             );
 
     /** The requirements as an immutable set */
-    private static final @NonNull ImmutableSet<TmfAnalysisRequirement> REQUIREMENTS;
+    private static final @NonNull Set<TmfAnalysisRequirement> REQUIREMENTS;
 
     static {
         /* initialize the requirement: domain and events */
@@ -80,10 +85,7 @@ public class LttngKernelAnalysis extends TmfStateSystemAnalysisModule {
         TmfAnalysisRequirement eventReq = new TmfAnalysisRequirement(SessionConfigStrings.CONFIG_ELEMENT_EVENT, REQUIRED_EVENTS, ValuePriorityLevel.MANDATORY);
         eventReq.addValues(OPTIONAL_EVENTS, ValuePriorityLevel.OPTIONAL);
 
-
-        @SuppressWarnings("null")
-        @NonNull ImmutableSet<TmfAnalysisRequirement> reqSet = ImmutableSet.of(domainReq, eventReq);
-        REQUIREMENTS = reqSet;
+        REQUIREMENTS = checkNotNull(ImmutableSet.of(domainReq, eventReq));
     }
 
     @Override
@@ -109,9 +111,7 @@ public class LttngKernelAnalysis extends TmfStateSystemAnalysisModule {
 
     @Override
     protected String getFullHelpText() {
-        @SuppressWarnings("null")
-        @NonNull String helpText = Messages.LttngKernelAnalysisModule_Help;
-        return helpText;
+        return NonNullUtils.nullToEmptyString(Messages.LttngKernelAnalysisModule_Help);
     }
 
     @Override

@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.cpuusage;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
@@ -183,8 +184,7 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
             for (ITmfTreeViewerEntry entry : rootEntry.getChildren()) {
                 if (entry instanceof CpuUsageEntry) {
                     if (selectedThread.equals(((CpuUsageEntry) entry).getTid())) {
-                        @SuppressWarnings("null")
-                        @NonNull List<ITmfTreeViewerEntry> list = Collections.singletonList(entry);
+                        List<ITmfTreeViewerEntry> list = checkNotNull(Collections.singletonList(entry));
                         super.setSelection(list);
                         return;
                     }

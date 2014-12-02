@@ -13,6 +13,8 @@
 
 package org.eclipse.tracecompass.tmf.core.trace.text;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -64,9 +66,7 @@ public class TextTraceEventContent implements ITmfEventField {
     private TextTraceEventContent(@NonNull String fieldName) {
         fName = fieldName;
         fValue = null;
-        @SuppressWarnings("null")
-        @NonNull List<TextTraceEventContent> fields = Collections.EMPTY_LIST;
-        fFields = fields;
+        fFields = checkNotNull(Collections.EMPTY_LIST);
     }
 
     // ------------------------------------------------------------------------

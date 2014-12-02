@@ -16,8 +16,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Map;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.tracecompass.internal.pcap.core.packet.Packet;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.PcapProtocol;
@@ -45,7 +45,7 @@ public class UDPPacket extends Packet {
     private @Nullable UDPEndpoint fSourceEndpoint;
     private @Nullable UDPEndpoint fDestinationEndpoint;
 
-    private @Nullable ImmutableMap<String, String> fFields;
+    private @Nullable Map<String, String> fFields;
 
     /**
      * Constructor of the UDP Packet class.
@@ -203,17 +203,16 @@ public class UDPPacket extends Packet {
 
     @Override
     public Map<String, String> getFields() {
-        ImmutableMap<String, String> map = fFields;
+        Map<String, String> map = fFields;
         if (map == null) {
-            @SuppressWarnings("null")
-            @NonNull ImmutableMap<String, String> newMap = ImmutableMap.<String, String> builder()
+            ImmutableMap.Builder<String, String> builder = ImmutableMap.<String, String> builder()
                     .put("Source Port", String.valueOf(fSourcePort)) //$NON-NLS-1$
                     .put("Destination Port", String.valueOf(fDestinationPort)) //$NON-NLS-1$
                     .put("Length", String.valueOf(fTotalLength) + " bytes") //$NON-NLS-1$ //$NON-NLS-2$
-                    .put("Checksum", String.format("%s%04x", "0x", fChecksum)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    .build();
-            fFields = newMap;
-            return newMap;
+                    .put("Checksum", String.format("%s%04x", "0x", fChecksum)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+            fFields = NonNullUtils.checkNotNull(builder.build());
+            return fFields;
         }
         return map;
     }

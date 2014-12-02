@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.internal.ctf.core.event.types;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -133,10 +135,7 @@ public final class ArrayDeclaration extends CompoundDeclaration {
             }
             definitions.add(fElemType.createDefinition(definitionScope, name, input));
         }
-        @SuppressWarnings("null")
-        @NonNull
-        ImmutableList<Definition> ret = definitions.build();
-        return ret;
+        return checkNotNull(definitions.build());
     }
 
     @Override

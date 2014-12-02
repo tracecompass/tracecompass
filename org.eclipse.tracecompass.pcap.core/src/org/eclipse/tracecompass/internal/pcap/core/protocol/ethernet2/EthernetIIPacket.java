@@ -12,12 +12,13 @@
 
 package org.eclipse.tracecompass.internal.pcap.core.protocol.ethernet2;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.tracecompass.internal.pcap.core.packet.Packet;
@@ -52,7 +53,7 @@ public class EthernetIIPacket extends Packet {
     private @Nullable EthernetIIEndpoint fSourceEndpoint;
     private @Nullable EthernetIIEndpoint fDestinationEndpoint;
 
-    private @Nullable ImmutableMap<String, String> fFields;
+    private @Nullable Map<String, String> fFields;
 
     /**
      * Constructor of the Ethernet Packet class.
@@ -124,9 +125,7 @@ public class EthernetIIPacket extends Packet {
      * @return The source MAC address.
      */
     public byte[] getSourceMacAddress() {
-        @SuppressWarnings("null")
-        @NonNull byte[] mac = Arrays.copyOf(fSourceMacAddress, fSourceMacAddress.length);
-        return mac;
+        return checkNotNull(Arrays.copyOf(fSourceMacAddress, fSourceMacAddress.length));
     }
 
     /**
@@ -135,9 +134,7 @@ public class EthernetIIPacket extends Packet {
      * @return The destination MAC address.
      */
     public byte[] getDestinationMacAddress() {
-        @SuppressWarnings("null")
-        @NonNull byte[] mac = Arrays.copyOf(fDestinationMacAddress, fDestinationMacAddress.length);
-        return mac;
+        return checkNotNull(Arrays.copyOf(fDestinationMacAddress, fDestinationMacAddress.length));
     }
 
     /**
@@ -208,16 +205,15 @@ public class EthernetIIPacket extends Packet {
 
     @Override
     public Map<String, String> getFields() {
-        ImmutableMap<String, String> map = fFields;
+        Map<String, String> map = fFields;
         if (map == null) {
-            @SuppressWarnings("null")
-            @NonNull ImmutableMap<String, String> newMap = ImmutableMap.<String, String> builder()
-                    .put("Source MAC Address", ConversionHelper.toMacAddress(fSourceMacAddress)) //$NON-NLS-1$
-                    .put("Destination MAC Address", ConversionHelper.toMacAddress(fDestinationMacAddress)) //$NON-NLS-1$
-                    .put("Ethertype", String.valueOf(EthertypeHelper.toEtherType(fType))) //$NON-NLS-1$
-                    .build();
-            fFields = newMap;
-            return newMap;
+            ImmutableMap.Builder<String, String> builder = ImmutableMap.<String, String> builder();
+            builder.put("Source MAC Address", ConversionHelper.toMacAddress(fSourceMacAddress)); //$NON-NLS-1$
+            builder.put("Destination MAC Address", ConversionHelper.toMacAddress(fDestinationMacAddress)); //$NON-NLS-1$
+            builder.put("Ethertype", String.valueOf(EthertypeHelper.toEtherType(fType))); //$NON-NLS-1$
+
+            fFields = checkNotNull(builder.build());
+            return fFields;
         }
         return map;
     }

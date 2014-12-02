@@ -10,6 +10,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
+ org.eclipse.tracecompass.common.core,
  org.eclipse.tracecompass.tmf.core,
  org.eclipse.tracecompass.tmf.ui,
  org.eclipse.tracecompass.tmf.analysis.xml.core
