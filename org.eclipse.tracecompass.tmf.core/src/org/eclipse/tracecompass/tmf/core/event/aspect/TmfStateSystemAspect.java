@@ -60,7 +60,7 @@ public class TmfStateSystemAspect implements ITmfEventAspect {
             return name;
         }
 
-        name = fSS.getAttributeName(fAttribute);
+        name = fSS.getFullAttributePath(fAttribute);
         return (name == null ? EMPTY_STRING : name);
     }
 
