@@ -20,7 +20,6 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    LttngKernelThreadInformationProviderTest.class,
     LttngKernelAnalysisTest.class
 })
 public class AllTests {

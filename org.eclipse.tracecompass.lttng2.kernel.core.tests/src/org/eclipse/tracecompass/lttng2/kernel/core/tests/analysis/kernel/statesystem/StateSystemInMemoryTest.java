@@ -17,8 +17,8 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelStateProvider;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEventLayout;
-import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelStateProvider;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
@@ -93,7 +93,7 @@ public class StateSystemInMemoryTest extends StateSystemTest {
 
         @Override
         protected ITmfStateProvider createStateProvider() {
-            return new LttngKernelStateProvider(checkNotNull(getTrace()), LttngEventLayout.getInstance());
+            return new KernelStateProvider(checkNotNull(getTrace()), LttngEventLayout.getInstance());
         }
 
         @Override

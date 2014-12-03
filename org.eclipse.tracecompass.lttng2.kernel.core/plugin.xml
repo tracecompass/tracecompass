@@ -20,24 +20,6 @@
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
       <module
-            analysis_module="org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelAnalysis"
-            automatic="true"
-            id="org.eclipse.linuxtools.lttng2.kernel.analysis"
-            name="%analysis.lttngkernel">
-         <tracetype
-               class="org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace">
-         </tracetype>
-      </module>
-      <module
-            analysis_module="org.eclipse.tracecompass.lttng2.kernel.core.analysis.cpuusage.LttngKernelCpuUsageAnalysis"
-            id="org.eclipse.linuxtools.lttng2.kernel.core.cpuusage"
-            name="%cpuusage.lttng.kernel">
-         <tracetype
-               applies="true"
-               class="org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace">
-         </tracetype>
-      </module>
-      <module
             analysis_module="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.module.VirtualMachineCpuAnalysis"
             automatic="false"
             id="lttng2.analysis.vm.core.VirtualMachineAnalysisModule"

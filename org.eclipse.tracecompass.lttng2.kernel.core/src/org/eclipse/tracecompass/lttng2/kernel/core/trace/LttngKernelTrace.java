@@ -21,10 +21,11 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Activator;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.Lttng26EventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.PerfEventLayout;
@@ -39,7 +40,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
  *
  * @author Alexandre Montplaisir
  */
-public class LttngKernelTrace extends CtfTmfTrace {
+public class LttngKernelTrace extends CtfTmfTrace implements IKernelTrace {
 
     /**
      * Supported Linux kernel tracers
@@ -72,13 +73,8 @@ public class LttngKernelTrace extends CtfTmfTrace {
         super();
     }
 
-    /**
-     * Return the kernel event layout (event and field names) used in this
-     * trace.
-     *
-     * @return The event layout
-     */
-    public @NonNull IKernelAnalysisEventLayout getEventLayout() {
+    @Override
+    public @NonNull IKernelAnalysisEventLayout getKernelEventLayout() {
         OriginTracer tracer = fOriginTracer;
         if (tracer == null) {
             throw new IllegalStateException("Cannot get the layout of a non-initialized trace!"); //$NON-NLS-1$

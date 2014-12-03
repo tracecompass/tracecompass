@@ -18,6 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysis;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelThreadInformationProvider;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Activator;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.VcpuStateValues;
@@ -27,10 +30,7 @@ import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.model.IV
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.model.VirtualCPU;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.model.VirtualMachine;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.model.qemukvm.QemuKvmVmModel;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEventLayout;
-import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelAnalysis;
-import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelThreadInformationProvider;
 import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -112,7 +112,7 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
     private void buildEventNames(ITmfTrace trace) {
         IKernelAnalysisEventLayout layout;
         if (trace instanceof LttngKernelTrace) {
-            layout = ((LttngKernelTrace) trace).getEventLayout();
+            layout = ((LttngKernelTrace) trace).getKernelEventLayout();
         } else {
             /* Fall-back to the base LttngEventLayout */
             layout = LttngEventLayout.getInstance();
@@ -356,7 +356,7 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
     private @Nullable HostThread getCurrentHostThread(ITmfEvent event, long ts) {
         /* Get the LTTng kernel analysis for the host */
         String hostId = event.getTrace().getHostId();
-        LttngKernelAnalysis module = TmfExperimentUtils.getAnalysisModuleOfClassForHost(getTrace(), hostId, LttngKernelAnalysis.class);
+        KernelAnalysis module = TmfExperimentUtils.getAnalysisModuleOfClassForHost(getTrace(), hostId, KernelAnalysis.class);
         if (module == null) {
             return null;
         }
@@ -376,7 +376,7 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
             return null;
         }
 
-        Integer currentTid = LttngKernelThreadInformationProvider.getThreadOnCpu(module, cpu, ts);
+        Integer currentTid = KernelThreadInformationProvider.getThreadOnCpu(module, cpu, ts);
         if (currentTid == null) {
             return null;
         }

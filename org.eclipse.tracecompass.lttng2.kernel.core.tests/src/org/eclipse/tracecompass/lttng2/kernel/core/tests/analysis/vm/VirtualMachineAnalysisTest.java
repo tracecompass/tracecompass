@@ -21,11 +21,11 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysis;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.VcpuStateValues;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.VmAttributes;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.module.VirtualMachineCpuAnalysis;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.trace.VirtualMachineExperiment;
-import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelAnalysis;
 import org.eclipse.tracecompass.lttng2.lttng.kernel.core.tests.shared.vm.VmTestExperiment;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
@@ -96,7 +96,7 @@ public class VirtualMachineAnalysisTest {
          * is implemented, we can remove this
          */
         for (ITmfTrace trace : experiment.getTraces()) {
-            for (LttngKernelAnalysis module : TmfTraceUtils.getAnalysisModulesOfClass(trace, LttngKernelAnalysis.class)) {
+            for (KernelAnalysis module : TmfTraceUtils.getAnalysisModulesOfClass(trace, KernelAnalysis.class)) {
                 module.schedule();
                 module.waitForCompletion();
             }

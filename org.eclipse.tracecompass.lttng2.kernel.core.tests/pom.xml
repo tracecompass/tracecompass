@@ -24,48 +24,19 @@
   <name>Trace Compass LTTng Kernel Analysis Core Tests Plug-in</name>
 
  <build>
-     <!-- workaround for https://issues.sonatype.org/browse/TYCHO-168 -->
-     <resources>
-      <resource>
-        <directory>src</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </resource>
-    </resources>
     <plugins>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.7</version>
-            <executions>
-                <execution>
-                    <id>prepare</id>
-                    <phase>validate</phase>
-                    <configuration>
-                    <target>
-                        <echo message="prepare phase" />
-                    </target>
-                    </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                </execution>
-            </executions>
-        </plugin>
-        <plugin>
-            <groupId>org.eclipse.tycho</groupId>
-            <artifactId>tycho-surefire-plugin</artifactId>
-            <version>${tycho-version}</version>
-            <configuration>
-                <includes>
-                    <include>**/AllTests.*</include>
-                </includes>
-                <useUIHarness>false</useUIHarness>
-                <useUIThread>false</useUIThread>
-                <product>org.eclipse.platform.ide</product>
-            </configuration>
-        </plugin>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-surefire-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <configuration>
+          <testSuite>org.eclipse.tracecompass.lttng2.kernel.core.tests</testSuite>
+          <testClass>org.eclipse.tracecompass.lttng2.kernel.core.tests.AllTests</testClass>
+          <useUIHarness>false</useUIHarness>
+          <useUIThread>false</useUIThread>
+          <product>org.eclipse.platform.ide</product>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 

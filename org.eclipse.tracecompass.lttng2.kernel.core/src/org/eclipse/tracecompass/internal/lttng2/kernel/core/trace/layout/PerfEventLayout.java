@@ -17,6 +17,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.util.Collection;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 
 import com.google.common.collect.ImmutableList;
 

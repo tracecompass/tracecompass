@@ -20,11 +20,11 @@ import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysis;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelThreadInformationProvider;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.VcpuStateValues;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.VmAttributes;
-import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelAnalysis;
-import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelThreadInformationProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -94,7 +94,7 @@ public class VirtualMachineCpuAnalysis extends TmfStateSystemAnalysisModule {
         Set<IAnalysisModule> modules = new HashSet<>();
         /* Depends on the LTTng Kernel analysis modules */
         for (ITmfTrace trace : TmfTraceManager.getTraceSet(getTrace())) {
-            for (LttngKernelAnalysis module : TmfTraceUtils.getAnalysisModulesOfClass(trace, LttngKernelAnalysis.class)) {
+            for (KernelAnalysis module : TmfTraceUtils.getAnalysisModulesOfClass(trace, KernelAnalysis.class)) {
                 modules.add(module);
             }
         }
@@ -182,7 +182,7 @@ public class VirtualMachineCpuAnalysis extends TmfStateSystemAnalysisModule {
         }
 
         String vmHostId = NonNullUtils.checkNotNull(ss.getAttributeName(vmQuark));
-        LttngKernelAnalysis kernelModule = TmfExperimentUtils.getAnalysisModuleOfClassForHost((TmfExperiment) trace, vmHostId, LttngKernelAnalysis.class);
+        KernelAnalysis kernelModule = TmfExperimentUtils.getAnalysisModuleOfClassForHost((TmfExperiment) trace, vmHostId, KernelAnalysis.class);
         if (kernelModule == null) {
             return map;
         }
@@ -191,11 +191,11 @@ public class VirtualMachineCpuAnalysis extends TmfStateSystemAnalysisModule {
          * Initialize the map with the original status intervals from the kernel
          * module
          */
-        for (Integer tid : LttngKernelThreadInformationProvider.getThreadIds(kernelModule)) {
+        for (Integer tid : KernelThreadInformationProvider.getThreadIds(kernelModule)) {
             if (tid == null) {
                 throw new IllegalStateException();
             }
-            map.putAll(tid, LttngKernelThreadInformationProvider.getStatusIntervalsForThread(kernelModule, tid, start, end, resolution, monitor));
+            map.putAll(tid, KernelThreadInformationProvider.getStatusIntervalsForThread(kernelModule, tid, start, end, resolution, monitor));
             if (monitor.isCanceled()) {
                 return map;
             }
@@ -220,7 +220,7 @@ public class VirtualMachineCpuAnalysis extends TmfStateSystemAnalysisModule {
                         if ((value & (VcpuStateValues.VCPU_PREEMPT | VcpuStateValues.VCPU_VMM)) == 0) {
                             break;
                         }
-                        Integer threadOnCpu = LttngKernelThreadInformationProvider.getThreadOnCpu(kernelModule, virtualCPU, cpuInterval.getStartTime());
+                        Integer threadOnCpu = KernelThreadInformationProvider.getThreadOnCpu(kernelModule, virtualCPU, cpuInterval.getStartTime());
                         if (threadOnCpu != null) {
                             map.put(threadOnCpu, new TmfStateInterval(cpuInterval.getStartTime(), cpuInterval.getEndTime(), threadOnCpu, VCPU_PREEMPT_VALUE));
                         }

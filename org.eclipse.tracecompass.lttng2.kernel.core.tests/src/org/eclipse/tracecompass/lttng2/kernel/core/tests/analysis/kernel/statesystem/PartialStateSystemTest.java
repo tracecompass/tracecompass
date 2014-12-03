@@ -21,8 +21,8 @@ import java.io.File;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelStateProvider;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEventLayout;
-import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelStateProvider;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
@@ -179,7 +179,7 @@ public class PartialStateSystemTest extends StateSystemTest {
 
         @Override
         protected ITmfStateProvider createStateProvider() {
-            return new LttngKernelStateProvider(checkNotNull(getTrace()), LttngEventLayout.getInstance());
+            return new KernelStateProvider(checkNotNull(getTrace()), LttngEventLayout.getInstance());
         }
 
         @Override

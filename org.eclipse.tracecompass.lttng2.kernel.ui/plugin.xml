@@ -11,35 +11,6 @@
       </perspective>
    </extension>
    <extension
-         point="org.eclipse.ui.views">
-      <view
-            allowMultiple="false"
-            category="org.eclipse.linuxtools.lttng2.ui.views.category"
-            class="org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.controlflow.ControlFlowView"
-            icon="icons/eview16/control_flow_view.gif"
-            id="org.eclipse.linuxtools.lttng2.kernel.ui.views.controlflow"
-            name="%controlflow.view.name"
-            restorable="true">
-      </view>
-      <view
-            allowMultiple="false"
-            category="org.eclipse.linuxtools.lttng2.ui.views.category"
-            class="org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.resources.ResourcesView"
-            icon="icons/eview16/resources_view.gif"
-            id="org.eclipse.linuxtools.lttng2.kernel.ui.views.resources"
-            name="%resources.view.name"
-            restorable="true">
-      </view>
-      <view
-            allowMultiple="false"
-            category="org.eclipse.linuxtools.lttng2.ui.views.category"
-            class="org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.cpuusage.CpuUsageView"
-            id="org.eclipse.linuxtools.lttng2.kernel.ui.views.cpuusage"
-            name="%cpuusage.view.name"
-            restorable="true">
-      </view>
-   </extension>
-   <extension
          point="org.eclipse.ui.navigator.navigatorContent">
       <commonWizard
             associatedExtensionId="org.eclipse.linuxtools.tmf.ui.navigator.content"
@@ -54,30 +25,6 @@
             </with>
          </enablement>
       </commonWizard>
-   </extension>
-   <extension
-         point="org.eclipse.linuxtools.tmf.core.analysis">
-      <output
-            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
-            id="org.eclipse.linuxtools.lttng2.kernel.ui.views.controlflow">
-         <analysisId
-               id="org.eclipse.linuxtools.lttng2.kernel.analysis">
-         </analysisId>
-      </output>
-      <output
-            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
-            id="org.eclipse.linuxtools.lttng2.kernel.ui.views.resources">
-         <analysisId
-               id="org.eclipse.linuxtools.lttng2.kernel.analysis">
-         </analysisId>
-      </output>
-      <output
-            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
-            id="org.eclipse.linuxtools.lttng2.kernel.ui.views.cpuusage">
-         <analysisId
-               id="org.eclipse.linuxtools.lttng2.kernel.core.cpuusage">
-         </analysisId>
-      </output>
    </extension>
    <extension
          point="org.eclipse.linuxtools.tmf.ui.tracetypeui">
