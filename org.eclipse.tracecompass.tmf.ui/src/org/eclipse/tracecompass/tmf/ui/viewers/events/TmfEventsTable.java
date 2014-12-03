@@ -868,13 +868,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     context.addVariable(ExportToTextCommandHandler.TMF_EVENT_TABLE_COLUMNS_ID, exportColumns);
 
                     handlerService.executeCommandInContext(cmd, null, context);
-                } catch (ExecutionException e) {
-                    displayException(e);
-                } catch (NotDefinedException e) {
-                    displayException(e);
-                } catch (NotEnabledException e) {
-                    displayException(e);
-                } catch (NotHandledException e) {
+                } catch (ExecutionException | NotDefinedException | NotEnabledException | NotHandledException e) {
                     displayException(e);
                 }
             }
