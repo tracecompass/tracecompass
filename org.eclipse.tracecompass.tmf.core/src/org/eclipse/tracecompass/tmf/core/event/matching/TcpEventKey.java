@@ -34,7 +34,7 @@ import com.google.common.hash.Hashing;
 public class TcpEventKey implements IEventMatchingKey {
 
     @SuppressWarnings("null")
-    private static final @NonNull HashFunction hf = Hashing.goodFastHash(32);
+    private static final @NonNull HashFunction HF = Hashing.goodFastHash(32);
     private final long fSeq;
     private final long fAckseq;
     private final long fFlags;
@@ -58,7 +58,7 @@ public class TcpEventKey implements IEventMatchingKey {
 
     @Override
     public int hashCode() {
-        return hf.newHasher()
+        return HF.newHasher()
                 .putLong(fSeq)
                 .putLong(fAckseq)
                 .putLong(fFlags).hash().asInt();

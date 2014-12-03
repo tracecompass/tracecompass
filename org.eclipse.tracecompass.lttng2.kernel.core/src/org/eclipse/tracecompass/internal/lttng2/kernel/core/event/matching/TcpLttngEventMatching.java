@@ -41,9 +41,9 @@ import com.google.common.collect.ImmutableSet;
  */
 public class TcpLttngEventMatching implements ITmfNetworkMatchDefinition {
 
-    private static final String[] key_seq = { TcpEventStrings.TRANSPORT_FIELDS, TcpEventStrings.TYPE_TCP, TcpEventStrings.SEQ };
-    private static final String[] key_ackseq = { TcpEventStrings.TRANSPORT_FIELDS, TcpEventStrings.TYPE_TCP, TcpEventStrings.ACKSEQ };
-    private static final String[] key_flags = { TcpEventStrings.TRANSPORT_FIELDS, TcpEventStrings.TYPE_TCP, TcpEventStrings.FLAGS };
+    private static final String[] KEY_SEQ = { TcpEventStrings.TRANSPORT_FIELDS, TcpEventStrings.TYPE_TCP, TcpEventStrings.SEQ };
+    private static final String[] KEY_ACKSEQ = { TcpEventStrings.TRANSPORT_FIELDS, TcpEventStrings.TYPE_TCP, TcpEventStrings.ACKSEQ };
+    private static final String[] KEY_FLAGS = { TcpEventStrings.TRANSPORT_FIELDS, TcpEventStrings.TYPE_TCP, TcpEventStrings.FLAGS };
 
     private static final ImmutableSet<String> REQUIRED_EVENTS = ImmutableSet.of(
             TcpEventStrings.NET_DEV_QUEUE,
@@ -97,19 +97,19 @@ public class TcpLttngEventMatching implements ITmfNetworkMatchDefinition {
         ITmfEventField data;
 
         long seq = -1, ackseq = -1, flags = -1;
-        data = field.getSubField(key_seq);
+        data = field.getSubField(KEY_SEQ);
         if (data != null) {
             seq = (long) data.getValue();
         } else {
             return null;
         }
-        data = field.getSubField(key_ackseq);
+        data = field.getSubField(KEY_ACKSEQ);
         if (data != null) {
             ackseq = (long) data.getValue();
         } else {
             return null;
         }
-        data = field.getSubField(key_flags);
+        data = field.getSubField(KEY_FLAGS);
         if (data != null) {
             flags = (long) data.getValue();
         } else {
