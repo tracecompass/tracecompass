@@ -33,6 +33,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
+import org.eclipse.tracecompass.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement.ValuePriorityLevel;
 import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
@@ -110,6 +111,8 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
             throw new TmfAnalysisException(NLS.bind(Messages.TmfAbstractAnalysisModule_TraceSetMoreThanOnce, getName()));
         }
 
+        TmfCoreTracer.traceAnalysis(getId(), trace, "setting trace for analysis"); //$NON-NLS-1$
+
         /* Check that analysis can be executed */
         if (!canExecute(trace)) {
             throw new TmfAnalysisException(NLS.bind(Messages.TmfAbstractAnalysisModule_AnalysisCannotExecute, getName()));
@@ -119,6 +122,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
         /* Get the parameter providers for this trace */
         fParameterProviders = TmfAnalysisManager.getParameterProviders(this, trace);
         for (IAnalysisParameterProvider provider : fParameterProviders) {
+            TmfCoreTracer.traceAnalysis(getId(), trace, "registered to parameter provider " + provider.getName()); //$NON-NLS-1$
             provider.registerModule(this);
         }
         resetAnalysis();
@@ -202,6 +206,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
      * Set the countdown latch back to 1 so the analysis can be executed again
      */
     protected void resetAnalysis() {
+        TmfCoreTracer.traceAnalysis(getId(), getTrace(), "reset: ready for execution"); //$NON-NLS-1$
         fFinishedLatch.countDown();
         fFinishedLatch = new CountDownLatch(1);
     }
@@ -231,9 +236,11 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
      * It has to be called inside a synchronized block
      */
     private void setAnalysisCompleted() {
-        fStarted = false;
-        fJob = null;
-        fFinishedLatch.countDown();
+        synchronized (syncObj) {
+            fStarted = false;
+            fJob = null;
+            fFinishedLatch.countDown();
+        }
     }
 
     /**
@@ -242,6 +249,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
     @Override
     public final void cancel() {
         synchronized (syncObj) {
+            TmfCoreTracer.traceAnalysis(getId(), getTrace(), "cancelled by application"); //$NON-NLS-1$
             if (fJob != null) {
                 if (fJob.cancel()) {
                     fAnalysisCancelled = true;
@@ -279,12 +287,14 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
 
         /* Do not execute if analysis has already run */
         if (fFinishedLatch.getCount() == 0) {
+            TmfCoreTracer.traceAnalysis(getId(), getTrace(), "already executed"); //$NON-NLS-1$
             return;
         }
 
         /* Do not execute if analysis already running */
         synchronized (syncObj) {
             if (fStarted) {
+                TmfCoreTracer.traceAnalysis(getId(), getTrace(), "already started, not starting again"); //$NON-NLS-1$
                 return;
             }
             fStarted = true;
@@ -310,10 +320,12 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
                 try {
                     mon.beginTask("", IProgressMonitor.UNKNOWN); //$NON-NLS-1$
                     broadcast(new TmfStartAnalysisSignal(TmfAbstractAnalysisModule.this, TmfAbstractAnalysisModule.this));
+                    TmfCoreTracer.traceAnalysis(TmfAbstractAnalysisModule.this.getId(), TmfAbstractAnalysisModule.this.getTrace(), "started"); //$NON-NLS-1$
                     fAnalysisCancelled = !executeAnalysis(mon);
                     for (IAnalysisModule module : dependentAnalyses) {
                         module.waitForCompletion(mon);
                     }
+                    TmfCoreTracer.traceAnalysis(TmfAbstractAnalysisModule.this.getId(), TmfAbstractAnalysisModule.this.getTrace(), "finished"); //$NON-NLS-1$
                 } catch (TmfAnalysisException e) {
                     Activator.logError("Error executing analysis with trace " + trace.getName(), e); //$NON-NLS-1$
                 } finally {
@@ -333,6 +345,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
 
             @Override
             protected void canceling() {
+                TmfCoreTracer.traceAnalysis(getId(), getTrace(), "job cancelled"); //$NON-NLS-1$
                 TmfAbstractAnalysisModule.this.canceling();
             }
 
@@ -347,6 +360,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
             if (trace == null) {
                 return new Status(IStatus.ERROR, Activator.PLUGIN_ID, String.format("No trace specified for analysis %s", getName())); //$NON-NLS-1$
             }
+            TmfCoreTracer.traceAnalysis(getId(), getTrace(), "scheduled"); //$NON-NLS-1$
             execute(trace);
         }
 

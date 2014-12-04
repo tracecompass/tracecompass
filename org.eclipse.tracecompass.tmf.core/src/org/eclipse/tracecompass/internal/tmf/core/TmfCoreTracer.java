@@ -21,6 +21,7 @@ import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
  * The TMF Core tracer, used to trace TMF internal components.
@@ -35,6 +36,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
  * <li><strong>Request</strong>: TMF requests life-cycle
  * <li><strong>Signal</strong>: TMF signals triggering and distribution
  * <li><strong>Event</strong>: TMF trace events
+ * <li><strong>Analysis</strong>: TMF analyzes
  * </ul>
  *
  * @version 1.0
@@ -54,6 +56,7 @@ public class TmfCoreTracer {
     private static final String REQUEST_TRACE_KEY   = PLUGIN_ID + "/request";
     private static final String SIGNAL_TRACE_KEY    = PLUGIN_ID + "/signal";
     private static final String EVENT_TRACE_KEY     = PLUGIN_ID + "/event";
+    private static final String ANALYSIS_TRACE_KEY     = PLUGIN_ID + "/analysis";
 
     private static final String TRACE_FILE_NAME = "TmfTrace.log";
 
@@ -66,6 +69,7 @@ public class TmfCoreTracer {
     static boolean REQUEST_CLASS_ENABLED   = false;
     static boolean SIGNAL_CLASS_ENABLED    = false;
     static boolean EVENT_CLASS_ENABLED     = false;
+    static boolean ANALYSIS_CLASS_ENABLED     = false;
 
     // Trace log file
     private static BufferedWriter fTraceFile;
@@ -104,6 +108,12 @@ public class TmfCoreTracer {
         if (traceKey != null) {
             EVENT_CLASS_ENABLED = (Boolean.valueOf(traceKey)).booleanValue();
             isTracing |= EVENT_CLASS_ENABLED;
+        }
+
+        traceKey = Platform.getDebugOption(ANALYSIS_TRACE_KEY);
+        if (traceKey != null) {
+            ANALYSIS_CLASS_ENABLED = (Boolean.valueOf(traceKey)).booleanValue();
+            isTracing |= ANALYSIS_CLASS_ENABLED;
         }
 
         // Create trace log file if any of the flags was set
@@ -155,15 +165,21 @@ public class TmfCoreTracer {
         return EVENT_CLASS_ENABLED;
     }
 
+    @SuppressWarnings("javadoc")
+    public static boolean isAnalysisTraced() {
+        return ANALYSIS_CLASS_ENABLED;
+    }
+
     // ------------------------------------------------------------------------
     // Tracing methods
     // ------------------------------------------------------------------------
 
     /**
-     * The central tracing method. Prepends the timestamp and the thread id
-     * to the trace message.
+     * The central tracing method. Prepends the timestamp and the thread id to
+     * the trace message.
      *
-     * @param msg the trace message to log
+     * @param msg
+     *            the trace message to log
      */
     public static synchronized void trace(String msg) {
         // Leave when there is no place to write the message.
@@ -245,6 +261,24 @@ public class TmfCoreTracer {
         if (EVENT_CLASS_ENABLED) {
             String message = ("[EVT] Provider=" + provider.toString()
                     + ", Req=" + request.getRequestId() + ", Event=" + event.getTimestamp());
+            trace(message);
+        }
+    }
+
+    /**
+     * Trace an event happening in an analysis
+     *
+     * @param analysisId
+     *            The analysis ID of the analysis being run
+     * @param trace
+     *            The trace this analysis is run on
+     * @param msg
+     *            The message to record for this analysis
+     */
+    public static void traceAnalysis(String analysisId, ITmfTrace trace, String msg) {
+        if (ANALYSIS_CLASS_ENABLED) {
+            String traceName = (trace == null) ? "" : trace.getName();
+            String message = ("[ANL] Anl=" + analysisId + " for " + traceName + " " + msg);
             trace(message);
         }
     }
