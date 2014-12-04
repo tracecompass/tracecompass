@@ -56,22 +56,22 @@ public class LttngKernelAnalysis extends TmfStateSystemAnalysisModule {
     private static final ImmutableSet<String> OPTIONAL_EVENTS = ImmutableSet.of(
             // FIXME These cannot be declared statically anymore, they depend on
             // the OriginTracer of the kernel trace.
-//            LttngStrings.EXIT_SYSCALL,
-//            LttngStrings.IRQ_HANDLER_ENTRY,
-//            LttngStrings.IRQ_HANDLER_EXIT,
-//            LttngStrings.SOFTIRQ_ENTRY,
-//            LttngStrings.SOFTIRQ_EXIT,
-//            LttngStrings.SOFTIRQ_RAISE,
-//            LttngStrings.SCHED_PROCESS_FORK,
-//            LttngStrings.SCHED_PROCESS_EXIT,
-//            LttngStrings.SCHED_PROCESS_FREE,
-//            LttngStrings.SCHED_SWITCH,
-//            LttngStrings.STATEDUMP_PROCESS_STATE,
-//            LttngStrings.SCHED_WAKEUP,
-//            LttngStrings.SCHED_WAKEUP_NEW,
-//
-//            /* FIXME Add the prefix for syscalls */
-//            LttngStrings.SYSCALL_PREFIX
+            // LttngStrings.EXIT_SYSCALL,
+            // LttngStrings.IRQ_HANDLER_ENTRY,
+            // LttngStrings.IRQ_HANDLER_EXIT,
+            // LttngStrings.SOFTIRQ_ENTRY,
+            // LttngStrings.SOFTIRQ_EXIT,
+            // LttngStrings.SOFTIRQ_RAISE,
+            // LttngStrings.SCHED_PROCESS_FORK,
+            // LttngStrings.SCHED_PROCESS_EXIT,
+            // LttngStrings.SCHED_PROCESS_FREE,
+            // LttngStrings.SCHED_SWITCH,
+            // LttngStrings.STATEDUMP_PROCESS_STATE,
+            // LttngStrings.SCHED_WAKEUP,
+            // LttngStrings.SCHED_WAKEUP_NEW,
+            //
+            // /* FIXME Add the prefix for syscalls */
+            // LttngStrings.SYSCALL_PREFIX
             );
 
     /** The requirements as an immutable set */
