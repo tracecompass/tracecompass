@@ -57,6 +57,9 @@ import com.google.common.collect.TreeMultimap;
  */
 public class VirtualMachineCpuAnalysis extends TmfStateSystemAnalysisModule {
 
+    /** The ID of this analysis module */
+    public static final String ID = "org.eclipse.tracecompass.lttng2.analysis.vm.core.VirtualMachineAnalysisModule"; //$NON-NLS-1$
+
     // TODO: Update with event layout when requirements are back */
     static final Set<String> REQUIRED_EVENTS = NonNullUtils.checkNotNull(ImmutableSet.of(
             // LttngStrings.SCHED_SWITCH

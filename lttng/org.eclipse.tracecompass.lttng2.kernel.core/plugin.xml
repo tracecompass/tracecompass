@@ -22,7 +22,7 @@
       <module
             analysis_module="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.module.VirtualMachineCpuAnalysis"
             automatic="false"
-            id="lttng2.analysis.vm.core.VirtualMachineAnalysisModule"
+            id="org.eclipse.tracecompass.lttng2.analysis.vm.core.VirtualMachineAnalysisModule"
             name="Virtual Machine Analysis">
             <tracetype
                   applies="true"
