@@ -120,6 +120,8 @@
 </profiles>
 
   <modules>
+    <module>org.eclipse.tracecompass.common.core</module>
+
     <module>org.eclipse.tracecompass.btf.core</module>
     <module>org.eclipse.tracecompass.btf.core.tests</module>
     <module>org.eclipse.tracecompass.btf.ui</module>
