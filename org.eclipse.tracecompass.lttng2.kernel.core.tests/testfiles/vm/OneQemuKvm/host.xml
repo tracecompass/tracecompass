@@ -1,0 +1,149 @@
+<trace>
+<event timestamp="0" name="set_aspects">
+<field name="cpu" value="1" type="int" />
+</event>
+<event timestamp="1" name="sched_switch">
+<field name="cpu" value="0" type="int" />
+<field name="prev_comm" value="any" type="string" />
+<field name="prev_tid" value="30" type="long" />
+<field name="prev_prio" value="20" type="int" />
+<field name="prev_state" value="0" type="long" />
+<field name="next_comm" value="qemucpu1" type="string" />
+<field name="next_tid" value="31" type="long" />
+<field name="next_prio" value="20" type="int" />
+</event>
+<event timestamp="5" name="kvm_entry">
+<field name="cpu" value="0" type="int" />
+<field name="vcpu_id" value="0" type="long" />
+</event>
+<event timestamp="45" name="kvm_exit">
+<field name="cpu" value="0" type="int" />
+<field name="exit_reason" value="32" type="int" />
+<field name="guest_rip" value="123456" type="long" />
+<field name="isa" value="1" type="int" />
+<field name="info1" value="654654" type="long" />
+<field name="info2" value="456789" type="long" />
+</event>
+<event timestamp="50" name="vmsync_gh_host">
+<field name="cpu" value="0" type="int" />
+<field name="cnt" value="1" type="int" />
+<field name="vm_uid" value="123456" type="long" />
+</event>
+<event timestamp="55" name="vmsync_hg_host">
+<field name="cpu" value="0" type="int" />
+<field name="cnt" value="2" type="int" />
+<field name="vm_uid" value="123456" type="long" />
+</event>
+<event timestamp="60" name="kvm_entry">
+<field name="cpu" value="0" type="int" />
+<field name="vcpu_id" value="0" type="long" />
+</event>
+<event timestamp="95" name="kvm_exit">
+<field name="cpu" value="0" type="int" />
+<field name="exit_reason" value="32" type="int" />
+<field name="guest_rip" value="123456" type="long" />
+<field name="isa" value="1" type="int" />
+<field name="info1" value="654654" type="long" />
+<field name="info2" value="456789" type="long" />
+</event>
+<event timestamp="100" name="sched_switch">
+<field name="cpu" value="0" type="int" />
+<field name="prev_comm" value="qemucpu1" type="string" />
+<field name="prev_tid" value="31" type="long" />
+<field name="prev_prio" value="20" type="int" />
+<field name="prev_state" value="0" type="long" />
+<field name="next_comm" value="any" type="string" />
+<field name="next_tid" value="30" type="long" />
+<field name="next_prio" value="20" type="int" />
+</event>
+<event timestamp="150" name="sched_switch">
+<field name="cpu" value="0" type="int" />
+<field name="prev_comm" value="any" type="string" />
+<field name="prev_tid" value="30" type="long" />
+<field name="prev_prio" value="20" type="int" />
+<field name="prev_state" value="0" type="long" />
+<field name="next_comm" value="qemucpu1" type="string" />
+<field name="next_tid" value="31" type="long" />
+<field name="next_prio" value="20" type="int" />
+</event>
+<event timestamp="155" name="kvm_entry">
+<field name="cpu" value="0" type="int" />
+<field name="vcpu_id" value="0" type="long" />
+</event>
+<event timestamp="195" name="kvm_exit">
+<field name="cpu" value="0" type="int" />
+<field name="exit_reason" value="32" type="int" />
+<field name="guest_rip" value="123456" type="long" />
+<field name="isa" value="1" type="int" />
+<field name="info1" value="654654" type="long" />
+<field name="info2" value="456789" type="long" />
+</event>
+<event timestamp="200" name="vmsync_gh_host">
+<field name="cpu" value="0" type="int" />
+<field name="cnt" value="3" type="int" />
+<field name="vm_uid" value="123456" type="long" />
+</event>
+<event timestamp="205" name="vmsync_hg_host">
+<field name="cpu" value="0" type="int" />
+<field name="cnt" value="4" type="int" />
+<field name="vm_uid" value="123456" type="long" />
+</event>
+<event timestamp="210" name="kvm_entry">
+<field name="cpu" value="0" type="int" />
+<field name="vcpu_id" value="0" type="long" />
+</event>
+<event timestamp="245" name="kvm_exit">
+<field name="cpu" value="0" type="int" />
+<field name="exit_reason" value="32" type="int" />
+<field name="guest_rip" value="123456" type="long" />
+<field name="isa" value="1" type="int" />
+<field name="info1" value="654654" type="long" />
+<field name="info2" value="456789" type="long" />
+</event>
+<event timestamp="250" name="vmsync_gh_host">
+<field name="cpu" value="0" type="int" />
+<field name="cnt" value="5" type="int" />
+<field name="vm_uid" value="123456" type="long" />
+</event>
+<event timestamp="255" name="vmsync_hg_host">
+<field name="cpu" value="0" type="int" />
+<field name="cnt" value="6" type="int" />
+<field name="vm_uid" value="123456" type="long" />
+</event>
+<event timestamp="260" name="kvm_entry">
+<field name="cpu" value="0" type="int" />
+<field name="vcpu_id" value="0" type="long" />
+</event>
+<event timestamp="295" name="kvm_exit">
+<field name="cpu" value="0" type="int" />
+<field name="exit_reason" value="32" type="int" />
+<field name="guest_rip" value="123456" type="long" />
+<field name="isa" value="1" type="int" />
+<field name="info1" value="654654" type="long" />
+<field name="info2" value="456789" type="long" />
+</event>
+<event timestamp="300" name="sched_switch">
+<field name="cpu" value="0" type="int" />
+<field name="prev_comm" value="qemucpu1" type="string" />
+<field name="prev_tid" value="31" type="long" />
+<field name="prev_prio" value="20" type="int" />
+<field name="prev_state" value="0" type="long" />
+<field name="next_comm" value="any" type="string" />
+<field name="next_tid" value="30" type="long" />
+<field name="next_prio" value="20" type="int" />
+</event>
+<event timestamp="350" name="sched_switch">
+<field name="cpu" value="0" type="int" />
+<field name="prev_comm" value="any" type="string" />
+<field name="prev_tid" value="30" type="long" />
+<field name="prev_prio" value="20" type="int" />
+<field name="prev_state" value="0" type="long" />
+<field name="next_comm" value="qemucpu1" type="string" />
+<field name="next_tid" value="31" type="long" />
+<field name="next_prio" value="20" type="int" />
+</event>
+<event timestamp="355" name="kvm_entry">
+<field name="cpu" value="0" type="int" />
+<field name="vcpu_id" value="0" type="long" />
+</event>
+</trace>
