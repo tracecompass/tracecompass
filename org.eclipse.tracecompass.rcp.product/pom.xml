@@ -82,30 +82,18 @@
                 <configuration>
                   <target>
                     <!-- Delete the current contents of the destination -->
-                    <symlink action="delete" link="${rcpDestination}/trace-compass-latest-linux.gtk.x86_64.tar.gz" />
-                    <symlink action="delete" link="${rcpDestination}/trace-compass-latest-linux.gtk.x86.tar.gz" />
-                    <symlink action="delete" link="${rcpDestination}/trace-compass-latest-macosx.cocoa.x86_64.tar.gz" />
-                    <symlink action="delete" link="${rcpDestination}/trace-compass-latest-win32.win32.x86_64.zip" />
-                    <symlink action="delete" link="${rcpDestination}/trace-compass-latest-win32.win32.x86.zip" />
                     <delete includeemptydirs="false">
                       <fileset dir="${rcpDestination}">
                         <include name="**" />
                       </fileset>
                     </delete>
 
-                    <!-- Copy the archives to the destination -->
+                    <!-- Copy the new archives to the destination -->
                     <copy includeemptydirs="false" todir="${rcpDestination}">
                       <fileset dir="${productDir}">
                         <include name="trace-compass-*" />
                       </fileset>
                     </copy>
-
-                    <!-- Re-create the symlinks pointing to the latest archives -->
-                    <symlink link="${rcpDestination}/trace-compass-latest-linux.gtk.x86_64.tar.gz"    resource="trace-compass-${project.version}-${build.timestamp}-linux.gtk.x86_64.tar.gz" />
-                    <symlink link="${rcpDestination}/trace-compass-latest-linux.gtk.x86.tar.gz"       resource="trace-compass-${project.version}-${build.timestamp}-linux.gtk.x86.tar.gz" />
-                    <symlink link="${rcpDestination}/trace-compass-latest-macosx.cocoa.x86_64.tar.gz" resource="trace-compass-${project.version}-${build.timestamp}-macosx.cocoa.x86_64.tar.gz" />
-                    <symlink link="${rcpDestination}/trace-compass-latest-win32.win32.x86_64.zip"     resource="trace-compass-${project.version}-${build.timestamp}-win32.win32.x86_64.zip" />
-                    <symlink link="${rcpDestination}/trace-compass-latest-win32.win32.x86.zip"        resource="trace-compass-${project.version}-${build.timestamp}-win32.win32.x86.zip" />
                   </target>
                 </configuration>
               </execution>
