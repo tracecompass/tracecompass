@@ -24,7 +24,7 @@ public class SyslogEventType extends TmfEventType {
     public static final String TYPE_ID = "Syslog"; //$NON-NLS-1$
     /** The labels (field names) used for SA system log events. */
     @SuppressWarnings("nls")
-    public static final String[] LABELS = {"Timestamp", "Host", "Logger", "Message"};
+    public static final String[] LABELS = {"Timestamp", "Host", "Logger", "File", "Line", "Message"};
     /** A default instance of this class */
     public static final SyslogEventType INSTANCE = new SyslogEventType();
 
@@ -36,8 +36,12 @@ public class SyslogEventType extends TmfEventType {
         int HOST      = 1;
         /** Index for the logger name */
         int LOGGER    = 2;
+        /** Index for the logger name */
+        int FILE    = 3;
+        /** Index for the logger name */
+        int LINE    = 4;
         /** Index for the event message */
-        int MESSAGE   = 3;
+        int MESSAGE   = 5;
     }
 
     /**

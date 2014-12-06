@@ -20,7 +20,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        CollapseEventsInTableTest.class,
+        CallsiteEventsInTableTest.class,
+        CollapseEventsInTableTest.class
 })
 public class AllTests {
 }

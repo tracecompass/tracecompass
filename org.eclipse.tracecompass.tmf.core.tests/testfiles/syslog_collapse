@@ -1,22 +1,22 @@
-Jan 1 01:01:01 HostA LoggerA: Message A
-Jan 1 02:02:02 HostB LoggerB: Message B
-Jan 1 03:03:03 HostC LoggerC: Message C
-Jan 1 04:04:04 HostD LoggerD: Message D
-Jan 1 05:05:05 HostE LoggerE:
-Jan 1 06:06:06 HostF LoggerF: Message F
-Jan 1 06:06:07 HostF LoggerF: Message F
-Jan 1 06:06:08 HostF LoggerF: Message F
-Jan 1 06:06:09 HostF LoggerF: Message F
-Jan 1 06:06:10 HostF LoggerF: Message F
-Jan 1 06:06:11 HostF LoggerF: Message F
-Jan 1 06:06:12 HostF LoggerF: Message F
-Jan 1 06:06:13 HostF LoggerF: Message F
-Jan 1 06:06:14 HostF LoggerF: Message F
-Jan 1 06:06:15 HostF LoggerF: Message F
-Jan 1 06:06:16 HostF LoggerF: Message F
-Jan 1 06:06:17 HostF LoggerF: Message F
-Jan 1 06:06:18 HostF LoggerF: Message F
-Jan 1 06:06:19 HostF LoggerF: Message F
-Jan 1 06:06:20 HostF LoggerF: Message F
-Jan 1 06:06:21 HostF LoggerF: Message D
-Jan 1 06:06:22 HostF LoggerF: Message D
+Jan 1 01:01:01 HostA LoggerA: SourceFile:4 Message A
+Jan 1 02:02:02 HostB LoggerB: SourceFile:5 Message B
+Jan 1 03:03:03 HostC LoggerC: SourceFile:6 Message C
+Jan 1 04:04:04 HostD LoggerD: SourceFile:7 Message D
+Jan 1 05:05:05 HostE LoggerE: SourceFile:8
+Jan 1 06:06:06 HostF LoggerF: SourceFile:9 Message F
+Jan 1 06:06:07 HostF LoggerF: SourceFile:9 Message F
+Jan 1 06:06:08 HostF LoggerF: SourceFile:9 Message F
+Jan 1 06:06:09 HostF LoggerF: SourceFile:9 Message F
+Jan 1 06:06:10 HostF LoggerF: SourceFile:9 Message F
+Jan 1 06:06:11 HostF LoggerF: SourceFile:9 Message F
+Jan 1 06:06:12 HostF LoggerF: SourceFile:9 Message F
+Jan 1 06:06:13 HostF LoggerF: SourceFile:9 Message F
+Jan 1 06:06:14 HostF LoggerF: SourceFile:9 Message F
+Jan 1 06:06:15 HostF LoggerF: SourceFile:9 Message F
+Jan 1 06:06:16 HostF LoggerF: SourceFile:9 Message F
+Jan 1 06:06:17 HostF LoggerF: SourceFile:9 Message F
+Jan 1 06:06:18 HostF LoggerF: SourceFile:9 Message F
+Jan 1 06:06:19 HostF LoggerF: SourceFile:9 Message F
+Jan 1 06:06:20 HostF LoggerF: SourceFile:9 Message F
+Jan 1 06:06:21 HostF LoggerF: SourceFile:10 Message D
+Jan 1 06:06:22 HostF LoggerF: SourceFile:10 Message D

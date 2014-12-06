@@ -42,7 +42,7 @@ public class SyslogTrace extends TextTrace<SyslogEvent> {
             TIMESTAMP_FORMAT, TmfTimePreferences.getLocale());
     /** The regular expression pattern of the first line of an event. */
     public static final Pattern LINE1_PATTERN = Pattern.compile(
-            "\\s*(\\S\\S\\S \\d\\d? \\d\\d:\\d\\d:\\d\\d)\\s*(\\S*)\\s*(\\S*):+\\s*(.*\\S)?"); //$NON-NLS-1$
+            "\\s*(\\S\\S\\S \\d\\d? \\d\\d:\\d\\d:\\d\\d)\\s*(\\S*)\\s*(\\S*):+\\s*(\\S*):([0-9]*)\\s*(.*\\S)?"); //$NON-NLS-1$
 
     /* The current calendar to use */
     private static final Calendar CURRENT = Calendar.getInstance();
@@ -86,7 +86,9 @@ public class SyslogTrace extends TextTrace<SyslogEvent> {
         content.setFieldValue(Index.TIMESTAMP, matcher.group(1));
         content.setFieldValue(Index.HOST, matcher.group(2));
         content.setFieldValue(Index.LOGGER, matcher.group(3));
-        content.setFieldValue(Index.MESSAGE, new StringBuffer(matcher.group(4) != null ? matcher.group(4) : "")); //$NON-NLS-1$
+        content.setFieldValue(Index.FILE, matcher.group(4));
+        content.setFieldValue(Index.LINE, matcher.group(5));
+        content.setFieldValue(Index.MESSAGE, new StringBuffer(matcher.group(6) != null ? matcher.group(6) : "")); //$NON-NLS-1$
 
         SyslogEvent event = new SyslogEvent(
                 this,

@@ -137,7 +137,7 @@ public class TextTraceTest {
         IStatus status = trace.validate(null, validTracePath);
         assertTrue(status.isOK());
         assertTrue(status instanceof TraceValidationStatus);
-        assertEquals(180, ((TraceValidationStatus) status).getConfidence());
+        assertEquals(185, ((TraceValidationStatus) status).getConfidence());
 
         URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(OTHER_PATH), null);
         URI uri = FileLocator.toFileURL(location).toURI();
@@ -192,6 +192,8 @@ public class TextTraceTest {
         assertEquals("getField:TIMESTAMP", "Jan 1 01:01:01", content.getFieldValue(Index.TIMESTAMP));
         assertEquals("getField:HOST", "HostA", content.getFieldValue(Index.HOST));
         assertEquals("getField:LOGGER", "LoggerA", content.getFieldValue(Index.LOGGER));
+        assertEquals("getField:FILE", "SourceFileA", content.getFieldValue(Index.FILE));
+        assertEquals("getField:LINE", "4", content.getFieldValue(Index.LINE));
         assertEquals("getField:MESSAGE", "Message A", content.getFieldValue(Index.MESSAGE).toString());
         event = fTrace.getNext(context);
         content = event.getContent();
@@ -199,6 +201,8 @@ public class TextTraceTest {
         assertEquals("getField:TIMESTAMP", "Jan 1 02:02:02", content.getFieldValue(Index.TIMESTAMP));
         assertEquals("getField:HOST", "HostB", content.getFieldValue(Index.HOST));
         assertEquals("getField:LOGGER", "LoggerB", content.getFieldValue(Index.LOGGER));
+        assertEquals("getField:FILE", "SourceFileB", content.getFieldValue(Index.FILE));
+        assertEquals("getField:LINE", "5", content.getFieldValue(Index.LINE));
         assertEquals("getField:MESSAGE", "Message B", content.getFieldValue(Index.MESSAGE).toString());
         event = fTrace.getNext(context);
         content = event.getContent();
@@ -206,6 +210,8 @@ public class TextTraceTest {
         assertEquals("getField:TIMESTAMP", "Jan 1 03:03:03", content.getFieldValue(Index.TIMESTAMP));
         assertEquals("getField:HOST", "HostC", content.getFieldValue(Index.HOST));
         assertEquals("getField:LOGGER", "LoggerC", content.getFieldValue(Index.LOGGER));
+        assertEquals("getField:FILE", "SourceFileC", content.getFieldValue(Index.FILE));
+        assertEquals("getField:LINE", "6", content.getFieldValue(Index.LINE));
         assertEquals("getField:MESSAGE", "Message C", content.getFieldValue(Index.MESSAGE).toString());
         event = fTrace.getNext(context);
         content = event.getContent();
@@ -213,6 +219,8 @@ public class TextTraceTest {
         assertEquals("getField:TIMESTAMP", "Jan 1 04:04:04", content.getFieldValue(Index.TIMESTAMP));
         assertEquals("getField:HOST", "HostD", content.getFieldValue(Index.HOST));
         assertEquals("getField:LOGGER", "LoggerD", content.getFieldValue(Index.LOGGER));
+        assertEquals("getField:FILE", "SourceFileD", content.getFieldValue(Index.FILE));
+        assertEquals("getField:LINE", "7", content.getFieldValue(Index.LINE));
         assertEquals("getField:MESSAGE", "Message D", content.getFieldValue(Index.MESSAGE).toString());
         event = fTrace.getNext(context);
         content = event.getContent();
@@ -220,6 +228,8 @@ public class TextTraceTest {
         assertEquals("getField:TIMESTAMP", "Jan 1 05:05:05", content.getFieldValue(Index.TIMESTAMP));
         assertEquals("getField:HOST", "HostE", content.getFieldValue(Index.HOST));
         assertEquals("getField:LOGGER", "LoggerE", content.getFieldValue(Index.LOGGER));
+        assertEquals("getField:FILE", "SourceFileE", content.getFieldValue(Index.FILE));
+        assertEquals("getField:LINE", "8", content.getFieldValue(Index.LINE));
         assertEquals("getField:MESSAGE", "", content.getFieldValue(Index.MESSAGE).toString());
         event = fTrace.getNext(context);
         content = event.getContent();
@@ -227,6 +237,8 @@ public class TextTraceTest {
         assertEquals("getField:TIMESTAMP", "Jan 1 06:06:06", content.getFieldValue(Index.TIMESTAMP));
         assertEquals("getField:HOST", "HostF", content.getFieldValue(Index.HOST));
         assertEquals("getField:LOGGER", "LoggerF", content.getFieldValue(Index.LOGGER));
+        assertEquals("getField:FILE", "SourceFileF", content.getFieldValue(Index.FILE));
+        assertEquals("getField:LINE", "9", content.getFieldValue(Index.LINE));
         assertEquals("getField:MESSAGE", "Message F", content.getFieldValue(Index.MESSAGE).toString());
         event = fTrace.getNext(context);
         assertEquals("event", null, event);

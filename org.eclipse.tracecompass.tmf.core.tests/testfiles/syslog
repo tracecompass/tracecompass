@@ -1,6 +1,6 @@
-Jan 1 01:01:01 HostA LoggerA: Message A
-Jan 1 02:02:02 HostB LoggerB: Message B
-Jan 1 03:03:03 HostC LoggerC: Message C
-Jan 1 04:04:04 HostD LoggerD: Message D
-Jan 1 05:05:05 HostE LoggerE:
-Jan 1 06:06:06 HostF LoggerF: Message F
+Jan 1 01:01:01 HostA LoggerA: SourceFileA:4 Message A
+Jan 1 02:02:02 HostB LoggerB: SourceFileB:5 Message B
+Jan 1 03:03:03 HostC LoggerC: SourceFileC:6 Message C
+Jan 1 04:04:04 HostD LoggerD: SourceFileD:7 Message D
+Jan 1 05:05:05 HostE LoggerE: SourceFileE:8
+Jan 1 06:06:06 HostF LoggerF: SourceFileF:9 Message F

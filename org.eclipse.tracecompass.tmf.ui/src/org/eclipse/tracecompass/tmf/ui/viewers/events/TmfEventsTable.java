@@ -1132,9 +1132,15 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      */
     protected void setItemData(final TableItem item, final ITmfEvent event, final long rank) {
         String[] itemStrings = getItemStrings(fColumns, event);
+
+        // Get the actual ITmfEvent from the CachedEvent
+        ITmfEvent tmfEvent = event;
+        if (event instanceof CachedEvent) {
+            tmfEvent = ((CachedEvent) event).event;
+        }
         item.setText(itemStrings);
-        item.setData(event);
-        item.setData(Key.TIMESTAMP, new TmfTimestamp(event.getTimestamp()));
+        item.setData(tmfEvent);
+        item.setData(Key.TIMESTAMP, new TmfTimestamp(tmfEvent.getTimestamp()));
         item.setData(Key.RANK, rank);
 
         final Collection<Long> markerIds = fBookmarksMap.get(rank);
@@ -1161,14 +1167,14 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         boolean searchNoMatch = false;
         final ITmfFilter searchFilter = (ITmfFilter) fTable.getData(Key.SEARCH_OBJ);
         if (searchFilter != null) {
-            if (searchFilter.matches(event)) {
+            if (searchFilter.matches(tmfEvent)) {
                 searchMatch = true;
             } else {
                 searchNoMatch = true;
             }
         }
 
-        final ColorSetting colorSetting = ColorSettingsManager.getColorSetting(event);
+        final ColorSetting colorSetting = ColorSettingsManager.getColorSetting(tmfEvent);
         if (searchNoMatch) {
             item.setForeground(colorSetting.getDimmedForegroundColor());
             item.setBackground(colorSetting.getDimmedBackgroundColor());

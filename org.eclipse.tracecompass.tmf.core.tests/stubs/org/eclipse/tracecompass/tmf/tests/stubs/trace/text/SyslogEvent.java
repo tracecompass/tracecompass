@@ -18,14 +18,18 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.collapse.ITmfCollapsibleEvent;
+import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
+import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfSourceLookup;
+import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.text.TextTraceEvent;
 import org.eclipse.tracecompass.tmf.core.trace.text.TextTraceEventContent;
+import org.eclipse.tracecompass.tmf.tests.stubs.trace.text.SyslogEventType.Index;
 
 /**
  * System log trace implementation of TmfEvent.
  */
-public class SyslogEvent extends TextTraceEvent implements ITmfCollapsibleEvent {
+public class SyslogEvent extends TextTraceEvent implements ITmfCollapsibleEvent, ITmfSourceLookup {
 
     /**
      * Default constructor
@@ -115,6 +119,20 @@ public class SyslogEvent extends TextTraceEvent implements ITmfCollapsibleEvent 
             }
         }
         return true;
+    }
+
+    @Override
+    public ITmfCallsite getCallsite() {
+        if (getContent() != null) {
+            long lineNo = 0;
+            try {
+                lineNo = Long.valueOf((String) getContent().getField(Index.LINE).getValue());
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+            return new TmfCallsite((String) getContent().getField(Index.FILE).getValue(), null, lineNo);
+        }
+        return null;
     }
 
 }

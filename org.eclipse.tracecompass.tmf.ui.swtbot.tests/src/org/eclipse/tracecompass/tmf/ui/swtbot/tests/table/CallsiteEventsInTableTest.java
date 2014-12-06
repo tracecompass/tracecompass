@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2014 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,7 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests.table;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
@@ -37,32 +37,37 @@ import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimePreferencesConstants;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.SWTBotUtil;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.conditions.ConditionHelpers;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.ui.IEditorReference;
+import org.hamcrest.Matcher;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * SWTBot test for testing collapsing feature.
+ * SWTBot test for testing callsite feature.
  *
  * @author Bernd Hufmann
  */
 @RunWith(SWTBotJunit4ClassRunner.class)
-public class CollapseEventsInTableTest {
+public class CallsiteEventsInTableTest {
 
     private static final String TRACE_PROJECT_NAME = "test";
-    private static final String COLLAPSE_TRACE_NAME = "syslog_collapse";
-    private static final String COLLAPSE_TRACE_PATH = "testfiles/" + COLLAPSE_TRACE_NAME;
-    private static final String COLLAPSE_TRACE_TYPE = "org.eclipse.linuxtools.tmf.tests.stubs.trace.text.testsyslog";
+    private static final String CALLSITE_TRACE_NAME = "syslog_collapse";
+    private static final String CALLSITE_TRACE_PATH = "testfiles/" + CALLSITE_TRACE_NAME;
+    private static final String CALLSITE_TRACE_TYPE = "org.eclipse.linuxtools.tmf.tests.stubs.trace.text.testsyslog";
+    private static final String SOURCE_FILE_NAME = "SourceFile";
+    private static final String SOURCE_FILE_PATH = "testfiles/" + SOURCE_FILE_NAME;
 
     private static File fTestFile = null;
+    private static File fSourceFile = null;
 
     private static SWTWorkbenchBot fBot;
 
@@ -77,7 +82,7 @@ public class CollapseEventsInTableTest {
         SWTBotUtil.failIfUIThread();
 
         /* set up test trace*/
-        URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(COLLAPSE_TRACE_PATH), null);
+        URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(CALLSITE_TRACE_PATH), null);
         URI uri;
         try {
             uri = FileLocator.toFileURL(location).toURI();
@@ -93,6 +98,20 @@ public class CollapseEventsInTableTest {
         defaultPreferences.put(ITmfTimePreferencesConstants.DATIME, "MMM d HH:mm:ss");
         defaultPreferences.put(ITmfTimePreferencesConstants.SUBSEC, ITmfTimePreferencesConstants.SUBSEC_NO_FMT);
         TmfTimestampFormat.updateDefaultFormats();
+
+        /* Create source file link */
+        location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(SOURCE_FILE_PATH), null);
+        try {
+            uri = FileLocator.toFileURL(location).toURI();
+            fSourceFile = new File(uri);
+        } catch (URISyntaxException | IOException e) {
+            e.printStackTrace();
+            fail();
+        }
+
+        assumeTrue(fSourceFile.exists());
+
+
 
         /* Set up for swtbot */
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
@@ -127,50 +146,28 @@ public class CollapseEventsInTableTest {
     @Test
     public void test() {
         SWTBotUtil.createProject(TRACE_PROJECT_NAME);
-        SWTBotUtil.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), COLLAPSE_TRACE_TYPE);
+
+        // Open source file as a unknown trace
+        SWTBotUtil.openTrace(TRACE_PROJECT_NAME, fSourceFile.getAbsolutePath(), null);
+
+        // Open the actual trace
+        SWTBotUtil.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CALLSITE_TRACE_TYPE);
         SWTBotEditor editorBot = SWTBotUtil.openEditor(fBot, fTestFile.getName());
 
         SWTBotTable tableBot = editorBot.bot().table();
 
-        /* Maximize editor area */
+        // Maximize editor area
         maximizeTable(tableBot);
         tableBot.click(1, 0);
 
-        /* Collapse Events */
-        SWTBotMenu menuBot = tableBot.contextMenu("Collapse Events");
+        // Open source code location
+        SWTBotMenu menuBot = tableBot.contextMenu("Open Source Code");
         menuBot.click();
-        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "7/22", 1, 1));
 
-        String filterString = tableBot.cell(1, 1);
-        assertEquals("filterString", "7/22", filterString);
-
-        /* Verify collapsed event */
-        filterString = tableBot.cell(7, 0);
-        assertEquals("repeatCount", "+14", filterString);
-
-        filterString = tableBot.cell(7, 1);
-        assertEquals("first timestamp", "Jan 1 06:06:06", filterString);
-
-        filterString = tableBot.cell(7, 2);
-        assertEquals("type", "Syslog", filterString);
-
-        filterString = tableBot.cell(7, 3);
-        assertEquals("content", "Timestamp=Jan 1 06:06:06, Host=HostF, Logger=LoggerF, File=SourceFile, Line=9, Message=Message F", filterString);
-
-        filterString = tableBot.cell(8, 0);
-        assertEquals("repeatCount", "+1", filterString);
-
-        filterString = tableBot.cell(8, 1);
-        assertEquals("first timestamp (2nd collapse)", "Jan 1 06:06:21", filterString);
-
-        filterString = tableBot.cell(8, 3);
-        assertEquals("content", "Timestamp=Jan 1 06:06:21, Host=HostF, Logger=LoggerF, File=SourceFile, Line=10, Message=Message D", filterString);
-
-        /* Clear Filter */
-        menuBot = tableBot.contextMenu("Clear Filters");
-        menuBot.click();
-        fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "Jan 1 01:01:01", 1, 1));
-        assertEquals("timestamp", "Jan 1 01:01:01", tableBot.cell(1, 1));
+        // Verify that source code was actually opened
+        Matcher<IEditorReference> matcher = WidgetMatcherFactory.withPartName(fSourceFile.getName());
+        final SWTBotEditor sourceEditorBot = fBot.editor(matcher);
+        assertTrue(sourceEditorBot.isActive());
 
         maximizeTable(tableBot);
 
