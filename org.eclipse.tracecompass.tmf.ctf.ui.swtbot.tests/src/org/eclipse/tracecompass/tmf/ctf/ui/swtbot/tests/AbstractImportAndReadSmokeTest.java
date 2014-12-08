@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.varia.NullAppender;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -43,14 +42,10 @@ import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
-import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.SWTBotUtil;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.conditions.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.views.histogram.HistogramView;
 import org.eclipse.tracecompass.tmf.ui.views.statistics.TmfStatisticsView;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorReference;
-import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.PlatformUI;
@@ -134,70 +129,6 @@ public abstract class AbstractImportAndReadSmokeTest {
 
         fBot.button("Finish").click();
         SWTBotUtil.waitForJobs();
-    }
-
-    /**
-     * Opens and get the TmfEventsEditor
-     *
-     * @param elementPath
-     *            the trace element path (relative to Traces folder)
-     * @return TmfEventsEditor
-     */
-    protected TmfEventsEditor openEditor(IPath elementPath) {
-        final SWTBotView projectExplorerBot = fBot.viewById(IPageLayout.ID_PROJECT_EXPLORER);
-        projectExplorerBot.setFocus();
-
-        final SWTBotTree tree = fBot.tree();
-        final SWTBotTreeItem treeItem = tree.getTreeItem(getProjectName());
-        treeItem.expand();
-
-        String nodeName = getFullNodeName(treeItem, TmfTracesFolder.TRACES_FOLDER_NAME);
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(nodeName, treeItem));
-        SWTBotTreeItem tracesNode = treeItem.getNode(nodeName);
-        tracesNode.expand();
-
-        SWTBotTreeItem currentNode = tracesNode;
-        for (String segment : elementPath.segments()) {
-            String fullNodeName = getFullNodeName(currentNode, segment);
-            fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(fullNodeName, currentNode));
-            SWTBotTreeItem newNode = currentNode.getNode(fullNodeName);
-            newNode.select();
-            newNode.doubleClick();
-            currentNode = newNode;
-        }
-
-        SWTBotUtil.delay(1000);
-        SWTBotUtil.waitForJobs();
-        final String expectedTitle = elementPath.toString();
-
-        final IEditorPart iep[] = new IEditorPart[1];
-        UIThreadRunnable.syncExec(new VoidResult() {
-            @Override
-            public void run() {
-                IEditorReference[] ieds = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
-                assertNotNull(ieds);
-                iep[0] = null;
-                for (IEditorReference ied : ieds) {
-                    if (ied.getTitle().equals(expectedTitle)) {
-                        iep[0] = ied.getEditor(true);
-                        break;
-                    }
-                }
-            }
-        });
-        assertNotNull(iep[0]);
-        return (TmfEventsEditor) iep[0];
-    }
-
-    private static String getFullNodeName(final SWTBotTreeItem treeItem, String prefix) {
-        List<String> nodes = treeItem.getNodes();
-        String nodeName = "";
-        for (String node : nodes) {
-            if (node.startsWith(prefix)) {
-                nodeName = node;
-            }
-        }
-        return nodeName;
     }
 
     /**

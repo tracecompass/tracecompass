@@ -150,7 +150,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         importFinish();
 
         checkOptions(options);
-        TmfEventsEditor tmfEd = openEditor(getTraceElementPath(options));
+        TmfEventsEditor tmfEd = SWTBotUtil.openEditor(fBot, getProjectName(), getTraceElementPath(options));
         if (testViews) {
             testViews(tmfEd);
         }

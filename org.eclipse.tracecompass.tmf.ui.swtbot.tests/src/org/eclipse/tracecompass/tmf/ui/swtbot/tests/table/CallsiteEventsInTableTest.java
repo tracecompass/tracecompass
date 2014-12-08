@@ -152,7 +152,7 @@ public class CallsiteEventsInTableTest {
 
         // Open the actual trace
         SWTBotUtil.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CALLSITE_TRACE_TYPE);
-        SWTBotEditor editorBot = SWTBotUtil.openEditor(fBot, fTestFile.getName());
+        SWTBotEditor editorBot = SWTBotUtil.activateEditor(fBot, fTestFile.getName());
 
         SWTBotTable tableBot = editorBot.bot().table();
 

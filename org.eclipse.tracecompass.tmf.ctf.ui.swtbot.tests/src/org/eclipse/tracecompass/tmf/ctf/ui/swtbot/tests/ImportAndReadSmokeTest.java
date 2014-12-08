@@ -61,7 +61,7 @@ public class ImportAndReadSmokeTest extends AbstractImportAndReadSmokeTest {
         batchImportSelectTrace();
         importFinish();
 
-        TmfEventsEditor tmfEd = openEditor(new Path(TRACE_NAME));
+        TmfEventsEditor tmfEd = SWTBotUtil.openEditor(fBot, getProjectName(), new Path(TRACE_NAME));
 
         testHistogramView(getViewPart("Histogram"), tmfEd);
         testPropertyView(getViewPart("Properties"));

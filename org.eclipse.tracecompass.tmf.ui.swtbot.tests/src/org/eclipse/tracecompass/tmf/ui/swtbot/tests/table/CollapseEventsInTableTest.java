@@ -128,7 +128,7 @@ public class CollapseEventsInTableTest {
     public void test() {
         SWTBotUtil.createProject(TRACE_PROJECT_NAME);
         SWTBotUtil.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), COLLAPSE_TRACE_TYPE);
-        SWTBotEditor editorBot = SWTBotUtil.openEditor(fBot, fTestFile.getName());
+        SWTBotEditor editorBot = SWTBotUtil.activateEditor(fBot, fTestFile.getName());
 
         SWTBotTable tableBot = editorBot.bot().table();
 
