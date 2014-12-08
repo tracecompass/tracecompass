@@ -392,8 +392,10 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
     private IStatus importSupplFiles(TracePackageSupplFilesElement suppFilesElement, TracePackageTraceElement traceElement, IProgressMonitor monitor) {
         List<Pair<String, String>> fileNameAndLabelPairs = new ArrayList<>();
         for (TracePackageElement child : suppFilesElement.getChildren()) {
-            TracePackageSupplFileElement supplFile = (TracePackageSupplFileElement) child;
-            fileNameAndLabelPairs.add(new Pair<>(supplFile.getText(), new Path(supplFile.getText()).lastSegment()));
+            if (child.isChecked()) {
+                TracePackageSupplFileElement supplFile = (TracePackageSupplFileElement) child;
+                fileNameAndLabelPairs.add(new Pair<>(supplFile.getText(), new Path(supplFile.getText()).lastSegment()));
+            }
         }
 
         if (!fileNameAndLabelPairs.isEmpty()) {
