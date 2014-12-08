@@ -208,6 +208,7 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
       <feature id="org.eclipse.e4.rcp"/>
       <feature id="org.eclipse.emf.common"/>
       <feature id="org.eclipse.equinox.p2.extras.feature"/>
+      <feature id="org.eclipse.tracecompass.btf"/>
       <feature id="org.eclipse.tracecompass.ctf"/>
       <feature id="org.eclipse.tracecompass.tmf.ctf"/>
       <feature id="org.eclipse.tracecompass.tmf.pcap"/>

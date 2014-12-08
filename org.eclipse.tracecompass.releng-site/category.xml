@@ -3,6 +3,9 @@
    <description>
       Nightly builds of Trace Compass project.
    </description>
+   <feature url="features/org.eclipse.tracecompass.btf_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.btf" version="0.0.0">
+      <category name="Trace Compass"/>
+   </feature>
    <feature url="features/org.eclipse.tracecompass.lttng2.kernel_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.lttng2.kernel" version="0.0.0">
       <category name="Trace Compass"/>
    </feature>
