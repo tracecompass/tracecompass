@@ -154,7 +154,9 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
             int nbRequested,
             ExecutionType priority) {
 
-        fRequestId = fRequestNumber++;
+        synchronized (this.getClass()) {
+            fRequestId = fRequestNumber++;
+        }
         fDataType = dataType;
         fIndex = index;
         fNbRequested = nbRequested;
@@ -184,7 +186,7 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
     /**
      * Resets the request counter (used for testing)
      */
-    public static void reset() {
+    public static synchronized void reset() {
         fRequestNumber = 0;
     }
 
