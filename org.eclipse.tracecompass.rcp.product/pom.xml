@@ -84,7 +84,8 @@
                     <!-- Delete the current contents of the destination -->
                     <delete includeemptydirs="false">
                       <fileset dir="${rcpDestination}">
-                        <include name="**" />
+                        <include name="*.tar.gz" />
+                        <include name="*.zip" />
                       </fileset>
                     </delete>
 
