@@ -202,7 +202,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         }
     }
 
-    private static @Nullable ITmfStateValue incrementByType(int quark, long timestamp, ITmfStateSystem ss, ITmfStateValue stateValue) throws AttributeNotFoundException {
+    private static @Nullable ITmfStateValue incrementByType(int quark, ITmfStateSystem ss, ITmfStateValue stateValue) throws AttributeNotFoundException {
         ITmfStateValue value = null;
         switch (stateValue.getType()) {
         case LONG: {
@@ -247,7 +247,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
             if (ss == null) {
                 throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
             }
-            ITmfStateValue value = incrementByType(quark, timestamp, ss, fValue);
+            ITmfStateValue value = incrementByType(quark, ss, fValue);
             if (value != null) {
                 processValue(quark, timestamp, value);
             } else {
@@ -282,7 +282,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
                 throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
             }
             ITmfStateValue incrementValue = getValue(event);
-            ITmfStateValue value = incrementByType(quark, timestamp, ss, incrementValue);
+            ITmfStateValue value = incrementByType(quark, ss, incrementValue);
             if (value != null) {
                 processValue(quark, timestamp, value);
             } else {
@@ -372,7 +372,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
             }
 
             ITmfStateValue incrementValue = getValue(event);
-            ITmfStateValue value = incrementByType(quark, timestamp, ss, incrementValue);
+            ITmfStateValue value = incrementByType(quark, ss, incrementValue);
             if (value != null) {
                 processValue(quark, timestamp, value);
             } else {
