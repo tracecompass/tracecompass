@@ -157,7 +157,7 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
             int nbRequested,
             ExecutionType priority) {
 
-        synchronized (this.getClass()) {
+        synchronized (TmfEventRequest.class) {
             fRequestId = fRequestNumber++;
         }
         fDataType = dataType;
