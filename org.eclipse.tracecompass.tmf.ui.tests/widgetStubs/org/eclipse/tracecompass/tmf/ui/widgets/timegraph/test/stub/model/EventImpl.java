@@ -82,4 +82,14 @@ public class EventImpl implements ITimeEvent {
         return duration;
     }
 
+    @Override
+    public ITimeEvent splitBefore(long splitTime) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ITimeEvent splitAfter(long splitTime) {
+        throw new UnsupportedOperationException();
+    }
+
 }

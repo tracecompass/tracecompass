@@ -13,15 +13,13 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 
-import org.eclipse.tracecompass.tmf.core.util.Pair;
-
 /**
  * Generic TimeEvent implementation
  *
  * @version 1.0
  * @author Patrick Tasse
  */
-public class TimeEvent implements ITimeEvent2 {
+public class TimeEvent implements ITimeEvent {
 
     /** TimeGraphEntry matching this time event */
     protected ITimeGraphEntry fEntry;
@@ -110,25 +108,19 @@ public class TimeEvent implements ITimeEvent2 {
         return fDuration;
     }
 
-    /**
-     * Split an event in two at the specified time. If the time is smaller or
-     * equal to the event's start, the first split event is null. If the time is
-     * greater or equal to the event's end, the second split event is null.
-     * <p>
-     * Subclasses should re-implement this method
-     *
-     * @since 2.1
-     */
     @Override
-    public Pair<ITimeEvent, ITimeEvent> split(long time) {
-        Pair<ITimeEvent, ITimeEvent> pair = new Pair<>();
-        if (time > fTime) {
-            pair.setFirst(new TimeEvent(fEntry, fTime, Math.min(fDuration, time - fTime), fValue));
-        }
-        if (time < fTime + fDuration) {
-            pair.setSecond(new TimeEvent(fEntry, Math.max(fTime, time), fDuration - Math.max(0, time - fTime), fValue));
-        }
-        return pair;
+    public ITimeEvent splitBefore(long splitTime) {
+        return (splitTime > fTime ?
+                new TimeEvent(fEntry, fTime, Math.min(fDuration, splitTime - fTime), fValue) :
+                null);
+    }
+
+    @Override
+    public ITimeEvent splitAfter(long splitTime) {
+        return (splitTime < fTime + fDuration ?
+                new TimeEvent(fEntry, Math.max(fTime, splitTime), fDuration - Math.max(0, splitTime - fTime),
+                        fValue) :
+                null);
     }
 
     @Override

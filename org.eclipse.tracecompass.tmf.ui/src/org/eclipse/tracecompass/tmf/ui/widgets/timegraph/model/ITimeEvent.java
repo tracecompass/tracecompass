@@ -47,4 +47,25 @@ public interface ITimeEvent {
      */
     long getDuration();
 
+    /**
+     * Split an event in two at the specified time and keep the part before the
+     * split. If the time is smaller or equal to the event's start, the returned
+     * event is null.
+     *
+     * @param splitTime
+     *            the time at which the event is to be split
+     * @return The part before the split time
+     */
+    ITimeEvent splitBefore(long splitTime);
+
+    /**
+     * Split an event in two at the specified time and keep the part after the
+     * split. If the time is greater or equal to the event's end, the returned
+     * event is null.
+     *
+     * @param splitTime
+     *            the time at which the event is to be split
+     * @return The part after the split time
+     */
+    ITimeEvent splitAfter(long splitTime);
 }
