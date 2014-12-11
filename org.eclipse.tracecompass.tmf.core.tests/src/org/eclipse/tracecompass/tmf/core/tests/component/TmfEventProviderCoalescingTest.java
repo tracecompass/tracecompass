@@ -28,13 +28,11 @@ import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEndSynchSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfStartSynchSignal;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfExperimentStub;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -83,22 +81,11 @@ public class TmfEventProviderCoalescingTest {
     }
 
     /**
-     * Test setup-up
-     */
-    @Before
-    public void testSetup() {
-        // Reset the request IDs
-        TmfEventRequest.reset();
-    }
-
-    /**
      * Test clean-up
      * @throws Exception if an error occurred
      */
     @After
     public void testCleanUp() throws Exception {
-        // Reset the request IDs
-        TmfEventRequest.reset();
         // clear pending request
         clearPendingRequests();
     }
@@ -127,8 +114,11 @@ public class TmfEventProviderCoalescingTest {
         assertEquals(0, fTmfTrace1.getAllPendingRequests().size());
         assertEquals(0, fTmfTrace2.getAllPendingRequests().size());
 
+        String expectedIds = "[" + expReq.getRequestId() + ", "
+                + trace1Req.getRequestId() + ", "
+                + trace2Req.getRequestId() + "]";
         TmfCoalescedEventRequest coalescedRequest = pending.get(0);
-        assertEquals("[0, 1, 2]", coalescedRequest.getSubRequestIds());
+        assertEquals(expectedIds, coalescedRequest.getSubRequestIds());
     }
 
     /**
@@ -147,21 +137,12 @@ public class TmfEventProviderCoalescingTest {
         fTmfTrace2.sendRequest(trace2Req);
         fExperiment.sendRequest(expReq);
 
-        // Create expected coalesced request to compare with
-        TmfCoalescedEventRequest expected = new TmfCoalescedEventRequest(ITmfEvent.class, TmfTimeRange.ETERNITY, 0, ITmfEventRequest.ALL_DATA, ExecutionType.BACKGROUND);
-        expected.addRequest(expReq);
-        expected.addRequest(trace1Req);
-        expected.addRequest(trace2Req);
-
         // Verify that requests are coalesced properly with the experiment request
         List<TmfCoalescedEventRequest> pending = fExperiment.getAllPendingRequests();
         assertEquals(1, pending.size());
 
         assertEquals(0, fTmfTrace1.getAllPendingRequests().size());
         assertEquals(0, fTmfTrace2.getAllPendingRequests().size());
-
-        TmfCoalescedEventRequest coalescedRequest = pending.get(0);
-        assertEquals(expected, coalescedRequest);
 
         // Now trigger manually the sending of the request
         fExperiment.notifyPendingRequest(false);
@@ -202,23 +183,12 @@ public class TmfEventProviderCoalescingTest {
         fExperiment2.sendRequest(exp2Req);
         fExperiment.sendRequest(expReq);
 
-        // Create expected coalesced request to compare with
-        TmfCoalescedEventRequest expected = new TmfCoalescedEventRequest(ITmfEvent.class, TmfTimeRange.ETERNITY, 0, ITmfEventRequest.ALL_DATA, ExecutionType.BACKGROUND);
-        expected.addRequest(expReq);
-        expected.addRequest(trace1Req);
-        expected.addRequest(trace2Req);
-        expected.addRequest(exp2Req);
-        expected.addRequest(trace3Req);
-
         // Verify that requests are coalesced properly with the experiment request
         List<TmfCoalescedEventRequest> pending = fExperiment.getAllPendingRequests();
         assertEquals(1, pending.size());
 
         assertEquals(0, fTmfTrace1.getAllPendingRequests().size());
         assertEquals(0, fTmfTrace2.getAllPendingRequests().size());
-
-        TmfCoalescedEventRequest coalescedRequest = pending.get(0);
-        assertEquals(expected, coalescedRequest);
 
         // Now trigger manually the sending of the request
         fExperiment.notifyPendingRequest(false);
@@ -266,21 +236,12 @@ public class TmfEventProviderCoalescingTest {
         fExperiment.sendRequest(expReq);
         fTmfTrace2.sendRequest(trace2Req);
 
-        // Create expected coalesced request to compare with
-        TmfCoalescedEventRequest expected = new TmfCoalescedEventRequest(ITmfEvent.class, TmfTimeRange.ETERNITY, 0, ITmfEventRequest.ALL_DATA, ExecutionType.BACKGROUND);
-        expected.addRequest(expReq);
-        expected.addRequest(trace1Req);
-        expected.addRequest(trace2Req);
-
         // Verify that requests are coalesced properly with the experiment request
         List<TmfCoalescedEventRequest> pending = fExperiment.getAllPendingRequests();
         assertEquals(1, pending.size());
 
         assertEquals(0, fTmfTrace1.getAllPendingRequests().size());
         assertEquals(0, fTmfTrace2.getAllPendingRequests().size());
-
-        TmfCoalescedEventRequest coalescedRequest = pending.get(0);
-        assertEquals(expected, coalescedRequest);
 
         // Now trigger manually the sending of the request
         fExperiment.notifyPendingRequest(false);
@@ -321,14 +282,6 @@ public class TmfEventProviderCoalescingTest {
         fTmfTrace2.sendRequest(trace2Req);
         fTmfTrace3.sendRequest(trace3Req);
 
-        // Create expected coalesced request to compare with
-        TmfCoalescedEventRequest expected = new TmfCoalescedEventRequest(ITmfEvent.class, TmfTimeRange.ETERNITY, 0, ITmfEventRequest.ALL_DATA, ExecutionType.BACKGROUND);
-        expected.addRequest(expReq);
-        expected.addRequest(exp2Req);
-        expected.addRequest(trace1Req);
-        expected.addRequest(trace2Req);
-        expected.addRequest(trace3Req);
-
         // Verify that requests are coalesced properly with the experiment request
         List<TmfCoalescedEventRequest> pending = fExperiment.getAllPendingRequests();
         assertEquals(1, pending.size());
@@ -336,9 +289,6 @@ public class TmfEventProviderCoalescingTest {
         assertEquals(0, fTmfTrace1.getAllPendingRequests().size());
         assertEquals(0, fTmfTrace2.getAllPendingRequests().size());
         assertEquals(0, fTmfTrace3.getAllPendingRequests().size());
-
-        TmfCoalescedEventRequest coalescedRequest = pending.get(0);
-        assertEquals(expected, coalescedRequest);
 
         // Now trigger manually the sending of the request
         fExperiment.notifyPendingRequest(false);
@@ -391,14 +341,6 @@ public class TmfEventProviderCoalescingTest {
         fTmfTrace2.sendRequest(trace2Req);
         fExperiment.sendRequest(expReq2);
 
-        // Create expected coalesced request to compare with
-        TmfCoalescedEventRequest expected = new TmfCoalescedEventRequest(ITmfEvent.class, TmfTimeRange.ETERNITY, 0, ITmfEventRequest.ALL_DATA, ExecutionType.BACKGROUND);
-        expected.addRequest(expReq);
-        expected.addRequest(trace1Req);
-        expected.addRequest(trace1Req2);
-        expected.addRequest(trace2Req);
-        expected.addRequest(expReq2);
-
         // Verify that requests are coalesced properly with the experiment request
         List<TmfCoalescedEventRequest> pending = fExperiment.getAllPendingRequests();
         assertEquals(1, pending.size());
@@ -408,8 +350,6 @@ public class TmfEventProviderCoalescingTest {
         assertEquals(0, fTmfTrace3.getAllPendingRequests().size());
         assertEquals(0, fExperiment2.getAllPendingRequests().size());
 
-        TmfCoalescedEventRequest coalescedRequest = pending.get(0);
-        assertEquals(expected, coalescedRequest);
         sendSync(false);
 
         try {

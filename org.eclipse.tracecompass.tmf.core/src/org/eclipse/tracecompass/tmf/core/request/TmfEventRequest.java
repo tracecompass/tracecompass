@@ -186,13 +186,6 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
         }
     }
 
-    /**
-     * Resets the request counter (used for testing)
-     */
-    public static synchronized void reset() {
-        fRequestNumber = 0;
-    }
-
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -407,24 +400,6 @@ public abstract class TmfEventRequest implements ITmfEventRequest {
     // ------------------------------------------------------------------------
     // Object
     // ------------------------------------------------------------------------
-
-    @Override
-    // All requests have a unique id
-    public int hashCode() {
-        return getRequestId();
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        if (other instanceof TmfEventRequest) {
-            TmfEventRequest request = (TmfEventRequest) other;
-            return request.fDataType == fDataType
-                    && request.fIndex == fIndex
-                    && request.fNbRequested == fNbRequested
-                    && request.fRange.equals(fRange);
-        }
-        return false;
-    }
 
     @Override
     public String toString() {

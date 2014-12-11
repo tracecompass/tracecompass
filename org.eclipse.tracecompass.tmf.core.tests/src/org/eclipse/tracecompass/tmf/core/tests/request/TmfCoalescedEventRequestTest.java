@@ -30,8 +30,8 @@ import org.eclipse.tracecompass.internal.tmf.core.request.TmfCoalescedEventReque
 import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
+import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
@@ -62,7 +62,6 @@ public class TmfCoalescedEventRequestTest {
     private TmfCoalescedEventRequest fRequest3;
     private TmfCoalescedEventRequest fRequest4;
 
-    private TmfCoalescedEventRequest fRequest1b;
     private TmfCoalescedEventRequest fRequest1c;
 
     private int fRequestCount;
@@ -73,13 +72,11 @@ public class TmfCoalescedEventRequestTest {
 
     @Before
     public void setUp() {
-        TmfEventRequest.reset();
         fRequest1 = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 0, 100, ExecutionType.FOREGROUND);
         fRequest2 = new TmfCoalescedEventRequest(ITmfEvent.class, range2, 0, 100, ExecutionType.FOREGROUND);
         fRequest3 = new TmfCoalescedEventRequest(ITmfEvent.class, range2, 0, 200, ExecutionType.FOREGROUND);
         fRequest4 = new TmfCoalescedEventRequest(ITmfEvent.class, range2, 0, 200, ExecutionType.FOREGROUND);
 
-        fRequest1b = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 0, 100, ExecutionType.FOREGROUND);
         fRequest1c = new TmfCoalescedEventRequest(ITmfEvent.class, range1, 0, 100, ExecutionType.FOREGROUND);
 
         fRequestCount = fRequest1c.getRequestId() + 1;
@@ -141,47 +138,15 @@ public class TmfCoalescedEventRequestTest {
     // ------------------------------------------------------------------------
 
     @Test
-    public void testEqualsReflexivity() {
-        assertTrue("equals", fRequest1.equals(fRequest1));
-        assertTrue("equals", fRequest2.equals(fRequest2));
-
-        assertFalse("equals", fRequest1.equals(fRequest2));
-        assertFalse("equals", fRequest2.equals(fRequest1));
-    }
-
-    @Test
-    public void testEqualsSymmetry() {
-        assertTrue("equals", fRequest1.equals(fRequest1b));
-        assertTrue("equals", fRequest1b.equals(fRequest1));
-
-        assertFalse("equals", fRequest1.equals(fRequest3));
-        assertFalse("equals", fRequest2.equals(fRequest3));
-        assertFalse("equals", fRequest3.equals(fRequest1));
-        assertFalse("equals", fRequest3.equals(fRequest2));
-    }
-
-    @Test
-    public void testEqualsTransivity() {
-        assertTrue("equals", fRequest1.equals(fRequest1b));
-        assertTrue("equals", fRequest1b.equals(fRequest1c));
-        assertTrue("equals", fRequest1.equals(fRequest1c));
-    }
-
-    @Test
-    public void testEqualsNull() {
-        assertFalse("equals", fRequest1.equals(null));
-        assertFalse("equals", fRequest2.equals(null));
-    }
-
-    // ------------------------------------------------------------------------
-    // hashCode
-    // ------------------------------------------------------------------------
-
-    @Test
-    public void testHashCode() {
-        assertTrue("hashCode", fRequest1.hashCode() == fRequest1.hashCode());
-        assertTrue("hashCode", fRequest2.hashCode() == fRequest2.hashCode());
-        assertTrue("hashCode", fRequest1.hashCode() != fRequest2.hashCode());
+    public void testEquals() {
+        /*
+         * No two different requests should be "equal", even if they used the
+         * same constructor parameters.
+         */
+        assertTrue(fRequest1.equals(fRequest1));
+        assertFalse(fRequest1.equals(fRequest2));
+        assertFalse(fRequest1.equals(fRequest3));
+        assertFalse(fRequest1.equals(fRequest4));
     }
 
     // ------------------------------------------------------------------------
@@ -190,10 +155,10 @@ public class TmfCoalescedEventRequestTest {
 
     @Test
     public void testToString() {
-        String expected1 = "[TmfCoalescedEventRequest(0,ITmfEvent,FOREGROUND," + range1 + ",0,100, [])]";
-        String expected2 = "[TmfCoalescedEventRequest(1,ITmfEvent,FOREGROUND," + range2 + ",0,100, [])]";
-        String expected3 = "[TmfCoalescedEventRequest(2,ITmfEvent,FOREGROUND," + range2 + ",0,200, [])]";
-        String expected4 = "[TmfCoalescedEventRequest(3,ITmfEvent,FOREGROUND," + range2 + ",0,200, [])]";
+        String expected1 = "[TmfCoalescedEventRequest(" + fRequest1.getRequestId() + ",ITmfEvent,FOREGROUND," + range1 + ",0,100, [])]";
+        String expected2 = "[TmfCoalescedEventRequest(" + fRequest2.getRequestId() + ",ITmfEvent,FOREGROUND," + range2 + ",0,100, [])]";
+        String expected3 = "[TmfCoalescedEventRequest(" + fRequest3.getRequestId() + ",ITmfEvent,FOREGROUND," + range2 + ",0,200, [])]";
+        String expected4 = "[TmfCoalescedEventRequest(" + fRequest4.getRequestId() + ",ITmfEvent,FOREGROUND," + range2 + ",0,200, [])]";
 
         assertEquals("toString", expected1, fRequest1.toString());
         assertEquals("toString", expected2, fRequest2.toString());
