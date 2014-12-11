@@ -21,7 +21,6 @@
   <artifactId>org.eclipse.tracecompass</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-
   <name>Trace Compass Parent</name>
 
   <licenses>
@@ -40,7 +39,7 @@
 
 <properties>
   <base.test.vmargs>-Xms256m -Xmx1024m -XX:MaxPermSize=256m</base.test.vmargs>
-  <tycho-version>0.22.0</tycho-version>
+  <tycho-version>0.21.0</tycho-version>
   <target-platform>tracecompass-e4.4</target-platform>
   <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
   <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
@@ -57,6 +56,11 @@
   <pluginRepository>
     <id>tycho-snapshots</id>
     <url>https://repo.eclipse.org/content/repositories/tycho-snapshots/</url>
+  </pluginRepository>
+  <pluginRepository>
+    <id>jboss-public-repository-group</id>
+    <name>JBoss Public Repository Group</name>
+    <url>http://repository.jboss.org/nexus/content/groups/public/</url>
   </pluginRepository>
 </pluginRepositories>
 
@@ -333,7 +337,9 @@
           <version>${tycho-version}</version>
           <configuration>
             <encoding>UTF-8</encoding>
-            <useProjectSettings>true</useProjectSettings>
+            <compilerArguments>
+              <properties>${project.basedir}/.settings/org.eclipse.jdt.core.prefs</properties>
+            </compilerArguments>
           </configuration>
 	 </plugin>
 	<plugin>
@@ -389,6 +395,11 @@
           <configuration>
             <excludePackageNames>org.eclipse.tracecompass.internal.*:*.test*</excludePackageNames>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.jboss.tools.tycho-plugins</groupId>
+          <artifactId>repository-utils</artifactId>
+          <version>0.21.1</version>
         </plugin>
       </plugins>
     </pluginManagement>
