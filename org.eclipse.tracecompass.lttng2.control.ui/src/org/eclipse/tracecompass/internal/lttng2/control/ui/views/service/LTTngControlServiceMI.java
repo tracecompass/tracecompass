@@ -272,7 +272,13 @@ public class LTTngControlServiceMI extends LTTngControlService {
                 }
                 break;
             case MIStrings.LIVE_TIMER_INTERVAL:
-                // TODO : live mode not supported yet in TMF:lttng-control
+                long liveDelay = Long.parseLong(rawInfo.getTextContent());
+                if (liveDelay > 0) {
+                    sessionInfo.setLive(true);
+                    sessionInfo.setLiveUrl(SessionInfo.DEFAULT_LIVE_NETWORK_URL);
+                    sessionInfo.setLivePort(SessionInfo.DEFAULT_LIVE_PORT);
+                    sessionInfo.setLiveDelay(liveDelay);
+                }
                 break;
             case MIStrings.DOMAINS:
                 // Extract the domains node
