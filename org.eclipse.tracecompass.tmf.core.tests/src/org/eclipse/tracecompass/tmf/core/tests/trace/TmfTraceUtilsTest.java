@@ -13,7 +13,6 @@
 package org.eclipse.tracecompass.tmf.core.tests.trace;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -23,7 +22,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
@@ -38,6 +36,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.tests.analysis.AnalysisManagerTest;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -154,19 +153,18 @@ public class TmfTraceUtilsTest {
     }
 
     /**
-     * Test the {@link TmfTraceUtils#getEventAspectsOfClass} method.
+     * Test the {@link TmfTraceUtils#resolveEventAspectOfClassForEvent(ITmfTrace, Class, ITmfEvent)} method.
      */
     @Test
-    public void testGetEventAspectsOfClass() {
-        /* Our custom trace type adds 1 aspect in addition to the base ones */
-        Iterable<ITmfEventAspect> aspects = TmfTraceUtils.getEventAspectsOfClass(fTrace, ITmfEventAspect.class);
-        Collection<ITmfEventAspect> aspectColl = ImmutableList.copyOf(aspects);
-        assertEquals(TmfTrace.BASE_ASPECTS.size() + 1, aspectColl.size());
+    public void testResolveEventAspectsOfClassForEvent() {
+        ITmfContext context = fTrace.seekEvent(0L);
+        ITmfEvent event = fTrace.getNext(context);
+        assertNotNull(event);
 
-        /* Make sure there is one and only one CpuAspect */
-        Iterable<TmfCpuAspect> cpuAspects = TmfTraceUtils.getEventAspectsOfClass(fTrace, TmfCpuAspect.class);
-        Iterator<TmfCpuAspect> iter = cpuAspects.iterator();
-        assertNotNull(iter.next());
-        assertFalse(iter.hasNext());
+        /* Make sure the CPU aspect returns the expected value */
+        Object cpuObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(fTrace,  TmfCpuAspect.class, event);
+        assertNotNull(cpuObj);
+        assertEquals(1, cpuObj);
+
     }
 }

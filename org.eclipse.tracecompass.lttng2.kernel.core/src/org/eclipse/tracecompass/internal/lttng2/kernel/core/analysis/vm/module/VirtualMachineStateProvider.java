@@ -219,22 +219,12 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
 
                 if (host.isGuest()) {
                     /* Get the event's CPU */
-                    Integer cpu = null;
-                    Iterable<TmfCpuAspect> aspects = TmfTraceUtils.getEventAspectsOfClass(event.getTrace(), TmfCpuAspect.class);
-                    for (TmfCpuAspect aspect : aspects) {
-                        Integer aspectRes = aspect.resolve(event);
-                        if (aspectRes != null) {
-                            cpu = aspectRes;
-                            break;
-                        }
-                    }
-                    if (cpu == null) {
-                        /*
-                         * We couldn't find any CPU information, ignore this
-                         * event
-                         */
+                    Object cpuObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
+                    if (cpuObj == null) {
+                        /* We couldn't find any CPU information, ignore this event */
                         break;
                     }
+                    Integer cpu = (Integer) cpuObj;
 
                     /*
                      * If sched switch is from a guest, just update the status
@@ -362,19 +352,12 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
         }
 
         /* Get the CPU the event is running on */
-        Integer cpu = null;
-        Iterable<TmfCpuAspect> aspects = TmfTraceUtils.getEventAspectsOfClass(event.getTrace(), TmfCpuAspect.class);
-        for (TmfCpuAspect aspect : aspects) {
-            Integer aspectRes = aspect.resolve(event);
-            if (aspectRes != null) {
-                cpu = aspectRes;
-                break;
-            }
-        }
-        if (cpu == null) {
+        Object cpuObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
+        if (cpuObj == null) {
             /* We couldn't find any CPU information, ignore this event */
             return null;
         }
+        Integer cpu = (Integer) cpuObj;
 
         Integer currentTid = KernelThreadInformationProvider.getThreadOnCpu(module, cpu, ts);
         if (currentTid == null) {

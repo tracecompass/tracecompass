@@ -13,13 +13,12 @@
 package org.eclipse.tracecompass.tmf.core.trace;
 
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 
 /**
@@ -29,7 +28,8 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
  */
 public final class TmfTraceUtils {
 
-    private TmfTraceUtils() {}
+    private TmfTraceUtils() {
+    }
 
     /**
      * Get an analysis module belonging to this trace, with the specified ID and
@@ -68,7 +68,7 @@ public final class TmfTraceUtils {
     public static @NonNull <T> Iterable<T> getAnalysisModulesOfClass(ITmfTrace trace, Class<T> moduleClass) {
         Iterable<IAnalysisModule> analysisModules = trace.getAnalysisModules();
         Set<T> modules = new HashSet<>();
-        for  (IAnalysisModule module : analysisModules) {
+        for (IAnalysisModule module : analysisModules) {
             if (moduleClass.isAssignableFrom(module.getClass())) {
                 modules.add(moduleClass.cast(module));
             }
@@ -77,24 +77,31 @@ public final class TmfTraceUtils {
     }
 
     /**
-     * Return the list of event aspects exposed by the given trace that match a
-     * given class.
+     * Return the first result of the first aspect that resolves as non null for
+     * the event received in parameter. If the returned value is not null, it
+     * can be safely cast to the aspect's class proper return type.
      *
      * @param trace
      *            The trace for which you want the event aspects
      * @param aspectClass
-     *            The returned aspects must be of this class (or a subtype)
-     * @return The event aspects that match the given class
+     *            The class of the aspect(s) to resolve
+     * @param event
+     *            The event for which to get the aspect
+     * @return The first result of the
+     *         {@link ITmfEventAspect#resolve(ITmfEvent)} that returns non null
+     *         for the event or {@code null} otherwise
      */
-    public static @NonNull <T extends ITmfEventAspect> Iterable<T> getEventAspectsOfClass(
-            ITmfTrace trace, Class<T> aspectClass) {
+    public static <T extends ITmfEventAspect> Object resolveEventAspectOfClassForEvent(
+            ITmfTrace trace, Class<T> aspectClass, @NonNull ITmfEvent event) {
         Iterable<ITmfEventAspect> aspects = trace.getEventAspects();
-        List<T> ret = new LinkedList<>();
         for (ITmfEventAspect aspect : aspects) {
             if (aspectClass.isAssignableFrom(aspect.getClass())) {
-                ret.add(aspectClass.cast(aspect));
+                Object obj = aspect.resolve(event);
+                if (obj != null) {
+                    return obj;
+                }
             }
         }
-        return ret;
+        return null;
     }
 }

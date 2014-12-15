@@ -147,18 +147,12 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
             return;
         }
 
-        Integer cpu = null;
-        Iterable<TmfCpuAspect> aspects = TmfTraceUtils.getEventAspectsOfClass(event.getTrace(), TmfCpuAspect.class);
-        for (TmfCpuAspect aspect : aspects) {
-            cpu = aspect.resolve(event);
-            if (cpu != null) {
-                break;
-            }
-        }
-        if (cpu == null) {
+        Object cpuObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
+        if (cpuObj == null) {
             /* We couldn't find any CPU information, ignore this event */
             return;
         }
+        Integer cpu = (Integer) cpuObj;
 
         final String eventName = event.getType().getName();
         final long ts = event.getTimestamp().getValue();
