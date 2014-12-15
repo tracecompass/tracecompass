@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.tmf.core.filter.model;
 
 import java.util.regex.Pattern;
 
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 
@@ -52,7 +53,7 @@ public final class TmfFilterMatchesAspectNode extends TmfFilterMatchesNode {
         if (pattern == null || event == null) {
             return false ^ isNot;
         }
-        String value = fEventAspect.resolve(event).toString();
+        String value = NonNullUtils.nullToEmptyString(fEventAspect.resolve(event));
         return pattern.matcher(value).matches() ^ isNot;
     }
 

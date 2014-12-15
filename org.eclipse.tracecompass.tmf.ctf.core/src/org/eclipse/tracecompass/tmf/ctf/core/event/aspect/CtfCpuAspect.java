@@ -26,7 +26,7 @@ public class CtfCpuAspect extends TmfCpuAspect {
     @Override
     public Integer resolve(ITmfEvent event) {
         if (!(event instanceof CtfTmfEvent)) {
-            return TmfCpuAspect.CPU_UNAVAILABLE;
+            return null;
         }
         int cpu = ((CtfTmfEvent) event).getCPU();
         return cpu;

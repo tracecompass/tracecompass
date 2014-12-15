@@ -12,8 +12,10 @@
 
 package org.eclipse.tracecompass.tmf.core.event.aspect;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 
 /**
  * An aspect is a piece of information that can be extracted, directly or
@@ -55,9 +57,8 @@ public interface ITmfEventAspect {
             }
 
             @Override
-            public String resolve(ITmfEvent event) {
-                String ret = event.getTimestamp().toString();
-                return (ret == null ? EMPTY_STRING : ret);
+            public @Nullable ITmfTimestamp resolve(ITmfEvent event) {
+                return event.getTimestamp();
             }
         };
 
@@ -76,13 +77,12 @@ public interface ITmfEventAspect {
             }
 
             @Override
-            public String resolve(ITmfEvent event) {
+            public @Nullable String resolve(ITmfEvent event) {
                 ITmfEventType type = event.getType();
                 if (type == null) {
-                    return EMPTY_STRING;
+                    return null;
                 }
-                String typeName = type.getName();
-                return (typeName == null ? EMPTY_STRING : typeName);
+                return type.getName();
             }
         };
 
@@ -101,9 +101,8 @@ public interface ITmfEventAspect {
             }
 
             @Override
-            public String resolve(ITmfEvent event) {
-                String ret = event.getContent().toString();
-                return (ret == null ? EMPTY_STRING : ret);
+            public @Nullable String resolve(ITmfEvent event) {
+                return event.getContent().toString();
             }
         };
 
@@ -122,9 +121,8 @@ public interface ITmfEventAspect {
             }
 
             @Override
-            public String resolve(ITmfEvent event) {
-                String ret = event.getTrace().getName();
-                return (ret == null ? EMPTY_STRING : ret);
+            public @Nullable String resolve(ITmfEvent event) {
+                return event.getTrace().getName();
             }
         };
     }
@@ -167,5 +165,5 @@ public interface ITmfEventAspect {
      *            The event to process
      * @return The resulting tidbit of information for this event.
      */
-    Object resolve(ITmfEvent event);
+    @Nullable Object resolve(ITmfEvent event);
 }

@@ -13,6 +13,7 @@
 
 package org.eclipse.tracecompass.internal.tmf.pcap.core.event.aspect;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.event.PcapEvent;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.protocol.TmfPcapProtocol;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -36,14 +37,13 @@ public class PcapDestinationAspect implements ITmfEventAspect {
     }
 
     @Override
-    public String resolve(ITmfEvent event) {
+    public @Nullable String resolve(ITmfEvent event) {
         if (!(event instanceof PcapEvent)) {
-            return EMPTY_STRING;
+            return null;
         }
         PcapEvent pcapEvent = (PcapEvent) event;
         TmfPcapProtocol protocol = pcapEvent.getMostEncapsulatedProtocol();
 
-        String ret = pcapEvent.getDestinationEndpoint(protocol);
-        return (ret == null ? EMPTY_STRING : ret);
+        return pcapEvent.getDestinationEndpoint(protocol);
     }
 }

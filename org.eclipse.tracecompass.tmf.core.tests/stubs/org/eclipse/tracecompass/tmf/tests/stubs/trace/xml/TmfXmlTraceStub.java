@@ -299,10 +299,10 @@ public class TmfXmlTraceStub extends TmfTrace {
         }
 
         @Override
-        public Integer resolve(ITmfEvent event) {
+        public @Nullable Integer resolve(ITmfEvent event) {
             Integer cpu = Ints.tryParse(fAspect.resolve(event));
             if (cpu == null) {
-                return TmfCpuAspect.CPU_UNAVAILABLE;
+                return null;
             }
             return cpu;
         }

@@ -239,7 +239,7 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
                             event.getTrace(), TmfCpuAspect.class);
                     for (TmfCpuAspect aspect : cpuAspects) {
                         Integer cpu = aspect.resolve(event);
-                        if (!cpu.equals(TmfCpuAspect.CPU_UNAVAILABLE)) {
+                        if (cpu != null) {
                             quark = getQuarkRelativeAndAdd(startQuark, cpu.toString());
                             break;
                         }

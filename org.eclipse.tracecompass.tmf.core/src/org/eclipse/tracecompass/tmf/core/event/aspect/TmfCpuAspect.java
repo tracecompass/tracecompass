@@ -25,12 +25,6 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  */
 public abstract class TmfCpuAspect implements ITmfEventAspect {
 
-    /**
-     * Value returned by the {@link #resolve(ITmfEvent)} method when the CPU is
-     * not available for an event.
-     */
-    public static final Integer CPU_UNAVAILABLE = -1;
-
     @Override
     public final String getName() {
         return Messages.getMessage(Messages.AspectName_CPU);
@@ -43,10 +37,10 @@ public abstract class TmfCpuAspect implements ITmfEventAspect {
 
     /**
      * Returns the CPU number of the CPU on which this event was executed or
-     * {@link #CPU_UNAVAILABLE} if the CPU is not available for an event.
+     * {@code null} if the CPU is not available for an event.
      */
     @Override
-    public abstract Integer resolve(ITmfEvent event);
+    public abstract @Nullable Integer resolve(ITmfEvent event);
 
     @Override
     public boolean equals(@Nullable Object other) {

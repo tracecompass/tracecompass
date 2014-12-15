@@ -213,7 +213,7 @@ public class QemuKvmVmModel implements IVirtualMachineModel {
         Iterable<TmfCpuAspect> aspects = TmfTraceUtils.getEventAspectsOfClass(event.getTrace(), TmfCpuAspect.class);
         for (TmfCpuAspect aspect : aspects) {
             Integer thisCpu = aspect.resolve(event);
-            if (!thisCpu.equals(TmfCpuAspect.CPU_UNAVAILABLE)) {
+            if (thisCpu != null) {
                 cpu = thisCpu;
                 break;
             }

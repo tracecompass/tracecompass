@@ -51,13 +51,12 @@ public class TmfEventFieldAspect implements ITmfEventAspect {
     }
 
     @Override
-    public String resolve(ITmfEvent event) {
+    public @Nullable String resolve(ITmfEvent event) {
         ITmfEventField field = event.getContent().getField(fFieldName);
         if (field == null) {
-            return EMPTY_STRING;
+            return null;
         }
-        String fieldValue = field.getFormattedValue();
-        return (fieldValue == null ? EMPTY_STRING : fieldValue);
+        return field.getFormattedValue();
     }
 
     // ------------------------------------------------------------------------

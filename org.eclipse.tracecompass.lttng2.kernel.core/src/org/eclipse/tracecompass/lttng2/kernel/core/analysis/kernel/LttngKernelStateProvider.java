@@ -150,8 +150,8 @@ public class LttngKernelStateProvider extends AbstractTmfStateProvider {
         Integer cpu = null;
         Iterable<TmfCpuAspect> aspects = TmfTraceUtils.getEventAspectsOfClass(event.getTrace(), TmfCpuAspect.class);
         for (TmfCpuAspect aspect : aspects) {
-            if (!aspect.resolve(event).equals(TmfCpuAspect.CPU_UNAVAILABLE)) {
-                cpu = aspect.resolve(event);
+            cpu = aspect.resolve(event);
+            if (cpu != null) {
                 break;
             }
         }
