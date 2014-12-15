@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.module;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +32,7 @@ import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEv
 import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelAnalysis;
 import org.eclipse.tracecompass.lttng2.kernel.core.analysis.kernel.LttngKernelThreadInformationProvider;
 import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -157,6 +160,7 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
             return;
         }
 
+        ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
         ITmfStateValue value;
 
         final ITmfEventField content = event.getContent();
@@ -345,7 +349,7 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
     // ------------------------------------------------------------------------
 
     private int getNodeVirtualMachines() {
-        return ss.getQuarkAbsoluteAndAdd(VmAttributes.VIRTUAL_MACHINES);
+        return checkNotNull(getStateSystemBuilder()).getQuarkAbsoluteAndAdd(VmAttributes.VIRTUAL_MACHINES);
     }
 
     private @Nullable HostThread getCurrentHostThread(ITmfEvent event, long ts) {

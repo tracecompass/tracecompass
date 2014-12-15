@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.lttng2.ust.core.tests.trace.callstack;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -285,7 +286,7 @@ public abstract class AbstractProviderTest {
 
         @Override
         protected ITmfStateProvider createStateProvider() {
-            return new LttngUstCallStackProvider(getTrace());
+            return new LttngUstCallStackProvider(checkNotNull(getTrace()));
         }
     }
 }

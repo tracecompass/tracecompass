@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.core.statesystem;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -88,7 +89,7 @@ public interface ITmfStateProvider {
      *         SS is assigned yet
      * @since 3.0
      */
-    ITmfStateSystem getAssignedStateSystem();
+    @Nullable ITmfStateSystem getAssignedStateSystem();
 
     /**
      * Send an event to this input plugin for processing. The implementation

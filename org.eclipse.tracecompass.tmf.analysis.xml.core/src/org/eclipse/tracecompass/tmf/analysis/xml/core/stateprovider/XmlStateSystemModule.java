@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
@@ -40,7 +42,7 @@ public class XmlStateSystemModule extends TmfStateSystemAnalysisModule {
     @Override
     @NonNull
     protected ITmfStateProvider createStateProvider() {
-        return new XmlStateProvider(getTrace(), getId(), fXmlFile);
+        return new XmlStateProvider(checkNotNull(getTrace()), getId(), fXmlFile);
     }
 
     @Override

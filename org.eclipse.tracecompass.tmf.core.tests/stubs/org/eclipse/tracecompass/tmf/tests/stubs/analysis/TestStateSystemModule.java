@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.tests.stubs.analysis;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
@@ -26,7 +28,7 @@ public class TestStateSystemModule extends TmfStateSystemAnalysisModule {
 
     @Override
     protected ITmfStateProvider createStateProvider() {
-        return new TestStateSystemProvider(getTrace());
+        return new TestStateSystemProvider(checkNotNull(getTrace()));
     }
 
     @Override

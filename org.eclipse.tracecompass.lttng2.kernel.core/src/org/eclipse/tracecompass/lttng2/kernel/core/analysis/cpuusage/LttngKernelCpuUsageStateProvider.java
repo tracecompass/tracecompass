@@ -13,6 +13,8 @@
 
 package org.eclipse.tracecompass.lttng2.kernel.core.analysis.cpuusage;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +22,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Activator;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Attributes;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.IKernelAnalysisEventLayout;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
@@ -61,7 +64,8 @@ public class LttngKernelCpuUsageStateProvider extends AbstractTmfStateProvider {
      * @param layout
      *            The event layout to use for this state provider.
      */
-    public LttngKernelCpuUsageStateProvider(ITmfTrace trace, @NonNull IKernelAnalysisEventLayout layout) {
+    public LttngKernelCpuUsageStateProvider(@NonNull ITmfTrace trace,
+            @NonNull IKernelAnalysisEventLayout layout) {
         super(trace, ITmfEvent.class, "LTTng Kernel CPU usage"); //$NON-NLS-1$
         fTraceStart = trace.getStartTime().getValue();
         fLayout = layout;
@@ -83,6 +87,7 @@ public class LttngKernelCpuUsageStateProvider extends AbstractTmfStateProvider {
 
     @Override
     protected void eventHandle(ITmfEvent event) {
+        final ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
         final String eventName = event.getType().getName();
 
         if (eventName.equals(fLayout.eventSchedSwitch())) {
@@ -109,7 +114,7 @@ public class LttngKernelCpuUsageStateProvider extends AbstractTmfStateProvider {
             Long prevTid = (Long) content.getField(fLayout.fieldPrevTid()).getValue();
 
             try {
-                Integer currentCPUNode = ss.getQuarkRelativeAndAdd(getNodeCPUs(), cpu.toString());
+                Integer currentCPUNode = ss.getQuarkRelativeAndAdd(getNodeCPUs(ss), cpu.toString());
 
                 /*
                  * This quark contains the value of the cumulative time spent on
@@ -152,8 +157,8 @@ public class LttngKernelCpuUsageStateProvider extends AbstractTmfStateProvider {
     }
 
     /* Shortcut for the "current CPU" attribute node */
-    private int getNodeCPUs() {
-        return ss.getQuarkAbsoluteAndAdd(Attributes.CPUS);
+    private static int getNodeCPUs(ITmfStateSystemBuilder ssb) {
+        return ssb.getQuarkAbsoluteAndAdd(Attributes.CPUS);
     }
 
 }

@@ -12,9 +12,13 @@
 
 package org.eclipse.tracecompass.tmf.tests.stubs.analysis;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -43,7 +47,7 @@ public class TestExperimentAnalysis extends TmfStateSystemAnalysisModule {
 
     @Override
     protected ITmfStateProvider createStateProvider() {
-        return new TestExpStateSystemProvider(getTrace());
+        return new TestExpStateSystemProvider(checkNotNull(getTrace()));
     }
 
     @Override
@@ -63,7 +67,7 @@ public class TestExperimentAnalysis extends TmfStateSystemAnalysisModule {
          * @param trace
          *            The LTTng 2.0 kernel trace directory
          */
-        public TestExpStateSystemProvider(ITmfTrace trace) {
+        public TestExpStateSystemProvider(@NonNull ITmfTrace trace) {
             super(trace, TmfEvent.class, "Stub State System for Experiment");
         }
 
@@ -79,6 +83,7 @@ public class TestExperimentAnalysis extends TmfStateSystemAnalysisModule {
 
         @Override
         protected void eventHandle(ITmfEvent event) {
+            ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
             if (!fTraces.contains(event.getTrace())) {
                 try {
                     int quarkId = ss.getQuarkAbsoluteAndAdd(TRACE_QUARK_NAME);

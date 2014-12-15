@@ -13,11 +13,15 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.statesystem.mipmap;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -92,7 +96,9 @@ public abstract class AbstractTmfMipmapStateProvider extends AbstractTmfStatePro
      *            The name given to this state change input. Only used
      *            internally.
      */
-    public AbstractTmfMipmapStateProvider(ITmfTrace trace, Class<? extends ITmfEvent> eventType, String id) {
+    public AbstractTmfMipmapStateProvider(@NonNull ITmfTrace trace,
+            @NonNull Class<? extends ITmfEvent> eventType,
+            @NonNull String id) {
         super(trace, eventType, id);
     }
 
@@ -143,6 +149,7 @@ public abstract class AbstractTmfMipmapStateProvider extends AbstractTmfStatePro
      */
     public void modifyMipmapAttribute(long ts, ITmfStateValue value, int baseQuark, int mipmapFeatureBits, int resolution)
             throws TimeRangeException, AttributeNotFoundException, StateValueTypeException {
+        ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
         ss.modifyAttribute(ts, value, baseQuark);
         if (value.getType() == Type.LONG || value.getType() == Type.INTEGER || value.getType() == Type.DOUBLE || value.isNull()) {
             Set<ITmfMipmapFeature> features = getFeatureSet(baseQuark, ts, value, mipmapFeatureBits, resolution);
@@ -157,6 +164,8 @@ public abstract class AbstractTmfMipmapStateProvider extends AbstractTmfStatePro
     // ------------------------------------------------------------------------
 
     private Set<ITmfMipmapFeature> getFeatureSet(int baseQuark, long ts, ITmfStateValue value, int mipmapFeatureBits, int resolution) {
+        ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
+
         Set<ITmfMipmapFeature> features = featureMap.get(baseQuark);
         if (features != null) {
             return features;

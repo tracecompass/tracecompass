@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.lttng2.kernel.core.analysis.cpuusage;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -58,7 +60,7 @@ public class LttngKernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
 
     @Override
     protected ITmfStateProvider createStateProvider() {
-        ITmfTrace trace = getTrace();
+        ITmfTrace trace = checkNotNull(getTrace());
         IKernelAnalysisEventLayout layout;
 
         if (trace instanceof LttngKernelTrace) {

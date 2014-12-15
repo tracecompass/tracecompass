@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.internal.lttng2.ust.core.trace.callstack;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.callstack.CallStackStateProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
@@ -81,7 +82,7 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
      * @param trace
      *            The UST trace
      */
-    public LttngUstCallStackProvider(ITmfTrace trace) {
+    public LttngUstCallStackProvider(@NonNull ITmfTrace trace) {
         super(trace);
     }
 

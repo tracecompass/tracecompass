@@ -13,8 +13,12 @@
 
 package org.eclipse.tracecompass.tmf.core.tests.statesystem.mipmap;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.statesystem.mipmap.AbstractTmfMipmapStateProvider;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -29,6 +33,7 @@ import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
+import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
 
 /**
  * A mipmap state provider for test
@@ -42,7 +47,7 @@ class TmfMipmapStateProviderStub extends AbstractTmfMipmapStateProvider {
 
     private int resolution;
     private ITmfStateValue.Type type;
-    private final static String MIPMAP_ID = "MIPMAP_ID"; //$NON-NLS-1$
+    private static final @NonNull String MIPMAP_ID = "MIPMAP_ID"; //$NON-NLS-1$
 
     private final String ERROR_ATTRIBUTE_NOT_FOUND = "Error : Impossible to find the attribute"; //$NON-NLS-1$
     private final String ERROR_INVALID_STATE_VALUE = "Error : Invalid state value"; //$NON-NLS-1$
@@ -57,13 +62,14 @@ class TmfMipmapStateProviderStub extends AbstractTmfMipmapStateProvider {
      *            the type of value to use
      */
     public TmfMipmapStateProviderStub(int resolution, ITmfStateValue.Type type) {
-        super(null, TmfEvent.class, MIPMAP_ID);
+        super(new TmfTraceStub(), TmfEvent.class, MIPMAP_ID);
         this.resolution = resolution;
         this.type = type;
     }
 
     @Override
     protected void eventHandle(ITmfEvent ev) {
+        ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
         final long ts = ev.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
         try {
             int quark = ss.getQuarkAbsoluteAndAdd(TEST_ATTRIBUTE_NAME);
@@ -95,7 +101,7 @@ class TmfMipmapStateProviderStub extends AbstractTmfMipmapStateProvider {
      *            The event value or null
      * @return A new TmfEvent
      */
-    public ITmfEvent createEvent(long time, Long longVal) {
+    public @NonNull ITmfEvent createEvent(long time, Long longVal) {
         ITmfStateValue value;
         if (longVal == null) {
             value = TmfStateValue.nullValue();

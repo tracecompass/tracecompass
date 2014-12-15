@@ -13,10 +13,14 @@
 
 package org.eclipse.tracecompass.internal.lttng2.ust.core.memoryusage;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -53,7 +57,7 @@ public class MemoryUsageStateProvider extends AbstractTmfStateProvider {
      * @param trace
      *            trace
      */
-    public MemoryUsageStateProvider(LttngUstTrace trace) {
+    public MemoryUsageStateProvider(@NonNull LttngUstTrace trace) {
         super(trace, CtfTmfEvent.class, "Ust:Memory"); //$NON-NLS-1$
     }
 
@@ -155,6 +159,7 @@ public class MemoryUsageStateProvider extends AbstractTmfStateProvider {
     }
 
     private void setMem(ITmfEvent event, Long ptr, Long size) {
+        ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
         long ts = event.getTimestamp().getValue();
         Long tid = getVtid(event);
 

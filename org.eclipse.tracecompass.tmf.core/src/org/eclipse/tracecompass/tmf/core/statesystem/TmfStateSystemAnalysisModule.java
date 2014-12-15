@@ -23,7 +23,6 @@ import java.util.concurrent.CountDownLatch;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.statesystem.backends.partial.PartialHistoryBackend;
 import org.eclipse.tracecompass.internal.tmf.core.statesystem.backends.partial.PartialStateSystem;
@@ -61,7 +60,6 @@ import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
  * @author Geneviève Bastien
  * @since 3.0
  */
-@NonNullByDefault
 public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisModule
         implements ITmfAnalysisModuleWithStateSystems {
 
@@ -442,7 +440,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
 
         fTimeRange = TmfTimeRange.ETERNITY;
         final ITmfTrace trace = provider.getTrace();
-        if (trace != null && !isCompleteTrace(trace)) {
+        if (!isCompleteTrace(trace)) {
             TmfTimeRange traceTimeRange = trace.getTimeRange();
             if (traceTimeRange != null) {
                 fTimeRange = traceTimeRange;

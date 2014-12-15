@@ -12,6 +12,10 @@
 
 package org.eclipse.tracecompass.tmf.tests.stubs.analysis;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -39,7 +43,7 @@ public class TestStateSystemProvider extends AbstractTmfStateProvider {
      * @param trace
      *            The LTTng 2.0 kernel trace directory
      */
-    public TestStateSystemProvider(ITmfTrace trace) {
+    public TestStateSystemProvider(@NonNull ITmfTrace trace) {
         super(trace, TmfEvent.class, "Stub State System");
     }
 
@@ -55,6 +59,8 @@ public class TestStateSystemProvider extends AbstractTmfStateProvider {
 
     @Override
     protected void eventHandle(ITmfEvent event) {
+        ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
+
         /* Just need something to fill the state system */
         if (fString.equals(event.getContent().getValue())) {
             try {

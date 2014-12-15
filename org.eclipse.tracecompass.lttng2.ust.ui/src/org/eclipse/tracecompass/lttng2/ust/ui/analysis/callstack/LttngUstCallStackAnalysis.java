@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.lttng2.ust.ui.analysis.callstack;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.callstack.LttngUstCallStackProvider;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
@@ -43,7 +45,7 @@ public class LttngUstCallStackAnalysis extends AbstractCallStackAnalysis {
 
     @Override
     protected ITmfStateProvider createStateProvider() {
-        return new LttngUstCallStackProvider(getTrace());
+        return new LttngUstCallStackProvider(checkNotNull(getTrace()));
     }
 
 }

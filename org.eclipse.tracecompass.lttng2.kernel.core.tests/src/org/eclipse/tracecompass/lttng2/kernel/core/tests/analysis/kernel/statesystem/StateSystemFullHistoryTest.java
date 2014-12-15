@@ -13,6 +13,7 @@
 
 package org.eclipse.tracecompass.lttng2.kernel.core.tests.analysis.kernel.statesystem;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -175,7 +176,7 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
 
         @Override
         protected ITmfStateProvider createStateProvider() {
-            return new LttngKernelStateProvider(getTrace(), LttngEventLayout.getInstance());
+            return new LttngKernelStateProvider(checkNotNull(getTrace()), LttngEventLayout.getInstance());
         }
 
         @Override

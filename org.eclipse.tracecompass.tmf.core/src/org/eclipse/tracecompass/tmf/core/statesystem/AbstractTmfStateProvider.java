@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.core.statesystem;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -48,7 +49,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
     private boolean ssAssigned;
 
     /** State system in which to insert the state changes */
-    protected ITmfStateSystemBuilder ss = null;
+    private @Nullable ITmfStateSystemBuilder ss = null;
 
     /**
      * Instantiate a new state provider plugin.
@@ -68,8 +69,16 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
         eventsQueue = new ArrayBlockingQueue<>(DEFAULT_EVENTS_QUEUE_SIZE);
         ssAssigned = false;
 
-        String id2 = (id == null ? "Unamed" : id); //$NON-NLS-1$
-        eventHandlerThread = new Thread(new EventProcessor(), id2 + " Event Handler"); //$NON-NLS-1$
+        eventHandlerThread = new Thread(new EventProcessor(), id + " Event Handler"); //$NON-NLS-1$
+    }
+
+    /**
+     * Get the state system builder of this provider (to insert states in).
+     *
+     * @return The state system object to be filled
+     */
+    protected @Nullable ITmfStateSystemBuilder getStateSystemBuilder() {
+        return ss;
     }
 
     @Override
@@ -99,7 +108,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
      * @since 3.0
      */
     @Override
-    public ITmfStateSystem getAssignedStateSystem() {
+    public @Nullable ITmfStateSystem getAssignedStateSystem() {
         return ss;
     }
 
@@ -188,7 +197,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
      */
     private class EventProcessor implements Runnable {
 
-        private ITmfEvent currentEvent;
+        private @Nullable ITmfEvent currentEvent;
 
         @Override
         public void run() {
@@ -226,9 +235,13 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
         }
 
         private void closeStateSystem() {
-            final long endTime = (currentEvent == null) ? 0 :
-                    currentEvent.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-            ss.closeHistory(endTime);
+            ITmfEvent event = currentEvent;
+            final long endTime = (event == null) ? 0 :
+                    event.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+
+            if (ss != null) {
+                ss.closeHistory(endTime);
+            }
         }
     }
 

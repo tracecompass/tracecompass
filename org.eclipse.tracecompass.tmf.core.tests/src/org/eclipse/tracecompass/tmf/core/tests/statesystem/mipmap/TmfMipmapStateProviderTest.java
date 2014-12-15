@@ -63,8 +63,9 @@ public class TmfMipmapStateProviderTest {
     public static void init() {
         TmfMipmapStateProviderStub mmp = new TmfMipmapStateProviderStub(RESOLUTION, Type.LONG);
         IStateHistoryBackend be = new InMemoryBackend(0);
-        ssq = StateSystemFactory.newStateSystem(SSID, be);
-        mmp.assignTargetStateSystem(ssq);
+        ITmfStateSystemBuilder ssb = StateSystemFactory.newStateSystem(SSID, be);
+        mmp.assignTargetStateSystem(ssb);
+        ssq = ssb;
 
         for (long time = START_TIME; time <= END_TIME; time += INTERVAL) {
             long value = time / INTERVAL;

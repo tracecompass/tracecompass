@@ -13,6 +13,8 @@
 
 package org.eclipse.tracecompass.btf.core.analysis;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import org.eclipse.tracecompass.btf.core.event.BtfEvent;
 import org.eclipse.tracecompass.btf.core.trace.BtfColumnNames;
 import org.eclipse.tracecompass.btf.core.trace.BtfTrace;
@@ -131,7 +133,7 @@ public class BtfStateProvider extends AbstractTmfStateProvider {
     @Override
     protected void eventHandle(ITmfEvent ev) {
         BtfEvent event = (BtfEvent) ev;
-        final ITmfStateSystemBuilder ssb = this.ss;
+        final ITmfStateSystemBuilder ssb = checkNotNull(getStateSystemBuilder());
 
         final long ts = event.getTimestamp().getValue();
         final String eventType = (String) event.getContent().getField(BtfColumnNames.EVENT.toString()).getValue();
@@ -189,7 +191,7 @@ public class BtfStateProvider extends AbstractTmfStateProvider {
                     quark = ssb.getQuarkAbsoluteAndAdd(ATTRIBUTE_TASKS, task, core);
                     ssb.modifyAttribute(ts, STATE_SUSPENDED.getValue(), quark);
                     quark = ssb.getQuarkRelativeAndAdd(quark, runnable);
-                    ss.modifyAttribute(ts, STATE_SUSPENDED.getValue(), quark);
+                    ssb.modifyAttribute(ts, STATE_SUSPENDED.getValue(), quark);
                 }
                 break;
 

@@ -76,7 +76,7 @@ public class UstMemoryAnalysisModule extends TmfStateSystemAnalysisModule {
 
     @Override
     protected ITmfStateProvider createStateProvider() {
-        return new MemoryUsageStateProvider(getTrace());
+        return new MemoryUsageStateProvider(checkNotNull(getTrace()));
     }
 
     @Override
