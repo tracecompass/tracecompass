@@ -26,18 +26,20 @@ public final class NonNullUtils {
     private NonNullUtils() {}
 
     /**
-     * Convert a potentially null string into an empty one if it is null.
+     * Returns a non-null {@link String} for a potentially null object. This
+     * method calls {@link Object#toString()} if the object is not null, or
+     * returns an empty string otherwise.
      *
-     * @param str
-     *            The string to null-check, and convert to an empty string if
-     *            null.
+     * @param obj
+     *            A {@link Nullable} object that we want converted to a string
      * @return The non-null string
      */
-    public static String nullToEmptyString(@Nullable String str) {
-        if (str == null) {
+    public static String nullToEmptyString(@Nullable Object obj) {
+        if (obj == null) {
             return ""; //$NON-NLS-1$
         }
-        return str;
+        String str = obj.toString();
+        return (str == null ? "" : str); //$NON-NLS-1$
     }
 
     /**
