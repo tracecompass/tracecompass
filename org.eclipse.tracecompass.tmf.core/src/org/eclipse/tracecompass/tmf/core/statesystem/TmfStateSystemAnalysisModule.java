@@ -108,6 +108,10 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         TmfStateSystemAnalysisModule module =
                 TmfTraceUtils.getAnalysisModuleOfClass(trace, TmfStateSystemAnalysisModule.class, moduleId);
         if (module != null) {
+            ITmfStateSystem ss = module.getStateSystem();
+            if (ss != null) {
+                return ss;
+            }
             IStatus status = module.schedule();
             if (status.isOK()) {
                 module.waitForInitialization();
