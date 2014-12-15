@@ -246,7 +246,7 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
     /**
      * The live delay
      */
-    private Integer fLiveDelay = 0;
+    private Long fLiveDelay = 0L;
     /**
      * The live url.
      */
@@ -807,7 +807,7 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
 
         if (fParent.isLiveSupported() && fLiveButton != null) {
             fIsLive = fLiveButton.getSelection();
-            fLiveDelay = LTTngControlServiceConstants.UNUSED_VALUE;
+            fLiveDelay = Long.valueOf(LTTngControlServiceConstants.UNUSED_VALUE);
             fLiveUrl = SessionInfo.DEFAULT_LIVE_NETWORK_URL;
             fLivePort = SessionInfo.DEFAULT_LIVE_PORT;
         }
@@ -848,7 +848,7 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
             if (fIsLive && fLiveGroup != null) {
                 String liveDelayText = fLiveDelayText.getText();
                 try {
-                    fLiveDelay = liveDelayText.equals(DEFAULT_TEXT) ? LTTngControlServiceConstants.UNUSED_VALUE : Integer.valueOf(liveDelayText);
+                    fLiveDelay = liveDelayText.equals(DEFAULT_TEXT) ? LTTngControlServiceConstants.UNUSED_VALUE : Long.valueOf(liveDelayText);
                     fLivePort = Integer.valueOf(fLivePortText.getText());
                     fLiveUrl = fLiveHostAddressText.getText();
                 } catch (NumberFormatException e) {

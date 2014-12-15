@@ -32,7 +32,7 @@ public class CreateSessionDialogStub implements ICreateSessionDialog {
     private String fDataUrl = null;
     private boolean fIsSnapshot;
     private boolean fIsLive = false;
-    private int fLiveDelay = 0;
+    private long fLiveDelay = 0;
 
     @Override
     public void initialize(TraceSessionGroup group) {

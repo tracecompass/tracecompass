@@ -90,7 +90,7 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
     /**
      * The delay in micro seconds before the data is flushed and streamed.
      */
-    private int fLiveDelay = -1;
+    private long fLiveDelay = -1;
 
     /**
      * The live connection url (Relayd).
@@ -232,12 +232,12 @@ public class SessionInfo extends TraceInfo implements ISessionInfo {
     }
 
     @Override
-    public int getLiveDelay() {
+    public long getLiveDelay() {
         return fLiveDelay;
     }
 
     @Override
-    public void setLiveDelay(int liveDelay) {
+    public void setLiveDelay(long liveDelay) {
         fLiveDelay = liveDelay;
     }
 
