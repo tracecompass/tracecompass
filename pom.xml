@@ -39,7 +39,7 @@
 
 <properties>
   <base.test.vmargs>-Xms256m -Xmx1024m -XX:MaxPermSize=256m</base.test.vmargs>
-  <tycho-version>0.21.0</tycho-version>
+  <tycho-version>0.22.0</tycho-version>
   <target-platform>tracecompass-e4.4</target-platform>
   <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
   <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
@@ -337,9 +337,7 @@
           <version>${tycho-version}</version>
           <configuration>
             <encoding>UTF-8</encoding>
-            <compilerArguments>
-              <properties>${project.basedir}/.settings/org.eclipse.jdt.core.prefs</properties>
-            </compilerArguments>
+            <useProjectSettings>true</useProjectSettings>
           </configuration>
 	 </plugin>
 	<plugin>
@@ -399,7 +397,7 @@
         <plugin>
           <groupId>org.jboss.tools.tycho-plugins</groupId>
           <artifactId>repository-utils</artifactId>
-          <version>0.21.1</version>
+          <version>0.22.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
