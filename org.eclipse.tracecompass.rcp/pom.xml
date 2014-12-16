@@ -47,6 +47,7 @@
                 <plugin id="org.eclipse.swt.gtk.solaris.x86"/>
                 <plugin id="org.eclipse.swt.gtk.linux.ppc"/>
                 <plugin id="org.eclipse.swt.cocoa.macosx"/>
+                <plugin id="org.eclipse.equinox.concurrent"/>
                 <plugin id="org.eclipse.equinox.launcher.gtk.solaris.sparc"/>
                 <plugin id="org.eclipse.equinox.launcher.gtk.linux.x86"/>
                 <plugin id="org.eclipse.equinox.launcher.gtk.linux.x86_64"/>
