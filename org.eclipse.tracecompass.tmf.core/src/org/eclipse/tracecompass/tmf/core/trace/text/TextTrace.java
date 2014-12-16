@@ -31,7 +31,6 @@ import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfEventParser;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfPersistentlyIndexable;
@@ -53,7 +52,7 @@ import org.eclipse.tracecompass.tmf.core.trace.location.TmfLongLocation;
  *
  * @since 3.0
  */
-public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace implements ITmfEventParser, ITmfPersistentlyIndexable {
+public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace implements ITmfPersistentlyIndexable {
 
     private static final TmfLongLocation NULL_LOCATION = new TmfLongLocation(-1L);
     private static final int MAX_LINES = 100;

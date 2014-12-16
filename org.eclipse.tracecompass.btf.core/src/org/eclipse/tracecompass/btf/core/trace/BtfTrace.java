@@ -39,7 +39,6 @@ import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceContext;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfEventParser;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceProperties;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
@@ -59,7 +58,7 @@ import com.google.common.collect.ImmutableMap;
  *
  * @author Matthew Khouzam
  */
-public class BtfTrace extends TmfTrace implements ITmfEventParser, ITmfPersistentlyIndexable, ITmfTraceProperties, AutoCloseable {
+public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITmfTraceProperties, AutoCloseable {
 
     private static final int TIMESTAMP_NUM = 0;
     private static final int SOURCE_NUM = 1;

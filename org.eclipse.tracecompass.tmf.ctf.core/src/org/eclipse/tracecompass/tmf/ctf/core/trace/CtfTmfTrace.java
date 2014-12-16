@@ -46,7 +46,6 @@ import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfEventParser;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceProperties;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceWithPreDefinedEvents;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
@@ -79,7 +78,7 @@ import com.google.common.collect.ImmutableSet;
  * @author Matthew khouzam
  */
 public class CtfTmfTrace extends TmfTrace
-        implements ITmfEventParser, ITmfTraceProperties, ITmfPersistentlyIndexable,
+        implements ITmfTraceProperties, ITmfPersistentlyIndexable,
         ITmfTraceWithPreDefinedEvents, AutoCloseable {
 
     // -------------------------------------------

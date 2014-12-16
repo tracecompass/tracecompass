@@ -26,6 +26,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.request.TmfCoalescedEventRequest;
 import org.eclipse.tracecompass.tmf.core.component.TmfEventProvider;
@@ -52,7 +53,7 @@ import org.eclipse.tracecompass.tmf.core.trace.location.TmfLongLocation;
  * <p>
  * Dummy test trace. Use in conjunction with TmfEventParserStub.
  */
-public class TmfTraceStub extends TmfTrace implements ITmfEventParser, ITmfPersistentlyIndexable {
+public class TmfTraceStub extends TmfTrace implements ITmfPersistentlyIndexable {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -61,8 +62,8 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser, ITmfPersi
     // The actual stream
     private RandomAccessFile fTrace;
 
-//    // The associated event parser
-//    private ITmfEventParser<TmfEvent> fParser;
+    // The associated event parser
+    private final @NonNull ITmfEventParser fParser;
 
     // The synchronization lock
     private final ReentrantLock fLock = new ReentrantLock();
@@ -78,7 +79,7 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser, ITmfPersi
      */
     public TmfTraceStub() {
         super();
-        setParser(new TmfEventParserStub(this));
+        fParser = new TmfEventParserStub(this);
     }
 
     /**
@@ -97,9 +98,9 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser, ITmfPersi
     public TmfTraceStub(final String path,
             final int cacheSize,
             final long interval) throws TmfTraceException {
-        super(null, ITmfEvent.class, path, cacheSize, interval, null);
+        super(null, ITmfEvent.class, path, cacheSize, interval);
         setupTrace(path);
-        setParser(new TmfEventParserStub(this));
+        fParser = new TmfEventParserStub(this);
     }
 
     /**
@@ -122,9 +123,9 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser, ITmfPersi
             final int cacheSize,
             final boolean waitForCompletion,
             final ITmfEventParser parser) throws TmfTraceException {
-        super(null, ITmfEvent.class, path, cacheSize, 0, null);
+        super(null, ITmfEvent.class, path, cacheSize, 0);
         setupTrace(path);
-        setParser((parser != null) ? parser : new TmfEventParserStub(this));
+        fParser = ((parser != null) ? parser : new TmfEventParserStub(this));
         if (waitForCompletion) {
             indexTrace(true);
         }
@@ -153,9 +154,9 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser, ITmfPersi
             final int cacheSize,
             final boolean waitForCompletion,
             final ITmfEventParser parser) throws TmfTraceException {
-        super(resource, ITmfEvent.class, path, cacheSize, 0, null);
+        super(resource, ITmfEvent.class, path, cacheSize, 0);
         setupTrace(path);
-        setParser((parser != null) ? parser : new TmfEventParserStub(this));
+        fParser = ((parser != null) ? parser : new TmfEventParserStub(this));
         if (waitForCompletion) {
             indexTrace(true);
         }
@@ -172,7 +173,7 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser, ITmfPersi
     public TmfTraceStub(final TmfTraceStub trace) throws TmfTraceException {
         super(trace);
         setupTrace(getPath()); // fPath will be set by the super-constructor
-        setParser(new TmfEventParserStub(this));
+        fParser = new TmfEventParserStub(this);
     }
 
 
@@ -195,7 +196,6 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser, ITmfPersi
         } catch (FileNotFoundException e) {
             throw new TmfTraceException(e.getMessage());
         }
-        setParser(new TmfEventParserStub(this));
         super.initTrace(resource, path, type);
     }
 
@@ -328,8 +328,8 @@ public class TmfTraceStub extends TmfTrace implements ITmfEventParser, ITmfPersi
         fLock.lock();
         try {
             // parseNextEvent will update the context
-            if (fTrace != null && getParser() != null && context != null) {
-                final ITmfEvent event = getParser().parseEvent(context);
+            if (fTrace != null && context != null) {
+                final ITmfEvent event = fParser.parseEvent(context);
                 return event;
             }
         } finally {

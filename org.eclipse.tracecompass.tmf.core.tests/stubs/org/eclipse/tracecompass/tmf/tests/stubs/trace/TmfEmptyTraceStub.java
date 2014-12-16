@@ -36,7 +36,6 @@ public class TmfEmptyTraceStub extends TmfTraceStub {
      */
     public TmfEmptyTraceStub() {
         super();
-        setParser(new TmfEventParserStub(this));
     }
 
     // ------------------------------------------------------------------------

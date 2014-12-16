@@ -40,7 +40,6 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfEventParser;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
@@ -58,7 +57,7 @@ import org.eclipse.tracecompass.tmf.core.trace.location.TmfLongLocation;
  * @author Matthew Khouzam
  */
 @SuppressWarnings("restriction")
-public class GdbTrace extends TmfTrace implements ITmfEventParser {
+public class GdbTrace extends TmfTrace {
 
     // ------------------------------------------------------------------------
     // Constants

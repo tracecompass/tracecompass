@@ -50,7 +50,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfEventParser;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -66,7 +65,7 @@ import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
  * @version 1.0
  * @author Francois Chouinard
  */
-public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPersistentlyIndexable {
+public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -209,7 +208,6 @@ public class TmfExperiment extends TmfTrace implements ITmfEventParser, ITmfPers
 
         setCacheSize(indexPageSize);
         setStreamingInterval(0);
-        setParser(this);
 
         // traces have to be set before super.initialize()
         if (traces != null) {

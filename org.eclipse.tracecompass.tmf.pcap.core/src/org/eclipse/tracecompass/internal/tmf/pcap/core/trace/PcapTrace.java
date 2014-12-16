@@ -43,7 +43,6 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfEventParser;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceProperties;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
@@ -62,7 +61,7 @@ import com.google.common.collect.ImmutableMap;
  *
  * @author Vincent Perot
  */
-public class PcapTrace extends TmfTrace implements ITmfEventParser, ITmfTraceProperties, AutoCloseable {
+public class PcapTrace extends TmfTrace implements ITmfTraceProperties, AutoCloseable {
 
     private static final Collection<ITmfEventAspect> PCAP_ASPECTS =
             checkNotNull(ImmutableList.of(

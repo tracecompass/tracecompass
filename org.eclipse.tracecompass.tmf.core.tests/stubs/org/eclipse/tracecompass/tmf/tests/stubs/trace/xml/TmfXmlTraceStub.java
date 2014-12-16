@@ -112,7 +112,6 @@ public class TmfXmlTraceStub extends TmfTrace {
             fTrace = new CustomXmlTrace(definitions[0]);
             /* Deregister the custom XML trace */
             TmfSignalManager.deregister(fTrace);
-            this.setParser(fTrace);
 
             Collection<ITmfEventAspect> aspects = TmfTrace.BASE_ASPECTS;
             fAspects = aspects;
@@ -138,6 +137,11 @@ public class TmfXmlTraceStub extends TmfTrace {
             this.setStartTime(curTime);
             this.setEndTime(curTime);
         }
+    }
+
+    @Override
+    public @Nullable ITmfEvent parseEvent(@Nullable ITmfContext context) {
+        return fTrace.parseEvent(context);
     }
 
     @Override
