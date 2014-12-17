@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,6 +10,7 @@
  *   Matthew Khouzam - Initial API and implementation
  *   Bernd Hufmann - Handling of directory traces types
  *   Geneviève Bastien - Added support of experiment types
+ *   Patrick Tasse - Renamed trace type id
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.core.project.model;
@@ -31,34 +32,34 @@ public class TraceTypeHelper {
 
     private final String fName;
     private final String fCategoryName;
-    private final String fCanonicalName;
+    private final String fTraceTypeId;
     private final TraceElementType fElementType;
     @NonNull
     private final ITmfTrace fTrace;
     private final boolean fIsDirectory;
 
     /**
-     * Constructor for a trace type helper. It is a link between a canonical
-     * (hard to read) name, a category name, a name and a trace object. It is
-     * used for trace validation.
+     * Constructor for a trace type helper. It is a link between a trace type
+     * id, a category name, a name and a trace object.
      *
-     * @param canonicalName
-     *            The "path" of the tracetype
+     * @param traceTypeId
+     *            the trace type id
      * @param categoryName
      *            the category of the trace type
      * @param name
-     *            the name of the trace
+     *            the name of the trace type
      * @param trace
      *            an object of the trace type
      * @param isDir
-     *            flag indicating whether the trace type is for a directory or file trace
+     *            flag indicating whether the trace type is for a directory or
+     *            file trace
      * @param elementType
      *            True if this helper is for an experiment type
      */
-    public TraceTypeHelper(String canonicalName, String categoryName, String name, @NonNull ITmfTrace trace, boolean isDir, TraceElementType elementType) {
+    public TraceTypeHelper(String traceTypeId, String categoryName, String name, @NonNull ITmfTrace trace, boolean isDir, TraceElementType elementType) {
         fName = name;
         fCategoryName = categoryName;
-        fCanonicalName = canonicalName;
+        fTraceTypeId = traceTypeId;
         fTrace = trace;
         fIsDirectory = isDir;
         fElementType = elementType;
@@ -83,12 +84,12 @@ public class TraceTypeHelper {
     }
 
     /**
-     * Get the canonical name
+     * Get the trace type id
      *
-     * @return the canonical Name
+     * @return the trace type id
      */
-    public String getCanonicalName() {
-        return fCanonicalName;
+    public String getTraceTypeId() {
+        return fTraceTypeId;
     }
 
     /**

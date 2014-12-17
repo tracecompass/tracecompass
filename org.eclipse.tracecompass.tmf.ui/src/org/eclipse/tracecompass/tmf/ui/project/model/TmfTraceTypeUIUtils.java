@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -137,7 +137,7 @@ public final class TmfTraceTypeUIUtils {
             Button b = new Button(shellToShow, SWT.RADIO);
             final String displayName = candidate.getCategoryName() + ':' + candidate.getName();
             b.setText(displayName);
-            names.put(displayName, candidate.getCanonicalName());
+            names.put(displayName, candidate.getTraceTypeId());
 
             b.addSelectionListener(new SelectionListener() {
 
@@ -219,7 +219,7 @@ public final class TmfTraceTypeUIUtils {
             List<Pair<Integer, TraceTypeHelper>> reducedCandidates = reduce(candidates);
             for (Pair<Integer, TraceTypeHelper> candidatePair : reducedCandidates) {
                 TraceTypeHelper candidate = candidatePair.getSecond();
-                if (candidate.getCanonicalName().equals(traceTypeHint)) {
+                if (candidate.getTraceTypeId().equals(traceTypeHint)) {
                     traceTypeToSet = candidate;
                     break;
                 }
@@ -276,7 +276,7 @@ public final class TmfTraceTypeUIUtils {
          * @since 3.1
          */
     public static IStatus setTraceType(IResource resource, TraceTypeHelper traceType, boolean refresh) throws CoreException {
-        String traceTypeId = traceType.getCanonicalName();
+        String traceTypeId = traceType.getTraceTypeId();
 
         resource.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceTypeId);
 
