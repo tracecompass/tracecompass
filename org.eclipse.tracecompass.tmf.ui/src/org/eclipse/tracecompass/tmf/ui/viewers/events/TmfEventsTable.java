@@ -123,7 +123,6 @@ import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfSourceLookup;
 import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAndNode;
-import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesAspectNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
@@ -1390,7 +1389,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                             tableEditor.getEditor().dispose();
                             return false;
                         }
-                        final TmfFilterMatchesAspectNode filter = new TmfFilterMatchesAspectNode(null);
+                        final TmfFilterMatchesNode filter = new TmfFilterMatchesNode(null);
                         ITmfEventAspect aspect = (ITmfEventAspect) column.getData(Key.ASPECT);
                         filter.setEventAspect(aspect);
                         filter.setRegex(regex);

@@ -65,6 +65,9 @@ import com.google.common.collect.ImmutableMap;
  */
 public class PcapTrace extends TmfTrace implements ITmfTraceProperties, AutoCloseable {
 
+    /** pcap trace type id as defined in plugin.xml */
+    public static final String TRACE_TYPE_ID = "org.eclipse.linuxtools.tmf.pcap.core.pcaptrace"; //$NON-NLS-1$
+
     private static final Collection<ITmfEventAspect> PCAP_ASPECTS =
             checkNotNull(ImmutableList.of(
                     ITmfEventAspect.BaseAspects.TIMESTAMP,

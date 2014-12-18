@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -245,15 +245,22 @@ public class Messages extends NLS {
     public static String CustomXmlParserOutputWizardPage_visible;
 
     public static String FilterDialog_FilterDialogTitle;
+    public static String FilterTreeLabelProvider_AspectHint;
+    public static String FilterTreeLabelProvider_FilterNameHint;
+    public static String FilterTreeLabelProvider_TraceTypeHint;
+    public static String FilterTreeLabelProvider_ValueHint;
     public static String FilterView_AddActionToolTipText;
     public static String FilterView_DeleteActionToolTipText;
     public static String FilterView_ExportActionToolTipText;
     public static String FilterView_FileDialogFilterName;
     public static String FilterView_ImportActionToolTipText;
     public static String FilterView_SaveActionToolTipText;
-    public static String FilterViewer_EmptyTreeHintText;
-    public static String FilterViewer_CommonCategory;
     public static String FilterViewer_AlphaButtonText;
+    public static String FilterViewer_AspectLabel;
+    public static String FilterViewer_CommonCategory;
+    public static String FilterViewer_EmptyTreeHintText;
+    public static String FilterViewer_EventField;
+    public static String FilterViewer_FieldHint;
     public static String FilterViewer_FieldLabel;
     public static String FilterViewer_FilterNameHint;
     public static String FilterViewer_IgnoreCaseButtonText;
@@ -264,7 +271,7 @@ public class Messages extends NLS {
     public static String FilterViewer_RegexHint;
     public static String FilterViewer_RegexLabel;
     public static String FilterViewer_ResultLabel;
-    public static String FilterViewer_Subfilter_ToolTip;
+    public static String FilterViewer_Subfield_ToolTip;
     public static String FilterViewer_TimestampButtonText;
     public static String FilterViewer_TypeLabel;
     public static String FilterViewer_ValueHint;

@@ -21,10 +21,11 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  * @version 1.0
  * @author Patrick Tasse
  */
-@SuppressWarnings("javadoc")
 public class TmfFilterAndNode extends TmfFilterTreeNode {
 
+    /** and node name */
     public static final String NODE_NAME = "AND"; //$NON-NLS-1$
+    /** not attribute name */
     public static final String NOT_ATTR = "not"; //$NON-NLS-1$
 
     private boolean fNot = false;

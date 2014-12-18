@@ -24,11 +24,13 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * @version 1.0
  * @author Patrick Tasse
  */
-@SuppressWarnings("javadoc")
 public class TmfFilterTraceTypeNode extends TmfFilterTreeNode {
 
+    /** tracetype node name */
     public static final String NODE_NAME = "TRACETYPE"; //$NON-NLS-1$
+    /** type attribute name */
     public static final String TYPE_ATTR = "type"; //$NON-NLS-1$
+    /** name attribute name */
     public static final String NAME_ATTR = "name"; //$NON-NLS-1$
 
     private String fTraceTypeId;

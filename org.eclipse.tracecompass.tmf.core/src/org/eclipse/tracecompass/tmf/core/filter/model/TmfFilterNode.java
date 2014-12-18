@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -23,10 +23,11 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  * @version 1.0
  * @author Patrick Tasse
  */
-@SuppressWarnings("javadoc")
 public class TmfFilterNode extends TmfFilterTreeNode {
 
+    /** filter node name */
     public static final String NODE_NAME = "FILTER"; //$NON-NLS-1$
+    /** name attribute name */
     public static final String NAME_ATTR = "name"; //$NON-NLS-1$
 
     String fFilterName;

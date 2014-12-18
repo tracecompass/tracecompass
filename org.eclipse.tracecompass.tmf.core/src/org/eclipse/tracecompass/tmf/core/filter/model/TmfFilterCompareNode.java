@@ -27,27 +27,32 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
  * @version 1.0
  * @author Patrick Tasse
  */
-@SuppressWarnings("javadoc")
-public class TmfFilterCompareNode extends TmfFilterTreeNode {
+public class TmfFilterCompareNode extends TmfFilterAspectNode {
 
+    /** compare node name */
     public static final String NODE_NAME = "COMPARE"; //$NON-NLS-1$
+    /** not attribute name */
     public static final String NOT_ATTR = "not"; //$NON-NLS-1$
-    public static final String FIELD_ATTR = "field"; //$NON-NLS-1$
+    /** result attribute name */
     public static final String RESULT_ATTR = "result"; //$NON-NLS-1$
+    /** type attribute name */
     public static final String TYPE_ATTR = "type"; //$NON-NLS-1$
+    /** value attribute name */
     public static final String VALUE_ATTR = "value"; //$NON-NLS-1$
 
     /**
      * Supported comparison types
      */
     public static enum Type {
+        /** numerical comparison type */
         NUM,
+        /** alphanumerical comparison type */
         ALPHA,
+        /** timestamp comparison type */
         TIMESTAMP
     }
 
     private boolean fNot = false;
-    private String fField;
     private int fResult;
     private Type fType = Type.NUM;
     private String fValue;
@@ -73,20 +78,6 @@ public class TmfFilterCompareNode extends TmfFilterTreeNode {
      */
     public void setNot(boolean not) {
         this.fNot = not;
-    }
-
-    /**
-     * @return the field name
-     */
-    public String getField() {
-        return fField;
-    }
-
-    /**
-     * @param field the field name
-     */
-    public void setField(String field) {
-        this.fField = field;
     }
 
     /**
@@ -148,6 +139,18 @@ public class TmfFilterCompareNode extends TmfFilterTreeNode {
         }
     }
 
+    /**
+     * @return true if the value is valid for the comparison type
+     */
+    public boolean hasValidValue() {
+        if (fType == Type.NUM) {
+            return fValueNumber != null;
+        } else if (fType == Type.TIMESTAMP) {
+            return fValue != null && !fValue.isEmpty() && fValueTimestamp != null;
+        }
+        return fValue != null;
+    }
+
     @Override
     public String getNodeName() {
         return NODE_NAME;
@@ -155,7 +158,10 @@ public class TmfFilterCompareNode extends TmfFilterTreeNode {
 
     @Override
     public boolean matches(ITmfEvent event) {
-        Object value = getFieldValue(event, fField);
+        if (event == null || fEventAspect == null) {
+            return false ^ fNot;
+        }
+        Object value = fEventAspect.resolve(event);
         if (value == null) {
             return false ^ fNot;
         }
@@ -207,13 +213,13 @@ public class TmfFilterCompareNode extends TmfFilterTreeNode {
         String result = (fResult == 0 ? "= " : fResult < 0 ? "< " : "> "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         String open = (fType == Type.NUM ? "" : fType == Type.ALPHA ? "\"" : "["); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         String close = (fType == Type.NUM ? "" : fType == Type.ALPHA ? "\"" : "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        return fField + (fNot ? " not " : " ") + result + open + fValue + close; //$NON-NLS-1$ //$NON-NLS-2$
+        String aspectName = fEventAspect != null ? fEventAspect.getName() : ""; //$NON-NLS-1$
+        return aspectName + (fNot ? " not " : " ") + result + open + fValue + close; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Override
     public ITmfFilterTreeNode clone() {
         TmfFilterCompareNode clone = (TmfFilterCompareNode) super.clone();
-        clone.fField = fField;
         clone.setValue(fValue);
         return clone;
     }
@@ -222,7 +228,6 @@ public class TmfFilterCompareNode extends TmfFilterTreeNode {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((fField == null) ? 0 : fField.hashCode());
         result = prime * result + (fNot ? 1231 : 1237);
         result = prime * result + fResult;
         result = prime * result + ((fType == null) ? 0 : fType.hashCode());
@@ -242,13 +247,6 @@ public class TmfFilterCompareNode extends TmfFilterTreeNode {
             return false;
         }
         TmfFilterCompareNode other = (TmfFilterCompareNode) obj;
-        if (fField == null) {
-            if (other.fField != null) {
-                return false;
-            }
-        } else if (!fField.equals(other.fField)) {
-            return false;
-        }
         if (fNot != other.fNot) {
             return false;
         }

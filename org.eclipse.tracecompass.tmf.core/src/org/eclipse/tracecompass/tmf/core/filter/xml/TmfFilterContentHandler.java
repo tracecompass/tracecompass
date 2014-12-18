@@ -16,19 +16,21 @@ package org.eclipse.tracecompass.tmf.core.filter.xml;
 
 import java.util.Stack;
 
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfEventFieldAspect;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAndNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAspectNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode.Type;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterContainsNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEqualsNode;
-import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesFieldNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterOrNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterRootNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterTraceTypeNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterTreeNode;
-import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode.Type;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
 import org.xml.sax.Attributes;
@@ -49,6 +51,10 @@ public class TmfFilterContentHandler extends DefaultHandler {
     private static final String NAME_ATTR = "name"; //$NON-NLS-1$
     private static final String LTTNG_KERNEL_TRACE = "Common Trace Format : LTTng Kernel Trace"; //$NON-NLS-1$
     private static final String LINUX_KERNEL_TRACE = "Common Trace Format : Linux Kernel Trace"; //$NON-NLS-1$
+    private static final String FIELD_ATTR = "field"; //$NON-NLS-1$
+    private static final String EVENT_FIELD_TIMESTAMP = ":timestamp:"; //$NON-NLS-1$
+    private static final String EVENT_FIELD_TYPE = ":type:"; //$NON-NLS-1$
+    private static final String EVENT_FIELD_CONTENT = ":content:"; //$NON-NLS-1$
 
     private ITmfFilterTreeNode fRoot = null;
     private Stack<ITmfFilterTreeNode> fFilterTreeStack = null;
@@ -117,7 +123,7 @@ public class TmfFilterContentHandler extends DefaultHandler {
             if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
                 ((TmfFilterContainsNode) node).setNot(true);
             }
-            ((TmfFilterContainsNode) node).setField(atts.getValue(TmfFilterContainsNode.FIELD_ATTR));
+            createEventAspect((TmfFilterAspectNode) node, atts);
             ((TmfFilterContainsNode) node).setValue(atts.getValue(TmfFilterContainsNode.VALUE_ATTR));
             value = atts.getValue(TmfFilterContainsNode.IGNORECASE_ATTR);
             if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
@@ -131,21 +137,21 @@ public class TmfFilterContentHandler extends DefaultHandler {
             if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
                 ((TmfFilterEqualsNode) node).setNot(true);
             }
-            ((TmfFilterEqualsNode) node).setField(atts.getValue(TmfFilterEqualsNode.FIELD_ATTR));
+            createEventAspect((TmfFilterAspectNode) node, atts);
             ((TmfFilterEqualsNode) node).setValue(atts.getValue(TmfFilterEqualsNode.VALUE_ATTR));
             value = atts.getValue(TmfFilterEqualsNode.IGNORECASE_ATTR);
             if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
                 ((TmfFilterEqualsNode) node).setIgnoreCase(true);
             }
 
-        } else if (localName.equals(TmfFilterMatchesFieldNode.NODE_NAME)) {
+        } else if (localName.equals(TmfFilterMatchesNode.NODE_NAME)) {
 
-            node = new TmfFilterMatchesFieldNode(null);
+            node = new TmfFilterMatchesNode(null);
             String value = atts.getValue(TmfFilterMatchesNode.NOT_ATTR);
             if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
                 ((TmfFilterMatchesNode) node).setNot(true);
             }
-            ((TmfFilterMatchesFieldNode) node).setField(atts.getValue(TmfFilterMatchesFieldNode.FIELD_ATTR));
+            createEventAspect((TmfFilterAspectNode) node, atts);
             ((TmfFilterMatchesNode) node).setRegex(atts.getValue(TmfFilterMatchesNode.REGEX_ATTR));
 
         } else if (localName.equals(TmfFilterCompareNode.NODE_NAME)) {
@@ -155,7 +161,7 @@ public class TmfFilterContentHandler extends DefaultHandler {
             if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
                 ((TmfFilterCompareNode) node).setNot(true);
             }
-            ((TmfFilterCompareNode) node).setField(atts.getValue(TmfFilterCompareNode.FIELD_ATTR));
+            createEventAspect((TmfFilterAspectNode) node, atts);
             value = atts.getValue(TmfFilterCompareNode.TYPE_ATTR);
             if (value != null) {
                 ((TmfFilterCompareNode) node).setType(Type.valueOf(value));
@@ -220,4 +226,51 @@ public class TmfFilterContentHandler extends DefaultHandler {
 
     }
 
+    private static void createEventAspect(TmfFilterAspectNode node, Attributes atts) {
+        String traceTypeId = atts.getValue(TmfFilterAspectNode.TRACE_TYPE_ID_ATTR);
+        String name = atts.getValue(TmfFilterAspectNode.EVENT_ASPECT_ATTR);
+        if (TmfFilterAspectNode.BASE_ASPECT_ID.equals(traceTypeId)) {
+            for (ITmfEventAspect eventAspect : ITmfEventAspect.BASE_ASPECTS) {
+                if (eventAspect.getName().equals(name)) {
+                    node.setEventAspect(eventAspect);
+                    node.setTraceTypeId(traceTypeId);
+                    break;
+                }
+            }
+        } else if (TmfFilterAspectNode.EVENT_FIELD_ASPECT_ID.equals(traceTypeId) && name != null) {
+            ITmfEventAspect eventAspect = new TmfEventFieldAspect(name, name);
+            node.setEventAspect(eventAspect);
+            node.setTraceTypeId(traceTypeId);
+        } else if (traceTypeId != null && name != null) {
+            TraceTypeHelper helper = TmfTraceType.getTraceType(traceTypeId);
+            if (helper != null) {
+                for (ITmfEventAspect eventAspect : helper.getTrace().getEventAspects()) {
+                    if (eventAspect.getName().equals(name)) {
+                        node.setEventAspect(eventAspect);
+                        node.setTraceTypeId(traceTypeId);
+                        break;
+                    }
+                }
+            }
+        } else {
+            // Backward compatibility with field-based filters
+            String field = atts.getValue(FIELD_ATTR);
+            if (field != null) {
+                if (field.equals(EVENT_FIELD_TIMESTAMP)) {
+                    node.setEventAspect(ITmfEventAspect.BaseAspects.TIMESTAMP);
+                    node.setTraceTypeId(TmfFilterAspectNode.BASE_ASPECT_ID);
+                } else if (field.equals(EVENT_FIELD_TYPE)) {
+                    node.setEventAspect(ITmfEventAspect.BaseAspects.EVENT_TYPE);
+                    node.setTraceTypeId(TmfFilterAspectNode.BASE_ASPECT_ID);
+                } else if (field.equals(EVENT_FIELD_CONTENT)) {
+                    node.setEventAspect(ITmfEventAspect.BaseAspects.CONTENTS);
+                    node.setTraceTypeId(TmfFilterAspectNode.BASE_ASPECT_ID);
+                } else {
+                    ITmfEventAspect eventAspect = new TmfEventFieldAspect(field, field);
+                    node.setEventAspect(eventAspect);
+                    node.setTraceTypeId(TmfFilterAspectNode.EVENT_FIELD_ASPECT_ID);
+                }
+            }
+        }
+    }
 }

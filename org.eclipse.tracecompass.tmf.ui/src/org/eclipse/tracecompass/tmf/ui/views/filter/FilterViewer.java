@@ -14,13 +14,15 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.filter;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -60,30 +62,43 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
-import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfEventFieldAspect;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAndNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAspectNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode.Type;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterContainsNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEqualsNode;
-import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesFieldNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterOrNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterRootNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterTraceTypeNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterTreeNode;
-import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition;
-import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
-import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition;
-import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
 
 class FilterViewer extends Composite {
 
-    private static final String SEP = " : "; //$NON-NLS-1$
+    private static final String EVENT_FIELD = Messages.FilterViewer_EventField;
+
+    class AspectItem {
+        public String label;
+        public ITmfEventAspect eventAspect;
+        public String traceTypeId;
+
+        public AspectItem(String label) {
+            this.label = label;
+        }
+
+        public AspectItem(String label, ITmfEventAspect eventAspect, String traceTypeId) {
+            this.label = label;
+            this.eventAspect = eventAspect;
+            this.traceTypeId = traceTypeId;
+        }
+    }
 
     private TreeViewer fViewer;
 
@@ -230,8 +245,8 @@ class FilterViewer extends Composite {
                         newNode = new TmfFilterContainsNode(node);
                     } else if (TmfFilterEqualsNode.NODE_NAME.equals(child)) {
                         newNode = new TmfFilterEqualsNode(node);
-                    } else if (TmfFilterMatchesFieldNode.NODE_NAME.equals(child)) {
-                        newNode = new TmfFilterMatchesFieldNode(node);
+                    } else if (TmfFilterMatchesNode.NODE_NAME.equals(child)) {
+                        newNode = new TmfFilterMatchesNode(node);
                     } else if (TmfFilterCompareNode.NODE_NAME.equals(child)) {
                         newNode = new TmfFilterCompareNode(node);
                     }
@@ -270,8 +285,8 @@ class FilterViewer extends Composite {
             new FilterContainsNodeComposite(fComposite, (TmfFilterContainsNode) node);
         } else if (node instanceof TmfFilterEqualsNode) {
             new FilterEqualsNodeComposite(fComposite, (TmfFilterEqualsNode) node);
-        } else if (node instanceof TmfFilterMatchesFieldNode) {
-            new FilterMatchesNodeComposite(fComposite, (TmfFilterMatchesFieldNode) node);
+        } else if (node instanceof TmfFilterMatchesNode) {
+            new FilterMatchesNodeComposite(fComposite, (TmfFilterMatchesNode) node);
         } else if (node instanceof TmfFilterCompareNode) {
             new FilterCompareNodeComposite(fComposite, (TmfFilterCompareNode) node);
         } else {
@@ -364,81 +379,175 @@ class FilterViewer extends Composite {
             setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
         }
 
-        protected Map<String, Object> getEventsTypeMap() {
-            Map<String, Object> eventsTypeMap = new TreeMap<>();
-            for (IConfigurationElement ce : TmfTraceType.getTypeElements()) {
-                String categoryPrefix = ""; //$NON-NLS-1$
-                String categoryId = ce.getAttribute(TmfTraceType.CATEGORY_ATTR);
-                if (categoryId != null) {
-                    categoryPrefix = TmfTraceType.getCategoryName(categoryId) + SEP;
-                }
-                String text = categoryPrefix + ce.getAttribute(TmfTraceType.NAME_ATTR);
-                eventsTypeMap.put(text, ce);
-            }
-            for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
-                String text = def.categoryName + SEP + def.definitionName;
-                eventsTypeMap.put(text, def);
-            }
-            for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
-                String text = def.categoryName + SEP + def.definitionName;
-                eventsTypeMap.put(text, def);
-            }
-            return eventsTypeMap;
-        }
-
         protected Map<String, TraceTypeHelper> getTraceTypeMap() {
             Map<String, TraceTypeHelper> traceTypeMap = new TreeMap<>();
             for (TraceTypeHelper helper : TmfTraceType.getTraceTypeHelpers()) {
-                String text = helper.getCategoryName() + SEP + helper.getName();
-                traceTypeMap.put(text, helper);
+                if (!helper.isExperimentType()) {
+                    traceTypeMap.put(helper.getLabel(), helper);
+                }
             }
             return traceTypeMap;
         }
+    }
 
-        protected String[] getFieldsList() {
-            ArrayList<String> fieldsList = new ArrayList<>();
-            fieldsList.add(Messages.FilterViewer_CommonCategory);
-            fieldsList.add(ITmfEvent.EVENT_FIELD_TIMESTAMP);
-            fieldsList.add(ITmfEvent.EVENT_FIELD_SOURCE);
-            fieldsList.add(ITmfEvent.EVENT_FIELD_TYPE);
-            fieldsList.add(ITmfEvent.EVENT_FIELD_REFERENCE);
-            fieldsList.add(ITmfEvent.EVENT_FIELD_CONTENT);
-            fieldsList.add(""); //$NON-NLS-1$
+    private abstract class FilterAspectNodeComposite extends FilterBaseNodeComposite {
+        TmfFilterAspectNode fAspectNode;
+        Combo fCombo;
+        Label fFieldLabel;
+        Text fFieldText;
 
-            for (Entry<String, Object> eventTypeEntry : getEventsTypeMap().entrySet()) {
-                Object value = eventTypeEntry.getValue();
-                if (value instanceof IConfigurationElement) {
-                    IConfigurationElement ce = (IConfigurationElement) value;
-                    try {
-                        ITmfEvent event = (ITmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
-                        ITmfEventType eventType = event.getType();
-                        if (eventType != null && eventType.getFieldNames().size() > 0) {
-                            String categoryId = ce.getAttribute(TmfTraceType.CATEGORY_ATTR);
-                            if (categoryId != null) {
-                                fieldsList.add('[' + TmfTraceType.getCategoryName(categoryId) + SEP
-                                        + ce.getAttribute(TmfTraceType.NAME_ATTR) + ']');
-                            } else {
-                                fieldsList.add('[' + ce.getAttribute(TmfTraceType.NAME_ATTR) + ']');
-                            }
-                            for (String field : eventType.getFieldNames()) {
-                                fieldsList.add(field);
-                            }
-                            fieldsList.add(""); //$NON-NLS-1$
-                        }
-                    } catch (CoreException e) {
-                    }
-                } else if (value instanceof CustomTraceDefinition) {
-                    CustomTraceDefinition def = (CustomTraceDefinition) value;
-                    if (def.outputs.size() > 0) {
-                        fieldsList.add('[' + def.categoryName + SEP + def.definitionName + ']');
-                        for (OutputColumn output : def.outputs) {
-                            fieldsList.add(output.name);
-                        }
-                        fieldsList.add(""); //$NON-NLS-1$
+        FilterAspectNodeComposite(Composite parent, TmfFilterAspectNode node) {
+            super(parent);
+            fAspectNode = node;
+        }
+
+        protected void createAspectControls() {
+            Label label = new Label(this, SWT.NONE);
+            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+            label.setText(Messages.FilterViewer_AspectLabel);
+
+            final List<AspectItem> aspectList = getAspectList(fAspectNode);
+
+            fCombo = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
+            fCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+            for (AspectItem aspect : aspectList) {
+                fCombo.add(aspect.label);
+            }
+            if (fAspectNode.getEventAspect() != null) {
+                for (int i = 0; i < aspectList.size(); i++) {
+                    AspectItem aspect = aspectList.get(i);
+                    if (aspect.eventAspect != null &&
+                            fAspectNode.getEventAspect().getName().equals(aspect.eventAspect.getName()) &&
+                            (fAspectNode.getTraceTypeId().equals(aspect.traceTypeId) ||
+                                    fAspectNode.getTraceTypeId().equals(TmfFilterAspectNode.BASE_ASPECT_ID))) {
+                        fCombo.select(i);
+                        break;
                     }
                 }
+                if (fCombo.getSelectionIndex() == -1 && fAspectNode.getEventAspect() instanceof TmfEventFieldAspect) {
+                    int index = fCombo.indexOf(EVENT_FIELD);
+                    aspectList.get(index).eventAspect = fAspectNode.getEventAspect();
+                    fCombo.select(index);
+                }
             }
-            return fieldsList.toArray(new String[0]);
+            fCombo.addModifyListener(new ModifyListener() {
+                @Override
+                public void modifyText(ModifyEvent e) {
+                    AspectItem aspect = aspectList.get(fCombo.getSelectionIndex());
+                    fAspectNode.setEventAspect(aspect.eventAspect);
+                    fAspectNode.setTraceTypeId(aspect.traceTypeId);
+                    if (TmfFilterAspectNode.EVENT_FIELD_ASPECT_ID.equals(fAspectNode.getTraceTypeId())) {
+                        if (fFieldText == null) {
+                            createFieldControls((TmfEventFieldAspect) fAspectNode.getEventAspect(), aspect);
+                            layout();
+                        }
+                    } else if (fFieldLabel != null && fFieldText != null) {
+                        fFieldLabel.dispose();
+                        fFieldLabel = null;
+                        fFieldText.dispose();
+                        fFieldText = null;
+                        layout();
+                    }
+                    fViewer.refresh(fAspectNode);
+                }
+            });
+
+            if (TmfFilterAspectNode.EVENT_FIELD_ASPECT_ID.equals(fAspectNode.getTraceTypeId())) {
+                AspectItem aspect = aspectList.get(fCombo.indexOf(EVENT_FIELD));
+                createFieldControls((TmfEventFieldAspect) fAspectNode.getEventAspect(), aspect);
+            }
+        }
+
+        private void createFieldControls(TmfEventFieldAspect eventFieldAspect, final AspectItem aspect) {
+            fFieldLabel = new Label(this, SWT.NONE);
+            fFieldLabel.moveBelow(fCombo);
+            fFieldLabel.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+            fFieldLabel.setText(Messages.FilterViewer_FieldLabel);
+
+            fFieldText = new Text(this, SWT.BORDER);
+            fFieldText.moveBelow(fFieldLabel);
+            fFieldText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+            fFieldText.setToolTipText(Messages.FilterViewer_Subfield_ToolTip);
+            if (eventFieldAspect.getName().length() > 0) {
+                fFieldText.setText(eventFieldAspect.getName());
+            }
+            if (fFieldText.getText().length() == 0) {
+                fFieldText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+                fFieldText.setText(Messages.FilterViewer_FieldHint);
+            }
+            fFieldText.addFocusListener(new FocusListener() {
+                @Override
+                public void focusLost(FocusEvent e) {
+                    if (fFieldText.getText().length() == 0) {
+                        fFieldText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+                        fFieldText.setText(Messages.FilterViewer_FieldHint);
+                    }
+                }
+
+                @Override
+                public void focusGained(FocusEvent e) {
+                    if (fFieldText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
+                        fFieldText.setText(""); //$NON-NLS-1$
+                    }
+                    fFieldText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+                }
+            });
+            fFieldText.addModifyListener(new ModifyListener() {
+                @Override
+                public void modifyText(ModifyEvent e) {
+                    if (!fFieldText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
+                        if (fAspectNode.getEventAspect() instanceof TmfEventFieldAspect) {
+                            @NonNull String name = checkNotNull(fFieldText.getText());
+                            fAspectNode.setEventAspect(new TmfEventFieldAspect(name, name));
+                            aspect.eventAspect = fAspectNode.getEventAspect();
+                            fViewer.refresh(fAspectNode);
+                        }
+                    }
+                }
+            });
+        }
+
+        private List<AspectItem> getAspectList(ITmfFilterTreeNode node) {
+            ArrayList<AspectItem> aspectList = new ArrayList<>();
+
+            aspectList.add(new AspectItem(Messages.FilterViewer_CommonCategory));
+            aspectList.add(new AspectItem(EVENT_FIELD, new TmfEventFieldAspect("", ""), TmfFilterAspectNode.EVENT_FIELD_ASPECT_ID)); //$NON-NLS-1$ //$NON-NLS-2$
+            for (ITmfEventAspect aspect : ITmfEventAspect.BASE_ASPECTS) {
+                aspectList.add(new AspectItem(aspect.getName(), aspect, TmfFilterAspectNode.BASE_ASPECT_ID));
+            }
+
+            ITmfFilterTreeNode curNode = node;
+            while (curNode != null) {
+                if (curNode instanceof TmfFilterTraceTypeNode) {
+                    TmfFilterTraceTypeNode traceTypeNode = (TmfFilterTraceTypeNode) curNode;
+                    TraceTypeHelper helper = TmfTraceType.getTraceType(traceTypeNode.getTraceTypeId());
+                    if (helper != null) {
+                        aspectList.add(new AspectItem("")); //$NON-NLS-1$
+                        aspectList.add(new AspectItem('[' + traceTypeNode.getName() + ']'));
+                        for (ITmfEventAspect aspect : helper.getTrace().getEventAspects()) {
+                            for (AspectItem baseAspect : aspectList) {
+                                if (aspect.equals(baseAspect.eventAspect)) {
+                                    aspectList.remove(baseAspect);
+                                    break;
+                                }
+                            }
+                            aspectList.add(new AspectItem(aspect.getName(), aspect, helper.getTraceTypeId()));
+                        }
+                    }
+                    return aspectList;
+                }
+                curNode = curNode.getParent();
+            }
+
+            for (Entry<String, TraceTypeHelper> traceTypeEntry : getTraceTypeMap().entrySet()) {
+                TraceTypeHelper helper = traceTypeEntry.getValue();
+                aspectList.add(new AspectItem("")); //$NON-NLS-1$
+                aspectList.add(new AspectItem('[' + traceTypeEntry.getKey() + ']'));
+                for (ITmfEventAspect aspect : helper.getTrace().getEventAspects()) {
+                    aspectList.add(new AspectItem(aspect.getName(), aspect, helper.getTraceTypeId()));
+                }
+            }
+            return aspectList;
         }
     }
 
@@ -574,15 +683,14 @@ class FilterViewer extends Composite {
         }
     }
 
-    private class FilterContainsNodeComposite extends FilterBaseNodeComposite {
+    private class FilterContainsNodeComposite extends FilterAspectNodeComposite {
         TmfFilterContainsNode fNode;
         Button fNotButton;
-        Combo fFieldCombo;
         Text fValueText;
         Button fIgnoreCaseButton;
 
         FilterContainsNodeComposite(Composite parent, TmfFilterContainsNode node) {
-            super(parent);
+            super(parent, node);
             fNode = node;
 
             Label label = new Label(this, SWT.NONE);
@@ -600,24 +708,7 @@ class FilterViewer extends Composite {
                 }
             });
 
-            label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-            label.setText(Messages.FilterViewer_FieldLabel);
-
-            fFieldCombo = new Combo(this, SWT.DROP_DOWN);
-            fFieldCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-            fFieldCombo.setItems(getFieldsList());
-            fFieldCombo.setToolTipText(Messages.FilterViewer_Subfilter_ToolTip);
-            if (fNode.getField() != null) {
-                fFieldCombo.setText(fNode.getField());
-            }
-            fFieldCombo.addModifyListener(new ModifyListener() {
-                @Override
-                public void modifyText(ModifyEvent e) {
-                    fNode.setField(fFieldCombo.getText());
-                    fViewer.refresh(fNode);
-                }
-            });
+            createAspectControls();
 
             label = new Label(this, SWT.NONE);
             label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
@@ -675,15 +766,14 @@ class FilterViewer extends Composite {
         }
     }
 
-    private class FilterEqualsNodeComposite extends FilterBaseNodeComposite {
+    private class FilterEqualsNodeComposite extends FilterAspectNodeComposite {
         TmfFilterEqualsNode fNode;
         Button fNotButton;
-        Combo fFieldCombo;
         Text fValueText;
         Button fIgnoreCaseButton;
 
         FilterEqualsNodeComposite(Composite parent, TmfFilterEqualsNode node) {
-            super(parent);
+            super(parent, node);
             fNode = node;
 
             Label label = new Label(this, SWT.NONE);
@@ -701,24 +791,7 @@ class FilterViewer extends Composite {
                 }
             });
 
-            label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-            label.setText(Messages.FilterViewer_FieldLabel);
-
-            fFieldCombo = new Combo(this, SWT.DROP_DOWN);
-            fFieldCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-            fFieldCombo.setItems(getFieldsList());
-            fFieldCombo.setToolTipText(Messages.FilterViewer_Subfilter_ToolTip);
-            if (fNode.getField() != null) {
-                fFieldCombo.setText(fNode.getField());
-            }
-            fFieldCombo.addModifyListener(new ModifyListener() {
-                @Override
-                public void modifyText(ModifyEvent e) {
-                    fNode.setField(fFieldCombo.getText());
-                    fViewer.refresh(fNode);
-                }
-            });
+            createAspectControls();
 
             label = new Label(this, SWT.NONE);
             label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
@@ -776,14 +849,13 @@ class FilterViewer extends Composite {
         }
     }
 
-    private class FilterMatchesNodeComposite extends FilterBaseNodeComposite {
-        TmfFilterMatchesFieldNode fNode;
+    private class FilterMatchesNodeComposite extends FilterAspectNodeComposite {
+        TmfFilterMatchesNode fNode;
         Button fNotButton;
-        Combo fFieldCombo;
         Text fRegexText;
 
-        FilterMatchesNodeComposite(Composite parent, TmfFilterMatchesFieldNode node) {
-            super(parent);
+        FilterMatchesNodeComposite(Composite parent, TmfFilterMatchesNode node) {
+            super(parent, node);
             fNode = node;
 
             Label label = new Label(this, SWT.NONE);
@@ -801,24 +873,7 @@ class FilterViewer extends Composite {
                 }
             });
 
-            label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-            label.setText(Messages.FilterViewer_FieldLabel);
-
-            fFieldCombo = new Combo(this, SWT.DROP_DOWN);
-            fFieldCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-            fFieldCombo.setItems(getFieldsList());
-            fFieldCombo.setToolTipText(Messages.FilterViewer_Subfilter_ToolTip);
-            if (fNode.getField() != null) {
-                fFieldCombo.setText(fNode.getField());
-            }
-            fFieldCombo.addModifyListener(new ModifyListener() {
-                @Override
-                public void modifyText(ModifyEvent e) {
-                    fNode.setField(fFieldCombo.getText());
-                    fViewer.refresh(fNode);
-                }
-            });
+            createAspectControls();
 
             label = new Label(this, SWT.NONE);
             label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
@@ -861,10 +916,9 @@ class FilterViewer extends Composite {
         }
     }
 
-    private class FilterCompareNodeComposite extends FilterBaseNodeComposite {
+    private class FilterCompareNodeComposite extends FilterAspectNodeComposite {
         TmfFilterCompareNode fNode;
         Button fNotButton;
-        Combo fFieldCombo;
         Text fValueText;
         Button fLTButton;
         Button fEQButton;
@@ -874,7 +928,7 @@ class FilterViewer extends Composite {
         Button fTimestampButton;
 
         FilterCompareNodeComposite(Composite parent, TmfFilterCompareNode node) {
-            super(parent);
+            super(parent, node);
             fNode = node;
 
             Label label = new Label(this, SWT.NONE);
@@ -892,24 +946,7 @@ class FilterViewer extends Composite {
                 }
             });
 
-            label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-            label.setText(Messages.FilterViewer_FieldLabel);
-
-            fFieldCombo = new Combo(this, SWT.DROP_DOWN);
-            fFieldCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-            fFieldCombo.setItems(getFieldsList());
-            fFieldCombo.setToolTipText(Messages.FilterViewer_Subfilter_ToolTip);
-            if (fNode.getField() != null) {
-                fFieldCombo.setText(fNode.getField());
-            }
-            fFieldCombo.addModifyListener(new ModifyListener() {
-                @Override
-                public void modifyText(ModifyEvent e) {
-                    fNode.setField(fFieldCombo.getText());
-                    fViewer.refresh(fNode);
-                }
-            });
+            createAspectControls();
 
             label = new Label(this, SWT.NONE);
             label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
