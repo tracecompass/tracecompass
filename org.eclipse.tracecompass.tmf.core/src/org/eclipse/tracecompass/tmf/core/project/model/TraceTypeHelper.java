@@ -30,6 +30,8 @@ import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
  */
 public class TraceTypeHelper {
 
+    private static final String SEP = " : "; //$NON-NLS-1$
+
     private final String fName;
     private final String fCategoryName;
     private final String fTraceTypeId;
@@ -81,6 +83,18 @@ public class TraceTypeHelper {
      */
     public String getCategoryName() {
         return fCategoryName;
+    }
+
+    /**
+     * Get the trace type label "category : name".
+     *
+     * @return the trace type label
+     */
+    public String getLabel() {
+        if (fCategoryName.isEmpty()) {
+            return fName;
+        }
+        return fCategoryName + SEP + fName;
     }
 
     /**

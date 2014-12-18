@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
@@ -109,6 +110,9 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
 
     // The resource used for persistent properties for this trace
     private IResource fResource;
+
+    // The trace type id
+    private @Nullable String fTraceTypeId;
 
     // The trace path
     private String fPath;
@@ -210,11 +214,12 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
     // ------------------------------------------------------------------------
 
     @Override
-    public void initTrace(final IResource resource, final String path, final Class<? extends ITmfEvent> type, String name) throws TmfTraceException {
+    public void initTrace(final IResource resource, final String path, final Class<? extends ITmfEvent> type, String name, String traceTypeId) throws TmfTraceException {
         if (name == null) {
             throw new IllegalArgumentException();
         }
         setName(name);
+        fTraceTypeId = traceTypeId;
         initTrace(resource, path, type);
     }
 
@@ -359,6 +364,11 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
     @Override
     public IResource getResource() {
         return fResource;
+    }
+
+    @Override
+    public @Nullable String getTraceTypeId() {
+        return fTraceTypeId;
     }
 
     @Override

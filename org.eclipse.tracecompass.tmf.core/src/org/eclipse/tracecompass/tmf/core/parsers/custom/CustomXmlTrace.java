@@ -35,7 +35,6 @@ import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfPersistentlyIndexable;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
@@ -60,7 +59,7 @@ import org.xml.sax.SAXParseException;
  * @author Patrick Tassé
  * @since 3.0
  */
-public class CustomXmlTrace extends TmfTrace implements ITmfPersistentlyIndexable {
+public class CustomXmlTrace extends CustomTrace implements ITmfPersistentlyIndexable {
 
     private static final TmfLongLocation NULL_LOCATION = new TmfLongLocation(-1L);
     private static final int DEFAULT_CACHE_SIZE = 100;
@@ -79,6 +78,7 @@ public class CustomXmlTrace extends TmfTrace implements ITmfPersistentlyIndexabl
      *            Trace definition
      */
     public CustomXmlTrace(final CustomXmlTraceDefinition definition) {
+        super(definition);
         fDefinition = definition;
         fEventType = new CustomXmlEventType(fDefinition);
         fRecordInputElement = getRecordInputElement(fDefinition.rootInputElement);

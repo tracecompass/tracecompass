@@ -518,7 +518,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
             if (getTraceType() != null) {
                 TraceTypeHelper helper = TmfTraceType.getTraceType(getTraceType());
                 if (helper != null) {
-                    return helper.getCategoryName() + " : " + helper.getName(); //$NON-NLS-1$
+                    return helper.getLabel();
                 }
             }
             return ""; //$NON-NLS-1$

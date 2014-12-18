@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson and others.
+ * Copyright (c) 2009, 2015 Ericsson and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -138,7 +138,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     private static final String IMPORT_WIZARD_IMPORT_UNRECOGNIZED_ID = ".import_unrecognized_traces_id"; //$NON-NLS-1$
     private static final String IMPORT_WIZARD_PRESERVE_FOLDERS_ID = ".import_preserve_folders_id"; //$NON-NLS-1$
     private static final String IMPORT_WIZARD_IMPORT_FROM_DIRECTORY_ID = ".import_from_directory"; //$NON-NLS-1$
-    private static final String SEPARATOR = ":"; //$NON-NLS-1$
 
     // constant from WizardArchiveFileResourceImportPage1
     private static final String[] FILE_IMPORT_MASK = { "*.jar;*.zip;*.tar;*.tar.gz;*.tgz", "*.*" }; //$NON-NLS-1$ //$NON-NLS-2$
@@ -1262,14 +1261,10 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
      * @return <code>true</code> if successful else <code>false</code>
      */
     public boolean finish() {
-        String traceTypeName = getImportTraceTypeId();
+        String traceTypeLabel = getImportTraceTypeId();
         String traceId = null;
-        if (!TRACE_TYPE_AUTO_DETECT.equals(traceTypeName)) {
-            String tokens[] = traceTypeName.split(SEPARATOR, 2);
-            if (tokens.length < 2) {
-                return false;
-            }
-            traceId = TmfTraceType.getTraceTypeId(tokens[0], tokens[1]);
+        if (!TRACE_TYPE_AUTO_DETECT.equals(traceTypeLabel)) {
+            traceId = TmfTraceType.getTraceTypeId(traceTypeLabel);
         }
 
         // Save dialog settings

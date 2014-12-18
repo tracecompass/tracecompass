@@ -173,10 +173,12 @@ public interface ITmfTrace extends ITmfEventProvider {
      *            the trace event type
      * @param name
      *            the trace name
+     * @param traceTypeId
+     *            the trace type id
      * @throws TmfTraceException
      *             If we couldn't open the trace
      */
-    void initTrace(IResource resource, String path, Class<? extends ITmfEvent> type, String name) throws TmfTraceException;
+    void initTrace(IResource resource, String path, Class<? extends ITmfEvent> type, String name, String traceTypeId) throws TmfTraceException;
 
     /**
      * Validate that the trace is of the correct type. The implementation should
@@ -210,6 +212,13 @@ public interface ITmfTrace extends ITmfEventProvider {
      * @return the associated trace resource
      */
     IResource getResource();
+
+    /**
+     * Get the trace type id
+     *
+     * @return the trace type id
+     */
+    @Nullable String getTraceTypeId();
 
     /**
      * @return the trace path

@@ -36,7 +36,6 @@ import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfPersistentlyIndexable;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
@@ -52,7 +51,7 @@ import org.eclipse.tracecompass.tmf.core.trace.location.TmfLongLocation;
  * @author Patrick Tassé
  * @since 3.0
  */
-public class CustomTxtTrace extends TmfTrace implements ITmfPersistentlyIndexable {
+public class CustomTxtTrace extends CustomTrace implements ITmfPersistentlyIndexable {
 
     private static final TmfLongLocation NULL_LOCATION = new TmfLongLocation(-1L);
     private static final int DEFAULT_CACHE_SIZE = 100;
@@ -70,6 +69,7 @@ public class CustomTxtTrace extends TmfTrace implements ITmfPersistentlyIndexabl
      *            Text trace definition
      */
     public CustomTxtTrace(final CustomTxtTraceDefinition definition) {
+        super(definition);
         fDefinition = definition;
         fEventType = new CustomTxtEventType(fDefinition);
         setCacheSize(DEFAULT_CACHE_SIZE);

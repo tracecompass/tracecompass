@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Yuriy Vashchuk - Initial API and implementation
+ *   Patrick Tasse - Update filter nodes
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.ui.views.filter;
@@ -20,10 +21,10 @@ import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode.Type;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterContainsNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEqualsNode;
-import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEventTypeNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesFieldNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterOrNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterTraceTypeNode;
 
 /**
  * This is the Label Provider for our Filter Tree
@@ -69,9 +70,9 @@ public class FilterTreeLabelProvider implements ILabelProvider {
             TmfFilterNode node = (TmfFilterNode) element;
             label = node.getNodeName() + " " + node.getFilterName(); //$NON-NLS-1$
 
-        } else if (element instanceof TmfFilterEventTypeNode) {
+        } else if (element instanceof TmfFilterTraceTypeNode) {
 
-            TmfFilterEventTypeNode node = (TmfFilterEventTypeNode) element;
+            TmfFilterTraceTypeNode node = (TmfFilterTraceTypeNode) element;
             label = "WITH " + node.getNodeName() + (node.getName() != null ? " " + node.getName() : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
         } else if (element instanceof TmfFilterAndNode) {

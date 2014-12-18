@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -68,19 +68,18 @@ import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode.Type;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterContainsNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEqualsNode;
-import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEventTypeNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesFieldNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterOrNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterRootNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterTraceTypeNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterTreeNode;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
-import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtEvent;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition;
-import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlEvent;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
+import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
 
 class FilterViewer extends Composite {
 
@@ -221,8 +220,8 @@ class FilterViewer extends Composite {
                     ITmfFilterTreeNode newNode = null;
                     if (TmfFilterNode.NODE_NAME.equals(child)) {
                         newNode = new TmfFilterNode(node, ""); //$NON-NLS-1$
-                    } else if (TmfFilterEventTypeNode.NODE_NAME.equals(child)) {
-                        newNode = new TmfFilterEventTypeNode(node);
+                    } else if (TmfFilterTraceTypeNode.NODE_NAME.equals(child)) {
+                        newNode = new TmfFilterTraceTypeNode(node);
                     } else if (TmfFilterAndNode.NODE_NAME.equals(child)) {
                         newNode = new TmfFilterAndNode(node);
                     } else if (TmfFilterOrNode.NODE_NAME.equals(child)) {
@@ -261,8 +260,8 @@ class FilterViewer extends Composite {
 
         if (node instanceof TmfFilterNode) {
             new FilterNodeComposite(fComposite, (TmfFilterNode) node);
-        } else if (node instanceof TmfFilterEventTypeNode) {
-            new FilterEventTypeNodeComposite(fComposite, (TmfFilterEventTypeNode) node);
+        } else if (node instanceof TmfFilterTraceTypeNode) {
+            new FilterTraceTypeNodeComposite(fComposite, (TmfFilterTraceTypeNode) node);
         } else if (node instanceof TmfFilterAndNode) {
             new FilterAndNodeComposite(fComposite, (TmfFilterAndNode) node);
         } else if (node instanceof TmfFilterOrNode) {
@@ -387,58 +386,17 @@ class FilterViewer extends Composite {
             return eventsTypeMap;
         }
 
-        protected String[] getFieldsList(ITmfFilterTreeNode node) {
-            ArrayList<String> fieldsList = new ArrayList<>();
-            ITmfFilterTreeNode curNode = node;
-            while (curNode != null) {
-                if (curNode instanceof TmfFilterEventTypeNode) {
-                    TmfFilterEventTypeNode eventTypeNode = (TmfFilterEventTypeNode) curNode;
-                    for (IConfigurationElement ce : TmfTraceType.getTypeElements()) {
-                        if (ce.getAttribute(TmfTraceType.EVENT_TYPE_ATTR).equals(eventTypeNode.getEventType())) {
-                            try {
-                                ITmfEvent event = (ITmfEvent) ce.createExecutableExtension(TmfTraceType.EVENT_TYPE_ATTR);
-                                ITmfEventType eventType = event.getType();
-                                if (eventType != null) {
-                                    for (String field : eventType.getRootField().getFieldNames()) {
-                                        fieldsList.add(field);
-                                    }
-                                }
-                            } catch (CoreException e) {
-                            }
-                            if (fieldsList.size() == 0) {
-                                fieldsList.add(ITmfEvent.EVENT_FIELD_TIMESTAMP);
-                                fieldsList.add(ITmfEvent.EVENT_FIELD_SOURCE);
-                                fieldsList.add(ITmfEvent.EVENT_FIELD_TYPE);
-                                fieldsList.add(ITmfEvent.EVENT_FIELD_REFERENCE);
-                                fieldsList.add(ITmfEvent.EVENT_FIELD_CONTENT);
-                            }
-                            return fieldsList.toArray(new String[0]);
-                        }
-                    }
-                    if (eventTypeNode.getEventType() != null && eventTypeNode.getEventType().startsWith(CustomTxtEvent.class.getCanonicalName())) {
-                        for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
-                            if (eventTypeNode.getEventType().equals(CustomTxtEvent.class.getCanonicalName() + ':' + def.categoryName + ':' + def.definitionName)) {
-                                for (OutputColumn output : def.outputs) {
-                                    fieldsList.add(output.name);
-                                }
-                                return fieldsList.toArray(new String[0]);
-                            }
-                        }
-                    }
-                    if (eventTypeNode.getEventType() != null && eventTypeNode.getEventType().startsWith(CustomXmlEvent.class.getCanonicalName())) {
-                        for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
-                            if (eventTypeNode.getEventType().equals(CustomXmlEvent.class.getCanonicalName() + ':' + def.categoryName + ':' + def.definitionName)) {
-                                for (OutputColumn output : def.outputs) {
-                                    fieldsList.add(output.name);
-                                }
-                                return fieldsList.toArray(new String[0]);
-                            }
-                        }
-                    }
-                }
-                curNode = curNode.getParent();
+        protected Map<String, TraceTypeHelper> getTraceTypeMap() {
+            Map<String, TraceTypeHelper> traceTypeMap = new TreeMap<>();
+            for (TraceTypeHelper helper : TmfTraceType.getTraceTypeHelpers()) {
+                String text = helper.getCategoryName() + SEP + helper.getName();
+                traceTypeMap.put(text, helper);
             }
+            return traceTypeMap;
+        }
 
+        protected String[] getFieldsList() {
+            ArrayList<String> fieldsList = new ArrayList<>();
             fieldsList.add(Messages.FilterViewer_CommonCategory);
             fieldsList.add(ITmfEvent.EVENT_FIELD_TIMESTAMP);
             fieldsList.add(ITmfEvent.EVENT_FIELD_SOURCE);
@@ -533,15 +491,15 @@ class FilterViewer extends Composite {
         }
     }
 
-    private class FilterEventTypeNodeComposite extends FilterBaseNodeComposite {
-        TmfFilterEventTypeNode fNode;
+    private class FilterTraceTypeNodeComposite extends FilterBaseNodeComposite {
+        TmfFilterTraceTypeNode fNode;
         Combo fTypeCombo;
-        Map<String, Object> fEventsTypeMap;
+        Map<String, TraceTypeHelper> fTraceTypeMap;
 
-        FilterEventTypeNodeComposite(Composite parent, TmfFilterEventTypeNode node) {
+        FilterTraceTypeNodeComposite(Composite parent, TmfFilterTraceTypeNode node) {
             super(parent);
             fNode = node;
-            fEventsTypeMap = getEventsTypeMap();
+            fTraceTypeMap = getTraceTypeMap();
 
             Label label = new Label(this, SWT.NONE);
             label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
@@ -549,39 +507,18 @@ class FilterViewer extends Composite {
 
             fTypeCombo = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
             fTypeCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-            fTypeCombo.setItems(fEventsTypeMap.keySet().toArray(new String[0]));
-            if (fNode.getEventType() != null) {
+            fTypeCombo.setItems(fTraceTypeMap.keySet().toArray(new String[0]));
+            if (fNode.getTraceTypeId() != null) {
                 fTypeCombo.setText(fNode.getName());
             }
             fTypeCombo.addModifyListener(new ModifyListener() {
                 @Override
                 public void modifyText(ModifyEvent e) {
-                    for (Entry<String, Object> eventTypeEntry : fEventsTypeMap.entrySet()) {
-                        if (eventTypeEntry.getKey().equals(fTypeCombo.getText())) {
-                            Object value = eventTypeEntry.getValue();
-                            if (value instanceof IConfigurationElement) {
-                                IConfigurationElement ce = (IConfigurationElement) value;
-                                fNode.setEventType(ce.getAttribute(TmfTraceType.EVENT_TYPE_ATTR));
-                                String categoryId = ce.getAttribute(TmfTraceType.CATEGORY_ATTR);
-                                if (categoryId != null) {
-                                    fNode.setName(TmfTraceType.getCategoryName(categoryId) + SEP
-                                            + ce.getAttribute(TmfTraceType.NAME_ATTR));
-                                } else {
-                                    fNode.setName(ce.getAttribute(TmfTraceType.NAME_ATTR));
-                                }
-                            } else if (value instanceof CustomTxtTraceDefinition) {
-                                CustomTxtTraceDefinition def = (CustomTxtTraceDefinition) value;
-                                fNode.setEventType(CustomTxtEvent.class.getCanonicalName() + ':' + def.categoryName + ':' + def.definitionName);
-                                fNode.setName(def.categoryName + SEP + def.definitionName);
-                            } else if (value instanceof CustomXmlTraceDefinition) {
-                                CustomXmlTraceDefinition def = (CustomXmlTraceDefinition) value;
-                                fNode.setEventType(CustomXmlEvent.class.getCanonicalName() + ':' + def.categoryName + ':' + def.definitionName);
-                                fNode.setName(def.categoryName + SEP + def.definitionName);
-                            }
-                            fViewer.refresh(fNode);
-                            break;
-                        }
-                    }
+                    TraceTypeHelper helper = fTraceTypeMap.get(fTypeCombo.getText());
+                    fNode.setTraceTypeId(helper.getTraceTypeId());
+                    fNode.setTraceClass(helper.getTraceClass());
+                    fNode.setName(fTypeCombo.getText());
+                    fViewer.refresh(fNode);
                 }
             });
         }
@@ -669,7 +606,7 @@ class FilterViewer extends Composite {
 
             fFieldCombo = new Combo(this, SWT.DROP_DOWN);
             fFieldCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-            fFieldCombo.setItems(getFieldsList(fNode));
+            fFieldCombo.setItems(getFieldsList());
             fFieldCombo.setToolTipText(Messages.FilterViewer_Subfilter_ToolTip);
             if (fNode.getField() != null) {
                 fFieldCombo.setText(fNode.getField());
@@ -770,7 +707,7 @@ class FilterViewer extends Composite {
 
             fFieldCombo = new Combo(this, SWT.DROP_DOWN);
             fFieldCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-            fFieldCombo.setItems(getFieldsList(fNode));
+            fFieldCombo.setItems(getFieldsList());
             fFieldCombo.setToolTipText(Messages.FilterViewer_Subfilter_ToolTip);
             if (fNode.getField() != null) {
                 fFieldCombo.setText(fNode.getField());
@@ -870,7 +807,7 @@ class FilterViewer extends Composite {
 
             fFieldCombo = new Combo(this, SWT.DROP_DOWN);
             fFieldCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-            fFieldCombo.setItems(getFieldsList(fNode));
+            fFieldCombo.setItems(getFieldsList());
             fFieldCombo.setToolTipText(Messages.FilterViewer_Subfilter_ToolTip);
             if (fNode.getField() != null) {
                 fFieldCombo.setText(fNode.getField());
@@ -961,7 +898,7 @@ class FilterViewer extends Composite {
 
             fFieldCombo = new Combo(this, SWT.DROP_DOWN);
             fFieldCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-            fFieldCombo.setItems(getFieldsList(fNode));
+            fFieldCombo.setItems(getFieldsList());
             fFieldCombo.setToolTipText(Messages.FilterViewer_Subfilter_ToolTip);
             if (fNode.getField() != null) {
                 fFieldCombo.setText(fNode.getField());

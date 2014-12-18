@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -16,65 +16,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
- * Filter node for an event
+ * Filter node for an trace type
  *
  * @version 1.0
  * @author Patrick Tasse
  */
 @SuppressWarnings("javadoc")
-public class TmfFilterEventTypeNode extends TmfFilterTreeNode {
+public class TmfFilterTraceTypeNode extends TmfFilterTreeNode {
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + ((fName == null) ? 0 : fName.hashCode());
-        result = prime * result + ((fType == null) ? 0 : fType.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        TmfFilterEventTypeNode other = (TmfFilterEventTypeNode) obj;
-        if (fName == null) {
-            if (other.fName != null) {
-                return false;
-            }
-        } else if (!fName.equals(other.fName)) {
-            return false;
-        }
-        if (fType == null) {
-            if (other.fType != null) {
-                return false;
-            }
-        } else if (!fType.equals(other.fType)) {
-            return false;
-        }
-        return true;
-    }
-
-    public static final String NODE_NAME = "EVENTTYPE"; //$NON-NLS-1$
+    public static final String NODE_NAME = "TRACETYPE"; //$NON-NLS-1$
     public static final String TYPE_ATTR = "type"; //$NON-NLS-1$
     public static final String NAME_ATTR = "name"; //$NON-NLS-1$
 
-    private String fType;
+    private String fTraceTypeId;
+    private Class<? extends ITmfTrace> fTraceClass;
     private String fName;
 
     /**
      * @param parent the parent node
      */
-    public TmfFilterEventTypeNode(ITmfFilterTreeNode parent) {
+    public TmfFilterTraceTypeNode(ITmfFilterTreeNode parent) {
         super(parent);
     }
 
@@ -84,17 +48,31 @@ public class TmfFilterEventTypeNode extends TmfFilterTreeNode {
     }
 
     /**
-     * @return the event type
+     * @return the trace type id
      */
-    public String getEventType() {
-        return fType;
+    public String getTraceTypeId() {
+        return fTraceTypeId;
     }
 
     /**
-     * @param type the event type
+     * @param traceTypeId the trace type id
      */
-    public void setEventType(String type) {
-        this.fType = type;
+    public void setTraceTypeId(String traceTypeId) {
+        this.fTraceTypeId = traceTypeId;
+    }
+
+    /**
+     * @return the trace class
+     */
+    public Class<? extends ITmfTrace> getTraceClass() {
+        return fTraceClass;
+    }
+
+    /**
+     * @param traceClass the trace class
+     */
+    public void setTraceClass(Class<? extends ITmfTrace> traceClass) {
+        this.fTraceClass = traceClass;
     }
 
     /**
@@ -114,15 +92,13 @@ public class TmfFilterEventTypeNode extends TmfFilterTreeNode {
     @Override
     public boolean matches(ITmfEvent event) {
         boolean match = false;
-        if (fType.contains(":")) { //$NON-NLS-1$
-            // special case for custom parsers
-            if (fType.startsWith(event.getClass().getCanonicalName())) {
-                if (fType.endsWith(event.getType().getName())) {
+        ITmfTrace trace = event.getTrace();
+        if (trace.getClass().equals(fTraceClass)) {
+            if (fTraceTypeId != null) {
+                if (fTraceTypeId.equals(trace.getTraceTypeId())) {
                     match = true;
                 }
-            }
-        } else {
-            if (event.getClass().getCanonicalName().equals(fType)) {
+            } else {
                 match = true;
             }
         }
@@ -149,7 +125,7 @@ public class TmfFilterEventTypeNode extends TmfFilterTreeNode {
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
-        buf.append("EventType is " + fName); //$NON-NLS-1$
+        buf.append("TraceType is " + fName); //$NON-NLS-1$
         if (getChildrenCount() > 0) {
             buf.append(" and "); //$NON-NLS-1$
         }
@@ -167,5 +143,43 @@ public class TmfFilterEventTypeNode extends TmfFilterTreeNode {
             buf.append(" )"); //$NON-NLS-1$
         }
         return buf.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((fName == null) ? 0 : fName.hashCode());
+        result = prime * result + ((fTraceTypeId == null) ? 0 : fTraceTypeId.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        TmfFilterTraceTypeNode other = (TmfFilterTraceTypeNode) obj;
+        if (fName == null) {
+            if (other.fName != null) {
+                return false;
+            }
+        } else if (!fName.equals(other.fName)) {
+            return false;
+        }
+        if (fTraceTypeId == null) {
+            if (other.fTraceTypeId != null) {
+                return false;
+            }
+        } else if (!fTraceTypeId.equals(other.fTraceTypeId)) {
+            return false;
+        }
+        return true;
     }
 }

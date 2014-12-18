@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Yuriy Vashchuk (yvashchuk@gmail.com) - Initial API and implementation
+ *   Patrick Tasse - Update filter nodes
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.core.filter.xml;
@@ -29,11 +30,11 @@ import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAndNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterContainsNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEqualsNode;
-import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEventTypeNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesFieldNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterOrNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterTraceTypeNode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -83,11 +84,11 @@ public class TmfFilterXMLWriter {
             TmfFilterNode node = (TmfFilterNode) treenode;
             element.setAttribute(TmfFilterNode.NAME_ATTR, node.getFilterName());
 
-        } else if (treenode instanceof TmfFilterEventTypeNode) {
+        } else if (treenode instanceof TmfFilterTraceTypeNode) {
 
-            TmfFilterEventTypeNode node = (TmfFilterEventTypeNode) treenode;
-            element.setAttribute(TmfFilterEventTypeNode.TYPE_ATTR, node.getEventType());
-            element.setAttribute(TmfFilterEventTypeNode.NAME_ATTR, node.getName());
+            TmfFilterTraceTypeNode node = (TmfFilterTraceTypeNode) treenode;
+            element.setAttribute(TmfFilterTraceTypeNode.TYPE_ATTR, node.getTraceTypeId());
+            element.setAttribute(TmfFilterTraceTypeNode.NAME_ATTR, node.getName());
 
         } else if (treenode instanceof TmfFilterAndNode) {
 
