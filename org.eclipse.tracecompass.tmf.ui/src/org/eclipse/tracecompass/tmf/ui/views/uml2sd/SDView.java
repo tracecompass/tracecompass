@@ -23,6 +23,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.commands.ActionHandler;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -68,10 +69,14 @@ import org.eclipse.tracecompass.tmf.ui.views.uml2sd.load.IUml2SDLoader;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.load.LoadersManager;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.util.Messages;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.handlers.IHandlerActivation;
+import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.views.properties.IPropertySheetPage;
 
@@ -83,7 +88,7 @@ import org.eclipse.ui.views.properties.IPropertySheetPage;
  * @version 1.0
  * @author sveyrier
  */
-public class SDView extends ViewPart {
+public class SDView extends ViewPart implements IPartListener {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -201,6 +206,12 @@ public class SDView extends ViewPart {
     private Zoom fNoZoomAction;
     private Zoom fZoomInAction;
     private Zoom fZoomOutAction;
+    private ActionHandler fPrintActionHandler;
+    /**
+     * Keeping this allows to deactivate the action when the view is
+     * deactivated.
+     */
+    private IHandlerActivation fPrintHandlerActivation;
 
     // ------------------------------------------------------------------------
     // Methods
@@ -235,8 +246,8 @@ public class SDView extends ViewPart {
         fTimeCompressionBar.setVisible(false);
         parent.layout(true);
 
-        Print print = new Print(this);
-        getViewSite().getActionBars().setGlobalActionHandler(ActionFactory.PRINT.getId(), print);
+        fPrintActionHandler = new ActionHandler(new Print(this));
+        getSite().getPage().addPartListener(this);
 
         fNeedInit = restoreLoader();
     }
@@ -266,6 +277,7 @@ public class SDView extends ViewPart {
     public void dispose() {
         KeyBindingsManager.getInstance().remove(this.getSite().getId());
         disposeZoomActions();
+        fPrintActionHandler.dispose();
         super.dispose();
     }
 
@@ -1177,5 +1189,33 @@ public class SDView extends ViewPart {
         @Override
         public void dispose() {
         }
+    }
+
+    @Override
+    public void partActivated(IWorkbenchPart part) {
+        if (part == this) {
+            final IHandlerService hs = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
+            fPrintHandlerActivation = hs.activateHandler(ActionFactory.PRINT.getCommandId(), fPrintActionHandler);
+        }
+    }
+
+    @Override
+    public void partBroughtToTop(IWorkbenchPart part) {
+    }
+
+    @Override
+    public void partClosed(IWorkbenchPart part) {
+    }
+
+    @Override
+    public void partDeactivated(IWorkbenchPart part) {
+        if (part == this && fPrintHandlerActivation != null) {
+            final IHandlerService hs = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
+            hs.deactivateHandler(fPrintHandlerActivation);
+        }
+    }
+
+    @Override
+    public void partOpened(IWorkbenchPart part) {
     }
 }
