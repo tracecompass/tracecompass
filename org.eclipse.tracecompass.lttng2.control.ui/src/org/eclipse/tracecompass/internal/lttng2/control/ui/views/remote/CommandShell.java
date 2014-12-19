@@ -208,7 +208,7 @@ public class CommandShell implements ICommandShell {
         }
 
         String[] output = splitLines(stdout);
-        String[] error = result == 0 ? null : splitLines(stderr);
+        String[] error = splitLines(stderr);
         return new CommandResult(result, output, error);
     }
 
