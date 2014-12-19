@@ -42,7 +42,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.ScrollBar;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Slider;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
@@ -79,6 +80,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     private static final long RECENTERING_MARGIN_FACTOR = 50;
     private static final String HIDE_ARROWS_KEY = "hide.arrows"; //$NON-NLS-1$
     private static final long DEFAULT_FREQUENCY = 1000000000L;
+    private static final int H_SCROLLBAR_MAX = Integer.MAX_VALUE - 1;
 
     private long fMinTimeInterval;
     private ITimeGraphEntry fSelectedEntry;
@@ -100,6 +102,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
     private TimeGraphControl fTimeGraphCtrl;
     private TimeGraphScale fTimeScaleCtrl;
+    private Slider fHorizontalScrollBar;
     private Slider fVerticalScrollBar;
     private TimeGraphColorScheme fColorScheme;
     private Object fInputElement;
@@ -206,7 +209,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
         if (fTimeGraphCtrl != null) {
             setTimeRange(input);
-            fVerticalScrollBar.setEnabled(true);
             setTopIndex(0);
             fSelectionBegin = 0;
             fSelectionEnd = 0;
@@ -245,7 +247,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     public void refresh() {
         ITimeGraphEntry[] input = fTimeGraphContentProvider.getElements(fInputElement);
         setTimeRange(input);
-        fVerticalScrollBar.setEnabled(true);
         refreshAllData(input);
     }
 
@@ -369,14 +370,13 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
                 setTopIndex(fVerticalScrollBar.getSelection());
             }
         });
-        fVerticalScrollBar.setEnabled(false);
 
         fTimeGraphCtrl = createTimeGraphControl(fDataViewer, fColorScheme);
 
         fTimeGraphCtrl.setTimeProvider(this);
         fTimeGraphCtrl.setTimeGraphScale(fTimeScaleCtrl);
         fTimeGraphCtrl.addSelectionListener(this);
-        fTimeGraphCtrl.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 2));
+        fTimeGraphCtrl.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         fTimeGraphCtrl.addMouseWheelListener(new MouseWheelListener() {
             @Override
             public void mouseScrolled(MouseEvent e) {
@@ -395,9 +395,48 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             }
         });
 
+        fHorizontalScrollBar = new Slider(fDataViewer, SWT.HORIZONTAL | SWT.NO_FOCUS);
+        fHorizontalScrollBar.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
+        fHorizontalScrollBar.addListener(SWT.MouseWheel, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                if ((event.stateMask & SWT.MODIFIER_MASK) == SWT.CTRL) {
+                    getTimeGraphControl().zoom(event.count > 0);
+                } else {
+                    getTimeGraphControl().horizontalScroll(event.count > 0);
+                }
+                // don't handle the immediately following SWT.Selection event
+                event.doit = false;
+            }
+        });
+        fHorizontalScrollBar.addListener(SWT.Selection, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                int start = fHorizontalScrollBar.getSelection();
+                long time0 = getTime0();
+                long time1 = getTime1();
+                long timeMin = getMinTime();
+                long timeMax = getMaxTime();
+                long delta = timeMax - timeMin;
+
+                long range = time1 - time0;
+                time0 = timeMin + Math.round(delta * ((double) start / H_SCROLLBAR_MAX));
+                time1 = time0 + range;
+
+                // TODO: Follow-up with Bug 310310
+                // In Linux SWT.DRAG is the only value received
+                // https://bugs.eclipse.org/bugs/show_bug.cgi?id=310310
+                if (event.detail == SWT.DRAG) {
+                    setStartFinishTime(time0, time1);
+                } else {
+                    setStartFinishTimeNotify(time0, time1);
+                }
+            }
+        });
+
         Composite filler = new Composite(fDataViewer, SWT.NONE);
         GridData gd = new GridData(SWT.DEFAULT, SWT.DEFAULT, false, false);
-        gd.heightHint = fTimeGraphCtrl.getHorizontalBar().getSize().y;
+        gd.heightHint = fHorizontalScrollBar.getSize().y;
         filler.setLayoutData(gd);
         filler.setLayout(new FillLayout());
 
@@ -409,6 +448,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         });
         resizeControls();
         fDataViewer.update();
+        adjustHorizontalScrollBar();
         adjustVerticalScrollBar();
         return fDataViewer;
     }
@@ -454,6 +494,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         if (fNameWidth < fMinNameWidth) {
             fNameWidth = fMinNameWidth;
         }
+        adjustHorizontalScrollBar();
         adjustVerticalScrollBar();
     }
 
@@ -612,7 +653,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         if (fNameWidth < MIN_NAME_WIDTH) {
             fNameWidth = MIN_NAME_WIDTH;
         }
-        fTimeGraphCtrl.adjustScrolls();
         fTimeGraphCtrl.redraw();
         fTimeScaleCtrl.redraw();
     }
@@ -690,7 +730,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             fTime1 = Math.min(fTime1Bound, fTime0 + fMinTimeInterval);
         }
         fTimeRangeFixed = true;
-        fTimeGraphCtrl.adjustScrolls();
+        adjustHorizontalScrollBar();
         fTimeGraphCtrl.redraw();
         fTimeScaleCtrl.redraw();
     }
@@ -715,7 +755,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             fTime0Bound = 0;
             fTime1Bound = 0;
         }
-        fTimeGraphCtrl.adjustScrolls();
+        adjustHorizontalScrollBar();
     }
 
     @Override
@@ -786,7 +826,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         if (fTime1 - fTime0 < fMinTimeInterval) {
             fTime1 = Math.min(fTime1Bound, fTime0 + fMinTimeInterval);
         }
-        fTimeGraphCtrl.adjustScrolls();
+        adjustHorizontalScrollBar();
         fTimeGraphCtrl.redraw();
         fTimeScaleCtrl.redraw();
 
@@ -1283,8 +1323,8 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      *
      * @return The scroll bar
      */
-    public ScrollBar getHorizontalBar() {
-        return fTimeGraphCtrl.getHorizontalBar();
+    public Slider getHorizontalBar() {
+        return fHorizontalScrollBar;
     }
 
     /**
@@ -1684,6 +1724,23 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             }
         }
         return fFollowArrowBwdAction;
+    }
+
+    private void adjustHorizontalScrollBar() {
+        long time0 = getTime0();
+        long time1 = getTime1();
+        long timeMin = getMinTime();
+        long timeMax = getMaxTime();
+        long delta = timeMax - timeMin;
+        int timePos = 0;
+        int thumb = H_SCROLLBAR_MAX;
+        if (delta != 0) {
+            // Thumb size (page size)
+            thumb = Math.max(1, (int) (H_SCROLLBAR_MAX * ((double) (time1 - time0) / delta)));
+            // At the beginning of visible window
+            timePos = (int) (H_SCROLLBAR_MAX * ((double) (time0 - timeMin) / delta));
+        }
+        fHorizontalScrollBar.setValues(timePos, 0, H_SCROLLBAR_MAX, thumb, Math.max(1, thumb / 2), Math.max(2, thumb));
     }
 
     private void adjustVerticalScrollBar() {
