@@ -12,6 +12,8 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote;
 
+import java.util.List;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -48,6 +50,6 @@ public interface ICommandShell {
      * @throws ExecutionException
      *             If the command fails
      */
-    ICommandResult executeCommand(String command,
+    ICommandResult executeCommand(List<String> command,
             IProgressMonitor monitor) throws ExecutionException;
 }

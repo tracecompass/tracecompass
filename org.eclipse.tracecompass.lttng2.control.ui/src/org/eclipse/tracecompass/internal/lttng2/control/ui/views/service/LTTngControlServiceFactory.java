@@ -12,6 +12,8 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -76,12 +78,19 @@ public class LTTngControlServiceFactory {
     public ILttngControlService getLttngControlService(ICommandShell shell) throws ExecutionException {
         // get the version
         boolean machineInterfaceMode = true;
-        String command = LTTngControlServiceConstants.CONTROL_COMMAND + LTTngControlServiceConstants.COMMAND_VERSION;
-        String commandMi = LTTngControlServiceConstants.CONTROL_COMMAND_MI_XML + LTTngControlServiceConstants.COMMAND_VERSION;
+        List<String> command = new ArrayList<>();
+        command.add(LTTngControlServiceConstants.CONTROL_COMMAND);
+        command.add(LTTngControlServiceConstants.COMMAND_VERSION);
+
+        List<String> commandMi = new ArrayList<>();
+        commandMi.add(LTTngControlServiceConstants.CONTROL_COMMAND);
+        commandMi.add(LTTngControlServiceConstants.CONTROL_COMMAND_MI_OPTION);
+        commandMi.add(LTTngControlServiceConstants.CONTROL_COMMAND_MI_XML);
+        commandMi.add(LTTngControlServiceConstants.COMMAND_VERSION);
 
         // Logging
         if (ControlPreferences.getInstance().isLoggingEnabled()) {
-            ControlCommandLogger.log(commandMi);
+            ControlCommandLogger.log(LTTngControlService.toCommandString(commandMi));
         }
 
         ICommandResult result = null;
@@ -104,7 +113,7 @@ public class LTTngControlServiceFactory {
 
             // Logging
             if (ControlPreferences.getInstance().isLoggingEnabled()) {
-                ControlCommandLogger.log(command);
+                ControlCommandLogger.log(LTTngControlService.toCommandString(command));
             }
 
             try {
