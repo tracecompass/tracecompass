@@ -218,7 +218,7 @@ public class TmfCoalescedEventRequest extends TmfEventRequest {
             // Populate requests cache
             requests = new HashSet<>();
             for (ITmfEventRequest myRequest : fRequests) {
-                if (myRequest.getEventProvider().providesEvent(data)) {
+                if (myRequest.getProviderFilter().matches(data)) {
                     requests.add(myRequest);
                 }
             }

@@ -130,15 +130,4 @@ public interface ITmfEventProvider extends ITmfComponent {
      * @return number of children
      */
     int getNbChildren();
-
-    /**
-     * Returns true if an event was provided by this event provider or one of
-     * its children event providers else false.
-     *
-     * @param event
-     *            the event to check
-     * @return <code>true</code> if event was provided by this provider or one
-     *         of its children else <code>false</code>
-     */
-    boolean providesEvent(ITmfEvent event);
 }

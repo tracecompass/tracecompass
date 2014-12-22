@@ -14,8 +14,8 @@
 package org.eclipse.tracecompass.tmf.core.request;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 
 /**
@@ -29,12 +29,18 @@ public interface ITmfEventRequest {
     // Constants
     // ------------------------------------------------------------------------
 
-    /** The request count for all the events
-     * @since 3.0*/
+    /**
+     * The request count for all the events
+     *
+     * @since 3.0
+     */
     static final int ALL_DATA = Integer.MAX_VALUE;
 
-    /** The request execution type/priority
-     * @since 3.0*/
+    /**
+     * The request execution type/priority
+     *
+     * @since 3.0
+     */
     enum ExecutionType {
         /**
          * Backgroung, long-running, lower priority request
@@ -87,19 +93,19 @@ public interface ITmfEventRequest {
     TmfTimeRange getRange();
 
     /**
-     * @return the event provider that the request is sent initially.
-     * @since 3.0
+     * @return the event provider filter to verify if an event is provided by
+     *         the relevant event provider.
      */
-    ITmfEventProvider getEventProvider();
+    ITmfFilter getProviderFilter();
 
     /**
-     * Sets the event provider that the request is sent initially.
+     * Sets a provider filter to verify if an event is provided by the relevant
+     * event provider.
      *
-     * @param provider
-     *            event provider to set
-     * @since 3.0
+     * @param filter
+     *            event provider filter to set
      */
-    void setEventProvider(ITmfEventProvider provider);
+    void setProviderFilter(ITmfFilter filter);
 
     // ------------------------------------------------------------------------
     // Request state predicates
