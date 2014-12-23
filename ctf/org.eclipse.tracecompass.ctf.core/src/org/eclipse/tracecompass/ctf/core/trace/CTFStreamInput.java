@@ -62,6 +62,11 @@ public class CTFStreamInput implements IDefinitionScope {
     private final File fFile;
 
     /**
+     * The file name
+     */
+    private final String fFileName;
+
+    /**
      * The packet index of this input
      */
     private final StreamInputPacketIndex fIndex;
@@ -98,6 +103,12 @@ public class CTFStreamInput implements IDefinitionScope {
     public CTFStreamInput(CTFStream stream, File file) {
         fStream = stream;
         fFile = file;
+        String name = fFile.getName();
+        if (name == null) {
+            throw new IllegalStateException("File cannot have a null name"); //$NON-NLS-1$
+        }
+        fFileName = name;
+
         fIndex = new StreamInputPacketIndex();
         /*
          * Create the definitions we need to read the packet headers + contexts
@@ -144,11 +155,7 @@ public class CTFStreamInput implements IDefinitionScope {
      * @return the filename of the streaminput file.
      */
     public String getFilename() {
-        String name = fFile.getName();
-        if (name == null) {
-            throw new IllegalStateException("File cannot have a null name"); //$NON-NLS-1$
-        }
-        return name;
+        return fFileName;
     }
 
     /**
