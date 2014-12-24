@@ -106,8 +106,8 @@ public class TsTransformFactoryTest {
      */
     @Test
     public void testToString() {
-        final String expectedLinear = "TmfTimestampLinear [ slope = 314.0, offset = 0.0 ]";
-        final String expectedLinearBigDec = "TmfTimestampLinear [ slope = 314, offset = 0 ]";
+        final String expectedLinear = "TmfTimestampTransformLinearFast [ slope = 314.0, offset = 0.0 ]";
+        final String expectedLinearBigDec = "TmfTimestampTransformLinearFast [ slope = 314, offset = 0 ]";
         final String expectedOffset = "TmfConstantTransform [ offset = 314 ]";
         final String expectedIdentity = "TmfTimestampTransform [ IDENTITY ]";
         final String expectedOffset100 = "TmfConstantTransform [ offset = 100 ]";

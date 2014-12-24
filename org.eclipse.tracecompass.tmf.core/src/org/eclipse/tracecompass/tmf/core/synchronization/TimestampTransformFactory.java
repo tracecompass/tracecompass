@@ -24,7 +24,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.synchronization.TmfConstantTransform;
 import org.eclipse.tracecompass.internal.tmf.core.synchronization.TmfTimestampTransform;
-import org.eclipse.tracecompass.internal.tmf.core.synchronization.TmfTimestampTransformLinear;
+import org.eclipse.tracecompass.internal.tmf.core.synchronization.TmfTimestampTransformLinearFast;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 
@@ -93,7 +93,7 @@ public final class TimestampTransformFactory {
         if (factor == 1.0) {
             return createWithOffset(offset);
         }
-        return new TmfTimestampTransformLinear(factor, offset.normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
+        return new TmfTimestampTransformLinearFast(factor, offset.normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
     }
 
     /**
@@ -111,7 +111,7 @@ public final class TimestampTransformFactory {
         if (factor == 1.0) {
             return createWithOffset(offset);
         }
-        return new TmfTimestampTransformLinear(factor, offset);
+        return new TmfTimestampTransformLinearFast(factor, offset);
     }
 
     /**
@@ -130,7 +130,7 @@ public final class TimestampTransformFactory {
         if (factor.equals(BigDecimal.ONE)) {
             return createWithOffset(offset.longValueExact());
         }
-        return new TmfTimestampTransformLinear(factor, offset);
+        return new TmfTimestampTransformLinearFast(factor, offset);
     }
 
     /**

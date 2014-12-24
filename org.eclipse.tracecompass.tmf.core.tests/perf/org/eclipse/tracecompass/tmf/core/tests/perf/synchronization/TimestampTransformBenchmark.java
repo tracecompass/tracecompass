@@ -15,8 +15,11 @@ package org.eclipse.tracecompass.tmf.core.tests.perf.synchronization;
 import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
+import org.eclipse.tracecompass.internal.tmf.core.synchronization.TmfTimestampTransformLinear;
+import org.eclipse.tracecompass.internal.tmf.core.synchronization.TmfTimestampTransformLinearFast;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.tracecompass.tmf.core.synchronization.TimestampTransformFactory;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -48,6 +51,24 @@ public class TimestampTransformBenchmark {
 
         transform = TimestampTransformFactory.createLinear(10000.1234545565635, -4312278758437L);
         doTimestampTransformRun("Linear transform with larger slope and negative offset", transform, 5);
+    }
+
+    /**
+     * Benchmark to compare the classic and fast timestamp transform.
+     *
+     * Ignore when running automatically, just for local benchmarks.
+     */
+    @Ignore
+    @Test
+    public void testCompareTimestampTransformPerformance() {
+        /*
+         * We call constructors directly instead of TimestampTransformFactory to
+         * create properly each transform type.
+         */
+        ITmfTimestampTransform classic = new TmfTimestampTransformLinear(Math.PI, 1234);
+        ITmfTimestampTransform fast = new TmfTimestampTransformLinearFast(Math.PI, 1234);
+        doTimestampTransformRun("Linear transform classic", classic, 5);
+        doTimestampTransformRun("Linear transform fast", fast, 5);
     }
 
     private static void doTimestampTransformRun(String testName, ITmfTimestampTransform xform, long loopCount) {

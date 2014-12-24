@@ -22,6 +22,8 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({ TsTransformTest.class,
         SyncTest.class,
         TsTransformFactoryTest.class,
+        TsTransformTest.class,
+        TsTransformFastTest.class,
         TimeOffsetTest.class })
 public class AllTests {
 

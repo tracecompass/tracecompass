@@ -69,7 +69,7 @@ public class ExperimentSyncTest {
             trace1.setTimestampTransform(tt1);
             trace2.setTimestampTransform(tt2);
 
-            assertEquals("TmfTimestampLinear [ slope = 0.9999413783703139011056845831168394, offset = 79796507913179.33347660124688298171 ]", tt1.toString());
+            assertEquals("TmfTimestampTransformLinearFast [ slope = 0.9999413783703139011056845831168394, offset = 79796507913179.33347660124688298171 ]", tt1.toString());
             assertEquals(TimestampTransformFactory.getDefaultTransform(), tt2);
 
             assertEquals(syncAlgo.getTimestampTransform(trace1.getHostId()), trace1.getTimestampTransform());
@@ -104,8 +104,8 @@ public class ExperimentSyncTest {
             trace3.setTimestampTransform(tt3);
 
             assertEquals(TimestampTransformFactory.getDefaultTransform(), tt1);
-            assertEquals("TmfTimestampLinear [ slope = 0.9999996313017589597204633828681240, offset = 498490309972.0038068817738527724192 ]", tt2.toString());
-            assertEquals("TmfTimestampLinear [ slope = 1.000000119014882262265342419815932, offset = -166652893534.6189900382736187431134 ]", tt3.toString());
+            assertEquals("TmfTimestampTransformLinearFast [ slope = 0.9999996313017589597204633828681240, offset = 498490309972.0038068817738527724192 ]", tt2.toString());
+            assertEquals("TmfTimestampTransformLinearFast [ slope = 1.000000119014882262265342419815932, offset = -166652893534.6189900382736187431134 ]", tt3.toString());
 
         }
     }

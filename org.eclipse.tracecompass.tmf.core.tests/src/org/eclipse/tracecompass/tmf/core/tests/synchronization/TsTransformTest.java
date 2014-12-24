@@ -12,7 +12,9 @@
 
 package org.eclipse.tracecompass.tmf.core.tests.synchronization;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -33,8 +35,8 @@ import org.junit.Test;
 @SuppressWarnings("nls")
 public class TsTransformTest {
 
-    private long ts = 1361657893526374091L;
-    private ITmfTimestamp oTs = new TmfTimestamp(ts);
+    private static final long ts = 1361657893526374091L;
+    private static final ITmfTimestamp oTs = new TmfTimestamp(ts);
 
     /**
      * Test the linear transform
@@ -141,4 +143,5 @@ public class TsTransformTest {
         assertEquals(312, tc1.transform(t));
 
     }
+
 }

@@ -45,12 +45,14 @@ public interface ITmfTimestampTransform extends Serializable {
 
     /**
      * Returns a timestamp transform that is the composition of two timestamp
-     * transforms.
+     * transforms. Composed objects must be the same type.
      *
      * @param composeWith
      *            The transform to first apply on the timestamp before applying
      *            the current object
      * @return A new timestamp transform object with the resulting composition.
+     *
+     * TODO: allow composition of different transform types.
      */
     ITmfTimestampTransform composeWith(ITmfTimestampTransform composeWith);
 

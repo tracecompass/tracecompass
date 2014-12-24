@@ -107,7 +107,9 @@ public class TmfTimestampTransformLinear implements ITmfTimestampTransformInvert
             TmfTimestampTransformLinear ttl = (TmfTimestampTransformLinear) composeWith;
             BigDecimal newAlpha = fAlpha.multiply(ttl.fAlpha, fMc);
             BigDecimal newBeta = fAlpha.multiply(ttl.fBeta, fMc).add(fBeta);
-            return TimestampTransformFactory.createLinear(newAlpha, newBeta);
+            /* Don't use the factory to make sure any further composition will
+             * be performed on the same object type */
+            return new TmfTimestampTransformLinear(newAlpha, newBeta);
         } else {
             /*
              * We do not know what to do with this kind of transform, just
@@ -147,4 +149,17 @@ public class TmfTimestampTransformLinear implements ITmfTimestampTransformInvert
         return TimestampTransformFactory.createLinear(BigDecimal.ONE.divide(fAlpha, fMc), BigDecimal.valueOf(-1).multiply(fBeta).divide(fAlpha, fMc));
     }
 
+    /**
+     * @return the slope alpha
+     */
+    public BigDecimal getAlpha() {
+        return fAlpha;
+    }
+
+    /**
+     * @return the offset beta
+     */
+    public BigDecimal getBeta() {
+        return fBeta;
+    }
 }
