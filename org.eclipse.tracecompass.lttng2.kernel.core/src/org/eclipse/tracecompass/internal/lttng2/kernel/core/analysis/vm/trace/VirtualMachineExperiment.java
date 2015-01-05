@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.trace;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.Collections;
 import java.util.Set;
 
@@ -30,9 +32,8 @@ public class VirtualMachineExperiment extends TmfExperiment {
     /**
      * Default constructor. Needed by the extension point.
      */
-    @SuppressWarnings("null")
     public VirtualMachineExperiment() {
-        this("default", Collections.EMPTY_SET); //$NON-NLS-1$
+        this("default", checkNotNull(Collections.EMPTY_SET)); //$NON-NLS-1$
     }
 
     /**
