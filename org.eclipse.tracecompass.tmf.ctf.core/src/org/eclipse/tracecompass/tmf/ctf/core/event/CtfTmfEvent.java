@@ -69,6 +69,8 @@ public class CtfTmfEvent extends TmfEvent
     /** Lazy-loaded field containing the event's payload */
     private ITmfEventField fContent;
 
+    private CtfTmfEventType fCtfTmfEventType;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -90,8 +92,7 @@ public class CtfTmfEvent extends TmfEvent
                  * Content handled with a lazy-loaded field re-implemented in
                  * getContent().
                  */
-                null
-        );
+                null);
 
         fEventDeclaration = declaration;
         fSourceCPU = cpu;
@@ -180,13 +181,16 @@ public class CtfTmfEvent extends TmfEvent
 
     @Override
     public ITmfEventType getType() {
-        CtfTmfEventType ctfTmfEventType = new CtfTmfEventType(fEventName, getContent());
+        if (fCtfTmfEventType == null) {
+            fCtfTmfEventType = new CtfTmfEventType(fEventName, getContent());
 
-        /* Register the event type in the owning trace, but only if there is one */
-        CtfTmfTrace trace = getTrace();
-        trace.registerEventType(ctfTmfEventType);
-
-        return ctfTmfEventType;
+            /*
+             * Register the event type in the owning trace, but only if there is
+             * one
+             */
+            getTrace().registerEventType(fCtfTmfEventType);
+        }
+        return fCtfTmfEventType;
     }
 
     /**
