@@ -13,7 +13,7 @@
 package org.eclipse.tracecompass.tmf.core.event.matching;
 
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching.MatchingType;
+import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching.Direction;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -46,10 +46,13 @@ public interface ITmfMatchEventDefinition {
     boolean canMatchTrace(ITmfTrace trace);
 
     /**
-     * Return all matching types this definition covers
+     * Returns the direction of this event, whether 'send', 'receive' or null if
+     * event is neither
      *
-     * @return an array of matching types
+     * @param event
+     *            The event to check
+     * @return The direction of this event, null if uninteresting event
      */
-    MatchingType[] getApplicableMatchingTypes();
+    Direction getDirection(ITmfEvent event);
 
 }

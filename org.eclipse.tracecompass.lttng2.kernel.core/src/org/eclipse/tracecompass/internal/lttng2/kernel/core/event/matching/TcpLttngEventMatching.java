@@ -21,10 +21,9 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.matching.IEventMatchingKey;
-import org.eclipse.tracecompass.tmf.core.event.matching.ITmfNetworkMatchDefinition;
+import org.eclipse.tracecompass.tmf.core.event.matching.ITmfMatchEventDefinition;
 import org.eclipse.tracecompass.tmf.core.event.matching.TcpEventKey;
-import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching.MatchingType;
-import org.eclipse.tracecompass.tmf.core.event.matching.TmfNetworkEventMatching.Direction;
+import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching.Direction;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceWithPreDefinedEvents;
 import org.eclipse.tracecompass.tmf.core.trace.TmfEventTypeCollectionHelper;
@@ -41,7 +40,7 @@ import com.google.common.collect.ImmutableSet;
  *
  * @author Geneviève Bastien
  */
-public class TcpLttngEventMatching implements ITmfNetworkMatchDefinition {
+public class TcpLttngEventMatching implements ITmfMatchEventDefinition {
 
     private static final @NonNull String[] KEY_SEQ = { TcpEventStrings.TRANSPORT_FIELDS, TcpEventStrings.TYPE_TCP, TcpEventStrings.SEQ };
     private static final @NonNull String[] KEY_ACKSEQ = { TcpEventStrings.TRANSPORT_FIELDS, TcpEventStrings.TYPE_TCP, TcpEventStrings.ACKSEQ };
@@ -80,17 +79,11 @@ public class TcpLttngEventMatching implements ITmfNetworkMatchDefinition {
 
         /* Is the event a tcp socket in or out event */
         if (evname.equals(TcpEventStrings.NETIF_RECEIVE_SKB) && canMatchPacket(event)) {
-            return Direction.IN;
+            return Direction.CAUSE;
         } else if (evname.equals(TcpEventStrings.NET_DEV_QUEUE) && canMatchPacket(event)) {
-            return Direction.OUT;
+            return Direction.EFFECT;
         }
         return null;
-    }
-
-    @Override
-    public MatchingType[] getApplicableMatchingTypes() {
-        MatchingType[] types = { MatchingType.NETWORK };
-        return types;
     }
 
     @Override

@@ -19,7 +19,7 @@ import java.util.Collection;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
 import org.eclipse.tracecompass.tmf.core.event.matching.ITmfEventMatching;
-import org.eclipse.tracecompass.tmf.core.event.matching.TmfNetworkEventMatching;
+import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -118,7 +118,7 @@ public abstract class SynchronizationManager extends TmfComponent {
     }
 
     private static SynchronizationAlgorithm synchronize(final File syncFile, final Collection<ITmfTrace> traces, SynchronizationAlgorithm syncAlgo) {
-        ITmfEventMatching matching = new TmfNetworkEventMatching(traces, syncAlgo);
+        ITmfEventMatching matching = new TmfEventMatching(traces, syncAlgo);
         matching.matchEvents();
 
         SynchronizationBackend syncBackend;

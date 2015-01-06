@@ -18,10 +18,9 @@ import org.eclipse.tracecompass.internal.lttng2.kernel.core.TcpEventStrings;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.matching.IEventMatchingKey;
-import org.eclipse.tracecompass.tmf.core.event.matching.ITmfNetworkMatchDefinition;
+import org.eclipse.tracecompass.tmf.core.event.matching.ITmfMatchEventDefinition;
 import org.eclipse.tracecompass.tmf.core.event.matching.TcpEventKey;
-import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching.MatchingType;
-import org.eclipse.tracecompass.tmf.core.event.matching.TmfNetworkEventMatching.Direction;
+import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching.Direction;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceWithPreDefinedEvents;
 import org.eclipse.tracecompass.tmf.core.trace.TmfEventTypeCollectionHelper;
@@ -39,7 +38,7 @@ import com.google.common.collect.ImmutableSet;
  *
  * @author Geneviève Bastien
  */
-public class TcpEventMatching implements ITmfNetworkMatchDefinition {
+public class TcpEventMatching implements ITmfMatchEventDefinition {
 
     private static final ImmutableSet<String> REQUIRED_EVENTS = ImmutableSet.of(
             TcpEventStrings.INET_SOCK_LOCAL_IN,
@@ -65,9 +64,9 @@ public class TcpEventMatching implements ITmfNetworkMatchDefinition {
 
         /* Is the event a tcp socket in or out event */
         if (evname.equals(TcpEventStrings.INET_SOCK_LOCAL_IN)) {
-            return Direction.IN;
+            return Direction.CAUSE;
         } else if (evname.equals(TcpEventStrings.INET_SOCK_LOCAL_OUT)) {
-            return Direction.OUT;
+            return Direction.EFFECT;
         }
         return null;
     }
@@ -90,12 +89,6 @@ public class TcpEventMatching implements ITmfNetworkMatchDefinition {
         Set<String> traceEvents = TmfEventTypeCollectionHelper.getEventNames(ktrace.getContainedEventTypes());
         traceEvents.retainAll(REQUIRED_EVENTS);
         return !traceEvents.isEmpty();
-    }
-
-    @Override
-    public MatchingType[] getApplicableMatchingTypes() {
-        MatchingType[] types = { MatchingType.NETWORK };
-        return types;
     }
 
 }

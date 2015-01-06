@@ -22,7 +22,6 @@ import org.eclipse.test.performance.PerformanceMeter;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpEventMatching;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpLttngEventMatching;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching;
-import org.eclipse.tracecompass.tmf.core.event.matching.TmfNetworkEventMatching;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
@@ -89,7 +88,7 @@ public class EventMatchingBenchmark {
         perf.tagAsSummary(pm, TEST_SUMMARY + ':' + testName + TIME, Dimension.CPU_TIME);
 
         for (int i = 0; i < loop_count; i++) {
-            TmfNetworkEventMatching traceMatch = new TmfNetworkEventMatching(testTraces);
+            TmfEventMatching traceMatch = new TmfEventMatching(testTraces);
 
             pm.start();
             traceMatch.matchEvents();
@@ -106,7 +105,7 @@ public class EventMatchingBenchmark {
         perf.tagAsSummary(pm, TEST_SUMMARY + ':' + testName + MEMORY, Dimension.USED_JAVA_HEAP);
 
         for (int i = 0; i < loop_count; i++) {
-            TmfNetworkEventMatching traceMatch = new TmfNetworkEventMatching(testTraces);
+            TmfEventMatching traceMatch = new TmfEventMatching(testTraces);
 
             System.gc();
             pm.start();
