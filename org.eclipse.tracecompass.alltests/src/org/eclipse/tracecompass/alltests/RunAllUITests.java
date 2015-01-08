@@ -22,7 +22,6 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     org.eclipse.tracecompass.gdbtrace.ui.tests.AllGdbTraceUITests.class,
     org.eclipse.tracecompass.lttng2.control.ui.tests.AllTests.class,
-    org.eclipse.tracecompass.lttng2.kernel.ui.tests.AllTests.class,
     org.eclipse.tracecompass.lttng2.ust.ui.tests.AllTests.class,
     org.eclipse.tracecompass.tmf.analysis.xml.ui.tests.AllAnalysisXmlUiTests.class,
     org.eclipse.tracecompass.tmf.ui.tests.AllTmfUITests.class,
