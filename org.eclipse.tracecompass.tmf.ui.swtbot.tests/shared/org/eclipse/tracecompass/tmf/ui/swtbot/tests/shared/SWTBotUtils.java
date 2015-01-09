@@ -10,7 +10,7 @@
  *   Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.swtbot.tests;
+package org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -43,7 +43,6 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.conditions.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.views.TracingPerspectiveFactory;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -58,7 +57,10 @@ import org.hamcrest.Matcher;
  *
  * @author Matthew Khouzam
  */
-public abstract class SWTBotUtil {
+public final class SWTBotUtils {
+
+    private SWTBotUtils() {}
+
     private static final String TRACING_PERSPECTIVE_ID = TracingPerspectiveFactory.ID;
 
     /**
@@ -102,7 +104,7 @@ public abstract class SWTBotUtil {
             }
         });
 
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.waitForJobs();
     }
 
     /**
@@ -116,13 +118,13 @@ public abstract class SWTBotUtil {
     public static void deleteProject(String projectName, SWTWorkbenchBot bot) {
         // Wait for any analysis to complete because it might create
         // supplementary files
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.waitForJobs();
         try {
             ResourcesPlugin.getWorkspace().getRoot().getProject(projectName).refreshLocal(IResource.DEPTH_INFINITE, null);
         } catch (CoreException e) {
         }
 
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.waitForJobs();
 
         final SWTBotView projectViewBot = bot.viewById(IPageLayout.ID_PROJECT_EXPLORER);
         projectViewBot.setFocus();
@@ -141,7 +143,7 @@ public abstract class SWTBotUtil {
         bot.waitUntil(Conditions.widgetIsEnabled(okButton));
         okButton.click();
 
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.waitForJobs();
     }
 
     /**
@@ -289,8 +291,8 @@ public abstract class SWTBotUtil {
             }
         });
 
-        SWTBotUtil.waitForJobs();
-        SWTBotUtil.delay(1000);
+        SWTBotUtils.waitForJobs();
+        SWTBotUtils.delay(1000);
         assertNotNull(tmfEd);
         return editorBot;
     }
@@ -329,8 +331,8 @@ public abstract class SWTBotUtil {
             currentNode = newNode;
         }
 
-        SWTBotUtil.delay(1000);
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.delay(1000);
+        SWTBotUtils.waitForJobs();
         final String expectedTitle = elementPath.toString();
 
         final IEditorPart iep[] = new IEditorPart[1];

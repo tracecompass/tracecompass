@@ -30,8 +30,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.BatchImportTraceWizard;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.SWTBotUtil;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.conditions.ConditionHelpers;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -61,14 +61,14 @@ public class ImportAndReadSmokeTest extends AbstractImportAndReadSmokeTest {
         batchImportSelectTrace();
         importFinish();
 
-        TmfEventsEditor tmfEd = SWTBotUtil.openEditor(fBot, getProjectName(), new Path(TRACE_NAME));
+        TmfEventsEditor tmfEd = SWTBotUtils.openEditor(fBot, getProjectName(), new Path(TRACE_NAME));
 
         testHistogramView(getViewPart("Histogram"), tmfEd);
         testPropertyView(getViewPart("Properties"));
         testStatisticsView(getViewPart("Statistics"));
         fBot.closeAllEditors();
 
-        SWTBotUtil.deleteProject(getProjectName(), fBot);
+        SWTBotUtils.deleteProject(getProjectName(), fBot);
     }
 
     private static void batchImportOpenWizard() {

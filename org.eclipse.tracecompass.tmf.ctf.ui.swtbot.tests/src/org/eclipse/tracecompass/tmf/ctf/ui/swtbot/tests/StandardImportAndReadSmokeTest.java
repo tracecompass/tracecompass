@@ -49,8 +49,8 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.SWTBotUtil;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.conditions.ConditionHelpers;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -150,14 +150,14 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         importFinish();
 
         checkOptions(options);
-        TmfEventsEditor tmfEd = SWTBotUtil.openEditor(fBot, getProjectName(), getTraceElementPath(options));
+        TmfEventsEditor tmfEd = SWTBotUtils.openEditor(fBot, getProjectName(), getTraceElementPath(options));
         if (testViews) {
             testViews(tmfEd);
         }
 
         fBot.closeAllEditors();
 
-        SWTBotUtil.deleteProject(getProjectName(), fBot);
+        SWTBotUtils.deleteProject(getProjectName(), fBot);
     }
 
     private void testViews(TmfEventsEditor editor) {

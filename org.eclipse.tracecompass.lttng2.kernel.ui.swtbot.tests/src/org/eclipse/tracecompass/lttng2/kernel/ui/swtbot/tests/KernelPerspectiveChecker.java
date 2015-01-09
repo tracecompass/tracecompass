@@ -17,9 +17,9 @@ import java.util.Arrays;
 
 import org.eclipse.tracecompass.analysis.os.linux.ui.views.controlflow.ControlFlowView;
 import org.eclipse.tracecompass.analysis.os.linux.ui.views.resources.ResourcesView;
-import org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.PerspectiveFactory;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.AbstractPerspectiveChecker;
+import org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.PerspectiveFactory;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.AbstractPerspectiveChecker;
 import org.eclipse.tracecompass.tmf.ui.views.histogram.HistogramView;
 import org.eclipse.tracecompass.tmf.ui.views.statistics.TmfStatisticsView;
 import org.eclipse.ui.IPageLayout;

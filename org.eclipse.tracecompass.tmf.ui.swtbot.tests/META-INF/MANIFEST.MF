@@ -7,8 +7,6 @@ Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.tmf.ui.swtbot.tests;singleton:=true
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Export-Package: org.eclipse.tracecompass.tmf.ui.swtbot.tests,
- org.eclipse.tracecompass.tmf.ui.swtbot.tests.conditions
 Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.core.resources,
  org.eclipse.core.runtime,
@@ -32,3 +30,5 @@ Import-Package: org.apache.log4j,
  org.eclipse.swtbot.swt.finder.utils,
  org.eclipse.swtbot.swt.finder.waits,
  org.eclipse.swtbot.swt.finder.widgets
+Export-Package: org.eclipse.tracecompass.tmf.ui.swtbot.tests,
+ org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared

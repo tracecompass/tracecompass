@@ -10,7 +10,7 @@
  *   Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.swtbot.tests;
+package org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -55,14 +55,14 @@ public abstract class AbstractPerspectiveChecker {
     /** Test Class setup */
     @BeforeClass
     public static void beforeInit() {
-        SWTBotUtil.failIfUIThread();
+        SWTBotUtils.failIfUIThread();
 
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 50000; /* 50 second timeout */
         fLogger.addAppender(new NullAppender());
         fBot = new SWTWorkbenchBot();
 
-        SWTBotUtil.closeView("welcome", fBot);
+        SWTBotUtils.closeView("welcome", fBot);
 
     }
 
@@ -72,8 +72,8 @@ public abstract class AbstractPerspectiveChecker {
      */
     @Test
     public void testPerspectiveForViews() {
-        SWTBotUtil.switchToPerspective(fPerspectiveId);
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.switchToPerspective(fPerspectiveId);
+        SWTBotUtils.waitForJobs();
         for (final String viewID : fViewIds) {
             List<SWTBotView> view = fBot.views(new BaseMatcher<String>() {
 
@@ -101,8 +101,8 @@ public abstract class AbstractPerspectiveChecker {
      */
     @Test
     public void testPerspectiveComplete() {
-        SWTBotUtil.switchToPerspective(fPerspectiveId);
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.switchToPerspective(fPerspectiveId);
+        SWTBotUtils.waitForJobs();
         for (SWTBotView view : fBot.views()) {
             assertTrue("view " + view.toString() + "is present", fViewIds.contains(view.getViewReference().getId()));
         }

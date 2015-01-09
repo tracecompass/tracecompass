@@ -33,7 +33,7 @@ import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.tracecompass.tmf.core.analysis.Messages;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.SWTBotUtil;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,7 +58,7 @@ public class OpenTraceStressTest {
      */
     @BeforeClass
     public static void init() {
-        SWTBotUtil.failIfUIThread();
+        SWTBotUtils.failIfUIThread();
 
         /* Set up for swtbot */
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
@@ -66,13 +66,13 @@ public class OpenTraceStressTest {
         workbenchbot = new SWTWorkbenchBot();
 
         /* Close welcome view */
-        SWTBotUtil.closeView("Welcome", workbenchbot);
+        SWTBotUtils.closeView("Welcome", workbenchbot);
 
         /* Switch perspectives */
-        SWTBotUtil.switchToPerspective(KERNEL_PERSPECTIVE_ID);
+        SWTBotUtils.switchToPerspective(KERNEL_PERSPECTIVE_ID);
 
         /* Finish waiting for eclipse to load */
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.waitForJobs();
     }
 
     /**
@@ -80,7 +80,7 @@ public class OpenTraceStressTest {
      */
     @Test
     public void testOpenAndCloseConcurrency() {
-        SWTBotUtil.createProject(TRACE_PROJECT_NAME);
+        SWTBotUtils.createProject(TRACE_PROJECT_NAME);
 
         File fTestFile = new File(CTF_TRACE.getPath());
 
@@ -112,21 +112,21 @@ public class OpenTraceStressTest {
         };
         mgr.addJobChangeListener(changeListener);
         for (int i = 0; i < 10; i++) {
-            SWTBotUtil.openTrace(TRACE_PROJECT_NAME, path, TRACE_TYPE, false);
-            SWTBotUtil.openTrace(TRACE_PROJECT_NAME, path, TRACE_TYPE, false);
-            SWTBotUtil.openTrace(TRACE_PROJECT_NAME, path, TRACE_TYPE, false);
-            SWTBotUtil.openTrace(TRACE_PROJECT_NAME, path, TRACE_TYPE, false);
-            SWTBotUtil.openTrace(TRACE_PROJECT_NAME, path, TRACE_TYPE, false);
+            SWTBotUtils.openTrace(TRACE_PROJECT_NAME, path, TRACE_TYPE, false);
+            SWTBotUtils.openTrace(TRACE_PROJECT_NAME, path, TRACE_TYPE, false);
+            SWTBotUtils.openTrace(TRACE_PROJECT_NAME, path, TRACE_TYPE, false);
+            SWTBotUtils.openTrace(TRACE_PROJECT_NAME, path, TRACE_TYPE, false);
+            SWTBotUtils.openTrace(TRACE_PROJECT_NAME, path, TRACE_TYPE, false);
             // Add little delay so that treads have a chance to start
-            SWTBotUtil.delay(1000);
+            SWTBotUtils.delay(1000);
             workbenchbot.closeAllEditors();
 
             if (!status.isOK()) {
-                SWTBotUtil.deleteProject(TRACE_PROJECT_NAME, workbenchbot);
+                SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, workbenchbot);
                 fail(handleErrorStatus(status));
             }
         }
-        SWTBotUtil.deleteProject(TRACE_PROJECT_NAME, workbenchbot);
+        SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, workbenchbot);
     }
 
     private static String handleErrorStatus(MultiStatus status) {

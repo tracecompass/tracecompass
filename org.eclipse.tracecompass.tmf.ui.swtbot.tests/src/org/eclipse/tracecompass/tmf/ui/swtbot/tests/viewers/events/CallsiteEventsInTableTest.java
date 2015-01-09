@@ -10,7 +10,7 @@
  *   Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.swtbot.tests.table;
+package org.eclipse.tracecompass.tmf.ui.swtbot.tests.viewers.events;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -36,7 +36,7 @@ import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimePreferencesConstants;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.SWTBotUtil;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
@@ -79,7 +79,7 @@ public class CallsiteEventsInTableTest {
      */
     @BeforeClass
     public static void init() {
-        SWTBotUtil.failIfUIThread();
+        SWTBotUtils.failIfUIThread();
 
         /* set up test trace*/
         URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(CALLSITE_TRACE_PATH), null);
@@ -119,13 +119,13 @@ public class CallsiteEventsInTableTest {
         fBot = new SWTWorkbenchBot();
 
         /* Close welcome view */
-        SWTBotUtil.closeView("Welcome", fBot);
+        SWTBotUtils.closeView("Welcome", fBot);
 
         /* Switch perspectives */
-        SWTBotUtil.switchToTracingPerspective();
+        SWTBotUtils.switchToTracingPerspective();
 
         /* Finish waiting for eclipse to load */
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.waitForJobs();
     }
 
     /**
@@ -145,14 +145,14 @@ public class CallsiteEventsInTableTest {
      */
     @Test
     public void test() {
-        SWTBotUtil.createProject(TRACE_PROJECT_NAME);
+        SWTBotUtils.createProject(TRACE_PROJECT_NAME);
 
         // Open source file as a unknown trace
-        SWTBotUtil.openTrace(TRACE_PROJECT_NAME, fSourceFile.getAbsolutePath(), null);
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fSourceFile.getAbsolutePath(), null);
 
         // Open the actual trace
-        SWTBotUtil.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CALLSITE_TRACE_TYPE);
-        SWTBotEditor editorBot = SWTBotUtil.activateEditor(fBot, fTestFile.getName());
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CALLSITE_TRACE_TYPE);
+        SWTBotEditor editorBot = SWTBotUtils.activateEditor(fBot, fTestFile.getName());
 
         SWTBotTable tableBot = editorBot.bot().table();
 
@@ -172,7 +172,7 @@ public class CallsiteEventsInTableTest {
         maximizeTable(tableBot);
 
         fBot.closeAllEditors();
-        SWTBotUtil.deleteProject(TRACE_PROJECT_NAME, fBot);
+        SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
     }
 
     private static void maximizeTable(SWTBotTable tableBot) {

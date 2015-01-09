@@ -10,7 +10,7 @@
  *   Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.swtbot.tests;
+package org.eclipse.tracecompass.tmf.ui.swtbot.tests.parsers.custom;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -24,6 +24,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -59,7 +60,6 @@ import org.junit.runner.RunWith;
  * </pre>
  *
  * @author Matthew Khouzam
- *
  */
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class TestCustomTxtWizard extends AbstractCustomParserWizard {
@@ -95,7 +95,7 @@ public class TestCustomTxtWizard extends AbstractCustomParserWizard {
     @Test
     public void testNew() throws FileNotFoundException, IOException {
         File xmlFile = ResourcesPlugin.getWorkspace().getRoot().getLocation().append(".metadata/.plugins/org.eclipse.tracecompass.tmf.core/custom_txt_parsers.xml").toFile();
-        SWTBotUtil.createProject(PROJECT_NAME);
+        SWTBotUtils.createProject(PROJECT_NAME);
         SWTBotView proejctExplorerBot = fBot.viewByTitle("Project Explorer");
         proejctExplorerBot.show();
         SWTBotTreeItem treeItem = proejctExplorerBot.bot().tree().getTreeItem(PROJECT_NAME);
@@ -137,7 +137,7 @@ public class TestCustomTxtWizard extends AbstractCustomParserWizard {
         assertNotNull(eventLine[1]);
         fBot.styledText().setText("12 Hello\nWorld\n23 Goodbye\ncruel world");
         eventLine[0].select();
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.waitForJobs();
         fBot.textWithLabel("Regular expression:").setText("\\s*(\\d\\d)\\s(.*\\S)");
         eventLine[1].select();
         fBot.textWithLabel("Regular expression:").setText("([^0-9]*)");
@@ -155,7 +155,7 @@ public class TestCustomTxtWizard extends AbstractCustomParserWizard {
         xmlPart = extractTestXml(xmlFile, CATEGORY_NAME, TRACETYPE_NAME);
         assertEquals("", xmlPart);
 
-        SWTBotUtil.deleteProject(PROJECT_NAME, fBot);
+        SWTBotUtils.deleteProject(PROJECT_NAME, fBot);
     }
 
     /**
@@ -198,7 +198,7 @@ public class TestCustomTxtWizard extends AbstractCustomParserWizard {
             fw.write(xmlContent);
             fw.flush();
         }
-        SWTBotUtil.createProject(PROJECT_NAME);
+        SWTBotUtils.createProject(PROJECT_NAME);
         SWTBotView proejctExplorerBot = fBot.viewByTitle("Project Explorer");
         proejctExplorerBot.show();
         SWTBotTreeItem treeItem = proejctExplorerBot.bot().tree().getTreeItem(PROJECT_NAME);
@@ -239,7 +239,7 @@ public class TestCustomTxtWizard extends AbstractCustomParserWizard {
         assertNotNull(eventLine[1]);
         fBot.styledText().setText("12 Hello\nWorld\n23 Goodbye\ncruel world");
         eventLine[0].select();
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.waitForJobs();
         fBot.textWithLabel("Regular expression:").setText("\\s*(\\d\\d)\\s(.*\\S)");
         eventLine[1].select();
         fBot.textWithLabel("Regular expression:").setText("([^0-9]*)");
@@ -257,6 +257,6 @@ public class TestCustomTxtWizard extends AbstractCustomParserWizard {
         xmlPart = extractTestXml(xmlFile, CATEGORY_NAME, TRACETYPE_NAME);
         assertEquals("", xmlPart);
 
-        SWTBotUtil.deleteProject(PROJECT_NAME, fBot);
+        SWTBotUtils.deleteProject(PROJECT_NAME, fBot);
     }
 }

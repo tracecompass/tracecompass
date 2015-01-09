@@ -49,8 +49,8 @@ import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.SWTBotUtil;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.conditions.ConditionHelpers;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IViewPart;
@@ -85,7 +85,7 @@ public class ImportAndReadPcapTest {
     @BeforeClass
     public static void init() {
 
-        SWTBotUtil.failIfUIThread();
+        SWTBotUtils.failIfUIThread();
 
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 300000; /* 300 second timeout */
@@ -102,7 +102,7 @@ public class ImportAndReadPcapTest {
         /* Switch perspectives */
         switchNetworkPerspective();
         /* Finish waiting for eclipse to load */
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.waitForJobs();
     }
 
     private static void switchNetworkPerspective() {
@@ -131,13 +131,13 @@ public class ImportAndReadPcapTest {
     @Test
     public void test() {
         assumeTrue(pttt.exists());
-        SWTBotUtil.createProject(TRACE_PROJECT_NAME);
+        SWTBotUtils.createProject(TRACE_PROJECT_NAME);
         openTrace();
         openEditor();
         testHV(getViewPart("Histogram"));
         testStreamView(getViewPartRef("Stream List"));
         fBot.closeAllEditors();
-        SWTBotUtil.deleteProject(TRACE_PROJECT_NAME, fBot);
+        SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
     }
 
     private void testStreamView(IViewReference viewPart) {
@@ -148,11 +148,11 @@ public class ImportAndReadPcapTest {
         assertNotNull(botTree);
         final TmfTimeSynchSignal signal = new TmfTimeSynchSignal(slv, fDesired1.getTimestamp());
         slv.broadcast(signal);
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.waitForJobs();
         // FIXME This is a race condition:
         // TmfEventsTable launches an async exec that may be run after the wait
         // for jobs. This last delay catches it.
-        SWTBotUtil.delay(1000);
+        SWTBotUtils.delay(1000);
 
     }
 
@@ -176,8 +176,8 @@ public class ImportAndReadPcapTest {
             fail(exception[0].getMessage());
         }
 
-        SWTBotUtil.delay(1000);
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.delay(1000);
+        SWTBotUtils.waitForJobs();
     }
 
     private void openEditor() {
@@ -209,8 +209,8 @@ public class ImportAndReadPcapTest {
             }
         });
 
-        SWTBotUtil.waitForJobs();
-        SWTBotUtil.delay(1000);
+        SWTBotUtils.waitForJobs();
+        SWTBotUtils.delay(1000);
         assertNotNull(tmfEd);
     }
 

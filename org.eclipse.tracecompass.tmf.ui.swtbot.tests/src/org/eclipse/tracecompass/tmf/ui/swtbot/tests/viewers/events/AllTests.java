@@ -10,7 +10,7 @@
  *   Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.swtbot.tests.table;
+package org.eclipse.tracecompass.tmf.ui.swtbot.tests.viewers.events;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

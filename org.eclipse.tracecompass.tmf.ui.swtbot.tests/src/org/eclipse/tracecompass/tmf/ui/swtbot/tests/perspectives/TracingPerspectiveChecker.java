@@ -10,11 +10,12 @@
  *   Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.swtbot.tests;
+package org.eclipse.tracecompass.tmf.ui.swtbot.tests.perspectives;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.AbstractPerspectiveChecker;
 import org.eclipse.tracecompass.tmf.ui.views.TracingPerspectiveFactory;
 import org.eclipse.tracecompass.tmf.ui.views.histogram.HistogramView;
 import org.eclipse.tracecompass.tmf.ui.views.statistics.TmfStatisticsView;

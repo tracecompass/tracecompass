@@ -42,8 +42,8 @@ import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.SWTBotUtil;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.conditions.ConditionHelpers;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.histogram.HistogramView;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -81,7 +81,7 @@ public class ImportAndReadKernelSmokeTest {
      */
     @BeforeClass
     public static void init() {
-        SWTBotUtil.failIfUIThread();
+        SWTBotUtils.failIfUIThread();
 
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
@@ -98,7 +98,7 @@ public class ImportAndReadKernelSmokeTest {
         /* Switch perspectives */
         switchKernelPerspective();
         /* Finish waiting for eclipse to load */
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.waitForJobs();
     }
 
     private static void switchKernelPerspective() {
@@ -126,15 +126,15 @@ public class ImportAndReadKernelSmokeTest {
      */
     @Test
     public void test() {
-        SWTBotUtil.createProject(TRACE_PROJECT_NAME);
-        SWTBotUtil.openTrace(TRACE_PROJECT_NAME, CTT.getPath(), TRACE_TYPE);
+        SWTBotUtils.createProject(TRACE_PROJECT_NAME);
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, CTT.getPath(), TRACE_TYPE);
         openEditor();
         testHV(getViewPart("Histogram"));
         testCFV((ControlFlowView) getViewPart("Control Flow"));
         testRV((ResourcesView) getViewPart("Resources"));
 
         fBot.closeAllEditors();
-        SWTBotUtil.deleteProject(TRACE_PROJECT_NAME, fBot);
+        SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
     }
 
     private void openEditor() {
@@ -151,8 +151,8 @@ public class ImportAndReadKernelSmokeTest {
             }
         });
 
-        SWTBotUtil.waitForJobs();
-        SWTBotUtil.delay(1000);
+        SWTBotUtils.waitForJobs();
+        SWTBotUtils.delay(1000);
         assertNotNull(tmfEd);
     }
 
@@ -172,18 +172,18 @@ public class ImportAndReadKernelSmokeTest {
         final TmfTimeSynchSignal signal = new TmfTimeSynchSignal(hv, fDesired1.getTimestamp());
         final TmfTimeSynchSignal signal2 = new TmfTimeSynchSignal(hv, fDesired2.getTimestamp());
         hv.updateTimeRange(100000);
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.waitForJobs();
         hv.currentTimeUpdated(signal);
         hv.broadcast(signal);
-        SWTBotUtil.waitForJobs();
-        SWTBotUtil.delay(1000);
+        SWTBotUtils.waitForJobs();
+        SWTBotUtils.delay(1000);
 
         hv.updateTimeRange(1000000000);
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.waitForJobs();
         hv.currentTimeUpdated(signal2);
         hv.broadcast(signal2);
-        SWTBotUtil.waitForJobs();
-        SWTBotUtil.delay(1000);
+        SWTBotUtils.waitForJobs();
+        SWTBotUtils.delay(1000);
         assertNotNull(hv);
     }
 

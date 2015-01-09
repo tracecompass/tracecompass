@@ -42,8 +42,8 @@ import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.SWTBotUtil;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.conditions.ConditionHelpers;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.histogram.HistogramView;
 import org.eclipse.tracecompass.tmf.ui.views.statistics.TmfStatisticsView;
 import org.eclipse.ui.IViewPart;
@@ -82,25 +82,25 @@ public abstract class AbstractImportAndReadSmokeTest {
     @BeforeClass
     public static void init() {
         assumeTrue(fTrace.exists());
-        SWTBotUtil.failIfUIThread();
+        SWTBotUtils.failIfUIThread();
 
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 50000; /* 50 second timeout */
         fLogger.addAppender(new NullAppender());
         fBot = new SWTWorkbenchBot();
 
-        SWTBotUtil.closeView("welcome", fBot);
+        SWTBotUtils.closeView("welcome", fBot);
 
-        SWTBotUtil.switchToTracingPerspective();
+        SWTBotUtils.switchToTracingPerspective();
         /* finish waiting for eclipse to load */
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.waitForJobs();
     }
 
     /**
      * Creates a tracing projects
      */
     protected void createProject() {
-        SWTBotUtil.focusMainWindow(fBot.shells());
+        SWTBotUtils.focusMainWindow(fBot.shells());
         fBot.menu("File").menu("New").menu("Project...").click();
 
         fBot.shell("New Project").setFocus();
@@ -128,7 +128,7 @@ public abstract class AbstractImportAndReadSmokeTest {
         text.setText(getProjectName());
 
         fBot.button("Finish").click();
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.waitForJobs();
     }
 
     /**
@@ -139,7 +139,7 @@ public abstract class AbstractImportAndReadSmokeTest {
         final SWTBotButton finishButton = fBot.button("Finish");
         finishButton.click();
         fBot.waitUntil(Conditions.shellCloses(shell));
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.waitForJobs();
     }
 
     /**
@@ -180,8 +180,8 @@ public abstract class AbstractImportAndReadSmokeTest {
             }
         });
 
-        SWTBotUtil.waitForJobs();
-        SWTBotUtil.delay(1000);
+        SWTBotUtils.waitForJobs();
+        SWTBotUtils.delay(1000);
 
         final CtfTmfEvent desiredEvent2 = getEvent(10000);
         SWTBotView hvBot = fBot.viewById(HistogramView.ID);
@@ -195,18 +195,18 @@ public abstract class AbstractImportAndReadSmokeTest {
         final TmfTimeSynchSignal signal = new TmfTimeSynchSignal(hv, desiredEvent1.getTimestamp());
         final TmfTimeSynchSignal signal2 = new TmfTimeSynchSignal(hv, desiredEvent2.getTimestamp());
         hv.updateTimeRange(100000);
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.waitForJobs();
         hv.currentTimeUpdated(signal);
         hv.broadcast(signal);
-        SWTBotUtil.waitForJobs();
-        SWTBotUtil.delay(1000);
+        SWTBotUtils.waitForJobs();
+        SWTBotUtils.delay(1000);
 
         hv.updateTimeRange(1000000000);
-        SWTBotUtil.waitForJobs();
+        SWTBotUtils.waitForJobs();
         hv.currentTimeUpdated(signal2);
         hv.broadcast(signal2);
-        SWTBotUtil.waitForJobs();
-        SWTBotUtil.delay(1000);
+        SWTBotUtils.waitForJobs();
+        SWTBotUtils.delay(1000);
         assertNotNull(hv);
     }
 

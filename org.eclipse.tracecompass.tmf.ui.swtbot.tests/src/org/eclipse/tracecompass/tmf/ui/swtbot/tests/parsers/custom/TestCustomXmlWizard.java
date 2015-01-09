@@ -10,7 +10,7 @@
  *   Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.swtbot.tests;
+package org.eclipse.tracecompass.tmf.ui.swtbot.tests.parsers.custom;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -23,6 +23,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -32,7 +33,6 @@ import org.junit.runner.RunWith;
  * This test will help validate the CustomXmlParserInputWizardPage
  *
  * @author Matthew Khouzam
- *
  */
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class TestCustomXmlWizard extends AbstractCustomParserWizard {
@@ -71,7 +71,7 @@ public class TestCustomXmlWizard extends AbstractCustomParserWizard {
     @Test
     public void testNew() throws FileNotFoundException, IOException {
         File xmlFile = ResourcesPlugin.getWorkspace().getRoot().getLocation().append(".metadata/.plugins/org.eclipse.tracecompass.tmf.core/custom_xml_parsers.xml").toFile();
-        SWTBotUtil.createProject(PROJECT_NAME);
+        SWTBotUtils.createProject(PROJECT_NAME);
         SWTBotView proejctExplorerBot = fBot.viewByTitle("Project Explorer");
         proejctExplorerBot.show();
         SWTBotTreeItem treeItem = proejctExplorerBot.bot().tree().getTreeItem(PROJECT_NAME);
@@ -111,7 +111,7 @@ public class TestCustomXmlWizard extends AbstractCustomParserWizard {
         xmlPart = extractTestXml(xmlFile, CATEGORY_NAME, TRACETYPE_NAME);
         assertEquals("", xmlPart);
 
-        SWTBotUtil.deleteProject(PROJECT_NAME, fBot);
+        SWTBotUtils.deleteProject(PROJECT_NAME, fBot);
     }
 
 }
