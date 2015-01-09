@@ -40,6 +40,8 @@
 <properties>
   <base.test.vmargs>-Xms256m -Xmx1024m -XX:MaxPermSize=256m</base.test.vmargs>
   <tycho-version>0.22.0</tycho-version>
+  <tycho-extras-version>0.22.0</tycho-extras-version>
+  <tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/tracecompass/org.eclipse.tracecompass.git</tycho.scmUrl>
   <target-platform>tracecompass-e4.4</target-platform>
   <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
   <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
@@ -365,6 +367,23 @@
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-versions-plugin</artifactId>
           <version>${tycho-version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-packaging-plugin</artifactId>
+          <version>${tycho-version}</version>
+          <configuration>
+            <sourceReferences>
+              <generate>true</generate>
+            </sourceReferences>
+          </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>org.eclipse.tycho.extras</groupId>
+              <artifactId>tycho-sourceref-jgit</artifactId>
+              <version>${tycho-extras-version}</version>
+            </dependency>
+          </dependencies>
         </plugin>
 	<plugin>
           <groupId>org.apache.maven.plugins</groupId>
