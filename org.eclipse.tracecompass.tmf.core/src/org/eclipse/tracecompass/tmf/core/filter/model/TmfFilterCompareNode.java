@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -18,7 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 
 
 /**
@@ -52,12 +54,14 @@ public class TmfFilterCompareNode extends TmfFilterAspectNode {
         TIMESTAMP
     }
 
+
     private boolean fNot = false;
     private int fResult;
     private Type fType = Type.NUM;
     private String fValue;
     private transient Number fValueNumber;
-    private transient TmfTimestamp fValueTimestamp;
+    private transient ITmfTimestamp fValueTimestamp;
+    private transient TmfTimestampFormat fTimestampFormat = new TmfTimestampFormat("T.SSSSSSSSS"); //$NON-NLS-1$
 
     /**
      * @param parent the parent node
@@ -81,14 +85,14 @@ public class TmfFilterCompareNode extends TmfFilterAspectNode {
     }
 
     /**
-     * @return the compare result
+     * @return the compare result (-1, 0 or 1)
      */
     public int getResult() {
         return fResult;
     }
 
     /**
-     * @param result the compare result
+     * @param result the compare result (-1, 0 or 1)
      */
     public void setResult(int result) {
         this.fResult = result;
@@ -110,14 +114,14 @@ public class TmfFilterCompareNode extends TmfFilterAspectNode {
     }
 
     /**
-     * @return the comparison value
+     * @return the comparison value (in seconds for the TIMESTAMP type)
      */
     public String getValue() {
         return fValue;
     }
 
     /**
-     * @param value the comparison value
+     * @param value the comparison value (in seconds for the TIMESTAMP type)
      */
     public void setValue(String value) {
         this.fValue = value;
@@ -133,7 +137,7 @@ public class TmfFilterCompareNode extends TmfFilterAspectNode {
             }
         } else if (fType == Type.TIMESTAMP) {
             try {
-                fValueTimestamp = new TmfTimestamp((long) (1E9 * NumberFormat.getInstance().parse(value.toString()).doubleValue()));
+                fValueTimestamp = new TmfNanoTimestamp(fTimestampFormat.parseValue(value.toString()));
             } catch (ParseException e) {
             }
         }
@@ -179,22 +183,16 @@ public class TmfFilterCompareNode extends TmfFilterAspectNode {
             }
         } else if (fType == Type.ALPHA) {
             String valueString = value.toString();
-            int comp = valueString.compareTo(fValue.toString());
-            if (comp < -1) {
-                comp = -1;
-            } else if (comp > 1) {
-                comp = 1;
-            }
+            int comp = (int) Math.signum(valueString.compareTo(fValue.toString()));
             return (comp == fResult) ^ fNot;
         } else if (fType == Type.TIMESTAMP) {
             if (fValueTimestamp != null) {
-                if (value instanceof TmfTimestamp) {
-                    TmfTimestamp valueTimestamp = (TmfTimestamp) value;
+                if (value instanceof ITmfTimestamp) {
+                    ITmfTimestamp valueTimestamp = (ITmfTimestamp) value;
                     return (valueTimestamp.compareTo(fValueTimestamp) == fResult) ^ fNot;
                 }
                 try {
-                    TmfTimestamp valueTimestamp = new TmfTimestamp((long) (1E9 * NumberFormat
-                                    .getInstance().parse(value.toString()).doubleValue()));
+                    ITmfTimestamp valueTimestamp = new TmfNanoTimestamp(fTimestampFormat.parseValue(value.toString()));
                     return (valueTimestamp.compareTo(fValueTimestamp) == fResult) ^ fNot;
                 } catch (ParseException e) {
                 }
