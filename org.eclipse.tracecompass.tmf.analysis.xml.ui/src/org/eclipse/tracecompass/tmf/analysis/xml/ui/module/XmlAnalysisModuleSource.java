@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.tmf.analysis.xml.ui.module;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -25,7 +26,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
@@ -103,20 +106,34 @@ public class XmlAnalysisModuleSource implements IAnalysisModuleSource {
         IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(TMF_XML_BUILTIN_ID);
         for (IConfigurationElement element : elements) {
             if (element.getName().equals(XML_FILE_ELEMENT)) {
-                String filename = element.getAttribute(XML_FILE_ATTRIB);
-                String name = element.getContributor().getName();
-                if (name != null) {
-                    Bundle bundle = Platform.getBundle(name);
-                    if (bundle != null) {
-                        try {
-                            URL xmlUrl = bundle.getResource(filename);
-                            URL locatedURL = FileLocator.toFileURL(xmlUrl);
-                            processFile(new File(locatedURL.getFile()));
-                        } catch (IOException e) {
-                            /* ignore */
+                final String filename = element.getAttribute(XML_FILE_ATTRIB);
+                final String name = element.getContributor().getName();
+                // Run this in a safe runner in case there is an exception
+                // (IOException, FileNotFoundException, NPE, etc).
+                // This makes sure other extensions are not prevented from
+                // working if one is faulty.
+                SafeRunner.run(new ISafeRunnable() {
+
+                    @Override
+                    public void run() throws Exception {
+                        if (name != null) {
+                            Bundle bundle = Platform.getBundle(name);
+                            if (bundle != null) {
+                                URL xmlUrl = bundle.getResource(filename);
+                                if (xmlUrl == null) {
+                                    throw new FileNotFoundException(filename);
+                                }
+                                URL locatedURL = FileLocator.toFileURL(xmlUrl);
+                                processFile(new File(locatedURL.getFile()));
+                            }
                         }
                     }
-                }
+
+                    @Override
+                    public void handleException(Throwable exception) {
+                        // Handled sufficiently in SafeRunner
+                    }
+                });
             }
         }
     }
