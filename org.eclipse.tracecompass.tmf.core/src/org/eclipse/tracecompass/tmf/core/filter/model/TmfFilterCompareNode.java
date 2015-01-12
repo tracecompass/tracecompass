@@ -95,7 +95,7 @@ public class TmfFilterCompareNode extends TmfFilterAspectNode {
      * @param result the compare result (-1, 0 or 1)
      */
     public void setResult(int result) {
-        this.fResult = result;
+        this.fResult = (int) Math.signum(result);
     }
 
     /**
@@ -131,15 +131,9 @@ public class TmfFilterCompareNode extends TmfFilterAspectNode {
             return;
         }
         if (fType == Type.NUM) {
-            try {
-                fValueNumber = NumberFormat.getInstance().parse(value).doubleValue();
-            } catch (ParseException e) {
-            }
+            fValueNumber = toNumber(value);
         } else if (fType == Type.TIMESTAMP) {
-            try {
-                fValueTimestamp = new TmfNanoTimestamp(fTimestampFormat.parseValue(value.toString()));
-            } catch (ParseException e) {
-            }
+            fValueTimestamp = toTimestamp(value);
         }
     }
 
@@ -163,22 +157,24 @@ public class TmfFilterCompareNode extends TmfFilterAspectNode {
     @Override
     public boolean matches(ITmfEvent event) {
         if (event == null || fEventAspect == null) {
-            return false ^ fNot;
+            return false;
         }
         Object value = fEventAspect.resolve(event);
         if (value == null) {
-            return false ^ fNot;
+            return false;
         }
         if (fType == Type.NUM) {
-            if (fValueNumber != null) {
-                if (value instanceof Number) {
-                    double valueDouble = ((Number) value).doubleValue();
-                    return (Double.compare(valueDouble, fValueNumber.doubleValue()) == fResult) ^ fNot;
+            if (fValueNumber instanceof Double) {
+                Number valueNumber = toNumber(value);
+                if (valueNumber != null) {
+                    return (Double.compare(valueNumber.doubleValue(), fValueNumber.doubleValue()) == fResult) ^ fNot;
                 }
-                try {
-                    double valueDouble = NumberFormat.getInstance().parse(value.toString()).doubleValue();
-                    return (Double.compare(valueDouble, fValueNumber.doubleValue()) == fResult) ^ fNot;
-                } catch (ParseException e) {
+            } else if (fValueNumber != null) {
+                Number valueNumber = toNumber(value);
+                if (valueNumber instanceof Double || valueNumber instanceof Float) {
+                    return (Double.compare(valueNumber.doubleValue(), fValueNumber.doubleValue()) == fResult) ^ fNot;
+                } else if (valueNumber != null) {
+                    return (Long.compare(valueNumber.longValue(), fValueNumber.longValue()) == fResult) ^ fNot;
                 }
             }
         } else if (fType == Type.ALPHA) {
@@ -187,18 +183,40 @@ public class TmfFilterCompareNode extends TmfFilterAspectNode {
             return (comp == fResult) ^ fNot;
         } else if (fType == Type.TIMESTAMP) {
             if (fValueTimestamp != null) {
-                if (value instanceof ITmfTimestamp) {
-                    ITmfTimestamp valueTimestamp = (ITmfTimestamp) value;
-                    return (valueTimestamp.compareTo(fValueTimestamp) == fResult) ^ fNot;
-                }
-                try {
-                    ITmfTimestamp valueTimestamp = new TmfNanoTimestamp(fTimestampFormat.parseValue(value.toString()));
-                    return (valueTimestamp.compareTo(fValueTimestamp) == fResult) ^ fNot;
-                } catch (ParseException e) {
+                ITmfTimestamp valueTimestamp = toTimestamp(value);
+                if (valueTimestamp != null) {
+                    int comp = (int) Math.signum(valueTimestamp.compareTo(fValueTimestamp));
+                    return (comp == fResult) ^ fNot;
                 }
             }
         }
-        return false ^ fNot;
+        return false;
+    }
+
+    private static Number toNumber(Object value) {
+        if (value instanceof Number) {
+            return (Number) value;
+        }
+        try {
+            return Long.decode(value.toString());
+        } catch (NumberFormatException e) {
+        }
+        try {
+            return NumberFormat.getInstance().parse(value.toString());
+        } catch (ParseException e) {
+        }
+        return null;
+    }
+
+    private ITmfTimestamp toTimestamp(Object value) {
+        if (value instanceof ITmfTimestamp) {
+            return (ITmfTimestamp) value;
+        }
+        try {
+            return new TmfNanoTimestamp(fTimestampFormat.parseValue(value.toString()));
+        } catch (ParseException e) {
+        }
+        return null;
     }
 
     @Override
