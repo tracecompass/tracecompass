@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Etienne Bergeron
+ * Copyright (c) 2013, 2014 Etienne Bergeron
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
