@@ -151,9 +151,9 @@ public class BtfEventPropertySource extends TmfEventPropertySource {
     private class EventPropertySource implements IPropertySource {
         private static final String DESCRIPTION = "Description"; //$NON-NLS-1$
         private static final String NOTE = "Note"; //$NON-NLS-1$
-        final String fEventName;
-        final String fNote;
-        final String fEventDescription;
+        private final String fEventName;
+        private final String fNote;
+        private final String fEventDescription;
 
         public EventPropertySource(String event, String note) {
             fEventName = event;
