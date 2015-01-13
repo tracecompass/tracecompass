@@ -46,7 +46,26 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     private final HistoryTree sht;
 
     /** Indicates if the history tree construction is done */
-    protected volatile boolean isFinishedBuilding = false;
+    private volatile boolean fFinishedBuilding = false;
+
+    /**
+     * Indicates if the history tree construction is done
+     *
+     * @return if the history tree construction is done
+     */
+    protected boolean isFinishedBuilding() {
+        return fFinishedBuilding;
+    }
+
+    /**
+     * Sets if the history tree is finished building
+     *
+     * @param isFinishedBuilding
+     *            is the history tree finished building
+     */
+    protected void setFinishedBuilding(boolean isFinishedBuilding) {
+        this.fFinishedBuilding = isFinishedBuilding;
+    }
 
     /**
      * Constructor for new history files. Use this when creating a new history
@@ -113,7 +132,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     public HistoryTreeBackend(File existingStateFile, int providerVersion)
             throws IOException {
         sht = new HistoryTree(existingStateFile, providerVersion);
-        isFinishedBuilding = true;
+        fFinishedBuilding = true;
     }
 
     /**
@@ -148,7 +167,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     @Override
     public void finishedBuilding(long endTime) {
         sht.closeTree(endTime);
-        isFinishedBuilding = true;
+        fFinishedBuilding = true;
     }
 
     @Override
@@ -173,7 +192,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
 
     @Override
     public void dispose() {
-        if (isFinishedBuilding) {
+        if (fFinishedBuilding) {
             sht.closeFile();
         } else {
             /*
@@ -243,7 +262,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
 
         try {
             while (interval == null && currentNode.getNodeType() == HTNode.NodeType.CORE) {
-                currentNode = sht.selectNextChild((CoreNode)currentNode, t);
+                currentNode = sht.selectNextChild((CoreNode) currentNode, t);
                 interval = currentNode.getRelevantInterval(key, t);
             }
         } catch (ClosedChannelException e) {

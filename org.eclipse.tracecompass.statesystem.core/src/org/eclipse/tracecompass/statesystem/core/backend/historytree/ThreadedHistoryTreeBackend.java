@@ -67,7 +67,7 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
      */
     public ThreadedHistoryTreeBackend(File newStateFile, int blockSize,
             int maxChildren, long startTime, int providerVersion, int queueSize)
-                    throws IOException {
+            throws IOException {
         super(newStateFile, blockSize, maxChildren, providerVersion, startTime);
 
         intervalQueue = new ArrayBlockingQueue<>(queueSize);
@@ -138,13 +138,13 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
          */
 
         stopRunningThread(endTime);
-        isFinishedBuilding = true;
+        setFinishedBuilding(true);
         return;
     }
 
     @Override
     public void dispose() {
-        if (!isFinishedBuilding) {
+        if (!isFinishedBuilding()) {
             stopRunningThread(Long.MAX_VALUE);
         }
         /*
@@ -160,8 +160,8 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
         }
 
         /*
-         * Send a "poison pill" in the queue, then wait for the HT to finish
-         * its closeTree()
+         * Send a "poison pill" in the queue, then wait for the HT to finish its
+         * closeTree()
          */
         try {
             HTInterval pill = new HTInterval(-1, endTime, -1, TmfStateValue.nullValue());
@@ -212,7 +212,7 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
             throws TimeRangeException, StateSystemDisposedException {
         super.doQuery(currentStateInfo, t);
 
-        if (isFinishedBuilding) {
+        if (isFinishedBuilding()) {
             /*
              * The history tree is the only place to look for intervals once
              * construction is finished.
@@ -259,8 +259,8 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
          * *while we were iterating* on the queue. One last pass in the tree
          * should find it.
          *
-         * This case is really rare, which is why we do a second pass at the
-         * end if needed, instead of systematically checking in the queue first
+         * This case is really rare, which is why we do a second pass at the end
+         * if needed, instead of systematically checking in the queue first
          * (which is slow).
          */
         return super.doSingularQuery(t, attributeQuark);
