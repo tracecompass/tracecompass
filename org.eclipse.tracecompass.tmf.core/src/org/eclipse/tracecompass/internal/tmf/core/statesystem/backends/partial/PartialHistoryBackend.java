@@ -289,7 +289,7 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
         private long lastCheckpointAt;
 
         public CheckpointsRequest(ITmfStateProvider input, Map<Long, Long> checkpoints) {
-            super(input.getExpectedEventType(),
+            super(ITmfEvent.class,
                     TmfTimeRange.ETERNITY,
                     0,
                     ITmfEventRequest.ALL_DATA,
@@ -330,7 +330,7 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
         private final ITmfTrace trace;
 
         PartialStateSystemRequest(ITmfStateProvider sci, TmfTimeRange range) {
-            super(sci.getExpectedEventType(),
+            super(ITmfEvent.class,
                     range,
                     0,
                     ITmfEventRequest.ALL_DATA,

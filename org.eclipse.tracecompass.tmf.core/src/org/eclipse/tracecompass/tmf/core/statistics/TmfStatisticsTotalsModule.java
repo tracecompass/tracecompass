@@ -96,7 +96,7 @@ public class TmfStatisticsTotalsModule extends TmfStateSystemAnalysisModule {
          *            The trace for which we build this state system
          */
         public StatsProviderTotals(@NonNull ITmfTrace trace) {
-            super(trace, ITmfEvent.class , NAME);
+            super(trace, NAME);
         }
 
         @Override

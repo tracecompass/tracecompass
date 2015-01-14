@@ -58,17 +58,6 @@ public interface ITmfStateProvider {
     long getStartTime();
 
     /**
-     * Method for the input plugin to specify which type of events it expects.
-     * This will guarantee that all events it receives via processEvent() are
-     * indeed of the given type, so it should be safe to cast to that type.
-     *
-     * @return The expected Class of the event. Only events of this class (and
-     *         valid subclasses) will be handled.
-     * @since 2.0
-     */
-    Class<? extends ITmfEvent> getExpectedEventType();
-
-    /**
      * Assign the target state system where this SCI will insert its state
      * changes. Because of dependencies issues, this can normally not be done at
      * the constructor.

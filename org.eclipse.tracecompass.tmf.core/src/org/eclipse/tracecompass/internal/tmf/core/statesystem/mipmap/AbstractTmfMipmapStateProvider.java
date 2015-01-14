@@ -26,9 +26,8 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundExc
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
-import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
@@ -90,16 +89,13 @@ public abstract class AbstractTmfMipmapStateProvider extends AbstractTmfStatePro
      *
      * @param trace
      *            The trace directory
-     * @param eventType
-     *            The specific class for the event type
      * @param id
      *            The name given to this state change input. Only used
      *            internally.
      */
     public AbstractTmfMipmapStateProvider(@NonNull ITmfTrace trace,
-            @NonNull Class<? extends ITmfEvent> eventType,
             @NonNull String id) {
-        super(trace, eventType, id);
+        super(trace, id);
     }
 
     // ------------------------------------------------------------------------

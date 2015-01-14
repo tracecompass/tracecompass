@@ -88,7 +88,7 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
      *            The trace for which we build this state system
      */
     public CallStackStateProvider(@NonNull ITmfTrace trace) {
-        super(trace, ITmfEvent.class, ID);
+        super(trace, ID);
     }
 
     @Override

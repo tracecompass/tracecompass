@@ -12,9 +12,12 @@
 
 package org.eclipse.tracecompass.tmf.core.statesystem;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
@@ -42,7 +45,6 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
     private static final int DEFAULT_EVENTS_QUEUE_SIZE = 10000;
 
     private final ITmfTrace fTrace;
-    private final Class<? extends ITmfEvent> fEventType;
     private final BlockingQueue<ITmfEvent> fEventsQueue;
     private final Thread fEventHandlerThread;
 
@@ -56,16 +58,11 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
      *
      * @param trace
      *            The LTTng 2.0 kernel trace directory
-     * @param eventType
-     *            The specific class for the event type that will be used within
-     *            the subclass
      * @param id
      *            Name given to this state change input. Only used internally.
      */
-    public AbstractTmfStateProvider(ITmfTrace trace,
-            Class<? extends ITmfEvent> eventType, String id) {
+    public AbstractTmfStateProvider(ITmfTrace trace, String id) {
         fTrace = trace;
-        fEventType = eventType;
         fEventsQueue = new ArrayBlockingQueue<>(DEFAULT_EVENTS_QUEUE_SIZE);
         fStateSystemAssigned = false;
 
@@ -123,11 +120,6 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
         }
         fStateSystemAssigned = false;
         fSS = null;
-    }
-
-    @Override
-    public final Class<? extends ITmfEvent> getExpectedEventType() {
-        return fEventType;
     }
 
     @Override
@@ -205,28 +197,28 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
                 System.err.println("Cannot run event manager without assigning a target state system first!"); //$NON-NLS-1$
                 return;
             }
-            ITmfEvent event;
+            @NonNull ITmfEvent event;
 
             try {
-                event = fEventsQueue.take();
+                /*
+                 * We never insert null in the queue. Cannot be checked at
+                 * compile-time until Java 8 annotations...
+                 */
+                event = checkNotNull(fEventsQueue.take());
                 /* This is a singleton, we want to do != instead of !x.equals */
                 while (event != END_EVENT) {
                     if (event == EMPTY_QUEUE_EVENT) {
                         /* Synchronization event, should be ignored */
-                        event = fEventsQueue.take();
+                        event = checkNotNull(fEventsQueue.take());
                         continue;
                     }
-
                     currentEvent = event;
-
-                    /* Make sure this is an event the sub-class can process */
-                    if (fEventType.isInstance(event) && event.getType() != null) {
-                        eventHandle(event);
-                    }
-                    event = fEventsQueue.take();
+                    eventHandle(event);
+                    event = checkNotNull(fEventsQueue.take());
                 }
                 /* We've received the last event, clean up */
                 closeStateSystem();
+
             } catch (InterruptedException e) {
                 /* We've been interrupted abnormally */
                 System.out.println("Event handler interrupted!"); //$NON-NLS-1$

@@ -476,7 +476,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         private final ITmfTrace trace;
 
         public StateSystemEventRequest(ITmfStateProvider sp, TmfTimeRange timeRange, int index) {
-            super(sp.getExpectedEventType(),
+            super(ITmfEvent.class,
                     timeRange,
                     index,
                     ITmfEventRequest.ALL_DATA,

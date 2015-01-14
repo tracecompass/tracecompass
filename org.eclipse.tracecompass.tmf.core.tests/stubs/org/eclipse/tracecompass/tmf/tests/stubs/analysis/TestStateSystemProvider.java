@@ -21,7 +21,6 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeExcept
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -44,7 +43,7 @@ public class TestStateSystemProvider extends AbstractTmfStateProvider {
      *            The LTTng 2.0 kernel trace directory
      */
     public TestStateSystemProvider(@NonNull ITmfTrace trace) {
-        super(trace, TmfEvent.class, "Stub State System");
+        super(trace, "Stub State System");
     }
 
     @Override

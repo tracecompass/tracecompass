@@ -64,7 +64,7 @@ public class KernelCpuUsageStateProvider extends AbstractTmfStateProvider {
      *            The event layout to use for this state provider.
      */
     public KernelCpuUsageStateProvider(ITmfTrace trace, IKernelAnalysisEventLayout layout) {
-        super(trace, ITmfEvent.class, "Kernel CPU usage"); //$NON-NLS-1$
+        super(trace, "Kernel CPU usage"); //$NON-NLS-1$
         fTraceStart = trace.getStartTime().getValue();
         fLayout = layout;
     }

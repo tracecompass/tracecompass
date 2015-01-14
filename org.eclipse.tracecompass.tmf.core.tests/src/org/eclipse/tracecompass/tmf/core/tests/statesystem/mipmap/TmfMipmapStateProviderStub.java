@@ -62,7 +62,7 @@ class TmfMipmapStateProviderStub extends AbstractTmfMipmapStateProvider {
      *            the type of value to use
      */
     public TmfMipmapStateProviderStub(int resolution, ITmfStateValue.Type type) {
-        super(new TmfTraceStub(), TmfEvent.class, MIPMAP_ID);
+        super(new TmfTraceStub(), MIPMAP_ID);
         this.resolution = resolution;
         this.type = type;
     }

@@ -30,7 +30,6 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
-import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 
 /**
  * State provider to track the memory of the threads using the UST libc wrapper
@@ -58,7 +57,7 @@ public class MemoryUsageStateProvider extends AbstractTmfStateProvider {
      *            trace
      */
     public MemoryUsageStateProvider(@NonNull LttngUstTrace trace) {
-        super(trace, CtfTmfEvent.class, "Ust:Memory"); //$NON-NLS-1$
+        super(trace, "Ust:Memory"); //$NON-NLS-1$
     }
 
     @Override

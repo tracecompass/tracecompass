@@ -104,7 +104,7 @@ public class TmfStatisticsEventTypesModule extends TmfStateSystemAnalysisModule 
          *            The trace for which we build this state system
          */
         public StatsProviderEventTypes(@NonNull ITmfTrace trace) {
-            super(trace, ITmfEvent.class ,"TMF Statistics, events per type"); //$NON-NLS-1$
+            super(trace ,"TMF Statistics, events per type"); //$NON-NLS-1$
         }
 
         @Override

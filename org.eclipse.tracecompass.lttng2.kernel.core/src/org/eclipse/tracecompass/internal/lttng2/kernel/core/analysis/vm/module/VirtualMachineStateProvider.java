@@ -97,7 +97,7 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
      *            The virtual machine experiment
      */
     public VirtualMachineStateProvider(TmfExperiment experiment) {
-        super(experiment, ITmfEvent.class, "Virtual Machine State Provider"); //$NON-NLS-1$
+        super(experiment, "Virtual Machine State Provider"); //$NON-NLS-1$
 
         fModel = new QemuKvmVmModel(experiment);
         Table<ITmfTrace, String, Integer> table = NonNullUtils.checkNotNull(HashBasedTable.<ITmfTrace, String, Integer> create());

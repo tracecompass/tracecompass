@@ -88,7 +88,7 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
      *            depending on the tracer implementation.
      */
     public KernelStateProvider(ITmfTrace trace, IKernelAnalysisEventLayout layout) {
-        super(trace, ITmfEvent.class, "Kernel"); //$NON-NLS-1$
+        super(trace, "Kernel"); //$NON-NLS-1$
         fLayout = layout;
         fEventNames = buildEventNames(layout);
     }
