@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,8 @@
  *
  * Contributors:
  *   Vincent Perot - Initial API and implementation
+ *   Alexandre Montplaisir - Update to new ITmfEventAspect API
+ *   Patrick Tasse - Make pcap aspects singletons
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.tmf.pcap.core.trace;
@@ -66,10 +68,10 @@ public class PcapTrace extends TmfTrace implements ITmfTraceProperties, AutoClos
     private static final Collection<ITmfEventAspect> PCAP_ASPECTS =
             checkNotNull(ImmutableList.of(
                     ITmfEventAspect.BaseAspects.TIMESTAMP,
-                    new PcapSourceAspect(),
-                    new PcapDestinationAspect(),
-                    new PcapReferenceAspect(),
-                    new PcapProtocolAspect(),
+                    PcapSourceAspect.INSTANCE,
+                    PcapDestinationAspect.INSTANCE,
+                    PcapReferenceAspect.INSTANCE,
+                    PcapProtocolAspect.INSTANCE,
                     ITmfEventAspect.BaseAspects.CONTENTS
                     ));
 

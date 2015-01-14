@@ -9,6 +9,7 @@
  * Contributors:
  *   Vincent Perot - Initial API and implementation
  *   Alexandre Montplaisir - Update to new ITmfEventAspect API
+ *   Patrick Tasse - Make pcap aspects singletons
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.tmf.pcap.core.event.aspect;
@@ -28,6 +29,12 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
  * @author Alexandre Montplaisir
  */
 public class PcapSourceAspect implements ITmfEventAspect {
+
+    /** Singleton instance */
+    public static final PcapSourceAspect INSTANCE = new PcapSourceAspect();
+
+    private PcapSourceAspect() {
+    }
 
     @Override
     public String getName() {
