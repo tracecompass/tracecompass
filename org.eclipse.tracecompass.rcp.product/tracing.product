@@ -51,7 +51,6 @@ http://www.eclipse.org/legal/epl-v10.html
       </win>
    </launcher>
 
-
    <vm>
       <linux include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7</linux>
       <macos include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7</macos>
@@ -230,6 +229,10 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
       <plugin id="org.eclipse.tracecompass.rcp.ui" autoStart="false" startLevel="5" />
       <plugin id="org.eclipse.update.configurator" autoStart="true" startLevel="3" />
    </configurations>
+
+   <repositories>
+      <repository location="http://download.eclipse.org/tracecompass/master/rcp-repository" enabled="true" />
+   </repositories>
 
    <preferencesInfo>
       <targetfile overwrite="false"/>

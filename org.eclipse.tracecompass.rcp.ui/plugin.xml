@@ -117,12 +117,20 @@
                   commandId="org.eclipse.ui.help.helpContents"
                   style="push">
             </command>
+            <separator
+                  name="org.eclipse.tracecompass.rcp.ui.separator"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.eclipse.equinox.p2.ui.sdk.update"
+                  style="push">
+            </command>
             <command
                   commandId="org.eclipse.equinox.p2.ui.sdk.install"
                   style="push">
             </command>
             <separator
-                  name="org.eclipse.linuxtools.tracing.rcp.ui.separator3"
+                  name="org.eclipse.tracecompass.rcp.ui.separator"
                   visible="true">
             </separator>
             <command
