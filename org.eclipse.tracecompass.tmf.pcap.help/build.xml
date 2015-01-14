@@ -7,8 +7,8 @@
    <property name="ug.title" value="Pcap Network Tracing User Guide" />
 
     <path id="wikitext.tasks.classpath">
-        <!-- Search in the local Eclipse installation directory for the Wikitext plugin -->
-        <fileset dir="${eclipse.home}/plugins" erroronmissingdir="false">
+        <!-- Search in the local Eclipse plugins directory for the Wikitext plugin -->
+        <fileset dir="${osgi.syspath}" erroronmissingdir="false">
             <include name="org.eclipse.mylyn.wikitext.*core*.jar" />
             <include name="com.google.guava_*.jar" />
         </fileset>
