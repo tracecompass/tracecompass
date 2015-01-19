@@ -14,6 +14,7 @@
 package org.eclipse.tracecompass.lttng2.kernel.core.trace;
 
 import java.nio.BufferOverflowException;
+import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
@@ -21,17 +22,22 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelTidAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Activator;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.Lttng26EventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.PerfEventLayout;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * This is the specification of CtfTmfTrace for use with LTTng 2.x kernel
@@ -54,6 +60,18 @@ public class LttngKernelTrace extends CtfTmfTrace implements IKernelTrace {
         private OriginTracer(@NonNull IKernelAnalysisEventLayout layout) {
             fLayout = layout;
         }
+    }
+
+    /**
+     * Event aspects available for all Lttng Kernel traces
+     */
+    private static final @NonNull Collection<ITmfEventAspect> LTTNG_KERNEL_ASPECTS;
+
+    static {
+        ImmutableSet.Builder<ITmfEventAspect> builder = ImmutableSet.builder();
+        builder.addAll(CtfTmfTrace.CTF_ASPECTS);
+        builder.add(new KernelTidAspect());
+        LTTNG_KERNEL_ASPECTS = NonNullUtils.checkNotNull(builder.build());
     }
 
     /**
@@ -137,6 +155,11 @@ public class LttngKernelTrace extends CtfTmfTrace implements IKernelTrace {
         } catch (final BufferOverflowException e) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.LttngKernelTrace_TraceReadError + ": " + Messages.LttngKernelTrace_MalformedTrace); //$NON-NLS-1$
         }
+    }
+
+    @Override
+    public Iterable<ITmfEventAspect> getEventAspects() {
+         return LTTNG_KERNEL_ASPECTS;
     }
 
 }

@@ -96,7 +96,7 @@ public class CtfTmfTrace extends TmfTrace
     /**
      * Event aspects available for all CTF traces
      */
-    private static final @NonNull Collection<ITmfEventAspect> CTF_ASPECTS =
+    protected static final @NonNull Collection<ITmfEventAspect> CTF_ASPECTS =
             checkNotNull(ImmutableList.of(
                     ITmfEventAspect.BaseAspects.TIMESTAMP,
                     new CtfChannelAspect(),

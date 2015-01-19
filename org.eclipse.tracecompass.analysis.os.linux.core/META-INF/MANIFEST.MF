@@ -15,6 +15,7 @@ Require-Bundle: org.eclipse.core.runtime,
 Import-Package: com.google.common.collect,
  com.google.common.hash;version="15.0.0"
 Export-Package: org.eclipse.tracecompass.analysis.os.linux.core.cpuusage,
+ org.eclipse.tracecompass.analysis.os.linux.core.event.aspect,
  org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis,
  org.eclipse.tracecompass.analysis.os.linux.core.model,
  org.eclipse.tracecompass.analysis.os.linux.core.trace,
