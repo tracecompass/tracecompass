@@ -94,7 +94,14 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
     public String getId() {
         String id = fId;
         if (id == null) {
-            id = new String(this.getClass().getCanonicalName());
+            id = this.getClass().getCanonicalName();
+            if (id == null) {
+                /*
+                 * Some types, like anonymous classes, don't have a canonical
+                 * name. Just use the default name instead.
+                 */
+                id = checkNotNull(this.getClass().getName());
+            }
             fId = id;
         }
         return id;

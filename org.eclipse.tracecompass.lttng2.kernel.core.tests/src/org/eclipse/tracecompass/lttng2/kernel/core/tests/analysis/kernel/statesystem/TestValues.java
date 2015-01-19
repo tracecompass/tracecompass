@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -17,15 +17,17 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 
 /**
  * Expected return values of querying test trace #1's state system at time
- * "18670067372290L + 1331649577946812237L"
+ * "18670067372290L + 1331649577946812237L".
+ *
+ * This file is can be generated using the {@link GenerateTestValues} script.
  *
  * @author Alexandre Montplaisir
  */
 interface TestValues {
 
-    static final int size = 863;
+    int size = 863;
 
-    static final long[] startTimes = {
+    long[] startTimes = {
         1331668247314038062L,
         1331668247314038062L,
         1331668248014145796L,
@@ -891,7 +893,7 @@ interface TestValues {
         1331668247314038062L,
     };
 
-    static final long[] endTimes = {
+    long[] endTimes = {
         1331668259054285979L,
         1331668259054285979L,
         1331668248014620024L,
@@ -1757,7 +1759,7 @@ interface TestValues {
         1331668259054285979L,
     };
 
-    static final ITmfStateValue[] values = {
+    ITmfStateValue[] values = {
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
         TmfStateValue.newValueInt(1397),

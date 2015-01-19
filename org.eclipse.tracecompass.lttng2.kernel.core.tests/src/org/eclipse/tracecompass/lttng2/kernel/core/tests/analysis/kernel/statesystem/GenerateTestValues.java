@@ -88,25 +88,25 @@ public class GenerateTestValues {
             /* Start printing the java file's contents */
             writer.println("interface TestValues {");
             writer.println();
-            writer.println(INDENT + "static final int size = " + fullState.size() + ";");
+            writer.println(INDENT + "int size = " + fullState.size() + ";");
             writer.println();
 
             /* Print the array contents */
-            writer.println(INDENT + "static final long[] startTimes = {");
+            writer.println(INDENT + "long[] startTimes = {");
             for (ITmfStateInterval interval : fullState) {
                 writer.println(INDENT + INDENT + String.valueOf(interval.getStartTime()) + "L,");
             }
             writer.println(INDENT + "};");
             writer.println();
 
-            writer.println(INDENT + "static final long[] endTimes = {");
+            writer.println(INDENT + "long[] endTimes = {");
             for (ITmfStateInterval interval : fullState) {
                 writer.println(INDENT + INDENT + String.valueOf(interval.getEndTime()) + "L,");
             }
             writer.println(INDENT + "};");
             writer.println();
 
-            writer.println(INDENT + "static final ITmfStateValue[] values = {");
+            writer.println(INDENT + "ITmfStateValue[] values = {");
             for (ITmfStateInterval interval : fullState) {
                 ITmfStateValue val = interval.getStateValue();
                 writer.print(INDENT + INDENT);
