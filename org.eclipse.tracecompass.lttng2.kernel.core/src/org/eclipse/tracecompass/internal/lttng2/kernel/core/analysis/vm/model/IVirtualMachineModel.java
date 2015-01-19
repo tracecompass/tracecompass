@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.model;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 
 /**
