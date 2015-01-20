@@ -25,6 +25,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfEventFieldAspect;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAndNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAspectNode;
@@ -104,10 +105,7 @@ public class TmfFilterXMLWriter {
 
             TmfFilterContainsNode node = (TmfFilterContainsNode) treenode;
             element.setAttribute(TmfFilterContainsNode.NOT_ATTR, Boolean.toString(node.isNot()));
-            if (node.getEventAspect() != null) {
-                element.setAttribute(TmfFilterAspectNode.EVENT_ASPECT_ATTR, node.getEventAspect().getName());
-                element.setAttribute(TmfFilterAspectNode.TRACE_TYPE_ID_ATTR, node.getTraceTypeId());
-            }
+            setAspectAttributes(element, node);
             element.setAttribute(TmfFilterContainsNode.VALUE_ATTR, node.getValue());
             element.setAttribute(TmfFilterContainsNode.IGNORECASE_ATTR, Boolean.toString(node.isIgnoreCase()));
 
@@ -115,10 +113,7 @@ public class TmfFilterXMLWriter {
 
             TmfFilterEqualsNode node = (TmfFilterEqualsNode) treenode;
             element.setAttribute(TmfFilterEqualsNode.NOT_ATTR, Boolean.toString(node.isNot()));
-            if (node.getEventAspect() != null) {
-                element.setAttribute(TmfFilterAspectNode.EVENT_ASPECT_ATTR, node.getEventAspect().getName());
-                element.setAttribute(TmfFilterAspectNode.TRACE_TYPE_ID_ATTR, node.getTraceTypeId());
-            }
+            setAspectAttributes(element, node);
             element.setAttribute(TmfFilterEqualsNode.VALUE_ATTR, node.getValue());
             element.setAttribute(TmfFilterEqualsNode.IGNORECASE_ATTR, Boolean.toString(node.isIgnoreCase()));
 
@@ -126,20 +121,14 @@ public class TmfFilterXMLWriter {
 
             TmfFilterMatchesNode node = (TmfFilterMatchesNode) treenode;
             element.setAttribute(TmfFilterMatchesNode.NOT_ATTR, Boolean.toString(node.isNot()));
-            if (node.getEventAspect() != null) {
-                element.setAttribute(TmfFilterAspectNode.EVENT_ASPECT_ATTR, node.getEventAspect().getName());
-                element.setAttribute(TmfFilterAspectNode.TRACE_TYPE_ID_ATTR, node.getTraceTypeId());
-            }
+            setAspectAttributes(element, node);
             element.setAttribute(TmfFilterMatchesNode.REGEX_ATTR, node.getRegex());
 
         } else if (treenode instanceof TmfFilterCompareNode) {
 
             TmfFilterCompareNode node = (TmfFilterCompareNode) treenode;
             element.setAttribute(TmfFilterCompareNode.NOT_ATTR, Boolean.toString(node.isNot()));
-            if (node.getEventAspect() != null) {
-                element.setAttribute(TmfFilterAspectNode.EVENT_ASPECT_ATTR, node.getEventAspect().getName());
-                element.setAttribute(TmfFilterAspectNode.TRACE_TYPE_ID_ATTR, node.getTraceTypeId());
-            }
+            setAspectAttributes(element, node);
             element.setAttribute(TmfFilterCompareNode.RESULT_ATTR, Integer.toString(node.getResult()));
             element.setAttribute(TmfFilterCompareNode.TYPE_ATTR, node.getType().toString());
             element.setAttribute(TmfFilterCompareNode.VALUE_ATTR, node.getValue());
@@ -150,6 +139,19 @@ public class TmfFilterXMLWriter {
 
         for (int i = 0; i < treenode.getChildrenCount(); i++) {
             buildXMLTree(document, treenode.getChild(i), element);
+        }
+    }
+
+    private static void setAspectAttributes(Element element, TmfFilterAspectNode node) {
+        if (node.getEventAspect() != null) {
+            element.setAttribute(TmfFilterAspectNode.EVENT_ASPECT_ATTR, node.getEventAspect().getName());
+            element.setAttribute(TmfFilterAspectNode.TRACE_TYPE_ID_ATTR, node.getTraceTypeId());
+            if (node.getEventAspect() instanceof TmfEventFieldAspect) {
+                TmfEventFieldAspect aspect = (TmfEventFieldAspect) node.getEventAspect();
+                if (aspect.getFieldPath() != null) {
+                    element.setAttribute(TmfFilterAspectNode.FIELD_ATTR, aspect.getFieldPath());
+                }
+            }
         }
     }
 

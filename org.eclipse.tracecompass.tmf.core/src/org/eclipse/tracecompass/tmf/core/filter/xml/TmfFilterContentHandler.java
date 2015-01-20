@@ -234,13 +234,15 @@ public class TmfFilterContentHandler extends DefaultHandler {
                 if (eventAspect.getName().equals(name)) {
                     node.setEventAspect(eventAspect);
                     node.setTraceTypeId(traceTypeId);
+                    if (eventAspect instanceof TmfEventFieldAspect) {
+                        String field = atts.getValue(TmfFilterAspectNode.FIELD_ATTR);
+                        if (field != null && !field.isEmpty()) {
+                            node.setEventAspect(((TmfEventFieldAspect) eventAspect).forField(field));
+                        }
+                    }
                     break;
                 }
             }
-        } else if (TmfFilterAspectNode.EVENT_FIELD_ASPECT_ID.equals(traceTypeId) && name != null) {
-            ITmfEventAspect eventAspect = new TmfEventFieldAspect(name, name);
-            node.setEventAspect(eventAspect);
-            node.setTraceTypeId(traceTypeId);
         } else if (traceTypeId != null && name != null) {
             TraceTypeHelper helper = TmfTraceType.getTraceType(traceTypeId);
             if (helper != null) {
@@ -248,6 +250,12 @@ public class TmfFilterContentHandler extends DefaultHandler {
                     if (eventAspect.getName().equals(name)) {
                         node.setEventAspect(eventAspect);
                         node.setTraceTypeId(traceTypeId);
+                        if (eventAspect instanceof TmfEventFieldAspect) {
+                            String field = atts.getValue(TmfFilterAspectNode.FIELD_ATTR);
+                            if (field != null && !field.isEmpty()) {
+                                node.setEventAspect(((TmfEventFieldAspect) eventAspect).forField(field));
+                            }
+                        }
                         break;
                     }
                 }
@@ -266,9 +274,8 @@ public class TmfFilterContentHandler extends DefaultHandler {
                     node.setEventAspect(ITmfEventAspect.BaseAspects.CONTENTS);
                     node.setTraceTypeId(TmfFilterAspectNode.BASE_ASPECT_ID);
                 } else {
-                    ITmfEventAspect eventAspect = new TmfEventFieldAspect(field, field);
-                    node.setEventAspect(eventAspect);
-                    node.setTraceTypeId(TmfFilterAspectNode.EVENT_FIELD_ASPECT_ID);
+                    node.setEventAspect(ITmfEventAspect.BaseAspects.CONTENTS.forField(field));
+                    node.setTraceTypeId(TmfFilterAspectNode.BASE_ASPECT_ID);
                 }
             }
         }

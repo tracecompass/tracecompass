@@ -33,8 +33,6 @@ public class PcapRootEventField extends TmfEventField {
     /**
      * Full constructor
      *
-     * @param value
-     *            The event field value.
      * @param fields
      *            The list of subfields.
      * @param packet
@@ -42,8 +40,8 @@ public class PcapRootEventField extends TmfEventField {
      * @throws IllegalArgumentException
      *             If 'name' is null, or if 'fields' has duplicate field names.
      */
-    public PcapRootEventField(Object value, @Nullable ITmfEventField[] fields, Packet packet) {
-        super(ITmfEventField.ROOT_FIELD_ID, value, fields);
+    public PcapRootEventField(@Nullable ITmfEventField[] fields, Packet packet) {
+        super(ITmfEventField.ROOT_FIELD_ID, null, fields);
         fPacketSourceField = new TmfEventField(PcapEvent.EVENT_FIELD_PACKET_SOURCE,
                 packet.getMostEcapsulatedPacket().getSourceEndpoint().toString(), null);
         fPacketDestinationField = new TmfEventField(PcapEvent.EVENT_FIELD_PACKET_DESTINATION,

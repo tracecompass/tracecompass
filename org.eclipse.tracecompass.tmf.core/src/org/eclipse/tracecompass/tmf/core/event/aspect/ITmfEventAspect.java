@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 
@@ -106,21 +107,17 @@ public interface ITmfEventAspect {
         /**
          * Aspect for the aggregated event contents (fields)
          */
-        ITmfEventAspect CONTENTS = new ITmfEventAspect() {
+        TmfEventFieldAspect CONTENTS = new TmfEventFieldAspect(Messages.getMessage(Messages.AspectName_Contents), null, new TmfEventFieldAspect.IRootField() {
             @Override
-            public String getName() {
-                return Messages.getMessage(Messages.AspectName_Contents);
+            public @Nullable ITmfEventField getRootField(ITmfEvent event) {
+                return event.getContent();
             }
-
+        }) {
             @Override
             public String getHelpText() {
                 return Messages.getMessage(Messages.AspectHelpText_Contents);
             }
 
-            @Override
-            public @Nullable String resolve(ITmfEvent event) {
-                return event.getContent().toString();
-            }
         };
 
         /**

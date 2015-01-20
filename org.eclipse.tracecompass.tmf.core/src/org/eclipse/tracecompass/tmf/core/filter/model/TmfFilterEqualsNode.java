@@ -116,8 +116,7 @@ public class TmfFilterEqualsNode extends TmfFilterAspectNode {
 
     @Override
     public String toString() {
-        String aspectName = fEventAspect != null ? fEventAspect.getName() : ""; //$NON-NLS-1$
-        return aspectName + (fNot ? " not" : "") + " equals \"" + fValue + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        return getAspectLabel() + (fNot ? " not" : "") + " equals \"" + fValue + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
 
     @Override

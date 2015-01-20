@@ -88,7 +88,7 @@ public class PcapEventFactory {
         String dataLink = Messages.PcapEventFactory_LinkType + ':' + LinkTypeHelper.toString((int) pcapPacket.getPcapFile().getDataLinkType());
 
         ITmfEventField[] fields = generatePacketFields(pcapPacket);
-        ITmfEventField field = new PcapRootEventField(EMPTY_STRING, fields, pcapPacket);
+        ITmfEventField field = new PcapRootEventField(fields, pcapPacket);
         Packet packet = pcapPacket.getMostEcapsulatedPacket();
         if (!fEventTypes.containsKey(packet.getProtocol())) {
             String typeIdString = PcapEventType.DEFAULT_PCAP_TYPE_ID + ':' + packet.getProtocol().getShortName();

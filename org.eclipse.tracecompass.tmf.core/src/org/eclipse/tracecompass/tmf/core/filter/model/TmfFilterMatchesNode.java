@@ -141,8 +141,7 @@ public class TmfFilterMatchesNode extends TmfFilterAspectNode {
 
     @Override
     public String toString() {
-        String aspectName = fEventAspect != null ? fEventAspect.getName() : ""; //$NON-NLS-1$
-        return aspectName + (isNot() ? " not" : "") + " matches \"" + getRegex() + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        return getAspectLabel() + (isNot() ? " not" : "") + " matches \"" + getRegex() + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
 
     @Override

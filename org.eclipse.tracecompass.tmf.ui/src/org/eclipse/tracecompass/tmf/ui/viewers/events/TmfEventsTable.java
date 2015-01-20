@@ -115,7 +115,7 @@ import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
-import org.eclipse.tracecompass.tmf.core.event.aspect.TmfEventFieldAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfContentFieldAspect;
 import org.eclipse.tracecompass.tmf.core.event.collapse.ITmfCollapsibleEvent;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfModelLookup;
@@ -336,7 +336,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * @param cacheSize
      *            The size of the event table cache
      * @param columnData
-     *            Unused
+     *            The column data array
      * @deprecated Deprecated constructor, use
      *             {@link #TmfEventsTable(Composite, int, Collection)}
      */
@@ -345,7 +345,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             final org.eclipse.tracecompass.tmf.ui.widgets.virtualtable.ColumnData[] columnData) {
         /*
          * We'll do a "best-effort" to keep trace types still using this API to
-         * keep working, by defining a TmfEventTableFieldColumn for each
+         * keep working, by defining a TmfEventTableColumn for each
          * ColumnData they passed.
          */
         this(parent, cacheSize, convertFromColumnData(columnData));
@@ -359,7 +359,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         for (org.eclipse.tracecompass.tmf.ui.widgets.virtualtable.ColumnData col : columnData) {
             String fieldName = col.header;
             if (fieldName != null) {
-                builder.add(new TmfEventFieldAspect(fieldName, fieldName));
+                builder.add(new TmfContentFieldAspect(fieldName, fieldName));
             }
         }
         return checkNotNull(builder.build());

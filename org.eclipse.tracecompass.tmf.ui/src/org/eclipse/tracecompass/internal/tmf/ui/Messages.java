@@ -259,7 +259,6 @@ public class Messages extends NLS {
     public static String FilterViewer_AspectLabel;
     public static String FilterViewer_CommonCategory;
     public static String FilterViewer_EmptyTreeHintText;
-    public static String FilterViewer_EventField;
     public static String FilterViewer_FieldHint;
     public static String FilterViewer_FieldLabel;
     public static String FilterViewer_FilterNameHint;

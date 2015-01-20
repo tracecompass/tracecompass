@@ -121,7 +121,7 @@ public class PcapEventFieldTest {
             IPv4Packet packet = new IPv4Packet(dummy, null, bb);
             ITmfEventField[] fieldArray = generatePacketFields(packet);
             fRegularField = new PcapEventField("Regular Field", EMPTY_STRING, fieldArray, packet);
-            fRootField = new PcapRootEventField(EMPTY_STRING, fieldArray, packet);
+            fRootField = new PcapRootEventField(fieldArray, packet);
         }
 
     }

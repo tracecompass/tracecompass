@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.tmf.core.filter.model;
 
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfEventFieldAspect;
 
 /**
  * Base class for filter nodes which use event aspects
@@ -25,10 +26,10 @@ public abstract class TmfFilterAspectNode extends TmfFilterTreeNode {
     public static final String EVENT_ASPECT_ATTR = "eventaspect"; //$NON-NLS-1$
     /** trace type id attribute name */
     public static final String TRACE_TYPE_ID_ATTR = "tracetypeid"; //$NON-NLS-1$
+    /** field attribute name */
+    public static final String FIELD_ATTR = "field"; //$NON-NLS-1$
     /** special case trace type id for base aspects */
     public static final String BASE_ASPECT_ID = "BASE.ASPECT.ID"; //$NON-NLS-1$
-    /** special case trace type id for event field aspect */
-    public static final String EVENT_FIELD_ASPECT_ID = "EVENT.FIELD.ASPECT.ID"; //$NON-NLS-1$
 
     /** event aspect */
     protected ITmfEventAspect fEventAspect;
@@ -61,7 +62,6 @@ public abstract class TmfFilterAspectNode extends TmfFilterTreeNode {
      * @return The trace type id from which the event aspect belongs, or a
      *         special case id
      * @see #BASE_ASPECT_ID
-     * @see #EVENT_FIELD_ASPECT_ID
      */
     public String getTraceTypeId() {
         return fTraceTypeId;
@@ -72,10 +72,29 @@ public abstract class TmfFilterAspectNode extends TmfFilterTreeNode {
      *            The trace type id from which the event aspect belongs, or a
      *            special case id
      * @see #BASE_ASPECT_ID
-     * @see #EVENT_FIELD_ASPECT_ID
      */
     public void setTraceTypeId(String traceTypeId) {
         fTraceTypeId = traceTypeId;
+    }
+
+    /**
+     * @return The string representation of the event aspect
+     */
+    public String getAspectLabel() {
+        if (fEventAspect == null) {
+            return ""; //$NON-NLS-1$
+        }
+        StringBuilder sb = new StringBuilder(fEventAspect.getName());
+        if (fEventAspect instanceof TmfEventFieldAspect) {
+            String field = ((TmfEventFieldAspect) fEventAspect).getFieldPath();
+            if (field != null && !field.isEmpty()) {
+                if (field.charAt(0) != '/') {
+                    sb.append('/');
+                }
+                sb.append(field);
+            }
+        }
+        return sb.toString();
     }
 
     @Override
