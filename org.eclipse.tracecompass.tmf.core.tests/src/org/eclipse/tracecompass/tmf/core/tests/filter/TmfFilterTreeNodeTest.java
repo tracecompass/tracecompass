@@ -76,8 +76,11 @@ public class TmfFilterTreeNodeTest {
 
     @Test
     public void testClone() {
-        assertEquals("clone()", fFilterNode, fFilterNode.clone());
-        assertFalse(fFilterNode == fFilterNode.clone());
+        ITmfFilterTreeNode clone = fFilterNode.clone();
+        assertFalse("clone().equals()", fFilterNode.equals(clone));
+        assertFalse("clone() ==", fFilterNode == clone);
+        assertEquals("clone().toString.equals()", fFilterNode.toString(), clone.toString());
+        assertNull("clone().getParent()", clone.getParent());
     }
 
     @Test

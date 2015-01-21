@@ -129,42 +129,4 @@ public class TmfFilterContainsNode extends TmfFilterAspectNode {
         clone.setValue(fValue);
         return clone;
     }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (fIgnoreCase ? 1231 : 1237);
-        result = prime * result + (fNot ? 1231 : 1237);
-        result = prime * result + ((fValue == null) ? 0 : fValue.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        TmfFilterContainsNode other = (TmfFilterContainsNode) obj;
-        if (fIgnoreCase != other.fIgnoreCase) {
-            return false;
-        }
-        if (fNot != other.fNot) {
-            return false;
-        }
-        if (fValue == null) {
-            if (other.fValue != null) {
-                return false;
-            }
-        } else if (!fValue.equals(other.fValue)) {
-            return false;
-        }
-        return true;
-    }
 }

@@ -59,4 +59,13 @@ public class TmfFilterRootNode extends TmfFilterTreeNode {
         return Arrays.asList(VALID_CHILDREN);
     }
 
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer("root"); //$NON-NLS-1$
+        if (getChildrenCount() > 0) {
+            buf.append(' ');
+            buf.append(Arrays.toString(getChildren()));
+        }
+        return buf.toString();
+    }
 }

@@ -143,38 +143,4 @@ public class TmfFilterMatchesNode extends TmfFilterAspectNode {
     public String toString() {
         return getAspectLabel() + (isNot() ? " not" : "") + " matches \"" + getRegex() + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (fNot ? 1231 : 1237);
-        result = prime * result + ((fRegex == null) ? 0 : fRegex.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        TmfFilterMatchesNode other = (TmfFilterMatchesNode) obj;
-        if (fNot != other.fNot) {
-            return false;
-        }
-        if (fRegex == null) {
-            if (other.fRegex != null) {
-                return false;
-            }
-        } else if (!fRegex.equals(other.fRegex)) {
-            return false;
-        }
-        return true;
-    }
 }

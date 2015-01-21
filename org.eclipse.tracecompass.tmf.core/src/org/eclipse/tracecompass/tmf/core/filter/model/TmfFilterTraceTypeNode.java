@@ -146,42 +146,4 @@ public class TmfFilterTraceTypeNode extends TmfFilterTreeNode {
         }
         return buf.toString();
     }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + ((fName == null) ? 0 : fName.hashCode());
-        result = prime * result + ((fTraceTypeId == null) ? 0 : fTraceTypeId.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        TmfFilterTraceTypeNode other = (TmfFilterTraceTypeNode) obj;
-        if (fName == null) {
-            if (other.fName != null) {
-                return false;
-            }
-        } else if (!fName.equals(other.fName)) {
-            return false;
-        }
-        if (fTraceTypeId == null) {
-            if (other.fTraceTypeId != null) {
-                return false;
-            }
-        } else if (!fTraceTypeId.equals(other.fTraceTypeId)) {
-            return false;
-        }
-        return true;
-    }
 }

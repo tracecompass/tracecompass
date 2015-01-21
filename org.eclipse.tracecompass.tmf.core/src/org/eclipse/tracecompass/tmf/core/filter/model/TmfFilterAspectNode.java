@@ -104,42 +104,4 @@ public abstract class TmfFilterAspectNode extends TmfFilterTreeNode {
         clone.setTraceTypeId(fTraceTypeId);
         return clone;
     }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + ((fEventAspect == null) ? 0 : fEventAspect.hashCode());
-        result = prime * result + ((fTraceTypeId == null) ? 0 : fTraceTypeId.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        TmfFilterAspectNode other = (TmfFilterAspectNode) obj;
-        if (fEventAspect == null) {
-            if (other.fEventAspect != null) {
-                return false;
-            }
-        } else if (!fEventAspect.equals(other.fEventAspect)) {
-            return false;
-        }
-        if (fTraceTypeId == null) {
-            if (other.fTraceTypeId != null) {
-                return false;
-            }
-        } else if (!fTraceTypeId.equals(other.fTraceTypeId)) {
-            return false;
-        }
-        return true;
-    }
 }
