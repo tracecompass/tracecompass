@@ -114,8 +114,8 @@ public class TmfFilterEqualsNode extends TmfFilterAspectNode {
     }
 
     @Override
-    public String toString() {
-        return getAspectLabel() + (fNot ? " not" : "") + " equals \"" + fValue + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+    public String toString(boolean explicit) {
+        return getAspectLabel(explicit) + (fNot ? " not equals " : " equals ") + (fIgnoreCase ? "ignorecase \"" : "\"") + fValue + '\"'; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
 
     @Override

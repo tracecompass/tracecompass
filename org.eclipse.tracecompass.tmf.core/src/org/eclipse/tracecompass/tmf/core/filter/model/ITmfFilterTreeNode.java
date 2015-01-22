@@ -120,8 +120,19 @@ public interface ITmfFilterTreeNode extends ITmfFilter {
     public List<String> getValidChildren();
 
     /**
+     * <h4>Returns a string representation of the filter tree node object.</h4>
+     *
+     * @param explicit
+     *            true if ambiguous fields should explicitly include additional
+     *            information that can differentiate them from other fields with
+     *            the same name
+     *
+     * @return a string representation of the filter tree node object
+     */
+    public String toString(boolean explicit);
+
+    /**
      * @return a clone of the node
      */
     public ITmfFilterTreeNode clone();
-
 }

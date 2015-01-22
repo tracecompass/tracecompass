@@ -88,14 +88,16 @@ public class TmfFilterNode extends TmfFilterTreeNode {
     }
 
     @Override
-    public String toString() {
+    public String toString(boolean explicit) {
         StringBuffer buf = new StringBuffer();
+        buf.append(fFilterName);
+        buf.append(": "); //$NON-NLS-1$
         if (getChildrenCount() > 1) {
             buf.append("( "); //$NON-NLS-1$
         }
         for (int i = 0; i < getChildrenCount(); i++) {
             ITmfFilterTreeNode node = getChildren()[i];
-            buf.append(node.toString());
+            buf.append(node.toString(explicit));
             if (i < (getChildrenCount() - 1)) {
                 buf.append(" and "); //$NON-NLS-1$
             }

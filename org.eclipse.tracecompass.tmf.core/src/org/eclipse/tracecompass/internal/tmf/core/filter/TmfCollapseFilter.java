@@ -113,6 +113,11 @@ public class TmfCollapseFilter implements ITmfFilterTreeNode {
     }
 
     @Override
+    public String toString(boolean explicit) {
+        return COLLAPSE_NODE_NAME + " [" + fPrevEvent + ']'; //$NON-NLS-1$
+    }
+
+    @Override
     public ITmfFilterTreeNode clone() {
         return new TmfCollapseFilter();
     }

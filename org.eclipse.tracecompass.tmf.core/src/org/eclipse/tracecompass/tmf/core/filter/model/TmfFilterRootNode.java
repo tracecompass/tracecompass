@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.core.filter.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -60,11 +61,15 @@ public class TmfFilterRootNode extends TmfFilterTreeNode {
     }
 
     @Override
-    public String toString() {
+    public String toString(boolean explicit) {
         StringBuffer buf = new StringBuffer("root"); //$NON-NLS-1$
         if (getChildrenCount() > 0) {
             buf.append(' ');
-            buf.append(Arrays.toString(getChildren()));
+            List<String> strings = new ArrayList<>();
+            for (ITmfFilterTreeNode child : getChildren()) {
+                strings.add(child.toString(explicit));
+            }
+            buf.append(strings.toString());
         }
         return buf.toString();
     }

@@ -119,8 +119,8 @@ public class TmfFilterContainsNode extends TmfFilterAspectNode {
     }
 
     @Override
-    public String toString() {
-        return getAspectLabel() + (fNot ? " not" : "") + " contains \"" + fValue + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+    public String toString(boolean explicit) {
+        return getAspectLabel(explicit) + (fNot ? " not contains " : " contains ") + (fIgnoreCase ? "ignorecase \"" : "\"") + fValue + '\"'; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
 
     @Override

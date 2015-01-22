@@ -120,6 +120,16 @@ public class ColorsViewTest {
         public ITmfFilterTreeNode clone() {
             return null;
         }
+
+        @Override
+        public String toString(boolean explicit) {
+            return toString();
+        }
+
+        @Override
+        public String toString() {
+            return getNodeName();
+        }
     }
 
     private static final String XMLSTUB_ID = "org.eclipse.linuxtools.tmf.core.tests.xmlstub";

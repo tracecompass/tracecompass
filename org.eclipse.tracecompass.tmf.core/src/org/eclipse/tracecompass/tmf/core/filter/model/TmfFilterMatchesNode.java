@@ -140,7 +140,7 @@ public class TmfFilterMatchesNode extends TmfFilterAspectNode {
     }
 
     @Override
-    public String toString() {
-        return getAspectLabel() + (isNot() ? " not" : "") + " matches \"" + getRegex() + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+    public String toString(boolean explicit) {
+        return getAspectLabel(explicit) + (fNot ? " not matches \"" : " matches \"") + getRegex() + '\"'; //$NON-NLS-1$ //$NON-NLS-2$
     }
 }

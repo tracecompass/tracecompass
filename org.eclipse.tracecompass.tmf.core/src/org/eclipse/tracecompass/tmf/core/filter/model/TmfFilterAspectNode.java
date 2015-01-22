@@ -78,13 +78,23 @@ public abstract class TmfFilterAspectNode extends TmfFilterTreeNode {
     }
 
     /**
+     * @param explicit
+     *            true if the string representation should explicitly include
+     *            the trace type id that can differentiate it from other aspects
+     *            with the same name
+     *
      * @return The string representation of the event aspect
      */
-    public String getAspectLabel() {
+    public String getAspectLabel(boolean explicit) {
         if (fEventAspect == null) {
             return ""; //$NON-NLS-1$
         }
         StringBuilder sb = new StringBuilder(fEventAspect.getName());
+        if (explicit) {
+            sb.append('[');
+            sb.append(fTraceTypeId);
+            sb.append(']');
+        }
         if (fEventAspect instanceof TmfEventFieldAspect) {
             String field = ((TmfEventFieldAspect) fEventAspect).getFieldPath();
             if (field != null && !field.isEmpty()) {

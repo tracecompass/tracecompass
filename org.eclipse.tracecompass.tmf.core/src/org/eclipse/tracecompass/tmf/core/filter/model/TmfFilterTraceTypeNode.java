@@ -125,9 +125,14 @@ public class TmfFilterTraceTypeNode extends TmfFilterTreeNode {
     }
 
     @Override
-    public String toString() {
+    public String toString(boolean explicit) {
         StringBuffer buf = new StringBuffer();
         buf.append("TraceType is " + fName); //$NON-NLS-1$
+        if (explicit) {
+            buf.append('[');
+            buf.append(fTraceTypeId);
+            buf.append(']');
+        }
         if (getChildrenCount() > 0) {
             buf.append(" and "); //$NON-NLS-1$
         }
@@ -136,7 +141,7 @@ public class TmfFilterTraceTypeNode extends TmfFilterTreeNode {
         }
         for (int i = 0; i < getChildrenCount(); i++) {
             ITmfFilterTreeNode node = getChildren()[i];
-            buf.append(node.toString());
+            buf.append(node.toString(explicit));
             if (i < getChildrenCount() - 1) {
                 buf.append(" and "); //$NON-NLS-1$
             }

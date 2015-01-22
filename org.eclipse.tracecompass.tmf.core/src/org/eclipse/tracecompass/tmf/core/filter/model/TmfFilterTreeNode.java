@@ -137,4 +137,9 @@ public abstract class TmfFilterTreeNode implements ITmfFilterTreeNode, Cloneable
             return null;
         }
     }
+
+    @Override
+    public String toString() {
+        return toString(false);
+    }
 }

@@ -66,7 +66,7 @@ public class TmfFilterOrNode extends TmfFilterTreeNode {
     }
 
     @Override
-    public String toString() {
+    public String toString(boolean explicit) {
         StringBuffer buf = new StringBuffer();
         if (fNot) {
             buf.append("not "); //$NON-NLS-1$
@@ -76,7 +76,7 @@ public class TmfFilterOrNode extends TmfFilterTreeNode {
         }
         for (int i = 0; i < getChildrenCount(); i++) {
             ITmfFilterTreeNode node = getChildren()[i];
-            buf.append(node.toString());
+            buf.append(node.toString(explicit));
             if (i < getChildrenCount() - 1) {
                 buf.append(" or "); //$NON-NLS-1$
             }

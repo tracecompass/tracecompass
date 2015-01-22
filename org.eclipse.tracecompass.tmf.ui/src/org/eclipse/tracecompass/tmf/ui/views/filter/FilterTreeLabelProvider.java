@@ -91,7 +91,7 @@ public class FilterTreeLabelProvider implements ILabelProvider {
 
             TmfFilterContainsNode node = (TmfFilterContainsNode) element;
             label = (node.isNot() ? "NOT " : "") + //$NON-NLS-1$ //$NON-NLS-2$
-                    (node.getEventAspect() != null ? node.getAspectLabel() : Messages.FilterTreeLabelProvider_AspectHint) +
+                    (node.getEventAspect() != null ? node.getAspectLabel(false) : Messages.FilterTreeLabelProvider_AspectHint) +
                     ' ' + node.getNodeName() +
                     (node.getValue() != null ? " \"" + node.getValue() + "\"" : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -99,7 +99,7 @@ public class FilterTreeLabelProvider implements ILabelProvider {
 
             TmfFilterEqualsNode node = (TmfFilterEqualsNode) element;
             label = (node.isNot() ? "NOT " : "") + //$NON-NLS-1$ //$NON-NLS-2$
-                    (node.getEventAspect() != null ? node.getAspectLabel() : Messages.FilterTreeLabelProvider_AspectHint) +
+                    (node.getEventAspect() != null ? node.getAspectLabel(false) : Messages.FilterTreeLabelProvider_AspectHint) +
                     ' ' + node.getNodeName() +
                     (node.getValue() != null ? " \"" + node.getValue() + "\"" : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -107,7 +107,7 @@ public class FilterTreeLabelProvider implements ILabelProvider {
 
             TmfFilterMatchesNode node = (TmfFilterMatchesNode) element;
             label = (node.isNot() ? "NOT " : "") + //$NON-NLS-1$ //$NON-NLS-2$
-                    (node.getEventAspect() != null ? node.getAspectLabel() : Messages.FilterTreeLabelProvider_AspectHint) +
+                    (node.getEventAspect() != null ? node.getAspectLabel(false) : Messages.FilterTreeLabelProvider_AspectHint) +
                     ' ' + node.getNodeName() +
                     (node.getRegex() != null ? " \"" + node.getRegex() + "\"" : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -115,7 +115,7 @@ public class FilterTreeLabelProvider implements ILabelProvider {
 
             TmfFilterCompareNode node = (TmfFilterCompareNode) element;
             label = (node.isNot() ? "NOT " : "") + //$NON-NLS-1$ //$NON-NLS-2$
-                    (node.getEventAspect() != null ? node.getAspectLabel() : Messages.FilterTreeLabelProvider_AspectHint) +
+                    (node.getEventAspect() != null ? node.getAspectLabel(false) : Messages.FilterTreeLabelProvider_AspectHint) +
                     (node.getResult() < 0 ? " <" : (node.getResult() > 0 ? " >" : " =")) + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     (node.getType() == Type.ALPHA ? " \"" : node.getType() == Type.TIMESTAMP ? " [" : ' ') + //$NON-NLS-1$ //$NON-NLS-2$
                     (node.hasValidValue() ? node.getValue() : Messages.FilterTreeLabelProvider_ValueHint) +
