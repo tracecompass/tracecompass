@@ -71,7 +71,7 @@ public interface IDeclaration {
     long getAlignment();
 
     /**
-     * The MAXIMUM size of this declaration
+     * The MAXIMUM size of this declaration (in bits).
      *
      * @return the maximum size
      * @since 3.0
