@@ -11,10 +11,11 @@
  *   Florian Wininger - Performance improvements
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ctf.core.trace.iterator;
+package org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator;
 
 import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInputReader;
+import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
 import org.eclipse.tracecompass.internal.tmf.ctf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
@@ -55,17 +56,21 @@ public class CtfIterator extends CTFTraceReader
      * Create a new CTF trace iterator, which initially points at the first
      * event in the trace.
      *
-     * @param trace
-     *            The trace to iterate over
+     * @param ctfTrace
+     *            The {@link CTFTrace} linked to the trace. It should be
+     *            provided by the corresponding 'ctfTmfTrace'.
+     *
+     * @param ctfTmfTrace
+     *            The {@link CtfTmfTrace} to iterate over
      * @throws CTFReaderException
      *             If the iterator couldn't not be instantiated, probably due to
      *             a read error.
      */
-    public CtfIterator(CtfTmfTrace trace) throws CTFReaderException {
-        super(trace.getCTFTrace());
-        fTrace = trace;
+    public CtfIterator(CTFTrace ctfTrace, CtfTmfTrace ctfTmfTrace) throws CTFReaderException {
+        super(ctfTrace);
+        fTrace = ctfTmfTrace;
         if (hasMoreEvents()) {
-            fCurLocation = new CtfLocation(trace.getStartTime());
+            fCurLocation = new CtfLocation(ctfTmfTrace.getStartTime());
             fCurRank = 0;
         } else {
             setUnknownLocation();
@@ -76,8 +81,11 @@ public class CtfIterator extends CTFTraceReader
      * Create a new CTF trace iterator, which will initially point to the given
      * location/rank.
      *
-     * @param trace
-     *            The trace to iterate over
+     * @param ctfTrace
+     *            The {@link CTFTrace} linked to the trace. It should be
+     *            provided by the corresponding 'ctfTmfTrace'.
+     * @param ctfTmfTrace
+     *            The {@link CtfTmfTrace} to iterate over
      * @param ctfLocationData
      *            The initial timestamp the iterator will be pointing to
      * @param rank
@@ -87,11 +95,11 @@ public class CtfIterator extends CTFTraceReader
      *             a read error.
      * @since 2.0
      */
-    public CtfIterator(CtfTmfTrace trace, CtfLocationInfo ctfLocationData, long rank)
+    public CtfIterator(CTFTrace ctfTrace, CtfTmfTrace ctfTmfTrace, CtfLocationInfo ctfLocationData, long rank)
             throws CTFReaderException {
-        super(trace.getCTFTrace());
+        super(ctfTrace);
 
-        this.fTrace = trace;
+        this.fTrace = ctfTmfTrace;
         if (this.hasMoreEvents()) {
             this.fCurLocation = new CtfLocation(ctfLocationData);
             if (this.getCurrentEvent().getTimestamp().getValue() != ctfLocationData.getTimestamp()) {
@@ -154,7 +162,7 @@ public class CtfIterator extends CTFTraceReader
         final CTFStreamInputReader top = super.getPrio().peek();
         if (top != null) {
             long ts = top.getCurrentEvent().getTimestamp();
-            return fTrace.getCTFTrace().timestampCyclesToNanos(ts);
+            return fTrace.timestampCyclesToNanos(ts);
         }
         return 0;
     }
@@ -178,7 +186,7 @@ public class CtfIterator extends CTFTraceReader
 
         /* Adjust the timestamp depending on the trace's offset */
         long currTimestamp = ctfLocationData.getTimestamp();
-        final long offsetTimestamp = this.getCtfTmfTrace().getCTFTrace().timestampNanoToCycles(currTimestamp);
+        final long offsetTimestamp = this.getCtfTmfTrace().timestampNanoToCycles(currTimestamp);
         try {
             if (offsetTimestamp < 0) {
                 ret = super.seek(0L);

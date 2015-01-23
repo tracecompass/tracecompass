@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.ILttngRelaydConnector;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.LttngRelaydConnectorFactory;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewerCommands.AttachReturnCode;
@@ -55,7 +54,6 @@ public final class LttngRelaydConsumer {
 
     private Job fConsumerJob;
     private CtfTmfTrace fCtfTmfTrace;
-    private CTFTrace fCtfTrace;
     private long fTimestampEnd;
     private AttachSessionResponse fSession;
     private Socket fConnection;
@@ -174,7 +172,6 @@ public final class LttngRelaydConsumer {
         }
 
         fCtfTmfTrace = trace;
-        fCtfTrace = trace.getCTFTrace();
         fConsumerJob = new Job("RelayD consumer") { //$NON-NLS-1$
 
             @Override
@@ -186,7 +183,7 @@ public final class LttngRelaydConsumer {
                             if (stream.getMetadataFlag() != 1) {
                                 IndexResponse indexReply = fRelayd.getNextIndex(stream);
                                 if (indexReply.getStatus() == NextIndexReturnCode.VIEWER_INDEX_OK) {
-                                    long nanoTimeStamp = fCtfTrace.timestampCyclesToNanos(indexReply.getTimestampEnd());
+                                    long nanoTimeStamp = fCtfTmfTrace.timestampCyclesToNanos(indexReply.getTimestampEnd());
                                     if (nanoTimeStamp > fTimestampEnd) {
                                         CtfTmfTimestamp endTime = new CtfTmfTimestamp(nanoTimeStamp);
                                         TmfTimeRange range = new TmfTimeRange(fCtfTmfTrace.getStartTime(), endTime);

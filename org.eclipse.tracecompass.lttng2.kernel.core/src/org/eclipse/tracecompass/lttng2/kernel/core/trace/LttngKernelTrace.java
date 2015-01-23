@@ -23,8 +23,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
-import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
-import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Activator;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.Lttng26EventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEventLayout;
@@ -32,6 +30,7 @@ import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.PerfEve
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
+import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 
 /**
@@ -91,7 +90,7 @@ public class LttngKernelTrace extends CtfTmfTrace implements IKernelTrace {
          * Set the 'fOriginTracer' in accordance to what is found in the
          * metadata
          */
-        Map<String, String> traceEnv = this.getCTFTrace().getEnvironment();
+        Map<String, String> traceEnv = this.getEnvironment();
         String tracerName = traceEnv.get("tracer_name"); //$NON-NLS-1$
         String tracerMajor = traceEnv.get("tracer_major"); //$NON-NLS-1$
         String tracerMinor = traceEnv.get("tracer_minor"); //$NON-NLS-1$
@@ -121,8 +120,9 @@ public class LttngKernelTrace extends CtfTmfTrace implements IKernelTrace {
          * Make sure the trace is openable as a CTF trace. We do this here
          * instead of calling super.validate() to keep the reference to "temp".
          */
-        try {
-            CTFTrace temp = new CTFTrace(path);
+        try (CtfTmfTrace temp = new CtfTmfTrace();) {
+            temp.initTrace((IResource) null, path, CtfTmfEvent.class);
+
             /* Make sure the domain is "kernel" in the trace's env vars */
             String dom = temp.getEnvironment().get("domain"); //$NON-NLS-1$
             if (dom != null && dom.equals("\"kernel\"")) { //$NON-NLS-1$
@@ -130,7 +130,7 @@ public class LttngKernelTrace extends CtfTmfTrace implements IKernelTrace {
             }
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.LttngKernelTrace_DomainError);
 
-        } catch (CTFReaderException e) {
+        } catch (TmfTraceException e) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.toString(), e);
         } catch (NullPointerException e) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.toString(), e);

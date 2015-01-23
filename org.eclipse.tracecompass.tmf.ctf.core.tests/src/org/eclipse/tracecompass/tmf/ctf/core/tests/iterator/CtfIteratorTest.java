@@ -19,13 +19,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
-import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
+import org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator.CtfIterator;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfLocation;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfLocationInfo;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
-import org.eclipse.tracecompass.tmf.ctf.core.trace.iterator.CtfIterator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,13 +45,12 @@ public class CtfIteratorTest {
 
     /**
      * Perform pre-test initialization.
-     * @throws CTFReaderException error
      */
     @Before
-    public void setUp() throws CTFReaderException {
+    public void setUp() {
         assumeTrue(testTrace.exists());
         trace = testTrace.getTrace();
-        iterator = new CtfIterator(trace);
+        iterator = (CtfIterator) trace.createIterator();
         CtfLocation ctfLocation = new CtfLocation(new CtfLocationInfo(1, 0));
         iterator.setLocation(ctfLocation);
         iterator.increaseRank();
@@ -73,23 +71,21 @@ public class CtfIteratorTest {
 
     /**
      * Run the CtfIterator(CtfTmfTrace) constructor on a non init'ed trace.
-     * @throws CTFReaderException error
      */
     @Test
-    public void testCtfIterator_noinit() throws CTFReaderException {
-        try (CtfIterator result = new CtfIterator(trace);) {
+    public void testCtfIterator_noinit() {
+        try (CtfIterator result = (CtfIterator) trace.createIterator();) {
             assertNotNull(result);
         }
     }
 
     /**
      * Run the CtfIterator(CtfTmfTrace) constructor on an init'ed trace.
-     * @throws CTFReaderException error
      */
     @Test
-    public void testCtfIterator_init() throws CTFReaderException {
+    public void testCtfIterator_init() {
         trace.init("test");
-        try (CtfIterator result = new CtfIterator(trace);) {
+        try (CtfIterator result = (CtfIterator) trace.createIterator();) {
             assertNotNull(result);
         }
     }
@@ -97,13 +93,12 @@ public class CtfIteratorTest {
     /**
      * Run the CtfIterator(CtfTmfTrace,long,long) constructor test, which
      * specifies an initial position for the iterator.
-     * @throws CTFReaderException error
      */
     @Test
-    public void testCtfIterator_position() throws CTFReaderException {
+    public void testCtfIterator_position() {
         long timestampValue = 1L;
         long rank = 1L;
-        try (CtfIterator result = new CtfIterator(trace, new CtfLocationInfo(timestampValue, 0), rank);) {
+        try (CtfIterator result = (CtfIterator) trace.createIterator(new CtfLocationInfo(timestampValue, 0), rank);) {
             assertNotNull(result);
         }
     }
@@ -120,11 +115,10 @@ public class CtfIteratorTest {
 
     /**
      * Run the int compareTo(CtfIterator) method test.
-     * @throws CTFReaderException error
      */
     @Test
-    public void testCompareTo() throws CTFReaderException {
-        try (CtfIterator o = new CtfIterator(trace);) {
+    public void testCompareTo() {
+        try (CtfIterator o = (CtfIterator) trace.createIterator();) {
             int result = iterator.compareTo(o);
             assertEquals(1L, result);
         }
@@ -133,11 +127,11 @@ public class CtfIteratorTest {
     /**
      * Run the boolean equals(Object) method test. Compare with another iterator
      * on the same trace.
-     * @throws CTFReaderException error
      */
     @Test
-    public void testEquals_other() throws CTFReaderException {
-        try (CtfIterator obj = new CtfIterator(trace);) {
+    public void testEquals_other() {
+        try (CtfIterator obj = (CtfIterator) trace.createIterator();) {
+            assertNotNull(obj);
             CtfLocation ctfLocation1 = new CtfLocation(new CtfLocationInfo(1, 0));
             obj.setLocation(ctfLocation1);
             obj.increaseRank();

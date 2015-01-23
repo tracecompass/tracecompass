@@ -19,12 +19,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.ctf.core.event.CTFCallsite;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.ICompositeDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
-import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfCustomAttributes;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
@@ -223,27 +221,20 @@ public class CtfTmfEvent extends TmfEvent
      */
     @Override
     public CtfTmfCallsite getCallsite() {
-        CTFCallsite callsite = null;
+        CtfTmfCallsite callsite = null;
         CtfTmfTrace trace = getTrace();
-        CTFTrace ctfTrace = trace.getCTFTrace();
-        /* Should not happen, but it is a good check */
-        if (ctfTrace == null) {
-            return null;
-        }
+
         if (getContent() != null) {
             ITmfEventField ipField = getContent().getField(CtfConstants.CONTEXT_FIELD_PREFIX + CtfConstants.IP_KEY);
             if (ipField != null && ipField.getValue() instanceof Long) {
                 long ip = (Long) ipField.getValue();
-                callsite = ctfTrace.getCallsite(fEventName, ip);
+                callsite = trace.getCallsite(fEventName, ip);
             }
         }
         if (callsite == null) {
-            callsite = ctfTrace.getCallsite(fEventName);
+            callsite = trace.getCallsite(fEventName);
         }
-        if (callsite != null) {
-            return new CtfTmfCallsite(callsite);
-        }
-        return null;
+        return callsite;
     }
 
     /**

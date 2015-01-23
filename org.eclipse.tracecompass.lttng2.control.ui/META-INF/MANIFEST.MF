@@ -17,7 +17,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.tracecompass.tmf.core;bundle-version="0.1.0",
  org.eclipse.tracecompass.tmf.ui;bundle-version="0.1.0",
  org.eclipse.tracecompass.tmf.ctf.core,
- org.eclipse.tracecompass.ctf.core,
  org.eclipse.remote.core;bundle-version="1.0.0",
  org.eclipse.remote.ui;bundle-version="1.1.0",
  org.eclipse.core.filesystem

@@ -59,7 +59,7 @@ public final class CtfTmfEventFactory {
         final IEventDeclaration eventDecl = eventDef.getDeclaration();
         final long ts = eventDef.getTimestamp();
         final CtfTmfTimestamp timestamp = originTrace.createTimestamp(
-                originTrace.getCTFTrace().timestampCyclesToNanos(ts));
+                originTrace.timestampCyclesToNanos(ts));
 
         int sourceCPU = eventDef.getCPU();
 
@@ -80,7 +80,7 @@ public final class CtfTmfEventFactory {
             long nbLostEvents = ((IntegerDefinition) nbLostEventsDef).getValue();
             long duration = ((IntegerDefinition) durationDef).getValue();
             CtfTmfTimestamp timestampEnd = new CtfTmfTimestamp(
-                    originTrace.getCTFTrace().timestampCyclesToNanos(ts) + duration);
+                    originTrace.timestampCyclesToNanos(ts) + duration);
 
             CtfTmfLostEvent lostEvent = new CtfTmfLostEvent(originTrace,
                     ITmfContext.UNKNOWN_RANK,

@@ -10,7 +10,7 @@
  *   Alexandre Montplaisir - Renamed/extracted from CtfTraceManager
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ctf.core.trace.iterator;
+package org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -97,7 +97,7 @@ public class CtfIteratorManager {
                     /*
                      * if we're not full yet, just add an element.
                      */
-                    iter = fTrace.createIterator();
+                    iter = (CtfIterator) fTrace.createIterator();
                     addElement(context, iter);
 
                 } else {

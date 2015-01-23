@@ -22,7 +22,7 @@ import static org.junit.Assume.assumeTrue;
 import java.util.Collection;
 import java.util.Set;
 
-import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
+import org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator.CtfIterator;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
@@ -30,7 +30,6 @@ import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEventFactory;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
-import org.eclipse.tracecompass.tmf.ctf.core.trace.iterator.CtfIterator;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -50,15 +49,12 @@ public class CtfTmfEventTest {
 
     /**
      * Perform pre-test initialization.
-     *
-     * @throws CTFReaderException
-     *             error
      */
     @Before
-    public void setUp() throws CTFReaderException {
+    public void setUp() {
         assumeTrue(testTrace.exists());
         try (CtfTmfTrace trace = testTrace.getTrace();
-                CtfIterator tr = new CtfIterator(trace);) {
+                CtfIterator tr = (CtfIterator) trace.createIterator();) {
             tr.advance();
             fixture = tr.getCurrentEvent();
             nullEvent = CtfTmfEventFactory.getNullEvent(trace);

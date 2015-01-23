@@ -13,11 +13,11 @@
 
 package org.eclipse.tracecompass.tmf.ctf.core.context;
 
+import org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator.CtfIterator;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
-import org.eclipse.tracecompass.tmf.ctf.core.trace.iterator.CtfIterator;
 
 /**
  * Lightweight Context for CtfTmf traces. Should only use 3 references, 1 ref to

@@ -17,12 +17,13 @@ package org.eclipse.tracecompass.lttng2.ust.core.trace;
 import java.nio.BufferOverflowException;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
-import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.Activator;
+import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
+import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 
 /**
@@ -50,8 +51,9 @@ public class LttngUstTrace extends CtfTmfTrace {
      */
     @Override
     public IStatus validate(final IProject project, final String path) {
-        try {
-            CTFTrace temp = new CTFTrace(path);
+        try (CtfTmfTrace temp = new CtfTmfTrace();) {
+            temp.initTrace((IResource) null, path, CtfTmfEvent.class);
+
             /* Make sure the domain is "ust" in the trace's env vars */
             String dom = temp.getEnvironment().get("domain"); //$NON-NLS-1$
             if (dom != null && dom.equals("\"ust\"")) { //$NON-NLS-1$
@@ -59,7 +61,7 @@ public class LttngUstTrace extends CtfTmfTrace {
             }
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.LttngUstTrace_DomainError);
 
-        } catch (CTFReaderException e) {
+        } catch (TmfTraceException e) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.toString(), e);
         } catch (NullPointerException e) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.toString(), e);
