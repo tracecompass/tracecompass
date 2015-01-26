@@ -364,4 +364,30 @@ public final class SWTBotUtils {
         }
         return nodeName;
     }
+
+    /**
+     * Select the traces folder
+     *
+     * @param bot
+     *            a given workbench bot
+     * @param projectName
+     *            the name of the project (it needs to exist or else it would time out)
+     * @return a {@link SWTBotTreeItem} of the "Traces" directory
+     */
+    public static SWTBotTreeItem selectTracesFolder(SWTWorkbenchBot bot, String projectName) {
+        SWTBotView projectExplorerBot = bot.viewByTitle("Project Explorer");
+        projectExplorerBot.show();
+        SWTBotTreeItem treeItem = projectExplorerBot.bot().tree().getTreeItem(projectName);
+        treeItem.select();
+        treeItem.expand();
+        SWTBotTreeItem treeNode = null;
+        for (String node : treeItem.getNodes()) {
+            if (node.matches("Traces\\s\\[(\\d)*\\]")) {
+                treeNode = treeItem.getNode(node);
+                break;
+            }
+        }
+        assertNotNull(treeNode);
+        return treeNode;
+    }
 }
