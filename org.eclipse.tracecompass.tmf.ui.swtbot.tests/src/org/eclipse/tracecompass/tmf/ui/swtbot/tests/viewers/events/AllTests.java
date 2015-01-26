@@ -21,7 +21,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         CallsiteEventsInTableTest.class,
-        CollapseEventsInTableTest.class
+        CollapseEventsInTableTest.class,
+        FilterViewerTest.class
 })
 public class AllTests {
 }

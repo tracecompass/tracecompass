@@ -47,6 +47,7 @@ import org.eclipse.tracecompass.tmf.ui.views.TracingPerspectiveFactory;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 import org.hamcrest.Matcher;
@@ -389,5 +390,29 @@ public final class SWTBotUtils {
         }
         assertNotNull(treeNode);
         return treeNode;
+    }
+
+    /**
+     * Open a view by id.
+     *
+     * @param id
+     *            view id.
+     */
+    public static void openView(final String id) {
+        final PartInitException res[] = new PartInitException[1];
+        UIThreadRunnable.syncExec(new VoidResult() {
+            @Override
+            public void run() {
+                try {
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(id);
+                } catch (PartInitException e) {
+                    res[0] = e;
+                }
+            }
+        });
+        if (res[0] != null) {
+            fail(res[0].getMessage());
+        }
+        waitForJobs();
     }
 }

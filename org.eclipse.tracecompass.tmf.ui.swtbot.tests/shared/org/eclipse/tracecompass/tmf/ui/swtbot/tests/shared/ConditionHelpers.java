@@ -181,7 +181,11 @@ public final class ConditionHelpers {
             @Override
             public boolean test() throws Exception {
                 try {
-                    return content.equals(table.cell(row, column));
+                    String cell = table.cell(row, column);
+                    if( cell == null ) {
+                        return false;
+                    }
+                    return cell.endsWith(content);
                 } catch (Exception e) {
                 }
                 return false;
