@@ -65,7 +65,7 @@
     <profile>
       <id>deploy-rcp</id>
       <properties>
-        <rcpDestination>/home/data/httpd/download.eclipse.org/tracecompass/rcp/nightly/</rcpDestination>
+        <rcpDestination>/home/data/httpd/download.eclipse.org/tracecompass/master/rcp/</rcpDestination>
         <productDir>target/products</productDir> <!-- Should not be overriden! -->
       </properties>
       <build>

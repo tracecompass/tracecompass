@@ -53,7 +53,7 @@
   <profile>
     <id>deploy-update-site</id>
     <properties>
-      <siteDestination>/home/data/httpd/download.eclipse.org/tracecompass/master/nightly/</siteDestination>
+      <siteDestination>/home/data/httpd/download.eclipse.org/tracecompass/master/repository/</siteDestination>
     </properties>
     <build>
       <plugins>
