@@ -61,12 +61,13 @@
         </plugins>
     </build>
 
+  <!-- Deploy RCP builds and update site to the downloads area -->
   <profiles>
     <profile>
       <id>deploy-rcp</id>
       <properties>
         <rcpDestination>/home/data/httpd/download.eclipse.org/tracecompass/master/rcp/</rcpDestination>
-        <productDir>target/products</productDir> <!-- Should not be overriden! -->
+        <rcpSiteDestination>/home/data/httpd/download.eclipse.org/tracecompass/master/rcp-repository/</rcpSiteDestination>
       </properties>
       <build>
         <plugins>
@@ -81,18 +82,29 @@
                 </goals>
                 <configuration>
                   <target>
-                    <!-- Delete the current contents of the destination -->
+                    <!-- Cleanup the "rcp" destination, and copy over the new archives -->
                     <delete includeemptydirs="false">
                       <fileset dir="${rcpDestination}">
                         <include name="*.tar.gz" />
                         <include name="*.zip" />
                       </fileset>
                     </delete>
-
-                    <!-- Copy the new archives to the destination -->
                     <copy includeemptydirs="false" todir="${rcpDestination}">
-                      <fileset dir="${productDir}">
+                      <fileset dir="target/products">
                         <include name="trace-compass-*" />
+                      </fileset>
+                    </copy>
+
+                    <!-- Cleanup the "rcp-repository" update site, and copy over the new one -->
+                    <delete includeemptydirs="false">
+                      <fileset
+                        dir="${rcpSiteDestination}">
+                        <include name="**" />
+                      </fileset>
+                    </delete>
+                    <copy includeemptydirs="false" todir="${rcpSiteDestination}">
+                      <fileset dir="target/repository">
+                        <include name="**" />
                       </fileset>
                     </copy>
                   </target>
