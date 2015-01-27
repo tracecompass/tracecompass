@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2010, 2015 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -40,6 +40,7 @@ import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstants;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtEvent;
@@ -54,7 +55,6 @@ import org.eclipse.tracecompass.tmf.core.synchronization.TimestampTransformFacto
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceProperties;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
@@ -342,7 +342,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
     public IFile createBookmarksFile() throws CoreException {
         IFile file = getBookmarksFile();
         if (fResource instanceof IFolder) {
-            return createBookmarksFile(getProject().getTracesFolder().getResource(), TmfTrace.class.getCanonicalName());
+            return createBookmarksFile(getProject().getTracesFolder().getResource(), ITmfEventsEditorConstants.TRACE_EDITOR_INPUT_TYPE);
         }
         return file;
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2010, 2015 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstants;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
@@ -332,7 +333,7 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
 
     @Override
     public IFile createBookmarksFile() throws CoreException {
-        return createBookmarksFile(getProject().getExperimentsFolder().getResource(), TmfExperiment.class.getCanonicalName());
+        return createBookmarksFile(getProject().getExperimentsFolder().getResource(), ITmfEventsEditorConstants.EXPERIMENT_EDITOR_INPUT_TYPE);
     }
 
     @Override

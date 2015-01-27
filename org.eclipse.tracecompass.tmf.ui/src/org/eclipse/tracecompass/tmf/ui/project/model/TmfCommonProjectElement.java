@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2010, 2015 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -253,13 +253,13 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      *
      * @param bookmarksFolder
      *            Folder where to put the bookmark file
-     * @param traceType
-     *            The canonical name to set as tracetype
+     * @param editorInputType
+     *            The editor input type to set (trace or experiment)
      * @return The bookmark file
      * @throws CoreException
      *             if the bookmarks file cannot be created
      */
-    protected IFile createBookmarksFile(IFolder bookmarksFolder, String traceType) throws CoreException {
+    protected IFile createBookmarksFile(IFolder bookmarksFolder, String editorInputType) throws CoreException {
         IFile file = getBookmarksFile();
         if (!file.exists()) {
             final IFile bookmarksFile = bookmarksFolder.getFile(BOOKMARKS_HIDDEN_FILE);
@@ -270,7 +270,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
             bookmarksFile.setHidden(true);
             file.createLink(bookmarksFile.getLocation(), IResource.REPLACE, null);
             file.setHidden(true);
-            file.setPersistentProperty(TmfCommonConstants.TRACETYPE, traceType);
+            file.setPersistentProperty(TmfCommonConstants.TRACETYPE, editorInputType);
         }
         return file;
     }
