@@ -54,7 +54,7 @@ will be placed in `org.eclipse.tracecompass.rcp.product/target/products`.
 
 To build a local p2 update site:
 
-    mvn clean install -Pbuild-update-site "-DsiteDestination=/path/to/destination"
+    mvn clean install -Pdeploy-update-site "-DsiteDestination=/path/to/destination"
 
 where `/path/to/destination` is the **absolute** path to destination directory
 on your disk.
