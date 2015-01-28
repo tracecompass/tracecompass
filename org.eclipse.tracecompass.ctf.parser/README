@@ -5,7 +5,3 @@ commit them.
 
 To rebuild the parser files, run Maven with the "ctf-grammar" profile, as such:
 $ mvn clean install -Pctf-grammar
-
-Alternatively, you can also run the "generate-grammar.sh" script to regenerate
-the parser files. That script requires "antlr3" to be installed on the system.
-
