@@ -576,19 +576,8 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
             updateAttributes(context, event.getTimestamp());
             context.setLocation(getCurrentLocation());
             context.increaseRank();
-            processEvent(event);
         }
         return event;
-    }
-
-    /**
-     * Hook for special event processing by the concrete class
-     * (called by TmfTrace.getEvent())
-     *
-     * @param event the event
-     */
-    protected void processEvent(final ITmfEvent event) {
-        // Do nothing
     }
 
     /**

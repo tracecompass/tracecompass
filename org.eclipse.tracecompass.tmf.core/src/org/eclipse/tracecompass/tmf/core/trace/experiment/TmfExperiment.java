@@ -445,8 +445,6 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
                         ((TmfExperimentLocation) expContext.getLocation()).getLocationInfo(),
                         trace, traceContext.getLocation(), traceContext.getRank());
                 expContext.setLocation(new TmfExperimentLocation(locationArray));
-
-                processEvent(event);
             }
         }
 
