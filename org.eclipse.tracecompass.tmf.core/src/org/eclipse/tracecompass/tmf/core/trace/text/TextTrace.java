@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
@@ -95,6 +96,7 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
             String line = rafile.getNextLine();
             List<Pattern> validationPatterns = getValidationPatterns();
             while ((line != null) && (lineCount++ < MAX_LINES)) {
+                line = preProcessLine(line);
                 for(Pattern pattern : validationPatterns) {
                     Matcher matcher = pattern.matcher(line);
                     if (matcher.matches()) {
@@ -151,6 +153,7 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
             long rawPos = fFile.getFilePointer();
             String line = fFile.getNextLine();
             while (line != null) {
+                line = preProcessLine(line);
                 Matcher matcher = getFirstLinePattern().matcher(line);
                 if (matcher.matches()) {
                     setupContext(context, rawPos, line, matcher);
@@ -266,6 +269,7 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
             long rawPos = fFile.getFilePointer();
             String line = fFile.getNextLine();
             while (line != null) {
+                line = preProcessLine(line);
                 Matcher matcher = getFirstLinePattern().matcher(line);
                 if (matcher.matches()) {
                     setupContext(context, rawPos, line, matcher);
@@ -281,6 +285,19 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
 
         context.setLocation(NULL_LOCATION);
         return event;
+    }
+
+    /**
+     * Pre-processes the input line. The default implementation returns the
+     * input line.
+     *
+     * @param line
+     *            non-null input string
+     * @return the pre-processed input line
+     */
+    @NonNull
+    protected String preProcessLine(@NonNull String line) {
+        return line;
     }
 
     /**
