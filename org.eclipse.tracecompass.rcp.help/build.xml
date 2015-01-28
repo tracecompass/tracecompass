@@ -7,7 +7,7 @@
     <!-- Set correct values -->
     <property name="help.doc.url.base" value="http://wiki.eclipse.org" />
     <property name="ug.path"  value="Linux_Tools_Project/Trace_Viewer/User_Guide" />
-    <property name="ug.title" value="Trace Viewer User Guide" />
+    <property name="ug.title" value="Trace Compass RCP User Guide" />
 
     <path id="wikitext.tasks.classpath">
         <!-- Search in the local Eclipse plugins directory for the Wikitext plugin -->
@@ -25,7 +25,7 @@
     <!-- Different location in more recent versions of Mylyn (Luna ?) -->
     <taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/wikitext/core/ant/tasks.properties" />
 
-    <target name="build" description="Generate Eclipse help content for the Linux Tools Trace Viewer User Guide">
+    <target name="build" description="Generate Eclipse help content for the Trace Compass RCP User Guide">
         <wikitext-to-eclipse-help markupLanguage="MediaWiki"
                 validate="true"
                 failonvalidationerror="true"

@@ -1,34 +1,41 @@
 = Overview =
-The Linux Tools Trace Viewer is a stand-alone application based on Eclipse's
+The Trace Compass RCP version is a stand-alone application based on Eclipse's
 Rich Client Platform (RCP). The purpose of this is to provide a lightweight
-application to view and analyze traces. It includes all TMF (Tracing and
-Monitoring Framework) features, as well as all features from the LTTng (Linux
-Tracing Toolkit next generation) Eclipse integration, which are provided by the
-Linux Tools Project.
+application to view and analyze traces. It includes most standard features found
+in the Trace Compass project.
 
 = Getting Started =
-To start the Linux Tools Trace Viewer, go to the directory where the Trace
-Viewer is installed and then run the application named '''traceViewer'''.
-During startup, the Trace Viewer will create, if necessary, an Eclipse workspace
-in the user's home directory with the name ''.traceviewer''. It also creates, if
-needed, a default tracing project called ''Tracing''.
+To start the Trace Compass RCP, go to the directory where it is installed and
+then run the executable named '''tracecompass'''. During startup, the program
+will create, if necessary, an Eclipse workspace under the user's home directory
+with the name ''.tracecompass''. It also creates, if needed, a default tracing
+project called ''Tracing''.
 
-Now the application can be used as described in the User Guide for Linux Tools
-LTTng integration (see section [[#References | References]]).
+Now the application can be used as described in the regular User Guide. (see
+section [[#References | References]]).
+
+= Updating the application =
+The RCP is pre-configured to point to the update site of its release "track".
+For example, if you download a "nightly" RCP, it will update using that
+"nightly" update site. These settings are configurable in the preferences, but
+in most cases, the user should not have to change them.
+
+The program does not check automatically for updates. To check manually, you can
+click on '''Help''' -> '''Check for Updates'''. If updates are available, a
+standard Eclipse update dialog will offer their installation.
 
 = Opening a Trace =
 To open a trace, click on the '''File''' menu and select '''Open Trace...'''.
-A new dialog will show for selecting a trace to open. Select a trace file
+A new dialog will show up for selecting a trace to open. Select a trace file
 and then click on '''OK'''. Note that for traces that are directories
 (such as Common Trace Format (CTF) traces) any file in the trace directory can
-be selected to open the trace. Now, the trace viewer's auto detection algorithm
-will validate the trace against all known trace types. If multiple trace types
-are valid, a trace type is chosen based on a confidence criteria. The
-validation process and the computation of the confidence level are trace type
-specific. After successful validation the trace will be opened with the
-detected trace type.
+be selected to open the trace. The auto detection algorithm will then validate
+the trace against all known trace types. If multiple trace types are valid, a
+trace type is chosen based on a confidence criteria. The validation process and
+the computation of the confidence level are trace type specific. After
+successful validation, the trace will be opened with the detected trace type.
 
-Alternatively the user can launch the trace viewer with the command-line
+Alternatively the user can launch '''tracecompass''' with the command-line
 argument '''--open <trace-path>'''. The trace will then automatically open 
 using the same algorithm than described above.
 
@@ -36,6 +43,6 @@ In both of the above cases, the trace will be linked to the default project.
 
 = References =
 
-* [http://www.eclipse.org/linuxtools/projectPages/lttng/ Linux Tools - LTTng integration]
+* [http://www.eclipse.org/tracecompass Trace Compass project]
 * [http://www.lttng.org/ LTTng project]
 
