@@ -14,6 +14,8 @@ package org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -36,13 +38,13 @@ public class CtfIteratorManager {
      * Cache size. Under 1023 on linux32 systems. Number of file handles
      * created.
      */
-    private final static int MAX_SIZE = 100;
+    private static final int MAX_SIZE = 100;
 
     /** The map of the cache */
-    private final HashMap<CtfTmfContext, CtfIterator> fMap;
+    private final Map<CtfTmfContext, CtfIterator> fMap;
 
     /** An array pointing to the same cache. this allows fast "random" accesses */
-    private final ArrayList<CtfTmfContext> fRandomAccess;
+    private final List<CtfTmfContext> fRandomAccess;
 
     /** Lock for when we access the two previous data structures */
     private final Lock fAccessLock = new ReentrantLock();
@@ -128,6 +130,7 @@ public class CtfIteratorManager {
         try {
             /* The try below is only to auto-call CtfIterator.close() */
             try (CtfIterator removed = fMap.remove(context)) {
+                // try with resource
             }
             fRandomAccess.remove(context);
 
