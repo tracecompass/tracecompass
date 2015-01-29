@@ -94,8 +94,8 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
      * traces that were opened using Linux Tools and early Trace Compass
      * versions.
      */
-    private static final ImmutableSet<String> traceInputTypeConstants = ImmutableSet.of(ITmfEventsEditorConstants.TRACE_EDITOR_INPUT_TYPE, "org.eclipse.linuxtools.tmf.core.trace.TmfTrace", "org.eclipse.tracecompass.tmf.core.trace.TmfTrace"); //$NON-NLS-1$//$NON-NLS-2$
-    private static final ImmutableSet<String> experimentInputTypeConstants = ImmutableSet.of(ITmfEventsEditorConstants.EXPERIMENT_EDITOR_INPUT_TYPE, "org.eclipse.linuxtools.tmf.core.trace.TmfExperiment", "org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment"); //$NON-NLS-1$ //$NON-NLS-2$
+    private static final ImmutableSet<String> TRACE_INPUT_TYPE_CONSTANTS = ImmutableSet.of(ITmfEventsEditorConstants.TRACE_EDITOR_INPUT_TYPE, "org.eclipse.linuxtools.tmf.core.trace.TmfTrace", "org.eclipse.tracecompass.tmf.core.trace.TmfTrace"); //$NON-NLS-1$//$NON-NLS-2$
+    private static final ImmutableSet<String> EXPERIMENT_INPUT_TYPE_CONSTANTS = ImmutableSet.of(ITmfEventsEditorConstants.EXPERIMENT_EDITOR_INPUT_TYPE, "org.eclipse.linuxtools.tmf.core.trace.TmfExperiment", "org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment"); //$NON-NLS-1$ //$NON-NLS-2$
 
     private TmfEventsTable fEventsTable;
     private IFile fFile;
@@ -132,7 +132,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                 if (traceTypeId == null) {
                     throw new PartInitException(Messages.TmfOpenTraceHelper_NoTraceType);
                 }
-                if (experimentInputTypeConstants.contains(traceTypeId)) {
+                if (EXPERIMENT_INPUT_TYPE_CONSTANTS.contains(traceTypeId)) {
                     // Special case: experiment bookmark resource
                     final TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject(), true);
                     if (project == null) {
@@ -147,7 +147,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                             return;
                         }
                     }
-                } else if (traceInputTypeConstants.contains(traceTypeId)) {
+                } else if (TRACE_INPUT_TYPE_CONSTANTS.contains(traceTypeId)) {
                     // Special case: trace bookmark resource
                     final TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject(), true);
                     for (final TmfTraceElement traceElement : project.getTracesFolder().getTraces()) {
