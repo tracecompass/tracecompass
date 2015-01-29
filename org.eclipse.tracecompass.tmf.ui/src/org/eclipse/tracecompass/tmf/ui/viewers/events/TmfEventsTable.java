@@ -668,9 +668,16 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 }
                 final TableItem[] selection = fTable.getSelection();
                 if ((selection != null) && (selection.length > 0)) {
-                    final TmfTimestamp ts = (TmfTimestamp) fTable.getSelection()[0].getData(Key.TIMESTAMP);
+                    TableItem item = fTable.getSelection()[0];
+                    final TmfTimestamp ts = (TmfTimestamp) item.getData(Key.TIMESTAMP);
                     if (ts != null) {
                         broadcast(new TmfTimeSynchSignal(TmfEventsTable.this, ts));
+                    }
+                    if (item.getData() instanceof ITmfEvent) {
+                        broadcast(new TmfEventSelectedSignal(TmfEventsTable.this, (ITmfEvent) item.getData()));
+                        fireSelectionChanged(new SelectionChangedEvent(TmfEventsTable.this, new StructuredSelection(item.getData())));
+                    } else {
+                        fireSelectionChanged(new SelectionChangedEvent(TmfEventsTable.this, StructuredSelection.EMPTY));
                     }
                 }
             }
