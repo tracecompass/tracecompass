@@ -192,6 +192,13 @@ public class FilterView extends TmfView {
         fViewer.setFocus();
     }
 
+    /**
+     * @return whether the tree is in focus or not
+     */
+    public boolean isTreeInFocus() {
+        return fViewer.isTreeInFocus();
+    }
+
     @Override
     public String toString() {
         return "[FilterView]"; //$NON-NLS-1$
