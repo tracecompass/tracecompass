@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,6 +9,7 @@
  * Contributors:
  *   Francois Chouinard - Initial API and implementation
  *   Bernd Hufmann - Update handling of suspend and resume
+ *   Patrick Tasse - Exit early if request is cancelled
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.tmf.core.component;
@@ -160,15 +161,20 @@ public class TmfEventThread implements Runnable {
 
         TmfCoreTracer.traceRequest(fRequest.getRequestId(), "is being serviced by " + fProvider.getName()); //$NON-NLS-1$
 
+        if (fRequest.isCancelled()) {
+            isCompleted = true;
+            return;
+        }
+
         // Extract the generic information
         fRequest.start();
         int nbRequested = fRequest.getNbRequested();
         int nbRead = 0;
-        isCompleted = false;
 
         // Initialize the execution
         ITmfContext context = fProvider.armRequest(fRequest);
         if (context == null) {
+            isCompleted = true;
             fRequest.cancel();
             return;
         }
@@ -207,6 +213,7 @@ public class TmfEventThread implements Runnable {
 
         } catch (Exception e) {
             Activator.logError("Error in " + fProvider.getName() + " handling " + fRequest, e); //$NON-NLS-1$ //$NON-NLS-2$
+            isCompleted = true;
             fRequest.fail();
         }
 
