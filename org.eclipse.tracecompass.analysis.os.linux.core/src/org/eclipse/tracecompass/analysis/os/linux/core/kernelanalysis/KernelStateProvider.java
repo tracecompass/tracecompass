@@ -110,8 +110,9 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
         builder.put(layout.eventSchedProcessExit(), SCHED_PROCESS_EXIT_INDEX);
         builder.put(layout.eventSchedProcessFree(), SCHED_PROCESS_FREE_INDEX);
 
-        if (layout.eventStatedumpProcessState() != null) {
-            builder.put(layout.eventStatedumpProcessState(), STATEDUMP_PROCESS_STATE_INDEX);
+        final String eventStatedumpProcessState = layout.eventStatedumpProcessState();
+        if (eventStatedumpProcessState != null) {
+            builder.put(eventStatedumpProcessState, STATEDUMP_PROCESS_STATE_INDEX);
         }
 
         for (String eventSchedWakeup : layout.eventsSchedWakeup()) {
