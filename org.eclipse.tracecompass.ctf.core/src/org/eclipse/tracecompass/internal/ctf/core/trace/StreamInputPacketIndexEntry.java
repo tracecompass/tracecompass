@@ -20,7 +20,7 @@ import java.util.Map;
  * <p>
  * Represents an entry in the index of event packets.
  */
-public class StreamInputPacketIndexEntry implements Comparable<StreamInputPacketIndexEntry> {
+public class StreamInputPacketIndexEntry {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -64,14 +64,13 @@ public class StreamInputPacketIndexEntry implements Comparable<StreamInputPacket
     /**
      * Which target is being traced
      */
-    private String fTarget ;
+    private String fTarget;
     private long fTargetID;
 
     /**
      * Attributes of this index entry
      */
     private final Map<String, Object> fAttributes = new HashMap<>();
-
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -205,7 +204,8 @@ public class StreamInputPacketIndexEntry implements Comparable<StreamInputPacket
     }
 
     /**
-     * @param lostEvents the lostEvents to set
+     * @param lostEvents
+     *            the lostEvents to set
      */
     public void setLostEvents(long lostEvents) {
         fLostEvents = lostEvents;
@@ -230,7 +230,7 @@ public class StreamInputPacketIndexEntry implements Comparable<StreamInputPacket
      *            The name of the attribute
      * @return The value that was stored, or null if it wasn't found
      */
-    public Object lookupAttribute(String field){
+    public Object lookupAttribute(String field) {
         return fAttributes.get(field);
     }
 
@@ -255,24 +255,7 @@ public class StreamInputPacketIndexEntry implements Comparable<StreamInputPacket
     /**
      * @return The ID of the target
      */
-    public long getTargetId(){
+    public long getTargetId() {
         return fTargetID;
-    }
-
-    @Override
-    public int compareTo(StreamInputPacketIndexEntry o) {
-        if (fTimestampBegin > o.fTimestampBegin) {
-            return 1;
-        }
-        if (fTimestampBegin < o.fTimestampBegin) {
-            return -1;
-        }
-        if (fTimestampEnd > o.fTimestampEnd) {
-            return 1;
-        }
-        if (fTimestampEnd < o.fTimestampEnd) {
-            return -1;
-        }
-        return 0;
     }
 }

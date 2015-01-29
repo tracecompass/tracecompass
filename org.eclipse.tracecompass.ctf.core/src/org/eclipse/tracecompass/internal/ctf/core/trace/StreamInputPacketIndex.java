@@ -15,9 +15,11 @@
 package org.eclipse.tracecompass.internal.ctf.core.trace;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -226,9 +228,32 @@ public class StreamInputPacketIndex {
     public int indexOf(StreamInputPacketIndexEntry element) {
         int indexOf = -1;
         if (element != null) {
-            indexOf = Collections.binarySearch(fEntries, element);
+            indexOf = Collections.binarySearch(fEntries, element, new MonotonicComparator());
         }
         return (indexOf < 0) ? -1 : indexOf;
+    }
+
+    /**
+     * Ordering comparator for entering entries into a data structure sorted by timestamp.
+     */
+    private static class MonotonicComparator implements Comparator<StreamInputPacketIndexEntry> {
+
+        @Override
+        public int compare(StreamInputPacketIndexEntry left, StreamInputPacketIndexEntry right) {
+            if (left.getTimestampBegin() > right.getTimestampBegin()) {
+                return 1;
+            }
+            if (left.getTimestampBegin() < right.getTimestampBegin()) {
+                return -1;
+            }
+            if (left.getTimestampEnd() > right.getTimestampEnd()) {
+                return 1;
+            }
+            if (left.getTimestampEnd() < right.getTimestampEnd()) {
+                return -1;
+            }
+            return 0;
+        }
     }
 
 }
