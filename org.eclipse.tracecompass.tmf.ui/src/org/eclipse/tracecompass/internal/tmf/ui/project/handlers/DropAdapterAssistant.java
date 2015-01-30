@@ -46,11 +46,11 @@ import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstants;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceImportException;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
@@ -628,7 +628,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
         if (folder.exists()) {
             try {
                 for (IResource member : folder.members()) {
-                    if (TmfTrace.class.getCanonicalName().equals(TmfTraceType.getTraceTypeId(member))) {
+                    if (ITmfEventsEditorConstants.TRACE_INPUT_TYPE_CONSTANTS.contains(TmfTraceType.getTraceTypeId(member))) {
                         member.delete(true, null);
                     }
                 }
