@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -98,10 +98,16 @@ public class TextTraceEventContent implements ITmfEventField {
     }
 
     @Override
-    public ITmfEventField getField(String name) {
-        for (TextTraceEventContent field : fFields) {
-            if (field.getName().equals(name)) {
-                return field;
+    public ITmfEventField getField(String... path) {
+        if (path.length == 0) {
+            return this;
+        }
+        // There are no sub fields
+        if (path.length == 1) {
+            for (TextTraceEventContent field : fFields) {
+                if (field.getName().equals(path[0])) {
+                    return field;
+                }
             }
         }
         return null;
@@ -114,15 +120,6 @@ public class TextTraceEventContent implements ITmfEventField {
             return null;
         }
         return value.toString();
-    }
-
-    @Override
-    public ITmfEventField getSubField(String... names) {
-        // There are no sub fields
-        if (names.length == 1) {
-            return getField(names[0]);
-        }
-        return null;
     }
 
     // ------------------------------------------------------------------------

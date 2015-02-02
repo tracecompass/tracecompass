@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,6 +9,7 @@
  * Contributors:
  *   Matthew Khouzam - Initial generation with CodePro tools
  *   Alexandre Montplaisir - Clean up, consolidate redundant tests
+ *   Patrick Tasse - Remove getSubField
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.ctf.core.tests.event;
@@ -124,15 +125,15 @@ public class CtfTmfEventTest {
     public void testGetSubFieldValue() {
         /* Field exists */
         String[] names = { "pid" };
-        assertNotNull(fixture.getContent().getSubField(names));
+        assertNotNull(fixture.getContent().getField(names));
 
         /* First field exists, not the second */
         String[] names2 = { "pid", "abcd" };
-        assertNull(fixture.getContent().getSubField(names2));
+        assertNull(fixture.getContent().getField(names2));
 
         /* Both field do not exist */
         String[] names3 = { "pfid", "abcd" };
-        assertNull(fixture.getContent().getSubField(names3));
+        assertNull(fixture.getContent().getField(names3));
 
         /* TODO Missing case of embedded field, need event for it */
     }

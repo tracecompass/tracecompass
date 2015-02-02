@@ -32,7 +32,7 @@ public class TmfEventFieldAspect implements ITmfEventAspect {
 
     private final String fAspectName;
     private final String fFieldName;
-    private final @Nullable String[] fFieldArray;
+    private final String[] fFieldArray;
 
     /**
      * Constructor
@@ -49,7 +49,7 @@ public class TmfEventFieldAspect implements ITmfEventAspect {
         if (!fieldName.isEmpty() && fieldName.charAt(0) == SLASH) {
             fFieldArray = getFieldArray(fieldName);
         } else {
-            fFieldArray = null;
+            fFieldArray = new String[] { fieldName };
         }
 
     }
@@ -67,11 +67,7 @@ public class TmfEventFieldAspect implements ITmfEventAspect {
     @Override
     public @Nullable String resolve(ITmfEvent event) {
         ITmfEventField field;
-        if (fFieldArray == null) {
-            field = event.getContent().getField(fFieldName);
-        } else {
-            field = event.getContent().getSubField(fFieldArray);
-        }
+        field = event.getContent().getField(fFieldArray);
         if (field == null) {
             return null;
         }

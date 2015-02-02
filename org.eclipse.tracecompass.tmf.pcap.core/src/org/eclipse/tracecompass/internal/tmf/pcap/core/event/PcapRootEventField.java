@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Vincent Perot - Initial API and implementation
+ *   Patrick Tasse - Remove getSubField
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.tmf.pcap.core.event;
@@ -72,11 +73,11 @@ public class PcapRootEventField extends TmfEventField {
     }
 
     @Override
-    public @Nullable ITmfEventField getField(@Nullable String name) {
-        if (name == null) {
-            return null;
+    public @Nullable ITmfEventField getField(String... path) {
+        if (path.length != 1) {
+            return super.getField(path);
         }
-        switch (name) {
+        switch (path[0]) {
         case PcapEvent.EVENT_FIELD_PACKET_SOURCE:
             return fPacketSourceField;
         case PcapEvent.EVENT_FIELD_PACKET_DESTINATION:
@@ -84,7 +85,7 @@ public class PcapRootEventField extends TmfEventField {
         case PcapEvent.EVENT_FIELD_PACKET_PROTOCOL:
             return fProtocolField;
         default:
-            return super.getField(name);
+            return super.getField(path);
         }
     }
 }

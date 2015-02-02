@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson
+ * Copyright (c) 2009, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -10,6 +10,7 @@
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Updated as per TMF Event Model 1.0
  *   Alexandre Montplaisir - Removed Cloneable, made immutable
+ *   Patrick Tasse - Remove getSubField
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.core.event;
@@ -128,17 +129,12 @@ public class TmfEventField implements ITmfEventField {
     }
 
     @Override
-    public ITmfEventField getField(final String name) {
-        return fFields.get(name);
-    }
-
-    /**
-     * @since 3.0
-     */
-    @Override
-    public ITmfEventField getSubField(final String... names) {
+    public ITmfEventField getField(final String... path) {
+        if (path.length == 1) {
+            return fFields.get(path[0]);
+        }
         ITmfEventField field = this;
-        for (String name : names) {
+        for (String name : path) {
             field = field.getField(name);
             if (field == null) {
                 return null;

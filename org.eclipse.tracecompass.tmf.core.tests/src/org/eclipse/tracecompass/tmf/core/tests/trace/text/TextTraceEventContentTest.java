@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Patrick Tasse - Remove getSubField
  *******************************************************************************/
 package org.eclipse.tracecompass.tmf.core.tests.trace.text;
 
@@ -223,9 +224,22 @@ public class TextTraceEventContentTest {
 
         field = fEventContent1.getField(SyslogEventType.LABELS[5]);
         assertEquals("getFieldName:Message", SyslogEventType.LABELS[5], field.getName());
-        assertEquals("getgetFieldName:Message", "MessageA", field.getValue());
+        assertEquals("getFieldName:Message", "MessageA", field.getValue());
 
         field = fEventContent1.getField("BlaBla");
+        assertNull(field);
+    }
+
+    @Test
+    public void testGetFieldWithPath() {
+        String[] path = { "Timestamp" };
+
+        ITmfEventField field = fEventContent1.getField(path);
+        assertEquals("getFieldPath:TIMESTAMP", SyslogEventType.LABELS[0], field.getName());
+        assertEquals("getFieldPath:TIMESTAMP", "Jan 1 01:01:01", field.getValue());
+
+        String[] path2 = { "Timestamp", "subField" };
+        field = fEventContent1.getField(path2);
         assertNull(field);
     }
 
@@ -237,19 +251,6 @@ public class TextTraceEventContentTest {
     @Test
     public void testToString() {
         assertEquals("Timestamp=Jan 1 01:01:01, Host=HostA, Logger=LoggerA, File=SourceFileA, Line=0, Message=MessageA", fEventContent1.toString());
-    }
-
-    @Test
-    public void testGetSubField() {
-        String[] names = { "Timestamp"};
-
-        ITmfEventField field = fEventContent1.getSubField(names);
-        assertEquals("getSubField:TIMESTAMP", SyslogEventType.LABELS[0], field.getName());
-        assertEquals("getSubField:TIMESTAMP", "Jan 1 01:01:01", field.getValue());
-
-        String[] names2 = { "Timestamp", "subField" };
-        field = fEventContent1.getSubField(names2);
-        assertNull(field);
     }
 
     @Test
