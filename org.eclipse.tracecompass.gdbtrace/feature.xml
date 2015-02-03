@@ -57,7 +57,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.tracecompass.gdbtrace.help"
+         id="org.eclipse.tracecompass.gdbtrace.doc.user"
          download-size="0"
          install-size="0"
          version="0.0.0"/>

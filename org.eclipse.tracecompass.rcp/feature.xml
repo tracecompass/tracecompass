@@ -48,7 +48,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.tracecompass.rcp.help"
+         id="org.eclipse.tracecompass.rcp.doc.user"
          download-size="0"
          install-size="0"
          version="0.0.0"
