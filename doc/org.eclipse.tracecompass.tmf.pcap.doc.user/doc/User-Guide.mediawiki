@@ -1,11 +1,11 @@
 
-= Pcap Support Within TMF =
+= Pcap Support Within Trace Compass =
 
-TMF now supports the reading of libpcap files for network tracing. Those files contains packets that were seen on a network, have a .pcap or .cap extension and can be captured with tools like Wireshark/Tshark/Tcpdump. To open a libpcap trace, simply import it just like any other trace type and TMF will recognize the format. Open the imported trace to see the packets that were captured. For more information about generic features of TMF see the [http://wiki.eclipse.org/index.php/Linux_Tools_Project/LTTng2/User_Guide User Guide].
+Trace Compass now supports the reading of libpcap files for network tracing. Those files contains packets that were seen on a network, have a .pcap or .cap extension and can be captured with tools like Wireshark/Tshark/Tcpdump. To open a libpcap trace, simply import it just like any other trace type and Trace Compass will recognize the format. Open the imported trace to see the packets that were captured. For more information about generic features of Trace Compass see the [https://wiki.eclipse.org/index.php/Trace_Compass#User_Guides User Guides].
 
 == Supported Protocols ==
 
-Currently, the Pcap integration in TMF can only recognize four protocols: Ethernet, Internet Protocol Version 4, TCP and UDP. In the future, more protocols will be added and supported. If you want to contribute, please see the “Adding a protocol” section in the [http://wiki.eclipse.org/Linux_Tools_Project/TMF/User_Guide TMF Developer Guide].
+Currently, the Pcap integration in Trace Compass can only recognize four protocols: Ethernet, Internet Protocol Version 4, TCP and UDP. In the future, more protocols will be added and supported. If you want to contribute, please see the “Adding a protocol” section in the [https://wiki.eclipse.org/index.php/Trace_Compass#User_Guides TMF Developer Guide].
 
 == Network Tracing Perspective ==
 
@@ -47,7 +47,4 @@ Most of the time, you want to analyze the conversation between two endpoints (a 
 
 == References ==
 
-
-* [http://wiki.eclipse.org/index.php/Linux_Tools_Project/LTTng2/User_Guide LTTng User Guide]
-* [http://wiki.eclipse.org/Linux_Tools_Project/TMF/User_Guide TMF Developer Guide]
-
+* [https://wiki.eclipse.org/index.php/Trace_Compass#User_Guides Trace Compass User Guides]

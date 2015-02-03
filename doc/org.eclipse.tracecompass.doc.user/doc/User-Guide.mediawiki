@@ -5,10 +5,7 @@ __TOC__
 
 = Overview =
 
-LTTng (Linux Trace Toolkit, next generation) is a highly efficient tracing tool for Linux that can be used to track down kernel and application performance issues as well as troubleshoot problems involving multiple concurrent processes and threads. It consists of a set of kernel modules, daemons - to collect the raw tracing data - and a set of tools to control, visualize and analyze the generated data. It also provides support for user space application instrumentation.
-For more information about LTTng, refer to the project [http://lttng.org site]
-
-'''Note''': This User Guide covers the integration of the latest LTTng (up to v2.4) in Eclipse.
+Trace Compass is a Java tool for viewing and analyzing any type of logs or traces. Its goal is to provide views, graphs, metrics, etc. to help extract useful information from traces, in a way that is more user-friendly and informative than huge text dumps.
 
 == About Tracing ==
 
@@ -20,36 +17,9 @@ Traces may include events from the operating system kernel (IRQ handler entry/ex
 
 For the maximum level of detail, tracing events may be viewed like a log file. However, trace analyzers and viewers are available to derive useful information from the raw data coupled with knowledge of the traced program. These programs must be specially designed to handle quickly the enormous amount of data a trace may contain.
 
-== LTTng integration ==
-
-The LTTng plug-in for Eclipse provides an Eclipse integration for the control of the LTTng tracer as well as fetching and visualization of the traces produced. It also provides the foundation for user-defined analysis tools.
-
-The LTTng Eclipse plug-in provides the following views:
-
-* ''Project'' - an extension to the standard Eclipse Project view tailored for tracing projects
-* ''Control'' - to control the tracer and configure the tracepoints
-* ''Events'' - a versatile view that presents the raw events in tabular format with support for searching, filtering and bookmarking
-* ''Statistics'' - a view that that provides simple statistics on event occurrences by type
-* ''Histogram'' - a view that displays the event density with respect to time in traces
-
-These views can be extended or tailored for specific trace types (e.g. kernel, HW, user app).
-
-At present, the LTTng Eclipse plug-in for Eclipse supports the following kernel-oriented views:
-
-* ''Control Flow'' - to visualize processes state transitions
-* ''Resources'' - to visualize system resources state transitions
-* ''CPU usage'' - to visualize the usage of the processor with respect to the time in traces
-
-It also supports the following User Space traces views:
-
-* ''Memory Usage'' - to visualize the memory usage per thread with respect to time in the traces
-* ''Call Stack'' - to visualize the call stack's evolution over time
-
-Although the control and fetching parts are targeted at the LTTng tracer, the underlying framework can also be used to process any trace that complies with the ''Common Trace Format'' ([http://www.efficios.com/ctf CTF]). CTF specifies a very efficient and compact binary trace format that is meant to be application-, architecture-, and language-agnostic.
-
 == Features ==
 
-The LTTng Eclipse plug-in has a number of features to allow efficient handling of very large traces (and sets of large traces):
+Trace Compass has a number of features to allow efficient handling of very large traces (and sets of large traces):
 
 * Support for arbitrarily large traces (larger than available memory)
 * Support for correlating multiple time-ordered traces
@@ -66,9 +36,43 @@ There is also support for the integration of non-LTTng trace types:
 * Dynamic creation of customized state systems (from XML files)
 * Dynamic creation of customized views (from XML files)
 
+Trace Compass provides the following main views:
+
+* ''Project Explorer'' - an extension to the standard Eclipse Project view tailored for tracing projects
+* ''Events'' - a versatile view that presents the raw events in tabular format with support for searching, filtering and bookmarking
+* ''Statistics'' - a view that that provides simple statistics on event occurrences by type
+* ''Histogram'' - a view that displays the event density with respect to time in traces
+
+These views can be extended or tailored for specific trace types (e.g. kernel, HW, user app).
+
+== LTTng integration ==
+
+One of the main features of Trace Compass is the LTTng integration. LTTng (Linux Trace Toolkit, next generation) is a highly efficient tracing tool for Linux that can be used to track down kernel and application performance issues as well as troubleshoot problems involving multiple concurrent processes and threads. It consists of a set of kernel modules, daemons - to collect the raw tracing data - and a set of tools to control, visualize and analyze the generated data. It also provides support for user space application instrumentation.
+For more information about LTTng, refer to the project [http://lttng.org site]
+
+'''Note''': This User Guide covers the integration of the latest LTTng (up to v2.4) in Eclipse.
+
+The LTTng plug-ins provide an integration for the control of the LTTng tracer as well as fetching and visualization of the traces produced. It also provides the foundation for user-defined analysis tools.
+
+At present, the LTTng plug-ins support the following kernel-oriented views:
+
+* ''Control Flow'' - to visualize processes state transitions
+* ''Resources'' - to visualize system resources state transitions
+* ''CPU usage'' - to visualize the usage of the processor with respect to the time in traces
+
+Also, the LTTng plug-ins supports the following User Space traces views:
+
+* ''Memory Usage'' - to visualize the memory usage per thread with respect to time in the traces
+* ''Call Stack'' - to visualize the call stack's evolution over time
+
+Finally, the LTTng plug-ins supports the following Control views:
+* ''Control'' - to control the tracer and configure the tracepoints
+
+Although the control and fetching parts are targeted at the LTTng tracer, the underlying framework can also be used to process any trace that complies with the ''Common Trace Format'' ([http://www.efficios.com/ctf CTF]). CTF specifies a very efficient and compact binary trace format that is meant to be application-, architecture-, and language-agnostic.
+
 = Installation =
 
-This section describes the installation of the LTTng tracer and the LTTng Eclipse plug-ins as well as their dependencies.
+This section describes the installation of the LTTng tracer and the Trace Compass plug-ins as well as their dependencies.
 
 == LTTng Tracer ==
 
@@ -84,79 +88,76 @@ For other distributions, older Ubuntu distributions, or the latest, bleeding edg
 
 '''Note''': The LTTng tracer (and accompanying tools) is required only if you want to create your own traces (the usual case). If you intend to simply analyze existing traces then it is not necessary to install the tracer.
 
-== LTTng Eclipse Plug-ins ==
+== Trace Compass Plug-ins ==
 
-The easiest way to install the LTTng plug-ins for Eclipse is through the Software Updates and Add-ons menu. For information on how to use this menu, refer to this [http://wiki.eclipse.org/Linux_Tools_Project/PluginInstallHelp#Installing_Updates_From_the_Linux_Tools_Update_Site link].
+The easiest way to install the Trace Compass plug-ins for Eclipse is through the Install New Software menu. For information on how to use this menu, refer to this [http://help.eclipse.org/luna/index.jsp?topic=%2Forg.eclipse.platform.doc.user%2Ftasks%2Ftasks-124.htm link].
 
-The LTTng plug-ins are structured as a stack of features/plug-ins as following:
+The Trace Compass main plug-ins are structured as a stack of features/plug-ins as following:
 
 * '''CTF''' - A CTF parser that can also be used as a standalone component
-** ''Feature'': org.eclipse.linuxtools.ctf
-** ''Plug-ins'': org.eclipse.linuxtools.ctf.core, org.eclipse.linuxtools.ctf.parser
+** ''Feature'': org.eclipse.tracecompass.ctf
+** ''Plug-ins'': org.eclipse.tracecompass.ctf.core, org.eclipse.tracecompass.ctf.parser
 
 * '''State System Core''' - State system for TMF
-** ''Plug-ins'': org.eclipse.linuxtools.statesystem.core
+** ''Plug-ins'': org.eclipse.tracecompass.statesystem.core
 
 * '''TMF''' - ''Tracing and Monitoring Framework'' a framework for generic trace processing
-** ''Feature'': org.eclipse.linuxtools.tmf
-** ''Plug-ins'': org.eclipse.linuxtools.tmf.core, org.eclipse.linuxtools.tmf.ui. org.eclipse.linuxtools.tmf.analysis.xml.core, org.eclipse.linuxtools.tmf.analysis.xml.ui
+** ''Feature'': org.eclipse.tracecompass.tmf
+** ''Plug-ins'': org.eclipse.tracecompass.tmf.core, org.eclipse.tracecompass.tmf.ui. org.eclipse.tracecompass.tmf.analysis.xml.core, org.eclipse.tracecompass.tmf.analysis.xml.ui
 
 * '''CTF support for TMF''' - CTF support for the TMF Feature
-** ''Feature'': org.eclipse.linuxtools.tmf.ctf
-** ''Plug-ins'': org.eclipse.linuxtools.tmf.ctf.core
+** ''Feature'': org.eclipse.tracecompass.tmf.ctf
+** ''Plug-ins'': org.eclipse.tracecompass.tmf.ctf.core
 
-* '''LTTng''' - The wrapper for the LTTng tracer control. Can be used for kernel or application tracing.
-** ''Feature'': org.eclipse.linuxtools.lttng2.control
-** ''Plug-ins'': org.eclipse.linuxtools.lttng2.control.core, org.eclipse.linuxtools.lttng2.control.ui
+* '''LTTng Control''' - The wrapper for the LTTng tracer control. Can be used for kernel or application tracing.
+** ''Feature'': org.eclipse.tracecompass.lttng2.control
+** ''Plug-ins'': org.eclipse.tracecompass.lttng2.control.core, org.eclipse.tracecompass.lttng2.control.ui
 
 * '''LTTng Kernel''' - Analysis components specific to Linux kernel traces
-** ''Feature'': org.eclipse.linuxtools.lttng2.kernel
-** ''Plug-ins'': org.eclipse.linuxtools.lttng2.kernel.core, org.eclipse.linuxtools.lttng2.kernel.ui
+** ''Feature'': org.eclipse.tracecompass.lttng2.kernel
+** ''Plug-ins'': org.eclipse.tracecompass.analysis.os.linux.core, org.eclipse.tracecompass.analysis.os.linux.ui, org.eclipse.tracecompass.lttng2.kernel.core, org.eclipse.tracecompass.lttng2.kernel.ui
 
 * '''LTTng UST''' - Analysis components specific to Linux userspace traces
-** ''Feature'': org.eclipse.linuxtools.lttng2.ust
-** ''Plug-ins'': org.eclipse.linuxtools.lttng2.ust.core, org.eclipse.linuxtools.lttng2.ust.ui
+** ''Feature'': org.eclipse.tracecompass.lttng2.ust
+** ''Plug-ins'': org.eclipse.tracecompass.lttng2.ust.core, org.eclipse.tracecompass.lttng2.ust.ui
 
-== LTTng Eclipse Dependencies ==
+== LTTng Control Dependencies ==
 
-The Eclipse LTTng controls the LTTng tracer through an ''ssh'' connection, if the tracer is running locally it can use or bypass the ''ssh'' connection.
+The Eclipse LTTng Control feature controls the LTTng tracer through an ''ssh'' connection, if the tracer is running locally it can use or bypass the ''ssh'' connection.
 
-Therefore, the target system (where the tracer runs) needs to run an ''ssh'' server as well as ''sftp'' server (for file transfer) to which you have permission to connect.
+When using ''ssh'', the target system (where the tracer runs) needs to run an ''ssh'' server as well as ''sftp'' server (for file transfer) to which you have permission to connect.
 
-On the host side (where Eclipse is running), you also need to have Eclipse Remote Services installed to handle the SSH connection and transport. The Remote Services can be installed the standard way (''Help'' > ''Install New Software...'' > ''General Purpose Tools'' > ''Remote Services'').
+On the host side (where Eclipse is running), you also need to have Eclipse Remote Services installed to handle the SSH connection and transport. The Remote Services are installed for you as a dependency of the LTTng Control feature. If necessary, it can be installed manually with the standard way (''Help'' > ''Install New Software...'' > ''General Purpose Tools'' > ''Remote Services'').
 
 == Installation Verification ==
 
-If you do not have any, sample LTTng traces can be found here [http://lttng.org/download]. At the bottom of the page there is a link to some sample LTTng 2.0 kernel traces. The trace needs to be uncompressed to be read.
+If you do not have any traces, sample LTTng traces can be found here [http://lttng.org/files/samples]. This page contains links to some sample LTTng 2.0 kernel traces. The trace needs to be uncompressed to be opened. The traces can also be imported directly as archive, see the [[#Importing|Importing]] section for more detail.
 
-Here are the quick steps to verify that your installation is functional:
+Here are the quick steps to verify that your installation is functional using a LTTng trace:
 
 * Start Eclipse
 * Open the LTTng perspective
 * Create a Tracing project
-** Right-click in the Project view and select "New Project"
+** Right-click in the Project Explorer view and select New, Tracing Project
 ** Enter the name of your project (e.g. "MyLTTngProject")
 ** The project will be created. It will contain 2 empty folders: "Traces" and "Experiments"
-* Open a sample trace
+* Open and visualize a sample trace
 ** Right-click on the newly created project "Traces" folder and select "Open Trace..."
 ** Navigate to the sample LTTng trace that you want to visualize and select any file in the trace folder
 ** The newly imported trace should appear under the Traces folder
-* Visualize the trace
-** Expand the Traces folder
-** Double-click on the trace
 ** The trace should load and the views be populated
 
 If an error message is displayed, you might want to double-check that the trace type is correctly set (right-click on the trace and "Select Trace Type...").
 
 Refer to [[#Tracing Perspective]] for detailed description of the views and their usage.
 
-= LTTng =
+= Trace Compass Main Features =
 
 == Tracing Perspective ==
 
-The '''Tracing''' perspective is part of the '''Tracing and Monitoring Framework (TMF)''' and groups the following views:
+The '''Tracing''' perspective is part of the  '''Tracing and Monitoring Framework (TMF)''' and groups the following views:
 
-* [[#Project_View | Project View]]
+* [[#Project Explorer_View | Project Explorer View]]
 * [[#Events_Editor | Events Editor]]
 * [[#Histogram_View | Histogram View]]
 * [[#Statistics_View   | Statistics View]]
@@ -183,13 +184,13 @@ To open one of the above '''Tracing''' views, use the Eclipse Show View dialog (
 
 [[Image:images/ShowTracingViews.png]]
 
-Additionally, the '''LTTng''' feature provides an '''LTTng Tracer Control''' functionality. It comes with a dedicated '''Control View'''.
+Additionally, the '''LTTng Control''' feature provides an '''LTTng Tracer Control''' functionality. It comes with a dedicated '''Control View'''.
 
 * [[#LTTng_Tracer_Control | LTTng Tracer Control]]
 
-== Project View ==
+== Project Explorer View ==
 
-The project view is the standard Eclipse Project Explorer. '''Tracing''' projects are well integrated in the Eclipse's Common Navigator Framework. The Project Explorer shows '''Tracing''' project with a small "T" decorator in the upper right of the project folder icon.
+The Project Explorer view is the standard Eclipse Project Explorer. '''Tracing''' projects are well integrated in the Eclipse's Common Navigator Framework. The Project Explorer shows '''Tracing''' project with a small "T" decorator in the upper right of the project folder icon.
 
 === Creating a Tracing Project ===
 
@@ -331,7 +332,7 @@ When Finish is clicked, the trace is imported in the target folder. The folder s
 
 === Selecting a Trace Type ===
 
-If no trace type was selected a trace type has to be associated to a trace before it can be opened. To select a trace type select the relevant trace and click the right mouse button. In the context-sensitive menu, select '''Select Trace Type...''' menu item. A sub-menu will show will all available trace type categories. From the relevant category select the required trace type. The examples, below show how to select the '''Common Trace Format''' types '''LTTng Kernel''' and '''Generic CTF trace'''.
+If no trace type was selected a trace type has to be associated to a trace before it can be opened. To select a trace type select the relevant trace and click the right mouse button. In the context-sensitive menu, select '''Select Trace Type...''' menu item. A sub-menu will show will all available trace type categories. From the relevant category select the required trace type. The examples, below show how to select the '''Common Trace Format''' types '''Linux Kernel Trace''' and '''Generic CTF trace'''.
 
 [[Image:images/SelectLTTngKernelTraceType.png]]
 
@@ -711,7 +712,7 @@ Fill out the first wizard page with the following information:
 * '''Category:''' Enter a category name for the trace type.
 * '''Trace type:''' Enter a name for the trace type, which is also the name of the custom parser.
 * '''Time Stamp format:''' Enter the date and time pattern that will be used to output the Time Stamp.<br>
-Note: information about date and time patterns can be found here: [../reference/api/org/eclipse/linuxtools/tmf/core/timestamp/TmfTimestampFormat.html TmfTimestampFormat]
+Note: information about date and time patterns can be found here: [../reference/api/org/eclipse/tracecompass/tmf/core/timestamp/TmfTimestampFormat.html TmfTimestampFormat]
 
 Click the '''Add next line''', '''Add child line''' or '''Remove line''' buttons to create a new line of input or delete it. For each line of input, enter the following information:
 
@@ -780,7 +781,7 @@ Fill out the first wizard page with the following information:
 * '''Trace type:''' Enter a name for the trace type, which is also the name of the custom parser.
 * '''Time Stamp format:''' Enter the date and time pattern that will be used to output the Time Stamp.<br>
 
-Note: information about date and time patterns can be found here: [../reference/api/org/eclipse/linuxtools/tmf/core/timestamp/TmfTimestampFormat.html TmfTimestampFormat]
+Note: information about date and time patterns can be found here: [../reference/api/org/eclipse/tracecompass/tmf/core/timestamp/TmfTimestampFormat.html TmfTimestampFormat]
 
 Click the '''Add document element''' button to create a new document element and enter a name for the root-level document element of the XML file.
 
@@ -994,7 +995,7 @@ Fill in all necessary information, select the radio button for '''Snapshot Mode'
 
 Refer to chapter [[#Recording a Snapshot | Recording a Snapshot]] for how to create a snapshot.
 
-=== Creating a Live Tracing Session ====
+=== Creating a Live Tracing Session ===
 LTTng Tools version v2.4.0 introduces the possibility to create live tracing sessions. The live mode allows you to stream the trace and view it while it's being recorded. To create such a live session, open the trace session dialog as described in chapter [[#Creating a Tracing Session | Creating a Tracing Session]].
 
 [[Image:images/LTTng2CreateSessionDialog_Live.png]]
@@ -1320,7 +1321,7 @@ A new display will open for selecting the traces to import.
 
 [[Image:images/LTTng2ImportDialog.png]]
 
-By default all traces are selected. A default project with the name '''Remote''' is selected which will be created if necessary. Update the list of traces to be imported, if necessary, by selecting and deselecting the relevant traces in the tree viewer. Use buttons '''Select All''' or '''Deselect All''' to select or deselect all traces. Also if needed, change the tracing project from the '''Available Projects''' combo box. Select the Overwrite button ('''Overwrite existing trace without warning''') if required. Then press button '''Ok'''. Upon successful import operation the selected traces will be stored in the '''Traces''' directory of the specified tracing project. The session directory structure as well as the trace names will be preserved in the destination tracing project. For '''Kernel''' traces the trace type '''LTTng Kernel Trace''' and for '''UST''' traces the trace type '''LTTng UST Trace''' will be set. From the '''Project Explorer''' view, the trace can be analyzed further.
+By default all traces are selected. A default project with the name '''Remote''' is selected which will be created if necessary. Update the list of traces to be imported, if necessary, by selecting and deselecting the relevant traces in the tree viewer. Use buttons '''Select All''' or '''Deselect All''' to select or deselect all traces. Also if needed, change the tracing project from the '''Available Projects''' combo box. Select the Overwrite button ('''Overwrite existing trace without warning''') if required. Then press button '''Ok'''. Upon successful import operation the selected traces will be stored in the '''Traces''' directory of the specified tracing project. The session directory structure as well as the trace names will be preserved in the destination tracing project. For '''Kernel''' traces the trace type '''Linux Kernel Trace''' and for '''UST''' traces the trace type '''LTTng UST Trace''' will be set. From the '''Project Explorer''' view, the trace can be analyzed further.
 
 '''Note''': If the overwrite button ('''Overwrite existing trace without warning''') was not selected and a trace with the same name of a trace to be imported already exists in the destination directory of the project, then a new confirmation dialog box will open.
 
@@ -1426,7 +1427,7 @@ The perspective can be opened from the Eclipse Open Perspective dialog ('''Windo
 
 == Control Flow View ==
 
-The '''''Control Flow''''' view is a LTTng-specific view that shows per-process events graphically. The LTTng Kernel analysis is executed the first time a LTTng Kernel is opened. After opening the trace, the element '''Control Flow''' is added under the '''LTTng Kernel Analysis''' tree element in the Project Explorer. To open the view,  double-click the '''Control Flow''' tree element.
+The '''''Control Flow''''' view is a LTTng-specific view that shows per-process events graphically. The Linux Kernel Analysis is executed the first time a LTTng Kernel is opened. After opening the trace, the element '''Control Flow''' is added under the '''Linux Kernel Analysis''' tree element in the Project Explorer. To open the view,  double-click the '''Control Flow''' tree element.
 
 [[Image:images/Cfv_show_view.png]]
 
@@ -1578,7 +1579,7 @@ The Control Flow View '''toolbar''', located at the top right of the view, has s
 
 == Resources View ==
 
-This view is specific to LTTng kernel traces.  The LTTng Kernel analysis is executed the first time a LTTng Kernel is opened. After opening the trace, the element '''Resources''' is added under the '''LTTng Kernel Analysis''' tree element of the Project Explorer. To open the view, double-click the '''Resources''' tree element.
+This view is specific to LTTng kernel traces.  The Linux Kernel Analysis is executed the first time a LTTng Kernel is opened. After opening the trace, the element '''Resources''' is added under the '''Linux Kernel Analysis''' tree element of the Project Explorer. To open the view, double-click the '''Resources''' tree element.
 
 Alternatively, go in '''Window''' -> '''Show View''' -> '''Other...''' and select '''LTTng/Resources''' in the list.
 
@@ -1651,7 +1652,7 @@ The Resources View '''toolbar''', located at the top right of the view, has shor
 
 == LTTng CPU Usage View ==
 
-The CPU Usage analysis and view is specific to LTTng Kernel traces. The CPU usage is derived from a kernel trace as long as the '''sched_switch''' event was enabled during the collection of the trace. This analysis is executed the first time that the CPU Usage view is opened after opening the trace. To open the view, double-click on the '''CPU Usage''' tree element under the '''LTTng Kernel Analysis''' tree element of the Project Explorer.
+The CPU Usage analysis and view is specific to LTTng Kernel traces. The CPU usage is derived from a kernel trace as long as the '''sched_switch''' event was enabled during the collection of the trace. This analysis is executed the first time that the CPU Usage view is opened after opening the trace. To open the view, double-click on the '''CPU Usage''' tree element under the '''Linux Kernel Analysis''' tree element of the Project Explorer.
 
 [[Image:images/LTTng_OpenCpuUsageView.png]]
 
@@ -1845,7 +1846,7 @@ The following tracepoints will be available
 
 The ones used for trace synchronization are '''inet_sock_local_in''' and '''inet_sock_local_out'''.
 
-== Synchronize traces in TMF ==
+== Synchronize traces in Trace Compass ==
 
 In order to synchronize traces, create a new experiment and select all traces that need to be synchronized. Right-click on the experiment and select '''Synchronize traces'''. For each trace whose time needs to be transformed, a new trace named as the original but followed by a '_' will be created with the transformed timestamps, and the original trace will be replaced in the experiment. The original trace can still be accessed under the '''Traces''' folder.
 
@@ -1952,13 +1953,13 @@ If you already have an XML file defining state providers and/or views, you can i
 
 You will be prompted to select the file. It will be validated before importing it and if successful, the new analysis and views will be shown under the traces for which they apply. You will need to close any already opened traces and re-open them before the new analysis can be executed.
 
-Right now, there is no way to "unimport" analyses from within the application. A UI to manage the imported analyses is currently being worked on. In the meantime, you can navigate to your workspace directory, and delete the files in .metadata/.plugins/org.eclipse.linuxtools.tmf.analysis.xml.core/xml_files .
+Right now, there is no way to "unimport" analyses from within the application. A UI to manage the imported analyses is currently being worked on. In the meantime, you can navigate to your workspace directory, and delete the files in .metadata/.plugins/org.eclipse.tracecompass.tmf.analysis.xml.core/xml_files .
 
 == Defining XML components ==
 
 To define XML components, you need to create a new XML file and use the XSD that comes with the XML plugin.
 
-''For now, the XSD is only available through the source code in org.eclipse.linuxtools.tmf.analysis.xml.core/src/org/eclipse/linuxtools/tmf/analysis/xml/core/module/xmlDefinition.xsd''.
+''For now, the XSD is only available through the source code in org.eclipse.tracecompass.tmf.analysis.xml.core/src/org/eclipse/tracecompass/tmf/analysis/xml/core/module/xmlDefinition.xsd''.
 
 An empty file, with no content yet would look like this:
 
@@ -1978,7 +1979,7 @@ The state system obtained by the state provider can then be used to populate dat
 
 === Definitions and example ===
 
-Before we start, we'll define a few terms used in the following sections. The interested reader should read the [[Developer-Guide|Tmf Developer Guide]] for more complete description of the state system and state providers.
+Before we start, we'll define a few terms used in the following sections. The interested reader should read the [https://wiki.eclipse.org/index.php/Trace_Compass#User_Guides Tmf Developer Guide] for more complete description of the state system and state providers.
 
 * The '''state system''' can be viewed as a model of the system, where the different elements (attributes) can be seen as a tree, and their evolution (states) is tracked through time.
 
@@ -2089,7 +2090,7 @@ The full XML file for the example above would look like this:
 
 <pre>
 <?xml version="1.0" encoding="UTF-8"?>
-<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../org.eclipse.linuxtools.tmf.analysis.xml.core/src/org/eclipse/linuxtools/tmf/analysis/xml/core/module/xmlDefinition.xsd">
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../org.eclipse.tracecompass.tmf.analysis.xml.core/src/org/eclipse/tracecompass/tmf/analysis/xml/core/module/xmlDefinition.xsd">
     <stateProvider version="0" id="my.test.state.provider">
         <head>
             <traceType id="my.trace.id" />
@@ -2200,7 +2201,7 @@ Also, if the values of the attributes to display are known, they can be defined,
 Here is the full XML for the time graph view:
 
 <pre>
-<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../org.eclipse.linuxtools.tmf.analysis.xml.core/src/org/eclipse/linuxtools/tmf/analysis/xml/core/module/xmlDefinition.xsd">
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../org.eclipse.tracecompass.tmf.analysis.xml.core/src/org/eclipse/tracecompass/tmf/analysis/xml/core/module/xmlDefinition.xsd">
     <timeGraphView id="my.test.time.graph.view">
         <head>
             <analysis id="my.test.state.provider" />
@@ -2228,7 +2229,7 @@ An XY chart displays series as a set of numerical values over time. The X-axis r
 
 Such views can be defined in XML using the data in the state system. The state system itself could have been built by an XML-defined state provider or by any pre-defined Java analysis. It only requires knowing the structure of the state system, which can be explored using the [[#State System Explorer View | State System Explorer View]] (or programmatically using the methods in ''ITmfStateSystem'').
 
-We will use the LTTng Kernel Analysis on LTTng kernel traces to show an example XY chart. In this state system, the status of each CPU is a numerical value. We will display this value as the Y axis of the series. There will be one series per CPU. The XML to display these entries would be as such:
+We will use the Linux Kernel Analysis on LTTng kernel traces to show an example XY chart. In this state system, the status of each CPU is a numerical value. We will display this value as the Y axis of the series. There will be one series per CPU. The XML to display these entries would be as such:
 
 <pre>
 <entry path="CPUs/*">
@@ -2247,7 +2248,7 @@ Like for the time graph views, optional header information can be added to the v
 
 <pre>
 <head>
-    <analysis id="org.eclipse.linuxtools.lttng2.kernel.analysis" />
+    <analysis id="org.eclipse.tracecompass.lttng2.kernel.analysis" />
     <label value="CPU status XY view" />
 </head>
 </pre>
@@ -2255,10 +2256,10 @@ Like for the time graph views, optional header information can be added to the v
 Here is the full XML for the XY Chart that displays the CPU status over time of an LTTng Kernel Trace:
 
 <pre>
-<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../org.eclipse.linuxtools.tmf.analysis.xml.core/src/org/eclipse/linuxtools/tmf/analysis/xml/core/module/xmlDefinition.xsd">
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../org.eclipse.tracecompass.tmf.analysis.xml.core/src/org/eclipse/tracecompass/tmf/analysis/xml/core/module/xmlDefinition.xsd">
 	<xyView id="my.test.xy.chart.view">
 		<head>
-			<analysis id="org.eclipse.linuxtools.lttng2.kernel.analysis" />
+			<analysis id="org.eclipse.tracecompass.lttng2.kernel.analysis" />
 			<label value="CPU status XY view" />
 		</head>
 
@@ -2297,13 +2298,13 @@ A cursory look at the histogram bar on the bottom show relatively even event dis
 
 As Bob suspects that he may be having some hardware raising IRQs or some other hardware based issue and adding delays. He looks at the ressource view and doesn't see anything abnormal.
 
-Bob did note an exact second one glitch occured: 11:58:03. He zooms into the time range or 11:58:02-11:58:04 using the histogram.He is happy to see the time is human readable local wall clock time and no longer in "nanseconds since the last reboot". <br>In the resource view, once again, he sees many soft irqs being raised at the same time, around the time his gui would freeze. He changes views and looks at the control flow view at that time and sees a process spending a lot of time in the kernel: FooMonitor- his temperature monitoring software.
+Bob did note an exact second one glitch occurred: 11:58:03. He zooms into the time range or 11:58:02-11:58:04 using the histogram. He is happy to see the time is human readable local wall clock time and no longer in "nanseconds since the last reboot". <br>In the resource view, once again, he sees many soft irqs being raised at the same time, around the time his GUI would freeze. He changes views and looks at the control flow view at that time and sees a process spending a lot of time in the kernel: FooMonitor- his temperature monitoring software.
 
-At this point he closes FooMonitor and notices the bug dissapeared. He could call it a day but he wants to see what was causing the system to freeze. He cannot justify closing a piece of software without understanding the issue. It may be a conflict that HIS software is causing after all.
+At this point he closes FooMonitor and notices the bug disappeared. He could call it a day but he wants to see what was causing the system to freeze. He cannot justify closing a piece of software without understanding the issue. It may be a conflict that HIS software is causing after all.
 
 The system freezes around the time this program is running. He clicks on the process in the control flow view and looks at the corresponding events in the detailed events view. He sees: open - read - close repeated hundreds of times on the same file. The file being read was /dev/HWmonitor. He sends a report to the FooMonitor team and warns his team that FooMonitor was glitching their performance.
 
-The FooMonitor team finds that they were calling a system bus call that would halt a cpu while reading the temperature so that the core would not induce an 0.1 degree error in the reading, by disabling this feature, they improve their software and stop the glitches from occurring on their custommer's machine. They also optimize their code to open the file read and clone it once.
+The FooMonitor team finds that they were calling a system bus call that would halt a CPU while reading the temperature so that the core would not induce an 0.1 degree error in the reading, by disabling this feature, they improve their software and stop the glitches from occurring on their custommer's machine. They also optimize their code to open the file read and clone it once.
 
 By using system wide kernel tracing, even without deep kernel knowledge Bob was able to isolate a bug in a rogue piece of software in his system.
 
@@ -2321,12 +2322,8 @@ Alice kills the program, and immediately the server speeds up. She then goes to 
 
 = References =
 
-* [http://www.eclipse.org/linuxtools/projectPages/lttng/ Linux Tools - LTTng integration]
+* [http://www.eclipse.org/tracecompass Trace Compass project] 
+* [https://wiki.eclipse.org/index.php/Trace_Compass#User_Guides Trace Compass User Guides]
 * [http://www.lttng.org/ LTTng project]
 * [http://lttng.org/files/doc/man-pages/man1/lttng.1.html LTTng Tracer Control Command Line Tool User Manual]
 * [http://lttng.org/files/doc/man-pages/man8/lttng-relayd.8.html LTTng relayd User Manual]
-* [http://wiki.eclipse.org/Linux_Tools_Project/TMF/User_Guide TMF User Guide]
-
-= Updating This Document =
-
-This document is maintained in a collaborative wiki.  If you wish to update or modify this document please visit [http://wiki.eclipse.org/index.php/Linux_Tools_Project/LTTng2/User_Guide http://wiki.eclipse.org/Linux_Tools_Project/LTTng2/User_Guide]

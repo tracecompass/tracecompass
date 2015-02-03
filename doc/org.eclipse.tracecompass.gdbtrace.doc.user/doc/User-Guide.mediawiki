@@ -9,7 +9,7 @@ The GDB Tracepoint Analysis feature is an extension to the Tracing and Monitorin
 
 = Getting Started =
 
-The feature can be installed from the Eclipse update site by selecting '''Linux Tools''' > '''GDB Tracepoint Analysis'''.
+The feature can be installed from the Eclipse update site by selecting '''Performance, Profiling and Tracing Tools''' > '''Trace Compass GDB Tracepoint Analysis'''.
 
 The feature requires GDB version 7.2 or later to be installed on the local host. The executable program 'gdb' must be found in the path.
 
@@ -34,7 +34,7 @@ Collecting the C/C++ tracepoint data is outside the scope of this feature. It ca
 
 = Importing Tracepoint Data =
 
-Some information in this section is redundant with the LTTng User Guide. For further details, see the LTTng User Guide entry in the [[#References | References]] section.
+Some information in this section is redundant with the Trace Compass User Guide. For further details, see the Trace Compass User Guides entry in the [[#References | References]] section.
 
 == Creating a Tracing Project ==
 
@@ -48,7 +48,7 @@ Alternatively, the trace can be drag & dropped to the '''Traces''' folder from a
 
 == Selecting the GDB Trace Type ==
 
-Right-click the imported trace in the '''Traces''' folder and choose '''Select Trace Type...''' > '''GDB''' > '''GDB Trace''' from the context menu. This step can be omitted if the trace type was selected at import.
+Right-click the imported trace in the '''Traces''' folder and choose '''Select Trace Type...''' > '''GDB''' > '''GDB Trace''' from the context menu. This step can be omitted if the trace type was selected or detected at import.
 
 The trace will be updated with the GDB icon [[Image:images/gdb_icon16.png]].
 
@@ -86,9 +86,6 @@ The trace can also be navigated from the '''Trace Control''' view by clicking th
 
 = References =
 
-* [http://wiki.eclipse.org/index.php/Linux_Tools_Project/LTTng2/User_Guide LTTng User Guide]
+* [http://www.eclipse.org/tracecompass Trace Compass project]
+* [https://wiki.eclipse.org/index.php/Trace_Compass#User_Guides Trace Compass User Guides]
 * [http://wiki.eclipse.org/CDT/User/FAQ#How_can_I_trace_my_application_using_C.2FC.2B.2B_Tracepoints.3F CDT FAQ - How can I trace my application using C/C++ Tracepoints?]
-
-= Updating This Document =
-
-This document is maintained in a collaborative wiki.  If you wish to update or modify this document please visit [http://wiki.eclipse.org/index.php/Linux_Tools_Project/GDB_Tracepoint_Analysis/User_Guide http://wiki.eclipse.org/Linux_Tools_Project/GDB_Tracepoint_Analysis/User_Guide]
