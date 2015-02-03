@@ -63,6 +63,8 @@ public class TmfFilterTraceTypeNodeTest extends TmfFilterTreeNodeTest {
     private static final String DEFINITION_NAME_TXT = "name txt";
     private static final String DEFINITION_NAME_XML = "name xml";
     private static final String SEP = ":";
+    private static final String CUSTOM_TXT_TRACE_TYPE_PREFIX = "custom.txt.trace" + SEP;
+    private static final String CUSTOM_XML_TRACE_TYPE_PREFIX = "custom.xml.trace" + SEP;
     private static CustomTxtTraceDefinition fCustomTxtDefinition = new CustomTxtTraceDefinition();
     private static CustomXmlTraceDefinition fCustomXmlDefinition = new CustomXmlTraceDefinition();
     static {
@@ -106,19 +108,19 @@ public class TmfFilterTraceTypeNodeTest extends TmfFilterTreeNodeTest {
         assertFalse(fFilter.matches(fEvent3));
 
         fFilter.setTraceClass(CustomTxtTrace.class);
-        fFilter.setTraceTypeId(CustomTxtTrace.class.getCanonicalName() + SEP + CATEGORY_TXT + SEP + DEFINITION_NAME_TXT);
+        fFilter.setTraceTypeId(CUSTOM_TXT_TRACE_TYPE_PREFIX + CATEGORY_TXT + SEP + DEFINITION_NAME_TXT);
         assertFalse(fFilter.matches(fEvent1));
         assertTrue(fFilter.matches(fEvent2));
         assertFalse(fFilter.matches(fEvent3));
 
         fFilter.setTraceClass(CustomXmlTrace.class);
-        fFilter.setTraceTypeId(CustomXmlTrace.class.getCanonicalName() + SEP + CATEGORY_XML + SEP + DEFINITION_NAME_XML);
+        fFilter.setTraceTypeId(CUSTOM_XML_TRACE_TYPE_PREFIX + CATEGORY_XML + SEP + DEFINITION_NAME_XML);
         assertFalse(fFilter.matches(fEvent1));
         assertFalse(fFilter.matches(fEvent2));
         assertTrue(fFilter.matches(fEvent3));
 
         fFilter.setTraceClass(CustomTxtTrace.class);
-        fFilter.setTraceTypeId(CustomTxtTrace.class.getCanonicalName() + SEP + CATEGORY_XML + SEP + DEFINITION_NAME_XML);
+        fFilter.setTraceTypeId(CUSTOM_TXT_TRACE_TYPE_PREFIX + CATEGORY_XML + SEP + DEFINITION_NAME_XML);
         assertFalse(fFilter.matches(fEvent1));
         assertFalse(fFilter.matches(fEvent2));
         assertFalse(fFilter.matches(fEvent3));

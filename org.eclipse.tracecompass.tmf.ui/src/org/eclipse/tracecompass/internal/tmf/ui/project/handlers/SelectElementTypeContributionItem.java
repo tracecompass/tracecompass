@@ -176,7 +176,7 @@ public class SelectElementTypeContributionItem extends CompoundContributionItem 
          */
         for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
             String traceBundle = Activator.getDefault().getBundle().getSymbolicName();
-            String traceTypeId = CustomTxtTrace.class.getCanonicalName() + ':' + def.categoryName + ':' + def.definitionName;
+            String traceTypeId = CustomTxtTrace.buildTraceTypeId(def.categoryName, def.definitionName);
             String traceIcon = DEFAULT_TRACE_ICON_PATH;
             String label = def.definitionName;
             boolean selected = selectedTraceTypes.contains(traceTypeId);
@@ -186,7 +186,7 @@ public class SelectElementTypeContributionItem extends CompoundContributionItem 
         }
         for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
             String traceBundle = Activator.getDefault().getBundle().getSymbolicName();
-            String traceTypeId = CustomXmlTrace.class.getCanonicalName() + ':' + def.categoryName + ':' + def.definitionName;
+            String traceTypeId = CustomXmlTrace.buildTraceTypeId(def.categoryName, def.definitionName);
             String traceIcon = DEFAULT_TRACE_ICON_PATH;
             String label = def.definitionName;
             boolean selected = selectedTraceTypes.contains(traceTypeId);

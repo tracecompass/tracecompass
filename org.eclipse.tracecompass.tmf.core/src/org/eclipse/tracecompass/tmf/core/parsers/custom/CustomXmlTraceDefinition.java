@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -62,6 +62,12 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
     /** "ignore" tag */
     public static final String TAG_IGNORE = Messages.CustomXmlTraceDefinition_ignoreTag;
 
+    /**
+     * Custom XML label used internally and therefore should not be externalized
+     */
+    public static final String CUSTOM_XML_CATEGORY = "Custom XML"; //$NON-NLS-1$
+
+
     /** Name of the default XML definitions file */
     protected static final String CUSTOM_XML_TRACE_DEFINITIONS_DEFAULT_FILE_NAME = "custom_xml_default_parsers.xml"; //$NON-NLS-1$
 
@@ -78,12 +84,21 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             Activator.getDefault().getStateLocation().addTrailingSeparator().append(CUSTOM_XML_TRACE_DEFINITIONS_FILE_NAME).toString();
 
     /**
-     * Legacy path to the XML definitions file (in the UI plug-in) TODO Remove
+     * Legacy path to the XML definitions file (in the UI plug-in of linux tools) TODO Remove
      * once we feel the transition phase is over.
      */
-    private static final String CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME_LEGACY =
+    private static final String CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME_LEGACY_UI =
             Activator.getDefault().getStateLocation().removeLastSegments(1).addTrailingSeparator()
                     .append("org.eclipse.linuxtools.tmf.ui") //$NON-NLS-1$
+                    .append(CUSTOM_XML_TRACE_DEFINITIONS_FILE_NAME).toString();
+
+    /**
+     * Legacy path to the XML definitions file (in the core plug-in of linux tools) TODO Remove
+     * once we feel the transition phase is over.
+     */
+    private static final String CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME_LEGACY_CORE =
+            Activator.getDefault().getStateLocation().removeLastSegments(1).addTrailingSeparator()
+                    .append("org.eclipse.linuxtools.tmf.core") //$NON-NLS-1$
                     .append(CUSTOM_XML_TRACE_DEFINITIONS_FILE_NAME).toString();
 
     // TODO: These strings should not be externalized
@@ -107,7 +122,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
      * Default constructor
      */
     public CustomXmlTraceDefinition() {
-        this(TmfTraceType.CUSTOM_XML_CATEGORY, "", null, new ArrayList<OutputColumn>(), ""); //$NON-NLS-1$ //$NON-NLS-2$
+        this(CUSTOM_XML_CATEGORY, "", null, new ArrayList<OutputColumn>(), ""); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /**
@@ -298,17 +313,18 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
      */
     public static CustomXmlTraceDefinition[] loadAll(boolean includeDefaults) {
         File defaultFile = new File(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME);
-        File legacyFile = new File(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME_LEGACY);
+        File legacyFileUI = new File(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME_LEGACY_UI);
+        File legacyFileCore = new File(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME_LEGACY_CORE);
 
         /*
          * If there is no file at the expected location, check the legacy
-         * location instead.
+         * locations instead.
          */
-        if (!defaultFile.exists() && legacyFile.exists()) {
-            CustomXmlTraceDefinition[] oldDefs = loadAll(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME_LEGACY);
-            for (CustomXmlTraceDefinition def : oldDefs) {
-                /* Save in the new location */
-                def.save();
+        if (!defaultFile.exists()) {
+            if (legacyFileCore.exists()) {
+                transferDefinitions(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME_LEGACY_CORE);
+            } else if (legacyFileUI.exists()) {
+                transferDefinitions(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME_LEGACY_UI);
             }
         }
 
@@ -328,6 +344,15 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
         }
         return defs.toArray(new CustomXmlTraceDefinition[0]);
     }
+
+    private static void transferDefinitions(String defFile) {
+        CustomXmlTraceDefinition[] oldDefs = loadAll(defFile);
+        for (CustomXmlTraceDefinition def : oldDefs) {
+            /* Save in the new location */
+            def.save();
+        }
+    }
+
 
     /**
      * Load all the XML trace definitions in the given definitions file.
@@ -402,7 +427,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
      */
     @Deprecated
     public static CustomXmlTraceDefinition load(String definitionName) {
-        return load(TmfTraceType.CUSTOM_XML_CATEGORY, definitionName);
+        return load(CUSTOM_XML_CATEGORY, definitionName);
     }
 
     /**
@@ -486,7 +511,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
                 Element element = (Element) node;
                 String categoryAttribute = element.getAttribute(CATEGORY_ATTRIBUTE);
                 if (categoryAttribute.isEmpty()) {
-                    categoryAttribute = TmfTraceType.CUSTOM_XML_CATEGORY;
+                    categoryAttribute = CUSTOM_XML_CATEGORY;
                 }
                 String nameAttribute = element.getAttribute(NAME_ATTRIBUTE);
                 if (categoryName.equals(categoryAttribute) &&
@@ -510,7 +535,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
 
         def.categoryName = definitionElement.getAttribute(CATEGORY_ATTRIBUTE);
         if (def.categoryName.isEmpty()) {
-            def.categoryName = TmfTraceType.CUSTOM_XML_CATEGORY;
+            def.categoryName = CUSTOM_XML_CATEGORY;
         }
         def.definitionName = definitionElement.getAttribute(NAME_ATTRIBUTE);
         if (def.definitionName.isEmpty()) {
@@ -595,7 +620,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
      */
     @Deprecated
     public static void delete(String definitionName) {
-        delete(TmfTraceType.CUSTOM_XML_CATEGORY, definitionName);
+        delete(CUSTOM_XML_CATEGORY, definitionName);
     }
 
     /**
