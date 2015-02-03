@@ -15,7 +15,6 @@
 
 package org.eclipse.tracecompass.tmf.core.project.model;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -221,6 +220,7 @@ public final class TmfTraceType {
     }
 
     /**
+<<<<<<< Upstream, based on 3097c4b013b2ea6ae2f6e8c1fa76e5aeaf2a1cbf
      * Gets the custom trace types (custom text and friends)
      *
      * @param type
@@ -245,6 +245,8 @@ public final class TmfTraceType {
     }
 
     /**
+=======
+>>>>>>> 930e20d Remove deprecated and unused metheds related to custom traces
      * Gets all the custom trace types
      *
      * @return the list of custom trace types
@@ -286,6 +288,7 @@ public final class TmfTraceType {
     /**
      * Add or replace a custom trace type
      *
+<<<<<<< Upstream, based on 3097c4b013b2ea6ae2f6e8c1fa76e5aeaf2a1cbf
      * @param category
      *            The custom parser category
      * @param definitionName
@@ -304,6 +307,8 @@ public final class TmfTraceType {
     /**
      * Add or replace a custom trace type
      *
+=======
+>>>>>>> 930e20d Remove deprecated and unused metheds related to custom traces
      * @param traceClass
      *            The custom trace class, either {@link CustomTxtTrace} or
      *            {@link CustomXmlTrace}
@@ -339,24 +344,6 @@ public final class TmfTraceType {
             TRACE_TYPES.put(traceTypeId, tt);
             // Deregister trace as signal handler because it is only used for validation
             TmfSignalManager.deregister(trace);
-        }
-    }
-
-    /**
-     * Remove a custom trace type
-     *
-     * @param category
-     *            The custom parser category
-     * @param definitionName
-     *            The custom parser definition name to add or replace
-     * @deprecated Use {@link #removeCustomTraceType(Class, String, String)}
-     */
-    @Deprecated
-    public static void removeCustomTraceType(String category, String definitionName) {
-        if (category.equals(CustomTxtTraceDefinition.CUSTOM_TXT_CATEGORY)) {
-            removeCustomTraceType(CustomTxtTrace.class, category, definitionName);
-        } else if (category.equals(CustomXmlTraceDefinition.CUSTOM_XML_CATEGORY)) {
-            removeCustomTraceType(CustomXmlTrace.class, category, definitionName);
         }
     }
 
@@ -524,27 +511,6 @@ public final class TmfTraceType {
      */
     public static boolean validate(TraceValidationHelper traceToValidate) {
         return validate(traceToValidate.getTraceType(), traceToValidate.getTraceToScan());
-    }
-
-    /**
-     * Validate a list of files with a tracetype
-     *
-     * @param traceTypeName
-     *            the trace category (canonical name)
-     * @param traces
-     *            the list of files to check if they are trace
-     * @return true if all the traces are valid
-     */
-    public static boolean validateTraceFiles(String traceTypeName, List<File> traces) {
-        if (traceTypeName != null && !"".equals(traceTypeName) && //$NON-NLS-1$
-                !traceTypeName.startsWith(CustomTxtTraceDefinition.CUSTOM_TXT_CATEGORY) && !traceTypeName.startsWith(CustomXmlTraceDefinition.CUSTOM_XML_CATEGORY)) {
-            for (File trace : traces) {
-                if (!validate(traceTypeName, trace.getAbsolutePath())) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     /**

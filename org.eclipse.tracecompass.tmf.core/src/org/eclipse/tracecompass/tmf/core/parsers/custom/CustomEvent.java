@@ -197,27 +197,6 @@ public class CustomEvent extends TmfEvent {
         return fColumnData[index].getValue().toString();
     }
 
-    /**
-     * Get the contents of the row in the events table corresponding to this
-     * event. The order of the elements corresponds to the order of the columns.
-     *
-     * @return The event row entries
-     * @deprecated This should not be used, since this isn't related to the
-     *             order of columns in the view anymore. You should use
-     *             {@link #getEventString(int)}
-     */
-    @Deprecated
-    public String[] getEventStrings() {
-        if (fData != null) {
-            processData();
-        }
-        String[] entries = new String[fColumnData.length];
-        for (int i = 0; i < fColumnData.length; i++) {
-            entries[i] = fColumnData[i].getValue().toString();
-        }
-        return entries;
-    }
-
     private void processData() {
         String timestampString = fData.get(CustomTraceDefinition.TAG_TIMESTAMP);
         String timestampInputFormat = fData.get(TIMESTAMP_INPUT_FORMAT_KEY);
