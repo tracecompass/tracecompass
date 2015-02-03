@@ -22,8 +22,9 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
         CallsiteEventsInTableTest.class,
         CollapseEventsInTableTest.class,
+        ColorsViewTest.class,
         TestTraceOffsetting.class,
-        FilterViewerTest.class
+        //FilterViewerTest.class
 })
 public class AllTests {
 }

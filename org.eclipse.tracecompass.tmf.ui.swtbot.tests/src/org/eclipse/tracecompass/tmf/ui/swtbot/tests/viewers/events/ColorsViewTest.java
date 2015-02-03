@@ -57,11 +57,6 @@ public class ColorsViewTest {
         }
 
         @Override
-        public String toString(boolean explicit) {
-            return "YES";
-        }
-
-        @Override
         public void setParent(ITmfFilterTreeNode parent) {
 
         }
