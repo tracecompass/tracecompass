@@ -4,7 +4,7 @@
         Generate Eclipse help content for the Trace Compass Pcap User Guide
     </description>
 
-   <property name="ug.title" value="Pcap Network Tracing User Guide" />
+   <property name="document.title" value="Pcap Network Tracing User Guide" />
 
     <path id="wikitext.tasks.classpath">
         <!-- Search in the local Eclipse plugins directory for the Wikitext plugin -->
@@ -17,9 +17,6 @@
         <pathelement path="${compile_classpath}" />
     </path>
 
-    <taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/internal/wikitext/mediawiki/core/tasks/tasks.properties" />
-    <taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/wikitext/core/util/anttask/tasks.properties" />
-    <!-- Different location in more recent versions of Mylyn (Luna ?) -->
     <taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/wikitext/core/ant/tasks.properties" />
 
     <target name="build" description="Generate Eclipse help content for the Trace Compass Pcap User Guide">
@@ -29,7 +26,7 @@
             overwrite="true"
             multipleOutputFiles="true"
             navigationimages="true"
-            title="${ug.title}"
+            title="${document.title}"
             formatoutput="true"
             helpPrefix="doc">
             <fileset dir="doc">
@@ -49,7 +46,7 @@
             <fileset dir="doc">
                 <include name="**/*.html" />
             </fileset>
-            <dtd publicid="-//W3C//DTD XHTML 1.0 Transitional//EN" location=".empty.dtd" />
+            <dtd publicid="-//W3C//DTD XHTML 1.0 Transitional//EN" location="../.empty.dtd" />
         </xmlvalidate>
     </target>
 

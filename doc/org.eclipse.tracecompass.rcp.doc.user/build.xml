@@ -4,10 +4,7 @@
             Generate Eclipse help content for the Trace Compass RCP user guide
     </description>
 
-    <!-- Set correct values -->
-    <property name="help.doc.url.base" value="http://wiki.eclipse.org" />
-    <property name="ug.path"  value="Linux_Tools_Project/Trace_Viewer/User_Guide" />
-    <property name="ug.title" value="Trace Compass RCP User Guide" />
+    <property name="document.title" value="Trace Compass RCP User Guide" />
 
     <path id="wikitext.tasks.classpath">
         <!-- Search in the local Eclipse plugins directory for the Wikitext plugin -->
@@ -20,9 +17,6 @@
         <pathelement path="${compile_classpath}" />
     </path>
 
-    <taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/internal/wikitext/mediawiki/core/tasks/tasks.properties" />
-    <taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/wikitext/core/util/anttask/tasks.properties" />
-    <!-- Different location in more recent versions of Mylyn (Luna ?) -->
     <taskdef classpathref="wikitext.tasks.classpath" resource="org/eclipse/mylyn/wikitext/core/ant/tasks.properties" />
 
     <target name="build" description="Generate Eclipse help content for the Trace Compass RCP User Guide">
@@ -32,7 +26,7 @@
                 overwrite="true"
                 multipleOutputFiles="true"
                 navigationimages="true"
-                title="${ug.title}"
+                title="${document.title}"
                 formatoutput="true"
                 helpPrefix="doc">
                 <fileset dir="./doc">
@@ -52,38 +46,14 @@
             <fileset dir="doc">
                 <include name="**/*.html" />
             </fileset>
-            <dtd publicid="-//W3C//DTD XHTML 1.0 Transitional//EN" location=".empty.dtd" />
+            <dtd publicid="-//W3C//DTD XHTML 1.0 Transitional//EN" location="../.empty.dtd" />
         </xmlvalidate>
-    </target>
-
-
-    <!-- If you need a proxy for the "download" target, set it here -->
-    <!--
-    <setproxy proxyhost="host" proxyport="port"/>
-    -->
-
-    <target name="download" description="Download the current contents of the LTTng User Guide from the Eclipse wiki">
-        <mediawiki-to-eclipse-help wikiBaseUrl="${help.doc.url.base}" title="${ug.title}" formatoutput="true" dest="." templateExcludes="*eclipseproject*">
-            <path name="${ug.path}" title="${ug.title}" generateToc="false" />
-            <stylesheet url="book.css" />
-            <pageAppendum>
-= Updating This Document =
-
-This document is maintained in a collaborative wiki.  If you wish to update or modify this document please visit
-http://wiki.eclipse.org/Linux_Tools_Project/LTTng2/User_Guide.
-            </pageAppendum>
-        </mediawiki-to-eclipse-help>
     </target>
 
     <target name ="clean" description="Delete all generated files">
       <delete failonerror="false" includeemptydirs="true">
-        <!-- Files under doc/ (generated locally) -->
         <fileset dir="doc" includes="**/*.html" />
         <fileset dir="doc" includes="**/*.xml" />
-
-        <!-- Files downloaded from the Eclipse wiki -->
-        <fileset dir="Linux_Tools_Project" />
-        <fileset file="toc.xml" />
       </delete>
     </target>
 
