@@ -50,7 +50,7 @@ Create a '''New''', '''Project...''', '''Plug-in Project''', set the title to ''
 
 Now the structure for the Nexus trace Plug-in is set up.
 
-Add a dependency to TMF core and UI by opening the '''MANIFEST.MF''' in '''META-INF''', selecting the '''Dependencies''' tab and '''Add ...''' '''org.eclipse.linuxtools.tmf.core''' and '''org.eclipse.linuxtools.tmf.ui'''.
+Add a dependency to TMF core and UI by opening the '''MANIFEST.MF''' in '''META-INF''', selecting the '''Dependencies''' tab and '''Add ...''' '''org.eclipse.tracecompass.tmf.core''' and '''org.eclipse.tracecompass.tmf.ui'''.
 
 [[Image:images/NTTAddDepend.png]]<br>
 [[Image:images/NTTSelectProjects.png]]<br>
@@ -78,9 +78,9 @@ It will need to implement:
 * parseEvent (read the next element in the trace)
 
 For reference, there is an example implementation of the Nexus Trace file in
-org.eclipse.linuxtools.tracing.examples.core.trace.nexus.NexusTrace.java.
+org.eclipse.tracecompass.tracing.examples.core.trace.nexus.NexusTrace.java.
 
-In this example, the '''validate''' function checks first checks if the file
+In this example, the '''validate''' function first checks if the file
 exists, then makes sure that it is really a file, and not a directory. Then we
 attempt to read the file header, to make sure that it is really a Nexus Trace.
 If that check passes, we return a TmfValidationStatus with a confidence of 20.
@@ -118,7 +118,7 @@ The trace location will be a long, representing the rank in the file. The '''Tmf
 
 === The ''org.eclipse.linuxtools.tmf.core.tracetype'' and ''org.eclipse.linuxtools.tmf.ui.tracetypeui'' plug-in extension point ===
 
-One should implement the ''tmf.core.tracetype'' extension in their own plug-in.
+One should use the ''tmf.core.tracetype'' extension point in their own plug-in.
 In this example, the Nexus trace plug-in will be modified.
 
 The '''plugin.xml''' file in the ui plug-in needs to be updated if one wants users to access the given event type. It can be updated in the Eclipse plug-in editor.
@@ -156,10 +156,10 @@ In the end, the extension menu should look like this.
 [[Image:images/NTTPluginxmlComplete.png]]<br>
 
 == Other Considerations ==
-The ''org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable'' provides additional features that are active when the event class (defined in '''event type''') implements certain additional interfaces.
+The ''org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventsTable'' provides additional features that are active when the event class (defined in '''event type''') implements certain additional interfaces.
 
 === Collapsing of repetitive events ===
-By implementing the interface ''org.eclipse.linuxtools.tmf.core.event.collapse.ITmfCollapsibleEvent'' the events table will allow to collapse repetitive events by selecting the menu item '''Collapse Events''' after pressing the right mouse button in the table.
+By implementing the interface ''org.eclipse.tracecompass.tmf.core.event.collapse.ITmfCollapsibleEvent'' the events table will allow to collapse repetitive events by selecting the menu item '''Collapse Events''' after pressing the right mouse button in the table.
 
 == Best Practices ==
 
@@ -173,7 +173,7 @@ By implementing the interface ''org.eclipse.linuxtools.tmf.core.event.collapse.I
 == Download the Code ==
 
 The described example is available in the
-org.eclipse.linuxtools.tracing.examples.(tests.)trace.nexus packages with a
+org.eclipse.tracecompass.tracing.examples.(tests.)trace.nexus packages with a
 trace generator and a quick test case.
 
 == Optional Trace Type Attributes ==
@@ -182,7 +182,7 @@ After defining the trace type as described in the previous chapters it is possib
 
 === Default Editor ===
 
-The '''defaultEditor''' attribute of the '''org.eclipse.tmf.ui.tracetypeui'''
+The '''defaultEditor''' attribute of the '''org.eclipse.linuxtools.tmf.ui.tracetypeui'''
 extension point allows for configuring the editor to use for displaying the
 events. If omitted, the ''TmfEventsEditor'' is used as default.
 
@@ -198,7 +198,7 @@ other pages can display other aspects of the trace.
 
 === Events Table Type ===
 
-The  '''eventsTableType''' attribute of the '''org.eclipse.tmf.ui.tracetypeui'''
+The  '''eventsTableType''' attribute of the '''org.eclipse.linuxtools.tmf.ui.tracetypeui'''
 extension point allows for configuring the events table class to use in the
 default events editor. If omitted, the default events table will be used.
 
@@ -208,10 +208,10 @@ This can be done by selecting the trace type in the plug-in manifest editor.
 Then click the right mouse button and select '''New -> eventsTableType''' in the
 context sensitive menu. Then select the newly added attribute and click on
 ''class'' on the right side of the manifest editor. The new class wizard will
-open. The ''superclass'' field will be already filled with the class ''org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable''.
+open. The ''superclass'' field will be already filled with the class ''org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventsTable''.
 
 By using this attribute, a table with different columns than the default columns
-can be defined. See the class org.eclipse.linuxtools.internal.lttng2.kernel.ui.viewers.events.Lttng2EventsTable
+can be defined. See the class org.eclipse.tracecompass.internal.gdbtrace.ui.views.events.GdbEventsTable
 for an example implementation.
 
 = View Tutorial =
@@ -225,15 +225,15 @@ This tutorial will cover concepts like:
 * Data requests (TmfEventRequest)
 * SWTChart integration
 
-'''Note''': TMF 3.0.0 provides base implementations for generating SWTChart viewers and views. For more details please refer to chapter [[#TMF Built-in Views and Viewers]].
+'''Note''': Trace Compass 0.1.0 provides base implementations for generating SWTChart viewers and views. For more details please refer to chapter [[#TMF Built-in Views and Viewers]].
 
 === Prerequisites ===
 
-The tutorial is based on Eclipse 4.4 (Eclipse Luna), TMF 3.0.0 and SWTChart 0.7.0. If you are using TMF from the source repository, SWTChart is already included in the target definition file (see org.eclipse.linuxtools.lttng.target). You can also install it manually by using the Orbit update site. http://download.eclipse.org/tools/orbit/downloads/
+The tutorial is based on Eclipse 4.4 (Eclipse Luna), Trace Compass 0.1.0 and SWTChart 0.7.0. If you are using TMF from the source repository, SWTChart is already included in the target definition file (see org.eclipse.tracecompass.target). You can also install it manually by using the Orbit update site. http://download.eclipse.org/tools/orbit/downloads/
 
 === Creating an Eclipse UI Plug-in ===
 
-To create a new project with name org.eclipse.linuxtools.tmf.sample.ui select '''File -> New -> Project -> Plug-in Development -> Plug-in Project'''. <br>
+To create a new project with name org.eclipse.tracecompass.tmf.sample.ui select '''File -> New -> Project -> Plug-in Development -> Plug-in Project'''. <br>
 [[Image:images/Screenshot-NewPlug-inProject1.png]]<br>
 
 [[Image:images/Screenshot-NewPlug-inProject2.png]]<br>
@@ -245,8 +245,8 @@ To create a new project with name org.eclipse.linuxtools.tmf.sample.ui select ''
 To open the plug-in manifest, double-click on the MANIFEST.MF file. <br>
 [[Image:images/SelectManifest.png]]<br>
 
-Change to the Dependencies tab and select '''Add...''' of the ''Required Plug-ins'' section. A new dialog box will open. Next find plug-in ''org.eclipse.linuxtools.tmf.core'' and press '''OK'''<br>
-Following the same steps, add ''org.eclipse.linuxtools.tmf.ui'' and ''org.swtchart''.<br>
+Change to the Dependencies tab and select '''Add...''' of the ''Required Plug-ins'' section. A new dialog box will open. Next find plug-in ''org.eclipse.tracecompass.tmf.core'' and press '''OK'''<br>
+Following the same steps, add ''org.eclipse.tracecompass.tmf.ui'' and ''org.swtchart''.<br>
 [[Image:images/AddDependencyTmfUi.png]]<br>
 
 Change to the Extensions tab and select '''Add...''' of the ''All Extension'' section. A new dialog box will open. Find the view extension ''org.eclipse.ui.views'' and press '''Finish'''.<br>
@@ -261,7 +261,7 @@ A new view entry has been created. Fill in the fields ''id'' and ''name''. For '
 This will generate an empty class. Once the quick fixes are applied, the following code is obtained:
 
 <pre>
-package org.eclipse.linuxtools.tmf.sample.ui;
+package org.eclipse.tracecompass.tmf.sample.ui;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
@@ -303,7 +303,7 @@ First, we can add an empty chart to the view and initialize some of its componen
     private static final String Y_AXIS_TITLE = "Signal";
     private static final String X_AXIS_TITLE = "Time";
     private static final String FIELD = "value"; // The name of the field that we want to display on the Y axis
-    private static final String VIEW_ID = "org.eclipse.linuxtools.tmf.sample.ui.view";
+    private static final String VIEW_ID = "org.eclipse.tracecompass.tmf.sample.ui.view";
     private Chart chart;
     private ITmfTrace currentTrace;
 
@@ -560,30 +560,30 @@ In summary, we have implemented a simple TMF view using the SWTChart library. We
 
 == TMF Built-in Views and Viewers ==
 
-TMF provides base implementations for several types of views and viewers for generating custom X-Y-Charts, Time Graphs, or Trees. They are well integrated with various TMF features such as reading traces and time synchronization with other views. They also handle mouse events for navigating the trace and view, zooming or presenting detailed information at mouse position. The code can be found in the TMF UI plug-in ''org.eclipse.linuxtools.tmf.ui''. See below for a list of relevant java packages:
+TMF provides base implementations for several types of views and viewers for generating custom X-Y-Charts, Time Graphs, or Trees. They are well integrated with various TMF features such as reading traces and time synchronization with other views. They also handle mouse events for navigating the trace and view, zooming or presenting detailed information at mouse position. The code can be found in the TMF UI plug-in ''org.eclipse.tracecompass.tmf.ui''. See below for a list of relevant java packages:
 
 * Generic
-** ''org.eclipse.linuxtools.tmf.ui.views'': Common TMF view base classes
+** ''org.eclipse.tracecompass.tmf.ui.views'': Common TMF view base classes
 * X-Y-Chart
-** ''org.eclipse.linuxtools.tmf.ui.viewers.xycharts'': Common base classes for X-Y-Chart viewers based on SWTChart
-** ''org.eclipse.linuxtools.tmf.ui.viewers.xycharts.barcharts'': Base classes for bar charts
-** ''org.eclipse.linuxtools.tmf.ui.viewers.xycharts.linecharts'': Base classes for line charts
+** ''org.eclipse.tracecompass.tmf.ui.viewers.xycharts'': Common base classes for X-Y-Chart viewers based on SWTChart
+** ''org.eclipse.tracecompass.tmf.ui.viewers.xycharts.barcharts'': Base classes for bar charts
+** ''org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts'': Base classes for line charts
 * Time Graph View
-** ''org.eclipse.linuxtools.tmf.ui.widgets.timegraph'': Base classes for time graphs e.g. Gantt-charts
+** ''org.eclipse.tracecompass.tmf.ui.widgets.timegraph'': Base classes for time graphs e.g. Gantt-charts
 * Tree Viewer
-** ''org.eclipse.linuxtools.tmf.ui.viewers.tree'': Base classes for TMF specific tree viewers
+** ''org.eclipse.tracecompass.tmf.ui.viewers.tree'': Base classes for TMF specific tree viewers
 
 Several features in TMF and the Eclipse LTTng integration are using this framework and can be used as example for further developments:
 * X-Y- Chart
-** ''org.eclipse.linuxtools.internal.lttng2.ust.ui.views.memusage.MemUsageView.java''
-** ''org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.cpuusage.CpuUsageView.java''
-** ''org.eclipse.linuxtools.tracing.examples.ui.views.histogram.NewHistogramView.java''
+** ''org.eclipse.tracecompass.internal.lttng2.ust.ui.views.memusage.MemUsageView.java''
+** ''org.eclipse.tracecompass.analysis.os.linux.ui.views.cpuusage.CpuUsageView.java''
+** ''org.eclipse.tracecompass.tracing.examples.ui.views.histogram.NewHistogramView.java''
 * Time Graph View
-** ''org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.controlflow.ControlFlowView.java''
-** ''org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.resources.ResourcesView.java''
+** ''org.eclipse.tracecompass.analysis.os.linux.ui.views.controlflow.ControlFlowView.java''
+** ''org.eclipse.tracecompass.analysis.os.linux.ui.views.resources.ResourcesView.java''
 * Tree Viewer
-** ''org.eclipse.linuxtools.tmf.ui.views.statesystem.TmfStateSystemExplorer.java''
-** ''org.eclipse.linuxtools.internal.lttng2.kernel.ui.views.cpuusage.CpuUsageComposite.java''
+** ''org.eclipse.tracecompass.tmf.ui.views.statesystem.TmfStateSystemExplorer.java''
+** ''org.eclipse.tracecompass.analysis.os.linux.ui.views.cpuusage.CpuUsageComposite.java''
 
 = Component Interaction =
 
@@ -865,7 +865,7 @@ Received by views that analyze packet streams.
 
 == Debugging ==
 
-TMF has built-in Eclipse tracing support for the debugging of signal interaction between components. To enable it, open the '''Run/Debug Configuration...''' dialog, select a configuration, click the '''Tracing''' tab, select the plug-in '''org.eclipse.linuxtools.tmf.core''', and check the '''signal''' item.
+TMF has built-in Eclipse tracing support for the debugging of signal interaction between components. To enable it, open the '''Run/Debug Configuration...''' dialog, select a configuration, click the '''Tracing''' tab, select the plug-in '''org.eclipse.tracecompass.tmf.core''', and check the '''signal''' item.
 
 All signals sent and received will be logged to the file TmfTrace.log located in the Eclipse home directory.
 
@@ -948,7 +948,7 @@ have both a value and sub-attributes, so they are like files and directories at
 the same time. We are then able to refer to every single attribute with its
 path in the tree.
 
-For example, in the attribute tree for LTTng kernel traces, we use the following
+For example, in the attribute tree for Linux kernel traces, we use the following
 attributes, among others:
 
 <pre>
@@ -1115,7 +1115,7 @@ of the same attribute over a time range).
 This section will describe the public interface and classes that can be used if
 you want to use the state system.
 
-=== Main classes in org.eclipse.linuxtools.tmf.core.statesystem ===
+=== Main classes in org.eclipse.tracecompass.tmf.core.statesystem ===
 
 ==== ITmfStateProvider / AbstractTmfStateProvider ====
 
@@ -1270,7 +1270,7 @@ automatically when it reaches the end of the trace.
 
 === Other relevant interfaces ===
 
-==== o.e.l.tmf.core.statevalue.ITmfStateValue ====
+==== ITmfStateValue ====
 
 This is the interface used to represent state values. Those are used when
 inserting state changes in the provider, and is also part of the state intervals
@@ -1282,7 +1282,7 @@ object inside the state value, one can use the .unbox* methods.
 
 Note: Do not instantiate null values manually, use TmfStateValue.nullValue()
 
-==== o.e.l.tmf.core.interval.ITmfStateInterval ====
+==== ITmfStateInterval ====
 
 This is the interface to represent the state intervals, which are stored in the
 state history backend, and are returned when doing state system queries. A very
@@ -1291,7 +1291,7 @@ self-descriptive.
 
 === Exceptions ===
 
-The following exceptions, found in o.e.l.tmf.core.exceptions, are related to
+The following exceptions, found in o.e.t.statesystem.core.exceptions, are related to
 state system activities.
 
 ==== AttributeNotFoundException ====
@@ -1468,24 +1468,22 @@ Also, we will use integer state values to represent "running" or "idle", instead
 of saving the strings that would get repeated every time. This will help in
 reducing the size of the history file.
 
-First we will define a state provider in MyStateProvider. Then, assuming we
-have already implemented a custom trace type extending CtfTmfTrace, we will add
-a section to it to make it build a state system using the provider we defined
-earlier. Finally, we will show some example code that can query the state
-system, which would normally go in a view or analysis module.
+First we will define a state provider in MyStateProvider. Then, we define an
+analysis module that takes care of creating the state provider. The analysis
+module will also contain code that can query the state system.
 
 === State Provider ===
 
 <pre>
-import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfEvent;
-import org.eclipse.linuxtools.tmf.core.event.ITmfEvent;
-import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
-import org.eclipse.linuxtools.tmf.core.exceptions.StateValueTypeException;
-import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
-import org.eclipse.linuxtools.tmf.core.statesystem.AbstractTmfStateProvider;
-import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
-import org.eclipse.linuxtools.tmf.core.statevalue.TmfStateValue;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
+import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
+import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
+import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 
 /**
  * Example state system provider.
@@ -1541,7 +1539,8 @@ public class MyStateProvider extends AbstractTmfStateProvider {
 
         try {
 
-            if (event.getEventName().equals("sched_switch")) {
+            if (event.getType().getName().equals("sched_switch")) {
+                ITmfStateSystemBuilder ss = getStateSystemBuilder();
                 int quark = ss.getQuarkAbsoluteAndAdd("CPUs", String.valueOf(event.getCPU()), "Status");
                 ITmfStateValue value;
                 if (nextTid > 0) {
@@ -1577,96 +1576,38 @@ public class MyStateProvider extends AbstractTmfStateProvider {
 }
 </pre>
 
-=== Trace type definition ===
+=== Analysis module definition ===
 
 <pre>
-import java.io.File;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.linuxtools.tmf.core.ctfadaptor.CtfTmfTrace;
-import org.eclipse.linuxtools.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateProvider;
-import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
-import org.eclipse.linuxtools.tmf.core.statesystem.TmfStateSystemFactory;
-import org.eclipse.linuxtools.tmf.core.trace.TmfTraceManager;
-
-/**
- * Example of a custom trace type using a custom state provider.
- *
- * @author Alexandre Montplaisir
- */
-public class MyTraceType extends CtfTmfTrace {
-
-    /** The file name of the history file  */
-    public final static String HISTORY_FILE_NAME = "mystatefile.ht";
-
-    /** ID of the state system we will build */
-    public static final String STATE_ID = "org.eclipse.linuxtools.lttng2.example";
-
-    /**
-     * Default constructor
-     */
-    public MyTraceType() {
-        super();
-    }
-
-    @Override
-    public IStatus validate(final IProject project, final String path)  {
-        /*
-         * Add additional validation code here, and return a IStatus.ERROR if
-         * validation fails.
-         */
-        return Status.OK_STATUS;
-    }
-
-    @Override
-    protected void buildStateSystem() throws TmfTraceException {
-        super.buildStateSystem();
-
-        /* Build the custom state system for this trace */
-        String directory = TmfTraceManager.getSupplementaryFileDir(this);
-        final File htFile = new File(directory + HISTORY_FILE_NAME);
-        final ITmfStateProvider htInput = new MyStateProvider(this);
-
-        ITmfStateSystem ss = TmfStateSystemFactory.newFullHistory(htFile, htInput, false);
-        fStateSystems.put(STATE_ID, ss);
-    }
-
-}
-</pre>
-
-=== Query code ===
-
-<pre>
 import java.util.List;
 
-import org.eclipse.linuxtools.tmf.core.exceptions.AttributeNotFoundException;
-import org.eclipse.linuxtools.tmf.core.exceptions.StateSystemDisposedException;
-import org.eclipse.linuxtools.tmf.core.exceptions.TimeRangeException;
-import org.eclipse.linuxtools.tmf.core.interval.ITmfStateInterval;
-import org.eclipse.linuxtools.tmf.core.statesystem.ITmfStateSystem;
-import org.eclipse.linuxtools.tmf.core.statevalue.ITmfStateValue;
-import org.eclipse.linuxtools.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
+import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
+import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
+import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
+import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
- * Class showing examples of state system queries.
+ * Class showing examples of a StateSystemAnalysisModule with state system queries.
  *
  * @author Alexandre Montplaisir
  */
-public class QueryExample {
+public class MyStateSystemAnalysisModule extends TmfStateSystemAnalysisModule {
 
-    private final ITmfStateSystem ss;
+	@Override
+	protected ITmfStateProvider createStateProvider() {
+        ITmfTrace trace = checkNotNull(getTrace());
+		return new MyStateProvider(trace);
+	}
 
-    /**
-     * Constructor
-     *
-     * @param trace
-     *            Trace that this "view" will display.
-     */
-    public QueryExample(ITmfTrace trace) {
-        ss = trace.getStateSystems().get(MyTraceType.STATE_ID);
+    @Override
+    protected StateSystemBackendType getBackendType() {
+        return StateSystemBackendType.FULL;
     }
 
     /**
@@ -1683,8 +1624,8 @@ public class QueryExample {
      */
     public boolean cpuIsRunning(int cpu, long timestamp) {
         try {
-            int quark = ss.getQuarkAbsolute("CPUs", String.valueOf(cpu), "Status");
-            ITmfStateValue value = ss.querySingleState(timestamp, quark).getStateValue();
+            int quark = getStateSystem().getQuarkAbsolute("CPUs", String.valueOf(cpu), "Status");
+            ITmfStateValue value = getStateSystem().querySingleState(timestamp, quark).getStateValue();
 
             if (value.equals(MyStateProvider.RUNNING)) {
                 return true;
@@ -1699,13 +1640,11 @@ public class QueryExample {
              * Handle the case where the attribute does not exist in the state
              * system (no CPU with this number, etc.)
              */
-             ...
         } catch (TimeRangeException e) {
             /*
              * Handle the case where 'timestamp' is outside of the range of the
              * history.
              */
-             ...
         } catch (StateSystemDisposedException e) {
             /*
              * Handle the case where the state system is being disposed. If this
@@ -1732,13 +1671,13 @@ public class QueryExample {
 
         try {
             /* Get the list of the quarks we are interested in. */
-            List<Integer> quarks = ss.getQuarks("CPUs", "*", "Status");
+            List<Integer> quarks = getStateSystem().getQuarks("CPUs", "*", "Status");
 
             /*
              * Get the full state at our target timestamp (it's better than
              * doing an arbitrary number of single queries).
              */
-            List<ITmfStateInterval> state = ss.queryFullState(timestamp);
+            List<ITmfStateInterval> state = getStateSystem().queryFullState(timestamp);
 
             /* Look at the value of the state for each quark */
             for (Integer quark : quarks) {
@@ -1753,10 +1692,8 @@ public class QueryExample {
              * Handle the case where 'timestamp' is outside of the range of the
              * history.
              */
-             ...
         } catch (StateSystemDisposedException e) {
             /* Handle the case where the state system is being disposed. */
-            ...
         }
         return count;
     }
@@ -1821,7 +1758,6 @@ The following chapters describe the Sequence Diagram Framework as well as a refe
 In the UML2 Sequence Diagram Framework an Eclipse extension point is defined so that other plug-ins can contribute code to create sequence diagram. 
 
 '''Identifier''': org.eclipse.linuxtools.tmf.ui.uml2SDLoader<br>
-'''Since''': 1.0<br>
 '''Description''': This extension point aims to list and connect any UML2 Sequence Diagram loader.<br>
 '''Configuration Markup''':<br>
 
@@ -1850,8 +1786,8 @@ default (true | false)
 
 *id - A unique identifier for this uml2SDLoader. This is not mandatory as long as the id attribute cannot be retrieved by the provider plug-in. The class attribute is the one on which the underlying algorithm relies.
 *name - An name of the extension instance.
-*class - The implementation of this UML2 SD viewer loader. The class must implement org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader.
-*view - The view ID of the view that this loader aims to populate. Either org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView itself or a extension of org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView.
+*class - The implementation of this UML2 SD viewer loader. The class must implement org.eclipse.tracecompass.tmf.ui.views.uml2sd.load.IUml2SDLoader.
+*view - The view ID of the view that this loader aims to populate. Either org.eclipse.tracecompass.tmf.ui.views.uml2sd.SDView itself or a extension of org.eclipse.tracecompass.tmf.ui.views.uml2sd.SDView.
 *default - Set to true to make this loader the default one for the view; in case of several default loaders, first one coming from extensions list is taken.
 
 
@@ -1864,7 +1800,7 @@ With this extension point, a loader class is associated with a Sequence Diagram 
 
 == Sequence Diagram View  ==
 
-For this extension point a Sequence Diagram View has to be defined as well. The Sequence Diagram View class implementation is provided by the plug-in ''org.eclipse.linuxtools.tmf.ui'' (''org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView'') and can be used as is or can also be sub-classed. For that, a view extension has to be added to the ''plugin.xml''. 
+For this extension point a Sequence Diagram View has to be defined as well. The Sequence Diagram View class implementation is provided by the plug-in ''org.eclipse.tracecompass.tmf.ui'' (''org.eclipse.tracecompass.tmf.ui.views.uml2sd.SDView'') and can be used as is or can also be sub-classed. For that, a view extension has to be added to the ''plugin.xml''.
 
 === Supported Widgets  ===
 
@@ -1924,7 +1860,7 @@ The tutorial is based on Eclipse 4.4 (Eclipse Luna) and TMF 3.0.0.
 
 === Creating an Eclipse UI Plug-in ===
 
-To create a new project with name org.eclipse.linuxtools.tmf.sample.ui select '''File -> New -> Project -> Plug-in Development -> Plug-in Project'''. <br>
+To create a new project with name org.eclipse.tracecompass.tmf.sample.ui select '''File -> New -> Project -> Plug-in Development -> Plug-in Project'''. <br>
 [[Image:images/Screenshot-NewPlug-inProject1.png]]<br>
 
 [[Image:images/Screenshot-NewPlug-inProject2.png]]<br>
@@ -1936,7 +1872,7 @@ To create a new project with name org.eclipse.linuxtools.tmf.sample.ui select ''
 To open the plug-in manifest, double-click on the MANIFEST.MF file. <br>
 [[Image:images/SelectManifest.png]]<br>
 
-Change to the Dependencies tab and select '''Add...''' of the ''Required Plug-ins'' section. A new dialog box will open. Next find plug-ins ''org.eclipse.linuxtools.tmf.ui'' and ''org.eclipse.linuxtools.tmf.core'' and then press '''OK'''<br>
+Change to the Dependencies tab and select '''Add...''' of the ''Required Plug-ins'' section. A new dialog box will open. Next find plug-ins ''org.eclipse.tracecompass.tmf.ui'' and ''org.eclipse.tracecompass.tmf.core'' and then press '''OK'''<br>
 [[Image:images/AddDependencyTmfUi.png]]<br>
 
 Change to the Extensions tab and select '''Add...''' of the ''All Extension'' section. A new dialog box will open. Find the view extension ''org.eclipse.ui.views'' and press '''Finish'''.<br> 
@@ -1945,7 +1881,7 @@ Change to the Extensions tab and select '''Add...''' of the ''All Extension'' se
 To create a Sequence Diagram View, click the right mouse button. Then select '''New -> view'''<br>
 [[Image:images/AddViewExtension2.png]]<br>
 
-A new view entry has been created. Fill in the  fields ''id'', ''name'' and ''class''. Note that for ''class'' the SD view implementation (''org.eclipse.linuxtools.tmf.ui.views.SDView'') of the TMF UI plug-in is used.<br>
+A new view entry has been created. Fill in the  fields ''id'', ''name'' and ''class''. Note that for ''class'' the SD view implementation (''org.eclipse.tracecompass.tmf.ui.views.SDView'') of the TMF UI plug-in is used.<br>
 [[Image:images/FillSampleSeqDiagram.png]]<br>
 
 The view is prepared. Run the Example. To launch the an Eclipse Application select the ''Overview'' tab and click on '''Launch an Eclipse Application'''<br>
@@ -1963,9 +1899,6 @@ Close the Example Application.
 
 After defining the Sequence Diagram View it's time to create the ''uml2SDLoader'' Extension. <br>
 
-Before doing that add a dependency to TMF. For that select '''Add...''' of the ''Required Plug-ins'' section. A new dialog box will open. Next find plug-in ''org.eclipse.linuxtools.tmf'' and press '''OK'''<br>
-[[Image:images/AddDependencyTmf.png]]<br>
-
 To create the loader extension, change to the Extensions tab and select '''Add...''' of the ''All Extension'' section. A new dialog box will open. Find the extension ''org.eclipse.linuxtools.tmf.ui.uml2SDLoader'' and press '''Finish'''.<br>
 [[Image:images/AddTmfUml2SDLoader.png]]<br>
 
@@ -1975,13 +1908,13 @@ A new 'uml2SDLoader'' extension has been created. Fill in fields ''id'', ''name'
 Then click on ''class'' (see above) to open the new class dialog box. Fill in the relevant fields and select '''Finish'''. <br>
 [[Image:images/NewSampleLoaderClass.png]]<br>
 
-A new Java class will be created which implements the interface ''org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader''.<br>
+A new Java class will be created which implements the interface ''org.eclipse.tracecompass.tmf.ui.views.uml2sd.load.IUml2SDLoader''.<br>
 
 <pre>
-package org.eclipse.linuxtools.tmf.sample.ui;
+package org.eclipse.tracecompass.tmf.sample.ui;
 
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader;
+import org.eclipse.tracecompass.tmf.ui.views.uml2sd.SDView;
+import org.eclipse.tracecompass.tmf.ui.views.uml2sd.load.IUml2SDLoader;
 
 public class SampleLoader implements IUml2SDLoader {
 
@@ -2013,18 +1946,19 @@ public class SampleLoader implements IUml2SDLoader {
 Next is to implement the methods of the IUml2SDLoader interface method. The following code snippet shows how to create the major sequence diagram elements. Please note that no time information is stored.<br>
 
 <pre>
-package org.eclipse.linuxtools.tmf.sample.ui;
+package org.eclipse.tracecompass.tmf.sample.ui;
 
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.SDView;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.AsyncMessage;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.AsyncMessageReturn;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.ExecutionOccurrence;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Frame;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Lifeline;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.Stop;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.SyncMessage;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.core.SyncMessageReturn;
-import org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader;
+import org.eclipse.tracecompass.tmf.ui.views.uml2sd.SDView;
+import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.AsyncMessage;
+import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.AsyncMessageReturn;
+import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.EllipsisMessage;
+import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.ExecutionOccurrence;
+import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.Frame;
+import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.Lifeline;
+import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.Stop;
+import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.SyncMessage;
+import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.SyncMessageReturn;
+import org.eclipse.tracecompass.tmf.ui.views.uml2sd.load.IUml2SDLoader;
 
 public class SampleLoader implements IUml2SDLoader {
 
@@ -2181,7 +2115,7 @@ Now it's time to run the example application. To launch the Example Application 
 
 === Adding time information ===
 
-To add time information in sequence diagram the timestamp has to be set for each message. The sequence diagram framework uses the ''TmfTimestamp'' class of plug-in ''org.eclipse.linuxtools.tmf.core''. Use ''setTime()'' on each message ''SyncMessage'' since start and end time are the same. For each ''AsyncMessage'' set start and end time separately by using methods ''setStartTime'' and ''setEndTime''. For example: <br>
+To add time information in sequence diagram the timestamp has to be set for each message. The sequence diagram framework uses the ''TmfTimestamp'' class of plug-in ''org.eclipse.tracecompass.tmf.core''. Use ''setTime()'' on each message ''SyncMessage'' since start and end time are the same. For each ''AsyncMessage'' set start and end time separately by using methods ''setStartTime'' and ''setEndTime''. For example: <br>
 
 <pre>
     private void createFrame() {
@@ -2235,7 +2169,7 @@ To use the basic paging provider, first the interface methods of the ''ISDPaging
 <pre>
 public class SampleLoader implements IUml2SDLoader, ISDPagingProvider {
     //...
-    private page = 0;
+    private int page = 0;
     
     @Override
     public void dispose() {
@@ -2447,7 +2381,7 @@ public class SampleLoader implements IUml2SDLoader, ISDPagingProvider, ISDFindPr
     }
 
     @Override
-    public boolean filter(List<?> list) {
+    public boolean filter(List<FilterCriteria> list) {
         return false;
     }
     //...
@@ -2597,7 +2531,7 @@ public class OpenSDView extends AbstractHandler {
         try {
             IWorkbenchPage persp = TmfUiPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
             SDView view = (SDView) persp.showView("org.eclipse.linuxtools.ust.examples.ui.componentinteraction");
-            LoadersManager.getLoadersManager().createLoader("org.eclipse.linuxtools.tmf.ui.views.uml2sd.impl.TmfUml2SDSyncLoader", view);
+            LoadersManager.getLoadersManager().createLoader("org.eclipse.tracecompass.tmf.ui.views.uml2sd.impl.TmfUml2SDSyncLoader", view);
         } catch (PartInitException e) {
             throw new ExecutionException("PartInitException caught: ", e);
         }
@@ -2608,7 +2542,7 @@ public class OpenSDView extends AbstractHandler {
 
 === Downloading the Tutorial ===
 
-Use the following link to download the source code of the tutorial [http://wiki.eclipse.org/images/e/e6/SamplePlugin.zip Plug-in of Tutorial].
+Use the following link to download the source code of the tutorial [https://wiki.eclipse.org/images/7/79/SamplePluginTC.zip Plug-in of Tutorial].
 
 == Integration of Tracing and Monitoring Framework with Sequence Diagram Framework ==
 
@@ -2659,7 +2593,7 @@ The reference loader uses TMF Experiments to access traces and to request data f
 
 The reference loader use the TMF Event Request Framework to request events from the experiment and its traces.
 
-When opening a traces (which is triggered by signal ''TmfExperimentSelected'') or when opening the Sequence Diagram View after a trace had been opened previously, a TMF background request is initiated to index the trace and to fill in the first page of the sequence diagram. The purpose of the indexing is to store time ranges for pages with 10000 messages per page. This allows quickly to move to certain pages in a trace without having to re-parse from the beginning. The request is called indexing request.
+When opening a trace (which is triggered by signal ''TmfTraceSelectedSignal'') or when opening the Sequence Diagram View after a trace had been opened previously, a TMF background request is initiated to index the trace and to fill in the first page of the sequence diagram. The purpose of the indexing is to store time ranges for pages with 10000 messages per page. This allows quickly to move to certain pages in a trace without having to re-parse from the beginning. The request is called indexing request.
 
 When switching pages, the a TMF foreground event request is initiated to retrieve the corresponding events from the experiment. It uses the time range stored in the index for the respective page.
 
@@ -2687,7 +2621,7 @@ Note that combined traces of multiple components, that contain the trace informa
 
 === Trace Format ===
 
-The reference implementation in class ''TmfUml2SDSyncLoader'' in package ''org.eclipse.linuxtools.tmf.ui.views.uml2sd.impl'' analyzes events from type ''ITmfEvent'' and creates events type ''ITmfSyncSequenceDiagramEvent'' if the ''ITmfEvent'' contains all relevant information information. The parsing algorithm looks like as follows:
+The reference implementation in class ''TmfUml2SDSyncLoader'' in package ''org.eclipse.tracecompass.tmf.ui.views.uml2sd.impl'' analyzes events from type ''ITmfEvent'' and creates events type ''ITmfSyncSequenceDiagramEvent'' if the ''ITmfEvent'' contains all relevant information information. The parsing algorithm looks like as follows:
 
 <pre>
     /**
@@ -2721,7 +2655,7 @@ The analysis looks for event type Strings containing ''SEND'' and ''RECEIVE''. I
 
 An example CTF (Common Trace Format) trace is provided that contains trace events with sequence diagram information. To download the reference trace, use the following link: [https://wiki.eclipse.org/images/3/35/ReferenceTrace.zip Reference Trace].
 
-Run an Eclipse application with TMF 3.0 or later installed. To open the Reference Sequence Diagram View, select '''Windows -> Show View -> Other... -> TMF -> Sequence Diagram''' <br>
+Run an Eclipse application with Trace Compass 0.1.0 or later installed. To open the Reference Sequence Diagram View, select '''Windows -> Show View -> Other... -> Tracing -> Sequence Diagram''' <br>
 [[Image:images/ShowTmfSDView.png]]<br>
 
 A blank Sequence Diagram View will open.
@@ -2742,7 +2676,7 @@ Now the reference implementation can be explored. To demonstrate the view featur
  
 === Extending the Reference Loader ===
 
-In some case it might be necessary to change the implementation of the analysis of each ''TmfEvent'' for the generation of ''Sequence Diagram Events''. For that just extend the class ''TmfUml2SDSyncLoader'' and overwrite the method ''protected ITmfSyncSequenceDiagramEvent getSequnceDiagramEvent(TmfEvent tmfEvent)'' with your own implementation.
+In some case it might be necessary to change the implementation of the analysis of each ''TmfEvent'' for the generation of ''Sequence Diagram Events''. For that just extend the class ''TmfUml2SDSyncLoader'' and overwrite the method ''protected ITmfSyncSequenceDiagramEvent getSequenceDiagramEvent(ITmfEvent tmfEvent)'' with your own implementation.
 
 = CTF Parser =
 
@@ -2757,7 +2691,7 @@ These files can be split into two types :
 * Event streams
 
 === Metadata ===
-The metadata is either raw text or packetized text. It is tsdl encoded. it contains a description of the type of data in the event streams. It can grow over time if new events are added to a trace but it will never overwrite what is already there.
+The metadata is either raw text or packetized text. It is TSDL encoded. it contains a description of the type of data in the event streams. It can grow over time if new events are added to a trace but it will never overwrite what is already there.
 
 === Event Streams ===
 The event streams are a file per stream per cpu. These streams are binary and packet based. The streams store events and event information (ie lost events) The event data is stored in headers and field payloads.
@@ -2769,17 +2703,17 @@ In order to read a CTF trace, two steps must be done.
 * The metadata must be read to know how to read the events.
 * the events must be read.
 
-The metadata is a written in a subset of the C language called TSDL. To read it, first it is depacketized (if it is not in plain text) then the raw text is parsed by an antlr grammer. The parsing is done in two phases. There is a lexer (CTFLexer.g) which separated the metatdata text into tokens. The tokens are then pattern matched using the parser (CTFParser.g) to form an AST. This AST is walked through using "IOStructGen.java" to populate streams and traces in trace parent object.
+The metadata is a written in a subset of the C language called TSDL. To read it, first it is depacketized (if it is not in plain text) then the raw text is parsed by an antlr grammar. The parsing is done in two phases. There is a lexer (CTFLexer.g) which separated the metatdata text into tokens. The tokens are then pattern matched using the parser (CTFParser.g) to form an AST. This AST is walked through using "IOStructGen.java" to populate streams and traces in trace parent object.
 
 When the metadata is loaded and read, the trace object will be populated with 3 items:
 * the event definitions available per stream: a definition is a description of the datatype.
 * the event declarations available per stream: this will save declaration creation on a per event basis. They will all be created in advance, just not populated.
 * the beginning of a packet index.
 
-Now all the trace readers for the event streams have everything they need to read a trace. They will each point to one file, and read the file from packet to packet. Everytime the trace reader changes packet, the index is updated with the new packet's information. The readers are in a priority queue and sorted by timestamp. This ensures that the events are read in a sequential order. They are also sorted by file name so that in the eventuality that two events occur at the same time, they stay in the same order.
+Now all the trace readers for the event streams have everything they need to read a trace. They will each point to one file, and read the file from packet to packet. Every time the trace reader changes packet, the index is updated with the new packet's information. The readers are in a priority queue and sorted by timestamp. This ensures that the events are read in a sequential order. They are also sorted by file name so that in the eventuality that two events occur at the same time, they stay in the same order.
 
 == Seeking in a trace ==
-The reason for maintaining an index is to speed up seeks. In the case that a user wishes to seek to a certain timestamp, they just have to find the index entry that contains the timestamp, and go there to iterate in that packet until the proper event is found. this will reduce the searches time by an order of 8000 for a 256k paket size (kernel default).
+The reason for maintaining an index is to speed up seeks. In the case that a user wishes to seek to a certain timestamp, they just have to find the index entry that contains the timestamp, and go there to iterate in that packet until the proper event is found. this will reduce the searches time by an order of 8000 for a 256k packet size (kernel default).
 
 == Interfacing to TMF == 
 The trace can be read easily now but the data is still awkward to extract.
@@ -2825,7 +2759,7 @@ Trace synchronization consists in taking traces, taken on different machines, wi
 
 == Event matching interfaces ==
 
-Here's a description of the major parts involved in event matching.  These classes are all in the ''org.eclipse.linuxtools.tmf.core.event.matching'' package:
+Here's a description of the major parts involved in event matching.  These classes are all in the ''org.eclipse.tracecompass.tmf.core.event.matching'' package:
 
 * '''ITmfEventMatching''': Controls the event matching process
 * '''ITmfMatchEventDefinition''': Describes how events are matched
@@ -2849,17 +2783,17 @@ These are the classes that describe how to actually match specific events togeth
 
 The '''canMatchTrace''' method will tell if a definition is compatible with a given trace.
 
-The '''getUniqueField''' method will return a list of field values that uniquely identify this event and can be used to find a previous event to match with.
+The '''getEventKey''' method will return a key for an event that uniquely identifies this event and will match the key from another event.
 
 Typically, there would be a match definition abstract class/interface per event matching type.
 
 The interface '''ITmfNetworkMatchDefinition''' adds the ''getDirection'' method to indicate whether this event is a ''in'' or ''out'' event to be matched with one from the opposite direction.
 
-As examples, two concrete network match definitions have been implemented in the ''org.eclipse.linuxtools.lttng2.kernel.core.event.matching'' package for two compatible methods of matching TCP packets (See the LTTng User Guide on ''trace synchronization'' for information on those matching methods). Each one tells which events need to be present in the metadata of a CTF trace for this matching method to be applicable. It also returns the field values from each event that will uniquely match 2 events together.
+As examples, two concrete network match definitions have been implemented in the ''org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching'' package for two compatible methods of matching TCP packets (See the Trace Compass User Guide on ''trace synchronization'' for information on those matching methods). Each one tells which events need to be present in the metadata of a CTF trace for this matching method to be applicable. It also returns the field values from each event that will uniquely match 2 events together.
 
 === IMatchProcessingUnit interface and derived classes ===
 
-While matching events is an exercice in itself, it's what to do with the match that really makes this functionality interesting. This is the job of the '''IMatchProcessingUnit''' interface.
+While matching events is an exercise in itself, it's what to do with the match that really makes this functionality interesting. This is the job of the '''IMatchProcessingUnit''' interface.
 
 '''TmfEventMatches''' provides a default implementation that only stores the matches to count them. When a new match is obtained, the ''addMatch'' is called with the match and the processing unit can do whatever needs to be done with it.
 
@@ -2993,18 +2927,18 @@ public class MyAppUstEventMatching implements ITmfNetworkMatchDefinition {
     }
 
     @Override
-    public List<Object> getUniqueField(ITmfEvent event) {
-        List<Object> keys = new ArrayList<Object>();
+    public IEventMatchingKey getEventKey(ITmfEvent event) {
+        IEventMatchingKey key;
 
         if (evname.equals("myapp:receive")) {
-            keys.add(event.getContent().getField("from").getValue());
-            keys.add(event.getContent().getField("messageid").getValue());
+            key = new MyEventMatchingKey(event.getContent().getField("from").getValue(),
+                event.getContent().getField("messageid").getValue());
         } else {
-            keys.add(event.getContent().getField("sendto").getValue());
-            keys.add(event.getContent().getField("messageid").getValue());
+            key = new MyEventMatchingKey(event.getContent().getField("sendto").getValue(),
+                event.getContent().getField("messageid").getValue());
         }
 
-        return keys;
+        return key;
     }
 
     @Override
@@ -3036,7 +2970,7 @@ Now, only adding the traces in an experiment and clicking the '''Synchronize tra
 
 == Trace synchronization ==
 
-Trace synchronization classes and interfaces are located in the ''org.eclipse.linuxtools.tmf.core.synchronization'' package.
+Trace synchronization classes and interfaces are located in the ''org.eclipse.tracecompass.tmf.core.synchronization'' package.
 
 === Synchronization algorithm ===
 
@@ -3086,7 +3020,7 @@ All analysis modules must implement the '''IAnalysisModule''' interface from the
 
 === Example ===
 
-This example shows how to add a simple analysis module for an LTTng kernel trace with two parameters.
+This example shows how to add a simple analysis module for an LTTng kernel trace with two parameters. It also specifies two mandatory events by overriding '''getAnalysisRequirements'''. The analysis requirements are further explained in the section [[#Providing requirements to analyses]].
 
 <pre>
 public class MyLttngKernelAnalysis extends TmfAbstractAnalysisModule {
@@ -3095,17 +3029,17 @@ public class MyLttngKernelAnalysis extends TmfAbstractAnalysisModule {
     public static final String PARAM2 = "myotherparam";
 
     @Override
-    public boolean canExecute(ITmfTrace trace) {
-        /* This just makes sure the trace is an Lttng kernel trace, though
-           usually that should have been done by specifying the trace type
-           this analysis module applies to */
-        if (!LttngKernelTrace.class.isAssignableFrom(trace.getClass())) {
-            return false;
-        }
+    public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
 
-        /* Does the trace contain the appropriate events? */
-        String[] events = { "sched_switch", "sched_wakeup" };
-        return ((LttngKernelTrace) trace).hasAllEvents(events);
+        // initialize the requirement: domain and events
+        TmfAnalysisRequirement domainReq = new TmfAnalysisRequirement(SessionConfigStrings.CONFIG_ELEMENT_DOMAIN);
+        domainReq.addValue(SessionConfigStrings.CONFIG_DOMAIN_TYPE_KERNEL, ValuePriorityLevel.MANDATORY);
+
+        List<String> requiredEvents = ImmutableList.of("sched_switch", "sched_wakeup");
+        TmfAnalysisRequirement eventReq = new TmfAnalysisRequirement(SessionConfigStrings.CONFIG_ELEMENT_EVENT,
+                requiredEvents, ValuePriorityLevel.MANDATORY);
+
+        return ImmutableList.of(domainReq, eventReq);
     }
 
     @Override
@@ -3182,7 +3116,7 @@ The following code shows what the resulting plugin.xml file should look like.
                default_value="3"
                name="myotherparam">
          <tracetype
-               class="org.eclipse.linuxtools.lttng2.kernel.core.trace.LttngKernelTrace">
+               class="org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace">
          </tracetype>
       </module>
 </extension>
@@ -3212,14 +3146,14 @@ The following code shows how to add a view output to the analysis defined above 
 <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
       <output
-            class="org.eclipse.linuxtools.tmf.ui.analysis.TmfAnalysisViewOutput"
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
             id="my.plugin.package.ui.views.myView">
          <analysisId
                id="my.lttng.kernel.analysis.id">
          </analysisId>
       </output>
       <output
-            class="org.eclipse.linuxtools.tmf.ui.analysis.TmfAnalysisViewOutput"
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
             id="my.plugin.package.ui.views.myMoreGenericView">
          <analysisModuleClass
                class="my.plugin.package.core.MyAnalysisModuleClass">
@@ -3265,7 +3199,7 @@ public class MyLttngKernelParameterProvider extends TmfAbstractAnalysisParamProv
     /*
      * Constructor
      */
-    public CriticalPathParameterProvider() {
+    public MyLttngKernelParameterProvider() {
         super();
         registerListener();
     }
@@ -3281,7 +3215,7 @@ public class MyLttngKernelParameterProvider extends TmfAbstractAnalysisParamProv
             return null;
         }
         if (name.equals(MyLttngKernelAnalysis.PARAM1)) {
-            return fCurrentEntry.getThreadId()
+            return fCurrentEntry.getThreadId();
         }
         return null;
     }
@@ -3402,7 +3336,7 @@ Performance tests are unit tests and they are added to the corresponding unit te
 
 Tests are to be added to a package under the ''perf'' directory, the package name would typically match the name of the package it is testing. For each package, a class named '''AllPerfTests''' would list all the performance tests classes inside this package. And like for unit tests, a class named '''AllPerfTests''' for the plug-in would list all the packages' '''AllPerfTests''' classes.
 
-When adding performance tests for the first time in a plug-in, the plug-in's '''AllPerfTests''' class should be added to the global list of performance tests, found in package ''org.eclipse.linuxtools.lttng.alltests'', in class '''RunAllPerfTests'''. This will ensure that performance tests for the plug-in are run along with the other performance tests
+When adding performance tests for the first time in a plug-in, the plug-in's '''AllPerfTests''' class should be added to the global list of performance tests, found in package ''org.eclipse.tracecompass.alltests'', in class '''RunAllPerfTests'''. This will ensure that performance tests for the plug-in are run along with the other performance tests
 
 === How ===
 
@@ -3533,7 +3467,7 @@ Before submitting a performance test to the code review, you should run it a few
 
 CPU time: CPU time represent the total time spent on CPU by the current process, for the time of the test execution. It is the sum of the time spent by all threads. On one hand, it is more significant than the elapsed time, since it should be the same no matter how many CPU cores the computer has. But since it calculates the time of every thread, one has to make sure that only threads related to what is being tested are executed during that time, or else the results will include the times of those other threads. For an application like TMF, it is hard to control all the threads, and empirically, it is found to vary a lot more than the system time from one run to the other.
 
-System time (Elapsed time): The time between the start and the end of the execution. It will vary depending on the parallelisation of the threads and the load of the machine.
+System time (Elapsed time): The time between the start and the end of the execution. It will vary depending on the parallelization of the threads and the load of the machine.
 
 Kernel time: Time spent in kernel mode
 
@@ -3548,9 +3482,9 @@ Supporting a new network protocol in TMF is straightforward. Minimal effort is r
 === Architecture ===
 
 All the TMF pcap-related code is divided in three projects (not considering the tests plugins):
-* '''org.eclipse.linuxtools.pcap.core''', which contains the parser that will read pcap files and constructs the different packets from a ByteBuffer. It also contains means to build packet streams, which are conversation (list of packets) between two endpoints. To add a protocol, almost all of the work will be in that project.
-* '''org.eclipse.linuxtools.tmf.pcap.core''', which contains TMF-specific concepts and act as a wrapper between TMF and the pcap parsing library. It only depends on org.eclipse.linuxtools.tmf.core and org.eclipse.pcap.core. To add a protocol, one file must be edited in this project.
-* '''org.eclipse.linuxtools.tmf.pcap.ui''', which contains all TMF pcap UI-specific concepts, such as the views and perspectives. No work is needed in that project.
+* '''org.eclipse.tracecompass.pcap.core''', which contains the parser that will read pcap files and constructs the different packets from a ByteBuffer. It also contains means to build packet streams, which are conversation (list of packets) between two endpoints. To add a protocol, almost all of the work will be in that project.
+* '''org.eclipse.tracecompass.tmf.pcap.core''', which contains TMF-specific concepts and act as a wrapper between TMF and the pcap parsing library. It only depends on org.eclipse.tracecompass.tmf.core and org.eclipse.tracecompass.pcap.core. To add a protocol, one file must be edited in this project.
+* '''org.eclipse.tracecompass.tmf.pcap.ui''', which contains all TMF pcap UI-specific concepts, such as the views and perspectives. No work is needed in that project.
 
 === UDP Packet Structure ===
 
@@ -3581,7 +3515,7 @@ Knowing that, we can define an UDPPacket class that contains those fields.
 
 === Creating the UDPPacket ===
 
-First, in org.eclipse.linuxtools.pcap.core, create a new package named '''org.eclipse.linuxtools.pcap.core.protocol.name''' with name being the name of the new protocol. In our case name is udp so we create the package '''org.eclipse.linuxtools.pcap.core.protocol.udp'''. All our work is going in this package.
+First, in org.eclipse.tracecompass.pcap.core, create a new package named '''org.eclipse.tracecompass.pcap.core.protocol.name''' with name being the name of the new protocol. In our case name is udp so we create the package '''org.eclipse.tracecompass.pcap.core.protocol.udp'''. All our work is going in this package.
 
 In this package, we create a new class named UDPPacket that extends Packet. All new protocol must define a packet type that extends the abstract class Packet. We also add different fields:
 * ''Packet'' '''fChildPacket''', which is the packet encapsulated by this UDP packet, if it exists. This field will be initialized by findChildPacket().
@@ -3602,14 +3536,14 @@ We also create the UDPPacket(PcapFile file, @Nullable Packet parent, ByteBuffer 
 The following class is obtained:
 
 <pre>
-package org.eclipse.linuxtools.pcap.core.protocol.udp;
+package org.eclipse.tracecompass.pcap.core.protocol.udp;
 
 import java.nio.ByteBuffer;
 import java.util.Map;
 
-import org.eclipse.linuxtools.internal.pcap.core.endpoint.ProtocolEndpoint;
-import org.eclipse.linuxtools.internal.pcap.core.packet.BadPacketException;
-import org.eclipse.linuxtools.internal.pcap.core.packet.Packet;
+import org.eclipse.tracecompass.internal.pcap.core.endpoint.ProtocolEndpoint;
+import org.eclipse.tracecompass.internal.pcap.core.packet.BadPacketException;
+import org.eclipse.tracecompass.internal.pcap.core.packet.Packet;
 
 public class UDPPacket extends Packet {
 
@@ -3639,7 +3573,7 @@ public class UDPPacket extends Packet {
      *             Thrown when the packet is erroneous.
      */
     public UDPPacket(PcapFile file, @Nullable Packet parent, ByteBuffer packet) throws BadPacketException {
-        super(file, parent, Protocol.UDP);
+        super(file, parent, PcapProtocol.UDP);
         // TODO Auto-generated constructor stub
     }
 
@@ -3960,10 +3894,10 @@ We create in our package a new class named UDPEndpoint that extends ProtocolEndp
 We obtain the following unimplemented class:
 
 <pre>
-package org.eclipse.linuxtools.pcap.core.protocol.udp;
+package org.eclipse.tracecompass.pcap.core.protocol.udp;
 
-import org.eclipse.linuxtools.internal.pcap.core.endpoint.ProtocolEndpoint;
-import org.eclipse.linuxtools.internal.pcap.core.packet.Packet;
+import org.eclipse.tracecompass.internal.pcap.core.endpoint.ProtocolEndpoint;
+import org.eclipse.tracecompass.internal.pcap.core.packet.Packet;
 
 public class UDPEndpoint extends ProtocolEndpoint {
 
@@ -4075,7 +4009,7 @@ Then we implement the methods:
 
 === Registering the UDP protocol ===
 
-The last step is to register the new protocol. There are three places where the protocol has to be registered. First, the parser has to know that a new protocol has been added. This is defined in the enum org.eclipse.linuxtools.pcap.core.protocol.PcapProtocol. Simply add the protocol name here, along with a few arguments:
+The last step is to register the new protocol. There are three places where the protocol has to be registered. First, the parser has to know that a new protocol has been added. This is defined in the enum org.eclipse.tracecompass.internal.pcap.core.protocol.PcapProtocol. Simply add the protocol name here, along with a few arguments:
 * ''String'' '''longname''', which is the long version of name of the protocol. In our case, it is "User Datagram Protocol".
 * ''String'' '''shortName''', which is the shortened name of the protocol. In our case, it is "UDP".
 * ''Layer'' '''layer''', which is the layer to which the protocol belongs in the OSI model. In our case, this is the layer 4.
@@ -4086,7 +4020,7 @@ Thus, the following line is added in the PcapProtocol enum:
     UDP("User Datagram Protocol", "udp", Layer.LAYER_4, true),
 </pre>
 
-Also, TMF has to know about the new protocol. This is defined in org.eclipse.linuxtools.tmf.pcap.core.protocol.TmfPcapProtocol. We simply add it, with a reference to the corresponding protocol in PcapProtocol. Thus, the following line is added in the TmfPcapProtocol enum:
+Also, TMF has to know about the new protocol. This is defined in org.eclipse.tracecompass.internal.tmf.pcap.core.protocol.TmfPcapProtocol. We simply add it, with a reference to the corresponding protocol in PcapProtocol. Thus, the following line is added in the TmfPcapProtocol enum:
 <pre>
     UDP(PcapProtocol.UDP),
 </pre>
@@ -4136,6 +4070,6 @@ To add a stream-based View, simply monitor the TmfPacketStreamSelectedSignal in 
 * Make adding protocol more "plugin-ish", via extension points for instance. This would make it easier to support new protocols, without modifying the source code.
 * Control dumpcap directly from eclipse, similar to how LTTng is controlled in the Control View.
 * Support pcapng. See: http://www.winpcap.org/ntar/draft/PCAP-DumpFileFormat.html for the file format.
-* Add SWTBOT tests to org.eclipse.linuxtools.tmf.pcap.ui
+* Add SWTBOT tests to org.eclipse.tracecompass.tmf.pcap.ui
 * Add a Raw Viewer, similar to Wireshark. We could use the “Show Raw” in the event editor to do that.
-* Externalize strings in org.eclipse.linuxtools.pcap.core. At the moment, all the strings are hardcoded. It would be good to externalize them all.
+* Externalize strings in org.eclipse.tracecompass.pcap.core. At the moment, all the strings are hardcoded. It would be good to externalize them all.
