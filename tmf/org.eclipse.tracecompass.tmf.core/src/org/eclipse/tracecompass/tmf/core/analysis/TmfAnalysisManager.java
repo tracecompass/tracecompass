@@ -15,14 +15,17 @@ package org.eclipse.tracecompass.tmf.core.analysis;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.analysis.TmfAnalysisModuleSources;
+import org.eclipse.tracecompass.internal.tmf.core.analysis.TmfAnalysisParameterProviders;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.collect.HashMultimap;
@@ -168,19 +171,41 @@ public class TmfAnalysisManager {
     }
 
     /**
-     * Get a parameter provider that applies to the requested trace
+     * Get the parameter providers that apply to the requested trace
      *
      * @param module
      *            Analysis module
      * @param trace
      *            The trace
-     * @return A parameter provider if one applies to the trace, null otherwise
+     * @return The set of parameter providers that apply to a trace for this module
+     * @deprecated Use the
+     *             {@link #getParameterProvidersForModule(IAnalysisModule, ITmfTrace)}
+     *             method that returns a set instead.
      */
+    @Deprecated
     public static List<IAnalysisParameterProvider> getParameterProviders(IAnalysisModule module, ITmfTrace trace) {
-        List<IAnalysisParameterProvider> providerList = new ArrayList<>();
+        /* Call the method that returns a set */
+        Set<IAnalysisParameterProvider> providerList = getParameterProvidersForModule(module, trace);
+        return new ArrayList<>(providerList);
+    }
+
+    /**
+     * Get the parameter providers that apply to the requested trace
+     *
+     * @param module
+     *            Analysis module
+     * @param trace
+     *            The trace
+     * @return The set of parameter providers that apply to a trace for this module
+     * @since 2.0
+     */
+    public static Set<IAnalysisParameterProvider> getParameterProvidersForModule(IAnalysisModule module, ITmfTrace trace) {
+        /* First, get the parameter providers from the extension point */
+        Set<IAnalysisParameterProvider> providerSet = TmfAnalysisParameterProviders.getParameterProvidersFor(module.getId());
+        /* Then add any new parameter provider coming from other sources */
         synchronized (fParameterProviders) {
             if (!fParameterProviders.containsKey(module.getId())) {
-                return providerList;
+                return providerSet;
             }
             /* We checked  via containsKey, get() should not return null */
             List<Class<? extends IAnalysisParameterProvider>> parameterProviders = checkNotNull(fParameterProviders.get(module.getId()));
@@ -191,15 +216,15 @@ public class TmfAnalysisManager {
                         provider = providerClass.newInstance();
                         fParamProviderInstances.put(providerClass, provider);
                     }
-                    if (provider.appliesToTrace(trace)) {
-                        providerList.add(provider);
+                    if (provider != null && provider.appliesToTrace(trace)) {
+                        providerSet.add(provider);
                     }
                 } catch (IllegalArgumentException | SecurityException | InstantiationException | IllegalAccessException e) {
                     Activator.logError(Messages.TmfAnalysisManager_ErrorParameterProvider, e);
                 }
             }
         }
-        return providerList;
+        return NonNullUtils.checkNotNull(Collections.unmodifiableSet(providerSet));
     }
 
     /**

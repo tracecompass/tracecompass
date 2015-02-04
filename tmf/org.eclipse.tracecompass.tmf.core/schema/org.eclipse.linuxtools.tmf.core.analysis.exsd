@@ -21,6 +21,7 @@
             <element ref="module"/>
             <element ref="source"/>
             <element ref="output"/>
+            <element ref="parameterProvider"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -203,6 +204,29 @@
                <documentation>
                   An ID for this output. For example, for a view, it would be the view ID.
                </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="parameterProvider">
+      <annotation>
+         <documentation>
+            Associates a parameter provider class with an analysis ID.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="analysisId"/>
+         </sequence>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The class that contains this analysis parameter provider.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.linuxtools.tmf.core.analysis.IAnalysisParameterProvider"/>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
