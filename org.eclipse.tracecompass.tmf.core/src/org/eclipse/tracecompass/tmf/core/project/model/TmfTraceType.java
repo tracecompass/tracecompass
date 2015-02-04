@@ -585,6 +585,28 @@ public final class TmfTraceType {
      */
     public static String getTraceTypeId(IResource resource) throws CoreException {
         String traceTypeId = resource.getPersistentProperties().get(TmfCommonConstants.TRACETYPE);
+        return buildCompatibilityTraceTypeId(traceTypeId);
+    }
+
+    /**
+     * This methods builds a trace type ID from a given ID taking into
+     * consideration any format changes that were done for the IDs of custom
+     * text or XML traces. For example, such format change took place when
+     * moving to Trace Compass. Trace type IDs that are part of the plug-in
+     * extension for trace types won't be changed.
+     *
+     * This method is useful for IDs that were persisted in the workspace before
+     * the format changes (e.g. in the persistent properties of a trace
+     * resource).
+     *
+     * It ensures backwards compatibility of the workspace for custom text and
+     * XML traces.
+     *
+     * @param traceTypeId
+     *            the legacy trace type ID
+     * @return the trace type ID in Trace Compass format
+     */
+    public static String buildCompatibilityTraceTypeId(String traceTypeId) {
         // Fix custom trace type id with old class name or without category name for backward compatibility
         if (traceTypeId != null) {
             String newTraceType = CustomTxtTrace.buildCompatibilityTraceTypeId(traceTypeId);
