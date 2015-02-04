@@ -30,6 +30,10 @@
 
   <name>Trace Compass Documentation</name>
 
+  <properties>
+    <docDestination>/home/data/httpd/archive.eclipse.org/tracecompass/doc</docDestination>
+  </properties>
+
   <modules>
     <module>org.eclipse.tracecompass.doc.dev</module>
     <module>org.eclipse.tracecompass.doc.user</module>

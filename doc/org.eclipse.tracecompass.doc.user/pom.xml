@@ -82,5 +82,41 @@
     </plugins>
   </build>
 
+  <profiles>
+    <profile>
+      <id>deploy-doc</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>deploy</id>
+                <phase>install</phase>
+                  <goals>
+                    <goal>run</goal>
+                  </goals>
+                  <configuration>
+                  <target>
+                    <delete includeemptydirs="false">
+                      <fileset
+                        dir="${docDestination}/org.eclipse.tracecompass.doc.user">
+                        <include name="**" />
+                      </fileset>
+                    </delete>
+
+                    <copy includeemptydirs="false" todir="${docDestination}/org.eclipse.tracecompass.doc.user">
+                      <fileset dir="doc" includes="*.html,images/**"/>
+                    </copy>
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
   <groupId>org.eclipse.tracecompass</groupId>
 </project>
