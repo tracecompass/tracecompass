@@ -1,4 +1,8 @@
 
+= Table of Contents =
+
+__TOC__
+
 = Introduction =
 
 The purpose of the '''Tracing Monitoring Framework (TMF)''' is to facilitate the integration of tracing and monitoring tools into Eclipse, to provide out-of-the-box generic functionalities/views and provide extension mechanisms of the base functionalities for application specific purposes.

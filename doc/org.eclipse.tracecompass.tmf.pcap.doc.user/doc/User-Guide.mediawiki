@@ -1,3 +1,4 @@
+
 = Pcap Support Within TMF =
 
 TMF now supports the reading of libpcap files for network tracing. Those files contains packets that were seen on a network, have a .pcap or .cap extension and can be captured with tools like Wireshark/Tshark/Tcpdump. To open a libpcap trace, simply import it just like any other trace type and TMF will recognize the format. Open the imported trace to see the packets that were captured. For more information about generic features of TMF see the [http://wiki.eclipse.org/index.php/Linux_Tools_Project/LTTng2/User_Guide User Guide].

@@ -1,4 +1,8 @@
 
+= Table of Contents =
+
+__TOC__
+
 = Overview =
 
 The GDB Tracepoint Analysis feature is an extension to the Tracing and Monitoring Framework that allows the visualization and analysis of C/C++ tracepoint data collected by GDB and stored to a log file.
