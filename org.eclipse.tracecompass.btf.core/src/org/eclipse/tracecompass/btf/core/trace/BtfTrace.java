@@ -90,8 +90,6 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
 
     private static final TmfLongLocation NULL_LOCATION = new TmfLongLocation(-1L);
 
-    private static final SimpleDateFormat ISO8601DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX"); //$NON-NLS-1$
-
     private static final int CACHE_SIZE = 256;
     private static final int MAX_CONFIDENCE = 100;
     private static final int MAX_LINES = 100;
@@ -148,6 +146,8 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
                 fProperties.put(CREATIONDATE, fCreationDate);
 
                 try {
+                    // DateFormats are inherently unsafe for multithreaded use so we can't make this a field. Just in case.
+                    final SimpleDateFormat ISO8601DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX"); //$NON-NLS-1$
                     Date dateTime = ISO8601DATEFORMAT.parse(fCreationDate);
                     fTsOffset = dateTime.getTime() * MICROSECONDS_IN_A_SECOND;
                 } catch (ParseException e) {
@@ -408,7 +408,7 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
 
     @Override
     public int getCheckpointSize() {
-        synchronized (getClass()) {
+        synchronized (BtfTrace.class) {
             if (fCheckpointSize == -1) {
                 TmfCheckpoint c = new TmfCheckpoint(TmfTimestamp.ZERO, new TmfLongLocation(0L), 0);
                 ByteBuffer b = ByteBuffer.allocate(ITmfCheckpoint.MAX_SERIALIZE_SIZE);
