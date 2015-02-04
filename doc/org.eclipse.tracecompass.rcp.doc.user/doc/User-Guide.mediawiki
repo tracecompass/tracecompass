@@ -1,12 +1,12 @@
 
-= Overview =
+= Trace Compass RCP =
 
 The Trace Compass RCP version is a stand-alone application based on Eclipse's
 Rich Client Platform (RCP). The purpose of this is to provide a lightweight
 application to view and analyze traces. It includes most standard features found
 in the Trace Compass project.
 
-= Getting Started =
+== Getting Started ==
 
 To start the Trace Compass RCP, go to the directory where it is installed and
 then run the executable named '''tracecompass'''. During startup, the program
@@ -17,7 +17,7 @@ project called ''Tracing''.
 Now the application can be used as described in the regular User Guide. (see
 section [[#References | References]]).
 
-= Updating the application =
+== Updating the application ==
 
 The RCP is pre-configured to point to the update site of its release "track".
 For example, if you download a "nightly" RCP, it will update using that
@@ -28,7 +28,7 @@ The program does not check automatically for updates. To check manually, you can
 click on '''Help''' -> '''Check for Updates'''. If updates are available, a
 standard Eclipse update dialog will offer their installation.
 
-= Opening a Trace =
+== Opening a Trace ==
 
 To open a trace, click on the '''File''' menu and select '''Open Trace...'''.
 A new dialog will show up for selecting a trace to open. Select a trace file
@@ -46,7 +46,7 @@ using the same algorithm than described above.
 
 In both of the above cases, the trace will be linked to the default project.
 
-= References =
+== References ==
 
 * [http://www.eclipse.org/tracecompass Trace Compass project]
 * [http://www.lttng.org/ LTTng project]
