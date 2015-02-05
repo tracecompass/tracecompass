@@ -318,20 +318,24 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                     super.handleData(event);
 
                     ITmfSyncSequenceDiagramEvent sdEvent = getSequenceDiagramEvent(event);
+                    ITmfTimestamp firstTime = fFirstTime;
+                    ITmfTimestamp lastTime = fLastTime;
 
                     if (sdEvent != null) {
                         ++fNbSeqEvents;
 
-                        if (fFirstTime == null) {
-                            fFirstTime = event.getTimestamp();
+                        if (firstTime == null) {
+                            firstTime = event.getTimestamp();
+                            fFirstTime = firstTime;
                         }
 
-                        fLastTime = event.getTimestamp();
+                        lastTime = event.getTimestamp();
+                        fLastTime = lastTime;
 
                         if ((fNbSeqEvents % MAX_NUM_OF_MSG) == 0) {
                             fLock.lock();
                             try {
-                                fCheckPoints.add(new TmfTimeRange(fFirstTime, fLastTime));
+                                fCheckPoints.add(new TmfTimeRange(firstTime, lastTime));
                                 if (fView != null) {
                                     fView.updateCoolBar();
                                 }
@@ -357,11 +361,13 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
                 @Override
                 public void handleSuccess() {
-                    if ((fFirstTime != null) && (fLastTime != null)) {
+                    final ITmfTimestamp firstTime = fFirstTime;
+                    final ITmfTimestamp lastTime = fLastTime;
+                    if ((firstTime != null) && (lastTime != null)) {
 
                         fLock.lock();
                         try {
-                            fCheckPoints.add(new TmfTimeRange(fFirstTime, fLastTime));
+                            fCheckPoints.add(new TmfTimeRange(firstTime, lastTime));
                             if (fView != null) {
                                 fView.updateCoolBar();
                             }
@@ -577,7 +583,11 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
             StructuredSelection stSel = (StructuredSelection) sel;
             if (stSel.getFirstElement() instanceof TmfSyncMessage) {
                 TmfSyncMessage syncMsg = ((TmfSyncMessage) stSel.getFirstElement());
-                broadcast(new TmfTimeSynchSignal(this, syncMsg.getStartTime()));
+                ITmfTimestamp startTime = syncMsg.getStartTime();
+                if (startTime == null) {
+                    startTime = TmfTimestamp.BIG_BANG;
+                }
+                broadcast(new TmfTimeSynchSignal(this, startTime));
             }
         }
     }

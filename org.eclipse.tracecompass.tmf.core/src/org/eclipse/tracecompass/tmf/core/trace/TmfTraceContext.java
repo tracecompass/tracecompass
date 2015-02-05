@@ -15,6 +15,8 @@
 package org.eclipse.tracecompass.tmf.core.trace;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
@@ -28,6 +30,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
  *
  * @author Alexandre Montplaisir
  */
+@NonNullByDefault
 final class TmfTraceContext {
 
     static final TmfTraceContext NULL_CONTEXT =
@@ -35,10 +38,10 @@ final class TmfTraceContext {
 
     private final TmfTimeRange fSelection;
     private final TmfTimeRange fWindowRange;
-    private final IFile fEditorFile;
-    private final ITmfFilter fFilter;
+    private final @Nullable IFile fEditorFile;
+    private final @Nullable ITmfFilter fFilter;
 
-    public TmfTraceContext(ITmfTimestamp beginTs, ITmfTimestamp endTs, TmfTimeRange tr, IFile editorFile) {
+    public TmfTraceContext(ITmfTimestamp beginTs, ITmfTimestamp endTs, TmfTimeRange tr, @Nullable IFile editorFile) {
         fSelection = new TmfTimeRange(beginTs, endTs);
         fWindowRange = tr;
         fEditorFile = editorFile;
@@ -65,7 +68,7 @@ final class TmfTraceContext {
      * @param filter
      *              The applied filter
      */
-    public TmfTraceContext(TmfTraceContext prevCtx, ITmfFilter filter) {
+    public TmfTraceContext(TmfTraceContext prevCtx, @Nullable ITmfFilter filter) {
         fSelection = prevCtx.fSelection;
         fWindowRange = prevCtx.fWindowRange;
         fEditorFile = prevCtx.fEditorFile;
@@ -84,14 +87,14 @@ final class TmfTraceContext {
         return fWindowRange;
     }
 
-    public IFile getEditorFile() {
+    public @Nullable IFile getEditorFile() {
         return fEditorFile;
     }
 
     /**
      * @return the current filter applied to the trace
      */
-    public ITmfFilter getFilter() {
+    public @Nullable ITmfFilter getFilter() {
         return fFilter;
     }
 

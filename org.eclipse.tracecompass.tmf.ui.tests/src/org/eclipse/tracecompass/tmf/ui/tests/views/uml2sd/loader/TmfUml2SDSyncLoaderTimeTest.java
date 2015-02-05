@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimeSynchSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
@@ -42,7 +43,7 @@ public class TmfUml2SDSyncLoaderTimeTest {
     // ------------------------------------------------------------------------
 
     // Test case 001 expected values
-    final static private Uml2SDTestTimestamp TC_001_TIME_VALUE       = new Uml2SDTestTimestamp(9788642228395L);
+    final static private @NonNull Uml2SDTestTimestamp TC_001_TIME_VALUE       = new Uml2SDTestTimestamp(9788642228395L);
     final static private String              TC_001_MESSAGE_NAME     = "START_GAME_REPLY";
     final static private int                 TC_001_PAGE_VALUE       = 0;
     final static private int                 TC_001_START_OCCURRANCE = 6;
@@ -51,7 +52,7 @@ public class TmfUml2SDSyncLoaderTimeTest {
     final static private String              TC_001_END_LIFELINE     = IUml2SDTestConstants.FIRST_PLAYER_NAME;
 
     // Test case 002 expected values
-    final static private Uml2SDTestTimestamp TC_002_TIME_VALUE       = new Uml2SDTestTimestamp(9789689830722L);
+    final static private @NonNull Uml2SDTestTimestamp TC_002_TIME_VALUE       = new Uml2SDTestTimestamp(9789689830722L);
     final static private String              TC_002_MESSAGE_NAME     = "PAUSE_GAME_REQUEST";
     final static private int                 TC_002_PAGE_VALUE       = 2;
     final static private int                 TC_002_START_OCCURRANCE = 7;
@@ -60,7 +61,7 @@ public class TmfUml2SDSyncLoaderTimeTest {
     final static private String              TC_002_END_LIFELINE     = IUml2SDTestConstants.MASTER_PLAYER_NAME;
 
     // Test case 003 expected values
-    final static private Uml2SDTestTimestamp TC_003_TIME_VALUE       = new Uml2SDTestTimestamp(9790750000000L);
+    final static private @NonNull Uml2SDTestTimestamp TC_003_TIME_VALUE       = new Uml2SDTestTimestamp(9790750000000L);
     final static private int                 TC_003_PAGE_VALUE       = 4;
 
     // Test case 004 expected values
@@ -70,28 +71,28 @@ public class TmfUml2SDSyncLoaderTimeTest {
     final static private int                 TC_005_PAGE_VALUE       = IUml2SDTestConstants.TOTAL_NUMBER_OF_PAGES - 1;
 
     // Test case 006 expected values
-    final static private Uml2SDTestTimestamp TC_006_TIME_VALUE       = new Uml2SDTestTimestamp(9792420661655L);
+    final static private @NonNull Uml2SDTestTimestamp TC_006_TIME_VALUE       = new Uml2SDTestTimestamp(9792420661655L);
     final static private int                 TC_006_PAGE_VALUE       = 4;
     final static private int                 TC_006_START_OCCURRANCE = IUml2SDTestConstants.MAX_MESSEAGES_PER_PAGE;
     final static private int                 TC_006_END_OCCURRANCE   = TC_006_START_OCCURRANCE;
 
     // Test case 007 expected values
-    final static private Uml2SDTestTimestamp TC_007_TIME_VALUE       = new Uml2SDTestTimestamp(9792420756010L);
+    final static private @NonNull Uml2SDTestTimestamp TC_007_TIME_VALUE       = new Uml2SDTestTimestamp(9792420756010L);
     final static private int                 TC_007_PAGE_VALUE       = 5;
     final static private int                 TC_007_START_OCCURRANCE = 1;
     final static private int                 TC_007_END_OCCURRANCE   = TC_007_START_OCCURRANCE;
 
     // Test case 008 expected values
-    final static private Uml2SDTestTimestamp TC_008_TIME_VALUE       = new Uml2SDTestTimestamp(9788642228395L);
+    final static private @NonNull Uml2SDTestTimestamp TC_008_TIME_VALUE       = new Uml2SDTestTimestamp(9788642228395L);
     final static private int                 TC_008_PAGE_VALUE       = 0;
-    final static private Uml2SDTestTimestamp TC_008_START_TIME_VALUE = new Uml2SDTestTimestamp(9788642228395L);
-    final static private Uml2SDTestTimestamp TC_008_END_TIME_VALUE   = new Uml2SDTestTimestamp(9789164833324L);
+    final static private @NonNull Uml2SDTestTimestamp TC_008_START_TIME_VALUE = new Uml2SDTestTimestamp(9788642228395L);
+    final static private @NonNull Uml2SDTestTimestamp TC_008_END_TIME_VALUE   = new Uml2SDTestTimestamp(9789164833324L);
 
     // Test case 009 expected values
-    final static private Uml2SDTestTimestamp TC_009_TIME_VALUE       = new Uml2SDTestTimestamp(9789689220871L);
+    final static private @NonNull Uml2SDTestTimestamp TC_009_TIME_VALUE       = new Uml2SDTestTimestamp(9789689220871L);
     final static private int                 TC_009_PAGE_VALUE       = 1;
-    final static private Uml2SDTestTimestamp TC_009_START_TIME_VALUE = TC_009_TIME_VALUE;
-    final static private Uml2SDTestTimestamp TC_009_END_TIME_VALUE   = new Uml2SDTestTimestamp(9789773881426L);
+    final static private @NonNull Uml2SDTestTimestamp TC_009_START_TIME_VALUE = TC_009_TIME_VALUE;
+    final static private @NonNull Uml2SDTestTimestamp TC_009_END_TIME_VALUE   = new Uml2SDTestTimestamp(9789773881426L);
 
     // Fields used in tests
     private static Uml2SDTestFacility fFacility;

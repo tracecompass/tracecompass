@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.Messages;
 import org.eclipse.tracecompass.internal.tmf.core.trace.indexer.TmfMemoryIndex;
 import org.eclipse.tracecompass.tmf.core.component.TmfEventProvider;
@@ -239,7 +240,7 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
      * @param startTime the new start time
      * @param endTime the new end time
      */
-    private void signalNewTimeRange(final ITmfTimestamp startTime, final ITmfTimestamp endTime) {
+    private void signalNewTimeRange(final @NonNull ITmfTimestamp startTime, final @NonNull ITmfTimestamp endTime) {
         fTrace.broadcast(new TmfTraceUpdatedSignal(fTrace, fTrace, new TmfTimeRange(startTime, endTime), fTrace.getNbEvents()));
     }
 

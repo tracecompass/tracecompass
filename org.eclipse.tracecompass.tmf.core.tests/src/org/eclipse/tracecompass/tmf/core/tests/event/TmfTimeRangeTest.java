@@ -17,7 +17,6 @@ package org.eclipse.tracecompass.tmf.core.tests.event;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
@@ -42,23 +41,6 @@ public class TmfTimeRangeTest {
 
         assertEquals("startTime", ts1, range.getStartTime());
         assertEquals("endTime", ts2, range.getEndTime());
-    }
-
-    @Test
-    public void testBadConstructor() {
-        try {
-            new TmfTimeRange(TmfTimestamp.BIG_BANG, null);
-            fail("TmfTimeRange: bad end time");
-        } catch (final IllegalArgumentException e) {
-            // Success
-        }
-
-        try {
-            new TmfTimeRange(null, TmfTimestamp.BIG_CRUNCH);
-            fail("TmfTimeRange: bad start time");
-        } catch (final IllegalArgumentException e) {
-            // Success
-        }
     }
 
     @Test
@@ -102,16 +84,6 @@ public class TmfTimeRangeTest {
 
         assertEquals("startTime", TmfTimestamp.BIG_BANG, range3.getStartTime());
         assertEquals("endTime", TmfTimestamp.BIG_CRUNCH, range3.getEndTime());
-    }
-
-    @Test
-    public void testCopyConstructor2() {
-        try {
-            new TmfTimeRange(null);
-            fail("TmfTimeRange: null argument");
-        } catch (final IllegalArgumentException e) {
-            // Success
-        }
     }
 
     // ------------------------------------------------------------------------

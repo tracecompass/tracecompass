@@ -106,6 +106,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.filter.TmfCollapseFilter;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
@@ -466,18 +467,19 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         fRawViewer.selectAndReveal((Long) e.item.getData(Key.RANK));
                     }
                     if (e.item.getData(Key.TIMESTAMP) instanceof ITmfTimestamp) {
-                        final ITmfTimestamp ts = (ITmfTimestamp) e.item.getData(Key.TIMESTAMP);
+                        final ITmfTimestamp ts = NonNullUtils.checkNotNull((ITmfTimestamp) e.item.getData(Key.TIMESTAMP));
                         if (fTable.getSelectionIndices().length == 1) {
                             fSelectedBeginTimestamp = ts;
                         }
-                        if (fSelectedBeginTimestamp != null) {
-                            if (fSelectedBeginTimestamp.compareTo(ts) <= 0) {
-                                broadcast(new TmfTimeSynchSignal(TmfEventsTable.this, fSelectedBeginTimestamp, ts));
+                        ITmfTimestamp selectedBeginTimestamp = fSelectedBeginTimestamp;
+                        if (selectedBeginTimestamp != null) {
+                            if (selectedBeginTimestamp.compareTo(ts) <= 0) {
+                                broadcast(new TmfTimeSynchSignal(TmfEventsTable.this, selectedBeginTimestamp, ts));
                                 if (fTable.getSelectionIndices().length == 2) {
-                                    updateStatusLine(ts.getDelta(fSelectedBeginTimestamp));
+                                    updateStatusLine(ts.getDelta(selectedBeginTimestamp));
                                 }
                             } else {
-                                broadcast(new TmfTimeSynchSignal(TmfEventsTable.this, ts, fSelectedBeginTimestamp));
+                                broadcast(new TmfTimeSynchSignal(TmfEventsTable.this, checkNotNull(ts), checkNotNull(fSelectedBeginTimestamp)));
                                 updateStatusLine(fSelectedBeginTimestamp.getDelta(ts));
                             }
                         }

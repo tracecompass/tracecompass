@@ -14,6 +14,8 @@
 package org.eclipse.tracecompass.tmf.core.timestamp;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * A utility class to define and manage time ranges.
@@ -22,6 +24,7 @@ import org.eclipse.jdt.annotation.NonNull;
  *
  * @see ITmfTimestamp
  */
+@NonNullByDefault
 public class TmfTimeRange {
 
     // ------------------------------------------------------------------------
@@ -31,12 +34,12 @@ public class TmfTimeRange {
     /**
      * The full possible time range
      */
-    public static final @NonNull TmfTimeRange ETERNITY = new EternityTimeRange();
+    public static final TmfTimeRange ETERNITY = new EternityTimeRange();
 
     /**
      * The null time range
      */
-    public static final @NonNull TmfTimeRange NULL_RANGE = new TmfTimeRange();
+    public static final TmfTimeRange NULL_RANGE = new TmfTimeRange();
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -64,9 +67,6 @@ public class TmfTimeRange {
      * @param endTime end of the time range
      */
     public TmfTimeRange(final ITmfTimestamp startTime, final ITmfTimestamp endTime) {
-        if (startTime == null || endTime == null) {
-            throw new IllegalArgumentException();
-        }
         fStartTime = startTime;
         fEndTime = endTime;
     }
@@ -77,9 +77,6 @@ public class TmfTimeRange {
      * @param range the other time range
      */
     public TmfTimeRange(final TmfTimeRange range) {
-        if (range == null) {
-            throw new IllegalArgumentException();
-        }
         fStartTime = range.getStartTime();
         fEndTime = range.getEndTime();
     }
@@ -140,7 +137,7 @@ public class TmfTimeRange {
      * @param range the other time range
      * @return the intersection time range, or null if no intersection exists
      */
-    public TmfTimeRange getIntersection(final TmfTimeRange range) {
+    public @Nullable TmfTimeRange getIntersection(final TmfTimeRange range) {
         if (fStartTime.compareTo(range.fEndTime) > 0 || fEndTime.compareTo(range.fStartTime) < 0) {
             return null; // no intersection
         }
@@ -166,7 +163,7 @@ public class TmfTimeRange {
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(final @Nullable Object obj) {
         if (this == obj) {
             return true;
         }
@@ -217,7 +214,7 @@ public class TmfTimeRange {
         }
 
         @Override
-        public TmfTimeRange getIntersection(TmfTimeRange range) {
+        public @NonNull TmfTimeRange getIntersection(TmfTimeRange range) {
             return range;
         }
     }

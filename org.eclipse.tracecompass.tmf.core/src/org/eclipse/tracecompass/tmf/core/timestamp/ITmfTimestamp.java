@@ -96,7 +96,7 @@ public interface ITmfTimestamp extends Comparable<ITmfTimestamp> {
      * @param ts the other timestamp
      * @return the time difference (this - other) as an ITmfTimestamp
      */
-    ITmfTimestamp getDelta(ITmfTimestamp ts);
+    @NonNull ITmfTimestamp getDelta(ITmfTimestamp ts);
 
     /**
      * Returns if this timestamp intersects the given time range. Borders are

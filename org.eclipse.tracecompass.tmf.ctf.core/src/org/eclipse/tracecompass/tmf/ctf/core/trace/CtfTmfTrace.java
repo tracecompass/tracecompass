@@ -584,7 +584,7 @@ public class CtfTmfTrace extends TmfTrace
     // ------------------------------------------------------------------------
 
     @Override
-    public CtfTmfTimestamp createTimestamp(long ts) {
+    public @NonNull CtfTmfTimestamp createTimestamp(long ts) {
         return new CtfTmfTimestamp(getTimestampTransform().transform(ts));
     }
 

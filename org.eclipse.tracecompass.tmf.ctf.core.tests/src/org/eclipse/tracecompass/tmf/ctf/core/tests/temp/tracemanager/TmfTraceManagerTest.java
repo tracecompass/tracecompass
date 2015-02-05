@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
@@ -142,7 +143,7 @@ public class TmfTraceManagerTest {
         TmfSignalManager.dispatchSignal(new TmfTraceSelectedSignal(this, trace));
     }
 
-    private void selectTimestamp(ITmfTimestamp ts) {
+    private void selectTimestamp(@NonNull ITmfTimestamp ts) {
         TmfSignalManager.dispatchSignal(new TmfTimeSynchSignal(this, ts));
     }
 
@@ -713,7 +714,7 @@ public class TmfTraceManagerTest {
     /**
      * Basically a "initial + offset" operation, but for ITmfTimetamp objects.
      */
-    private static ITmfTimestamp calculateOffset(ITmfTimestamp initialTs, ITmfTimestamp offsetTs) {
+    private static @NonNull ITmfTimestamp calculateOffset(ITmfTimestamp initialTs, ITmfTimestamp offsetTs) {
         long start = initialTs.normalize(0, SCALE).getValue();
         long offset = offsetTs.normalize(0, SCALE).getValue();
         return new TmfTimestamp(start + offset, SCALE);

@@ -600,9 +600,10 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
                                 endTimestamp = trace.getEndTime();
                             }
                         }
-                        if (safeTimestamp != null && (lastSafeTimestamp == null || safeTimestamp.compareTo(lastSafeTimestamp) > 0)) {
-                            timeRange = new TmfTimeRange(startTimestamp, safeTimestamp);
-                            lastSafeTimestamp = safeTimestamp;
+                        ITmfTimestamp safeTs = safeTimestamp;
+                        if (safeTs != null && (lastSafeTimestamp == null || safeTs.compareTo(lastSafeTimestamp) > 0)) {
+                            timeRange = new TmfTimeRange(startTimestamp, safeTs);
+                            lastSafeTimestamp = safeTs;
                         } else {
                             timeRange = null;
                         }

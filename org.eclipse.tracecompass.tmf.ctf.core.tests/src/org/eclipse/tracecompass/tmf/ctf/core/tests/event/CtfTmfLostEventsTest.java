@@ -17,6 +17,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfLostEvent;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
@@ -176,7 +177,7 @@ public class CtfTmfLostEventsTest {
         return req.getEvent();
     }
 
-    private CtfTmfEvent getOneEventTime(ITmfTimestamp ts) {
+    private CtfTmfEvent getOneEventTime(@NonNull ITmfTimestamp ts) {
         OneEventRequestPerTs req = new OneEventRequestPerTs(ts);
         fixture.sendRequest(req);
         try {
@@ -210,7 +211,7 @@ public class CtfTmfLostEventsTest {
 
         private CtfTmfEvent event = null;
 
-        public OneEventRequestPerTs(ITmfTimestamp ts) {
+        public OneEventRequestPerTs(@NonNull ITmfTimestamp ts) {
             super(CtfTmfEvent.class,
                     new TmfTimeRange(ts, TmfTimestamp.BIG_CRUNCH),
                     0, 1, ExecutionType.FOREGROUND);

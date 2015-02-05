@@ -13,6 +13,10 @@
 
 package org.eclipse.tracecompass.tmf.core.signal;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 
 /**
@@ -23,6 +27,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
  *
  * @author Francois Chouinard
 */
+@NonNullByDefault
 public class TmfTimeSynchSignal extends TmfSignal {
 
     private final ITmfTimestamp fBeginTime;
@@ -36,7 +41,7 @@ public class TmfTimeSynchSignal extends TmfSignal {
      * @param ts
      *            Timestamp of selection
      */
-    public TmfTimeSynchSignal(Object source, ITmfTimestamp ts) {
+    public TmfTimeSynchSignal(@Nullable Object source, ITmfTimestamp ts) {
         super(source);
         fBeginTime = ts;
         fEndTime = ts;
@@ -52,7 +57,7 @@ public class TmfTimeSynchSignal extends TmfSignal {
      * @param end
      *            Timestamp of end of selection range
      */
-    public TmfTimeSynchSignal(Object source, ITmfTimestamp begin, ITmfTimestamp end) {
+    public TmfTimeSynchSignal(@Nullable Object source, ITmfTimestamp begin, ITmfTimestamp end) {
         super(source);
         fBeginTime = begin;
         fEndTime = end;
@@ -76,15 +81,13 @@ public class TmfTimeSynchSignal extends TmfSignal {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("[TmfTimeSynchSignal ("); //$NON-NLS-1$
-        if (fBeginTime != null) {
-            sb.append(fBeginTime.toString());
-            if (!fBeginTime.equals(fEndTime) && fEndTime != null) {
-                sb.append('-');
-                sb.append(fEndTime.toString());
-            }
+        sb.append(fBeginTime.toString());
+        if (!fBeginTime.equals(fEndTime)) {
+            sb.append('-');
+            sb.append(fEndTime.toString());
         }
         sb.append(")]"); //$NON-NLS-1$
-        return sb.toString();
+        return checkNotNull(sb.toString());
     }
 
 }

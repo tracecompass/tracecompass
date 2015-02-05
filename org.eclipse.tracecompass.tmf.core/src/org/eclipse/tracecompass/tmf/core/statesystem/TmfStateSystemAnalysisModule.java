@@ -410,10 +410,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         fTimeRange = TmfTimeRange.ETERNITY;
         final ITmfTrace trace = provider.getTrace();
         if (!isCompleteTrace(trace)) {
-            TmfTimeRange traceTimeRange = trace.getTimeRange();
-            if (traceTimeRange != null) {
-                fTimeRange = traceTimeRange;
-            }
+            fTimeRange = trace.getTimeRange();
         }
 
         fStateProvider = provider;
