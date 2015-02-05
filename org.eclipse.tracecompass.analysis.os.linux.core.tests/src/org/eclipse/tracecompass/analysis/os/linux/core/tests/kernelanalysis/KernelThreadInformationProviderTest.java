@@ -57,11 +57,6 @@ public class KernelThreadInformationProviderTest {
 
     private static final @NonNull String LTTNG_KERNEL_FILE = "testfiles/lttng_kernel_analysis.xml";
 
-    /**
-     * The ID of the kernel analysis module for development traces
-     */
-    private static final String TEST_KERNEL_ANALYSIS_ID = "org.eclipse.tracecompass.analysis.os.linux.tests.kernel";
-
     private ITmfTrace fTrace;
     private KernelAnalysis fModule;
 
@@ -98,7 +93,7 @@ public class KernelThreadInformationProviderTest {
         assertNotNull(module);
         module.schedule();
         module.waitForCompletion();
-        fModule = TmfTraceUtils.getAnalysisModuleOfClass(fTrace, KernelAnalysis.class, TEST_KERNEL_ANALYSIS_ID);
+        fModule = TmfTraceUtils.getAnalysisModuleOfClass(fTrace, KernelAnalysis.class, KernelAnalysis.ID);
     }
 
     /**

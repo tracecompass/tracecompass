@@ -135,7 +135,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
                  * it
                  */
                 IFolder newresource = ResourcesPlugin.getWorkspace().getRoot().getFolder(path.append(module.getId()));
-                analysis = new TmfAnalysisElement(module.getName(), newresource, this, module.getId());
+                analysis = new TmfAnalysisElement(module.getName(), newresource, this, module);
             }
             analysis.refreshChildren();
         }

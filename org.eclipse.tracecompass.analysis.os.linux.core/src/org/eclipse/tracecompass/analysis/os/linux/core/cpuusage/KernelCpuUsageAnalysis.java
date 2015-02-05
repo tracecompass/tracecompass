@@ -115,7 +115,7 @@ public class KernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
         if (trace == null || cpuSs == null) {
             return map;
         }
-        ITmfStateSystem kernelSs = TmfStateSystemAnalysisModule.getStateSystemByModuleClass(trace, KernelAnalysis.class);
+        ITmfStateSystem kernelSs = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysis.ID);
         if (kernelSs == null) {
             return map;
         }

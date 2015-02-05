@@ -28,7 +28,6 @@ import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisOutput;
-import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.osgi.framework.Bundle;
 
@@ -47,7 +46,7 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
         }
     };
 
-    private final @NonNull String fAnalysisId;
+    private final @NonNull IAnalysisModuleHelper fAnalysisHelper;
     private boolean fCanExecute = true;
 
     /**
@@ -59,12 +58,12 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
      *            The resource
      * @param parent
      *            Parent of the analysis
-     * @param id
-     *            The analysis module id
+     * @param module
+     *            The analysis module helper
      */
-    protected TmfAnalysisElement(String name, IResource resource, ITmfProjectModelElement parent, @NonNull String id) {
+    protected TmfAnalysisElement(String name, IResource resource, ITmfProjectModelElement parent, @NonNull IAnalysisModuleHelper module) {
         super(name, resource, parent);
-        fAnalysisId = id;
+        fAnalysisHelper = module;
         parent.addChild(this);
     }
 
@@ -80,12 +79,6 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
         Map<String, TmfAnalysisOutputElement> childrenMap = new HashMap<>();
         for (TmfAnalysisOutputElement output : getAvailableOutputs()) {
             childrenMap.put(output.getName(), output);
-        }
-
-        IAnalysisModuleHelper helper = TmfAnalysisManager.getAnalysisModule(fAnalysisId);
-        if (helper == null) {
-            deleteOutputs();
-            return;
         }
 
         /** Get base path for resource */
@@ -106,7 +99,7 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
                 return;
             }
 
-            IAnalysisModule module = trace.getAnalysisModule(fAnalysisId);
+            IAnalysisModule module = trace.getAnalysisModule(fAnalysisHelper.getId());
             if (module == null) {
                 deleteOutputs();
                 /*
@@ -171,7 +164,7 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
      * @return The analysis id
      */
     public String getAnalysisId() {
-        return fAnalysisId;
+        return fAnalysisHelper.getId();
     }
 
     /**
@@ -187,23 +180,18 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
             TmfTraceElement traceElement = (TmfTraceElement) parent;
             trace = traceElement.getTrace();
             if (trace != null) {
-                IAnalysisModule module = trace.getAnalysisModule(fAnalysisId);
+                IAnalysisModule module = trace.getAnalysisModule(fAnalysisHelper.getId());
                 if (module != null) {
                     return module.getHelpText(trace);
                 }
             }
         }
 
-        IAnalysisModuleHelper helper = TmfAnalysisManager.getAnalysisModule(fAnalysisId);
-        if (helper == null) {
-            return new String();
-        }
-
         if (trace != null) {
-            return helper.getHelpText(trace);
+            return fAnalysisHelper.getHelpText(trace);
         }
 
-        return helper.getHelpText();
+        return fAnalysisHelper.getHelpText();
     }
 
     /**
@@ -212,11 +200,7 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
      * @return The analysis icon file name
      */
     public String getIconFile() {
-        IAnalysisModuleHelper helper = TmfAnalysisManager.getAnalysisModule(fAnalysisId);
-        if (helper == null) {
-            return null;
-        }
-        return helper.getIcon();
+        return fAnalysisHelper.getIcon();
     }
 
     /**
@@ -225,11 +209,7 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
      * @return The analysis bundle
      */
     public Bundle getBundle() {
-        IAnalysisModuleHelper helper = TmfAnalysisManager.getAnalysisModule(fAnalysisId);
-        if (helper == null) {
-            return null;
-        }
-        return helper.getBundle();
+        return fAnalysisHelper.getBundle();
     }
 
     /** Delete all outputs under this analysis element */

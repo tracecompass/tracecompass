@@ -12,10 +12,12 @@
 
 package org.eclipse.tracecompass.tmf.core.tests.analysis;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -29,6 +31,8 @@ import org.eclipse.tracecompass.tmf.tests.stubs.analysis.AnalysisModuleTestHelpe
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.collect.Multimap;
 
 /**
  * Test suite for the TmfAnalysisModule class
@@ -68,14 +72,18 @@ public class AnalysisManagerTest {
      */
     @Test
     public void testGetAnalysisModules() {
-        Map<String, IAnalysisModuleHelper> modules = TmfAnalysisManager.getAnalysisModules();
+        Multimap<String, IAnalysisModuleHelper> modules = TmfAnalysisManager.getAnalysisModules();
         /* At least 3 modules should be found */
         assertTrue(modules.size() >= 3);
 
-        IAnalysisModuleHelper module = modules.get(MODULE_PARAM_DEFAULT);
+        Collection<IAnalysisModuleHelper> moduleList = modules.get(MODULE_PARAM_DEFAULT);
+        assertEquals(1, moduleList.size());
+        IAnalysisModuleHelper module = moduleList.iterator().next();
         assertTrue(module.isAutomatic());
 
-        module = modules.get(MODULE_PARAM);
+        moduleList = modules.get(MODULE_PARAM);
+        assertEquals(1, moduleList.size());
+        module = moduleList.iterator().next();
         assertFalse(module.isAutomatic());
     }
 

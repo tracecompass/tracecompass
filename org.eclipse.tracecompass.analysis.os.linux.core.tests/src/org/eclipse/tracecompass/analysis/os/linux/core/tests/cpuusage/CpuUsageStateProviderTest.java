@@ -56,11 +56,6 @@ public class CpuUsageStateProviderTest {
 
     private static final String CPU_USAGE_FILE = "testfiles/cpu_analysis.xml";
 
-    /**
-     * The ID of the cpu usage analysis module for development traces
-     */
-    private static final String TEST_CPU_USAGE_ANALYSIS_ID = "org.eclipse.tracecompass.analysis.os.linux.tests.cpuusage";
-
     private ITmfTrace fTrace;
     private KernelCpuUsageAnalysis fModule;
 
@@ -104,7 +99,7 @@ public class CpuUsageStateProviderTest {
         module.waitForCompletion();
         /* End of the FIXME block */
 
-        fModule = TmfTraceUtils.getAnalysisModuleOfClass(fTrace, KernelCpuUsageAnalysis.class, TEST_CPU_USAGE_ANALYSIS_ID);
+        fModule = TmfTraceUtils.getAnalysisModuleOfClass(fTrace, KernelCpuUsageAnalysis.class, KernelCpuUsageAnalysis.ID);
         assertNotNull(fModule);
     }
 

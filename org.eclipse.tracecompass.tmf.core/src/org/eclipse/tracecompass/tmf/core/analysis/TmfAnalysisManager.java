@@ -20,12 +20,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.analysis.TmfAnalysisModuleSources;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * Manages the available analysis helpers from different sources and their
@@ -37,7 +40,7 @@ import com.google.common.collect.ImmutableMap;
 @NonNullByDefault
 public class TmfAnalysisManager {
 
-    private static final Map<String, IAnalysisModuleHelper> fAnalysisModules = new HashMap<>();
+    private static final Multimap<String, IAnalysisModuleHelper> fAnalysisModules = NonNullUtils.checkNotNull(HashMultimap.<String, IAnalysisModuleHelper> create());
     private static final Map<String, List<Class<? extends IAnalysisParameterProvider>>> fParameterProviders = new HashMap<>();
     private static final Map<Class<? extends IAnalysisParameterProvider>, IAnalysisParameterProvider> fParamProviderInstances = new HashMap<>();
     private static final List<IAnalysisModuleSource> fSources = new ArrayList<>();
@@ -45,11 +48,8 @@ public class TmfAnalysisManager {
 
     /**
      * Constructor, not to be used
-     * TODO This class is not meant to be instantiated, put me private in next major release
-     * @deprecated It was never meant to be public
      */
-    @Deprecated
-    public TmfAnalysisManager() {
+    private TmfAnalysisManager() {
 
     }
 
@@ -110,7 +110,7 @@ public class TmfAnalysisManager {
      *
      * @return The map of available {@link IAnalysisModuleHelper}
      */
-    public static synchronized Map<String, IAnalysisModuleHelper> getAnalysisModules() {
+    public static synchronized Multimap<String, IAnalysisModuleHelper> getAnalysisModules() {
         if (fAnalysisModules.isEmpty()) {
             for (IAnalysisModuleSource source : fSources) {
                 for (IAnalysisModuleHelper helper : source.getAnalysisModules()) {
@@ -118,11 +118,13 @@ public class TmfAnalysisManager {
                 }
             }
         }
-        return checkNotNull(ImmutableMap.copyOf(fAnalysisModules));
+        return checkNotNull(ImmutableMultimap.copyOf(fAnalysisModules));
     }
 
     /**
-     * Gets all analysis module helpers that apply to a given trace type
+     * Gets all analysis module helpers that apply to a given trace type. For
+     * each analysis ID, only one helper will be returned if more than one
+     * applies.
      *
      * This map is read-only
      *
@@ -131,7 +133,7 @@ public class TmfAnalysisManager {
      * @return The map of available {@link IAnalysisModuleHelper}
      */
     public static Map<String, IAnalysisModuleHelper> getAnalysisModules(Class<? extends ITmfTrace> traceclass) {
-        Map<String, IAnalysisModuleHelper> allModules = getAnalysisModules();
+        Multimap<String, IAnalysisModuleHelper> allModules = getAnalysisModules();
         Map<String, IAnalysisModuleHelper> map = new HashMap<>();
         for (IAnalysisModuleHelper module : allModules.values()) {
             if (module.appliesToTraceType(traceclass)) {
@@ -139,18 +141,6 @@ public class TmfAnalysisManager {
             }
         }
         return checkNotNull(ImmutableMap.copyOf(map));
-    }
-
-    /**
-     * Gets an analysis module helper identified by an id
-     *
-     * @param id
-     *            Id of the analysis module to get
-     * @return The {@link IAnalysisModuleHelper}
-     */
-    public static @Nullable IAnalysisModuleHelper getAnalysisModule(String id) {
-        Map<String, IAnalysisModuleHelper> map = getAnalysisModules();
-        return map.get(id);
     }
 
     /**

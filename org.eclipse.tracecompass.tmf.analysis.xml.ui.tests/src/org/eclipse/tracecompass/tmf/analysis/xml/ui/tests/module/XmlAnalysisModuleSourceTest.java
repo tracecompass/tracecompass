@@ -17,7 +17,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.util.Map;
 
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
@@ -27,6 +26,8 @@ import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.collect.Multimap;
 
 /**
  * Test suite for the {@link XmlAnalysisModuleSource} class
@@ -114,7 +115,7 @@ public class XmlAnalysisModuleSourceTest {
          */
         TmfAnalysisManager.initialize();
 
-        Map<String, IAnalysisModuleHelper> modules = TmfAnalysisManager.getAnalysisModules();
+        Multimap<String, IAnalysisModuleHelper> modules = TmfAnalysisManager.getAnalysisModules();
         assertFalse(findModule(modules.values(), SS_MODULE));
         /* Test that the builtin module is present */
         assertTrue(findModule(modules.values(), BUILTIN_MODULE));

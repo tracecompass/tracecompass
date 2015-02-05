@@ -6,7 +6,7 @@
       <module
             analysis_module="org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.KernelCpuUsageAnalysis"
             automatic="false"
-            id="org.eclipse.tracecompass.analysis.os.linux.tests.cpuusage"
+            id="org.eclipse.tracecompass.analysis.os.linux.cpuusage"
             name="CPU Usage Test Analysis">
          <tracetype
                applies="true"
@@ -16,7 +16,7 @@
       <module
             analysis_module="org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysis"
             automatic="false"
-            id="org.eclipse.tracecompass.analysis.os.linux.tests.kernel"
+            id="org.eclipse.tracecompass.analysis.os.linux.kernel"
             name="Linux Kernel Test Analysis">
          <tracetype
                applies="true"
