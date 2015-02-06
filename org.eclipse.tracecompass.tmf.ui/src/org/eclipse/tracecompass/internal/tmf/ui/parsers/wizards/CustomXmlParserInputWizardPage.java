@@ -106,8 +106,8 @@ import com.google.common.base.Joiner;
 public class CustomXmlParserInputWizardPage extends WizardPage {
 
     private static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS"; //$NON-NLS-1$
-    private static final String TIMESTAMP_FORMAT_BUNDLE = "org.eclipse.linuxtools.lttng.help"; //$NON-NLS-1$
-    private static final String TIMESTAMP_FORMAT_PATH = "reference/api/org/eclipse/linuxtools/tmf/core/timestamp/TmfTimestampFormat.html"; //$NON-NLS-1$
+    private static final String TIMESTAMP_FORMAT_BUNDLE = "org.eclipse.tracecompass.doc.user"; //$NON-NLS-1$
+    private static final String TIMESTAMP_FORMAT_PATH = "reference/api/org/eclipse/tracecompass/tmf/core/timestamp/TmfTimestampFormat.html"; //$NON-NLS-1$
     private static final Image ELEMENT_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/element_icon.gif"); //$NON-NLS-1$
     private static final Image ADD_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/add_button.gif"); //$NON-NLS-1$
     private static final Image ADD_NEXT_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/addnext_button.gif"); //$NON-NLS-1$
