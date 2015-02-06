@@ -13,10 +13,8 @@
 package org.eclipse.tracecompass.btf.ui;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.tracecompass.btf.core.event.BtfEvent;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -41,8 +39,6 @@ public class Activator extends Plugin {
      * The shared instance
      */
     private static Activator fPlugin;
-
-    private BtfEventAdapterFactory fBtfEventAdapterFactory;
 
 
     // ------------------------------------------------------------------------
@@ -82,8 +78,6 @@ public class Activator extends Plugin {
     public void start(BundleContext context) throws Exception {
         super.start(context);
         setDefault(this);
-        fBtfEventAdapterFactory = new BtfEventAdapterFactory();
-        Platform.getAdapterManager().registerAdapters(fBtfEventAdapterFactory, BtfEvent.class);
     }
 
     @Override

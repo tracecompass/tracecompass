@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
+ *   Patrick Tasse - Fix target instance field
  *******************************************************************************/
 
 package org.eclipse.tracecompass.btf.core.event;
@@ -110,16 +111,16 @@ public class BtfEventType extends TmfEventType {
     public ITmfEventField generateContent(String event, long sourceInstance, long targetInstance) {
         String[] data;
         TmfEventField retField;
-        TmfEventField sourceInstanceField = new TmfEventField(fCols.get(1), sourceInstance, null);
-        TmfEventField targetInstanceField = new TmfEventField(fCols.get(2), sourceInstance, null);
+        TmfEventField sourceInstanceField = new TmfEventField(BtfColumnNames.SOURCE_INSTANCE.toString(), sourceInstance, null);
+        TmfEventField targetInstanceField = new TmfEventField(BtfColumnNames.TARGET_INSTANCE.toString(), targetInstance, null);
         if (fHasNotes) {
             data = event.split(",", 2); //$NON-NLS-1$
-            TmfEventField eventField = new TmfEventField(fCols.get(0), data[0], BTFPayload.getFieldDescription(data[0]));
-            TmfEventField notesField = new TmfEventField(fCols.get(3), data[1], null);
+            TmfEventField eventField = new TmfEventField(BtfColumnNames.EVENT.toString(), data[0], BTFPayload.getFieldDescription(data[0]));
+            TmfEventField notesField = new TmfEventField(BtfColumnNames.NOTES.toString(), data[1], null);
             retField = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, null, new TmfEventField[] { eventField, sourceInstanceField, targetInstanceField, notesField });
         } else {
             data = new String[] { event };
-            TmfEventField eventField = new TmfEventField(fCols.get(0), data[0], BTFPayload.getFieldDescription(data[0]));
+            TmfEventField eventField = new TmfEventField(BtfColumnNames.EVENT.toString(), data[0], BTFPayload.getFieldDescription(data[0]));
             retField = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, null, new TmfEventField[] { eventField, sourceInstanceField, targetInstanceField });
         }
         return retField;

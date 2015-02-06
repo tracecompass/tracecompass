@@ -141,7 +141,7 @@ public class BtfStateProvider extends AbstractTmfStateProvider {
         final long ts = event.getTimestamp().getValue();
         final String eventType = (String) event.getContent().getField(BtfColumnNames.EVENT.toString()).getValue();
         final String source = event.getSource();
-        final String target = event.getReference();
+        final String target = event.getTarget();
         String task;
         int quark;
         try {
@@ -262,7 +262,7 @@ public class BtfStateProvider extends AbstractTmfStateProvider {
             throws AttributeNotFoundException {
         String name = event.getType().getName();
         if (name.equals("Task")) { //$NON-NLS-1$
-            String task = event.getReference();
+            String task = event.getTarget();
             int quark = ssb.getQuarkAbsoluteAndAdd(ATTRIBUTE_TASKS, task);
             ssb.modifyAttribute(ts, stateValue.getValue(), quark);
         }
