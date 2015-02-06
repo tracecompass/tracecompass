@@ -1384,7 +1384,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
         public void run(IProgressMonitor progressMonitor) {
             String currentPath = null;
-            final Map<String, TraceFileSystemElement> folderElements = new HashMap<>();
             try {
 
                 final ArrayList<TraceFileSystemElement> fileSystemElements = new ArrayList<>();
@@ -1437,6 +1436,8 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                     fBaseSourceContainerPath = destTempFolder.getLocation();
                 }
 
+                // Map to remember already imported directory traces
+                final Map<String, TraceFileSystemElement> directoryTraces = new HashMap<>();
                 while (fileSystemElementsIter.hasNext()) {
                     ModalContext.checkCanceled(progressMonitor);
                     currentPath = null;
@@ -1448,9 +1449,9 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                     currentPath = resourcePath;
                     SubMonitor sub = subMonitor.newChild(1);
                     if (element.isDirectory()) {
-                        if (!folderElements.containsKey(resourcePath)) {
+                        if (!directoryTraces.containsKey(resourcePath)) {
                             if (isDirectoryTrace(element)) {
-                                folderElements.put(resourcePath, element);
+                                directoryTraces.put(resourcePath, element);
                                 validateAndImportTrace(element, sub);
                             }
                         }
@@ -1459,12 +1460,27 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                         String parentPath = parentElement.getFileSystemObject().getAbsolutePath(fBaseSourceContainerPath.toOSString());
                         parentElement.setDestinationContainerPath(computeDestinationContainerPath(new Path(parentPath)));
                         currentPath = parentPath;
-                        if (!folderElements.containsKey(parentPath)) {
+                        if (!directoryTraces.containsKey(parentPath)) {
                             if (isDirectoryTrace(parentElement)) {
-                                folderElements.put(parentPath, parentElement);
+                                directoryTraces.put(parentPath, parentElement);
                                 validateAndImportTrace(parentElement, sub);
                             } else {
-                                if (fileSystemObject.exists()) {
+                                boolean validateFile = true;
+                                TraceFileSystemElement grandParentElement = (TraceFileSystemElement) parentElement.getParent();
+                                // Special case for LTTng trace that may contain index directory and files
+                                if (grandParentElement != null) {
+                                    String grandParentPath = grandParentElement.getFileSystemObject().getAbsolutePath(fBaseSourceContainerPath.toOSString());
+                                    grandParentElement.setDestinationContainerPath(computeDestinationContainerPath(new Path(parentPath)));
+                                    currentPath = grandParentPath;
+                                    if (directoryTraces.containsKey(grandParentPath)) {
+                                        validateFile = false;
+                                    } else if (isDirectoryTrace(grandParentElement)) {
+                                        directoryTraces.put(grandParentPath, grandParentElement);
+                                        validateAndImportTrace(grandParentElement, sub);
+                                        validateFile = false;
+                                    }
+                                }
+                                if (validateFile && (fileSystemObject.exists())) {
                                     validateAndImportTrace(element, sub);
                                 }
                             }
