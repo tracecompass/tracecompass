@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.btf.core.trace;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 
@@ -20,7 +21,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
  *
  * @author Matthew Khouzam
  */
-public enum BtfTimstampFormat {
+public enum BtfTimestampFormat {
     /**
      * Picoseconds
      */
@@ -46,7 +47,7 @@ public enum BtfTimstampFormat {
     private final int fScale;
     private final double fScaleFactor;
 
-    private BtfTimstampFormat(String name, int scale, double scaleFactor) {
+    private BtfTimestampFormat(String name, int scale, double scaleFactor) {
         fName = name;
         fScale = scale;
         fScaleFactor = scaleFactor;
@@ -73,18 +74,18 @@ public enum BtfTimstampFormat {
      *            the timestamp in text "ns", "ms" ...
      * @return a BtfTimestampFormat object
      */
-    public static BtfTimstampFormat parse(String text) {
+    public static BtfTimestampFormat parse(String text) {
         switch (text.toLowerCase()) {
         case "ps": //$NON-NLS-1$
             throw new IllegalArgumentException("ps not yet supported"); //$NON-NLS-1$
         case "ns": //$NON-NLS-1$
-            return BtfTimstampFormat.NS;
+            return BtfTimestampFormat.NS;
         case "us": //$NON-NLS-1$
-            return BtfTimstampFormat.US;
+            return BtfTimestampFormat.US;
         case "ms": //$NON-NLS-1$
-            return BtfTimstampFormat.MS;
+            return BtfTimestampFormat.MS;
         case "s": //$NON-NLS-1$
-            return BtfTimstampFormat.S;
+            return BtfTimestampFormat.S;
         default:
             throw new IllegalArgumentException(text + " not a valid argument, use ps, ns, us, ms, s"); //$NON-NLS-1$
         }
@@ -97,7 +98,7 @@ public enum BtfTimstampFormat {
      *            timestamp without scale
      * @return TmfTimestamp with proper scale
      */
-    public ITmfTimestamp createTimestamp(long timestamp) {
+    public @NonNull ITmfTimestamp createTimestamp(long timestamp) {
         return new TmfTimestamp(timestamp, fScale);
     }
 }

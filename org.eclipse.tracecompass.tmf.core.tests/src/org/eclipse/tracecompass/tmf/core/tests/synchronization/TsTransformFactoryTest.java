@@ -16,6 +16,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.synchronization.TmfConstantTransform;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.tracecompass.tmf.core.synchronization.TimestampTransformFactory;
@@ -30,6 +32,7 @@ import org.junit.Test;
  * @author Matthew Khouzam
  *
  */
+@NonNullByDefault
 public class TsTransformFactoryTest {
     private final ITmfTimestamp t0 = new TmfTimestamp(0);
     private final ITmfTimestamp t100 = new TmfTimestamp(100);
@@ -40,7 +43,7 @@ public class TsTransformFactoryTest {
     private final ITmfTimestamp tn1 = new TmfNanoTimestamp(1);
     private final ITmfTimestampTransform identity1 = TimestampTransformFactory.createLinear(1.0, new TmfNanoTimestamp(0));
     private final ITmfTimestampTransform offset1 = TimestampTransformFactory.createWithOffset(100);
-    private final ITmfTimestampTransform offset2 = TimestampTransformFactory.createLinear(BigDecimal.ONE, new BigDecimal(100));
+    private final ITmfTimestampTransform offset2 = TimestampTransformFactory.createLinear(NonNullUtils.checkNotNull(BigDecimal.ONE), NonNullUtils.checkNotNull(new BigDecimal(100)));
     private final ITmfTimestampTransform offset3 = TimestampTransformFactory.createLinear(1.0, 100);
     private final ITmfTimestampTransform offset4 = TimestampTransformFactory.createLinear(1.0, new TmfNanoTimestamp(100));
 
@@ -48,7 +51,7 @@ public class TsTransformFactoryTest {
      * Test with identity
      */
     @Test
-    public void transformIdenity() {
+    public void transformIdentity() {
         final ITmfTimestampTransform identity = TimestampTransformFactory.createWithOffset(0);
         final ITmfTimestampTransform innefficientIdentity = new TmfConstantTransform();
         final ITmfTimestampTransform compositeInnefficientIdentity = identity.composeWith(innefficientIdentity);
@@ -112,7 +115,7 @@ public class TsTransformFactoryTest {
         final String expectedIdentity = "TmfTimestampTransform [ IDENTITY ]";
         final String expectedOffset100 = "TmfConstantTransform [ offset = 100 ]";
         assertEquals(expectedLinear, TimestampTransformFactory.createLinear(314, 0).toString());
-        assertEquals(expectedLinearBigDec, TimestampTransformFactory.createLinear(BigDecimal.valueOf(314), BigDecimal.ZERO).toString());
+        assertEquals(expectedLinearBigDec, TimestampTransformFactory.createLinear(NonNullUtils.checkNotNull(BigDecimal.valueOf(314)), NonNullUtils.checkNotNull(BigDecimal.ZERO)).toString());
         assertEquals(expectedOffset, TimestampTransformFactory.createLinear(1, 314).toString());
         assertEquals(expectedOffset, TimestampTransformFactory.createWithOffset(314).toString());
         assertEquals(expectedOffset, TimestampTransformFactory.createWithOffset(14).composeWith(TimestampTransformFactory.createWithOffset(300)).toString());

@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.tmf.core.synchronization;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.tracecompass.tmf.core.synchronization.TimestampTransformFactory;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
@@ -146,7 +147,7 @@ public class TmfTimestampTransformLinear implements ITmfTimestampTransformInvert
 
     @Override
     public ITmfTimestampTransform inverse() {
-        return TimestampTransformFactory.createLinear(BigDecimal.ONE.divide(fAlpha, fMc), BigDecimal.valueOf(-1).multiply(fBeta).divide(fAlpha, fMc));
+        return TimestampTransformFactory.createLinear(NonNullUtils.checkNotNull(BigDecimal.ONE.divide(fAlpha, fMc)), NonNullUtils.checkNotNull(BigDecimal.valueOf(-1).multiply(fBeta).divide(fAlpha, fMc)));
     }
 
     /**

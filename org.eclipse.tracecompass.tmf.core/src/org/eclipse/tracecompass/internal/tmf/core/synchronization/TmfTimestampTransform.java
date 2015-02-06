@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.synchronization;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 
@@ -31,7 +32,7 @@ public final class TmfTimestampTransform implements ITmfTimestampTransformInvert
     /**
      * The unique instance of this transform, since it is always the same
      */
-    public static final TmfTimestampTransform IDENTITY = new TmfTimestampTransform();
+    public static final @NonNull TmfTimestampTransform IDENTITY = new TmfTimestampTransform();
 
     /**
      * Default constructor

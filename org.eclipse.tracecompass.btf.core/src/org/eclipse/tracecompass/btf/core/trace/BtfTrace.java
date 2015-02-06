@@ -101,7 +101,7 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
     private String fCreationDate;
     private String fInputFile;
     // default unit is ns
-    private BtfTimstampFormat fTsFormat = BtfTimstampFormat.NS;
+    private BtfTimestampFormat fTsFormat = BtfTimestampFormat.NS;
 
     private File fFile;
     private RandomAccessFile fFileInput;
@@ -153,7 +153,7 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
                 fProperties.put(INPUTFILE, fInputFile);
                 break;
             case lTIMESCALE:
-                fTsFormat = BtfTimstampFormat.parse(tokens[1]);
+                fTsFormat = BtfTimestampFormat.parse(tokens[1]);
                 fProperties.put(TIMESCALE, fTsFormat.toString());
                 break;
             case lENTITYTYPE:

@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.tmf.core.synchronization;
 
 import java.io.Serializable;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 
 /**
@@ -32,7 +33,7 @@ public interface ITmfTimestampTransform extends Serializable {
      *            The timestamp to transform
      * @return the transformed timestamp
      */
-    ITmfTimestamp transform(ITmfTimestamp timestamp);
+    @NonNull ITmfTimestamp transform(@NonNull ITmfTimestamp timestamp);
 
     /**
      * Transforms a timestamp value

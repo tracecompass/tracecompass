@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.synchronization.graph.SyncSpanningTree;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventDependency;
@@ -449,7 +450,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
         public ITmfTimestampTransform getTimestampTransform(String hostId) {
             if (hostId.equals(fOtherHost) && (getQuality() == SyncQuality.ACCURATE || getQuality() == SyncQuality.APPROXIMATE || getQuality() == SyncQuality.FAIL)) {
                 /* alpha: beta => 1 / fAlpha, -1 * fBeta / fAlpha); */
-                return TimestampTransformFactory.createLinear(BigDecimal.ONE.divide(fAlpha, fMc), BigDecimal.valueOf(-1).multiply(fBeta).divide(fAlpha, fMc));
+                return TimestampTransformFactory.createLinear(NonNullUtils.checkNotNull(BigDecimal.ONE.divide(fAlpha, fMc)), NonNullUtils.checkNotNull(BigDecimal.valueOf(-1).multiply(fBeta).divide(fAlpha, fMc)));
             }
             return TimestampTransformFactory.getDefaultTransform();
         }

@@ -13,6 +13,7 @@
 
 package org.eclipse.tracecompass.tmf.core.timestamp;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 
 /**
@@ -89,7 +90,7 @@ public interface ITmfTimestamp extends Comparable<ITmfTimestamp> {
      * @param scale the new timestamp scale
      * @return a new 'adjusted' ITmfTimestamp
      */
-    ITmfTimestamp normalize(long offset, int scale);
+    @NonNull ITmfTimestamp normalize(long offset, int scale);
 
     /**
      * Returns the difference between [this] and [ts] as a timestamp
