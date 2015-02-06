@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,14 +8,16 @@
  *
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
+ *   Patrick Tasse - Update properties
  *******************************************************************************/
 
 package org.eclipse.tracecompass.btf.ui;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
+import org.eclipse.tracecompass.btf.core.event.BTFPayload;
 import org.eclipse.tracecompass.btf.core.event.BtfEvent;
+import org.eclipse.tracecompass.btf.core.trace.BtfColumnNames;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventPropertySource;
@@ -34,6 +36,19 @@ public class BtfEventPropertySource extends TmfEventPropertySource {
     private static final String ID_EVENT_SOURCE = "event_source"; //$NON-NLS-1$
     private static final String ID_EVENT_TYPE = "event_type"; //$NON-NLS-1$
     private static final String ID_EVENT_TARGET = "event_target"; //$NON-NLS-1$
+    private static final String ID_EVENT_NOTES = "event_notes"; //$NON-NLS-1$
+    private static final IPropertyDescriptor[] DESCRIPTORS = new IPropertyDescriptor[] {
+        new ReadOnlyTextPropertyDescriptor(ID_EVENT_TIMESTAMP, "Timestamp"), //$NON-NLS-1$
+        new ReadOnlyTextPropertyDescriptor(ID_EVENT_SOURCE, "Source"), //$NON-NLS-1$
+        new ReadOnlyTextPropertyDescriptor(ID_EVENT_TYPE, "Type"), //$NON-NLS-1$
+        new ReadOnlyTextPropertyDescriptor(ID_EVENT_TARGET, "Target"), //$NON-NLS-1$
+        new ReadOnlyTextPropertyDescriptor(ID_EVENT_EVENT, "Event"), //$NON-NLS-1$
+        new ReadOnlyTextPropertyDescriptor(ID_EVENT_NOTES, "Notes") //$NON-NLS-1$
+    };
+    private static final IPropertyDescriptor[] DESCRIPTORS_WITHOUT_NOTES = Arrays.copyOf(DESCRIPTORS, DESCRIPTORS.length - 1);
+    private static final String DESCRIPTION = "Description"; //$NON-NLS-1$
+    private static final String INSTANCE = "Instance"; //$NON-NLS-1$
+
     private final BtfEvent fEvent;
 
     /**
@@ -50,28 +65,24 @@ public class BtfEventPropertySource extends TmfEventPropertySource {
 
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        return new IPropertyDescriptor[] {
-                new ReadOnlyTextPropertyDescriptor(ID_EVENT_TIMESTAMP, "Timestamp"), //$NON-NLS-1$
-                new ReadOnlyTextPropertyDescriptor(ID_EVENT_SOURCE, "Source"), //$NON-NLS-1$
-                new ReadOnlyTextPropertyDescriptor(ID_EVENT_TYPE, "Type"), //$NON-NLS-1$
-                new ReadOnlyTextPropertyDescriptor(ID_EVENT_TARGET, "Target"), //$NON-NLS-1$
-                new ReadOnlyTextPropertyDescriptor(ID_EVENT_EVENT, "event") //$NON-NLS-1$
-        };
+        if (fEvent.getContent().getField(BtfColumnNames.NOTES.toString()) == null) {
+            return DESCRIPTORS_WITHOUT_NOTES;
+        }
+        return DESCRIPTORS;
     }
 
-    private class TargetPropertySource implements IPropertySource {
-        private static final String INSTANCE = "Instance"; //$NON-NLS-1$
-        private final String fTarget;
+    private class EntityPropertySource implements IPropertySource {
+        private final String fName;
         private final String fInstance;
 
-        public TargetPropertySource(String target, String instance) {
-            fTarget = target;
+        public EntityPropertySource(String name, String instance) {
+            fName = name;
             fInstance = instance;
         }
 
         @Override
         public Object getEditableValue() {
-            return fTarget;
+            return fName;
         }
 
         @Override
@@ -91,7 +102,7 @@ public class BtfEventPropertySource extends TmfEventPropertySource {
 
         @Override
         public boolean isPropertySet(Object id) {
-            return INSTANCE.equals(id);
+            return false;
         }
 
         @Override
@@ -105,7 +116,6 @@ public class BtfEventPropertySource extends TmfEventPropertySource {
     }
 
     private class TypePropertySource implements IPropertySource {
-        private static final String DESCRIPTION = "Description"; //$NON-NLS-1$
         private final String fType;
         private final String fDescr;
 
@@ -136,7 +146,7 @@ public class BtfEventPropertySource extends TmfEventPropertySource {
 
         @Override
         public boolean isPropertySet(Object id) {
-            return DESCRIPTION.equals(id);
+            return false;
         }
 
         @Override
@@ -149,47 +159,29 @@ public class BtfEventPropertySource extends TmfEventPropertySource {
     }
 
     private class EventPropertySource implements IPropertySource {
-        private static final String DESCRIPTION = "Description"; //$NON-NLS-1$
-        private static final String NOTE = "Note"; //$NON-NLS-1$
-        private final String fEventName;
-        private final String fNote;
-        private final String fEventDescription;
+        private final ITmfEventField fEventField;
 
-        public EventPropertySource(String event, String note) {
-            fEventName = event;
-            fNote = note;
-
-            ITmfEventField content = fEvent.getContent();
-            String first = content.getFieldNames().iterator().next();
-            content = content.getField(first);
-            first = content.getFieldNames().iterator().next();
-            fEventDescription = content.getField(first).getValue().toString();
+        public EventPropertySource(ITmfEventField eventField) {
+            fEventField = eventField;
         }
 
         @Override
         public Object getEditableValue() {
-            return fEventName;
+            return fEventField.getValue();
         }
 
         @Override
         public IPropertyDescriptor[] getPropertyDescriptors() {
-            if (fNote == null) {
-                return new IPropertyDescriptor[] {
-                new ReadOnlyTextPropertyDescriptor(DESCRIPTION, DESCRIPTION)
-                };
-            }
             return new IPropertyDescriptor[] {
-                    new ReadOnlyTextPropertyDescriptor(DESCRIPTION, DESCRIPTION),
-                    new ReadOnlyTextPropertyDescriptor(NOTE, NOTE)
+                    new ReadOnlyTextPropertyDescriptor(DESCRIPTION, DESCRIPTION)
             };
         }
 
         @Override
         public Object getPropertyValue(Object id) {
-            if (NOTE.equals(id)) {
-                return fNote;
-            } else if (DESCRIPTION.equals(id)) {
-                return fEventDescription;
+            if (DESCRIPTION.equals(id)) {
+                ITmfEventField description = fEventField.getField(BTFPayload.DESCRIPTION);
+                return description == null ? null : description.getValue();
             }
             return null;
         }
@@ -214,17 +206,23 @@ public class BtfEventPropertySource extends TmfEventPropertySource {
         if (id instanceof String) {
             String id2 = (String) id;
             final ITmfEventField content = fEvent.getContent();
-            List<String> fieldNames = new ArrayList<>(content.getFieldNames());
             switch (id2) {
-            case ID_EVENT_TARGET:
-                return new TargetPropertySource(fEvent.getReference(), content.getField(fieldNames.get(2)).toString());
             case ID_EVENT_SOURCE:
-                return new TargetPropertySource(fEvent.getSource(), content.getField(fieldNames.get(1)).toString());
+                String source = fEvent.getSource();
+                ITmfEventField sourceInstance = content.getField(BtfColumnNames.SOURCE_INSTANCE.toString());
+                return new EntityPropertySource(source, sourceInstance.getValue().toString());
             case ID_EVENT_TYPE:
                 return new TypePropertySource(fEvent.getType().getName(), fEvent.getEventDescription());
+            case ID_EVENT_TARGET:
+                String target = fEvent.getTarget();
+                ITmfEventField targetInstance = content.getField(BtfColumnNames.TARGET_INSTANCE.toString());
+                return new EntityPropertySource(target, targetInstance.getValue().toString());
             case ID_EVENT_EVENT:
-                ITmfEventField noteField = (fieldNames.size() > 3) ? content.getField(fieldNames.get(3)) : null;
-                return new EventPropertySource(content.getField(fieldNames.get(0)).getValue().toString(), (noteField == null) ? null : noteField.getValue().toString());
+                ITmfEventField event = content.getField(BtfColumnNames.EVENT.toString());
+                return event == null ? null : new EventPropertySource(event);
+            case ID_EVENT_NOTES:
+                ITmfEventField notes = content.getField(BtfColumnNames.NOTES.toString());
+                return notes == null ? null : notes.getValue();
             default:
                 break;
             }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,6 +9,7 @@
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
  *   Alexandre Montplaisir - Update to new Event Table API
+ *   Patrick Tasse - Update for renamed target field
  *******************************************************************************/
 
 package org.eclipse.tracecompass.btf.core.trace;
@@ -70,7 +71,7 @@ public final class BtfEventAspects {
 
     /**
      * The "target" aspect, taking its value from
-     * {@link ITmfEvent#getReference()}.
+     * {@link ITmfEvent#getTarget()}.
      */
     private static class BtfTargetAspect implements ITmfEventAspect {
 
@@ -89,7 +90,7 @@ public final class BtfEventAspects {
             if (!(event instanceof BtfEvent)) {
                 return EMPTY_STRING;
             }
-            String ret = ((BtfEvent) event).getReference();
+            String ret = ((BtfEvent) event).getTarget();
             return (ret == null ? EMPTY_STRING : ret);
         }
     }

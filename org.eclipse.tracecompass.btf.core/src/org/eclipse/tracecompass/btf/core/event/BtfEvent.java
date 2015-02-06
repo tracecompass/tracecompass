@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,10 +8,12 @@
  *
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
+ *   Patrick Tasse - Rename reference to target
  *******************************************************************************/
 
 package org.eclipse.tracecompass.btf.core.event;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
@@ -19,8 +21,8 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
- * A Btf event, basically a wrapper for the TmfEvent with the additional field
- * of "description"
+ * A Btf event, basically a wrapper for the TmfEvent with the additional fields
+ * source, target and description.
  *
  * @author Matthew Khouzam
  */
@@ -28,7 +30,7 @@ public class BtfEvent extends TmfEvent {
 
     private final String fDescription;
     private final String fSource;
-    private final String fReference;
+    private final String fTarget;
 
     /**
      * Standard constructor.
@@ -47,7 +49,7 @@ public class BtfEvent extends TmfEvent {
      *            a description of the type
      * @param content
      *            the event content (payload)
-     * @param reference
+     * @param target
      *            the event reference
      */
     public BtfEvent(final ITmfTrace trace,
@@ -57,11 +59,11 @@ public class BtfEvent extends TmfEvent {
             final ITmfEventType type,
             final String description,
             final ITmfEventField content,
-            final String reference) {
+            final String target) {
         super(trace, rank, timestamp, type, content);
         fDescription = description;
         fSource = source;
-        fReference = reference;
+        fTarget = target;
     }
 
     /**
@@ -71,6 +73,12 @@ public class BtfEvent extends TmfEvent {
      */
     public String getEventDescription() {
         return fDescription;
+    }
+
+    @Override
+    public Object getAdapter(Class adapter) {
+        // Force loading the adapters otherwise some plugins might not load
+        return Platform.getAdapterManager().loadAdapter(this, adapter.getName());
     }
 
     /**
@@ -83,11 +91,11 @@ public class BtfEvent extends TmfEvent {
     }
 
     /**
-     * Returns the reference of this event.
+     * Returns the target of this event.
      *
-     * @return This event's reference
+     * @return This event's target
      */
-    public String getReference() {
-        return fReference;
+    public String getTarget() {
+        return fTarget;
     }
 }

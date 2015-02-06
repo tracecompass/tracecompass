@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
+ *   Patrick Tasse - Update empty descriptions
  *******************************************************************************/
 
 package org.eclipse.tracecompass.btf.core.event;
@@ -27,10 +28,13 @@ import com.google.common.collect.ImmutableMap.Builder;
  */
 public class BTFPayload {
 
+    /** Description subfield name */
+    public static final String DESCRIPTION = "description"; //$NON-NLS-1$
+
     private static final Map<String, String> EVENT_DESCRIPTIONS;
-    private static final String EMPTY = "TBA"; //$NON-NLS-1$
+    private static final String EMPTY = ""; //$NON-NLS-1$
     private static final Map<String, TmfEventField[]> FIELDS;
-    private static final TmfEventField[] TBA_FIELD = new TmfEventField[] { new TmfEventField(EMPTY, EMPTY, new TmfEventField[] { new TmfEventField(EMPTY, EMPTY, null) }) };
+    private static final TmfEventField[] EMPTY_DESCRIPTION = new TmfEventField[] { new TmfEventField(DESCRIPTION, EMPTY, null) };
 
     static {
         ImmutableMap.Builder<String, String> builder = new Builder<>();
@@ -84,7 +88,7 @@ public class BTFPayload {
         EVENT_DESCRIPTIONS = builder.build();
         ImmutableMap.Builder<String, TmfEventField[]> fieldBuilder = new Builder<>();
         for (String key : EVENT_DESCRIPTIONS.keySet()) {
-            fieldBuilder.put(key, new TmfEventField[] { new TmfEventField("description", EVENT_DESCRIPTIONS.get(key), null) }); //$NON-NLS-1$
+            fieldBuilder.put(key, new TmfEventField[] { new TmfEventField(DESCRIPTION, EVENT_DESCRIPTIONS.get(key), null) });
         }
         FIELDS = fieldBuilder.build();
     }
@@ -97,9 +101,8 @@ public class BTFPayload {
      * @return the description
      */
     public static TmfEventField[] getFieldDescription(String key) {
-        String shortKey = key.split(",", 2)[0]; //$NON-NLS-1$
-        TmfEventField[] retVal = FIELDS.get(shortKey);
-        return (retVal == null) ? TBA_FIELD : retVal;
+        TmfEventField[] retVal = FIELDS.get(key);
+        return (retVal == null) ? EMPTY_DESCRIPTION : retVal;
     }
 
 }
