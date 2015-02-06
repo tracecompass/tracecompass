@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2015 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,14 +8,18 @@
  *
  * Contributors:
  *   Geneviève Bastien - Initial API and implementation
+ *   Bernd Hufmann - Ensure backwards compatibility to Linux Tools
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.analysis.xml.ui.module;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +34,7 @@ import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.Messages;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.ui.module.TmfAnalysisModuleHelperXml.XmlAnalysisModuleType;
@@ -56,6 +61,15 @@ public class XmlAnalysisModuleSource implements IAnalysisModuleSource {
     private static final String XML_FILE_ELEMENT = "xmlfile"; //$NON-NLS-1$
 
     private static final String XML_FILE_ATTRIB = "file"; //$NON-NLS-1$
+
+    /*
+     * Legacy (Linux Tools) XML directory.
+     * TODO Remove once we feel the transition phase is over.
+     */
+    private static final IPath XML_DIRECTORY_LEGACY =
+            Activator.getDefault().getStateLocation().removeLastSegments(1)
+            .append("org.eclipse.linuxtools.tmf.analysis.xml.core") //$NON-NLS-1$
+            .append("xml_files"); //$NON-NLS-1$
 
     private static List<IAnalysisModuleHelper> fModules = null;
 
@@ -144,6 +158,28 @@ public class XmlAnalysisModuleSource implements IAnalysisModuleSource {
         if (!(fFolder.isDirectory() && fFolder.exists())) {
             return;
         }
+
+        /*
+         * Transfer files from Linux Tools directory.
+         */
+        File fOldFolder = XML_DIRECTORY_LEGACY.toFile();
+        if ((fOldFolder.isDirectory() && fOldFolder.exists())) {
+            for (File fromFile : fOldFolder.listFiles()) {
+                File toFile = pathToFiles.append(fromFile.getName()).toFile();
+                if (!toFile.exists() && !fromFile.isDirectory()) {
+                    try (FileInputStream fis = new FileInputStream(fromFile);
+                            FileOutputStream fos = new FileOutputStream(toFile);
+                            FileChannel source = fis.getChannel();
+                            FileChannel destination = fos.getChannel();) {
+                        destination.transferFrom(source, 0, source.size());
+                    } catch (IOException e) {
+                        String error = Messages.XmlUtils_ErrorCopyingFile;
+                        Activator.logError(error, e);
+                    }
+                }
+            }
+        }
+
         for (File xmlFile : fFolder.listFiles()) {
             processFile(xmlFile);
         }

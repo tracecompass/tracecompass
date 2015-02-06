@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -13,10 +13,12 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.colors;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
@@ -38,6 +40,15 @@ public class ColorSettingsManager {
     private static final String COLOR_SETTINGS_PATH_NAME =
         Activator.getDefault().getStateLocation().addTrailingSeparator().append(COLOR_SETTINGS_FILE_NAME).toString();
 
+    /*
+     * Legacy path to the XML definitions file (in Linux Tools)
+     *  TODO Remove once we feel the transition phase is over.
+     */
+    private static final IPath COLOR_SETTINGS_PATH_NAME_LEGACY =
+            Activator.getDefault().getStateLocation().removeLastSegments(1)
+                    .append("org.eclipse.linuxtools.tmf.ui") //$NON-NLS-1$
+                    .append(COLOR_SETTINGS_FILE_NAME);
+
     // The default color setting
     private static final ColorSetting DEFAULT_COLOR_SETTING = new ColorSetting(
             Display.getDefault().getSystemColor(SWT.COLOR_LIST_FOREGROUND).getRGB(),
@@ -51,7 +62,25 @@ public class ColorSettingsManager {
     public static final int PRIORITY_NONE = Integer.MAX_VALUE;
 
     // The stored color settings
-    private static ColorSetting[] fColorSettings = ColorSettingsXML.load(COLOR_SETTINGS_PATH_NAME);
+    private static ColorSetting[] fColorSettings;
+
+    static {
+        File defaultFile = new File(COLOR_SETTINGS_PATH_NAME);
+        /*
+         * If there is no file at the expected location, check the legacy
+         * location instead.
+         */
+        if (!defaultFile.exists()) {
+            File legacyFileCore = COLOR_SETTINGS_PATH_NAME_LEGACY.toFile();
+            if (legacyFileCore.exists()) {
+                ColorSetting[] colorSettings = ColorSettingsXML.load(COLOR_SETTINGS_PATH_NAME_LEGACY.toString());
+                if (colorSettings != null) {
+                    ColorSettingsXML.save(COLOR_SETTINGS_PATH_NAME, colorSettings);
+                }
+            }
+        }
+        fColorSettings = ColorSettingsXML.load(COLOR_SETTINGS_PATH_NAME);
+    }
 
     // The listener list
     private static List<IColorSettingsListener> fListeners = new ArrayList<>();
@@ -72,7 +101,9 @@ public class ColorSettingsManager {
      */
     public static void setColorSettings(ColorSetting[] colorSettings) {
         fColorSettings = (colorSettings != null) ? Arrays.copyOf(colorSettings, colorSettings.length) : null;
-        ColorSettingsXML.save(COLOR_SETTINGS_PATH_NAME, fColorSettings);
+        if (fColorSettings != null) {
+            ColorSettingsXML.save(COLOR_SETTINGS_PATH_NAME, fColorSettings);
+        }
         fireColorSettingsChanged();
     }
 
