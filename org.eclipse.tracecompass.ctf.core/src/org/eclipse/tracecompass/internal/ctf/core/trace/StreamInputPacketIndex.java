@@ -16,12 +16,14 @@ package org.eclipse.tracecompass.internal.ctf.core.trace;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.TreeSet;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
@@ -234,9 +236,15 @@ public class StreamInputPacketIndex {
     }
 
     /**
-     * Ordering comparator for entering entries into a data structure sorted by timestamp.
+     * Ordering comparator for entering entries into a data structure sorted by
+     * timestamp.
      */
-    private static class MonotonicComparator implements Comparator<StreamInputPacketIndexEntry> {
+    private static class MonotonicComparator implements Comparator<StreamInputPacketIndexEntry>, Serializable {
+        /**
+         * For {@link Serializable}, that way if we migrate to a {@link TreeSet}
+         * the comparator is serializable too.
+         */
+        private static final long serialVersionUID = -5693064068367242076L;
 
         @Override
         public int compare(StreamInputPacketIndexEntry left, StreamInputPacketIndexEntry right) {
