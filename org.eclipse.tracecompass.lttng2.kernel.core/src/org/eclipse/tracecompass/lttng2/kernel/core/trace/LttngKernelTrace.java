@@ -70,7 +70,7 @@ public class LttngKernelTrace extends CtfTmfTrace implements IKernelTrace {
     static {
         ImmutableSet.Builder<ITmfEventAspect> builder = ImmutableSet.builder();
         builder.addAll(CtfTmfTrace.CTF_ASPECTS);
-        builder.add(new KernelTidAspect());
+        builder.add(KernelTidAspect.INSTANCE);
         LTTNG_KERNEL_ASPECTS = NonNullUtils.checkNotNull(builder.build());
     }
 

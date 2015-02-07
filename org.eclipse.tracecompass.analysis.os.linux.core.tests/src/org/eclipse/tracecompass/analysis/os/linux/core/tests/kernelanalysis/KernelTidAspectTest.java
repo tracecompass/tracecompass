@@ -67,7 +67,7 @@ public class KernelTidAspectTest {
         public Iterable<ITmfEventAspect> getEventAspects() {
             ImmutableSet.Builder<ITmfEventAspect> builder = ImmutableSet.builder();
             builder.addAll(super.getEventAspects());
-            builder.add(new KernelTidAspect());
+            builder.add(KernelTidAspect.INSTANCE);
             return NonNullUtils.checkNotNull(builder.build());
         }
 

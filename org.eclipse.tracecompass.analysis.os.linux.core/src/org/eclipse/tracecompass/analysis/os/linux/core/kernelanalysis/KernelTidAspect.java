@@ -24,7 +24,13 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
  *
  * @author Geneviève Bastien
  */
-public class KernelTidAspect extends LinuxTidAspect {
+public final class KernelTidAspect extends LinuxTidAspect {
+
+    /** The singleton instance */
+    public static final KernelTidAspect INSTANCE = new KernelTidAspect();
+
+    private KernelTidAspect() {
+    }
 
     @Override
     public @Nullable Integer resolve(ITmfEvent event) {
