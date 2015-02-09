@@ -39,6 +39,7 @@ public class HistogramDataModelTest {
     private final static HistogramBucket _0 = new HistogramBucket(new int[] {0});
     private final static HistogramBucket _1 = new HistogramBucket(new int[] {1});
     private final static HistogramBucket _2 = new HistogramBucket(new int[] {2});
+    private final static HistogramBucket _3 = new HistogramBucket(new int[] {3});
     private final static HistogramBucket _4 = new HistogramBucket(new int[] {4});
     private final static HistogramBucket _9 = new HistogramBucket(new int[] {9});
     private final static HistogramBucket _20 = new HistogramBucket(new int[] {20});
@@ -681,6 +682,46 @@ public class HistogramDataModelTest {
 
         testModelConsistency(model, nbBuckets, nbCombinedEvents, 4, 0, 0, nbEvents - 1, 4 * nbBuckets);
         assertEquals(9, result.fMaxCombinedValue);
+    }
+
+    /**
+     * Test method for {@link HistogramDataModel#scaleTo(int,int,int)}.
+     */
+    @Test
+    public void testLostEventsScaleTo_4() {
+        final int nbBuckets = 10;
+        final int maxHeight = 10;
+        final int nbEvents = 3 * nbBuckets;
+        final int nbLostEvents_0 = 4;
+        final int nbLostEvents_1 = 9;
+        final int nbCombinedEvents = nbEvents + 2;
+        final HistogramBucket[] expectedResult = new HistogramBucket[] { _3, _4, _4, _4, _4, _4, _4, _3, _0, _0 };
+        final int[] expectedLostEventsResult = new int[] { 4, 2, 0, 3, 3, 3, 0, 0, 0, 0 };
+
+        HistogramDataModel model = new HistogramDataModel(nbBuckets);
+
+        final TmfTimeRange timeRange_0 = new TmfTimeRange(
+                new TmfTimestamp(5L, ITmfTimestamp.NANOSECOND_SCALE),
+                new TmfTimestamp(10L, ITmfTimestamp.NANOSECOND_SCALE));
+        model.countLostEvent(timeRange_0, nbLostEvents_0, false);
+
+        int firstNonLostEventTime = 6;
+        countEventsInModel(nbEvents, model, 0, firstNonLostEventTime);
+
+        final TmfTimeRange timeRange_1 = new TmfTimeRange(
+                new TmfTimestamp(18L, ITmfTimestamp.NANOSECOND_SCALE),
+                new TmfTimestamp(27L, ITmfTimestamp.NANOSECOND_SCALE));
+        model.countLostEvent(timeRange_1, nbLostEvents_1, false);
+
+        HistogramScaledData result = model.scaleTo(nbBuckets, maxHeight, 1);
+
+        testModelConsistency(model, nbBuckets, nbCombinedEvents, 4, 5, 5, nbEvents + firstNonLostEventTime - 1, 4 * nbBuckets + firstNonLostEventTime - 1);
+
+        assertArrayEquals(expectedResult, result.fData);
+
+        assertArrayEquals(expectedLostEventsResult, result.fLostEventsData);
+
+        assertEquals(7, result.fMaxCombinedValue);
     }
 
     /*
