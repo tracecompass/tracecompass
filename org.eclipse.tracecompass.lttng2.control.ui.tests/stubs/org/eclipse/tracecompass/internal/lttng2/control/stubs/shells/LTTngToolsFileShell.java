@@ -69,7 +69,7 @@ public class LTTngToolsFileShell extends TestCommandShell {
      *
      * &lt;COMMAND_INPUT&gt;
      * Command
-     * &lt;/COMAND_INPUT&gt;
+     * &lt;/COMMAND_INPUT&gt;
      *
      * &lt;COMMAND_RESULT&gt;
      * CommandResult
@@ -87,8 +87,8 @@ public class LTTngToolsFileShell extends TestCommandShell {
      * Where: ScenarioName - is the scenario name
      *        Command - the command line string
      *        CommandResult - the result integer of the command (0 for success, 1 for failure)
-     *        ComandOutput - the command output string (multi-line possible)
-     *        ComandErrorOutput - the command error output string (multi-line possible)
+     *        CommandOutput - the command output string (multi-line possible)
+     *        CommandErrorOutput - the command error output string (multi-line possible)
      *
      * Note: 1) There can be many scenarios per file
      *       2) There can be many (Command-CommandResult-CommandOutput) triples per scenario
@@ -169,7 +169,7 @@ public class LTTngToolsFileShell extends TestCommandShell {
                             input = strLine;
 
                             // Handle instances of 'lttng list
-                            // <session"-comamand
+                            // <session"-command
                             Matcher matcher = LTTNG_LIST_SESSION_PATTERN.matcher(strLine);
                             if (matcher.matches() && !input.matches(LTTNG_LIST_PROVIDER_PATTERN)) {
                                 String sessionName = matcher.group(1).trim();
