@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <description>
+      Nightly builds of the Trace Compass RCP update site
+   </description>
+   <feature url="features/org.eclipse.tracecompass.rcp_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.rcp" version="0.0.0"/>
+   <feature url="features/org.eclipse.tracecompass.rcp.branding.feature_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.rcp.branding.feature" version="0.0.0"/>
+   <feature url="features/org.eclipse.tracecompass.rcp.source_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.rcp.source" version="0.0.0"/>
+   <feature url="features/org.eclipse.tracecompass.rcp.branding.feature.source_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.rcp.branding.feature.source" version="0.0.0"/>
+   <category-def name="Trace Compass" label="Trace Compass Main Features"/>
+</site>
