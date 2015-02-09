@@ -1485,9 +1485,9 @@ public class LTTngControlService implements ILttngControlService {
     protected List<String> createCommand(String... strings) {
         List<String> command = new ArrayList<>();
         command.add(LTTngControlServiceConstants.CONTROL_COMMAND);
-        String groupOption = getTracingGroupOption();
+        List<String> groupOption = getTracingGroupOption();
         if (!groupOption.isEmpty()) {
-            command.add(groupOption);
+            command.addAll(groupOption);
         }
         String verboseOption = getVerboseOption();
         if (!verboseOption.isEmpty()) {
@@ -1502,11 +1502,13 @@ public class LTTngControlService implements ILttngControlService {
     /**
      * @return the tracing group option if configured in the preferences
      */
-    protected String getTracingGroupOption() {
+    protected List<String> getTracingGroupOption() {
+        List<String> groupOption = new ArrayList<>();
         if (!ControlPreferences.getInstance().isDefaultTracingGroup() && !ControlPreferences.getInstance().getTracingGroup().equals("")) { //$NON-NLS-1$
-            return LTTngControlServiceConstants.OPTION_TRACING_GROUP + ControlPreferences.getInstance().getTracingGroup();
+            groupOption.add(LTTngControlServiceConstants.OPTION_TRACING_GROUP);
+            groupOption.add(ControlPreferences.getInstance().getTracingGroup());
         }
-        return ""; //$NON-NLS-1$
+        return groupOption;
     }
 
     /**

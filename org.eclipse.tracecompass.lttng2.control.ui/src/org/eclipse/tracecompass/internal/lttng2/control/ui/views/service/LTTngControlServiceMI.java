@@ -729,12 +729,12 @@ public class LTTngControlServiceMI extends LTTngControlService {
     protected List<String> createCommand(String... strings) {
         List<String> command = new ArrayList<>();
         command.add(LTTngControlServiceConstants.CONTROL_COMMAND);
+        List<String> groupOption = getTracingGroupOption();
+        if (!groupOption.isEmpty()) {
+            command.addAll(groupOption);
+        }
         command.add(LTTngControlServiceConstants.CONTROL_COMMAND_MI_OPTION);
         command.add(LTTngControlServiceConstants.CONTROL_COMMAND_MI_XML);
-        String groupOption = getTracingGroupOption();
-        if (!groupOption.isEmpty()) {
-            command.add(groupOption);
-        }
         for (String string : strings) {
             command.add(string);
         }
