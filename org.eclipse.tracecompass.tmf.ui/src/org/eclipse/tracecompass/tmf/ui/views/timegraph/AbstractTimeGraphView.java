@@ -150,6 +150,9 @@ public abstract class AbstractTimeGraphView extends TmfView {
     /** The tree label provider, or null if combo is not used */
     private TreeLabelProvider fLabelProvider = null;
 
+    /** The time graph content provider */
+    private @NonNull ITimeGraphContentProvider fTimeGraphContentProvider = new TimeGraphContentProvider();
+
     /** The relative weight of the sash, ignored if combo is not used */
     private int[] fWeight = { 1, 1 };
 
@@ -560,6 +563,18 @@ public abstract class AbstractTimeGraphView extends TmfView {
     }
 
     /**
+     * Sets the time graph content provider. This should be called from the
+     * constructor.
+     *
+     * @param tgcp
+     *            The time graph content provider
+     * @since 1.0
+     */
+    protected void setTimeGraphContentProvider(final @NonNull ITimeGraphContentProvider tgcp) {
+        fTimeGraphContentProvider = tgcp;
+    }
+
+    /**
      * Sets the relative weight of each part of the time graph combo.
      * This should be called from the constructor.
      *
@@ -795,22 +810,21 @@ public abstract class AbstractTimeGraphView extends TmfView {
 
     @Override
     public void createPartControl(Composite parent) {
-        ITimeGraphContentProvider contentProvider = new TimeGraphContentProvider();
         if (fColumns == null || fLabelProvider == null) {
             fTimeGraphWrapper = new TimeGraphViewerWrapper(parent, SWT.NONE);
             TimeGraphViewer viewer = fTimeGraphWrapper.getTimeGraphViewer();
-            viewer.setTimeGraphContentProvider(contentProvider);
+            viewer.setTimeGraphContentProvider(fTimeGraphContentProvider);
         } else {
             TimeGraphComboWrapper wrapper = new TimeGraphComboWrapper(parent, SWT.NONE);
             fTimeGraphWrapper = wrapper;
             TimeGraphCombo combo = wrapper.getTimeGraphCombo();
-            combo.setTreeContentProvider(contentProvider);
+            combo.setTreeContentProvider(fTimeGraphContentProvider);
             combo.setTreeLabelProvider(fLabelProvider);
             combo.setTreeColumns(fColumns);
-            combo.setFilterContentProvider(contentProvider);
+            combo.setFilterContentProvider(fTimeGraphContentProvider);
             combo.setFilterLabelProvider(fFilterLabelProvider);
             combo.setFilterColumns(fFilterColumns);
-            combo.setTimeGraphContentProvider(contentProvider);
+            combo.setTimeGraphContentProvider(fTimeGraphContentProvider);
         }
 
         fTimeGraphWrapper.setTimeGraphProvider(fPresentation);
