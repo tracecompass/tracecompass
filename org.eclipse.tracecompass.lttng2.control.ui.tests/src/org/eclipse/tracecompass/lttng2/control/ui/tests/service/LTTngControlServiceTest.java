@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -78,6 +78,7 @@ public class LTTngControlServiceTest {
     private static final String SCEN_LTTNG_COMPILED_VERSION = "LttngVersionCompiled";
     private static final String SCEN_NO_SESSION_AVAILABLE = "NoSessionAvailable";
     private static final String SCEN_GET_SESSION_NAMES1 = "GetSessionNames1";
+    private static final String SCEN_GET_SESSION_WITH_GROUP = "GetSessionWithTracingGroup";
     private static final String SCEN_GET_SESSION_NAME_NOT_EXIST = "GetSessionNameNotExist";
     private static final String SCEN_GET_SESSION_NAME_NOT_EXIST_VERBOSE = "GetSessionNameNotExistVerbose";
     protected static final String SCEN_GET_SESSION_GARBAGE_OUT = "GetSessionGarbageOut";
@@ -284,6 +285,31 @@ public class LTTngControlServiceTest {
             fail(e.toString());
         }
     }
+
+    @Test
+    public void testGetSessionNamesWithTracingGroup() {
+        try {
+            fShell.setScenario(SCEN_GET_SESSION_WITH_GROUP);
+            ControlPreferences.getInstance().getPreferenceStore().setValue(
+                    ControlPreferences.TRACE_CONTROL_TRACING_GROUP_PREF, "group");
+
+            String[] result = fService.getSessionNames(new NullProgressMonitor());
+
+            assertNotNull(result);
+            assertEquals(2, result.length);
+            assertEquals("mysession1", result[0]);
+            assertEquals("mysession", result[1]);
+
+            ControlCommandLogger.init(ControlPreferences.getInstance().getLogfilePath(), false);
+            ControlPreferences.getInstance().getPreferenceStore().setValue(
+                    ControlPreferences.TRACE_CONTROL_TRACING_GROUP_PREF, ControlPreferences.TRACE_CONTROL_DEFAULT_TRACING_GROUP);
+
+
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
+
 
     @Test
     public void testGetSessionNotExist() {
