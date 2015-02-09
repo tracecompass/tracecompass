@@ -116,7 +116,7 @@ public class BtfEventType extends TmfEventType {
         if (fHasNotes) {
             data = event.split(",", 2); //$NON-NLS-1$
             TmfEventField eventField = new TmfEventField(BtfColumnNames.EVENT.toString(), data[0], BTFPayload.getFieldDescription(data[0]));
-            TmfEventField notesField = new TmfEventField(BtfColumnNames.NOTES.toString(), data[1], null);
+            TmfEventField notesField = new TmfEventField(BtfColumnNames.NOTES.toString(), data.length == 2 ? data[1] : null, null);
             retField = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, null, new TmfEventField[] { eventField, sourceInstanceField, targetInstanceField, notesField });
         } else {
             data = new String[] { event };
