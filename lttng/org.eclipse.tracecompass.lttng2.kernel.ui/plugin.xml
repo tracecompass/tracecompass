@@ -33,4 +33,13 @@
             tracetype="org.eclipse.linuxtools.lttng2.kernel.tracetype">
       </type>
    </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.analysis">
+      <parameterProvider
+            class="org.eclipse.tracecompass.internal.lttng2.kernel.ui.criticalpath.CriticalPathParameterProvider">
+         <analysisId
+               id="org.eclipse.tracecompass.analysis.graph.core.criticalpath">
+         </analysisId>
+      </parameterProvider>
+   </extension>
 </plugin>
