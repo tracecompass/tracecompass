@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -206,7 +206,6 @@ public class TmfTimestampFormatTest {
      */
     @Test
     public void testParseDateTime() throws ParseException {
-//        long ref = tsf.parseValue("2014-11-22 12:34:56.123456789"); // Saturday
         long time;
 
         time = new TmfTimestampFormat("yyyy", GMT, CA).parseValue("2014");
@@ -316,6 +315,15 @@ public class TmfTimestampFormatTest {
 
         time = new TmfTimestampFormat("yyyy\"MM\"dd\"HH\"mm\"ss\"SSS\"SSS\"SSS", GMT, CA).parseValue("2014\"11\"22\"12\"34\"56\"123\"456\"789");
         assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy MM dd HH mm ss SSS SSS SSS", GMT, CA).parseValue("2014  11  22  12  34  56  123 456 789");
+        assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy MM dd HH mm ss SSS SSS SSS", GMT, CA).parseValue("2014  1  2  3  4  5 123 456 789");
+        assertEquals("2014-01-02 03:04:05.123456789", tsf.format(time));
+
+        time = new TmfTimestampFormat("yyyy MM dd HH mm ss SSS SSS SSS", GMT, CA).parseValue("2014 \t 1 \t 2 \t 3 \t 4 \t 5 \t 123 456 789");
+        assertEquals("2014-01-02 03:04:05.123456789", tsf.format(time));
     }
 
     /**
