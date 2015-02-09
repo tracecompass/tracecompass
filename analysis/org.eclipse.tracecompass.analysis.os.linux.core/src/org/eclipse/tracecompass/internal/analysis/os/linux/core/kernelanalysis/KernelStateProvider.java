@@ -18,9 +18,9 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.Attributes;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.LinuxValues;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.StateValues;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
-import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelanalysis.LinuxValues;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;

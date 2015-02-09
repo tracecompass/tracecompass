@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelanalysis;
+package org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis;
 
 /**
  * Definitions of values used in the Linux kernel code.
@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelanalysis;
  * be added here first.
  *
  * @author Alexandre Montplaisir
+ * @since 2.0
  */
 public interface LinuxValues {
 
