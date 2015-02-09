@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -614,13 +614,27 @@ public class TmfTimestampFormat extends SimpleDateFormat {
      * Returns the source string length if decimal separator is not found.
      */
     private int indexOfSourceDecimalSeparator(String source) {
-        String pattern = fPattern.substring(0, fPatternDecimalSeparatorIndex);
         String separator = fDecimalSeparator == '\'' ? "''" : String.valueOf(fDecimalSeparator); //$NON-NLS-1$
-        int sourcePos = source.indexOf(fDecimalSeparator);
-        int patternPos = pattern.indexOf(separator);
-        while (patternPos != -1 && sourcePos != -1) {
+        int patternPos = fPattern.indexOf(separator);
+        int sourcePos = -1;
+        while (patternPos != -1 && patternPos <= fPatternDecimalSeparatorIndex) {
             sourcePos = source.indexOf(fDecimalSeparator, sourcePos + 1);
-            patternPos = pattern.indexOf(separator, patternPos + separator.length());
+            if (sourcePos == -1) {
+                break;
+            }
+            // skip optional spaces and tabs before a pattern letter
+            char p = patternPos < fPattern.length() - 1 ? fPattern.charAt(patternPos + 1) : '\0';
+            if ((p >= 'a' && p <= 'z') || (p >= 'A' && p <= 'Z')) {
+                while (sourcePos < source.length() - 1) {
+                    char s = source.charAt(sourcePos + 1);
+                    if (s == ' ' || s == '\t') {
+                        sourcePos++;
+                    } else {
+                        break;
+                    }
+                }
+            }
+            patternPos = fPattern.indexOf(separator, patternPos + separator.length());
         }
         if (sourcePos == -1) {
             sourcePos = source.length();
