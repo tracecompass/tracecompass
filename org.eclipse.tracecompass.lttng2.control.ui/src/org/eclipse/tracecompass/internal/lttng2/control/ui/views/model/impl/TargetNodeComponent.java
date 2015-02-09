@@ -284,6 +284,16 @@ public class TargetNodeComponent extends TraceControlComponent implements IRemot
         return !getControlService().isVersionSupported("2.2.0"); //$NON-NLS-1$
     }
 
+    /**
+     * Checks if given version is supported by this ILTTngControlService implementation.
+     *
+     * @param version The version to check
+     * @return <code>true</code> if version is supported else <code>false</code>
+     */
+    public boolean isVersionSupported(String version) {
+        return getControlService().isVersionSupported(version);
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

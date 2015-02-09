@@ -131,7 +131,7 @@ public interface IChannelInfo extends ITraceInfo {
      * Sets the maximum size of trace files
      * @param maxSizeTraceFiles - maximum size
      */
-    void setMaxSizeTraceFiles(int maxSizeTraceFiles);
+    void setMaxSizeTraceFiles(long maxSizeTraceFiles);
     /**
      * Sets the maximum number of trace files
      * @param maxNumberTraceFiles - maximum number
@@ -140,7 +140,7 @@ public interface IChannelInfo extends ITraceInfo {
     /**
      * @return maximum size of trace files
      */
-    int getMaxSizeTraceFiles();
+    long getMaxSizeTraceFiles();
     /**
      * @return maximum number of trace files
      */

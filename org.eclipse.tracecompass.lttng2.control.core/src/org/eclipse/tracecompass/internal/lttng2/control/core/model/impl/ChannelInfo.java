@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -68,7 +68,7 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
     /**
      * The maximum size of trace files
      */
-    private int fMaxSizeTraceFiles;
+    private long fMaxSizeTraceFiles;
     /**
      * The maximum number of trace files
      */
@@ -322,7 +322,7 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
     }
 
     @Override
-    public void setMaxSizeTraceFiles(int maxSizeTraceFiles) {
+    public void setMaxSizeTraceFiles(long maxSizeTraceFiles) {
         fMaxSizeTraceFiles = maxSizeTraceFiles;
     }
 
@@ -332,7 +332,7 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
     }
 
     @Override
-    public int getMaxSizeTraceFiles() {
+    public long getMaxSizeTraceFiles() {
         return fMaxSizeTraceFiles;
     }
 

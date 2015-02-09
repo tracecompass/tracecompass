@@ -127,7 +127,7 @@ public class TraceControlPropertiesTest {
         assertEquals("myNode", source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_NAME_PROPERTY_ID));
         assertEquals("localhost",  source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_ADDRESS_PROPERTY_ID));
         assertEquals(TargetNodeState.CONNECTED.name(), source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_STATE_PROPERTY_ID));
-        assertEquals("2.1.0", source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_VERSION_PROPERTY_ID));
+        assertEquals("2.5.0", source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_VERSION_PROPERTY_ID));
         assertNull(source.getPropertyValue("test"));
 
         adapter = node.getAdapter(IChannelInfo.class);
@@ -265,6 +265,8 @@ public class TraceControlPropertiesTest {
         assertEquals(String.valueOf(200), channelSource.getPropertyValue(TraceChannelPropertySource.TRACE_CHANNEL_READ_TIMER_PROPERTY_ID));
         assertEquals(String.valueOf(262144), channelSource.getPropertyValue(TraceChannelPropertySource.TRACE_CHANNEL_SUBBUFFER_SIZE_PROPERTY_ID));
         assertEquals(String.valueOf(0), channelSource.getPropertyValue(TraceChannelPropertySource.TRACE_CHANNEL_SWITCH_TIMER_PROPERTY_ID));
+        assertEquals(Integer.valueOf(2), channelSource.getPropertyValue(TraceChannelPropertySource.TRACE_CHANNEL_TRACE_FILE_COUNT_PROPERTY_ID));
+        assertEquals(Long.valueOf(262144), channelSource.getPropertyValue(TraceChannelPropertySource.TRACE_CHANNEL_TRACE_FILE_SIZE_PROPERTY_ID));
 
         // ------------------------------------------------------------------------
         // Verify Event Properties (adapter)

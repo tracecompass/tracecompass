@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,6 +10,9 @@
  *     Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.property;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent;
@@ -61,6 +64,14 @@ public class TraceChannelPropertySource extends BasePropertySource {
      */
     public static final String TRACE_CHANNEL_OUTPUT_TYPE_PROPERTY_ID = "trace.channel.output.type"; //$NON-NLS-1$
     /**
+     * The trace channel 'trace file count' property ID.
+     */
+    public static final String TRACE_CHANNEL_TRACE_FILE_COUNT_PROPERTY_ID = "trace.channel.trace.file.count"; //$NON-NLS-1$
+    /**
+     * The trace channel 'trace file size' property ID.
+     */
+    public static final String TRACE_CHANNEL_TRACE_FILE_SIZE_PROPERTY_ID = "trace.channel.trace.file.size"; //$NON-NLS-1$
+    /**
      *  The trace channel 'name' property name.
      */
     public static final String TRACE_CHANNEL_NAME_PROPERTY_NAME = Messages.TraceControl_ChannelNamePropertyName;
@@ -92,8 +103,15 @@ public class TraceChannelPropertySource extends BasePropertySource {
      *  The trace channel 'output type' property name.
      */
     public static final String TRACE_CHANNEL_OUTPUT_TYPEPROPERTY_NAME = Messages.TraceControl_OutputTypePropertyName;
+    /**
+     * The trace channel 'trace file count' property name.
+     */
+    public static final String TRACE_CHANNEL_TRACE_FILE_COUNT_PROPERTY_NAME = Messages.TraceControl_TraceFileCountPropertyName;
+    /**
+     * The trace channel 'trace file size' property name.
+     */
+    public static final String TRACE_CHANNEL_TRACE_FILE_SIZE_PROPERTY_NAME = Messages.TraceControl_TraceFileSizePropertyName;
 
-    // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
     /**
@@ -118,15 +136,21 @@ public class TraceChannelPropertySource extends BasePropertySource {
 
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        return new IPropertyDescriptor[] {
-                new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_NAME_PROPERTY_ID, TRACE_CHANNEL_NAME_PROPERTY_NAME),
-                new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_STATE_PROPERTY_ID, TRACE_CHANNEL_STATE_PROPERTY_NAME),
-                new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_OVERWRITE_MODE_PROPERTY_ID, TRACE_CHANNEL_OVERWRITE_MODE_PROPERTY_NAME),
-                new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_SUBBUFFER_SIZE_PROPERTY_ID, TRACE_CHANNEL_SUBBUFFER_SIZE_PROPERTY_NAME),
-                new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_NO_SUBBUFFERS_PROPERTY_ID, TRACE_CHANNEL_NO_SUBBUFFERS_PROPERTY_NAME),
-                new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_SWITCH_TIMER_PROPERTY_ID, TRACE_CHANNEL_SWITCH_TIMER_PROPERTY_NAME),
-                new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_READ_TIMER_PROPERTY_ID, TRACE_CHANNEL_READ_TIMER_PROPERTY_NAME),
-                new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_OUTPUT_TYPE_PROPERTY_ID, TRACE_CHANNEL_OUTPUT_TYPEPROPERTY_NAME)};
+        List<IPropertyDescriptor> properties = new ArrayList<>();
+        properties.add(new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_NAME_PROPERTY_ID, TRACE_CHANNEL_NAME_PROPERTY_NAME));
+        properties.add(new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_STATE_PROPERTY_ID, TRACE_CHANNEL_STATE_PROPERTY_NAME));
+        properties.add(new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_OVERWRITE_MODE_PROPERTY_ID, TRACE_CHANNEL_OVERWRITE_MODE_PROPERTY_NAME));
+        properties.add(new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_SUBBUFFER_SIZE_PROPERTY_ID, TRACE_CHANNEL_SUBBUFFER_SIZE_PROPERTY_NAME));
+        properties.add(new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_NO_SUBBUFFERS_PROPERTY_ID, TRACE_CHANNEL_NO_SUBBUFFERS_PROPERTY_NAME));
+        properties.add(new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_SWITCH_TIMER_PROPERTY_ID, TRACE_CHANNEL_SWITCH_TIMER_PROPERTY_NAME));
+        properties.add(new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_READ_TIMER_PROPERTY_ID, TRACE_CHANNEL_READ_TIMER_PROPERTY_NAME));
+        properties.add(new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_OUTPUT_TYPE_PROPERTY_ID, TRACE_CHANNEL_OUTPUT_TYPEPROPERTY_NAME));
+
+        if (fChannel.getTargetNode().isVersionSupported("2.5.0")) { //$NON-NLS-1$
+            properties.add(new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_TRACE_FILE_COUNT_PROPERTY_ID, TRACE_CHANNEL_TRACE_FILE_COUNT_PROPERTY_NAME));
+            properties.add(new ReadOnlyTextPropertyDescriptor(TRACE_CHANNEL_TRACE_FILE_SIZE_PROPERTY_ID, TRACE_CHANNEL_TRACE_FILE_SIZE_PROPERTY_NAME));
+        }
+        return properties.toArray(new IPropertyDescriptor[0]);
     }
 
     @Override
@@ -154,6 +178,12 @@ public class TraceChannelPropertySource extends BasePropertySource {
         }
         if(TRACE_CHANNEL_OUTPUT_TYPE_PROPERTY_ID.equals(id)) {
             return fChannel.getOutputType().getInName();
+        }
+        if (TRACE_CHANNEL_TRACE_FILE_COUNT_PROPERTY_ID.equals(id)) {
+            return fChannel.getMaxNumberTraceFiles();
+        }
+        if (TRACE_CHANNEL_TRACE_FILE_SIZE_PROPERTY_ID.equals(id)) {
+            return fChannel.getMaxSizeTraceFiles();
         }
         return null;
     }

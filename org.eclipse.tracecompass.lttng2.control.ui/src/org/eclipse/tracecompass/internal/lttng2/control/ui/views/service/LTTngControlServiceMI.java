@@ -446,7 +446,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
                                 channel.setOutputType(attribute.getTextContent());
                                 break;
                             case MIStrings.TRACEFILE_SIZE:
-                                channel.setMaxSizeTraceFiles(Integer.parseInt(attribute.getTextContent()));
+                                channel.setMaxSizeTraceFiles(Long.parseLong(attribute.getTextContent()));
                                 break;
                             case MIStrings.TRACEFILE_COUNT:
                                 channel.setMaxNumberTraceFiles(Integer.parseInt(attribute.getTextContent()));

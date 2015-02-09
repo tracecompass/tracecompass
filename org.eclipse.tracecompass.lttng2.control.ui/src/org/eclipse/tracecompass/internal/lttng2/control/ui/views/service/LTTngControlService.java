@@ -1192,6 +1192,15 @@ public class LTTngControlService implements ILttngControlService {
                             channelInfo.setOutputType(getAttributeValue(subLine));
                         }
 
+                    } else if (LTTngControlServiceConstants.TRACE_FILE_COUNT_ATTRIBUTE.matcher(subLine).matches()) {
+                        if (channelInfo != null) {
+                            channelInfo.setMaxNumberTraceFiles(Integer.valueOf(getAttributeValue(subLine)));
+                        }
+
+                    } else if (LTTngControlServiceConstants.TRACE_FILE_SIZE_ATTRIBUTE.matcher(subLine).matches()) {
+                        if (channelInfo != null) {
+                            channelInfo.setMaxSizeTraceFiles(Long.valueOf(getAttributeValue(subLine)));
+                        }
                     } else if (LTTngControlServiceConstants.EVENT_SECTION_PATTERN.matcher(subLine).matches()) {
                         List<IEventInfo> events = new ArrayList<>();
                         index = parseEvents(output, index, events);
