@@ -21,7 +21,7 @@ The framework can easily be extended to support more trace types. To make a new
 trace type, one must define the following items:
 
 * The event type
-* The trace reader
+* The trace type
 * The trace context
 * The trace location
 * The ''org.eclipse.linuxtools.tmf.core.tracetype'' plug-in extension point
@@ -31,9 +31,10 @@ The '''event type''' must implement an ''ITmfEvent'' or extend a class that
 implements an ''ITmfEvent''. Typically it will extend ''TmfEvent''. The event
 type must contain all the data of an event.
 
-The '''trace reader''' must be of an ''ITmfTrace'' type. The ''TmfTrace'' class
+The '''trace type''' must be of an ''ITmfTrace'' type. The ''TmfTrace'' class
 will supply many background operations so that the reader only needs to
-implement certain functions.
+implement certain functions. This includes the ''event aspects'' for events of
+this trace type. See the section below.
 
 The '''trace context''' can be seen as the internals of an iterator. It is
 required by the trace reader to parse events as it iterates the trace and to
@@ -45,6 +46,57 @@ checkpoints, it is generally persistent. It is used to rebuild a context,
 therefore, it needs to contain enough information to unambiguously point to one
 and only one event. Finally the ''tracetype'' plug-in extension associates a
 given trace, non-programmatically to a trace type for use in the UI.
+
+== Event Aspects ==
+
+In Trace Compass, an ''event aspect'' represents any type of information that
+can be extracted from a trace event. The simple case is information that is
+present directly in the event. For example, the timestamp of an event, a field
+of an LTTng event, or the "payload" that is on the same line of a text trace
+entry. But it could also be the result of an indirect operation, for example a
+state system query at the timestamp of the given event (see the section
+[[#Generic State System]]).
+
+All aspects should implement the '''ITmfEventAspect''' interface. The important
+method in there is ''resolve(ITmfEvent)'', which tells this aspect what to
+output for a given event. The singleton pattern fits well for pre-defined aspect
+classes, in general.
+
+The aspects defined for a trace type determine the initial columns in the Event
+Table, as well as the elements on which the trace can be filtered, among other
+things.
+
+=== Base and custom aspects ===
+
+Some base aspects are defined in '''TmfTrace#BASE_ASPECTS'''. They use generic
+methods found in '''ITmfEvent''', so they should be applicable for any event
+type defined in the framework. If one does not override
+'''TmfTrace#getEventAspects''', then only the base aspects will be used with
+this trace.
+
+Overriding the method does not append to this list, it replaces it. So if you
+wish to define additional aspects for a new trace type, do not forget to include
+the BASE_ASPECTS you want to use, if any, within the list.
+
+The order of the elements in the returned ''Iterable'' may matter to other
+components. For instance, the initial ordering of the columns in the Events
+Table will match it.
+
+Defining additional aspects allows to expose more data from the trace events
+without having to update all the views using the aspects API.
+
+=== Creating event aspects programmatically ===
+
+Another advantage of event aspects is that they can be created programmatically,
+without having to modify the base trace or event classes. A new analysis
+applying to a pre-existing trace type may wish to define additional aspects to
+make its job easier.
+
+While the notion of event aspects should not be exposed to users directly, it is
+possible to create new aspects based on user input. For example, an "event
+field" dialog could ask the user to enter a field name, which would then create
+an aspect that would look for the value of a field with this name in every
+event. The user could then be able to display or filter on this aspect.
 
 == Optional Trace Type Attributes ==
 
