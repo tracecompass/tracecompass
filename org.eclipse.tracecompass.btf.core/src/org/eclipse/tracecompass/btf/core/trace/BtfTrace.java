@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
+ *   Patrick Tasse - Fix parsing of instance numbers
  *******************************************************************************/
 
 package org.eclipse.tracecompass.btf.core.trace;
@@ -60,13 +61,6 @@ import com.google.common.collect.ImmutableMap;
  */
 public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITmfTraceProperties, AutoCloseable {
 
-    private static final int TIMESTAMP_NUM = 0;
-    private static final int SOURCE_NUM = 1;
-    private static final int SOURCE_INSTANCE_NUM = 2;
-    private static final int TYPE_NUM = 3;
-    private static final int TARGET_INSTANCE_NUM = 5;
-    private static final int TARGET_NUM = 4;
-    private static final int EVENT_NUM = 6;
     private static final int MAX_FIELDS = 7;
 
     private static final long MICROSECONDS_IN_A_SECOND = 1000000L;
@@ -387,13 +381,27 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
             return null;
         }
         String[] tokens = line.split(",", MAX_FIELDS); //$NON-NLS-1$
-        long timestamp = Long.parseLong(tokens[TIMESTAMP_NUM]);
-        String source = tokens[SOURCE_NUM];
-        long sourceInstance = Long.parseLong(tokens[SOURCE_INSTANCE_NUM]);
-        BtfEventType type = BtfEventTypeFactory.parse(tokens[TYPE_NUM]);
-        String target = tokens[TARGET_NUM];
-        long targetInstance = Long.parseLong(tokens[TARGET_INSTANCE_NUM]);
-        String event = tokens[EVENT_NUM];
+        if (tokens.length < MAX_FIELDS) {
+            return null;
+        }
+        int i = 0;
+        long timestamp = Long.parseLong(tokens[i++]);
+        String source = tokens[i++];
+        long sourceInstance = -1;
+        try {
+            sourceInstance = Long.parseLong(tokens[i++]);
+        } catch (NumberFormatException e) {
+            // this field can be empty
+        }
+        BtfEventType type = BtfEventTypeFactory.parse(tokens[i++]);
+        String target = tokens[i++];
+        long targetInstance = -1;
+        try {
+            targetInstance = Long.parseLong(tokens[i++]);
+        } catch (NumberFormatException e) {
+            // this field can be empty
+        }
+        String event = tokens[i++];
 
         ITmfEventField content = type.generateContent(event, sourceInstance, targetInstance);
 
