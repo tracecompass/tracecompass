@@ -568,20 +568,30 @@ public class HistogramDataModel implements IHistogramDataModel {
      */
     public void countLostEvent(TmfTimeRange timeRange, long nbLostEvents, boolean fullRange) {
 
+        long startTime = timeRange.getStartTime().getValue();
+        long endTime = timeRange.getEndTime().getValue();
+
         // Validate
-        if (timeRange.getStartTime().getValue() < 0 || timeRange.getEndTime().getValue() < 0) {
+        if (startTime < 0 || endTime < 0) {
             return;
+        }
+
+        // Set the start/end time if not already done
+        if ((fFirstBucketTime == 0) && (fLastBucket == 0) && (fBuckets[0] == null)) {
+            fFirstBucketTime = startTime;
+            fFirstEventTime = startTime;
+            updateEndTime();
         }
 
         // Compact as needed
         if (fullRange) {
-            while (timeRange.getEndTime().getValue() >= fTimeLimit) {
+            while (endTime >= fTimeLimit) {
                 mergeBuckets();
             }
         }
 
-        int indexStart = (int) ((timeRange.getStartTime().getValue() - fFirstBucketTime) / fBucketDuration);
-        int indexEnd = (int) ((timeRange.getEndTime().getValue() - fFirstBucketTime) / fBucketDuration);
+        int indexStart = (int) ((startTime - fFirstBucketTime) / fBucketDuration);
+        int indexEnd = (int) ((endTime - fFirstBucketTime) / fBucketDuration);
         int nbBucketRange = (indexEnd - indexStart) + 1;
 
         int lostEventPerBucket = (int) Math.ceil((double) nbLostEvents / nbBucketRange);
