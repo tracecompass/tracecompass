@@ -83,14 +83,14 @@ org.eclipse.tracecompass.tracing.examples.core.trace.nexus.NexusTrace.java.
 In this example, the '''validate''' function first checks if the file
 exists, then makes sure that it is really a file, and not a directory. Then we
 attempt to read the file header, to make sure that it is really a Nexus Trace.
-If that check passes, we return a TmfValidationStatus with a confidence of 20.
+If that check passes, we return a TraceValidationStatus with a confidence of 20.
 
-Typically, TmfValidationStatus confidences should range from 1 to 100. 1 meaning
+Typically, TraceValidationStatus confidences should range from 1 to 100. 1 meaning
 "there is a very small chance that this trace is of this type", and 100 meaning
 "it is this type for sure, and cannot be anything else". At run-time, the
-auto-detection will pick the the type which returned the highest confidence. So
+auto-detection will pick the type which returned the highest confidence. So
 checks of the type "does the file exist?" should not return a too high
-confidence.
+confidence. If confidence 0 is returned the auto-detection won't pick this type.
 
 Here we used a confidence of 20, to leave "room" for more specific trace types
 in the Nexus format that could be defined in TMF.
