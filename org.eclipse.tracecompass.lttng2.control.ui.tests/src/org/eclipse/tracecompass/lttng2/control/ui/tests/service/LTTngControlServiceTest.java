@@ -15,6 +15,7 @@
 package org.eclipse.tracecompass.lttng2.control.ui.tests.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -83,6 +84,7 @@ public class LTTngControlServiceTest {
     private static final String SCEN_GET_SESSION_NAME_NOT_EXIST_VERBOSE = "GetSessionNameNotExistVerbose";
     protected static final String SCEN_GET_SESSION_GARBAGE_OUT = "GetSessionGarbageOut";
     private static final String SCEN_GET_SESSION1 = "GetSession1";
+    private static final String SCEN_GET_SESSION_WITH_LIVE = "GetSessionWithLiveInterval";
     private static final String SCEN_GET_KERNEL_PROVIDER1 = "GetKernelProvider1";
     private static final String SCEN_LIST_WITH_NO_KERNEL1 = "ListWithNoKernel1";
     private static final String SCEN_LIST_WITH_NO_KERNEL2 = "ListWithNoKernel2";
@@ -469,6 +471,43 @@ public class LTTngControlServiceTest {
             domains = session.getDomains();
             assertNotNull(domains);
             assertEquals(0, domains.length);
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
+
+    @Test
+    public void testGetSessionWithLive() {
+        try {
+            fShell.setScenario(SCEN_GET_SESSION_WITH_LIVE);
+
+            // Verify Session (snapshot session, non-live)
+            ISessionInfo session = fService.getSession("mysession", new NullProgressMonitor());
+            assertNotNull(session);
+            assertEquals("mysession", session.getName());
+            assertEquals("/home/user/lttng-traces/mysession-20120129-084256", session.getSessionPath());
+            assertEquals(TraceSessionState.INACTIVE, session.getSessionState());
+            assertFalse(session.isLive());
+
+            // Verify Session (regular session, non-live)
+            session = fService.getSession("mysession1", new NullProgressMonitor());
+            assertNotNull(session);
+            assertEquals("mysession1", session.getName());
+            assertEquals("/home/user/lttng-traces/mysession1-20120129-084256", session.getSessionPath());
+            assertEquals(TraceSessionState.ACTIVE, session.getSessionState());
+            assertFalse(session.isLive());
+
+            // Verify Session (regular session, live)
+            session = fService.getSession("mysession2", new NullProgressMonitor());
+            assertNotNull(session);
+            assertEquals("mysession2", session.getName());
+            assertEquals("tcp4://172.0.0.1:5342/ [data: 5343]", session.getSessionPath());
+            assertEquals("net://127.0.0.1", session.getLiveUrl());
+            assertEquals(Integer.valueOf(5344), session.getLivePort());
+            assertEquals(1000000, session.getLiveDelay());
+            assertEquals(TraceSessionState.INACTIVE, session.getSessionState());
+            assertTrue(session.isLive());
+
         } catch (ExecutionException e) {
             fail(e.toString());
         }

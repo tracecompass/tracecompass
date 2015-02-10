@@ -287,7 +287,7 @@ public class LTTngControlService implements ILttngControlService {
             matcher = LTTngControlServiceConstants.LIST_LIVE_TIMER_INTERVAL_PATTERN.matcher(line);
             if (matcher.matches()) {
                 long liveDelay = Long.parseLong(matcher.group(1));
-                if (liveDelay > 0) {
+                if ((liveDelay > 0) && (liveDelay <= LTTngControlServiceConstants.MAX_LIVE_TIMER_INTERVAL)) {
                     sessionInfo.setLive(true);
                     sessionInfo.setLiveUrl(SessionInfo.DEFAULT_LIVE_NETWORK_URL);
                     sessionInfo.setLivePort(SessionInfo.DEFAULT_LIVE_PORT);

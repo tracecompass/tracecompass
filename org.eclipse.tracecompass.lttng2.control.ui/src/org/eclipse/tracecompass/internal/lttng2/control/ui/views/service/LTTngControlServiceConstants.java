@@ -274,6 +274,11 @@ public interface LTTngControlServiceConstants {
      */
     String OPTION_MAX_TRACE_FILES = "-W"; //$NON-NLS-1$
 
+    /**
+     * Maximum live timer interval value
+     */
+    Long MAX_LIVE_TIMER_INTERVAL = 0xFFFFFFFEL;
+
     // ------------------------------------------------------------------------
     // Parsing constants
     // ------------------------------------------------------------------------
