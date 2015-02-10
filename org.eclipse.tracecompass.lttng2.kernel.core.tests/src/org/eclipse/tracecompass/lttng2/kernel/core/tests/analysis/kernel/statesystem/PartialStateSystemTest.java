@@ -64,7 +64,7 @@ public class PartialStateSystemTest extends StateSystemTest {
 
         module = new TestLttngKernelAnalysisModule(TEST_FILE_NAME);
         try {
-            module.setTrace(testTrace.getTrace());
+            assertTrue(module.setTrace(testTrace.getTrace()));
         } catch (TmfAnalysisException e) {
             fail();
         }
@@ -170,11 +170,11 @@ public class PartialStateSystemTest extends StateSystemTest {
         }
 
         @Override
-        public void setTrace(@Nullable ITmfTrace trace) throws TmfAnalysisException {
+        public boolean setTrace(@Nullable ITmfTrace trace) throws TmfAnalysisException {
             if (!(trace instanceof CtfTmfTrace)) {
-                throw new IllegalStateException("TestLttngKernelAnalysisModule: trace should be of type CtfTmfTrace"); //$NON-NLS-1$
+                return false;
             }
-            super.setTrace(trace);
+            return super.setTrace(trace);
         }
 
         @Override

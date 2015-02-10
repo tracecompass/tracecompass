@@ -60,7 +60,8 @@ public class TestRequirementAnalysis extends TmfAbstractAnalysisModule {
     }
 
     @Override
-    public void setTrace(ITmfTrace trace) throws TmfAnalysisException {
+    public boolean setTrace(ITmfTrace trace) throws TmfAnalysisException {
+        return super.setTrace(trace);
     }
 
     @Override

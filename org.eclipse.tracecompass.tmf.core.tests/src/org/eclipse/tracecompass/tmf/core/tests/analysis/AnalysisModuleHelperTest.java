@@ -26,10 +26,8 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
-import org.eclipse.tracecompass.tmf.core.analysis.Messages;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisModuleHelperConfigElement;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement;
@@ -147,36 +145,32 @@ public class AnalysisModuleHelperTest {
     @Test
     public void testNewModule() {
         /* Test analysis module with traceStub */
-        Exception exception = null;
         IAnalysisModule module = null;
         try {
             module = fModule.newModule(TmfTestTrace.A_TEST_10K.getTrace());
             assertNotNull(module);
             assertTrue(module instanceof TestAnalysis);
         } catch (TmfAnalysisException e) {
-            exception = e;
+            fail();
         } finally {
             if (module != null) {
                 module.dispose();
             }
         }
-        assertNull(exception);
 
         /* TestAnalysis2 module with trace, should return an exception */
         try {
             module = fModuleOther.newModule(TmfTestTrace.A_TEST_10K.getTrace());
+            assertNull(module);
         } catch (TmfAnalysisException e) {
-            exception = e;
+            fail();
         } finally {
             if (module != null) {
                 module.dispose();
             }
         }
-        assertNotNull(exception);
-        assertEquals(NLS.bind(Messages.TmfAnalysisModuleHelper_AnalysisDoesNotApply, fModuleOther.getName()), exception.getMessage());
 
         /* TestAnalysis2 module with a TraceStub2 */
-        exception = null;
         ITmfTrace trace = fTrace;
         assertNotNull(trace);
         try {
@@ -184,13 +178,12 @@ public class AnalysisModuleHelperTest {
             assertNotNull(module);
             assertTrue(module instanceof TestAnalysis2);
         } catch (TmfAnalysisException e) {
-            exception = e;
+            fail();
         } finally {
             if (module != null) {
                 module.dispose();
             }
         }
-        assertNull(exception);
     }
 
 
@@ -213,60 +206,52 @@ public class AnalysisModuleHelperTest {
 
         try {
 
-            /* fModule should throw exception for both experiments */
-            Exception exception = null;
+            /* fModule should return null for both experiments */
             IAnalysisModule module = null;
             try {
                 module = fModule.newModule(exp1);
+                assertNull(module);
             } catch (TmfAnalysisException e) {
-                exception = e;
+                fail();
             } finally {
                 if (module != null) {
                     module.dispose();
                 }
             }
-            assertNotNull(exception);
-            assertEquals(NLS.bind(Messages.TmfAnalysisModuleHelper_AnalysisDoesNotApply, fModule.getName()), exception.getMessage());
 
-            exception = null;
             try {
                 module = fModule.newModule(exp2);
+                assertNull(module);
             } catch (TmfAnalysisException e) {
-                exception = e;
+                fail();
             } finally {
                 if (module != null) {
                     module.dispose();
                 }
             }
-            assertNotNull(exception);
-            assertEquals(NLS.bind(Messages.TmfAnalysisModuleHelper_AnalysisDoesNotApply, fModule.getName()), exception.getMessage());
 
             /* fModuleOther should throw exception for exp1, but not exp2 */
-            exception = null;
             try {
                 module = fModuleOther.newModule(exp1);
+                assertNull(module);
             } catch (TmfAnalysisException e) {
-                exception = e;
+                fail();
             } finally {
                 if (module != null) {
                     module.dispose();
                 }
             }
-            assertNotNull(exception);
-            assertEquals(NLS.bind(Messages.TmfAnalysisModuleHelper_AnalysisDoesNotApply, fModuleOther.getName()), exception.getMessage());
 
-            exception = null;
             try {
                 module = fModuleOther.newModule(exp2);
                 assertNotNull(module);
             } catch (TmfAnalysisException e) {
-                exception = e;
+                fail();
             } finally {
                 if (module != null) {
                     module.dispose();
                 }
             }
-            assertNull(exception);
 
         } finally {
             exp2.dispose();
@@ -290,6 +275,7 @@ public class AnalysisModuleHelperTest {
         IAnalysisModule module = null;
         try {
             module = helper.newModule(trace);
+            assertNotNull(module);
             assertNull(module.getParameter(TestAnalysis.PARAM_TEST));
             module.setParameter(TestAnalysis.PARAM_TEST, 1);
             assertEquals(1, module.getParameter(TestAnalysis.PARAM_TEST));
@@ -308,6 +294,7 @@ public class AnalysisModuleHelperTest {
         assertNotNull(helper);
         try {
             module = helper.newModule(trace);
+            assertNotNull(module);
             assertEquals(3, module.getParameter(TestAnalysis.PARAM_TEST));
             module.setParameter(TestAnalysis.PARAM_TEST, 1);
             assertEquals(1, module.getParameter(TestAnalysis.PARAM_TEST));
@@ -332,6 +319,7 @@ public class AnalysisModuleHelperTest {
         assertNotNull(trace);
         try {
             module = helper.newModule(trace);
+            assertNotNull(module);
             assertNull(module.getParameter(TestAnalysis.PARAM_TEST));
 
             try {

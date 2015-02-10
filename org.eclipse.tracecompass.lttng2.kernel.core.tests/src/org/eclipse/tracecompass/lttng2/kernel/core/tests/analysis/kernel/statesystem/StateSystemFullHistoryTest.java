@@ -68,7 +68,7 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
 
         module = new TestLttngKernelAnalysisModule(TEST_FILE_NAME);
         try {
-            module.setTrace(testTrace.getTrace());
+            assertTrue(module.setTrace(testTrace.getTrace()));
         } catch (TmfAnalysisException e) {
             fail();
         }
@@ -111,7 +111,7 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
     public void testBuild() {
         TestLttngKernelAnalysisModule module2 = new TestLttngKernelAnalysisModule(BENCHMARK_FILE_NAME);
         try {
-            module2.setTrace(testTrace.getTrace());
+            assertTrue(module2.setTrace(testTrace.getTrace()));
         } catch (TmfAnalysisException e) {
             module2.dispose();
             fail();
@@ -135,7 +135,7 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
         /* 'newStateFile' should have already been created */
         TestLttngKernelAnalysisModule module2 = new TestLttngKernelAnalysisModule(TEST_FILE_NAME);
         try {
-            module2.setTrace(testTrace.getTrace());
+            assertTrue(module2.setTrace(testTrace.getTrace()));
         } catch (TmfAnalysisException e) {
             module2.dispose();
             fail();
@@ -167,11 +167,11 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
         }
 
         @Override
-        public void setTrace(@Nullable ITmfTrace trace) throws TmfAnalysisException {
+        public boolean setTrace(@Nullable ITmfTrace trace) throws TmfAnalysisException {
             if (!(trace instanceof CtfTmfTrace)) {
-                throw new IllegalStateException("TestLttngKernelAnalysisModule: trace should be of type CtfTmfTrace"); //$NON-NLS-1$
+                return false;
             }
-            super.setTrace(trace);
+            return super.setTrace(trace);
         }
 
         @Override

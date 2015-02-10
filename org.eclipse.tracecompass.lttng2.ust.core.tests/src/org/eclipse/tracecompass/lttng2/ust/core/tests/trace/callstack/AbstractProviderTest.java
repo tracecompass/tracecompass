@@ -102,7 +102,7 @@ public abstract class AbstractProviderTest {
         fTrace = trace;
         fModule = new TestLttngCallStackModule();
         try {
-            fModule.setTrace(trace);
+            assertTrue(fModule.setTrace(trace));
         } catch (TmfAnalysisException e) {
             fail();
         }
@@ -143,7 +143,7 @@ public abstract class AbstractProviderTest {
             try {
                 module = new TestLttngCallStackModule();
                 try {
-                    module.setTrace(ustTrace);
+                    assertTrue(module.setTrace(ustTrace));
                 } catch (TmfAnalysisException e) {
                     fail();
                 }

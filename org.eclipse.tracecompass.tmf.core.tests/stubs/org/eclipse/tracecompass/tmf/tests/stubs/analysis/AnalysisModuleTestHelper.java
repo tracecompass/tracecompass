@@ -120,14 +120,20 @@ public class AnalysisModuleTestHelper implements IAnalysisModuleHelper {
             module.setName(getName());
             module.setId(getId());
             module.setAutomatic(isAutomatic());
-            module.setTrace(trace);
+            if (!module.setTrace(trace)) {
+                module.dispose();
+                module = null;
+            }
             break;
         case TEST2:
             module = new TestAnalysis2();
             module.setName(getName());
             module.setId(getId());
             module.setAutomatic(isAutomatic());
-            module.setTrace(trace);
+            if (!module.setTrace(trace)) {
+                module.dispose();
+                module = null;
+            }
             break;
         default:
             break;

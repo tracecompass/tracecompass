@@ -189,8 +189,13 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper {
 
         }
         if (module != null) {
-            module.setTrace(trace);
-            TmfAnalysisManager.analysisModuleCreated(module);
+            if (module.setTrace(trace)) {
+                TmfAnalysisManager.analysisModuleCreated(module);
+            } else {
+                /* The analysis does not apply to the trace, dispose of the module */
+                module.dispose();
+                module = null;
+            }
         }
 
         return module;

@@ -74,7 +74,9 @@ public class GenerateTestValues {
                 }
             };
 
-            module.setTrace(trace);
+            if (!module.setTrace(trace)) {
+                throw new IllegalStateException();
+            }
             module.setId("test-values");
             module.schedule();
             module.waitForCompletion();

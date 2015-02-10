@@ -115,7 +115,7 @@ public class AnalysisModuleTest {
 
         /* Set a stub trace for analysis */
         try {
-            module.setTrace(TmfTestTrace.A_TEST_10K.getTrace());
+            assertTrue(module.setTrace(TmfTestTrace.A_TEST_10K.getTrace()));
         } catch (TmfAnalysisException e) {
             fail(e.getMessage());
         }
@@ -143,7 +143,7 @@ public class AnalysisModuleTest {
         /* Set a stub trace for analysis */
         ITmfTrace trace = TmfTestTrace.A_TEST_10K.getTrace();
         try {
-            module.setTrace(trace);
+            assertTrue(module.setTrace(trace));
         } catch (TmfAnalysisException e) {
             fail(e.getMessage());
         }
@@ -172,14 +172,38 @@ public class AnalysisModuleTest {
         assertEquals(MODULE_GENERIC_ID, module.getId());
         assertEquals(MODULE_GENERIC_NAME, module.getName());
 
-        Exception exception = null;
+        try {
+            assertFalse(module.setTrace(TmfTestTrace.A_TEST_10K.getTrace()));
+        } catch (TmfAnalysisException e) {
+            fail();
+        }
+
+        module.dispose();
+    }
+
+    /**
+     * Test the {@link TmfAbstractAnalysisModule#setTrace(ITmfTrace)} method
+     * with wrong trace
+     */
+    @Test
+    public void testSetTraceTwice() {
+        IAnalysisModule module = new TestAnalysis();
+
+        module.setName(MODULE_GENERIC_NAME);
+        module.setId(MODULE_GENERIC_ID);
+
+        try {
+            assertTrue(module.setTrace(TmfTestTrace.A_TEST_10K.getTrace()));
+        } catch (TmfAnalysisException e) {
+            fail();
+        }
+        TmfAnalysisException exception = null;
         try {
             module.setTrace(TmfTestTrace.A_TEST_10K.getTrace());
         } catch (TmfAnalysisException e) {
             exception = e;
         }
         assertNotNull(exception);
-        assertEquals(NLS.bind(Messages.TmfAbstractAnalysisModule_AnalysisCannotExecute, module.getName()), exception.getMessage());
 
         module.dispose();
     }
@@ -193,7 +217,7 @@ public class AnalysisModuleTest {
 
         module.setParameter(TestAnalysis.PARAM_TEST, 999);
         try {
-            module.setTrace(TmfTestTrace.A_TEST_10K.getTrace());
+            assertTrue(module.setTrace(TmfTestTrace.A_TEST_10K.getTrace()));
         } catch (TmfAnalysisException e) {
             fail(e.getMessage());
         }
@@ -223,7 +247,7 @@ public class AnalysisModuleTest {
         TestAnalysis module = setUpAnalysis();
 
         try {
-            module.setTrace(TmfTestTrace.A_TEST_10K.getTrace());
+            assertTrue(module.setTrace(TmfTestTrace.A_TEST_10K.getTrace()));
         } catch (TmfAnalysisException e) {
             fail(e.getMessage());
         }
@@ -252,7 +276,7 @@ public class AnalysisModuleTest {
         TestAnalysis module = setUpAnalysis();
 
         try {
-            module.setTrace(TmfTestTrace.A_TEST_10K.getTrace());
+            assertTrue(module.setTrace(TmfTestTrace.A_TEST_10K.getTrace()));
         } catch (TmfAnalysisException e) {
             fail(e.getMessage());
         }
@@ -316,8 +340,8 @@ public class AnalysisModuleTest {
         module.setParameter(TestAnalysis.PARAM_TEST, paramAndResult);
 
         try {
-            depModule.setTrace(trace);
-            module.setTrace(trace);
+            assertTrue(depModule.setTrace(trace));
+            assertTrue(module.setTrace(trace));
         } catch (TmfAnalysisException e) {
             fail(e.getMessage());
         }

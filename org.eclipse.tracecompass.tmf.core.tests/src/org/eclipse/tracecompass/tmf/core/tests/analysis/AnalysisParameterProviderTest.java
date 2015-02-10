@@ -75,6 +75,7 @@ public class AnalysisParameterProviderTest {
         IAnalysisModule module = null;
         try {
             module = helper.newModule(trace);
+            assertNotNull(module);
 
             assertEquals(10, module.getParameter(TestAnalysis.PARAM_TEST));
 

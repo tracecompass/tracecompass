@@ -289,6 +289,9 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
         for (IAnalysisModuleHelper helper : modules.values()) {
             try {
                 IAnalysisModule module = helper.newModule(this);
+                if (module == null) {
+                    continue;
+                }
                 fAnalysisModules.put(module.getId(), module);
                 if (module.isAutomatic()) {
                     status.add(module.schedule());

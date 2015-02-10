@@ -88,16 +88,23 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
     }
 
     @Override
-    public void setTrace(ITmfTrace trace) throws TmfAnalysisException {
-        super.setTrace(trace);
+    public boolean setTrace(ITmfTrace trace) throws TmfAnalysisException {
+        if (!super.setTrace(trace)) {
+            return false;
+        }
 
         /*
          * Since these sub-analyzes are not built from an extension point, we
          * have to assign the trace ourselves. Very important to do so before
          * calling schedule()!
          */
-        totalsModule.setTrace(trace);
-        eventTypesModule.setTrace(trace);
+        if (!totalsModule.setTrace(trace)) {
+            return false;
+        }
+        if (!eventTypesModule.setTrace(trace)) {
+            return false;
+        }
+        return true;
     }
 
     @Override

@@ -87,7 +87,8 @@ public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProv
     boolean isAutomatic();
 
     /**
-     * Sets the trace on which to run the analysis
+     * Sets the trace on which to run the analysis and return whether the trace
+     * could be successfully set
      *
      * Note: The trace cannot be final since most modules are instantiated in a
      * way that does not know about the trace, but it shouldn't be set more than
@@ -96,9 +97,15 @@ public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProv
      *
      * @param trace
      *            The trace to run the analysis on
+     * @return {@code true} if the trace was successfully set on the module,
+     *         {@code false} if the analysis cannot be applied to the trace,
+     *         for instance if the trace does not have the right requirements
      * @throws TmfAnalysisException
+     *             This exception should be thrown if the trace is set more than
+     *             once
+     * @since 1.0
      */
-    void setTrace(@NonNull ITmfTrace trace) throws TmfAnalysisException;
+    boolean setTrace(@NonNull ITmfTrace trace) throws TmfAnalysisException;
 
     /**
      * Add a parameter to this module

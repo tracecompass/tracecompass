@@ -111,8 +111,11 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
         fAutomatic = auto;
     }
 
+    /**
+     * @since 1.0
+     */
     @Override
-    public void setTrace(ITmfTrace trace) throws TmfAnalysisException {
+    public boolean setTrace(ITmfTrace trace) throws TmfAnalysisException {
         if (fTrace != null) {
             throw new TmfAnalysisException(NLS.bind(Messages.TmfAbstractAnalysisModule_TraceSetMoreThanOnce, getName()));
         }
@@ -121,7 +124,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
 
         /* Check that analysis can be executed */
         if (!canExecute(trace)) {
-            throw new TmfAnalysisException(NLS.bind(Messages.TmfAbstractAnalysisModule_AnalysisCannotExecute, getName()));
+            return false;
         }
 
         fTrace = trace;
@@ -133,6 +136,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
         }
         resetAnalysis();
         fStarted = false;
+        return true;
     }
 
     /**

@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.tmf.core.analysis;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.osgi.framework.Bundle;
@@ -141,10 +142,10 @@ public interface IAnalysisModuleHelper extends IAnalysisRequirementProvider {
      * @param trace
      *            The trace to be linked to the module
      * @return A new {@link IAnalysisModule} instance initialized with the
-     *         trace.
+     *         trace or {@code null} if the module couldn't be instantiated
      * @throws TmfAnalysisException
      *             Exceptions that occurred when setting trace
      */
-    IAnalysisModule newModule(@NonNull ITmfTrace trace) throws TmfAnalysisException;
+    @Nullable IAnalysisModule newModule(@NonNull ITmfTrace trace) throws TmfAnalysisException;
 
 }

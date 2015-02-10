@@ -96,7 +96,7 @@ public class LttngKernelAnalysisTest {
         ITmfTrace trace = fTrace;
         assertNotNull(trace);
         try {
-            fKernelAnalysisModule.setTrace(trace);
+            assertTrue(fKernelAnalysisModule.setTrace(trace));
         } catch (TmfAnalysisException e) {
             fail(e.getMessage());
         }

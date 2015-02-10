@@ -26,11 +26,11 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 public class BtfAnalysisModule extends TmfStateSystemAnalysisModule {
 
     @Override
-    public void setTrace(ITmfTrace trace) throws TmfAnalysisException {
+    public boolean setTrace(ITmfTrace trace) throws TmfAnalysisException {
         if (!(trace instanceof BtfTrace)) {
-            throw new IllegalArgumentException("BtfAnalysisModule: trace should be of type BtfTrace"); //$NON-NLS-1$
+            return false;
         }
-        super.setTrace(trace);
+        return super.setTrace(trace);
     }
 
     @Override

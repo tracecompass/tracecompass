@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.analysis.TmfAnalysisModuleSourceConfigElement;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
@@ -197,9 +196,8 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
             }
         }
 
-        /* Check that analysis can be executed */
         if (!applies) {
-            throw new TmfAnalysisException(NLS.bind(Messages.TmfAnalysisModuleHelper_AnalysisDoesNotApply, getName()));
+            return null;
         }
 
         IAnalysisModule module = createModule();
@@ -222,8 +220,12 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
                 module.setParameter(paramName, defaultValue);
             }
         }
-        module.setTrace(trace);
-        TmfAnalysisManager.analysisModuleCreated(module);
+        if (module.setTrace(trace)) {
+            TmfAnalysisManager.analysisModuleCreated(module);
+        } else {
+            module.dispose();
+            module = null;
+        }
 
         return module;
 
