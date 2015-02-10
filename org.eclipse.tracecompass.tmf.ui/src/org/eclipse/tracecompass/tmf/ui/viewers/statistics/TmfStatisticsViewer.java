@@ -10,6 +10,7 @@
  *   Mathieu Denis <mathieu.denis@polymtl.ca> - Initial API and implementation
  *   Alexandre Montplaisir - Port to ITmfStatistics provider
  *   Patrick Tasse - Support selection range
+ *   Bernd Hufmann - Fix range selection updates
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.ui.viewers.statistics;
@@ -726,6 +727,17 @@ public class TmfStatisticsViewer extends TmfViewer {
             Map<String, Long> map = stats.getEventTypesInRange(start, end);
             updateStats(map);
 
+            /*
+             * Remove job from map so that new range selection updates can
+             * be processed.
+             */
+            Map<ITmfTrace, Job> updateJobs;
+            if (fIsGlobal) {
+                updateJobs = fUpdateJobsGlobal;
+            } else {
+                updateJobs = fUpdateJobsPartial;
+            }
+            updateJobs.remove(fJobTrace);
             return Status.OK_STATUS;
         }
 
