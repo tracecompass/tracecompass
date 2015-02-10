@@ -1755,6 +1755,8 @@ If you followed the steps in the previous section, you should have a Callstack V
 ** <pre>nm myprogram > mapping.txt</pre>
 * Click the '''Import Mapping File''' ([[Image:images/import.gif]]) button in the Callstack View, and select the ''mapping.txt'' file that was just created.
 
+(If you are dealing with C++ executables, you may want to use ''nm --demangle'' instead to get readable function names.)
+
 The view should now update to display the function names instead. Make sure the binary used for taking the trace is the one used for this step too (otherwise, there is a good chance of the addresses not being the same).
 
 == Memory Usage ==
