@@ -92,7 +92,7 @@ public class TmfEventTest {
         final ITmfEvent event = new TmfEvent(fTrace, ITmfContext.UNKNOWN_RANK, null, null, null);
         assertNotNull("getTrace", event.getTrace());
         assertEquals("getRank", ITmfContext.UNKNOWN_RANK, event.getRank());
-        assertNull("getTimestamp", event.getTimestamp());
+        assertEquals("getTimestamp", TmfTimestamp.ZERO, event.getTimestamp());
         assertNull("getType", event.getType());
         assertNull("getContent", event.getContent());
     }

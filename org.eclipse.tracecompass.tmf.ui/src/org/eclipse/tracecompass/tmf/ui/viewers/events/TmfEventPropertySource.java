@@ -306,7 +306,7 @@ public class TmfEventPropertySource implements IPropertySource {
 
     @Override
     public Object getPropertyValue(Object id) {
-        if (id.equals(ID_TIMESTAMP) && fEvent.getTimestamp() != null) {
+        if (id.equals(ID_TIMESTAMP)) {
             return new TimestampPropertySource(fEvent.getTimestamp());
         } else if (id.equals(ID_TYPE) && fEvent.getType() != null) {
             return fEvent.getType().toString();

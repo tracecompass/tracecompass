@@ -17,6 +17,8 @@ package org.eclipse.tracecompass.tmf.core.timestamp;
 
 import java.nio.ByteBuffer;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 /**
  * A generic timestamp implementation. The timestamp is represented by the
  * tuple { value, scale, precision }. By default, timestamps are scaled in
@@ -34,29 +36,19 @@ public class TmfTimestamp implements ITmfTimestamp {
     /**
      * The beginning of time
      */
-    public static final ITmfTimestamp BIG_BANG =
+    public static final @NonNull ITmfTimestamp BIG_BANG =
             new TmfTimestamp(Long.MIN_VALUE, Integer.MAX_VALUE);
 
     /**
      * The end of time
      */
-    public static final ITmfTimestamp BIG_CRUNCH =
+    public static final @NonNull ITmfTimestamp BIG_CRUNCH =
             new TmfTimestamp(Long.MAX_VALUE, Integer.MAX_VALUE);
-
-    /**
-     * A more practical definition of "beginning of time"
-     */
-    public static final ITmfTimestamp PROJECT_IS_FUNDED = BIG_BANG;
-
-    /**
-     * A more practical definition of "end of time"
-     */
-    public static final ITmfTimestamp PROJECT_IS_CANNED = BIG_CRUNCH;
 
     /**
      * Zero
      */
-    public static final ITmfTimestamp ZERO =
+    public static final @NonNull ITmfTimestamp ZERO =
             new TmfTimestamp(0, 0);
 
     // ------------------------------------------------------------------------

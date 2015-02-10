@@ -45,7 +45,7 @@ public class CustomEvent extends TmfEvent {
     protected static final String NO_MESSAGE = ""; //$NON-NLS-1$
 
     /** Replacement for the super-class' timestamp field */
-    private ITmfTimestamp customEventTimestamp;
+    private @NonNull ITmfTimestamp customEventTimestamp;
 
     /** Replacement for the super-class' content field */
     private ITmfEventField customEventContent;
@@ -71,6 +71,7 @@ public class CustomEvent extends TmfEvent {
         super(null, ITmfContext.UNKNOWN_RANK, null, null, null);
         fDefinition = definition;
         fData = new HashMap<>();
+        customEventTimestamp = TmfTimestamp.ZERO;
     }
 
     /**
@@ -112,7 +113,11 @@ public class CustomEvent extends TmfEvent {
         fData = new HashMap<>();
 
         /* Set our overridden fields */
-        customEventTimestamp = timestamp;
+        if (timestamp == null) {
+            customEventTimestamp = TmfTimestamp.ZERO;
+        } else {
+            customEventTimestamp = timestamp;
+        }
         customEventContent = null;
         customEventType = type;
     }
@@ -149,7 +154,7 @@ public class CustomEvent extends TmfEvent {
      * @param timestamp
      *            The new timestamp
      */
-    protected void setTimestamp(ITmfTimestamp timestamp) {
+    protected void setTimestamp(@NonNull ITmfTimestamp timestamp) {
         customEventTimestamp = timestamp;
     }
 
@@ -235,7 +240,7 @@ public class CustomEvent extends TmfEvent {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + ((fDefinition == null) ? 0 : fDefinition.hashCode());
-        result = prime * result + ((customEventTimestamp == null) ? 0 : customEventTimestamp.hashCode());
+        result = prime * result + customEventTimestamp.hashCode();
         result = prime * result + ((customEventContent == null) ? 0 : customEventContent.hashCode());
         result = prime * result + ((customEventType == null) ? 0 : customEventType.hashCode());
         return result;
@@ -261,11 +266,7 @@ public class CustomEvent extends TmfEvent {
             return false;
         }
 
-        if (customEventTimestamp == null) {
-            if (other.customEventTimestamp != null) {
-                return false;
-            }
-        } else if (!customEventTimestamp.equals(other.customEventTimestamp)) {
+        if (!customEventTimestamp.equals(other.customEventTimestamp)) {
             return false;
         }
 

@@ -55,7 +55,7 @@ public interface ITmfEvent extends IAdaptable {
      * @return the event timestamp
      * @since 2.0
      */
-    ITmfTimestamp getTimestamp();
+    @NonNull ITmfTimestamp getTimestamp();
 
     /**
      * @return the event type

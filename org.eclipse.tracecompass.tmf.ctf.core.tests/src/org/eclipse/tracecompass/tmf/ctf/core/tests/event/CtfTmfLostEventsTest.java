@@ -212,7 +212,7 @@ public class CtfTmfLostEventsTest {
 
         public OneEventRequestPerTs(ITmfTimestamp ts) {
             super(CtfTmfEvent.class,
-                    new TmfTimeRange(ts, TmfTimestamp.PROJECT_IS_CANNED),
+                    new TmfTimeRange(ts, TmfTimestamp.BIG_CRUNCH),
                     0, 1, ExecutionType.FOREGROUND);
         }
 

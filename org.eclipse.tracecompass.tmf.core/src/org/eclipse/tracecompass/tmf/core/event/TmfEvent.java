@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.tmf.core.event;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
@@ -38,7 +39,7 @@ public class TmfEvent extends PlatformObject implements ITmfEvent {
 
     private final ITmfTrace fTrace;
     private final long fRank;
-    private final ITmfTimestamp fTimestamp;
+    private final @NonNull ITmfTimestamp fTimestamp;
     private final ITmfEventType fType;
     private final ITmfEventField fContent;
 
@@ -82,7 +83,11 @@ public class TmfEvent extends PlatformObject implements ITmfEvent {
             final ITmfEventField content) {
         fTrace = trace;
         fRank = rank;
-        fTimestamp = timestamp;
+        if (timestamp != null) {
+            fTimestamp = timestamp;
+        } else {
+            fTimestamp = TmfTimestamp.ZERO;
+        }
         fType = type;
         fContent = content;
     }
@@ -146,7 +151,7 @@ public class TmfEvent extends PlatformObject implements ITmfEvent {
         int result = 1;
         result = prime * result + ((fTrace == null) ? 0 : fTrace.hashCode());
         result = prime * result + (int) (fRank ^ (fRank >>> 32));
-        result = prime * result + ((fTimestamp == null) ? 0 : fTimestamp.hashCode());
+        result = prime * result + fTimestamp.hashCode();
         result = prime * result + ((fType == null) ? 0 : fType.hashCode());
         result = prime * result + ((fContent == null) ? 0 : fContent.hashCode());
         return result;
@@ -174,11 +179,7 @@ public class TmfEvent extends PlatformObject implements ITmfEvent {
         if (fRank != other.fRank) {
             return false;
         }
-        if (fTimestamp == null) {
-            if (other.fTimestamp != null) {
-                return false;
-            }
-        } else if (!fTimestamp.equals(other.fTimestamp)) {
+        if (!fTimestamp.equals(other.fTimestamp)) {
             return false;
         }
         if (fType == null) {

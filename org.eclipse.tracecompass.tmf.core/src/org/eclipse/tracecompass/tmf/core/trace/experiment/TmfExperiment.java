@@ -419,7 +419,7 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
         for (int i = 0; i < length; i++) {
             final ITmfEvent event = expContext.getEvent(i);
 
-            if (event != null && event.getTimestamp() != null) {
+            if (event != null) {
                 final ITmfTimestamp otherTS = event.getTimestamp();
                 if (otherTS.compareTo(timestamp) < 0) {
                     trace = i;
