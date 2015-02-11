@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Alexandre Montplaisir - Initial API and implementation
+ *   Bernd Hufmann - Add Content aspect
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.gdbtrace.core.trace;
@@ -36,7 +37,8 @@ public final class GdbEventAspects {
             checkNotNull(ImmutableList.of(
                     new TmfContentFieldAspect(GdbTraceEventContent.TRACE_FRAME, GdbTraceEventContent.TRACE_FRAME),
                     new TmfContentFieldAspect(GdbTraceEventContent.TRACEPOINT, GdbTraceEventContent.TRACEPOINT),
-                    new GdbFileAspect()
+                    new GdbFileAspect(),
+                    ITmfEventAspect.BaseAspects.CONTENTS
                     ));
 
     private static class GdbFileAspect implements ITmfEventAspect {
