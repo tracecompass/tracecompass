@@ -21,10 +21,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.IBinaryParser;
@@ -39,12 +39,18 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 
+import com.google.common.collect.ImmutableMap;
+
 /**
  * Class containing the different methods to import an address->name mapping.
  *
  * @author Alexandre Montplaisir
  */
-public class FunctionNameMapper {
+public final class FunctionNameMapper {
+
+    private FunctionNameMapper() {}
+
+    private static final Pattern REMOVE_ZEROS_PATTERN = Pattern.compile("^0+(?!$)"); //$NON-NLS-1$
 
     /**
      * Get the function name mapping from a text file obtained by doing
@@ -81,14 +87,7 @@ public class FunctionNameMapper {
         if (map.isEmpty()) {
             return null;
         }
-        return Collections.unmodifiableMap(map);
-    }
-
-    /**
-     * Strip the leading zeroes from the address
-     * */
-    private static String stripLeadingZeros(String address) {
-        return address.replaceFirst("^0+(?!$)", "");  //$NON-NLS-1$ //$NON-NLS-2$;
+        return ImmutableMap.copyOf(map);
     }
 
     /**
@@ -113,7 +112,15 @@ public class FunctionNameMapper {
             }
         }
 
-        return map;
+        return ImmutableMap.copyOf(map);
+    }
+
+
+    /**
+     * Strip the leading zeroes from the address
+     * */
+    private static String stripLeadingZeros(String address) {
+        return REMOVE_ZEROS_PATTERN.matcher(address).replaceFirst(""); //$NON-NLS-1$
     }
 
     private static @Nullable IBinaryParser.IBinaryObject getBinaryObject(File file) {
