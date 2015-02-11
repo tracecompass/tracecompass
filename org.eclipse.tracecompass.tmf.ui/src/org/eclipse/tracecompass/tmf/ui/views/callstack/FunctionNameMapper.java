@@ -52,6 +52,7 @@ class FunctionNameMapper {
         try (FileReader fr = new FileReader(mappingFile);
                 BufferedReader reader = new BufferedReader(fr);) {
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+                line = line.trim();
                 /* Only lines with 3 elements contain addresses */
                 String[] elems = line.split(" ", 3); //$NON-NLS-1$
                 if (elems.length == 3) {
