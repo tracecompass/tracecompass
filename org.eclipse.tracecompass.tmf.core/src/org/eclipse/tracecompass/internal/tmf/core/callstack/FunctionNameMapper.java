@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -11,7 +11,7 @@
  *   Marc-Andre Laperle - Map from binary file
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.views.callstack;
+package org.eclipse.tracecompass.internal.tmf.core.callstack;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,15 +37,26 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.core.Activator;
 
 /**
  * Class containing the different methods to import an address->name mapping.
  *
  * @author Alexandre Montplaisir
  */
-class FunctionNameMapper {
+public class FunctionNameMapper {
 
+    /**
+     * Get the function name mapping from a text file obtained by doing
+     *
+     * <pre>
+     * nm[--demangle][binary] &gt; file.txt
+     * </pre>
+     *
+     * @param mappingFile
+     *            The file to import
+     * @return A map&lt;address, function name&gt; of the results
+     */
     public static @Nullable Map<String, String> mapFromNmTextFile(File mappingFile) {
         Map<String, String> map = new HashMap<>();
 
@@ -55,8 +66,7 @@ class FunctionNameMapper {
                 /* Only lines with 3 elements contain addresses */
                 String[] elems = line.split(" ", 3); //$NON-NLS-1$
                 if (elems.length == 3) {
-                    /* Strip the leading zeroes from the address */
-                    String address = elems[0].replaceFirst("^0+(?!$)", ""); //$NON-NLS-1$ //$NON-NLS-2$;
+                    String address = stripLeadingZeros(elems[0]);
                     String name = elems[elems.length - 1];
                     map.put(address, name);
                 }
@@ -80,6 +90,13 @@ class FunctionNameMapper {
         return address.replaceFirst("^0+(?!$)", "");  //$NON-NLS-1$ //$NON-NLS-2$;
     }
 
+    /**
+     * Get the function name mapping from an executable binary.
+     *
+     * @param file
+     *            The file to import
+     * @return A map&lt;address, function name&gt; of the results
+     */
     public static @Nullable Map<String, String> mapFromBinaryFile(File file) {
         Map<String, String> map = new HashMap<>();
         IBinaryParser.IBinaryObject binaryObject = getBinaryObject(file);
@@ -117,7 +134,7 @@ class FunctionNameMapper {
 
                     @Override
                     public void handleException(Throwable exception) {
-                        Activator.getDefault().logError("Error creating binary parser", exception); //$NON-NLS-1$
+                        Activator.logError("Error creating binary parser", exception); //$NON-NLS-1$
                     }
                 });
             }
@@ -151,7 +168,7 @@ class FunctionNameMapper {
                     hintBuffer = array;
                 }
             } catch (IOException e) {
-                Activator.getDefault().logError("Error reading initial bytes of binary file", e); //$NON-NLS-1$
+                Activator.logError("Error reading initial bytes of binary file", e); //$NON-NLS-1$
                 return null;
             }
         }
@@ -166,7 +183,7 @@ class FunctionNameMapper {
                         return (IBinaryParser.IBinaryObject)binFile;
                     }
                 } catch (IOException e) {
-                    Activator.getDefault().logError("Error parsing binary file", e); //$NON-NLS-1$
+                    Activator.logError("Error parsing binary file", e); //$NON-NLS-1$
                 }
             }
         }
