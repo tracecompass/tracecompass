@@ -23,6 +23,7 @@ import org.junit.runner.RunWith;
 @DebugSuite.SuiteClasses({
     TmfCorePluginTest.class,
     org.eclipse.tracecompass.tmf.core.tests.analysis.AllTests.class,
+    org.eclipse.tracecompass.tmf.core.tests.callstack.AllTests.class,
     org.eclipse.tracecompass.tmf.core.tests.component.AllTests.class,
     org.eclipse.tracecompass.tmf.core.tests.event.AllTests.class,
     org.eclipse.tracecompass.tmf.core.tests.event.lookup.AllTests.class,
