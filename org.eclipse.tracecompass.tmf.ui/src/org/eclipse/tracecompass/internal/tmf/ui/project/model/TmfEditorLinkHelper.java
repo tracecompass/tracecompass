@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,9 +15,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstants;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
@@ -54,14 +53,14 @@ public class TmfEditorLinkHelper implements ILinkHelper {
                 final TmfProjectElement project = TmfProjectRegistry.getProject(file.getProject(), true);
 
                 // Check for experiments, traces which are folders or traces which are files
-                if (traceTypeId.equals(TmfExperiment.class.getCanonicalName())) {
+                if (ITmfEventsEditorConstants.EXPERIMENT_INPUT_TYPE_CONSTANTS.contains(traceTypeId)) {
                     // Case 1: Experiment
                     for (final TmfExperimentElement experimentElement : project.getExperimentsFolder().getExperiments()) {
                         if (experimentElement.getResource().equals(file.getParent())) {
                             return new StructuredSelection(experimentElement);
                         }
                     }
-                } else if (traceTypeId.equals(TmfTrace.class.getCanonicalName())) {
+                } else if (ITmfEventsEditorConstants.TRACE_INPUT_TYPE_CONSTANTS.contains(traceTypeId)) {
                     // Case 2: Trace that is a folder
                     for (final TmfTraceElement traceElement : project.getTracesFolder().getTraces()) {
                         if (traceElement.getResource().equals(file.getParent())) {
