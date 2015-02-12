@@ -24,7 +24,8 @@ import org.junit.runners.Suite;
         CollapseEventsInTableTest.class,
         ColorsViewTest.class,
         TestTraceOffsetting.class,
-        FilterViewerTest.class
+        FilterViewerTest.class,
+        SDViewTest.class
 })
 public class AllTests {
 }
