@@ -75,6 +75,7 @@ public class FilteredCheckboxTree extends FilteredTree implements ICheckable {
     @Override
     protected TreeViewer doCreateTreeViewer(Composite parentComposite, int style) {
         fCheckboxTreeViewer = new CheckboxTreeViewer(parentComposite, style);
+        fCheckboxTreeViewer.setUseHashlookup(true);
         fCheckboxTreeViewer.addCheckStateListener(new ICheckStateListener() {
             @Override
             public void checkStateChanged(CheckStateChangedEvent event) {
