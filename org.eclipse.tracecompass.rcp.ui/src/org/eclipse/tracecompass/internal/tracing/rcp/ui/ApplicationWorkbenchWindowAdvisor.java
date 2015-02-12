@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Marc-Andre Laperle - Bug 459835
  **********************************************************************/
 package org.eclipse.tracecompass.internal.tracing.rcp.ui;
 
@@ -107,6 +108,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     private static void openTraceIfNecessary(IProject project) {
         String traceToOpen = TracingRcpPlugin.getDefault().getCli().getArgument(CliParser.OPEN_FILE_LOCATION);
+        String userHome = System.getProperty("user.home"); //$NON-NLS-1$
+        // In case the application was not started on the shell, expand ~ to home directory
+        if (traceToOpen.startsWith("~/") && userHome != null) { //$NON-NLS-1$
+            traceToOpen = traceToOpen.replaceFirst("^~", userHome); //$NON-NLS-1$
+        }
+
         if (traceToOpen != null) {
             try {
                 TmfTraceFolder destinationFolder = TmfProjectRegistry.getProject(project, true).getTracesFolder();
