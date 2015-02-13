@@ -88,27 +88,28 @@ public class KernelTidAspectTest {
      */
     @Before
     public void setUp() {
-        fTrace = new TmfXmlTraceStubWithTidAspects();
+        ITmfTrace trace = new TmfXmlTraceStubWithTidAspects();
         IPath filePath = Activator.getAbsoluteFilePath(LTTNG_KERNEL_FILE);
-        IStatus status = fTrace.validate(null, filePath.toOSString());
+        IStatus status = trace.validate(null, filePath.toOSString());
         if (!status.isOK()) {
             fail(status.getException().getMessage());
         }
         try {
-            fTrace.initTrace(null, filePath.toOSString(), TmfEvent.class);
+            trace.initTrace(null, filePath.toOSString(), TmfEvent.class);
         } catch (TmfTraceException e) {
             fail(e.getMessage());
         }
-        deleteSuppFiles(fTrace);
+        deleteSuppFiles(trace);
         /* Make sure the Kernel analysis has run */
-        ((TmfTrace) fTrace).traceOpened(new TmfTraceOpenedSignal(this, fTrace, null));
+        ((TmfTrace) trace).traceOpened(new TmfTraceOpenedSignal(this, trace, null));
         IAnalysisModule module = null;
-        for (IAnalysisModule mod : TmfTraceUtils.getAnalysisModulesOfClass(fTrace, KernelAnalysis.class)) {
+        for (IAnalysisModule mod : TmfTraceUtils.getAnalysisModulesOfClass(trace, KernelAnalysis.class)) {
             module = mod;
         }
         assertNotNull(module);
         module.schedule();
         module.waitForCompletion();
+        fTrace = trace;
     }
 
     /**
@@ -120,11 +121,11 @@ public class KernelTidAspectTest {
     }
 
     private void resolveNextEvent(ITmfContext context, Integer tid) {
-
-        ITmfEvent event = fTrace.getNext(context);
+        ITmfTrace trace = fTrace;
+        ITmfEvent event = trace.getNext(context);
         assertNotNull(event);
 
-        Object tidObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(fTrace, KernelTidAspect.class, event);
+        Object tidObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(trace, KernelTidAspect.class, event);
         if (tid == null) {
             assertNull(tidObj);
         } else {

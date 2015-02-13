@@ -72,26 +72,26 @@ public class CpuUsageStateProviderTest {
      */
     @Before
     public void setUp() {
-        fTrace = new TmfXmlTraceStub();
+        ITmfTrace trace = new TmfXmlTraceStub();
         IPath filePath = Activator.getAbsoluteFilePath(CPU_USAGE_FILE);
-        IStatus status = fTrace.validate(null, filePath.toOSString());
+        IStatus status = trace.validate(null, filePath.toOSString());
         if (!status.isOK()) {
             fail(status.getException().getMessage());
         }
         try {
-            fTrace.initTrace(null, filePath.toOSString(), TmfEvent.class);
+            trace.initTrace(null, filePath.toOSString(), TmfEvent.class);
         } catch (TmfTraceException e) {
             fail(e.getMessage());
         }
-        deleteSuppFiles(fTrace);
-        ((TmfTrace) fTrace).traceOpened(new TmfTraceOpenedSignal(this, fTrace, null));
+        deleteSuppFiles(trace);
+        ((TmfTrace) trace).traceOpened(new TmfTraceOpenedSignal(this, trace, null));
         /*
          * FIXME: Make sure this analysis is finished before running the CPU
          * analysis. This block can be removed once analysis dependency and
          * request precedence is implemented
          */
         IAnalysisModule module = null;
-        for (IAnalysisModule mod : TmfTraceUtils.getAnalysisModulesOfClass(fTrace, KernelAnalysis.class)) {
+        for (IAnalysisModule mod : TmfTraceUtils.getAnalysisModulesOfClass(trace, KernelAnalysis.class)) {
             module = mod;
         }
         assertNotNull(module);
@@ -99,8 +99,9 @@ public class CpuUsageStateProviderTest {
         module.waitForCompletion();
         /* End of the FIXME block */
 
-        fModule = TmfTraceUtils.getAnalysisModuleOfClass(fTrace, KernelCpuUsageAnalysis.class, KernelCpuUsageAnalysis.ID);
+        fModule = TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelCpuUsageAnalysis.class, KernelCpuUsageAnalysis.ID);
         assertNotNull(fModule);
+        fTrace = trace;
     }
 
     /**

@@ -73,27 +73,28 @@ public class KernelThreadInformationProviderTest {
      */
     @Before
     public void setUp() {
-        fTrace = new TmfXmlTraceStub();
+        ITmfTrace trace = new TmfXmlTraceStub();
         IPath filePath = Activator.getAbsoluteFilePath(LTTNG_KERNEL_FILE);
-        IStatus status = fTrace.validate(null, filePath.toOSString());
+        IStatus status = trace.validate(null, filePath.toOSString());
         if (!status.isOK()) {
             fail(status.getException().getMessage());
         }
         try {
-            fTrace.initTrace(null, filePath.toOSString(), TmfEvent.class);
+            trace.initTrace(null, filePath.toOSString(), TmfEvent.class);
         } catch (TmfTraceException e) {
             fail(e.getMessage());
         }
-        deleteSuppFiles(fTrace);
-        ((TmfTrace) fTrace).traceOpened(new TmfTraceOpenedSignal(this, fTrace, null));
+        deleteSuppFiles(trace);
+        ((TmfTrace) trace).traceOpened(new TmfTraceOpenedSignal(this, trace, null));
         IAnalysisModule module = null;
-        for (IAnalysisModule mod : TmfTraceUtils.getAnalysisModulesOfClass(fTrace, KernelAnalysis.class)) {
+        for (IAnalysisModule mod : TmfTraceUtils.getAnalysisModulesOfClass(trace, KernelAnalysis.class)) {
             module = mod;
         }
         assertNotNull(module);
         module.schedule();
         module.waitForCompletion();
-        fModule = TmfTraceUtils.getAnalysisModuleOfClass(fTrace, KernelAnalysis.class, KernelAnalysis.ID);
+        fModule = TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelAnalysis.class, KernelAnalysis.ID);
+        fTrace = trace;
     }
 
     /**

@@ -342,6 +342,7 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
             }
         } else {
             for (String moduleId : analysisIds) {
+                moduleId = checkNotNull(moduleId);
                 ITmfAnalysisModuleWithStateSystems module = TmfTraceUtils.getAnalysisModuleOfClass(trace, ITmfAnalysisModuleWithStateSystems.class, moduleId);
                 if (module != null) {
                     stateSystemModules.add(module);

@@ -127,10 +127,13 @@ public class TmfTraceUtilsTest {
      */
     @Test
     public void testGetModulesByClass() {
-        /* Open the trace, the modules should be populated */
-        fTrace.traceOpened(new TmfTraceOpenedSignal(this, fTrace, null));
+        TmfTrace trace = fTrace;
+        assertNotNull(trace);
 
-        Iterable<TestAnalysis> testModules = TmfTraceUtils.getAnalysisModulesOfClass(fTrace, TestAnalysis.class);
+        /* Open the trace, the modules should be populated */
+        trace.traceOpened(new TmfTraceOpenedSignal(this, trace, null));
+
+        Iterable<TestAnalysis> testModules = TmfTraceUtils.getAnalysisModulesOfClass(trace, TestAnalysis.class);
         assertTrue(testModules.iterator().hasNext());
 
         int count = 0;
@@ -144,9 +147,9 @@ public class TmfTraceUtilsTest {
          */
         assertTrue(count >= 2);
 
-        TestAnalysis module = TmfTraceUtils.getAnalysisModuleOfClass(fTrace, TestAnalysis.class, AnalysisManagerTest.MODULE_PARAM);
+        TestAnalysis module = TmfTraceUtils.getAnalysisModuleOfClass(trace, TestAnalysis.class, AnalysisManagerTest.MODULE_PARAM);
         assertNotNull(module);
-        IAnalysisModule traceModule = fTrace.getAnalysisModule(AnalysisManagerTest.MODULE_PARAM);
+        IAnalysisModule traceModule = trace.getAnalysisModule(AnalysisManagerTest.MODULE_PARAM);
         assertNotNull(traceModule);
         assertEquals(module, traceModule);
 
@@ -157,12 +160,15 @@ public class TmfTraceUtilsTest {
      */
     @Test
     public void testResolveEventAspectsOfClassForEvent() {
-        ITmfContext context = fTrace.seekEvent(0L);
-        ITmfEvent event = fTrace.getNext(context);
+        TmfTrace trace = fTrace;
+        assertNotNull(trace);
+
+        ITmfContext context = trace.seekEvent(0L);
+        ITmfEvent event = trace.getNext(context);
         assertNotNull(event);
 
         /* Make sure the CPU aspect returns the expected value */
-        Object cpuObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(fTrace,  TmfCpuAspect.class, event);
+        Object cpuObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(trace,  TmfCpuAspect.class, event);
         assertNotNull(cpuObj);
         assertEquals(1, cpuObj);
 

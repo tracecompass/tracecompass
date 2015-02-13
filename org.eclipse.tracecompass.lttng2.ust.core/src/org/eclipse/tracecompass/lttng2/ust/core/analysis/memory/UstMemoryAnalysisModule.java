@@ -42,7 +42,7 @@ public class UstMemoryAnalysisModule extends TmfStateSystemAnalysisModule {
     /**
      * Analysis ID, it should match that in the plugin.xml file
      */
-    public static String ID = "org.eclipse.linuxtools.lttng2.ust.analysis.memory"; //$NON-NLS-1$
+    public static final @NonNull String ID = "org.eclipse.linuxtools.lttng2.ust.analysis.memory"; //$NON-NLS-1$
 
     private static final ImmutableSet<String> REQUIRED_EVENTS = ImmutableSet.of(
             UstMemoryStrings.MALLOC,

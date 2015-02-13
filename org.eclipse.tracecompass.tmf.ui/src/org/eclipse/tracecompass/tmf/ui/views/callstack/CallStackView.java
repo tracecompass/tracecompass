@@ -14,6 +14,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.callstack;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +31,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -455,11 +458,11 @@ public class CallStackView extends TmfView {
     }
 
     private class BuildThread extends Thread {
-        private final ITmfTrace fBuildTrace;
+        private final @NonNull ITmfTrace fBuildTrace;
         private final ITmfTrace fParentTrace;
         private final IProgressMonitor fMonitor;
 
-        public BuildThread(ITmfTrace trace, ITmfTrace parentTrace) {
+        public BuildThread(@NonNull ITmfTrace trace, ITmfTrace parentTrace) {
             super("CallStackView build"); //$NON-NLS-1$
             fBuildTrace = trace;
             fParentTrace = parentTrace;
@@ -833,6 +836,7 @@ public class CallStackView extends TmfView {
                 refresh();
                 synchronized (fBuildThreadMap) {
                     for (ITmfTrace trace : TmfTraceManager.getTraceSet(fTrace)) {
+                        trace = checkNotNull(trace);
                         BuildThread buildThread = new BuildThread(trace, fTrace);
                         fBuildThreadMap.put(trace, buildThread);
                         buildThread.start();
@@ -846,7 +850,7 @@ public class CallStackView extends TmfView {
         }
     }
 
-    private void buildThreadList(final ITmfTrace trace, final ITmfTrace parentTrace, IProgressMonitor monitor) {
+    private void buildThreadList(final @NonNull ITmfTrace trace, final ITmfTrace parentTrace, IProgressMonitor monitor) {
         if (monitor.isCanceled()) {
             return;
         }
@@ -1314,7 +1318,7 @@ public class CallStackView extends TmfView {
         return fPrevEventAction;
     }
 
-    private static @Nullable AbstractCallStackAnalysis getCallStackModule(ITmfTrace trace) {
+    private static @Nullable AbstractCallStackAnalysis getCallStackModule(@NonNull ITmfTrace trace) {
         /*
          * Since we cannot know the exact analysis ID (in separate plugins), we
          * will search using the analysis type.

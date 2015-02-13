@@ -13,6 +13,8 @@
 
 package org.eclipse.tracecompass.tmf.analysis.xml.ui.views.timegraph;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -245,6 +247,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
         List<Element> entries = XmlUtils.getChildElements(viewElement, TmfXmlUiStrings.ENTRY_ELEMENT);
         Set<XmlEntry> entryList = new TreeSet<>(getEntryComparator());
         for (ITmfTrace aTrace : TmfTraceManager.getTraceSet(trace)) {
+            aTrace = checkNotNull(aTrace);
             if (monitor.isCanceled()) {
                 return;
             }
@@ -259,6 +262,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
                 }
             } else {
                 for (String moduleId : analysisIds) {
+                    moduleId = checkNotNull(moduleId);
                     ITmfAnalysisModuleWithStateSystems module = TmfTraceUtils.getAnalysisModuleOfClass(aTrace, ITmfAnalysisModuleWithStateSystems.class, moduleId);
                     if (module != null) {
                         stateSystemModules.add(module);

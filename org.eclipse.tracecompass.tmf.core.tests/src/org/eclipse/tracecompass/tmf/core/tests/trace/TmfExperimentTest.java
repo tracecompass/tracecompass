@@ -195,14 +195,17 @@ public class TmfExperimentTest {
 
     @Test
     public void testGetAnalysisModules() {
+        TmfExperiment experiment = fExperiment;
+        assertNotNull(experiment);
+
         /* There should not be any modules at this point */
-        Iterable<IAnalysisModule> modules = fExperiment.getAnalysisModules();
+        Iterable<IAnalysisModule> modules = experiment.getAnalysisModules();
         assertFalse(modules.iterator().hasNext());
 
         /* Open the experiment, the modules should be populated */
-        fExperiment.traceOpened(new TmfTraceOpenedSignal(this, fExperiment, null));
-        modules = fExperiment.getAnalysisModules();
-        Iterable<TestExperimentAnalysis> testModules = TmfTraceUtils.getAnalysisModulesOfClass(fExperiment, TestExperimentAnalysis.class);
+        experiment.traceOpened(new TmfTraceOpenedSignal(this, experiment, null));
+        modules = experiment.getAnalysisModules();
+        Iterable<TestExperimentAnalysis> testModules = TmfTraceUtils.getAnalysisModulesOfClass(experiment, TestExperimentAnalysis.class);
         assertTrue(modules.iterator().hasNext());
         assertTrue(testModules.iterator().hasNext());
     }

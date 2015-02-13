@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.core.trace.experiment;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -87,6 +89,7 @@ public final class TmfExperimentUtils {
      */
     public static @Nullable <T extends IAnalysisModule> T getAnalysisModuleOfClassForHost(TmfExperiment experiment, String hostId, Class<T> moduleClass) {
         for (ITmfTrace trace : getTracesFromHost(experiment, hostId)) {
+            trace = checkNotNull(trace);
             for (T module : TmfTraceUtils.getAnalysisModulesOfClass(trace, moduleClass)) {
                 return module;
             }

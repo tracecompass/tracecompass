@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.lttng2.kernel.core.tests.analysis.vm;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -96,6 +97,7 @@ public class VirtualMachineAnalysisTest {
          * is implemented, we can remove this
          */
         for (ITmfTrace trace : experiment.getTraces()) {
+            trace = checkNotNull(trace);
             for (KernelAnalysis module : TmfTraceUtils.getAnalysisModulesOfClass(trace, KernelAnalysis.class)) {
                 module.schedule();
                 module.waitForCompletion();

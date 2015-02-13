@@ -29,6 +29,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeExcept
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLineChartViewer;
 
@@ -63,8 +64,9 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
 
     @Override
     protected void initializeDataSource() {
-        if (getTrace() != null) {
-            fModule = TmfTraceUtils.getAnalysisModuleOfClass(getTrace(), TmfStateSystemAnalysisModule.class, UstMemoryAnalysisModule.ID);
+        ITmfTrace trace = getTrace();
+        if (trace != null) {
+            fModule = TmfTraceUtils.getAnalysisModuleOfClass(trace, TmfStateSystemAnalysisModule.class, UstMemoryAnalysisModule.ID);
             if (fModule == null) {
                 return;
             }

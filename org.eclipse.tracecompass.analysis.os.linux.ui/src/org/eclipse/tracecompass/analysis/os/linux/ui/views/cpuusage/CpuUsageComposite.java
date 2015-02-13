@@ -195,7 +195,10 @@ public class CpuUsageComposite extends AbstractTmfTreeViewer {
 
     @Override
     public void initializeDataSource() {
-        fModule = TmfTraceUtils.getAnalysisModuleOfClass(getTrace(), KernelCpuUsageAnalysis.class, KernelCpuUsageAnalysis.ID);
+        /* Should not be called while trace is still null */
+        ITmfTrace trace = checkNotNull(getTrace());
+
+        fModule = TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelCpuUsageAnalysis.class, KernelCpuUsageAnalysis.ID);
         if (fModule == null) {
             return;
         }

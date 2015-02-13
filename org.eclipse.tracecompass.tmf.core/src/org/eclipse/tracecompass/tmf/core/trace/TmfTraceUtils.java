@@ -15,7 +15,7 @@ package org.eclipse.tracecompass.tmf.core.trace;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -26,6 +26,7 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
  *
  * @author Alexandre Montplaisir
  */
+@NonNullByDefault
 public final class TmfTraceUtils {
 
     private TmfTraceUtils() {
@@ -65,7 +66,7 @@ public final class TmfTraceUtils {
      *            Returned modules must extend this class
      * @return List of modules of class moduleClass
      */
-    public static @NonNull <T> Iterable<T> getAnalysisModulesOfClass(ITmfTrace trace, Class<T> moduleClass) {
+    public static <T> Iterable<T> getAnalysisModulesOfClass(ITmfTrace trace, Class<T> moduleClass) {
         Iterable<IAnalysisModule> analysisModules = trace.getAnalysisModules();
         Set<T> modules = new HashSet<>();
         for (IAnalysisModule module : analysisModules) {
@@ -91,8 +92,8 @@ public final class TmfTraceUtils {
      *         {@link ITmfEventAspect#resolve(ITmfEvent)} that returns non null
      *         for the event or {@code null} otherwise
      */
-    public static <T extends ITmfEventAspect> Object resolveEventAspectOfClassForEvent(
-            ITmfTrace trace, Class<T> aspectClass, @NonNull ITmfEvent event) {
+    public static @Nullable <T extends ITmfEventAspect> Object resolveEventAspectOfClassForEvent(
+            ITmfTrace trace, Class<T> aspectClass, ITmfEvent event) {
         Iterable<ITmfEventAspect> aspects = trace.getEventAspects();
         for (ITmfEventAspect aspect : aspects) {
             if (aspectClass.isAssignableFrom(aspect.getClass())) {

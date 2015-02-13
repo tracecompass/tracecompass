@@ -18,6 +18,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
@@ -35,7 +36,7 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
         implements ITmfAnalysisModuleWithStateSystems {
 
     /** ID of this analysis module */
-    public static final String ID = "org.eclipse.linuxtools.tmf.core.statistics.analysis"; //$NON-NLS-1$
+    public static final @NonNull String ID = "org.eclipse.linuxtools.tmf.core.statistics.analysis"; //$NON-NLS-1$
 
     /** The trace's statistics */
     private ITmfStatistics fStatistics = null;

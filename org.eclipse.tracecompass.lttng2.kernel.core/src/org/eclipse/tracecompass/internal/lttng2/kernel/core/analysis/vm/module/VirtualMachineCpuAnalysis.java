@@ -13,6 +13,8 @@
 
 package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.module;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
@@ -94,6 +96,7 @@ public class VirtualMachineCpuAnalysis extends TmfStateSystemAnalysisModule {
         Set<IAnalysisModule> modules = new HashSet<>();
         /* Depends on the LTTng Kernel analysis modules */
         for (ITmfTrace trace : TmfTraceManager.getTraceSet(getTrace())) {
+            trace = checkNotNull(trace);
             for (KernelAnalysis module : TmfTraceUtils.getAnalysisModulesOfClass(trace, KernelAnalysis.class)) {
                 modules.add(module);
             }
