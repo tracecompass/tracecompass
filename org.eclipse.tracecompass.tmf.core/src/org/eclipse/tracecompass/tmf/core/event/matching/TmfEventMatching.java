@@ -162,8 +162,10 @@ public class TmfEventMatching implements ITmfEventMatching {
      * Method that initializes any data structure for the event matching. It
      * also assigns to each trace an event matching definition instance that
      * applies to the trace
+     *
+     * @since 1.0
      */
-    protected void initMatching() {
+    public void initMatching() {
         // Initialize the matching infrastructure (unmatched event lists)
         fUnmatchedIn.clear();
         fUnmatchedOut.clear();
@@ -216,7 +218,7 @@ public class TmfEventMatching implements ITmfEventMatching {
      *            The monitor for the synchronization job
      * @since 1.0
      */
-    protected void matchEvent(ITmfEvent event, ITmfTrace trace, @NonNull IProgressMonitor monitor) {
+    public void matchEvent(ITmfEvent event, ITmfTrace trace, @NonNull IProgressMonitor monitor) {
         ITmfMatchEventDefinition def = null;
         Direction evType = null;
         for (ITmfMatchEventDefinition oneDef : getEventDefinitions(event.getTrace())) {
