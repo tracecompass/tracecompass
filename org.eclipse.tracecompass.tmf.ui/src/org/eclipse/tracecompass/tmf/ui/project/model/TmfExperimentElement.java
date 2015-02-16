@@ -17,6 +17,8 @@ package org.eclipse.tracecompass.tmf.ui.project.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -196,6 +198,13 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
             }, IResource.NONE);
         } catch (CoreException e) {
         }
+        Comparator<IResource> comparator = new Comparator<IResource>() {
+            @Override
+            public int compare(IResource o1, IResource o2) {
+                return o1.getFullPath().toString().compareTo(o2.getFullPath().toString());
+            }
+        };
+        Collections.sort(list, comparator);
         return list;
     }
 
