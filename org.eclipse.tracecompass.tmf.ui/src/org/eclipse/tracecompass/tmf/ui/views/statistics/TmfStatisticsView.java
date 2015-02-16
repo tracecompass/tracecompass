@@ -26,6 +26,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.viewers.ITmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.statistics.TmfStatisticsViewer;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
@@ -90,7 +91,7 @@ public class TmfStatisticsView extends TmfView {
         fStatsViewers.setParent(parent);
         createStatisticsViewers();
 
-        ITmfTrace trace = getActiveTrace();
+        ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
         if (trace != null) {
             traceSelected(new TmfTraceSelectedSignal(this, trace));
         }

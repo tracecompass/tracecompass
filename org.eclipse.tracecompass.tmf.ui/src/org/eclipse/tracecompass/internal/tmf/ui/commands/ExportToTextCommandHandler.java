@@ -52,7 +52,7 @@ public class ExportToTextCommandHandler extends AbstractHandler {
     public Object execute(ExecutionEvent event) throws ExecutionException {
         List<TmfEventTableColumn> columns = getColumns(event.getApplicationContext());
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
-        ITmfFilter filter = TmfTraceManager.getInstance().getCurrentFilter();
+        ITmfFilter filter = TmfTraceManager.getInstance().getCurrentTraceContext().getFilter();
         if (trace != null) {
             FileDialog fd = new FileDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), SWT.SAVE);
             fd.setFilterExtensions(new String[] { "*.csv", "*.*", "*" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

@@ -55,6 +55,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
@@ -320,7 +321,7 @@ public class StreamListView extends TmfView {
     public void createPartControl(@Nullable Composite parent) {
         // Initialize
         fTableMap = new HashMap<>();
-        fCurrentTrace = getActiveTrace();
+        fCurrentTrace = TmfTraceManager.getInstance().getActiveTrace();
         fCurrentStream = null;
 
         // Add a tab folder

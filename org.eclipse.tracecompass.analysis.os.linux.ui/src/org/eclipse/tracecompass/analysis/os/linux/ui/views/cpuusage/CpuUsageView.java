@@ -22,6 +22,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 
 /**
@@ -76,7 +77,7 @@ public class CpuUsageView extends TmfView {
         sash.setLayout(new FillLayout());
 
         /* Initialize the viewers with the currently selected trace */
-        ITmfTrace trace = getActiveTrace();
+        ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
         if (trace != null) {
             TmfTraceSelectedSignal signal = new TmfTraceSelectedSignal(this, trace);
             fTreeViewer.traceSelected(signal);

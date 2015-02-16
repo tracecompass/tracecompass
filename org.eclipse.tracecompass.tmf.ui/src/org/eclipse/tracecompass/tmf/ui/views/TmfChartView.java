@@ -13,6 +13,7 @@ package org.eclipse.tracecompass.tmf.ui.views;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 
 /**
@@ -91,7 +92,7 @@ abstract public class TmfChartView extends TmfView {
     // ------------------------------------------------------------------------
     @Override
     public void createPartControl(Composite parent) {
-        ITmfTrace trace = getActiveTrace();
+        ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
         if (trace != null) {
             setTrace(trace);
             loadTrace();

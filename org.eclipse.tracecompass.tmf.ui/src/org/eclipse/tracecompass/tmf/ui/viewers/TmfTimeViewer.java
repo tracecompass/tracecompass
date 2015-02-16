@@ -27,6 +27,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 
 /**
@@ -272,10 +273,12 @@ public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvide
     public void loadTrace(ITmfTrace trace) {
         fTrace = trace;
 
-        long timestamp = TmfTraceManager.getInstance().getSelectionBeginTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-        TmfTimeRange currentRange = TmfTraceManager.getInstance().getCurrentRange();
-        long windowStartTime = currentRange.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-        long windowEndTime = currentRange.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
+        long timestamp = ctx.getSelectionRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        TmfTimeRange windowRange = ctx.getWindowRange();
+
+        long windowStartTime = windowRange.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+        long windowEndTime = windowRange.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
         long windowDuration = windowEndTime - windowStartTime;
         long startTime = fTrace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
         long endTime = fTrace.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();

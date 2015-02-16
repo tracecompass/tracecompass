@@ -50,6 +50,7 @@ import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsModule;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
@@ -112,9 +113,6 @@ public class TmfStatisticsViewer extends TmfViewer {
     /** Tells to send a time range request when the trace gets updated. */
     private boolean fSendRangeRequest = true;
 
-    /** Reference to the trace manager */
-    private final TmfTraceManager fTraceManager;
-
     private final Map<ITmfTrace, Job> fUpdateJobsPartial = new HashMap<>();
     private final Map<ITmfTrace, Job> fUpdateJobsGlobal = new HashMap<>();
 
@@ -136,7 +134,6 @@ public class TmfStatisticsViewer extends TmfViewer {
      */
     public TmfStatisticsViewer(Composite parent, String viewerName, ITmfTrace trace) {
         init(parent, viewerName, trace);
-        fTraceManager = TmfTraceManager.getInstance();
     }
 
     /**
@@ -204,9 +201,9 @@ public class TmfStatisticsViewer extends TmfViewer {
             // Sends the time range request only once from this method.
             if (fSendRangeRequest) {
                 fSendRangeRequest = false;
-                ITmfTimestamp begin = fTraceManager.getSelectionBeginTime();
-                ITmfTimestamp end = fTraceManager.getSelectionEndTime();
-                TmfTimeRange timeRange = new TmfTimeRange(begin, end);
+
+                TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
+                TmfTimeRange timeRange = ctx.getSelectionRange();
                 requestTimeRangeData(trace, timeRange);
             }
         }
