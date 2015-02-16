@@ -63,24 +63,13 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
             int value = tcEvent.getValue();
 
             if (entry.getType() == EntryDisplayType.DISPLAY) {
+                // Draw state only if state is already known
                 Integer index = stateIndex.get(value);
-                if (index == null) {
-                    /* Colors won't be refreshed yet, return something known */
-                    index = TRANSPARENT;
-                    stateIndex.put(value, stateValues.size());
-                    StateItem item = new StateItem(calcColor(stateValues.size()), String.valueOf(value));
-                    stateValues.add(item);
-                    Display.getDefault().asyncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            fireColorSettingsChanged();
-                        }
-                    });
+                if (index != null) {
+                    return index;
                 }
-                return index;
             }
         }
-
         return INVISIBLE;
     }
 
