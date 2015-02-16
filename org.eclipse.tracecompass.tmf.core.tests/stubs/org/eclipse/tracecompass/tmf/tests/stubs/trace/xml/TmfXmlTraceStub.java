@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Geneviève Bastien - Initial implementation
+ *   Patrick Tasse - Dispose wrapped trace
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.tests.stubs.trace.xml;
@@ -136,6 +137,12 @@ public class TmfXmlTraceStub extends TmfTrace {
             this.setStartTime(curTime);
             this.setEndTime(curTime);
         }
+    }
+
+    @Override
+    public synchronized void dispose() {
+        super.dispose();
+        fTrace.dispose();
     }
 
     @Override
