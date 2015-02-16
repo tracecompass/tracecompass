@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
  *
@@ -8,6 +8,9 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
+ * Contributors:
+ *   Alexandre Montplaisir - Initial API and implementation
+ *   Patrick Tasse - Add message to exceptions
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.statesystem.core;
@@ -241,7 +244,7 @@ public final class AttributeTree {
              * The attribute doesn't exist, but we have been specified to NOT
              * add any new attributes.
              */
-            throw new AttributeNotFoundException();
+            throw new AttributeNotFoundException(ss.getSSID() + " Quark:" + startingNodeQuark + ", SubPath:" + Arrays.toString(subPath)); //$NON-NLS-1$ //$NON-NLS-2$
         }
         /*
          * The attribute was already existing, return the quark of that
@@ -325,7 +328,7 @@ public final class AttributeTree {
 
         /* Check if the quark is valid */
         if (attributeQuark < -1 || attributeQuark >= attributeList.size()) {
-            throw new AttributeNotFoundException();
+            throw new AttributeNotFoundException(ss.getSSID() + " Quark:" + attributeQuark); //$NON-NLS-1$
         }
 
         /* Set up the node from which we'll start the search */

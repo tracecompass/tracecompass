@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ecole Polytechnique de Montreal
+ * Copyright (c) 2014, 2015 Ecole Polytechnique de Montreal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,6 +9,7 @@
  * Contributors:
  *   Florian Wininger - Initial API and implementation
  *   Naser Ezzati - Add the comparison operators
+ *   Patrick Tasse - Add message to exceptions
  ******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.analysis.xml.core.model;
@@ -221,7 +222,7 @@ public class TmfXmlCondition {
                  * check
                  */
                 if (quark == IXmlStateSystemContainer.ERROR_QUARK) {
-                    throw new AttributeNotFoundException();
+                    throw new AttributeNotFoundException(ss.getSSID() + " Attribute:" + attribute); //$NON-NLS-1$
                 }
             }
 

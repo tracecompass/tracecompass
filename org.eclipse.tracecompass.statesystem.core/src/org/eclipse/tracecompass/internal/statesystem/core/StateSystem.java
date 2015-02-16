@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
  *
@@ -8,6 +8,9 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
+ * Contributors:
+ *   Alexandre Montplaisir - Initial API and implementation
+ *   Patrick Tasse - Add message to exceptions
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.statesystem.core;
@@ -405,7 +408,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
             stackDepth = previousSV.unboxInt();
         } else {
             /* Previous state of this attribute was another type? Not good! */
-            throw new StateValueTypeException();
+            throw new StateValueTypeException(getSSID() + " Quark:" + attributeQuark + ", Type:" + previousSV.getType() + ", Expected:" + Type.INTEGER); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
 
         if (stackDepth >= 100000) {
@@ -413,8 +416,8 @@ public class StateSystem implements ITmfStateSystemBuilder {
              * Limit stackDepth to 100000, to avoid having Attribute Trees grow
              * out of control due to buggy insertions
              */
-            String message = "Stack limit reached, not pushing"; //$NON-NLS-1$
-            throw new AttributeNotFoundException(message);
+            String message = " Stack limit reached, not pushing"; //$NON-NLS-1$
+            throw new AttributeNotFoundException(getSSID() + " Quark:" + attributeQuark + message); //$NON-NLS-1$
         }
 
         stackDepth++;
@@ -429,7 +432,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
             throws AttributeNotFoundException, TimeRangeException,
             StateValueTypeException {
         /* These are the state values of the stack-attribute itself */
-        ITmfStateValue previousSV = queryOngoingState(attributeQuark);
+        ITmfStateValue previousSV = transState.getOngoingStateValue(attributeQuark);
 
         if (previousSV.isNull()) {
             /*
@@ -445,16 +448,14 @@ public class StateSystem implements ITmfStateSystemBuilder {
              * The existing value was not an integer (which is expected for
              * stack tops), this doesn't look like a valid stack attribute.
              */
-            throw new StateValueTypeException();
+            throw new StateValueTypeException(getSSID() + " Quark:" + attributeQuark + ", Type:" + previousSV.getType() + ", Expected:" + Type.INTEGER); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
 
         int stackDepth = previousSV.unboxInt();
 
         if (stackDepth <= 0) {
             /* This on the other hand should not happen... */
-            String message = "A top-level stack attribute cannot " + //$NON-NLS-1$
-                    "have a value of 0 or less."; //$NON-NLS-1$
-            throw new StateValueTypeException(message);
+            throw new StateValueTypeException(getSSID() + " Quark:" + attributeQuark + ", Stack depth:" + stackDepth);  //$NON-NLS-1$//$NON-NLS-2$
         }
 
         /* The attribute should already exist at this point */

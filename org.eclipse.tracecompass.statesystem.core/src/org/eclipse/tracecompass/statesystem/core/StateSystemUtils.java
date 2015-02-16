@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2015 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,6 +9,7 @@
  * Contributors:
  *   Geneviève Bastien - Initial API and implementation
  *   Alexandre Montplaisir - Initial API and implementation
+ *   Patrick Tasse - Add message to exceptions
  *******************************************************************************/
 
 package org.eclipse.tracecompass.statesystem.core;
@@ -82,7 +83,7 @@ public final class StateSystemUtils {
              * This attribute is an integer attribute, but it doesn't seem like
              * it's used as a stack-attribute...
              */
-            throw new StateValueTypeException();
+            throw new StateValueTypeException(ss.getSSID() + " Quark:" + stackAttributeQuark + ", Stack depth:" + curStackDepth);  //$NON-NLS-1$//$NON-NLS-2$
         }
 
         int subAttribQuark = ss.getQuarkRelative(stackAttributeQuark, String.valueOf(curStackDepth));
@@ -126,7 +127,7 @@ public final class StateSystemUtils {
 
         /* Make sure the time range makes sense */
         if (t2 < t1) {
-            throw new TimeRangeException();
+            throw new TimeRangeException(ss.getSSID() + " Start:" + t1 + ", End:" + t2); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         /* Set the actual, valid end time of the range query */
@@ -193,7 +194,7 @@ public final class StateSystemUtils {
 
         /* Make sure the time range makes sense */
         if (t2 < t1 || resolution <= 0) {
-            throw new TimeRangeException();
+            throw new TimeRangeException(ss.getSSID() + " Start:" + t1 + ", End:" + t2 + ", Resolution:" + resolution); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
 
         /* Set the actual, valid end time of the range query */

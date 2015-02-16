@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2012, 2015 Ericsson, École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
  *
  * All rights reserved. This program and the accompanying materials are
@@ -10,6 +10,7 @@
  * Contributors:
  *    Alexandre Montplaisir - Initial API and implementation
  *    Florian Wininger - Allow to change the size of a interval
+ *    Patrick Tasse - Add message to exceptions
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
@@ -86,7 +87,7 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
     public HTInterval(long intervalStart, long intervalEnd, int attribute,
             TmfStateValue value) throws TimeRangeException {
         if (intervalStart > intervalEnd) {
-            throw new TimeRangeException();
+            throw new TimeRangeException("Start:" + intervalStart + ", End:" + intervalEnd); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         this.start = intervalStart;
@@ -105,7 +106,7 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
     private HTInterval(long intervalStart, long intervalEnd, int attribute,
             TmfStateValue value, int size) throws TimeRangeException {
         if (intervalStart > intervalEnd) {
-            throw new TimeRangeException();
+            throw new TimeRangeException("Start:" + intervalStart + ", End:" + intervalEnd); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         this.start = intervalStart;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
  *
@@ -8,6 +8,9 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
+ * Contributors:
+ *   Alexandre Montplaisir - Initial API and implementation
+ *   Patrick Tasse - Add message to exceptions
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.statesystem.core;
@@ -198,7 +201,7 @@ public class TransientState {
 
     private void checkValidAttribute(int quark) throws AttributeNotFoundException {
         if (quark > fOngoingStateInfo.size() - 1 || quark < 0) {
-            throw new AttributeNotFoundException();
+            throw new AttributeNotFoundException(fBackend.getSSID() + " Quark:" + quark); //$NON-NLS-1$
         }
     }
 
@@ -299,7 +302,7 @@ public class TransientState {
                  * but for every other types, it needs to match our
                  * expectations!
                  */
-                throw new StateValueTypeException();
+                throw new StateValueTypeException(fBackend.getSSID() + " Quark:" + quark + ", Type:" + value.getType() + ", Expected:" + expectedSvType); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             }
 
             if (fOngoingStateInfo.get(quark).equals(value)) {

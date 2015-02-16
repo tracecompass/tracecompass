@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson, École Polytechnique de Montréal, and others
+ * Copyright (c) 2010, 2015 Ericsson, École Polytechnique de Montréal, and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,6 +9,7 @@
  * Contributors:
  *   Alexandre Montplaisir - Initial API and implementation
  *   Florian Wininger - Add Extension and Leaf Node
+ *   Patrick Tasse - Add message to exceptions
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
@@ -430,7 +431,7 @@ public class HistoryTree {
      */
     public void insertInterval(HTInterval interval) throws TimeRangeException {
         if (interval.getStartTime() < config.getTreeStart()) {
-            throw new TimeRangeException();
+            throw new TimeRangeException("Interval Start:" + interval.getStartTime() + ", Config Start:" + config.getTreeStart()); //$NON-NLS-1$ //$NON-NLS-2$
         }
         tryInsertAtNode(interval, latestBranch.size() - 1);
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
  *
@@ -8,6 +8,9 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
+ * Contributors:
+ *   Alexandre Montplaisir - Initial API and implementation
+ *   Patrick Tasse - Add message to exceptions
  *******************************************************************************/
 
 package org.eclipse.tracecompass.statesystem.core.backend.historytree;
@@ -230,10 +233,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     @Override
     public void doQuery(List<ITmfStateInterval> stateInfo, long t)
             throws TimeRangeException, StateSystemDisposedException {
-        if (!checkValidTime(t)) {
-            /* We can't possibly have information about this query */
-            throw new TimeRangeException();
-        }
+        checkValidTime(t);
 
         /* We start by reading the information in the root node */
         HTNode currentNode = sht.getRootNode();
@@ -262,8 +262,12 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         return getRelevantInterval(t, attributeQuark);
     }
 
-    private boolean checkValidTime(long t) {
-        return (t >= sht.getTreeStart() && t <= sht.getTreeEnd());
+    private void checkValidTime(long t) {
+        long treeStart = sht.getTreeStart();
+        long treeEnd = sht.getTreeEnd();
+        if (t < treeStart || t > treeEnd) {
+            throw new TimeRangeException(ssid + " Time:" + t + ", Start:" + treeStart + ", End:" + treeEnd); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        }
     }
 
     /**
@@ -276,9 +280,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      */
     private HTInterval getRelevantInterval(long t, int key)
             throws TimeRangeException, StateSystemDisposedException {
-        if (!checkValidTime(t)) {
-            throw new TimeRangeException();
-        }
+        checkValidTime(t);
 
         HTNode currentNode = sht.getRootNode();
         HTInterval interval = currentNode.getRelevantInterval(key, t);

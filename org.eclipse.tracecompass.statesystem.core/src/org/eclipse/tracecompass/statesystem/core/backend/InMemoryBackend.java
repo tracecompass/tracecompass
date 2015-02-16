@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,6 +9,7 @@
  * Contributors:
  *   Alexandre Montplaisir - Initial API and implementation
  *   Matthew Khouzam - Modified to use a TreeSet
+ *   Patrick Tasse - Add message to exceptions
  ******************************************************************************/
 
 package org.eclipse.tracecompass.statesystem.core.backend;
@@ -116,7 +117,7 @@ public class InMemoryBackend implements IStateHistoryBackend {
             int quark, ITmfStateValue value) throws TimeRangeException {
         /* Make sure the passed start/end times make sense */
         if (stateStartTime > stateEndTime || stateStartTime < startTime) {
-            throw new TimeRangeException();
+            throw new TimeRangeException(ssid + " Interval Start:" + stateStartTime + ", Interval End:" + stateEndTime + ", Backend Start:" + startTime); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
 
         ITmfStateInterval interval = new TmfStateInterval(stateStartTime, stateEndTime, quark, value);
@@ -136,7 +137,7 @@ public class InMemoryBackend implements IStateHistoryBackend {
     public void doQuery(List<ITmfStateInterval> currentStateInfo, long t)
             throws TimeRangeException {
         if (!checkValidTime(t)) {
-            throw new TimeRangeException();
+            throw new TimeRangeException(ssid + " Time:" + t + ", Start:" + startTime + ", End:" + latestTime); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
 
         /*
@@ -161,7 +162,7 @@ public class InMemoryBackend implements IStateHistoryBackend {
     public ITmfStateInterval doSingularQuery(long t, int attributeQuark)
             throws TimeRangeException, AttributeNotFoundException {
         if (!checkValidTime(t)) {
-            throw new TimeRangeException();
+            throw new TimeRangeException(ssid + " Time:" + t + ", Start:" + startTime + ", End:" + latestTime); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
 
         /*
@@ -182,7 +183,7 @@ public class InMemoryBackend implements IStateHistoryBackend {
                 }
             }
         }
-        throw new AttributeNotFoundException();
+        throw new AttributeNotFoundException(ssid + " Quark:" + attributeQuark); //$NON-NLS-1$
     }
 
     private boolean checkValidTime(long t) {
