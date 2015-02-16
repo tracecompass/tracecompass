@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Mohamad Gebai - Initial API and implementation
+ *   Patrick Tasse - Fix experiment name
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.trace;
@@ -33,7 +34,7 @@ public class VirtualMachineExperiment extends TmfExperiment {
      * Default constructor. Needed by the extension point.
      */
     public VirtualMachineExperiment() {
-        this("default", checkNotNull(Collections.EMPTY_SET)); //$NON-NLS-1$
+        this("", checkNotNull(Collections.EMPTY_SET)); //$NON-NLS-1$
     }
 
     /**
