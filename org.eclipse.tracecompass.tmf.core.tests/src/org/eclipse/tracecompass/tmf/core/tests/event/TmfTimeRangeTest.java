@@ -69,23 +69,6 @@ public class TmfTimeRangeTest {
         assertEquals("endTime", TmfTimestamp.BIG_CRUNCH, range.getEndTime());
     }
 
-    @Test
-    public void testCopyConstructor() {
-        final ITmfTimestamp ts1 = new TmfTimestamp(12345);
-        final ITmfTimestamp ts2 = new TmfTimestamp(12350);
-        final TmfTimeRange range0 = new TmfTimeRange(ts1, ts2);
-        final TmfTimeRange range1 = new TmfTimeRange(range0);
-
-        assertEquals("startTime", ts1, range1.getStartTime());
-        assertEquals("endTime", ts2, range1.getEndTime());
-
-        final TmfTimeRange range2 = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfTimeRange range3 = new TmfTimeRange(range2);
-
-        assertEquals("startTime", TmfTimestamp.BIG_BANG, range3.getStartTime());
-        assertEquals("endTime", TmfTimestamp.BIG_CRUNCH, range3.getEndTime());
-    }
-
     // ------------------------------------------------------------------------
     // hashCode
     // ------------------------------------------------------------------------
@@ -95,9 +78,9 @@ public class TmfTimeRangeTest {
         final ITmfTimestamp ts1 = new TmfTimestamp(12345);
         final ITmfTimestamp ts2 = new TmfTimestamp(12350);
         final TmfTimeRange range1 = new TmfTimeRange(ts1, ts2);
-        final TmfTimeRange range1b = new TmfTimeRange(range1);
+        final TmfTimeRange range1b =new TmfTimeRange(ts1, ts2);
         final TmfTimeRange range2 = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
-        final TmfTimeRange range2b = new TmfTimeRange(range2);
+        final TmfTimeRange range2b = new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH);
 
         assertTrue("hashCode", range1.hashCode() == range1b.hashCode());
         assertTrue("hashCode", range2.hashCode() == range2b.hashCode());

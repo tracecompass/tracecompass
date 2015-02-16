@@ -182,7 +182,7 @@ public class Uml2SDSignalValidator extends TmfComponent implements IUml2SdSignal
 
     @Override
     public void setCurrentRange(TmfTimeRange currentRange) {
-        fCurrentTimeRange = currentRange == null ? null : new TmfTimeRange(currentRange);
+        fCurrentTimeRange = currentRange == null ? null : currentRange;
     }
 }
 

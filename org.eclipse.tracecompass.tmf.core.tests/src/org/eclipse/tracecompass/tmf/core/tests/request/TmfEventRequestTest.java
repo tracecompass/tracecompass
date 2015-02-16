@@ -37,7 +37,7 @@ public class TmfEventRequestTest {
     // Variables
     // ------------------------------------------------------------------------
 
-    private static TmfTimeRange range1 = new TmfTimeRange(TmfTimeRange.ETERNITY);
+    private static TmfTimeRange range1 = TmfTimeRange.ETERNITY;
     private static TmfTimeRange range2 = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BIG_CRUNCH);
 
     private static TmfEventRequest fRequest1;
@@ -59,7 +59,7 @@ public class TmfEventRequestTest {
 
     private static TmfEventRequest setupTestRequest(final boolean[] flags) {
 
-        TmfEventRequest request = new TmfEventRequestStub(ITmfEvent.class, new TmfTimeRange(TmfTimeRange.ETERNITY), 100, 200) {
+        TmfEventRequest request = new TmfEventRequestStub(ITmfEvent.class, TmfTimeRange.ETERNITY, 100, 200) {
             @Override
             public void handleCompleted() {
                 super.handleCompleted();

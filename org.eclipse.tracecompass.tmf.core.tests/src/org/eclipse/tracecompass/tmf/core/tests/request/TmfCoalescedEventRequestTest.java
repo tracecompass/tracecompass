@@ -54,7 +54,7 @@ public class TmfCoalescedEventRequestTest {
     // Variables
     // ------------------------------------------------------------------------
 
-    private final TmfTimeRange range1 = new TmfTimeRange(TmfTimeRange.ETERNITY);
+    private final TmfTimeRange range1 = TmfTimeRange.ETERNITY;
     private final TmfTimeRange range2 = new TmfTimeRange(new TmfTimestamp(), TmfTimestamp.BIG_CRUNCH);
 
     private TmfCoalescedEventRequest fRequest1;
