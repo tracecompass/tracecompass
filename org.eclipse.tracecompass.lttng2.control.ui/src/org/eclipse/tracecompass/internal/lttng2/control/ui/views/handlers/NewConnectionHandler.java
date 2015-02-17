@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson and others
+ * Copyright (c) 2012, 2015 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -19,14 +19,14 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.window.Window;
 import org.eclipse.remote.core.IRemoteConnection;
-import org.eclipse.remote.core.IRemoteServices;
-import org.eclipse.remote.core.RemoteServices;
+import org.eclipse.remote.core.IRemoteConnectionType;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.Workaround_Bug449362;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.INewConnectionDialog;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.TraceControlDialogFactory;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceControlComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent;
+import org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote.RemoteSystemProxy;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -48,13 +48,13 @@ public class NewConnectionHandler extends BaseControlViewHandler {
     /**
      * Id of the parameter for the remote services id.
      * @see NewConnectionHandler
-     * @see IRemoteServices#getId()
+     * @see IRemoteConnectionType#getId()
      */
     public static final String PARAMETER_REMOTE_SERVICES_ID = "org.eclipse.linuxtools.lttng2.control.ui.remoteServicesIdParameter"; //$NON-NLS-1$
     /**
      * Id of the parameter for the name of the remote connection.
      * @see NewConnectionHandler
-     * @see IRemoteServices#getName()
+     * @see IRemoteConnection#getName()
      */
     public static final String PARAMETER_CONNECTION_NAME = "org.eclipse.linuxtools.lttng2.control.ui.connectionNameParameter"; //$NON-NLS-1$
 
@@ -101,16 +101,10 @@ public class NewConnectionHandler extends BaseControlViewHandler {
         // First check whether arguments have been supplied
         Object remoteServicesId = parameters.get(PARAMETER_REMOTE_SERVICES_ID);
         Object connectionName = parameters.get(PARAMETER_CONNECTION_NAME);
-        if (remoteServicesId != null && connectionName != null) {
-            if (!Workaround_Bug449362.triggerRSEStartup(remoteServicesId.toString())) {
-                // Skip the connection in order to avoid an infinite loop
-            } else {
-                IRemoteServices rs = RemoteServices.getRemoteServices(remoteServicesId.toString());
-                if (rs != null) {
-                    return rs.getConnectionManager().getConnection(connectionName.toString());
-                }
-            }
-            return null;
+        if ((remoteServicesId != null) && (connectionName != null)) {
+            return RemoteSystemProxy.getRemoteConnection(
+                    checkNotNull(remoteServicesId.toString()),
+                    checkNotNull(connectionName.toString()));
         }
 
         // Without the arguments, open dialog box for the node name and address

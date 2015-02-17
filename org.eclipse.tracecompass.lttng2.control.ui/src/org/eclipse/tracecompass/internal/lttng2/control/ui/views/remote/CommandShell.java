@@ -10,6 +10,7 @@
  *   Patrick Tasse - Initial API and implementation
  *   Bernd Hufmann - Updated using Executor Framework
  *   Markus Schorn - Bug 448058: Use org.eclipse.remote in favor of RSE
+ *   Bernd Hufmann - Update to org.eclipse.remote API 2.0
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote;
 
@@ -24,11 +25,10 @@ import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.remote.core.IRemoteProcess;
-import org.eclipse.remote.core.IRemoteProcessBuilder;
+import org.eclipse.remote.core.IRemoteProcessService;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.preferences.ControlPreferences;
 
@@ -43,22 +43,10 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.preferences.Con
 public class CommandShell implements ICommandShell {
 
     // ------------------------------------------------------------------------
-    // Constants
-    // ------------------------------------------------------------------------
-
-    private static final String BEGIN_TAG = "org.eclipse.tracecompass-BEGIN-TAG:"; //$NON-NLS-1$
-    private static final String END_TAG = "org.eclipse.tracecompass-END-TAG:"; //$NON-NLS-1$
-    private static final String RSE_ADAPTER_ID = "org.eclipse.ptp.remote.RSERemoteServices"; //$NON-NLS-1$
-    private static final String SHELL_ECHO_CMD = "echo "; //$NON-NLS-1$
-    private static final char CMD_SEPARATOR = ';';
-    private static final String CMD_RESULT_VAR = " $?"; //$NON-NLS-1$
-
-    // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
     private IRemoteConnection fConnection = null;
     private final ExecutorService fExecutor = Executors.newFixedThreadPool(1);
-    private int fBackedByShell;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -93,10 +81,7 @@ public class CommandShell implements ICommandShell {
                 @Override
                 public CommandResult call() throws IOException, InterruptedException {
                     if (monitor == null || !monitor.isCanceled()) {
-                        final boolean wrapCommand =
-                                RSE_ADAPTER_ID.equals(fConnection.getRemoteServices().getId())
-                                && isBackedByShell();
-                        IRemoteProcess process = startRemoteProcess(wrapCommand, command);
+                        IRemoteProcess process = fConnection.getService(IRemoteProcessService.class).getProcessBuilder(command).start();
                         InputReader stdout = new InputReader(process.getInputStream());
                         InputReader stderr = new InputReader(process.getErrorStream());
 
@@ -104,7 +89,7 @@ public class CommandShell implements ICommandShell {
                             stdout.waitFor(monitor);
                             stderr.waitFor(monitor);
                             if (monitor == null || !monitor.isCanceled()) {
-                                return createResult(wrapCommand, process.waitFor(), stdout.toString(), stderr.toString());
+                                return createResult(process.waitFor(), stdout.toString(), stderr.toString());
                             }
                         } catch (OperationCanceledException e) {
                         } catch (InterruptedException e) {
@@ -136,77 +121,16 @@ public class CommandShell implements ICommandShell {
         throw new ExecutionException(Messages.TraceControl_ShellNotConnected, null);
     }
 
-    private IRemoteProcess startRemoteProcess(boolean wrapCommand, List<String> command) throws IOException {
-        if (wrapCommand) {
-            StringBuilder formattedCommand = new StringBuilder();
-            formattedCommand.append(SHELL_ECHO_CMD).append(BEGIN_TAG);
-            formattedCommand.append(CMD_SEPARATOR);
-            for(String cmd : command) {
-                formattedCommand.append(cmd).append(' ');
-            }
-            formattedCommand.append(CMD_SEPARATOR);
-            formattedCommand.append(SHELL_ECHO_CMD).append(END_TAG).append(CMD_RESULT_VAR);
-            String[] args = formattedCommand.toString().trim().split("\\s+"); //$NON-NLS-1$
-            return fConnection.getProcessBuilder(args).start();
-        }
-
-        return fConnection.getProcessBuilder(command).start();
-    }
-
-    private boolean isBackedByShell() throws InterruptedException {
-        if (fBackedByShell == 0) {
-            String cmd= SHELL_ECHO_CMD + BEGIN_TAG + CMD_SEPARATOR + SHELL_ECHO_CMD + END_TAG;
-            IRemoteProcessBuilder pb = fConnection.getProcessBuilder(cmd.trim().split("\\s+")); //$NON-NLS-1$
-            pb.redirectErrorStream(true);
-            IRemoteProcess process = null;
-            InputReader reader = null;
-            try {
-                process = pb.start();
-                reader = new InputReader(process.getInputStream());
-                reader.waitFor(new NullProgressMonitor());
-                process.waitFor();
-
-                fBackedByShell = -1;
-                String result= reader.toString();
-                int pos = result.indexOf(BEGIN_TAG, skipEchoBeginTag(result));
-                if (pos >= 0 && result.substring(pos + BEGIN_TAG.length()).trim().startsWith(END_TAG)) {
-                    fBackedByShell = 1;
-                }
-            } catch (IOException e) {
-                // On Windows, cannot start built-in echo command
-                fBackedByShell = -1;
-            } finally {
-                if (process != null) {
-                    process.destroy();
-                }
-                if (reader != null) {
-                    reader.stop();
-                }
-            }
-        }
-        return fBackedByShell == 1;
-    }
-
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------
 
-    private static CommandResult createResult(boolean isWrapped, int origResult, String origStdout, String origStderr) {
+    private static CommandResult createResult(int origResult, String origStdout, String origStderr) {
         final int result;
         final String stdout, stderr;
-        if (isWrapped) {
-            String[] holder = {origStdout};
-            result = unwrapOutput(holder);
-            stdout = holder[0];
-            // Workaround if error stream is not available and stderr output is written
-            // in standard output above. This is true for the SshTerminalShell implementation.
-            stderr = origStderr.isEmpty() ? stdout : origStderr;
-        } else {
-            result = origResult;
-            stdout = origStdout;
-            stderr = origStderr;
-        }
-
+        result = origResult;
+        stdout = origStdout;
+        stderr = origStderr;
         String[] output = splitLines(stdout);
         String[] error = splitLines(stderr);
         return new CommandResult(result, output, error);
@@ -219,48 +143,4 @@ public class CommandShell implements ICommandShell {
         return output.split("\\r?\\n"); //$NON-NLS-1$
     }
 
-    private static int unwrapOutput(String[] outputHolder) {
-        String output = outputHolder[0];
-        int begin = skipEchoBeginTag(output);
-        begin = output.indexOf(BEGIN_TAG, begin);
-
-        if (begin < 0) {
-            outputHolder[0] = ""; //$NON-NLS-1$
-            return 1;
-        }
-
-        begin += BEGIN_TAG.length();
-        int end = output.indexOf(END_TAG, begin);
-        if (end < 0) {
-            outputHolder[0] = output.substring(begin).trim();
-            return 1;
-        }
-
-        outputHolder[0] = output.substring(begin, end).trim();
-        String tail = output.substring(end + END_TAG.length()).trim();
-        int numEnd;
-        for (numEnd = 0; numEnd < tail.length(); numEnd++) {
-            if (!Character.isDigit(tail.charAt(numEnd))) {
-                break;
-            }
-        }
-        try {
-            return Integer.parseInt(tail.substring(0, numEnd));
-        } catch (NumberFormatException e) {
-            return 1;
-        }
-    }
-
-    private static int skipEchoBeginTag(String output) {
-        final String searchFor = SHELL_ECHO_CMD + BEGIN_TAG;
-        int begin = 0;
-        for(;;) {
-            int i= output.indexOf(searchFor, begin);
-            if (i >= begin) {
-                begin = i + searchFor.length();
-            } else {
-                return begin;
-            }
-        }
-    }
 }

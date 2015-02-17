@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -24,8 +24,6 @@ import java.net.URL;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.remote.core.IRemoteConnection;
-import org.eclipse.remote.core.IRemoteConnectionManager;
-import org.eclipse.remote.core.RemoteServices;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TargetNodeState;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceChannelOutputType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
@@ -46,6 +44,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.Trac
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceEventComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.UstProviderComponent;
+import org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote.RemoteSystemProxy;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -115,8 +114,7 @@ public class TraceControlUstProviderTests {
 
         ITraceControlComponent root = fFacility.getControlView().getTraceControlRoot();
 
-        IRemoteConnectionManager cm = RemoteServices.getLocalServices().getConnectionManager();
-        IRemoteConnection host = cm.getConnection(IRemoteConnectionManager.LOCAL_CONNECTION_NAME);
+        IRemoteConnection host = RemoteSystemProxy.getLocalConnection();
 
         TargetNodeComponent node = new TargetNodeComponent("myNode", root, host, fProxy);
         root.addChild(node);

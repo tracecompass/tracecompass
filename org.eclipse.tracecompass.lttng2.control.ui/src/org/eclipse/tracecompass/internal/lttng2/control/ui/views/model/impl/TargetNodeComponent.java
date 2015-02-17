@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,6 +10,7 @@
  *   Bernd Hufmann - Initial API and implementation
  *   Bernd Hufmann - Updated for support of LTTng Tools 2.1
  *   Markus Schorn - Bug 448058: Use org.eclipse.remote in favor of RSE
+ *   Bernd Hufmann - Update to org.eclipse.remote API 2.0
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl;
 
@@ -26,8 +27,8 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.remote.core.IRemoteConnection;
-import org.eclipse.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.remote.core.IRemoteConnectionChangeListener;
+import org.eclipse.remote.core.RemoteConnectionChangeEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TargetNodeState;
@@ -292,17 +293,17 @@ public class TargetNodeComponent extends TraceControlComponent implements IRemot
     // ------------------------------------------------------------------------
 
     @Override
-    public void connectionChanged(IRemoteConnectionChangeEvent e) {
+    public void connectionChanged(RemoteConnectionChangeEvent e) {
         if (fState == TargetNodeState.CONNECTING) {
             return;
         }
 
         switch (e.getType()) {
-        case IRemoteConnectionChangeEvent.CONNECTION_CLOSED:
-        case IRemoteConnectionChangeEvent.CONNECTION_ABORTED:
+        case RemoteConnectionChangeEvent.CONNECTION_CLOSED:
+        case RemoteConnectionChangeEvent.CONNECTION_ABORTED:
             handleDisconnected();
             break;
-        case IRemoteConnectionChangeEvent.CONNECTION_OPENED:
+        case RemoteConnectionChangeEvent.CONNECTION_OPENED:
             handleConnected();
             break;
         default:

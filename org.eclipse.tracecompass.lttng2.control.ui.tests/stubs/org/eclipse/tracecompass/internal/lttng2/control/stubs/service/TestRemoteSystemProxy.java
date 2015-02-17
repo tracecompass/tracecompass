@@ -15,7 +15,7 @@ package org.eclipse.tracecompass.internal.lttng2.control.stubs.service;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.remote.core.IRemoteConnectionChangeListener;
-import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteFileService;
 import org.eclipse.remote.core.IRemoteProcessBuilder;
 import org.eclipse.tracecompass.internal.lttng2.control.stubs.shells.LTTngToolsFileShell;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote.ICommandShell;
@@ -34,7 +34,7 @@ public class TestRemoteSystemProxy implements IRemoteSystemProxy {
     }
 
     @Override
-    public IRemoteFileManager getFileServiceSubSystem() {
+    public IRemoteFileService getRemoteFileService() {
         return null;
     }
 

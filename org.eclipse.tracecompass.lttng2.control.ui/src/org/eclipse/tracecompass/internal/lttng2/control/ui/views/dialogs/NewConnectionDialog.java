@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -16,15 +16,9 @@ import static java.text.MessageFormat.format;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -38,13 +32,13 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnectionHostService;
+import org.eclipse.remote.core.IRemoteConnectionType;
 import org.eclipse.remote.core.IRemoteConnectionWorkingCopy;
-import org.eclipse.remote.core.IRemoteServices;
-import org.eclipse.remote.core.RemoteServices;
-import org.eclipse.remote.ui.IRemoteUIConnectionManager;
+import org.eclipse.remote.core.IRemoteServicesManager;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
+import org.eclipse.remote.ui.IRemoteUIConnectionService;
 import org.eclipse.remote.ui.IRemoteUIConnectionWizard;
-import org.eclipse.remote.ui.IRemoteUIServices;
-import org.eclipse.remote.ui.RemoteUIServices;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -84,13 +78,9 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         public String getText(Object element) {
             if (element instanceof IRemoteConnection) {
                 IRemoteConnection rc = (IRemoteConnection) element;
-                if (rc.getRemoteServices() == RemoteServices.getLocalServices()) {
-                    return rc.getName();
-                }
-
-                return format("{0} [{1}]", rc.getName(), rc.getAddress()); //$NON-NLS-1$
-            } else if (element instanceof IRemoteServices) {
-                IRemoteServices rs = (IRemoteServices) element;
+                return getConnectionLabel(rc);
+            } else if (element instanceof IRemoteConnectionType) {
+                IRemoteConnectionType rs = (IRemoteConnectionType) element;
                 return rs.getName();
             }
             return Messages.TraceControl_UnknownNode;
@@ -107,7 +97,6 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
 
     private static final class ConnectionContentProvider implements ITreeContentProvider {
         private static final Object[] NO_CHILDREN = {};
-        private static List<IRemoteServices> fProviders;
 
         @Override
         public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
@@ -120,56 +109,37 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         @Override
         public Object[] getElements(Object inputElement) {
             List<Object> children = new ArrayList<>();
-            children.addAll(RemoteServices.getLocalServices().getConnectionManager().getConnections());
-
-            List<IRemoteServices> result = getProviders();
-            children.addAll(result);
-            return children.toArray();
-        }
-
-        private static List<IRemoteServices> getProviders() {
-            if (fProviders == null) {
-                IExtensionRegistry registry = Platform.getExtensionRegistry();
-                IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.remote.core", "remoteServices"); //$NON-NLS-1$ //$NON-NLS-2$
-                List<IRemoteServices> result = new ArrayList<>();
-                if (extensionPoint != null) {
-                    Set<String> handled = new HashSet<>();
-                    handled.add(RemoteServices.getLocalServices().getId());
-                    for (IConfigurationElement ce : extensionPoint.getConfigurationElements()) {
-                        String id = ce.getAttribute("id"); //$NON-NLS-1$
-                        if (handled.add(id)) {
-                            IRemoteServices service = RemoteServices.getRemoteServices(id);
-                            if (service != null) {
-                                result.add(service);
-                            }
-                        }
-                    }
-                    Collections.sort(result);
-                }
-                fProviders = Collections.unmodifiableList(result);
+            IRemoteServicesManager manager = Activator.getService(IRemoteServicesManager.class);
+            if (manager != null) {
+                children.addAll(manager.getAllConnectionTypes());
             }
-            return fProviders;
+            return children.toArray();
         }
 
         @Override
         public Object[] getChildren(Object parentElement) {
-            if (parentElement instanceof IRemoteServices) {
-                return getConnections((IRemoteServices) parentElement);
+            if (parentElement instanceof IRemoteConnectionType) {
+                return getConnections((IRemoteConnectionType) parentElement);
             }
             return NO_CHILDREN;
         }
 
-        private static IRemoteConnection[] getConnections(IRemoteServices parentElement) {
-            List<IRemoteConnection> connectionList = parentElement.getConnectionManager().getConnections();
+        private static IRemoteConnection[] getConnections(IRemoteConnectionType parentElement) {
+            List<IRemoteConnection> connectionList = parentElement.getConnections();
             IRemoteConnection[] result = connectionList.toArray(new IRemoteConnection[connectionList.size()]);
-            Arrays.sort(result);
+            Arrays.sort(result, new Comparator<IRemoteConnection>() {
+                @Override
+                public int compare(IRemoteConnection o1, IRemoteConnection o2) {
+                    return getConnectionLabel(o1).compareTo(getConnectionLabel(o2));
+                }
+            });
             return result;
         }
 
         @Override
         public Object getParent(Object element) {
             if (element instanceof IRemoteConnection) {
-                return ((IRemoteConnection) element).getRemoteServices();
+                return ((IRemoteConnection) element).getConnectionType();
             }
             return null;
         }
@@ -230,9 +200,13 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         fConnectionTree.setAutoExpandLevel(2);
         fConnectionTree.setInput(this);
 
-        List<IRemoteServices> providers = ConnectionContentProvider.getProviders();
+        IRemoteServicesManager manager = Activator.getService(IRemoteServicesManager.class);
+        if (manager == null) {
+            return result;
+        }
+        List<IRemoteConnectionType> providers = manager.getAllConnectionTypes();
         if (!providers.isEmpty()) {
-            IRemoteServices provider = providers.get(0);
+            IRemoteConnectionType provider = providers.get(0);
             IRemoteConnection[] connections = ConnectionContentProvider.getConnections(provider);
             if (connections.length > 0) {
                 fConnectionTree.setSelection(new StructuredSelection(connections[0]));
@@ -319,18 +293,18 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         fNewButton.setEnabled(getServiceForCreation() != null);
     }
 
-    private IRemoteServices getServiceForCreation() {
+    private IRemoteConnectionType getServiceForCreation() {
         Object o = ((IStructuredSelection) fConnectionTree.getSelection()).getFirstElement();
-        IRemoteServices result = null;
-        if (o instanceof IRemoteServices) {
-            result = (IRemoteServices) o;
+        IRemoteConnectionType result = null;
+        if (o instanceof IRemoteConnectionType) {
+            result = (IRemoteConnectionType) o;
         } else if (o instanceof IRemoteConnection) {
-            result = ((IRemoteConnection) o).getRemoteServices();
+            result = ((IRemoteConnection) o).getConnectionType();
         } else {
             return null;
         }
 
-        if ((result.getCapabilities() & IRemoteServices.CAPABILITY_ADD_CONNECTIONS) == 0) {
+        if ((result.getCapabilities() & IRemoteConnectionType.CAPABILITY_ADD_CONNECTIONS) == 0) {
             return null;
         }
 
@@ -341,20 +315,25 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         if (conn == null) {
             return false;
         }
-        IRemoteServices rs = conn.getRemoteServices();
-        return (rs.getCapabilities() & IRemoteServices.CAPABILITY_EDIT_CONNECTIONS) != 0;
+        IRemoteConnectionType rs = conn.getConnectionType();
+        return (rs.getCapabilities() & IRemoteConnectionType.CAPABILITY_EDIT_CONNECTIONS) != 0;
     }
 
     private void onNewConnection() {
-        IRemoteServices rs = getServiceForCreation();
+        IRemoteConnectionType rs = getServiceForCreation();
         if (rs != null) {
-            IRemoteUIServices uiService = RemoteUIServices.getRemoteUIServices(rs);
+            IRemoteUIConnectionService uiService = rs.getService(IRemoteUIConnectionService.class);
             if (uiService != null) {
-                IRemoteUIConnectionWizard wiz = uiService.getUIConnectionManager().getConnectionWizard(getShell());
+                IRemoteUIConnectionWizard wiz = uiService.getConnectionWizard(getShell());
                 if (wiz != null) {
                     IRemoteConnectionWorkingCopy wc = wiz.open();
                     if (wc != null) {
-                        IRemoteConnection conn = wc.save();
+                        IRemoteConnection conn = null;
+                        try {
+                            conn = wc.save();
+                        } catch (RemoteConnectionException e) {
+                            Activator.getDefault().logWarning("Connection configuration could not be saved for " + fConnection.getName() , e); //$NON-NLS-1$
+                        }
                         if (conn != null) {
                             fConnectionTree.refresh();
                             fConnectionTree.setSelection(new StructuredSelection(conn), true);
@@ -368,18 +347,19 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
     private void onEditConnection() {
         setConnection();
         if (fConnection != null) {
-            IRemoteUIServices ui = RemoteUIServices.getRemoteUIServices(fConnection.getRemoteServices());
+            IRemoteUIConnectionService ui = fConnection.getConnectionType().getService(IRemoteUIConnectionService.class);
             if (ui != null) {
-                IRemoteUIConnectionManager connManager = ui.getUIConnectionManager();
-                if (connManager != null) {
-                    IRemoteUIConnectionWizard wiz = connManager.getConnectionWizard(getShell());
+                    IRemoteUIConnectionWizard wiz = ui.getConnectionWizard(getShell());
                     wiz.setConnection(fConnection.getWorkingCopy());
                     IRemoteConnectionWorkingCopy result = wiz.open();
                     if (result != null) {
-                        result.save();
+                        try {
+                            result.save();
+                        } catch (RemoteConnectionException e) {
+                            Activator.getDefault().logWarning("Connection configuration could not be saved for " + fConnection.getName() , e); //$NON-NLS-1$
+                        }
                         fConnectionTree.refresh();
                     }
-                }
             }
         }
     }
@@ -406,5 +386,14 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
     @Override
     public IRemoteConnection getConnection() {
         return fConnection;
+    }
+
+    private static String getConnectionLabel(IRemoteConnection rc) {
+        StringBuffer label = new StringBuffer();
+        label.append(rc.getName());
+        if (rc.hasService(IRemoteConnectionHostService.class)) {
+            label.append(format(" [{0}]", rc.getService(IRemoteConnectionHostService.class).getHostname())); //$NON-NLS-1$
+        }
+        return label.toString();
     }
 }

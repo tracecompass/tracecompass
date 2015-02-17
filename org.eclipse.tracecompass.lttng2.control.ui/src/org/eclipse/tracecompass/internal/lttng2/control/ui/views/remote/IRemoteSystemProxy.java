@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,13 +9,14 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *   Markus Schorn - Bug 448058: Use org.eclipse.remote in favor of RSE
+ *   Bernd Hufmann - Update to org.eclipse.remote API 2.0
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.remote.core.IRemoteConnectionChangeListener;
-import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteFileService;
 import org.eclipse.remote.core.IRemoteProcessBuilder;
 
 /**
@@ -27,9 +28,6 @@ import org.eclipse.remote.core.IRemoteProcessBuilder;
  */
 public interface IRemoteSystemProxy {
 
-    // ------------------------------------------------------------------------
-    // Constants
-    // ------------------------------------------------------------------------
     /**
      * Invalid port number for IP based connections.
      */
@@ -44,7 +42,7 @@ public interface IRemoteSystemProxy {
      *
      * @return file service subsystem, or <code>null</code> if not found.
      */
-    IRemoteFileManager getFileServiceSubSystem();
+    IRemoteFileService getRemoteFileService();
 
     /**
      * Returns a remote process builder for remote launching a process.
@@ -52,7 +50,6 @@ public interface IRemoteSystemProxy {
      * @return the builder, or <code>null</code> if not possible.
      */
     IRemoteProcessBuilder getProcessBuilder(String...command);
-
 
     /**
      * Connects the shell service sub system.

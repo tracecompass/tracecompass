@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -19,7 +19,7 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
-import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteFileService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.FocusEvent;
@@ -817,7 +817,7 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
             if (!fIsAdvancedEnabled && !fIsLive) {
                 TargetNodeComponent node = (TargetNodeComponent)fParent.getParent();
                 IRemoteSystemProxy proxy = node.getRemoteSystemProxy();
-                IRemoteFileManager fsss = proxy.getFileServiceSubSystem();
+                IRemoteFileService fsss = proxy.getRemoteFileService();
                 if (fsss != null) {
                     IFileStore remoteFolder = fsss.getResource(fSessionPath);
                     if (remoteFolder == null) {

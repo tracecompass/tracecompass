@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson
+ * Copyright (c) 2009, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -26,8 +26,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.remote.core.IRemoteConnection;
-import org.eclipse.remote.core.IRemoteServices;
-import org.eclipse.remote.core.RemoteServices;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
@@ -37,6 +35,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.Targ
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceControlContentProvider;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceControlLabelProvider;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceControlRoot;
+import org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote.RemoteSystemProxy;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
@@ -130,7 +129,7 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
         for (ITraceControlComponent cmp : fRoot.getChildren()) {
             if (cmp instanceof TargetNodeComponent) {
                 IRemoteConnection rc = ((TargetNodeComponent) cmp).getRemoteConnection();
-                memento.putString(KEY_REMOTE_PROVIDER + i, rc.getRemoteServices().getId());
+                memento.putString(KEY_REMOTE_PROVIDER + i, rc.getConnectionType().getId());
                 memento.putString(KEY_REMOTE_CONNECTION_NAME + i, rc.getName());
                 i++;
             }
@@ -147,19 +146,12 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
             for(int i = 0; ; i++) {
                 String id = memento.getString(KEY_REMOTE_PROVIDER + i);
                 String name = memento.getString(KEY_REMOTE_CONNECTION_NAME + i);
-                if (id == null || name == null) {
+                if ((id == null) || (name == null)) {
                     break;
                 }
-                if (!Workaround_Bug449362.triggerRSEStartup(id)) {
-                    // Skip the connection in order to avoid an infinite loop
-                } else {
-                    IRemoteServices rs = RemoteServices.getRemoteServices(id);
-                    if (rs != null) {
-                        IRemoteConnection rc = rs.getConnectionManager().getConnection(name);
-                        if (rc != null) {
-                            fInitialConnections.add(rc);
-                        }
-                    }
+                IRemoteConnection conn = RemoteSystemProxy.getRemoteConnection(id, name);
+                if (conn != null) {
+                    fInitialConnections.add(conn);
                 }
             }
         }

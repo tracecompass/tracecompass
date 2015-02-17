@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,9 +9,11 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *   Markus Schorn - Bug 448058: Use org.eclipse.remote in favor of RSE
+ *   Bernd Hufmann - Update to org.eclipse.remote API 2.0
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.property;
 
+import org.eclipse.remote.core.IRemoteConnectionHostService;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent;
 import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
@@ -63,6 +65,11 @@ public class TargetNodePropertySource extends BasePropertySource {
      */
     public static final String TARGET_NODE_VERSION_PROPERTY_NAME = Messages.TraceControl_VersionPropertyName;
 
+    /**
+     * The name of the address for local host
+     */
+    private static final String LOCAL_CONNECTION_HOST_NAME = "localhost"; //$NON-NLS-1$
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -101,7 +108,10 @@ public class TargetNodePropertySource extends BasePropertySource {
             return fTargetNode.getName();
         }
         if (TARGET_NODE_ADDRESS_PROPERTY_ID.equals(id)) {
-            return fTargetNode.getRemoteConnection().getAddress();
+            if (fTargetNode.getRemoteConnection().hasService(IRemoteConnectionHostService.class)) {
+                return fTargetNode.getRemoteConnection().getService(IRemoteConnectionHostService.class).getHostname();
+            }
+            return LOCAL_CONNECTION_HOST_NAME;
         }
         if (TARGET_NODE_STATE_PROPERTY_ID.equals(id)) {
             return fTargetNode.getTargetNodeState().name();

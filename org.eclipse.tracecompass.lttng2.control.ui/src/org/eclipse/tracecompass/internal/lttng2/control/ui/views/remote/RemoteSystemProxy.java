@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,17 +9,28 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *   Markus Schorn - Bug 448058: Use org.eclipse.remote in favor of RSE
+ *   Bernd Hufmann - Update to org.eclipse.remote API 2.0
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.remote;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.remote.core.IRemoteConnection;
-import org.eclipse.remote.core.IRemoteConnectionChangeEvent;
 import org.eclipse.remote.core.IRemoteConnectionChangeListener;
-import org.eclipse.remote.core.IRemoteFileManager;
+import org.eclipse.remote.core.IRemoteConnectionType;
+import org.eclipse.remote.core.IRemoteFileService;
 import org.eclipse.remote.core.IRemoteProcessBuilder;
+import org.eclipse.remote.core.IRemoteProcessService;
+import org.eclipse.remote.core.IRemoteServicesManager;
+import org.eclipse.remote.core.RemoteConnectionChangeEvent;
 import org.eclipse.remote.core.exception.RemoteConnectionException;
+import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
+
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 
 /**
  * <p>
@@ -30,11 +41,13 @@ import org.eclipse.remote.core.exception.RemoteConnectionException;
  */
 public class RemoteSystemProxy implements IRemoteSystemProxy, IRemoteConnectionChangeListener {
 
+    /** Name of a local connection */
+    public static final String LOCAL_CONNECTION_NAME = "Local"; //$NON-NLS-1$
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-
-    private IRemoteConnection fHost;
+    private final IRemoteConnection fHost;
     private boolean fExplicitConnect;
 
     // ------------------------------------------------------------------------
@@ -57,13 +70,13 @@ public class RemoteSystemProxy implements IRemoteSystemProxy, IRemoteConnectionC
     // ------------------------------------------------------------------------
 
     @Override
-    public IRemoteFileManager getFileServiceSubSystem() {
-        return fHost.getFileManager();
+    public IRemoteFileService getRemoteFileService() {
+        return fHost.getService(IRemoteFileService.class);
     }
 
     @Override
     public IRemoteProcessBuilder getProcessBuilder(String...command) {
-        return fHost.getProcessBuilder(command);
+        return fHost.getService(IRemoteProcessService.class).getProcessBuilder(command);
     }
 
     @Override
@@ -114,11 +127,49 @@ public class RemoteSystemProxy implements IRemoteSystemProxy, IRemoteConnectionC
     }
 
     @Override
-    public void connectionChanged(IRemoteConnectionChangeEvent event) {
+    public void connectionChanged(RemoteConnectionChangeEvent event) {
         int type = event.getType();
-        if (type == IRemoteConnectionChangeEvent.CONNECTION_ABORTED ||
-                type == IRemoteConnectionChangeEvent.CONNECTION_CLOSED) {
+        if (type == RemoteConnectionChangeEvent.CONNECTION_ABORTED ||
+                type == RemoteConnectionChangeEvent.CONNECTION_CLOSED) {
             fExplicitConnect = false;
         }
+    }
+
+    /**
+     * Return a remote connection using OSGI service.
+     *
+     * @param remoteServicesId
+     *            ID of remote service
+     * @param name
+     *            name of connection
+     * @return the corresponding remote connection or null
+     */
+    public static @Nullable IRemoteConnection getRemoteConnection(final @NonNull String remoteServicesId, final @NonNull String name) {
+        IRemoteServicesManager manager = Activator.getService(IRemoteServicesManager.class);
+        if (manager == null) {
+            return null;
+        }
+        FluentIterable<IRemoteConnection> connections = FluentIterable.from(manager.getAllRemoteConnections());
+        Optional<IRemoteConnection> ret = connections.firstMatch(new Predicate<IRemoteConnection>() {
+            @Override
+            public boolean apply(IRemoteConnection input) {
+                return (input.getConnectionType().getId().equals(remoteServicesId.toString()) && input.getName().equals(name.toString()));
+            }
+        });
+        return ret.orNull();
+    }
+
+    /**
+     * Return a Local connection.
+     *
+     * @return the local connection
+     */
+    public static @Nullable IRemoteConnection getLocalConnection() {
+        IRemoteServicesManager manager = Activator.getService(IRemoteServicesManager.class);
+        if (manager == null) {
+            return null;
+        }
+        IRemoteConnectionType type = manager.getLocalConnectionType();
+        return type.getConnection(LOCAL_CONNECTION_NAME);
     }
 }
