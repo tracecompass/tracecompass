@@ -38,6 +38,7 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout{
     private static final String SOFTIRQ_EXIT = "softirq_exit"; //$NON-NLS-1$
     private static final String SOFTIRQ_RAISE = "softirq_raise"; //$NON-NLS-1$
     private static final String SCHED_SWITCH = "sched_switch"; //$NON-NLS-1$
+    private static final String SCHED_PI_SETPRIO = "sched_pi_setprio"; //$NON-NLS-1$
 
     private static final Collection<String> SCHED_WAKEUP_EVENTS =
             checkNotNull(ImmutableList.of("sched_wakeup", "sched_wakeup_new")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -62,6 +63,9 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout{
     private static final String PARENT_TID = "parent_tid"; //$NON-NLS-1$
     private static final String CHILD_COMM = "child_comm"; //$NON-NLS-1$
     private static final String CHILD_TID = "child_tid"; //$NON-NLS-1$
+    private static final String PRIO = "prio"; //$NON-NLS-1$
+    private static final String NEW_PRIO = "newprio"; //$NON-NLS-1$
+    private static final String NEXT_PRIO = "next_prio"; //$NON-NLS-1$
 
     /** All instances are the same. Only provide a static instance getter */
     private DefaultEventLayout() {
@@ -107,6 +111,11 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout{
     @Override
     public String eventSchedSwitch() {
         return SCHED_SWITCH;
+    }
+
+    @Override
+    public String eventSchedPiSetprio() {
+        return SCHED_PI_SETPRIO;
     }
 
     @Override
@@ -201,6 +210,21 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout{
     @Override
     public String fieldChildTid() {
         return CHILD_TID;
+    }
+
+    @Override
+    public String fieldPrio() {
+        return PRIO;
+    }
+
+    @Override
+    public String fieldNewPrio() {
+        return NEW_PRIO;
+    }
+
+    @Override
+    public String fieldNextPrio() {
+        return NEXT_PRIO;
     }
 
 }

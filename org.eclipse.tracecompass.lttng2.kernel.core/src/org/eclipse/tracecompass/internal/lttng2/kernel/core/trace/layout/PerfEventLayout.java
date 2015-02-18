@@ -75,6 +75,11 @@ public class PerfEventLayout implements IKernelAnalysisEventLayout {
         return "sched:sched_switch"; //$NON-NLS-1$
     }
 
+    @Override
+    public String eventSchedPiSetprio() {
+        return "sched:sched_pi_setprio"; //$NON-NLS-1$
+    }
+
     private static final Collection<String> WAKEUP_EVENTS =
             checkNotNull(ImmutableList.of("sched:sched_wakeup", "sched:sched_wakeup_new")); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -171,6 +176,21 @@ public class PerfEventLayout implements IKernelAnalysisEventLayout {
     @Override
     public String fieldChildTid() {
         return "child_pid"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String fieldPrio() {
+        return "prio"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String fieldNewPrio() {
+        return "newprio"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String fieldNextPrio() {
+        return "next_prio"; //$NON-NLS-1$
     }
 
 }

@@ -358,8 +358,8 @@ public abstract class StateSystemTest {
     public void testGetQuarks_end() {
         List<Integer> list = fixture.getQuarks(Attributes.THREADS, "1577", "*");
 
-        /* There should be 4 sub-attributes for each Thread node */
-        assertEquals(4, list.size());
+        /* There should be 5 sub-attributes for each Thread node */
+        assertEquals(5, list.size());
     }
 
     // ------------------------------------------------------------------------

@@ -52,7 +52,7 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
      * Version number of this state provider. Please bump this if you modify the
      * contents of the generated state history in some way.
      */
-    private static final int VERSION = 5;
+    private static final int VERSION = 6;
 
     private static final int IRQ_HANDLER_ENTRY_INDEX = 1;
     private static final int IRQ_HANDLER_EXIT_INDEX = 2;
@@ -65,6 +65,7 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
     private static final int SCHED_PROCESS_FREE_INDEX = 9;
     private static final int STATEDUMP_PROCESS_STATE_INDEX = 10;
     private static final int SCHED_WAKEUP_INDEX = 11;
+    private static final int SCHED_PI_SETPRIO_INDEX = 12;
 
 
     // ------------------------------------------------------------------------
@@ -106,6 +107,7 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
         builder.put(layout.eventSoftIrqExit(), SOFT_IRQ_EXIT_INDEX);
         builder.put(layout.eventSoftIrqRaise(), SOFT_IRQ_RAISE_INDEX);
         builder.put(layout.eventSchedSwitch(), SCHED_SWITCH_INDEX);
+        builder.put(layout.eventSchedPiSetprio(), SCHED_PI_SETPRIO_INDEX);
         builder.put(layout.eventSchedProcessFork(), SCHED_PROCESS_FORK_INDEX);
         builder.put(layout.eventSchedProcessExit(), SCHED_PROCESS_EXIT_INDEX);
         builder.put(layout.eventSchedProcessFree(), SCHED_PROCESS_FREE_INDEX);
@@ -279,6 +281,7 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
                 Long prevState = (Long) content.getField(fLayout.fieldPrevState()).getValue();
                 String nextProcessName = (String) content.getField(fLayout.fieldNextComm()).getValue();
                 Integer nextTid = ((Long) content.getField(fLayout.fieldNextTid()).getValue()).intValue();
+                Integer nextPrio = ((Long) content.getField(fLayout.fieldNextPrio()).getValue()).intValue();
 
                 Integer formerThreadNode = ss.getQuarkRelativeAndAdd(getNodeThreads(ss), prevTid.toString());
                 Integer newCurrentThreadNode = ss.getQuarkRelativeAndAdd(getNodeThreads(ss), nextTid.toString());
@@ -298,6 +301,11 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
                 /* Set the exec name of the new process */
                 quark = ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.EXEC_NAME);
                 value = TmfStateValue.newValueString(nextProcessName);
+                ss.modifyAttribute(ts, value, quark);
+
+                /* Set the current prio for the new process */
+                quark = ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.PRIO);
+                value = TmfStateValue.newValueInt(nextPrio);
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Make sure the PPID and system_call sub-attributes exist */
@@ -322,6 +330,21 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
                     value = StateValues.CPU_STATUS_IDLE_VALUE;
                 }
                 quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATUS);
+                ss.modifyAttribute(ts, value, quark);
+            }
+                break;
+
+            case SCHED_PI_SETPRIO_INDEX:
+            {
+                ITmfEventField content = event.getContent();
+                Integer tid = ((Long) content.getField(fLayout.fieldTid()).getValue()).intValue();
+                Integer prio = ((Long) content.getField(fLayout.fieldNewPrio()).getValue()).intValue();
+
+                Integer updateThreadNode = ss.getQuarkRelativeAndAdd(getNodeThreads(ss), tid.toString());
+
+                /* Set the current prio for the new process */
+                quark = ss.getQuarkRelativeAndAdd(updateThreadNode, Attributes.PRIO);
+                value = TmfStateValue.newValueInt(prio);
                 ss.modifyAttribute(ts, value, quark);
             }
                 break;
@@ -440,6 +463,7 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
             case SCHED_WAKEUP_INDEX:
             {
                 final int tid = ((Long) event.getContent().getField(fLayout.fieldTid()).getValue()).intValue();
+                final int prio = ((Long) event.getContent().getField(fLayout.fieldPrio()).getValue()).intValue();
                 final int threadNode = ss.getQuarkRelativeAndAdd(getNodeThreads(ss), String.valueOf(tid));
 
                 /*
@@ -455,6 +479,14 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
                     value = StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE;
                     ss.modifyAttribute(ts, value, quark);
                 }
+
+                /*
+                 * When a user changes a threads prio (e.g. with pthread_setschedparam),
+                 * it shows in ftrace with a sched_wakeup.
+                 */
+                quark = ss.getQuarkRelativeAndAdd(threadNode, Attributes.PRIO);
+                value = TmfStateValue.newValueInt(prio);
+                ss.modifyAttribute(ts, value, quark);
             }
                 break;
 

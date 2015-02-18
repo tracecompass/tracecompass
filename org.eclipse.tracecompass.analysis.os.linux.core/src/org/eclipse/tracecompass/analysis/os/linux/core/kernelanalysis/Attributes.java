@@ -40,6 +40,7 @@ public interface Attributes {
     static final String PPID = "PPID";
     //static final String STATUS = "Status"
     static final String EXEC_NAME = "Exec_name";
+    static final String PRIO = "Prio";
     static final String SYSTEM_CALL = "System_call";
 
     /* Attributes under "Resources" */
