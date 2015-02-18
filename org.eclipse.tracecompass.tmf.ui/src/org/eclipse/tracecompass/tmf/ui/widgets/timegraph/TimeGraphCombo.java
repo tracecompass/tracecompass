@@ -680,6 +680,7 @@ public class TimeGraphCombo extends Composite {
                 fTreeViewer.refresh();
                 fTreeViewer.expandAll();
                 fTimeGraphViewer.refresh();
+                fTimeGraphViewer.expandAll();
                 fInhibitTreeSelection = false;
                 alignTreeItems(true);
                 // Reset selection
@@ -891,10 +892,13 @@ public class TimeGraphCombo extends Composite {
     public void refresh() {
         fInhibitTreeSelection = true;
         Tree tree = fTreeViewer.getTree();
-        tree.setRedraw(false);
-        fTreeViewer.refresh();
-        fTreeViewer.expandAll();
-        tree.setRedraw(true);
+        try {
+            tree.setRedraw(false);
+            fTreeViewer.refresh();
+            fTreeViewer.expandToLevel(fTreeViewer.getAutoExpandLevel());
+        } finally {
+            tree.setRedraw(true);
+        }
         fTimeGraphViewer.refresh();
         alignTreeItems(true);
         fInhibitTreeSelection = false;
