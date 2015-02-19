@@ -52,6 +52,7 @@ import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 import org.hamcrest.Matcher;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -85,6 +86,7 @@ public class ImportAndReadKernelSmokeTest {
 
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
+        fLogger.removeAllAppenders();
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
         fBot = new SWTWorkbenchBot();
 
@@ -99,6 +101,14 @@ public class ImportAndReadKernelSmokeTest {
         switchKernelPerspective();
         /* Finish waiting for eclipse to load */
         SWTBotUtils.waitForJobs();
+    }
+
+    /**
+     * Test Class teardown
+     */
+    @AfterClass
+    public static void terminate() {
+        fLogger.removeAllAppenders();
     }
 
     private static void switchKernelPerspective() {

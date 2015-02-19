@@ -50,6 +50,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.views.properties.PropertySheet;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 
@@ -86,6 +87,7 @@ public abstract class AbstractImportAndReadSmokeTest {
 
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 50000; /* 50 second timeout */
+        fLogger.removeAllAppenders();
         fLogger.addAppender(new NullAppender());
         fBot = new SWTWorkbenchBot();
 
@@ -94,6 +96,14 @@ public abstract class AbstractImportAndReadSmokeTest {
         SWTBotUtils.switchToTracingPerspective();
         /* finish waiting for eclipse to load */
         SWTBotUtils.waitForJobs();
+    }
+
+    /**
+     * Test Class teardown
+     */
+    @AfterClass
+    public static void terminate() {
+        fLogger.removeAllAppenders();
     }
 
     /**

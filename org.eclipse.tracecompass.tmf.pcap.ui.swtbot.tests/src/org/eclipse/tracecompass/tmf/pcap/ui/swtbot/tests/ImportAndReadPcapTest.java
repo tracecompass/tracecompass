@@ -57,6 +57,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -89,6 +90,7 @@ public class ImportAndReadPcapTest {
 
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 300000; /* 300 second timeout */
+        fLogger.removeAllAppenders();
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
         fBot = new SWTWorkbenchBot();
 
@@ -103,6 +105,14 @@ public class ImportAndReadPcapTest {
         switchNetworkPerspective();
         /* Finish waiting for eclipse to load */
         SWTBotUtils.waitForJobs();
+    }
+
+    /**
+     * Test Class teardown
+     */
+    @AfterClass
+    public static void terminate() {
+        fLogger.removeAllAppenders();
     }
 
     private static void switchNetworkPerspective() {

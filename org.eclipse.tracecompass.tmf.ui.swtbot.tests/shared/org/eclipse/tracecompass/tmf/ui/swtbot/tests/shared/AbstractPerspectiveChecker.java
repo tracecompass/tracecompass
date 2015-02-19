@@ -27,6 +27,7 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.ui.IViewReference;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,11 +60,20 @@ public abstract class AbstractPerspectiveChecker {
 
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 50000; /* 50 second timeout */
+        fLogger.removeAllAppenders();
         fLogger.addAppender(new NullAppender());
         fBot = new SWTWorkbenchBot();
 
         SWTBotUtils.closeView("welcome", fBot);
 
+    }
+
+    /**
+     * Test Class teardown
+     */
+    @AfterClass
+    public static void terminate() {
+        fLogger.removeAllAppenders();
     }
 
     /**

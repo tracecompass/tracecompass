@@ -115,6 +115,7 @@ public class CallsiteEventsInTableTest {
 
         /* Set up for swtbot */
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
+        fLogger.removeAllAppenders();
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
         fBot = new SWTWorkbenchBot();
 
@@ -133,6 +134,7 @@ public class CallsiteEventsInTableTest {
      */
     @AfterClass
     public static void tearDown() {
+        fLogger.removeAllAppenders();
         /* Set timestamp defaults */
         IEclipsePreferences defaultPreferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
         defaultPreferences.put(ITmfTimePreferencesConstants.DATIME, ITmfTimePreferencesConstants.TIME_HOUR_FMT);
