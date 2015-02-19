@@ -400,14 +400,15 @@ public abstract class StateSystemTest {
     @Test
     public void testFirstIntervalIsConsidered() {
         try {
+            int quark = fixture.getQuarkAbsolute(Attributes.THREADS, "1397", Attributes.STATUS);
             List<ITmfStateInterval> list = fixture.queryFullState(1331668248014135800L);
-            ITmfStateInterval interval = list.get(233);
+            ITmfStateInterval interval = list.get(quark);
             assertEquals(1331668247516664825L, interval.getStartTime());
 
             int valueInt = interval.getStateValue().unboxInt();
             assertEquals(1, valueInt);
 
-        } catch (StateSystemDisposedException e) {
+        } catch (StateSystemDisposedException | AttributeNotFoundException e) {
             fail();
         }
     }
