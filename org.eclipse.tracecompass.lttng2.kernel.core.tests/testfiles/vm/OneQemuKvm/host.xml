@@ -6,11 +6,11 @@
 <field name="cpu" value="0" type="int" />
 <field name="prev_comm" value="any" type="string" />
 <field name="prev_tid" value="30" type="long" />
-<field name="prev_prio" value="20" type="int" />
+<field name="prev_prio" value="20" type="long" />
 <field name="prev_state" value="0" type="long" />
 <field name="next_comm" value="qemucpu1" type="string" />
 <field name="next_tid" value="31" type="long" />
-<field name="next_prio" value="20" type="int" />
+<field name="next_prio" value="20" type="long" />
 </event>
 <event timestamp="5" name="kvm_entry">
 <field name="cpu" value="0" type="int" />
@@ -50,21 +50,21 @@
 <field name="cpu" value="0" type="int" />
 <field name="prev_comm" value="qemucpu1" type="string" />
 <field name="prev_tid" value="31" type="long" />
-<field name="prev_prio" value="20" type="int" />
+<field name="prev_prio" value="20" type="long" />
 <field name="prev_state" value="0" type="long" />
 <field name="next_comm" value="any" type="string" />
 <field name="next_tid" value="30" type="long" />
-<field name="next_prio" value="20" type="int" />
+<field name="next_prio" value="20" type="long" />
 </event>
 <event timestamp="150" name="sched_switch">
 <field name="cpu" value="0" type="int" />
 <field name="prev_comm" value="any" type="string" />
 <field name="prev_tid" value="30" type="long" />
-<field name="prev_prio" value="20" type="int" />
+<field name="prev_prio" value="20" type="long" />
 <field name="prev_state" value="0" type="long" />
 <field name="next_comm" value="qemucpu1" type="string" />
 <field name="next_tid" value="31" type="long" />
-<field name="next_prio" value="20" type="int" />
+<field name="next_prio" value="20" type="long" />
 </event>
 <event timestamp="155" name="kvm_entry">
 <field name="cpu" value="0" type="int" />
@@ -126,21 +126,21 @@
 <field name="cpu" value="0" type="int" />
 <field name="prev_comm" value="qemucpu1" type="string" />
 <field name="prev_tid" value="31" type="long" />
-<field name="prev_prio" value="20" type="int" />
+<field name="prev_prio" value="20" type="long" />
 <field name="prev_state" value="0" type="long" />
 <field name="next_comm" value="any" type="string" />
 <field name="next_tid" value="30" type="long" />
-<field name="next_prio" value="20" type="int" />
+<field name="next_prio" value="20" type="long" />
 </event>
 <event timestamp="350" name="sched_switch">
 <field name="cpu" value="0" type="int" />
 <field name="prev_comm" value="any" type="string" />
 <field name="prev_tid" value="30" type="long" />
-<field name="prev_prio" value="20" type="int" />
+<field name="prev_prio" value="20" type="long" />
 <field name="prev_state" value="0" type="long" />
 <field name="next_comm" value="qemucpu1" type="string" />
 <field name="next_tid" value="31" type="long" />
-<field name="next_prio" value="20" type="int" />
+<field name="next_prio" value="20" type="long" />
 </event>
 <event timestamp="355" name="kvm_entry">
 <field name="cpu" value="0" type="int" />

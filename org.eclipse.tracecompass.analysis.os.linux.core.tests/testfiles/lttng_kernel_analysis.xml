@@ -55,11 +55,11 @@
 <field name="cpu" value="1" type="int" />
 <field name="prev_comm" value="proc3" type="string" />
 <field name="prev_tid" value="30" type="long" />
-<field name="prev_prio" value="20" type="int" />
+<field name="prev_prio" value="20" type="long" />
 <field name="prev_state" value="0" type="long" />
 <field name="next_comm" value="proc11" type="string" />
 <field name="next_tid" value="11" type="long" />
-<field name="next_prio" value="20" type="int" />
+<field name="next_prio" value="20" type="long" />
 </event>
 <event timestamp="15" name="lttng_statedump_process_state">
 <field name="cpu" value="0" type="int" />
@@ -83,11 +83,11 @@
 <field name="cpu" value="1" type="int" />
 <field name="prev_comm" value="proc11" type="string" />
 <field name="prev_tid" value="10" type="long" />
-<field name="prev_prio" value="20" type="int" />
+<field name="prev_prio" value="20" type="long" />
 <field name="prev_state" value="0" type="long" />
 <field name="next_comm" value="proc20" type="string" />
 <field name="next_tid" value="20" type="long" />
-<field name="next_prio" value="20" type="int" />
+<field name="next_prio" value="20" type="long" />
 </event>
 <event timestamp="25" name="sched_process_fork">
 <field name="cpu" value="1" type="int" />
@@ -102,50 +102,50 @@
 <field name="cpu" value="1" type="int" />
 <field name="prev_comm" value="proc20" type="string" />
 <field name="prev_tid" value="20" type="long" />
-<field name="prev_prio" value="20" type="int" />
+<field name="prev_prio" value="20" type="long" />
 <field name="prev_state" value="0" type="long" />
 <field name="next_comm" value="proc21" type="string" />
 <field name="next_tid" value="21" type="long" />
-<field name="next_prio" value="20" type="int" />
+<field name="next_prio" value="20" type="long" />
 </event>
 <event timestamp="35" name="sched_switch">
 <field name="cpu" value="0" type="int" />
 <field name="prev_comm" value="lttng-sessiond" type="string" />
 <field name="prev_tid" value="100" type="long" />
-<field name="prev_prio" value="20" type="int" />
+<field name="prev_prio" value="20" type="long" />
 <field name="prev_state" value="0" type="long" />
 <field name="next_comm" value="proc11" type="string" />
 <field name="next_tid" value="11" type="long" />
-<field name="next_prio" value="20" type="int" />
+<field name="next_prio" value="20" type="long" />
 </event>
 <event timestamp="50" name="sched_switch">
 <field name="cpu" value="1" type="int" />
 <field name="prev_comm" value="proc21" type="string" />
 <field name="prev_tid" value="21" type="long" />
-<field name="prev_prio" value="20" type="int" />
+<field name="prev_prio" value="20" type="long" />
 <field name="prev_state" value="0" type="long" />
 <field name="next_comm" value="proc30" type="string" />
 <field name="next_tid" value="30" type="long" />
-<field name="next_prio" value="20" type="int" />
+<field name="next_prio" value="20" type="long" />
 </event>
 <event timestamp="60" name="sched_switch">
 <field name="cpu" value="1" type="int" />
 <field name="prev_comm" value="proc30" type="string" />
 <field name="prev_tid" value="30" type="long" />
-<field name="prev_prio" value="20" type="int" />
+<field name="prev_prio" value="20" type="long" />
 <field name="prev_state" value="0" type="long" />
 <field name="next_comm" value="proc21" type="string" />
 <field name="next_tid" value="21" type="long" />
-<field name="next_prio" value="20" type="int" />
+<field name="next_prio" value="20" type="long" />
 </event>
 <event timestamp="70" name="sched_switch">
 <field name="cpu" value="1" type="int" />
 <field name="prev_comm" value="proc21" type="string" />
 <field name="prev_tid" value="21" type="long" />
-<field name="prev_prio" value="20" type="int" />
+<field name="prev_prio" value="20" type="long" />
 <field name="prev_state" value="0" type="long" />
 <field name="next_comm" value="proc20" type="string" />
 <field name="next_tid" value="20" type="long" />
-<field name="next_prio" value="20" type="int" />
+<field name="next_prio" value="20" type="long" />
 </event>
 </trace>

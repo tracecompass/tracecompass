@@ -6,21 +6,21 @@
 <field name="cpu" value="0" type="int" />
 <field name="prev_comm" value="any" type="string" />
 <field name="prev_tid" value="130" type="long" />
-<field name="prev_prio" value="20" type="int" />
+<field name="prev_prio" value="20" type="long" />
 <field name="prev_state" value="0" type="long" />
 <field name="next_comm" value="any2" type="string" />
 <field name="next_tid" value="131" type="long" />
-<field name="next_prio" value="20" type="int" />
+<field name="next_prio" value="20" type="long" />
 </event>
 <event timestamp="35" name="sched_switch">
 <field name="cpu" value="0" type="int" />
 <field name="prev_comm" value="any2" type="string" />
 <field name="prev_tid" value="131" type="long" />
-<field name="prev_prio" value="20" type="int" />
+<field name="prev_prio" value="20" type="long" />
 <field name="prev_state" value="0" type="long" />
 <field name="next_comm" value="any" type="string" />
 <field name="next_tid" value="130" type="long" />
-<field name="next_prio" value="20" type="int" />
+<field name="next_prio" value="20" type="long" />
 </event>
 <event timestamp="40" name="vmsync_gh_guest">
 <field name="cpu" value="0" type="int" />
@@ -36,21 +36,21 @@
 <field name="cpu" value="0" type="int" />
 <field name="prev_comm" value="any" type="string" />
 <field name="prev_tid" value="130" type="long" />
-<field name="prev_prio" value="20" type="int" />
+<field name="prev_prio" value="20" type="long" />
 <field name="prev_state" value="0" type="long" />
 <field name="next_comm" value="any2" type="string" />
 <field name="next_tid" value="131" type="long" />
-<field name="next_prio" value="20" type="int" />
+<field name="next_prio" value="20" type="long" />
 </event>
 <event timestamp="175" name="sched_switch">
 <field name="cpu" value="0" type="int" />
 <field name="prev_comm" value="any2" type="string" />
 <field name="prev_tid" value="131" type="long" />
-<field name="prev_prio" value="20" type="int" />
+<field name="prev_prio" value="20" type="long" />
 <field name="prev_state" value="0" type="long" />
 <field name="next_comm" value="any" type="string" />
 <field name="next_tid" value="130" type="long" />
-<field name="next_prio" value="20" type="int" />
+<field name="next_prio" value="20" type="long" />
 </event>
 <event timestamp="190" name="vmsync_gh_guest">
 <field name="cpu" value="0" type="int" />
@@ -66,11 +66,11 @@
 <field name="cpu" value="0" type="int" />
 <field name="prev_comm" value="any" type="string" />
 <field name="prev_tid" value="130" type="long" />
-<field name="prev_prio" value="20" type="int" />
+<field name="prev_prio" value="20" type="long" />
 <field name="prev_state" value="0" type="long" />
 <field name="next_comm" value="any2" type="string" />
 <field name="next_tid" value="131" type="long" />
-<field name="next_prio" value="20" type="int" />
+<field name="next_prio" value="20" type="long" />
 </event>
 <event timestamp="240" name="vmsync_gh_guest">
 <field name="cpu" value="0" type="int" />
@@ -86,20 +86,20 @@
 <field name="cpu" value="0" type="int" />
 <field name="prev_comm" value="any2" type="string" />
 <field name="prev_tid" value="131" type="long" />
-<field name="prev_prio" value="20" type="int" />
+<field name="prev_prio" value="20" type="long" />
 <field name="prev_state" value="0" type="long" />
 <field name="next_comm" value="any" type="string" />
 <field name="next_tid" value="130" type="long" />
-<field name="next_prio" value="20" type="int" />
+<field name="next_prio" value="20" type="long" />
 </event>
 <event timestamp="375" name="sched_switch">
 <field name="cpu" value="0" type="int" />
 <field name="prev_comm" value="any" type="string" />
 <field name="prev_tid" value="130" type="long" />
-<field name="prev_prio" value="20" type="int" />
+<field name="prev_prio" value="20" type="long" />
 <field name="prev_state" value="0" type="long" />
 <field name="next_comm" value="any2" type="string" />
 <field name="next_tid" value="131" type="long" />
-<field name="next_prio" value="20" type="int" />
+<field name="next_prio" value="20" type="long" />
 </event>
 </trace>
