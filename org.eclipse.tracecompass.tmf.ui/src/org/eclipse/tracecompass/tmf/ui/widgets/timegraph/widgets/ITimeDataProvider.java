@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2014 Intel Corporation, Ericsson
+ * Copyright (c) 2007, 2015 Intel Corporation, Ericsson
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -60,32 +60,38 @@ public interface ITimeDataProvider {
     long getSelectionEnd();
 
     /**
-     * @return The beginning time
+     * Get the user-specified bounds begin time. May be set to SWT.DEFAULT. For
+     * the actual bound use {@link #getMinTime()}.
+     *
+     * @return The user-specified begin time, or SWT.DEFAULT if input bound used
      */
     long getBeginTime();
 
     /**
-     * @return The end time
+     * Get the user-specified bounds end time. May be set to SWT.DEFAULT. For
+     * the actual bound use {@link #getMaxTime()}.
+     *
+     * @return The user-specified end time, or SWT.DEFAULT if input bound used
      */
     long getEndTime();
 
     /**
-     * @return The minimum time
+     * @return The bounds minimum time
      */
     long getMinTime();
 
     /**
-     * @return The maximum time
+     * @return The bounds maximum time
      */
     long getMaxTime();
 
     /**
-     * @return The start time of the current selection window
+     * @return The current window start time
      */
     long getTime0();
 
     /**
-     * @return The end time of the current selection window
+     * @return The current window end time
      */
     long getTime1();
 

@@ -745,7 +745,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             return;
         }
         long selectedTime = fTimeProvider.getSelectionBegin();
-        long endTime = fTimeProvider.getEndTime();
+        long endTime = fTimeProvider.getMaxTime();
         ITimeEvent nextEvent;
         if (-1 == n && selectedTime > endTime) {
             nextEvent = Utils.findEvent(trace, selectedTime, 0);

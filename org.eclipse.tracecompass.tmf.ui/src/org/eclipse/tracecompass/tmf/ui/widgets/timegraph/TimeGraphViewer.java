@@ -85,16 +85,16 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
     private long fMinTimeInterval;
     private ITimeGraphEntry fSelectedEntry;
-    private long fBeginTime;
-    private long fEndTime;
-    private long fTime0;
-    private long fTime1;
-    private long fSelectionBegin = 0;
-    private long fSelectionEnd = 0;
-    private long fTime0Bound;
-    private long fTime1Bound;
-    private long fTime0ExtSynch = 0;
-    private long fTime1ExtSynch = 0;
+    private long fBeginTime = SWT.DEFAULT; // The user-specified bounds start time
+    private long fEndTime = SWT.DEFAULT; // The user-specified bounds end time
+    private long fTime0 = SWT.DEFAULT; // The current window start time
+    private long fTime1 = SWT.DEFAULT; // The current window end time
+    private long fSelectionBegin = SWT.DEFAULT;
+    private long fSelectionEnd = SWT.DEFAULT;
+    private long fTime0Bound = SWT.DEFAULT; // The bounds start time
+    private long fTime1Bound = SWT.DEFAULT; // The bounds end time
+    private long fTime0ExtSynch = SWT.DEFAULT;
+    private long fTime1ExtSynch = SWT.DEFAULT;
     private boolean fTimeRangeFixed;
     private int fNameWidthPref = DEFAULT_NAME_WIDTH;
     private int fMinNameWidth = MIN_NAME_WIDTH;
@@ -271,8 +271,8 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         if (fTimeGraphCtrl != null) {
             setTimeRange(input);
             setTopIndex(0);
-            fSelectionBegin = 0;
-            fSelectionEnd = 0;
+            fSelectionBegin = SWT.DEFAULT;
+            fSelectionEnd = SWT.DEFAULT;
             fSelectedEntry = null;
             refreshAllData(input);
         }
@@ -331,34 +331,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     }
 
     /**
-     * Handler for when the model is updated. Called from the display order in
-     * the API
-     *
-     * @param traces
-     *            The traces in the model
-     * @param start
-     *            The start time
-     * @param end
-     *            The end time
-     * @param updateTimeBounds
-     *            Should we updated the time bounds too
-     */
-    public void modelUpdate(ITimeGraphEntry[] traces, long start,
-            long end, boolean updateTimeBounds) {
-        if (null != fTimeGraphCtrl) {
-            updateInternalData(traces, start, end);
-            if (updateTimeBounds) {
-                fTimeRangeFixed = true;
-                // set window to match limits
-                setStartFinishTime(fTime0Bound, fTime1Bound);
-            } else {
-                fTimeGraphCtrl.redraw();
-                fTimeScaleCtrl.redraw();
-            }
-        }
-    }
-
-    /**
      * @return The string representing the view type
      */
     protected String getViewTypeStr() {
@@ -375,8 +347,8 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
     void loadOptions() {
         fMinTimeInterval = 1;
-        fSelectionBegin = -1;
-        fSelectionEnd = -1;
+        fSelectionBegin = SWT.DEFAULT;
+        fSelectionEnd = SWT.DEFAULT;
         fNameWidth = Utils.loadIntOption(getPreferenceString("namewidth"), //$NON-NLS-1$
                 fNameWidthPref, fMinNameWidth, MAX_NAME_WIDTH);
     }
@@ -553,40 +525,73 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     }
 
     /**
-     * Try to set most convenient time range for display.
+     * Recalculate the time bounds based on the time graph entries,
+     * if the user-specified bound is set to SWT.DEFAULT.
      *
-     * @param traces
-     *            The traces in the model
+     * @param entries
+     *            The root time graph entries in the model
      */
-    public void setTimeRange(ITimeGraphEntry traces[]) {
-        fEndTime = 0;
-        fBeginTime = -1;
-        for (int i = 0; i < traces.length; i++) {
-            ITimeGraphEntry entry = traces[i];
-            if (entry.getEndTime() >= entry.getStartTime() && entry.getEndTime() > 0) {
-                if (fBeginTime < 0 || entry.getStartTime() < fBeginTime) {
-                    fBeginTime = entry.getStartTime();
-                }
-                if (entry.getEndTime() > fEndTime) {
-                    fEndTime = entry.getEndTime();
-                }
-            }
+    public void setTimeRange(ITimeGraphEntry entries[]) {
+        fTime0Bound = (fBeginTime != SWT.DEFAULT ? fBeginTime : fEndTime);
+        fTime1Bound = (fEndTime != SWT.DEFAULT ? fEndTime : fBeginTime);
+        if (fBeginTime != SWT.DEFAULT && fEndTime != SWT.DEFAULT) {
+            return;
         }
+        if (entries == null || entries.length == 0) {
+            return;
+        }
+        if (fTime0Bound == SWT.DEFAULT) {
+            fTime0Bound = Long.MAX_VALUE;
+        }
+        if (fTime1Bound == SWT.DEFAULT) {
+            fTime1Bound = Long.MIN_VALUE;
+        }
+        for (ITimeGraphEntry entry : entries) {
+            setTimeRange(entry);
+        }
+    }
 
-        if (fBeginTime < 0) {
-            fBeginTime = 0;
+    private void setTimeRange(ITimeGraphEntry entry) {
+        if (fBeginTime == SWT.DEFAULT && entry.hasTimeEvents() && entry.getStartTime() != SWT.DEFAULT) {
+            fTime0Bound = Math.min(entry.getStartTime(), fTime0Bound);
+        }
+        if (fEndTime == SWT.DEFAULT && entry.hasTimeEvents() && entry.getEndTime() != SWT.DEFAULT) {
+            fTime1Bound = Math.max(entry.getEndTime(), fTime1Bound);
+        }
+        if (entry.hasChildren()) {
+            for (ITimeGraphEntry child : entry.getChildren()) {
+                setTimeRange(child);
+            }
         }
     }
 
     /**
-     * Recalculate the time bounds
+     * Set the time bounds to the provided values.
+     *
+     * @param beginTime
+     *            The bounds begin time, or SWT.DEFAULT to use the input bounds
+     * @param endTime
+     *            The bounds end time, or SWT.DEFAULT to use the input bounds
+     */
+    public void setTimeBounds(long beginTime, long endTime) {
+        fBeginTime = beginTime;
+        fEndTime = endTime;
+        fTime0Bound = (fBeginTime != SWT.DEFAULT ? fBeginTime : fEndTime);
+        fTime1Bound = (fEndTime != SWT.DEFAULT ? fEndTime : fBeginTime);
+        if (fTime0Bound > fTime1Bound) {
+            // only possible if both are not default
+            fBeginTime = endTime;
+            fEndTime = beginTime;
+            fTime0Bound = fBeginTime;
+            fTime1Bound = fEndTime;
+        }
+        adjustHorizontalScrollBar();
+    }
+
+    /**
+     * Recalculate the current time window when bounds have changed.
      */
     public void setTimeBounds() {
-        fTime0Bound = fBeginTime;
-        if (fTime0Bound < 0) {
-            fTime0Bound = 0;
-        }
-        fTime1Bound = fEndTime;
         if (!fTimeRangeFixed) {
             fTime0 = fTime0Bound;
             fTime1 = fTime1Bound;
@@ -596,29 +601,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         if (fTime1 - fTime0 < fMinTimeInterval) {
             fTime1 = Math.min(fTime1Bound, fTime0 + fMinTimeInterval);
         }
-    }
-
-    /**
-     * @param traces
-     * @param start
-     * @param end
-     */
-    void updateInternalData(ITimeGraphEntry[] traces, long start, long end) {
-        ITimeGraphEntry[] realTraces = traces;
-
-        if (null == realTraces) {
-            realTraces = new ITimeGraphEntry[0];
-        }
-        if ((start == 0 && end == 0) || start < 0 || end < 0) {
-            // Start and end time are unspecified and need to be determined from
-            // individual processes
-            setTimeRange(realTraces);
-        } else {
-            fBeginTime = start;
-            fEndTime = end;
-        }
-
-        refreshAllData(realTraces);
     }
 
     /**
@@ -787,29 +769,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         adjustHorizontalScrollBar();
         fTimeGraphCtrl.redraw();
         fTimeScaleCtrl.redraw();
-    }
-
-    /**
-     * Set the time bounds to the provided values
-     *
-     * @param beginTime
-     *            The start time of the window
-     * @param endTime
-     *            The end time
-     */
-    public void setTimeBounds(long beginTime, long endTime) {
-        if (endTime >= beginTime) {
-            fBeginTime = beginTime;
-            fEndTime = endTime;
-            fTime0Bound = beginTime;
-            fTime1Bound = endTime;
-        } else {
-            fBeginTime = 0;
-            fEndTime = 0;
-            fTime0Bound = 0;
-            fTime1Bound = 0;
-        }
-        adjustHorizontalScrollBar();
     }
 
     @Override

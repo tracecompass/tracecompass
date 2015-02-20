@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2012, 2015 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -20,6 +20,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.eclipse.swt.SWT;
+
 /**
  * An entry for use in the time graph views
  *
@@ -35,8 +37,8 @@ public class TimeGraphEntry implements ITimeGraphEntry {
 
     /** Name of this entry (text to show) */
     private String fName;
-    private long fStartTime = -1;
-    private long fEndTime = -1;
+    private long fStartTime = SWT.DEFAULT;
+    private long fEndTime = SWT.DEFAULT;
     private List<ITimeEvent> fEventList = new ArrayList<>();
     private List<ITimeEvent> fZoomedEventList = new ArrayList<>();
     private Comparator<ITimeGraphEntry> fComparator;
@@ -177,10 +179,10 @@ public class TimeGraphEntry implements ITimeGraphEntry {
             } else {
                 fEventList.add(event);
             }
-            if (fStartTime == -1 || start < fStartTime) {
+            if (fStartTime == SWT.DEFAULT || start < fStartTime) {
                 fStartTime = start;
             }
-            if (fEndTime == -1 || end > fEndTime) {
+            if (fEndTime == SWT.DEFAULT || end > fEndTime) {
                 fEndTime = end;
             }
         }
