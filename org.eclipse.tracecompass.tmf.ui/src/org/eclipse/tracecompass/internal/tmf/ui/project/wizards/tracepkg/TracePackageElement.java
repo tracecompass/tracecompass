@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *     Marc-Andre Laperle - Initial API and implementation
+ *     Patrick Tasse - Add list methods
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg;
@@ -46,7 +47,7 @@ public abstract class TracePackageElement extends WorkbenchAdapter {
     }
 
     /**
-     * Add a child to the element.
+     * Add a child at the end of the element's children list.
      *
      * @param child
      *            the element to add as a child
@@ -57,7 +58,20 @@ public abstract class TracePackageElement extends WorkbenchAdapter {
     }
 
     /**
-     * Remove a child from the element.
+     * Insert a child at the specified position in the element's children list.
+     *
+     * @param index
+     *            the index at which the element is to be inserted
+     * @param child
+     *            the element to insert as a child
+     */
+    public void addChild(int index, TracePackageElement child) {
+        fChildren.add(index, child);
+        child.setParent(this);
+    }
+
+    /**
+     * Remove a child from the element's children list.
      *
      * @param child
      *            the child to remove
@@ -65,6 +79,17 @@ public abstract class TracePackageElement extends WorkbenchAdapter {
     public void removeChild(TracePackageElement child) {
         fChildren.remove(child);
         child.setParent(null);
+    }
+
+    /**
+     * Returns the index of the specified child in the element's children list.
+     *
+     * @param child
+     *            the child to search for
+     * @return the index of the child in the list, or -1 if not found
+     */
+    public int indexOf(TracePackageElement child) {
+        return fChildren.indexOf(child);
     }
 
     /**
