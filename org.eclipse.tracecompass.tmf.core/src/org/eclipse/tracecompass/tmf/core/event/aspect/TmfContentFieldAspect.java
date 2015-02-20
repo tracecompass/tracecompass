@@ -30,6 +30,7 @@ public class TmfContentFieldAspect implements ITmfEventAspect {
 
     private final String fAspectName;
     private final String[] fFieldPath;
+    private final String fHelpText;
 
     /**
      * Constructor
@@ -41,8 +42,30 @@ public class TmfContentFieldAspect implements ITmfEventAspect {
      *            event content. Should *not* be localized!
      */
     public TmfContentFieldAspect(String aspectName, String... fieldPath) {
+        this(aspectName, EMPTY_STRING, fieldPath);
+    }
+
+    private TmfContentFieldAspect(String aspectName, String helpText, String... fieldPath) {
         fAspectName = aspectName;
         fFieldPath = checkNotNull(Arrays.copyOf(fieldPath, fieldPath.length));
+        fHelpText = helpText;
+    }
+
+    /**
+     * Creates a new instance of this aspect with the specified name, help text,
+     * and field path.
+     *
+     * @param aspectName
+     *            The name of the aspect. Should be localized.
+     * @param helpText
+     *            The help text.
+     * @param fieldPath
+     *            The field name or absolute field path array to look for in the
+     *            event content. Should *not* be localized!
+     * @return the new aspect
+     */
+    public static TmfContentFieldAspect create(String aspectName, String helpText, String... fieldPath) {
+        return new TmfContentFieldAspect(aspectName, helpText, fieldPath);
     }
 
     @Override
@@ -52,7 +75,7 @@ public class TmfContentFieldAspect implements ITmfEventAspect {
 
     @Override
     public String getHelpText() {
-        return EMPTY_STRING;
+        return fHelpText;
     }
 
     @Override
@@ -75,6 +98,7 @@ public class TmfContentFieldAspect implements ITmfEventAspect {
         int result = 1;
         result = prime * result + fAspectName.hashCode();
         result = prime * result + Arrays.hashCode(fFieldPath);
+        result = prime * result + fHelpText.hashCode();
         return result;
     }
 
@@ -94,6 +118,9 @@ public class TmfContentFieldAspect implements ITmfEventAspect {
             return false;
         }
         if (!Arrays.equals(fFieldPath, other.fFieldPath)) {
+            return false;
+        }
+        if (!fHelpText.equals(other.fHelpText)) {
             return false;
         }
         return true;
