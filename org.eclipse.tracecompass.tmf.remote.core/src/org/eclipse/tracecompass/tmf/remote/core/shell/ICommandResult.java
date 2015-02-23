@@ -11,10 +11,9 @@
  *********************************************************************/
 package org.eclipse.tracecompass.tmf.remote.core.shell;
 
+
 /**
- * <p>
  * Interface for providing command execution result.
- * </p>
  *
  * @author Bernd Hufmann
  */
@@ -27,14 +26,20 @@ public interface ICommandResult {
     int getResult();
 
     /**
-     * @return returns the command output.
+     * Return the command output.
+     *
+     * It should not be null, but could be empty.
+     *
+     * @return the command output.
      */
     String[] getOutput();
 
     /**
-     * The error output of the command.
+     * Return the command error output.
      *
-     * @return returns the command error output.
+     * It should not be null, but could be empty.
+     *
+     * @return the command error output.
      */
     String[] getErrorOutput();
 }

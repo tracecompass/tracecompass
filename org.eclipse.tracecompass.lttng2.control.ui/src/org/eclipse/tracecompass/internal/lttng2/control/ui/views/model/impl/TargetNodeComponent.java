@@ -142,7 +142,7 @@ public class TargetNodeComponent extends TraceControlComponent implements IRemot
         fService = null;
         final ICommandShell shell = fShell;
         if (shell != null) {
-            shell.disconnect();
+            shell.dispose();
             fShell = null;
         }
     }
@@ -414,8 +414,9 @@ public class TargetNodeComponent extends TraceControlComponent implements IRemot
     private ILttngControlService createControlService() throws ExecutionException {
         if (fService == null) {
             try {
-                fShell = fRemoteProxy.createCommandShell();
-                fService = LTTngControlServiceFactory.getInstance().getLttngControlService(fShell);
+                ICommandShell shell = fRemoteProxy.createCommandShell();
+                fShell = shell;
+                fService = LTTngControlServiceFactory.getLttngControlService(shell);
             } catch (ExecutionException e) {
                 disposeControlService();
                 throw e;

@@ -12,9 +12,12 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.stubs.shells;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,7 +31,6 @@ import java.util.regex.Pattern;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlService;
-import org.eclipse.tracecompass.tmf.remote.core.shell.CommandResult;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandResult;
 
 @SuppressWarnings("javadoc")
@@ -96,9 +98,8 @@ public class LTTngToolsFileShell extends TestCommandShell {
      *
      * <pre>
      * @param scenariofile - path to scenario file
-     * @throws Exception
      */
-    public synchronized void loadScenarioFile(String scenariofile) throws Exception {
+    public synchronized void loadScenarioFile(String scenariofile) {
         fScenariofile = scenariofile;
 
         // clean up map
@@ -197,7 +198,9 @@ public class LTTngToolsFileShell extends TestCommandShell {
                         } else if (OUTPUT_END_KEY.equals(strLine)) {
                             // Save output/result in command map
                             if (output != null && errorOutput != null) {
-                                commandMap.put(input, new CommandResult(result, output.toArray(new String[output.size()]), errorOutput.toArray(new String[errorOutput.size()])));
+                                commandMap.put(input, new CommandResultStub(result,
+                                        checkNotNull(output.toArray(new String[output.size()])),
+                                        checkNotNull(errorOutput.toArray(new String[errorOutput.size()]))));
                             }
                             inOutput = false;
                         } else if (OUTPUT_KEY.equals(strLine)) {
@@ -226,6 +229,8 @@ public class LTTngToolsFileShell extends TestCommandShell {
                     }
                 }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -258,12 +263,12 @@ public class LTTngToolsFileShell extends TestCommandShell {
         }
 
         if (commands.containsKey(fullCommand)) {
-            return commands.get(fullCommand);
+            return checkNotNull(commands.get(fullCommand));
         }
 
         String[] output = new String[1];
         output[0] = String.valueOf("Command not found");
-        CommandResult result = new CommandResult(1, output, output);
+        CommandResultStub result = new CommandResultStub(1, output, output);
         return result;
     }
 

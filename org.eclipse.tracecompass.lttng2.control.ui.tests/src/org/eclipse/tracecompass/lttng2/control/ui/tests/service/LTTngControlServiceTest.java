@@ -31,6 +31,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IDomainInfo;
@@ -48,7 +49,6 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionS
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BufferType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.ChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.SessionInfo;
-import org.eclipse.tracecompass.internal.lttng2.control.stubs.service.CommandShellFactory;
 import org.eclipse.tracecompass.internal.lttng2.control.stubs.shells.LTTngToolsFileShell;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.logging.ControlCommandLogger;
@@ -119,10 +119,8 @@ public class LTTngControlServiceTest {
     // ------------------------------------------------------------------------
     // Test data
     // ------------------------------------------------------------------------
-
-    private CommandShellFactory fShellFactory;
     private String fTestfile;
-    protected LTTngToolsFileShell fShell;
+    protected final @NonNull LTTngToolsFileShell fShell = new LTTngToolsFileShell();
     protected ILttngControlService fService;
 
     // ------------------------------------------------------------------------
@@ -137,13 +135,9 @@ public class LTTngControlServiceTest {
      */
     @Before
     public void setUp() throws Exception {
-        fShellFactory = CommandShellFactory.getInstance();
-
         URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path(getTestDirectory() + File.separator + getTestStream()), null);
         File testfile = new File(FileLocator.toFileURL(location).toURI());
         fTestfile = testfile.getAbsolutePath();
-
-        fShell = fShellFactory.getFileShell();
         fShell.loadScenarioFile(fTestfile);
         fService = getControlService();
         if (fService == null) {
@@ -192,7 +186,7 @@ public class LTTngControlServiceTest {
     public void testVersion() {
         try {
             fShell.setScenario(SCEN_LTTNG_VERSION);
-            ILttngControlService service = LTTngControlServiceFactory.getInstance().getLttngControlService(fShell);
+            ILttngControlService service = LTTngControlServiceFactory.getLttngControlService(fShell);
             assertNotNull(service);
             assertEquals("2.1.0", service.getVersionString());
         } catch (ExecutionException e) {
@@ -204,7 +198,7 @@ public class LTTngControlServiceTest {
     public void testVersionWithPrompt() {
         try {
             fShell.setScenario(SCEN_LTTNG_VERSION_WITH_PROMPT);
-            ILttngControlService service = LTTngControlServiceFactory.getInstance().getLttngControlService(fShell);
+            ILttngControlService service = LTTngControlServiceFactory.getLttngControlService(fShell);
             assertNotNull(service);
             assertEquals("2.0.0", service.getVersionString());
         } catch (ExecutionException e) {
@@ -212,22 +206,17 @@ public class LTTngControlServiceTest {
         }
     }
 
-    @Test
-    public void testUnsupportedVersion() {
-        try {
-            fShell.setScenario(SCEN_LTTNG_UNSUPPORTED_VERSION);
-            LTTngControlServiceFactory.getInstance().getLttngControlService(fShell);
-            fail("No exeption thrown");
-        } catch (ExecutionException e) {
-            // success
-        }
+    @Test(expected=ExecutionException.class)
+    public void testUnsupportedVersion() throws ExecutionException {
+        fShell.setScenario(SCEN_LTTNG_UNSUPPORTED_VERSION);
+        LTTngControlServiceFactory.getLttngControlService(fShell);
     }
 
     @Test
     public void testNoVersion() {
         try {
             fShell.setScenario(SCEN_LTTNG_NO_VERSION);
-            LTTngControlServiceFactory.getInstance().getLttngControlService(fShell);
+            LTTngControlServiceFactory.getLttngControlService(fShell);
             fail("No exeption thrown");
         } catch (ExecutionException e) {
             // success
@@ -238,7 +227,7 @@ public class LTTngControlServiceTest {
     public void testVersionCompiled() {
         try {
             fShell.setScenario(SCEN_LTTNG_COMPILED_VERSION);
-            ILttngControlService service = LTTngControlServiceFactory.getInstance().getLttngControlService(fShell);
+            ILttngControlService service = LTTngControlServiceFactory.getLttngControlService(fShell);
             assertNotNull(service);
             assertEquals("2.5.0", service.getVersionString());
         } catch (ExecutionException e) {

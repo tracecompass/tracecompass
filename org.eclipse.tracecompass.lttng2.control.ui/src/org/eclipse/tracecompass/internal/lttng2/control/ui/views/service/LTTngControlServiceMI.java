@@ -507,7 +507,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
         ICommandResult result = executeCommand(command, monitor, false);
         List<IBaseEventInfo> events = new ArrayList<>();
 
-        if (isError(result) && result.getErrorOutput() != null) {
+        if (isError(result)) {
             // Ignore the following 2 cases:
             // Spawning a session daemon
             // Error: Unable to list kernel events
@@ -535,7 +535,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
         ICommandResult result = executeCommand(command, monitor, false);
         List<IUstProviderInfo> allProviders = new ArrayList<>();
 
-        if (isError(result) && result.getErrorOutput() != null) {
+        if (isError(result)) {
             // Ignore the following 2 cases:
             // Spawning a session daemon
             // Error: Unable to list UST events: Listing UST events failed
@@ -694,13 +694,13 @@ public class LTTngControlServiceMI extends LTTngControlService {
         ICommandResult result = executeCommand(command, monitor, false);
         String[] errorOutput = result.getErrorOutput();
 
-        if (isError(result) && (errorOutput != null)) {
+        if (isError(result)) {
             // Don't treat this as an error
             if (ignoredPattern(errorOutput, LTTngControlServiceConstants.SESSION_NOT_FOUND_ERROR_PATTERN)) {
                 return;
 
             }
-            throw new ExecutionException(Messages.TraceControl_CommandError + " " + toCommandString(command) + "\n" + formatOutput(result)); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new ExecutionException(Messages.TraceControl_CommandError + " " + toCommandString(command) + "\n" + result.toString()); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         // Check for action effect

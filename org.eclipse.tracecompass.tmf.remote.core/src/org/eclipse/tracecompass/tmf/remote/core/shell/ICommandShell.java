@@ -16,40 +16,30 @@ import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
- * <p>
  * Interface for a command shell implementation
- * </p>
  *
  * @author Bernd Hufmann
  */
 public interface ICommandShell {
 
     /**
-     * Method to connect the command shell.
-     *
-     * @throws ExecutionException
-     *             If the command fails
-     */
-    void connect() throws ExecutionException;
-
-    /**
      * Method to disconnect the command shell.
      */
-    void disconnect();
+    void dispose();
 
     /**
      * Method to execute a command on the command shell.
      *
      * @param command
-     *            - the command to executed
+     *            The command to executed
      * @param monitor
-     *            - a progress monitor
-     * @return the command result
+     *            A progress monitor
+     * @return a {@link ICommandResult} instance
      * @throws ExecutionException
      *             If the command fails
      */
-    ICommandResult executeCommand(List<String> command,
-            IProgressMonitor monitor) throws ExecutionException;
+    ICommandResult executeCommand(List<String> command, @Nullable IProgressMonitor monitor) throws ExecutionException;
 }

@@ -18,6 +18,7 @@ import java.util.regex.Matcher;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.logging.ControlCommandLogger;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.preferences.ControlPreferences;
@@ -30,15 +31,8 @@ import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandShell;
  *
  * @author Bernd Hufmann
  */
-public class LTTngControlServiceFactory {
-
-    // ------------------------------------------------------------------------
-    // Attributes
-    // ------------------------------------------------------------------------
-    /**
-     * The singleton instance.
-     */
-    private static LTTngControlServiceFactory fInstance = null;
+@NonNullByDefault
+public final class LTTngControlServiceFactory {
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -47,19 +41,6 @@ public class LTTngControlServiceFactory {
      * Constructor
      */
     private LTTngControlServiceFactory() {
-    }
-
-    // ------------------------------------------------------------------------
-    // Accessors
-    // ------------------------------------------------------------------------
-    /**
-     * @return the LTTngControlServiceFactory singleton instance.
-     */
-    public static synchronized LTTngControlServiceFactory getInstance() {
-        if (fInstance == null) {
-            fInstance = new LTTngControlServiceFactory();
-        }
-        return fInstance;
     }
 
     // ------------------------------------------------------------------------
@@ -75,61 +56,28 @@ public class LTTngControlServiceFactory {
      * @throws ExecutionException
      *             If the command fails
      */
-    public ILttngControlService getLttngControlService(ICommandShell shell) throws ExecutionException {
+    public static ILttngControlService getLttngControlService(ICommandShell shell) throws ExecutionException {
         // get the version
         boolean machineInterfaceMode = true;
-        List<String> command = new ArrayList<>();
-        command.add(LTTngControlServiceConstants.CONTROL_COMMAND);
-        command.add(LTTngControlServiceConstants.COMMAND_VERSION);
-
-        List<String> commandMi = new ArrayList<>();
-        commandMi.add(LTTngControlServiceConstants.CONTROL_COMMAND);
-        commandMi.add(LTTngControlServiceConstants.CONTROL_COMMAND_MI_OPTION);
-        commandMi.add(LTTngControlServiceConstants.CONTROL_COMMAND_MI_XML);
-        commandMi.add(LTTngControlServiceConstants.COMMAND_VERSION);
-
-        // Logging
-        if (ControlPreferences.getInstance().isLoggingEnabled()) {
-            ControlCommandLogger.log(LTTngControlService.toCommandString(commandMi));
-        }
-
-        ICommandResult result = null;
 
         // Looking for a machine interface on LTTng side
-        try {
-            result = shell.executeCommand(commandMi, new NullProgressMonitor());
-        } catch (ExecutionException e) {
-            throw new ExecutionException(Messages.TraceControl_GettingVersionError, e);
-        }
-
-        // Output logging
-        if (ControlPreferences.getInstance().isLoggingEnabled()) {
-            ControlCommandLogger.log(LTTngControlService.formatOutput(result));
-        }
+        List<String> command = new ArrayList<>();
+        command.add(LTTngControlServiceConstants.CONTROL_COMMAND);
+        command.add(LTTngControlServiceConstants.CONTROL_COMMAND_MI_OPTION);
+        command.add(LTTngControlServiceConstants.CONTROL_COMMAND_MI_XML);
+        command.add(LTTngControlServiceConstants.COMMAND_VERSION);
+        ICommandResult result = executeCommand(shell, command);
 
         if (result.getResult() != 0) {
             machineInterfaceMode = false;
             // Fall back if no machine interface is present
-
-            // Logging
-            if (ControlPreferences.getInstance().isLoggingEnabled()) {
-                ControlCommandLogger.log(LTTngControlService.toCommandString(command));
-            }
-
-            try {
-                result = shell.executeCommand(command, new NullProgressMonitor());
-            } catch (ExecutionException e) {
-                throw new ExecutionException(Messages.TraceControl_GettingVersionError + ": " + e); //$NON-NLS-1$
-            }
-
-            // Output logging
-            if (ControlPreferences.getInstance().isLoggingEnabled()) {
-                ControlCommandLogger.log(LTTngControlService.formatOutput(result));
-            }
+            command.clear();
+            command.add(LTTngControlServiceConstants.CONTROL_COMMAND);
+            command.add(LTTngControlServiceConstants.COMMAND_VERSION);
+            result = executeCommand(shell, command);
         }
 
-
-        if ((result != null) && (result.getResult() == 0) && (result.getOutput().length >= 1)) {
+        if ((result.getResult() == 0) && (result.getOutput().length >= 1)) {
             if (machineInterfaceMode) {
                 LTTngControlServiceMI service = new LTTngControlServiceMI(shell, LTTngControlService.class.getResource(LTTngControlServiceConstants.MI_XSD_FILENAME));
                 service.setVersion(result.getOutput());
@@ -154,5 +102,26 @@ public class LTTngControlServiceFactory {
             }
         }
         throw new ExecutionException(Messages.TraceControl_GettingVersionError);
+    }
+
+    private static ICommandResult executeCommand(ICommandShell shell, List<String> command) throws ExecutionException {
+        // Logging
+        if (ControlPreferences.getInstance().isLoggingEnabled()) {
+            ControlCommandLogger.log(LTTngControlService.toCommandString(command));
+        }
+
+        ICommandResult result = null;
+
+        try {
+            result = shell.executeCommand(command, new NullProgressMonitor());
+        } catch (ExecutionException e) {
+            throw new ExecutionException(Messages.TraceControl_GettingVersionError + ": " + e); //$NON-NLS-1$
+        }
+
+        // Output logging
+        if (ControlPreferences.getInstance().isLoggingEnabled()) {
+            ControlCommandLogger.log(result.toString());
+        }
+        return result;
     }
 }

@@ -9,14 +9,19 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
-package org.eclipse.tracecompass.tmf.remote.core.shell;
+package org.eclipse.tracecompass.internal.tmf.remote.core.shell;
 
-import java.util.Arrays;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
+
+import java.util.List;
+
+import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandResult;
+
+import com.google.common.collect.ImmutableList;
 
 /**
- * <p>
  * Class containing command result of remote command execution.
- * </p>
  *
  * @author Bernd Hufmann
  */
@@ -25,16 +30,14 @@ public class CommandResult implements ICommandResult {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    /**
-     * The result of the command. 0 if successful else > 0
-     */
-    private int fResult;
+    /** The result of the command. 0 if successful else > 0 */
+    private final int fResult;
 
-    /**
-     * The output as String array.
-     */
-    private String[] fOutput = new String[0];
-    private String[] fErrorOutput = new String[0];
+    /** The output as list of Strings. */
+    private final List<String> fOutput;
+
+    /** The error stream output as list of Strings. */
+    private final List<String> fErrorOutput;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -52,12 +55,8 @@ public class CommandResult implements ICommandResult {
      */
     public CommandResult(int result, String[] output, String[] errorOutput) {
         fResult = result;
-        if (output != null) {
-            fOutput = Arrays.copyOf(output, output.length);
-        }
-        if (errorOutput != null) {
-            fErrorOutput = Arrays.copyOf(errorOutput, errorOutput.length);
-        }
+        fOutput = checkNotNull(ImmutableList.copyOf(output));
+        fErrorOutput = checkNotNull(ImmutableList.copyOf(errorOutput));
     }
 
     // ------------------------------------------------------------------------
@@ -71,11 +70,27 @@ public class CommandResult implements ICommandResult {
 
     @Override
     public String[] getOutput() {
-        return Arrays.copyOf(fOutput, fOutput.length);
+        return checkNotNull(fOutput.toArray(new String[fOutput.size()]));
     }
 
     @Override
     public String[] getErrorOutput() {
-        return Arrays.copyOf(fErrorOutput, fErrorOutput.length);
+        return checkNotNull(fErrorOutput.toArray(new String[fErrorOutput.size()]));
+    }
+
+    @Override
+    public String toString() {
+        StringBuffer ret = new StringBuffer();
+        ret.append("Error Output:\n"); //$NON-NLS-1$
+        for (String string : fErrorOutput) {
+            ret.append(string).append("\n"); //$NON-NLS-1$
+        }
+        ret.append("Return Value: "); //$NON-NLS-1$
+        ret.append(fResult);
+        ret.append("\n"); //$NON-NLS-1$
+        for (String string : fOutput) {
+            ret.append(string).append("\n"); //$NON-NLS-1$
+        }
+        return nullToEmptyString(ret.toString());
     }
 }
