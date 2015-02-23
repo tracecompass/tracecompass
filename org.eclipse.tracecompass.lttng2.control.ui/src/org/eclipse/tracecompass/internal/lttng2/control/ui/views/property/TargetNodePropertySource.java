@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.internal.lttng2.control.ui.views.property;
 import org.eclipse.remote.core.IRemoteConnectionHostService;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent;
+import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxy;
 import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 
@@ -108,8 +109,9 @@ public class TargetNodePropertySource extends BasePropertySource {
             return fTargetNode.getName();
         }
         if (TARGET_NODE_ADDRESS_PROPERTY_ID.equals(id)) {
-            if (fTargetNode.getRemoteConnection().hasService(IRemoteConnectionHostService.class)) {
-                return fTargetNode.getRemoteConnection().getService(IRemoteConnectionHostService.class).getHostname();
+            RemoteSystemProxy proxy = fTargetNode.getRemoteSystemProxy();
+            if (proxy.getRemoteConnection().hasService(IRemoteConnectionHostService.class)) {
+                return proxy.getRemoteConnection().getService(IRemoteConnectionHostService.class).getHostname();
             }
             return LOCAL_CONNECTION_HOST_NAME;
         }

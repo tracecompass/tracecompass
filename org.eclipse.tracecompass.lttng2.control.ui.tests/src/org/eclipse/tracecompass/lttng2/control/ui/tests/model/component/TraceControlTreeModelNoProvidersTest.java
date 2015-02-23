@@ -25,6 +25,7 @@ import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TargetNodeState;
@@ -61,7 +62,8 @@ public class TraceControlTreeModelNoProvidersTest {
     // Test data
     // ------------------------------------------------------------------------
 
-    private TestRemoteSystemProxy fProxy;
+    private IRemoteConnection fHost = RemoteSystemProxy.getLocalConnection();
+    private @NonNull TestRemoteSystemProxy fProxy = new TestRemoteSystemProxy(fHost);
     private String fTestFile;
 
     // ------------------------------------------------------------------------
@@ -76,7 +78,6 @@ public class TraceControlTreeModelNoProvidersTest {
      */
     @Before
     public void setUp() throws Exception {
-        fProxy = new TestRemoteSystemProxy();
         URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path(TraceControlTestFacility.DIRECTORY + File.separator + TEST_STREAM), null);
         File testfile = new File(FileLocator.toFileURL(location).toURI());
         fTestFile = testfile.getAbsolutePath();
@@ -101,9 +102,7 @@ public class TraceControlTreeModelNoProvidersTest {
 
         ITraceControlComponent root = TraceControlTestFacility.getInstance().getControlView().getTraceControlRoot();
 
-        IRemoteConnection host = RemoteSystemProxy.getLocalConnection();
-
-        TargetNodeComponent node = new TargetNodeComponent(TARGET_NODE_NAME, root, host, fProxy);
+        TargetNodeComponent node = new TargetNodeComponent(TARGET_NODE_NAME, root, fProxy);
 
         root.addChild(node);
         node.connect();

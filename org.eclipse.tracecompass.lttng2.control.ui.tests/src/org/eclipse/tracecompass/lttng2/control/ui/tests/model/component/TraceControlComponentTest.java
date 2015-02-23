@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TargetNodeState;
 import org.eclipse.tracecompass.internal.lttng2.control.stubs.service.TestRemoteSystemProxy;
@@ -34,6 +35,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.ILttngC
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlService;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlServiceConstants;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlServiceMI;
+import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxy;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.junit.Test;
@@ -43,6 +45,8 @@ import org.junit.Test;
  * <code>{@link TraceControlComponent}</code>.
  */
 public class TraceControlComponentTest {
+
+    private IRemoteConnection fHost = RemoteSystemProxy.getLocalConnection();
 
     /**
      * Run the TraceControlComponent(String) constructor test.
@@ -266,7 +270,7 @@ public class TraceControlComponentTest {
         ILttngControlService result = fixture.getControlService();
         assertEquals(null, result);
 
-        TestRemoteSystemProxy proxy = new TestRemoteSystemProxy();
+        TestRemoteSystemProxy proxy = new TestRemoteSystemProxy(fHost);
         ILttngControlService service = new LTTngControlService(proxy.createCommandShell());
         fixture.setControlService(service);
         result = fixture.getControlService();

@@ -55,7 +55,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
-import org.eclipse.tracecompass.tmf.remote.core.proxy.IRemoteSystemProxy;
+import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxy;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.ui.ISharedImages;
@@ -408,9 +408,13 @@ public class ImportDialog extends Dialog implements IImportDialog {
         contextGroup.setLayout(layout);
         contextGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-        IRemoteSystemProxy proxy = fSession.getTargetNode().getRemoteSystemProxy();
+        RemoteSystemProxy proxy = fSession.getTargetNode().getRemoteSystemProxy();
 
         IRemoteFileService fsss = proxy.getRemoteFileService();
+
+        if (fsss == null) {
+            return;
+        }
 
         final String path = fSession.isSnapshotSession() ? fSession.getSnapshotInfo().getSnapshotPath() : fSession.getSessionPath();
         final IFileStore remoteFolder = fsss.getResource(path);

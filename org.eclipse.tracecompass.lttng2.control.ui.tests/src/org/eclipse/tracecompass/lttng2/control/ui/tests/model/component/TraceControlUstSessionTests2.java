@@ -22,6 +22,7 @@ import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TargetNodeState;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BufferType;
@@ -63,7 +64,8 @@ public class TraceControlUstSessionTests2 {
     // ------------------------------------------------------------------------
 
     private TraceControlTestFacility fFacility;
-    private TestRemoteSystemProxy fProxy;
+    private IRemoteConnection fHost = RemoteSystemProxy.getLocalConnection();
+    private @NonNull TestRemoteSystemProxy fProxy = new TestRemoteSystemProxy(fHost);
     private String fTestFile;
 
     // ------------------------------------------------------------------------
@@ -80,7 +82,6 @@ public class TraceControlUstSessionTests2 {
     public void setUp() throws Exception {
         fFacility = TraceControlTestFacility.getInstance();
         fFacility.init();
-        fProxy = new TestRemoteSystemProxy();
         URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path(TraceControlTestFacility.DIRECTORY + File.separator + TEST_STREAM), null);
         File testfile = new File(FileLocator.toFileURL(location).toURI());
         fTestFile = testfile.getAbsolutePath();
@@ -109,9 +110,7 @@ public class TraceControlUstSessionTests2 {
 
         ITraceControlComponent root = fFacility.getControlView().getTraceControlRoot();
 
-        IRemoteConnection host = RemoteSystemProxy.getLocalConnection();
-
-        TargetNodeComponent node = new TargetNodeComponent("myNode", root, host, fProxy);
+        TargetNodeComponent node = new TargetNodeComponent("myNode", root, fProxy);
 
         root.addChild(node);
         fFacility.waitForJobs();

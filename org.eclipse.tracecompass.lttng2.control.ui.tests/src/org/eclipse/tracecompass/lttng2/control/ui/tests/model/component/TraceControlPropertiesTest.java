@@ -93,8 +93,8 @@ public class TraceControlPropertiesTest {
      */
     @Test
     public void testComponentProperties() throws Exception {
-
-        TestRemoteSystemProxy proxy = new TestRemoteSystemProxy();
+        IRemoteConnection host = RemoteSystemProxy.getLocalConnection();
+        TestRemoteSystemProxy proxy = new TestRemoteSystemProxy(host);
 
         URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path(DIRECTORY + File.separator + TEST_STREAM), null);
         File testfile = new File(FileLocator.toFileURL(location).toURI());
@@ -103,8 +103,7 @@ public class TraceControlPropertiesTest {
 
         ITraceControlComponent root = TraceControlTestFacility.getInstance().getControlView().getTraceControlRoot();
 
-        IRemoteConnection host = RemoteSystemProxy.getLocalConnection();
-        TargetNodeComponent node = new TargetNodeComponent("myNode", root, host, proxy);
+        TargetNodeComponent node = new TargetNodeComponent("myNode", root, proxy);
 
         root.addChild(node);
         node.connect();

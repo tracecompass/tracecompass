@@ -46,7 +46,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messag
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionGroup;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlServiceConstants;
-import org.eclipse.tracecompass.tmf.remote.core.proxy.IRemoteSystemProxy;
+import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxy;
 
 /**
  * <p>
@@ -816,7 +816,7 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
             // validate sessionPath
             if (!fIsAdvancedEnabled && !fIsLive) {
                 TargetNodeComponent node = (TargetNodeComponent)fParent.getParent();
-                IRemoteSystemProxy proxy = node.getRemoteSystemProxy();
+                RemoteSystemProxy proxy = node.getRemoteSystemProxy();
                 IRemoteFileService fsss = proxy.getRemoteFileService();
                 if (fsss != null) {
                     IFileStore remoteFolder = fsss.getResource(fSessionPath);

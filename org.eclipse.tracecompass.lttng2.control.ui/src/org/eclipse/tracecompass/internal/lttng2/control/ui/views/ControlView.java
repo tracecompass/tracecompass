@@ -128,7 +128,7 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
         int i = 0;
         for (ITraceControlComponent cmp : fRoot.getChildren()) {
             if (cmp instanceof TargetNodeComponent) {
-                IRemoteConnection rc = ((TargetNodeComponent) cmp).getRemoteConnection();
+                IRemoteConnection rc = ((TargetNodeComponent) cmp).getRemoteSystemProxy().getRemoteConnection();
                 memento.putString(KEY_REMOTE_PROVIDER + i, rc.getConnectionType().getId());
                 memento.putString(KEY_REMOTE_CONNECTION_NAME + i, rc.getName());
                 i++;

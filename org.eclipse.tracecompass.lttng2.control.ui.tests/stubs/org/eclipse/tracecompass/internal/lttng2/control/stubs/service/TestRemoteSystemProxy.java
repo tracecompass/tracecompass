@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,17 +12,24 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.stubs.service;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.remote.core.IRemoteFileService;
 import org.eclipse.remote.core.IRemoteProcessBuilder;
 import org.eclipse.tracecompass.internal.lttng2.control.stubs.shells.LTTngToolsFileShell;
-import org.eclipse.tracecompass.tmf.remote.core.proxy.IRemoteSystemProxy;
+import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxy;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandShell;
 
 @SuppressWarnings("javadoc")
-public class TestRemoteSystemProxy implements IRemoteSystemProxy {
+public class TestRemoteSystemProxy extends RemoteSystemProxy {
+
+    public TestRemoteSystemProxy(IRemoteConnection host) {
+        super(checkNotNull(host));
+    }
 
     private LTTngToolsFileShell fShell = null;
     private String fTestFile = null;
@@ -43,7 +50,7 @@ public class TestRemoteSystemProxy implements IRemoteSystemProxy {
     }
 
     @Override
-    public void disconnect() throws ExecutionException {
+    public void disconnect() {
         fShell = null;
     }
 
@@ -53,18 +60,20 @@ public class TestRemoteSystemProxy implements IRemoteSystemProxy {
 
     @Override
     public ICommandShell createCommandShell() throws ExecutionException {
-        if (fShell == null) {
-            fShell = CommandShellFactory.getInstance().getFileShell();
+        LTTngToolsFileShell shell = fShell;
+        if (shell == null) {
+            shell = CommandShellFactory.getInstance().getFileShell();
             if ((fTestFile != null) && (fScenario != null)) {
                 try {
-                    fShell.loadScenarioFile(fTestFile);
+                    shell.loadScenarioFile(fTestFile);
                 } catch (Exception e) {
                     throw new ExecutionException(e.toString());
                 }
-                fShell.setScenario(fScenario);
+                shell.setScenario(fScenario);
+                fShell = shell;
             }
         }
-        return fShell;
+        return checkNotNull(shell);
     }
 
     @Override
