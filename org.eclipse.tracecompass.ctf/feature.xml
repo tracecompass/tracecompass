@@ -19,10 +19,6 @@
       %license
    </license>
 
-   <url>
-      <update label="Linux Tools Update Site" url="http://download.eclipse.org/linuxtools/update"/>
-   </url>
-
    <requires>
       <import plugin="org.antlr.runtime" version="3.2.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.runtime"/>

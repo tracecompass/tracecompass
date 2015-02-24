@@ -19,10 +19,6 @@
       %license
    </license>
 
-   <url>
-      <update label="Linux Tools Update Site" url="http://download.eclipse.org/linuxtools/update"/>
-   </url>
-
    <includes
          id="org.eclipse.tracecompass.tmf"
          version="0.0.0"
