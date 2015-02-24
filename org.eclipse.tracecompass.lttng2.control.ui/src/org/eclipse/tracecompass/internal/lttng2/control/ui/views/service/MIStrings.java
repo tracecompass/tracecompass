@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -8,15 +8,17 @@
  *
  * Contributors:
  *   Jonathan Rajotte Julien - Initial API and implementation
+ *   Bernd Hufmann - Added null annotations
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.service;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
+
 /**
  * Non-externalized strings for use with the LTTng Control services. This
- * nformation is extracted from mi_lttng.xsd from lttng-tool libmi.
+ * information is extracted from mi_lttng.xsd from lttng-tool libmi.
  *
  * @author Jonathan Rajotte
  */

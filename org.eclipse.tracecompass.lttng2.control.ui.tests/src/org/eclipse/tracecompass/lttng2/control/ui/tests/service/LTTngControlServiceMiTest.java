@@ -41,7 +41,7 @@ public class LTTngControlServiceMiTest extends LTTngControlServiceTest {
     protected ILttngControlService getControlService() {
         try {
             URL resource = LTTngControlServiceMI.class.getResource(LTTngControlServiceConstants.MI_XSD_FILENAME);
-            return new LTTngControlServiceMI(getfShell(), resource);
+            return new LTTngControlServiceMI(getShell(), resource);
         } catch (ExecutionException e) {
             return null;
         }

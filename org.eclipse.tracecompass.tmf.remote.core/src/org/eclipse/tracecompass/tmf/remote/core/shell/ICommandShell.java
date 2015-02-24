@@ -12,8 +12,6 @@
  **********************************************************************/
 package org.eclipse.tracecompass.tmf.remote.core.shell;
 
-import java.util.List;
-
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.Nullable;
@@ -41,5 +39,13 @@ public interface ICommandShell {
      * @throws ExecutionException
      *             If the command fails
      */
-    ICommandResult executeCommand(List<String> command, @Nullable IProgressMonitor monitor) throws ExecutionException;
+    ICommandResult executeCommand(ICommandInput command, @Nullable IProgressMonitor monitor) throws ExecutionException;
+
+    /**
+     * Creates a command input instance
+     *
+     * @return {@link ICommandInput} instance
+     *
+     */
+    ICommandInput createCommand();
 }

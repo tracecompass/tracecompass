@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlService;
+import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandInput;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandResult;
 
 @SuppressWarnings("javadoc")
@@ -244,9 +244,9 @@ public class LTTngToolsFileShell extends TestCommandShell {
     }
 
     @Override
-    public synchronized ICommandResult executeCommand(List<String> command, IProgressMonitor monitor) throws ExecutionException {
+    public synchronized ICommandResult executeCommand(ICommandInput command, IProgressMonitor monitor) throws ExecutionException {
         Map<String, ICommandResult> commands = fScenarioMap.get(fScenario);
-        String commandLine = LTTngControlService.toCommandString(command);
+        String commandLine = command.toString();
         String fullCommand = commandLine;
 
         Matcher matcher = LTTNG_LIST_SESSION_PATTERN.matcher(commandLine);

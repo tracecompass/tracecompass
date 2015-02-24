@@ -13,6 +13,7 @@
 
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.service;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.osgi.framework.Version;
 
 /**
@@ -22,6 +23,9 @@ import org.osgi.framework.Version;
  * @author Bernd Hufmann
  */
 public class LttngVersion extends Version {
+
+    /** A null version */
+    public static final @NonNull LttngVersion NULL_VERSION = new LttngVersion(Version.emptyVersion.toString());
 
     private final String fLicense;
     private final String fCommit;

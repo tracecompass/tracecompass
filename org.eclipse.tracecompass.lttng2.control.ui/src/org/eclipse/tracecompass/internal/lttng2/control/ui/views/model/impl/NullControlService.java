@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Wind River Systems, Inc. and others
+ * Copyright (c) 2014, 2015 Wind River Systems, Inc. and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,9 +8,12 @@
  *
  * Contributors:
  *   Markus Schorn - Initial API and implementation
+ *   Bernd Hufmann - Update for null safety
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl;
+
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,18 +29,17 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.ILttngControlService;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LttngVersion;
-import org.osgi.framework.Version;
 
 class NullControlService implements ILttngControlService {
 
     @Override
     public LttngVersion getVersion() {
-        return new LttngVersion(Version.emptyVersion.toString());
+        return LttngVersion.NULL_VERSION;
     }
 
     @Override
     public String getVersionString() {
-        return Version.emptyVersion.toString();
+        return checkNotNull(LttngVersion.NULL_VERSION.toString());
     }
 
     @Override
@@ -47,7 +49,7 @@ class NullControlService implements ILttngControlService {
 
     @Override
     public List<String> getSessionNames(IProgressMonitor monitor) throws ExecutionException {
-        return Collections.emptyList();
+        return checkNotNull(Collections.EMPTY_LIST);
     }
 
     @Override
@@ -62,17 +64,17 @@ class NullControlService implements ILttngControlService {
 
     @Override
     public List<IBaseEventInfo> getKernelProvider(IProgressMonitor monitor) throws ExecutionException {
-        return Collections.emptyList();
+        return checkNotNull(Collections.EMPTY_LIST);
     }
 
     @Override
     public List<IUstProviderInfo> getUstProvider() throws ExecutionException {
-        return Collections.emptyList();
+        return checkNotNull(Collections.EMPTY_LIST);
     }
 
     @Override
     public List<IUstProviderInfo> getUstProvider(IProgressMonitor monitor) throws ExecutionException {
-        return Collections.emptyList();
+        return checkNotNull(Collections.EMPTY_LIST);
     }
 
     @Override
@@ -122,7 +124,7 @@ class NullControlService implements ILttngControlService {
 
     @Override
     public List<String> getContextList(IProgressMonitor monitor) throws ExecutionException {
-        return Collections.emptyList();
+        return checkNotNull(Collections.EMPTY_LIST);
     }
 
     @Override

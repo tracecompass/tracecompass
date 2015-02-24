@@ -15,12 +15,16 @@ package org.eclipse.tracecompass.internal.lttng2.control.stubs.shells;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandInput;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandResult;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandShell;
 
@@ -38,11 +42,16 @@ public class TestCommandShell implements ICommandShell {
     }
 
     @Override
-    public ICommandResult executeCommand(List<String> command, IProgressMonitor monitor) throws ExecutionException {
+    public ICommandResult executeCommand(ICommandInput command, IProgressMonitor monitor) throws ExecutionException {
         if (fIsConnected) {
             return new CommandResultStub(0, new String[0], new String[0]);
         }
         return new CommandResultStub(1, new String[0], new String[0]);
+    }
+
+    @Override
+    public ICommandInput createCommand() {
+        return new CommandInputStub();
     }
 
     /**
@@ -99,6 +108,41 @@ public class TestCommandShell implements ICommandShell {
                 ret.append(string).append("\n"); //$NON-NLS-1$
             }
             return nullToEmptyString(ret.toString());
+        }
+    }
+
+    /**
+     * Command Input Stub
+     */
+    public class CommandInputStub implements ICommandInput {
+        private final List<String> fInput = new ArrayList<>();
+
+        @Override
+        @NonNull public List<String> getInput() {
+            return checkNotNull(fInput);
+        }
+
+        @Override
+        public void add(@Nullable String segment) {
+            if (segment != null) {
+                fInput.add(segment);
+            }
+        }
+
+        @Override
+        public void addAll(@Nullable List<String> segments) {
+            if (segments != null) {
+                fInput.addAll(segments);
+            }
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            for (String segment : fInput) {
+                builder.append(segment).append(' ');
+            }
+            return nullToEmptyString(builder.toString().trim());
         }
     }
 }

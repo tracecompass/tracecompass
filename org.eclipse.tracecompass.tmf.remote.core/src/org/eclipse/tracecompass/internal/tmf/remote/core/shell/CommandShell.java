@@ -17,7 +17,6 @@ package org.eclipse.tracecompass.internal.tmf.remote.core.shell;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,6 +34,7 @@ import org.eclipse.remote.core.IRemoteProcess;
 import org.eclipse.remote.core.IRemoteProcessService;
 import org.eclipse.tracecompass.internal.tmf.remote.core.messages.Messages;
 import org.eclipse.tracecompass.internal.tmf.remote.core.preferences.TmfRemotePreferences;
+import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandInput;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandResult;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandShell;
 
@@ -77,7 +77,12 @@ public class CommandShell implements ICommandShell {
     }
 
     @Override
-    public ICommandResult executeCommand(final List<String> command, @Nullable final IProgressMonitor aMonitor) throws ExecutionException {
+    public ICommandInput createCommand() {
+        return new CommandInput();
+    }
+
+    @Override
+    public ICommandResult executeCommand(final ICommandInput command, @Nullable final IProgressMonitor aMonitor) throws ExecutionException {
         if (fConnection.isOpen()) {
             FutureTask<CommandResult> future = new FutureTask<>(new Callable<CommandResult>() {
                 @Override
@@ -87,7 +92,7 @@ public class CommandShell implements ICommandShell {
                         monitor = new NullProgressMonitor();
                     }
                     if (!monitor.isCanceled()) {
-                        IRemoteProcess process = fConnection.getService(IRemoteProcessService.class).getProcessBuilder(command).start();
+                        IRemoteProcess process = fConnection.getService(IRemoteProcessService.class).getProcessBuilder(command.getInput()).start();
                         InputReader stdout = new InputReader(checkNotNull(process.getInputStream()));
                         InputReader stderr = new InputReader(checkNotNull(process.getErrorStream()));
 
@@ -146,5 +151,4 @@ public class CommandShell implements ICommandShell {
     private static String[] splitLines(String output) {
         return checkNotNull(output.split("\\r?\\n")); //$NON-NLS-1$
     }
-
 }

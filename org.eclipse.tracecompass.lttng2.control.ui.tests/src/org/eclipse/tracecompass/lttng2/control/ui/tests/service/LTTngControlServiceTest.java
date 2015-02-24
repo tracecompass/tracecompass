@@ -161,7 +161,10 @@ public class LTTngControlServiceTest {
         return new LTTngControlService(fShell);
     }
 
-    public LTTngToolsFileShell getfShell() {
+    /**
+     * @return the shell implementation
+     */
+    public @NonNull LTTngToolsFileShell getShell() {
         return fShell;
     }
 

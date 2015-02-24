@@ -12,8 +12,8 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.service;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.regex.Matcher;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -22,6 +22,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.logging.ControlCommandLogger;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.preferences.ControlPreferences;
+import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandInput;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandResult;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandShell;
 
@@ -61,7 +62,7 @@ public final class LTTngControlServiceFactory {
         boolean machineInterfaceMode = true;
 
         // Looking for a machine interface on LTTng side
-        List<String> command = new ArrayList<>();
+        ICommandInput command = shell.createCommand();
         command.add(LTTngControlServiceConstants.CONTROL_COMMAND);
         command.add(LTTngControlServiceConstants.CONTROL_COMMAND_MI_OPTION);
         command.add(LTTngControlServiceConstants.CONTROL_COMMAND_MI_XML);
@@ -71,7 +72,7 @@ public final class LTTngControlServiceFactory {
         if (result.getResult() != 0) {
             machineInterfaceMode = false;
             // Fall back if no machine interface is present
-            command.clear();
+            command = shell.createCommand();
             command.add(LTTngControlServiceConstants.CONTROL_COMMAND);
             command.add(LTTngControlServiceConstants.COMMAND_VERSION);
             result = executeCommand(shell, command);
@@ -92,7 +93,7 @@ public final class LTTngControlServiceFactory {
                     Matcher matcher = LTTngControlServiceConstants.VERSION_2_PATTERN.matcher(version);
                     if (matcher.matches()) {
                         LTTngControlService service = new LTTngControlService(shell);
-                        service.setVersion(version);
+                        service.setVersion(checkNotNull(version));
                         return service;
                     }
                     throw new ExecutionException(Messages.TraceControl_UnsupportedVersionError + ": " + version); //$NON-NLS-1$
@@ -102,10 +103,10 @@ public final class LTTngControlServiceFactory {
         throw new ExecutionException(Messages.TraceControl_GettingVersionError);
     }
 
-    private static ICommandResult executeCommand(ICommandShell shell, List<String> command) throws ExecutionException {
+    private static ICommandResult executeCommand(ICommandShell shell, ICommandInput command) throws ExecutionException {
         // Logging
         if (ControlPreferences.getInstance().isLoggingEnabled()) {
-            ControlCommandLogger.log(LTTngControlService.toCommandString(command));
+            ControlCommandLogger.log(command.toString());
         }
 
         ICommandResult result = null;
