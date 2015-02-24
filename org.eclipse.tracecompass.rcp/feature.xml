@@ -20,10 +20,6 @@
       %license
    </license>
 
-   <url>
-      <update label="Linux Tools Update Site" url="http://download.eclipse.org/linuxtools/update"/>
-   </url>
-
    <requires>
       <import feature="org.eclipse.e4.rcp" version="0.0.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.equinox.p2.core.feature" version="0.0.0" match="greaterOrEqual"/>
