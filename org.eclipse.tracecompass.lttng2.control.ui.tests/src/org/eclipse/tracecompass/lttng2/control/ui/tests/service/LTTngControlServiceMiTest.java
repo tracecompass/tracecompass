@@ -17,6 +17,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URL;
+import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -73,8 +74,8 @@ public class LTTngControlServiceMiTest extends LTTngControlServiceTest {
         assertTrue(sessionInfo.isStreamedTrace());
         assertTrue(sessionInfo.isLive());
         assertEquals("tcp4://127.0.0.1:5342/ [data: 5343]", sessionInfo.getSessionPath());
-        String[] names = fService.getSessionNames(new NullProgressMonitor());
-        assertEquals(names[0], "mysession");
+        List<String> names = fService.getSessionNames(new NullProgressMonitor());
+        assertEquals(names.get(0), "mysession");
         fService.destroySession("mysession", new NullProgressMonitor());
     }
 

@@ -150,7 +150,7 @@ public class LTTngControlService implements ILttngControlService {
     // ------------------------------------------------------------------------
 
     @Override
-    public String[] getSessionNames(IProgressMonitor monitor) throws ExecutionException {
+    public List<String> getSessionNames(IProgressMonitor monitor) throws ExecutionException {
         List<String> command = createCommand(LTTngControlServiceConstants.COMMAND_LIST);
 
         ICommandResult result = executeCommand(command, monitor);
@@ -165,28 +165,25 @@ public class LTTngControlService implements ILttngControlService {
         // Use lttng list <session_name> for more details
 
         ArrayList<String> retArray = new ArrayList<>();
-        int index = 0;
-        while (index < result.getOutput().length) {
-            String line = result.getOutput()[index];
+        for (String line : result.getOutput()) {
             Matcher matcher = LTTngControlServiceConstants.SESSION_PATTERN.matcher(line);
             if (matcher.matches()) {
                 retArray.add(matcher.group(2).trim());
             }
-            index++;
         }
-        return retArray.toArray(new String[retArray.size()]);
+        return retArray;
     }
 
     /**
      * Check if there is a pattern to be ignored into a sequence of string
      *
      * @param input
-     *            an arrays of string
+     *            an input list of Strings
      * @param pattern
      *            the pattern to search for
-     * @return if the pattern exist into the array of string
+     * @return if the pattern exist in the array of string
      */
-    protected boolean ignoredPattern(String[] input, Pattern pattern) {
+    protected boolean ignoredPattern(List<String> input, Pattern pattern) {
         for (String line : input) {
             Matcher matcher = pattern.matcher(line);
             if (matcher.matches()) {
@@ -208,13 +205,13 @@ public class LTTngControlService implements ILttngControlService {
         // Trace path: /home/eedbhu/lttng-traces/mysession2-20120123-110330
         ISessionInfo sessionInfo = new SessionInfo(sessionName);
 
-        while (index < result.getOutput().length) {
+        while (index < result.getOutput().size()) {
             // Tracing session mysession2: [inactive]
             // Trace path: /home/eedbhu/lttng-traces/mysession2-20120123-110330
             //
             // === Domain: Kernel ===
             //
-            String line = result.getOutput()[index];
+            String line = result.getOutput().get(index);
             Matcher matcher = LTTngControlServiceConstants.TRACE_SESSION_PATTERN.matcher(line);
             if (matcher.matches()) {
                 sessionInfo.setSessionState(matcher.group(2));
@@ -325,8 +322,8 @@ public class LTTngControlService implements ILttngControlService {
         // [3] snapshot-3: net4://172.0.0.1/
         ISnapshotInfo snapshotInfo = new SnapshotInfo(""); //$NON-NLS-1$
 
-        while (index < result.getOutput().length) {
-            String line = result.getOutput()[index];
+        while (index < result.getOutput().size()) {
+            String line = result.getOutput().get(index);
             Matcher matcher = LTTngControlServiceConstants.LIST_SNAPSHOT_OUTPUT_PATTERN.matcher(line);
             if (matcher.matches()) {
                 snapshotInfo.setId(Integer.valueOf(matcher.group(1)));
@@ -438,8 +435,8 @@ public class LTTngControlService implements ILttngControlService {
         IUstProviderInfo provider = null;
 
         int index = 0;
-        while (index < result.getOutput().length) {
-            String line = result.getOutput()[index];
+        while (index < result.getOutput().size()) {
+            String line = result.getOutput().get(index);
             Matcher matcher = LTTngControlServiceConstants.UST_PROVIDER_PATTERN.matcher(line);
             if (matcher.matches()) {
                 provider = new UstProviderInfo(matcher.group(2).trim());
@@ -468,15 +465,13 @@ public class LTTngControlService implements ILttngControlService {
         // Session myssession2 created.
         // Traces will be written in
         // /home/user/lttng-traces/myssession2-20120209-095418
-        String[] output = result.getOutput();
+        List<String> output = result.getOutput();
 
         // Get and session name and path
         String name = null;
         String path = null;
 
-        int index = 0;
-        while (index < output.length) {
-            String line = output[index];
+        for (String line : output) {
             Matcher nameMatcher = LTTngControlServiceConstants.CREATE_SESSION_NAME_PATTERN.matcher(line);
             Matcher pathMatcher = LTTngControlServiceConstants.CREATE_SESSION_PATH_PATTERN.matcher(line);
             if (nameMatcher.matches()) {
@@ -484,7 +479,6 @@ public class LTTngControlService implements ILttngControlService {
             } else if (pathMatcher.matches()) {
                 path = String.valueOf(pathMatcher.group(1).trim());
             }
-            index++;
         }
 
         // Verify session name
@@ -547,15 +541,13 @@ public class LTTngControlService implements ILttngControlService {
         ICommandResult result = executeCommand(command, monitor);
 
         // Verify output
-        String[] output = result.getOutput();
+        List<String> output = result.getOutput();
 
         // Get and session name and path
         String name = null;
         String path = null;
 
-        int index = 0;
-        while (index < output.length) {
-            String line = output[index];
+        for (String line : output) {
             Matcher nameMatcher = LTTngControlServiceConstants.CREATE_SESSION_NAME_PATTERN.matcher(line);
             Matcher pathMatcher = LTTngControlServiceConstants.CREATE_SESSION_PATH_PATTERN.matcher(line);
 
@@ -564,7 +556,6 @@ public class LTTngControlService implements ILttngControlService {
             } else if (pathMatcher.matches() && (sessionInfo.getNetworkUrl() != null)) {
                 path = String.valueOf(pathMatcher.group(1).trim());
             }
-            index++;
         }
 
         // Verify session name
@@ -938,14 +929,14 @@ public class LTTngControlService implements ILttngControlService {
 
         ICommandResult result = executeCommand(command, monitor);
 
-        String[] output = result.getOutput();
+        List<String> output = result.getOutput();
 
         List<String> contexts = new ArrayList<>(0);
 
         int index = 0;
         boolean inList = false;
-        while (index < output.length) {
-            String line = result.getOutput()[index];
+        while (index < output.size()) {
+            String line = output.get(index);
 
             Matcher startMatcher = LTTngControlServiceConstants.ADD_CONTEXT_HELP_CONTEXTS_INTRO.matcher(line);
             Matcher endMatcher = LTTngControlServiceConstants.ADD_CONTEXT_HELP_CONTEXTS_END_LINE.matcher(line);
@@ -1064,14 +1055,11 @@ public class LTTngControlService implements ILttngControlService {
         }
 
         // Look for error pattern
-        int index = 0;
-        while (index < result.getErrorOutput().length) {
-            String line = result.getErrorOutput()[index];
+        for (String line : result.getErrorOutput()) {
             Matcher matcher = LTTngControlServiceConstants.ERROR_PATTERN.matcher(line);
             if (matcher.matches()) {
                 return true;
             }
-            index++;
         }
 
         return false;
@@ -1113,16 +1101,16 @@ public class LTTngControlService implements ILttngControlService {
      * Parses the domain information.
      *
      * @param output
-     *            - a command output array
+     *            a command output list
      * @param currentIndex
-     *            - current index in command output array
+     *            current index in command output list
      * @param channels
-     *            - list for returning channel information
+     *            list for returning channel information
      * @param domainInfo
-     *            - The domain information
-     * @return the new current index in command output array
+     *            The domain information
+     * @return the new current index in command output list
      */
-    protected int parseDomain(String[] output, int currentIndex, List<IChannelInfo> channels, IDomainInfo domainInfo) {
+    protected int parseDomain(List<String> output, int currentIndex, List<IChannelInfo> channels, IDomainInfo domainInfo) {
         int index = currentIndex;
 
         // if kernel set the buffer type to shared
@@ -1142,8 +1130,8 @@ public class LTTngControlService implements ILttngControlService {
         // read timer interval: 200
         // output: splice()
 
-        while (index < output.length) {
-            String line = output[index];
+        while (index < output.size()) {
+            String line = output.get(index);
 
             if (isVersionSupported("2.2.0")) { //$NON-NLS-1$
                 Matcher bufferTypeMatcher = LTTngControlServiceConstants.BUFFER_TYPE_PATTERN.matcher(line);
@@ -1165,8 +1153,8 @@ public class LTTngControlService implements ILttngControlService {
             Matcher noUstChannelMatcher = LTTngControlServiceConstants.DOMAIN_NO_UST_CHANNEL_PATTERN.matcher(line);
             if (outerMatcher.matches()) {
                 IChannelInfo channelInfo = null;
-                while (index < output.length) {
-                    String subLine = output[index];
+                while (index < output.size()) {
+                    String subLine = output.get(index);
 
                     Matcher innerMatcher = LTTngControlServiceConstants.CHANNEL_PATTERN.matcher(subLine);
                     if (innerMatcher.matches()) {
@@ -1244,18 +1232,18 @@ public class LTTngControlService implements ILttngControlService {
      * Parses the event information within a domain.
      *
      * @param output
-     *            - a command output array
+     *            a command output list
      * @param currentIndex
-     *            - current index in command output array
+     *            current index in command output list
      * @param events
-     *            - list for returning event information
-     * @return the new current index in command output array
+     *            list for returning event information
+     * @return the new current index in command output list
      */
-    protected int parseEvents(String[] output, int currentIndex, List<IEventInfo> events) {
+    protected int parseEvents(List<String> output, int currentIndex, List<IEventInfo> events) {
         int index = currentIndex;
 
-        while (index < output.length) {
-            String line = output[index];
+        while (index < output.size()) {
+            String line = output.get(index);
             if (LTTngControlServiceConstants.CHANNEL_PATTERN.matcher(line).matches()) {
                 // end of channel
                 return index;
@@ -1312,8 +1300,8 @@ public class LTTngControlService implements ILttngControlService {
                     // offset: 0x0
                     // symbol: init_post
                     index++;
-                    while (index < output.length) {
-                        String probeLine = output[index];
+                    while (index < output.size()) {
+                        String probeLine = output.get(index);
                         // parse probe
                         Matcher addrMatcher = LTTngControlServiceConstants.PROBE_ADDRESS_PATTERN.matcher(probeLine);
                         Matcher offsetMatcher = LTTngControlServiceConstants.PROBE_OFFSET_PATTERN.matcher(probeLine);
@@ -1370,18 +1358,18 @@ public class LTTngControlService implements ILttngControlService {
      * Parses the event information within a provider.
      *
      * @param output
-     *            - a command output array
+     *            a command output list
      * @param currentIndex
-     *            - current index in command output array
+     *            current index in command output list
      * @param events
-     *            - list for returning event information
-     * @return the new current index in command output array
+     *            list for returning event information
+     * @return the new current index in command output list
      */
-    protected int getProviderEventInfo(String[] output, int currentIndex, List<IBaseEventInfo> events) {
+    protected int getProviderEventInfo(List<String> output, int currentIndex, List<IBaseEventInfo> events) {
         int index = currentIndex;
         IBaseEventInfo eventInfo = null;
-        while (index < output.length) {
-            String line = output[index];
+        while (index < output.size()) {
+            String line = output.get(index);
             Matcher matcher = LTTngControlServiceConstants.PROVIDER_EVENT_PATTERN.matcher(line);
             if (matcher.matches()) {
                 // sched_kthread_stop (loglevel: TRACE_EMERG0) (type:
@@ -1413,18 +1401,18 @@ public class LTTngControlService implements ILttngControlService {
      * Parse a field's information.
      *
      * @param output
-     *            A command output array
+     *            A command output list
      * @param currentIndex
-     *            The current index in the command output array
+     *            The current index in the command output list
      * @param fields
      *            List for returning the field information
-     * @return The new current index in the command output array
+     * @return The new current index in the command output list
      */
-    protected int getFieldInfo(String[] output, int currentIndex, List<IFieldInfo> fields) {
+    protected int getFieldInfo(List<String> output, int currentIndex, List<IFieldInfo> fields) {
         int index = currentIndex;
         IFieldInfo fieldInfo = null;
-        while (index < output.length) {
-            String line = output[index];
+        while (index < output.size()) {
+            String line = output.get(index);
             Matcher matcher = LTTngControlServiceConstants.EVENT_FIELD_PATTERN.matcher(line);
             if (matcher.matches()) {
                 // field: content (string)

@@ -11,6 +11,8 @@
  *********************************************************************/
 package org.eclipse.tracecompass.tmf.remote.core.shell;
 
+import java.util.List;
+
 
 /**
  * Interface for providing command execution result.
@@ -29,17 +31,19 @@ public interface ICommandResult {
      * Return the command output.
      *
      * It should not be null, but could be empty.
+     * It should return an immutable list.
      *
      * @return the command output.
      */
-    String[] getOutput();
+    List<String> getOutput();
 
     /**
      * Return the command error output.
      *
      * It should not be null, but could be empty.
+     * It should return an immutable list.
      *
      * @return the command error output.
      */
-    String[] getErrorOutput();
+    List<String> getErrorOutput();
 }

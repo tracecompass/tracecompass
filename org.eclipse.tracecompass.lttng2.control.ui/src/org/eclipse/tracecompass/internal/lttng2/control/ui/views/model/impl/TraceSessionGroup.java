@@ -111,10 +111,10 @@ public class TraceSessionGroup extends TraceControlComponent {
      */
     public void getSessionsFromNode(IProgressMonitor monitor)
             throws ExecutionException {
-        String[] sessionNames = getControlService().getSessionNames(monitor);
-        for (int i = 0; i < sessionNames.length; i++) {
-            TraceSessionComponent session = new TraceSessionComponent(
-                    sessionNames[i], this);
+        List<String> sessionNames = getControlService().getSessionNames(monitor);
+        for (String sessionName : sessionNames) {
+            TraceSessionComponent session =
+                    new TraceSessionComponent(sessionName, this);
             addChild(session);
             session.getConfigurationFromNode(monitor);
         }

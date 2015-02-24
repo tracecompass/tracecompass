@@ -77,15 +77,14 @@ public final class LTTngControlServiceFactory {
             result = executeCommand(shell, command);
         }
 
-        if ((result.getResult() == 0) && (result.getOutput().length >= 1)) {
+        if ((result.getResult() == 0) && (!result.getOutput().isEmpty())) {
             if (machineInterfaceMode) {
                 LTTngControlServiceMI service = new LTTngControlServiceMI(shell, LTTngControlService.class.getResource(LTTngControlServiceConstants.MI_XSD_FILENAME));
                 service.setVersion(result.getOutput());
                 return service;
             }
-            int index = 0;
-            while (index < result.getOutput().length) {
-                String line = result.getOutput()[index];
+
+            for (String line : result.getOutput()) {
                 line = line.replace("-", ".");  //$NON-NLS-1$//$NON-NLS-2$
                 Matcher versionMatcher = LTTngControlServiceConstants.VERSION_PATTERN.matcher(line);
                 if (versionMatcher.matches()) {
@@ -98,7 +97,6 @@ public final class LTTngControlServiceFactory {
                     }
                     throw new ExecutionException(Messages.TraceControl_UnsupportedVersionError + ": " + version); //$NON-NLS-1$
                 }
-                index++;
             }
         }
         throw new ExecutionException(Messages.TraceControl_GettingVersionError);

@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandResult;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandShell;
 
@@ -47,6 +48,7 @@ public class TestCommandShell implements ICommandShell {
     /**
      * Command Result Stub
      */
+    @NonNullByDefault
     protected class CommandResultStub implements ICommandResult {
 
         private final int fResult;
@@ -64,8 +66,8 @@ public class TestCommandShell implements ICommandShell {
          */
         public CommandResultStub(int result, String[] output, String[] errorOutput) {
             fResult = result;
-            fOutput = Arrays.asList(output);
-            fErrorOutput = Arrays.asList(errorOutput);
+            fOutput = checkNotNull(Arrays.asList(output));
+            fErrorOutput = checkNotNull(Arrays.asList(errorOutput));
         }
 
         @Override
@@ -74,13 +76,13 @@ public class TestCommandShell implements ICommandShell {
         }
 
         @Override
-        public String[] getOutput() {
-            return checkNotNull(fOutput.toArray(new String[fOutput.size()]));
+        public List<String> getOutput() {
+            return fOutput;
         }
 
         @Override
-        public String[] getErrorOutput() {
-            return checkNotNull(fErrorOutput.toArray(new String[fErrorOutput.size()]));
+        public List<String> getErrorOutput() {
+            return fErrorOutput;
         }
 
         @Override

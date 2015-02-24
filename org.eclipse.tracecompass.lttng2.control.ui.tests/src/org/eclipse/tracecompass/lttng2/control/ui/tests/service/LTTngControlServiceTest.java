@@ -251,10 +251,10 @@ public class LTTngControlServiceTest {
     public void testGetSessionNames1() {
         try {
             fShell.setScenario(SCEN_NO_SESSION_AVAILABLE);
-            String[] result = fService.getSessionNames(new NullProgressMonitor());
+            List<String> result = fService.getSessionNames(new NullProgressMonitor());
 
             assertNotNull(result);
-            assertEquals(0, result.length);
+            assertEquals(0, result.size());
 
         } catch (ExecutionException e) {
             fail(e.toString());
@@ -265,12 +265,12 @@ public class LTTngControlServiceTest {
     public void testGetSessionNames2() {
         try {
             fShell.setScenario(SCEN_GET_SESSION_NAMES1);
-            String[] result = fService.getSessionNames(new NullProgressMonitor());
+            List<String> result = fService.getSessionNames(new NullProgressMonitor());
 
             assertNotNull(result);
-            assertEquals(2, result.length);
-            assertEquals("mysession1", result[0]);
-            assertEquals("mysession", result[1]);
+            assertEquals(2, result.size());
+            assertEquals("mysession1", result.get(0));
+            assertEquals("mysession", result.get(1));
 
         } catch (ExecutionException e) {
             fail(e.toString());
@@ -284,12 +284,12 @@ public class LTTngControlServiceTest {
             ControlPreferences.getInstance().getPreferenceStore().setValue(
                     ControlPreferences.TRACE_CONTROL_TRACING_GROUP_PREF, "group");
 
-            String[] result = fService.getSessionNames(new NullProgressMonitor());
+            List<String> result = fService.getSessionNames(new NullProgressMonitor());
 
             assertNotNull(result);
-            assertEquals(2, result.length);
-            assertEquals("mysession1", result[0]);
-            assertEquals("mysession", result[1]);
+            assertEquals(2, result.size());
+            assertEquals("mysession1", result.get(0));
+            assertEquals("mysession", result.get(1));
 
             ControlCommandLogger.init(ControlPreferences.getInstance().getLogfilePath(), false);
             ControlPreferences.getInstance().getPreferenceStore().setValue(
@@ -333,10 +333,10 @@ public class LTTngControlServiceTest {
     public void testGetSessionNameGarbage() {
         try {
             fShell.setScenario(SCEN_GET_SESSION_GARBAGE_OUT);
-            String[] result = fService.getSessionNames(new NullProgressMonitor());
+            List<String> result = fService.getSessionNames(new NullProgressMonitor());
 
             assertNotNull(result);
-            assertEquals(0, result.length);
+            assertEquals(0, result.size());
 
         } catch (ExecutionException e) {
             fail(e.toString());
@@ -1391,8 +1391,8 @@ public class LTTngControlServiceTest {
 
             assertEquals(TraceSessionState.INACTIVE, sessionInfo.getSessionState());
 
-            String[] names = fService.getSessionNames(new NullProgressMonitor());
-            assertEquals(names[0], "mysession");
+            List<String> names = fService.getSessionNames(new NullProgressMonitor());
+            assertEquals(names.get(0), "mysession");
 
             ISnapshotInfo snapshotInfo = fService.getSnapshotInfo("mysession", new NullProgressMonitor());
             assertNotNull(snapshotInfo);
@@ -1429,8 +1429,8 @@ public class LTTngControlServiceTest {
 
             assertEquals(TraceSessionState.INACTIVE, sessionInfo.getSessionState());
 
-            String[] names = fService.getSessionNames(new NullProgressMonitor());
-            assertEquals(names[0], "mysession");
+            List<String> names = fService.getSessionNames(new NullProgressMonitor());
+            assertEquals(names.get(0), "mysession");
 
             ISnapshotInfo snapshotInfo = fService.getSnapshotInfo("mysession", new NullProgressMonitor());
             assertNotNull(snapshotInfo);
@@ -1466,8 +1466,8 @@ public class LTTngControlServiceTest {
             assertEquals(TraceSessionState.INACTIVE, sessionInfo.getSessionState());
             assertTrue(sessionInfo.isStreamedTrace());
 
-            String[] names = fService.getSessionNames(new NullProgressMonitor());
-            assertEquals(names[0], "mysession");
+            List<String> names = fService.getSessionNames(new NullProgressMonitor());
+            assertEquals(names.get(0), "mysession");
 
             ISnapshotInfo snapshotInfo = sessionInfo.getSnapshotInfo();
             assertNotNull(sessionInfo);
@@ -1494,8 +1494,8 @@ public class LTTngControlServiceTest {
         try {
             fShell.setScenario(SCEN_CREATE_SNAPSHOT_SESSION_ERRORS);
 
-            String[] names = fService.getSessionNames(new NullProgressMonitor());
-            assertEquals(names[0], "mysession");
+            List<String> names = fService.getSessionNames(new NullProgressMonitor());
+            assertEquals(names.get(0), "mysession");
         } catch (ExecutionException e) {
             fail(e.toString());
         }
@@ -1537,8 +1537,8 @@ public class LTTngControlServiceTest {
         assertTrue(sessionInfo.isStreamedTrace());
         assertTrue(sessionInfo.isLive());
         assertEquals("net://127.0.0.1", sessionInfo.getSessionPath());
-        String[] names = fService.getSessionNames(new NullProgressMonitor());
-        assertEquals(names[0], "mysession");
+        List<String> names = fService.getSessionNames(new NullProgressMonitor());
+        assertEquals(names.get(0), "mysession");
         fService.destroySession("mysession", new NullProgressMonitor());
     }
 

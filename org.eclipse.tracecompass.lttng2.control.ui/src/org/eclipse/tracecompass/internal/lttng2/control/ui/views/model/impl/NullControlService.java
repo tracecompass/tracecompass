@@ -46,8 +46,8 @@ class NullControlService implements ILttngControlService {
     }
 
     @Override
-    public String[] getSessionNames(IProgressMonitor monitor) throws ExecutionException {
-        return new String[0];
+    public List<String> getSessionNames(IProgressMonitor monitor) throws ExecutionException {
+        return Collections.emptyList();
     }
 
     @Override

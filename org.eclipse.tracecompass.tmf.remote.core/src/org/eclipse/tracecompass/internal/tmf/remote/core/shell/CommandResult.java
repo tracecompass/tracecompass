@@ -69,13 +69,13 @@ public class CommandResult implements ICommandResult {
     }
 
     @Override
-    public String[] getOutput() {
-        return checkNotNull(fOutput.toArray(new String[fOutput.size()]));
+    public List<String> getOutput() {
+        return fOutput;
     }
 
     @Override
-    public String[] getErrorOutput() {
-        return checkNotNull(fErrorOutput.toArray(new String[fErrorOutput.size()]));
+    public List<String> getErrorOutput() {
+        return fErrorOutput;
     }
 
     @Override

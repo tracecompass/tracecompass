@@ -57,11 +57,11 @@ public interface ILttngControlService {
      *
      * @param monitor
      *            - a progress monitor
-     * @return an array with session names.
+     * @return a list of session names.
      * @throws ExecutionException
      *             If the command fails
      */
-    String[] getSessionNames(IProgressMonitor monitor)
+    List<String> getSessionNames(IProgressMonitor monitor)
             throws ExecutionException;
 
     /**

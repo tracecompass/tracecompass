@@ -109,15 +109,15 @@ public class LTTngControlServiceMI extends LTTngControlService {
     }
 
     /**
-     * Generate a Document object from an array of String.
+     * Generate a Document object from an list of Strings.
      *
      * @param xmlStrings
-     *            array of strings representing an xml input
+     *            list of strings representing an xml input
      * @return Document generated from strings input
      * @throws ExecutionException
      *             when parsing has failed
      */
-    private Document getDocumentFromStrings(String[] xmlStrings) throws ExecutionException {
+    private Document getDocumentFromStrings(List<String> xmlStrings) throws ExecutionException {
         StringBuilder concatenedString = new StringBuilder();
         for (String string : xmlStrings) {
             concatenedString.append(string);
@@ -142,7 +142,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
      * @throws ExecutionException
      *             when xml extraction fail
      */
-    public void setVersion(String[] xmlOutput) throws ExecutionException {
+    public void setVersion(List<String> xmlOutput) throws ExecutionException {
         Document doc = getDocumentFromStrings(xmlOutput);
         NodeList element = doc.getElementsByTagName(MIStrings.VERSION);
         int major = 0;
@@ -198,7 +198,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
     }
 
     @Override
-    public String[] getSessionNames(IProgressMonitor monitor) throws ExecutionException {
+    public List<String> getSessionNames(IProgressMonitor monitor) throws ExecutionException {
         List<String> command = createCommand(LTTngControlServiceConstants.COMMAND_LIST);
         ICommandResult result = executeCommand(command, monitor);
 
@@ -213,7 +213,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
                 retArray.add(node.getTextContent());
             }
         }
-        return retArray.toArray(new String[retArray.size()]);
+        return retArray;
     }
 
     @Override
@@ -692,7 +692,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
         List<String> command = createCommand(LTTngControlServiceConstants.COMMAND_DESTROY_SESSION, sessionName);
 
         ICommandResult result = executeCommand(command, monitor, false);
-        String[] errorOutput = result.getErrorOutput();
+        List<String> errorOutput = result.getErrorOutput();
 
         if (isError(result)) {
             // Don't treat this as an error
