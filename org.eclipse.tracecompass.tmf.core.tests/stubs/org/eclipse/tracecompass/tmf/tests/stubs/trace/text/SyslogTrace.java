@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,25 +8,33 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Patrick Tasse - Move field declarations to trace
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.tests.stubs.trace.text;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfContentFieldAspect;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimePreferences;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.core.trace.text.TextTrace;
 import org.eclipse.tracecompass.tmf.core.trace.text.TextTraceEventContent;
-import org.eclipse.tracecompass.tmf.tests.stubs.trace.text.SyslogEventType.Index;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Extension of TmfTrace for handling of system logs.
@@ -46,6 +54,27 @@ public class SyslogTrace extends TextTrace<SyslogEvent> {
 
     /* The current calendar to use */
     private static final Calendar CURRENT = Calendar.getInstance();
+
+    /** The event fields */
+    @SuppressWarnings({"javadoc", "nls"})
+    public interface Field {
+        @NonNull String HOST = "Host";
+        @NonNull String LOGGER = "Logger";
+        @NonNull String FILE = "File";
+        @NonNull String LINE = "Line";
+        @NonNull String MESSAGE = "Message";
+    }
+
+    /** The event aspects */
+    public static final @NonNull Collection<ITmfEventAspect> ASPECTS =
+            checkNotNull(ImmutableList.of(
+                    ITmfEventAspect.BaseAspects.TIMESTAMP,
+                    new TmfContentFieldAspect(Field.HOST, Field.HOST),
+                    new TmfContentFieldAspect(Field.LOGGER, Field.LOGGER),
+                    new TmfContentFieldAspect(Field.FILE, Field.FILE),
+                    new TmfContentFieldAspect(Field.LINE, Field.LINE),
+                    new TmfContentFieldAspect(Field.MESSAGE, Field.MESSAGE)
+                    ));
 
     /**
      * Constructor
@@ -81,14 +110,13 @@ public class SyslogTrace extends TextTrace<SyslogEvent> {
             timestamp = new TmfTimestamp();
         }
 
-        TextTraceEventContent content = new TextTraceEventContent(SyslogEventType.LABELS);
+        TextTraceEventContent content = new TextTraceEventContent(5);
         content.setValue(new StringBuffer(line));
-        content.setFieldValue(Index.TIMESTAMP, matcher.group(1));
-        content.setFieldValue(Index.HOST, matcher.group(2));
-        content.setFieldValue(Index.LOGGER, matcher.group(3));
-        content.setFieldValue(Index.FILE, matcher.group(4));
-        content.setFieldValue(Index.LINE, matcher.group(5));
-        content.setFieldValue(Index.MESSAGE, new StringBuffer(matcher.group(6) != null ? matcher.group(6) : "")); //$NON-NLS-1$
+        content.addField(Field.HOST, matcher.group(2));
+        content.addField(Field.LOGGER, matcher.group(3));
+        content.addField(Field.FILE, matcher.group(4));
+        content.addField(Field.LINE, matcher.group(5));
+        content.addField(Field.MESSAGE, new StringBuffer(matcher.group(6) != null ? matcher.group(6) : "")); //$NON-NLS-1$
 
         SyslogEvent event = new SyslogEvent(
                 this,
@@ -104,7 +132,7 @@ public class SyslogTrace extends TextTrace<SyslogEvent> {
         TextTraceEventContent content = event.getContent();
         ((StringBuffer) content.getValue()).append("\n").append(line); //$NON-NLS-1$
         if (line.trim().length() > 0) {
-            ((StringBuffer) content.getFieldValue(Index.MESSAGE)).append(SEPARATOR + line.trim());
+            ((StringBuffer) content.getFieldValue(Field.MESSAGE)).append(SEPARATOR + line.trim());
         }
     }
 
@@ -113,4 +141,8 @@ public class SyslogTrace extends TextTrace<SyslogEvent> {
         return new TmfTimestamp(60, ITmfTimestamp.SECOND_SCALE);
     }
 
+    @Override
+    public Iterable<ITmfEventAspect> getEventAspects() {
+        return ASPECTS;
+    }
 }

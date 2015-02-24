@@ -141,36 +141,46 @@ public class CollapseEventsInTableTest {
         menuBot.click();
         fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "7/22", 1, 1));
 
-        String filterString = tableBot.cell(1, 1);
-        assertEquals("filterString", "7/22", filterString);
+        String cell = tableBot.cell(1, 1);
+        assertEquals("filterString", "7/22", cell);
 
-        /* Verify collapsed event */
-        filterString = tableBot.cell(7, 0);
-        assertEquals("repeatCount", "+14", filterString);
+        /* Verify first collapsed event */
+        cell = tableBot.cell(7, 0);
+        assertEquals("1st repeatCount", "+14", cell);
+        cell = tableBot.cell(7, 1);
+        assertEquals("1st Timestamp", "Jan 1 06:06:06", cell);
+        cell = tableBot.cell(7, 2);
+        assertEquals("1st Host", "HostF", cell);
+        cell = tableBot.cell(7, 3);
+        assertEquals("1st Logger", "LoggerF", cell);
+        cell = tableBot.cell(7, 4);
+        assertEquals("1st File", "SourceFile", cell);
+        cell = tableBot.cell(7, 5);
+        assertEquals("1st Line", "9", cell);
+        cell = tableBot.cell(7, 6);
+        assertEquals("1st Message", "Message F", cell);
 
-        filterString = tableBot.cell(7, 1);
-        assertEquals("first timestamp", "Jan 1 06:06:06", filterString);
-
-        filterString = tableBot.cell(7, 2);
-        assertEquals("type", "Syslog", filterString);
-
-        filterString = tableBot.cell(7, 3);
-        assertEquals("content", "Timestamp=Jan 1 06:06:06, Host=HostF, Logger=LoggerF, File=SourceFile, Line=9, Message=Message F", filterString);
-
-        filterString = tableBot.cell(8, 0);
-        assertEquals("repeatCount", "+1", filterString);
-
-        filterString = tableBot.cell(8, 1);
-        assertEquals("first timestamp (2nd collapse)", "Jan 1 06:06:21", filterString);
-
-        filterString = tableBot.cell(8, 3);
-        assertEquals("content", "Timestamp=Jan 1 06:06:21, Host=HostF, Logger=LoggerF, File=SourceFile, Line=10, Message=Message D", filterString);
+        /* Verify second collapsed event */
+        cell = tableBot.cell(8, 0);
+        assertEquals("2nd repeatCount", "+1", cell);
+        cell = tableBot.cell(8, 1);
+        assertEquals("2nd Timestamp", "Jan 1 06:06:21", cell);
+        cell = tableBot.cell(8, 2);
+        assertEquals("2nd Host", "HostF", cell);
+        cell = tableBot.cell(8, 3);
+        assertEquals("2nd Logger", "LoggerF", cell);
+        cell = tableBot.cell(8, 4);
+        assertEquals("2nd File", "SourceFile", cell);
+        cell = tableBot.cell(8, 5);
+        assertEquals("2nd Line", "10", cell);
+        cell = tableBot.cell(8, 6);
+        assertEquals("2nd Message", "Message D", cell);
 
         /* Clear Filter */
         menuBot = tableBot.contextMenu("Clear Filters");
         menuBot.click();
         fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "Jan 1 01:01:01", 1, 1));
-        assertEquals("timestamp", "Jan 1 01:01:01", tableBot.cell(1, 1));
+        assertEquals("Timestamp", "Jan 1 01:01:01", tableBot.cell(1, 1));
 
         maximizeTable(tableBot);
 

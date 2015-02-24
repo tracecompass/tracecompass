@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
+ *   Patrick Tasse - Move field declarations to trace
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.tests.stubs.trace.text;
@@ -24,7 +25,7 @@ import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.text.TextTraceEvent;
 import org.eclipse.tracecompass.tmf.core.trace.text.TextTraceEventContent;
-import org.eclipse.tracecompass.tmf.tests.stubs.trace.text.SyslogEventType.Index;
+import org.eclipse.tracecompass.tmf.tests.stubs.trace.text.SyslogTrace.Field;
 
 /**
  * System log trace implementation of TmfEvent.
@@ -126,11 +127,11 @@ public class SyslogEvent extends TextTraceEvent implements ITmfCollapsibleEvent,
         if (getContent() != null) {
             long lineNo = 0;
             try {
-                lineNo = Long.valueOf((String) getContent().getField(Index.LINE).getValue());
+                lineNo = Long.valueOf((String) getContent().getField(Field.LINE).getValue());
             } catch (NumberFormatException e) {
                 // ignore
             }
-            return new TmfCallsite((String) getContent().getField(Index.FILE).getValue(), null, lineNo);
+            return new TmfCallsite((String) getContent().getField(Field.FILE).getValue(), null, lineNo);
         }
         return null;
     }
