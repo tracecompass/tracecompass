@@ -110,7 +110,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         String traceToOpen = TracingRcpPlugin.getDefault().getCli().getArgument(CliParser.OPEN_FILE_LOCATION);
         String userHome = System.getProperty("user.home"); //$NON-NLS-1$
         // In case the application was not started on the shell, expand ~ to home directory
-        if (traceToOpen.startsWith("~/") && userHome != null) { //$NON-NLS-1$
+        if ((traceToOpen != null) && traceToOpen.startsWith("~/") && (userHome != null)) { //$NON-NLS-1$
             traceToOpen = traceToOpen.replaceFirst("^~", userHome); //$NON-NLS-1$
         }
 
