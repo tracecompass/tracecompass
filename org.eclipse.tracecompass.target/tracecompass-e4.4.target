@@ -16,7 +16,7 @@
 <unit id="org.eclipse.equinox.executable.feature.group" version="0.0.0"/>
 <unit id="org.eclipse.jdt.annotation" version="1.1.0.v20140129-1625"/>
 <unit id="org.eclipse.pde.runtime" version="0.0.0"/>
-<repository location="http://download.eclipse.org/eclipse/updates/4.4-M-builds/M-4.4.2RC4-201502041700"/>
+<repository location="http://download.eclipse.org/eclipse/updates/4.4/R-4.4.2-201502041700"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.antlr.runtime" version="3.2.0.v201101311130"/>
