@@ -1391,7 +1391,7 @@ The Control View provides property information of selected tree component. Depen
 
 == LTTng Tracer Control Preferences ==
 
-Serveral LTTng 2.0 tracer control preferences exists which can be configured. To configure these preferences, select '''Window->Preferences''' from the top level menu. The preference display will open. Then select '''Tracing->LTTng Tracer Control Preferences'''. This preferences page allows the user to specify the tracing group of the user and to specify the command execution timeout as well as it allows the user to configure the logging of LTTng 2.0 tracer control commands and results to a file.
+Several LTTng 2.0 tracer control preferences exists which can be configured. To configure these preferences, select '''Window -> Preferences''' from the top level menu. The preference display will open. Then select '''Tracing -> LTTng Tracer Control Preferences'''. This preferences page allows the user to specify the tracing group of the user and to specify the command execution timeout as well as it allows the user to configure the logging of LTTng 2.0 tracer control commands and results to a file.
 
 [[Image:images/LTTng2Preferences.png]]
 
@@ -1403,7 +1403,7 @@ To configure logging of trace control commands and the corresponding command res
 
 [[Image:images/LTTng2PreferencesLogging.png]]
 
-To configure the LTTng command execution timeout, enter a timeout value into the text field '''Command Timeout (in seconds)''' and press on button '''OK'''. To reset to the default value of 15 seconds, click on the button '''Restore Defaults'''.
+To configure the LTTng command execution timeout, select '''Tracing -> Remote Connection Preferences''' and enter a timeout value into the text field '''Command Timeout (in seconds)'''. Then press on button '''OK'''. To reset to the default value of 15 seconds, click on the button '''Restore Defaults'''.
 
 [[Image:images/LTTng2PreferencesTimeout.png]]
 
