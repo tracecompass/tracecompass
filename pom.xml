@@ -105,6 +105,20 @@
             </execution>
           </executions>
         </plugin>
+        <plugin>
+          <groupId>org.eclipse.tycho.extras</groupId>
+          <artifactId>tycho-pack200b-plugin</artifactId>
+          <version>${tycho-extras-version}</version>
+          <executions>
+            <execution>
+              <id>pack200-pack</id>
+              <goals>
+                <goal>pack</goal>
+              </goals>
+              <phase>package</phase>
+            </execution>
+          </executions>
+        </plugin>
       </plugins>
     </build>
   </profile>
