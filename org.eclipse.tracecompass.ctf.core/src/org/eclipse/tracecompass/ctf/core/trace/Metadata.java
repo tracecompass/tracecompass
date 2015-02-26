@@ -154,7 +154,7 @@ public class Metadata {
             readMetaDataText(metadataTextInput);
 
         } catch (FileNotFoundException e) {
-            throw new CTFReaderException("Cannot find metadata file!"); //$NON-NLS-1$
+            throw new CTFReaderException("Cannot find metadata file!", e); //$NON-NLS-1$
         } catch (IOException | ParseException e) {
             throw new CTFReaderException(e);
         } catch (RecognitionException | RewriteCardinalityException e) {
