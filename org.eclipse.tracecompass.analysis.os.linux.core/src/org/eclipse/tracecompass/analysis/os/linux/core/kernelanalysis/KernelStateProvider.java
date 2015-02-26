@@ -52,7 +52,7 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
      * Version number of this state provider. Please bump this if you modify the
      * contents of the generated state history in some way.
      */
-    private static final int VERSION = 6;
+    private static final int VERSION = 7;
 
     private static final int IRQ_HANDLER_ENTRY_INDEX = 1;
     private static final int IRQ_HANDLER_EXIT_INDEX = 2;
@@ -447,12 +447,15 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
                 /* Set the process' status */
                 quark = ss.getQuarkRelativeAndAdd(curThreadNode, Attributes.STATUS);
                 if (ss.queryOngoingState(quark).isNull()) {
-                     /* "2" here means "WAIT_FOR_CPU", and "5" "WAIT_BLOCKED" in the LTTng kernel. */
-                    if (status == 2) {
+                     /* "2" here means "WAIT_FOR_CPU", and "5" "WAIT_BLOCKED" in the Linux kernel. */
+                    switch (status) {
+                    case 2:
                         value = StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE;
-                    } else if (status == 5) {
-                        value = StateValues.PROCESS_STATUS_WAIT_BLOCKED_VALUE;
-                    } else {
+                        break;
+                    case 5:
+                        value = StateValues.PROCESS_STATUS_WAIT_UNKNOWN_VALUE;
+                        break;
+                    default:
                         value = StateValues.PROCESS_STATUS_UNKNOWN_VALUE;
                     }
                     ss.modifyAttribute(ts, value, quark);

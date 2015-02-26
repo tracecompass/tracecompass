@@ -291,7 +291,7 @@ public class KernelThreadInformationProviderTest {
         intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process21, 25, 50L, 3, monitor);
         testIntervals("tid 21 [25,50,3]", intervals, values3);
 
-        ITmfStateValue[] values4 = { TmfStateValue.nullValue(), StateValues.PROCESS_STATUS_WAIT_BLOCKED_VALUE,
+        ITmfStateValue[] values4 = { TmfStateValue.nullValue(), StateValues.PROCESS_STATUS_WAIT_UNKNOWN_VALUE,
                 StateValues.PROCESS_STATUS_RUN_USERMODE_VALUE, StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE };
         intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process20, 0, 70L, 3, monitor);
         testIntervals("tid 20 [0,70,3]", intervals, values4);

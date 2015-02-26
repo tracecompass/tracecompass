@@ -50,6 +50,7 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
 
     private enum State {
         UNKNOWN        (new RGB(100, 100, 100)),
+        WAIT_UNKNOWN   (new RGB(200, 200, 200)),
         WAIT_BLOCKED   (new RGB(200, 200, 0)),
         WAIT_FOR_CPU   (new RGB(200, 100, 0)),
         USERMODE       (new RGB(0,   200, 0)),
@@ -108,6 +109,8 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
 
     private static State getMatchingState(int status) {
         switch (status) {
+        case StateValues.PROCESS_STATUS_WAIT_UNKNOWN:
+            return State.WAIT_UNKNOWN;
         case StateValues.PROCESS_STATUS_WAIT_BLOCKED:
             return State.WAIT_BLOCKED;
         case StateValues.PROCESS_STATUS_WAIT_FOR_CPU:
