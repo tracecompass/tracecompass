@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 
@@ -31,10 +32,22 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
  */
 public class NullBackend implements IStateHistoryBackend {
 
+    private final @NonNull String ssid;
+
     /**
      * Constructor
+     *
+     * @param ssid
+     *            The state system's id
      */
-    public NullBackend() {}
+    public NullBackend(@NonNull String ssid) {
+        this.ssid = ssid;
+    }
+
+    @Override
+    public String getSSID() {
+        return ssid;
+    }
 
     @Override
     public long getStartTime() {

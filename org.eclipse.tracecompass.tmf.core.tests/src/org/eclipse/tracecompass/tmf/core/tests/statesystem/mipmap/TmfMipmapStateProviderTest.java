@@ -62,8 +62,8 @@ public class TmfMipmapStateProviderTest {
     @BeforeClass
     public static void init() {
         TmfMipmapStateProviderStub mmp = new TmfMipmapStateProviderStub(RESOLUTION, Type.LONG);
-        IStateHistoryBackend be = new InMemoryBackend(0);
-        ITmfStateSystemBuilder ssb = StateSystemFactory.newStateSystem(SSID, be);
+        IStateHistoryBackend be = new InMemoryBackend(SSID, 0);
+        ITmfStateSystemBuilder ssb = StateSystemFactory.newStateSystem(be);
         mmp.assignTargetStateSystem(ssb);
         ssq = ssb;
 

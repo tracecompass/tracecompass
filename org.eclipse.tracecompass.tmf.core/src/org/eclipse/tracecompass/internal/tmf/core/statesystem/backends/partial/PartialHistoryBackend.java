@@ -56,6 +56,8 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  */
 public class PartialHistoryBackend implements IStateHistoryBackend {
 
+    private final @NonNull String fSSID;
+
     /**
      * A partial history needs the state input plugin to re-generate state
      * between checkpoints.
@@ -84,6 +86,8 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
     /**
      * Constructor
      *
+     * @param ssid
+     *            The state system's ID
      * @param partialInput
      *            The state change input object that was used to build the
      *            upstream state system. This partial history will make its own
@@ -98,8 +102,11 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
      *            Configuration parameter indicating how many trace events there
      *            should be between each checkpoint
      */
-    public PartialHistoryBackend(ITmfStateProvider partialInput, PartialStateSystem pss,
-            IStateHistoryBackend realBackend, long granularity) {
+    public PartialHistoryBackend(@NonNull String ssid,
+            ITmfStateProvider partialInput,
+            PartialStateSystem pss,
+            IStateHistoryBackend realBackend,
+            long granularity) {
         if (granularity <= 0 || partialInput == null || pss == null ||
                 partialInput.getAssignedStateSystem() != pss) {
             throw new IllegalArgumentException();
@@ -107,6 +114,7 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
 
         final long startTime = realBackend.getStartTime();
 
+        fSSID = ssid;
         fPartialInput = partialInput;
         fPartialSS = pss;
 
@@ -122,6 +130,11 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
         ITmfEventRequest request = new CheckpointsRequest(fPartialInput, fCheckpoints);
         fPartialInput.getTrace().sendRequest(request);
         /* The request will countDown the checkpoints latch once it's finished */
+    }
+
+    @Override
+    public String getSSID() {
+        return fSSID;
     }
 
     @Override

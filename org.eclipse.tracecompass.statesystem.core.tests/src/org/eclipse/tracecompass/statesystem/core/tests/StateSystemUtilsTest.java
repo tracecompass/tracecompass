@@ -51,8 +51,8 @@ public class StateSystemUtilsTest {
     @Before
     public void setupStateSystem() {
         try {
-            IStateHistoryBackend backend = new InMemoryBackend(START_TIME);
-            fStateSystem = StateSystemFactory.newStateSystem(DUMMY_STRING, backend);
+            IStateHistoryBackend backend = new InMemoryBackend(DUMMY_STRING, START_TIME);
+            fStateSystem = StateSystemFactory.newStateSystem(backend);
             int quark = fStateSystem.getQuarkAbsoluteAndAdd(DUMMY_STRING);
 
             fStateSystem.modifyAttribute(1200L, TmfStateValue.newValueInt(10), quark);

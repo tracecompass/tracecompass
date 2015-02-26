@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -71,20 +72,30 @@ public class InMemoryBackend implements IStateHistoryBackend {
 
             };
 
+    private final @NonNull String ssid;
     private final TreeSet<ITmfStateInterval> intervals;
     private final long startTime;
+
     private volatile long latestTime;
 
     /**
      * Constructor
      *
+     * @param ssid
+     *            The state system's ID
      * @param startTime
      *            The start time of this interval store
      */
-    public InMemoryBackend(long startTime) {
+    public InMemoryBackend(@NonNull String ssid, long startTime) {
+        this.ssid = ssid;
         this.startTime = startTime;
         this.latestTime = startTime;
         this.intervals = new TreeSet<>(END_COMPARATOR);
+    }
+
+    @Override
+    public String getSSID() {
+        return ssid;
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -81,8 +81,8 @@ public class StateSystemPushPopTest {
         ITmfStateValue value;
         testHtFile = File.createTempFile("test", ".ht");
 
-        IStateHistoryBackend backend = new HistoryTreeBackend(testHtFile, 0, 0L);
-        ss = new StateSystem("push-pop-test", backend, true);
+        IStateHistoryBackend backend = new HistoryTreeBackend("push-pop-test", testHtFile, 0, 0L);
+        ss = new StateSystem(backend, true);
 
         /* Build the thing */
         final int attrib = ss.getQuarkAbsoluteAndAdd("Test", "stack");

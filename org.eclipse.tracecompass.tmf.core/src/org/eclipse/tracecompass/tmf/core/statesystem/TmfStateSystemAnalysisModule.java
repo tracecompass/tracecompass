@@ -254,9 +254,9 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
            /* Load an existing history */
             final int version = provider.getVersion();
             try {
-                IStateHistoryBackend backend = new HistoryTreeBackend(htFile, version);
+                IStateHistoryBackend backend = new HistoryTreeBackend(id, htFile, version);
                 fHtBackend = backend;
-                fStateSystem = StateSystemFactory.newStateSystem(id, backend, false);
+                fStateSystem = StateSystemFactory.newStateSystem(backend, false);
                 fInitialized.countDown();
                 return;
             } catch (IOException e) {
@@ -272,10 +272,10 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         final int QUEUE_SIZE = 10000;
 
         try {
-            IStateHistoryBackend backend = new ThreadedHistoryTreeBackend(htFile,
+            IStateHistoryBackend backend = new ThreadedHistoryTreeBackend(id, htFile,
                     provider.getStartTime(), provider.getVersion(), QUEUE_SIZE);
             fHtBackend = backend;
-            fStateSystem = StateSystemFactory.newStateSystem(id, backend);
+            fStateSystem = StateSystemFactory.newStateSystem(backend);
             provider.assignTargetStateSystem(fStateSystem);
             build(provider);
         } catch (IOException e) {
@@ -325,7 +325,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         /* 2 */
         IStateHistoryBackend realBackend = null;
         try {
-            realBackend = new ThreadedHistoryTreeBackend(htPartialFile,
+            realBackend = new ThreadedHistoryTreeBackend(id, htPartialFile,
                     provider.getStartTime(), provider.getVersion(), QUEUE_SIZE);
         } catch (IOException e) {
             throw new TmfTraceException(e.toString(), e);
@@ -341,13 +341,14 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         partialProvider.assignTargetStateSystem(pss);
 
         /* 3 */
+        String partialId = new String(id + ".partial"); //$NON-NLS-1$
         IStateHistoryBackend partialBackend =
-                new PartialHistoryBackend(partialProvider, pss, realBackend, granularity);
+                new PartialHistoryBackend(partialId, partialProvider, pss, realBackend, granularity);
 
         /* 4 */
         @SuppressWarnings("restriction")
         org.eclipse.tracecompass.internal.statesystem.core.StateSystem realSS =
-        (org.eclipse.tracecompass.internal.statesystem.core.StateSystem) StateSystemFactory.newStateSystem(id, partialBackend);
+        (org.eclipse.tracecompass.internal.statesystem.core.StateSystem) StateSystemFactory.newStateSystem(partialBackend);
 
         /* 5 */
         pss.assignUpstream(realSS);
@@ -368,9 +369,9 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
      * {@link ITmfStateSystem#queryOngoingState} will be available.
      */
     private void createNullHistory(String id, ITmfStateProvider provider) {
-        IStateHistoryBackend backend = new NullBackend();
+        IStateHistoryBackend backend = new NullBackend(id);
         fHtBackend = backend;
-        fStateSystem = StateSystemFactory.newStateSystem(id, backend);
+        fStateSystem = StateSystemFactory.newStateSystem(backend);
         provider.assignTargetStateSystem(fStateSystem);
         build(provider);
     }
@@ -381,9 +382,9 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
      * to 2^31 intervals.
      */
     private void createInMemoryHistory(String id, ITmfStateProvider provider) {
-        IStateHistoryBackend backend = new InMemoryBackend(provider.getStartTime());
+        IStateHistoryBackend backend = new InMemoryBackend(id, provider.getStartTime());
         fHtBackend = backend;
-        fStateSystem = StateSystemFactory.newStateSystem(id, backend);
+        fStateSystem = StateSystemFactory.newStateSystem(backend);
         provider.assignTargetStateSystem(fStateSystem);
         build(provider);
     }

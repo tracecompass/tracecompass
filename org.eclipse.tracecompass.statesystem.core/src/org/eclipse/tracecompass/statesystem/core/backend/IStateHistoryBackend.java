@@ -41,6 +41,13 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 public interface IStateHistoryBackend {
 
     /**
+     * Get the ID of the state system that populates this backend.
+     *
+     * @return The state system's ID.
+     */
+    @NonNull String getSSID();
+
+    /**
      * Get the start time of this state history. This is usually the same as the
      * start time of the originating trace.
      *

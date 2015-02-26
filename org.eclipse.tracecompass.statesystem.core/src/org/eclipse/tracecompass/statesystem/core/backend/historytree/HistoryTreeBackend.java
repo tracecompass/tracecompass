@@ -19,6 +19,7 @@ import java.io.PrintWriter;
 import java.nio.channels.ClosedChannelException;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.CoreNode;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTConfig;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTInterval;
@@ -39,6 +40,8 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
  * @since 3.0
  */
 public class HistoryTreeBackend implements IStateHistoryBackend {
+
+    private final @NonNull String ssid;
 
     /**
      * The history tree that sits underneath.
@@ -71,6 +74,8 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      * Constructor for new history files. Use this when creating a new history
      * from scratch.
      *
+     * @param ssid
+     *            The state system's ID
      * @param newStateFile
      *            The filename/location where to store the state history (Should
      *            end in .ht)
@@ -88,8 +93,9 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      * @throws IOException
      *             Thrown if we can't create the file for some reason
      */
-    public HistoryTreeBackend(File newStateFile, int blockSize,
+    public HistoryTreeBackend(@NonNull String ssid, File newStateFile, int blockSize,
             int maxChildren, int providerVersion, long startTime) throws IOException {
+        this.ssid = ssid;
         final HTConfig conf = new HTConfig(newStateFile, blockSize, maxChildren,
                 providerVersion, startTime);
         sht = new HistoryTree(conf);
@@ -100,6 +106,8 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      * from scratch. This version supplies sane defaults for the configuration
      * parameters.
      *
+     * @param ssid
+     *            The state system's id
      * @param newStateFile
      *            The filename/location where to store the state history (Should
      *            end in .ht)
@@ -112,14 +120,16 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      * @throws IOException
      *             Thrown if we can't create the file for some reason
      */
-    public HistoryTreeBackend(File newStateFile, int providerVersion, long startTime)
+    public HistoryTreeBackend(@NonNull String ssid, File newStateFile, int providerVersion, long startTime)
             throws IOException {
-        this(newStateFile, 64 * 1024, 50, providerVersion, startTime);
+        this(ssid, newStateFile, 64 * 1024, 50, providerVersion, startTime);
     }
 
     /**
      * Existing history constructor. Use this to open an existing state-file.
      *
+     * @param ssid
+     *            The state system's id
      * @param existingStateFile
      *            Filename/location of the history we want to load
      * @param providerVersion
@@ -129,8 +139,9 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      *             recognized, or if the version of the file does not match the
      *             expected providerVersion.
      */
-    public HistoryTreeBackend(File existingStateFile, int providerVersion)
+    public HistoryTreeBackend(@NonNull String ssid, File existingStateFile, int providerVersion)
             throws IOException {
+        this.ssid = ssid;
         sht = new HistoryTree(existingStateFile, providerVersion);
         fFinishedBuilding = true;
     }
@@ -142,6 +153,11 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      */
     protected HistoryTree getSHT() {
         return sht;
+    }
+
+    @Override
+    public String getSSID() {
+        return ssid;
     }
 
     @Override
