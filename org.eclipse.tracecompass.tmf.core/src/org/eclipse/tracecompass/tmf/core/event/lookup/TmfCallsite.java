@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.core.event.lookup;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.equalsNullable;
 
 /**
  * TMF call site information for source code lookup.
@@ -99,7 +100,8 @@ public class TmfCallsite implements ITmfCallsite {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + fFileName.hashCode(); // fFileName cannot be null
+        // fFileName cannot be null!
+        result = prime * result + fFileName.hashCode();
         result = prime * result + ((fFunctionName == null) ? 0 : fFunctionName.hashCode());
         result = prime * result + (int) (fLineNumber ^ (fLineNumber >>> 32));
         return result;
@@ -123,11 +125,7 @@ public class TmfCallsite implements ITmfCallsite {
             return false;
         }
 
-        if (fFunctionName == null) {
-            if (other.fFunctionName != null) {
-                return false;
-            }
-        } else if (!fFunctionName.equals(other.fFunctionName)) {
+        if (!equalsNullable(fFunctionName, other.fFunctionName)) {
             return false;
         }
         if (fLineNumber != other.fLineNumber) {
