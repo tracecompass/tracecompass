@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.ctf.core.event.types;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.equalsNullable;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -232,34 +234,16 @@ public class VariantDeclaration extends Declaration {
         }
         // do not check the order of the fields
 
-        if (fFields == null) {
-            if (other.fFields != null) {
-                return false;
-            }
-        } else {
-            if( !fFields.equals(other.fFields)) {
-                return false;
-            }
-        }
-        if (fPrevDefinitionScope == null) {
-            if (other.fPrevDefinitionScope != null) {
-                return false;
-            }
-        } else if (!fPrevDefinitionScope.equals(other.fPrevDefinitionScope)) {
+        if (!equalsNullable(fFields, other.fFields)) {
             return false;
         }
-        if (fTag == null) {
-            if (other.fTag != null) {
-                return false;
-            }
-        } else if (!fTag.equals(other.fTag)) {
+        if (!equalsNullable(fPrevDefinitionScope, other.fPrevDefinitionScope)) {
             return false;
         }
-        if (fTagDef == null) {
-            if (other.fTagDef != null) {
-                return false;
-            }
-        } else if (!fTagDef.equals(other.fTagDef)) {
+        if (!equalsNullable(fTag, other.fTag)) {
+            return false;
+        }
+        if (!equalsNullable(fTagDef, other.fTagDef)){
             return false;
         }
         return true;
