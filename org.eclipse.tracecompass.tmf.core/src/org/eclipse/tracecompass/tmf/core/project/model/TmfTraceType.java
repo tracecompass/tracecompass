@@ -220,33 +220,6 @@ public final class TmfTraceType {
     }
 
     /**
-<<<<<<< Upstream, based on 3097c4b013b2ea6ae2f6e8c1fa76e5aeaf2a1cbf
-     * Gets the custom trace types (custom text and friends)
-     *
-     * @param type
-     *            the type to get (Text, xml or other...)
-     * @return the list of custom trace types
-     */
-    public static List<String> getCustomTraceTypes(String type) {
-        List<String> traceTypes = new ArrayList<>();
-        if (type.equals(CustomTxtTraceDefinition.CUSTOM_TXT_CATEGORY)) {
-            for (CustomTxtTraceDefinition def : CustomTxtTraceDefinition.loadAll()) {
-                String traceTypeName = def.definitionName;
-                traceTypes.add(traceTypeName);
-            }
-        }
-        if (type.equals(CustomXmlTraceDefinition.CUSTOM_XML_CATEGORY)) {
-            for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
-                String traceTypeName = def.definitionName;
-                traceTypes.add(traceTypeName);
-            }
-        }
-        return traceTypes;
-    }
-
-    /**
-=======
->>>>>>> 930e20d Remove deprecated and unused metheds related to custom traces
      * Gets all the custom trace types
      *
      * @return the list of custom trace types
@@ -288,27 +261,6 @@ public final class TmfTraceType {
     /**
      * Add or replace a custom trace type
      *
-<<<<<<< Upstream, based on 3097c4b013b2ea6ae2f6e8c1fa76e5aeaf2a1cbf
-     * @param category
-     *            The custom parser category
-     * @param definitionName
-     *            The custom parser definition name to add or replace
-     * @deprecated Use {@link #addCustomTraceType(Class, String, String)}
-     */
-    @Deprecated
-    public static void addCustomTraceType(String category, String definitionName) {
-        if (category.equals(CustomTxtTraceDefinition.CUSTOM_TXT_CATEGORY)) {
-            addCustomTraceType(CustomTxtTrace.class, category, definitionName);
-        } else if (category.equals(CustomXmlTraceDefinition.CUSTOM_XML_CATEGORY)) {
-            addCustomTraceType(CustomXmlTrace.class, category, definitionName);
-        }
-    }
-
-    /**
-     * Add or replace a custom trace type
-     *
-=======
->>>>>>> 930e20d Remove deprecated and unused metheds related to custom traces
      * @param traceClass
      *            The custom trace class, either {@link CustomTxtTrace} or
      *            {@link CustomXmlTrace}
