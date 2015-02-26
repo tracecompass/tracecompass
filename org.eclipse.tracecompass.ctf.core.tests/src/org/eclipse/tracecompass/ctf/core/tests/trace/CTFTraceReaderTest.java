@@ -17,9 +17,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
+import org.eclipse.tracecompass.ctf.core.CTFReaderException;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
-import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
 import org.junit.Before;
@@ -70,7 +70,7 @@ public class CTFTraceReaderTest {
      *
      * @throws CTFReaderException
      */
-    @Test(expected = org.eclipse.tracecompass.ctf.core.trace.CTFReaderException.class)
+    @Test(expected = org.eclipse.tracecompass.ctf.core.CTFReaderException.class)
     public void testOpen_nonexisting() throws CTFReaderException {
         CTFTrace trace = new CTFTrace("badfile.bad");
         try (CTFTraceReader result = new CTFTraceReader(trace);) {
@@ -84,7 +84,7 @@ public class CTFTraceReaderTest {
      *
      * @throws CTFReaderException
      */
-    @Test(expected = org.eclipse.tracecompass.ctf.core.trace.CTFReaderException.class)
+    @Test(expected = org.eclipse.tracecompass.ctf.core.CTFReaderException.class)
     public void testOpen_invalid() throws CTFReaderException {
         CTFTrace trace = new CTFTrace("");
         try (CTFTraceReader result = new CTFTraceReader(trace);) {

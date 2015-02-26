@@ -17,7 +17,7 @@ import java.lang.reflect.Field;
 
 import org.antlr.runtime.MismatchedTokenException;
 import org.antlr.runtime.RecognitionException;
-import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFReaderException;
 import org.eclipse.tracecompass.ctf.parser.CTFLexer;
 
 /**

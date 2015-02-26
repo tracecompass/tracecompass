@@ -25,11 +25,11 @@ import java.io.File;
 import java.nio.ByteOrder;
 import java.util.UUID;
 
+import org.eclipse.tracecompass.ctf.core.CTFReaderException;
 import org.eclipse.tracecompass.ctf.core.event.CTFClock;
 import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
-import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStream;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.exceptions.ParseException;
@@ -86,7 +86,7 @@ public class CTFTraceTest {
      * @throws CTFReaderException
      *             is expected
      */
-    @Test(expected = org.eclipse.tracecompass.ctf.core.trace.CTFReaderException.class)
+    @Test(expected = org.eclipse.tracecompass.ctf.core.CTFReaderException.class)
     public void testOpen_invalid() throws CTFReaderException {
         File path = new File("");
         CTFTrace result = new CTFTrace(path);

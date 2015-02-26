@@ -26,7 +26,7 @@ import java.util.ListIterator;
 import java.util.TreeSet;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFReaderException;
 
 /**
  * <b><u>StreamInputPacketIndex</u></b>

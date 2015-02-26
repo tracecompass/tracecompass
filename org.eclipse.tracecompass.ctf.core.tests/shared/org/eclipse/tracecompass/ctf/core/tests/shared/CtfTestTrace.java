@@ -13,8 +13,8 @@ package org.eclipse.tracecompass.ctf.core.tests.shared;
 
 import java.io.File;
 
+import org.eclipse.tracecompass.ctf.core.CTFReaderException;
 import org.eclipse.tracecompass.ctf.core.tests.synthetictraces.LttngKernelTraceGenerator;
-import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 
 /**

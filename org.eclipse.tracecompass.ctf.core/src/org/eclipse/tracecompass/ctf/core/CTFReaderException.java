@@ -10,7 +10,7 @@
  *   Alexandre Montplaisir - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.ctf.core.trace;
+package org.eclipse.tracecompass.ctf.core;
 
 /**
  * General exception that is thrown when there is a problem somewhere with the

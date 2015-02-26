@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.ctf.core.trace;
 
 import java.util.UUID;
 
+import org.eclipse.tracecompass.ctf.core.CTFReaderException;
 import org.eclipse.tracecompass.ctf.core.event.types.AbstractArrayDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.CompoundDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;

@@ -16,7 +16,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.ListIterator;
 
-import org.eclipse.tracecompass.ctf.core.trace.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFReaderException;
 import org.eclipse.tracecompass.internal.ctf.core.trace.StreamInputPacketIndex;
 import org.eclipse.tracecompass.internal.ctf.core.trace.StreamInputPacketIndexEntry;
 import org.junit.Before;
