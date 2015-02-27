@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysis;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.ThreadPriorityAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelTidAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.Activator;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
@@ -68,6 +69,7 @@ public class KernelTidAspectTest {
             ImmutableSet.Builder<ITmfEventAspect> builder = ImmutableSet.builder();
             builder.addAll(super.getEventAspects());
             builder.add(KernelTidAspect.INSTANCE);
+            builder.add(ThreadPriorityAspect.INSTANCE);
             return NonNullUtils.checkNotNull(builder.build());
         }
 

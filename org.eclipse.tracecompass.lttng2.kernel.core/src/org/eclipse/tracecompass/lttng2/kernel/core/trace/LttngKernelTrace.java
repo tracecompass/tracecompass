@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.ThreadPriorityAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelTidAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
@@ -71,6 +72,7 @@ public class LttngKernelTrace extends CtfTmfTrace implements IKernelTrace {
         ImmutableSet.Builder<ITmfEventAspect> builder = ImmutableSet.builder();
         builder.addAll(CtfTmfTrace.CTF_ASPECTS);
         builder.add(KernelTidAspect.INSTANCE);
+        builder.add(ThreadPriorityAspect.INSTANCE);
         LTTNG_KERNEL_ASPECTS = NonNullUtils.checkNotNull(builder.build());
     }
 

@@ -22,7 +22,17 @@ import org.eclipse.osgi.util.NLS;
  */
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.lttng2.kernel.core.analysis.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.messages"; //$NON-NLS-1$
+
+    /**
+     * @since 1.0
+     */
+    public static @Nullable String AspectName_Prio;
+
+    /**
+     * @since 1.0
+     */
+    public static @Nullable String AspectHelpText_Prio;
 
     public static @Nullable String LttngKernelAnalysisModule_Help;
 
