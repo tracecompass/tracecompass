@@ -32,23 +32,23 @@
       <!-- Do not delete the existing .java parser files in target/ -->
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
-        <version>2.5</version>
-            <configuration>
-              <excludeDefaultDirectories>true</excludeDefaultDirectories>
-              <filesets>
-                <fileset>
-                  <directory>target</directory>
-                  <followSymlinks>false</followSymlinks>
-                  <includes>
-                    <include>*/**</include>
-                  </includes>
-                  <excludes>
-                    <exclude>generated-sources/antlr3/org/eclipse/tracecompass/ctf/parser/CTFLexer.java</exclude>
-                    <exclude>generated-sources/antlr3/org/eclipse/tracecompass/ctf/parser/CTFParser.java</exclude>
-                  </excludes>
-                </fileset>
-              </filesets>
-            </configuration>
+        <version>2.6.1</version>
+        <configuration>
+          <excludeDefaultDirectories>true</excludeDefaultDirectories>
+          <filesets>
+            <fileset>
+              <directory>target</directory>
+              <followSymlinks>false</followSymlinks>
+              <includes>
+                <include>*/**</include>
+              </includes>
+              <excludes>
+                <exclude>generated-sources/antlr3/org/eclipse/tracecompass/ctf/parser/CTFLexer.java</exclude>
+                <exclude>generated-sources/antlr3/org/eclipse/tracecompass/ctf/parser/CTFParser.java</exclude>
+              </excludes>
+            </fileset>
+          </filesets>
+        </configuration>
       </plugin>
     </plugins>
   </build>

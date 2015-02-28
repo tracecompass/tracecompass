@@ -40,6 +40,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.8</version>
             <executions>
               <execution>
                 <id>prepare</id>
@@ -79,7 +80,7 @@
       <!-- We don't use the ant file to clean because of http://jira.codehaus.org/browse/MANTRUN-78 -->
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
-        <version>2.5</version>
+        <version>2.6.1</version>
         <executions>
           <execution>
             <id>clean-traces</id>
