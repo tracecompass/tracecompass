@@ -36,7 +36,7 @@ public final class Activator extends Plugin {
     /**
      * The shared instance
      */
-    private static Activator plugin;
+    private static Activator fPlugin;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -46,6 +46,7 @@ public final class Activator extends Plugin {
      * The constructor
      */
     public Activator() {
+        setDefault(this);
     }
 
     // ------------------------------------------------------------------------
@@ -58,7 +59,12 @@ public final class Activator extends Plugin {
      * @return the shared instance
      */
     public static Activator getDefault() {
-        return plugin;
+        return fPlugin;
+    }
+
+    // Sets plug-in instance
+    private static void setDefault(Activator plugin) {
+        fPlugin = plugin;
     }
 
     // ------------------------------------------------------------------------
@@ -68,12 +74,12 @@ public final class Activator extends Plugin {
     @Override
     public void start(BundleContext context) throws Exception {
         super.start(context);
-        plugin = this;
+        setDefault(this);
     }
 
     @Override
     public void stop(BundleContext context) throws Exception {
-        plugin = null;
+        setDefault(null);
         super.stop(context);
     }
 
@@ -142,7 +148,7 @@ public final class Activator extends Plugin {
      * @return the specified service or null if it's not registered
      */
     public static @Nullable <T> T getService(Class<T> service) {
-        BundleContext context = plugin.getBundle().getBundleContext();
+        BundleContext context = fPlugin.getBundle().getBundleContext();
         ServiceReference<T> ref = context.getServiceReference(service);
         return ((ref != null) ? context.getService(ref) : null);
     }

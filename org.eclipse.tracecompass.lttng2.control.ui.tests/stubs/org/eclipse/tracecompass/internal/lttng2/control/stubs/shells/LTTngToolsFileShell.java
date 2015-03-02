@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.tracecompass.internal.tmf.remote.core.stubs.shells.TestCommandShell;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandInput;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandResult;
 
@@ -198,7 +199,7 @@ public class LTTngToolsFileShell extends TestCommandShell {
                         } else if (OUTPUT_END_KEY.equals(strLine)) {
                             // Save output/result in command map
                             if (output != null && errorOutput != null) {
-                                commandMap.put(input, new CommandResultStub(result,
+                                commandMap.put(input, createCommandResult(result,
                                         checkNotNull(output.toArray(new String[output.size()])),
                                         checkNotNull(errorOutput.toArray(new String[errorOutput.size()]))));
                             }
@@ -268,7 +269,7 @@ public class LTTngToolsFileShell extends TestCommandShell {
 
         String[] output = new String[1];
         output[0] = String.valueOf("Command not found");
-        CommandResultStub result = new CommandResultStub(1, output, output);
+        ICommandResult result = createCommandResult(1, output, output);
         return result;
     }
 
