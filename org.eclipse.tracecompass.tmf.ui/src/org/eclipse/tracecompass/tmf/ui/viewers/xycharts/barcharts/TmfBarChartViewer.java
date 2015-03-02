@@ -33,7 +33,6 @@ import org.swtchart.ISeries.SeriesType;
  *
  * @author Alexandre Montplaisir
  * @author Bernd Hufmann
- * @since 3.0
  */
 public abstract class TmfBarChartViewer extends TmfXYChartViewer {
 

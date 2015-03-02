@@ -33,7 +33,6 @@ import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
  * accordingly.
  *
  * @author Alexandre Montplaisir
- * @since 2.0
  */
 public class TmfSignalThrottler {
 

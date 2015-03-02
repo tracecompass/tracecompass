@@ -35,7 +35,6 @@ import org.eclipse.ui.dialogs.SelectionStatusDialog;
 
 /**
  * Implementation of a dialog box to rename a folder.
- * @since 3.0
  */
 public class RenameFolderDialog extends SelectionStatusDialog {
 

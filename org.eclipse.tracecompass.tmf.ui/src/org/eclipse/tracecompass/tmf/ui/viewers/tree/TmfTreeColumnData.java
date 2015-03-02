@@ -32,7 +32,6 @@ import org.eclipse.swt.widgets.Tree;
  * percent providers, whether the column is movable, etc.
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class TmfTreeColumnData {
     /** Name of the column. */

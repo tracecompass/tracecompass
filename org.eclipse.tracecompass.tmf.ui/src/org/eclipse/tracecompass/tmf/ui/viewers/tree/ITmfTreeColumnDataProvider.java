@@ -20,7 +20,6 @@ import java.util.List;
  * viewers will use class implementing this to populate the columns.
  *
  * @author Mathieu Denis
- * @since 3.0
  */
 public interface ITmfTreeColumnDataProvider {
 

@@ -95,7 +95,6 @@ public class CtfIterator extends CTFTraceReader
      * @throws CTFReaderException
      *             If the iterator couldn't not be instantiated, probably due to
      *             a read error.
-     * @since 2.0
      */
     public CtfIterator(CTFTrace ctfTrace, CtfTmfTrace ctfTmfTrace, CtfLocationInfo ctfLocationData, long rank)
             throws CTFReaderException {
@@ -176,7 +175,6 @@ public class CtfIterator extends CTFTraceReader
      *            The LocationData representing the position to seek to
      * @return boolean True if the seek was successful, false if there was an
      *         error seeking.
-     * @since 2.0
      */
     public synchronized boolean seek(CtfLocationInfo ctfLocationData) {
         boolean ret = false;
@@ -289,9 +287,6 @@ public class CtfIterator extends CTFTraceReader
         return (getRank() >= 0);
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public void setLocation(ITmfLocation location) {
         // FIXME alex: isn't there a cleaner way than a cast here?

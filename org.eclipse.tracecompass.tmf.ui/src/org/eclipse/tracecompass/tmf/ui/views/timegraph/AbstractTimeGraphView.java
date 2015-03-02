@@ -82,8 +82,6 @@ import org.eclipse.ui.IActionBars;
  *
  * This view contains either a time graph viewer, or a time graph combo which is
  * divided between a tree viewer on the left and a time graph viewer on the right.
- *
- * @since 2.1
  */
 public abstract class AbstractTimeGraphView extends TmfView {
 
@@ -441,17 +439,11 @@ public abstract class AbstractTimeGraphView extends TmfView {
             return new String();
         }
 
-        /**
-         * @since 3.2
-         */
         @Override
         public Image getImage(Object element) {
             return null;
         }
 
-        /**
-         * @since 3.2
-         */
         @Override
         public String getText(Object element) {
             TimeGraphEntry entry = (TimeGraphEntry) element;
@@ -597,7 +589,6 @@ public abstract class AbstractTimeGraphView extends TmfView {
      * Getter for the presentation provider
      *
      * @return The time graph presentation provider
-     * @since 3.0
      */
     protected ITimeGraphPresentationProvider2 getPresentationProvider() {
         return fPresentation;
@@ -653,8 +644,6 @@ public abstract class AbstractTimeGraphView extends TmfView {
      *
      * @param labelProvider
      *            The filter label provider
-     *
-     * @since 3.0
      */
     protected void setFilterLabelProvider(final TreeLabelProvider labelProvider) {
         fFilterLabelProvider = labelProvider;
@@ -764,7 +753,6 @@ public abstract class AbstractTimeGraphView extends TmfView {
      *            the trace
      *
      * @return the entry list map
-     * @since 3.0
      */
     protected List<TimeGraphEntry> getEntryList(ITmfTrace trace) {
         synchronized (fEntryListMap) {
@@ -793,7 +781,6 @@ public abstract class AbstractTimeGraphView extends TmfView {
      *            the trace
      * @param list
      *            the list of time graph entries to add
-     * @since 3.0
      */
     protected void addToEntryList(ITmfTrace trace, List<TimeGraphEntry> list) {
         synchronized (fEntryListMap) {
@@ -813,7 +800,6 @@ public abstract class AbstractTimeGraphView extends TmfView {
      *            the trace
      * @param list
      *            the list of time graph entries to remove
-     * @since 3.0
      */
     protected void removeFromEntryList(ITmfTrace trace, List<TimeGraphEntry> list) {
         synchronized (fEntryListMap) {
@@ -938,7 +924,6 @@ public abstract class AbstractTimeGraphView extends TmfView {
      *
      * @param signal
      *            The incoming signal
-     * @since 2.0
      */
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
@@ -1054,7 +1039,6 @@ public abstract class AbstractTimeGraphView extends TmfView {
 
     /**
      * @param signal the format of the timestamps was updated.
-     * @since 2.1
      */
     @TmfSignalHandler
     public void updateTimeFormat( final TmfTimestampFormatUpdateSignal signal){
@@ -1080,7 +1064,6 @@ public abstract class AbstractTimeGraphView extends TmfView {
 
     /**
      * Forces a rebuild of the entries list, even if entries already exist for this trace
-     * @since 3.0
      */
     protected void rebuild() {
         setStartTime(Long.MAX_VALUE);
@@ -1124,7 +1107,6 @@ public abstract class AbstractTimeGraphView extends TmfView {
      * @param trace
      *            The trace associated with this view
      * @return List of traces with data to display
-     * @since 3.0
      */
     protected @NonNull Iterable<ITmfTrace> getTracesToBuild(@NonNull ITmfTrace trace) {
         return TmfTraceManager.getTraceSet(trace);
@@ -1141,7 +1123,6 @@ public abstract class AbstractTimeGraphView extends TmfView {
      *            The parent of the trace set, or the trace itself
      * @param monitor
      *            The progress monitor object
-     * @since 3.0
      */
     protected abstract void buildEventList(@NonNull ITmfTrace trace, @NonNull ITmfTrace parentTrace, @NonNull IProgressMonitor monitor);
 
@@ -1177,7 +1158,6 @@ public abstract class AbstractTimeGraphView extends TmfView {
      * @param monitor
      *            The progress monitor object
      * @return The list of link events
-     * @since 2.1
      */
     protected @Nullable List<ILinkEvent> getLinkList(long startTime, long endTime,
             long resolution, @NonNull IProgressMonitor monitor) {

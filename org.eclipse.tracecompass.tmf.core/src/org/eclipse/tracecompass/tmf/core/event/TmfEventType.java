@@ -86,9 +86,6 @@ public class TmfEventType implements ITmfEventType {
         return fRootField;
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public Collection<String> getFieldNames() {
         return (fRootField != null) ? fRootField.getFieldNames() : Collections.EMPTY_SET;

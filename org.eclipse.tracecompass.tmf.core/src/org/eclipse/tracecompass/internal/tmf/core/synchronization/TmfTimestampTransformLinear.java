@@ -27,7 +27,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
  * f(t) = alpha*t + beta
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class TmfTimestampTransformLinear implements ITmfTimestampTransformInvertible {
 

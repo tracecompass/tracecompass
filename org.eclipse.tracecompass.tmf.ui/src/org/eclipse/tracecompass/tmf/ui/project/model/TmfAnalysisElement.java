@@ -35,7 +35,6 @@ import org.osgi.framework.Bundle;
  * Class for project elements of type analysis modules
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfStyledProjectModelElement {
 

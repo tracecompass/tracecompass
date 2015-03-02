@@ -30,7 +30,6 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
  * @author Alexandre Montplaisir
  * @noextend This class should not be extended directly. You should instead
  *           implement an {@link ITmfEventAspect}.
- * @since 3.1
  */
 @NonNullByDefault
 public class TmfEventTableColumn {

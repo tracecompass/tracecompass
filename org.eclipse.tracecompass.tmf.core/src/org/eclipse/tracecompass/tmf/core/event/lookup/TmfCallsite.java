@@ -17,7 +17,6 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.equalsNullable;
 /**
  * TMF call site information for source code lookup.
  *
- * @since 2.0
  * @author Bernd Hufmann
  */
 public class TmfCallsite implements ITmfCallsite {

@@ -18,8 +18,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 /**
  * A content provider mediates between the viewer's model
  * and the viewer itself.
- *
- * @since 3.0
  */
 public interface ITimeGraphContentProvider {
     /**

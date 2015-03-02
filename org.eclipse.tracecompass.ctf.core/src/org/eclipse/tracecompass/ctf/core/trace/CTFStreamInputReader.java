@@ -33,7 +33,6 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Matthew Khouzam
  * @author Simon Marchi
- * @since 3.0
  */
 public class CTFStreamInputReader implements AutoCloseable {
 

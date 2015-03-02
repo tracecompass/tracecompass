@@ -31,7 +31,6 @@ import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 /**
  * Wizard implementation for creating a TMF tracing project.
  *
- * @version 1.0
  * @author Francois Chouinard
  */
 public class NewTmfProjectWizard extends Wizard implements INewWizard, IExecutableExtension {
@@ -42,8 +41,6 @@ public class NewTmfProjectWizard extends Wizard implements INewWizard, IExecutab
 
     /**
      * The wizard id
-     *
-     * @since 2.0
      */
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.ui.wizards.newProject"; //$NON-NLS-1$
 

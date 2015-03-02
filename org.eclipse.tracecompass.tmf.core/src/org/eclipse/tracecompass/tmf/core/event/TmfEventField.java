@@ -112,17 +112,11 @@ public class TmfEventField implements ITmfEventField {
         return fValue;
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public Collection<String> getFieldNames() {
         return fFields.keySet();
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public Collection<ITmfEventField> getFields() {
         return fFields.values();
@@ -248,9 +242,6 @@ public class TmfEventField implements ITmfEventField {
         sb.append(joiner.join(getFields()));
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public String getFormattedValue() {
         return getValue().toString();

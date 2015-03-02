@@ -18,7 +18,6 @@ import java.nio.ByteBuffer;
  * A concrete implementation of TmfLocation based on Long:s
  *
  * @author Francois Chouinard
- * @since 3.0
  */
 public final class TmfLongLocation extends TmfLocation {
 
@@ -55,8 +54,6 @@ public final class TmfLongLocation extends TmfLocation {
      *
      * @param bufferIn
      *            the buffer to read from
-     *
-     * @since 3.0
      */
     public TmfLongLocation(ByteBuffer bufferIn) {
         this(bufferIn.getLong());
@@ -67,9 +64,6 @@ public final class TmfLongLocation extends TmfLocation {
         return (Long) super.getLocationInfo();
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public void serialize(ByteBuffer bufferOut) {
         bufferOut.putLong(getLocationInfo().longValue());

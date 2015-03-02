@@ -205,7 +205,6 @@ public class EventDeclaration implements IEventDeclaration {
      *
      * @param stream
      *            the stream
-     * @since 2.0
      */
     public void setStream(CTFStream stream) {
         fStream = stream;
@@ -293,7 +292,6 @@ public class EventDeclaration implements IEventDeclaration {
      *            the key of the attribute
      * @param value
      *            the value of the attribute
-     * @since 2.0
      */
     public void setCustomAttribute(String key, String value) {
         fCustomAttributes.put(key, value);

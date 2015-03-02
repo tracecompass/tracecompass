@@ -36,7 +36,6 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
  * which can then contain your 2-3 other backends underneath.
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  */
 public interface IStateHistoryBackend {
 

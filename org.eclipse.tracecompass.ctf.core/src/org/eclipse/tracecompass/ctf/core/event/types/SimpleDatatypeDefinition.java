@@ -19,7 +19,6 @@ import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
  * getIntegerValue and getStringValue to a class.
  *
  * @author Matthew Khouzam
- * @since 1.2
  */
 public abstract class SimpleDatatypeDefinition extends Definition {
 
@@ -33,7 +32,6 @@ public abstract class SimpleDatatypeDefinition extends Definition {
      * @param fieldName
      *            The name of the field matching this definition in the parent
      *            scope
-     * @since 3.0
      */
     public SimpleDatatypeDefinition(@NonNull IDeclaration declaration, IDefinitionScope definitionScope,
             @NonNull String fieldName) {

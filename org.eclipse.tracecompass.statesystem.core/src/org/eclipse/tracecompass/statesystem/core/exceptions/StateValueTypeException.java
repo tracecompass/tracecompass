@@ -25,7 +25,6 @@ package org.eclipse.tracecompass.statesystem.core.exceptions;
  * {@link org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue#getType()}.
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  */
 public class StateValueTypeException extends RuntimeException {
 
@@ -55,7 +54,6 @@ public class StateValueTypeException extends RuntimeException {
      *            Message to attach to this exception
      * @param e
      *            Cause of this exception
-     * @since 3.0
      */
     public StateValueTypeException(String message, Throwable e) {
         super(message, e);

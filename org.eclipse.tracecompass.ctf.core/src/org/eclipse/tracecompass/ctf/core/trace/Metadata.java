@@ -95,8 +95,6 @@ public class Metadata {
 
     /**
      * For network streaming
-     *
-     * @since 3.0
      */
     public Metadata() {
         trace = new CTFTrace();
@@ -119,7 +117,6 @@ public class Metadata {
      * Gets the parent trace
      *
      * @return the parent trace
-     * @since 3.0
      */
     public CTFTrace getTrace() {
         return trace;
@@ -134,7 +131,6 @@ public class Metadata {
      *
      * @throws CTFReaderException
      *             If there was a problem parsing the metadata
-     * @since 3.0
      */
     public void parseFile() throws CTFReaderException {
 
@@ -191,7 +187,6 @@ public class Metadata {
      *             this exception wraps a ParseException, IOException or
      *             CtfAntlrException, three exceptions that can be obtained from
      *             parsing a TSDL file
-     * @since 3.0
      */
     public void parseText(String data) throws CTFReaderException {
         Reader metadataTextInput = new StringReader(data);
@@ -222,7 +217,6 @@ public class Metadata {
      *             this exception wraps a ParseException, IOException or
      *             CtfAntlrException, three exceptions that can be obtained from
      *             parsing a TSDL file
-     * @since 3.0
      */
     public void parseTextFragment(String dataFragment) throws CTFReaderException {
         Reader metadataTextInput = new StringReader(dataFragment);

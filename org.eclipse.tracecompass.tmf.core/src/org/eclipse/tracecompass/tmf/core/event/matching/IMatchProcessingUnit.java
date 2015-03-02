@@ -23,7 +23,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * TmfEventMatches class in order to be informed of matches.
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public interface IMatchProcessingUnit {
 

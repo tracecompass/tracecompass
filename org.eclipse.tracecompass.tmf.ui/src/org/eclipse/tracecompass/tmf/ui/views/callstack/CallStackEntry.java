@@ -21,7 +21,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
  * An entry, or row, in the Call Stack view
  *
  * @author Patrick Tasse
- * @since 2.0
  */
 public class CallStackEntry extends TimeGraphEntry {
 
@@ -63,7 +62,6 @@ public class CallStackEntry extends TimeGraphEntry {
      *            The trace that this view is talking about
      * @param ss
      *            The call stack state system
-     * @since 3.1
      */
     public CallStackEntry(String name, int quark, int stackLevel, ITmfTrace trace, @NonNull ITmfStateSystem ss) {
         super(name, 0, 0);
@@ -115,7 +113,6 @@ public class CallStackEntry extends TimeGraphEntry {
      *
      * @param entryTime
      *            the function entry time
-     * @since 3.1
      */
     public void setFunctionEntryTime(long entryTime) {
         fFunctionEntryTime = entryTime;
@@ -125,7 +122,6 @@ public class CallStackEntry extends TimeGraphEntry {
      * Get the selected function entry time
      *
      * @return the function entry time
-     * @since 3.1
      */
     public long getFunctionEntryTime() {
         return fFunctionEntryTime;
@@ -136,7 +132,6 @@ public class CallStackEntry extends TimeGraphEntry {
      *
      * @param exitTime
      *            the function exit time
-     * @since 3.1
      */
     public void setFunctionExitTime(long exitTime) {
         fFunctionExitTime = exitTime;
@@ -146,7 +141,6 @@ public class CallStackEntry extends TimeGraphEntry {
      * Get the selected function exit time
      *
      * @return the function exit time
-     * @since 3.1
      */
     public long getFunctionExitTime() {
         return fFunctionExitTime;
@@ -183,7 +177,6 @@ public class CallStackEntry extends TimeGraphEntry {
      * Retrieve the call stack state system associated with this entry.
      *
      * @return The call stack state system
-     * @since 3.1
      */
     public @NonNull ITmfStateSystem getStateSystem() {
         return fSS;

@@ -591,7 +591,6 @@ public class SDWidget extends ScrollView implements SelectionListener,
      *
      * @param zoomValue
      *          The current zoom value
-     * @since 2.0
      */
     public void setZoomValue(float zoomValue) {
         fZoomValue = zoomValue;
@@ -671,7 +670,6 @@ public class SDWidget extends ScrollView implements SelectionListener,
      * Returns the current graph node.
      *
      * @return the current graph node
-     * @since 2.0
      */
     public GraphNode getCurrentGraphNode() {
         return fCurrentGraphNode;
@@ -681,7 +679,6 @@ public class SDWidget extends ScrollView implements SelectionListener,
      * Returns the current zoom value.
      *
      * @return the current zoom value
-     * @since 2.0
      */
     public float getZoomValue() {
         return fZoomValue;
@@ -691,7 +688,6 @@ public class SDWidget extends ScrollView implements SelectionListener,
      * Gets the zoom in mode.
      *
      * @return the mode value to set.
-     * @since 2.0
      */
     public boolean getZoomInMode() {
         return fZoomInMode;
@@ -702,7 +698,6 @@ public class SDWidget extends ScrollView implements SelectionListener,
      * Gets the zoom out mode.
      *
      * @return the mode value to set.
-     * @since 2.0
      */
     public boolean getZoomOutMode() {
         return fZoomOutMode;
@@ -711,7 +706,6 @@ public class SDWidget extends ScrollView implements SelectionListener,
     /**
      * Returns if ctrl selection
      * @return true if ctrl selection else false
-     * @since 2.0
      */
     public boolean isCtrlSelection() {
         return fCtrlSelection;
@@ -720,7 +714,6 @@ public class SDWidget extends ScrollView implements SelectionListener,
     /**
      * Returns if shift selection
      * @return true if shift Selection else false
-     * @since 2.0
      */
     public boolean isShiftSelection() {
         return fCtrlSelection;

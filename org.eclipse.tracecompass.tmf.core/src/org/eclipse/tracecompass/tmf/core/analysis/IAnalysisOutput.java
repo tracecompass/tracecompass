@@ -18,7 +18,6 @@ import org.eclipse.jdt.annotation.NonNull;
  * Interface for all output types of analysis
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public interface IAnalysisOutput {
 

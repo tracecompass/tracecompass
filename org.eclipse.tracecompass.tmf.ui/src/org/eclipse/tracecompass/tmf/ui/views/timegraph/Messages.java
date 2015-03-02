@@ -16,8 +16,6 @@ import org.eclipse.osgi.util.NLS;
 
 /**
  * Generic messages for the bar charts
- *
- * @since 2.1
  */
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {

@@ -122,7 +122,6 @@ public class DiagramToolTip {
 
     /**
      * @return parent control
-     * @since 2.0
      */
     protected Control getParent() {
         return fParent;

@@ -13,7 +13,6 @@
 package org.eclipse.tracecompass.tmf.core.timestamp;
 
 /**
- * @since 2.1
  * @noimplement This interface is not intended to be implemented by clients.
  */
 @SuppressWarnings({ "javadoc", "nls" })
@@ -51,8 +50,6 @@ public interface ITmfTimePreferencesConstants {
     String DELIMITER_SEMICOLON = ";";
     String DELIMITER_SLASH = "/";
     String DELIMITER_DQUOT = "\"";
-    /** @since 3.0 */
     String DELIMITER_QUOTE = "''";
-    /** @since 3.2*/
     String LOCALE = TIME_FORMAT_PREF + ".locale";
 }

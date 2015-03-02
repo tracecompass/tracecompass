@@ -16,7 +16,6 @@ import org.eclipse.osgi.util.NLS;
 /**
  * Messages related to the sequence diagram loader
  *
- * @version 1.0
  * @author Bernd Hufmann
  */
 @SuppressWarnings("javadoc")
@@ -29,15 +28,10 @@ public class Messages extends NLS {
     public static String TmfUml2SDSyncLoader_SearchJobDescrition;
     public static String TmfUml2SDSyncLoader_SearchNotFound;
 
-    /** @since 2.0  */
     public static String TmfUml2SDSyncLoader_EventTypeSend;
-    /** @since 2.0  */
     public static String TmfUml2SDSyncLoader_EventTypeReceive;
-    /** @since 2.0  */
     public static String TmfUml2SDSyncLoader_FieldSender;
-    /** @since 2.0  */
     public static String TmfUml2SDSyncLoader_FieldReceiver;
-    /** @since 2.0  */
     public static String TmfUml2SDSyncLoader_FieldSignal;
     static {
         // initialize resource bundle

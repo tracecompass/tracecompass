@@ -51,98 +51,66 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
     private static final int BASE_10 = 10;
     /**
      * unsigned int 32 bits big endian
-     *
-     * @since 3.0
      */
     public static final IntegerDeclaration UINT_32B_DECL = new IntegerDeclaration(32, false, ByteOrder.BIG_ENDIAN);
     /**
      * unsigned int 32 bits little endian
-     *
-     * @since 3.0
      */
     public static final IntegerDeclaration UINT_32L_DECL = new IntegerDeclaration(32, false, ByteOrder.LITTLE_ENDIAN);
     /**
      * signed int 32 bits big endian
-     *
-     * @since 3.0
      */
     public static final IntegerDeclaration INT_32B_DECL = new IntegerDeclaration(32, true, ByteOrder.BIG_ENDIAN);
     /**
      * signed int 32 bits little endian
-     *
-     * @since 3.0
      */
     public static final IntegerDeclaration INT_32L_DECL = new IntegerDeclaration(32, true, ByteOrder.LITTLE_ENDIAN);
     /**
      * unsigned int 32 bits big endian
-     *
-     * @since 3.0
      */
     public static final IntegerDeclaration UINT_64B_DECL = new IntegerDeclaration(64, false, ByteOrder.BIG_ENDIAN);
     /**
      * unsigned int 64 bits little endian
-     *
-     * @since 3.0
      */
     public static final IntegerDeclaration UINT_64L_DECL = new IntegerDeclaration(64, false, ByteOrder.LITTLE_ENDIAN);
     /**
      * signed int 64 bits big endian
-     *
-     * @since 3.0
      */
     public static final IntegerDeclaration INT_64B_DECL = new IntegerDeclaration(64, true, ByteOrder.BIG_ENDIAN);
     /**
      * signed int 64 bits little endian
-     *
-     * @since 3.0
      */
     public static final IntegerDeclaration INT_64L_DECL = new IntegerDeclaration(64, true, ByteOrder.LITTLE_ENDIAN);
     /**
      * unsigned 8 bit int endianness doesn't matter since it's 8 bits (byte)
-     *
-     * @since 3.0
      */
     public static final IntegerDeclaration UINT_8_DECL = new IntegerDeclaration(8, false, ByteOrder.BIG_ENDIAN);
     /**
      * signed 8 bit int endianness doesn't matter since it's 8 bits (char)
-     *
-     * @since 3.0
      */
     public static final IntegerDeclaration INT_8_DECL = new IntegerDeclaration(8, true, ByteOrder.BIG_ENDIAN);
     /**
      * Unsigned 5 bit int, used for event headers
-     *
-     * @since 3.1
      */
     public static final IntegerDeclaration UINT_5B_DECL = new IntegerDeclaration(5, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 1); //$NON-NLS-1$
     /**
      * Unsigned 5 bit int, used for event headers
-     *
-     * @since 3.1
      */
     public static final IntegerDeclaration UINT_5L_DECL = new IntegerDeclaration(5, false, 10, ByteOrder.LITTLE_ENDIAN, Encoding.NONE, "", 1); //$NON-NLS-1$
     /**
      * Unsigned 5 bit int, used for event headers
-     *
-     * @since 3.1
      */
     public static final IntegerDeclaration UINT_27B_DECL = new IntegerDeclaration(27, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 1); //$NON-NLS-1$
     /**
      * Unsigned 5 bit int, used for event headers
-     *
-     * @since 3.1
      */
     public static final IntegerDeclaration UINT_27L_DECL = new IntegerDeclaration(27, false, 10, ByteOrder.LITTLE_ENDIAN, Encoding.NONE, "", 1); //$NON-NLS-1$
     /**
      * Unsigned 16 bit int, used for event headers
-     *
-     * @since 3.1
      */
     public static final IntegerDeclaration UINT_16B_DECL = new IntegerDeclaration(16, false, ByteOrder.BIG_ENDIAN);
     /**
      * Unsigned 16 bit int, used for event headers
-     *
-     * @since 3.1
      */
     public static final IntegerDeclaration UINT_16L_DECL = new IntegerDeclaration(16, false, ByteOrder.LITTLE_ENDIAN);
     // ------------------------------------------------------------------------
@@ -179,7 +147,6 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
      * @param alignment
      *            The minimum alignment. Should be >= 1
      * @return the integer declaration
-     * @since 3.0
      */
     public static IntegerDeclaration createDeclaration(int len, boolean signed, int base,
             @Nullable ByteOrder byteOrder, Encoding encoding, String clock, long alignment) {
@@ -345,7 +312,6 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
      * Is the integer an unsigned byte (8 bits and no sign)?
      *
      * @return is the integer an unsigned byte
-     * @since 3.1
      */
     public boolean isUnsignedByte() {
         return (fLength == SIZE_8) && (!fSigned);
@@ -374,9 +340,6 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
         return fClock;
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public int getMaximumSize() {
         return fLength;
@@ -386,9 +349,6 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
     // Operations
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 3.0
-     */
     @Override
     public IntegerDefinition createDefinition(@Nullable IDefinitionScope definitionScope,
             String fieldName, BitBuffer input) throws CTFReaderException {
@@ -408,7 +368,6 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
      * Get the maximum value for this integer declaration.
      *
      * @return The maximum value for this integer declaration
-     * @since 2.0
      */
     public BigInteger getMaxValue() {
         /*
@@ -427,7 +386,6 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
      * Get the minimum value for this integer declaration.
      *
      * @return The minimum value for this integer declaration
-     * @since 2.0
      */
     public BigInteger getMinValue() {
         if (!fSigned) {

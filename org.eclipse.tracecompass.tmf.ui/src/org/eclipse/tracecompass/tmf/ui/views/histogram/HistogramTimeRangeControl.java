@@ -27,7 +27,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 /**
  * This control provides a group containing a text control.
  *
- * @version 2.0
  * @author Francois Chouinard
  */
 public class HistogramTimeRangeControl extends HistogramTextControl {
@@ -43,7 +42,6 @@ public class HistogramTimeRangeControl extends HistogramTextControl {
      * @param parent The parent composite
      * @param groupLabel A group value
      * @param value A text value
-     * @since 2.0
      */
     public HistogramTimeRangeControl(HistogramView parentView, Composite parent,
             String groupLabel, long value)
@@ -96,7 +94,6 @@ public class HistogramTimeRangeControl extends HistogramTextControl {
      * adjust the text and group widgets and then refresh the view layout.
      *
      * @param signal the incoming signal
-     * @since 2.0
      */
     @TmfSignalHandler
     public void intervalFormatUpdated(TmfTimestampFormatUpdateSignal signal) {

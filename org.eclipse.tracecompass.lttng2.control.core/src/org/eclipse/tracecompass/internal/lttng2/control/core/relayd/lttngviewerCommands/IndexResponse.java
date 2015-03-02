@@ -22,7 +22,6 @@ import java.nio.ByteOrder;
  * An Lttng packet index
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public class IndexResponse implements IRelayResponse {
 

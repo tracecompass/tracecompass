@@ -26,141 +26,101 @@ import com.google.common.base.Joiner;
  * A node of a lexical scope
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 @NonNullByDefault
 public class LexicalScope implements Comparable<LexicalScope> {
     /**
      * Empty string
-     *
-     * @since 3.0
      */
     public static final LexicalScope ROOT = new RootScope();
 
     /**
      * Trace string
-     *
-     * @since 3.0
      */
     public static final LexicalScope TRACE = new LexicalScope(ROOT, "trace"); //$NON-NLS-1$
 
     /**
      * Env string
-     *
-     * @since 3.0
      */
     public static final LexicalScope ENV = new LexicalScope(ROOT, "env"); //$NON-NLS-1$
 
     /**
      * Stream string
-     *
-     * @since 3.0
      */
     public static final LexicalScope STREAM = new LexicalScope(ROOT, "stream"); //$NON-NLS-1$
 
     /**
      * Event string
-     *
-     * @since 3.0
      */
     public static final LexicalScope EVENT = new LexicalScope(ROOT, "event"); //$NON-NLS-1$
 
     /**
      * Variant string
-     *
-     * @since 3.0
      */
     public static final LexicalScope VARIANT = new LexicalScope(ROOT, "variant"); //$NON-NLS-1$
 
     /**
      * packet string
-     *
-     * @since 3.0
      */
     public static final LexicalScope PACKET = new LexicalScope(ROOT, "packet"); //$NON-NLS-1$
 
     /**
      * Packet header string
-     *
-     * @since 3.0
-     *
      */
     public static final LexicalScope PACKET_HEADER = new PacketHeaderScope();
 
     /**
      * Stream packet scope
-     *
-     * @since 3.0
      */
     public static final LexicalScope STREAM_PACKET = new LexicalScope(STREAM, "packet"); //$NON-NLS-1$
 
     /**
      * Stream Packet header string
-     *
-     * @since 3.0
      */
     public static final LexicalScope STREAM_PACKET_CONTEXT = new LexicalScope(STREAM_PACKET, "context"); //$NON-NLS-1$
 
     /**
      * Trace packet scope
-     *
-     * @since 3.0
      */
     public static final LexicalScope TRACE_PACKET = new LexicalScope(TRACE, "packet"); //$NON-NLS-1$
 
     /**
      * Stream event scope
-     *
-     * @since 3.0
      */
     public static final LexicalScope STREAM_EVENT = new LexicalScope(STREAM, "event"); //$NON-NLS-1$
 
     /**
      * Trace packet header string
-     *
-     * @since 3.0
      */
     public static final LexicalScope TRACE_PACKET_HEADER = new LexicalScope(TRACE_PACKET, "header"); //$NON-NLS-1$
 
     /**
      * Stream event context
-     *
-     * @since 3.0
      */
     public static final LexicalScope STREAM_EVENT_CONTEXT = new LexicalScope(STREAM_EVENT, "context"); //$NON-NLS-1$
 
     /**
      * Stream event header
-     *
-     * @since 3.0
      */
     public static final LexicalScope STREAM_EVENT_HEADER = new LexicalScope(STREAM_EVENT, "header"); //$NON-NLS-1$
 
     /**
      * Event header
-     *
-     * @since 3.1
      */
     public static final LexicalScope EVENT_HEADER = new EventHeaderScope(EVENT, "header"); //$NON-NLS-1$
 
     /**
      * Fields in an event
-     *
-     * @since 3.0
      */
     public static final LexicalScope FIELDS = new FieldsScope(ROOT, "fields"); //$NON-NLS-1$
 
     /**
      * Context of an event
-     *
-     * @since 3.0
      */
     public static final LexicalScope CONTEXT = new LexicalScope(ROOT, "context"); //$NON-NLS-1$
 
     /**
      * Sorted list of parent paths
-     *
-     * @since 3.0
      */
     public static final LexicalScope[] PARENT_PATHS = {
             ROOT,

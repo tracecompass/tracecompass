@@ -17,7 +17,6 @@ package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewer
  * Instruction to send to relayd
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public interface IBaseCommand {
 

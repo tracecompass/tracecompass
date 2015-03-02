@@ -36,7 +36,6 @@ import com.google.common.collect.ImmutableSet;
  * UST trace
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class UstMemoryAnalysisModule extends TmfStateSystemAnalysisModule {
 

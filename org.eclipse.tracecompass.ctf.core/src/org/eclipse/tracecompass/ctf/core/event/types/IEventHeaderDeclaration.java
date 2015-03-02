@@ -18,7 +18,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  * Event header declaration abstract class
  *
  * @author Matthew Khouzam
- * @since 3.1
  */
 @NonNullByDefault
 public interface IEventHeaderDeclaration extends IDeclaration {

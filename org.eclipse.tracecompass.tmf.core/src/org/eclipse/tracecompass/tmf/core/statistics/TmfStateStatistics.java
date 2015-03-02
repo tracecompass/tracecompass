@@ -36,7 +36,6 @@ import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
  * the time interval selected.
  *
  * @author Alexandre Montplaisir
- * @since 2.0
  */
 public class TmfStateStatistics implements ITmfStatistics {
 
@@ -61,7 +60,6 @@ public class TmfStateStatistics implements ITmfStatistics {
      *            The state system containing the "totals" information
      * @param eventTypes
      *            The state system containing the "event types" information
-     * @since 3.0
      */
     public TmfStateStatistics(@NonNull ITmfStateSystem totals, @NonNull ITmfStateSystem eventTypes) {
         this.totalsStats = totals;
@@ -72,7 +70,6 @@ public class TmfStateStatistics implements ITmfStatistics {
      * Return the state system containing the "totals" values
      *
      * @return The "totals" state system
-     * @since 3.0
      */
     public ITmfStateSystem getTotalsSS() {
         return totalsStats;
@@ -82,7 +79,6 @@ public class TmfStateStatistics implements ITmfStatistics {
      * Return the state system containing the "event types" values
      *
      * @return The "event types" state system
-     * @since 3.0
      */
     public ITmfStateSystem getEventTypesSS() {
         return typesStats;

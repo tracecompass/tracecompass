@@ -30,7 +30,6 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
  * the parsing/instantiation of events, and the usual TMF API implementations.
  *
  * @author Alexandre Montplaisir
- * @since 2.0
  */
 public final class CtfTmfEventFactory {
 

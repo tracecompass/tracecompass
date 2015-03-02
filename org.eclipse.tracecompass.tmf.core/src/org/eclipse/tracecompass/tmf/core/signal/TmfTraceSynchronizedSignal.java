@@ -18,7 +18,6 @@ import org.eclipse.tracecompass.tmf.core.synchronization.SynchronizationAlgorith
  * Signal indicating a trace synchronization has been done
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class TmfTraceSynchronizedSignal extends TmfSignal {
 

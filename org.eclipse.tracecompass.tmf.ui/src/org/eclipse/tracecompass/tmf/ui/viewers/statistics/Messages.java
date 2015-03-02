@@ -18,7 +18,6 @@ import org.eclipse.osgi.util.NLS;
  * Messages file for statistics view strings.
  *
  * @author Mathieu Denis
- * @since 2.0
  */
 public class Messages extends NLS {
 

@@ -24,8 +24,6 @@ import org.eclipse.swt.SWT;
 
 /**
  * An entry for use in the time graph views
- *
- * @since 2.1
  */
 public class TimeGraphEntry implements ITimeGraphEntry {
 
@@ -84,7 +82,6 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      * Sets the entry's parent
      *
      * @param entry The new parent entry
-     * @since 3.1
      */
     /*
      * TODO: This method should be added to the interface in the next major API version.
@@ -133,8 +130,6 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      *
      * @param endTime
      *            the end time
-     *
-     * @since 3.0
      */
     public void updateEndTime(long endTime) {
         fEndTime = Math.max(endTime, fEndTime);
@@ -236,7 +231,6 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      *
      * @param child
      *            The child entry
-     * @since 3.1
      */
     public synchronized void addChild(ITimeGraphEntry child) {
         /*
@@ -266,7 +260,6 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      *            Index at which the specified entry is to be inserted
      * @param child
      *            The child entry
-     * @since 3.1
      */
     public synchronized void addChild(int index, ITimeGraphEntry child) {
         /*
@@ -285,7 +278,6 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      *
      * @param comparator
      *            The entry comparator
-     * @since 3.1
      */
     public synchronized void sortChildren(Comparator<ITimeGraphEntry> comparator) {
         fComparator = comparator;

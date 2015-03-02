@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * This location is trace-specific, must be comparable and immutable.
  *
  * @author Francois Chouinard
- * @since 3.0
  */
 public interface ITmfLocation {
 
@@ -37,15 +36,12 @@ public interface ITmfLocation {
      * Returns the concrete trace location information
      *
      * @return the location information
-     * @since 2.0
      */
     Comparable<?> getLocationInfo();
 
     /**
      * Write the location to the ByteBuffer so that it can be saved to disk.
      * @param bufferOut the buffer to write to
-     *
-     * @since 3.0
      */
     void serialize(ByteBuffer bufferOut);
 }

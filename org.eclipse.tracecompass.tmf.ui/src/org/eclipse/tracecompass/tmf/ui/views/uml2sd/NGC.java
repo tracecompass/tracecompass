@@ -146,7 +146,6 @@ public class NGC implements IGC {
      * Returns the current visible y screen bounds.
      *
      * @return the current visible y screen bounds
-     * @since 2.0
      */
     protected int getVisibleY() {
         return fVisibleY;
@@ -157,7 +156,6 @@ public class NGC implements IGC {
      *
      * @param visibleY
      *          the current visible y screen bounds
-     * @since 2.0
      */
     protected void setVisibleY(int visibleY) {
         fVisibleY = visibleY;
@@ -167,8 +165,6 @@ public class NGC implements IGC {
      * Returns the current visible x screen bound.
      *
      * @return the current visible x screen bound.
-     * @since 2.0
-     *
      */
     protected int getfVisibleX() {
         return fVisibleX;
@@ -179,8 +175,6 @@ public class NGC implements IGC {
      *
      * @param visibleX
      *          the current visible x screen bound.
-     * @since 2.0
-     *
      */
     protected void setVisibleX(int visibleX) {
         fVisibleX = visibleX;
@@ -190,7 +184,6 @@ public class NGC implements IGC {
      * Returns current yx value (view visible height - visible screen bounds).
      *
      * @return current yx value
-     * @since 2.0
      */
     protected int getYx() {
         return yx;
@@ -201,7 +194,6 @@ public class NGC implements IGC {
      *
      * @param  yx
      *       current yx value
-     * @since 2.0
      */
     protected void setYx(int yx) {
         this.yx = yx;
@@ -211,7 +203,6 @@ public class NGC implements IGC {
      * Returns the current xx value (view visible width - visible screen bounds)
      *
      * @return the current xx value
-     * @since 2.0
      */
     protected int getXx() {
         return xx;
@@ -222,7 +213,6 @@ public class NGC implements IGC {
      *
      * @param xx
      *      the current xx value
-     * @since 2.0
      */
     protected void setXx(int xx) {
         this.xx = xx;
@@ -928,7 +918,6 @@ public class NGC implements IGC {
      * Returns the graphical context.
      *
      * @return the graphical context
-     * @since 2.0
      */
     protected GC getGc() {
         return fContext;
@@ -938,7 +927,6 @@ public class NGC implements IGC {
      * Returns the SD widget.
      *
      * @return the SD widget
-     * @since 2.0
      */
     protected SDWidget getSDWidget() {
         return fView;
@@ -948,7 +936,6 @@ public class NGC implements IGC {
      * Returns the gradient color.
      *
      * @return the gradient color
-     * @since 2.0
      */
     protected IColor setGradientColor() {
         return fGradientColor;

@@ -92,9 +92,6 @@ public class TmfSyncSequenceDiagramEvent implements ITmfSyncSequenceDiagramEvent
         return fName;
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public ITmfTimestamp getStartTime() {
         return fStartTime;

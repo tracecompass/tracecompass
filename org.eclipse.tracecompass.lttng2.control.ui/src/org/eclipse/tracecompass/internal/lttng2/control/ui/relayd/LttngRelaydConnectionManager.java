@@ -36,7 +36,6 @@ import org.eclipse.ui.PlatformUI;
  * the connection.
  *
  * @author Marc-Andre Laperle
- * @since 3.1
  */
 public final class LttngRelaydConnectionManager {
     private static LttngRelaydConnectionManager fConnectionManager;

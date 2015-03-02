@@ -63,8 +63,6 @@ public class TimeGraphTooltipHandler {
      *            The presentation provider
      * @param timeProv
      *            The time provider
-     *
-     * @since 2.0
      */
     public TimeGraphTooltipHandler(ITimeGraphPresentationProvider graphProv,
             ITimeDataProvider timeProv) {
@@ -78,8 +76,6 @@ public class TimeGraphTooltipHandler {
      *
      * @param timeDataProvider
      *            The time data provider
-     *
-     * @since 3.2
      */
     public void setTimeProvider(ITimeDataProvider timeDataProvider) {
         fTimeDataProvider = timeDataProvider;

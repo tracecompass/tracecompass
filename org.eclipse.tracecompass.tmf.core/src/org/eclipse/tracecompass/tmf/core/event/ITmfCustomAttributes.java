@@ -19,7 +19,6 @@ import java.util.Set;
  * attributes.
  *
  * @author Simon Delisle
- * @since 2.0
  */
 public interface ITmfCustomAttributes {
 

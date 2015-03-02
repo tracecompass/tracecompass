@@ -18,7 +18,6 @@ import org.eclipse.osgi.util.NLS;
  * Externalized message strings from the lttng2.core.control.session
  *
  * @author Guilliano Molaire
- * @since 3.0
  */
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {

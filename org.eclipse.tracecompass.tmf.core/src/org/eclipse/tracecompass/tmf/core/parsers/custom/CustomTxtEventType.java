@@ -16,7 +16,6 @@ package org.eclipse.tracecompass.tmf.core.parsers.custom;
  * Event type for custom text traces.
  *
  * @author Patrick Tassé
- * @since 3.0
  */
 public class CustomTxtEventType extends CustomEventType {
 

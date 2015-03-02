@@ -28,7 +28,6 @@ import org.eclipse.tracecompass.tmf.core.trace.indexer.checkpoint.ITmfCheckpoint
  * <p>Note: This index alone will not work for
  * traces that have events with time stamps that are out of order.</p>
  *
- * @since 3.0
  * @author Marc-Andre Laperle
  */
 public class TmfFlatArrayTraceIndex implements ITmfCheckpointIndex {

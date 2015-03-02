@@ -133,7 +133,6 @@ public class HistogramDataModel implements IHistogramDataModel {
      *
      * @param startTime
      *            The histogram start time
-     * @since 2.0
      */
     public HistogramDataModel(long startTime) {
         this(startTime, DEFAULT_NUMBER_OF_BUCKETS);
@@ -156,7 +155,6 @@ public class HistogramDataModel implements IHistogramDataModel {
      *            the histogram start time
      * @param nbBuckets
      *            A number of buckets.
-     * @since 2.0
      */
     public HistogramDataModel(long startTime, int nbBuckets) {
         fFirstBucketTime = fFirstEventTime = fEndTime = startTime;
@@ -199,7 +197,6 @@ public class HistogramDataModel implements IHistogramDataModel {
 
     /**
      * Disposes the data model
-     * @since 3.0
      */
     public void dispose() {
         fTraceMap.clear();
@@ -258,7 +255,6 @@ public class HistogramDataModel implements IHistogramDataModel {
     /**
      * Sets the trace of this model.
      * @param trace - a {@link ITmfTrace}
-     * @since 3.0
      */
     public void setTrace(ITmfTrace trace) {
         this.fTrace = trace;
@@ -273,7 +269,6 @@ public class HistogramDataModel implements IHistogramDataModel {
     /**
      * Gets the trace of this model.
      * @return a {@link ITmfTrace}
-     * @since 3.0
      */
     public ITmfTrace getTrace() {
         return this.fTrace;
@@ -282,7 +277,6 @@ public class HistogramDataModel implements IHistogramDataModel {
     /**
      * Gets the traces names of this model.
      * @return an array of trace names
-     * @since 3.0
      */
     public String[] getTraceNames() {
         FluentIterable<ITmfTrace> traces = FluentIterable.from(TmfTraceManager.getTraceSet(fTrace));
@@ -298,7 +292,6 @@ public class HistogramDataModel implements IHistogramDataModel {
     /**
      * Gets the number of traces of this model.
      * @return the number of traces of this model.
-     * @since 3.0
      */
     public int getNbTraces() {
         Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(fTrace);
@@ -315,7 +308,6 @@ public class HistogramDataModel implements IHistogramDataModel {
      *            the histogram range start time
      * @param endTime
      *            the histogram range end time
-     * @since 2.0
      */
     public void setTimeRange(long startTime, long endTime) {
         fFirstBucketTime = fFirstEventTime = fEndTime = startTime;
@@ -332,7 +324,6 @@ public class HistogramDataModel implements IHistogramDataModel {
      *
      * @param endTime
      *            the time of the last used bucket
-     * @since 2.2
      */
     public void setEndTime(long endTime) {
         fEndTime = endTime;
@@ -352,7 +343,6 @@ public class HistogramDataModel implements IHistogramDataModel {
      * Returns the begin time of the current selection in the model.
      *
      * @return the begin time of the current selection.
-     * @since 2.1
      */
     public long getSelectionBegin() {
         return fSelectionBegin;
@@ -362,7 +352,6 @@ public class HistogramDataModel implements IHistogramDataModel {
      * Returns the end time of the current selection in the model.
      *
      * @return the end time of the current selection.
-     * @since 2.1
      */
     public long getSelectionEnd() {
         return fSelectionEnd;
@@ -453,7 +442,6 @@ public class HistogramDataModel implements IHistogramDataModel {
      *            The selection begin time.
      * @param endTime
      *            The selection end time.
-     * @since 2.1
      */
     public void setSelection(long beginTime, long endTime) {
         fSelectionBegin = beginTime;
@@ -467,7 +455,6 @@ public class HistogramDataModel implements IHistogramDataModel {
      *            The selection begin time.
      * @param endTime
      *            The selection end time.
-     * @since 2.1
      */
     public void setSelectionNotifyListeners(long beginTime, long endTime) {
         fSelectionBegin = beginTime;
@@ -484,7 +471,6 @@ public class HistogramDataModel implements IHistogramDataModel {
      *            The timestamp of the event to count
      * @param trace
      *            The event trace
-     * @since 3.0
      */
     @Override
     public synchronized void countEvent(long eventCount, long timestamp, ITmfTrace trace) {
@@ -564,7 +550,6 @@ public class HistogramDataModel implements IHistogramDataModel {
      *            the number of lost events
      * @param fullRange
      *            Full range or time range for histogram request
-     * @since 2.2
      */
     public void countLostEvent(TmfTimeRange timeRange, long nbLostEvents, boolean fullRange) {
 

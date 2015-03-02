@@ -22,7 +22,6 @@ import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
  * variant or sequence fields. This will accelerate reading of the trace.
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public final class StructDeclarationFlattener {
 

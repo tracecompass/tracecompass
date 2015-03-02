@@ -25,7 +25,6 @@ import org.eclipse.jdt.annotation.NonNull;
  * seconds.
  *
  * @author Francois Chouinard
- * @since 2.0
  */
 public class TmfTimestamp implements ITmfTimestamp {
 
@@ -120,7 +119,6 @@ public class TmfTimestamp implements ITmfTimestamp {
      *            The timestamp to copy
      * @param newvalue
      *            The value the new timestamp will have
-     * @since 3.0
      */
     public TmfTimestamp(ITmfTimestamp timestamp, long newvalue) {
         if (timestamp == null) {
@@ -139,8 +137,6 @@ public class TmfTimestamp implements ITmfTimestamp {
      *
      * @param bufferIn
      *            the buffer to read from
-     *
-     * @since 3.0
      */
     public TmfTimestamp(ByteBuffer bufferIn) {
         this(bufferIn.getLong(), bufferIn.getInt());
@@ -314,9 +310,6 @@ public class TmfTimestamp implements ITmfTimestamp {
         return toString(TmfTimestampFormat.getDefaulTimeFormat());
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public String toString(final TmfTimestampFormat format) {
         try {
@@ -331,8 +324,6 @@ public class TmfTimestamp implements ITmfTimestamp {
     /**
      * Write the time stamp to the ByteBuffer so that it can be saved to disk.
      * @param bufferOut the buffer to write to
-     *
-     * @since 3.0
      */
     public void serialize(ByteBuffer bufferOut) {
         bufferOut.putLong(fValue);

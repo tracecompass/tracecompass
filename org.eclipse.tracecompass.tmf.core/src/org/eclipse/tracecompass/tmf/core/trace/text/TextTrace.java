@@ -50,8 +50,6 @@ import org.eclipse.tracecompass.tmf.core.trace.location.TmfLongLocation;
  *
  * @param <T>
  *            TmfEvent class returned by this trace
- *
- * @since 3.0
  */
 public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace implements ITmfPersistentlyIndexable {
 
@@ -337,7 +335,6 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
      * the first 100 to compute the confidence level
      *
      * @return collection of patterns to validate against
-     * @since 3.2
      */
     protected List<Pattern> getValidationPatterns() {
         return Collections.singletonList(getFirstLinePattern());

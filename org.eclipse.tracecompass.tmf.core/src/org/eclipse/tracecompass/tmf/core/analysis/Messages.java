@@ -17,7 +17,6 @@ import org.eclipse.osgi.util.NLS;
  * Message bundle for org.eclipse.linuxtools.tmf.core.analysis
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.tmf.core.analysis.messages"; //$NON-NLS-1$

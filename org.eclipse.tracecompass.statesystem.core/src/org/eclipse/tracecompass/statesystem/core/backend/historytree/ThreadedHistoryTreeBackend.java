@@ -34,7 +34,6 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
  * in a separate thread.
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  */
 public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
         implements Runnable {

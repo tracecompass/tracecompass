@@ -21,9 +21,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * Receivers can safely perform event requests for the specified time range.
  * The signal acts as a trigger for coalescing such requests.
  *
- * @version 1.0
  * @author Patrick Tasse
- * @since 2.0
  */
 public class TmfTraceRangeUpdatedSignal extends TmfSignal {
 

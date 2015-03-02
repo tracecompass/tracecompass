@@ -80,7 +80,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeForma
 /**
  * Time graph control implementation
  *
- * @version 1.0
  * @author Alvaro Sanchez-Leon
  * @author Patrick Tasse
  */
@@ -89,8 +88,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         MouseWheelListener, MouseTrackListener, TraverseListener, ISelectionProvider,
         MenuDetectListener, ITmfTimeGraphDrawingHelper, ITimeGraphColorListener, Listener {
 
-    /** Constant indicating that all levels of the time graph should be expanded
-     * @since 3.1 */
+    /** Constant indicating that all levels of the time graph should be expanded */
     public static final int ALL_LEVELS = AbstractTreeViewer.ALL_LEVELS;
 
     private static final int DRAG_NONE = 0;
@@ -205,7 +203,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * Gets the timegraph provider used by this timegraph viewer.
      *
      * @return the timegraph provider, or <code>null</code> if not set.
-     * @since 3.0
      */
     public ITimeGraphPresentationProvider getTimeGraphProvider() {
         return fTimeGraphProvider;
@@ -215,7 +212,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * Gets the color map used by this timegraph viewer.
      *
      * @return a color map, or <code>null</code> if not set.
-     * @since 3.0
      */
     public Color[] getEventColorMap() {
         return fEventColorMap;
@@ -237,7 +233,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *
      * @param statusLineManager
      *            The status line manager, or null to disable status line messages
-     * @since 2.1
      */
     public void setStatusLineManager(IStatusLineManager statusLineManager) {
         if (fStatusLineManager != null && statusLineManager == null) {
@@ -251,7 +246,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *
      * @param timeGraphScale
      *            The time graph scale
-     * @since 2.1
      */
     public void setTimeGraphScale(TimeGraphScale timeGraphScale) {
         fTimeGraphScale = timeGraphScale;
@@ -316,7 +310,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *
      * @param listener
      *            The listener to add
-     * @since 3.1
      */
     public void addDragSelectionListener(ITimeGraphTimeListener listener) {
         if (listener == null) {
@@ -333,7 +326,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *
      * @param listener
      *            The listener to remove
-     * @since 3.1
      */
     public void removeDragSelectionListener(ITimeGraphTimeListener listener) {
         if (null != fDragSelectionListeners) {
@@ -348,7 +340,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *            Time interval start
      * @param end
      *            Time interval end
-     * @since 3.1
      */
     public void fireDragSelectionChanged(long start, long end) {
         // check for backward intervals
@@ -411,7 +402,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * Refresh the links (arrows) of this widget
      *
      * @param events The link events to refresh
-     * @since 2.1
      */
     public void refreshArrows(List<ILinkEvent> events) {
         fItemData.refreshArrows(events);
@@ -475,7 +465,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @param level
      *            non-negative level, or <code>ALL_LEVELS</code> to expand all
      *            levels of the tree
-     * @since 3.1
      */
     public void setAutoExpandLevel(int level) {
         fAutoExpandLevel = level;
@@ -487,7 +476,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @return non-negative level, or <code>ALL_LEVELS</code> if all levels of
      *         the tree are expanded automatically
      * @see #setAutoExpandLevel
-     * @since 3.1
      */
     public int getAutoExpandLevel() {
         return fAutoExpandLevel;
@@ -512,8 +500,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     /**
      * Collapses all nodes of the viewer's tree, starting with the root.
-     *
-     * @since 2.0
      */
     public void collapseAll() {
         for (Item item : fItemData.fItems) {
@@ -525,8 +511,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     /**
      * Expands all nodes of the viewer's tree, starting with the root.
-     *
-     * @since 2.0
      */
     public void expandAll() {
         for (Item item : fItemData.fItems) {
@@ -581,9 +565,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     /**
      * Add a menu listener on {@link ITimeGraphEntry}s
+     *
      * @param listener
      *            The listener to add
-     * @since 1.2
      */
     public void addTimeGraphEntryMenuListener(MenuDetectListener listener) {
         if (!fTimeGraphEntryMenuListeners.contains(listener)) {
@@ -596,7 +580,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *
      * @param listener
      *            The listener to remove
-     * @since 1.2
      */
     public void removeTimeGraphEntryMenuListener(MenuDetectListener listener) {
         if (fTimeGraphEntryMenuListeners.contains(listener)) {
@@ -621,7 +604,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *
      * @param listener
      *            The listener to add
-     * @since 1.2
      */
     public void addTimeEventMenuListener(MenuDetectListener listener) {
         if (!fTimeEventMenuListeners.contains(listener)) {
@@ -634,7 +616,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *
      * @param listener
      *            The listener to remove
-     * @since 1.2
      */
     public void removeTimeEventMenuListener(MenuDetectListener listener) {
         if (fTimeEventMenuListeners.contains(listener)) {
@@ -815,8 +796,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *
      * @param left
      *            true to scroll left, false to scroll right
-     *
-     * @since 3.2
      */
     public void horizontalScroll(boolean left) {
         long time0 = fTimeProvider.getTime0();
@@ -928,8 +907,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * Hide arrows
      *
      * @param hideArrows true to hide arrows
-     *
-     * @since 2.1
      */
     public void hideArrows(boolean hideArrows) {
         fHideArrows = hideArrows;
@@ -937,8 +914,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     /**
      * Follow the arrow forward
-     *
-     * @since 2.1
      */
     public void followArrowFwd() {
         ITimeGraphEntry trace = getSelectedTrace();
@@ -963,8 +938,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     /**
      * Follow the arrow backward
-     *
-     * @since 2.1
      */
     public void followArrowBwd() {
         ITimeGraphEntry trace = getSelectedTrace();
@@ -1039,7 +1012,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @param y
      *            the y coordinate
      * @return the index of the item at the given location, of -1 if none.
-     * @since 3.0
      */
     protected int getItemIndexAtY(int y) {
         if (y < 0) {
@@ -1070,7 +1042,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *            a point in the widget
      * @return the {@link ITimeGraphEntry} at this point, or <code>null</code>
      *         if none.
-     * @since 3.0
      */
     protected ITimeGraphEntry getEntry(Point pt) {
         int idx = getItemIndexAtY(pt.y);
@@ -1084,7 +1055,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @param pt
      *            a point in the widget
      * @return The closest arrow event, or null if there is none close enough.
-     * @since 3.2
      */
     protected ILinkEvent getArrow(Point pt) {
         if (fHideArrows) {
@@ -1112,9 +1082,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
         return null;
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public int getXForTime(long time) {
         if (null == fTimeProvider) {
@@ -1129,9 +1096,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
         return x;
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public long getTimeAtX(int coord) {
         if (null == fTimeProvider) {
@@ -1489,7 +1453,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *            The width reserved for the names
      * @param gc
      *            Reference to the SWT GC object
-     * @since 2.1
      */
     public void drawLinks(Rectangle bounds, ITimeDataProvider timeProvider,
             List<ILinkEvent> links, int nameSpace, GC gc) {
@@ -1516,7 +1479,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *            the name space
      * @param gc
      *            Graphics context
-     * @since 2.1
      */
     protected void drawLink(ILinkEvent event, Rectangle bounds, ITimeDataProvider timeProvider, int nameSpace, GC gc) {
         drawArrow(getColorScheme(), event, getArrowRectangle(bounds, event), gc);
@@ -1559,7 +1521,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @param gc
      *            Graphics context
      * @return true if the state was drawn
-     * @since 2.1
      */
     protected boolean drawArrow(TimeGraphColorScheme colors, ITimeEvent event,
             Rectangle rect, GC gc) {
@@ -1737,7 +1698,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @param timeSelected
      *            Is the timestamp currently selected
      * @return true if the state was drawn
-     * @since 2.0
      */
     protected boolean drawState(TimeGraphColorScheme colors, ITimeEvent event,
             Rectangle rect, GC gc, boolean selected, boolean timeSelected) {
@@ -2373,8 +2333,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @param rowHeight
      *            The height
      * @return true if the height is successfully stored, false otherwise
-     *
-     * @since 2.1
      */
     public boolean setItemHeight(ITimeGraphEntry entry, int rowHeight) {
         Item item = fItemData.findItem(entry);
@@ -2403,8 +2361,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     /**
      * @return The entries that are currently filtered out
-     *
-     * @since 2.0
      */
     public List<ITimeGraphEntry> getFilteredOut() {
         return fItemData.getFilteredOut();
@@ -2439,7 +2395,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     /**
      * @param filter The filter object to be attached to the view
-     * @since 2.0
      */
     public void addFilter(ViewerFilter filter) {
         if (!fFilters.contains(filter)) {
@@ -2449,15 +2404,11 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     /**
      * @param filter The filter object to be attached to the view
-     * @since 2.0
      */
     public void removeFilter(ViewerFilter filter) {
         fFilters.remove(filter);
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public void colorSettingsChanged(StateItem[] stateItems) {
         /* Destroy previous colors from the resource manager */
@@ -2638,9 +2589,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
     }
 
-    /**
-     * @since 1.2
-     */
     @Override
     public void menuDetected(MenuDetectEvent e) {
         if (null == fTimeProvider) {

@@ -17,7 +17,6 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  * Interface for deciding whether an event can be collapsed with another event.
  *
  * @author Bernd Hufmann
- * @since 3.2
  */
 public interface ITmfCollapsibleEvent {
 

@@ -22,7 +22,6 @@ import java.nio.ByteOrder;
  * Get response of viewer stream
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public class StreamResponse implements IRelayResponse {
 

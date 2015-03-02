@@ -23,7 +23,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * Trace event for custom XML traces.
  *
  * @author Patrick Tassé
- * @since 3.0
  */
 public class CustomXmlEvent extends CustomEvent {
 

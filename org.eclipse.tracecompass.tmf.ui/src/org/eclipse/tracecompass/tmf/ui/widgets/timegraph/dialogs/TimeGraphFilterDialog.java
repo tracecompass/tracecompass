@@ -59,8 +59,6 @@ import org.eclipse.ui.dialogs.SelectionStatusDialog;
  * CheckedTreeSelectionDialog It was necessary to develop this similar dialog to
  * allow multiple columns
  *
- * @version 1.0
- * @since 2.0
  * @author François Rajotte
  */
 public class TimeGraphFilterDialog extends SelectionStatusDialog {

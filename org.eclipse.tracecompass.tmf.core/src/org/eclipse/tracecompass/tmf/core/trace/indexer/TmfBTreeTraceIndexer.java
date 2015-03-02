@@ -19,7 +19,6 @@ import org.eclipse.tracecompass.tmf.core.trace.indexer.checkpoint.TmfCheckpointI
 /**
  * An indexer that uses a Btree index to store checkpoints
  *
- * @since 3.0
  * @author Marc-Andre Laperle
  */
 public class TmfBTreeTraceIndexer extends TmfCheckpointIndexer {

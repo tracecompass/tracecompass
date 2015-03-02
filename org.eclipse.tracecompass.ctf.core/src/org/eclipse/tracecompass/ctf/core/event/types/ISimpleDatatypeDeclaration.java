@@ -16,7 +16,6 @@ package org.eclipse.tracecompass.ctf.core.event.types;
  * Common interface for simple CTF data types (which do not contain sub-fields).
  *
  * @author Matthew Khouzam
- * @since 3.1
  */
 public interface ISimpleDatatypeDeclaration {
 

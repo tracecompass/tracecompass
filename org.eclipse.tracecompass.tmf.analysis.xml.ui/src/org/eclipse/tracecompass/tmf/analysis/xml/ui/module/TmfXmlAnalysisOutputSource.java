@@ -50,7 +50,6 @@ public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener
 
     /**
      * Enum to match the name of a view's XML element to its view ID.
-     * @since 1.2
      */
     public static enum ViewType {
         /**

@@ -106,7 +106,6 @@ public final class Utils {
      * @return the UUID
      * @throws CTFReaderException
      *             if the definition contains less than 16 elements
-     * @since 3.1
      */
     public static UUID getUUIDfromDefinition(AbstractArrayDefinition uuidDef) throws CTFReaderException {
         byte[] uuidArray = new byte[UUID_LEN];

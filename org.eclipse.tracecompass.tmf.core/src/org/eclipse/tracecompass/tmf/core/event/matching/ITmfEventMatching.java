@@ -17,7 +17,6 @@ package org.eclipse.tracecompass.tmf.core.event.matching;
  * Interface for matching trace events
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public interface ITmfEventMatching {
 

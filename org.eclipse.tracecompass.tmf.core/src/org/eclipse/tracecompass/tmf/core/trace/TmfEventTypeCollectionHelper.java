@@ -23,7 +23,6 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
  * TODO Remove once Java 8 is used (replace with Streams)
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public final class TmfEventTypeCollectionHelper {
 

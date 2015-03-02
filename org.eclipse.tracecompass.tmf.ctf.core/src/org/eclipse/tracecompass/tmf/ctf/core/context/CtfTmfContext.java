@@ -24,8 +24,6 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
  * a boxed Long, a long and an int.
  *
  * @author Matthew Khouzam
- * @version 1.0
- * @since 2.0
  */
 public class CtfTmfContext implements ITmfContext {
 
@@ -47,7 +45,6 @@ public class CtfTmfContext implements ITmfContext {
      *
      * @param ctfTmfTrace
      *            the parent trace
-     * @since 1.1
      */
     public CtfTmfContext(CtfTmfTrace ctfTmfTrace) {
         fTrace = ctfTmfTrace;
@@ -63,9 +60,6 @@ public class CtfTmfContext implements ITmfContext {
         return fCurRank;
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public synchronized ITmfLocation getLocation() {
         return fCurLocation;
@@ -76,9 +70,6 @@ public class CtfTmfContext implements ITmfContext {
         return fCurRank != CtfLocation.INVALID_LOCATION.getTimestamp();
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public synchronized void setLocation(ITmfLocation location) {
         fCurLocation = (CtfLocation) location;
@@ -170,7 +161,6 @@ public class CtfTmfContext implements ITmfContext {
      *              unique location to find the event.
      *
      * @return success or not
-     * @since 2.0
      */
     public synchronized boolean seek(final CtfLocationInfo location) {
         fCurLocation = new CtfLocation(location);

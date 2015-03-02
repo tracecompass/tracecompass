@@ -39,7 +39,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.tabsview.TmfViewerFolder;
  * TreeViewer. - The controller that keeps model and view synchronized is an
  * observer of the model.
  *
- * @version 2.0
  * @author Mathieu Denis
  */
 public class TmfStatisticsView extends TmfView {
@@ -56,8 +55,6 @@ public class TmfStatisticsView extends TmfView {
 
     /**
      * The viewer that builds the columns to show the statistics.
-     *
-     * @since 2.0
      */
     protected final TmfViewerFolder fStatsViewers;
 
@@ -110,7 +107,6 @@ public class TmfStatisticsView extends TmfView {
      *
      * @param signal
      *            Contains the information about the selection.
-     * @since 2.0
      */
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
@@ -132,7 +128,6 @@ public class TmfStatisticsView extends TmfView {
      *
      * @param signal
      *            Contains the information about the selection.
-     * @since 2.0
      */
     @TmfSignalHandler
     public void traceSelected(TmfTraceSelectedSignal signal) {
@@ -171,7 +166,6 @@ public class TmfStatisticsView extends TmfView {
 
     /**
      * @param signal the incoming signal
-     * @since 2.0
      */
     @TmfSignalHandler
     public void traceClosed(TmfTraceClosedSignal signal) {
@@ -203,8 +197,6 @@ public class TmfStatisticsView extends TmfView {
      * created, since the global viewer already contains all the basic
      * statistics. If there is no trace selected, a global statistics viewer will
      * still be created.
-     *
-     * @since 2.0
      */
     protected void createStatisticsViewers() {
         // Default style for the tabs that will be created

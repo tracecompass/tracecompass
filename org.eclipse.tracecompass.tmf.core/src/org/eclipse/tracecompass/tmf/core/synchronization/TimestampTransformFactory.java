@@ -35,7 +35,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
  * A factory to generate timestamp tranforms
  *
  * @author Matthew Khouzam
- * @since 3.1
  */
 @NonNullByDefault
 public final class TimestampTransformFactory {
@@ -164,7 +163,6 @@ public final class TimestampTransformFactory {
      * @param resource
      *            the trace resource
      * @return the timestamp transform
-     * @since 3.2
      */
     public static ITmfTimestampTransform getTimestampTransform(@Nullable IResource resource) {
         File syncFile = getSyncFormulaFile(resource);
@@ -187,7 +185,6 @@ public final class TimestampTransformFactory {
      * @param tt
      *            The timestamp transform for all timestamps of this trace, or
      *            null to clear it
-     * @since 3.2
      */
     public static void setTimestampTransform(@Nullable IResource resource, @Nullable ITmfTimestampTransform tt) {
         /* Save the timestamp transform to a file */

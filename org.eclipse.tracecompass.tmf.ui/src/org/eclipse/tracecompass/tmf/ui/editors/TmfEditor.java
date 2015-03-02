@@ -21,7 +21,6 @@ import org.eclipse.ui.part.EditorPart;
 /**
  * The main editor abstract class for use in TMF.
  *
- * @version 1.0
  * @author Patrick Tasse
  */
 public abstract class TmfEditor extends EditorPart implements ITmfComponent {
@@ -61,9 +60,6 @@ public abstract class TmfEditor extends EditorPart implements ITmfComponent {
         TmfSignalManager.dispatchSignal(signal);
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public void broadcastAsync(TmfSignal signal) {
         TmfSignalManager.dispatchSignalAsync(signal);

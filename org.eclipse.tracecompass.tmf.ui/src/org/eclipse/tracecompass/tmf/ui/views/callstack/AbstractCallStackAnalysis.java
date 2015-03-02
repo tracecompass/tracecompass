@@ -21,7 +21,6 @@ import org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput;
  * The base classes for analyses who want to populate the CallStack View.
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  */
 public abstract class AbstractCallStackAnalysis extends TmfStateSystemAnalysisModule {
 
@@ -46,7 +45,6 @@ public abstract class AbstractCallStackAnalysis extends TmfStateSystemAnalysisMo
      * {@link CallStackStateProvider}.
      *
      * @return the absolute pattern of the thread attributes
-     * @since 3.1
      */
     public String[] getThreadsPattern() {
         return DEFAULT_THREADS_PATTERN;
@@ -59,7 +57,6 @@ public abstract class AbstractCallStackAnalysis extends TmfStateSystemAnalysisMo
      * {@link CallStackStateProvider}.
      *
      * @return the relative path of the call stack attribute
-     * @since 3.1
      */
     public String[] getCallStackPath() {
         return DEFAULT_CALL_STACK_PATH;

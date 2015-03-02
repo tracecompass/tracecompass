@@ -21,7 +21,6 @@ import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfBaseColumnDat
  * Class that format data for cells in the statistics view.
  *
  * @author Vincent Perot
- * @since 3.0
  */
 public final class TmfStatisticsFormatter {
 

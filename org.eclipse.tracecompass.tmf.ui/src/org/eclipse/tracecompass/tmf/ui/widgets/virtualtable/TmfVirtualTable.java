@@ -635,8 +635,6 @@ public class TmfVirtualTable extends Composite {
      * @see SWT#LEFT
      * @see SWT#RIGHT
      * @see SWT#CENTER
-     *
-     * @since 3.1
      */
     public TableColumn newTableColumn(int style) {
         TableColumn column = new TableColumn(fTable, style);
@@ -1103,7 +1101,6 @@ public class TmfVirtualTable extends Composite {
      * recently selected. The array is empty if no items are selected.
      * <p>
      * @return the array of indices of the selected items
-     * @since 2.1
      */
     public int[] getSelectionIndices() {
         if (fSelectedEventRank < 0 || fSelectedBeginRank < 0) {

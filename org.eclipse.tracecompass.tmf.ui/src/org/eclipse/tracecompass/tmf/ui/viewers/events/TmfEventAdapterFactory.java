@@ -16,8 +16,6 @@ import org.eclipse.ui.views.properties.IPropertySource;
 
 /**
  * Implements basic UI support for TMF events.
- *
- * @since 2.0
  */
 public class TmfEventAdapterFactory implements IAdapterFactory {
 

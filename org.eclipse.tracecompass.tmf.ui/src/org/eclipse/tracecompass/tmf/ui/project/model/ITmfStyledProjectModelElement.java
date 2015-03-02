@@ -19,7 +19,6 @@ import org.eclipse.jface.viewers.StyledString.Styler;
  * This interface can be implemented by elements to a style to their text.
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public interface ITmfStyledProjectModelElement {
 

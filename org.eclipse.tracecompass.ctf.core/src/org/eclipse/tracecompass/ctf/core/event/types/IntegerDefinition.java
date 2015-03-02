@@ -54,7 +54,6 @@ public final class IntegerDefinition extends SimpleDatatypeDefinition {
      *            the field name
      * @param value
      *            integer value
-     * @since 3.0
      */
     public IntegerDefinition(@NonNull IntegerDeclaration declaration,
             IDefinitionScope definitionScope, @NonNull String fieldName, long value) {
@@ -113,7 +112,6 @@ public final class IntegerDefinition extends SimpleDatatypeDefinition {
      * @param signed
      *            Is the value signed or not
      * @return formatted number string
-     * @since 3.0
      */
     public static String formatNumber(long value, int base, boolean signed) {
         String s;

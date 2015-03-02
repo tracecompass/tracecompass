@@ -154,7 +154,6 @@ public class TmfSignalManager {
      *
      * @param signal
      *            the signal to dispatch
-     * @since 3.0
      */
     public static void dispatchSignalAsync(final TmfSignal signal) {
         if (!fExecutor.isShutdown()) {
@@ -169,7 +168,6 @@ public class TmfSignalManager {
 
     /**
      * Disposes the signal manager
-     * @since 3.0
      */
     public static void dispose() {
         fExecutor.shutdown();

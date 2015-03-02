@@ -22,8 +22,6 @@ import org.eclipse.tracecompass.tmf.core.component.ITmfComponent;
  * viewer's contents.
  *
  * @author Mathieu Denis
- * @version 2.0
- * @since 2.0
  */
 public interface ITmfViewer extends ITmfComponent {
 

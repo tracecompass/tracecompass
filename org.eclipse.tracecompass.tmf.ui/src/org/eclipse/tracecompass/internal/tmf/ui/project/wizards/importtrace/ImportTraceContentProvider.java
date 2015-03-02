@@ -32,7 +32,6 @@ import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
  * }+
  *
  * @author Matthew Khouzam
- * @since 2.0
  */
 class ImportTraceContentProvider implements ITreeContentProvider {
 

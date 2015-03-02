@@ -44,7 +44,6 @@ import org.eclipse.ui.dialogs.SelectionStatusDialog;
 
 /**
  * Implementation of new folder dialog that creates the folder element.
- * @since 3.0
  */
 public class NewFolderDialog extends SelectionStatusDialog {
 

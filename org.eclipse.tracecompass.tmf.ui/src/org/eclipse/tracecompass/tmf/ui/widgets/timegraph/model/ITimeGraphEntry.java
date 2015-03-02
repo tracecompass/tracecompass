@@ -19,7 +19,6 @@ import java.util.List;
 /**
  * Interface for an entry (row) in the time graph view
  *
- * @version 1.0
  * @author Alvaro Sanchez-Leon
  * @author Patrick Tasse
  */
@@ -44,7 +43,6 @@ public interface ITimeGraphEntry {
      * Returns the child elements of this entry.
      *
      * @return an array of child elements
-     * @since 2.0
      */
     List<? extends ITimeGraphEntry> getChildren();
 

@@ -28,7 +28,6 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
  * requests.
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  */
 public class NullBackend implements IStateHistoryBackend {
 

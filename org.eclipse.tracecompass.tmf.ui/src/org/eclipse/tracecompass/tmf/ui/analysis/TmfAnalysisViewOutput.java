@@ -39,7 +39,6 @@ import org.eclipse.ui.views.IViewDescriptor;
  * display which output.
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class TmfAnalysisViewOutput implements IAnalysisOutput, IExecutableExtension {
 

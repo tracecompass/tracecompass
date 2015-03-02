@@ -133,8 +133,6 @@ public class CTFTraceReader implements AutoCloseable {
 
     /**
      * Dispose the CTFTraceReader
-     *
-     * @since 3.0
      */
     @Override
     public void close() {
@@ -179,7 +177,6 @@ public class CTFTraceReader implements AutoCloseable {
      * Get the priority queue of this trace reader.
      *
      * @return The priority queue of input readers
-     * @since 2.0
      */
     protected PriorityQueue<CTFStreamInputReader> getPrio() {
         return fPrio;
@@ -225,8 +222,6 @@ public class CTFTraceReader implements AutoCloseable {
      *
      * @throws CTFReaderException
      *             An error occured
-     *
-     * @since 3.0
      */
     public void update() throws CTFReaderException {
         Set<CTFStreamInputReader> readers = new HashSet<>();
@@ -263,7 +258,6 @@ public class CTFTraceReader implements AutoCloseable {
      * Gets an iterable of the stream input readers, useful for foreaches
      *
      * @return the iterable of the stream input readers
-     * @since 3.0
      */
     public Iterable<IEventDeclaration> getEventDeclarations() {
         ImmutableSet.Builder<IEventDeclaration> builder = new Builder<>();
@@ -434,7 +428,6 @@ public class CTFTraceReader implements AutoCloseable {
      * Gets the stream with the oldest event
      *
      * @return the stream with the oldest event
-     * @since 3.0
      */
     public CTFStreamInputReader getTopStream() {
         return fPrio.peek();
@@ -509,7 +502,6 @@ public class CTFTraceReader implements AutoCloseable {
      *
      * @param live
      *            whether the trace is live
-     * @since 3.0
      */
     public void setLive(boolean live) {
         for (CTFStreamInputReader s : fPrio) {
@@ -521,8 +513,6 @@ public class CTFTraceReader implements AutoCloseable {
      * Get if the trace is to read live or not
      *
      * @return whether the trace is live or not
-     * @since 3.0
-     *
      */
     public boolean isLive() {
         return getTopStream().isLive();

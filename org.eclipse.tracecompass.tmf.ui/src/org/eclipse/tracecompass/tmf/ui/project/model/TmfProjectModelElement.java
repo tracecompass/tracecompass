@@ -113,9 +113,6 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
         return fLocation;
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public TmfProjectElement getProject() {
         return fParent.getProject();
@@ -247,7 +244,6 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
      * @param createFolder
      *            if true, the returned folder will be created
      * @return the trace specific supplementary folder
-     * @since 3.0
      */
     public IFolder prepareTraceSupplementaryFolder(String supplFolderPath, boolean createFolder) {
         IFolder folder = getTraceSupplementaryFolder(supplFolderPath);

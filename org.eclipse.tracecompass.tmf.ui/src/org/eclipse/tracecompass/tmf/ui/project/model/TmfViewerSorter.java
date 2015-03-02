@@ -16,8 +16,6 @@ import org.eclipse.jface.viewers.ViewerSorter;
 
 /**
  * Viewer sorter for TMF project model elements
- *
- * @since 3.0
  */
 public class TmfViewerSorter extends ViewerSorter {
 

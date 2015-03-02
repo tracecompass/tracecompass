@@ -22,7 +22,6 @@ import java.util.Map;
  * other things.
  *
  * @author Alexandre Montplaisir
- * @since 2.0
  */
 public interface ITmfTraceProperties {
 

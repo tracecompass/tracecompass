@@ -52,7 +52,6 @@ import org.xml.sax.SAXException;
  * in the imported XML files
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class XmlAnalysisModuleSource implements IAnalysisModuleSource {
 

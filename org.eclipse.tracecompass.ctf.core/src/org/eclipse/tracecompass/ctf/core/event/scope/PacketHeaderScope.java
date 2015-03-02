@@ -19,7 +19,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  * id ) of a lexical scope the sole reason to have this is to accelerate tostring()
  *
  * @author Matthew Khouzam
- * @since 3.1
  */
 @NonNullByDefault
 public class PacketHeaderScope extends LexicalScope {

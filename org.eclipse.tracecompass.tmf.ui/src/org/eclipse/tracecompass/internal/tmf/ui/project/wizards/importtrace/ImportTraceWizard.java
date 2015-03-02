@@ -23,9 +23,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 /**
  * The import trace wizard implementation.
  * <p>
- * @version 1.0
  * @author Francois Chouinard
- * @since 2.0
  */
 public class ImportTraceWizard extends Wizard implements IImportWizard {
 

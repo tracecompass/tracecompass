@@ -26,7 +26,6 @@ import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
  * instantiate new ones.
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  */
 @NonNullByDefault
 public final class StateSystemFactory {

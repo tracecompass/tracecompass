@@ -22,7 +22,6 @@ import java.nio.ByteOrder;
  * Get viewer session response to command
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public class SessionResponse implements IRelayResponse {
 

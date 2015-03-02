@@ -21,7 +21,6 @@ package org.eclipse.tracecompass.tmf.core.exceptions;
  * not match, this exception is thrown.
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class TmfAnalysisException extends Exception {
 

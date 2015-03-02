@@ -33,7 +33,6 @@ import org.swtchart.ISeriesSet;
  * notified by any changes caused by selection and zoom.
  *
  * @author Bernd Hufmann
- * @since 3.0
  */
 public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChartTimeProvider {
 

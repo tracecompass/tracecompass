@@ -36,7 +36,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 /**
  * General utilities and definitions used by the time graph widget
  *
- * @version 1.0
  * @author Alvaro Sanchez-Leon
  * @author Patrick Tasse
  */
@@ -52,19 +51,16 @@ public class Utils {
 
         /**
          * Absolute timestamp (ie, relative to the Unix epoch)
-         * @since 2.0
          */
         CALENDAR,
 
         /**
          * Timestamp displayed as a simple number
-         * @since 2.0
          */
         NUMBER,
 
         /**
          * Timestamp displayed as cycles
-         * @since 3.2
          */
         CYCLES
     }
@@ -96,8 +92,6 @@ public class Utils {
 
     /**
      * Update the time and date formats to use the current time zone
-     *
-     * @since 2.1
      */
     public static void updateTimeZone() {
         TimeZone timeZone = TmfTimePreferences.getTimeZone();
@@ -310,8 +304,6 @@ public class Utils {
      * @param isTransparent
      *            If <code>true</code> the background will be transparent, otherwise it will be opaque
      * @return The number of characters written
-     *
-     * @since 2.0
      */
     public static int drawText(GC gc, String text, int x, int y, int width, boolean isCentered, boolean isTransparent) {
         if (width < 1) {
@@ -422,7 +414,6 @@ public class Utils {
      *            The time format to use
      * @param resolution
      *            The resolution to use
-     * @since 3.2
      * @return the formatted time delta
      */
     public static String formatDelta(long delta, TimeFormat format, Resolution resolution) {
@@ -441,7 +432,6 @@ public class Utils {
      * @param resolution
      *            The resolution to use
      * @return the formatted time delta
-     * @since 3.2
      */
     public static String formatDeltaAbs(long delta, Resolution resolution) {
         StringBuffer str = new StringBuffer();
@@ -555,7 +545,6 @@ public class Utils {
      *            1: Next Event</li> <li>2: Previous Event when located in a non
      *            Event Area </list>
      * @return a {@link ITimeEvent}, or <code>null</code>.
-     * @since 3.0
      */
     public static ITimeEvent findEvent(ITimeGraphEntry entry, long time, int n) {
         if (null == entry || ! entry.hasTimeEvents()) {
@@ -768,7 +757,6 @@ public class Utils {
      *            y-coordinate of point 2
      *
      * @return the square of the distance in pixels^2
-     * @since 3.2
      */
     public static double distance2(int x1, int y1, int x2, int y2) {
         int dx = x2 - x1;
@@ -797,7 +785,6 @@ public class Utils {
      *            y-coordinate of segment point 2
      *
      * @return the distance in pixels
-     * @since 3.2
      */
     public static double distance(int px, int py, int x1, int y1, int x2, int y2) {
         double length2 = distance2(x1, y1, x2, y2);

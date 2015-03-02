@@ -39,7 +39,6 @@ import com.google.common.collect.ImmutableList.Builder;
  * circular dependency). The length is the number of elements in an array.
  *
  * @author Matthew Khouzam
- * @since 3.1
  */
 public final class ArrayDeclaration extends CompoundDeclaration {
 

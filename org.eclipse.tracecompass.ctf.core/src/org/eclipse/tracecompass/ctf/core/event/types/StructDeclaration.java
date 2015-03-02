@@ -74,7 +74,6 @@ public class StructDeclaration extends Declaration {
      *            the names of all the fields
      * @param declarations
      *            all the fields
-     * @since 3.0
      */
     public StructDeclaration(String[] names, Declaration[] declarations) {
         fMaxAlign = 1;
@@ -112,7 +111,6 @@ public class StructDeclaration extends Declaration {
      * Get the fields of the struct as a map.
      *
      * @return a Map of the fields (key is the name)
-     * @since 2.0
      */
     public Map<String, IDeclaration> getFields() {
         return fFieldMap;
@@ -124,7 +122,6 @@ public class StructDeclaration extends Declaration {
      * @param fieldName
      *            The field name
      * @return The declaration of the field, or null if there is no such field.
-     * @since 3.1
      */
     @Nullable
     public IDeclaration getField(String fieldName) {
@@ -136,7 +133,6 @@ public class StructDeclaration extends Declaration {
      * retain the order of the fields.
      *
      * @return the field list.
-     * @since 3.0
      */
     public Iterable<String> getFieldsList() {
         return fFieldMap.keySet();
@@ -147,9 +143,6 @@ public class StructDeclaration extends Declaration {
         return this.fMaxAlign;
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public int getMaximumSize() {
         int maxSize = 0;
@@ -163,9 +156,6 @@ public class StructDeclaration extends Declaration {
     // Operations
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 3.0
-     */
     @Override
     public StructDefinition createDefinition(IDefinitionScope definitionScope,
             String fieldName, BitBuffer input) throws CTFReaderException {
@@ -190,7 +180,6 @@ public class StructDeclaration extends Declaration {
      * @return a reference to the definition
      * @throws CTFReaderException
      *             error in reading
-     * @since 3.1
      */
     public StructDefinition createDefinition(IDefinitionScope definitionScope,
             LexicalScope fieldScope, @NonNull BitBuffer input) throws CTFReaderException {

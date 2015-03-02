@@ -17,8 +17,6 @@ import org.eclipse.core.resources.IFolder;
 /**
  * Implementation of model element representing the unique "Traces" folder in
  * the project.
- *
- * @since 3.0
  */
 public class TmfTracesFolder extends TmfTraceFolder {
 

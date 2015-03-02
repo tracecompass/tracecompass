@@ -16,8 +16,6 @@ package org.eclipse.tracecompass.tmf.core.trace;
  * An interface that provides information about the completeness of a trace. A
  * trace is considered complete when it is known that no more data will be added
  * to it.
- *
- * @since 3.1
  */
 public interface ITmfTraceCompleteness {
 

@@ -28,8 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * to this node.
  *
  * @author Mathieu Denis
- * @version 2.0
- * @since 2.0
  */
 public class TmfStatisticsTreeNode {
 
@@ -174,7 +172,6 @@ public class TmfStatisticsTreeNode {
      * Return the top node.
      *
      * @return Top node.
-     * @since 3.0
      */
     public TmfStatisticsTreeNode getTop() {
         return fTopNode;
@@ -220,8 +217,6 @@ public class TmfStatisticsTreeNode {
     /**
      * Resets the global number of events. It doesn't remove any node and
      * doesn't modify the partial event count. Works recursively.
-     *
-     * @since 2.0
      */
     public void resetGlobalValue() {
         for (TmfStatisticsTreeNode child : fChildren.values()) {
@@ -233,8 +228,6 @@ public class TmfStatisticsTreeNode {
     /**
      * Resets the number of events in the time range. It doesn't remove any node
      * and doesn't modify the global event count. Works recursively.
-     *
-     * @since 2.0
      */
     public void resetTimeRangeValue() {
         for (TmfStatisticsTreeNode child : fChildren.values()) {

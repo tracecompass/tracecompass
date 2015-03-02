@@ -22,7 +22,6 @@ import java.nio.ByteOrder;
  * Response to a "create session" command
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public class CreateSessionResponse implements IRelayResponse {
 

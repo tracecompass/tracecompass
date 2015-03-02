@@ -17,8 +17,6 @@ package org.eclipse.tracecompass.tmf.core.timestamp;
  * A simplified timestamp where scale and precision are set to 0.
  *
  * @author Francois Chouinard
- * @version 1.1
- * @since 2.0
  */
 public class TmfSimpleTimestamp extends TmfTimestamp {
 

@@ -16,7 +16,6 @@ package org.eclipse.tracecompass.ctf.core;
  * General exception that is thrown when there is a problem somewhere with the
  * CTF trace reader.
  *
- * @version 1.0
  * @author Alexandre Montplaisir
  */
 public class CTFReaderException extends Exception {
@@ -57,7 +56,6 @@ public class CTFReaderException extends Exception {
      *            The message attached to this exception
      * @param exception
      *            The previous Exception caught
-     * @since 2.0
      */
     public CTFReaderException(String message, Throwable exception) {
         super(message, exception);

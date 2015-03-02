@@ -34,7 +34,6 @@ import org.eclipse.ui.IActionBars;
  *
  * @author Florian Wininger
  * @author Alexandre Montplaisir
- * @since 2.0
  */
 public class TmfStateSystemExplorer extends TmfView {
 

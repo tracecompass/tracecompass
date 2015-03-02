@@ -94,8 +94,6 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
     private static final String[] PREF_TEXT_COLOR_LIST = { PREF_LIFELINE, PREF_SYNC_MESS, PREF_SYNC_MESS_RET, PREF_ASYNC_MESS, PREF_ASYNC_MESS_RET, PREF_LIFELINE_HEADER, PREF_FRAME_NAME };
     /**
      * Temporary tag
-     *
-     * @since 2.0
      */
     public static final String TEMP_TAG = "_TEMP";//$NON-NLS-1$
 
@@ -442,7 +440,6 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
      * Returns a unmodifiable map with font preferences.
      *
      * @return map with font preferences
-     * @since 2.0
      */
     protected Map<String, IFont> getFontPref() {
         return Collections.unmodifiableMap(fFontPref);
@@ -452,7 +449,6 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
      * Returns a unmodifiable map with foreground color preferences
      *
      * @return map with foreground color preferences
-     * @since 2.0
      */
     public Map<String, IColor> getForeColorPref() {
         return Collections.unmodifiableMap(fForeColorPref);
@@ -462,7 +458,6 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
      * Returns a unmodifiable map with background color preferences
      *
      * @return map with background color preferences
-     * @since 2.0
      */
     public Map<String, IColor> getBackColorPref() {
         return Collections.unmodifiableMap(fBackColorPref);
@@ -472,7 +467,6 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
      * Returns a unmodifiable map with text color preferences
      *
      * @return map with text color preferences
-     * @since 2.0
      */
     public Map<String, IColor> getTextColorPref() {
         return Collections.unmodifiableMap(fTextColorPref);
@@ -482,7 +476,6 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
      * Returns the preference store.
      *
      * @return the preference store
-     * @since 2.0
      */
     public IPreferenceStore getPrefStore() {
         return fPrefStore;
@@ -492,7 +485,6 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
      * Returns flag about focus selection
      *
      * @return flag about focus selection
-     * @since 2.0
      */
     public boolean isNoFocusSelection() {
         return fNoFocusSelection;

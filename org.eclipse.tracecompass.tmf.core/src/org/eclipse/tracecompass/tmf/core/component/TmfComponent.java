@@ -23,7 +23,6 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
  * <p>
  * Currently, it only addresses the inter-component signaling.
  *
- * @version 1.0
  * @author Francois Chouinard
  */
 public abstract class TmfComponent implements ITmfComponent {
@@ -114,9 +113,6 @@ public abstract class TmfComponent implements ITmfComponent {
         TmfSignalManager.dispatchSignal(signal);
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public void broadcastAsync(TmfSignal signal) {
         TmfSignalManager.dispatchSignalAsync(signal);

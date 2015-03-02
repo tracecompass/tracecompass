@@ -19,36 +19,28 @@ import org.eclipse.osgi.util.NLS;
  * Message strings for TMF model handling.
  *
  * @author Jean-Christian Kouamé
- * @since 2.1
  */
 public class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.tmf.ui.project.model.messages"; //$NON-NLS-1$
 
-    /** Instantiate analysis message box title
-     * @since 3.0*/
+    /** Instantiate analysis message box title */
     public static String TmfAnalysisElement_InstantiateAnalysis;
 
-    /** The message when analysis view is not available
-     * @since 3.0*/
+    /** The message when analysis view is not available */
     public static String TmfAnalysisViewOutput_ViewUnavailable;
-    /** Analysis view title
-     * @since 3.0 */
+    /** Analysis view title */
     public static String TmfAnalysisViewOutput_Title;
 
-    /** Error message when closing editor
-     * @since 3.0 */
+    /** Error message when closing editor */
     public static String TmfCommonProjectElement_ErrorClosingEditor;
 
-    /** Error message when refreshing persistent property
-     * @since 3.0 */
+    /** Error message when refreshing persistent property */
     public static String TmfCommonProjectElement_ErrorRefreshingProperty;
 
-    /** Error message when instantiating trace
-     * @since 3.0 */
+    /** Error message when instantiating trace */
     public static String TmfExperimentElement_ErrorInstantiatingTrace;
-    /** Experiment text
-     * @since 3.0*/
+    /** Experiment text */
     public static String TmfExperimentElement_TypeName;
 
     /** The category of the resource properties */
@@ -72,67 +64,52 @@ public class Messages extends NLS {
     /** The descriptor for the linked property */
     public static String TmfTraceElement_IsLinked;
 
-    /** The descriptor for the source location property
-     * @since 3.0*/
+    /** The descriptor for the source location property */
     public static String TmfTraceElement_SourceLocation;
 
-    /** The descriptor for the time offset property
-     * @since 3.2*/
+    /** The descriptor for the time offset property */
     public static String TmfTraceElement_TimeOffset;
 
-    /** The descriptor for the last modified property
-     * @since 3.2 */
+    /** The descriptor for the last modified property */
     public static String TmfTraceElement_LastModified;
 
-    /** The descriptor for the size property
-     * @since 3.2 */
+    /** The descriptor for the size property */
     public static String TmfTraceElement_Size;
 
-    /** The format string for the size property of a file
-     * @since 3.2 */
+    /** The format string for the size property of a file */
     public static String TmfTraceElement_FileSizeString;
 
-    /** The format string for the size property of a folder
-     * @since 3.2 */
+    /** The format string for the size property of a folder */
     public static String TmfTraceElement_FolderSizeString;
 
-    /** The format string for the size property of a folder with too many members
-     * @since 3.2 */
+    /** The format string for the size property of a folder with too many members */
     public static String TmfTraceElement_FolderSizeOverflowString;
 
-    /** Trace text
-     * @since 3.0*/
+    /** Trace text */
     public static String TmfTraceElement_TypeName;
     /**
-     * The title for the select trace type dialog
-     * @since 2.2
-     * */
+     * The title for the select trace type dialog */
     public static String TmfTraceType_SelectTraceType;
 
-    /** Error opening a trace or experiment
-     * @since 3.0*/
+    /** Error opening a trace or experiment */
     public static String TmfOpenTraceHelper_ErrorOpeningElement;
     /** Could not link trace */
     public static String TmfOpenTraceHelper_LinkFailed;
     /** No trace type match */
     public static String TmfOpenTraceHelper_NoTraceTypeMatch;
-    /** Open trace or experiment
-     * @since 3.0*/
+    /** Open trace or experiment */
     public static String TmfOpenTraceHelper_OpenElement;
     /** Reduce was too efficient, no candidates found! */
     public static String TmfOpenTraceHelper_ReduceError;
-    /** No trace or experiment type
-     * @since 3.0*/
+    /** No trace or experiment type */
     public static String TmfOpenTraceHelper_NoTraceOrExperimentType;
     /** No trace type */
     public static String TmfOpenTraceHelper_NoTraceType;
-    /** Error opening trace or experiment
-     * @since 3.0*/
+    /** Error opening trace or experiment */
     public static String TmfOpenTraceHelper_ErrorElement;
     /** Init error */
     public static String TmfOpenTraceHelper_InitError;
-    /** Trace not found
-     * @since 3.0*/
+    /** Trace not found */
     public static String TmfOpenTraceHelper_TraceNotFound;
 
 

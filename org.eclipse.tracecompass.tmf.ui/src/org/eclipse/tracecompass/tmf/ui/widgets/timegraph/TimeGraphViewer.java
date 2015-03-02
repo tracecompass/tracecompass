@@ -65,13 +65,11 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeForma
 /**
  * Generic time graph viewer implementation
  *
- * @version 1.0
  * @author Patrick Tasse, and others
  */
 public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
-    /** Constant indicating that all levels of the time graph should be expanded
-     * @since 3.1 */
+    /** Constant indicating that all levels of the time graph should be expanded */
     public static final int ALL_LEVELS = AbstractTreeViewer.ALL_LEVELS;
 
     private static final int DEFAULT_NAME_WIDTH = 200;
@@ -224,8 +222,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      *
      * @param timeGraphContentProvider
      *            the timegraph content provider
-     *
-     * @since 3.0
      */
     public void setTimeGraphContentProvider(ITimeGraphContentProvider timeGraphContentProvider) {
         fTimeGraphContentProvider = timeGraphContentProvider;
@@ -235,8 +231,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * Gets the timegraph content provider used by this timegraph viewer.
      *
      * @return the timegraph content provider
-     *
-     * @since 3.0
      */
     public ITimeGraphContentProvider getTimeGraphContentProvider() {
         return fTimeGraphContentProvider;
@@ -261,8 +255,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * @param inputElement
      *            The input of this time graph viewer, or <code>null</code> if
      *            none
-     *
-     * @since 3.0
      */
     public void setInput(Object inputElement) {
         fInputElement = inputElement;
@@ -282,8 +274,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * Gets the input for this time graph viewer.
      *
      * @return The input of this time graph viewer, or <code>null</code> if none
-     *
-     * @since 3.0
      */
     public Object getInput() {
         return fInputElement;
@@ -294,7 +284,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      *
      * @param links
      *            the links to display in this time graph combo
-     * @since 2.1
      */
     public void setLinks(List<ILinkEvent> links) {
         if (fTimeGraphCtrl != null) {
@@ -497,7 +486,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * @param colors
      *            The color scheme
      * @return The new TimeGraphControl
-     * @since 2.0
      */
     protected TimeGraphControl createTimeGraphControl(Composite parent,
             TimeGraphColorScheme colors) {
@@ -719,17 +707,11 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         return fTime0Bound;
     }
 
-    /**
-     * @since 2.1
-     */
     @Override
     public long getSelectionBegin() {
         return fSelectionBegin;
     }
 
-    /**
-     * @since 2.1
-     */
     @Override
     public long getSelectionEnd() {
         return fSelectionEnd;
@@ -787,9 +769,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         setSelectedTimeInt(time, ensureVisible, false);
     }
 
-    /**
-     * @since 2.1
-     */
     @Override
     public void setSelectionRangeNotify(long beginTime, long endTime) {
         boolean changed = (beginTime != fSelectionBegin || endTime != fSelectionEnd);
@@ -802,9 +781,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         }
     }
 
-    /**
-     * @since 2.1
-     */
     @Override
     public void setSelectionRange(long beginTime, long endTime) {
         fSelectionBegin = Math.max(fTime0Bound, Math.min(fTime1Bound, beginTime));
@@ -1137,9 +1113,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         fTime1ExtSynch = fTime1;
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public TimeFormat getTimeFormat() {
         return fTimeFormat;
@@ -1148,7 +1121,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     /**
      * @param tf
      *            the {@link TimeFormat} used to display timestamps
-     * @since 2.0
      */
     public void setTimeFormat(TimeFormat tf) {
         this.fTimeFormat = tf;
@@ -1168,7 +1140,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      *
      * @param clockFrequency
      *            the clock frequency in Hz
-     * @since 3.2
      */
     public void setClockFrequency(long clockFrequency) {
         fClockFrequency = clockFrequency;
@@ -1300,7 +1271,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * Returns the time graph control associated with this viewer.
      *
      * @return the time graph control
-     * @since 2.0
      */
     public TimeGraphControl getTimeGraphControl() {
         return fTimeGraphCtrl;
@@ -1310,7 +1280,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * Returns the time graph scale associated with this viewer.
      *
      * @return the time graph scale
-     * @since 2.0
      */
     public TimeGraphScale getTimeGraphScale() {
         return fTimeScaleCtrl;
@@ -1322,8 +1291,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * @param time
      *            the time
      * @return the x coordinate corresponding to the time
-     *
-     * @since 2.0
      */
     public int getXForTime(long time) {
         return fTimeGraphCtrl.getXForTime(time);
@@ -1335,8 +1302,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * @param x
      *            the x coordinate
      * @return the time corresponding to the x coordinate
-     *
-     * @since 2.0
      */
     public long getTimeAtX(int x) {
         return fTimeGraphCtrl.getTimeAtX(x);
@@ -1411,7 +1376,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * @param level
      *            non-negative level, or <code>ALL_LEVELS</code> to expand all
      *            levels of the tree
-     * @since 3.1
      */
     public void setAutoExpandLevel(int level) {
         fTimeGraphCtrl.setAutoExpandLevel(level);
@@ -1423,7 +1387,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * @return non-negative level, or <code>ALL_LEVELS</code> if all levels of
      *         the tree are expanded automatically
      * @see #setAutoExpandLevel
-     * @since 3.1
      */
     public int getAutoExpandLevel() {
         return fTimeGraphCtrl.getAutoExpandLevel();
@@ -1444,8 +1407,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
     /**
      * Collapses all nodes of the viewer's tree, starting with the root.
-     *
-     * @since 2.0
      */
     public void collapseAll() {
         fTimeGraphCtrl.collapseAll();
@@ -1454,8 +1415,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
     /**
      * Expands all nodes of the viewer's tree, starting with the root.
-     *
-     * @since 2.0
      */
     public void expandAll() {
         fTimeGraphCtrl.expandAll();
@@ -1678,8 +1637,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      *            or null
      *
      * @return The Action object
-     *
-     * @since 2.1
      */
     public Action getHideArrowsAction(final IDialogSettings dialogSettings) {
         if (fHideArrowsAction == null) {
@@ -1721,8 +1678,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * Get the follow arrow forward action.
      *
      * @return The Action object
-     *
-     * @since 2.1
      */
     public Action getFollowArrowFwdAction() {
         if (fFollowArrowFwdAction == null) {
@@ -1747,8 +1702,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * Get the follow arrow backward action.
      *
      * @return The Action object
-     *
-     * @since 2.1
      */
     public Action getFollowArrowBwdAction() {
         if (fFollowArrowBwdAction == null) {
@@ -1807,7 +1760,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * @param listener
      *            a {@link MenuDetectListener}
      * @see org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl#addTimeGraphEntryMenuListener(org.eclipse.swt.events.MenuDetectListener)
-     * @since 1.2
      */
     public void addTimeGraphEntryMenuListener(MenuDetectListener listener) {
         fTimeGraphCtrl.addTimeGraphEntryMenuListener(listener);
@@ -1817,7 +1769,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * @param listener
      *            a {@link MenuDetectListener}
      * @see org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl#removeTimeGraphEntryMenuListener(org.eclipse.swt.events.MenuDetectListener)
-     * @since 1.2
      */
     public void removeTimeGraphEntryMenuListener(MenuDetectListener listener) {
         fTimeGraphCtrl.removeTimeGraphEntryMenuListener(listener);
@@ -1827,7 +1778,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * @param listener
      *            a {@link MenuDetectListener}
      * @see org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl#addTimeEventMenuListener(org.eclipse.swt.events.MenuDetectListener)
-     * @since 1.2
      */
     public void addTimeEventMenuListener(MenuDetectListener listener) {
         fTimeGraphCtrl.addTimeEventMenuListener(listener);
@@ -1837,7 +1787,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * @param listener
      *            a {@link MenuDetectListener}
      * @see org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl#removeTimeEventMenuListener(org.eclipse.swt.events.MenuDetectListener)
-     * @since 1.2
      */
     public void removeTimeEventMenuListener(MenuDetectListener listener) {
         fTimeGraphCtrl.removeTimeEventMenuListener(listener);
@@ -1846,7 +1795,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     /**
      * @param filter
      *            The filter object to be attached to the view
-     * @since 2.0
      */
     public void addFilter(ViewerFilter filter) {
         fTimeGraphCtrl.addFilter(filter);
@@ -1856,7 +1804,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     /**
      * @param filter
      *            The filter object to be attached to the view
-     * @since 2.0
      */
     public void removeFilter(ViewerFilter filter) {
         fTimeGraphCtrl.removeFilter(filter);

@@ -36,7 +36,6 @@ import org.osgi.framework.Bundle;
  * elements.
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelper {
 

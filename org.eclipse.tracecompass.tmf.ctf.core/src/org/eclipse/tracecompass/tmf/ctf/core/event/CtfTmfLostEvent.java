@@ -24,7 +24,6 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
  * An implementation of {@link ITmfLostEvent} for use in the CTF adaptor.
  *
  * @author Alexandre Montplaisir
- * @since 2.2
  */
 public class CtfTmfLostEvent extends CtfTmfEvent implements ITmfLostEvent {
 

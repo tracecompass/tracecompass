@@ -30,7 +30,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * Analysis module to compute the statistics of a trace.
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  */
 public class TmfStatisticsModule extends TmfAbstractAnalysisModule
         implements ITmfAnalysisModuleWithStateSystems {

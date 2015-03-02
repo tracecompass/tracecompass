@@ -17,7 +17,6 @@ import java.util.Arrays;
 /**
  * This class counts events for a particular time range, taking into account origin of the event.
  * @author Xavier Raynaud
- * @since 3.0
  */
 public class HistogramBucket {
 

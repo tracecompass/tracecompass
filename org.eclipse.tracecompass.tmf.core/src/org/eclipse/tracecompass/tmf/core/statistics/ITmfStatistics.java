@@ -26,7 +26,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
  * ({@link ITmfTimestamp#NANOSECOND_SCALE}).
  *
  * @author Alexandre Montplaisir
- * @since 2.0
  */
 public interface ITmfStatistics {
 

@@ -49,7 +49,6 @@ public class SDTimeEvent {
      * @param time The time stamp of the event.
      * @param event The event index.
      * @param node The time range implementing node.
-     * @since 2.0
      */
     public SDTimeEvent(ITmfTimestamp time, int event, ITimeRange node) {
         fTimestamp = time;
@@ -64,7 +63,6 @@ public class SDTimeEvent {
      * Returns the timestamp of the event.
      *
      * @return the timestamp of the event.
-     * @since 2.0
      */
     public ITmfTimestamp getTime() {
         return fTimestamp;

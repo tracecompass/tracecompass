@@ -25,7 +25,6 @@ import org.eclipse.ui.dialogs.PatternFilter;
  * or one of the parents matches.
  *
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
- * @since 3.2
  */
 public class TreePatternFilter extends PatternFilter {
 

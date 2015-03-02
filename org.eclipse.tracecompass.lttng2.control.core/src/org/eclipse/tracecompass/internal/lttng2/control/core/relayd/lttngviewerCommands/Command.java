@@ -17,7 +17,6 @@ package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewer
  * Viewer commands
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public enum Command implements IBaseCommand {
 

@@ -36,7 +36,6 @@ import org.eclipse.ui.IWorkbench;
  * three pages shown. This one selects the files to be scanned.
  *
  * @author Matthew Khouzam
- * @since 2.0
  */
 public class ImportTraceWizardSelectDirectoriesPage extends AbstractImportTraceWizardPage {
 

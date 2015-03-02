@@ -16,8 +16,6 @@ import org.eclipse.osgi.util.NLS;
 
 /**
  * Messages class
- *
- * @since 3.0
  */
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {

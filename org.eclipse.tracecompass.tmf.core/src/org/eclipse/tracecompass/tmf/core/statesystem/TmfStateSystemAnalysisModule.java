@@ -58,7 +58,6 @@ import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
  * (defaults to the analysis'ID)
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisModule
         implements ITmfAnalysisModuleWithStateSystems {
@@ -104,7 +103,6 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
      * @param moduleId
      *            The ID of the state system analysis module
      * @return The state system, or null if there was no match
-     * @since 3.1
      */
     public static @Nullable ITmfStateSystem getStateSystem(ITmfTrace trace, String moduleId) {
         TmfStateSystemAnalysisModule module =

@@ -26,7 +26,6 @@ import com.google.common.collect.ImmutableList.Builder;
  * Attach session response
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public class AttachSessionResponse implements IRelayResponse {
 

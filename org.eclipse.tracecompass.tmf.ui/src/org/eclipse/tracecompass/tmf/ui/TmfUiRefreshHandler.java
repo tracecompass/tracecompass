@@ -43,7 +43,6 @@ import org.eclipse.swt.widgets.Display;
  * sent to the UI thread via one single call to {@link Display#syncExec}.
  *
  * @author Alexandre Montplaisir
- * @since 3.1
  */
 public class TmfUiRefreshHandler {
 

@@ -352,7 +352,6 @@ public class HistogramView extends TmfView {
      * Returns the current trace handled by the view
      *
      * @return the current trace
-     * @since 2.0
      */
     public ITmfTrace getTrace() {
         return fTrace;
@@ -362,7 +361,6 @@ public class HistogramView extends TmfView {
      * Returns the time range of the current selected window (base on default time scale).
      *
      * @return the time range of current selected window.
-     * @since 2.0
      */
     public TmfTimeRange getTimeRange() {
         return new TmfTimeRange(
@@ -374,7 +372,6 @@ public class HistogramView extends TmfView {
      * get the show lost events action
      *
      * @return The action object
-     * @since 2.2
      */
     public Action getShowLostEventsAction() {
         if (hideLostEventsAction == null) {
@@ -400,7 +397,6 @@ public class HistogramView extends TmfView {
      * get the show trace action
      *
      * @return The action object
-     * @since 3.0
      */
     public Action getShowTraceAction() {
         if (showTraceAction == null) {
@@ -523,7 +519,6 @@ public class HistogramView extends TmfView {
      * Handles trace opened signal. Loads histogram if new trace time range is not
      * equal <code>TmfTimeRange.NULL_RANGE</code>
      * @param signal the trace opened signal
-     * @since 2.0
      */
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
@@ -536,7 +531,6 @@ public class HistogramView extends TmfView {
      * Handles trace selected signal. Loads histogram if new trace time range is not
      * equal <code>TmfTimeRange.NULL_RANGE</code>
      * @param signal the trace selected signal
-     * @since 2.0
      */
     @TmfSignalHandler
     public void traceSelected(TmfTraceSelectedSignal signal) {
@@ -555,7 +549,6 @@ public class HistogramView extends TmfView {
     /**
      * Handles trace closed signal. Clears the view and data model and cancels requests.
      * @param signal the trace closed signal
-     * @since 2.0
      */
     @TmfSignalHandler
     public void traceClosed(TmfTraceClosedSignal signal) {
@@ -604,7 +597,6 @@ public class HistogramView extends TmfView {
      * will be issued.
      *
      * @param signal the trace range updated signal
-     * @since 2.0
      */
     @TmfSignalHandler
     public void traceRangeUpdated(TmfTraceRangeUpdatedSignal signal) {
@@ -627,7 +619,6 @@ public class HistogramView extends TmfView {
     /**
      * Handles the trace updated signal. Used to update time limits (start and end time)
      * @param signal the trace updated signal
-     * @since 2.0
      */
     @TmfSignalHandler
     public void traceUpdated(TmfTraceUpdatedSignal signal) {

@@ -21,7 +21,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
  * This is the visible (zoom) time range. To synchronize on the selection range,
  * use {@link TmfTimeSynchSignal}.
  *
- * @version 1.0
  * @author Francois Chouinard
  */
 public class TmfRangeSynchSignal extends TmfSignal {
@@ -35,7 +34,6 @@ public class TmfRangeSynchSignal extends TmfSignal {
      *            Object sending this signal
      * @param range
      *            The new time range
-     * @since 2.1
      */
     public TmfRangeSynchSignal(Object source, TmfTimeRange range) {
         super(source);
@@ -44,7 +42,6 @@ public class TmfRangeSynchSignal extends TmfSignal {
 
     /**
      * @return This signal's time range
-     * @since 2.0
      */
     public TmfTimeRange getCurrentRange() {
         return fCurrentRange;

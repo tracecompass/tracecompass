@@ -19,7 +19,6 @@ package org.eclipse.tracecompass.tmf.core.analysis;
  *
  * @author Guilliano Molaire
  * @author Mathieu Rail
- * @since 3.0
  */
 public interface IAnalysisRequirementProvider {
 

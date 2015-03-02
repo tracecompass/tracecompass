@@ -40,7 +40,6 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
  * intervals.
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  */
 public class InMemoryBackend implements IStateHistoryBackend {
 

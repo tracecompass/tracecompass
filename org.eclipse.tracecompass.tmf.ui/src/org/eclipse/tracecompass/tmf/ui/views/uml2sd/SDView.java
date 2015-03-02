@@ -95,42 +95,34 @@ public class SDView extends ViewPart implements IPartListener {
     // ------------------------------------------------------------------------
     /**
      * Name of menu separator for view modes
-     * @since 2.0
      */
     public static final String UML2SD_VIEW_MODES_SEPARATOR = "UML2SD_VIEW_MODES"; //$NON-NLS-1$
     /**
      * Name of menu separator for working set
-     * @since 2.0
      */
     public static final String UML2SD_WORKING_SET_SEPARATOR = "UML2SD_WORKING_SET"; //$NON-NLS-1$
     /**
      * Name of menu separator for sorting
-     * @since 2.0
      */
     public static final String UML2SD_SORTING_SEPARATOR = "UML2SD_SORTING"; //$NON-NLS-1$
     /**
      * Name of menu separator for filtering
-     * @since 2.0
      */
     public static final String UML2SD_FILTERING_SEPARATOR = "UML2SD_FILTERING"; //$NON-NLS-1$
     /**
      * Name of menu separator for view layout
-     * @since 2.0
      */
     public static final String UML2SD_VIEW_LAYOUT_SEPARATOR = "UML2SD_VIEW_LAYOUT"; //$NON-NLS-1$
     /**
      * Name of menu separator for link editor
-     * @since 2.0
      */
     public static final String UML2SD_LINK_EDITOR_SEPARATOR = "UML2SD_LINK_EDITOR"; //$NON-NLS-1$
     /**
      * Name of menu separator for other commands
-     * @since 2.0
      */
     public static final String UML2SD_OTHER_COMMANDS_SEPARATOR = "UML2SD_OTHER_COMMANDS"; //$NON-NLS-1$
     /**
      * Name of menu separator for other plug-in commands
-     * @since 2.0
      */
     public static final String UML2SD_OTHER_PLUGINS_COMMANDS_SEPARATOR = "UML2SD_OTHER_PLUGINS_COMMANDS"; //$NON-NLS-1$
 
@@ -504,7 +496,6 @@ public class SDView extends ViewPart implements IPartListener {
      *
      * @param sdWidget
      *          A sdWidget to set
-     * @since 2.0
      */
     protected void setSDWidget(SDWidget sdWidget) {
         fSdWidget = sdWidget;
@@ -515,7 +506,6 @@ public class SDView extends ViewPart implements IPartListener {
      *
      * @param timeCompressionbar
      *          A sdWidget to set
-     * @since 2.0
      */
     protected void setTimeBar(TimeCompressionBar timeCompressionbar) {
         fTimeCompressionBar = timeCompressionbar;
@@ -526,7 +516,6 @@ public class SDView extends ViewPart implements IPartListener {
      *
      * @param needInit
      *          flag value to set
-     * @since 2.0
      */
     protected void setNeedInit(boolean needInit) {
         fNeedInit = needInit;
@@ -1086,7 +1075,6 @@ public class SDView extends ViewPart implements IPartListener {
     /**
      * Gets the initialization flag.
      * @return the value of the initialization flag.
-     * @since 2.0
      */
     protected boolean isNeedInit() {
         return fNeedInit;

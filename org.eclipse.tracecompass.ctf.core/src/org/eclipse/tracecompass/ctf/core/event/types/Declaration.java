@@ -22,7 +22,6 @@ import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
  * performance is often a high priority in this class
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public abstract class Declaration implements IDeclaration {
 
@@ -52,7 +51,6 @@ public abstract class Declaration implements IDeclaration {
      *            The bitbuffer that is being read
      * @throws CTFReaderException
      *             Happens when there is an out of bounds exception
-     * @since 3.0
      */
     protected final void alignRead(BitBuffer input) throws CTFReaderException {
         long mask = getAlignment() - 1;

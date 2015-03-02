@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.QualifiedName;
 /**
  *  This class provides a common container for TMF constants.
  *
- * @version 1.0
  *  @author Bernd Hufmann
  */
 public class TmfCommonConstants {
@@ -33,7 +32,6 @@ public class TmfCommonConstants {
 
     /**
      * The source location persistent property of a trace resource.
-     * @since 3.0
      */
     public static final QualifiedName SOURCE_LOCATION = new QualifiedName("org.eclipse.linuxtools.tmf", "source.location"); //$NON-NLS-1$//$NON-NLS-2$
 
@@ -44,15 +42,12 @@ public class TmfCommonConstants {
 
     /**
      * The name of the parent folder for storing trace specific supplementary data. Each trace will have a sub-directory underneath with folder name equal to the trace name.
-     * @since 3.0
      */
     public static final String TRACE_SUPPLEMENTARY_FOLDER_NAME = ".tracing"; //$NON-NLS-1$
 
     /**
      * The name of the default project that can be created under various
      * conditions when there is no tracing project in the workspace.
-     *
-     * @since 2.2
      */
     public static final String DEFAULT_TRACE_PROJECT_NAME = Messages.DefaultTraceProjectName;
 

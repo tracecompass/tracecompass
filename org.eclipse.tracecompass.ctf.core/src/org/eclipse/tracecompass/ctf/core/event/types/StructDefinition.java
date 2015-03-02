@@ -70,7 +70,6 @@ public final class StructDefinition extends ScopedDefinition implements IComposi
      *            the list of fields
      * @param definitions
      *            the definitions
-     * @since 3.1
      */
     public StructDefinition(@NonNull StructDeclaration declaration,
             IDefinitionScope definitionScope,
@@ -93,7 +92,6 @@ public final class StructDefinition extends ScopedDefinition implements IComposi
      *            the list of fields
      * @param definitions
      *            the definitions
-     * @since 3.1
      */
     public StructDefinition(@NonNull StructDeclaration declaration,
             IDefinitionScope definitionScope,
@@ -124,7 +122,6 @@ public final class StructDefinition extends ScopedDefinition implements IComposi
      *            the list of fields
      * @param definitions
      *            the definitions
-     * @since 3.1
      */
     public StructDefinition(@NonNull StructDeclaration declaration,
             IDefinitionScope definitionScope, @NonNull LexicalScope scope,

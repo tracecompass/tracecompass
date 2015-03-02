@@ -19,7 +19,6 @@ package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewer
  * > src/bin/lttng-relayd/lttng-viewer-abi.h</a>
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public interface LttngViewerCommands {
 

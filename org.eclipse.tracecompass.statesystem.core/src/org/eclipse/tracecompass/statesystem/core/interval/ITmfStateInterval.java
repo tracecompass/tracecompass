@@ -22,7 +22,6 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
  * classes should ideally be marked as 'final'.
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  */
 public interface ITmfStateInterval {
 

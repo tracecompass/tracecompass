@@ -17,7 +17,6 @@ import org.eclipse.osgi.util.NLS;
  * Message bundle for lttng2.kernel.core.trace
  *
  * @author Matthew Khouzam
- * @since 2.1
  */
 public class Messages extends NLS {
 

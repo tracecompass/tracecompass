@@ -29,7 +29,6 @@ import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisModuleHelperConfigE
  * platform's extensions registry.
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public final class TmfAnalysisModuleSourceConfigElement implements IAnalysisModuleSource {
 

@@ -65,7 +65,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * The type of value used must be constant for a particular CallStack.
  *
  * @author Patrick Tasse
- * @since 2.0
  */
 public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
 
@@ -157,7 +156,6 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
      *            The event to check
      * @return If false, the event will be ignored by the state provider. If
      *         true processing will continue.
-     * @since 3.0
      */
     protected abstract boolean considerEvent(ITmfEvent event);
 
@@ -187,7 +185,6 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
      * @param event
      *            The event
      * @return The thread name (as will be shown in the view)
-     * @since 3.0
      */
     protected abstract String getThreadName(ITmfEvent event);
 
@@ -197,7 +194,6 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
      * @param event
      *            The event
      * @return The thread id, or null if undefined
-     * @since 3.1
      */
     protected Long getThreadId(ITmfEvent event) {
         return null;

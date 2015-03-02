@@ -53,27 +53,22 @@ public class Messages extends NLS {
     public static String SelectTracesWizardPage_Description;
     /**
      * The error message when selecting of traces for an experiment fails.
-     * @since 3.1
      */
     public static String SelectTracesWizardPage_SelectionError;
     /**
      * The task name for selecting of a trace for an experiment.
-     * @since 3.1
      */
     public static String SelectTracesWizardPage_TraceSelectionTask;
     /**
      * The task name for removing of a trace for an experiment.
-     * @since 3.1
      */
     public static String SelectTracesWizardPage_TraceRemovalTask;
     /**
      * The cancel message for the trace selection operation.
-     * @since 3.1
      */
     public static String SelectTracesWizardPage_SelectionOperationCancelled;
     /**
      * The error message title.
-     * @since 3.1
      */
     public static String SelectTracesWizardPage_InternalErrorTitle;
     /**
@@ -142,27 +137,22 @@ public class Messages extends NLS {
     public static String CopyTraceDialog_TraceNewName;
     /**
      * The title of the new folder dialog.
-     * @since 3.0
      */
     public static String NewFolderDialog_DialogTitle;
     /**
      * The label of the new folder name field.
-     * @since 3.0
      */
     public static String NewFolderDialog_FolderName;
     /**
      * The title of the rename folder dialog.
-     * @since 3.0
      */
     public static String RenameFolderDialog_DialogTitle;
     /**
      * The label of the field of the current folder name.
-     * @since 3.0
      */
     public static String RenameFolderDialog_FolderName;
     /**
      * The label of the field for entering the new folder name.
-     * @since 3.0
      */
     public static String RenameFolderDialog_FolderNewName;
 

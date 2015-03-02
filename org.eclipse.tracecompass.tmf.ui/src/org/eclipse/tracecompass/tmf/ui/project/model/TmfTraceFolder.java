@@ -80,7 +80,6 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
      * @param name The name of trace folder.
      * @param resource The folder resource.
      * @param parent The parent element (folder).
-     * @since 3.0
      */
     public TmfTraceFolder(String name, IFolder resource, TmfTraceFolder parent) {
         super(name, resource, parent);

@@ -45,7 +45,6 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
  *
  * @author Bernd Hufmann
  * @author Geneviève Bastien
- * @since 3.0
  */
 public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvider {
 

@@ -16,7 +16,6 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph;
  * A time graph state color change listener
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public interface ITimeGraphColorListener {
 

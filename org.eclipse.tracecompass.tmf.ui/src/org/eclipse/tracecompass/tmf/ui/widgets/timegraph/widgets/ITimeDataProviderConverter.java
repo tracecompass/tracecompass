@@ -15,8 +15,6 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets;
 /**
  * Time data provider that converts between time data units used internally and
  * time in display units used by the caller.
- *
- * @since 3.2
  */
 public interface ITimeDataProviderConverter extends ITimeDataProvider {
 

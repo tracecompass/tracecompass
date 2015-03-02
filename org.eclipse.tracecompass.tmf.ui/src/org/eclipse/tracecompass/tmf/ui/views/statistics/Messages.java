@@ -17,9 +17,7 @@ import org.eclipse.osgi.util.NLS;
 /**
  * Messages file for statistics view strings.
  *
- * @version 2.0
  * @author Mathieu Denis
- * @since 2.0
  */
 public class Messages extends NLS {
 
@@ -27,7 +25,6 @@ public class Messages extends NLS {
 
     /**
      * String for the global tab name
-     * @since 2.0
      */
     public static String TmfStatisticsView_GlobalTabName;
 

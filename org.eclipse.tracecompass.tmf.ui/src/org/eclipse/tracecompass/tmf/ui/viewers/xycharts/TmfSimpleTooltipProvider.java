@@ -22,7 +22,6 @@ import org.swtchart.IAxis;
  * value of the current mouse position.
  *
  * @author Bernd Hufmann
- * @since 3.0
  */
 public class TmfSimpleTooltipProvider extends TmfBaseProvider implements MouseTrackListener {
 

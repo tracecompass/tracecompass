@@ -16,7 +16,6 @@ package org.eclipse.tracecompass.internal.lttng2.control.ui.relayd;
  * A class that holds information about the relayd connection.
  *
  * @author Marc-Andre Laperle
- * @since 3.1
  */
 public final class LttngRelaydConnectionInfo {
 

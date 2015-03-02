@@ -130,7 +130,6 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
     /**
      * Returns a list of experiment model elements under the experiments folder.
      * @return list of experiment model elements
-     * @since 3.0
      */
     public List<TmfExperimentElement> getExperiments() {
         List<ITmfProjectModelElement> children = getChildren();

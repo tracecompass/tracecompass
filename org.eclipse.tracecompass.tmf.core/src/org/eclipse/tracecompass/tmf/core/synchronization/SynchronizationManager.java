@@ -27,7 +27,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * otherwise their calculation.
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public abstract class SynchronizationManager extends TmfComponent {
 

@@ -18,8 +18,6 @@ import org.eclipse.core.runtime.Path;
 
 /**
  * Utility class for common tmf.core functionalities
- *
- * @since 3.2
  */
 public class TmfTraceCoreUtils {
 

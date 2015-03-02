@@ -25,7 +25,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.virtualtable.ColumnData;
  * Event table for text traces, which has one column for every event field.
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  * @deprecated Users of this class should instead use
  *             {@link TmfEventsTable#TmfEventsTable(Composite, int, java.util.Collection)}
  *             , by passing

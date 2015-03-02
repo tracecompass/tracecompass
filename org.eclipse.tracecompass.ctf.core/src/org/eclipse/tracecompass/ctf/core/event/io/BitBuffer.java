@@ -28,8 +28,6 @@ import org.eclipse.tracecompass.ctf.core.CTFReaderException;
  * <b><u>BitBuffer</u></b>
  * <p>
  * A bitwise buffer capable of accessing fields with bit offsets.
- *
- * @since 2.0
  */
 public final class BitBuffer {
 
@@ -127,7 +125,6 @@ public final class BitBuffer {
      * @throws CTFReaderException
      *             An error occurred reading the long. This exception can be
      *             raised if the buffer tries to read out of bounds
-     * @since 3.0
      */
     public long getLong() throws CTFReaderException {
         return get(BIT_LONG, true);
@@ -149,7 +146,6 @@ public final class BitBuffer {
      *             An error occurred reading the data. If more than 64 bits at a
      *             time are read, or the buffer is read beyond its end, this
      *             exception will be raised.
-     * @since 3.0
      */
     public long get(int length, boolean signed) throws CTFReaderException {
         if (length > BIT_LONG) {
@@ -190,7 +186,6 @@ public final class BitBuffer {
      * @throws BufferUnderflowException
      *             - If there are fewer than length bytes remaining in this
      *             buffer
-     * @since 3.1
      */
     public void get(@NonNull byte[] dst) {
         fBuffer.position((int) (fPosition / BIT_CHAR));
@@ -625,7 +620,6 @@ public final class BitBuffer {
      *            The new position of the buffer.
      * @throws CTFReaderException
      *             Thrown on out of bounds exceptions
-     * @since 3.0
      */
     public void position(long newPosition) throws CTFReaderException {
 
@@ -640,7 +634,6 @@ public final class BitBuffer {
      * Sets the position in the buffer.
      *
      * @return order The position of the buffer.
-     * @since 3.0
      */
     public long position() {
         return fPosition;

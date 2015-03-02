@@ -20,7 +20,6 @@ import org.eclipse.jdt.annotation.Nullable;
  * scope they normally contain a timestamp
  *
  * @author Matthew Khouzam
- * @since 3.1
  */
 @NonNullByDefault
 public class EventHeaderVScope extends LexicalScope {

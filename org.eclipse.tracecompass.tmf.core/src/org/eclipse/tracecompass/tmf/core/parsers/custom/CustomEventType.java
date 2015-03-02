@@ -20,7 +20,6 @@ import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
  * Event type for custom text parsers.
  *
  * @author Patrick Tassé
- * @since 3.0
  */
 public abstract class CustomEventType extends TmfEventType {
 

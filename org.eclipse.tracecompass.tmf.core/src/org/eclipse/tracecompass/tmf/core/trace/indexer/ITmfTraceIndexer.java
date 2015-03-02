@@ -25,7 +25,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * @see ITmfEvent
  *
  * @author Francois Chouinard
- * @since 3.0
  */
 public interface ITmfTraceIndexer {
 
@@ -68,7 +67,6 @@ public interface ITmfTraceIndexer {
      * @param waitForCompletion
      *            Should we block the calling thread until the build is
      *            complete?
-     * @since 2.0
      */
     void buildIndex(long offset, TmfTimeRange range, boolean waitForCompletion);
 
@@ -85,7 +83,6 @@ public interface ITmfTraceIndexer {
      *
      * @param context The trace context to save
      * @param timestamp The timestamp matching this context
-     * @since 2.0
      */
     void updateIndex(ITmfContext context, ITmfTimestamp timestamp);
 
@@ -95,7 +92,6 @@ public interface ITmfTraceIndexer {
      *
      * @param timestamp the requested timestamp
      * @return the checkpoint context
-     * @since 2.0
      */
     ITmfContext seekIndex(ITmfTimestamp timestamp);
 

@@ -20,9 +20,7 @@ import org.eclipse.ui.views.properties.PropertySheetSorter;
 /**
  * Property sheet page with empty sorter
  *
- * @version 1.0
  * @author Patrick Tasse
- * @since 2.0
  */
 public class UnsortedPropertySheetPage extends PropertySheetPage {
 

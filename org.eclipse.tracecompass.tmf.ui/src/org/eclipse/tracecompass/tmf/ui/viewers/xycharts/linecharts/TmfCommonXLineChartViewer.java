@@ -41,7 +41,6 @@ import org.swtchart.Range;
  * series appearance can be overridden when creating it.
  *
  * @author - Geneviève Bastien
- * @since 3.0
  */
 public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
@@ -102,8 +101,6 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     /**
      * Forces a reinitialization of the data sources, even if it has already
      * been initialized for this trace before
-     *
-     * @since 3.1
      */
     protected void reinitialize() {
         fSeriesValues.clear();

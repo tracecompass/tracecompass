@@ -22,7 +22,6 @@ import java.nio.ByteOrder;
  * Metadata packet response containing a packet of metadata
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public class MetadataPacketResponse implements IRelayResponse {
 

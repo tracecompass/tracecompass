@@ -18,7 +18,6 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.equalsNullable;
  * Trace import helper class
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public class TraceValidationHelper implements Comparable<TraceValidationHelper> {
 

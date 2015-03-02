@@ -76,7 +76,6 @@ public class HotSpot extends GraphNode {
      * Returns the marker image.
      *
      * @return the image
-     * @since 2.0
      */
     protected IImage getImage() {
         return fImage;

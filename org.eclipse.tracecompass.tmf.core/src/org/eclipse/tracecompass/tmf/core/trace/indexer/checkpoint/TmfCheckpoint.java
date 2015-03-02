@@ -28,7 +28,6 @@ import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
  * @see ITmfTimestamp
  *
  * @author Francois Chouinard
- * @since 3.0
  */
 public class TmfCheckpoint implements ITmfCheckpoint {
 
@@ -57,7 +56,6 @@ public class TmfCheckpoint implements ITmfCheckpoint {
      *            the corresponding trace location
      * @param checkpointRank
      *            the rank of the checkpoint
-     * @since 3.0
      */
     public TmfCheckpoint(final ITmfTimestamp timestamp, final ITmfLocation location, long checkpointRank) {
         fTimestamp = timestamp;
@@ -75,8 +73,6 @@ public class TmfCheckpoint implements ITmfCheckpoint {
      *            the corresponding trace location
      * @param bufferIn
      *            the byte buffer to read from
-     *
-     * @since 3.0
      */
     public TmfCheckpoint(final ITmfTimestamp timestamp, final ITmfLocation location, ByteBuffer bufferIn) {
         fTimestamp = timestamp;
@@ -102,9 +98,6 @@ public class TmfCheckpoint implements ITmfCheckpoint {
     // ITmfCheckpoint
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 2.0
-     */
     @Override
     public ITmfTimestamp getTimestamp() {
         return fTimestamp;
@@ -199,9 +192,6 @@ public class TmfCheckpoint implements ITmfCheckpoint {
         return getClass().getSimpleName() + " [fLocation=" + fLocation + ", fTimestamp=" + fTimestamp + ", fCheckpointRank=" + fCheckpointRank + "]";
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public void serialize(ByteBuffer bufferOut) {
         fLocation.serialize(bufferOut);
@@ -212,9 +202,6 @@ public class TmfCheckpoint implements ITmfCheckpoint {
         bufferOut.putLong(fCheckpointRank);
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public long getCheckpointRank() {
         return fCheckpointRank;

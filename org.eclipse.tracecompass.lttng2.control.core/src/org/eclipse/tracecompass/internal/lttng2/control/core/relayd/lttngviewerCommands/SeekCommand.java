@@ -17,7 +17,6 @@ package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewer
  * Seek command
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public enum SeekCommand implements IBaseCommand {
 

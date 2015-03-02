@@ -25,7 +25,6 @@ import com.google.common.collect.SetMultimap;
  * Helper class to simplify analysis requirement management.
  *
  * @author Guilliano Molaire
- * @since 3.0
  */
 public final class TmfAnalysisRequirementHelper {
 

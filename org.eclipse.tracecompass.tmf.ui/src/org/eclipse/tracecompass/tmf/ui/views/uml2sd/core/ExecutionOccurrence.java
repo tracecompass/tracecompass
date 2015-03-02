@@ -130,7 +130,6 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
      * Set the time when the execution occurrence starts.
      *
      * @param time the time when the execution occurrence starts
-     * @since 2.0
      */
     public void setStartTime(ITmfTimestamp time) {
         fStartTime = time;
@@ -144,7 +143,6 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
      * Set the time when the execution occurrence ends.
      *
      * @param time the time when the execution occurrence ends
-     * @since 2.0
      */
     public void setEndTime(ITmfTimestamp time) {
         fEndTime = time;
@@ -154,17 +152,11 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
         }
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public ITmfTimestamp getStartTime() {
         return fStartTime;
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public ITmfTimestamp getEndTime() {
         return fEndTime;
@@ -177,7 +169,6 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
 
    /**
     * @return the RGB of the occurrence filler.
-    * @since 2.0
     */
     public int[] getFillRGB() {
        if (fFillRGB == null) {
@@ -188,7 +179,6 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
 
     /**
      * @return the RGB of the occurrence filler.
-     * @since 2.0
      */
      public int[] getStrokeRGB() {
         if (fStrokeRGB == null) {
@@ -199,7 +189,6 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
 
     /**
      * @return the image.
-     * @since 2.0
      */
     protected IImage getImage() {
         return fImage;
@@ -207,7 +196,6 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
 
     /**
      * @return the image.
-     * @since 2.0
      */
     protected IImage getEllipsesImage() {
         return fEllipsesImage;
@@ -256,8 +244,8 @@ public class ExecutionOccurrence extends BasicExecutionOccurrence implements ITi
     }
 
     /**
-     * Sets the flag whether the frame has time info or not
-     * @since 2.0
+     * Sets the flag whether the frame has time info or not'
+     *
      * @param hasTimeInfo
      *          true if frame has time info else false
      */

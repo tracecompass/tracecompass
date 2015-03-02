@@ -29,7 +29,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITmfTimeGraphDr
 /**
  * Provider class for the time graph provider
  *
- * @version 1.0
  * @author Patrick Tasse
  *
  */
@@ -52,8 +51,8 @@ public class TimeGraphPresentationProvider implements ITimeGraphPresentationProv
 
     /**
      * Constructor
+     *
      * @param stateTypeName  The state type name
-     * @since 2.1
      */
     public TimeGraphPresentationProvider(String stateTypeName) {
         fStateTypeName = stateTypeName;
@@ -61,7 +60,6 @@ public class TimeGraphPresentationProvider implements ITimeGraphPresentationProv
 
     /**
      * Constructor
-     * @since 2.1
      */
     public TimeGraphPresentationProvider() {
         this(Messages.TmfTimeLegend_TRACE_STATES);
@@ -72,10 +70,6 @@ public class TimeGraphPresentationProvider implements ITimeGraphPresentationProv
         return fStateTypeName;
     }
 
-    /**
-     * @see org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider#getStateTypeName(org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry)
-     * @since 2.0
-     */
     @Override
     public String getStateTypeName(ITimeGraphEntry entry) {
         return null;
@@ -91,17 +85,11 @@ public class TimeGraphPresentationProvider implements ITimeGraphPresentationProv
         return 0;
     }
 
-    /**
-     * @since 2.1
-     */
     @Override
     public ITmfTimeGraphDrawingHelper getDrawingHelper() {
         return fDrawingHelper;
     }
 
-    /**
-     * @since 2.1
-     */
     @Override
     public void setDrawingHelper(ITmfTimeGraphDrawingHelper helper) {
         fDrawingHelper = helper;
@@ -142,25 +130,16 @@ public class TimeGraphPresentationProvider implements ITimeGraphPresentationProv
         return null;
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event, long hoverTime) {
         return getEventHoverToolTipInfo(event);
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public boolean displayTimesInTooltip() {
         return true;
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public void addColorListener(ITimeGraphColorListener listener) {
         if (!fListeners.contains(listener)) {
@@ -168,9 +147,6 @@ public class TimeGraphPresentationProvider implements ITimeGraphPresentationProv
         }
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public void removeColorListener(ITimeGraphColorListener listener) {
         fListeners.remove(listener);
@@ -178,7 +154,6 @@ public class TimeGraphPresentationProvider implements ITimeGraphPresentationProv
 
     /**
      * Notifies listeners of the state table change
-     * @since 3.0
      */
     protected void fireColorSettingsChanged() {
         for (ITimeGraphColorListener listener : fListeners) {

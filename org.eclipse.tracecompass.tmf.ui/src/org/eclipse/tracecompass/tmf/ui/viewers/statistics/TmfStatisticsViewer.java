@@ -69,7 +69,6 @@ import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfTreeContentPr
  * It is linked to a single ITmfTrace until its disposal.
  *
  * @author Mathieu Denis
- * @since 2.0
  */
 public class TmfStatisticsViewer extends TmfViewer {
 
@@ -220,7 +219,6 @@ public class TmfStatisticsViewer extends TmfViewer {
      *
      * @param signal
      *            Contains the information about the new selected time range.
-     * @since 2.1
      */
     @TmfSignalHandler
     public void timeSynchUpdated(TmfTimeSynchSignal signal) {
@@ -318,7 +316,6 @@ public class TmfStatisticsViewer extends TmfViewer {
      *
      * @param request
      *            The request to be canceled
-     * @since 3.0
      */
     protected void cancelOngoingRequest(ITmfEventRequest request) {
         if (request != null && !request.isCompleted()) {
@@ -331,7 +328,6 @@ public class TmfStatisticsViewer extends TmfViewer {
      * the columns.
      *
      * @return An object of type {@link TmfBaseColumnDataProvider}.
-     * @since 3.0
      */
     protected TmfBaseColumnDataProvider getColumnDataProvider() {
         return new TmfBaseColumnDataProvider();

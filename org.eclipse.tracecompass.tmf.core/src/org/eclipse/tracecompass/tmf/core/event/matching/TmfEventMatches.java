@@ -22,7 +22,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * This default implementation of the class just counts the matches
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class TmfEventMatches implements IMatchProcessingUnit {
 

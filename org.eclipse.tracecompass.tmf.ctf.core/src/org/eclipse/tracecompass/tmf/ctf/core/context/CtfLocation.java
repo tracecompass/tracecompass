@@ -23,7 +23,6 @@ import org.eclipse.tracecompass.tmf.core.trace.location.TmfLocation;
  *
  * It can be copied and used to restore a position in a given trace.
  *
- * @version 1.0
  * @author Matthew Khouzam
  */
 public final class CtfLocation extends TmfLocation {
@@ -46,7 +45,6 @@ public final class CtfLocation extends TmfLocation {
      *
      * @param timestamp
      *            The timestamp of this location
-     * @since 2.0
      */
     public CtfLocation(final ITmfTimestamp timestamp) {
         this(timestamp.getValue(), 0);
@@ -59,7 +57,6 @@ public final class CtfLocation extends TmfLocation {
      *            The timestamp of this location
      * @param index
      *            The index of this location for this timestamp
-     * @since 2.0
      */
     public CtfLocation(final ITmfTimestamp timestamp, long index) {
         this(timestamp.getValue(), index);
@@ -72,7 +69,6 @@ public final class CtfLocation extends TmfLocation {
      *            The new timestamp
      * @param index
      *            The new index
-     * @since 2.0
      */
     public CtfLocation(final long timestampValue, final long index) {
        super(new CtfLocationInfo(timestampValue, index));
@@ -83,7 +79,6 @@ public final class CtfLocation extends TmfLocation {
      *
      * @param locationInfo
      *            The locationInfo object to use
-     * @since 2.0
      */
     public CtfLocation(CtfLocationInfo locationInfo) {
         super(locationInfo);
@@ -94,7 +89,6 @@ public final class CtfLocation extends TmfLocation {
      *
      * @param location
      *            Other location to copy
-     * @since 2.0
      */
     public CtfLocation(final CtfLocation location) {
         super(location);
@@ -109,16 +103,11 @@ public final class CtfLocation extends TmfLocation {
      *
      * @param bufferIn
      *            the buffer to read from
-     *
-     * @since 3.0
      */
     public CtfLocation(ByteBuffer bufferIn) {
         super(new CtfLocationInfo(bufferIn));
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public CtfLocationInfo getLocationInfo() {
         return (CtfLocationInfo) super.getLocationInfo();
@@ -138,8 +127,6 @@ public final class CtfLocation extends TmfLocation {
 
     /**
      * Constructs the location from the ByteBuffer. This typically happens when reading from disk.
-     *
-     * @since 3.0
      */
     @Override
     public void serialize(ByteBuffer bufferOut) {

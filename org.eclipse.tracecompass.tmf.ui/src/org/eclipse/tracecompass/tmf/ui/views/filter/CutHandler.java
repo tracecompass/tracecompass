@@ -19,8 +19,8 @@ import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
 
 /**
  * Handler for cut command in filter view
+ *
  * @author Xavier Raynaud <xavier.raynaud@kalray.eu>
- * @since 3.0
  */
 public class CutHandler extends CopyHandler {
 

@@ -18,9 +18,7 @@ import org.eclipse.tracecompass.tmf.ui.views.uml2sd.dialogs.MinMaxDialog;
 /**
  * Action class implementation to configure minimum and maximum time range values.
  *
- * @version 1.0
  * @author sveyrier
- *
  */
 public class ConfigureMinMax extends BaseSDAction {
 
@@ -28,7 +26,6 @@ public class ConfigureMinMax extends BaseSDAction {
      * Constructor
      * @param view
      *          the sequence diagram view reference
-     * @since 2.0
      */
     public ConfigureMinMax(SDView view) {
         super(view);

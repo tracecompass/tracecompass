@@ -53,7 +53,6 @@ public interface ITmfEventType {
 
     /**
      * @return the event field names (labels)
-     * @since 3.0
      */
     Collection<String> getFieldNames();
 }

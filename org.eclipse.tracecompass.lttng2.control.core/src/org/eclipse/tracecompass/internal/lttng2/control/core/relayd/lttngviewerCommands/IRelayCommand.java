@@ -18,7 +18,6 @@ package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewer
  * Command sent, needs a getBytes to stream the data
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public interface IRelayCommand {
 

@@ -23,8 +23,6 @@ import java.util.Map;
  * tree can be retrieved.
  *
  * @author Mathieu Denis
- * @version 2.0
- * @since 2.0
  */
 public class TmfStatisticsTreeManager {
 

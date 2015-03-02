@@ -28,7 +28,6 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewerC
  * LTTng RelayD connector factory
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public final class LttngRelaydConnectorFactory {
 

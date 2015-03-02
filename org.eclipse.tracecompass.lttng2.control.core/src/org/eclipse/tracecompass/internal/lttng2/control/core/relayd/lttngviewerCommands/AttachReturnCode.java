@@ -17,7 +17,6 @@ package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewer
  * Return codes for "viewer attach" command
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public enum AttachReturnCode implements IBaseCommand {
 

@@ -22,7 +22,6 @@ import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
  * It ties a trace location to an event rank. The context should be enough to
  * restore the trace state so the corresponding event can be read.
  *
- * @version 1.0
  * @author Francois Chouinard
  *
  * @see ITmfLocation
@@ -54,7 +53,6 @@ public class TmfContext implements ITmfContext {
      * Simple constructor (unknown rank)
      *
      * @param location the event location
-     * @since 3.0
      */
     public TmfContext(final ITmfLocation location) {
         this(location, UNKNOWN_RANK);
@@ -65,7 +63,6 @@ public class TmfContext implements ITmfContext {
      *
      * @param location the event location
      * @param rank the event rank
-     * @since 3.0
      */
     public TmfContext(final ITmfLocation location, final long rank) {
         fLocation = location;
@@ -89,17 +86,11 @@ public class TmfContext implements ITmfContext {
     // ITmfContext
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 3.0
-     */
     @Override
     public ITmfLocation getLocation() {
         return fLocation;
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public void setLocation(final ITmfLocation location) {
         fLocation = location;

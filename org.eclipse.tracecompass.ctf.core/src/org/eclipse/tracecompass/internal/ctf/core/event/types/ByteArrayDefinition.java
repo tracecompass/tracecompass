@@ -31,7 +31,6 @@ import com.google.common.collect.ImmutableList;
  * A fixed length string definition
  *
  * @author Matthew Khouzam
- * @since 3.1
  */
 @NonNullByDefault
 public final class ByteArrayDefinition extends AbstractArrayDefinition {

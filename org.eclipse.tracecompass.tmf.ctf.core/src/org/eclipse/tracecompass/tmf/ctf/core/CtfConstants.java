@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.QualifiedName;
 /**
  * Set of constants used by the CTF adaptor classes
  *
- * @since 2.0
  * @noimplement This interface is not intended to be implemented by clients.
  */
 @SuppressWarnings("nls")
@@ -43,22 +42,16 @@ public interface CtfConstants {
 
     /**
      * The host persistent property for the live session.
-     *
-     * @since 3.1
      */
     QualifiedName LIVE_HOST = new QualifiedName("org.eclipse.linuxtools.tmf.ctf.core", "live.host"); //$NON-NLS-1$//$NON-NLS-2$
 
     /**
      * The port persistent property for the live session.
-     *
-     * @since 3.1
      */
     QualifiedName LIVE_PORT = new QualifiedName("org.eclipse.linuxtools.tmf.ctf.core", "live.port"); //$NON-NLS-1$//$NON-NLS-2$
 
     /**
      * The live session name persistent property.
-     *
-     * @since 3.1
      */
     QualifiedName LIVE_SESSION_NAME = new QualifiedName("org.eclipse.linuxtools.tmf.ctf.core", "live.session.name"); //$NON-NLS-1$//$NON-NLS-2$;
 }

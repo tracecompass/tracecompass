@@ -20,7 +20,6 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  * The specified event has been selected.
  *
  * @author Patrick Tasse
- * @since 3.2
  */
 public class TmfEventSelectedSignal extends TmfSignal {
 

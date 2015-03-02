@@ -20,7 +20,6 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
  * functionalities to warn the analysis module of parameter changed
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public abstract class TmfAbstractAnalysisParamProvider implements IAnalysisParameterProvider {
 

@@ -95,8 +95,6 @@ public abstract class TimeGraphBaseControl extends Canvas implements PaintListen
      * Retrieve the color scheme
      *
      * @return The color scheme
-     *
-     * @since 2.0
      */
     public TimeGraphColorScheme getColorScheme() {
         return fColorScheme;

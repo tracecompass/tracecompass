@@ -19,7 +19,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
  * A basic implementation of ITmfAsyncSequenceDiagramEvent.
  * </p>
  *
- * @version 1.0
  * @author Bernd Hufmann
  */
 public class TmfAsyncSequenceDiagramEvent extends TmfSyncSequenceDiagramEvent implements ITmfAsyncSequenceDiagramEvent {
@@ -57,9 +56,6 @@ public class TmfAsyncSequenceDiagramEvent extends TmfSyncSequenceDiagramEvent im
     // Operations
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 2.0
-     */
     @Override
     public ITmfTimestamp getEndTime() {
         return fEndTime;

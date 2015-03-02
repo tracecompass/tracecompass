@@ -77,9 +77,6 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
         return this.getContainerType().getAlignment();
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public int getMaximumSize() {
         return fContainerType.getMaximumSize();
@@ -89,9 +86,6 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
     // Operations
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 3.0
-     */
     @Override
     public EnumDefinition createDefinition(@Nullable IDefinitionScope definitionScope, String fieldName, BitBuffer input) throws CTFReaderException {
         alignRead(input);
@@ -134,7 +128,6 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
      * Gets a set of labels of the enum
      *
      * @return A set of labels of the enum, can be empty but not null
-     * @since 3.0
      */
     public Set<String> getLabels() {
         return Collections.unmodifiableSet(fLabels);

@@ -19,8 +19,6 @@ import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 
 /**
  * Implementation of a TmfContext for text traces.
- *
- * @since 3.0
  */
 public class TextTraceContext extends TmfContext {
 

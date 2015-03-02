@@ -104,7 +104,6 @@ public class VariantDeclaration extends Declaration {
      * Gets the fields of the variant
      *
      * @return the fields of the variant
-     * @since 2.0
      */
     public Map<String, IDeclaration> getFields() {
         return this.fFields;
@@ -119,9 +118,6 @@ public class VariantDeclaration extends Declaration {
     // Operations
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 3.0
-     */
     @Override
     public VariantDefinition createDefinition(IDefinitionScope definitionScope,
             String fieldName, BitBuffer input) throws CTFReaderException {
@@ -164,15 +160,11 @@ public class VariantDeclaration extends Declaration {
      * gets the tag definition
      *
      * @return the fTagDef
-     * @since 3.0
      */
     public EnumDefinition getTagDef() {
         return fTagDef;
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public int getMaximumSize() {
         Collection<IDeclaration> values = fFields.values();

@@ -341,7 +341,6 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
      * @return the bookmarks file
      * @throws CoreException
      *             if the bookmarks file cannot be created
-     * @since 2.0
      */
     @Override
     public IFile createBookmarksFile() throws CoreException {
@@ -357,7 +356,6 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
      * exist.
      *
      * @return the bookmarks file
-     * @since 2.0
      */
     @Override
     public IFile getBookmarksFile() {
@@ -611,7 +609,6 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
      * @param newName
      *            The new trace name
      * @return the new Resource object
-     * @since 2.0
      */
     public TmfTraceElement copy(String newName) {
         TmfTraceFolder folder = (TmfTraceFolder) getParent();
@@ -626,8 +623,6 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
 
     /**
      * Close opened editors associated with this trace.
-     *
-     * @since 2.0
      */
     @Override
     public void closeEditors() {
@@ -660,7 +655,6 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
      *
      * @throws CoreException
      *             thrown when IResource.delete fails
-     * @since 2.2
      */
     public void delete(IProgressMonitor progressMonitor) throws CoreException {
         // Close editors in UI Thread

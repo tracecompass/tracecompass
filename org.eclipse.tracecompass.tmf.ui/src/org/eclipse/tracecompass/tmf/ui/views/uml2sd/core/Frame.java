@@ -546,7 +546,6 @@ public class Frame extends BasicFrame {
      * @param dateToFind date to be found
      * @param bounds a two items array that will receive bounds if found
      * @return true if both bounds not null
-     * @since 2.0
      */
     public boolean findDateBounds(ITmfTimestamp dateToFind, ITimeRange bounds[]) {
         if (hasTimeInfo()) {
@@ -1128,7 +1127,6 @@ public class Frame extends BasicFrame {
 
     /**
      * @return highlighted life line if set else null.
-     * @since 2.0
      */
     protected Lifeline getHighlightLifeline() {
         return fHighlightLifeline;
@@ -1136,7 +1134,6 @@ public class Frame extends BasicFrame {
 
     /**
      * @return the start event value.
-     * @since 2.0
      */
     protected int getStartEvent() {
         return fStartEvent;
@@ -1146,7 +1143,6 @@ public class Frame extends BasicFrame {
      * Returns the number of events
      *
      * @return the number of events
-     * @since 2.0
      */
     protected int getNumberOfEvents() {
         return fNbEvent;
@@ -1154,8 +1150,8 @@ public class Frame extends BasicFrame {
 
     /**
      * Returns the highlight color.
+     *
      * @return the highlight color
-     * @since 2.0
      */
     protected IColor getHighlightColor() {
         return fHighlightColor;
@@ -1163,9 +1159,9 @@ public class Frame extends BasicFrame {
 
     /**
      * Set the highlighted life line.
+     *
      * @param lifeline
      *          The highlighted life line if set else null
-     * @since 2.0
      */
     protected void setHighlightLifeline(Lifeline lifeline) {
         fHighlightLifeline = lifeline;
@@ -1173,9 +1169,9 @@ public class Frame extends BasicFrame {
 
     /**
      * Sets the start event value
+     *
      * @param startEvent
      *           the start event value.
-     * @since 2.0
      */
     protected void setStartEvent(int startEvent) {
         fStartEvent = startEvent;
@@ -1186,7 +1182,6 @@ public class Frame extends BasicFrame {
      *
      * @param nbEvents
      *          The number of events
-     * @since 2.0
      */
     protected void setNumberOfEvents(int nbEvents) {
         fNbEvent = nbEvents;
@@ -1194,9 +1189,9 @@ public class Frame extends BasicFrame {
 
     /**
      * Sets the highlight color.
+     *
      * @param color
      *          the highlight color
-     * @since 2.0
      */
     protected void setHighlightColor(IColor color) {
         fHighlightColor = color;
@@ -1207,7 +1202,6 @@ public class Frame extends BasicFrame {
      *
      * @param occurences
      *          the list of execution occurrences
-     * @since 2.0
      */
     protected void setExecutionOccurrencesWithTime(List<SDTimeEvent> occurences) {
         fExecutionOccurrencesWithTime = occurences;

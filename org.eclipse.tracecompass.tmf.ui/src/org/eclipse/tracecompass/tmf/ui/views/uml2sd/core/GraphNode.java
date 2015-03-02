@@ -797,7 +797,6 @@ public abstract class GraphNode {
      *
      * @param occurence
      *          the start event occurrence attached to the graphNode
-     * @since 2.0
      */
     protected void setStartOccurrence(int occurence) {
         fStartEventOccurrence = occurence;
@@ -808,7 +807,6 @@ public abstract class GraphNode {
      *
      * @param occurence
      *          the start event occurrence attached to the graphNode
-     * @since 2.0
      */
     protected void setEndOccurrence(int occurence) {
         fEndEventOccurrence = occurence;
@@ -818,7 +816,6 @@ public abstract class GraphNode {
      * Sets the color preference id
      * @param id
      *          The color preference id
-     * @since 2.0
      */
     protected void setColorPrefId(String id) {
         fPrefId = id;
@@ -827,7 +824,6 @@ public abstract class GraphNode {
     /**
      * Gets the color preference id
      * @return the color preference id
-     * @since 2.0
      */
     protected String getColorPrefId() {
         return fPrefId;
@@ -835,7 +831,6 @@ public abstract class GraphNode {
 
     /**
      * @return if node has children or not
-     * @since 2.0
      */
     protected boolean hasChildren() {
         return fHasChilden;
@@ -845,7 +840,6 @@ public abstract class GraphNode {
      * Sets the flag indicating where the node has children or not.
      * @param hasChildren
      *          if node has children or not
-     * @since 2.0
      */
     protected void hasChildren(boolean hasChildren) {
         fHasChilden = hasChildren;
@@ -854,7 +848,6 @@ public abstract class GraphNode {
      * Returns a map from node name to graph node.
      *
      * @return map with children graph bodes
-     * @since 2.0
      */
     protected Map<String, List<GraphNode>> getNodeMap() {
         return fNodes;
@@ -863,7 +856,6 @@ public abstract class GraphNode {
      * Returns a map from node name to graph node for forward sorting
      *
      * @return forward sorting map
-     * @since 2.0
      */
     protected Map<String, List<GraphNode>> getForwardNodes() {
         return fForwardNodes;
@@ -872,7 +864,6 @@ public abstract class GraphNode {
      * Returns a map from node name to graph node for backwards sorting.
      *
      * @return backwards sorting map
-     * @since 2.0
      */
     protected Map<String, List<GraphNode>> getBackwardNodes() {
         return fBackwardNodes;
@@ -881,7 +872,6 @@ public abstract class GraphNode {
      * Returns a map from node name to index.
      *
      * @return map with node name to index
-     * @since 2.0
      */
     protected Map<String, Integer> getIndexes() {
         return fIndexes;
@@ -890,7 +880,6 @@ public abstract class GraphNode {
     /**
      * Returns a map from node name to sort flag for forwards sorting.
      * @return a map from node name to sort flag
-     * @since 2.0
      */
     protected Map<String, Boolean> getForwardSortMap() {
         return fForwardSort;
@@ -898,7 +887,6 @@ public abstract class GraphNode {
     /**
      * Returns a map from node name to flag for backwards sorting.
      * @return map from node name to flag for backwards sorting.
-     * @since 2.0
      */
     protected Map<String, Boolean> getBackwardSortMap() {
         return fBackwardSort;

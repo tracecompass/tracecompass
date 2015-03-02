@@ -22,7 +22,6 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.equalsNullable;
  * reference to the configuration element defining its trace type.
  *
  * @author Matthew Khouzam
- * @since 2.0
  */
 class FileAndName implements Comparable<FileAndName> {
 

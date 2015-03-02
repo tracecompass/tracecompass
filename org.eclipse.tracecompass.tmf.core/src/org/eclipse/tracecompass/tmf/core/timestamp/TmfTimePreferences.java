@@ -28,8 +28,6 @@ import org.eclipse.tracecompass.internal.tmf.core.Activator;
  * TMF Time format preferences
  *
  * @author Francois Chouinard
- * @version 1.0
- * @since 2.1
  */
 public final class TmfTimePreferences {
 
@@ -104,7 +102,6 @@ public final class TmfTimePreferences {
      * Get the locale
      *
      * @return the locale
-     * @since 3.2
      */
     public static Locale getLocale() {
         return Locale.forLanguageTag(Platform.getPreferencesService().getString(Activator.PLUGIN_ID, ITmfTimePreferencesConstants.LOCALE, Locale.getDefault().toLanguageTag(), null));

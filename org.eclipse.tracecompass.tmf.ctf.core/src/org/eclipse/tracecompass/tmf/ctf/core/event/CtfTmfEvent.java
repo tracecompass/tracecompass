@@ -40,9 +40,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
  * A wrapper class around CTF's Event Definition/Declaration that maps all types
  * of Declaration to native Java types.
  *
- * @version 1.0
  * @author Alexandre Montplaisir
- * @since 2.0
  */
 public class CtfTmfEvent extends TmfEvent
         implements ITmfSourceLookup, ITmfModelLookup, ITmfCustomAttributes {
@@ -191,9 +189,6 @@ public class CtfTmfEvent extends TmfEvent
         return fCtfTmfEventType;
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public Set<String> listCustomAttributes() {
         if (fEventDeclaration == null) {
@@ -202,9 +197,6 @@ public class CtfTmfEvent extends TmfEvent
         return fEventDeclaration.getCustomAttributes();
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public String getCustomAttribute(String name) {
         if (fEventDeclaration == null) {
@@ -217,7 +209,6 @@ public class CtfTmfEvent extends TmfEvent
      * Get the call site for this event.
      *
      * @return the call site information, or null if there is none
-     * @since 2.0
      */
     @Override
     public CtfTmfCallsite getCallsite() {
@@ -237,9 +228,6 @@ public class CtfTmfEvent extends TmfEvent
         return callsite;
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public String getModelUri() {
         return getCustomAttribute(CtfConstants.MODEL_URI_KEY);

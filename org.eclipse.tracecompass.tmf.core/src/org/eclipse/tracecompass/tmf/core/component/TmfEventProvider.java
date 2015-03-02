@@ -48,7 +48,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
  * </p>
  *
  * @author Francois Chouinard
- * @since 3.0
  */
 public abstract class TmfEventProvider extends TmfComponent implements ITmfEventProvider, ITmfFilter {
 
@@ -56,8 +55,7 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
     // Constants
     // ------------------------------------------------------------------------
 
-    /** Default amount of events per request "chunk"
-     * @since 3.0 */
+    /** Default amount of events per request "chunk" */
     public static final int DEFAULT_BLOCK_SIZE = 50000;
 
     /** Delay for coalescing background requests (in milli-seconds) */
@@ -183,9 +181,6 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
     // ITmfRequestHandler
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 3.0
-     */
     @Override
     public void sendRequest(final ITmfEventRequest request) {
         synchronized (fLock) {
@@ -294,7 +289,6 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
      *
      * @param request
      *            The request to copy
-     * @since 3.0
      */
     protected void newCoalescedEventRequest(ITmfEventRequest request) {
         synchronized (fLock) {
@@ -320,7 +314,6 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
      *
      * @param request
      *            The request to add to the list
-     * @since 3.0
      */
     protected void coalesceEventRequest(ITmfEventRequest request) {
         synchronized (fLock) {
@@ -405,7 +398,6 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
      *
      * @param request
      *            The data request
-     * @since 3.0
      */
     protected void queueRequest(final ITmfEventRequest request) {
 
@@ -431,7 +423,6 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
      *            The request
      * @return An application specific context; null if request can't be
      *         serviced
-     * @since 3.0
      */
     public abstract ITmfContext armRequest(ITmfEventRequest request);
 
@@ -445,7 +436,6 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
      * @param nbRead
      *            The number of events read so far
      * @return true if completion criteria is met
-     * @since 3.0
      */
     public boolean isCompleted(ITmfEventRequest request, ITmfEvent event, int nbRead) {
         boolean requestCompleted = isCompleted2(request, nbRead);
@@ -466,7 +456,6 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
 
     /**
      * @return the shutdown state (i.e. if it is accepting new requests)
-     * @since 2.0
      */
     protected boolean executorIsShutdown() {
         return fExecutor.isShutdown();
@@ -474,7 +463,6 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
 
     /**
      * @return the termination state
-     * @since 2.0
      */
     protected boolean executorIsTerminated() {
         return fExecutor.isTerminated();

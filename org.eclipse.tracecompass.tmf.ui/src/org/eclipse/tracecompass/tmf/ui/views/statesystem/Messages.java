@@ -18,7 +18,6 @@ import org.eclipse.osgi.util.NLS;
  * Localizable strings in the State System Visualizer.
  *
  * @author Alexandre Montplaisir
- * @since 2.0
  */
 public class Messages extends NLS {
 
@@ -45,8 +44,7 @@ public class Messages extends NLS {
     /** Label for the "value" column */
     public static String ValueColumnLabel;
 
-    /** Label for the "type" column
-     * @since 2.1*/
+    /** Label for the "type" column */
     public static String TypeColumnLabel;
 
     /** Label for the "start time" column */
@@ -64,23 +62,18 @@ public class Messages extends NLS {
      */
     public static String OutOfRangeMsg;
 
-    /** Label for the Filter button
-     * @since 2.1*/
+    /** Label for the Filter button */
     public static String FilterButton;
 
-    /** Label for the type Interger
-     * @since 2.1*/
+    /** Label for the type Interger */
     public static String TypeInteger;
 
-    /** Label for the type Long
-     * @since 2.1*/
+    /** Label for the type Long */
     public static String TypeLong;
 
-    /** Label for type Double
-     * @since 3.0*/
+    /** Label for type Double */
     public static String TypeDouble;
 
-    /** Label for the type String
-     * @since 2.1*/
+    /** Label for the type String */
     public static String TypeString;
 }

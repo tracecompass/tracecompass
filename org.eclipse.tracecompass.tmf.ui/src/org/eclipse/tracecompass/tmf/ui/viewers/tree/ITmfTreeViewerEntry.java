@@ -20,7 +20,6 @@ import org.eclipse.jdt.annotation.NonNull;
  * Interface for an entry (row) in a TMF tree viewer
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public interface ITmfTreeViewerEntry {
 

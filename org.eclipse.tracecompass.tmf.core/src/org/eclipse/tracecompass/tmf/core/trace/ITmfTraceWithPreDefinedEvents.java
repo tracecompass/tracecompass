@@ -30,7 +30,6 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
  *
  * @author Geneviève Bastien
  * @author Matthew Khouzam
- * @since 3.0
  */
 public interface ITmfTraceWithPreDefinedEvents {
 

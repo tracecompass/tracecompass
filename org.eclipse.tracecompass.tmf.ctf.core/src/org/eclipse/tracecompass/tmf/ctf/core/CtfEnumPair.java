@@ -18,7 +18,6 @@ import org.eclipse.tracecompass.tmf.core.util.Pair;
  * Pair of Enum value name and its long value.
  *
  * @author Bernd Hufmann
- * @since 2.0
  */
 public class CtfEnumPair extends Pair<String, Long> {
 

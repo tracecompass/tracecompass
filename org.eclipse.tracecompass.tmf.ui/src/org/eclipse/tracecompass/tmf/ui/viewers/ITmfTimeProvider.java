@@ -19,7 +19,6 @@ package org.eclipse.tracecompass.tmf.ui.viewers;
  *
  * @author Bernd Hufmann
  * @author Geneviève Bastien
- * @since 3.0
  */
 public interface ITmfTimeProvider extends ITmfViewer {
 

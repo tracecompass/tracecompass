@@ -62,7 +62,6 @@ import org.eclipse.ui.part.FileEditorInput;
  * project.
  *
  * @author Matthew Khouzam
- * @since 2.1
  */
 public class TmfOpenTraceHelper {
 
@@ -85,7 +84,6 @@ public class TmfOpenTraceHelper {
      * @throws CoreException
      *             core exceptions if something is not well set up in the back
      *             end
-     * @since 3.0
      */
     public static IStatus openTraceFromPath(TmfTraceFolder destinationFolder, String path, Shell shell) throws CoreException {
         return openTraceFromPath(destinationFolder, path, shell, null);
@@ -107,8 +105,6 @@ public class TmfOpenTraceHelper {
      * @throws CoreException
      *             core exceptions if something is not well set up in the back
      *             end
-     *
-     * @since 3.0
      */
     public static IStatus openTraceFromPath(TmfTraceFolder destinationFolder, String path, Shell shell, String tracetypeHint) throws CoreException {
         final String pathToUse = checkTracePath(path);
@@ -224,7 +220,6 @@ public class TmfOpenTraceHelper {
      * @param traceName
      *            the trace name
      * @return success or error
-     * @since 3.0
      */
     private static IStatus openTraceFromFolder(TmfTraceFolder destinationFolder, String traceName) {
         final List<ITmfProjectModelElement> elements = destinationFolder.getChildren();
@@ -319,7 +314,6 @@ public class TmfOpenTraceHelper {
      *
      * @param traceElement
      *            the {@link TmfTraceElement} to open
-     * @since 3.0
      */
     public static void openTraceFromElement(final TmfCommonProjectElement traceElement) {
 
@@ -422,7 +416,6 @@ public class TmfOpenTraceHelper {
      *            the {@link TmfTraceElement} to open
      * @param editor
      *            the reusable editor
-     * @since 3.0
      */
     public static void reopenTraceFromElement(final TmfCommonProjectElement traceElement, final IReusableEditor editor) {
 

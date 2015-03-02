@@ -178,40 +178,19 @@ public class Messages extends NLS {
     public static String ImportTraceWizardRemove;
     public static String ImportTraceWizardDirectoryTitle;
     public static String ImportTraceWizardDirectoryHint;
-    /**
-     * @since 2.2
-     */
     public static String ImportTraceWizardScanPagebyte;
 
-    /**
-     * @since 2.2
-     */
     public static String ImportTraceWizardScanPageGigabyte;
 
-    /**
-     * @since 2.2
-     */
     public static String ImportTraceWizardScanPageKilobyte;
 
-    /**
-     * @since 2.2
-     */
     public static String ImportTraceWizardScanPageMegabyte;
 
     public static String ImportTraceWizardScanPageRenameError;
-    /**
-     * @since 2.2
-     */
     public static String ImportTraceWizardScanPageSelectAtleastOne;
 
-    /**
-     * @since 2.2
-     */
     public static String ImportTraceWizardScanPageSize;
     public static String ImportTraceWizardSelectAll;
-    /**
-     * @since 2.2
-     */
     public static String ImportTraceWizardScanPageTerabyte;
 
     public static String ImportTraceWizardScanPageTitle;

@@ -19,7 +19,6 @@ import org.eclipse.jdt.annotation.NonNull;
  * output if the module corresponds to the output specifications
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class TmfNewAnalysisOutputListener implements ITmfNewAnalysisModuleListener {
 

@@ -24,8 +24,8 @@ import org.eclipse.ui.PlatformUI;
 
 /**
  * Handler for copy command in filter view
+ *
  * @author Xavier Raynaud <xavier.raynaud@kalray.eu>
- * @since 3.0
  */
 public class CopyHandler extends AbstractHandler {
 

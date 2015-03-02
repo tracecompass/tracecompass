@@ -26,7 +26,6 @@ import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.GraphNode;
 /**
  * Action class implementation to show end of a graph node.
  *
- * @version 1.0
  * @author sveyrier
  */
 public class ShowNodeEnd extends BaseSDAction {
@@ -45,7 +44,6 @@ public class ShowNodeEnd extends BaseSDAction {
      * Constructor
      *
      * @param view The sequence diagram view reference
-     * @since 2.0
      */
     public ShowNodeEnd(SDView view) {
         super(view);

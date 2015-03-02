@@ -15,8 +15,6 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 /**
  * A null time event. Used to represent an event that should not be drawn,
  * for example as a zoomed event that overshadows an underlying event.
- *
- * @since 2.0
  */
 public class NullTimeEvent extends TimeEvent {
 

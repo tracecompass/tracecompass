@@ -16,8 +16,6 @@ package org.eclipse.tracecompass.tmf.core.signal;
  * The default timestamp/interval format was modified
  *
  * @author Francois Chouinard
- * @version 1.0
- * @since 2.0
  */
 public class TmfTimestampFormatUpdateSignal extends TmfSignal {
 

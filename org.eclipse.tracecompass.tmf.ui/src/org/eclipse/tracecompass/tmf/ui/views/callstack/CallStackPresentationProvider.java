@@ -35,7 +35,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
  * presentation provider.
  *
  * @author Patrick Tasse
- * @since 2.0
  */
 public class CallStackPresentationProvider extends TimeGraphPresentationProvider {
 
@@ -62,7 +61,6 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
      *
      * @param view
      *            The callstack view that will contain the time events
-     * @since 3.0
      */
     public CallStackPresentationProvider(CallStackView view) {
         fView = view;

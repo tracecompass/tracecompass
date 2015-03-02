@@ -65,7 +65,6 @@ import org.eclipse.ui.wizards.datatransfer.ImportOperation;
  * Batch Import trace wizard.
  *
  * @author Matthew Khouzam
- * @since 2.0
  */
 public class BatchImportTraceWizard extends ImportTraceWizard {
 
@@ -510,7 +509,6 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
      * @param traceToScan
      *            The trace to scan
      * @return if the trace has been scanned yet or not
-     * @since 3.0
      */
     public boolean hasScanned(TraceValidationHelper traceToScan) {
         return fResults.containsKey(traceToScan);
@@ -523,7 +521,6 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
      *            The trace that has been scanned
      * @param validate
      *            if the trace is valid
-     * @since 3.0
      */
     public void addResult(TraceValidationHelper traceToScan, boolean validate) {
         fResults.put(traceToScan, validate);
@@ -535,7 +532,6 @@ public class BatchImportTraceWizard extends ImportTraceWizard {
      * @param traceToScan
      *            the scanned trace
      * @return whether it passes or not
-     * @since 3.0
      */
     public boolean getResult(TraceValidationHelper traceToScan) {
         return fResults.get(traceToScan);

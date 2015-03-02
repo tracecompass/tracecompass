@@ -24,7 +24,6 @@ import org.eclipse.tracecompass.tmf.core.trace.indexer.checkpoint.ITmfCheckpoint
 /**
  * A checkpoint index that store all checkpoints in memory.
  *
- * @since 3.0
  * @author Marc-Andre Laperle
  */
 public class TmfMemoryIndex implements ITmfCheckpointIndex, ICheckpointCollection {

@@ -46,7 +46,6 @@ public final class FloatDefinition extends Definition {
      *            the field name
      * @param value
      *            field value
-     * @since 3.0
      */
     public FloatDefinition(@NonNull FloatDeclaration declaration,
             IDefinitionScope definitionScope, @NonNull String fieldName, double value) {

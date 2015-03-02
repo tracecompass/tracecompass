@@ -42,9 +42,6 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
         fTraceEvents = new Vector<>(modelSize);
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public List<ITimeGraphEntry> getChildren() {
         return null;

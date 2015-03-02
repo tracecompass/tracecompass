@@ -33,7 +33,6 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
  * performed on attributes of the state system.
  *
  * @author Patrick Tassé
- * @since 3.0
  */
 public final class TmfStateSystemOperations {
 

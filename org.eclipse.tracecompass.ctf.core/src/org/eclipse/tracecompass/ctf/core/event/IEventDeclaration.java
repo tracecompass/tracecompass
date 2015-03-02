@@ -25,7 +25,6 @@ import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInputReader;
  * events.
  *
  * @author Matthew Khouzam
- * @since 2.0
  */
 public interface IEventDeclaration {
 
@@ -42,7 +41,6 @@ public interface IEventDeclaration {
      * @throws CTFReaderException
      *             As a bitbuffer is used to read, it could have wrapped
      *             IOExceptions.
-     * @since 3.0
      */
     EventDefinition createDefinition(CTFStreamInputReader streamInputReader, @NonNull BitBuffer input, long timestamp) throws CTFReaderException;
 
@@ -78,7 +76,6 @@ public interface IEventDeclaration {
      * Gets the {@link CTFStream} of an event declaration
      *
      * @return the stream
-     * @since 3.0
      */
     CTFStream getStream();
 
@@ -86,7 +83,6 @@ public interface IEventDeclaration {
      * What is the log level of this event?
      *
      * @return the log level.
-     * @since 2.0
      */
     long getLogLevel();
 
@@ -94,7 +90,6 @@ public interface IEventDeclaration {
      * Get the {@link Set} of names of the custom CTF attributes.
      *
      * @return The set of custom attributes
-     * @since 2.0
      */
     Set<String> getCustomAttributes();
 
@@ -104,7 +99,6 @@ public interface IEventDeclaration {
      * @param key
      *            The CTF attribute name
      * @return the CTF attribute
-     * @since 2.0
      */
     String getCustomAttribute(String key);
 

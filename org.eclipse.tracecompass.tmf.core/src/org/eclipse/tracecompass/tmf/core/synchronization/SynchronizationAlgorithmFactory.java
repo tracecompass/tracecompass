@@ -18,7 +18,6 @@ import org.eclipse.tracecompass.internal.tmf.core.synchronization.SyncAlgorithmF
  * A factory to generate synchronization algorithm to synchronize traces
  *
  * @author Geneviève Bastien
- * @since 3.2
  */
 public final class SynchronizationAlgorithmFactory {
 

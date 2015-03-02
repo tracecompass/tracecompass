@@ -19,7 +19,6 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
  * update themselves with the results.
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class TmfStartAnalysisSignal extends TmfSignal {
 

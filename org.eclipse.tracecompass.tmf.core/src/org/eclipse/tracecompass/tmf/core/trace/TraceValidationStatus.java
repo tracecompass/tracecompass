@@ -17,8 +17,6 @@ import org.eclipse.core.runtime.Status;
 /**
  * A class representing the validation status of a trace against a particular
  * trace type.
- *
- * @since 3.0
  */
 public class TraceValidationStatus extends Status {
 

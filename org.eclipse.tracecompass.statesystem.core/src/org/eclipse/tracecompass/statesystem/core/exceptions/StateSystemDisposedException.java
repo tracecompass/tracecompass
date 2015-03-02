@@ -17,7 +17,6 @@ package org.eclipse.tracecompass.statesystem.core.exceptions;
  * been disposed.
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  */
 public class StateSystemDisposedException extends Exception {
 

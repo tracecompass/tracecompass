@@ -18,7 +18,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
  * Interface for synchronous sequence diagram events.
  * </p>
  *
- * @version 1.0
  * @author Bernd Hufmann
  */
 public interface ITmfSyncSequenceDiagramEvent {
@@ -48,7 +47,6 @@ public interface ITmfSyncSequenceDiagramEvent {
      * Returns Start time of message (i.e. send time).
      *
      * @return Start timestamp of message (i.e. send time)
-     * @since 2.0
      */
     ITmfTimestamp getStartTime();
 }

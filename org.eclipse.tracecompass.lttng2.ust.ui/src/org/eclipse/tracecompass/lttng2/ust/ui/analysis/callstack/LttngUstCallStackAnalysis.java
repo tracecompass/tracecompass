@@ -26,7 +26,6 @@ import org.eclipse.tracecompass.tmf.ui.views.callstack.AbstractCallStackAnalysis
  * events.
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  */
 public class LttngUstCallStackAnalysis extends AbstractCallStackAnalysis {
 

@@ -20,8 +20,6 @@ import org.eclipse.tracecompass.ctf.core.event.CTFCallsite;
  * Comparator for CTFCallsite
  *
  * @author Simon Delisle
- * @since 3.0
- *
  */
 public class CTFCallsiteComparator implements Comparator<CTFCallsite> {
 

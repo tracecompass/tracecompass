@@ -15,8 +15,6 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 /**
  * TimeEvent implementation for events that do not involve only one entry, they
  * have a source entry and destination entry
- *
- * @since 2.1
  */
 public class TimeLinkEvent extends TimeEvent implements ILinkEvent {
 

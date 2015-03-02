@@ -19,7 +19,6 @@ import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
  * Event content for custom text parsers
  *
  * @author Patrick Tassé
- * @since 3.0
  */
 public class CustomEventContent extends TmfEventField {
 

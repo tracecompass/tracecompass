@@ -22,7 +22,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
  * example after trace synchronization
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public interface ITmfTimestampTransform extends Serializable {
 

@@ -16,8 +16,6 @@ import org.eclipse.swt.widgets.Composite;
 
 /**
  * Text control for selection start time
- *
- * @since 2.2
  */
 public class HistogramSelectionStartControl extends HistogramCurrentTimeControl {
 

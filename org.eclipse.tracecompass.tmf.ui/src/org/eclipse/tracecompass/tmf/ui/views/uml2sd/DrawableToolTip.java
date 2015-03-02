@@ -221,7 +221,6 @@ public class DrawableToolTip implements PaintListener {
      * @param value the current in the scale
      * @param min the scale min
      * @param max the scale max
-     * @since 2.0
      */
     public void showToolTip(ITmfTimestamp value, ITmfTimestamp min, ITmfTimestamp max) {
         fMinMaxRange = new TmfTimeRange(min, max);

@@ -25,7 +25,6 @@ import org.eclipse.ui.views.IViewDescriptor;
  * Class for project elements of type analysis output
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class TmfAnalysisOutputElement extends TmfProjectModelElement {
 

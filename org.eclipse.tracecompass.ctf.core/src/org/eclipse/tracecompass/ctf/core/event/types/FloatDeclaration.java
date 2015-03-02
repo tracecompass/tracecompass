@@ -98,9 +98,6 @@ public final class FloatDeclaration extends Declaration implements ISimpleDataty
         return fAlignement;
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public int getMaximumSize() {
         return fMantissa + fExponent + 1;
@@ -110,9 +107,6 @@ public final class FloatDeclaration extends Declaration implements ISimpleDataty
     // Operations
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 3.0
-     */
     @Override
     public FloatDefinition createDefinition(@Nullable IDefinitionScope definitionScope,
             String fieldName, BitBuffer input) throws CTFReaderException {

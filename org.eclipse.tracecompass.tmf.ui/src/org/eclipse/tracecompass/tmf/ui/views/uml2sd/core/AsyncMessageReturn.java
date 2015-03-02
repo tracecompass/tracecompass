@@ -78,7 +78,6 @@ public class AsyncMessageReturn extends AsyncMessage {
      * Returns the associated message (the message it is the return).<br>
      *
      * @return parentMessage the message to associate
-     * @since 2.0
      */
     public AsyncMessage getMessage() {
         return fMessage;

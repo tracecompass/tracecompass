@@ -100,7 +100,6 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
     /**
      * Initialize statically at startup by getting extensions from the platform
      * extension registry.
-     * @since 3.0
      */
     public static void init() {
         IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(TmfTraceType.TMF_TRACE_TYPE_ID);
@@ -255,7 +254,6 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
      * Adds a trace to the experiment
      *
      * @param trace The trace element to add
-     * @since 2.0
      */
     public void addTrace(TmfTraceElement trace) {
         addTrace(trace, true);
@@ -266,8 +264,6 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
      *
      * @param trace The trace element to add
      * @param refresh Flag for refreshing the project
-     *
-     * @since 3.1
      */
     public void addTrace(TmfTraceElement trace, boolean refresh) {
         /**
@@ -318,7 +314,6 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
      *
      * @param trace The trace to remove
      * @throws CoreException exception
-     * @since 2.0
      */
     public void removeTrace(TmfTraceElement trace) throws CoreException {
 
@@ -380,7 +375,6 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
      * and the corresponding extension.
      *
      * @return the {@link TmfExperiment} or <code>null</code> for an error
-     * @since 3.0
      */
     @Override
     public TmfExperiment instantiateTrace() {

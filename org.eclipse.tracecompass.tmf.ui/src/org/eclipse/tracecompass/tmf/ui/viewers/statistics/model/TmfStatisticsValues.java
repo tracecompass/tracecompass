@@ -23,8 +23,6 @@ package org.eclipse.tracecompass.tmf.ui.viewers.statistics.model;
  * another for the number of events in the selected time range.
  *
  * @author Mathieu Denis
- * @version 2.0
- * @since 2.0
  */
 public class TmfStatisticsValues {
 

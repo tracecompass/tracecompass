@@ -28,7 +28,6 @@ import org.eclipse.tracecompass.internal.tmf.core.Activator;
  * Class to fetch and save synchronization information between traces
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class SynchronizationBackend {
 

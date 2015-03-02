@@ -134,22 +134,18 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // Drag states
     /**
      * No drag in progress
-     * @since 2.2
      */
     protected final int DRAG_NONE = 0;
     /**
      * Drag the selection
-     * @since 2.2
      */
     protected final int DRAG_SELECTION = 1;
     /**
      * Drag the time range
-     * @since 2.2
      */
     protected final int DRAG_RANGE = 2;
     /**
      * Drag the zoom range
-     * @since 2.2
      */
     protected final int DRAG_ZOOM = 3;
 
@@ -207,13 +203,11 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      * @see #DRAG_SELECTION
      * @see #DRAG_RANGE
      * @see #DRAG_ZOOM
-     * @since 2.2
      */
     protected int fDragState = DRAG_NONE;
 
     /**
      * The button that started a mouse drag, or 0 if no drag in progress
-     * @since 2.2
      */
     protected int fDragButton = 0;
 
@@ -224,7 +218,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     /**
      * show the traces or not
-     * @since 3.0
      */
     static boolean showTraces = true;
 
@@ -429,7 +422,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      * Return <code>true</code> if the traces must be displayed in the histogram,
      * <code>false</code> otherwise.
      * @return whether the traces should be displayed
-     * @since 3.0
      */
     public boolean showTraces() {
         return showTraces && fDataModel.getNbTraces() < getMaxNbTraces();
@@ -439,7 +431,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      * Returns the maximum number of traces the histogram can display with separate colors.
      * If there is more traces, histogram will use only one color to display them.
      * @return the maximum number of traces the histogram can display.
-     * @since 3.0
      */
     public int getMaxNbTraces() {
         return fHistoBarColors.length;
@@ -449,7 +440,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      * Returns the color used to display the trace at the given index.
      * @param traceIndex a trace index
      * @return a {@link Color}
-     * @since 3.0
      */
     public Color getTraceColor(int traceIndex) {
         return fHistoBarColors[traceIndex % fHistoBarColors.length];
@@ -489,7 +479,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      *
      * @param beginTime The begin time of the current selection
      * @param endTime The end time of the current selection
-     * @since 2.1
      */
     public void setSelection(final long beginTime, final long endTime) {
         fSelectionBegin = (beginTime > 0) ? beginTime : 0;
@@ -530,7 +519,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      *
      * @param offset
      *            the bucket display offset
-     * @since 2.2
      */
     protected void setOffset(final int offset) {
         fOffset = offset;
@@ -636,7 +624,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     /**
      * Add a mouse wheel listener to the histogram
      * @param listener the mouse wheel listener
-     * @since 2.0
      */
     public void addMouseWheelListener(MouseWheelListener listener) {
         fCanvas.addMouseWheelListener(listener);
@@ -645,7 +632,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     /**
      * Remove a mouse wheel listener from the histogram
      * @param listener the mouse wheel listener
-     * @since 2.0
      */
     public void removeMouseWheelListener(MouseWheelListener listener) {
         fCanvas.removeMouseWheelListener(listener);
@@ -654,7 +640,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     /**
      * Add a key listener to the histogram
      * @param listener the key listener
-     * @since 3.1
      */
     public void addKeyListener(KeyListener listener) {
         fCanvas.addKeyListener(listener);
@@ -663,7 +648,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     /**
      * Remove a key listener from the histogram
      * @param listener the key listener
-     * @since 3.1
      */
     public void removeKeyListener(KeyListener listener) {
         fCanvas.removeKeyListener(listener);
@@ -846,7 +830,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      *            the range start time
      * @param rangeDuration
      *            the range duration
-     * @since 2.2
      */
     protected void drawTimeRangeWindow(GC imageGC, long rangeStartTime, long rangeDuration) {
 
@@ -943,9 +926,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // MouseMoveListener
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 2.2
-     */
     @Override
     public void mouseMove(MouseEvent event) {
         if (fDragState == DRAG_SELECTION && fDataModel.getStartTime() < fDataModel.getEndTime()) {
@@ -1033,7 +1013,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      *
      * @param signal
      *            the incoming signal
-     * @since 2.0
      */
     @TmfSignalHandler
     public void timestampFormatUpdated(TmfTimestampFormatUpdateSignal signal) {

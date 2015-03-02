@@ -16,7 +16,6 @@ package org.eclipse.tracecompass.tmf.core.event.lookup;
  * Interface for events to implement to provide information for model element lookup.
  *
  * @author Bernd Hufmann
- * @since 2.0
  */
 public interface ITmfModelLookup {
     /**

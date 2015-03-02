@@ -32,7 +32,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
  * The TMF coalesced event request
  *
  * @author Francois Chouinard
- * @since 3.0
  */
 public class TmfCoalescedEventRequest extends TmfEventRequest {
 

@@ -99,7 +99,6 @@ public class Stop extends GraphNode {
      * Get the lifeline on which the stop must be draw
      *
      * @return the the stop owing lifeline
-     * @since 2.0
      */
     public Lifeline getLifeline() {
         return fLifeline;
@@ -109,7 +108,6 @@ public class Stop extends GraphNode {
      * Get the event occurrence when this stop appears
      *
      * @return the eventOccurence to assign to the stop
-     * @since 2.0
      */
     public int getEventOccurrence() {
         return fEventOccurrence;

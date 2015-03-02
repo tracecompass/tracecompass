@@ -28,7 +28,6 @@ import org.w3c.dom.Element;
  * Analysis module for the data-driven state systems, defined in XML.
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class XmlStateSystemModule extends TmfStateSystemAnalysisModule {
 

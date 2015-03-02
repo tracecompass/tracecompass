@@ -18,9 +18,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 /**
  * Signal indicating an event search has been applied.
  *
- * @version 1.0
  * @author Patrick Tasse
- * @since 2.0
  */
 public class TmfEventSearchAppliedSignal extends TmfSignal {
 

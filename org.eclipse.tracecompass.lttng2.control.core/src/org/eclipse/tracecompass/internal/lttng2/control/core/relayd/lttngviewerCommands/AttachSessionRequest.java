@@ -20,7 +20,6 @@ import java.nio.ByteOrder;
  * VIEWER_ATTACH_SESSION payload.
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public class AttachSessionRequest implements IRelayCommand {
 

@@ -17,7 +17,6 @@ package org.eclipse.tracecompass.ctf.core.event.types;
  * Parent of sequences and arrays
  *
  * @author Matthew Khouzam
- * @since 3.1
  */
 public abstract class CompoundDeclaration extends Declaration {
 

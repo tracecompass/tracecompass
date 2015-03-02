@@ -23,7 +23,6 @@ import org.eclipse.jface.viewers.Viewer;
  * The elements do not have children.
  *
  * @author Patrick Tasse
- * @since 3.2
  */
 public class ArrayTreeContentProvider implements ITreeContentProvider {
 

@@ -20,7 +20,6 @@ import java.nio.ByteOrder;
  * LTTNG_VIEWER_GET_NEW_STREAMS payload.
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public class NewStreamsRequest implements IRelayCommand {
 

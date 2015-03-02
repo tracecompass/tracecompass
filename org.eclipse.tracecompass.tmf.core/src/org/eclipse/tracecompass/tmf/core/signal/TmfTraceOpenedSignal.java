@@ -21,9 +21,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * Receivers can get ready to receive TmfTraceRangeUpdatedSignal for coalescing
  * and can expect TmfTraceSelectedSignal to follow.
  *
- * @version 1.0
  * @author Patrick Tasse
- * @since 2.0
  */
 public class TmfTraceOpenedSignal extends TmfSignal {
 
@@ -59,7 +57,6 @@ public class TmfTraceOpenedSignal extends TmfSignal {
      * Get a pointer to the editor file for this trace
      *
      * @return The IFile object
-     * @since 3.0
      */
     public IFile getEditorFile() {
         return fEditorFile;

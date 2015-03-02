@@ -54,7 +54,6 @@ public class TmfXmlViewOutput extends TmfAnalysisViewOutput {
      *            id of the view to display as output
      * @param viewType
      *            type of view this output is for
-     * @since 1.2
      */
     public TmfXmlViewOutput(String viewid, @NonNull ViewType viewType) {
         super(viewid);

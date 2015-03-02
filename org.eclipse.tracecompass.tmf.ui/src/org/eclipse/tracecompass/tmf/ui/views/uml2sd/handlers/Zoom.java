@@ -229,8 +229,6 @@ public class Zoom extends BaseSDAction {
 
     /**
      * Dispose the action and its resources
-     *
-     * @since 3.2
      */
     public void dispose() {
         fZoomInCursor.dispose();

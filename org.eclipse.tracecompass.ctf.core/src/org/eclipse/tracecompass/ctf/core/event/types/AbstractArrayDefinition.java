@@ -21,7 +21,6 @@ import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
  * Array definition, used for compound definitions and fixed length strings
  *
  * @author Matthew Khouzam
- * @since 3.1
  */
 @NonNullByDefault
 public abstract class AbstractArrayDefinition extends Definition {

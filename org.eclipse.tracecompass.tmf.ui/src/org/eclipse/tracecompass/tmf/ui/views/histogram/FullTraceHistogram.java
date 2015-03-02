@@ -216,7 +216,6 @@ public class FullTraceHistogram extends Histogram {
     /**
      * Get the histogram zoom
      * @return the histogram zoom
-     * @since 2.0
      */
     public HistogramZoom getZoom() {
         return fZoom;

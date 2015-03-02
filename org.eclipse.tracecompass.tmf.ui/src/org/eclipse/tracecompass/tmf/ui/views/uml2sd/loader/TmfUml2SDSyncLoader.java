@@ -124,7 +124,6 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     // Experiment attributes
     /**
      * The TMF trace reference.
-     * @since 2.0
      */
     protected ITmfTrace fTrace = null;
     /**
@@ -229,7 +228,6 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
      * Returns the current time if available else null.
      *
      * @return the current time if available else null
-     * @since 2.0
      */
     public ITmfTimestamp getCurrentTime() {
         fLock.lock();
@@ -262,7 +260,6 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     /**
      * Handler for the trace opened signal.
      * @param signal The trace opened signal
-     * @since 2.0
      */
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
@@ -278,7 +275,6 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
      * the first page.
      *
      * @param signal The trace selected signal
-     * @since 2.0
      */
     @TmfSignalHandler
     public void traceSelected(TmfTraceSelectedSignal signal) {
@@ -293,7 +289,6 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     /**
      * Method for loading the current selected trace into the view.
      * Sub-class need to override this method to add the view specific implementation.
-     * @since 2.0
      */
     protected void loadTrace() {
         ITmfEventRequest indexRequest = null;
@@ -417,7 +412,6 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
      * Signal handler for the trace closed signal.
      *
      * @param signal The trace closed signal
-     * @since 2.0
      */
     @TmfSignalHandler
     public void traceClosed(TmfTraceClosedSignal signal) {
@@ -1110,7 +1104,6 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
      *
      * @param time The timestamp
      * @return page that contains the time
-     * @since 2.0
      */
     protected int getPage(ITmfTimestamp time) {
         int page;
@@ -1168,7 +1161,6 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
      *
      * @param startTime The start time of time range.
      * @return the time range
-     * @since 2.0
      */
     protected TmfTimeRange getSignalTimeRange(ITmfTimestamp startTime) {
         fLock.lock();
@@ -1242,7 +1234,6 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
          *
          * @param findCriteria The search criteria
          * @param window Time range to search in
-         * @since 2.0
          */
         public SearchJob(Criteria findCriteria, TmfTimeRange window) {
             super(Messages.TmfUml2SDSyncLoader_SearchJobDescrition);
@@ -1418,7 +1409,6 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
          * Returns timestamp of found time.
          *
          * @return timestamp of found time.
-         * @since 2.0
          */
         public ITmfTimestamp getFoundTime() {
             return fFoundTime;
@@ -1428,9 +1418,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     /**
      * Job class to provide progress monitor feedback.
      *
-     * @version 1.0
      * @author Bernd Hufmann
-     *
      */
     protected static class IndexingJob extends Job {
 
@@ -1461,7 +1449,6 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
      *
      * @param tmfEvent Event to parse for sequence diagram event details
      * @return sequence diagram event if details are available else null
-     * @since 2.0
      */
     protected ITmfSyncSequenceDiagramEvent getSequenceDiagramEvent(ITmfEvent tmfEvent){
         //type = .*RECEIVE.* or .*SEND.*

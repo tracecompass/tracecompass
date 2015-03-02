@@ -21,7 +21,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
  * its operations. Implementors can store checkpoints in various ways and
  * optionally restore them later, see ({@link #isCreatedFromScratch})
  *
- * @since 3.0
  * @author Marc-Andre Laperle
  */
 public interface ITmfCheckpointIndex {

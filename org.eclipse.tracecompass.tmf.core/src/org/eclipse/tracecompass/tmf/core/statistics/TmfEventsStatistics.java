@@ -37,7 +37,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * and m is the portion of the trace covered by the selected interval.
  *
  * @author Alexandre Montplaisir
- * @since 2.0
  */
 public class TmfEventsStatistics implements ITmfStatistics {
 

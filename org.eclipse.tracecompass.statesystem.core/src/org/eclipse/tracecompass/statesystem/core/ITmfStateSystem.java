@@ -27,7 +27,6 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
  * the read-only quark-getting methods, as well as the history-querying ones.
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  * @noimplement Only the internal StateSystem class should implement this
  *              interface.
  */

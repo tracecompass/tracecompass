@@ -23,7 +23,6 @@ import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
  * TODO: replace by default methods and an interface when java 8 is upon us
  *
  * @author Matthew Khouzam
- * @since 3.1
  */
 @NonNullByDefault
 public abstract class ScopedDefinition extends Definition implements IDefinitionScope {
@@ -55,7 +54,6 @@ public abstract class ScopedDefinition extends Definition implements IDefinition
      *            the field name
      * @param scope
      *            the lexical scope
-     * @since 3.1
      */
     public ScopedDefinition(StructDeclaration declaration, @Nullable IDefinitionScope definitionScope, String fieldName, LexicalScope scope) {
         super(declaration, definitionScope, fieldName, scope);

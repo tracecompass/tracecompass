@@ -124,7 +124,6 @@ import org.eclipse.ui.wizards.datatransfer.ImportOperation;
  *
  *
  * @author Francois Chouinard
- * @since 2.0
  */
 @SuppressWarnings("restriction")
 public class ImportTraceWizardPage extends WizardResourceImportPage {

@@ -18,7 +18,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
  * Interface for asynchronous sequence diagram events.
  * </p>
  *
- * @version 1.0
  * @author Bernd Hufmann
  */
 public interface ITmfAsyncSequenceDiagramEvent extends ITmfSyncSequenceDiagramEvent {
@@ -26,7 +25,6 @@ public interface ITmfAsyncSequenceDiagramEvent extends ITmfSyncSequenceDiagramEv
      * Returns end timestamp of message (i.e. receive time)
      *
      * @return end timestamp of message (i.e. receive time)
-     * @since 2.0
      */
     ITmfTimestamp getEndTime();
 }

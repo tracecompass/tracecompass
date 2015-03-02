@@ -25,7 +25,6 @@ import org.swtchart.IPlotArea;
  * It also notifies the viewer about a change of selection.
  *
  * @author Bernd Hufmann
- * @since 3.0
  */
 public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseListener, MouseMoveListener, ICustomPaintListener {
 

@@ -29,7 +29,6 @@ import org.eclipse.ui.handlers.HandlerUtil;
  * Batch import handler, spawn a wizard
  *
  * @author Matthew Khouzam
- * @since 2.0
  */
 public class BatchImportTraceHandler extends AbstractHandler {
 

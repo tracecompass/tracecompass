@@ -35,7 +35,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * TmfAnalysisManager), as it is being handled by the TmfStatisticsModule.
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  */
 public class TmfStatisticsTotalsModule extends TmfStateSystemAnalysisModule {
 

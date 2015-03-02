@@ -19,7 +19,6 @@ import org.eclipse.jdt.annotation.Nullable;
  * A lttng specific speedup node field scope of a lexical scope
  *
  * @author Matthew Khouzam
- * @since 3.1
  */
 @NonNullByDefault
 public class FieldsScope extends LexicalScope {

@@ -23,7 +23,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 /**
  * A basic implementation of ITmfEvent.
  *
- * @version 1.0
  * @author Francois Chouinard
  *
  * @see ITmfTimestamp
@@ -74,7 +73,6 @@ public class TmfEvent extends PlatformObject implements ITmfEvent {
      *            the event type
      * @param content
      *            the event content (payload)
-     * @since 2.0
      */
     public TmfEvent(final ITmfTrace trace,
             final long rank,
@@ -123,9 +121,6 @@ public class TmfEvent extends PlatformObject implements ITmfEvent {
         return fRank;
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public ITmfTimestamp getTimestamp() {
         return fTimestamp;

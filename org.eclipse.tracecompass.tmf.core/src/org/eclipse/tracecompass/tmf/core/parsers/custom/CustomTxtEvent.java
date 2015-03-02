@@ -27,7 +27,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * Trace event for custom text parsers.
  *
  * @author Patrick Tassé
- * @since 3.0
  */
 public class CustomTxtEvent extends CustomEvent {
 

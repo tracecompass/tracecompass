@@ -20,7 +20,6 @@ import org.eclipse.tracecompass.tmf.ui.views.distribution.model.IBaseDistributio
 /**
  * Histogram data model interface.
  *
- * @version 1.0
  * @author Bernd Hufmann
  */
 public interface IHistogramDataModel extends IBaseDistributionModel {
@@ -30,7 +29,6 @@ public interface IHistogramDataModel extends IBaseDistributionModel {
      * @param eventCount the event to count
      * @param timestamp the timestamp of the event to count
      * @param trace the trace corresponding to given events
-     * @since 3.0
      */
     void countEvent(long eventCount, long timestamp, ITmfTrace trace);
 

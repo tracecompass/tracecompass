@@ -36,7 +36,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * Base event for custom text parsers.
  *
  * @author Patrick Tassé
- * @since 3.0
  */
 public class CustomEvent extends TmfEvent {
 
@@ -191,7 +190,6 @@ public class CustomEvent extends TmfEvent {
      *            The ID/index of the field to display. This corresponds to the
      *            index in the event content.
      * @return The String to display in the cell
-     * @since 3.1
      */
     public String getEventString(int index) {
         if (fData != null) {

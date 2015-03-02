@@ -25,7 +25,6 @@ import org.swtchart.IPlotArea;
  * It also notifies the viewer about a change of range.
  *
  * @author Bernd Hufmann
- * @since 3.0
  */
 public class TmfMouseDragZoomProvider extends TmfBaseProvider implements MouseListener, MouseMoveListener, ICustomPaintListener {
 

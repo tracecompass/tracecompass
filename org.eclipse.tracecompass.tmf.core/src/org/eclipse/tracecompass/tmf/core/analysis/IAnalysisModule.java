@@ -41,7 +41,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * wishes.
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public interface IAnalysisModule extends ITmfComponent, IAnalysisRequirementProvider {
 

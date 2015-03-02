@@ -33,7 +33,6 @@ import org.eclipse.ui.dialogs.WizardResourceImportPage;
  * pages.
  *
  * @author Matthew Khouzam
- * @since 2.0
  */
 abstract class AbstractImportTraceWizardPage extends WizardResourceImportPage {
 

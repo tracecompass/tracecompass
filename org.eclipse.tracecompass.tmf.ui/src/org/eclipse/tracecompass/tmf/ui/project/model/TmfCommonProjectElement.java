@@ -58,7 +58,6 @@ import org.eclipse.ui.part.FileEditorInput;
  * all project elements: supplementary files, analysis, types, etc.
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
 

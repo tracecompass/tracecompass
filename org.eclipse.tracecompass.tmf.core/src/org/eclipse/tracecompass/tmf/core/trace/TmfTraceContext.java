@@ -27,7 +27,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
  * TODO could be extended to support the notion of current location too.
  *
  * @author Alexandre Montplaisir
- * @since 2.0
  */
 final class TmfTraceContext {
 
@@ -65,7 +64,6 @@ final class TmfTraceContext {
      *              The previous context
      * @param filter
      *              The applied filter
-     * @since 2.2
      */
     public TmfTraceContext(TmfTraceContext prevCtx, ITmfFilter filter) {
         fSelection = prevCtx.fSelection;
@@ -92,7 +90,6 @@ final class TmfTraceContext {
 
     /**
      * @return the current filter applied to the trace
-     * @since 2.2
      */
     public ITmfFilter getFilter() {
         return fFilter;

@@ -57,7 +57,6 @@ import org.osgi.framework.Bundle;
  * Utils class for the UI-specific parts of @link {@link TmfTraceType}.
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  */
 public final class TmfTraceTypeUIUtils {
 
@@ -79,8 +78,7 @@ public final class TmfTraceTypeUIUtils {
     /** Extension point element 'Events table type' */
     public static final String EVENTS_TABLE_TYPE_ELEM = "eventsTableType"; //$NON-NLS-1$
 
-    /** Extension point element 'Event Table Columns'
-     * @since 3.2*/
+    /** Extension point element 'Event Table Columns' */
     public static final String EVENT_TABLE_COLUMNS = "eventTableColumns"; //$NON-NLS-1$
 
     /** Extension point attribute 'tracetype' */
@@ -287,7 +285,6 @@ public final class TmfTraceTypeUIUtils {
          * @return Status.OK_Status if successful, error is otherwise.
          * @throws CoreException
          *             An exception caused by accessing eclipse project items.
-         * @since 3.1
          */
     public static IStatus setTraceType(IResource resource, TraceTypeHelper traceType, boolean refresh) throws CoreException {
         String traceTypeId = traceType.getTraceTypeId();
@@ -388,7 +385,6 @@ public final class TmfTraceTypeUIUtils {
      *            by the trace type.
      * @return The corresponding Event Table, or 'null' if this trace type did
      *         not specify any.
-     * @since 3.2
      */
     public static @Nullable TmfEventsTable getEventTable(ITmfTrace trace, Composite parent, int cacheSize) {
         final String traceType = getTraceType(trace);

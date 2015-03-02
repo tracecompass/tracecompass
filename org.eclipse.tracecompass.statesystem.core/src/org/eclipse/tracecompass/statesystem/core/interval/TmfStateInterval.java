@@ -20,7 +20,6 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
  * system.
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  */
 public final class TmfStateInterval implements ITmfStateInterval {
 

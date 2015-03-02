@@ -170,19 +170,16 @@ import com.google.common.collect.Multimap;
  *
  * @author Francois Chouinard
  * @author Patrick Tasse
- * @since 2.0
  */
 public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorSettingsListener, ISelectionProvider {
 
     /**
      * Empty string array, used by {@link #getItemStrings}.
-     * @since 3.0
      */
     protected static final @NonNull String[] EMPTY_STRING_ARRAY = new String[0];
 
     /**
      * Empty string
-     * @since 3.1
      */
     protected static final @NonNull String EMPTY_STRING = ""; //$NON-NLS-1$
 
@@ -379,7 +376,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      *            The iteration order of this collection will correspond to the
      *            initial ordering of the columns in the table.
      *            </p>
-     * @since 3.1
      */
     public TmfEventsTable(final Composite parent, int cacheSize,
             @NonNull Iterable<ITmfEventAspect> aspects) {
@@ -1540,7 +1536,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      *
      * @param filter
      *            The filter to apply
-     * @since 1.1
      */
     protected void applyFilter(ITmfFilter filter) {
         stopFilterThread();
@@ -2062,7 +2057,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * @param event
      *            The event printed in this row
      * @return The event row entries
-     * @since 3.0
      */
     public String[] getItemStrings(ITmfEvent event) {
         List<TmfEventTableColumn> columns = new ArrayList<>();
@@ -2126,7 +2120,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      *
      * @param statusLineManager
      *            The status line manager, or null to disable status line messages
-     * @since 2.1
      */
     public void setStatusLineManager(IStatusLineManager statusLineManager) {
         if (fStatusLineManager != null && statusLineManager == null) {
@@ -2200,17 +2193,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     // ISelectionProvider
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 2.0
-     */
     @Override
     public void addSelectionChangedListener(ISelectionChangedListener listener) {
         selectionChangedListeners.add(listener);
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public ISelection getSelection() {
         if (fTable == null || fTable.isDisposed()) {
@@ -2225,17 +2212,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         return new StructuredSelection(list);
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public void removeSelectionChangedListener(ISelectionChangedListener listener) {
         selectionChangedListeners.remove(listener);
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public void setSelection(ISelection selection) {
         // not implemented
@@ -2248,7 +2229,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * @param event a selection changed event
      *
      * @see ISelectionChangedListener#selectionChanged
-     * @since 2.0
      */
     protected void fireSelectionChanged(final SelectionChangedEvent event) {
         Object[] listeners = selectionChangedListeners.getListeners();
@@ -2531,7 +2511,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     }
 
     /**
-     * @since 2.0
+     * Refresh the table
      */
     public void refresh() {
         fCache.clear();

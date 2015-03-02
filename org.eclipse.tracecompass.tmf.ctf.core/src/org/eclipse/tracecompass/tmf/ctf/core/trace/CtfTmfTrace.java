@@ -263,16 +263,12 @@ public class CtfTmfTrace extends TmfTrace
      *
      * @return null, since the trace has no knowledge of the current location
      * @see org.eclipse.tracecompass.tmf.core.trace.ITmfTrace#getCurrentLocation()
-     * @since 3.0
      */
     @Override
     public ITmfLocation getCurrentLocation() {
         return null;
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public double getLocationRatio(ITmfLocation location) {
         final CtfLocation curLocation = (CtfLocation) location;
@@ -292,7 +288,6 @@ public class CtfTmfTrace extends TmfTrace
      * @param location
      *            ITmfLocation<?>
      * @return ITmfContext
-     * @since 3.0
      */
     @Override
     public synchronized ITmfContext seekEvent(final ITmfLocation location) {
@@ -439,9 +434,6 @@ public class CtfTmfTrace extends TmfTrace
     // ITmfTraceProperties
     // -------------------------------------------
 
-    /**
-     * @since 2.0
-     */
     @Override
     public Map<String, String> getTraceProperties() {
         Map<String, String> properties = new HashMap<>();
@@ -492,8 +484,6 @@ public class CtfTmfTrace extends TmfTrace
 
     /**
      * Gets the list of declared events
-     *
-     * @since 3.0
      */
     @Override
     public Set<CtfTmfEventType> getContainedEventTypes() {
@@ -543,7 +533,6 @@ public class CtfTmfTrace extends TmfTrace
      * Get an iterator to the trace
      *
      * @return an iterator to the trace
-     * @since 2.0
      */
     public ITmfContext createIterator() {
         try {
@@ -577,9 +566,6 @@ public class CtfTmfTrace extends TmfTrace
     // Timestamp transformation functions
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 3.0
-     */
     @Override
     public CtfTmfTimestamp createTimestamp(long ts) {
         return new CtfTmfTimestamp(getTimestampTransform().transform(ts));
@@ -587,9 +573,6 @@ public class CtfTmfTrace extends TmfTrace
 
     private static int fCheckpointSize = -1;
 
-    /**
-     * @since 3.0
-     */
     @Override
     public synchronized int getCheckpointSize() {
         if (fCheckpointSize == -1) {
@@ -608,9 +591,6 @@ public class CtfTmfTrace extends TmfTrace
         return new TmfBTreeTraceIndexer(this, interval);
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public ITmfLocation restoreLocation(ByteBuffer bufferIn) {
         return new CtfLocation(bufferIn);

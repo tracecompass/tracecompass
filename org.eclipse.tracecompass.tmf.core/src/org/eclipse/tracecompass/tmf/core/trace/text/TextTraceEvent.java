@@ -22,7 +22,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
  * Class to store the common functionality of text trace events.
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  */
 public abstract class TextTraceEvent extends TmfEvent {
 

@@ -79,9 +79,7 @@ import com.google.common.collect.Iterables;
 /**
  * Editor for TMF events
  *
- * @version 1.0
  * @author Patrick Tasse
- * @since 2.0
  */
 public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReusableEditor, IPropertyListener, IResourceChangeListener, ISelectionProvider, ISelectionChangedListener, IPartListener, IGotoMarker {
 
@@ -433,9 +431,6 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         return super.getAdapter(adapter);
     }
 
-    /**
-     * @since 2.1
-     */
     @Override
     public void gotoMarker(IMarker marker) {
         if (fTrace == null || fEventsTable == null) {
@@ -473,17 +468,11 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     // ISelectionProvider
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 2.0
-     */
     @Override
     public void addSelectionChangedListener(ISelectionChangedListener listener) {
         fSelectionChangedListeners.add(listener);
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public ISelection getSelection() {
         if (fEventsTable == null) {
@@ -492,17 +481,11 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         return fEventsTable.getSelection();
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public void removeSelectionChangedListener(ISelectionChangedListener listener) {
         fSelectionChangedListeners.remove(listener);
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public void setSelection(ISelection selection) {
         // not implemented
@@ -515,7 +498,6 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
      * @param event a selection changed event
      *
      * @see ISelectionChangedListener#selectionChanged
-     * @since 2.0
      */
     protected void fireSelectionChanged(final SelectionChangedEvent event) {
         Object[] listeners = fSelectionChangedListeners.getListeners();
@@ -534,9 +516,6 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     // ISelectionChangedListener
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 2.0
-     */
     @Override
     public void selectionChanged(SelectionChangedEvent event) {
         fireSelectionChanged(event);
@@ -546,9 +525,6 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     // IPartListener
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 2.0
-     */
     @Override
     public void partActivated(IWorkbenchPart part) {
         if (part == this && fTrace != null) {
@@ -560,9 +536,6 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         }
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public void partBroughtToTop(IWorkbenchPart part) {
         if (part == this && fTrace != null) {
@@ -574,23 +547,14 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         }
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public void partClosed(IWorkbenchPart part) {
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public void partDeactivated(IWorkbenchPart part) {
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public void partOpened(IWorkbenchPart part) {
     }
@@ -631,7 +595,6 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
      * Update the display to use the updated timestamp format
      *
      * @param signal the incoming signal
-     * @since 2.0
      */
     @TmfSignalHandler
     public void timestampFormatUpdated(TmfTimestampFormatUpdateSignal signal) {

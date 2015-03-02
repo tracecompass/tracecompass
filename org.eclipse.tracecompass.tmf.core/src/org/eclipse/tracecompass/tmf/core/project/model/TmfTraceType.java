@@ -41,10 +41,8 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * Utility class for accessing TMF trace type extensions from the platform's
  * extensions registry.
  *
- * @version 1.0
  * @author Patrick Tasse
  * @author Matthew Khouzam
- * @since 3.0
  */
 public final class TmfTraceType {
 
@@ -533,7 +531,6 @@ public final class TmfTraceType {
      * @return the trace type id or null if it is not set
      * @throws CoreException
      *             if the trace type id cannot be accessed
-     * @since 3.2
      */
     public static String getTraceTypeId(IResource resource) throws CoreException {
         String traceTypeId = resource.getPersistentProperties().get(TmfCommonConstants.TRACETYPE);

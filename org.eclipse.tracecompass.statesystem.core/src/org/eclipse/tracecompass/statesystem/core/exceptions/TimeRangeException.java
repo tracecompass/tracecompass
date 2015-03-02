@@ -21,7 +21,6 @@ package org.eclipse.tracecompass.statesystem.core.exceptions;
  * the cursor is), so this exception is also thrown in that case.
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  */
 public class TimeRangeException extends RuntimeException {
 

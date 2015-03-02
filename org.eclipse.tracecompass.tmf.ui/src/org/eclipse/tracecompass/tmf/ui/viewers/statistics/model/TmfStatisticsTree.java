@@ -21,8 +21,6 @@ package org.eclipse.tracecompass.tmf.ui.viewers.statistics.model;
  * node at a given place.
  *
  * @author Mathieu Denis
- * @version 2.0
- * @since 2.0
  */
 public class TmfStatisticsTree {
 

@@ -27,7 +27,6 @@ import org.xml.sax.SAXParseException;
  * Base class for custom trace definitions.
  *
  * @author Patrick Tassé
- * @since 3.0
  */
 public abstract class CustomTraceDefinition {
 
@@ -49,8 +48,7 @@ public abstract class CustomTraceDefinition {
     /** "Other" tag */
     public static final String TAG_OTHER = Messages.CustomTraceDefinition_otherTag;
 
-    /** Category of this trace definition
-     * @since 3.2 */
+    /** Category of this trace definition */
     public String categoryName;
 
     /** Name of this trace definition */
@@ -119,7 +117,6 @@ public abstract class CustomTraceDefinition {
      * Creates a new empty entity resolver
      *
      * @return a new entity resolver
-     * @since 3.1
      */
     protected static EntityResolver createEmptyEntityResolver() {
         return new EntityResolver() {
@@ -136,7 +133,6 @@ public abstract class CustomTraceDefinition {
      * Creates an error handler for parse exceptions
      *
      * @return a new error handler
-     * @since 3.1
      */
     protected static ErrorHandler createErrorHandler() {
         return new ErrorHandler() {

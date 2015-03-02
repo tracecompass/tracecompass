@@ -27,7 +27,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * <li>a content (payload)
  * </ul>
  *
- * @version 1.0
  * @author Francois Chouinard
  *
  * @see ITmfTimestamp
@@ -53,7 +52,6 @@ public interface ITmfEvent extends IAdaptable {
 
     /**
      * @return the event timestamp
-     * @since 2.0
      */
     @NonNull ITmfTimestamp getTimestamp();
 

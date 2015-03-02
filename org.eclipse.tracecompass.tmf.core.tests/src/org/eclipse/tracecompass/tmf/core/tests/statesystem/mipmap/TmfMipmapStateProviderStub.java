@@ -39,7 +39,6 @@ import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
  * A mipmap state provider for test
  *
  * @author Jean-Christian Kouamé
- * @since 3.0
  */
 class TmfMipmapStateProviderStub extends AbstractTmfMipmapStateProvider {
     /** test attribute name */

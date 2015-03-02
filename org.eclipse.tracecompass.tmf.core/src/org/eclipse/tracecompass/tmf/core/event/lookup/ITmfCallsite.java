@@ -22,7 +22,6 @@ package org.eclipse.tracecompass.tmf.core.event.lookup;
  * </ul>
  *
  * @author Bernd Hufmann
- * @since 2.0
  *
  * @see TmfCallsite
  */

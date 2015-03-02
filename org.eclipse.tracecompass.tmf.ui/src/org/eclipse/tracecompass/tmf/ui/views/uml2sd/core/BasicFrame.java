@@ -203,7 +203,6 @@ public class BasicFrame extends GraphNode {
 
     /**
      * @return true if mininum and maximum time needs to be calculated else false
-     * @since 2.0
      */
     protected boolean isComputeMinMax() {
         return fComputeMinMax;
@@ -211,7 +210,6 @@ public class BasicFrame extends GraphNode {
 
     /**
      * @return true if mininum and maximum time needs to be calculated else false
-     * @since 2.0
      */
     protected boolean isCustomMinMax() {
         return fCustomMinMax;
@@ -221,7 +219,6 @@ public class BasicFrame extends GraphNode {
      * gets the initialization flag for SD minimum.
      *
      * @return the initialization flag for SD minimum
-     * @since 2.0
      */
     protected boolean getInitSDMin() {
         return fInitSDMin;
@@ -392,7 +389,6 @@ public class BasicFrame extends GraphNode {
      * Return the minimum time stored in the frame taking all GraphNodes into account
      *
      * @return the minimum GraphNode time
-     * @since 2.0
      */
     public ITmfTimestamp getMinTime() {
         if (fLastExternalTimePref != SDViewPref.getInstance().excludeExternalTime()) {
@@ -411,7 +407,6 @@ public class BasicFrame extends GraphNode {
      *
      * @param min
      *            The minimum timestamp
-     * @since 2.0
      */
     public void setMin(ITmfTimestamp min) {
         fMinTime = min;
@@ -423,7 +418,6 @@ public class BasicFrame extends GraphNode {
      *
      * @param max
      *            The maximum timestamp
-     * @since 2.0
      */
     public void setMax(ITmfTimestamp max) {
         fMaxTime = max;
@@ -442,7 +436,6 @@ public class BasicFrame extends GraphNode {
      * Return the maximum time stored in the frame taking all GraphNodes into account
      *
      * @return the maximum GraphNode time
-     * @since 2.0
      */
     public ITmfTimestamp getMaxTime() {
         if (fLastExternalTimePref != SDViewPref.getInstance().excludeExternalTime()) {
@@ -487,7 +480,6 @@ public class BasicFrame extends GraphNode {
      * Returns the minimum time between consecutive messages.
      *
      * @return the minimum time between consecutive messages
-     * @since 2.0
      */
     public ITmfTimestamp getSDMinTime() {
         computeMaxMinTime();
@@ -498,7 +490,6 @@ public class BasicFrame extends GraphNode {
      * Returns the maximum time between consecutive messages.
      *
      * @return the maximum time between consecutive messages
-     * @since 2.0
      */
     public ITmfTimestamp getSDMaxTime() {
         computeMaxMinTime();
@@ -594,7 +585,6 @@ public class BasicFrame extends GraphNode {
 
     /**
      * @return true if frame has time info else false
-     * @since 2.0
      */
     public boolean hasTimeInfo() {
         return fHasTimeInfo;
@@ -602,7 +592,7 @@ public class BasicFrame extends GraphNode {
 
     /**
      * Sets the flag whether the frame has time info or not
-     * @since 2.0
+     *
      * @param hasTimeInfo
      *          true if frame has time info else false
      */
@@ -612,9 +602,9 @@ public class BasicFrame extends GraphNode {
 
     /**
      * Sets the flag for minimum and maximum computation.
+     *
      * @param computeMinMax
      *          true if mininum and maximum time needs to be calculated else false
-     * @since 2.0
      */
     public void setComputeMinMax(boolean computeMinMax) {
         fComputeMinMax = computeMinMax;
@@ -625,7 +615,6 @@ public class BasicFrame extends GraphNode {
      *
      * @param initSDMin
      *          the flag to set
-     * @since 2.0
      */
     public void setInitSDMin(boolean initSDMin) {
         fInitSDMin = initSDMin;

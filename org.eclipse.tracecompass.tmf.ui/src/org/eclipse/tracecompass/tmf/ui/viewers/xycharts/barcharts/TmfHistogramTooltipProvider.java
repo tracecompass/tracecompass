@@ -31,7 +31,6 @@ import org.swtchart.ISeries;
  * It only considers the first series of the chart.
  *
  * @author Bernd Hufmann
- * @since 3.0
  */
 public class TmfHistogramTooltipProvider extends TmfBaseProvider implements MouseTrackListener, MouseMoveListener, PaintListener {
 

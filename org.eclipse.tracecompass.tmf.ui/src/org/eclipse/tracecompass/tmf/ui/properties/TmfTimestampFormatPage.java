@@ -46,9 +46,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  * global timestamp and interval time formats (for display and parsing). The
  * user can either pick a pre-defined format or enter his/her own.
  *
- * @version 1.0
  * @author Francois Chouinard
- * @since 2.0
  */
 public class TmfTimestampFormatPage extends PreferencePage implements IWorkbenchPreferencePage, SelectionListener, IPropertyChangeListener {
 

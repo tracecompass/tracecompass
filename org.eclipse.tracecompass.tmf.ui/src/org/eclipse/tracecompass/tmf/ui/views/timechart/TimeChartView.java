@@ -573,7 +573,6 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
      *
      * @param signal
      *            The incoming signal
-     * @since 2.0
      */
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
@@ -601,7 +600,6 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
      *
      * @param signal
      *            The incoming signal
-     * @since 2.0
      */
     @TmfSignalHandler
     public void traceClosed(TmfTraceClosedSignal signal) {
@@ -697,7 +695,6 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
      *
      * @param signal
      *            The incoming signal
-     * @since 2.0
      */
     @TmfSignalHandler
     public void synchToRange(final TmfRangeSynchSignal signal) {
@@ -722,7 +719,6 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
      *
      * @param signal
      *            The incoming signal
-     * @since 2.0
      */
     @TmfSignalHandler
     public void filterApplied(TmfEventFilterAppliedSignal signal) {
@@ -739,7 +735,6 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
      *
      * @param signal
      *            The incoming signal
-     * @since 2.0
      */
     @TmfSignalHandler
     public void searchApplied(TmfEventSearchAppliedSignal signal) {

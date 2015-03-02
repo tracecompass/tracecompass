@@ -26,7 +26,6 @@ import com.google.common.collect.ImmutableList.Builder;
  * VIEWER_LIST_SESSIONS payload.
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public class ListSessionsResponse implements IRelayResponse {
 

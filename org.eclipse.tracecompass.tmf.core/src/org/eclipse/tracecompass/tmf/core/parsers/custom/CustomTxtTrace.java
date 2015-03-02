@@ -52,7 +52,6 @@ import org.eclipse.tracecompass.tmf.core.trace.location.TmfLongLocation;
  * Base class for custom plain text traces.
  *
  * @author Patrick Tassé
- * @since 3.0
  */
 public class CustomTxtTrace extends TmfTrace implements ITmfPersistentlyIndexable {
 

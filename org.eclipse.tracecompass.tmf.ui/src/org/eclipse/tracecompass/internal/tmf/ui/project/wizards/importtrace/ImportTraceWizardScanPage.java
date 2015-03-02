@@ -58,7 +58,6 @@ import org.eclipse.ui.IWorkbench;
  * be scanned.
  *
  * @author Matthew Khouzam
- * @since 2.0
  */
 public class ImportTraceWizardScanPage extends AbstractImportTraceWizardPage {
 

@@ -17,7 +17,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 /**
  * A interface for handling time ranges.
  *
- * @version 1.0
  * @author sveyrier
  */
 public interface ITimeRange {
@@ -25,7 +24,6 @@ public interface ITimeRange {
     /**
      * Returns the time when the message began.
      * @return the time when the message began
-     * @since 2.0
      */
     ITmfTimestamp getStartTime();
 
@@ -33,7 +31,6 @@ public interface ITimeRange {
      * Returns the time when the message ended.
      *
      * @return the time when the message ended
-     * @since 2.0
      */
     ITmfTimestamp getEndTime();
 

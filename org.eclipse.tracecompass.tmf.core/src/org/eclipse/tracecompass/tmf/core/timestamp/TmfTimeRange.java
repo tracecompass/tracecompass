@@ -19,8 +19,6 @@ import org.eclipse.jdt.annotation.NonNull;
  * A utility class to define and manage time ranges.
  *
  * @author Francois Chouinard
- * @version 1.0
- * @since 2.0
  *
  * @see ITmfTimestamp
  */

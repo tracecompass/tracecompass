@@ -25,7 +25,6 @@ import org.eclipse.jdt.annotation.Nullable;
  *            The type of the second object.
  *
  * @author Philippe Sawicki
- * @since 2.0
  */
 public class Pair<A, B> {
 

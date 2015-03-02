@@ -20,7 +20,6 @@ import org.eclipse.jface.viewers.LabelProvider;
  * Trace label provider for the candidate tree
  *
  * @author Matthew Khouzam
- * @since 2.0
  */
 class ImportTraceLabelProvider extends LabelProvider {
 

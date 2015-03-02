@@ -39,7 +39,6 @@ import com.google.common.collect.Multimap;
  * where it is declared with a literal
  *
  * @author Matthew Khouzam
- * @since 3.1
  */
 public class SequenceDeclaration extends CompoundDeclaration {
 

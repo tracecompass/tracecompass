@@ -17,7 +17,6 @@ package org.eclipse.tracecompass.tmf.core.analysis;
  * objects being instantiated.
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public interface ITmfNewAnalysisModuleListener {
 

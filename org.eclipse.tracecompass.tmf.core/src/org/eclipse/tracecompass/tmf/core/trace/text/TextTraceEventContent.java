@@ -25,8 +25,6 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 
 /**
  * Implementation of ITmfEventField for Text Traces.
- *
- * @since 3.0
  */
 public class TextTraceEventContent implements ITmfEventField {
 

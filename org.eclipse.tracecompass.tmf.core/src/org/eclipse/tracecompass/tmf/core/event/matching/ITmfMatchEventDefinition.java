@@ -21,7 +21,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * manages for a given matching type what events/fields are used to match events
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public interface ITmfMatchEventDefinition {
 

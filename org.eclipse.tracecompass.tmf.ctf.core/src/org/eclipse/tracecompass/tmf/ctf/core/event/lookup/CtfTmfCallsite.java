@@ -21,7 +21,6 @@ import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
  * CTF TMF call site information for source code lookup.
  *
  * @author Patrick Tasse
- * @since 2.0
  */
 public class CtfTmfCallsite extends TmfCallsite {
 

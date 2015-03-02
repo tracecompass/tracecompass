@@ -71,7 +71,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
  * Time graph "combo" view (with the list/tree on the left and the gantt chart
  * on the right)
  *
- * @version 1.0
  * @author Patrick Tasse
  */
 public class TimeGraphCombo extends Composite {
@@ -80,8 +79,7 @@ public class TimeGraphCombo extends Composite {
     // Constants
     // ------------------------------------------------------------------------
 
-    /** Constant indicating that all levels of the time graph should be expanded
-     * @since 3.1 */
+    /** Constant indicating that all levels of the time graph should be expanded */
     public static final int ALL_LEVELS = AbstractTreeViewer.ALL_LEVELS;
 
     private static final Object FILLER = new Object();
@@ -359,7 +357,6 @@ public class TimeGraphCombo extends Composite {
      *            the style of widget to construct
      * @param weights
      *            The relative weights of each side of the sash form
-     * @since 2.1
      */
     public TimeGraphCombo(Composite parent, int style, int[] weights) {
         super(parent, style);
@@ -647,8 +644,6 @@ public class TimeGraphCombo extends Composite {
 
     /**
      * Callback for the show filter action
-     *
-     * @since 2.0
      */
     public void showFilterDialog() {
         ITimeGraphEntry[] topInput = fTimeGraphViewer.getTimeGraphContentProvider().getElements(fTimeGraphViewer.getInput());
@@ -695,7 +690,6 @@ public class TimeGraphCombo extends Composite {
      * Get the show filter action.
      *
      * @return The Action object
-     * @since 2.0
      */
     public Action getShowFilterAction() {
         if (showFilterAction == null) {
@@ -751,7 +745,6 @@ public class TimeGraphCombo extends Composite {
      * Sets the tree content provider used by the filter dialog
      *
      * @param contentProvider the tree content provider
-     * @since 2.0
      */
     public void setFilterContentProvider(ITreeContentProvider contentProvider) {
         fFilterDialog.setContentProvider(contentProvider);
@@ -761,7 +754,6 @@ public class TimeGraphCombo extends Composite {
      * Sets the tree label provider used by the filter dialog
      *
      * @param labelProvider the tree label provider
-     * @since 2.0
      */
     public void setFilterLabelProvider(ITableLabelProvider labelProvider) {
         fFilterDialog.setLabelProvider(labelProvider);
@@ -785,7 +777,6 @@ public class TimeGraphCombo extends Composite {
      * Sets the tree columns for this time graph combo's filter dialog.
      *
      * @param columnNames the tree column names
-     * @since 2.0
      */
     public void setFilterColumns(String[] columnNames) {
         fFilterDialog.setColumnNames(columnNames);
@@ -796,8 +787,6 @@ public class TimeGraphCombo extends Composite {
      *
      * @param timeGraphContentProvider
      *            the time graph content provider
-     *
-     * @since 3.0
      */
     public void setTimeGraphContentProvider(ITimeGraphContentProvider timeGraphContentProvider) {
         fTimeGraphViewer.setTimeGraphContentProvider(timeGraphContentProvider);
@@ -816,8 +805,6 @@ public class TimeGraphCombo extends Composite {
      * Sets or clears the input for this time graph combo.
      *
      * @param input the input of this time graph combo, or <code>null</code> if none
-     *
-     * @since 3.0
      */
     public void setInput(Object input) {
         fFilter.setFiltered(null);
@@ -845,8 +832,6 @@ public class TimeGraphCombo extends Composite {
      * Gets the input for this time graph combo.
      *
      * @return The input of this time graph combo, or <code>null</code> if none
-     *
-     * @since 3.0
      */
     public Object getInput() {
         return fTreeViewer.getInput();
@@ -856,7 +841,6 @@ public class TimeGraphCombo extends Composite {
      * Sets or clears the list of links to display on this combo
      *
      * @param links the links to display in this time graph combo
-     * @since 2.1
      */
     public void setLinks(List<ILinkEvent> links) {
         fTimeGraphViewer.setLinks(links);
@@ -864,7 +848,6 @@ public class TimeGraphCombo extends Composite {
 
     /**
      * @param filter The filter object to be attached to the view
-     * @since 2.0
      */
     public void addFilter(ViewerFilter filter) {
         ViewerFilter wrapper = new ViewerFilterWrapper(filter);
@@ -876,7 +859,6 @@ public class TimeGraphCombo extends Composite {
 
     /**
      * @param filter The filter object to be removed from the view
-     * @since 2.0
      */
     public void removeFilter(ViewerFilter filter) {
         ViewerFilter wrapper = fViewerFilterMap.get(filter);
@@ -957,7 +939,6 @@ public class TimeGraphCombo extends Composite {
      * @param level
      *            non-negative level, or <code>ALL_LEVELS</code> to expand all
      *            levels of the tree
-     * @since 3.1
      */
     public void setAutoExpandLevel(int level) {
         fTimeGraphViewer.setAutoExpandLevel(level);
@@ -974,7 +955,6 @@ public class TimeGraphCombo extends Composite {
      * @return non-negative level, or <code>ALL_LEVELS</code> if all levels of
      *         the tree are expanded automatically
      * @see #setAutoExpandLevel
-     * @since 3.1
      */
     public int getAutoExpandLevel() {
         return fTimeGraphViewer.getAutoExpandLevel();
@@ -987,8 +967,6 @@ public class TimeGraphCombo extends Composite {
      *            The entry to expand/collapse
      * @param expanded
      *            True for expanded, false for collapsed
-     *
-     * @since 2.0
      */
     public void setExpandedState(ITimeGraphEntry entry, boolean expanded) {
         fTimeGraphViewer.setExpandedState(entry, expanded);
@@ -998,8 +976,6 @@ public class TimeGraphCombo extends Composite {
 
     /**
      * Collapses all nodes of the viewer's tree, starting with the root.
-     *
-     * @since 2.0
      */
     public void collapseAll() {
         fTimeGraphViewer.collapseAll();
@@ -1009,8 +985,6 @@ public class TimeGraphCombo extends Composite {
 
     /**
      * Expands all nodes of the viewer's tree, starting with the root.
-     *
-     * @since 2.0
      */
     public void expandAll() {
         fTimeGraphViewer.expandAll();

@@ -15,8 +15,6 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 /**
  * Interface for time event that allows to specify the destination entry of the
  * event
- *
- * @since 2.1
  */
 public interface ILinkEvent extends ITimeEvent {
 

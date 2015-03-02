@@ -155,8 +155,6 @@ import java.util.TimeZone;
  * </table>
  * </blockquote>
  * <p>
- * @version 1.0
- * @since 2.0
  * @author Francois Chouinard
  */
 public class TmfTimestampFormat extends SimpleDateFormat {
@@ -220,12 +218,10 @@ public class TmfTimestampFormat extends SimpleDateFormat {
     protected String fSupplPatternLetters = "TSCN"; //$NON-NLS-1$
     /**
      * The sub-second pattern letters.
-     * @since 3.0
      */
     protected String fSubSecPatternChars = "SCN"; //$NON-NLS-1$
     /**
      * The optional sub-second delimiter characters.
-     * @since 3.0
      */
     protected String fDelimiterChars = " .,-_:;/'\""; //$NON-NLS-1$
 
@@ -266,7 +262,6 @@ public class TmfTimestampFormat extends SimpleDateFormat {
      *
      * @param pattern the format pattern
      * @param timeZone the time zone
-     * @since 2.1
      */
     public TmfTimestampFormat(String pattern, TimeZone timeZone) {
         fLocale = Locale.getDefault();
@@ -280,7 +275,6 @@ public class TmfTimestampFormat extends SimpleDateFormat {
      * @param pattern the format pattern
      * @param timeZone the time zone
      * @param locale the locale
-     * @since 3.2
      */
     public TmfTimestampFormat(String pattern, TimeZone timeZone, Locale locale) {
         super("", locale); //$NON-NLS-1$
@@ -303,9 +297,6 @@ public class TmfTimestampFormat extends SimpleDateFormat {
     // Getters/setters
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 2.1
-     */
     public static void updateDefaultFormats() {
         fDefaultTimeFormat = new TmfTimestampFormat(
                 TmfTimePreferences.getTimePattern(),

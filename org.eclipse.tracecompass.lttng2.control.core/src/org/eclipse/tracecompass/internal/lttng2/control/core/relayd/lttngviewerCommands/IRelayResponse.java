@@ -17,7 +17,6 @@ package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewer
  * Command response, this will allow sorting commands easier
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public interface IRelayResponse {
 

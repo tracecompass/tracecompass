@@ -61,7 +61,6 @@ public abstract class Definition implements IDefinition {
      * @param fieldName
      *            the name of the definition. (it is a field in the parent
      *            scope)
-     * @since 3.0
      */
     public Definition(@NonNull IDeclaration declaration, IDefinitionScope definitionScope, @NonNull String fieldName) {
         this(declaration, definitionScope, fieldName, declaration.getPath(definitionScope, fieldName));
@@ -83,7 +82,6 @@ public abstract class Definition implements IDefinition {
      *
      * @param scope
      *            the scope
-     * @since 3.1
      */
     public Definition(@NonNull IDeclaration declaration, IDefinitionScope definitionScope, @NonNull String fieldName, @NonNull LexicalScope scope) {
         fDeclaration = declaration;
@@ -100,7 +98,6 @@ public abstract class Definition implements IDefinition {
      * Get the field name in its container.
      *
      * @return The field name
-     * @since 2.0
      */
     protected String getFieldName() {
         return fFieldName;
@@ -118,7 +115,6 @@ public abstract class Definition implements IDefinition {
      * scope DOT the name of the definition (name of the field in its container)
      *
      * @return The definition scope
-     * @since 3.0
      */
     protected IDefinitionScope getDefinitionScope() {
         return fDefinitionScope;

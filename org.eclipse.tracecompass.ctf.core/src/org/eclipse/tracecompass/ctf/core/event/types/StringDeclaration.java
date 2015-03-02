@@ -108,9 +108,6 @@ public class StringDeclaration extends Declaration {
         return BITS_PER_BYTE;
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public int getMaximumSize() {
         /*
@@ -124,9 +121,6 @@ public class StringDeclaration extends Declaration {
     // Operations
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 3.0
-     */
     @Override
     public StringDefinition createDefinition(@Nullable IDefinitionScope definitionScope,
             String fieldName, BitBuffer input) throws CTFReaderException {

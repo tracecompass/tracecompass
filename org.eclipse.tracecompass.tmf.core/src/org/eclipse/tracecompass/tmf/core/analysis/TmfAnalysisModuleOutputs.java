@@ -27,7 +27,6 @@ import org.eclipse.tracecompass.internal.tmf.core.Activator;
  * new module listeners.
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class TmfAnalysisModuleOutputs {
 

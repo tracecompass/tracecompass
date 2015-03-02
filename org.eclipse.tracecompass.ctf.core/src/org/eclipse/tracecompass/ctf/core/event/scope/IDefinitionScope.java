@@ -20,7 +20,6 @@ import org.eclipse.tracecompass.ctf.core.event.types.Definition;
  * @version 1.0
  * @author Matthew Khouzam
  * @author Simon Marchi
- * @since 3.0
  */
 public interface IDefinitionScope {
 
@@ -28,7 +27,6 @@ public interface IDefinitionScope {
      * Gets the path in a C style for the scope.
      *
      * @return the path
-     * @since 3.0
      */
     LexicalScope getScopePath();
 

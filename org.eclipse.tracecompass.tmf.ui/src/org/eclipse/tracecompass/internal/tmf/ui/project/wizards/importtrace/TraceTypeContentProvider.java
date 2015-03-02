@@ -26,7 +26,6 @@ import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
  * Trace type content provider, a helper for showing trace types
  *
  * @author Matthew Khouzam
- * @since 2.0
  */
 public class TraceTypeContentProvider implements ITreeContentProvider {
 

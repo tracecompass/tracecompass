@@ -19,7 +19,6 @@ package org.eclipse.tracecompass.tmf.core.trace.location;
  * comparable location information.
  *
  * @author Francois Chouinard
- * @since 3.0
  */
 public abstract class TmfLocation implements ITmfLocation {
 
@@ -57,9 +56,6 @@ public abstract class TmfLocation implements ITmfLocation {
     // Getters
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 2.0
-     */
     @Override
     public Comparable<?> getLocationInfo() {
         return fLocationInfo;

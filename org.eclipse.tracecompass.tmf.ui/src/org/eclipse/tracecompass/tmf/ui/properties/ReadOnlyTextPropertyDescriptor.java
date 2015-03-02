@@ -23,7 +23,6 @@ import org.eclipse.ui.views.properties.TextPropertyDescriptor;
  * A uneditable version of a {@link TextPropertyDescriptor}.
  *
  * @author Alexandre Montplaisir
- * @since 2.0
  */
 public class ReadOnlyTextPropertyDescriptor extends PropertyDescriptor {
 

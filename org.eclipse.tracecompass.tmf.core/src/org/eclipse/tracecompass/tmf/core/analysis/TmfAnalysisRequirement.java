@@ -43,7 +43,6 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfEventTypeCollectionHelper;
  *
  * @author Guilliano Molaire
  * @author Mathieu Rail
- * @since 3.0
  */
 public class TmfAnalysisRequirement {
 

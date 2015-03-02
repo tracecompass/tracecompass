@@ -23,7 +23,6 @@ package org.eclipse.tracecompass.tmf.core.analysis;
  * source.
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public interface IAnalysisModuleSource {
 

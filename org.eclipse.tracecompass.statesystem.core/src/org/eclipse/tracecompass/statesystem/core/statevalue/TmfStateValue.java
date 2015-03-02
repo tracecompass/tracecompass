@@ -27,7 +27,6 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeExcept
  * The available types are Int, Long, Double and String.
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  */
 public abstract class TmfStateValue implements ITmfStateValue {
 
@@ -89,7 +88,6 @@ public abstract class TmfStateValue implements ITmfStateValue {
      * @param longValue
      *            The long value to contain
      * @return The newly-created TmfStateValue object
-     * @since 2.0
      */
     public static TmfStateValue newValueLong(long longValue) {
         /* Lookup in cache for the existence of the same value. */
@@ -111,7 +109,6 @@ public abstract class TmfStateValue implements ITmfStateValue {
      * @param value
      *            The double value to contain
      * @return The newly-created TmfStateValue object
-     * @since 3.0
      */
     public static TmfStateValue newValueDouble(double value) {
         /* Lookup in cache for the existence of the same value. */
@@ -176,9 +173,6 @@ public abstract class TmfStateValue implements ITmfStateValue {
         throw new StateValueTypeException(unboxErrMsg("Long")); //$NON-NLS-1$
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public double unboxDouble() {
         throw new StateValueTypeException(unboxErrMsg("Double")); //$NON-NLS-1$

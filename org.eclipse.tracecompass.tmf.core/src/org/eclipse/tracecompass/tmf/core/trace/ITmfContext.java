@@ -51,7 +51,6 @@ public interface ITmfContext {
 
     /**
      * @return the location of the event at the context rank
-     * @since 3.0
      */
     ITmfLocation getLocation();
 
@@ -66,7 +65,6 @@ public interface ITmfContext {
 
     /**
      * @param location the new location
-     * @since 3.0
      */
     void setLocation(ITmfLocation location);
 

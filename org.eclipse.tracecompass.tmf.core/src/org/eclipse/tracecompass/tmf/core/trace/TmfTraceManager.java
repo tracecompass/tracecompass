@@ -62,7 +62,6 @@ import com.google.common.collect.ImmutableSet;
  * {@link #getInstance()}).
  *
  * @author Alexandre Montplaisir
- * @since 2.0
  */
 public final class TmfTraceManager {
 
@@ -107,7 +106,6 @@ public final class TmfTraceManager {
 
     /**
      * @return The begin timestamp of selection
-     * @since 2.1
      */
     public ITmfTimestamp getSelectionBeginTime() {
         return getCurrentTraceContext().getSelectionBegin();
@@ -115,7 +113,6 @@ public final class TmfTraceManager {
 
     /**
      * @return The end timestamp of selection
-     * @since 2.1
      */
     public ITmfTimestamp getSelectionEndTime() {
         return getCurrentTraceContext().getSelectionEnd();
@@ -134,7 +131,6 @@ public final class TmfTraceManager {
      * Gets the filter applied to the current trace
      *
      * @return a filter, or <code>null</code>
-     * @since 2.2
      */
     public synchronized ITmfFilter getCurrentFilter() {
         return getCurrentTraceContext().getFilter();
@@ -175,7 +171,6 @@ public final class TmfTraceManager {
      * @param trace
      *            the trace
      * @return the editor file or null if the trace is not opened
-     * @since 3.0
      */
     public synchronized IFile getTraceEditorFile(ITmfTrace trace) {
         TmfTraceContext ctx = fTraces.get(trace);
@@ -227,7 +222,6 @@ public final class TmfTraceManager {
      * @param trace
      *            The trace or experiment
      * @return The corresponding trace set, including the experiment.
-     * @since 3.1
      */
     public static @NonNull Collection<ITmfTrace> getTraceSetWithExperiment(ITmfTrace trace) {
         if (trace == null) {
@@ -275,7 +269,6 @@ public final class TmfTraceManager {
      *
      * @param trace
      *            The trace for which to refresh the supplementary files
-     * @since 3.0
      */
     public static void refreshSupplementaryFiles(ITmfTrace trace) {
         IResource resource = trace.getResource();
@@ -348,7 +341,6 @@ public final class TmfTraceManager {
      *
      * @param signal
      *            The incoming signal
-     * @since 2.2
      */
     @TmfSignalHandler
     public synchronized void filterApplied(TmfEventFilterAppliedSignal signal) {
@@ -488,7 +480,6 @@ public final class TmfTraceManager {
      *
      * @return the temporary directory path suitable to be passed to the
      *         java.io.File constructor without a trailing separator
-     * @since 3.2
      */
     public static String getTemporaryDirPath() {
         // Get the workspace path from the properties

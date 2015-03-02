@@ -38,7 +38,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * logic is abstracted away.
  *
  * @author Alexandre Montplaisir
- * @since 2.0
  */
 public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
 
@@ -83,17 +82,11 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
         return fTrace;
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public long getStartTime() {
         return fTrace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public void assignTargetStateSystem(ITmfStateSystemBuilder ssb) {
         fSS = ssb;
@@ -101,9 +94,6 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
         fEventHandlerThread.start();
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public @Nullable ITmfStateSystem getAssignedStateSystem() {
         return fSS;

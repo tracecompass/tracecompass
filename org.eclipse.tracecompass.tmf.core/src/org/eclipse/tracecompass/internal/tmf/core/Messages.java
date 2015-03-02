@@ -13,7 +13,6 @@ import org.eclipse.osgi.util.NLS;
 
 /**
  * TMF Core message bundle
- * @since 2.0
  */
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {

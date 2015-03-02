@@ -22,7 +22,6 @@ import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
  * "NULL" character. Their encoding is described in the TSDL meta-data. In
  * absence of encoding attribute information, the default encoding is UTF-8.
  *
- * @version 1.0
  * @author Matthew Khouzam
  * @author Simon Marchi
  */
@@ -49,7 +48,6 @@ public final class StringDefinition extends Definition {
      *            the field name
      * @param value
      *            The String value
-     * @since 3.0
      */
     public StringDefinition(@NonNull StringDeclaration declaration,
             IDefinitionScope definitionScope, @NonNull String fieldName, String value) {

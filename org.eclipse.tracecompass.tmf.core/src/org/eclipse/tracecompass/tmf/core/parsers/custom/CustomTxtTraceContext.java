@@ -24,7 +24,6 @@ import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
  * Trace context for custom text traces.
  *
  * @author Patrick Tassé
- * @since 3.0
  */
 public class CustomTxtTraceContext extends TmfContext {
 

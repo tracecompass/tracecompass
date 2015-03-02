@@ -66,7 +66,6 @@ public class HistogramRequest extends TmfEventRequest {
      *            The requested execution priority
      * @param fullRange
      *            Full range or time range for histogram request
-     * @since 3.0
      */
     public HistogramRequest(HistogramDataModel histogram, TmfTimeRange range,
             int rank, int nbEvents, int blockSize,

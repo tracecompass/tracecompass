@@ -34,8 +34,6 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.exceptions.Pars
  * <b><u>Stream</u></b>
  * <p>
  * Represents a stream in a trace.
- *
- * @since 3.0
  */
 public class CTFStream {
 
@@ -157,7 +155,6 @@ public class CTFStream {
      *
      * @param eventHeader
      *            the current event header for all events in this stream
-     * @since 3.1
      */
     public void setEventHeader(IEventHeaderDeclaration eventHeader) {
         fEventHeaderDecl = eventHeader;
@@ -195,7 +192,6 @@ public class CTFStream {
      * Gets the event header declaration
      *
      * @return the event header declaration in declaration form
-     * @since 3.1
      */
     public IDeclaration getEventHeaderDeclaration() {
         return fEventHeaderDecl;
@@ -248,7 +244,6 @@ public class CTFStream {
      * Get all the event declarations in this stream.
      *
      * @return The event declarations for this stream
-     * @since 3.2
      */
     public @NonNull Collection<IEventDeclaration> getEventDeclarations() {
         List<IEventDeclaration> retVal = new ArrayList<>(fEvents);
@@ -266,7 +261,6 @@ public class CTFStream {
      *         'null' if there are no declaration with this ID
      * @throws IllegalArgumentException
      *             If the passed ID is invalid
-     * @since 3.2
      */
     public @Nullable IEventDeclaration getEventDeclaration(int eventId) {
         int eventIndex = (eventId == EventDeclaration.UNSET_EVENT_ID) ? 0 : eventId;
@@ -336,7 +330,6 @@ public class CTFStream {
      *            list of the events to add
      * @throws CTFReaderException
      *             if the list already contains data
-     * @since 3.2
      */
     public void addEvents(Collection<IEventDeclaration> events) throws CTFReaderException {
         if (fEventUnsetId) {

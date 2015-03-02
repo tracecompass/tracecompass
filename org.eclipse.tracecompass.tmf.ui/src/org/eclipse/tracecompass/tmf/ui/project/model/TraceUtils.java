@@ -30,8 +30,6 @@ import org.eclipse.ui.PlatformUI;
 
 /**
  * Utility class for common tmf.ui functionalities
- *
- * @since 2.1
  */
 public class TraceUtils {
 
@@ -59,7 +57,6 @@ public class TraceUtils {
      * Get the opened (accessible) projects with Tmf nature
      *
      * @return the Tmf projects
-     * @since 2.2
      */
     public static List<IProject> getOpenedTmfProjects() {
         IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
@@ -85,7 +82,6 @@ public class TraceUtils {
      *            the progress monitor
      * @throws CoreException
      *            if the folder cannot be created
-     * @since 3.0
      */
     public static void createFolder(IFolder folder, IProgressMonitor monitor) throws CoreException {
         if (!folder.exists()) {

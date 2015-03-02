@@ -49,7 +49,6 @@ import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
  * @see ITmfEvent
  *
  * @author Francois Chouinard
- * @since 3.0
  */
 public class TmfCheckpointIndexer implements ITmfTraceIndexer {
 
@@ -110,7 +109,6 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
      *
      * @param trace the trace to index
      * @return the index
-     * @since 3.0
      */
     protected ITmfCheckpointIndex createIndex(final ITmfTrace trace) {
         return new TmfMemoryIndex(trace);
@@ -138,9 +136,6 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
     // ITmfTraceIndexer - buildIndex
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 2.0
-     */
     @Override
     public void buildIndex(final long offset, final TmfTimeRange range, final boolean waitForCompletion) {
 
@@ -252,9 +247,6 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
     // ITmfTraceIndexer - updateIndex
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 2.0
-     */
     @Override
     public synchronized void updateIndex(final ITmfContext context, final ITmfTimestamp timestamp) {
         if ((context.getRank() % fCheckpointInterval) == 0) {
@@ -271,9 +263,6 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
     // ITmfTraceIndexer - seekIndex
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 2.0
-     */
     @Override
     public synchronized ITmfContext seekIndex(final ITmfTimestamp timestamp) {
 
@@ -343,7 +332,6 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
 
     /**
      * @return the trace index
-     * @since 3.0
      */
     protected ITmfCheckpointIndex getTraceIndex() {
         return fTraceIndex;

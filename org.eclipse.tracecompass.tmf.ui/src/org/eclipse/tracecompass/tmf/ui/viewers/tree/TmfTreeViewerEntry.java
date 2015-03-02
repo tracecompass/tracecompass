@@ -21,7 +21,6 @@ import org.eclipse.jdt.annotation.NonNull;
  * Basic implementation of an entry for the TMF tree viewer. A name is all that is needed for this entry.
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class TmfTreeViewerEntry implements ITmfTreeViewerEntry {
 

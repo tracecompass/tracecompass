@@ -34,7 +34,6 @@ import org.eclipse.ui.IWorkbench;
  * This page selects the project to import to.
  *
  * @author Matthew Khouzam
- * @since 2.0
  */
 public class ImportTraceWizardPageOptions extends AbstractImportTraceWizardPage {
 

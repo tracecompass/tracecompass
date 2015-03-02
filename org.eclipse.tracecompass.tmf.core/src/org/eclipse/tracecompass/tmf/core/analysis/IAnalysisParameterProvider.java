@@ -19,7 +19,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * not set manually
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public interface IAnalysisParameterProvider {
 

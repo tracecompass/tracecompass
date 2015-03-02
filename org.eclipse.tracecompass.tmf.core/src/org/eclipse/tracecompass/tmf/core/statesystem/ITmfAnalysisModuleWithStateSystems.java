@@ -20,7 +20,6 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
  * Interface for analysis modules providing state systems.
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public interface ITmfAnalysisModuleWithStateSystems extends IAnalysisModule {
 

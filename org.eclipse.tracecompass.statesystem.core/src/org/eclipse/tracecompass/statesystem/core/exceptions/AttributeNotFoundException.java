@@ -17,7 +17,6 @@ package org.eclipse.tracecompass.statesystem.core.exceptions;
  * doesn't exist in the system, of if the quark is simply invalid (ie, < 0).
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  */
 public class AttributeNotFoundException extends Exception {
 

@@ -53,7 +53,6 @@ import org.eclipse.tracecompass.tmf.ui.viewers.TmfTimeViewer;
  * not.
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
 
@@ -325,7 +324,6 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
      *
      * @param selection
      *            The list of selected items
-     * @since 3.1
      */
     public void setSelection(@NonNull List<ITmfTreeViewerEntry> selection) {
         IStructuredSelection sel = new StructuredSelection(selection);
@@ -381,7 +379,6 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
      *
      * @param rootEntry
      *            The new input of this viewer, or null if none
-     * @since 3.1
      */
     protected void contentChanged(ITmfTreeViewerEntry rootEntry) {
 

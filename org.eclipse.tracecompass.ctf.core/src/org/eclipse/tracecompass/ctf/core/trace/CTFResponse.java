@@ -14,8 +14,6 @@ package org.eclipse.tracecompass.ctf.core.trace;
  * A response to a request
  *
  * @author Matthew Khouzam
- * @since 3.0
- *
  */
 public enum CTFResponse {
     /**

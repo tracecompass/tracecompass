@@ -55,7 +55,6 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
  * @author Florian Wininger
  * @author Alexandre Montplaisir
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
 

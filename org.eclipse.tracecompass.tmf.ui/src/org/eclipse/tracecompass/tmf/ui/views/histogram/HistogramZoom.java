@@ -60,7 +60,6 @@ public class HistogramZoom implements MouseWheelListener, KeyListener {
      *            The start time of the zoom area
      * @param end
      *            The end time of the zoom area
-     * @since 2.0
      */
     public HistogramZoom(Histogram histogram, long start, long end) {
         fHistogram = histogram;
@@ -153,9 +152,6 @@ public class HistogramZoom implements MouseWheelListener, KeyListener {
         zoom(event.count);
     }
 
-    /**
-     * @since 3.1
-     */
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.character == '+') {
@@ -165,9 +161,6 @@ public class HistogramZoom implements MouseWheelListener, KeyListener {
         }
     }
 
-    /**
-     * @since 3.1
-     */
     @Override
     public void keyReleased(KeyEvent e) {
     }

@@ -13,9 +13,6 @@ package org.eclipse.tracecompass.tmf.core.parsers.custom;
 
 import org.eclipse.osgi.util.NLS;
 
-/**
- * @since 3.0
- */
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {
 
@@ -29,7 +26,6 @@ public class Messages extends NLS {
     public static String CustomTraceDefinition_timestampTag;
     public static String CustomTxtTraceDefinition_action;
     public static String CustomTxtTraceDefinition_cardinality;
-    /** @since 3.2*/
     public static String CustomTxtTraceDefinition_category;
     public static String CustomTxtTraceDefinition_definition;
     public static String CustomTxtTraceDefinition_definitionRootElement;
@@ -44,7 +40,6 @@ public class Messages extends NLS {
     public static String CustomTxtTraceDefinition_timestampOutputFormat;
     public static String CustomXmlTraceDefinition_action;
     public static String CustomXmlTraceDefinition_attribute;
-    /** @since 3.2*/
     public static String CustomXmlTraceDefinition_category;
     public static String CustomXmlTraceDefinition_definition;
     public static String CustomXmlTraceDefinition_definitionRootElement;

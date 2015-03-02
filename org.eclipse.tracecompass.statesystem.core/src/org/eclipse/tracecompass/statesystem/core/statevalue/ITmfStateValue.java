@@ -18,13 +18,11 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeExcept
  * This is the interface for using state values and reading their contents.
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  */
 public interface ITmfStateValue extends Comparable<ITmfStateValue> {
 
     /**
      * The supported types of state values
-     * @since 2.0
      */
     public enum Type {
         /** Null value, for an interval not carrying any information */
@@ -33,8 +31,7 @@ public interface ITmfStateValue extends Comparable<ITmfStateValue> {
         INTEGER,
         /** 64-bit integer value */
         LONG,
-        /** IEEE 754 double precision number
-         * @since 3.0*/
+        /** IEEE 754 double precision number */
         DOUBLE,
         /** Variable-length string value */
         STRING,
@@ -46,7 +43,6 @@ public interface ITmfStateValue extends Comparable<ITmfStateValue> {
      * depending on the needs of the different users.
      *
      * @return The ITmfStateValue.Type enum representing the type of this value
-     * @since 2.0
      */
     Type getType();
 
@@ -73,7 +69,6 @@ public interface ITmfStateValue extends Comparable<ITmfStateValue> {
      * @return The long contained in the state value
      * @throws StateValueTypeException
      *             If the contained value cannot be read as a long
-     * @since 2.0
      */
     long unboxLong();
 
@@ -83,7 +78,6 @@ public interface ITmfStateValue extends Comparable<ITmfStateValue> {
      * @return The double contained in the state value
      * @throws StateValueTypeException
      *             If the contained value cannot be read as a double
-     * @since 3.0
      */
     double unboxDouble();
 

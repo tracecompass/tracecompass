@@ -16,7 +16,6 @@ package org.eclipse.tracecompass.tmf.core.project.model;
  * Tmf trace import exception
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public class TmfTraceImportException extends Exception {
 

@@ -73,7 +73,6 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
     * @param parent The parent composite
     * @param label The text label
     * @param value The initial value
-    * @since 2.0
     */
     public HistogramTextControl(HistogramView parentView, Composite parent, String label, long value)
     {
@@ -132,7 +131,6 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
 
     /**
      * Dispose of the widget
-     * @since 2.0
      */
     public void dispose() {
         fFont.dispose();
@@ -175,7 +173,6 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
      * inactive or "grayed" look.
      *
      * @param enabled the new enabled state
-     * @since 2.2
      */
     public void setEnabled(boolean enabled) {
         fTextValue.setEnabled(enabled);
@@ -186,7 +183,6 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
      *
      * @param time the time to set
      * @param displayTime the display value
-     * @since 2.0
      */
     protected void setValue(final long time, final String displayTime) {
         // If this is the UI thread, process now
@@ -230,7 +226,6 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
     /**
      * Add a mouse wheel listener to the text control
      * @param listener the mouse wheel listener
-     * @since 2.0
      */
     public void addMouseWheelListener(MouseWheelListener listener) {
         fTextValue.addMouseWheelListener(listener);
@@ -239,7 +234,6 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
     /**
      * Remove a mouse wheel listener from the text control
      * @param listener the mouse wheel listener
-     * @since 2.0
      */
     public void removeMouseWheelListener(MouseWheelListener listener) {
         fTextValue.removeMouseWheelListener(listener);

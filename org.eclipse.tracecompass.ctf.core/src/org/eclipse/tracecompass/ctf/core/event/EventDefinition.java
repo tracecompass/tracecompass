@@ -38,8 +38,6 @@ public final class EventDefinition implements IDefinitionScope {
 
     /**
      * A null event, can be used for testing or poison pilling
-     *
-     * @since 3.0
      */
     @NonNull
     public static final EventDefinition NULL_EVENT = new EventDefinition(new EventDeclaration(), null, -1L, null, null, null, null);
@@ -94,7 +92,6 @@ public final class EventDefinition implements IDefinitionScope {
      *            the stream context
      * @param fields
      *            The event fields
-     * @since 3.0
      */
     public EventDefinition(IEventDeclaration declaration,
             CTFStreamInputReader streamInputReader,
@@ -116,9 +113,6 @@ public final class EventDefinition implements IDefinitionScope {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 3.0
-     */
     @Override
     public LexicalScope getScopePath() {
         String eventName = fDeclaration.getName();
@@ -136,7 +130,6 @@ public final class EventDefinition implements IDefinitionScope {
      * Gets the declaration (the form) of the data
      *
      * @return the event declaration
-     * @since 2.0
      */
     public IEventDeclaration getDeclaration() {
         return fDeclaration;
@@ -155,7 +148,6 @@ public final class EventDefinition implements IDefinitionScope {
      * Gets the context of this event without the context of the stream
      *
      * @return the context in struct form
-     * @since 1.2
      */
     public StructDefinition getEventContext() {
         return fEventContext;
@@ -220,7 +212,6 @@ public final class EventDefinition implements IDefinitionScope {
      * Gets the stream input reader that this event was made by
      *
      * @return the parent
-     * @since 3.0
      */
     public CTFStreamInputReader getStreamInputReader() {
         return fStreamInputReader;

@@ -19,8 +19,6 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.equalsNullable;
  * Callsite information to help with cdt integration
  *
  * @author Matthew Khouzam
- *
- * @since 1.2
  */
 public class CTFCallsite implements Comparable<CTFCallsite> {
 

@@ -17,7 +17,6 @@ package org.eclipse.tracecompass.lttng2.control.core.session;
  * schema "session.xsd" in src/common/config/ folder of LTTng-tools.
  *
  * @author Guilliano Molaire
- * @since 3.0
  */
 @SuppressWarnings({ "javadoc", "nls" })
 public interface SessionConfigStrings {

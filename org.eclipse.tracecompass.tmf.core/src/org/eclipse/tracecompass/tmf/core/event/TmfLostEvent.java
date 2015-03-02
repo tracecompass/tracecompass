@@ -23,8 +23,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * A basic implementation of ITmfLostEvent.
  *
  * @author Francois Chouinard
- * @version 1.0
- * @since 1.2
  */
 public class TmfLostEvent extends TmfEvent implements ITmfLostEvent {
 
@@ -54,7 +52,6 @@ public class TmfLostEvent extends TmfEvent implements ITmfLostEvent {
      *            the 'problematic' time range
      * @param nbLostEvents
      *            the number of lost events in the time range
-     * @since 2.0
      */
     public TmfLostEvent(final ITmfTrace trace,
             final long rank,
@@ -71,9 +68,6 @@ public class TmfLostEvent extends TmfEvent implements ITmfLostEvent {
     // ITmfLostEvent
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 2.0
-     */
     @Override
     public TmfTimeRange getTimeRange() {
         return fTimeRange;

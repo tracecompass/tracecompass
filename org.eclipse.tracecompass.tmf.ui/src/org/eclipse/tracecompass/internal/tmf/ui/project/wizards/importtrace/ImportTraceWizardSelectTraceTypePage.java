@@ -36,7 +36,6 @@ import org.eclipse.ui.IWorkbench;
  * shown. This one selects the type of traces that are to be scanned.
  *
  * @author Matthew Khouzam
- * @since 2.0
  */
 public class ImportTraceWizardSelectTraceTypePage extends AbstractImportTraceWizardPage {
 

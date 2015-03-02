@@ -35,7 +35,6 @@ import com.google.common.collect.Multimap;
  * parameter providers.
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 @NonNullByDefault
 public class TmfAnalysisManager {

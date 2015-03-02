@@ -21,7 +21,6 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
  * into the viewer when the view is created.
  *
  * @author Bernd Hufmann
- * @since 3.0
  */
 abstract public class TmfChartView extends TmfView {
 

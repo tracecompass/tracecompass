@@ -28,7 +28,6 @@ import org.swtchart.ISeries;
  * accurate.
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class TmfCommonXLineChartTooltipProvider extends TmfBaseProvider implements MouseTrackListener {
 

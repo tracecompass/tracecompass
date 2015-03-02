@@ -19,7 +19,6 @@ import java.util.List;
  * (subfields)
  *
  * @author Matthew Khouzam
- * @since 3.1
  */
 public interface ICompositeDefinition extends IDefinition {
 

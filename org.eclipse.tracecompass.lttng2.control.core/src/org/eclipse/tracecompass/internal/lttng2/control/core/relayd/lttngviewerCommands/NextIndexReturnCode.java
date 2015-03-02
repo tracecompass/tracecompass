@@ -17,7 +17,6 @@ package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewer
  * Get next index return code (hope it's viewer_index_ok)
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public enum NextIndexReturnCode implements IBaseCommand {
 

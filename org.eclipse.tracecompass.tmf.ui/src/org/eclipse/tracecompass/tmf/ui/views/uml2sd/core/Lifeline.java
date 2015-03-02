@@ -116,7 +116,6 @@ public class Lifeline extends GraphNode {
      * Gets the lifeline category for this lifeline.
      *
      * @return arrayIndex the index of the category to use
-     * @since 2.0
      */
     public int getCategory() {
         return fCategory;

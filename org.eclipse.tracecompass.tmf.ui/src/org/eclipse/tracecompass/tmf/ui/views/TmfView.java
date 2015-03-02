@@ -31,7 +31,6 @@ import org.eclipse.ui.part.ViewPart;
  * It registers any sub class to the signal manager for receiving and sending
  * TMF signals.
  *
- * @version 1.2
  * @author Francois Chouinard
  */
 public abstract class TmfView extends ViewPart implements ITmfComponent {
@@ -40,13 +39,11 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
 
     /**
      * Action class for pinning of TmfView.
-     * @since 2.0
      */
     protected PinTmfViewAction fPinAction;
 
     /**
      * Reference to the trace manager
-     * @since 2.0
      */
     protected final TmfTraceManager fTraceManager;
 
@@ -90,9 +87,6 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
         TmfSignalManager.dispatchSignal(signal);
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public void broadcastAsync(TmfSignal signal) {
         TmfSignalManager.dispatchSignalAsync(signal);
@@ -107,7 +101,6 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
      * For example, this flag can be used to ignore time synchronization signals from other TmfViews.
      *
      * @return pin flag
-     * @since 2.0
      */
     public boolean isPinned() {
         return ((fPinAction != null) && (fPinAction.isChecked()));
@@ -116,8 +109,6 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
     /**
      * Method adds a pin action to the TmfView. The pin action allows to toggle the <code>fIsPinned</code> flag.
      * For example, this flag can be used to ignore time synchronization signals from other TmfViews.
-     *
-     * @since 2.0
      */
     protected void contributePinActionToToolBar() {
         if (fPinAction == null) {
@@ -135,7 +126,6 @@ public abstract class TmfView extends ViewPart implements ITmfComponent {
      * TMF trace.
      *
      * @return The active trace, or 'null' if not a trace
-     * @since 2.0
      */
     public ITmfTrace getActiveTrace() {
         IEditorPart editor = getSite().getPage().getActiveEditor();

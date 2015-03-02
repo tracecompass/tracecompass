@@ -55,7 +55,6 @@ public interface ITmfEventField {
 
     /**
      * @return the value formatted as string
-     * @since 2.0
      */
     String getFormattedValue();
 
@@ -64,7 +63,6 @@ public interface ITmfEventField {
      * {@link #getFields()}. The returned Collection is immutable.
      *
      * @return The subfield names (empty Collection if none)
-     * @since 3.0
      */
     Collection<String> getFieldNames();
 
@@ -73,7 +71,6 @@ public interface ITmfEventField {
      * {@link #getFieldNames()}. The returned Collection is immutable.
      *
      * @return The subfields (empty Collection if none)
-     * @since 3.0
      */
     Collection<? extends ITmfEventField> getFields();
 

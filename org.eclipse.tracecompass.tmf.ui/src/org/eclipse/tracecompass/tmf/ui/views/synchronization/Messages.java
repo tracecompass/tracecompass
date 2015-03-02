@@ -16,7 +16,6 @@ import org.eclipse.osgi.util.NLS;
 
 /**
  * Message file for the synchronization view
- * @since 3.0
  */
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {

@@ -26,7 +26,6 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewerC
  * Connector for Lttng Relayd
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public interface ILttngRelaydConnector extends AutoCloseable {
 

@@ -19,7 +19,6 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  * to destination event
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public class TmfEventDependency {
 

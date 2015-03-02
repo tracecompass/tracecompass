@@ -21,8 +21,6 @@ import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
  * It allows the access to the control and the parent of a viewer.
  *
  * @author Mathieu Denis
- * @version 2.0
- * @since 2.0
  */
 public abstract class TmfViewer extends TmfComponent implements ITmfViewer {
 

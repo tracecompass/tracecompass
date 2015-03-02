@@ -246,9 +246,6 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider, IStyledL
     public void init(ICommonContentExtensionSite aConfig) {
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public StyledString getStyledText(Object element) {
         String text = getText(element);

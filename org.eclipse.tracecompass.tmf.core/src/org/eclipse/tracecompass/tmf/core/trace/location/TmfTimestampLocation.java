@@ -21,7 +21,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
  * A concrete implementation of TmfLocation based on ITmfTimestamp:s
  *
  * @author Francois Chouinard
- * @since 3.0
  */
 public final class TmfTimestampLocation extends TmfLocation {
 
@@ -48,8 +47,6 @@ public final class TmfTimestampLocation extends TmfLocation {
      *
      * @param bufferIn
      *            the buffer to read from
-     *
-     * @since 3.0
      */
     public TmfTimestampLocation(ByteBuffer bufferIn) {
         super(new TmfTimestamp(bufferIn));
@@ -60,9 +57,6 @@ public final class TmfTimestampLocation extends TmfLocation {
         return (ITmfTimestamp) super.getLocationInfo();
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public void serialize(ByteBuffer bufferOut) {
         TmfTimestamp t = new TmfTimestamp(getLocationInfo());

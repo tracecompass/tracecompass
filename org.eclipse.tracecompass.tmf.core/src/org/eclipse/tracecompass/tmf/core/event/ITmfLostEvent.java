@@ -30,8 +30,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
  * @see TmfLostEvent
  *
  * @author Francois Chouinard
- * @version 1.0
- * @since 1.2
  */
 public interface ITmfLostEvent extends ITmfEvent {
 
@@ -41,7 +39,6 @@ public interface ITmfLostEvent extends ITmfEvent {
 
     /**
      * @return the 'problem' time range
-     * @since 2.0
      */
     TmfTimeRange getTimeRange();
 

@@ -22,7 +22,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
  * using the TmfTimestampFormat class.
  *
  * @author Bernd Hufmann
- * @since 3.0
  */
 public class TmfChartTimeStampFormat extends SimpleDateFormat {
 

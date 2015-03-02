@@ -60,7 +60,6 @@ import org.xml.sax.SAXParseException;
  * Trace object for custom XML trace parsers.
  *
  * @author Patrick Tassé
- * @since 3.0
  */
 public class CustomXmlTrace extends TmfTrace implements ITmfPersistentlyIndexable {
 

@@ -116,7 +116,6 @@ public class FilterView extends TmfView {
      *
      * @param filter
      *            The filter to add.
-     * @since 3.1
      */
     public void addFilter(ITmfFilterTreeNode filter) {
         if (filter == null) {

@@ -44,7 +44,6 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
  * Consumer of the relay d.
  *
  * @author Matthew Khouzam
- * @since 3.1
  */
 public final class LttngRelaydConsumer {
 

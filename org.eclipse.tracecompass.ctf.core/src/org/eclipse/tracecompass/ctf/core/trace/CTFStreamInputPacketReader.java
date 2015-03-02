@@ -47,7 +47,6 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Matthew Khouzam
  * @author Simon Marchi
- * @since 3.0
  */
 public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseable {
 
@@ -526,7 +525,6 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
      * Get stream event header
      *
      * @return the stream event header
-     * @since 3.1
      */
     public ICompositeDefinition getStreamEventHeaderDefinition() {
         return fCurrentStreamEventHeaderDef;

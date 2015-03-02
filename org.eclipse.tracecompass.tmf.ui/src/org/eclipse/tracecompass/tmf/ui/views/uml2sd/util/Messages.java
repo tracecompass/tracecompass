@@ -18,9 +18,7 @@ import org.eclipse.osgi.util.NLS;
 /**
  * Messages related to the sequence diagram
  *
- * @version 1.0
  * @author Bernd Hufmann
- * @since 2.0
  */
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {

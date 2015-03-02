@@ -83,9 +83,6 @@ public interface TmfXmlStrings {
     String STACK_PEEK = "peek";
     String CPU = "cpu";
 
-    /**
-     * @since 1.2
-     */
     String TIMESTAMP = "timestamp";
 
     /* Operator type */

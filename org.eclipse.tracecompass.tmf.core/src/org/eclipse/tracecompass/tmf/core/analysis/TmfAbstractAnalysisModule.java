@@ -49,7 +49,6 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
  * behavior to some methods of the analysis module
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 @NonNullByDefault
 public abstract class TmfAbstractAnalysisModule extends TmfComponent implements IAnalysisModule {
@@ -433,7 +432,6 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
      *
      * @param signal
      *            Trace selected signal
-     * @since 3.1
      */
     @TmfSignalHandler
     public void traceSelected(TmfTraceSelectedSignal signal) {

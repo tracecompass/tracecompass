@@ -50,7 +50,6 @@ public final class EnumDefinition extends SimpleDatatypeDefinition {
      *            the field name
      * @param intValue
      *            the value of the enum
-     * @since 3.0
      */
     public EnumDefinition(@NonNull EnumDeclaration declaration,
             IDefinitionScope definitionScope, @NonNull String fieldName, IntegerDefinition intValue) {

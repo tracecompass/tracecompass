@@ -28,8 +28,6 @@ import org.eclipse.ui.views.properties.IPropertySource;
 
 /**
  * Property source for events
- *
- * @since 2.0
  */
 public class TmfEventPropertySource implements IPropertySource {
 

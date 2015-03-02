@@ -46,7 +46,6 @@ public interface IDeclaration {
      * @return a reference to the definition
      * @throws CTFReaderException
      *             error in reading
-     * @since 3.0
      */
     Definition createDefinition(IDefinitionScope definitionScope, @NonNull String fieldName, @NonNull BitBuffer input) throws CTFReaderException;
 
@@ -58,7 +57,6 @@ public interface IDeclaration {
      * @param fieldName
      *            the name of the definition
      * @return the path of the definition
-     * @since 3.0
      */
     @NonNull LexicalScope getPath(IDefinitionScope definitionScope, @NonNull String fieldName);
 
@@ -74,7 +72,6 @@ public interface IDeclaration {
      * The MAXIMUM size of this declaration (in bits).
      *
      * @return the maximum size
-     * @since 3.0
      */
     int getMaximumSize();
 

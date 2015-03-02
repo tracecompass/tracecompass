@@ -20,7 +20,6 @@ import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
  * declaration
  *
  * @author Matthew Khouzam
- * @since 3.1
  */
 @NonNullByDefault
 public interface IDefinition {

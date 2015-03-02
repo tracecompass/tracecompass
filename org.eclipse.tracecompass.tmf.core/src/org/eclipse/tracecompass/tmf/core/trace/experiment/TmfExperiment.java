@@ -74,7 +74,6 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
     /**
      * The file name of the Synchronization
      *
-     * @since 3.0
      * @deprecated This file name shouldn't be used directly anymore. All
      *             synchronization files have been moved to a folder and you
      *             should use the {@link #getSynchronizationFolder(boolean)}
@@ -198,7 +197,6 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
      *            the experiment index page size
      * @param resource
      *            the resource associated to the experiment
-     * @since 3.0
      */
     public void initExperiment(final Class<? extends ITmfEvent> type,
             final String path,
@@ -230,9 +228,6 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
         }
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public IStatus validate(final IProject project, final String path) {
         return Status.OK_STATUS;
@@ -258,7 +253,6 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
      * @param index
      *            the event index (rank)
      * @return the corresponding event timestamp
-     * @since 2.0
      */
     public ITmfTimestamp getTimestamp(final int index) {
         final ITmfContext context = seekEvent(index);
@@ -271,9 +265,6 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
     // Request management
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 2.0
-     */
     @Override
     public synchronized ITmfContext armRequest(final ITmfEventRequest request) {
 
@@ -297,9 +288,6 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
     // ITmfTrace trace positioning
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 3.0
-     */
     @Override
     public synchronized ITmfContext seekEvent(final ITmfLocation location) {
         // Validate the location
@@ -351,9 +339,6 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
         return context;
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public double getLocationRatio(final ITmfLocation location) {
         if (location instanceof TmfExperimentLocation) {
@@ -367,9 +352,6 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
         return 0.0;
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public ITmfLocation getCurrentLocation() {
         // never used
@@ -451,9 +433,6 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
         return event;
     }
 
-    /**
-     * @since 2.0
-     */
     @Override
     public ITmfTimestamp getInitialRangeOffset() {
 
@@ -491,7 +470,6 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
      * @return The path to the folder where synchronization-related
      *         supplementary files can be kept or <code>null</code> if not
      *         available.
-     * @since 3.2
      */
     public String getSynchronizationFolder(boolean absolute) {
         /* Set up the path to the synchronization file we'll use */
@@ -526,7 +504,6 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
      * read a synchronization file if it exists
      *
      * @return The synchronization object
-     * @since 3.0
      */
     public SynchronizationAlgorithm synchronizeTraces() {
         return synchronizeTraces(false);
@@ -539,7 +516,6 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
      *            Whether to actually synchronize or just try opening a sync
      *            file
      * @return The synchronization object
-     * @since 3.0
      */
     public SynchronizationAlgorithm synchronizeTraces(boolean doSync) {
         fSyncLock.lock();
@@ -677,9 +653,6 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
         }
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public synchronized int getCheckpointSize() {
         int totalCheckpointSize = 0;
@@ -707,9 +680,6 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
         return totalCheckpointSize;
     }
 
-    /**
-     * @since 3.0
-     */
     @Override
     public ITmfLocation restoreLocation(ByteBuffer bufferIn) {
         List<ITmfTrace> children = getChildren(ITmfTrace.class);

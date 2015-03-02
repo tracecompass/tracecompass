@@ -20,7 +20,6 @@ import java.nio.ByteOrder;
  * VIEWER_GET_NEXT_INDEX payload.
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public class GetNextIndex implements IRelayCommand {
 

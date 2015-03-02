@@ -20,7 +20,6 @@ import org.eclipse.jdt.annotation.Nullable;
  * of a lexical scope
  *
  * @author Matthew Khouzam
- * @since 3.1
  */
 @NonNullByDefault
 public class RootScope extends LexicalScope {

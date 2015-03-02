@@ -22,7 +22,6 @@ import java.nio.ByteOrder;
  * CONNECT payload.
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public class ConnectResponse implements IRelayResponse, IRelayCommand {
 

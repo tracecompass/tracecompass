@@ -25,7 +25,6 @@ import com.google.common.collect.ImmutableList;
  * Response to a "new streams" command
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public class NewStreamsResponse implements IRelayResponse {
 

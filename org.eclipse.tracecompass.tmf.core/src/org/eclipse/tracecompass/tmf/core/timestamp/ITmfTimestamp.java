@@ -33,8 +33,6 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  * </ul>
  *
  * @author Francois Chouinard
- * @version 2.0
- * @since 2.0
  *
  * @see ITmfEvent
  * @see TmfTimeRange
@@ -123,7 +121,6 @@ public interface ITmfTimestamp extends Comparable<ITmfTimestamp> {
      *
      * @param format the timestamp formatter
      * @return the formatted timestamp
-     * @since 2.0
      */
     String toString(final TmfTimestampFormat format);
 

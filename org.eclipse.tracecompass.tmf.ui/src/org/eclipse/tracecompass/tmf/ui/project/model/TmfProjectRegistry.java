@@ -94,7 +94,6 @@ public class TmfProjectRegistry implements IResourceChangeListener {
      * @param monitor
      *          - A progress monitor
      * @return the IProject object or null
-     * @since 2.0
      */
     public static IProject createProject(String projectName, final URI projectLocation, IProgressMonitor monitor) {
 
@@ -151,9 +150,6 @@ public class TmfProjectRegistry implements IResourceChangeListener {
     // IResourceChangeListener
     // ------------------------------------------------------------------------
 
-    /**
-     * @since 3.0
-     */
     @Override
     public void resourceChanged(IResourceChangeEvent event) {
         if (event.getType() == IResourceChangeEvent.PRE_DELETE || event.getType() == IResourceChangeEvent.PRE_CLOSE) {

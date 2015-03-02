@@ -20,7 +20,6 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
  * <p>
  * Currently, it only addresses the inter-component signalling.
  *
- * @version 1.0
  * @author Francois Chouinard
  *
  * @see TmfComponent
@@ -50,7 +49,6 @@ public interface ITmfComponent {
      * in a separate thread.
      *
      * @param signal the signal to broadcast
-     * @since 3.0
      */
     void broadcastAsync(TmfSignal signal);
 }

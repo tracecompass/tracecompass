@@ -21,7 +21,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeForma
 /**
  * Time data provider interface, for use in the timegraph widget.
  *
- * @version 1.0
  * @author Alvaro Sanchez-Leon
  * @author Patrick Tasse
  * @author Xavier Raynaud
@@ -34,7 +33,6 @@ public interface ITimeDataProvider {
      *
      * @param beginTime the selection begin time
      * @param endTime the selection end time
-     * @since 3.0
      */
     void setSelectionRangeNotify(long beginTime, long endTime);
 
@@ -43,19 +41,16 @@ public interface ITimeDataProvider {
      *
      * @param beginTime the selection begin time
      * @param endTime the selection end time
-     * @since 3.0
      */
     void setSelectionRange(long beginTime, long endTime);
 
     /**
      * @return The begin time of the current selection
-     * @since 3.0
      */
     long getSelectionBegin();
 
     /**
      * @return The end time of the current selection
-     * @since 3.0
      */
     long getSelectionEnd();
 
@@ -175,7 +170,6 @@ public interface ITimeDataProvider {
      *   <li>{@link TimeFormat#RELATIVE} relative time, displayed as seconds/ms/us/ns
      *   <li>{@link TimeFormat#NUMBER}   number, displayed as long values.
      * </ul>
-     * @since 2.0
      */
     TimeFormat getTimeFormat();
 }

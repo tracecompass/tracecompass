@@ -111,7 +111,6 @@ import org.xml.sax.SAXParseException;
  * </p>
  *
  * @author Guilliano Molaire
- * @since 3.0
  */
 public final class SessionConfigGenerator {
 

@@ -13,9 +13,6 @@ package org.eclipse.tracecompass.tmf.ui.properties;
 
 import org.eclipse.osgi.util.NLS;
 
-/**
- * @since 2.1
- */
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.tmf.ui.properties.messages"; //$NON-NLS-1$

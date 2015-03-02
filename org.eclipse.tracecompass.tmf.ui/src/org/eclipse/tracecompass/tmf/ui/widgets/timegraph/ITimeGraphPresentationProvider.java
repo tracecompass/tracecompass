@@ -23,18 +23,15 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 /**
  * Interface for the time graph widget provider
  *
- * @version 1.0
  * @author Patrick Tasse
  */
 public interface ITimeGraphPresentationProvider {
 
     /** State table index for an invisible event
-     * @since 2.0
      */
     final int INVISIBLE = -1;
 
     /** State table index for a transparent event (only borders drawn)
-     * @since 2.0
      */
     final int TRANSPARENT = -2;
 
@@ -52,7 +49,6 @@ public interface ITimeGraphPresentationProvider {
     * @param entry
     *           the entry
     * @return the name of state type depending on the given entry or null.
-    * @since 2.0
     */
    String getStateTypeName(ITimeGraphEntry entry);
 
@@ -158,8 +154,6 @@ public interface ITimeGraphPresentationProvider {
      * @param event the time event
      * @param hoverTime the time corresponding to the mouse hover position
      * @return a map of tool tip information
-     *
-     * @since 2.0
      */
     Map<String, String> getEventHoverToolTipInfo(ITimeEvent event, long hoverTime);
 
@@ -168,8 +162,6 @@ public interface ITimeGraphPresentationProvider {
      * {@link #getEventHoverToolTipInfo(ITimeEvent)}).
      *
      * @return <code>true</code> if times and duration should be displayed on tooltip, <code>false</code> otherwise.
-     *
-     * @since 3.0
      */
     public boolean displayTimesInTooltip();
 

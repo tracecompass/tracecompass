@@ -62,7 +62,6 @@ public abstract class CtfTmfEventField extends TmfEventField {
      *            The value of this field. Its type should match the field type.
      * @param fields
      *            The children fields. Useful for composite fields
-     * @since 2.0
      */
     protected CtfTmfEventField(String name, Object value, ITmfEventField[] fields) {
         super(/* Strip the underscore from the field name if there is one */
@@ -99,7 +98,6 @@ public abstract class CtfTmfEventField extends TmfEventField {
      * @param fieldName
      *            String The name to assign to this field
      * @return The resulting CtfTmfEventField object
-     * @since 3.1
      */
     public static CtfTmfEventField parseField(IDefinition fieldDef,
             String fieldName) {

@@ -29,7 +29,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 /**
  * This control provides a group containing a text control.
  *
- * @version 1.1
  * @author Francois Chouinard
  */
 public class HistogramCurrentTimeControl extends HistogramTextControl {
@@ -45,7 +44,6 @@ public class HistogramCurrentTimeControl extends HistogramTextControl {
      * @param parent A parent composite to draw in
      * @param label A label
      * @param value A value
-     * @since 2.0
      */
     public HistogramCurrentTimeControl(HistogramView parentView, Composite parent,
             String label, long value)
@@ -96,7 +94,6 @@ public class HistogramCurrentTimeControl extends HistogramTextControl {
      *
      * @param time
      *            the new selected time
-     * @since 2.2
      */
     protected void updateSelectionTime(long time) {
         fParentView.updateSelectionTime(time, time);
@@ -120,7 +117,6 @@ public class HistogramCurrentTimeControl extends HistogramTextControl {
      * adjust the text and group widgets and then refresh the view layout.
      *
      * @param signal the incoming signal
-     * @since 2.0
      */
     @TmfSignalHandler
     public void timestampFormatUpdated(TmfTimestampFormatUpdateSignal signal) {

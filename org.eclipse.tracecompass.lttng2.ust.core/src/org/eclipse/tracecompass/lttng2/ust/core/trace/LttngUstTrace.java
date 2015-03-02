@@ -30,7 +30,6 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
  * Class to contain LTTng-UST traces
  *
  * @author Matthew Khouzam
- * @since 2.1
  */
 public class LttngUstTrace extends CtfTmfTrace {
 

@@ -42,8 +42,6 @@ import org.eclipse.tracecompass.internal.ctf.core.trace.StreamInputPacketIndexEn
  * <b><u>StreamInput</u></b>
  * <p>
  * Represents a trace file that belongs to a certain stream.
- *
- * @since 3.0
  */
 public class CTFStreamInput implements IDefinitionScope {
 

@@ -20,7 +20,6 @@ import java.util.NoSuchElementException;
 /**
  * An iterator for time events. Events from the zoomed event list override any
  * events from the underlying event list.
- * @since 2.0
  */
 public class EventIterator implements Iterator<ITimeEvent> {
 

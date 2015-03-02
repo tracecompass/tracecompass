@@ -20,7 +20,6 @@ import java.nio.ByteOrder;
  * The LTTng command
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public class ViewerCommand implements IRelayCommand {
 

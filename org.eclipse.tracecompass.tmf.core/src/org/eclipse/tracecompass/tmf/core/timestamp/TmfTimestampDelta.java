@@ -18,7 +18,6 @@ import java.util.TimeZone;
  * The toString() method takes negative values into consideration.
  *
  * @author Bernd Hufmann
- * @since 2.0
  */
 public class TmfTimestampDelta extends TmfTimestamp {
 

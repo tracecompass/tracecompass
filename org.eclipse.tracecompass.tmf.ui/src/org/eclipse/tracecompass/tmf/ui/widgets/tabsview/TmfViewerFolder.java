@@ -30,8 +30,6 @@ import org.eclipse.tracecompass.tmf.ui.viewers.ITmfViewer;
  * The indexing of the viewers is based on their name.
  *
  * @author Mathieu Denis
- * @version 2.0
- * @since 2.0
  */
 public class TmfViewerFolder extends Composite {
 

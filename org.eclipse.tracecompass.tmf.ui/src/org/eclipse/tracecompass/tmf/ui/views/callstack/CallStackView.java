@@ -110,7 +110,6 @@ import org.eclipse.ui.IEditorPart;
  * Main implementation for the Call Stack view
  *
  * @author Patrick Tasse
- * @since 2.0
  */
 public class CallStackView extends TmfView {
 
@@ -675,7 +674,6 @@ public class CallStackView extends TmfView {
      *
      * @param signal
      *            The incoming signal
-     * @since 2.0
      */
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {

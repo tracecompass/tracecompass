@@ -22,7 +22,6 @@ import java.nio.ByteOrder;
  * Response to getpacket command
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public class TracePacketResponse implements IRelayResponse {
 

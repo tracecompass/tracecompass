@@ -17,7 +17,6 @@ import org.eclipse.osgi.util.NLS;
  * Message bundle for the ust memory analysis module
  *
  * @author Guilliano Molaire
- * @since 3.0
  */
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.lttng2.ust.core.analysis.memory.messages"; //$NON-NLS-1$

@@ -19,7 +19,6 @@ import java.util.Comparator;
  * even values), so separate comparators are provided.
  *
  * @author Alexandre Montplaisir
- * @since 3.0
  */
 public class TmfIntervalEndComparator implements Comparator<ITmfStateInterval> {
 

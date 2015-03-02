@@ -18,7 +18,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
  * Time Event implementation specific to the Call Stack View
  *
  * @author Patrick Tasse
- * @since 2.0
  */
 public class CallStackEvent extends TimeEvent {
 

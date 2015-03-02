@@ -28,7 +28,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
  * @author Francois Chouinard
  *
  * @see TmfEventProvider
- * @since 3.0
  */
 public interface ITmfEventProvider extends ITmfComponent {
 

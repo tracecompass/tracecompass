@@ -26,7 +26,6 @@ import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
  * and a trace
  *
  * @author Matthew Khouzam
- * @since 3.0
  */
 public class TraceTypeHelper {
 
@@ -123,7 +122,6 @@ public class TraceTypeHelper {
      * @param path
      *            the trace to validate
      * @return the confidence level (0 is lowest) or -1 if validation fails
-     * @since 3.0
      */
     public int validateWithConfidence(String path) {
         int result = -1;
@@ -140,7 +138,6 @@ public class TraceTypeHelper {
     /**
      * Get an object of the trace type
      * @return an object of the trace type
-     * @since 2.1
      */
     public ITmfTrace getTrace() {
         return fTrace;
@@ -159,7 +156,6 @@ public class TraceTypeHelper {
      * Get the class associated with this trace type
      *
      * @return The trace class
-     * @since 3.0
      */
     public Class<? extends ITmfTrace> getTraceClass() {
         return fTrace.getClass();

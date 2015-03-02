@@ -17,14 +17,12 @@ import java.util.EventObject;
 /**
  * Notifier for the time graph that the time range has been updated.
  *
- * @version 1.0
  * @author Patrick Tasse
  */
 public class TimeGraphRangeUpdateEvent extends EventObject {
 
     /**
      * Default serial version UID for this class.
-     * @since 1.0
      */
     private static final long serialVersionUID = 1L;
 

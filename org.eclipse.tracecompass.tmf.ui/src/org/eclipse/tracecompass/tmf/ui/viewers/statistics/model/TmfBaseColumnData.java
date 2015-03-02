@@ -21,7 +21,6 @@ import org.eclipse.jface.viewers.ViewerComparator;
  * Contains all the information necessary to build a column of the table.
  *
  * @author Mathieu Denis
- * @since 2.0
  */
 public class TmfBaseColumnData {
 

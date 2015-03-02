@@ -23,7 +23,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * Abstract class for synchronization algorithm
  *
  * @author Geneviève Bastien
- * @since 3.0
  */
 public abstract class SynchronizationAlgorithm extends TmfEventMatches implements Serializable {
 
