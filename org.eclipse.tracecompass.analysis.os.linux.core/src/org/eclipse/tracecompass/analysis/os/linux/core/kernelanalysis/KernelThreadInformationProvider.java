@@ -196,6 +196,7 @@ public final class KernelThreadInformationProvider {
      * @param ts
      *            The timestamp at which to get the priority
      * @return The priority of this thread, or {@code null} if not found
+     * @since 1.0
      */
     public static @Nullable Integer getThreadPrio(KernelAnalysis module, Integer threadId, long ts) {
         Integer execPrio = null;

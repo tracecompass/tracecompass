@@ -63,6 +63,7 @@ public class TmfContentFieldAspect implements ITmfEventAspect {
      *            The field name or absolute field path array to look for in the
      *            event content. Should *not* be localized!
      * @return the new aspect
+     * @since 1.0
      */
     public static TmfContentFieldAspect create(String aspectName, String helpText, String... fieldPath) {
         return new TmfContentFieldAspect(aspectName, helpText, fieldPath);

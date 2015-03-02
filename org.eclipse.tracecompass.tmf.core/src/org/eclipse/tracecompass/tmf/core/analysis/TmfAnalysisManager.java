@@ -108,6 +108,7 @@ public class TmfAnalysisManager {
      * This map is read-only
      *
      * @return The map of available {@link IAnalysisModuleHelper}
+     * @since 1.0
      */
     public static synchronized Multimap<String, IAnalysisModuleHelper> getAnalysisModules() {
         if (fAnalysisModules.isEmpty()) {

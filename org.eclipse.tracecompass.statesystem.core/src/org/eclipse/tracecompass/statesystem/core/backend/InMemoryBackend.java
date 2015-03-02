@@ -84,6 +84,7 @@ public class InMemoryBackend implements IStateHistoryBackend {
      *            The state system's ID
      * @param startTime
      *            The start time of this interval store
+     * @since 1.0
      */
     public InMemoryBackend(@NonNull String ssid, long startTime) {
         this.ssid = ssid;
@@ -92,6 +93,9 @@ public class InMemoryBackend implements IStateHistoryBackend {
         this.intervals = new TreeSet<>(END_COMPARATOR);
     }
 
+    /**
+     * @since 1.0
+     */
     @Override
     public String getSSID() {
         return ssid;

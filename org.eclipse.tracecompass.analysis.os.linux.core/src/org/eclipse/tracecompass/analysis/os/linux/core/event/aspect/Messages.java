@@ -15,6 +15,9 @@ package org.eclipse.tracecompass.analysis.os.linux.core.event.aspect;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 
+/**
+ * @since 1.0
+ */
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {
 

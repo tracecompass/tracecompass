@@ -54,6 +54,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      * Indicates if the history tree construction is done
      *
      * @return if the history tree construction is done
+     * @since 1.0
      */
     protected boolean isFinishedBuilding() {
         return fFinishedBuilding;
@@ -64,6 +65,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      *
      * @param isFinishedBuilding
      *            is the history tree finished building
+     * @since 1.0
      */
     protected void setFinishedBuilding(boolean isFinishedBuilding) {
         this.fFinishedBuilding = isFinishedBuilding;
@@ -91,6 +93,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      *            The earliest time stamp that will be stored in the history
      * @throws IOException
      *             Thrown if we can't create the file for some reason
+     * @since 1.0
      */
     public HistoryTreeBackend(@NonNull String ssid, File newStateFile, int blockSize,
             int maxChildren, int providerVersion, long startTime) throws IOException {
@@ -118,6 +121,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      *            The earliest time stamp that will be stored in the history
      * @throws IOException
      *             Thrown if we can't create the file for some reason
+     * @since 1.0
      */
     public HistoryTreeBackend(@NonNull String ssid, File newStateFile, int providerVersion, long startTime)
             throws IOException {
@@ -137,6 +141,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      *             If we can't read the file, if it doesn't exist, is not
      *             recognized, or if the version of the file does not match the
      *             expected providerVersion.
+     * @since 1.0
      */
     public HistoryTreeBackend(@NonNull String ssid, File existingStateFile, int providerVersion)
             throws IOException {
@@ -154,6 +159,9 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         return sht;
     }
 
+    /**
+     * @since 1.0
+     */
     @Override
     public String getSSID() {
         return ssid;

@@ -17,6 +17,7 @@ package org.eclipse.tracecompass.ctf.core;
  * CTF trace reader.
  *
  * @author Alexandre Montplaisir
+ * @since 1.0
  */
 public class CTFReaderException extends Exception {
 

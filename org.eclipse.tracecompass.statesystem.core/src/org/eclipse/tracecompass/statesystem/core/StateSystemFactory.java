@@ -39,6 +39,7 @@ public final class StateSystemFactory {
      * @param backend
      *            Back-end plugin to use
      * @return The new state system
+     * @since 1.0
      */
    public static ITmfStateSystemBuilder newStateSystem(IStateHistoryBackend backend) {
        return new StateSystem(backend);
@@ -56,6 +57,7 @@ public final class StateSystemFactory {
      * @return The new state system
      * @throws IOException
      *             If there was a problem creating the new history file
+     * @since 1.0
      */
     public static ITmfStateSystemBuilder newStateSystem(IStateHistoryBackend backend,
             boolean newFile) throws IOException {

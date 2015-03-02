@@ -64,6 +64,7 @@ public class TextTraceEventContent implements ITmfEventField {
      *
      * @param initialCapacity
      *            the initial capacity of the field list
+     * @since 1.0
      */
     public TextTraceEventContent(int initialCapacity) {
         fName = ITmfEventField.ROOT_FIELD_ID;
@@ -254,6 +255,7 @@ public class TextTraceEventContent implements ITmfEventField {
      *            a subfield name
      * @param value
      *            the subfield value
+     * @since 1.0
      */
     public void addField(@NonNull String name, Object value) {
         TextTraceEventContent field = new TextTraceEventContent(name);

@@ -18,6 +18,7 @@ import org.eclipse.osgi.util.NLS;
  * Externalized strings for this plugin
  *
  * @author Geneviève Bastien
+ * @since 1.0
  */
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {

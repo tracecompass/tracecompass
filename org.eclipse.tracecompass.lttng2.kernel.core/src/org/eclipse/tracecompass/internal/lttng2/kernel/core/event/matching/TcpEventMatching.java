@@ -54,6 +54,9 @@ public class TcpEventMatching implements ITmfMatchEventDefinition {
         return false;
     }
 
+    /**
+     * @since 1.0
+     */
     @Override
     public Direction getDirection(ITmfEvent event) {
         String evname = event.getType().getName();

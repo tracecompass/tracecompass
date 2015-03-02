@@ -73,6 +73,9 @@ public class TcpLttngEventMatching implements ITmfMatchEventDefinition {
         return !traceEvents.isEmpty();
     }
 
+    /**
+     * @since 1.0
+     */
     @Override
     public Direction getDirection(ITmfEvent event) {
         String evname = event.getType().getName();

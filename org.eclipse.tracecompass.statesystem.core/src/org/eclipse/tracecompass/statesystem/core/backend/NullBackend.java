@@ -38,11 +38,15 @@ public class NullBackend implements IStateHistoryBackend {
      *
      * @param ssid
      *            The state system's id
+     * @since 1.0
      */
     public NullBackend(@NonNull String ssid) {
         this.ssid = ssid;
     }
 
+    /**
+     * @since 1.0
+     */
     @Override
     public String getSSID() {
         return ssid;

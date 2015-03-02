@@ -51,6 +51,7 @@ public interface ITmfMatchEventDefinition {
      * @param event
      *            The event to check
      * @return The direction of this event, null if uninteresting event
+     * @since 1.0
      */
     Direction getDirection(ITmfEvent event);
 

@@ -59,6 +59,7 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
      *            Parent of the analysis
      * @param module
      *            The analysis module helper
+     * @since 1.0
      */
     protected TmfAnalysisElement(String name, IResource resource, ITmfProjectModelElement parent, @NonNull IAnalysisModuleHelper module) {
         super(name, resource, parent);

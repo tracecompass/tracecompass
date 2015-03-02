@@ -71,6 +71,7 @@ public final class NonNullUtils {
      * @param o2
      *            the second object to compare
      * @return true if o1.equals(o2) or o1 == o2
+     * @since 1.0
      */
     public static boolean equalsNullable(final @Nullable Object o1, final @Nullable Object o2) {
         if (o1 == o2) {

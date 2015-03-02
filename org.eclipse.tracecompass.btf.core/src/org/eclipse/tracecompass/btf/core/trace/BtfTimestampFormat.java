@@ -20,6 +20,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
  * Timstamp format of BTF timescale as per v2.1 of the spec
  *
  * @author Matthew Khouzam
+ * @since 1.0
  */
 public enum BtfTimestampFormat {
     /**

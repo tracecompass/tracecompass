@@ -24,6 +24,7 @@ import com.google.common.hash.Hashing;
  * threads by adding the host ID it belongs to.
  *
  * @author Geneviève Bastien
+ * @since 1.0
  */
 public class HostThread {
 

@@ -52,7 +52,10 @@ public interface IKernelAnalysisEventLayout {
     String eventSoftIrqExit();
     String eventSoftIrqRaise();
     String eventSchedSwitch();
+
+    /** @since 1.0 */
     String eventSchedPiSetprio();
+
     Collection<String> eventsSchedWakeup();
     String eventSchedProcessFork();
     String eventSchedProcessExit();
@@ -76,7 +79,13 @@ public interface IKernelAnalysisEventLayout {
     String fieldChildComm();
     String fieldParentTid();
     String fieldChildTid();
+
+    /** @since 1.0 */
     String fieldPrio();
+
+    /** @since 1.0 */
     String fieldNewPrio();
+
+    /** @since 1.0 */
     String fieldNextPrio();
 }

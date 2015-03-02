@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableList;
  * Due to historical reasons, the definitions are the same as LTTng event names.
  *
  * @author Alexandre Montplaisir
+ * @since 1.0
  */
 public class DefaultEventLayout implements IKernelAnalysisEventLayout{
 
@@ -113,6 +114,9 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout{
         return SCHED_SWITCH;
     }
 
+    /**
+     * @since 1.0
+     */
     @Override
     public String eventSchedPiSetprio() {
         return SCHED_PI_SETPRIO;
@@ -212,16 +216,25 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout{
         return CHILD_TID;
     }
 
+    /**
+     * @since 1.0
+     */
     @Override
     public String fieldPrio() {
         return PRIO;
     }
 
+    /**
+     * @since 1.0
+     */
     @Override
     public String fieldNewPrio() {
         return NEW_PRIO;
     }
 
+    /**
+     * @since 1.0
+     */
     @Override
     public String fieldNextPrio() {
         return NEXT_PRIO;

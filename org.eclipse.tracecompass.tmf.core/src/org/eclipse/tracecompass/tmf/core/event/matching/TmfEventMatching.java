@@ -71,6 +71,7 @@ public class TmfEventMatching implements ITmfEventMatching {
 
     /**
      * Enum for cause and effect types of event
+     * @since 1.0
      */
     public enum Direction {
         /**
@@ -88,6 +89,7 @@ public class TmfEventMatching implements ITmfEventMatching {
      *
      * @param traces
      *            The set of traces for which to match events
+     * @since 1.0
      */
     public TmfEventMatching(Collection<ITmfTrace> traces) {
         this(traces, new TmfEventMatches());
@@ -212,6 +214,7 @@ public class TmfEventMatching implements ITmfEventMatching {
      *            The trace to which this event belongs
      * @param monitor
      *            The monitor for the synchronization job
+     * @since 1.0
      */
     protected void matchEvent(ITmfEvent event, ITmfTrace trace, @NonNull IProgressMonitor monitor) {
         ITmfMatchEventDefinition def = null;

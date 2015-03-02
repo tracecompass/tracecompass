@@ -67,6 +67,7 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
      *            works well
      * @throws IOException
      *             If there was a problem opening the history file for writing
+     * @since 1.0
      */
     public ThreadedHistoryTreeBackend(@NonNull String ssid, File newStateFile, int blockSize,
             int maxChildren, long startTime, int providerVersion, int queueSize)
@@ -98,6 +99,7 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
      *            works well
      * @throws IOException
      *             If there was a problem opening the history file for writing
+     * @since 1.0
      */
     public ThreadedHistoryTreeBackend(@NonNull String ssid, File newStateFile, long startTime,
             int providerVersion, int queueSize) throws IOException {
