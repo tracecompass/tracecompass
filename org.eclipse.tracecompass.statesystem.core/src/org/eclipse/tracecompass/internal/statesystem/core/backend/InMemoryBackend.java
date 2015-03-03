@@ -12,7 +12,7 @@
  *   Patrick Tasse - Add message to exceptions
  ******************************************************************************/
 
-package org.eclipse.tracecompass.statesystem.core.backend;
+package org.eclipse.tracecompass.internal.statesystem.core.backend;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,6 +24,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -85,7 +86,6 @@ public class InMemoryBackend implements IStateHistoryBackend {
      *            The state system's ID
      * @param startTime
      *            The start time of this interval store
-     * @since 1.0
      */
     public InMemoryBackend(@NonNull String ssid, long startTime) {
         this.ssid = ssid;
@@ -94,9 +94,6 @@ public class InMemoryBackend implements IStateHistoryBackend {
         this.intervals = new TreeSet<>(END_COMPARATOR);
     }
 
-    /**
-     * @since 1.0
-     */
     @Override
     public String getSSID() {
         return ssid;

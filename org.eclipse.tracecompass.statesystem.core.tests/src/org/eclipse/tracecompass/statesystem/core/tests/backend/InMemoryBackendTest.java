@@ -17,8 +17,10 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.tracecompass.statesystem.core.backend.InMemoryBackend;
+import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
+import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
+import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -35,14 +37,14 @@ import org.junit.Test;
 public class InMemoryBackendTest {
 
     private static final int NUMBER_OF_ATTRIBUTES = 10;
-    private static InMemoryBackend fixture;
+    private static IStateHistoryBackend fixture;
 
     /**
      * Test setup. make a state system that is moderately large
      */
     @BeforeClass
     public static void init() {
-        fixture = new InMemoryBackend("test-ss", 0);
+        fixture = StateHistoryBackendFactory.createInMemoryBackend("test-ss", 0);
         for (int attribute = 0; attribute < NUMBER_OF_ATTRIBUTES; attribute++) {
             for (int timeStart = 0; timeStart < 1000; timeStart++) {
                 try {
@@ -100,7 +102,7 @@ public class InMemoryBackendTest {
         }
         try {
             fixture.doQuery(interval, 950);
-        } catch (TimeRangeException e) {
+        } catch (TimeRangeException | StateSystemDisposedException e) {
             fail(e.getMessage());
         }
 
@@ -149,9 +151,7 @@ public class InMemoryBackendTest {
             ITmfStateInterval ref[] = intervalQuery.toArray(new ITmfStateInterval[0]);
             assertArrayEquals(ref, interval);
 
-        } catch (TimeRangeException e) {
-            fail(e.getMessage());
-        } catch (AttributeNotFoundException e) {
+        } catch (TimeRangeException | AttributeNotFoundException | StateSystemDisposedException e) {
             fail(e.getMessage());
         }
     }
@@ -165,9 +165,7 @@ public class InMemoryBackendTest {
             ITmfStateInterval interval = fixture.doSingularQuery(999, 0);
             assertEquals(TmfStateValue.nullValue(), interval.getStateValue());
 
-        } catch (TimeRangeException e) {
-            fail(e.getMessage());
-        } catch (AttributeNotFoundException e) {
+        } catch (TimeRangeException | AttributeNotFoundException | StateSystemDisposedException e) {
             fail(e.getMessage());
         }
     }
@@ -183,11 +181,7 @@ public class InMemoryBackendTest {
             assertEquals(90, interval.getEndTime());
             assertEquals(0, interval.getStateValue().unboxInt());
 
-        } catch (TimeRangeException e) {
-            fail(e.getMessage());
-        } catch (AttributeNotFoundException e) {
-            fail(e.getMessage());
-        } catch (StateValueTypeException e) {
+        } catch (TimeRangeException | AttributeNotFoundException | StateSystemDisposedException e) {
             fail(e.getMessage());
         }
     }
@@ -201,9 +195,7 @@ public class InMemoryBackendTest {
             ITmfStateInterval interval = fixture.doSingularQuery(99998, 9);
             testInterval(interval, 99909, 99999, 99);
 
-        } catch (TimeRangeException e) {
-            fail(e.getMessage());
-        } catch (AttributeNotFoundException e) {
+        } catch (TimeRangeException | AttributeNotFoundException | StateSystemDisposedException e) {
             fail(e.getMessage());
         }
     }
@@ -220,7 +212,7 @@ public class InMemoryBackendTest {
             ITmfStateInterval interval = fixture.doSingularQuery(-1, 0);
             assertNull(interval);
 
-        } catch (AttributeNotFoundException e) {
+        } catch (AttributeNotFoundException | StateSystemDisposedException e) {
             fail(e.getMessage());
         }
     }
@@ -237,7 +229,7 @@ public class InMemoryBackendTest {
             ITmfStateInterval interval = fixture.doSingularQuery(100000, 0);
             assertNull(interval);
 
-        } catch (AttributeNotFoundException e) {
+        } catch (AttributeNotFoundException | StateSystemDisposedException e) {
             fail(e.getMessage());
         }
     }

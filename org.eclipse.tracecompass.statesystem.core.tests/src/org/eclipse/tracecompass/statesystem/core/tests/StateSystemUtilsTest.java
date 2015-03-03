@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.StateSystemFactory;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
-import org.eclipse.tracecompass.statesystem.core.backend.InMemoryBackend;
+import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -51,7 +51,7 @@ public class StateSystemUtilsTest {
     @Before
     public void setupStateSystem() {
         try {
-            IStateHistoryBackend backend = new InMemoryBackend(DUMMY_STRING, START_TIME);
+            IStateHistoryBackend backend = StateHistoryBackendFactory.createInMemoryBackend(DUMMY_STRING, START_TIME);
             fStateSystem = StateSystemFactory.newStateSystem(backend);
             int quark = fStateSystem.getQuarkAbsoluteAndAdd(DUMMY_STRING);
 

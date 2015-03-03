@@ -11,10 +11,10 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources
 Export-Package: org.eclipse.tracecompass.internal.statesystem.core;x-friends:="org.eclipse.tracecompass.statesystem.core.tests",
+ org.eclipse.tracecompass.internal.statesystem.core.backend;x-internal:=true,
  org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;x-friends:="org.eclipse.tracecompass.statesystem.core.tests",
  org.eclipse.tracecompass.statesystem.core,
  org.eclipse.tracecompass.statesystem.core.backend,
- org.eclipse.tracecompass.statesystem.core.backend.historytree,
  org.eclipse.tracecompass.statesystem.core.exceptions,
  org.eclipse.tracecompass.statesystem.core.interval,
  org.eclipse.tracecompass.statesystem.core.statevalue

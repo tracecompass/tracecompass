@@ -21,7 +21,7 @@ import org.eclipse.tracecompass.internal.tmf.core.statesystem.mipmap.TmfStateSys
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.StateSystemFactory;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
-import org.eclipse.tracecompass.statesystem.core.backend.InMemoryBackend;
+import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -52,13 +52,13 @@ public class TmfMipmapStateProviderWeightedTest {
     public static void init() {
         /* setup for INTEGER test */
         TmfMipmapStateProviderStub mmpi = new TmfMipmapStateProviderStub(RESOLUTION, Type.INTEGER);
-        IStateHistoryBackend bei = new InMemoryBackend(SSID, 0);
+        IStateHistoryBackend bei = StateHistoryBackendFactory.createInMemoryBackend(SSID, 0);
         ITmfStateSystemBuilder ssbi = StateSystemFactory.newStateSystem(bei);
         mmpi.assignTargetStateSystem(ssbi);
         ssqi = ssbi;
         /* setup for DOUBLE test */
         TmfMipmapStateProviderStub mmpd = new TmfMipmapStateProviderStub(RESOLUTION, Type.DOUBLE);
-        IStateHistoryBackend bed = new InMemoryBackend(SSID, 0);
+        IStateHistoryBackend bed = StateHistoryBackendFactory.createInMemoryBackend(SSID, 0);
         ITmfStateSystemBuilder ssbd = StateSystemFactory.newStateSystem(bed);
         mmpd.assignTargetStateSystem(ssbd);
         ssqd = ssbd;

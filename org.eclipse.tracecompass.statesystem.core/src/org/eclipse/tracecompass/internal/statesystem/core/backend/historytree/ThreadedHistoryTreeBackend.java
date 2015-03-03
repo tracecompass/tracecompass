@@ -12,7 +12,7 @@
  *   Alexandre Montplaisir - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.statesystem.core.backend.historytree;
+package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +22,6 @@ import java.util.concurrent.BlockingQueue;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.statesystem.core.Activator;
-import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTInterval;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -67,7 +66,6 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
      *            works well
      * @throws IOException
      *             If there was a problem opening the history file for writing
-     * @since 1.0
      */
     public ThreadedHistoryTreeBackend(@NonNull String ssid, File newStateFile, int blockSize,
             int maxChildren, long startTime, int providerVersion, int queueSize)
@@ -99,7 +97,6 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
      *            works well
      * @throws IOException
      *             If there was a problem opening the history file for writing
-     * @since 1.0
      */
     public ThreadedHistoryTreeBackend(@NonNull String ssid, File newStateFile, long startTime,
             int providerVersion, int queueSize) throws IOException {

@@ -27,7 +27,7 @@ import org.eclipse.tracecompass.internal.tmf.core.statesystem.mipmap.TmfStateSys
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.StateSystemFactory;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
-import org.eclipse.tracecompass.statesystem.core.backend.InMemoryBackend;
+import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
@@ -62,7 +62,7 @@ public class TmfMipmapStateProviderTest {
     @BeforeClass
     public static void init() {
         TmfMipmapStateProviderStub mmp = new TmfMipmapStateProviderStub(RESOLUTION, Type.LONG);
-        IStateHistoryBackend be = new InMemoryBackend(SSID, 0);
+        IStateHistoryBackend be = StateHistoryBackendFactory.createInMemoryBackend(SSID, 0);
         ITmfStateSystemBuilder ssb = StateSystemFactory.newStateSystem(be);
         mmp.assignTargetStateSystem(ssb);
         ssq = ssb;

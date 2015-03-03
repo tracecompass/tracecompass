@@ -13,6 +13,7 @@
 
 package org.eclipse.tracecompass.statesystem.core.tests;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -26,7 +27,7 @@ import org.eclipse.tracecompass.internal.statesystem.core.StateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
-import org.eclipse.tracecompass.statesystem.core.backend.historytree.HistoryTreeBackend;
+import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
@@ -81,7 +82,8 @@ public class StateSystemPushPopTest {
         ITmfStateValue value;
         testHtFile = File.createTempFile("test", ".ht");
 
-        IStateHistoryBackend backend = new HistoryTreeBackend("push-pop-test", testHtFile, 0, 0L);
+        IStateHistoryBackend backend = StateHistoryBackendFactory.createHistoryTreeBackendNewFile(
+                "push-pop-test", checkNotNull(testHtFile), 0, 0, 0);
         ss = new StateSystem(backend, true);
 
         /* Build the thing */
