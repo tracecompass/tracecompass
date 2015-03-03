@@ -199,15 +199,6 @@ public class CtfTmfTrace extends TmfTrace
         }
     }
 
-    /**
-     * Return the iterator manager of this trace
-     *
-     * @return The iterator manager
-     */
-    public CtfIteratorManager getIteratorManager() {
-        return fIteratorManager;
-    }
-
     @Override
     public void close() {
         dispose();
@@ -561,6 +552,31 @@ public class CtfTmfTrace extends TmfTrace
             Activator.getDefault().logError(e.getMessage(), e);
         }
         return null;
+    }
+
+    /**
+     * Create the 'CtfIterator' object from a CtfTmfContext.
+     *
+     * @param context
+     *            The iterator will initially be pointing to this context
+     * @return A new CtfIterator object
+     * @since 1.0
+     */
+    public ITmfContext createIteratorFromContext(CtfTmfContext context) {
+        return fIteratorManager.getIterator(context);
+    }
+
+    /**
+     * Dispose an iterator that was create with
+     * {@link #createIteratorFromContext}
+     *
+     * @param context
+     *            The last context that was pointed to by the iterator (this is
+     *            the 'key' to find the correct iterator to dispose).
+     * @since 1.0
+     */
+    public void disposeContext(CtfTmfContext context) {
+        fIteratorManager.removeIterator(context);
     }
 
     // ------------------------------------------------------------------------

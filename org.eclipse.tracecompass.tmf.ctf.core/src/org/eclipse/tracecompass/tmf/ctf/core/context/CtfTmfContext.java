@@ -140,7 +140,7 @@ public class CtfTmfContext implements ITmfContext {
 
     @Override
     public void dispose() {
-        fTrace.getIteratorManager().removeIterator(this);
+        fTrace.disposeContext(this);
     }
 
     /**
@@ -178,6 +178,6 @@ public class CtfTmfContext implements ITmfContext {
      * @return an iterator
      */
     private CtfIterator getIterator() {
-        return fTrace.getIteratorManager().getIterator(this);
+        return (CtfIterator) fTrace.createIteratorFromContext(this);
     }
 }
