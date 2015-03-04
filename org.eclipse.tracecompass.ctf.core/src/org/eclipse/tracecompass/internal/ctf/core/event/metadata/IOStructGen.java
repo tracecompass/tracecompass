@@ -1433,8 +1433,8 @@ public class IOStructGen {
             }
         }
 
-        if (size == 0) {
-            throw new ParseException("Integer missing size attribute"); //$NON-NLS-1$
+        if (size <= 0) {
+            throw new ParseException("Invalid size attribute in Integer: " + size); //$NON-NLS-1$
         }
 
         if (alignment == 0) {

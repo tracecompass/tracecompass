@@ -240,10 +240,6 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
      */
     private IntegerDeclaration(int len, boolean signed, int base,
             @Nullable ByteOrder byteOrder, Encoding encoding, String clock, long alignment) {
-        if (len <= 0 || len == 1 && signed) {
-            throw new IllegalArgumentException();
-        }
-
         fLength = len;
         fSigned = signed;
         fBase = base;

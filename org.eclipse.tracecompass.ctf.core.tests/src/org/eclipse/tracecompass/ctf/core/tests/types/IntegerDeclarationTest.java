@@ -70,34 +70,6 @@ public class IntegerDeclarationTest {
     }
 
     /**
-     * Test that IntegerDeclaration throws when constructing a signed 1 bit
-     * declaration
-     */
-    @Test(expected = java.lang.IllegalArgumentException.class)
-    public void testIntegerDeclarationIllegalArgSignedBit() {
-        int len = 1;
-        boolean signed = true;
-        int base = 1;
-        ByteOrder byteOrder = ByteOrder.BIG_ENDIAN;
-        Encoding encoding = Encoding.ASCII;
-        IntegerDeclaration.createDeclaration(len, signed, base, byteOrder, encoding, "", 16);
-    }
-
-    /**
-     * Test that IntegerDeclaration throws when constructing a invalid length
-     * declaration
-     */
-    @Test(expected = java.lang.IllegalArgumentException.class)
-    public void testIntegerDeclarationIllegalArgBadLenght() {
-        int len = 0;
-        boolean signed = false;
-        int base = 1;
-        ByteOrder byteOrder = ByteOrder.BIG_ENDIAN;
-        Encoding encoding = Encoding.ASCII;
-        IntegerDeclaration.createDeclaration(len, signed, base, byteOrder, encoding, "", 16);
-    }
-
-    /**
      * Test the factory part more rigorously to make sure there are no
      * regressions
      */
