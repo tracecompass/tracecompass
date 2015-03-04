@@ -11,7 +11,7 @@
 			<arguments>
 				<dictionary>
 					<key>LaunchConfigHandle</key>
-					<value>&lt;project&gt;/.externalToolBuilders/org.eclipse.linuxtools.tmf.pcap.help build.xml [Builder].launch</value>
+					<value>&lt;project&gt;/.externalToolBuilders/Trace Compass Pcap User Guide Builder.launch</value>
 				</dictionary>
 				<dictionary>
 					<key>incclean</key>
