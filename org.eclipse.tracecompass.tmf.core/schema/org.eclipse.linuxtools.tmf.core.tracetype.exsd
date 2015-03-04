@@ -100,7 +100,7 @@
                   The fully qualified name of a class that implements the &lt;samp&gt;ITmfTrace&lt;/samp&gt; interface.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.linuxtools.tmf.core.trace.ITmfTrace"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.tracecompass.tmf.core.trace.ITmfTrace"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -110,7 +110,7 @@
                   The fully qualified name of a class that implements the &lt;samp&gt;ITmfEvent&lt;/samp&gt;  interface
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.linuxtools.tmf.core.event.ITmfEvent"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.tracecompass.tmf.core.event.ITmfEvent"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -156,7 +156,7 @@
                   The fully qualified name of a class that extends the &lt;samp&gt;TmfExperiment&lt;/samp&gt; class
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.linuxtools.tmf.core.trace.TmfExperiment:"/>
+                  <meta.attribute kind="java" basedOn="org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment:"/>
                </appinfo>
             </annotation>
          </attribute>

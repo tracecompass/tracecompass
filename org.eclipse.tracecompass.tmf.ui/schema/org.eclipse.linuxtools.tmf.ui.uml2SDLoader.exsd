@@ -63,10 +63,10 @@
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  The implementation of this UML2 SD viewer loader. The class must implement  &lt;code&gt;org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader&lt;/code&gt;.
+                  The implementation of this UML2 SD viewer loader. The class must implement  &lt;code&gt;org.eclipse.tracecompass.tmf.ui.views.uml2sd.load.IUml2SDLoader&lt;/code&gt;.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.linuxtools.tmf.ui.views.uml2sd.load.IUml2SDLoader"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.tracecompass.tmf.ui.views.uml2sd.load.IUml2SDLoader"/>
                </appinfo>
             </annotation>
          </attribute>

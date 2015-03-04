@@ -131,7 +131,7 @@ If omitted, the default events table will be used.
 If empty, the default events table will be used.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.linuxtools.tmf.ui.viewers.events.TmfEventsTable:"/>
+                  <meta.attribute kind="java" basedOn="org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventsTable:"/>
                </appinfo>
             </annotation>
          </attribute>
