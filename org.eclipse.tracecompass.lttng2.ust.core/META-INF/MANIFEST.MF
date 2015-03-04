@@ -8,7 +8,7 @@ Bundle-SymbolicName: org.eclipse.tracecompass.lttng2.ust.core;singleton:=true
 Bundle-Activator: org.eclipse.tracecompass.internal.lttng2.ust.core.Activator
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Export-Package: org.eclipse.tracecompass.internal.lttng2.ust.core;x-internal:=true,
+Export-Package: org.eclipse.tracecompass.internal.lttng2.ust.core;x-friends:="org.eclipse.tracecompass.lttng2.ust.core.tests,org.eclipse.tracecompass.lttng2.ust.ui",
  org.eclipse.tracecompass.internal.lttng2.ust.core.memoryusage;x-friends:="org.eclipse.tracecompass.lttng2.ust.ui,org.eclipse.tracecompass.lttng2.ust.core.tests",
  org.eclipse.tracecompass.internal.lttng2.ust.core.trace.callstack;x-friends:="org.eclipse.tracecompass.lttng2.ust.ui,org.eclipse.tracecompass.lttng2.ust.core.tests",
  org.eclipse.tracecompass.lttng2.ust.core.analysis.memory,
