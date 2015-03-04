@@ -45,9 +45,15 @@ public interface StateValues {
     int PROCESS_STATUS_RUN_SYSCALL = 3;
     int PROCESS_STATUS_INTERRUPTED = 4;
     int PROCESS_STATUS_WAIT_FOR_CPU = 5;
+    /**
+     * @since 1.0
+     */
     int PROCESS_STATUS_WAIT_UNKNOWN = 6;
 
     ITmfStateValue PROCESS_STATUS_UNKNOWN_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_UNKNOWN);
+    /**
+     * @since 1.0
+     */
     ITmfStateValue PROCESS_STATUS_WAIT_UNKNOWN_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_WAIT_UNKNOWN);
     ITmfStateValue PROCESS_STATUS_WAIT_BLOCKED_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_WAIT_BLOCKED);
     ITmfStateValue PROCESS_STATUS_RUN_USERMODE_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_RUN_USERMODE);
