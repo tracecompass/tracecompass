@@ -28,6 +28,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.remote.core.IRemoteProcess;
@@ -82,7 +83,7 @@ public class CommandShell implements ICommandShell {
     }
 
     @Override
-    public ICommandResult executeCommand(final ICommandInput command, @Nullable final IProgressMonitor aMonitor) throws ExecutionException {
+    public ICommandResult executeCommand(final @NonNull ICommandInput command, @Nullable final IProgressMonitor aMonitor) throws ExecutionException {
         if (fConnection.isOpen()) {
             FutureTask<CommandResult> future = new FutureTask<>(new Callable<CommandResult>() {
                 @Override
