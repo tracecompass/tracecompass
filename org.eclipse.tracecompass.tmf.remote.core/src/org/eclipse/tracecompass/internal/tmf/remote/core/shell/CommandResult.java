@@ -16,6 +16,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyStrin
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandResult;
 
 import com.google.common.collect.ImmutableList;
@@ -25,6 +26,7 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Bernd Hufmann
  */
+@NonNullByDefault
 public class CommandResult implements ICommandResult {
 
     // ------------------------------------------------------------------------

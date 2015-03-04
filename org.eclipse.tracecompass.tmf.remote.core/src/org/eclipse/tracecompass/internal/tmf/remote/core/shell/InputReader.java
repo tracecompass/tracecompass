@@ -18,7 +18,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
+@NonNullByDefault
 class InputReader {
     private static final int JOIN_TIMEOUT = 300;
     private static final int BYTES_PER_KB = 1024;
