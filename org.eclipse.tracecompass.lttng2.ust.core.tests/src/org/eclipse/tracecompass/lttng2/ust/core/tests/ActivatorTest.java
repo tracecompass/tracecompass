@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -62,7 +62,7 @@ public class ActivatorTest extends TestCase {
     // ------------------------------------------------------------------------
 
     /**
-     * Test method for {@link org.eclipse.linuxtools.lttng2.kernel.core.Activator#Activator()}.
+     * Test method for {@link org.eclipse.tracecompass.internal.lttng2.ust.core.Activator#Activator()}.
      */
     @Test
     public void testActivator() {
@@ -70,7 +70,7 @@ public class ActivatorTest extends TestCase {
     }
 
     /**
-     * Test method for {@link org.eclipse.linuxtools.lttng2.kernel.core.Activator#getDefault()}.
+     * Test method for {@link org.eclipse.tracecompass.internal.lttng2.ust.core.Activator#getDefault()}.
      */
     @Test
     public void testGetDefault() {
@@ -78,7 +78,7 @@ public class ActivatorTest extends TestCase {
     }
 
     /**
-     * Test method for {@link org.eclipse.linuxtools.lttng2.kernel.core.Activator#start(org.osgi.framework.BundleContext)}.
+     * Test method for {@link org.eclipse.tracecompass.internal.lttng2.ust.core.Activator#start(org.osgi.framework.BundleContext)}.
      */
     @Test
     public void testStartBundleContext() {
@@ -86,7 +86,7 @@ public class ActivatorTest extends TestCase {
     }
 
     /**
-     * Test method for {@link org.eclipse.linuxtools.lttng2.kernel.core.Activator#stop(org.osgi.framework.BundleContext)}.
+     * Test method for {@link org.eclipse.tracecompass.internal.lttng2.ust.core.Activator#stop(org.osgi.framework.BundleContext)}.
      */
     @Test
     public void testStopBundleContext() {

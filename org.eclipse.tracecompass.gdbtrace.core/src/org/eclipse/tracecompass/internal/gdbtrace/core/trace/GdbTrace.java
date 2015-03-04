@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson
+ * Copyright (c) 2011, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -32,7 +32,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.tracecompass.internal.gdbtrace.core.Activator;
 import org.eclipse.tracecompass.internal.gdbtrace.core.GdbTraceCorePlugin;
 import org.eclipse.tracecompass.internal.gdbtrace.core.event.GdbTraceEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -96,22 +95,22 @@ public class GdbTrace extends TmfTrace {
     public IStatus validate(IProject project, String path) {
         File file = new File(path);
         if (!file.exists()) {
-            return new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+            return new Status(IStatus.ERROR, GdbTraceCorePlugin.PLUGIN_ID,
                     NLS.bind(Messages.GdbTrace_FileNotFound, path));
         }
         if (!file.isFile()) {
-            return new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+            return new Status(IStatus.ERROR, GdbTraceCorePlugin.PLUGIN_ID,
                     NLS.bind(Messages.GdbTrace_GdbTracesMustBeAFile, path));
         }
         try (BufferedInputStream stream = new BufferedInputStream(new FileInputStream(file))) {
             byte[] buffer = new byte[HEADER.length];
             int read = stream.read(buffer);
             if (read != HEADER.length || !Arrays.equals(buffer, HEADER)) {
-                return new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                return new Status(IStatus.ERROR, GdbTraceCorePlugin.PLUGIN_ID,
                         NLS.bind(Messages.GdbTrace_NotGdbTraceFile, path));
             }
         } catch (IOException e) {
-            return new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+            return new Status(IStatus.ERROR, GdbTraceCorePlugin.PLUGIN_ID,
                     NLS.bind(Messages.GdbTrace_IOException, path), e);
         }
         return new TraceValidationStatus(100, GdbTraceCorePlugin.PLUGIN_ID);

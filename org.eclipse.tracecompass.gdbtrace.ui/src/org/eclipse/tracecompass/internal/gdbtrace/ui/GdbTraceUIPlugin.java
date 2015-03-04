@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson
+ * Copyright (c) 2011, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -27,7 +27,7 @@ public class GdbTraceUIPlugin extends AbstractUIPlugin {
     // ------------------------------------------------------------------------
 
     /** The plug-in ID */
-    public static final String PLUGIN_ID = "org.eclipse.linuxtools.gdbtrace.ui"; //$NON-NLS-1$
+    public static final String PLUGIN_ID = "org.eclipse.tracecompass.gdbtrace.ui"; //$NON-NLS-1$
 
     private static GdbTraceUIPlugin plugin;
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson
+ * Copyright (c) 2011, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -80,7 +80,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.internal.gdbtrace.core.Activator;
 import org.eclipse.tracecompass.internal.gdbtrace.core.GdbTraceCorePlugin;
 import org.eclipse.tracecompass.internal.gdbtrace.core.event.GdbTraceEvent;
 import org.eclipse.tracecompass.internal.gdbtrace.core.event.GdbTraceEventContent;
@@ -242,13 +241,13 @@ public class DsfGdbAdaptor {
                                     break;
                                 }
                             } catch (InterruptedException e) {
-                                Activator.logError("Interruption exception", e); //$NON-NLS-1$
+                                GdbTraceCorePlugin.logError("Interruption exception", e); //$NON-NLS-1$
                             } catch (ExecutionException e) {
-                                Activator.logError("GDB exception", e); //$NON-NLS-1$
+                                GdbTraceCorePlugin.logError("GDB exception", e); //$NON-NLS-1$
                             } catch (RejectedExecutionException e) {
-                                Activator.logError("Request rejected exception", e); //$NON-NLS-1$
+                                GdbTraceCorePlugin.logError("Request rejected exception", e); //$NON-NLS-1$
                             } catch (TimeoutException e) {
-                                Activator.logError("Timeout", e); //$NON-NLS-1$
+                                GdbTraceCorePlugin.logError("Timeout", e); //$NON-NLS-1$
                             } finally {
                                 tracker.dispose();
                             }
@@ -474,13 +473,13 @@ public class DsfGdbAdaptor {
                 selectRecordQuery.get(); // blocks
             }
         } catch (InterruptedException e) {
-            Activator.logError("Interruption exception", e); //$NON-NLS-1$
+            GdbTraceCorePlugin.logError("Interruption exception", e); //$NON-NLS-1$
         } catch (ExecutionException e) {
-            Activator.logError("GDB exception", e); //$NON-NLS-1$
+            GdbTraceCorePlugin.logError("GDB exception", e); //$NON-NLS-1$
         } catch (RejectedExecutionException e) {
-            Activator.logError("Request rejected exception", e); //$NON-NLS-1$
+            GdbTraceCorePlugin.logError("Request rejected exception", e); //$NON-NLS-1$
         } catch (TimeoutException e) {
-            Activator.logError("Timeout", e); //$NON-NLS-1$
+            GdbTraceCorePlugin.logError("Timeout", e); //$NON-NLS-1$
         } finally {
             tracker.dispose();
         }
@@ -538,13 +537,13 @@ public class DsfGdbAdaptor {
 
             frameNum = data.getNumberOfCollectedFrame();
         } catch (InterruptedException e) {
-            Activator.logError("Interruption exception", e); //$NON-NLS-1$
+            GdbTraceCorePlugin.logError("Interruption exception", e); //$NON-NLS-1$
         } catch (ExecutionException e) {
-            Activator.logError("GDB exception", e); //$NON-NLS-1$
+            GdbTraceCorePlugin.logError("GDB exception", e); //$NON-NLS-1$
         } catch (RejectedExecutionException e) {
-            Activator.logError("Request rejected exception", e); //$NON-NLS-1$
+            GdbTraceCorePlugin.logError("Request rejected exception", e); //$NON-NLS-1$
         } catch (TimeoutException e) {
-            Activator.logError("Timeout", e); //$NON-NLS-1$
+            GdbTraceCorePlugin.logError("Timeout", e); //$NON-NLS-1$
         } finally {
             tracker.dispose();
         }
@@ -623,16 +622,16 @@ public class DsfGdbAdaptor {
             }
         } catch (InterruptedException e) {
             status = false;
-            Activator.logError("Interruption exception", e); //$NON-NLS-1$
+            GdbTraceCorePlugin.logError("Interruption exception", e); //$NON-NLS-1$
         } catch (ExecutionException e) {
             status = false;
-            Activator.logError("GDB exception", e); //$NON-NLS-1$
+            GdbTraceCorePlugin.logError("GDB exception", e); //$NON-NLS-1$
         } catch (RejectedExecutionException e) {
             status = false;
-            Activator.logError("Request rejected exception", e); //$NON-NLS-1$
+            GdbTraceCorePlugin.logError("Request rejected exception", e); //$NON-NLS-1$
         } catch (TimeoutException e) {
             status = false;
-            Activator.logError("Timeout", e); //$NON-NLS-1$
+            GdbTraceCorePlugin.logError("Timeout", e); //$NON-NLS-1$
         } finally {
             tracker.dispose();
         }

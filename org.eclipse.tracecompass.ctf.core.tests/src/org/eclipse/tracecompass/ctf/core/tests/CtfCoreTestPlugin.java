@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -32,7 +32,7 @@ public class CtfCoreTestPlugin extends Plugin {
     // ------------------------------------------------------------------------
 
     /** The plug-in ID */
-    public static final String PLUGIN_ID = "org.eclipse.linuxtools.ctf.core.tests";
+    public static final String PLUGIN_ID = "org.eclipse.tracecompass.ctf.core.tests";
 
     // The shared instance
     private static CtfCoreTestPlugin fPlugin;

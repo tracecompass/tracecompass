@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -26,7 +26,7 @@ public class BtfTestPlugin implements BundleActivator {
     /**
      * The plug-in ID
      */
-    public static final String PLUGIN_ID = "org.eclipse.linuxtools.btf.core.tests";
+    public static final String PLUGIN_ID = "org.eclipse.tracecompass.btf.core.tests";
 
     private static BundleContext fContext;
 
