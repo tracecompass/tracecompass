@@ -4,7 +4,7 @@
 <extension
          id="application"
          point="org.eclipse.core.runtime.applications">
-      <application>org.eclipse.linuxtools.tracing.rcp.product
+      <application>
          <run
                class="org.eclipse.tracecompass.internal.tracing.rcp.ui.Application">
          </run>
@@ -14,20 +14,20 @@
          point="org.eclipse.ui.handlers">
    </extension>
    <extension point="org.eclipse.ui.activities">
-      <activity name="%activity.name"                    id="org.eclipse.linuxtools.internal.tracing.rcp.ui"      description="%activity.description" />
+      <activity name="%activity.name"                    id="org.eclipse.tracecompass.rcp.ui"      description="%activity.description" />
       <activity name="%activity.name.javaPerspective"      id="org.eclipse.unwantedJavaPerspective"     description="%activity.description.javaPerspective" />
       <activity name="%activity.name.teamPerspective"      id="org.eclipse.unwantedTeamPerspective"     description="%activity.description.teamPerspective" />
       <activity name="%activity.name.debugPerspective"     id="org.eclipse.unwantedDebugPerspective"    description="%activity.description.debugPerspective" />
       <activity name="%activity.name.pluginDevPerspective" id="org.eclipse.unwantedPluginDevPerspective" description="%activity.description.pluginDevPerspective" />
       <activity name="%activity.name.resourcePerspective"  id="org.eclipse.unwantedResourcePerspective"  description="%activity.description.resourcePerspective" />
       <activity name="%activity.name.search"  id="org.eclipse.unwantedSearch"  description="%activity.description.search" />
-      <activityPatternBinding activityId="org.eclipse.linuxtools.internal.tracing.rcp.ui"      pattern="org\.eclipse\.linuxtools.*" />
+      <activityPatternBinding activityId="org.eclipse.tracecompass.rcp.ui"      pattern="org\.eclipse\.tracecompass.*" />
       <activityPatternBinding activityId="org.eclipse.unwantedJavaPerspective"     pattern="org\.eclipse\.jdt.*" />
       <activityPatternBinding activityId="org.eclipse.unwantedTeamPerspective"     pattern="org\.eclipse\.team.*" />
       <activityPatternBinding activityId="org.eclipse.unwantedDebugPerspective"    pattern="org\.eclipse\.debug.*" />
       <activityPatternBinding activityId="org.eclipse.unwantedSearch" pattern="org\.eclipse\.search.*" />
       <activityPatternBinding activityId="org.eclipse.unwantedResourcePerspective"  pattern="org\.eclipse\.ui\.[r]*" />
-      <defaultEnablement id="org.eclipse.linuxtools.internal.tracing.rcp.ui" />
+      <defaultEnablement id="org.eclipse.tracecompass.rcp.ui" />
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -35,7 +35,7 @@
             allPopups="false"
             locationURI="menu:org.eclipse.ui.main.menu">
          <menu
-               id="org.eclipse.linuxtools.tracing.rcp.ui.menuFile"
+               id="org.eclipse.tracecompass.rcp.ui.menu.file"
                label="%menu.main.file"
                mnemonic="%menu.mnemonic">
             <command
@@ -44,7 +44,7 @@
                   style="push">
             </command>
             <separator
-                  name="OpenSeparator"
+                  name="org.eclipse.tracecompass.rcp.ui.menu.file.separator1"
                   visible="true">
             </separator>
             <command
@@ -53,7 +53,7 @@
                   style="push">
             </command>
             <separator
-                  name="ImportSeparator"
+                  name="org.eclipse.tracecompass.rcp.ui.menu.file.separator2"
                   visible="true">
             </separator>
             <command
@@ -61,7 +61,7 @@
                   style="push">
             </command>
             <separator
-                  name="ExitSeparator"
+                  name="org.eclipse.tracecompass.rcp.ui.menu.file.separator3"
                   visible="true">
             </separator>
             <command
@@ -74,7 +74,7 @@
             allPopups="false"
             locationURI="menu:org.eclipse.ui.main.menu">
          <menu
-               id="org.eclipse.linuxtools.tracing.rcp.ui.menuWindow"
+               id="org.eclipse.tracecompass.rcp.ui.menu.window"
                label="%menu.main.window">
             <command
                   commandId="org.eclipse.ui.perspectives.showPerspective"
@@ -85,7 +85,7 @@
                   style="push">
             </command>
             <separator
-                  name="org.eclipse.linuxtools.tracing.rcp.ui.separator1"
+                  name="org.eclipse.tracecompass.rcp.ui.menu.window.separator1"
                   visible="true">
             </separator>
             <command
@@ -97,7 +97,7 @@
                   style="push">
             </command>
             <separator
-                  name="org.eclipse.linuxtools.tracing.rcp.ui.separator2"
+                  name="org.eclipse.tracecompass.rcp.ui.menu.window.separator2"
                   visible="true">
             </separator>
             <command
@@ -110,7 +110,7 @@
             allPopups="false"
             locationURI="menu:org.eclipse.ui.main.menu">
          <menu
-               id="org.eclipse.linuxtools.tracing.rcp.ui.menuhelp"
+               id="org.eclipse.tracecompass.rcp.ui.menu.help"
                label="%menu.main.help"
                mnemonic="%menu.mnemonic.0">
             <command
@@ -118,7 +118,7 @@
                   style="push">
             </command>
             <separator
-                  name="org.eclipse.tracecompass.rcp.ui.separator"
+                  name="org.eclipse.tracecompass.rcp.ui.menu.help.separator1"
                   visible="true">
             </separator>
             <command
@@ -130,7 +130,7 @@
                   style="push">
             </command>
             <separator
-                  name="org.eclipse.tracecompass.rcp.ui.separator"
+                  name="org.eclipse.tracecompass.rcp.ui.menu.help.separator2"
                   visible="true">
             </separator>
             <command
