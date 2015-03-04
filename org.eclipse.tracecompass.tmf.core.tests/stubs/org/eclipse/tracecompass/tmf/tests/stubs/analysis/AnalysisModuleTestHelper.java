@@ -91,7 +91,7 @@ public class AnalysisModuleTestHelper implements IAnalysisModuleHelper {
 
     @Override
     public Bundle getBundle() {
-        return Platform.getBundle("org.eclipse.linuxtools.tmf.core.tests");
+        return Platform.getBundle("org.eclipse.tracecompass.tmf.core.tests");
     }
 
     @Override

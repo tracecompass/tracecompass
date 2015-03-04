@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -18,7 +18,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * Test suite for org.eclipse.linuxtools.tmf.core.tests.statesystem.mipmap
+ * Test suite for org.eclipse.tracecompass.tmf.core.statesystem.mipmap
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson
+ * Copyright (c) 2009, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -34,7 +34,7 @@ public class RequestBenchmark extends TmfEventRequest {
     }
 
     // Path of the trace
-    private static final String TRACE_PATH = "../org.eclipse.linuxtools.ctf.core.tests/traces/kernel";
+    private static final String TRACE_PATH = "../org.eclipse.tracecompass.ctf.core.tests/traces/kernel";
 
     // Change this to run several time over the same trace
     private static final int NB_OF_PASS = 100;

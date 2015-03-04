@@ -3468,7 +3468,7 @@ public class AnalysisBenchmark {
         for (int i = 0; i < LOOP_COUNT; i++) {
 
             /** Start each run of the test with new objects to avoid different code paths */
-            try (IAnalysisModule module = new LttngKernelAnalysisModule();
+            try (IAnalysisModule module = new KernelAnalysis();
                     LttngKernelTrace trace = new LttngKernelTrace()) {
                 module.setId("test");
                 trace.initTrace(null, testTrace.getPath(), CtfTmfEvent.class);

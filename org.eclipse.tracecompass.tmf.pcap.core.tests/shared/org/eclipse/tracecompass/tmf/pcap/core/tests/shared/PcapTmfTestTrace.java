@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -25,7 +25,7 @@ import org.eclipse.tracecompass.tmf.pcap.core.tests.stubs.PcapTmfTraceStub;
  * Available Pcap TMF test traces. Kind-of-extends {@link PcapTestTrace}.
  *
  * To run tests using these, you first need to run the "get-traces.[xml|sh]"
- * script located under lttng/org.eclipse.linuxtools.pcap.core.tests/rsc/ .
+ * script located under org.eclipse.tracecompass.pcap.core.tests/rsc/ .
  *
  * @author Vincent Perot
  */

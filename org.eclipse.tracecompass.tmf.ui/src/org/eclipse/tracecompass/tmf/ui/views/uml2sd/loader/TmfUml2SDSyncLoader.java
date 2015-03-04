@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2011, 2014 Ericsson
+ * Copyright (c) 2011, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -31,6 +31,7 @@ import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
+import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.signal.TmfRangeSynchSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
@@ -69,7 +70,7 @@ import org.eclipse.ui.progress.IProgressConstants;
 /**
  * <p>
  * This class is a reference implementation of the
- * <code>org.eclipse.linuxtools.tmf.ui.Uml2SDLoader</code> extension point. It
+ * <code>org.eclipse.tracecompass.tmf.ui.Uml2SDLoader</code> extension point. It
  * provides a Sequence Diagram loader for a user space trace with specific trace
  * content for sending and receiving signals between components. I also includes
  * a default implementation for the <code>ITmfEvent</code> parsing.
@@ -1339,25 +1340,25 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
         /**
          * Constructor
-         * @param range @see org.eclipse.linuxtools.tmf.request.TmfEventRequest#TmfEventRequest(...)
-         * @param nbRequested @see org.eclipse.linuxtools.tmf.request.TmfEventRequest#handleData(...)
-         * @param execType @see org.eclipse.linuxtools.tmf.request.TmfEventRequest#handleData(...)
+         * @param range see {@link TmfEventRequest#TmfEventRequest(Class, TmfTimeRange, long, int, org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType) TmfEventRequest}
+         * @param nbRequested see {@link TmfEventRequest#TmfEventRequest(Class, TmfTimeRange, long, int, org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType) TmfEventRequest}
+         * @param priority {@link ExecutionType#FOREGROUND} or {@link ExecutionType#BACKGROUND}
          * @param criteria The search criteria
          */
-        public SearchEventRequest(TmfTimeRange range, int nbRequested, ExecutionType execType, Criteria criteria) {
-            this(range, nbRequested, execType, criteria, null);
+        public SearchEventRequest(TmfTimeRange range, int nbRequested, ExecutionType priority, Criteria criteria) {
+            this(range, nbRequested, priority, criteria, null);
         }
 
         /**
          * Constructor
-         * @param range @see org.eclipse.linuxtools.tmf.request.TmfEventRequest#TmfEventRequest(...)
-         * @param nbRequested @see org.eclipse.linuxtools.tmf.request.TmfEventRequest#TmfEventRequest(...)
-         * @param execType @see org.eclipse.linuxtools.tmf.request.TmfEventRequest#TmfEventRequest(...)
+         * @param range see {@link TmfEventRequest#TmfEventRequest(Class, TmfTimeRange, long, int, org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType) TmfEventRequest}
+         * @param nbRequested see {@link TmfEventRequest#TmfEventRequest(Class, TmfTimeRange, long, int, org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType) TmfEventRequest}
+         * @param priority {@link ExecutionType#FOREGROUND} or {@link ExecutionType#BACKGROUND}
          * @param criteria The search criteria
          * @param monitor progress monitor
          */
-        public SearchEventRequest(TmfTimeRange range, int nbRequested, ExecutionType execType, Criteria criteria, IProgressMonitor monitor) {
-            super(ITmfEvent.class, range, 0, nbRequested, execType);
+        public SearchEventRequest(TmfTimeRange range, int nbRequested, ExecutionType priority, Criteria criteria, IProgressMonitor monitor) {
+            super(ITmfEvent.class, range, 0, nbRequested, priority);
             fCriteria = new Criteria(criteria);
             fMonitor = monitor;
         }

@@ -225,7 +225,7 @@ public final class SWTBotUtils {
      * @param tracePath
      *            the path of the trace file (absolute or relative)
      * @param traceType
-     *            the trace canonical string (eg:
+     *            the trace type id (eg:
      *            org.eclipse.linuxtools.btf.trace)
      */
     public static void openTrace(final String projectName, final String tracePath, final String traceType) {
@@ -240,7 +240,7 @@ public final class SWTBotUtils {
      * @param tracePath
      *            the path of the trace file (absolute or relative)
      * @param traceType
-     *            the trace canonical string (eg:
+     *            the trace type id (eg:
      *            org.eclipse.linuxtools.btf.trace)
      * @param delay
      *            delay and wait for jobs

@@ -16,7 +16,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * Master test suite for all Linux Tools LTTng unit tests.
+ * Master test suite for all Trace Compass UI unit tests.
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation, Ericsson
+ * Copyright (c) 2005, 2015 IBM Corporation, Ericsson
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ public interface IColor {
 
     /**
      * Returns the contained color. Returned object must be an instance of org.eclipse.swt.graphics.Color if used with
-     * the org.eclipse.linuxtools.tmf.ui.views.uml2sd.NGC graphical context
+     * the org.eclipse.tracecompass.tmf.ui.views.uml2sd.NGC graphical context
      *
      * @return the color
      */

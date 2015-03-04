@@ -6,7 +6,7 @@
             <view
             category="org.eclipse.linuxtools.tmf.ui.views.category"
             class="org.eclipse.tracecompass.examples.ui.views.histogram.NewHistogramView"
-            id="org.eclipse.linuxtools.tracing.examples.ui.views.HistogramView"
+            id="org.eclipse.tracecompass.examples.ui.views.NewHistogramView"
             name="%tracing.examples.histogram.view.name"
             restorable="true">
       </view>
