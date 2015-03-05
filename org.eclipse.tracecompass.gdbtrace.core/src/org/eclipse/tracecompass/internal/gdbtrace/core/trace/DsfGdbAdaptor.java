@@ -200,7 +200,8 @@ public class DsfGdbAdaptor {
                 List<?> eventContextList = ((IStructuredSelection) selection).toList();
                 for (Object eventContext : eventContextList) {
                     if (eventContext instanceof IAdaptable) {
-                        IDMContext context = (IDMContext) ((IAdaptable) eventContext).getAdapter(IDMContext.class);
+                        Object contextObject = ((IAdaptable) eventContext).getAdapter(IDMContext.class);
+                        IDMContext context = (IDMContext) contextObject;
                         if (context != null) {
                             String sessionId;
                             synchronized(fCurrentSessionId) {

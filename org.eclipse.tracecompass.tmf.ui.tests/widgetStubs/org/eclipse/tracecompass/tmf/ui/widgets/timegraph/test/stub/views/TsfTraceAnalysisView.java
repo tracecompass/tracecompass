@@ -16,7 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -99,7 +99,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
      * example).
      */
 
-    class TreeObject implements IAdaptable {
+    class TreeObject extends PlatformObject {
         private final String name;
         private TreeParent parent;
 
@@ -122,11 +122,6 @@ public class TsfTraceAnalysisView extends ViewPart implements
         @Override
         public String toString() {
             return getName();
-        }
-
-        @Override
-        public Object getAdapter(Class key) {
-            return null;
         }
     }
 

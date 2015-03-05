@@ -18,6 +18,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.filter.TmfCollapseFilter;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -144,12 +145,7 @@ public class TmfCollapseFilterTest {
         }
     }
 
-    private class NonCollapsibleEvent implements ITmfEvent {
-
-        @Override
-        public Object getAdapter(Class adapter) {
-            return null;
-        }
+    private class NonCollapsibleEvent extends PlatformObject implements ITmfEvent {
 
         @Override
         public ITmfTrace getTrace() {
