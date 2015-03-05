@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -28,7 +28,6 @@ import org.junit.runner.RunWith;
         org.eclipse.tracecompass.tmf.ctf.core.tests.context.AllTests.class,
         org.eclipse.tracecompass.tmf.ctf.core.tests.event.AllTests.class,
         org.eclipse.tracecompass.tmf.ctf.core.tests.iterator.AllTests.class,
-        org.eclipse.tracecompass.tmf.ctf.core.tests.timestamp.AllTests.class,
         org.eclipse.tracecompass.tmf.ctf.core.tests.trace.AllTests.class,
 
         /* Tests in other packages (that are there because of CTF) */

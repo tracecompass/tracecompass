@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -36,8 +36,8 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewerC
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewerCommands.StreamResponse;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
-import org.eclipse.tracecompass.tmf.ctf.core.timestamp.CtfTmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 
 /**
@@ -184,7 +184,7 @@ public final class LttngRelaydConsumer {
                                 if (indexReply.getStatus() == NextIndexReturnCode.VIEWER_INDEX_OK) {
                                     long nanoTimeStamp = fCtfTmfTrace.timestampCyclesToNanos(indexReply.getTimestampEnd());
                                     if (nanoTimeStamp > fTimestampEnd) {
-                                        CtfTmfTimestamp endTime = new CtfTmfTimestamp(nanoTimeStamp);
+                                        TmfNanoTimestamp endTime = new TmfNanoTimestamp(nanoTimeStamp);
                                         TmfTimeRange range = new TmfTimeRange(fCtfTmfTrace.getStartTime(), endTime);
 
                                         long currentTime = System.nanoTime();
@@ -198,7 +198,7 @@ public final class LttngRelaydConsumer {
                                 } else if (indexReply.getStatus() == NextIndexReturnCode.VIEWER_INDEX_HUP) {
                                     // The trace is now complete because the trace session was destroyed
                                     fCtfTmfTrace.setComplete(true);
-                                    TmfTraceRangeUpdatedSignal signal = new TmfTraceRangeUpdatedSignal(LttngRelaydConsumer.this, fCtfTmfTrace, new TmfTimeRange(fCtfTmfTrace.getStartTime(), new CtfTmfTimestamp(fTimestampEnd)));
+                                    TmfTraceRangeUpdatedSignal signal = new TmfTraceRangeUpdatedSignal(LttngRelaydConsumer.this, fCtfTmfTrace, new TmfTimeRange(fCtfTmfTrace.getStartTime(), new TmfNanoTimestamp(fTimestampEnd)));
                                     fCtfTmfTrace.broadcastAsync(signal);
                                     return Status.OK_STATUS;
                                 }

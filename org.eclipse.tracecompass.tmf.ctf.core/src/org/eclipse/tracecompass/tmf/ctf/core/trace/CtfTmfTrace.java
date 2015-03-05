@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2012, 2015 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -48,6 +48,7 @@ import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceProperties;
@@ -69,7 +70,6 @@ import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEventType;
 import org.eclipse.tracecompass.tmf.ctf.core.event.aspect.CtfChannelAspect;
 import org.eclipse.tracecompass.tmf.ctf.core.event.aspect.CtfCpuAspect;
 import org.eclipse.tracecompass.tmf.ctf.core.event.lookup.CtfTmfCallsite;
-import org.eclipse.tracecompass.tmf.ctf.core.timestamp.CtfTmfTimestamp;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -583,9 +583,12 @@ public class CtfTmfTrace extends TmfTrace
     // Timestamp transformation functions
     // ------------------------------------------------------------------------
 
+    /**
+     * @since 1.0
+     */
     @Override
-    public @NonNull CtfTmfTimestamp createTimestamp(long ts) {
-        return new CtfTmfTimestamp(getTimestampTransform().transform(ts));
+    public @NonNull TmfNanoTimestamp createTimestamp(long ts) {
+        return new TmfNanoTimestamp(getTimestampTransform().transform(ts));
     }
 
     private static int fCheckpointSize = -1;
@@ -593,7 +596,7 @@ public class CtfTmfTrace extends TmfTrace
     @Override
     public synchronized int getCheckpointSize() {
         if (fCheckpointSize == -1) {
-            TmfCheckpoint c = new TmfCheckpoint(new CtfTmfTimestamp(0), new CtfLocation(0, 0), 0);
+            TmfCheckpoint c = new TmfCheckpoint(new TmfNanoTimestamp(0), new CtfLocation(0, 0), 0);
             ByteBuffer b = ByteBuffer.allocate(ITmfCheckpoint.MAX_SERIALIZE_SIZE);
             b.clear();
             c.serialize(b);

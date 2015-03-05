@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -32,6 +32,7 @@ import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEndSynchSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
@@ -40,7 +41,6 @@ import org.eclipse.tracecompass.tmf.ctf.core.context.CtfLocation;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfLocationInfo;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
-import org.eclipse.tracecompass.tmf.ctf.core.timestamp.CtfTmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.After;
 import org.junit.Before;
@@ -161,7 +161,7 @@ public class CtfTmfTraceTest {
      */
     @Test
     public void testSeekEventLoc_timetamp() {
-        CtfLocation loc = new CtfLocation(new CtfTmfTimestamp(0L));
+        CtfLocation loc = new CtfLocation(new TmfNanoTimestamp(0L));
         fixture.seekEvent(loc);
         assertNotNull(fixture);
     }

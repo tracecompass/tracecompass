@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -18,9 +18,9 @@ import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDefinition;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
-import org.eclipse.tracecompass.tmf.ctf.core.timestamp.CtfTmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 
 /**
@@ -57,7 +57,7 @@ public final class CtfTmfEventFactory {
         /* Prepare what to pass to CtfTmfEvent's constructor */
         final IEventDeclaration eventDecl = eventDef.getDeclaration();
         final long ts = eventDef.getTimestamp();
-        final CtfTmfTimestamp timestamp = originTrace.createTimestamp(
+        final TmfNanoTimestamp timestamp = originTrace.createTimestamp(
                 originTrace.timestampCyclesToNanos(ts));
 
         int sourceCPU = eventDef.getCPU();
@@ -78,7 +78,7 @@ public final class CtfTmfEventFactory {
             }
             long nbLostEvents = ((IntegerDefinition) nbLostEventsDef).getValue();
             long duration = ((IntegerDefinition) durationDef).getValue();
-            CtfTmfTimestamp timestampEnd = new CtfTmfTimestamp(
+            TmfNanoTimestamp timestampEnd = new TmfNanoTimestamp(
                     originTrace.timestampCyclesToNanos(ts) + duration);
 
             CtfTmfLostEvent lostEvent = new CtfTmfLostEvent(originTrace,

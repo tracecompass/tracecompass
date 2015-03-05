@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -23,11 +23,11 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfLostEvent;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
-import org.eclipse.tracecompass.tmf.ctf.core.timestamp.CtfTmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.After;
 import org.junit.Before;
@@ -102,8 +102,8 @@ public class CtfTmfLostEventsTest {
     @Test
     public void testFirstLostEvent() {
         final long rank = 153;
-        final ITmfTimestamp start = new CtfTmfTimestamp(1376592664828848222L);
-        final ITmfTimestamp end   = new CtfTmfTimestamp(1376592664828848540L);
+        final ITmfTimestamp start = new TmfNanoTimestamp(1376592664828848222L);
+        final ITmfTimestamp end   = new TmfNanoTimestamp(1376592664828848540L);
         final long nbLost = 859;
 
         final CtfTmfEvent ev = getOneEventTime(start);
@@ -126,8 +126,8 @@ public class CtfTmfLostEventsTest {
     @Test
     public void testSecondLostEvent() {
         final long rank = 191;
-        final ITmfTimestamp start = new CtfTmfTimestamp(1376592664829402521L);
-        final ITmfTimestamp end   = new CtfTmfTimestamp(1376592664829403076L);
+        final ITmfTimestamp start = new TmfNanoTimestamp(1376592664829402521L);
+        final ITmfTimestamp end   = new TmfNanoTimestamp(1376592664829403076L);
         final long nbLost = 488;
 
         final CtfTmfEvent ev = getOneEventTime(start);
@@ -151,7 +151,7 @@ public class CtfTmfLostEventsTest {
     @Test
     public void testNormalEvent() {
         final long rank = 200;
-        final ITmfTimestamp ts = new CtfTmfTimestamp(1376592664829423928L);
+        final ITmfTimestamp ts = new TmfNanoTimestamp(1376592664829423928L);
 
         final CtfTmfEvent event = getOneEventTime(ts);
         /* Make sure seeking by rank yields the same event */

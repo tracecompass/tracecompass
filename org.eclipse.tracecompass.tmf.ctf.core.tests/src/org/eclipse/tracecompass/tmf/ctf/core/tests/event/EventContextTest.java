@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -20,11 +20,11 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
-import org.eclipse.tracecompass.tmf.ctf.core.timestamp.CtfTmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.After;
 import org.junit.Before;
@@ -225,7 +225,7 @@ public class EventContextTest {
 
         public EventContextTestRequest(long timestamp) {
             super(CtfTmfEvent.class,
-                    new TmfTimeRange(new CtfTmfTimestamp(timestamp), TmfTimestamp.BIG_CRUNCH),
+                    new TmfTimeRange(new TmfNanoTimestamp(timestamp), TmfTimestamp.BIG_CRUNCH),
                     0, 1, ExecutionType.FOREGROUND);
         }
 

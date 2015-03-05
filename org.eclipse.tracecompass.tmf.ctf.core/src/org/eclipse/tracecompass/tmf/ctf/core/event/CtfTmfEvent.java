@@ -30,10 +30,10 @@ import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfModelLookup;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfSourceLookup;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.ctf.core.CtfConstants;
 import org.eclipse.tracecompass.tmf.ctf.core.event.lookup.CtfTmfCallsite;
-import org.eclipse.tracecompass.tmf.ctf.core.timestamp.CtfTmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 
 /**
@@ -74,7 +74,7 @@ public class CtfTmfEvent extends TmfEvent
     /**
      * Constructor used by {@link CtfTmfEventFactory#createEvent}
      */
-    CtfTmfEvent(CtfTmfTrace trace, long rank, CtfTmfTimestamp timestamp,
+    CtfTmfEvent(CtfTmfTrace trace, long rank, TmfNanoTimestamp timestamp,
             String fileName, int cpu, IEventDeclaration declaration, @NonNull EventDefinition eventDefinition) {
         super(trace,
                 rank,
@@ -112,7 +112,7 @@ public class CtfTmfEvent extends TmfEvent
     CtfTmfEvent(CtfTmfTrace trace) {
         super(trace,
                 ITmfContext.UNKNOWN_RANK,
-                new CtfTmfTimestamp(-1),
+                new TmfNanoTimestamp(-1),
                 null,
                 new TmfEventField("", null, new CtfTmfEventField[0])); //$NON-NLS-1$
         fSourceCPU = -1;
