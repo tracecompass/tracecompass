@@ -181,9 +181,9 @@ public class TargetNodeComponent extends TraceControlComponent implements IRemot
     }
 
     @Override
-    public Object getAdapter(Class adapter) {
+    public <T> T getAdapter(Class<T> adapter) {
         if (adapter == IPropertySource.class) {
-            return new TargetNodePropertySource(this);
+            return adapter.cast(new TargetNodePropertySource(this));
         }
         return null;
     }

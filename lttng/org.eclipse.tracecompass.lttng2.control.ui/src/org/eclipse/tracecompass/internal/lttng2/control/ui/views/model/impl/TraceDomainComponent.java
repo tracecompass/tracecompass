@@ -84,9 +84,9 @@ public class TraceDomainComponent extends TraceControlComponent {
     }
 
     @Override
-    public Object getAdapter(Class adapter) {
+    public <T> T getAdapter(Class<T> adapter) {
         if (adapter == IPropertySource.class) {
-            return new TraceDomainPropertySource(this);
+            return adapter.cast(new TraceDomainPropertySource(this));
         }
         return null;
     }

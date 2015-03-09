@@ -76,9 +76,10 @@ public class BtfEvent extends TmfEvent {
     }
 
     @Override
-    public Object getAdapter(Class adapter) {
+    public <T> T getAdapter(Class<T> adapterType) {
         // Force loading the adapters otherwise some plugins might not load
-        return Platform.getAdapterManager().loadAdapter(this, adapter.getName());
+        Object adatper = Platform.getAdapterManager().loadAdapter(this, adapterType.getName());
+        return adapterType.cast(adatper);
     }
 
     /**

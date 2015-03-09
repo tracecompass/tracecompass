@@ -83,8 +83,8 @@ public class TmfEventsCache {
         }
 
         @Override
-        public Object getAdapter(Class adapter) {
-            return event.getAdapter(adapter);
+        public <T> T getAdapter(Class<T> adapterType) {
+            return event.getAdapter(adapterType);
         }
 
         @Override

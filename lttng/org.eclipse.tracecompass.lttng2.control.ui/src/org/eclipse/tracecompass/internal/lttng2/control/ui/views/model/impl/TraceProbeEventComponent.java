@@ -65,9 +65,9 @@ public class TraceProbeEventComponent extends TraceEventComponent {
     }
 
     @Override
-    public Object getAdapter(Class adapter) {
+    public <T> T getAdapter(Class<T> adapter) {
         if (adapter == IPropertySource.class) {
-            return new TraceProbeEventPropertySource(this);
+            return adapter.cast(new TraceProbeEventPropertySource(this));
         }
         return null;
     }

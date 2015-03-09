@@ -220,9 +220,9 @@ public class TraceSessionComponent extends TraceControlComponent {
     }
 
     @Override
-    public Object getAdapter(Class adapter) {
+    public <T> T getAdapter(Class<T> adapter) {
         if (adapter == IPropertySource.class) {
-            return new TraceSessionPropertySource(this);
+            return adapter.cast(new TraceSessionPropertySource(this));
         }
         return null;
     }

@@ -32,10 +32,10 @@ public class BtfEventAdapterFactory implements IAdapterFactory {
     }
 
     @Override
-    public Object getAdapter(Object element, Class key) {
-        if (element instanceof BtfEvent && IPropertySource.class.equals(key)) {
+    public <T> T getAdapter(Object element, Class<T> adapterType) {
+        if (element instanceof BtfEvent && IPropertySource.class.equals(adapterType)) {
             BtfEvent tmfEvent = (BtfEvent) element;
-            return new BtfEventPropertySource(tmfEvent);
+            return adapterType.cast(new BtfEventPropertySource(tmfEvent));
         }
         return null;
     }

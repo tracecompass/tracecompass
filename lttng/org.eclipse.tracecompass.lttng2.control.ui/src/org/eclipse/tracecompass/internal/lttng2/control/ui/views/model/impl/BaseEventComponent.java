@@ -138,9 +138,9 @@ public class BaseEventComponent extends TraceControlComponent {
     }
 
     @Override
-    public Object getAdapter(Class adapter) {
+    public <T> T getAdapter(Class<T> adapter) {
         if (adapter == IPropertySource.class) {
-            return new BaseEventPropertySource(this);
+            return adapter.cast(new BaseEventPropertySource(this));
         }
         return null;
     }

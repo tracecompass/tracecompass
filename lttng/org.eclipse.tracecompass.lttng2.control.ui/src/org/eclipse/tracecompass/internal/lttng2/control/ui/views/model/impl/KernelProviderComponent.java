@@ -72,9 +72,9 @@ public class KernelProviderComponent extends TraceControlComponent {
     }
 
     @Override
-    public Object getAdapter(Class adapter) {
+    public <T> T getAdapter(Class<T> adapter) {
         if (adapter == IPropertySource.class) {
-            return new KernelProviderPropertySource(this);
+            return adapter.cast(new KernelProviderPropertySource(this));
         }
         return null;
     }

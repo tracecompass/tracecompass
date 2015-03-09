@@ -29,10 +29,10 @@ public class TmfEventAdapterFactory implements IAdapterFactory {
     }
 
     @Override
-    public Object getAdapter(Object element, Class key) {
+    public <T> T getAdapter(Object element, Class<T> adapterType) {
         ITmfEvent tmfEvent = (ITmfEvent) element;
-        if (IPropertySource.class.equals(key)) {
-            return new TmfEventPropertySource(tmfEvent);
+        if (IPropertySource.class.equals(adapterType)) {
+            return adapterType.cast(new TmfEventPropertySource(tmfEvent));
         }
         return null;
     }

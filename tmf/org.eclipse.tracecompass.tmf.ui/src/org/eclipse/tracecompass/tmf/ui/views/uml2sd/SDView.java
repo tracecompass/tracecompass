@@ -1146,10 +1146,10 @@ public class SDView extends ViewPart implements IPartListener {
     }
 
     @Override
-    public Object getAdapter(Class adapter) {
-        Object obj = super.getAdapter(adapter);
+    public <T> T getAdapter(Class<T> adapter) {
+        T obj = super.getAdapter(adapter);
         if (fSdPropertiesProvider != null && adapter.equals(IPropertySheetPage.class)) {
-            return fSdPropertiesProvider.getPropertySheetEntry();
+            return adapter.cast(fSdPropertiesProvider.getPropertySheetEntry());
         }
 
         return obj;

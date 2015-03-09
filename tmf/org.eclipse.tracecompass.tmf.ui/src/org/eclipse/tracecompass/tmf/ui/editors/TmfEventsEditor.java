@@ -411,14 +411,14 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     }
 
     @Override
-    public Object getAdapter(final Class adapter) {
+    public <T> T getAdapter(final Class<T> adapter) {
         if (IGotoMarker.class.equals(adapter)) {
             if (fTrace == null || fEventsTable == null) {
-                return this;
+                return adapter.cast(this);
             }
-            return fEventsTable;
+            return adapter.cast(fEventsTable);
         } else if (IPropertySheetPage.class.equals(adapter)) {
-            return new UnsortedPropertySheetPage();
+            return adapter.cast(new UnsortedPropertySheetPage());
         }
         return super.getAdapter(adapter);
     }

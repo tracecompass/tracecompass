@@ -244,9 +244,9 @@ public class TraceChannelComponent extends TraceControlComponent {
     }
 
     @Override
-    public Object getAdapter(Class adapter) {
+    public <T> T getAdapter(Class<T> adapter) {
         if (adapter == IPropertySource.class) {
-            return new TraceChannelPropertySource(this);
+            return adapter.cast(new TraceChannelPropertySource(this));
         }
         return null;
     }
