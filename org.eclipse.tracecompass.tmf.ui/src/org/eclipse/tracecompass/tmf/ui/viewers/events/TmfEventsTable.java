@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -76,6 +77,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -89,6 +91,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -184,6 +187,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      */
     protected static final @NonNull String EMPTY_STRING = ""; //$NON-NLS-1$
 
+    private static final @NonNull String DOT_STAR_PREFIX = "^\\.\\*"; //$NON-NLS-1$
+    private static final @NonNull String DOT_STAR_SUFFIX = "\\.\\*$"; //$NON-NLS-1$
+
     private static final boolean IS_LINUX = System.getProperty("os.name").contains("Linux") ? true : false; //$NON-NLS-1$ //$NON-NLS-2$
 
     private static final Image BOOKMARK_IMAGE = Activator.getDefault().getImageFromPath(
@@ -234,6 +240,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
         /** Event aspect represented by this column */
         String ASPECT = "$aspect"; //$NON-NLS-1$
+
+        /** Table item list of style ranges
+         * @since 1.0*/
+        String STYLE_RANGES = "$style_ranges"; //$NON-NLS-1$
     }
 
     /**
@@ -633,6 +643,86 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         fTable.addListener(SWT.MouseDown, tooltipListener);
         fTable.addListener(SWT.MouseWheel, tooltipListener);
 
+        fTable.addListener(SWT.EraseItem, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                TableItem item = (TableItem) event.item;
+                List<?> styleRanges = (List<?>) item.getData(Key.STYLE_RANGES);
+
+                GC gc = event.gc;
+                Color background = item.getBackground(event.index);
+                /*
+                 * Paint the background if it is not the default system color.
+                 * In Windows, if you let the widget draw the background, it
+                 * will not show the item's background color if the item is
+                 * selected or hot. If there are no style ranges and the item
+                 * background is the default system color, we do not want to
+                 * paint it or otherwise we would override the platform theme
+                 * (e.g. alternating colors).
+                 */
+                if (styleRanges != null || !background.equals(item.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND))) {
+                    // we will paint the table item's background
+                    event.detail &= ~SWT.BACKGROUND;
+
+                    // paint the item's default background
+                    gc.setBackground(background);
+                    gc.fillRectangle(event.x, event.y, event.width, event.height);
+                }
+
+                /*
+                 * We will paint the table item's foreground. In Windows, if you paint
+                 * the background but let the widget draw the foreground, it will
+                 * override your background, unless the item is selected or hot.
+                 */
+                event.detail &= ~SWT.FOREGROUND;
+
+                // paint the highlighted background for all style ranges
+                if (styleRanges != null) {
+                    Rectangle textBounds = item.getTextBounds(event.index);
+                    String text = item.getText(event.index);
+                    for (Object o : styleRanges) {
+                        if (o instanceof StyleRange) {
+                            StyleRange styleRange = (StyleRange) o;
+                            if (styleRange.data.equals(event.index)) {
+                                int startIndex = styleRange.start;
+                                int endIndex = startIndex + styleRange.length;
+                                int startX = gc.stringExtent(text.substring(0, startIndex)).x;
+                                int endX = gc.stringExtent(text.substring(0, endIndex)).x;
+                                gc.setBackground(styleRange.background);
+                                gc.fillRectangle(textBounds.x + startX, textBounds.y, (endX - startX), textBounds.height);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        fTable.addListener(SWT.PaintItem, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                TableItem item = (TableItem) event.item;
+
+                // we promised to paint the table item's foreground
+                GC gc = event.gc;
+                Image image = item.getImage(event.index);
+                if (image != null) {
+                    Rectangle imageBounds = item.getImageBounds(event.index);
+                    /*
+                     * The image bounds don't match the default image position.
+                     */
+                    gc.drawImage(image, imageBounds.x, imageBounds.y + 1);
+                }
+                gc.setForeground(item.getForeground(event.index));
+                gc.setFont(item.getFont(event.index));
+                String text = item.getText(event.index);
+                Rectangle textBounds = item.getTextBounds(event.index);
+                /*
+                 * The text bounds don't match the default text position.
+                 */
+                gc.drawText(text, textBounds.x - 1, textBounds.y + 2, true);
+            }
+        });
+
         // Create resources
         createResources();
 
@@ -884,6 +974,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             public void run() {
                 fHeaderState = HeaderState.SEARCH;
                 fTable.refresh();
+                fTable.redraw();
             }
         };
 
@@ -892,6 +983,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             public void run() {
                 fHeaderState = HeaderState.FILTER;
                 fTable.refresh();
+                fTable.redraw();
             }
         };
 
@@ -1185,6 +1277,14 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             item.setForeground(colorSetting.getForegroundColor());
             item.setBackground(colorSetting.getBackgroundColor());
         }
+        /*
+         * Make sure the default system color is used. If the background is set
+         * to the default system color's value instead of null, it overrides the
+         * platform theme (e.g. alternating colors).
+         */
+        if (item.getBackground().equals(item.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND))) {
+            item.setBackground(null);
+        }
 
         if (searchMatch) {
             if (!markerIds.isEmpty()) {
@@ -1197,6 +1297,43 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         } else {
             item.setImage((Image) null);
         }
+
+        List<StyleRange> styleRanges = new ArrayList<>();
+        for (int index = 0; index < fTable.getColumns().length; index++) {
+            TableColumn column = fTable.getColumns()[index];
+            String regex = null;
+            if (fHeaderState == HeaderState.FILTER) {
+                regex = (String) column.getData(Key.FILTER_TXT);
+            } else if (searchMatch) {
+                regex = (String) column.getData(Key.SEARCH_TXT);
+            }
+            if (regex != null) {
+                // remove '.*' at beginning and end of regex
+                regex = regex.replaceAll(DOT_STAR_PREFIX, EMPTY_STRING).replaceAll(DOT_STAR_SUFFIX, EMPTY_STRING);
+                String text = item.getText(index);
+                try {
+                    Pattern pattern = Pattern.compile(regex);
+                    Matcher matcher = pattern.matcher(text);
+                    while (matcher.find()) {
+                        int start = matcher.start();
+                        int length = matcher.end() - start;
+                        Color foreground = colorSetting.getForegroundColor();
+                        Color background = item.getDisplay().getSystemColor(SWT.COLOR_YELLOW);
+                        StyleRange styleRange = new StyleRange(start, length, foreground, background);
+                        styleRange.data = index;
+                        styleRanges.add(styleRange);
+                    }
+                } catch (PatternSyntaxException e) {
+                    /* ignored */
+                }
+            }
+        }
+        if (styleRanges.isEmpty()) {
+            item.setData(Key.STYLE_RANGES, null);
+        } else {
+            item.setData(Key.STYLE_RANGES, styleRanges);
+        }
+        item.getParent().redraw();
 
         if ((itemStrings[MARGIN_COLUMN_INDEX] != null) && !itemStrings[MARGIN_COLUMN_INDEX].isEmpty()) {
             packMarginColumn();
@@ -1264,6 +1401,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         item.setData(null);
         item.setData(Key.TIMESTAMP, null);
         item.setData(Key.RANK, null);
+        item.setData(Key.STYLE_RANGES, null);
         item.setForeground(null);
         item.setBackground(null);
     }
@@ -1305,6 +1443,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         }
                         fTable.setSelection(0);
                         fTable.refresh();
+                        fTable.redraw();
                         return;
                     }
 
