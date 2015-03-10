@@ -66,6 +66,12 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
     }
 
     /**
+     * Average width of the characters used for state labels. Is computed in the
+     * first call to postDrawEvent(). Is null before that.
+     */
+    private Integer fAverageCharacterWidth = null;
+
+    /**
      * Default constructor
      */
     public ControlFlowPresentationProvider() {
@@ -184,7 +190,10 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
 
     @Override
     public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
-        if (bounds.width <= gc.getFontMetrics().getAverageCharWidth()) {
+        if (fAverageCharacterWidth == null) {
+            fAverageCharacterWidth = gc.getFontMetrics().getAverageCharWidth();
+        }
+        if (bounds.width <= fAverageCharacterWidth) {
             return;
         }
         if (!(event instanceof TimeEvent)) {
