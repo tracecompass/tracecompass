@@ -31,7 +31,10 @@ public class Messages extends NLS {
     public static String ControlFlowView_previousProcessActionToolTipText;
     public static String ControlFlowView_followCPUBwdText;
     public static String ControlFlowView_followCPUFwdText;
-
+    public static String ControlFlowView_checkActiveLabel;
+    public static String ControlFlowView_checkActiveToolTip;
+    public static String ControlFlowView_uncheckInactiveLabel;
+    public static String ControlFlowView_uncheckInactiveToolTip;
     public static String ControlFlowView_attributeSyscallName;
     public static String ControlFlowView_attributeCpuName;
 

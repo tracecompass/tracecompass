@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2012, 2015 Ericsson, École Polytechnique de Montréal and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,6 +9,7 @@
  * Contributors:
  *   Patrick Tasse - Initial API and implementation
  *   Geneviève Bastien - Move code to provide base classes for time graph view
+ *   Christian Mansky - Add check active / uncheck inactive buttons
  *******************************************************************************/
 
 package org.eclipse.tracecompass.analysis.os.linux.ui.views.controlflow;
@@ -27,6 +28,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.Attributes;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysis;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelThreadInformationProvider;
@@ -106,6 +108,17 @@ public class ControlFlowView extends AbstractTimeGraphView {
         setFilterColumns(FILTER_COLUMN_NAMES);
         setFilterLabelProvider(new ControlFlowFilterLabelProvider());
         setEntryComparator(new ControlFlowEntryComparator());
+    }
+
+    @Override
+    public void createPartControl(Composite parent) {
+        super.createPartControl(parent);
+        // add "Check active" Button to TimeGraphFilterDialog
+        super.getTimeGraphCombo().addTimeGraphFilterCheckActiveButton(
+                new ControlFlowCheckActiveProvider(Messages.ControlFlowView_checkActiveLabel, Messages.ControlFlowView_checkActiveToolTip));
+        // add "Uncheck inactive" Button to TimeGraphFilterDialog
+        super.getTimeGraphCombo().addTimeGraphFilterUncheckInactiveButton(
+                new ControlFlowCheckActiveProvider(Messages.ControlFlowView_uncheckInactiveLabel, Messages.ControlFlowView_uncheckInactiveToolTip));
     }
 
     @Override

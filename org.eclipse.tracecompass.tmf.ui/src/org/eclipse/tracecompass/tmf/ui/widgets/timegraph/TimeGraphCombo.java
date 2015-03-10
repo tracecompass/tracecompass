@@ -10,6 +10,7 @@
  *   Patrick Tasse - Initial API and implementation
  *   François Rajotte - Filter implementation
  *   Geneviève Bastien - Add event links between entries
+ *   Christian Mansky - Add check active / uncheck inactive buttons
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph;
@@ -63,6 +64,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.ITimeGraphEntryActiveProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TimeGraphFilterDialog;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
@@ -757,6 +759,28 @@ public class TimeGraphCombo extends Composite {
      */
     public void setFilterLabelProvider(ITableLabelProvider labelProvider) {
         fFilterDialog.setLabelProvider(labelProvider);
+    }
+
+    /**
+     * Adds a "check active" button used by the filter dialog
+     *
+     * @param activeProvider
+     *            Additional button info specific to a certain view.
+     * @since 1.0
+     */
+    public void addTimeGraphFilterCheckActiveButton(ITimeGraphEntryActiveProvider activeProvider) {
+        fFilterDialog.addTimeGraphFilterCheckActiveButton(activeProvider);
+    }
+
+    /**
+     * Adds an "uncheck inactive" button used by the filter dialog
+     *
+     * @param inactiveProvider
+     *            Additional button info specific to a certain view.
+     * @since 1.0
+     */
+    public void addTimeGraphFilterUncheckInactiveButton(ITimeGraphEntryActiveProvider inactiveProvider) {
+        fFilterDialog.addTimeGraphFilterUncheckInactiveButton(inactiveProvider);
     }
 
     /**
