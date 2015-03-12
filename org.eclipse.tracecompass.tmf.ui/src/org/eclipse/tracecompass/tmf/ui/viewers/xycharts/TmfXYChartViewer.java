@@ -16,9 +16,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.tmf.core.signal.TmfRangeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTimeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfTimeViewer;
@@ -297,11 +297,11 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
      * Signal handler for handling of the time synch signal.
      *
      * @param signal
-     *            The time synch signal {@link TmfTimeSynchSignal}
+     *            The time synch signal {@link TmfSelectionRangeUpdatedSignal}
      */
     @Override
     @TmfSignalHandler
-    public void selectionRangeUpdated(TmfTimeSynchSignal signal) {
+    public void selectionRangeUpdated(TmfSelectionRangeUpdatedSignal signal) {
         super.selectionRangeUpdated(signal);
         if ((signal.getSource() != this) && (getTrace() != null)) {
             if (fMouseSelectionProvider != null) {
@@ -311,15 +311,15 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     }
 
     /**
-     * Signal handler for handling of the time range synch signal.
+     * Signal handler for handling of the window range signal.
      *
      * @param signal
-     *            The time range synch signal {@link TmfRangeSynchSignal}
+     *            The {@link TmfWindowRangeUpdatedSignal}
      */
     @Override
     @TmfSignalHandler
-    public void timeRangeUpdated(TmfRangeSynchSignal signal) {
-        super.timeRangeUpdated(signal);
+    public void windowRangeUpdated(TmfWindowRangeUpdatedSignal signal) {
+        super.windowRangeUpdated(signal);
         updateContent();
     }
 

@@ -33,10 +33,10 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
-import org.eclipse.tracecompass.tmf.core.signal.TmfRangeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTimeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
@@ -450,13 +450,15 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     }
 
     /**
-     * Moves to the page that contains the time provided by the signal. The messages will be selected
-     * if the provided time is the time of a message.
+     * Moves to the page that contains the time provided by the signal. The
+     * messages will be selected if the provided time is the time of a message.
      *
-     * @param signal The Time synch signal.
+     * @param signal
+     *            The selection range signal
+     * @since 1.0
      */
     @TmfSignalHandler
-    public void synchToTime(TmfTimeSynchSignal signal) {
+    public void selectionRangeUpdated(TmfSelectionRangeUpdatedSignal signal) {
         fLock.lock();
         try {
             if ((signal.getSource() != this) && (fFrame != null) && (fCheckPoints.size() > 0)) {
@@ -470,14 +472,16 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     }
 
     /**
-     * Moves to the page that contains the current time provided by signal.
-     * No message will be selected however the focus will be set to the message
-     * if the provided time is the time of a message.
+     * Moves to the page that contains the current time provided by signal. No
+     * message will be selected however the focus will be set to the message if
+     * the provided time is the time of a message.
      *
-     * @param signal The time range sync signal
+     * @param signal
+     *            The window range signal
+     * @since 1.0
      */
     @TmfSignalHandler
-    public void synchToTimeRange(TmfRangeSynchSignal signal) {
+    public void windowRangeUpdated(TmfWindowRangeUpdatedSignal signal) {
         fLock.lock();
         try {
             if ((signal.getSource() != this) && (fFrame != null) && !fIsSignalSent && (fCheckPoints.size() > 0)) {
@@ -588,7 +592,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                 if (startTime == null) {
                     startTime = TmfTimestamp.BIG_BANG;
                 }
-                broadcast(new TmfTimeSynchSignal(this, startTime));
+                broadcast(new TmfSelectionRangeUpdatedSignal(this, startTime));
             }
         }
     }
@@ -1106,7 +1110,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
 
         if (notifyAll) {
             TmfTimeRange timeRange = getSignalTimeRange(window.getStartTime());
-            broadcast(new TmfRangeSynchSignal(this, timeRange));
+            broadcast(new TmfWindowRangeUpdatedSignal(this, timeRange));
         }
     }
 

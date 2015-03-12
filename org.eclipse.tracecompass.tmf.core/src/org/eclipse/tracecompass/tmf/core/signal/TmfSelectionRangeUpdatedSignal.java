@@ -20,35 +20,40 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 
 /**
- * A new time or time range selection has been made.
+ * A new time range selection has been made.
  *
- * This is the selected time or time range. To synchronize on the visible
- * (zoom) range, use {@link TmfRangeSynchSignal}.
+ * This is the selected time or time range. A single-timestamp selection is
+ * represented by a range where the start time is equal to the end time.
+ *
+ * To update the visible (zoom) range instead, use
+ * {@link TmfWindowRangeUpdatedSignal}.
  *
  * @author Francois Chouinard
-*/
+ * @since 1.0
+ */
 @NonNullByDefault
-public class TmfTimeSynchSignal extends TmfSignal {
+public class TmfSelectionRangeUpdatedSignal extends TmfSignal {
 
     private final ITmfTimestamp fBeginTime;
     private final ITmfTimestamp fEndTime;
 
     /**
-     * Constructor
+     * Constructor for a single timestamp selection (start and end times will be
+     * the same).
      *
      * @param source
      *            Object sending this signal
      * @param ts
      *            Timestamp of selection
      */
-    public TmfTimeSynchSignal(@Nullable Object source, ITmfTimestamp ts) {
+    public TmfSelectionRangeUpdatedSignal(@Nullable Object source, ITmfTimestamp ts) {
         super(source);
         fBeginTime = ts;
         fEndTime = ts;
     }
 
     /**
-     * Constructor
+     * Constructor for a time range selection.
      *
      * @param source
      *            Object sending this signal
@@ -57,7 +62,7 @@ public class TmfTimeSynchSignal extends TmfSignal {
      * @param end
      *            Timestamp of end of selection range
      */
-    public TmfTimeSynchSignal(@Nullable Object source, ITmfTimestamp begin, ITmfTimestamp end) {
+    public TmfSelectionRangeUpdatedSignal(@Nullable Object source, ITmfTimestamp begin, ITmfTimestamp end) {
         super(source);
         fBeginTime = begin;
         fEndTime = end;
@@ -80,13 +85,14 @@ public class TmfTimeSynchSignal extends TmfSignal {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("[TmfTimeSynchSignal ("); //$NON-NLS-1$
+        sb.append(getClass().getSimpleName());
+        sb.append(" ["); //$NON-NLS-1$
         sb.append(fBeginTime.toString());
         if (!fBeginTime.equals(fEndTime)) {
             sb.append('-');
             sb.append(fEndTime.toString());
         }
-        sb.append(")]"); //$NON-NLS-1$
+        sb.append("]"); //$NON-NLS-1$
         return checkNotNull(sb.toString());
     }
 

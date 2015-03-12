@@ -38,9 +38,9 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.tracecompass.tmf.core.signal.TmfRangeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTimeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfTimeViewer;
 
@@ -471,11 +471,11 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
      * correspond to the selection by the user, not the visible time range.
      *
      * @param signal
-     *            The time synch signal {@link TmfTimeSynchSignal}
+     *            The time synch signal {@link TmfSelectionRangeUpdatedSignal}
      */
     @Override
     @TmfSignalHandler
-    public void selectionRangeUpdated(TmfTimeSynchSignal signal) {
+    public void selectionRangeUpdated(TmfSelectionRangeUpdatedSignal signal) {
         super.selectionRangeUpdated(signal);
         if ((signal.getSource() != this) && (getTrace() != null)) {
             updateContent(this.getSelectionBeginTime(), this.getSelectionEndTime(), true);
@@ -483,16 +483,16 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
     }
 
     /**
-     * Signal handler for handling of the time range synch signal. This time
-     * range is the visible zone of the view.
+     * Signal handler for handling of the window range signal. This time range
+     * is the visible zone of the view.
      *
      * @param signal
-     *            The time range synch signal {@link TmfRangeSynchSignal}
+     *            The {@link TmfWindowRangeUpdatedSignal}
      */
     @Override
     @TmfSignalHandler
-    public void timeRangeUpdated(TmfRangeSynchSignal signal) {
-        super.timeRangeUpdated(signal);
+    public void windowRangeUpdated(TmfWindowRangeUpdatedSignal signal) {
+        super.windowRangeUpdated(signal);
         updateContent(this.getWindowStartTime(), this.getWindowEndTime(), false);
     }
 

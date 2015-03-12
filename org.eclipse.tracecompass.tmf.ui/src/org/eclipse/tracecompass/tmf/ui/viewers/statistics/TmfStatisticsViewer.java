@@ -44,7 +44,7 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTimeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.statistics.ITmfStatistics;
 import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsEventTypesModule;
@@ -218,9 +218,10 @@ public class TmfStatisticsViewer extends TmfViewer {
      *
      * @param signal
      *            Contains the information about the new selected time range.
+     * @since 1.0
      */
     @TmfSignalHandler
-    public void timeSynchUpdated(TmfTimeSynchSignal signal) {
+    public void timeSynchUpdated(TmfSelectionRangeUpdatedSignal signal) {
         if (fTrace == null) {
             return;
         }

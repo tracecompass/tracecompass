@@ -137,7 +137,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfEventFilterAppliedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEventSearchAppliedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEventSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTimeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
@@ -494,12 +494,12 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         ITmfTimestamp selectedBeginTimestamp = fSelectedBeginTimestamp;
                         if (selectedBeginTimestamp != null) {
                             if (selectedBeginTimestamp.compareTo(ts) <= 0) {
-                                broadcast(new TmfTimeSynchSignal(TmfEventsTable.this, selectedBeginTimestamp, ts));
+                                broadcast(new TmfSelectionRangeUpdatedSignal(TmfEventsTable.this, selectedBeginTimestamp, ts));
                                 if (fTable.getSelectionIndices().length == 2) {
                                     updateStatusLine(ts.getDelta(selectedBeginTimestamp));
                                 }
                             } else {
-                                broadcast(new TmfTimeSynchSignal(TmfEventsTable.this, checkNotNull(ts), checkNotNull(fSelectedBeginTimestamp)));
+                                broadcast(new TmfSelectionRangeUpdatedSignal(TmfEventsTable.this, checkNotNull(ts), checkNotNull(fSelectedBeginTimestamp)));
                                 updateStatusLine(fSelectedBeginTimestamp.getDelta(ts));
                             }
                         }
@@ -779,7 +779,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     TableItem item = fTable.getSelection()[0];
                     final TmfTimestamp ts = (TmfTimestamp) item.getData(Key.TIMESTAMP);
                     if (ts != null) {
-                        broadcast(new TmfTimeSynchSignal(TmfEventsTable.this, ts));
+                        broadcast(new TmfSelectionRangeUpdatedSignal(TmfEventsTable.this, ts));
                     }
                     if (item.getData() instanceof ITmfEvent) {
                         broadcast(new TmfEventSelectedSignal(TmfEventsTable.this, (ITmfEvent) item.getData()));
@@ -2091,7 +2091,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     fSelectedRank = foundRank;
                     fRawViewer.selectAndReveal(fSelectedRank);
                     if (foundTimestamp != null) {
-                        broadcast(new TmfTimeSynchSignal(TmfEventsTable.this, foundTimestamp));
+                        broadcast(new TmfSelectionRangeUpdatedSignal(TmfEventsTable.this, foundTimestamp));
                     }
                     fireSelectionChanged(new SelectionChangedEvent(TmfEventsTable.this, getSelection()));
                     synchronized (fSearchSyncObj) {
@@ -2636,13 +2636,14 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     }
 
     /**
-     * Handler for the time synch signal.
+     * Handler for the selection range signal.
      *
      * @param signal
      *            The incoming signal
+     * @since 1.0
      */
     @TmfSignalHandler
-    public void currentTimeUpdated(final TmfTimeSynchSignal signal) {
+    public void selectionRangeUpdated(final TmfSelectionRangeUpdatedSignal signal) {
         if ((signal.getSource() != this) && (fTrace != null) && (!fTable.isDisposed())) {
 
             // Create a request for one event that will be queued after other ongoing requests. When this request is completed

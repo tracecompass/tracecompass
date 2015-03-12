@@ -36,7 +36,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTimeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
@@ -202,18 +202,18 @@ public abstract class AbstractImportAndReadSmokeTest {
             }
         }
         HistogramView hv = (HistogramView) vp;
-        final TmfTimeSynchSignal signal = new TmfTimeSynchSignal(hv, desiredEvent1.getTimestamp());
-        final TmfTimeSynchSignal signal2 = new TmfTimeSynchSignal(hv, desiredEvent2.getTimestamp());
+        final TmfSelectionRangeUpdatedSignal signal = new TmfSelectionRangeUpdatedSignal(hv, desiredEvent1.getTimestamp());
+        final TmfSelectionRangeUpdatedSignal signal2 = new TmfSelectionRangeUpdatedSignal(hv, desiredEvent2.getTimestamp());
         hv.updateTimeRange(100000);
         SWTBotUtils.waitForJobs();
-        hv.currentTimeUpdated(signal);
+        hv.selectionRangeUpdated(signal);
         hv.broadcast(signal);
         SWTBotUtils.waitForJobs();
         SWTBotUtils.delay(1000);
 
         hv.updateTimeRange(1000000000);
         SWTBotUtils.waitForJobs();
-        hv.currentTimeUpdated(signal2);
+        hv.selectionRangeUpdated(signal2);
         hv.broadcast(signal2);
         SWTBotUtils.waitForJobs();
         SWTBotUtils.delay(1000);

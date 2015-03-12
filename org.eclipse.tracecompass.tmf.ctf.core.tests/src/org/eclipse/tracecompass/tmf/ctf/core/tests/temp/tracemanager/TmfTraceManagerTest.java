@@ -24,9 +24,9 @@ import java.util.Collections;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.signal.TmfRangeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTimeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
@@ -145,11 +145,11 @@ public class TmfTraceManagerTest {
     }
 
     private void selectTimestamp(@NonNull ITmfTimestamp ts) {
-        TmfSignalManager.dispatchSignal(new TmfTimeSynchSignal(this, ts));
+        TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, ts));
     }
 
     private void selectWindowRange(TmfTimeRange tr) {
-        TmfSignalManager.dispatchSignal(new TmfRangeSynchSignal(this, tr));
+        TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, tr));
     }
 
     // ------------------------------------------------------------------------

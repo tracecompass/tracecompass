@@ -58,7 +58,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEventSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTimeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
@@ -538,7 +538,7 @@ public class OffsetDialog extends Dialog {
      *            the event selected signal
      */
     @TmfSignalHandler
-    public void timeSelected(final TmfTimeSynchSignal signal) {
+    public void timeSelected(final TmfSelectionRangeUpdatedSignal signal) {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {

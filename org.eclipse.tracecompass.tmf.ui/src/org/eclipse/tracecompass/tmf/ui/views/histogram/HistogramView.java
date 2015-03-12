@@ -46,10 +46,10 @@ import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
-import org.eclipse.tracecompass.tmf.core.signal.TmfRangeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalThrottler;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTimeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceRangeUpdatedSignal;
@@ -432,7 +432,7 @@ public class HistogramView extends TmfView {
         updateDisplayedSelectionTime(beginTime, endTime);
         TmfTimestamp beginTs = new TmfTimestamp(beginTime, ITmfTimestamp.NANOSECOND_SCALE);
         TmfTimestamp endTs = new TmfTimestamp(endTime, ITmfTimestamp.NANOSECOND_SCALE);
-        TmfTimeSynchSignal signal = new TmfTimeSynchSignal(this, beginTs, endTs);
+        TmfSelectionRangeUpdatedSignal signal = new TmfSelectionRangeUpdatedSignal(this, beginTs, endTs);
         fTimeSyncThrottle.queue(signal);
     }
 
@@ -476,7 +476,7 @@ public class HistogramView extends TmfView {
             updateDisplayedTimeRange(startTime, endTime);
 
             // Send the FW signal
-            TmfRangeSynchSignal signal = new TmfRangeSynchSignal(this, timeRange);
+            TmfWindowRangeUpdatedSignal signal = new TmfWindowRangeUpdatedSignal(this, timeRange);
             fTimeRangeSyncThrottle.queue(signal);
         }
     }
@@ -639,13 +639,15 @@ public class HistogramView extends TmfView {
 }
 
     /**
-     * Handles the current time updated signal. Sets the current time in the time range
-     * histogram as well as the full histogram.
+     * Handles the selection range updated signal. Sets the current time
+     * selection in the time range histogram as well as the full histogram.
      *
-     * @param signal the signal to process
+     * @param signal
+     *            the signal to process
+     * @since 1.0
      */
     @TmfSignalHandler
-    public void currentTimeUpdated(final TmfTimeSynchSignal signal) {
+    public void selectionRangeUpdated(final TmfSelectionRangeUpdatedSignal signal) {
         if (Display.getCurrent() == null) {
             // Make sure the signal is handled in the UI thread
             Display.getDefault().asyncExec(new Runnable() {
@@ -654,7 +656,7 @@ public class HistogramView extends TmfView {
                     if (fParent.isDisposed()) {
                         return;
                     }
-                    currentTimeUpdated(signal);
+                    selectionRangeUpdated(signal);
                 }
             });
             return;
@@ -667,11 +669,15 @@ public class HistogramView extends TmfView {
     }
 
     /**
-     * Updates the current time range in the time range histogram and full range histogram.
-     * @param signal the signal to process
+     * Updates the current window time range in the time range histogram and
+     * full range histogram.
+     *
+     * @param signal
+     *            the signal to process
+     * @since 1.0
      */
     @TmfSignalHandler
-    public void timeRangeUpdated(final TmfRangeSynchSignal signal) {
+    public void windowRangeUpdated(final TmfWindowRangeUpdatedSignal signal) {
         if (Display.getCurrent() == null) {
             // Make sure the signal is handled in the UI thread
             Display.getDefault().asyncExec(new Runnable() {
@@ -680,7 +686,7 @@ public class HistogramView extends TmfView {
                     if (fParent.isDisposed()) {
                         return;
                     }
-                    timeRangeUpdated(signal);
+                    windowRangeUpdated(signal);
                 }
             });
             return;

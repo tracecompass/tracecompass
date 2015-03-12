@@ -14,10 +14,10 @@
 package org.eclipse.tracecompass.tmf.ui.viewers;
 
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.tmf.core.signal.TmfRangeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalThrottler;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTimeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceRangeUpdatedSignal;
@@ -239,7 +239,7 @@ public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvide
             final ITmfTimestamp startTimestamp = new TmfTimestamp(getSelectionBeginTime(), ITmfTimestamp.NANOSECOND_SCALE);
             final ITmfTimestamp endTimestamp = new TmfTimestamp(getSelectionEndTime(), ITmfTimestamp.NANOSECOND_SCALE);
 
-            TmfTimeSynchSignal signal = new TmfTimeSynchSignal(this, startTimestamp, endTimestamp);
+            TmfSelectionRangeUpdatedSignal signal = new TmfSelectionRangeUpdatedSignal(this, startTimestamp, endTimestamp);
             broadcast(signal);
         }
     }
@@ -257,7 +257,7 @@ public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvide
                 new TmfTimestamp(getWindowEndTime(), ITmfTimestamp.NANOSECOND_SCALE));
 
         // Send the signal
-        TmfRangeSynchSignal signal = new TmfRangeSynchSignal(this, timeRange);
+        TmfWindowRangeUpdatedSignal signal = new TmfWindowRangeUpdatedSignal(this, timeRange);
         fTimeRangeSyncThrottle.queue(signal);
     }
 
@@ -356,13 +356,14 @@ public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvide
     }
 
     /**
-     * Signal handler for handling of the time synch signal, ie the selected range.
+     * Signal handler for handling of the selected range signal.
      *
      * @param signal
-     *            The time synch signal {@link TmfTimeSynchSignal}
+     *            The {@link TmfSelectionRangeUpdatedSignal}
+     * @since 1.0
      */
     @TmfSignalHandler
-    public void selectionRangeUpdated(TmfTimeSynchSignal signal) {
+    public void selectionRangeUpdated(TmfSelectionRangeUpdatedSignal signal) {
         if ((signal.getSource() != this) && (fTrace != null)) {
             ITmfTimestamp selectedTime = signal.getBeginTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE);
             ITmfTimestamp selectedEndTime = signal.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE);
@@ -372,13 +373,14 @@ public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvide
     }
 
     /**
-     * Signal handler for handling of the time range synch signal, ie the visible range.
+     * Signal handler for handling of the window range signal.
      *
      * @param signal
-     *            The time range synch signal {@link TmfRangeSynchSignal}
+     *            The {@link TmfWindowRangeUpdatedSignal}
+     * @since 1.0
      */
     @TmfSignalHandler
-    public void timeRangeUpdated(TmfRangeSynchSignal signal) {
+    public void windowRangeUpdated(TmfWindowRangeUpdatedSignal signal) {
 
         if (fTrace != null) {
             // Validate the time range

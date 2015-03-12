@@ -75,9 +75,9 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
-import org.eclipse.tracecompass.tmf.core.signal.TmfRangeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTimeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
@@ -239,11 +239,11 @@ public class CallStackView extends TmfView {
     private final Object fSyncObj = new Object();
 
     // The saved time sync. signal used when switching off the pinning of a view
-    private TmfTimeSynchSignal fSavedTimeSyncSignal;
+    private TmfSelectionRangeUpdatedSignal fSavedTimeSyncSignal;
 
-    // The saved time range sync. signal used when switching off the pinning of
+    // The saved window range signal used when switching off the pinning of
     // a view
-    private TmfRangeSynchSignal fSavedRangeSyncSignal;
+    private TmfWindowRangeUpdatedSignal fSavedRangeSyncSignal;
 
     // ------------------------------------------------------------------------
     // Classes
@@ -578,7 +578,7 @@ public class CallStackView extends TmfView {
                 long startTime = event.getStartTime();
                 long endTime = event.getEndTime();
                 TmfTimeRange range = new TmfTimeRange(new TmfNanoTimestamp(startTime), new TmfNanoTimestamp(endTime));
-                broadcast(new TmfRangeSynchSignal(CallStackView.this, range));
+                broadcast(new TmfWindowRangeUpdatedSignal(CallStackView.this, range));
                 startZoomThread(startTime, endTime);
             }
         });
@@ -589,7 +589,7 @@ public class CallStackView extends TmfView {
                 long beginTime = event.getBeginTime();
                 long endTime = event.getEndTime();
                 synchingToTime(beginTime);
-                broadcast(new TmfTimeSynchSignal(CallStackView.this, new TmfNanoTimestamp(beginTime), new TmfNanoTimestamp(endTime)));
+                broadcast(new TmfSelectionRangeUpdatedSignal(CallStackView.this, new TmfNanoTimestamp(beginTime), new TmfNanoTimestamp(endTime)));
             }
         });
 
@@ -616,7 +616,7 @@ public class CallStackView extends TmfView {
                         entryTime -= spacingTime;
                         exitTime += spacingTime;
                         TmfTimeRange range = new TmfTimeRange(new TmfNanoTimestamp(entryTime), new TmfNanoTimestamp(exitTime));
-                        broadcast(new TmfRangeSynchSignal(CallStackView.this, range));
+                        broadcast(new TmfWindowRangeUpdatedSignal(CallStackView.this, range));
                         fTimeGraphCombo.getTimeGraphViewer().setStartFinishTime(entryTime, exitTime);
                         startZoomThread(entryTime, exitTime);
                     }
@@ -639,7 +639,7 @@ public class CallStackView extends TmfView {
                         startTime -= spacingTime;
                         endTime += spacingTime;
                         TmfTimeRange range = new TmfTimeRange(new TmfNanoTimestamp(startTime), new TmfNanoTimestamp(endTime));
-                        broadcast(new TmfRangeSynchSignal(CallStackView.this, range));
+                        broadcast(new TmfWindowRangeUpdatedSignal(CallStackView.this, range));
                         fTimeGraphCombo.getTimeGraphViewer().setStartFinishTime(startTime, endTime);
                         startZoomThread(startTime, endTime);
                     }
@@ -729,15 +729,16 @@ public class CallStackView extends TmfView {
     }
 
     /**
-     * Handler for the TimeSynch signal
+     * Handler for the selection range signal.
      *
      * @param signal
      *            The incoming signal
+     * @since 1.0
      */
     @TmfSignalHandler
-    public void synchToTime(final TmfTimeSynchSignal signal) {
+    public void selectionRangeUpdated(final TmfSelectionRangeUpdatedSignal signal) {
 
-        fSavedTimeSyncSignal = isPinned() ? new TmfTimeSynchSignal(signal.getSource(), signal.getBeginTime(), signal.getEndTime()) : null;
+        fSavedTimeSyncSignal = isPinned() ? new TmfSelectionRangeUpdatedSignal(signal.getSource(), signal.getBeginTime(), signal.getEndTime()) : null;
 
         if (signal.getSource() == this || fTrace == null || isPinned()) {
             return;
@@ -788,17 +789,18 @@ public class CallStackView extends TmfView {
     }
 
     /**
-     * Handler for the RangeSynch signal
+     * Handler for the window range signal.
      *
      * @param signal
      *            The incoming signal
+     * @since 1.0
      */
     @TmfSignalHandler
-    public void synchToRange(final TmfRangeSynchSignal signal) {
+    public void windowRangeUpdated(final TmfWindowRangeUpdatedSignal signal) {
 
         if (isPinned()) {
             fSavedRangeSyncSignal =
-                    new TmfRangeSynchSignal(signal.getSource(), new TmfTimeRange(signal.getCurrentRange().getStartTime(), signal.getCurrentRange().getEndTime()));
+                    new TmfWindowRangeUpdatedSignal(signal.getSource(), new TmfTimeRange(signal.getCurrentRange().getStartTime(), signal.getCurrentRange().getEndTime()));
 
             fSavedTimeSyncSignal = null;
         }
@@ -1187,12 +1189,12 @@ public class CallStackView extends TmfView {
             public void propertyChange(PropertyChangeEvent event) {
                 if (IAction.CHECKED.equals(event.getProperty()) && !isPinned()) {
                     if (fSavedRangeSyncSignal != null) {
-                        synchToRange(fSavedRangeSyncSignal);
+                        windowRangeUpdated(fSavedRangeSyncSignal);
                         fSavedRangeSyncSignal = null;
                     }
 
                     if (fSavedTimeSyncSignal != null) {
-                        synchToTime(fSavedTimeSyncSignal);
+                        selectionRangeUpdated(fSavedTimeSyncSignal);
                         fSavedTimeSyncSignal = null;
                     }
                 }

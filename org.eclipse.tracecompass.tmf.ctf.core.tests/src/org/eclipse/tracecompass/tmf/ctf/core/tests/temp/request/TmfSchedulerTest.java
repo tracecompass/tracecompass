@@ -27,7 +27,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTimeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -191,7 +191,7 @@ public class TmfSchedulerTest {
         ForegroundRequest foreground3 = new ForegroundRequest(TmfTimeRange.ETERNITY);
         fixture.sendRequest(foreground3);
 
-        TmfTimeSynchSignal signal3 = new TmfTimeSynchSignal(this, new TmfTimestamp(fForegroundTimeRange.getStartTime()));
+        TmfSelectionRangeUpdatedSignal signal3 = new TmfSelectionRangeUpdatedSignal(this, new TmfTimestamp(fForegroundTimeRange.getStartTime()));
         fixture.broadcast(signal3);
 
         try {
@@ -211,7 +211,7 @@ public class TmfSchedulerTest {
     public void TestMultiRequest4() {
         ForegroundRequest foreground4 = new ForegroundRequest(fForegroundTimeRange);
         fixture.sendRequest(foreground4);
-        TmfTimeSynchSignal signal4 = new TmfTimeSynchSignal(this, new TmfTimestamp(fStartTime + ((fEndTime - fStartTime) / 8)));
+        TmfSelectionRangeUpdatedSignal signal4 = new TmfSelectionRangeUpdatedSignal(this, new TmfTimestamp(fStartTime + ((fEndTime - fStartTime) / 8)));
         fixture.broadcast(signal4);
 
         try {
@@ -231,7 +231,7 @@ public class TmfSchedulerTest {
     public void TestMultiRequest5() {
         ForegroundRequest foreground5 = new ForegroundRequest(fForegroundTimeRange);
         fixture.sendRequest(foreground5);
-        TmfTimeSynchSignal signal5 = new TmfTimeSynchSignal(this, new TmfTimestamp(fEndTime - ((fEndTime - fStartTime) / 4)));
+        TmfSelectionRangeUpdatedSignal signal5 = new TmfSelectionRangeUpdatedSignal(this, new TmfTimestamp(fEndTime - ((fEndTime - fStartTime) / 4)));
         fixture.broadcast(signal5);
 
         try {
@@ -255,7 +255,7 @@ public class TmfSchedulerTest {
         fixture.sendRequest(background6);
         fixture.sendRequest(foreground6);
 
-        TmfTimeSynchSignal signal6 = new TmfTimeSynchSignal(this, new TmfTimestamp(fStartTime + ((fEndTime - fStartTime) / 8)));
+        TmfSelectionRangeUpdatedSignal signal6 = new TmfSelectionRangeUpdatedSignal(this, new TmfTimestamp(fStartTime + ((fEndTime - fStartTime) / 8)));
         fixture.broadcast(signal6);
 
         try {

@@ -861,7 +861,7 @@ Sent by TmfCheckpointIndexer when new events have been indexed and the number of
 
 Received by components that need to be notified of a new trace event count.
 
-=== TmfTimeSynchSignal ===
+=== TmfSelectionRangeUpdatedSignal ===
 
 ''Purpose''
 
@@ -877,7 +877,7 @@ Sent by any component that allows the user to select a time or time range.
 
 Received by any component that needs to be notified of the currently selected time or time range.
 
-=== TmfRangeSynchSignal ===
+=== TmfWindowRangeUpdatedSignal ===
 
 ''Purpose''
 

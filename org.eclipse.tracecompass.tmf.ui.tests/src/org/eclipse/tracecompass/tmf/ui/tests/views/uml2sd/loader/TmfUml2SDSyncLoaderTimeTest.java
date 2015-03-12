@@ -21,8 +21,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.tmf.core.signal.TmfRangeSynchSignal;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTimeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.GraphNode;
@@ -129,7 +129,7 @@ public class TmfUml2SDSyncLoaderTimeTest {
      */
     @Test
     public void verifySynchToTimeInPage() {
-        fFacility.getTrace().broadcast(new TmfTimeSynchSignal(this, TC_001_TIME_VALUE));
+        fFacility.getTrace().broadcast(new TmfSelectionRangeUpdatedSignal(this, TC_001_TIME_VALUE));
         fFacility.getLoader().waitForCompletion();
         fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         assertEquals("synchToTime", TC_001_PAGE_VALUE, fFacility.getLoader().currentPage());
@@ -154,7 +154,7 @@ public class TmfUml2SDSyncLoaderTimeTest {
      */
     @Test
     public void verifySynchToTimeOutsidePage() {
-        fFacility.getTrace().broadcast(new TmfTimeSynchSignal(this, TC_002_TIME_VALUE));
+        fFacility.getTrace().broadcast(new TmfSelectionRangeUpdatedSignal(this, TC_002_TIME_VALUE));
         fFacility.getLoader().waitForCompletion();
         fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         assertEquals("synchToTime", TC_002_PAGE_VALUE, fFacility.getLoader().currentPage());
@@ -182,7 +182,7 @@ public class TmfUml2SDSyncLoaderTimeTest {
     public void verifySynchToTimeNonExisting() {
         fFacility.getLoader().firstPage();
 
-        fFacility.getTrace().broadcast(new TmfTimeSynchSignal(this, TC_003_TIME_VALUE));
+        fFacility.getTrace().broadcast(new TmfSelectionRangeUpdatedSignal(this, TC_003_TIME_VALUE));
         fFacility.getLoader().waitForCompletion();
         fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         assertEquals("synchToTime", 0, TC_003_TIME_VALUE.compareTo(fFacility.getLoader().getCurrentTime()));
@@ -200,7 +200,7 @@ public class TmfUml2SDSyncLoaderTimeTest {
      */
     @Test
     public void verifySynchToTimeBeforeExpStart() {
-        fFacility.getTrace().broadcast(new TmfTimeSynchSignal(this, TmfTimestamp.BIG_BANG));
+        fFacility.getTrace().broadcast(new TmfSelectionRangeUpdatedSignal(this, TmfTimestamp.BIG_BANG));
         fFacility.getLoader().waitForCompletion();
         fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         assertEquals("synchToTime", TC_004_PAGE_VALUE, fFacility.getLoader().currentPage());
@@ -217,7 +217,7 @@ public class TmfUml2SDSyncLoaderTimeTest {
      */
     @Test
     public void verifySynchToTimeAfterExpEnd() {
-        fFacility.getTrace().broadcast(new TmfTimeSynchSignal(this, TmfTimestamp.BIG_CRUNCH));
+        fFacility.getTrace().broadcast(new TmfSelectionRangeUpdatedSignal(this, TmfTimestamp.BIG_CRUNCH));
         fFacility.getLoader().waitForCompletion();
         fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         assertEquals("synchToTime", TC_005_PAGE_VALUE, fFacility.getLoader().currentPage());
@@ -234,7 +234,7 @@ public class TmfUml2SDSyncLoaderTimeTest {
      */
     @Test
     public void verifySynchToTimeEqualsLast() {
-        fFacility.getTrace().broadcast(new TmfTimeSynchSignal(this, TC_006_TIME_VALUE));
+        fFacility.getTrace().broadcast(new TmfSelectionRangeUpdatedSignal(this, TC_006_TIME_VALUE));
         fFacility.getLoader().waitForCompletion();
         fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         assertEquals("synchToTime", TC_006_PAGE_VALUE, fFacility.getLoader().currentPage());
@@ -254,7 +254,7 @@ public class TmfUml2SDSyncLoaderTimeTest {
      */
     @Test
     public void verifySynchToTimeFirst() {
-        fFacility.getTrace().broadcast(new TmfTimeSynchSignal(this, TC_007_TIME_VALUE));
+        fFacility.getTrace().broadcast(new TmfSelectionRangeUpdatedSignal(this, TC_007_TIME_VALUE));
         fFacility.getLoader().waitForCompletion();
         fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         assertEquals("synchToTime", TC_007_PAGE_VALUE, fFacility.getLoader().currentPage());
@@ -279,7 +279,7 @@ public class TmfUml2SDSyncLoaderTimeTest {
         TmfTimeRange range = new TmfTimeRange(TC_008_START_TIME_VALUE, TC_008_END_TIME_VALUE);
         fFacility.getLoader().waitForCompletion();
         fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
-        fFacility.getTrace().broadcast(new TmfRangeSynchSignal(this, range));
+        fFacility.getTrace().broadcast(new TmfWindowRangeUpdatedSignal(this, range));
         assertEquals("synchToTimeRange", TC_008_PAGE_VALUE, fFacility.getLoader().currentPage());
         assertNotNull("synchToTimeRange", fFacility.getLoader().getCurrentTime());
         assertEquals("synchToTimeRange", 0, TC_008_TIME_VALUE.compareTo(fFacility.getLoader().getCurrentTime()));
@@ -298,7 +298,7 @@ public class TmfUml2SDSyncLoaderTimeTest {
     @Test
     public void verifyTimeRangeDifferentPages() {
         TmfTimeRange range = new TmfTimeRange(TC_009_START_TIME_VALUE, TC_009_END_TIME_VALUE);
-        fFacility.getTrace().broadcast(new TmfRangeSynchSignal(this, range));
+        fFacility.getTrace().broadcast(new TmfWindowRangeUpdatedSignal(this, range));
         fFacility.getLoader().waitForCompletion();
         fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         assertEquals("synchToTimeRange", TC_009_PAGE_VALUE, fFacility.getLoader().currentPage());

@@ -42,7 +42,7 @@ import org.eclipse.tracecompass.internal.tmf.pcap.core.trace.PcapTrace;
 import org.eclipse.tracecompass.internal.tmf.pcap.ui.NetworkingPerspectiveFactory;
 import org.eclipse.tracecompass.internal.tmf.pcap.ui.stream.StreamListView;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTimeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.pcap.core.tests.shared.PcapTmfTestTrace;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
@@ -156,7 +156,7 @@ public class ImportAndReadPcapTest {
         botView.setFocus();
         SWTBotTree botTree = fBot.tree();
         assertNotNull(botTree);
-        final TmfTimeSynchSignal signal = new TmfTimeSynchSignal(slv, fDesired1.getTimestamp());
+        final TmfSelectionRangeUpdatedSignal signal = new TmfSelectionRangeUpdatedSignal(slv, fDesired1.getTimestamp());
         slv.broadcast(signal);
         SWTBotUtils.waitForJobs();
         // FIXME This is a race condition:

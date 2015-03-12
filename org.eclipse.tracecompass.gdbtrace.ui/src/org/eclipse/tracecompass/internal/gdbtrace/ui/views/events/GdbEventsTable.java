@@ -28,7 +28,7 @@ import org.eclipse.tracecompass.internal.gdbtrace.core.event.GdbTraceEventConten
 import org.eclipse.tracecompass.internal.gdbtrace.core.trace.GdbEventAspects;
 import org.eclipse.tracecompass.internal.gdbtrace.core.trace.GdbTrace;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTimeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
@@ -107,7 +107,7 @@ public class GdbEventsTable extends TmfEventsTable {
 
     @Override
     @TmfSignalHandler
-    public void currentTimeUpdated(final TmfTimeSynchSignal signal) {
+    public void selectionRangeUpdated(final TmfSelectionRangeUpdatedSignal signal) {
         // do not synchronize on time
     }
 

@@ -46,9 +46,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.tracecompass.tmf.core.signal.TmfRangeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTimeSynchSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -879,7 +879,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
                 final long startTime = event.getStartTime();
                 final long endTime = event.getEndTime();
                 TmfTimeRange range = new TmfTimeRange(new TmfNanoTimestamp(startTime), new TmfNanoTimestamp(endTime));
-                broadcast(new TmfRangeSynchSignal(AbstractTimeGraphView.this, range));
+                broadcast(new TmfWindowRangeUpdatedSignal(AbstractTimeGraphView.this, range));
                 startZoomThread(startTime, endTime);
             }
         });
@@ -889,7 +889,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
             public void timeSelected(TimeGraphTimeEvent event) {
                 TmfNanoTimestamp startTime = new TmfNanoTimestamp(event.getBeginTime());
                 TmfNanoTimestamp endTime = new TmfNanoTimestamp(event.getEndTime());
-                broadcast(new TmfTimeSynchSignal(AbstractTimeGraphView.this, startTime, endTime));
+                broadcast(new TmfSelectionRangeUpdatedSignal(AbstractTimeGraphView.this, startTime, endTime));
             }
         });
 
@@ -979,13 +979,14 @@ public abstract class AbstractTimeGraphView extends TmfView {
     }
 
     /**
-     * Handler for the time synch signal
+     * Handler for the selection range signal.
      *
      * @param signal
      *            The signal that's received
+     * @since 1.0
      */
     @TmfSignalHandler
-    public void synchToTime(final TmfTimeSynchSignal signal) {
+    public void selectionRangeUpdated(final TmfSelectionRangeUpdatedSignal signal) {
         if (signal.getSource() == this || fTrace == null) {
             return;
         }
@@ -1011,13 +1012,14 @@ public abstract class AbstractTimeGraphView extends TmfView {
     }
 
     /**
-     * Handler for the range synch signal
+     * Handler for the window range signal.
      *
      * @param signal
      *            The signal that's received
+     * @since 1.0
      */
     @TmfSignalHandler
-    public void synchToRange(final TmfRangeSynchSignal signal) {
+    public void windowRangeUpdated(final TmfWindowRangeUpdatedSignal signal) {
         if (signal.getSource() == this || fTrace == null) {
             return;
         }

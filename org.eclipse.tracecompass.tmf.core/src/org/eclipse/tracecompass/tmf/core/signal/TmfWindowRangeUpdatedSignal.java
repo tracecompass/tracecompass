@@ -16,14 +16,15 @@ package org.eclipse.tracecompass.tmf.core.signal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 
 /**
- * A new time range has been selected.
+ * A new range has been selected for the visible (zoom) time range.
  *
- * This is the visible (zoom) time range. To synchronize on the selection range,
- * use {@link TmfTimeSynchSignal}.
+ * To update the selection range instead, use
+ * {@link TmfSelectionRangeUpdatedSignal}.
  *
  * @author Francois Chouinard
+ * @since 1.0
  */
-public class TmfRangeSynchSignal extends TmfSignal {
+public class TmfWindowRangeUpdatedSignal extends TmfSignal {
 
     private final TmfTimeRange fCurrentRange;
 
@@ -35,7 +36,7 @@ public class TmfRangeSynchSignal extends TmfSignal {
      * @param range
      *            The new time range
      */
-    public TmfRangeSynchSignal(Object source, TmfTimeRange range) {
+    public TmfWindowRangeUpdatedSignal(Object source, TmfTimeRange range) {
         super(source);
         fCurrentRange = range;
     }
@@ -49,7 +50,7 @@ public class TmfRangeSynchSignal extends TmfSignal {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("TmfRangeSynchSignal [source="); //$NON-NLS-1$
+        StringBuilder sb = new StringBuilder(getClass().getSimpleName() + " [source="); //$NON-NLS-1$
 
         if (getSource() != null) {
             sb.append(getSource().toString());
