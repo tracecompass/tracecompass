@@ -19,10 +19,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
 
 /**
  * Static class for managing color settings.
@@ -51,9 +50,9 @@ public class ColorSettingsManager {
 
     // The default color setting
     private static final ColorSetting DEFAULT_COLOR_SETTING = new ColorSetting(
-            Display.getDefault().getSystemColor(SWT.COLOR_LIST_FOREGROUND).getRGB(),
-            Display.getDefault().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB(),
-            Display.getDefault().getSystemColor(SWT.COLOR_LIST_FOREGROUND).getRGB(),
+            null,
+            null,
+            null,
             null);
 
     /**
@@ -119,7 +118,8 @@ public class ColorSettingsManager {
     public static ColorSetting getColorSetting(ITmfEvent event) {
         for (int i = 0; i < fColorSettings.length; i++) {
             ColorSetting colorSetting = fColorSettings[i];
-            if (colorSetting.getFilter() != null && colorSetting.getFilter().matches(event)) {
+            ITmfFilter filter = colorSetting.getFilter();
+            if (filter != null && filter.matches(event)) {
                 return colorSetting;
             }
         }
@@ -135,7 +135,8 @@ public class ColorSettingsManager {
     public static int getColorSettingPriority(ITmfEvent event) {
         for (int i = 0; i < fColorSettings.length; i++) {
             ColorSetting colorSetting = fColorSettings[i];
-            if (colorSetting.getFilter() != null && colorSetting.getFilter().matches(event)) {
+            ITmfFilter filter = colorSetting.getFilter();
+            if (filter != null && filter.matches(event)) {
                 return i;
             }
         }

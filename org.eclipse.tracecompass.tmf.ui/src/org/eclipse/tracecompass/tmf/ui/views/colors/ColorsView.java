@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,6 +12,8 @@
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.ui.views.colors;
+
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,6 +54,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
+import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 import org.eclipse.tracecompass.tmf.ui.views.filter.FilterDialog;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
@@ -271,9 +274,9 @@ public class ColorsView extends TmfView {
         @Override
         public void run() {
             ColorSetting colorSetting = new ColorSetting(
-                    Display.getDefault().getSystemColor(SWT.COLOR_LIST_FOREGROUND).getRGB(),
-                    Display.getDefault().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB(),
-                    Display.getDefault().getSystemColor(SWT.COLOR_LIST_FOREGROUND).getRGB(),
+                    checkNotNull(Display.getDefault().getSystemColor(SWT.COLOR_LIST_FOREGROUND).getRGB()),
+                    checkNotNull(Display.getDefault().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB()),
+                    checkNotNull(Display.getDefault().getSystemColor(SWT.COLOR_LIST_FOREGROUND).getRGB()),
                     null);
             ColorSettingRow row = new ColorSettingRow(fListComposite, colorSetting);
             if (fSelectedRow == null) {
@@ -520,9 +523,10 @@ public class ColorsView extends TmfView {
             filterButton.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
             final Label filterText = new Label(this, SWT.NONE);
-            if (colorSetting.getFilter() != null) {
-                filterText.setText(colorSetting.getFilter().toString());
-                filterText.setToolTipText(colorSetting.getFilter().toString());
+            ITmfFilter filter = colorSetting.getFilter();
+            if (filter != null) {
+                filterText.setText(filter.toString());
+                filterText.setToolTipText(filter.toString());
             }
             filterText.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
             filterText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));

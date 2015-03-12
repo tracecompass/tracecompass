@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -31,6 +31,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.tracecompass.tmf.core.filter.xml.TmfFilterContentHandler;
 import org.eclipse.tracecompass.tmf.core.filter.xml.TmfFilterXMLWriter;
@@ -82,19 +83,23 @@ public class ColorSettingsXML {
                 Element colorSettingElement = document.createElement(COLOR_SETTING_TAG);
                 rootElement.appendChild(colorSettingElement);
 
-                Element fgElement = document.createElement(FG_TAG);
-                colorSettingElement.appendChild(fgElement);
                 RGB foreground = colorSetting.getForegroundRGB();
-                fgElement.setAttribute(R_ATTR, Integer.toString(foreground.red));
-                fgElement.setAttribute(G_ATTR, Integer.toString(foreground.green));
-                fgElement.setAttribute(B_ATTR, Integer.toString(foreground.blue));
+                if (foreground != null) {
+                    Element fgElement = document.createElement(FG_TAG);
+                    colorSettingElement.appendChild(fgElement);
+                    fgElement.setAttribute(R_ATTR, Integer.toString(foreground.red));
+                    fgElement.setAttribute(G_ATTR, Integer.toString(foreground.green));
+                    fgElement.setAttribute(B_ATTR, Integer.toString(foreground.blue));
+                }
 
-                Element bgElement = document.createElement(BG_TAG);
-                colorSettingElement.appendChild(bgElement);
                 RGB background = colorSetting.getBackgroundRGB();
-                bgElement.setAttribute(R_ATTR, Integer.toString(background.red));
-                bgElement.setAttribute(G_ATTR, Integer.toString(background.green));
-                bgElement.setAttribute(B_ATTR, Integer.toString(background.blue));
+                if (background != null) {
+                    Element bgElement = document.createElement(BG_TAG);
+                    colorSettingElement.appendChild(bgElement);
+                    bgElement.setAttribute(R_ATTR, Integer.toString(background.red));
+                    bgElement.setAttribute(G_ATTR, Integer.toString(background.green));
+                    bgElement.setAttribute(B_ATTR, Integer.toString(background.blue));
+                }
 
                 Element tickColorElement = document.createElement(TICK_TAG);
                 colorSettingElement.appendChild(tickColorElement);
@@ -103,10 +108,11 @@ public class ColorSettingsXML {
                 tickColorElement.setAttribute(G_ATTR, Integer.toString(tickColor.green));
                 tickColorElement.setAttribute(B_ATTR, Integer.toString(tickColor.blue));
 
-                if (colorSetting.getFilter() != null) {
+                ITmfFilter filter = colorSetting.getFilter();
+                if (filter instanceof ITmfFilterTreeNode) {
                     Element filterElement = document.createElement(FILTER_TAG);
                     colorSettingElement.appendChild(filterElement);
-                    TmfFilterXMLWriter.buildXMLTree(document, colorSetting.getFilter(), filterElement);
+                    TmfFilterXMLWriter.buildXMLTree(document, (ITmfFilterTreeNode) filter, filterElement);
                 }
             }
 
@@ -164,9 +170,9 @@ public class ColorSettingsXML {
     private static class ColorSettingsContentHandler extends DefaultHandler {
 
         private List<ColorSetting> colorSettings = new ArrayList<>(0);
-        private RGB fg = new RGB(0, 0, 0);
-        private RGB bg = new RGB(255, 255, 255);
-        private RGB tickColor = new RGB(0, 0, 0);
+        private RGB fg;
+        private RGB bg;
+        private RGB tickColor;
         private ITmfFilterTreeNode filter;
         private TmfFilterContentHandler filterContentHandler;
 
@@ -178,6 +184,7 @@ public class ColorSettingsXML {
             } else if (localName.equals(COLOR_SETTING_TAG)) {
                 fg = null;
                 bg = null;
+                tickColor = null;
                 filter = null;
             } else if (localName.equals(FG_TAG)) {
                 int r = Integer.parseInt(attributes.getValue(R_ATTR));
