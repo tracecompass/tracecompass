@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelanalysis.LinuxValues;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
@@ -447,12 +448,17 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
                 /* Set the process' status */
                 quark = ss.getQuarkRelativeAndAdd(curThreadNode, Attributes.STATUS);
                 if (ss.queryOngoingState(quark).isNull()) {
-                     /* "2" here means "WAIT_FOR_CPU", and "5" "WAIT_BLOCKED" in the Linux kernel. */
                     switch (status) {
-                    case 2:
+                    case LinuxValues.STATEDUMP_PROCESS_STATUS_WAIT_CPU:
                         value = StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE;
                         break;
-                    case 5:
+                    case LinuxValues.STATEDUMP_PROCESS_STATUS_WAIT:
+                        /*
+                         * We have no information on what the process is waiting
+                         * on (unlike a sched_switch for example), so we will
+                         * use the WAIT_UNKNOWN state instead of the "normal"
+                         * WAIT_BLOCKED state.
+                         */
                         value = StateValues.PROCESS_STATUS_WAIT_UNKNOWN_VALUE;
                         break;
                     default:
