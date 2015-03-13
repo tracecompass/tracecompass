@@ -51,26 +51,31 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
      * @param newStateFile
      *            The name of the history file that will be created. Should end
      *            in ".ht"
-     * @param blockSize
-     *            The size of the blocks in the file
-     * @param maxChildren
-     *            The maximum number of children allowed for each core node
-     * @param startTime
-     *            The earliest timestamp stored in the history
      * @param providerVersion
      *            Version of of the state provider. We will only try to reopen
      *            existing files if this version matches the one in the
      *            framework.
+     * @param startTime
+     *            The earliest timestamp stored in the history
      * @param queueSize
      *            The size of the interval insertion queue. 2000 - 10000 usually
      *            works well
+     * @param blockSize
+     *            The size of the blocks in the file
+     * @param maxChildren
+     *            The maximum number of children allowed for each core node
      * @throws IOException
      *             If there was a problem opening the history file for writing
      */
-    public ThreadedHistoryTreeBackend(@NonNull String ssid, File newStateFile, int blockSize,
-            int maxChildren, long startTime, int providerVersion, int queueSize)
-            throws IOException {
-        super(ssid, newStateFile, blockSize, maxChildren, providerVersion, startTime);
+    public ThreadedHistoryTreeBackend(@NonNull String ssid,
+            File newStateFile,
+            int providerVersion,
+            long startTime,
+            int queueSize,
+            int blockSize,
+            int maxChildren)
+                    throws IOException {
+        super(ssid, newStateFile, providerVersion, startTime, blockSize, maxChildren);
 
         intervalQueue = new ArrayBlockingQueue<>(queueSize);
         shtThread = new Thread(this, "History Tree Thread"); //$NON-NLS-1$
@@ -86,20 +91,24 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
      * @param newStateFile
      *            The name of the history file that will be created. Should end
      *            in ".ht"
-     * @param startTime
-     *            The earliest timestamp stored in the history
      * @param providerVersion
      *            Version of of the state provider. We will only try to reopen
      *            existing files if this version matches the one in the
      *            framework.
+     * @param startTime
+     *            The earliest timestamp stored in the history
      * @param queueSize
      *            The size of the interval insertion queue. 2000 - 10000 usually
      *            works well
      * @throws IOException
      *             If there was a problem opening the history file for writing
      */
-    public ThreadedHistoryTreeBackend(@NonNull String ssid, File newStateFile, long startTime,
-            int providerVersion, int queueSize) throws IOException {
+    public ThreadedHistoryTreeBackend(@NonNull String ssid,
+            File newStateFile,
+            int providerVersion,
+            long startTime,
+            int queueSize)
+                    throws IOException {
         super(ssid, newStateFile, providerVersion, startTime);
 
         intervalQueue = new ArrayBlockingQueue<>(queueSize);

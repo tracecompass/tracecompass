@@ -273,7 +273,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
 
         try {
             IStateHistoryBackend backend = StateHistoryBackendFactory.createHistoryTreeBackendNewFile(
-                    id, htFile, provider.getStartTime(), provider.getVersion(), QUEUE_SIZE);
+                    id, htFile, provider.getVersion(), provider.getStartTime(), QUEUE_SIZE);
             fHtBackend = backend;
             fStateSystem = StateSystemFactory.newStateSystem(backend);
             provider.assignTargetStateSystem(fStateSystem);
@@ -326,7 +326,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         IStateHistoryBackend realBackend = null;
         try {
             realBackend = StateHistoryBackendFactory.createHistoryTreeBackendNewFile(
-                    id, htPartialFile, provider.getStartTime(), provider.getVersion(), QUEUE_SIZE);
+                    id, htPartialFile, provider.getVersion(), provider.getStartTime(), QUEUE_SIZE);
         } catch (IOException e) {
             throw new TmfTraceException(e.toString(), e);
         }

@@ -81,22 +81,26 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      * @param newStateFile
      *            The filename/location where to store the state history (Should
      *            end in .ht)
-     * @param blockSize
-     *            The size of the blocks in the history file. This should be a
-     *            multiple of 4096.
-     * @param maxChildren
-     *            The maximum number of children each core node can have
      * @param providerVersion
      *            Version of of the state provider. We will only try to reopen
      *            existing files if this version matches the one in the
      *            framework.
      * @param startTime
      *            The earliest time stamp that will be stored in the history
+     * @param blockSize
+     *            The size of the blocks in the history file. This should be a
+     *            multiple of 4096.
+     * @param maxChildren
+     *            The maximum number of children each core node can have
      * @throws IOException
      *             Thrown if we can't create the file for some reason
      */
-    public HistoryTreeBackend(@NonNull String ssid, File newStateFile, int blockSize,
-            int maxChildren, int providerVersion, long startTime) throws IOException {
+    public HistoryTreeBackend(@NonNull String ssid,
+            File newStateFile,
+            int providerVersion,
+            long startTime,
+            int blockSize,
+            int maxChildren) throws IOException {
         this.ssid = ssid;
         final HTConfig conf = new HTConfig(newStateFile, blockSize, maxChildren,
                 providerVersion, startTime);
@@ -125,7 +129,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      */
     public HistoryTreeBackend(@NonNull String ssid, File newStateFile, int providerVersion, long startTime)
             throws IOException {
-        this(ssid, newStateFile, 64 * 1024, 50, providerVersion, startTime);
+        this(ssid, newStateFile, providerVersion, startTime, 64 * 1024, 50);
     }
 
     /**

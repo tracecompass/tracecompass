@@ -87,9 +87,9 @@ public final class StateHistoryBackendFactory {
      *             Thrown if we can't create the file for some reason
      */
     public static IStateHistoryBackend createHistoryTreeBackendNewFile(String ssid,
-            File stateFile, long startTime, int providerVersion, int queueSize) throws IOException {
+            File stateFile, int providerVersion, long startTime, int queueSize) throws IOException {
         if (queueSize > 0) {
-            return new ThreadedHistoryTreeBackend(ssid, stateFile, startTime, providerVersion, queueSize);
+            return new ThreadedHistoryTreeBackend(ssid, stateFile, providerVersion, startTime, queueSize);
         }
         return new HistoryTreeBackend(ssid, stateFile, providerVersion, startTime);
     }
