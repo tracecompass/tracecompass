@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -34,10 +34,13 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
+import org.eclipse.tracecompass.internal.tmf.ui.parsers.CustomParserUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.parsers.wizards.CustomTxtParserWizard;
 import org.eclipse.tracecompass.internal.tmf.ui.parsers.wizards.CustomXmlParserWizard;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition;
+import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTrace;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition;
+import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
@@ -219,8 +222,10 @@ public class ManageCustomParsersDialog extends Dialog {
                     String name = selection.substring(selection.indexOf(SEP) + SEP_LEN);
                     if (txtButton.getSelection()) {
                         CustomTxtTraceDefinition.delete(category, name);
+                        CustomParserUtils.cleanup(CustomTxtTrace.buildTraceTypeId(category, name));
                     } else if (xmlButton.getSelection()) {
                         CustomXmlTraceDefinition.delete(category, name);
+                        CustomParserUtils.cleanup(CustomXmlTrace.buildTraceTypeId(category, name));
                     }
                     fillParserList();
                 }
