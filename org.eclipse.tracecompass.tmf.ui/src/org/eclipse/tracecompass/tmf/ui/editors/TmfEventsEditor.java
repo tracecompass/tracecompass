@@ -198,16 +198,18 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         if (propId == IEditorPart.PROP_INPUT && getEditorInput() instanceof TmfEditorInput) {
             if (fTrace != null) {
                 broadcast(new TmfTraceClosedSignal(this, fTrace));
+                TmfTraceColumnManager.saveColumnOrder(fTrace.getTraceTypeId(), fEventsTable.getColumnOrder());
             }
+            fEventsTable.dispose();
             fTraceSelected = false;
             fFile = ((TmfEditorInput) getEditorInput()).getFile();
             fTrace = ((TmfEditorInput) getEditorInput()).getTrace();
             /* change the input to a FileEditorInput to allow open handlers to find this editor */
             super.setInput(new FileEditorInput(fFile));
-            fEventsTable.dispose();
             if (fTrace != null) {
                 setPartName(fTrace.getName());
                 fEventsTable = createEventsTable(fParent, fTrace.getCacheSize());
+                fEventsTable.setColumnOrder(TmfTraceColumnManager.loadColumnOrder(fTrace.getTraceTypeId()));
                 fEventsTable.addSelectionChangedListener(this);
                 fEventsTable.setTrace(fTrace, true);
                 fEventsTable.refreshBookmarks(fFile);
@@ -237,6 +239,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         if (fTrace != null) {
             setPartName(fTrace.getName());
             fEventsTable = createEventsTable(parent, fTrace.getCacheSize());
+            fEventsTable.setColumnOrder(TmfTraceColumnManager.loadColumnOrder(fTrace.getTraceTypeId()));
             fEventsTable.addSelectionChangedListener(this);
             fEventsTable.setTrace(fTrace, true);
             fEventsTable.refreshBookmarks(fFile);
@@ -271,6 +274,9 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         removePropertyListener(this);
         if (fTrace != null) {
             broadcast(new TmfTraceClosedSignal(this, fTrace));
+            if (fEventsTable != null) {
+                TmfTraceColumnManager.saveColumnOrder(fTrace.getTraceTypeId(), fEventsTable.getColumnOrder());
+            }
         }
         if (fEventsTable != null) {
             fEventsTable.dispose();

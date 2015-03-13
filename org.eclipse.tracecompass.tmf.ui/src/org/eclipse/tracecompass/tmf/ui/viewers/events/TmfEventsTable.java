@@ -318,6 +318,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private boolean fCacheUpdateCompleted = false;
     private final Object fCacheUpdateSyncObj = new Object();
 
+    // Keep track of column order, it is needed after table is disposed
+    private int[] fColumnOrder;
+
     private boolean fDisposeOnClose;
 
     // ------------------------------------------------------------------------
@@ -433,29 +436,33 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             column.pack();
             if (col instanceof TmfMarginColumn) {
                 column.setResizable(false);
-                column.addControlListener(new ControlAdapter() {
-                    /*
-                     * Make sure that the margin column is always first
-                     */
-                    @Override
-                    public void controlMoved(ControlEvent e) {
-                        int[] order = fTable.getColumnOrder();
-                        if (order[0] == MARGIN_COLUMN_INDEX) {
-                            return;
-                        }
-                        for (int i = order.length - 1; i > 0; i--) {
-                            if (order[i] == MARGIN_COLUMN_INDEX) {
-                                order[i] = order[i - 1];
-                                order[i - 1] = MARGIN_COLUMN_INDEX;
-                            }
-                        }
-                        fTable.setColumnOrder(order);
-                    }
-                });
             } else {
                 column.setMoveable(true);
             }
+            column.addControlListener(new ControlAdapter() {
+                /*
+                 * Make sure that the margin column is always first
+                 * and keep the column order variable up to date.
+                 */
+                @Override
+                public void controlMoved(ControlEvent e) {
+                    int[] order = fTable.getColumnOrder();
+                    if (order[0] == MARGIN_COLUMN_INDEX) {
+                        fColumnOrder = order;
+                        return;
+                    }
+                    for (int i = order.length - 1; i > 0; i--) {
+                        if (order[i] == MARGIN_COLUMN_INDEX) {
+                            order[i] = order[i - 1];
+                            order[i - 1] = MARGIN_COLUMN_INDEX;
+                        }
+                    }
+                    fTable.setColumnOrder(order);
+                    fColumnOrder = fTable.getColumnOrder();
+                }
+            });
         }
+        fColumnOrder = fTable.getColumnOrder();
 
         // Set the frozen row for header row
         fTable.setFrozenRowCount(1);
@@ -2205,6 +2212,42 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             columns.add(fColumns.get(i));
         }
         return getItemStrings(columns, event);
+    }
+
+    /**
+     * Returns an array of zero-relative integers that map
+     * the creation order of the receiver's columns to the
+     * order in which they are currently being displayed.
+     * <p>
+     * Specifically, the indices of the returned array represent
+     * the current visual order of the columns, and the contents
+     * of the array represent the creation order of the columns.
+     *
+     * @return the current visual order of the receiver's columns
+     * @since 1.0
+     */
+    public int[] getColumnOrder() {
+        return fColumnOrder;
+    }
+
+    /**
+     * Sets the order that the columns in the receiver should
+     * be displayed in to the given argument which is described
+     * in terms of the zero-relative ordering of when the columns
+     * were added.
+     * <p>
+     * Specifically, the contents of the array represent the
+     * original position of each column at the time its creation.
+     *
+     * @param order the new order to display the columns
+     * @since 1.0
+     */
+    public void setColumnOrder(int[] order) {
+        if (order == null || order.length != fTable.getColumns().length) {
+            return;
+        }
+        fTable.setColumnOrder(order);
+        fColumnOrder = fTable.getColumnOrder();
     }
 
     /**
