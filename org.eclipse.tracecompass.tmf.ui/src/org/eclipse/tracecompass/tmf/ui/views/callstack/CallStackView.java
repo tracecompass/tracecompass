@@ -49,8 +49,6 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -92,10 +90,10 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.editors.ITmfTraceEditor;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphContentProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphRangeListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphCombo;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphContentProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphRangeUpdateEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphViewer;
@@ -338,47 +336,6 @@ public class CallStackView extends TmfView {
         }
     }
 
-    private class TreeContentProvider implements ITreeContentProvider {
-
-        @Override
-        public void dispose() {
-        }
-
-        @Override
-        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-        }
-
-        @Override
-        public Object[] getElements(Object inputElement) {
-            if (inputElement != null) {
-                try {
-                    return ((List<?>) inputElement).toArray(new ITimeGraphEntry[0]);
-                } catch (ClassCastException e) {
-                }
-            }
-            return new ITimeGraphEntry[0];
-        }
-
-        @Override
-        public Object[] getChildren(Object parentElement) {
-            ITimeGraphEntry entry = (ITimeGraphEntry) parentElement;
-            return entry.getChildren().toArray();
-        }
-
-        @Override
-        public Object getParent(Object element) {
-            ITimeGraphEntry entry = (ITimeGraphEntry) element;
-            return entry.getParent();
-        }
-
-        @Override
-        public boolean hasChildren(Object element) {
-            ITimeGraphEntry entry = (ITimeGraphEntry) element;
-            return entry.hasChildren();
-        }
-
-    }
-
     private class TreeLabelProvider implements ITableLabelProvider {
 
         @Override
@@ -438,21 +395,6 @@ public class CallStackView extends TmfView {
                 }
             }
             return ""; //$NON-NLS-1$
-        }
-
-    }
-
-    private class TimeGraphContentProvider implements ITimeGraphContentProvider {
-
-        @Override
-        public ITimeGraphEntry[] getElements(Object inputElement) {
-            if (inputElement != null) {
-                try {
-                    return ((List<?>) inputElement).toArray(new ITimeGraphEntry[0]);
-                } catch (ClassCastException e) {
-                }
-            }
-            return new ITimeGraphEntry[0];
         }
 
     }
@@ -556,7 +498,7 @@ public class CallStackView extends TmfView {
     public void createPartControl(Composite parent) {
         fTimeGraphCombo = new TimeGraphCombo(parent, SWT.NONE);
 
-        fTimeGraphCombo.setTreeContentProvider(new TreeContentProvider());
+        fTimeGraphCombo.setTreeContentProvider(new TimeGraphContentProvider());
 
         fTimeGraphCombo.setTreeLabelProvider(new TreeLabelProvider());
 

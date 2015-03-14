@@ -38,9 +38,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
@@ -67,6 +65,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphRangeListener
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphSelectionListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphCombo;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphContentProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphRangeUpdateEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphTimeEvent;
@@ -343,63 +342,6 @@ public abstract class AbstractTimeGraphView extends TmfView {
         IAction getShowFilterAction() {
             return combo.getShowFilterAction();
         }
-    }
-
-    private class TreeContentProvider implements ITreeContentProvider {
-
-        @Override
-        public void dispose() {
-        }
-
-        @Override
-        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-        }
-
-        @Override
-        public ITimeGraphEntry[] getElements(Object inputElement) {
-            if (inputElement != null) {
-                try {
-                    return ((List<?>) inputElement).toArray(new ITimeGraphEntry[0]);
-                } catch (ClassCastException e) {
-                }
-            }
-            return new ITimeGraphEntry[0];
-        }
-
-        @Override
-        public Object[] getChildren(Object parentElement) {
-            ITimeGraphEntry entry = (ITimeGraphEntry) parentElement;
-            List<? extends ITimeGraphEntry> children = entry.getChildren();
-            return children.toArray(new ITimeGraphEntry[children.size()]);
-        }
-
-        @Override
-        public Object getParent(Object element) {
-            ITimeGraphEntry entry = (ITimeGraphEntry) element;
-            return entry.getParent();
-        }
-
-        @Override
-        public boolean hasChildren(Object element) {
-            ITimeGraphEntry entry = (ITimeGraphEntry) element;
-            return entry.hasChildren();
-        }
-
-    }
-
-    private class TimeGraphContentProvider implements ITimeGraphContentProvider {
-
-        @Override
-        public ITimeGraphEntry[] getElements(Object inputElement) {
-            if (inputElement != null) {
-                try {
-                    return ((List<?>) inputElement).toArray(new ITimeGraphEntry[0]);
-                } catch (ClassCastException e) {
-                }
-            }
-            return new ITimeGraphEntry[0];
-        }
-
     }
 
     /**
@@ -853,21 +795,22 @@ public abstract class AbstractTimeGraphView extends TmfView {
 
     @Override
     public void createPartControl(Composite parent) {
+        ITimeGraphContentProvider contentProvider = new TimeGraphContentProvider();
         if (fColumns == null || fLabelProvider == null) {
             fTimeGraphWrapper = new TimeGraphViewerWrapper(parent, SWT.NONE);
             TimeGraphViewer viewer = fTimeGraphWrapper.getTimeGraphViewer();
-            viewer.setTimeGraphContentProvider(new TimeGraphContentProvider());
+            viewer.setTimeGraphContentProvider(contentProvider);
         } else {
             TimeGraphComboWrapper wrapper = new TimeGraphComboWrapper(parent, SWT.NONE);
             fTimeGraphWrapper = wrapper;
             TimeGraphCombo combo = wrapper.getTimeGraphCombo();
-            combo.setTreeContentProvider(new TreeContentProvider());
+            combo.setTreeContentProvider(contentProvider);
             combo.setTreeLabelProvider(fLabelProvider);
             combo.setTreeColumns(fColumns);
-            combo.setFilterContentProvider(new TreeContentProvider());
+            combo.setFilterContentProvider(contentProvider);
             combo.setFilterLabelProvider(fFilterLabelProvider);
             combo.setFilterColumns(fFilterColumns);
-            combo.setTimeGraphContentProvider(new TimeGraphContentProvider());
+            combo.setTimeGraphContentProvider(contentProvider);
         }
 
         fTimeGraphWrapper.setTimeGraphProvider(fPresentation);

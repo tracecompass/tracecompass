@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph;
 
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 
 
@@ -19,7 +20,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
  * A content provider mediates between the viewer's model
  * and the viewer itself.
  */
-public interface ITimeGraphContentProvider {
+public interface ITimeGraphContentProvider extends ITreeContentProvider {
     /**
      * Returns the time graph entries to display in the viewer when its input is
      * set to the given element.
@@ -28,5 +29,18 @@ public interface ITimeGraphContentProvider {
      *            the input element
      * @return the array of time graph entries to display in the viewer
      */
+    @Override
     public ITimeGraphEntry[] getElements(Object inputElement);
+
+    /**
+     * @since 1.0
+     */
+    @Override
+    public ITimeGraphEntry[] getChildren(Object parentElement);
+
+    /**
+     * @since 1.0
+     */
+    @Override
+    public ITimeGraphEntry getParent(Object element);
 }

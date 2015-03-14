@@ -206,15 +206,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      */
     public TimeGraphViewer(Composite parent, int style) {
         createDataViewer(parent, style);
-        fTimeGraphContentProvider = new ITimeGraphContentProvider() {
-            @Override
-            public ITimeGraphEntry[] getElements(Object inputElement) {
-                if (inputElement instanceof ITimeGraphEntry[]) {
-                    return (ITimeGraphEntry[]) inputElement;
-                }
-                return new ITimeGraphEntry[0];
-            }
-        };
+        fTimeGraphContentProvider = new TimeGraphContentProvider();
     }
 
     /**
