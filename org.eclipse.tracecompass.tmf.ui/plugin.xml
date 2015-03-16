@@ -1831,4 +1831,25 @@
             icon="icons/elcl16/experiment.gif">
       </experiment>
    </extension>
+   <extension
+         point="org.eclipse.ui.themes">
+      <themeElementCategory
+            id="org.eclipse.tracecompass.tmf.ui.theme.category"
+            label="%themes.category.label">
+      </themeElementCategory>
+      <fontDefinition
+            categoryId="org.eclipse.tracecompass.tmf.ui.theme.category"
+            defaultsTo="org.eclipse.jface.dialogfont"
+            id="org.eclipse.tracecompass.tmf.ui.font.eventtable"
+            isEditable="true"
+            label="%font.eventtable.label">
+      </fontDefinition>
+      <fontDefinition
+            categoryId="org.eclipse.tracecompass.tmf.ui.theme.category"
+            defaultsTo="org.eclipse.jface.textfont"
+            id="org.eclipse.tracecompass.tmf.ui.font.eventraw"
+            isEditable="true"
+            label="%font.eventraw.label">
+      </fontDefinition>
+   </extension>
 </plugin>

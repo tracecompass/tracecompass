@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,6 +15,9 @@ package org.eclipse.tracecompass.tmf.ui.widgets.rawviewer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.resource.FontRegistry;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CaretEvent;
 import org.eclipse.swt.custom.CaretListener;
@@ -33,7 +36,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -48,6 +50,8 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.themes.IThemeManager;
 
 /**
  * TmfRawEventViewer allows for the display of the raw data for an arbitrarily
@@ -62,12 +66,13 @@ import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
  * @author Patrick Tasse
  */
 public class TmfRawEventViewer extends Composite implements ControlListener, SelectionListener,
-                KeyListener, CaretListener, MouseMoveListener, MouseTrackListener, MouseWheelListener {
+        KeyListener, CaretListener, MouseMoveListener, MouseTrackListener, MouseWheelListener, IPropertyChangeListener {
 
     private static final Color COLOR_BACKGROUND_ODD = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
     private static final Color COLOR_BACKGROUND_EVEN = new Color(Display.getDefault(), 242, 242, 242);
     private static final Color COLOR_BACKGROUND_SELECTED = new Color(Display.getDefault(), 231, 246, 254);
     private static final Color COLOR_BACKGROUND_HIGHLIGHTED = new Color(Display.getDefault(), 246, 252, 255);
+    private static final String FONT_DEFINITION_ID = "org.eclipse.tracecompass.tmf.ui.font.eventraw"; //$NON-NLS-1$
     private static final int MAX_LINE_DATA_SIZE = 1000;
     private static final int SLIDER_MAX = 1000000;
 
@@ -151,11 +156,34 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 
     @Override
     public void dispose() {
-        if (fFixedFont != null) {
-            fFixedFont.dispose();
-            fFixedFont = null;
-        }
+        PlatformUI.getWorkbench().getThemeManager().removePropertyChangeListener(this);
         super.dispose();
+    }
+
+    // ------------------------------------------------------------------------
+    // Font handling
+    // ------------------------------------------------------------------------
+
+    /**
+     * Initialize the fonts.
+     * @since 1.0
+     */
+    protected void initializeFonts() {
+        FontRegistry fontRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getFontRegistry();
+        fFixedFont = fontRegistry.get(FONT_DEFINITION_ID);
+        fStyledText.setFont(fFixedFont);
+    }
+
+    /**
+     * @since 1.0
+     */
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        if ((IThemeManager.CHANGE_CURRENT_THEME.equals(event.getProperty())) ||
+                (FONT_DEFINITION_ID.equals(event.getProperty()))) {
+            initializeFonts();
+            refreshTextArea();
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -182,17 +210,11 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         textAreaGridLayout.marginWidth = 0;
         fTextArea.setLayout(textAreaGridLayout);
 
-        if (fFixedFont == null) {
-            if (System.getProperty("os.name").contains("Windows")) { //$NON-NLS-1$ //$NON-NLS-2$
-                fFixedFont = new Font(Display.getCurrent(), new FontData("Courier New", 10, SWT.NORMAL)); //$NON-NLS-1$
-            } else {
-                fFixedFont = new Font(Display.getCurrent(), new FontData("Monospace", 10, SWT.NORMAL)); //$NON-NLS-1$
-            }
-        }
-
         fStyledText = new StyledText(fTextArea, SWT.READ_ONLY);
-        fStyledText.setFont(fFixedFont);
         fStyledText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+        initializeFonts();
+        PlatformUI.getWorkbench().getThemeManager().addPropertyChangeListener(this);
 
         fStyledText.addCaretListener(this);
         fStyledText.addMouseMoveListener(this);

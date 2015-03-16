@@ -62,10 +62,12 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.resource.FontDescriptor;
+import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.OpenStrategy;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -161,6 +163,7 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.ide.IGotoMarker;
 import org.eclipse.ui.themes.ColorUtil;
+import org.eclipse.ui.themes.IThemeManager;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
@@ -175,7 +178,7 @@ import com.google.common.collect.Multimap;
  * @author Francois Chouinard
  * @author Patrick Tasse
  */
-public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorSettingsListener, ISelectionProvider {
+public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorSettingsListener, ISelectionProvider, IPropertyChangeListener {
 
     /**
      * Empty string array, used by {@link #getItemStrings}.
@@ -191,6 +194,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private static final @NonNull String DOT_STAR_SUFFIX = "\\.\\*$"; //$NON-NLS-1$
 
     private static final boolean IS_LINUX = System.getProperty("os.name").contains("Linux") ? true : false; //$NON-NLS-1$ //$NON-NLS-2$
+
+    private static final String FONT_DEFINITION_ID = "org.eclipse.tracecompass.tmf.ui.font.eventtable"; //$NON-NLS-1$
 
     private static final Image BOOKMARK_IMAGE = Activator.getDefault().getImageFromPath(
             "icons/elcl16/bookmark_obj.gif"); //$NON-NLS-1$
@@ -307,6 +312,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private LocalResourceManager fResourceManager = new LocalResourceManager(JFaceResources.getResources());
     private Color fGrayColor;
     private Color fGreenColor;
+    private Font fFont;
     private Font fBoldFont;
 
     private final List<TmfEventTableColumn> fColumns = new LinkedList<>();
@@ -732,6 +738,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
         // Create resources
         createResources();
+
+        initializeFonts();
+        PlatformUI.getWorkbench().getThemeManager().addPropertyChangeListener(this);
 
         ColorSettingsManager.addColorSettingsListener(this);
 
@@ -1182,6 +1191,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     public void dispose() {
         stopSearchThread();
         stopFilterThread();
+        PlatformUI.getWorkbench().getThemeManager().removePropertyChangeListener(this);
         ColorSettingsManager.removeColorSettingsListener(this);
         fComposite.dispose();
         if ((fTrace != null) && fDisposeOnClose) {
@@ -1292,6 +1302,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         if (item.getBackground().equals(item.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND))) {
             item.setBackground(null);
         }
+        item.setFont(fFont);
 
         if (searchMatch) {
             if (!markerIds.isEmpty()) {
@@ -1374,7 +1385,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     item.setText(i, FILTER_HINT);
                 }
                 item.setForeground(i, fGrayColor);
-                item.setFont(i, fTable.getFont());
+                item.setFont(i, fFont);
             } else {
                 item.setText(i, filter);
                 item.setForeground(i, fGreenColor);
@@ -1411,6 +1422,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         item.setData(Key.STYLE_RANGES, null);
         item.setForeground(null);
         item.setBackground(null);
+        item.setFont(fFont);
     }
 
     /**
@@ -2113,7 +2125,30 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         fGrayColor = fResourceManager.createColor(ColorUtil.blend(fTable.getBackground().getRGB(), fTable
                 .getForeground().getRGB()));
         fGreenColor = fTable.getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN);
-        fBoldFont = fResourceManager.createFont(FontDescriptor.createFrom(fTable.getFont()).setStyle(SWT.BOLD));
+    }
+
+    /**
+     * Initialize the fonts.
+     * @since 1.0
+     */
+    protected void initializeFonts() {
+        FontRegistry fontRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getFontRegistry();
+        fFont = fontRegistry.get(FONT_DEFINITION_ID);
+        fBoldFont = fontRegistry.getBold(FONT_DEFINITION_ID);
+        fTable.setFont(fFont);
+        /* Column header font cannot be set. See Bug 63038 */
+    }
+
+    /**
+     * @since 1.0
+     */
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        if ((IThemeManager.CHANGE_CURRENT_THEME.equals(event.getProperty())) ||
+                (FONT_DEFINITION_ID.equals(event.getProperty()))) {
+            initializeFonts();
+            fTable.refresh();
+        }
     }
 
     /**
