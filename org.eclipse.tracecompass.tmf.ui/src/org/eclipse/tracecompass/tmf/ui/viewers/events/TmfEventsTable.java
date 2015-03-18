@@ -673,7 +673,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                  * paint it or otherwise we would override the platform theme
                  * (e.g. alternating colors).
                  */
-                if (styleRanges != null || !background.equals(item.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND))) {
+                if (styleRanges != null || !background.equals(item.getParent().getBackground())) {
                     // we will paint the table item's background
                     event.detail &= ~SWT.BACKGROUND;
 
@@ -723,7 +723,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     /*
                      * The image bounds don't match the default image position.
                      */
-                    gc.drawImage(image, imageBounds.x, imageBounds.y + 1);
+                    if (IS_LINUX) {
+                        gc.drawImage(image, imageBounds.x + 1, imageBounds.y + 3);
+                    } else {
+                        gc.drawImage(image, imageBounds.x, imageBounds.y + 1);
+                    }
                 }
                 gc.setForeground(item.getForeground(event.index));
                 gc.setFont(item.getFont(event.index));
@@ -732,7 +736,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 /*
                  * The text bounds don't match the default text position.
                  */
-                gc.drawText(text, textBounds.x - 1, textBounds.y + 2, true);
+                if (IS_LINUX) {
+                    gc.drawText(text, textBounds.x + 1, textBounds.y + 3, true);
+                } else {
+                    gc.drawText(text, textBounds.x - 1, textBounds.y + 2, true);
+                }
             }
         });
 
@@ -1293,14 +1301,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         } else {
             item.setForeground(colorSetting.getForegroundColor());
             item.setBackground(colorSetting.getBackgroundColor());
-        }
-        /*
-         * Make sure the default system color is used. If the background is set
-         * to the default system color's value instead of null, it overrides the
-         * platform theme (e.g. alternating colors).
-         */
-        if (item.getBackground().equals(item.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND))) {
-            item.setBackground(null);
         }
         item.setFont(fFont);
 
