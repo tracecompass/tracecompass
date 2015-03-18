@@ -297,6 +297,9 @@ public class TmfTimestampFormat extends SimpleDateFormat {
     // Getters/setters
     // ------------------------------------------------------------------------
 
+    /**
+     * Update the default time and default interval formats
+     */
     public static void updateDefaultFormats() {
         fDefaultTimeFormat = new TmfTimestampFormat(
                 TmfTimePreferences.getTimePattern(),
