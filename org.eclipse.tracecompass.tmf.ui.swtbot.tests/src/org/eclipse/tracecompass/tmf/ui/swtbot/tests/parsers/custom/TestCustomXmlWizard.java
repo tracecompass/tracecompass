@@ -102,12 +102,14 @@ public class TestCustomXmlWizard extends AbstractCustomParserWizard {
         fBot.button("Next >").click();
         fBot.button("Finish").click();
 
+        fBot.waitUntil(new CustomDefinitionHasContent(xmlFile, CATEGORY_NAME, TRACETYPE_NAME, EXPECTED_TEST_DEFINITION));
         String xmlPart = extractTestXml(xmlFile, CATEGORY_NAME, TRACETYPE_NAME);
         assertEquals(EXPECTED_TEST_DEFINITION, xmlPart);
         fBot.list().select(CATEGORY_NAME + " : " + TRACETYPE_NAME);
         fBot.button("Delete").click();
         fBot.button("Yes").click();
         fBot.button("Close").click();
+        fBot.waitUntil(new CustomDefinitionHasContent(xmlFile, CATEGORY_NAME, TRACETYPE_NAME, ""));
         xmlPart = extractTestXml(xmlFile, CATEGORY_NAME, TRACETYPE_NAME);
         assertEquals("", xmlPart);
 

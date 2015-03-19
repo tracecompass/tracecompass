@@ -15,13 +15,14 @@ package org.eclipse.tracecompass.tmf.ui.swtbot.tests.parsers.custom;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
+import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -85,7 +86,7 @@ public class AbstractCustomParserWizard {
     protected static String extractTestXml(File xmlFile, String category, String definitionName) throws IOException, FileNotFoundException {
         StringBuilder xmlPart = new StringBuilder();
         boolean started = false;
-        try (RandomAccessFile raf = new RandomAccessFile(xmlFile, "r");) {
+        try (BufferedRandomAccessFile raf = new BufferedRandomAccessFile(xmlFile, "r");) {
             String s = raf.readLine();
             while (s != null) {
                 if (s.equals("<Definition category=\"" + category + "\" name=\"" + definitionName + "\">")) {
@@ -102,5 +103,47 @@ public class AbstractCustomParserWizard {
             }
         }
         return xmlPart.toString();
+    }
+
+    /**
+     * Waits until the XML file containing custom parser defintions contains the
+     * expected content for the specified trace type
+     */
+    protected static class CustomDefinitionHasContent extends DefaultCondition {
+
+        private final File fDefinitionFile;
+        private final String fCategoryName;
+        private final String fTypeName;
+        private final String fExpectedContent;
+
+        /**
+         * Creates a condition that waits until the XML file hast the expected
+         * content.
+         *
+         * @param definitionFile
+         *            the XML definition file
+         * @param categoryName
+         *            the category name
+         * @param typeName
+         *            the trace type name
+         * @param expectedContent
+         *            the expected content
+         */
+        protected CustomDefinitionHasContent(File definitionFile, String categoryName, String typeName, String expectedContent) {
+            fDefinitionFile = definitionFile;
+            fCategoryName = categoryName;
+            fTypeName = typeName;
+            fExpectedContent = expectedContent;
+        }
+
+        @Override
+        public boolean test() throws Exception {
+            return extractTestXml(fDefinitionFile, fCategoryName, fTypeName).equals(fExpectedContent);
+        }
+
+        @Override
+        public String getFailureMessage() {
+            return "The file " +fDefinitionFile + " did not contain expected content for " + fCategoryName + ":" + fTypeName + ", Expected:" + fExpectedContent;
+        }
     }
 }
