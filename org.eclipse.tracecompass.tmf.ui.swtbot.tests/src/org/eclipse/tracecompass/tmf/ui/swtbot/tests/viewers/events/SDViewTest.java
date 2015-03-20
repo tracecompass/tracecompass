@@ -23,6 +23,7 @@ import java.util.List;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
@@ -149,11 +150,14 @@ public class SDViewTest {
         for (SWTBotToolbarButton buttonBot : viewButtons) {
             titles.add(buttonBot.getToolTipText());
         }
+
+        final char commandKeyChar = (char) 0x2318;
+        final String findShortcut = (Platform.getOS().equals(Platform.OS_MACOSX) ? commandKeyChar : "Ctrl+") + "F";
         String[] expected = { "Reset zoom factor", "Select",
                 "Zoom in the diagram", "Zoom out the diagram",
                 "Go to next page", "Go to previous page",
                 "Go to first page", "Go to last page",
-                "Find... (Ctrl+F)"
+                "Find... (" + findShortcut + ")"
         };
         assertArrayEquals("Buttons", expected, titles.toArray(new String[0]));
         SDView view = (SDView) viewBot.getViewReference().getPart(false);
