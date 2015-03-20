@@ -23,9 +23,10 @@ import org.junit.runners.Suite;
         CallsiteEventsInTableTest.class,
         CollapseEventsInTableTest.class,
         ColorsViewTest.class,
-        TestTraceOffsetting.class,
         FilterViewerTest.class,
-        SDViewTest.class
+        MovableColumnEventsEditorTest.class,
+        SDViewTest.class,
+        TestTraceOffsetting.class
 })
 public class AllTests {
 }
