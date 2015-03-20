@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.ctf.core.trace;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.ctf.core.event.types.EnumDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.FloatDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
@@ -122,24 +123,24 @@ public class StreamInputPacketIndexEntry {
         for (String field : streamPacketContextDef.getDeclaration().getFieldsList()) {
             IDefinition id = streamPacketContextDef.lookupDefinition(field);
             if (id instanceof IntegerDefinition) {
-                addAttribute(field, ((IntegerDefinition) id).getValue());
+                fAttributes.put(field, ((IntegerDefinition) id).getValue());
             } else if (id instanceof FloatDefinition) {
-                addAttribute(field, ((FloatDefinition) id).getValue());
+                fAttributes.put(field, ((FloatDefinition) id).getValue());
             } else if (id instanceof EnumDefinition) {
-                addAttribute(field, ((EnumDefinition) id).getValue());
+                fAttributes.put(field, ((EnumDefinition) id).getValue());
             } else if (id instanceof StringDefinition) {
-                addAttribute(field, ((StringDefinition) id).getValue());
+                fAttributes.put(field, ((StringDefinition) id).getValue());
             }
         }
 
-        Long contentSize = (Long) this.lookupAttribute("content_size"); //$NON-NLS-1$
-        Long packetSize = (Long) this.lookupAttribute("packet_size"); //$NON-NLS-1$
-        Long tsBegin = (Long) this.lookupAttribute("timestamp_begin"); //$NON-NLS-1$
-        Long tsEnd = (Long) this.lookupAttribute("timestamp_end"); //$NON-NLS-1$
-        String device = (String) this.lookupAttribute("device"); //$NON-NLS-1$
+        Long contentSize = (Long) fAttributes.get(CTFStrings.CONTENT_SIZE);
+        Long packetSize = (Long) fAttributes.get(CTFStrings.PACKET_SIZE);
+        Long tsBegin = (Long) fAttributes.get(CTFStrings.TIMESTAMP_BEGIN);
+        Long tsEnd = (Long) fAttributes.get(CTFStrings.TIMESTAMP_END);
+        String device = (String) fAttributes.get(CTFStrings.DEVICE);
         // LTTng Specific
-        Long cpuId = (Long) this.lookupAttribute("cpu_id"); //$NON-NLS-1$
-        Long lostEvents = (Long) this.lookupAttribute("events_discarded"); //$NON-NLS-1$
+        Long cpuId = (Long) fAttributes.get(CTFStrings.CPU_ID);
+        Long lostEvents = (Long) fAttributes.get(CTFStrings.EVENTS_DISCARDED);
 
         /* Read the content size in bits */
         if (contentSize != null) {
@@ -154,7 +155,7 @@ public class StreamInputPacketIndexEntry {
         if (packetSize != null) {
             fPacketSizeBits = (packetSize.longValue());
         } else if (this.getContentSizeBits() != 0) {
-            fPacketSizeBits = (getContentSizeBits());
+            fPacketSizeBits = fContentSizeBits;
         } else {
             fPacketSizeBits = (fileSizeBytes * Byte.SIZE);
         }

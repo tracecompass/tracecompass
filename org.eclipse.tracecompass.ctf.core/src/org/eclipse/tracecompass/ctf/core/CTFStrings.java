@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Alexandre Montplaisir - Initial API and implementation
+ *   Matthew Khouzam - Add packet header Strings
  *******************************************************************************/
 
 package org.eclipse.tracecompass.ctf.core;
@@ -37,4 +38,57 @@ public interface CTFStrings {
      * Name of the field in lost events indicating the time range
      */
     String LOST_EVENTS_DURATION = "duration";
+
+    // -------------------------------------------------------------------------
+    // Packet header strings
+    // -------------------------------------------------------------------------
+
+    /**
+     * Lost events so far in this stream (LTTng Specific)
+     *
+     * @since 1.0
+     */
+    String EVENTS_DISCARDED = "events_discarded";
+
+    /**
+     * The CPU ID of this packet (LTTng Specific)
+     *
+     * @since 1.0
+     */
+    String CPU_ID = "cpu_id";
+
+    /**
+     * The device of this packet
+     *
+     * @since 1.0
+     */
+    String DEVICE = "device";
+
+    /**
+     * The first time stamp of this packet
+     *
+     * @since 1.0
+     */
+    String TIMESTAMP_BEGIN = "timestamp_begin";
+
+    /**
+     * The last time stamp of this packet
+     *
+     * @since 1.0
+     */
+    String TIMESTAMP_END = "timestamp_end";
+
+    /**
+     * Size of this packet
+     *
+     * @since 1.0
+     */
+    String PACKET_SIZE = "packet_size";
+
+    /**
+     * Size of data in this packet (not necessarily the packet size)
+     *
+     * @since 1.0
+     */
+    String CONTENT_SIZE = "content_size";
 }
