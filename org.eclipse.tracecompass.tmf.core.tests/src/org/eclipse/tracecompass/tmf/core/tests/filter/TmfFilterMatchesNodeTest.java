@@ -61,6 +61,18 @@ public class TmfFilterMatchesNodeTest extends TmfFilterTreeNodeTest {
         fFilter.setEventAspect(new TmfContentFieldAspect(FIELD, FIELD));
 
         fFilter.setRegex("value");
+        assertTrue(fFilter.matches(fEvent1));
+        assertTrue(fFilter.matches(fEvent2));
+
+        fFilter.setRegex(".*value.*");
+        assertTrue(fFilter.matches(fEvent1));
+        assertTrue(fFilter.matches(fEvent2));
+
+        fFilter.setRegex("^value");
+        assertTrue(fFilter.matches(fEvent1));
+        assertTrue(fFilter.matches(fEvent2));
+
+        fFilter.setRegex("value$");
         assertFalse(fFilter.matches(fEvent1));
         assertFalse(fFilter.matches(fEvent2));
 

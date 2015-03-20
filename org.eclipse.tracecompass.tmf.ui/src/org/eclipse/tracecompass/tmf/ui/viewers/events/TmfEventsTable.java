@@ -190,9 +190,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      */
     protected static final @NonNull String EMPTY_STRING = ""; //$NON-NLS-1$
 
-    private static final @NonNull String DOT_STAR_PREFIX = "^\\.\\*"; //$NON-NLS-1$
-    private static final @NonNull String DOT_STAR_SUFFIX = "\\.\\*$"; //$NON-NLS-1$
-
     private static final boolean IS_LINUX = System.getProperty("os.name").contains("Linux") ? true : false; //$NON-NLS-1$ //$NON-NLS-2$
 
     private static final String FONT_DEFINITION_ID = "org.eclipse.tracecompass.tmf.ui.font.eventtable"; //$NON-NLS-1$
@@ -1326,8 +1323,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 regex = (String) column.getData(Key.SEARCH_TXT);
             }
             if (regex != null) {
-                // remove '.*' at beginning and end of regex
-                regex = regex.replaceAll(DOT_STAR_PREFIX, EMPTY_STRING).replaceAll(DOT_STAR_SUFFIX, EMPTY_STRING);
                 String text = item.getText(index);
                 try {
                     Pattern pattern = Pattern.compile(regex);
@@ -1527,7 +1522,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             /*
              * returns true is value was changed
              */
-            private boolean updateHeader(final String text) {
+            private boolean updateHeader(final String regex) {
                 String objKey = null;
                 String txtKey = null;
                 if (fHeaderState == HeaderState.SEARCH) {
@@ -1537,9 +1532,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     objKey = Key.FILTER_OBJ;
                     txtKey = Key.FILTER_TXT;
                 }
-                if (text.trim().length() > 0) {
+                if (regex.length() > 0) {
                     try {
-                        final String regex = TmfFilterMatchesNode.regexFix(text);
                         Pattern.compile(regex);
                         if (regex.equals(column.getData(txtKey))) {
                             tableEditor.getEditor().dispose();

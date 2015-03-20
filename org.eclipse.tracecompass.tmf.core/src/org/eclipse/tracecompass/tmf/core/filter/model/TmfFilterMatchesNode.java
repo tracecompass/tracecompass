@@ -108,7 +108,7 @@ public class TmfFilterMatchesNode extends TmfFilterAspectNode {
         if (value == null) {
             return false ^ isNot;
         }
-        return pattern.matcher(value.toString()).matches() ^ isNot;
+        return pattern.matcher(value.toString()).find() ^ isNot;
     }
 
     @Override
@@ -121,22 +121,6 @@ public class TmfFilterMatchesNode extends TmfFilterAspectNode {
         TmfFilterMatchesNode clone = (TmfFilterMatchesNode) super.clone();
         clone.setRegex(fRegex);
         return clone;
-    }
-
-    /**
-     * @param pattern
-     *            the rough regex pattern
-     * @return the compliant regex
-     */
-    public static String regexFix(String pattern) {
-        String ret = pattern;
-        // if the pattern does not contain one of the expressions .* !^
-        // (at the beginning) $ (at the end), then a .* is added at the
-        // beginning and at the end of the pattern
-        if (!(ret.indexOf(".*") >= 0 || ret.charAt(0) == '^' || ret.charAt(ret.length() - 1) == '$')) { //$NON-NLS-1$
-            ret = ".*" + ret + ".*"; //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        return ret;
     }
 
     @Override
