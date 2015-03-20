@@ -31,7 +31,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
-import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.tracecompass.tmf.core.filter.xml.TmfFilterContentHandler;
 import org.eclipse.tracecompass.tmf.core.filter.xml.TmfFilterXMLWriter;
@@ -108,11 +107,11 @@ public class ColorSettingsXML {
                 tickColorElement.setAttribute(G_ATTR, Integer.toString(tickColor.green));
                 tickColorElement.setAttribute(B_ATTR, Integer.toString(tickColor.blue));
 
-                ITmfFilter filter = colorSetting.getFilter();
-                if (filter instanceof ITmfFilterTreeNode) {
+                ITmfFilterTreeNode filter = colorSetting.getFilter();
+                if (filter != null) {
                     Element filterElement = document.createElement(FILTER_TAG);
                     colorSettingElement.appendChild(filterElement);
-                    TmfFilterXMLWriter.buildXMLTree(document, (ITmfFilterTreeNode) filter, filterElement);
+                    TmfFilterXMLWriter.buildXMLTree(document, filter, filterElement);
                 }
             }
 
