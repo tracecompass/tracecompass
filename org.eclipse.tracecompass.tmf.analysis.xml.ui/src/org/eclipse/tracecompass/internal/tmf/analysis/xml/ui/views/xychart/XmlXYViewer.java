@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2015 École Polytechnique de Montréal and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -276,9 +276,6 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
                              */
                             seriesName = ss.getAttributeName(quark);
                         }
-                    }
-                    if (seriesName == null) {
-                        throw new IllegalStateException();
                     }
                     fSeriesData.put(quark, new SeriesData(xvalues.length, display.getAttributeQuark(quark), seriesName, entry.getType()));
                 }

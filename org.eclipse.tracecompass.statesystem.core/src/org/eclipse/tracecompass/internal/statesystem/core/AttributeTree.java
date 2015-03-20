@@ -15,6 +15,8 @@
 
 package org.eclipse.tracecompass.internal.statesystem.core;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.File;
@@ -291,7 +293,7 @@ public final class AttributeTree {
                 nextNode = prevNode.getSubAttributeNode(curDirectory);
                 if (nextNode == null) {
                     /* This is where we need to start adding */
-                    nextNode = new Attribute(prevNode, curDirectory, attributeList.size());
+                    nextNode = new Attribute(prevNode, checkNotNull(curDirectory), attributeList.size());
                     prevNode.addSubAttribute(nextNode);
                     attributeList.add(nextNode);
                     ss.addEmptyAttribute();
@@ -377,7 +379,7 @@ public final class AttributeTree {
      *            The quark of the attribute
      * @return The (base) name of the attribute
      */
-    public String getAttributeName(int quark) {
+    public @NonNull String getAttributeName(int quark) {
         return attributeList.get(quark).getName();
     }
 
@@ -388,10 +390,7 @@ public final class AttributeTree {
      *            The quark of the attribute
      * @return The full path name of the attribute
      */
-    public String getFullAttributeName(int quark) {
-        if (quark >= attributeList.size() || quark < 0) {
-            return null;
-        }
+    public @NonNull String getFullAttributeName(int quark) {
         return attributeList.get(quark).getFullAttributeName();
     }
 

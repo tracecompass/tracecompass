@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2015 École Polytechnique de Montréal and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -164,9 +164,6 @@ public class KernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
 
                 for (int tidNode : tidNodes) {
                     String curTidName = cpuSs.getAttributeName(tidNode);
-                    if (curTidName == null) {
-                        continue;
-                    }
                     int tid = Integer.parseInt(curTidName);
 
                     countAtEnd = endState.get(tidNode).getStateValue().unboxLong();

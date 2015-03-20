@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -151,8 +151,10 @@ public interface ITmfStateSystem {
      * @param subPath
      *            "Rest" of the path to get to the final attribute
      * @return The matching quark, if it existed
+     * @throws IndexOutOfBoundsException
+     *             If the starting node quark is out of range
      * @throws AttributeNotFoundException
-     *             If the quark is invalid
+     *             If the sub-attribute does not exist
      */
     int getQuarkRelative(int startingNodeQuark, String... subPath)
             throws AttributeNotFoundException;
@@ -229,8 +231,10 @@ public interface ITmfStateSystem {
      * @param attributeQuark
      *            The quark for which we want the name
      * @return The name of the quark
+     * @throws IndexOutOfBoundsException
+     *             If the attribute quark is out of range
      */
-    String getAttributeName(int attributeQuark);
+    @NonNull String getAttributeName(int attributeQuark);
 
     /**
      * This returns the slash-separated path of an attribute by providing its
@@ -239,8 +243,10 @@ public interface ITmfStateSystem {
      * @param attributeQuark
      *            The quark of the attribute we want
      * @return One single string separated with '/', like a filesystem path
+     * @throws IndexOutOfBoundsException
+     *             If the attribute quark is out of range
      */
-    String getFullAttributePath(int attributeQuark);
+    @NonNull String getFullAttributePath(int attributeQuark);
 
     /**
      * Returns the parent quark of the attribute.
@@ -249,6 +255,8 @@ public interface ITmfStateSystem {
      *            The quark of the attribute
      * @return Quark of the parent attribute or <code>-1</code> if root quark or
      *         no parent.
+     * @throws IndexOutOfBoundsException
+     *             If the attribute quark is out of range
      */
     int getParentAttributeQuark(int attributeQuark);
 
