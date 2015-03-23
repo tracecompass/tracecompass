@@ -120,17 +120,17 @@ public class CommandShell implements ICommandShell {
             try {
                 return checkNotNull(future.get(TmfRemotePreferences.getCommandTimeout(), TimeUnit.SECONDS));
             } catch (InterruptedException ex) {
-                throw new ExecutionException(Messages.TraceControl_ExecutionCancelled, ex);
+                throw new ExecutionException(Messages.RemoteConnection_ExecutionCancelled, ex);
             } catch (TimeoutException ex) {
-                throw new ExecutionException(Messages.TraceControl_ExecutionTimeout, ex);
+                throw new ExecutionException(Messages.RemoteConnection_ExecutionTimeout, ex);
             } catch (Exception ex) {
-                throw new ExecutionException(Messages.TraceControl_ExecutionFailure, ex);
+                throw new ExecutionException(Messages.RemoteConnection_ExecutionFailure, ex);
             }
             finally {
                 future.cancel(true);
             }
         }
-        throw new ExecutionException(Messages.TraceControl_ShellNotConnected, null);
+        throw new ExecutionException(Messages.RemoteConnection_ShellNotConnected, null);
     }
 
     // ------------------------------------------------------------------------

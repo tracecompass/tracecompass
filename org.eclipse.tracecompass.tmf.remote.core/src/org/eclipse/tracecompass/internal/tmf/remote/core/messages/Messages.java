@@ -24,11 +24,11 @@ public final class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.tmf.remote.core.messages.messages"; //$NON-NLS-1$
 
     // Failures
-    public static String TraceControl_ExecutionCancelled;
-    public static String TraceControl_ExecutionFailure;
-    public static String TraceControl_ExecutionTimeout;
-    public static String TraceControl_ShellNotConnected;
-    public static String TraceControl_CommandShellError;
+    public static String RemoteConnection_ExecutionCancelled;
+    public static String RemoteConnection_ExecutionFailure;
+    public static String RemoteConnection_ExecutionTimeout;
+    public static String RemoteConnection_ShellNotConnected;
+    public static String RemoteConnection_CommandShellError;
 
     static {
         // initialize resource bundle
