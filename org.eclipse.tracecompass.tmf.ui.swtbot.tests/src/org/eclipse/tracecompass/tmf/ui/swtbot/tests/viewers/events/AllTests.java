@@ -24,6 +24,7 @@ import org.junit.runners.Suite;
         CollapseEventsInTableTest.class,
         ColorsViewTest.class,
         FilterViewerTest.class,
+        FontEventEditorTest.class,
         MovableColumnEventsEditorTest.class,
         SDViewTest.class,
         TestTraceOffsetting.class
