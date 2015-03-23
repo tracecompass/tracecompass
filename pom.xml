@@ -203,6 +203,8 @@
     <module>org.eclipse.tracecompass.tmf.remote.core.tests</module>
     <module>org.eclipse.tracecompass.tmf.remote.ui</module>
 
+    <module>org.eclipse.tracecompass.tmf.remote.ui.tests</module>
+
     <module>org.eclipse.tracecompass.releng-site</module>
     <module>org.eclipse.tracecompass.target</module>
     <module>org.eclipse.tracecompass.testing</module>

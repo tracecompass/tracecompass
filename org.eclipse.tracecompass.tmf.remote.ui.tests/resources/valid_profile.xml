@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<profiles>
+    <version>0.1</version>
+    <profile name="myProfile">
+        <node name="myhost">
+            <uri>ssh://user@127.0.0.1:22</uri>
+            <traceGroup recursive="true" root="/home/user/traces/test/test_with_lttng">
+                <trace name="test.log.(group1)" type="org.eclipse.tracecompass.tmf.remote.ui.test.tracetype1">
+                    <file name=".*test\.log\.(\d+)"/>
+                </trace>
+                <trace name="TestLog.(group1)" type="org.eclipse.tracecompass.tmf.remote.ui.test.tracetype2">
+                    <file name=".*TestLog\.(\d+)"/>
+                </trace>
+            </traceGroup>
+            <traceGroup recursive="false" root="/home/user/traces/test/">
+                <trace name="lttng/(group1)" type="org.eclipse.linuxtools.tmf.ui.type.ctf">
+                    <file name="lttng/(.*)"/>
+                </trace>
+            </traceGroup>
+        </node>
+        <node name="myhost3">
+            <uri>ssh://user@127.0.0.1:22</uri>
+            <traceGroup recursive="false" root="/home">
+                <trace name="" type="trace.type">
+                    <file name=".*"/>
+                </trace>
+            </traceGroup>
+        </node>
+    </profile>
+    <profile name="myProfile2">
+        <node name="myhost2">
+            <uri>ssh://user@142.111.222.333:22</uri>
+            <traceGroup recursive="false" root="/home/user/traces/test/">
+                <trace name="lttng/(group1)" type="org.eclipse.linuxtools.tmf.ui.type.ctf">
+                    <file name="lttng/(.*)"/>
+                </trace>
+            </traceGroup>
+        </node>
+    </profile>
+</profiles>

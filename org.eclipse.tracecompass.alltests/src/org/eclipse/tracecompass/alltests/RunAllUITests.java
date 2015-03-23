@@ -24,7 +24,9 @@ import org.junit.runners.Suite;
     org.eclipse.tracecompass.lttng2.control.ui.tests.AllTests.class,
     org.eclipse.tracecompass.lttng2.ust.ui.tests.AllTests.class,
     org.eclipse.tracecompass.tmf.analysis.xml.ui.tests.AllAnalysisXmlUiTests.class,
+    org.eclipse.tracecompass.tmf.remote.ui.tests.AllTmfRemoteUITests.class,
     org.eclipse.tracecompass.tmf.ui.tests.AllTmfUITests.class,
+
 })
 public class RunAllUITests {
 

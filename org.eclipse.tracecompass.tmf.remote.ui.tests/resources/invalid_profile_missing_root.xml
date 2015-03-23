@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<profiles>
+    <version>0.1</version>
+    <profile name="myProfile">
+        <node name="myhost">
+            <uri>ssh://user@127.0.0.1:22</uri><traceGroup recursive="false">
+            <trace name="lttng/(group1)" type="org.eclipse.linuxtools.tmf.ui.type.ctf">
+                <file name="lttng/(.*)" />
+            </trace>
+        </traceGroup>
+        </node>
+
+    </profile>
+</profiles>
