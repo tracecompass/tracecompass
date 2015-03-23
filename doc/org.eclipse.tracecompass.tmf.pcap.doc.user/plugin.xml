@@ -6,5 +6,8 @@
       <toc
             file="doc/User-Guide-toc.xml"
             primary="true" />
+      <index
+            path="index/">
+      </index>
    </extension>
 </plugin>

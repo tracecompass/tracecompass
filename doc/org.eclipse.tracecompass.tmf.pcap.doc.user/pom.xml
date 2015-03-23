@@ -80,6 +80,34 @@
 
         </dependencies>
       </plugin>
+      <!-- Build help index -->
+      <plugin>
+        <groupId>org.eclipse.tycho.extras</groupId>
+        <artifactId>tycho-eclipserun-plugin</artifactId>
+        <version>${tycho-extras-version}</version>
+        <configuration>
+          <appArgLine>-application org.eclipse.ant.core.antRunner -buildfile build.xml build.index</appArgLine>
+        </configuration>
+      </plugin>
+      <!-- We don't use the ant file to clean because of http://jira.codehaus.org/browse/MANTRUN-78 -->
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>2.6.1</version>
+        <executions>
+          <execution>
+            <id>clean-index</id>
+            <phase>clean</phase>
+            <configuration>
+              <filesets>
+                <fileset><directory>index/</directory></fileset>
+              </filesets>
+            </configuration>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 

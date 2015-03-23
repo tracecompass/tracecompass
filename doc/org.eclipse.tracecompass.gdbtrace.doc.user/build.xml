@@ -64,5 +64,7 @@
         <fileset dir="doc" includes="**/*.xml" />
       </delete>
     </target>
-
+    <target name="build.index" description="Builds search index for the plug-in" if="eclipse.running">
+      <help.buildHelpIndex manifest="${basedir}/plugin.xml" destination="${basedir}" />
+    </target>
 </project>

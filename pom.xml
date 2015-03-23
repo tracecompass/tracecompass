@@ -48,6 +48,7 @@
   <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
   <sonar.java.source>1.7</sonar.java.source>
   <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  <help-docs-eclipserun-repo>http://download.eclipse.org/eclipse/updates/4.4</help-docs-eclipserun-repo>
 </properties>
 
 <pluginRepositories>
@@ -516,6 +517,43 @@
           <groupId>org.jboss.tools.tycho-plugins</groupId>
           <artifactId>repository-utils</artifactId>
           <version>0.22.0</version>
+        </plugin>
+        <plugin>
+                <groupId>org.eclipse.tycho.extras</groupId>
+                <artifactId>tycho-eclipserun-plugin</artifactId>
+                <version>${tycho-extras-version}</version>
+                <configuration>
+                        <dependencies>
+                                <dependency>
+                                        <artifactId>org.apache.ant</artifactId>
+                                        <type>eclipse-plugin</type>
+                                </dependency>
+                                <dependency>
+                                        <artifactId>org.eclipse.help.base</artifactId>
+                                        <type>eclipse-plugin</type>
+                                </dependency>
+                                <dependency>
+                                        <artifactId>org.eclipse.ant.core</artifactId>
+                                        <type>eclipse-plugin</type>
+                                </dependency>
+                        </dependencies>
+                        <!-- This needs to be explicitely set now, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=395281 -->
+                        <repositories>
+                                <repository>
+                                        <id>platform</id>
+                                        <layout>p2</layout>
+                                        <url>${help-docs-eclipserun-repo}</url>
+                                </repository>
+                        </repositories>
+                </configuration>
+                <executions>
+                        <execution>
+                                <goals>
+                                        <goal>eclipse-run</goal>
+                                </goals>
+                                <phase>compile</phase>
+                        </execution>
+                </executions>
         </plugin>
       </plugins>
     </pluginManagement>
