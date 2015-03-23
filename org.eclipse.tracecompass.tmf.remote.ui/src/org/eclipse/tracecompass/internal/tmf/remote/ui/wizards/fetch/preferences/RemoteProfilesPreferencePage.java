@@ -30,9 +30,12 @@ import javax.xml.transform.TransformerException;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.URIUtil;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -108,6 +111,9 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
     private static final String REMOTE_PROFILES_XML_FILE_PATH =
             Activator.getDefault().getStateLocation().addTrailingSeparator().append(REMOTE_PROFILES_XML_FILE_NAME).toOSString();
 
+    private static final String REMOTE_PROFILES_LOCATION_PREF = "REMOTE_PROFILES_LOCATION"; //$NON-NLS-1$
+    private static final String REMOTE_PROFILES_LOCATION_DIR_DEF = ""; //$NON-NLS-1$
+
     private static final String DEFAULT_ROOT_IMPORT_PATH = "/rootpath"; //$NON-NLS-1$
     private static final String DEFAULT_IMPORT_NAME = ""; //$NON-NLS-1$
     private static final String DEFAULT_FILE_PATTERN = ".*"; //$NON-NLS-1$
@@ -128,6 +134,27 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
     private Action fCutAction;
     private Action fCopyAction;
     private Action fPasteAction;
+
+    private static final String fProfileFilePath;
+
+    static {
+        String profileFilePath = REMOTE_PROFILES_XML_FILE_PATH;
+
+        // Get alternative location under the parent of Activator.getDefault().getStateLocation()
+        IEclipsePreferences prefs = DefaultScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+        String plugin = prefs.get(REMOTE_PROFILES_LOCATION_PREF, REMOTE_PROFILES_LOCATION_DIR_DEF);
+
+        if (!plugin.isEmpty()) {
+            // Alternative location
+            IPath profileFolderPath = Activator.getDefault().getStateLocation().removeLastSegments(1).append(plugin);
+            File profileFolder = profileFolderPath.toFile();
+            // Create folder if it doesn't exist
+            if (profileFolder.exists() || profileFolder.mkdir()) {
+                profileFilePath = profileFolderPath.append(REMOTE_PROFILES_XML_FILE_NAME).toString();
+            }
+        }
+        fProfileFilePath = profileFilePath;
+    }
 
     /**
      * Constructor
@@ -251,7 +278,7 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
         createGlobalActions();
         createContextMenu();
 
-        fProfiles = readProfiles(REMOTE_PROFILES_XML_FILE_PATH, new NullProgressMonitor());
+        fProfiles = readProfiles(fProfileFilePath, new NullProgressMonitor());
 
         treeViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
         treeViewer.setInput(fProfiles);
@@ -298,7 +325,7 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
      * @return the list of remote profiles
      */
     public static List<RemoteImportProfileElement> getRemoteProfiles(IProgressMonitor monitor) {
-        return readProfiles(REMOTE_PROFILES_XML_FILE_PATH, monitor);
+        return readProfiles(fProfileFilePath, monitor);
     }
 
     private static List<RemoteImportProfileElement> readProfiles(String path, IProgressMonitor monitor) {
@@ -1137,7 +1164,7 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
 
     @Override
     public boolean performOk() {
-        return writeProfiles(fProfiles, REMOTE_PROFILES_XML_FILE_PATH);
+        return writeProfiles(fProfiles, fProfileFilePath);
     }
 
     /**
