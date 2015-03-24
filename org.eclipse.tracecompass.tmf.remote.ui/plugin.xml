@@ -7,7 +7,13 @@
             category="org.eclipse.linuxtools.tmf.ui.TmfTracingPreferences"
             class="org.eclipse.tracecompass.internal.tmf.remote.ui.preferences.ControlPreferencePage"
             id="org.eclipse.linuxtools.tmf.remote.ui.preferences"
-            name="%preference.page.remote.name">
+            name="%preference.page.remote.connection.name">
+      </page>
+      <page
+            category="org.eclipse.linuxtools.tmf.ui.TmfTracingPreferences"
+            class="org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch.preferences.RemoteProfilesPreferencePage"
+            id="org.eclipse.linuxtools.tmf.remote.ui.preferences.remoteprofiles"
+            name="%preferences.page.remote.profiles.name">
       </page>
    </extension>
 
