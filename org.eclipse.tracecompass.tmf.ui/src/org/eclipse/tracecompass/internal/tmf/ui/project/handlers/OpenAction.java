@@ -54,13 +54,12 @@ public class OpenAction extends Action {
         ISelection selection = selectionProvider.getSelection();
         if (!selection.isEmpty()) {
             IStructuredSelection sSelection = (IStructuredSelection) selection;
-            if (sSelection.size() == 1) {
-                if (sSelection.getFirstElement() instanceof TmfTraceElement ||
-                        sSelection.getFirstElement() instanceof TmfExperimentElement ||
-                        sSelection.getFirstElement() instanceof TmfAnalysisOutputElement) {
-                    element = (TmfProjectModelElement) sSelection.getFirstElement();
-                    return true;
-                }
+            Object firstElement = sSelection.getFirstElement();
+            if ((sSelection.size() == 1) && (firstElement instanceof TmfTraceElement ||
+                    firstElement instanceof TmfExperimentElement ||
+                    firstElement instanceof TmfAnalysisOutputElement)) {
+                element = (TmfProjectModelElement) firstElement;
+                return true;
             }
         }
         return false;
