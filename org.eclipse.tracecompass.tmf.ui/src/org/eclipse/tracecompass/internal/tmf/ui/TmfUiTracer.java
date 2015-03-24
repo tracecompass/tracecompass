@@ -23,15 +23,15 @@ public class TmfUiTracer {
 
     private static String pluginID = Activator.PLUGIN_ID;
 
-    static boolean ERROR   = false;
-    static boolean WARNING = false;
-    static boolean INFO    = false;
+    private static boolean fError   = false;
+    private static boolean fWarning = false;
+    private static boolean fInfo    = false;
 
-    static boolean INDEX   = false;
-    static boolean DISPLAY = false;
-    static boolean SORTING = false;
+    private static boolean fIndex   = false;
+    private static boolean fDisplay = false;
+    private static boolean fSorting = false;
 
-    private static String LOGNAME = "traceUI.log";
+    private static final String LOGNAME = "traceUI.log";
     private static BufferedWriter fTraceLog = null;
 
     private static BufferedWriter openLogFile(String filename) {
@@ -54,38 +54,38 @@ public class TmfUiTracer {
 
         traceKey = Platform.getDebugOption(pluginID + "/error");
         if (traceKey != null) {
-            ERROR = (Boolean.valueOf(traceKey)).booleanValue();
-            isTracing |= ERROR;
+            fError = (Boolean.valueOf(traceKey)).booleanValue();
+            isTracing |= fError;
         }
 
         traceKey = Platform.getDebugOption(pluginID + "/warning");
         if (traceKey != null) {
-            WARNING = (Boolean.valueOf(traceKey)).booleanValue();
-            isTracing |= WARNING;
+            fWarning = (Boolean.valueOf(traceKey)).booleanValue();
+            isTracing |= fWarning;
         }
 
         traceKey = Platform.getDebugOption(pluginID + "/info");
         if (traceKey != null) {
-            INFO = (Boolean.valueOf(traceKey)).booleanValue();
-            isTracing |= INFO;
+            fInfo = (Boolean.valueOf(traceKey)).booleanValue();
+            isTracing |= fInfo;
         }
 
         traceKey = Platform.getDebugOption(pluginID + "/updateindex");
         if (traceKey != null) {
-            INDEX = (Boolean.valueOf(traceKey)).booleanValue();
-            isTracing |= INDEX;
+            fIndex = (Boolean.valueOf(traceKey)).booleanValue();
+            isTracing |= fIndex;
         }
 
         traceKey = Platform.getDebugOption(pluginID + "/display");
         if (traceKey != null) {
-            DISPLAY = (Boolean.valueOf(traceKey)).booleanValue();
-            isTracing |= DISPLAY;
+            fDisplay = (Boolean.valueOf(traceKey)).booleanValue();
+            isTracing |= fDisplay;
         }
 
         traceKey = Platform.getDebugOption(pluginID + "/sorting");
         if (traceKey != null) {
-            SORTING = (Boolean.valueOf(traceKey)).booleanValue();
-            isTracing |= SORTING;
+            fSorting = (Boolean.valueOf(traceKey)).booleanValue();
+            isTracing |= fSorting;
         }
 
         // Create trace log file if needed
@@ -118,28 +118,28 @@ public class TmfUiTracer {
      * @return If ERROR messages are traced
      */
     public static boolean isErrorTraced() {
-        return ERROR;
+        return fError;
     }
 
     /**
      * @return If INDEX messages are traced
      */
     public static boolean isIndexTraced() {
-        return INDEX;
+        return fIndex;
     }
 
     /**
      * @return If DISPLAY messages are traced
      */
     public static boolean isDisplayTraced() {
-        return DISPLAY;
+        return fDisplay;
     }
 
     /**
      * @return If SORTING messages are traced
      */
     public static boolean isSortingTraced() {
-        return SORTING;
+        return fSorting;
     }
 
 
