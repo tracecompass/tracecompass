@@ -138,12 +138,10 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
 
             progressMonitor.done();
 
+        } catch (InterruptedException e) {
+            setStatus(Status.CANCEL_STATUS);
         } catch (Exception e) {
-            if (e instanceof InterruptedException) {
-                setStatus(Status.CANCEL_STATUS);
-            } else {
-                setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.Messages.TracePackage_ErrorOperation, e));
-            }
+            setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.Messages.TracePackage_ErrorOperation, e));
         }
     }
 
