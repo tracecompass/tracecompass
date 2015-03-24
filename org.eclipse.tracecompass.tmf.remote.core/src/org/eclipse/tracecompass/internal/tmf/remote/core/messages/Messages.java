@@ -30,6 +30,9 @@ public final class Messages extends NLS {
     public static String RemoteConnection_ShellNotConnected;
     public static String RemoteConnection_CommandShellError;
 
+    public static String RemoteConnection_ConnectionError;
+    public static String RemoteConnection_DuplicateConnectionError;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

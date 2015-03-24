@@ -8,13 +8,28 @@
  *
  * Contributors:
  *     Marc-Andre Laperle - Initial API and implementation
+ *     Bernd Hufmann - Add connection handling
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch.model;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.MessageFormat;
+
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.URIUtil;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.remote.core.exception.RemoteConnectionException;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tracecompass.internal.tmf.remote.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.remote.ui.messages.RemoteMessages;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageElement;
+import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxy;
+import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxyFactory;
 
 /**
  * An RemoteImportConnectionNodeElement representing a connection node.
@@ -27,6 +42,7 @@ public class RemoteImportConnectionNodeElement extends TracePackageElement {
 
     private String fName;
     private String fURI;
+    private RemoteSystemProxy fRemoteProxy;
 
     /**
      * Constructs an instance of RemoteImportConnectionNodeElement.
@@ -91,4 +107,59 @@ public class RemoteImportConnectionNodeElement extends TracePackageElement {
         fURI = uri;
     }
 
+    /**
+     * Connects to the remote host
+     *
+     * @param monitor
+     *                a progress monitor
+     *
+     * @return status of the executions
+     */
+    public IStatus connect(@NonNull IProgressMonitor monitor) {
+        // Use local variables to avoid null annotation warning
+        RemoteSystemProxy proxy = fRemoteProxy;
+        String name = fName;
+        if (name == null) {
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, RemoteMessages.RemoteImportConnectionNodeElement_NodeNameNullError);
+        }
+        if (proxy == null) {
+            try {
+                URI hostUri = null;
+                hostUri = URIUtil.fromString(fURI);
+                if (hostUri == null) {
+                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, RemoteMessages.RemoteImportConnectionNodeElement_UriNullError);
+                }
+                proxy = RemoteSystemProxyFactory.createProxy(hostUri, name);
+                fRemoteProxy = proxy;
+            } catch (URISyntaxException e) {
+                return new Status(IStatus.ERROR, Activator.PLUGIN_ID, MessageFormat.format(RemoteMessages.RemoteImportConnectionNodeElement_InvalidUriString, fURI), e);
+            } catch (RemoteConnectionException e) {
+                return new Status(IStatus.ERROR, Activator.PLUGIN_ID, MessageFormat.format(RemoteMessages.RemoteImportConnectionNodeElement_ConnectionFailure, fURI), e);
+            }
+        }
+        try {
+            proxy.connect(monitor);
+            return Status.OK_STATUS;
+        } catch (ExecutionException e) {
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, MessageFormat.format(RemoteMessages.RemoteImportConnectionNodeElement_ConnectionFailure, fURI), e);
+        }
+    }
+
+    /**
+     * Disconnects the remote host
+     */
+    public void disconnect() {
+        if (fRemoteProxy != null) {
+            fRemoteProxy.disconnect();
+        }
+    }
+
+    /**
+     * Returns the remote system proxy implementation
+     *
+     * @return the remote system proxy or null
+     */
+    public RemoteSystemProxy getRemoteSystemProxy() {
+        return fRemoteProxy;
+    }
 }

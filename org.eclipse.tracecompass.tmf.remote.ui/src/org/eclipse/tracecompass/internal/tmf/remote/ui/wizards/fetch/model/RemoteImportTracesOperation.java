@@ -1,0 +1,356 @@
+/*******************************************************************************
+ * Copyright (c) 2015 Ericsson
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Bernd Hufmann - Initial API and implementation
+ *******************************************************************************/
+
+package org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch.model;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.util.Arrays;
+
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.URIUtil;
+import org.eclipse.jface.operation.ModalContext;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tracecompass.internal.tmf.remote.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.remote.ui.messages.RemoteMessages;
+import org.eclipse.tracecompass.internal.tmf.ui.project.operations.TmfWorkspaceModifyOperation;
+import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.ImportConfirmation;
+import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.ImportConflictHandler;
+import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageElement;
+import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageTraceElement;
+import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
+import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceCoreUtils;
+import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceImportException;
+import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
+import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceTypeUIUtils;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
+import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
+
+/**
+ * Operation to import a set of traces from a remote node into a tracing project.
+ *
+ * @author Bernd Hufmann
+ */
+public class RemoteImportTracesOperation extends TmfWorkspaceModifyOperation {
+
+    // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    private static final int BUFFER_IN_KB = 16;
+    private static final int BYTES_PER_KB = 1024;
+
+    // ------------------------------------------------------------------------
+    // Attributes
+    // ------------------------------------------------------------------------
+    private IStatus fStatus;
+    final private Shell fShell;
+    final private TmfTraceFolder fDestination;
+    final private Object[] fTraceElements;
+    final private ImportConflictHandler fConflictHandler;
+
+    // ------------------------------------------------------------------------
+    // Constructor(s)
+    // ------------------------------------------------------------------------
+    /**
+     * Operation to import a set of traces from a remote node into a tracing project.
+     * @param shell
+     *                shell to display confirmation dialog
+     * @param destination
+     *                The destination traces folder
+     * @param elements
+     *                The trace model elements describing the traces to import
+     * @param overwriteAll
+     *                 Flag to indicate to overwrite all existing traces
+     */
+    public RemoteImportTracesOperation(Shell shell, TmfTraceFolder destination, Object[] elements, boolean overwriteAll) {
+        super();
+        fShell = shell;
+        fDestination = destination;
+        fTraceElements = Arrays.copyOf(elements, elements.length);
+        if (overwriteAll) {
+            fConflictHandler = new ImportConflictHandler(fShell, destination, ImportConfirmation.OVERWRITE_ALL);
+        } else {
+            fConflictHandler = new ImportConflictHandler(fShell, destination, ImportConfirmation.SKIP);
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    // Operations
+    // ------------------------------------------------------------------------
+    @Override
+    protected void execute(IProgressMonitor monitor) throws CoreException,
+            InvocationTargetException, InterruptedException {
+
+        try {
+            doRun(monitor);
+            setStatus(Status.OK_STATUS);
+        } catch (InterruptedException e) {
+            setStatus(Status.CANCEL_STATUS);
+            throw e;
+        } catch (Exception e) {
+            setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, RemoteMessages.RemoteImportTracesOperation_ImportFailure, e));
+            throw new InvocationTargetException(e);
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    // Helper methods
+    // ------------------------------------------------------------------------
+    private void doRun(IProgressMonitor monitor) throws ExecutionException, CoreException, IOException, InterruptedException {
+
+        IFolder destinationFolder = fDestination.getResource();
+        if (!destinationFolder.exists()) {
+            throw new ExecutionException(RemoteMessages.RemoteImportTracesOperation_ImportDialogInvalidTracingProject + " (" + TmfTracesFolder.TRACES_FOLDER_NAME + ")"); //$NON-NLS-1$//$NON-NLS-2$
+        }
+
+        SubMonitor subMonitor = SubMonitor.convert(monitor, fTraceElements.length * 4);
+        subMonitor.beginTask(RemoteMessages.RemoteImportTracesOperation_DownloadTask, fTraceElements.length * 4);
+
+        for (Object packageElement : fTraceElements) {
+            if (!(packageElement instanceof TracePackageTraceElement)) {
+                continue;
+            }
+            TracePackageTraceElement traceElement = (TracePackageTraceElement) packageElement;
+            TracePackageElement parentElement = traceElement.getParent();
+            while (parentElement != null) {
+                if (parentElement instanceof RemoteImportTraceGroupElement) {
+                    break;
+                }
+                parentElement = parentElement.getParent();
+            }
+
+            if (parentElement == null) {
+                continue;
+            }
+
+            RemoteImportTraceGroupElement traceGroup = (RemoteImportTraceGroupElement) parentElement;
+            String rootPath = traceGroup.getRootImportPath();
+
+            // Create folder with node name in destination folder
+            RemoteImportConnectionNodeElement nodeElement = (RemoteImportConnectionNodeElement) traceGroup.getParent();
+            String nodeName = nodeElement.getName();
+            IFolder nodeFolder = destinationFolder.getFolder(nodeName);
+
+            TracePackageElement[] children = traceElement.getChildren();
+            SubMonitor childMonitor = subMonitor.newChild(1);
+            TraceUtils.createFolder(nodeFolder, childMonitor);
+
+            for (TracePackageElement element : children) {
+                ModalContext.checkCanceled(monitor);
+
+                if (element instanceof RemoteImportTraceFilesElement) {
+                    RemoteImportTraceFilesElement traceFilesElement = (RemoteImportTraceFilesElement) element;
+
+                    IFileStore remoteFile = traceFilesElement.getRemoteFile();
+
+                    // Preserve folder structure
+                    IPath sessionParentPath = TmfTraceCoreUtils.newSafePath(rootPath);
+                    IPath traceParentPath = TmfTraceCoreUtils.newSafePath(remoteFile.getParent().toURI().getPath());
+                    IPath relativeTracePath = Path.EMPTY;
+                    if (sessionParentPath.isPrefixOf(traceParentPath)) {
+                        relativeTracePath = traceParentPath.makeRelativeTo(sessionParentPath);
+                    }
+
+                    String[] segments = relativeTracePath.segments();
+                    for (int i = 0; i < segments.length; i++) {
+                        String segment = TmfTraceCoreUtils.validateName(TmfTraceCoreUtils.safePathToString(segments[i]));
+                        if (i == 0) {
+                            relativeTracePath = new Path(segment);
+                        } else {
+                            relativeTracePath = relativeTracePath.append(segment);
+                        }
+                    }
+
+                    IFolder traceFolder = nodeFolder.getFolder(new Path(relativeTracePath.toOSString()));
+                    childMonitor = subMonitor.newChild(1);
+                    TraceUtils.createFolder(traceFolder, childMonitor);
+                    childMonitor.done();
+
+                    // Import trace
+                    IResource traceRes = null;
+                    IFileInfo info = remoteFile.fetchInfo();
+                    if (info.isDirectory()) {
+                        traceRes = downloadDirectoryTrace(remoteFile, traceFolder, subMonitor.newChild(1));
+                    } else {
+                        traceRes = downloadFileTrace(remoteFile, traceFolder, subMonitor.newChild(1));
+                    }
+
+                    String traceName = traceElement.getText();
+                    if (traceRes == null || !traceRes.exists()) {
+                        continue;
+                    }
+
+                    // Select trace type
+                    TraceTypeHelper traceTypeHelper = null;
+                    String traceTypeStr = traceElement.getTraceType();
+                    if (traceTypeStr != null) {
+                        traceTypeHelper = TmfTraceType.getTraceType(traceTypeStr);
+                    }
+
+                    // no specific trace type found
+                    if (traceTypeHelper == null) {
+                        try {
+                            // Try to auto-detect the trace typ
+                            childMonitor = subMonitor.newChild(1);
+                            childMonitor.setTaskName(NLS.bind(RemoteMessages.RemoteImportTracesOperation_DetectingTraceType, traceName));
+                            childMonitor.done();
+                            traceTypeHelper = TmfTraceTypeUIUtils.selectTraceType(traceRes.getLocation().toOSString(), null, null);
+                        } catch (TmfTraceImportException e) {
+                            //Could not figure out the type
+                        }
+                    }
+
+                    if (traceTypeHelper != null) {
+                        TmfTraceTypeUIUtils.setTraceType(traceRes, traceTypeHelper);
+                    }
+
+                    // Set source location
+                    URI uri = remoteFile.toURI();
+                    String sourceLocation = URIUtil.toUnencodedString(uri);
+                    traceRes.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
+                }
+            }
+        }
+    }
+
+    // Download a directory trace
+    private IResource downloadDirectoryTrace(IFileStore trace, IFolder traceFolder, IProgressMonitor monitor) throws CoreException, IOException, InterruptedException {
+
+        IFileStore[] sources = trace.childStores(EFS.NONE, monitor);
+
+        // Don't import just the metadata file
+        if (sources.length > 1) {
+            String traceName = trace.getName();
+
+            traceName = TmfTraceCoreUtils.validateName(traceName);
+
+            IFolder folder = traceFolder.getFolder(traceName);
+            String newName = fConflictHandler.checkAndHandleNameClash(folder.getFullPath(), monitor);
+            if (newName == null) {
+                return null;
+            }
+
+            folder = traceFolder.getFolder(newName);
+            folder.create(true, true, null);
+
+            SubMonitor subMonitor = SubMonitor.convert(monitor, sources.length);
+            subMonitor.beginTask(RemoteMessages.RemoteImportTracesOperation_DownloadTask, sources.length);
+
+            for (IFileStore source : sources) {
+                if (subMonitor.isCanceled()) {
+                    throw new InterruptedException();
+                }
+
+                IPath destination = folder.getLocation().addTrailingSeparator().append(source.getName());
+                IFileInfo info = source.fetchInfo();
+                // TODO allow for downloading index directory and files
+                if (!info.isDirectory()) {
+                    SubMonitor childMonitor = subMonitor.newChild(1);
+                    childMonitor.setTaskName(RemoteMessages.RemoteImportTracesOperation_DownloadTask + ' '  + trace.getName()+ '/' + source.getName());
+
+                    try (InputStream in = source.openInputStream(EFS.NONE, new NullProgressMonitor())) {
+                        copy(in, destination, childMonitor, info.getLength());
+                    }
+                }
+            }
+            folder.refreshLocal(IResource.DEPTH_INFINITE, null);
+            return folder;
+        }
+        return null;
+    }
+
+    // Download file trace
+    private IResource downloadFileTrace(IFileStore trace, IFolder traceFolder, IProgressMonitor monitor) throws CoreException, IOException, InterruptedException {
+
+        IFolder folder = traceFolder;
+        String traceName = trace.getName();
+
+        traceName = TmfTraceCoreUtils.validateName(traceName);
+
+        IResource resource = folder.findMember(traceName);
+        if ((resource != null) && resource.exists()) {
+            String newName = fConflictHandler.checkAndHandleNameClash(resource.getFullPath(), monitor);
+            if (newName == null) {
+                return null;
+            }
+            traceName = newName;
+        }
+        SubMonitor subMonitor = SubMonitor.convert(monitor, 1);
+        subMonitor.beginTask(RemoteMessages.RemoteImportTracesOperation_DownloadTask, 1);
+
+        IPath destination = folder.getLocation().addTrailingSeparator().append(traceName);
+        IFileInfo info = trace.fetchInfo();
+        subMonitor.setTaskName(RemoteMessages.RemoteImportTracesOperation_DownloadTask + ' '  + trace.getName()+ '/' +trace.getName());
+        try (InputStream in = trace.openInputStream(EFS.NONE, new NullProgressMonitor())) {
+            copy(in, destination, subMonitor, info.getLength());
+        }
+        folder.refreshLocal(IResource.DEPTH_INFINITE, null);
+        return folder.findMember(traceName);
+    }
+
+
+    private static void copy(InputStream in, IPath destination, SubMonitor monitor, long length) throws IOException {
+        try (OutputStream out = new FileOutputStream(destination.toFile())) {
+            monitor.setWorkRemaining((int) (length / BYTES_PER_KB));
+            byte[] buf = new byte[BYTES_PER_KB * BUFFER_IN_KB];
+            int counter = 0;
+            for (;;) {
+                int n = in.read(buf);
+                if (n <= 0) {
+                    return;
+                }
+                out.write(buf, 0, n);
+                counter = (counter % BYTES_PER_KB) + n;
+                monitor.worked(counter / BYTES_PER_KB);
+            }
+        }
+    }
+
+    /**
+     * Set the result status for this operation
+     *
+     * @param status
+     *            the status
+     */
+    protected void setStatus(IStatus status) {
+        fStatus = status;
+    }
+
+    /**
+     * Gets the result of the operation.
+     *
+     * @return result status of operation
+     */
+    public IStatus getStatus() {
+        return fStatus;
+    }
+}
