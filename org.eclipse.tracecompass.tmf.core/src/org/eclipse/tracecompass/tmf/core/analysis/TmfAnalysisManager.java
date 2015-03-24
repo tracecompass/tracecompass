@@ -188,18 +188,10 @@ public class TmfAnalysisManager {
                         provider = providerClass.newInstance();
                         fParamProviderInstances.put(providerClass, provider);
                     }
-                    if (provider != null) {
-                        if (provider.appliesToTrace(trace)) {
-                            providerList.add(provider);
-                        }
+                    if (provider != null && provider.appliesToTrace(trace)) {
+                        providerList.add(provider);
                     }
-                } catch (IllegalArgumentException e) {
-                    Activator.logError(Messages.TmfAnalysisManager_ErrorParameterProvider, e);
-                } catch (SecurityException e) {
-                    Activator.logError(Messages.TmfAnalysisManager_ErrorParameterProvider, e);
-                } catch (InstantiationException e) {
-                    Activator.logError(Messages.TmfAnalysisManager_ErrorParameterProvider, e);
-                } catch (IllegalAccessException e) {
+                } catch (IllegalArgumentException | SecurityException | InstantiationException | IllegalAccessException e) {
                     Activator.logError(Messages.TmfAnalysisManager_ErrorParameterProvider, e);
                 }
             }
