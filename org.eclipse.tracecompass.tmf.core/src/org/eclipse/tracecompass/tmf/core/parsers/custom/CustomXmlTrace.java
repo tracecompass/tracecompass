@@ -435,7 +435,8 @@ public class CustomXmlTrace extends TmfTrace implements ITmfPersistentlyIndexabl
         String separator = null;
         for (int i = 0; i < nodeList.getLength(); i++) {
             final Node node = nodeList.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
+            short nodeType = node.getNodeType();
+            if (nodeType == Node.ELEMENT_NODE) {
                 if (separator == null) {
                     separator = " | "; //$NON-NLS-1$
                 } else {
@@ -452,10 +453,8 @@ public class CustomXmlTrace extends TmfTrace implements ITmfPersistentlyIndexabl
                     parseElement(element, buffer);
                     buffer.append(" ]"); //$NON-NLS-1$
                 }
-            } else if (node.getNodeType() == Node.TEXT_NODE) {
-                if (node.getNodeValue().trim().length() != 0) {
-                    buffer.append(node.getNodeValue().trim());
-                }
+            } else if ((nodeType == Node.TEXT_NODE) && (!node.getNodeValue().trim().isEmpty())) {
+                buffer.append(node.getNodeValue().trim());
             }
         }
         return buffer;
