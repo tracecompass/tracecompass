@@ -24,18 +24,27 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.bindings.keys.IKeyLookup;
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.bindings.keys.ParseException;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
+import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
@@ -52,7 +61,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 import org.hamcrest.Matcher;
 
-
 /**
  * SWTBot Helper functions
  *
@@ -60,7 +68,8 @@ import org.hamcrest.Matcher;
  */
 public final class SWTBotUtils {
 
-    private SWTBotUtils() {}
+    private SWTBotUtils() {
+    }
 
     private static final String TRACING_PERSPECTIVE_ID = TracingPerspectiveFactory.ID;
 
@@ -225,8 +234,7 @@ public final class SWTBotUtils {
      * @param tracePath
      *            the path of the trace file (absolute or relative)
      * @param traceType
-     *            the trace type id (eg:
-     *            org.eclipse.linuxtools.btf.trace)
+     *            the trace type id (eg: org.eclipse.linuxtools.btf.trace)
      */
     public static void openTrace(final String projectName, final String tracePath, final String traceType) {
         openTrace(projectName, tracePath, traceType, true);
@@ -240,8 +248,7 @@ public final class SWTBotUtils {
      * @param tracePath
      *            the path of the trace file (absolute or relative)
      * @param traceType
-     *            the trace type id (eg:
-     *            org.eclipse.linuxtools.btf.trace)
+     *            the trace type id (eg: org.eclipse.linuxtools.btf.trace)
      * @param delay
      *            delay and wait for jobs
      */
@@ -372,7 +379,8 @@ public final class SWTBotUtils {
      * @param bot
      *            a given workbench bot
      * @param projectName
-     *            the name of the project (it needs to exist or else it would time out)
+     *            the name of the project (it needs to exist or else it would
+     *            time out)
      * @return a {@link SWTBotTreeItem} of the "Traces" directory
      */
     public static SWTBotTreeItem selectTracesFolder(SWTWorkbenchBot bot, String projectName) {
@@ -414,5 +422,44 @@ public final class SWTBotUtils {
             fail(res[0].getMessage());
         }
         waitForJobs();
+    }
+
+    /**
+     * Maximize a table
+     *
+     * @param tableBot
+     *            the {@link SWTBotTable} table
+     */
+    public static void maximizeTable(SWTBotTable tableBot) {
+        try {
+            tableBot.pressShortcut(KeyStroke.getInstance(IKeyLookup.CTRL_NAME + "+"), KeyStroke.getInstance("M"));
+        } catch (ParseException e) {
+            fail();
+        }
+    }
+
+    /**
+     * Get the bounds of a cell (SWT.Rectangle) for the specified row and column
+     * index in a table
+     *
+     * @param table
+     *            the table
+     * @param row
+     *            the row of the table to look up
+     * @param col
+     *            the column of the table to look up
+     * @return the bounds in display relative coordinates
+     */
+    public static Rectangle getCellBounds(final Table table, final int row, final int col) {
+        return UIThreadRunnable.syncExec(new Result<Rectangle>() {
+            @Override
+            public Rectangle run() {
+                TableItem item = table.getItem(row);
+                Rectangle bounds = item.getBounds(col);
+                Point p = table.toDisplay(bounds.x, bounds.y);
+                Rectangle rect = new Rectangle(p.x, p.y, bounds.width, bounds.height);
+                return rect;
+            }
+        });
     }
 }

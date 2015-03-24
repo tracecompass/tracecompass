@@ -28,9 +28,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.bindings.keys.IKeyLookup;
-import org.eclipse.jface.bindings.keys.KeyStroke;
-import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
@@ -125,7 +122,7 @@ public class FontEventEditorTest {
         SWTBotTable tableBot = editorBot.bot().table();
 
         // Maximize editor area
-        maximizeTable(tableBot);
+        SWTBotUtils.maximizeTable(tableBot);
         tableBot.contextMenu("Show Raw").click();
         tableBot.setFocus();
         tableBot.click(4, 1);
@@ -181,13 +178,4 @@ public class FontEventEditorTest {
             }
         });
     }
-
-    private static void maximizeTable(SWTBotTable tableBot) {
-        try {
-            tableBot.pressShortcut(KeyStroke.getInstance(IKeyLookup.CTRL_NAME + "+"), KeyStroke.getInstance("M"));
-        } catch (ParseException e) {
-            fail();
-        }
-    }
-
 }

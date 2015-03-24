@@ -29,21 +29,18 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.jface.bindings.keys.IKeyLookup;
-import org.eclipse.jface.bindings.keys.KeyStroke;
-import org.eclipse.jface.bindings.keys.ParseException;
-import org.eclipse.tracecompass.internal.tmf.core.Activator;
-import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimePreferencesConstants;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.tracecompass.internal.tmf.core.Activator;
+import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimePreferencesConstants;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -135,7 +132,7 @@ public class CollapseEventsInTableTest {
         SWTBotTable tableBot = editorBot.bot().table();
 
         /* Maximize editor area */
-        maximizeTable(tableBot);
+        SWTBotUtils.maximizeTable(tableBot);
         tableBot.click(1, 0);
 
         /* Collapse Events */
@@ -184,18 +181,9 @@ public class CollapseEventsInTableTest {
         fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "Jan 1 01:01:01", 1, 1));
         assertEquals("Timestamp", "Jan 1 01:01:01", tableBot.cell(1, 1));
 
-        maximizeTable(tableBot);
+        SWTBotUtils.maximizeTable(tableBot);
 
         fBot.closeAllEditors();
         SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
     }
-
-    private static void maximizeTable(SWTBotTable tableBot) {
-        try {
-            tableBot.pressShortcut(KeyStroke.getInstance(IKeyLookup.CTRL_NAME + "+"), KeyStroke.getInstance("M"));
-        } catch (ParseException e) {
-            fail();
-        }
-    }
-
 }

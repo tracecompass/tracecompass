@@ -28,9 +28,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.bindings.keys.IKeyLookup;
-import org.eclipse.jface.bindings.keys.KeyStroke;
-import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
@@ -126,7 +123,7 @@ public class MovableColumnEventsEditorTest {
         SWTBotTable tableBot = editorBot.bot().table();
 
         // Maximize editor area
-        maximizeTable(tableBot);
+        SWTBotUtils.maximizeTable(tableBot);
 
         // Verify that source code was actually opened
         assertArrayEquals("Before reorder", BEFORE_COLS, tableBot.columns().toArray());
@@ -146,7 +143,7 @@ public class MovableColumnEventsEditorTest {
         editorBot = SWTBotUtils.activateEditor(fBot, fTestFile.getName());
         tableBot = editorBot.bot().table();
         // Maximize editor area
-        maximizeTable(tableBot);
+        SWTBotUtils.maximizeTable(tableBot);
         assertArrayEquals("After reorder", AFTER_COLS, tableBot.columns().toArray());
         // close and re-open
         editorBot.close();
@@ -156,19 +153,10 @@ public class MovableColumnEventsEditorTest {
         editorBot = SWTBotUtils.activateEditor(fBot, fTestFile.getName());
         tableBot = editorBot.bot().table();
         // Maximize editor area
-        maximizeTable(tableBot);
+        SWTBotUtils.maximizeTable(tableBot);
         assertNull("After reset", TmfTraceColumnManager.loadColumnOrder(COLUMN_TRACE_TYPE));
         assertArrayEquals("After reset", BEFORE_COLS, tableBot.columns().toArray());
         fBot.closeAllEditors();
         SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
     }
-
-    private static void maximizeTable(SWTBotTable tableBot) {
-        try {
-            tableBot.pressShortcut(KeyStroke.getInstance(IKeyLookup.CTRL_NAME + "+"), KeyStroke.getInstance("M"));
-        } catch (ParseException e) {
-            fail();
-        }
-    }
-
 }
