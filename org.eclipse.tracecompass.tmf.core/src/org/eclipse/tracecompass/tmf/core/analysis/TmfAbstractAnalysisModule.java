@@ -260,11 +260,9 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
     public final void cancel() {
         synchronized (syncObj) {
             TmfCoreTracer.traceAnalysis(getId(), getTrace(), "cancelled by application"); //$NON-NLS-1$
-            if (fJob != null) {
-                if (fJob.cancel()) {
-                    fAnalysisCancelled = true;
-                    setAnalysisCompleted();
-                }
+            if (fJob != null && fJob.cancel()) {
+                fAnalysisCancelled = true;
+                setAnalysisCompleted();
             }
             fStarted = false;
         }
