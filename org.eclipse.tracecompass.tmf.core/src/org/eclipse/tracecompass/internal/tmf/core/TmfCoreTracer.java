@@ -65,11 +65,11 @@ public class TmfCoreTracer {
     // ------------------------------------------------------------------------
 
     // Classes tracing flags
-    static boolean COMPONENT_CLASS_ENABLED = false;
-    static boolean REQUEST_CLASS_ENABLED   = false;
-    static boolean SIGNAL_CLASS_ENABLED    = false;
-    static boolean EVENT_CLASS_ENABLED     = false;
-    static boolean ANALYSIS_CLASS_ENABLED     = false;
+    private static boolean fComponentClassEnabled = false;
+    private static boolean fRequestClassEnabled   = false;
+    private static boolean fSignalClassEnabled    = false;
+    private static boolean fEventClassEnabled     = false;
+    private static boolean fAnalysisClassEnabled  = false;
 
     // Trace log file
     private static BufferedWriter fTraceFile;
@@ -88,32 +88,32 @@ public class TmfCoreTracer {
 
         traceKey = Platform.getDebugOption(COMPONENT_TRACE_KEY);
         if (traceKey != null) {
-            COMPONENT_CLASS_ENABLED = (Boolean.valueOf(traceKey)).booleanValue();
-            isTracing |= COMPONENT_CLASS_ENABLED;
+            fComponentClassEnabled = (Boolean.valueOf(traceKey)).booleanValue();
+            isTracing |= fComponentClassEnabled;
         }
 
         traceKey = Platform.getDebugOption(REQUEST_TRACE_KEY);
         if (traceKey != null) {
-            REQUEST_CLASS_ENABLED = (Boolean.valueOf(traceKey)).booleanValue();
-            isTracing |= REQUEST_CLASS_ENABLED;
+            fRequestClassEnabled = (Boolean.valueOf(traceKey)).booleanValue();
+            isTracing |= fRequestClassEnabled;
         }
 
         traceKey = Platform.getDebugOption(SIGNAL_TRACE_KEY);
         if (traceKey != null) {
-            SIGNAL_CLASS_ENABLED = (Boolean.valueOf(traceKey)).booleanValue();
-            isTracing |= SIGNAL_CLASS_ENABLED;
+            fSignalClassEnabled = (Boolean.valueOf(traceKey)).booleanValue();
+            isTracing |= fSignalClassEnabled;
         }
 
         traceKey = Platform.getDebugOption(EVENT_TRACE_KEY);
         if (traceKey != null) {
-            EVENT_CLASS_ENABLED = (Boolean.valueOf(traceKey)).booleanValue();
-            isTracing |= EVENT_CLASS_ENABLED;
+            fEventClassEnabled = (Boolean.valueOf(traceKey)).booleanValue();
+            isTracing |= fEventClassEnabled;
         }
 
         traceKey = Platform.getDebugOption(ANALYSIS_TRACE_KEY);
         if (traceKey != null) {
-            ANALYSIS_CLASS_ENABLED = (Boolean.valueOf(traceKey)).booleanValue();
-            isTracing |= ANALYSIS_CLASS_ENABLED;
+            fAnalysisClassEnabled = (Boolean.valueOf(traceKey)).booleanValue();
+            isTracing |= fAnalysisClassEnabled;
         }
 
         // Create trace log file if any of the flags was set
@@ -145,29 +145,49 @@ public class TmfCoreTracer {
     // Predicates
     // ------------------------------------------------------------------------
 
-    @SuppressWarnings("javadoc")
+    /**
+     * Is component tracing enabled?
+     *
+     * @return true if components are traced, false otherwise
+     */
     public static boolean isComponentTraced() {
-        return COMPONENT_CLASS_ENABLED;
+        return fComponentClassEnabled;
     }
 
-    @SuppressWarnings("javadoc")
+    /**
+     * Is request tracing enabled? (useful to debug scheduling issues)
+     *
+     * @return true if requests are traced, false otherwise
+     */
     public static boolean isRequestTraced() {
-        return REQUEST_CLASS_ENABLED;
+        return fRequestClassEnabled;
     }
 
-    @SuppressWarnings("javadoc")
+    /**
+     * Is signal tracing enabled? (useful to debug UI issues)
+     *
+     * @return true if signals are traced, false otherwise
+     */
     public static boolean isSignalTraced() {
-        return SIGNAL_CLASS_ENABLED;
+        return fSignalClassEnabled;
     }
 
-    @SuppressWarnings("javadoc")
+    /**
+     * Is event tracing enabled? (useful to debug parser issues)
+     *
+     * @return true if events are traced, false otherwise
+     */
     public static boolean isEventTraced() {
-        return EVENT_CLASS_ENABLED;
+        return fEventClassEnabled;
     }
 
-    @SuppressWarnings("javadoc")
+    /**
+     * Is analysis tracing enabled? (useful to debug analysis issues)
+     *
+     * @return true if analyses are traced, false otherwise
+     */
     public static boolean isAnalysisTraced() {
-        return ANALYSIS_CLASS_ENABLED;
+        return fAnalysisClassEnabled;
     }
 
     // ------------------------------------------------------------------------
@@ -226,7 +246,7 @@ public class TmfCoreTracer {
      *            The message to record for this component
      */
     public static void traceComponent(String componentName, String msg) {
-        if (COMPONENT_CLASS_ENABLED) {
+        if (fComponentClassEnabled) {
             String message = ("[CMP] Cmp=" + componentName + " " + msg);
             trace(message);
         }
@@ -241,24 +261,40 @@ public class TmfCoreTracer {
      *            The message to record for this component
      */
     public static void traceRequest(int requestId, String msg) {
-        if (REQUEST_CLASS_ENABLED) {
+        if (fRequestClassEnabled) {
             String message = ("[REQ] Req=" + requestId + " " + msg);
             trace(message);
         }
     }
 
-    @SuppressWarnings("javadoc")
+    /**
+     * Trace a signal being fired
+     *
+     * @param signal
+     *            The signal
+     * @param msg
+     *            The message to record for this component
+     */
     public static void traceSignal(TmfSignal signal, String msg) {
-        if (SIGNAL_CLASS_ENABLED) {
+        if (fSignalClassEnabled) {
             String message = ("[SIG] Sig=" + signal.getClass().getSimpleName()
                     + " Target=" + msg);
             trace(message);
         }
     }
 
-    @SuppressWarnings("javadoc")
+    /**
+     * Trace an event with its provider and request
+     *
+     * @param provider
+     *            The provider supplying the event
+     * @param request
+     *            The request being traced
+     * @param event
+     *            The event being traced
+     */
     public static void traceEvent(ITmfEventProvider provider, ITmfEventRequest request, ITmfEvent event) {
-        if (EVENT_CLASS_ENABLED) {
+        if (fEventClassEnabled) {
             String message = ("[EVT] Provider=" + provider.toString()
                     + ", Req=" + request.getRequestId() + ", Event=" + event.getTimestamp());
             trace(message);
@@ -276,7 +312,7 @@ public class TmfCoreTracer {
      *            The message to record for this analysis
      */
     public static void traceAnalysis(String analysisId, ITmfTrace trace, String msg) {
-        if (ANALYSIS_CLASS_ENABLED) {
+        if (fAnalysisClassEnabled) {
             String traceName = (trace == null) ? "" : trace.getName();
             String message = ("[ANL] Anl=" + analysisId + " for " + traceName + " " + msg);
             trace(message);
