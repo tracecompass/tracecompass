@@ -237,7 +237,7 @@ public class ColorsViewTest {
         viewBot.toolbarButton(delete).click();
         final RGB foreground = new RGB(0, 0, 0);
         final RGB background = new RGB(255, 255, 0);
-        // Simulate the site effects of picking a color because we cannot
+        // Simulate the side effects of picking a color because we cannot
         // control native Color picker dialog in SWTBot.
         final ColorSetting[] cs = new ColorSetting[1];
         UIThreadRunnable.syncExec(new VoidResult() {
@@ -248,6 +248,8 @@ public class ColorsViewTest {
             }
         });
         final SWTBotTable eventsEditor = fBot.activeEditor().bot().table();
+        // should fix race condition of loading the trace
+        SWTBotUtils.waitForJobs();
         eventsEditor.select(2);
         final SWTBotTableItem tableItem = eventsEditor.getTableItem(2);
         RGB fgc = UIThreadRunnable.syncExec(new Result<RGB>() {
@@ -264,5 +266,12 @@ public class ColorsViewTest {
         });
         assertEquals("Fg", foreground, fgc);
         assertEquals("Bg", background, bgc);
+        // reset color settings
+        UIThreadRunnable.syncExec(new VoidResult() {
+            @Override
+            public void run() {
+                ColorSettingsManager.setColorSettings(new ColorSetting[0]);
+            }
+        });
     }
 }
