@@ -969,9 +969,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
         try {
             return new TarFile(fileName);
-        } catch (TarException e) {
-            // ignore
-        } catch (IOException e) {
+        } catch (TarException | IOException e) {
             // ignore
         }
 
@@ -1116,12 +1114,10 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             return false;
         }
 
-        if (!isImportFromDirectory()) {
-            if (!ensureTarSourceIsValid(source.getAbsolutePath()) && !ensureZipSourceIsValid(source.getAbsolutePath())) {
-                setMessage(null);
-                setErrorMessage(Messages.ImportTraceWizard_BadArchiveFormat);
-                return false;
-            }
+        if (!isImportFromDirectory() && !ensureTarSourceIsValid(source.getAbsolutePath()) && !ensureZipSourceIsValid(source.getAbsolutePath())) {
+            setMessage(null);
+            setErrorMessage(Messages.ImportTraceWizard_BadArchiveFormat);
+            return false;
         }
 
         if (fSelectionGroup.getCheckedElementCount() == 0) {
@@ -1448,11 +1444,9 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                     currentPath = resourcePath;
                     SubMonitor sub = subMonitor.newChild(1);
                     if (element.isDirectory()) {
-                        if (!directoryTraces.containsKey(resourcePath)) {
-                            if (isDirectoryTrace(element)) {
-                                directoryTraces.put(resourcePath, element);
-                                validateAndImportTrace(element, sub);
-                            }
+                        if (!directoryTraces.containsKey(resourcePath) && isDirectoryTrace(element)) {
+                            directoryTraces.put(resourcePath, element);
+                            validateAndImportTrace(element, sub);
                         }
                     } else {
                         TraceFileSystemElement parentElement = (TraceFileSystemElement) element.getParent();
