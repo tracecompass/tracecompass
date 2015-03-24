@@ -390,11 +390,11 @@ public class ExportTracePackageWizardPage extends AbstractTracePackageWizardPage
     private static String stripKnownExtension(String str) {
         String ret = str;
         if (str.endsWith(TAR_GZ_EXTENSION)) {
-            ret = ret.substring(0, ret.lastIndexOf(".")); //$NON-NLS-1$
+            ret = ret.substring(0, ret.lastIndexOf('.'));
         }
 
         if (ret.endsWith(ZIP_EXTENSION) | ret.endsWith(TAR_EXTENSION) | ret.endsWith(TGZ_EXTENSION)) {
-            ret = ret.substring(0, ret.lastIndexOf(".")); //$NON-NLS-1$
+            ret = ret.substring(0, ret.lastIndexOf('.'));
         }
 
         return ret;
