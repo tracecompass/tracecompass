@@ -180,6 +180,11 @@ public class StateSystem implements ITmfStateSystemBuilder {
         return getAttributeTree().getFullAttributeName(attributeQuark);
     }
 
+    @Override
+    public String[] getFullAttributePathArray(int attributeQuark) {
+        return getAttributeTree().getFullAttributePathArray(attributeQuark);
+    }
+
     //--------------------------------------------------------------------------
     //        Methods related to the storage backend
     //--------------------------------------------------------------------------

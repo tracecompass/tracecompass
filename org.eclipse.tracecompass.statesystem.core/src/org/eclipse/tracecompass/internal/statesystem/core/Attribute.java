@@ -196,9 +196,9 @@ public final class Attribute {
      * Return a String array composed of the full (absolute) path representing
      * this attribute
      *
-     * @return
+     * @return The full attribute path elements
      */
-    private String[] getFullAttribute() {
+    public @NonNull String[] getFullAttribute() {
         LinkedList<String> list = new LinkedList<>();
         Attribute curNode = this;
 
@@ -208,7 +208,7 @@ public final class Attribute {
             curNode = curNode.parent;
         }
 
-        return list.toArray(new String[0]);
+        return checkNotNull(list.toArray(new String[0]));
     }
 
     /**

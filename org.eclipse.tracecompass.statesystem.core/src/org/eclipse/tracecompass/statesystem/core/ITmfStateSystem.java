@@ -104,6 +104,10 @@ public interface ITmfStateSystem {
      */
     void dispose();
 
+    // ------------------------------------------------------------------------
+    // Read-only quark-getting methods
+    // ------------------------------------------------------------------------
+
     /**
      * Return the current total amount of attributes in the system. This is also
      * equal to the quark that will be assigned to the next attribute that's
@@ -112,10 +116,6 @@ public interface ITmfStateSystem {
      * @return The current number of attributes in the system
      */
     int getNbAttributes();
-
-    /**
-     * @name Read-only quark-getting methods
-     */
 
     /**
      * Basic quark-retrieving method. Pass an attribute in parameter as an array
@@ -249,6 +249,19 @@ public interface ITmfStateSystem {
     @NonNull String getFullAttributePath(int attributeQuark);
 
     /**
+     * Return the full attribute path, as an array of strings representing each
+     * element.
+     *
+     * @param attributeQuark
+     *            The quark of the attribute we want.
+     * @return The array of path elements
+     * @throws IndexOutOfBoundsException
+     *             If the attribute quark is out of range
+     * @since 1.0
+     */
+    @NonNull String[] getFullAttributePathArray(int attributeQuark);
+
+    /**
      * Returns the parent quark of the attribute.
      *
      * @param attributeQuark
@@ -260,9 +273,9 @@ public interface ITmfStateSystem {
      */
     int getParentAttributeQuark(int attributeQuark);
 
-    /**
-     * @name Query methods
-     */
+    // ------------------------------------------------------------------------
+    // Query methods
+    // ------------------------------------------------------------------------
 
     /**
      * Returns the current state value we have (in the Transient State) for the
