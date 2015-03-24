@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2009, 2015 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -17,11 +17,11 @@ package org.eclipse.tracecompass.tmf.ui.project.wizards;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IWorkspace;
@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.ModalContext;
@@ -385,9 +386,9 @@ public class SelectTracesWizardPage extends WizardPage {
         TmfTraceElement[] traces;
         private IStatus fStatus;
 
-        public SelectTracesOperation(IFolder experiment, TmfTraceElement[] traces) {
+        public SelectTracesOperation(IFolder experiment, @NonNull TmfTraceElement[] traces) {
             this.experiment = experiment;
-            this.traces = traces;
+            this.traces = Arrays.copyOf(traces, traces.length);
         }
 
         public void run(IProgressMonitor progressMonitor) {
@@ -461,8 +462,8 @@ public class SelectTracesWizardPage extends WizardPage {
     /**
      * Get the list of selected traces
      */
-    private TmfTraceElement[] getSelection() {
-        Vector<TmfTraceElement> traces = new Vector<>();
+    private @NonNull TmfTraceElement[] getSelection() {
+        List<TmfTraceElement> traces = new ArrayList<>();
         Object[] selection = fCheckboxTreeViewer.getCheckedElements();
         for (Object sel : selection) {
             if (sel instanceof TmfTraceElement) {
