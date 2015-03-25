@@ -47,6 +47,7 @@
     <module>org.eclipse.tracecompass.lttng2.ust.core.tests</module>
     <module>org.eclipse.tracecompass.lttng2.ust.ui</module>
     <module>org.eclipse.tracecompass.lttng2.ust.ui.tests</module>
+    <module>org.eclipse.tracecompass.lttng2.ust.ui.swtbot.tests</module>
   </modules>
 
 </project>
