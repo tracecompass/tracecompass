@@ -15,7 +15,6 @@ package org.eclipse.tracecompass.ctf.core.trace;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.nio.file.StandardOpenOption;
@@ -31,6 +30,7 @@ import org.eclipse.tracecompass.ctf.core.event.types.Definition;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
+import org.eclipse.tracecompass.internal.ctf.core.SafeMappedByteBuffer;
 import org.eclipse.tracecompass.internal.ctf.core.event.types.ArrayDefinition;
 import org.eclipse.tracecompass.internal.ctf.core.trace.StreamInputPacketIndex;
 import org.eclipse.tracecompass.internal.ctf.core.trace.StreamInputPacketIndexEntry;
@@ -275,7 +275,7 @@ public class CTFStreamInput implements IDefinitionScope {
     }
 
     private static ByteBuffer getByteBufferAt(FileChannel fc, long position, long size) throws CTFReaderException, IOException {
-        MappedByteBuffer map = fc.map(MapMode.READ_ONLY, position, size);
+        ByteBuffer map = SafeMappedByteBuffer.map(fc, MapMode.READ_ONLY, position, size);
         if (map == null) {
             throw new CTFReaderException("Failed to allocate mapped byte buffer"); //$NON-NLS-1$
         }

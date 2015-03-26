@@ -927,6 +927,12 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         public boolean closeArchive() {
             return fLeveledImportProvider.closeArchive();
         }
+
+        @Override
+        public void dispose() {
+            super.dispose();
+            closeArchive();
+        }
     }
 
     @SuppressWarnings("resource")
