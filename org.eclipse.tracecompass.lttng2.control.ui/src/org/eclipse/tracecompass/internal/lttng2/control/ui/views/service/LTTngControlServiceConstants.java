@@ -412,11 +412,11 @@ public interface LTTngControlServiceConstants {
     /**
      * Pattern to match for channel (trace file size) information (lttng list <session>)
      */
-    Pattern TRACE_FILE_COUNT_ATTRIBUTE = Pattern.compile("\\s+trace\\s+file\\s+count\\:.*"); //$NON-NLS-1$
+    Pattern TRACE_FILE_COUNT_ATTRIBUTE = checkNotNull(Pattern.compile("\\s+trace\\s+file\\s+count\\:.*")); //$NON-NLS-1$
     /**
      * Pattern to match for channel (trace file size) information (lttng list <session>)
      */
-    Pattern TRACE_FILE_SIZE_ATTRIBUTE = Pattern.compile("\\s+trace\\s+file\\s+size\\s+\\(bytes\\)\\:.*"); //$NON-NLS-1$
+    Pattern TRACE_FILE_SIZE_ATTRIBUTE = checkNotNull(Pattern.compile("\\s+trace\\s+file\\s+size\\s+\\(bytes\\)\\:.*")); //$NON-NLS-1$
     /**
      * Pattern to match for provider information (lttng list -k/-u)
      */
