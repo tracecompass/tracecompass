@@ -23,6 +23,7 @@ import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
+import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
 import org.eclipse.tracecompass.ctf.core.event.types.Definition;
 import org.eclipse.tracecompass.ctf.core.event.types.ICompositeDefinition;
@@ -135,7 +136,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
      *             out of bounds exception or such
      */
     public StructDefinition getEventContextDefinition(@NonNull BitBuffer input) throws CTFReaderException {
-        return fStreamEventContextDecl.createDefinition(fStreamInputReader.getStreamInput(), LexicalScope.STREAM_EVENT_CONTEXT, input);
+        return fStreamEventContextDecl.createDefinition(fStreamInputReader.getStreamInput(), ILexicalScope.STREAM_EVENT_CONTEXT, input);
     }
 
     /**
@@ -153,7 +154,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
         if (!(fStreamEventHeaderDecl instanceof StructDeclaration)) {
             throw new IllegalStateException("Definition is not a struct definition, this is a deprecated method that doesn't work so well, stop using it."); //$NON-NLS-1$
         }
-        return ((StructDeclaration) fStreamEventHeaderDecl).createDefinition(this, LexicalScope.STREAM_EVENT_HEADER, input);
+        return ((StructDeclaration) fStreamEventHeaderDecl).createDefinition(this, ILexicalScope.STREAM_EVENT_HEADER, input);
     }
 
     /**
@@ -166,7 +167,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
      *             out of bounds exception or such
      */
     public StructDefinition getStreamPacketContextDefinition(@NonNull BitBuffer input) throws CTFReaderException {
-        return fStreamPacketContextDecl.createDefinition(fStreamInputReader.getStreamInput(), LexicalScope.STREAM_PACKET_CONTEXT, input);
+        return fStreamPacketContextDecl.createDefinition(fStreamInputReader.getStreamInput(), ILexicalScope.STREAM_PACKET_CONTEXT, input);
     }
 
     /**
@@ -179,7 +180,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
      *             out of bounds exception or such
      */
     public StructDefinition getTracePacketHeaderDefinition(@NonNull BitBuffer input) throws CTFReaderException {
-        return fTracePacketHeaderDecl.createDefinition(fStreamInputReader.getStreamInput().getStream().getTrace(), LexicalScope.TRACE_PACKET_HEADER, input);
+        return fTracePacketHeaderDecl.createDefinition(fStreamInputReader.getStreamInput().getStream().getTrace(), ILexicalScope.TRACE_PACKET_HEADER, input);
     }
 
     /**
@@ -214,7 +215,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
 
     @Override
     public LexicalScope getScopePath() {
-        return LexicalScope.PACKET;
+        return ILexicalScope.PACKET;
     }
 
     // ------------------------------------------------------------------------
@@ -380,7 +381,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
                 eventID = ehd.getId();
                 timestamp = calculateTimestamp(ehd.getTimestamp(), ehd.getTimestampLength());
             } else {
-                fCurrentStreamEventHeaderDef = ((StructDeclaration) fStreamEventHeaderDecl).createDefinition(null, LexicalScope.EVENT_HEADER, currentBitBuffer);
+                fCurrentStreamEventHeaderDef = ((StructDeclaration) fStreamEventHeaderDecl).createDefinition(null, ILexicalScope.EVENT_HEADER, currentBitBuffer);
                 StructDefinition StructEventHeaderDef = (StructDefinition) fCurrentStreamEventHeaderDef;
                 /* Check for the event id. */
                 IDefinition idDef = StructEventHeaderDef.lookupDefinition("id"); //$NON-NLS-1$
@@ -498,10 +499,10 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
 
     @Override
     public Definition lookupDefinition(String lookupPath) {
-        if (lookupPath.equals(LexicalScope.STREAM_PACKET_CONTEXT.toString())) {
+        if (lookupPath.equals(ILexicalScope.STREAM_PACKET_CONTEXT.getPath())) {
             return (Definition) fCurrentStreamPacketContextDef;
         }
-        if (lookupPath.equals(LexicalScope.TRACE_PACKET_HEADER.toString())) {
+        if (lookupPath.equals(ILexicalScope.TRACE_PACKET_HEADER.getPath())) {
             return (Definition) fCurrentTracePacketHeaderDef;
         }
         return null;

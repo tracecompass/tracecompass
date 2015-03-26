@@ -11,16 +11,11 @@
 
 package org.eclipse.tracecompass.ctf.core.event.scope;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-
-import com.google.common.base.Joiner;
 
 /**
  * A node of a lexical scope
@@ -28,115 +23,21 @@ import com.google.common.base.Joiner;
  * @author Matthew Khouzam
  */
 @NonNullByDefault
-public class LexicalScope implements Comparable<LexicalScope> {
-    /**
-     * Empty string
-     */
-    public static final LexicalScope ROOT = new RootScope();
-
-    /**
-     * Trace string
-     */
-    public static final LexicalScope TRACE = new LexicalScope(ROOT, "trace"); //$NON-NLS-1$
-
-    /**
-     * Env string
-     */
-    public static final LexicalScope ENV = new LexicalScope(ROOT, "env"); //$NON-NLS-1$
-
-    /**
-     * Stream string
-     */
-    public static final LexicalScope STREAM = new LexicalScope(ROOT, "stream"); //$NON-NLS-1$
-
-    /**
-     * Event string
-     */
-    public static final LexicalScope EVENT = new LexicalScope(ROOT, "event"); //$NON-NLS-1$
-
-    /**
-     * Variant string
-     */
-    public static final LexicalScope VARIANT = new LexicalScope(ROOT, "variant"); //$NON-NLS-1$
-
-    /**
-     * packet string
-     */
-    public static final LexicalScope PACKET = new LexicalScope(ROOT, "packet"); //$NON-NLS-1$
-
-    /**
-     * Packet header string
-     */
-    public static final LexicalScope PACKET_HEADER = new PacketHeaderScope();
-
-    /**
-     * Stream packet scope
-     */
-    public static final LexicalScope STREAM_PACKET = new LexicalScope(STREAM, "packet"); //$NON-NLS-1$
-
-    /**
-     * Stream Packet header string
-     */
-    public static final LexicalScope STREAM_PACKET_CONTEXT = new LexicalScope(STREAM_PACKET, "context"); //$NON-NLS-1$
-
-    /**
-     * Trace packet scope
-     */
-    public static final LexicalScope TRACE_PACKET = new LexicalScope(TRACE, "packet"); //$NON-NLS-1$
-
-    /**
-     * Stream event scope
-     */
-    public static final LexicalScope STREAM_EVENT = new LexicalScope(STREAM, "event"); //$NON-NLS-1$
-
-    /**
-     * Trace packet header string
-     */
-    public static final LexicalScope TRACE_PACKET_HEADER = new LexicalScope(TRACE_PACKET, "header"); //$NON-NLS-1$
-
-    /**
-     * Stream event context
-     */
-    public static final LexicalScope STREAM_EVENT_CONTEXT = new LexicalScope(STREAM_EVENT, "context"); //$NON-NLS-1$
-
-    /**
-     * Stream event header
-     */
-    public static final LexicalScope STREAM_EVENT_HEADER = new LexicalScope(STREAM_EVENT, "header"); //$NON-NLS-1$
-
-    /**
-     * Event header
-     */
-    public static final LexicalScope EVENT_HEADER = new EventHeaderScope(EVENT, "header"); //$NON-NLS-1$
-
-    /**
-     * Fields in an event
-     */
-    public static final LexicalScope FIELDS = new FieldsScope(ROOT, "fields"); //$NON-NLS-1$
-
-    /**
-     * Context of an event
-     */
-    public static final LexicalScope CONTEXT = new LexicalScope(ROOT, "context"); //$NON-NLS-1$
-
-    /**
-     * Sorted list of parent paths
-     */
-    public static final LexicalScope[] PARENT_PATHS = {
-            ROOT,
-            CONTEXT,
-            FIELDS,
-            PACKET_HEADER,
-            STREAM_EVENT_CONTEXT,
-            STREAM_EVENT_HEADER,
-            STREAM_PACKET_CONTEXT,
-            TRACE_PACKET_HEADER
-    };
-
+public class LexicalScope implements ILexicalScope {
     private int hash = 0;
     private final String fName;
     private final String fPath;
-    private final Map<String, LexicalScope> fChildren = new ConcurrentHashMap<>();
+    private final Map<String, ILexicalScope> fChildren = new ConcurrentHashMap<>();
+
+    /**
+     * Hidden constructor for the root node only
+     *
+     * @since 1.0
+     */
+    protected LexicalScope() {
+        fPath = ""; //$NON-NLS-1$
+        fName = ""; //$NON-NLS-1$
+    }
 
     /**
      * The scope constructor
@@ -145,77 +46,47 @@ public class LexicalScope implements Comparable<LexicalScope> {
      *            The parent node, can be null, but shouldn't
      * @param name
      *            the name of the field
+     * @since 1.0
      */
-    public LexicalScope(@Nullable LexicalScope parent, String name) {
+    public LexicalScope(ILexicalScope parent, String name) {
         fName = name;
-        if (parent != null) {
-            @NonNull String pathString = checkNotNull(Joiner.on('.').skipNulls().join(parent.fPath, parent.getName()));
-            /*
-             * if joiner return null, we get an NPE... so we won't assign fPath
-             * to null
-             */
-            if (pathString.startsWith(".")) { //$NON-NLS-1$
-                /*
-                 * substring throws an exception or returns a string, it won't
-                 * return null
-                 */
-                pathString = checkNotNull(pathString.substring(1));
-            }
-            fPath = pathString;
-            parent.addChild(fName, this);
-        } else {
-            fPath = ""; //$NON-NLS-1$
-        }
+        fPath = parent.getPath().isEmpty() ? fName : parent.getPath() + '.' + fName;
+        parent.addChild(name, this);
     }
 
     /**
-     * Adds a child lexical scope
-     *
-     * @param name
-     *            the name of the child
-     * @param child
-     *            the child
+     * @since 1.0
      */
-    private void addChild(String name, LexicalScope child) {
+    @Override
+    public void addChild(String name, ILexicalScope child) {
         fChildren.put(name, child);
     }
 
-    /**
-     * Get the name
-     *
-     * @return the name
-     */
+    @Override
     public String getName() {
         return fName;
     }
 
     /**
-     * Gets a child of a given name
-     *
-     * @param name
-     *            the child
-     * @return the scope, can be null
+     * @since 1.0
      */
-    @Nullable
-    public LexicalScope getChild(String name) {
+    @Override
+    public @Nullable ILexicalScope getChild(String name) {
         return fChildren.get(name);
     }
 
+    /**
+     * @since 1.0
+     */
     @Override
-    public String toString() {
-        return (fPath.isEmpty() ? fName : fPath + '.' + fName);
+    public String getPath() {
+        return fPath;
     }
 
+    // for debugging purposes
     @Override
-    public int compareTo(@Nullable LexicalScope other) {
-        if (other == null) {
-            throw new IllegalArgumentException();
-        }
-        int comp = fPath.compareTo(other.fPath);
-        if (comp == 0) {
-            return fName.compareTo(other.fName);
-        }
-        return comp;
+    public String toString() {
+        return getPath();
     }
 
     @Override

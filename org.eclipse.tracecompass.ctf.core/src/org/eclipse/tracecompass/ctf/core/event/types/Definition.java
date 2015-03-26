@@ -14,7 +14,7 @@ package org.eclipse.tracecompass.ctf.core.event.types;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
-import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
+import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 
 /**
  * A CTF definition
@@ -40,7 +40,7 @@ public abstract class Definition implements IDefinition {
     private final String fFieldName;
 
     /** The complete path of this field */
-    private final @NonNull LexicalScope fPath;
+    private final @NonNull ILexicalScope fPath;
 
     private final IDefinitionScope fDefinitionScope;
 
@@ -82,8 +82,9 @@ public abstract class Definition implements IDefinition {
      *
      * @param scope
      *            the scope
+     * @since 1.0
      */
-    public Definition(@NonNull IDeclaration declaration, IDefinitionScope definitionScope, @NonNull String fieldName, @NonNull LexicalScope scope) {
+    public Definition(@NonNull IDeclaration declaration, IDefinitionScope definitionScope, @NonNull String fieldName, @NonNull ILexicalScope scope) {
         fDeclaration = declaration;
         fDefinitionScope = definitionScope;
         fFieldName = fieldName;
@@ -103,8 +104,11 @@ public abstract class Definition implements IDefinition {
         return fFieldName;
     }
 
+    /**
+     * @since 1.0
+     */
     @Override
-    public LexicalScope getScopePath() {
+    public ILexicalScope getScopePath() {
         return fPath;
     }
 
@@ -131,6 +135,6 @@ public abstract class Definition implements IDefinition {
 
     @Override
     public String toString() {
-        return fPath.toString() + '[' + Integer.toHexString(hashCode()) + ']';
+        return fPath.getPath() + '[' + Integer.toHexString(hashCode()) + ']';
     }
 }

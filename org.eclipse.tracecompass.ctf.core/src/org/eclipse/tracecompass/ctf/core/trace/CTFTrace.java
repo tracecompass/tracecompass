@@ -39,7 +39,7 @@ import org.eclipse.tracecompass.ctf.core.event.CTFClock;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
-import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
+import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 import org.eclipse.tracecompass.ctf.core.event.types.Definition;
 import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDefinition;
@@ -466,7 +466,7 @@ public class CTFTrace implements IDefinitionScope {
 
             if (fPacketHeaderDecl != null) {
                 /* Read the packet header */
-                fPacketHeaderDef = fPacketHeaderDecl.createDefinition(this, LexicalScope.PACKET_HEADER, streamBitBuffer);
+                fPacketHeaderDef = fPacketHeaderDecl.createDefinition(this, ILexicalScope.PACKET_HEADER, streamBitBuffer);
             }
         } catch (IOException e) {
             /* Shouldn't happen at this stage if every other check passed */
@@ -530,9 +530,12 @@ public class CTFTrace implements IDefinitionScope {
     // IDefinitionScope
     // ------------------------------------------------------------------------
 
+    /**
+     * @since 1.0
+     */
     @Override
-    public LexicalScope getScopePath() {
-        return LexicalScope.TRACE;
+    public ILexicalScope getScopePath() {
+        return ILexicalScope.TRACE;
     }
 
     /**
@@ -545,7 +548,7 @@ public class CTFTrace implements IDefinitionScope {
      */
     @Override
     public Definition lookupDefinition(String lookupPath) {
-        if (lookupPath.equals(LexicalScope.TRACE_PACKET_HEADER.toString())) {
+        if (lookupPath.equals(ILexicalScope.TRACE_PACKET_HEADER.getPath())) {
             return fPacketHeaderDef;
         }
         return null;

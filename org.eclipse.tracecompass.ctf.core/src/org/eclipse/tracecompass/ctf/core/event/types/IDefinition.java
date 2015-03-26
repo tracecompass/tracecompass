@@ -13,7 +13,7 @@
 package org.eclipse.tracecompass.ctf.core.event.types;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
+import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 
 /**
  * Interface for data definitions. A definition is when a value is given to a
@@ -28,8 +28,9 @@ public interface IDefinition {
      * Get the complete path of this field.
      *
      * @return The path
+     * @since 1.0
      */
-    LexicalScope getScopePath();
+    ILexicalScope getScopePath();
 
     /**
      * Get the declaration of this definition

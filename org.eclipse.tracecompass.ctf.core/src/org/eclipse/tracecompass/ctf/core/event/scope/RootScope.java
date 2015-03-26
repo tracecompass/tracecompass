@@ -22,40 +22,40 @@ import org.eclipse.jdt.annotation.Nullable;
  * @author Matthew Khouzam
  */
 @NonNullByDefault
-public class RootScope extends LexicalScope {
+public final class RootScope extends LexicalScope {
 
     /**
      * The scope constructor
      */
     public RootScope() {
-        super(null, ""); //$NON-NLS-1$
+        super();
     }
 
     @Override
     @Nullable
-    public LexicalScope getChild(String name) {
+    public ILexicalScope getChild(String name) {
         /*
          * This happens ~40 % of the time
          */
-        if (name.equals(EVENT_HEADER.toString())) {
+        if (name.equals(EVENT_HEADER.getPath())) {
             return EVENT_HEADER;
         }
         /*
          * This happens ~30 % of the time
          */
-        if (name.equals(FIELDS.toString())) {
+        if (name.equals(FIELDS.getPath())) {
             return FIELDS;
         }
         /*
          * This happens ~30 % of the time
          */
-        if (name.equals(CONTEXT.toString())) {
+        if (name.equals(CONTEXT.getPath())) {
             return CONTEXT;
         }
         /*
          * This happens ~1 % of the time
          */
-        if (name.equals(PACKET_HEADER.toString())) {
+        if (name.equals(PACKET_HEADER.getPath())) {
             return PACKET_HEADER;
         }
         return super.getChild(name);

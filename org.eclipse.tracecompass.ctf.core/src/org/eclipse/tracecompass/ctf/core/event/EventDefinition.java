@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
+import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
 import org.eclipse.tracecompass.ctf.core.event.types.Definition;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
@@ -113,15 +114,18 @@ public final class EventDefinition implements IDefinitionScope {
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
 
+    /**
+     * @since 1.0
+     */
     @Override
-    public LexicalScope getScopePath() {
+    public ILexicalScope getScopePath() {
         String eventName = fDeclaration.getName();
         if (eventName == null) {
             return null;
         }
-        LexicalScope myScope = LexicalScope.EVENT.getChild(eventName);
+        ILexicalScope myScope = ILexicalScope.EVENT.getChild(eventName);
         if (myScope == null) {
-            myScope = new LexicalScope(LexicalScope.EVENT, eventName);
+            myScope = new LexicalScope(ILexicalScope.EVENT, eventName);
         }
         return myScope;
     }

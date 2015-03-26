@@ -15,7 +15,7 @@ package org.eclipse.tracecompass.ctf.core.event.types;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
-import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
+import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 
 /**
  * Scoped defintion. a defintion where you can lookup various datatypes
@@ -54,8 +54,9 @@ public abstract class ScopedDefinition extends Definition implements IDefinition
      *            the field name
      * @param scope
      *            the lexical scope
+     * @since 1.0
      */
-    public ScopedDefinition(StructDeclaration declaration, @Nullable IDefinitionScope definitionScope, String fieldName, LexicalScope scope) {
+    public ScopedDefinition(StructDeclaration declaration, @Nullable IDefinitionScope definitionScope, String fieldName, ILexicalScope scope) {
         super(declaration, definitionScope, fieldName, scope);
     }
 

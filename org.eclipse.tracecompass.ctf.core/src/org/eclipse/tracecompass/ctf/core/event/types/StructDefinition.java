@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
-import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
+import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -122,9 +122,10 @@ public final class StructDefinition extends ScopedDefinition implements IComposi
      *            the list of fields
      * @param definitions
      *            the definitions
+     * @since 1.0
      */
     public StructDefinition(@NonNull StructDeclaration declaration,
-            IDefinitionScope definitionScope, @NonNull LexicalScope scope,
+            IDefinitionScope definitionScope, @NonNull ILexicalScope scope,
             @NonNull String structFieldName, @NonNull Iterable<String> fieldNames, Definition[] definitions) {
         super(declaration, definitionScope, structFieldName, scope);
         fFieldNames = ImmutableList.copyOf(fieldNames);

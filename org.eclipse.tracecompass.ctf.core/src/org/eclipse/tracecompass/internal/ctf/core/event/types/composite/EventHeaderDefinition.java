@@ -15,7 +15,7 @@ package org.eclipse.tracecompass.internal.ctf.core.event.types.composite;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
+import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 import org.eclipse.tracecompass.ctf.core.event.types.Declaration;
 import org.eclipse.tracecompass.ctf.core.event.types.Definition;
 import org.eclipse.tracecompass.ctf.core.event.types.ICompositeDefinition;
@@ -55,7 +55,7 @@ public final class EventHeaderDefinition extends Definition implements IComposit
      *            the number of bits valid in the timestamp
      */
     public EventHeaderDefinition(@NonNull Declaration eventHeaderDecl, int id, long timestamp, int timestampLength) {
-        super(eventHeaderDecl, null, LexicalScope.EVENT_HEADER.toString(), LexicalScope.EVENT_HEADER);
+        super(eventHeaderDecl, null, ILexicalScope.EVENT_HEADER.getPath(), ILexicalScope.EVENT_HEADER);
         fId = id;
         fTimestamp = timestamp;
         fTimestampLength = timestampLength;

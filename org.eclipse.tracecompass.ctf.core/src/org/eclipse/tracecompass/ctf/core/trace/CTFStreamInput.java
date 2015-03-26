@@ -25,6 +25,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.CTFReaderException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
+import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
 import org.eclipse.tracecompass.ctf.core.event.types.Definition;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDefinition;
@@ -175,7 +176,7 @@ public class CTFStreamInput implements IDefinitionScope {
      */
     @Override
     public LexicalScope getScopePath() {
-        return LexicalScope.STREAM;
+        return ILexicalScope.STREAM;
     }
 
     // ------------------------------------------------------------------------
@@ -311,7 +312,7 @@ public class CTFStreamInput implements IDefinitionScope {
     private StructDefinition parseTracePacketHeader(
             BitBuffer bitBuffer) throws CTFReaderException {
 
-        StructDefinition tracePacketHeaderDef = fTracePacketHeaderDecl.createDefinition(fStream.getTrace(), LexicalScope.TRACE_PACKET_HEADER, bitBuffer);
+        StructDefinition tracePacketHeaderDef = fTracePacketHeaderDecl.createDefinition(fStream.getTrace(), ILexicalScope.TRACE_PACKET_HEADER, bitBuffer);
 
         /*
          * Check the CTF magic number
@@ -357,7 +358,7 @@ public class CTFStreamInput implements IDefinitionScope {
     private StreamInputPacketIndexEntry parsePacketContext(long dataOffsetBits, long fileSizeBytes,
             BitBuffer bitBuffer) throws CTFReaderException {
         StreamInputPacketIndexEntry packetIndex;
-        StructDefinition streamPacketContextDef = fStreamPacketContextDecl.createDefinition(this, LexicalScope.STREAM_PACKET_CONTEXT, bitBuffer);
+        StructDefinition streamPacketContextDef = fStreamPacketContextDecl.createDefinition(this, ILexicalScope.STREAM_PACKET_CONTEXT, bitBuffer);
         packetIndex = new StreamInputPacketIndexEntry(dataOffsetBits, streamPacketContextDef, fileSizeBytes, fLostSoFar);
         fLostSoFar = packetIndex.getLostEvents() + fLostSoFar;
         setTimestampEnd(packetIndex.getTimestampEnd());

@@ -15,6 +15,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.ctf.core.CTFReaderException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
+import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
 
 /**
@@ -25,23 +26,26 @@ import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
  */
 public abstract class Declaration implements IDeclaration {
 
+    /**
+     * @since 1.0
+     */
     @Override
-    public LexicalScope getPath(IDefinitionScope definitionScope, @NonNull String fieldName) {
+    public ILexicalScope getPath(IDefinitionScope definitionScope, @NonNull String fieldName) {
         if (definitionScope != null) {
-            final LexicalScope parentPath = definitionScope.getScopePath();
+            final ILexicalScope parentPath = definitionScope.getScopePath();
             if (parentPath != null) {
-                LexicalScope myScope = parentPath.getChild(fieldName);
+                ILexicalScope myScope = parentPath.getChild(fieldName);
                 if (myScope == null) {
                     myScope = new LexicalScope(parentPath, fieldName);
                 }
                 return myScope;
             }
         }
-        LexicalScope child = LexicalScope.ROOT.getChild(fieldName);
+        ILexicalScope child = ILexicalScope.ROOT.getChild(fieldName);
         if (child != null) {
             return child;
         }
-        return new LexicalScope(LexicalScope.ROOT, fieldName);
+        return new LexicalScope(ILexicalScope.ROOT, fieldName);
     }
 
     /**

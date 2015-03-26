@@ -21,17 +21,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * @author Matthew Khouzam
  */
 @NonNullByDefault
-public class FieldsScope extends LexicalScope {
-
-    /**
-     * ret field
-     */
-    public static final LexicalScope FIELDS_RET = new LexicalScope(FIELDS, "_ret"); //$NON-NLS-1$
-
-    /**
-     * tid field
-     */
-    public static final LexicalScope FIELDS_TID = new LexicalScope(FIELDS, "_tid"); //$NON-NLS-1$
+public final class FieldsScope extends LexicalScope {
 
     /**
      * The scope constructor
@@ -41,13 +31,13 @@ public class FieldsScope extends LexicalScope {
      * @param name
      *            the name of the field
      */
-    public FieldsScope(LexicalScope parent, String name) {
+    FieldsScope(ILexicalScope parent, String name) {
         super(parent, name);
     }
 
     @Override
     @Nullable
-    public LexicalScope getChild(String name) {
+    public ILexicalScope getChild(String name) {
         if (name.equals(FIELDS_RET.getName())) {
             return FIELDS_RET;
         }

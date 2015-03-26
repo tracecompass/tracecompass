@@ -22,17 +22,8 @@ import org.eclipse.jdt.annotation.Nullable;
  * @author Matthew Khouzam
  */
 @NonNullByDefault
-public class EventHeaderScope extends LexicalScope {
+public final class EventHeaderScope extends LexicalScope {
 
-    /**
-     * Event header id string
-     */
-    public static final LexicalScope EVENT_HEADER_ID = new LexicalScope(EVENT_HEADER, "id"); //$NON-NLS-1$
-
-    /**
-     * Event header v as in variant string
-     */
-    public static final LexicalScope EVENT_HEADER_V = new EventHeaderVScope(EVENT_HEADER, "v"); //$NON-NLS-1$
 
     /**
      * The scope constructor
@@ -42,13 +33,13 @@ public class EventHeaderScope extends LexicalScope {
      * @param name
      *            the name of the field
      */
-    public EventHeaderScope(LexicalScope parent, String name) {
+    EventHeaderScope(ILexicalScope parent, String name) {
         super(parent, name);
     }
 
     @Override
     @Nullable
-    public LexicalScope getChild(String name) {
+    public ILexicalScope getChild(String name) {
         if (name.equals(EVENT_HEADER_ID.getName())) {
             return EVENT_HEADER_ID;
         }
@@ -59,7 +50,7 @@ public class EventHeaderScope extends LexicalScope {
     }
 
     @Override
-    public String toString() {
+    public String getPath() {
         return "event.header"; //$NON-NLS-1$
     }
 

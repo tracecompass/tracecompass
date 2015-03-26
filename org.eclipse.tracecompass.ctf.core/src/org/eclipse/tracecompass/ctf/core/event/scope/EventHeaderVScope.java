@@ -22,16 +22,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * @author Matthew Khouzam
  */
 @NonNullByDefault
-public class EventHeaderVScope extends LexicalScope {
-
-    /**
-     * Packet header v id string
-     */
-    public static final LexicalScope PACKET_HEADER_V_ID = new LexicalScope(PACKET_HEADER, "id"); //$NON-NLS-1$
-    /**
-     * Packet header v timestamp string
-     */
-    public static final LexicalScope PACKET_HEADER_V_TIMESTAMP = new LexicalScope(PACKET_HEADER, "timestamp"); //$NON-NLS-1$
+public final class EventHeaderVScope extends LexicalScope {
 
     /**
      * The scope constructor
@@ -41,18 +32,18 @@ public class EventHeaderVScope extends LexicalScope {
      * @param name
      *            the name of the field
      */
-    public EventHeaderVScope(LexicalScope parent, String name) {
+    EventHeaderVScope(ILexicalScope parent, String name) {
         super(parent, name);
     }
 
     @Override
     @Nullable
-    public LexicalScope getChild(String name) {
-        if (name.equals(PACKET_HEADER_V_TIMESTAMP.getName())) {
-            return PACKET_HEADER_V_TIMESTAMP;
+    public ILexicalScope getChild(String name) {
+        if (name.equals(EVENT_HEADER_V_TIMESTAMP.getName())) {
+            return EVENT_HEADER_V_TIMESTAMP;
         }
-        if (name.equals(PACKET_HEADER_V_ID.getName())) {
-            return PACKET_HEADER_V_ID;
+        if (name.equals(EVENT_HEADER_V_ID.getName())) {
+            return EVENT_HEADER_V_ID;
         }
         return super.getChild(name);
     }

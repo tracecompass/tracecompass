@@ -22,7 +22,7 @@ import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
-import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
+import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 import org.eclipse.tracecompass.ctf.core.event.types.Declaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
@@ -90,10 +90,10 @@ public class EventDeclaration implements IEventDeclaration {
     @Override
     public EventDefinition createDefinition(CTFStreamInputReader streamInputReader, @NonNull BitBuffer input, long timestamp) throws CTFReaderException {
         StructDeclaration streamEventContextDecl = streamInputReader.getStreamEventContextDecl();
-        StructDefinition streamEventContext = streamEventContextDecl != null ? streamEventContextDecl.createDefinition(fStream.getTrace(), LexicalScope.STREAM_EVENT_CONTEXT, input) : null;
+        StructDefinition streamEventContext = streamEventContextDecl != null ? streamEventContextDecl.createDefinition(fStream.getTrace(), ILexicalScope.STREAM_EVENT_CONTEXT, input) : null;
         StructDefinition packetContext = streamInputReader.getPacketReader().getCurrentPacketEventHeader();
-        StructDefinition eventContext = fContext != null ? fContext.createDefinition(fStream.getTrace(), LexicalScope.CONTEXT, input) : null;
-        StructDefinition eventPayload = fFields != null ? fFields.createDefinition(fStream.getTrace(), LexicalScope.FIELDS, input) : null;
+        StructDefinition eventContext = fContext != null ? fContext.createDefinition(fStream.getTrace(), ILexicalScope.CONTEXT, input) : null;
+        StructDefinition eventPayload = fFields != null ? fFields.createDefinition(fStream.getTrace(), ILexicalScope.FIELDS, input) : null;
 
         // a bit lttng specific
         // CTF doesn't require a timestamp,

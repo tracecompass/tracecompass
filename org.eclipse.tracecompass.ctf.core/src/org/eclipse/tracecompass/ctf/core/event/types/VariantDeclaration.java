@@ -128,7 +128,7 @@ public class VariantDeclaration extends Declaration {
         fDeclarationToPopulate = fFields.get(varFieldName);
         if (fDeclarationToPopulate == null) {
             throw new CTFReaderException("Unknown enum selector for variant " + //$NON-NLS-1$
-                    definitionScope.getScopePath().toString());
+                    definitionScope.getScopePath().getPath());
         }
         Definition fieldValue = fDeclarationToPopulate.createDefinition(definitionScope, fieldName, input);
         return new VariantDefinition(this, definitionScope, varFieldName, fieldName, fieldValue);

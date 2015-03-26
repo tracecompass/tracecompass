@@ -31,7 +31,7 @@ public class PacketHeaderScope extends LexicalScope {
     }
 
     @Override
-    public String toString() {
+    public String getPath() {
         return "packet.header"; //$NON-NLS-1$
     }
 

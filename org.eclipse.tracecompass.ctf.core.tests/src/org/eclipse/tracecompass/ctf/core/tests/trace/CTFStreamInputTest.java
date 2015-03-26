@@ -96,7 +96,7 @@ public class CTFStreamInputTest {
      */
     @Test
     public void testGetPath() {
-        String result = fixture.getScopePath().toString();
+        String result = fixture.getScopePath().getPath();
         assertNotNull(result);
     }
 

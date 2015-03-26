@@ -16,7 +16,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.ctf.core.CTFReaderException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
-import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
+import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 
 /**
  * A CTF data type declaration.
@@ -57,8 +57,9 @@ public interface IDeclaration {
      * @param fieldName
      *            the name of the definition
      * @return the path of the definition
+     * @since 1.0
      */
-    @NonNull LexicalScope getPath(IDefinitionScope definitionScope, @NonNull String fieldName);
+    @NonNull ILexicalScope getPath(IDefinitionScope definitionScope, @NonNull String fieldName);
 
     /**
      * The minimum alignment. if the field is 32 bits, the definition will pad

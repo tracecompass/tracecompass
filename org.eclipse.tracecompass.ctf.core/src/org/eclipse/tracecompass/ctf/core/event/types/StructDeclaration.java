@@ -26,7 +26,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.CTFReaderException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
-import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
+import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 
 /**
  * A CTF structure declaration.
@@ -180,9 +180,10 @@ public class StructDeclaration extends Declaration {
      * @return a reference to the definition
      * @throws CTFReaderException
      *             error in reading
+     * @since 1.0
      */
     public StructDefinition createDefinition(IDefinitionScope definitionScope,
-            LexicalScope fieldScope, @NonNull BitBuffer input) throws CTFReaderException {
+            ILexicalScope fieldScope, @NonNull BitBuffer input) throws CTFReaderException {
         alignRead(input);
         final Definition[] myFields = new Definition[fFieldMap.size()];
 

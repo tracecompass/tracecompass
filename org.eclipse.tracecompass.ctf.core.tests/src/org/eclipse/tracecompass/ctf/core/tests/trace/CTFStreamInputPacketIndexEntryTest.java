@@ -22,7 +22,7 @@ import java.nio.ByteOrder;
 
 import org.eclipse.tracecompass.ctf.core.CTFReaderException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
-import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
+import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 import org.eclipse.tracecompass.ctf.core.event.types.Encoding;
 import org.eclipse.tracecompass.ctf.core.event.types.EnumDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.FloatDeclaration;
@@ -91,7 +91,7 @@ public class CTFStreamInputPacketIndexEntryTest {
         bb.getByteBuffer().put(("Test").getBytes());
         bb.getByteBuffer().put((byte) 0);
         bb.getByteBuffer().put((byte) 0);
-        StructDefinition sdef = sd.createDefinition(null, LexicalScope.PACKET_HEADER, bb);
+        StructDefinition sdef = sd.createDefinition(null, ILexicalScope.PACKET_HEADER, bb);
         StreamInputPacketIndexEntry sipie = new StreamInputPacketIndexEntry(0, sdef, 128, 0);
         assertNull(sipie.getTarget());
         assertEquals(100, sipie.getTimestampBegin());
@@ -120,7 +120,7 @@ public class CTFStreamInputPacketIndexEntryTest {
         bb.getByteBuffer().put(("Test").getBytes());
         bb.getByteBuffer().put((byte) 0);
         bb.getByteBuffer().put((byte) 0);
-        StructDefinition sdef = sd.createDefinition(null, LexicalScope.PACKET_HEADER, bb);
+        StructDefinition sdef = sd.createDefinition(null, ILexicalScope.PACKET_HEADER, bb);
         StreamInputPacketIndexEntry sipie = new StreamInputPacketIndexEntry(0, sdef, 128, 0);
         assertNull(sipie.getTarget());
         assertEquals(100, sipie.getTimestampBegin());
@@ -150,7 +150,7 @@ public class CTFStreamInputPacketIndexEntryTest {
         bb.getByteBuffer().put(("Test").getBytes());
         bb.getByteBuffer().put((byte) 0);
         bb.getByteBuffer().put((byte) 0);
-        StructDefinition sdef = sd.createDefinition(null, LexicalScope.PACKET_HEADER, bb);
+        StructDefinition sdef = sd.createDefinition(null, ILexicalScope.PACKET_HEADER, bb);
         StreamInputPacketIndexEntry sipie = new StreamInputPacketIndexEntry(0, sdef, 128, 0);
         assertNull(sipie.getTarget());
         assertEquals(100, sipie.getTimestampBegin());
@@ -178,7 +178,7 @@ public class CTFStreamInputPacketIndexEntryTest {
         bb.getByteBuffer().put(("Test").getBytes());
         bb.getByteBuffer().put((byte) 0);
         bb.getByteBuffer().put((byte) 0);
-        StructDefinition sdef = sd.createDefinition(null, LexicalScope.PACKET_HEADER, bb);
+        StructDefinition sdef = sd.createDefinition(null, ILexicalScope.PACKET_HEADER, bb);
         StreamInputPacketIndexEntry sipie = new StreamInputPacketIndexEntry(0, sdef, 128, 0);
         assertNull(sipie.getTarget());
         assertEquals(Long.MIN_VALUE, sipie.getTimestampBegin());
@@ -205,7 +205,7 @@ public class CTFStreamInputPacketIndexEntryTest {
         bb.getByteBuffer().put(("Test66").getBytes());
         bb.getByteBuffer().put((byte) 0);
         bb.getByteBuffer().put((byte) 0);
-        StructDefinition sdef = sd.createDefinition(null, LexicalScope.PACKET_HEADER, bb);
+        StructDefinition sdef = sd.createDefinition(null, ILexicalScope.PACKET_HEADER, bb);
         StreamInputPacketIndexEntry sipie = new StreamInputPacketIndexEntry(0, sdef, 128, 0);
         assertEquals(Long.MIN_VALUE, sipie.getTimestampBegin());
         assertEquals(Long.MAX_VALUE, sipie.getTimestampEnd());
@@ -232,7 +232,7 @@ public class CTFStreamInputPacketIndexEntryTest {
         bb.getByteBuffer().putInt(0);
         bb.getByteBuffer().putInt(66);
         bb.getByteBuffer().putInt(300);
-        StructDefinition sdef = sd.createDefinition(null, LexicalScope.PACKET_HEADER, bb);
+        StructDefinition sdef = sd.createDefinition(null, ILexicalScope.PACKET_HEADER, bb);
         StreamInputPacketIndexEntry sipie = new StreamInputPacketIndexEntry(0, sdef, 128, 100);
         assertEquals(Long.MIN_VALUE, sipie.getTimestampBegin());
         assertEquals(Long.MAX_VALUE, sipie.getTimestampEnd());
@@ -259,7 +259,7 @@ public class CTFStreamInputPacketIndexEntryTest {
         @SuppressWarnings("null")
         BitBuffer bb = new BitBuffer(ByteBuffer.allocate(128));
 
-        StructDefinition sdef = sd.createDefinition(null, LexicalScope.PACKET_HEADER, bb);
+        StructDefinition sdef = sd.createDefinition(null, ILexicalScope.PACKET_HEADER, bb);
         assertEquals(expectedResult, new StreamInputPacketIndexEntry(0, sdef, 10000, 0).toString());
     }
 }

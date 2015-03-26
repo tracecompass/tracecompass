@@ -27,8 +27,9 @@ public interface IDefinitionScope {
      * Gets the path in a C style for the scope.
      *
      * @return the path
+     * @since 1.0
      */
-    LexicalScope getScopePath();
+    ILexicalScope getScopePath();
 
     /**
      * Looks up in this definition scope.
