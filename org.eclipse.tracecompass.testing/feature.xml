@@ -20,6 +20,13 @@
    </license>
 
    <plugin
+         id="org.eclipse.tracecompass.analysis.os.linux.core.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
          id="org.eclipse.tracecompass.btf.core.tests"
          download-size="0"
          install-size="0"
@@ -48,7 +55,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.tracecompass.analysis.os.linux.core.tests"
+         id="org.eclipse.tracecompass.gdbtrace.ui.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -154,6 +161,13 @@
 
    <plugin
          id="org.eclipse.tracecompass.tmf.pcap.ui.swtbot.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.tracecompass.tmf.remote.core.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"
