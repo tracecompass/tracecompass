@@ -38,9 +38,8 @@
           <useUIThread>false</useUIThread>
           <argLine>${tycho.testArgLine} ${base.ui.test.vmargs}</argLine>
           <product>org.eclipse.platform.ide</product>
-<!-- Disable GTK3 with Luna because it makes the test hang (bug in IcedTea http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=1736) -->
           <environmentVariables>
-            <SWT_GTK3>0</SWT_GTK3>
+            <SWT_GTK3>${SWT_GTK3}</SWT_GTK3>
           </environmentVariables>
         </configuration>
       </plugin>
