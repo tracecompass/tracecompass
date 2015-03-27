@@ -9,16 +9,19 @@
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
  *   Alexandre Montplaisir - Replaced separate Condition objects by anonymous classes
- *   Patrick Tasse - Add projectElementHasChild condition
+ *   Patrick Tasse - Add projectElementHasChild and isEditorOpened conditions
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared;
 
 
+import static org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory.withPartName;
+
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
@@ -26,6 +29,8 @@ import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.ui.IEditorReference;
+import org.hamcrest.Matcher;
 
 /**
  * Is a tree node available
@@ -248,5 +253,24 @@ public final class ConditionHelpers {
         public SWTBotTreeItem getItem() {
             return fItem;
         }
+    }
+
+    /**
+     * Condition to check if an editor with the specified title is opened.
+     *
+     * @param bot
+     *            a workbench bot
+     * @param title
+     *            the editor title
+     * @return ICondition for verification
+     */
+    public static ICondition isEditorOpened(final SWTWorkbenchBot bot, final String title) {
+        return new SWTBotTestCondition() {
+            @Override
+            public boolean test() throws Exception {
+                Matcher<IEditorReference> withPartName = withPartName(title);
+                return !bot.editors(withPartName).isEmpty();
+            }
+        };
     }
 }
