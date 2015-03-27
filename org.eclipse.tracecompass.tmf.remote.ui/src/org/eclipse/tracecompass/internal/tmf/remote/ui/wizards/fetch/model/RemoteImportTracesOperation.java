@@ -72,10 +72,10 @@ public class RemoteImportTracesOperation extends TmfWorkspaceModifyOperation {
     // Attributes
     // ------------------------------------------------------------------------
     private IStatus fStatus;
-    final private Shell fShell;
-    final private TmfTraceFolder fDestination;
-    final private Object[] fTraceElements;
-    final private ImportConflictHandler fConflictHandler;
+    private final Shell fShell;
+    private final TmfTraceFolder fDestination;
+    private final Object[] fTraceElements;
+    private final ImportConflictHandler fConflictHandler;
 
     // ------------------------------------------------------------------------
     // Constructor(s)

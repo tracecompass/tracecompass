@@ -33,8 +33,8 @@ public class RemoteFetchLogWizard extends Wizard implements IImportWizard {
     // Constants
     // ------------------------------------------------------------------------
     private static final String FETCH_LOG_WIZARD = "RemoteFetchLogWizard"; //$NON-NLS-1$
-    static private final String PLUGIN_ID = Activator.PLUGIN_ID;
-    static private final String ICON_PATH = "icons/elcl16/fetch_log_wiz.gif"; //$NON-NLS-1$
+    private static final String PLUGIN_ID = Activator.PLUGIN_ID;
+    private static final String ICON_PATH = "icons/elcl16/fetch_log_wiz.gif"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
