@@ -28,7 +28,7 @@ import org.eclipse.remote.internal.jsch.core.JSchConnection;
 import org.eclipse.tracecompass.internal.tmf.remote.core.messages.Messages;
 
 /**
- * Connection factory.
+ * RemoteSystemProxy factory.
  *
  * @author Bernd Hufmann
  */
@@ -39,14 +39,14 @@ public class RemoteSystemProxyFactory {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-    private static final Map<String, IConnectionFactory> fConnectionFactories = new HashMap<>();
-    private static final DefaultConnectionFactory fDefaultConnectionFactory = new DefaultConnectionFactory();
+    private static final Map<String, IConnectionFactory> CONNECTION_FACTORIES = new HashMap<>();
+    private static final DefaultConnectionFactory DEFAULT_CONNECTION_FACTORY = new DefaultConnectionFactory();
 
     static {
         // Add local services
         IRemoteServicesManager manager = RemoteSystemProxy.getService(IRemoteServicesManager.class);
         if (manager != null) {
-            fConnectionFactories.put(manager.getLocalConnectionType().getId(), new LocalConnectionFactory());
+            CONNECTION_FACTORIES.put(manager.getLocalConnectionType().getId(), new LocalConnectionFactory());
         }
     }
 
@@ -63,7 +63,7 @@ public class RemoteSystemProxyFactory {
      *                the factory implementation
      */
     public static void registerConnectionFactory(String connectionTypeId, IConnectionFactory factory) {
-        fConnectionFactories.put(connectionTypeId, factory);
+        CONNECTION_FACTORIES.put(connectionTypeId, factory);
     }
 
     /**
@@ -90,12 +90,12 @@ public class RemoteSystemProxyFactory {
             throw new RemoteConnectionException(MessageFormat.format(Messages.RemoteConnection_ConnectionError, hostUri));
         }
 
-        IConnectionFactory connectionFactory = fConnectionFactories.get(connectionType.getId());
+        IConnectionFactory connectionFactory = CONNECTION_FACTORIES.get(connectionType.getId());
         // Create a new connection
         if (connectionFactory != null) {
             connection = connectionFactory.createConnection(connectionType, hostUri, hostName);
         } else {
-            connection = fDefaultConnectionFactory.createConnection(connectionType, hostUri, hostName);
+            connection = DEFAULT_CONNECTION_FACTORY.createConnection(connectionType, hostUri, hostName);
         }
 
         return new RemoteSystemProxy(connection);
