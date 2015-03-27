@@ -9,6 +9,7 @@
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
  *   Alexandre Montplaisir - Replaced separate Condition objects by anonymous classes
+ *   Patrick Tasse - Add projectElementHasChild condition
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared;
@@ -17,8 +18,10 @@ package org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
@@ -191,5 +194,59 @@ public final class ConditionHelpers {
                 return false;
             }
         };
+    }
+
+    /**
+     * Condition to check if a tracing project element has a child with the
+     * specified name. A project element label may have a count suffix in the
+     * format ' [n]'.
+     */
+    public static class ProjectElementHasChild extends DefaultCondition {
+
+        private final SWTBotTreeItem fParentItem;
+        private final String fName;
+        private final String fRegex;
+        private SWTBotTreeItem fItem = null;
+
+        /**
+         * Constructor.
+         *
+         * @param parentItem
+         *            the parent item
+         * @param name
+         *            the child name to look for
+         */
+        public ProjectElementHasChild(final SWTBotTreeItem parentItem, final String name) {
+            fParentItem = parentItem;
+            fName = name;
+            /* Project element labels may have count suffix */
+            fRegex = name + "(\\s\\[(\\d)+\\])?";
+        }
+
+        @Override
+        public boolean test() throws Exception {
+            fParentItem.expand();
+            for (SWTBotTreeItem item : fParentItem.getItems()) {
+                if (item.getText().matches(fRegex)) {
+                    fItem = item;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public String getFailureMessage() {
+            return NLS.bind("No child of {0} found with name {1}", fParentItem.getText(), fName);
+        }
+
+        /**
+         * Returns the matching child item if the condition returned true.
+         *
+         * @return the matching item
+         */
+        public SWTBotTreeItem getItem() {
+            return fItem;
+        }
     }
 }

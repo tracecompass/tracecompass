@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.List;
@@ -52,6 +53,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers.ProjectElementHasChild;
 import org.eclipse.tracecompass.tmf.ui.views.TracingPerspectiveFactory;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -321,56 +323,42 @@ public final class SWTBotUtils {
         projectExplorerBot.setFocus();
 
         final SWTBotTree tree = bot.tree();
+        bot.waitUntil(ConditionHelpers.IsTreeNodeAvailable(projectName, tree));
         final SWTBotTreeItem treeItem = tree.getTreeItem(projectName);
         treeItem.expand();
 
-        String nodeName = getFullNodeName(treeItem, TmfTracesFolder.TRACES_FOLDER_NAME);
-        bot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(nodeName, treeItem));
-        SWTBotTreeItem tracesNode = treeItem.getNode(nodeName);
+        SWTBotTreeItem tracesNode = getTraceProjectItem(bot, treeItem, TmfTracesFolder.TRACES_FOLDER_NAME);
         tracesNode.expand();
 
-        SWTBotTreeItem currentNode = tracesNode;
+        SWTBotTreeItem currentItem = tracesNode;
         for (String segment : elementPath.segments()) {
-            String fullNodeName = getFullNodeName(currentNode, segment);
-            bot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(fullNodeName, currentNode));
-            SWTBotTreeItem newNode = currentNode.getNode(fullNodeName);
-            newNode.select();
-            newNode.doubleClick();
-            currentNode = newNode;
+            currentItem = getTraceProjectItem(bot, currentItem, segment);
+            currentItem.select();
+            currentItem.doubleClick();
         }
 
-        SWTBotUtils.delay(1000);
-        SWTBotUtils.waitForJobs();
-        final String expectedTitle = elementPath.toString();
-
-        final IEditorPart iep[] = new IEditorPart[1];
-        UIThreadRunnable.syncExec(new VoidResult() {
-            @Override
-            public void run() {
-                IEditorReference[] ieds = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
-                assertNotNull(ieds);
-                iep[0] = null;
-                for (IEditorReference ied : ieds) {
-                    if (ied.getTitle().equals(expectedTitle)) {
-                        iep[0] = ied.getEditor(true);
-                        break;
-                    }
-                }
-            }
-        });
-        assertNotNull(iep[0]);
-        return (TmfEventsEditor) iep[0];
+        SWTBotEditor editor = bot.editorByTitle(elementPath.toString());
+        IEditorPart editorPart = editor.getReference().getEditor(false);
+        assertTrue(editorPart instanceof TmfEventsEditor);
+        return (TmfEventsEditor) editorPart;
     }
 
-    private static String getFullNodeName(final SWTBotTreeItem treeItem, String prefix) {
-        List<String> nodes = treeItem.getNodes();
-        String nodeName = "";
-        for (String node : nodes) {
-            if (node.startsWith(prefix)) {
-                nodeName = node;
-            }
-        }
-        return nodeName;
+    /**
+     * Returns the child tree item of the specified item with the given name.
+     * The project element label may have a count suffix in the format ' [n]'.
+     *
+     * @param bot
+     *            a given workbench bot
+     * @param parentItem
+     *            the parent tree item
+     * @param name
+     *            the desired child element name (without suffix)
+     * @return the a {@link SWTBotTreeItem} with the specified name
+     */
+    public static SWTBotTreeItem getTraceProjectItem(SWTWorkbenchBot bot, final SWTBotTreeItem parentItem, final String name) {
+        ProjectElementHasChild condition = new ProjectElementHasChild(parentItem, name);
+        bot.waitUntil(condition);
+        return condition.getItem();
     }
 
     /**
@@ -381,23 +369,18 @@ public final class SWTBotUtils {
      * @param projectName
      *            the name of the project (it needs to exist or else it would
      *            time out)
-     * @return a {@link SWTBotTreeItem} of the "Traces" directory
+     * @return a {@link SWTBotTreeItem} of the "Traces" folder
      */
     public static SWTBotTreeItem selectTracesFolder(SWTWorkbenchBot bot, String projectName) {
         SWTBotView projectExplorerBot = bot.viewByTitle("Project Explorer");
         projectExplorerBot.show();
-        SWTBotTreeItem treeItem = projectExplorerBot.bot().tree().getTreeItem(projectName);
-        treeItem.select();
-        treeItem.expand();
-        SWTBotTreeItem treeNode = null;
-        for (String node : treeItem.getNodes()) {
-            if (node.matches("Traces\\s\\[(\\d)*\\]")) {
-                treeNode = treeItem.getNode(node);
-                break;
-            }
-        }
-        assertNotNull(treeNode);
-        return treeNode;
+        SWTBotTree tree = projectExplorerBot.bot().tree();
+        bot.waitUntil(ConditionHelpers.IsTreeNodeAvailable(projectName, tree));
+        SWTBotTreeItem projectTreeItem = tree.getTreeItem(projectName);
+        projectTreeItem.select();
+        SWTBotTreeItem tracesFolderItem = getTraceProjectItem(bot, projectTreeItem, TmfTracesFolder.TRACES_FOLDER_NAME);
+        tracesFolderItem.select();
+        return tracesFolderItem;
     }
 
     /**
