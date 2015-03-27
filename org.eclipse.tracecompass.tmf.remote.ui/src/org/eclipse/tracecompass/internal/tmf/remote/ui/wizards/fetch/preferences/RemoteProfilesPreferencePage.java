@@ -195,10 +195,8 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
                     return true;
                 }
                 for (Object child : contentProvider.getChildren(profile)) {
-                    if (child instanceof RemoteImportConnectionNodeElement) {
-                        if (super.isLeafMatch(viewer, child)) {
-                            return true;
-                        }
+                    if ((child instanceof RemoteImportConnectionNodeElement) && (super.isLeafMatch(viewer, child))) {
+                        return true;
                     }
                 }
                 return false;
