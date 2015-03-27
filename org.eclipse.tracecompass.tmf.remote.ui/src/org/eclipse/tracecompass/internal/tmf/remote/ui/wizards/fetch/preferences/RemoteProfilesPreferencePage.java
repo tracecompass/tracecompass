@@ -367,17 +367,7 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
                     return;
                 }
                 for (Object item : selection.toList()) {
-                    if (item instanceof RemoteImportProfileElement) {
-                        fProfiles.remove(item);
-                        fTreeViewer.refresh();
-                        validate();
-                    } else if (item instanceof TracePackageElement) {
-                        TracePackageElement element = (TracePackageElement) item;
-                        TracePackageElement parent = element.getParent();
-                        parent.removeChild(element);
-                        fTreeViewer.refresh(parent);
-                        validate();
-                    }
+                    removeElement(item);
                 }
             }
         };
@@ -394,17 +384,7 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
                 }
                 setClipboardContents(selection);
                 Object item = selection.getFirstElement();
-                if (item instanceof RemoteImportProfileElement) {
-                    fProfiles.remove(item);
-                    fTreeViewer.refresh();
-                    validate();
-                } else if (item instanceof TracePackageElement) {
-                    TracePackageElement element = (TracePackageElement) item;
-                    TracePackageElement parent = element.getParent();
-                    parent.removeChild(element);
-                    fTreeViewer.refresh(parent);
-                    validate();
-                }
+                removeElement(item);
             }
         };
         fCutAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_CUT));
@@ -975,6 +955,20 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
         validate();
     }
 
+    private void removeElement(Object item) {
+        if (item instanceof RemoteImportProfileElement) {
+            fProfiles.remove(item);
+            fTreeViewer.refresh();
+            validate();
+        } else if (item instanceof TracePackageElement) {
+            TracePackageElement element = (TracePackageElement) item;
+            TracePackageElement parent = element.getParent();
+            parent.removeChild(element);
+            fTreeViewer.refresh(parent);
+            validate();
+        }
+    }
+
     private TracePackageElement copyElement(TracePackageElement parent, TracePackageElement element) {
         TracePackageElement copy = null;
         if (element instanceof RemoteImportProfileElement) {
@@ -1188,4 +1182,5 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
     public String getSelectedProfile() {
         return fSelectedProfileName;
     }
+
 }
