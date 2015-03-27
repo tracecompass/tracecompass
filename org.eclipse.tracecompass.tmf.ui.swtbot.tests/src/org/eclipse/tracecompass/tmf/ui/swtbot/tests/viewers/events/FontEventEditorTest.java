@@ -164,7 +164,7 @@ public class FontEventEditorTest {
         assertFalse(font2.equals(font));
         // Reset the raw viewer to the "Text Font"
         bot.button("Reset").click();
-        bot.button("Apply").click();
+        bot.button("OK").click();
         assertEquals(getFont(rawText), font);
         fBot.closeAllEditors();
         SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
