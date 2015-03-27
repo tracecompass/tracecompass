@@ -135,7 +135,7 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
     private Action fCopyAction;
     private Action fPasteAction;
 
-    private static final String fProfileFilePath;
+    private static final String PROFILE_FILE_PATH;
 
     static {
         String profileFilePath = REMOTE_PROFILES_XML_FILE_PATH;
@@ -153,7 +153,7 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
                 profileFilePath = profileFolderPath.append(REMOTE_PROFILES_XML_FILE_NAME).toString();
             }
         }
-        fProfileFilePath = profileFilePath;
+        PROFILE_FILE_PATH = profileFilePath;
     }
 
     /**
@@ -276,7 +276,7 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
         createGlobalActions();
         createContextMenu();
 
-        fProfiles = readProfiles(fProfileFilePath, new NullProgressMonitor());
+        fProfiles = readProfiles(PROFILE_FILE_PATH, new NullProgressMonitor());
 
         treeViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
         treeViewer.setInput(fProfiles);
@@ -323,7 +323,7 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
      * @return the list of remote profiles
      */
     public static List<RemoteImportProfileElement> getRemoteProfiles(IProgressMonitor monitor) {
-        return readProfiles(fProfileFilePath, monitor);
+        return readProfiles(PROFILE_FILE_PATH, monitor);
     }
 
     private static List<RemoteImportProfileElement> readProfiles(String path, IProgressMonitor monitor) {
@@ -1155,7 +1155,7 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
 
     @Override
     public boolean performOk() {
-        return writeProfiles(fProfiles, fProfileFilePath);
+        return writeProfiles(fProfiles, PROFILE_FILE_PATH);
     }
 
     /**
