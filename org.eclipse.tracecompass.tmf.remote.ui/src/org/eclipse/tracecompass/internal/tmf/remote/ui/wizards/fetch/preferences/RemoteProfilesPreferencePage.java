@@ -890,9 +890,7 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
                 String[] availableTraceTypes = TmfTraceType.getAvailableTraceTypes();
                 String[] traceTypeList = new String[availableTraceTypes.length + 1];
                 traceTypeList[0] = TRACE_TYPE_AUTO_DETECT;
-                for (int i = 0; i < availableTraceTypes.length; i++) {
-                    traceTypeList[i + 1] = availableTraceTypes[i];
-                }
+                System.arraycopy(availableTraceTypes, 0, traceTypeList, 1, availableTraceTypes.length);
                 combo.setItems(traceTypeList);
                 combo.select(0);
                 for (int i = 1; i < traceTypeList.length; i++) {
