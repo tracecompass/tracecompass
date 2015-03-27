@@ -268,8 +268,6 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
             return null;
         }
 
-        TracePackageElement[] elementViewerInput = new TracePackageElement[0];
-
         try {
             final AbstractTracePackageOperation generateManifestOperation = new RemoteGenerateManifestOperation(fProfile);
 
@@ -290,18 +288,15 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
                 handleErrorStatus(status[0]);
                 return null;
             }
-            elementViewerInput = generateManifestOperation.getResultElements();
+            return generateManifestOperation.getResultElements();
         } catch (InvocationTargetException e1) {
             handleError(
                     Messages.TracePackageExtractManifestOperation_ErrorReadingManifest,
                     e1);
-            return null;
         } catch (InterruptedException e1) {
             // Canceled
-            return null;
         }
-
-        return elementViewerInput;
+        return null;
     }
 
     /**
