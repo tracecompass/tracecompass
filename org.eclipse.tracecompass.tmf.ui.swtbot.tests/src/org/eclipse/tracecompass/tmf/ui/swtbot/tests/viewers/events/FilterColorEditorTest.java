@@ -50,7 +50,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
 /**
@@ -173,18 +172,12 @@ public class FilterColorEditorTest {
         assertTrue(colorAfter.contains(fBackground));
         assertTrue(colorAfter.contains(fForeground));
         assertTrue(colorAfter.contains(YELLOW));
-        Multiset<RGB> diff = HashMultiset.create();
+
         /*
-         * make the histogram difference This will allow us to verify what has
-         * changed in the two images. Hopefully the sum will be zero
+         * Check that some background became yellow.
          */
-        for (RGB entry : colorAfter.elementSet()) {
-            diff.add(entry, Math.abs(colorAfter.count(entry) - colorBefore.count(entry)));
-        }
-        /*
-         * Check that the background became yellow
-         */
-        assertEquals(diff.count(fBackground), (diff.count(YELLOW)));
+        assertTrue(colorAfter.count(fBackground) < colorBefore.count(fBackground));
+        assertTrue(colorAfter.count(YELLOW) > colorBefore.count(YELLOW));
     }
 
     /**
@@ -250,8 +243,6 @@ public class FilterColorEditorTest {
         // toggle filter mode
         fTableBot.click(0, 0);
         ImageHelper afterFilter = ImageHelper.grabImage(cellBounds);
-        // toggle search mode
-        fTableBot.click(0, 0);
 
         List<RGB> beforeLine = before.getPixelRow(2);
         List<RGB> afterLine = after.getPixelRow(2);
