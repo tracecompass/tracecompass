@@ -843,7 +843,8 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
                     }
                 });
 
-                label = new Label(fComposite, SWT.NONE);
+                // create label for alignment
+                new Label(fComposite, SWT.NONE);
                 final Button recursiveButton = new Button(fComposite, SWT.CHECK);
                 gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
                 recursiveButton.setLayoutData(gd);
