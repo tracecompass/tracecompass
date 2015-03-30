@@ -29,7 +29,7 @@ import org.eclipse.tracecompass.internal.tmf.remote.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.remote.ui.messages.RemoteMessages;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageElement;
 import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxy;
-import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxyFactory;
+import org.eclipse.tracecompass.tmf.remote.core.proxy.TmfRemoteConnectionFactory;
 
 /**
  * An RemoteImportConnectionNodeElement representing a connection node.
@@ -129,7 +129,7 @@ public class RemoteImportConnectionNodeElement extends TracePackageElement {
                 if (hostUri == null) {
                     return new Status(IStatus.ERROR, Activator.PLUGIN_ID, RemoteMessages.RemoteImportConnectionNodeElement_UriNullError);
                 }
-                proxy = RemoteSystemProxyFactory.createProxy(hostUri, name);
+                proxy = new RemoteSystemProxy(TmfRemoteConnectionFactory.createConnection(hostUri, name));
                 fRemoteProxy = proxy;
             } catch (URISyntaxException e) {
                 return new Status(IStatus.ERROR, Activator.PLUGIN_ID, MessageFormat.format(RemoteMessages.RemoteImportConnectionNodeElement_InvalidUriString, fURI), e);

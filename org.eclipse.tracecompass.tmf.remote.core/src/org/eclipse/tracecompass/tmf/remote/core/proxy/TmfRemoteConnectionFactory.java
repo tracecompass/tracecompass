@@ -28,13 +28,15 @@ import org.eclipse.remote.internal.jsch.core.JSchConnection;
 import org.eclipse.tracecompass.internal.tmf.remote.core.messages.Messages;
 
 /**
- * RemoteSystemProxy factory.
+ * Factory for creation of remote connections programmatically.
+ *
+ * It creates {@link IRemoteConnection} instances base on host URI and name.
  *
  * @author Bernd Hufmann
  */
 @SuppressWarnings("restriction")
 @NonNullByDefault
-public class RemoteSystemProxyFactory {
+public class TmfRemoteConnectionFactory {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -67,18 +69,18 @@ public class RemoteSystemProxyFactory {
     }
 
     /**
-     * Creates a remote system proxy.
+     * Creates a remote connection instance.
      *
      * @param hostUri
      *                The host URI
      * @param hostName
      *                The hostname
-     * @return the remote system proxy
+     * @return the remote connection {@link IRemoteConnection}
      *
      * @throws RemoteConnectionException
      *                In case of an error
      */
-    public static RemoteSystemProxy createProxy(URI hostUri, String hostName) throws RemoteConnectionException {
+    public static IRemoteConnection createConnection(URI hostUri, String hostName) throws RemoteConnectionException {
 
         IRemoteConnection connection = null;
         IRemoteServicesManager manager = RemoteSystemProxy.getService(IRemoteServicesManager.class);
@@ -98,7 +100,7 @@ public class RemoteSystemProxyFactory {
             connection = DEFAULT_CONNECTION_FACTORY.createConnection(connectionType, hostUri, hostName);
         }
 
-        return new RemoteSystemProxy(connection);
+        return connection;
     }
 
     // ------------------------------------------------------------------------
