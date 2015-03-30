@@ -817,7 +817,7 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
             if (!fIsAdvancedEnabled && !fIsLive) {
                 TargetNodeComponent node = (TargetNodeComponent)fParent.getParent();
                 RemoteSystemProxy proxy = node.getRemoteSystemProxy();
-                IRemoteFileService fsss = proxy.getRemoteFileService();
+                IRemoteFileService fsss = proxy.getRemoteConnection().getService(IRemoteFileService.class);
                 if (fsss != null) {
                     IFileStore remoteFolder = fsss.getResource(fSessionPath);
                     if (remoteFolder == null) {

@@ -17,9 +17,6 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.remote.core.IRemoteConnection;
-import org.eclipse.remote.core.IRemoteConnectionChangeListener;
-import org.eclipse.remote.core.IRemoteFileService;
-import org.eclipse.remote.core.IRemoteProcessService;
 import org.eclipse.tracecompass.internal.lttng2.control.stubs.shells.LTTngToolsFileShell;
 import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxy;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandShell;
@@ -34,16 +31,6 @@ public class TestRemoteSystemProxy extends RemoteSystemProxy {
     private LTTngToolsFileShell fShell = null;
     private String fTestFile = null;
     private String fScenario = null;
-
-    @Override
-    public IRemoteProcessService getProcessService() {
-        return null;
-    }
-
-    @Override
-    public IRemoteFileService getRemoteFileService() {
-        return null;
-    }
 
     @Override
     public void connect(IProgressMonitor monitor) throws ExecutionException {
@@ -71,14 +58,6 @@ public class TestRemoteSystemProxy extends RemoteSystemProxy {
             fShell = shell;
         }
         return shell;
-    }
-
-    @Override
-    public void addConnectionChangeListener(IRemoteConnectionChangeListener listener) {
-    }
-
-    @Override
-    public void removeConnectionChangeListener(IRemoteConnectionChangeListener listener) {
     }
 
     public void setTestFile(String testFile) {

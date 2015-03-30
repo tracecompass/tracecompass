@@ -93,7 +93,7 @@ public class RemoteGenerateManifestOperation extends AbstractGenerateManifestOpe
                         root = traceGroup.getRootImportPath();
                         TracePackageElement[] traceElements = traceGroup.getChildren();
                         fTemplatePatternsToTraceElements = generatePatterns(traceElements);
-                        IRemoteFileService fs = proxy.getRemoteFileService();
+                        IRemoteFileService fs = proxy.getRemoteConnection().getService(IRemoteFileService.class);
                         if (fs == null) {
                             continue;
                         }

@@ -20,8 +20,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.remote.core.IRemoteConnectionType;
-import org.eclipse.remote.core.IRemoteFileService;
-import org.eclipse.remote.core.IRemoteProcessService;
 import org.eclipse.remote.core.IRemoteServicesManager;
 import org.eclipse.remote.core.RemoteConnectionChangeEvent;
 import org.eclipse.remote.core.exception.RemoteConnectionException;
@@ -81,25 +79,6 @@ public class RemoteSystemProxy implements IRemoteConnectionChangeListener {
     // ------------------------------------------------------------------------
 
     /**
-     * Finds the remote file system service.
-     *
-     * @return file service subsystem, or <code>null</code> if not found.
-     */
-    public @Nullable IRemoteFileService getRemoteFileService() {
-        return fHost.getService(IRemoteFileService.class);
-    }
-
-    /**
-     * Returns a remote process service.
-     *
-     * @return the remote process service ({@link IRemoteProcessService}, or
-     *         <code>null</code> if not found.
-     */
-    public @Nullable IRemoteProcessService getProcessService() {
-        return fHost.getService(IRemoteProcessService.class);
-    }
-
-    /**
      * Connects the remote connection.
      *
      * @param monitor
@@ -143,28 +122,6 @@ public class RemoteSystemProxy implements IRemoteConnectionChangeListener {
      */
     public ICommandShell createCommandShell() {
         return new CommandShell(fHost);
-    }
-
-    /**
-     * Method to add a communication listener to the connector service defined
-     * for the given connection.
-     *
-     * @param listener
-     *            listener to add
-     */
-    public void addConnectionChangeListener(IRemoteConnectionChangeListener listener) {
-        fHost.addConnectionChangeListener(listener);
-    }
-
-    /**
-     * Method to remove a communication listener from the connector service
-     * defined for the given connection.
-     *
-     * @param listener
-     *            listener to remove
-     */
-    public void removeConnectionChangeListener(IRemoteConnectionChangeListener listener) {
-        fHost.removeConnectionChangeListener(listener);
     }
 
     /**

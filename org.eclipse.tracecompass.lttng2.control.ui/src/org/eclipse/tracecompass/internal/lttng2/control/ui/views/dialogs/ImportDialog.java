@@ -410,7 +410,7 @@ public class ImportDialog extends Dialog implements IImportDialog {
 
         RemoteSystemProxy proxy = fSession.getTargetNode().getRemoteSystemProxy();
 
-        IRemoteFileService fsss = proxy.getRemoteFileService();
+        IRemoteFileService fsss = proxy.getRemoteConnection().getService(IRemoteFileService.class);
 
         if (fsss == null) {
             return;

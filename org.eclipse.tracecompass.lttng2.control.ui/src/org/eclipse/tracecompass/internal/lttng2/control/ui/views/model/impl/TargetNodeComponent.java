@@ -113,7 +113,7 @@ public class TargetNodeComponent extends TraceControlComponent implements IRemot
         setImage(TARGET_NODE_CONNECTED_ICON_FILE);
         fDisconnectedImage = Activator.getDefault().loadIcon(TARGET_NODE_DISCONNECTED_ICON_FILE);
         fRemoteProxy = proxy;
-        fRemoteProxy.addConnectionChangeListener(this);
+        fRemoteProxy.getRemoteConnection().addConnectionChangeListener(this);
         setToolTip(fRemoteProxy.getRemoteConnection().getName());
     }
 
@@ -133,7 +133,7 @@ public class TargetNodeComponent extends TraceControlComponent implements IRemot
 
     @Override
     public void dispose() {
-        fRemoteProxy.removeConnectionChangeListener(this);
+        fRemoteProxy.getRemoteConnection().removeConnectionChangeListener(this);
         fRemoteProxy.dispose();
         disposeControlService();
     }
