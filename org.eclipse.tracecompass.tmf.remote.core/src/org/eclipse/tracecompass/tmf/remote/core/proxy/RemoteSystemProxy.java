@@ -21,7 +21,6 @@ import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.remote.core.IRemoteConnectionType;
 import org.eclipse.remote.core.IRemoteFileService;
-import org.eclipse.remote.core.IRemoteProcessBuilder;
 import org.eclipse.remote.core.IRemoteProcessService;
 import org.eclipse.remote.core.IRemoteServicesManager;
 import org.eclipse.remote.core.RemoteConnectionChangeEvent;
@@ -91,14 +90,13 @@ public class RemoteSystemProxy implements IRemoteConnectionChangeListener {
     }
 
     /**
-     * Returns a remote process builder for remote launching a process.
+     * Returns a remote process service.
      *
-     * @param command
-     *            the command to be executed.
-     * @return the builder, or <code>null</code> if not possible.
+     * @return the remote process service ({@link IRemoteProcessService}, or
+     *         <code>null</code> if not found.
      */
-    public @Nullable IRemoteProcessBuilder getProcessBuilder(String...command) {
-        return fHost.getService(IRemoteProcessService.class).getProcessBuilder(command);
+    public @Nullable IRemoteProcessService getProcessService() {
+        return fHost.getService(IRemoteProcessService.class);
     }
 
     /**

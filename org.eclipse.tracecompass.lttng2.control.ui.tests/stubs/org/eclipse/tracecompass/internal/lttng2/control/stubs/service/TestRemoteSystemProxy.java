@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.remote.core.IRemoteConnectionChangeListener;
 import org.eclipse.remote.core.IRemoteFileService;
-import org.eclipse.remote.core.IRemoteProcessBuilder;
+import org.eclipse.remote.core.IRemoteProcessService;
 import org.eclipse.tracecompass.internal.lttng2.control.stubs.shells.LTTngToolsFileShell;
 import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxy;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandShell;
@@ -36,7 +36,7 @@ public class TestRemoteSystemProxy extends RemoteSystemProxy {
     private String fScenario = null;
 
     @Override
-    public IRemoteProcessBuilder getProcessBuilder(String... command) {
+    public IRemoteProcessService getProcessService() {
         return null;
     }
 
