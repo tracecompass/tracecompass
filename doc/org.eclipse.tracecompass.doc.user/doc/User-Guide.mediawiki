@@ -330,6 +330,106 @@ If the wizard was opened using the File menu, the destination project has to be 
 
 When Finish is clicked, the trace is imported in the target folder. The folder structure from the trace package is restored in the target folder.
 
+=== Remote Fetching ===
+
+It is possible to import traces automatically from one or more remote hosts according to a predefined remote profile by using the '''Fetch Remote Traces''' wizard.
+
+To start the wizard, right-click on a target trace folder and select '''Fetch Remote Traces...'''.
+
+[[Image:images/FetchRemoteTracesMenu.png]]
+
+The wizard opens on the '''Remote Profile''' page.
+
+[[Image:images/RemoteProfileWizardPageBlank.png]]
+
+If the remote profile already exists, it can be selected in the '''Profile name''' combo box. Otherwise, click '''Manage Profiles''' to open the '''Remote Profiles''' preferences page.
+
+==== Remote Profile elements ====
+
+[[Image:images/RemoteProfilesPreferencesPage.png]]
+
+Click '''Add''' to create a new remote profile. A default remote profile template appears.
+
+[[Image:images/RemoteProfilesPreferencesPageDefault.png]]
+
+===== Profile =====
+
+Edit the '''Profile name''' field to give a unique name to the new profile.
+
+Under the Profile element, at least one Connection Node element must be defined.
+
+===== Connection Node =====
+
+'''Node name''': Unique name for the connection within the scope of the Remote Services provider.
+
+'''URI''': URI for the connection. Its scheme maps to a particular Remote Services provider. If the connection name already exists for that provider, the URI must match its connection information. The scheme '''ssh''' can be used for the Built-In SSH provider. The scheme '''file''' can be used for the local file system.
+
+To view or edit existing connections, see the '''Remote Development''' > '''Remote Connections''' preferences page. On this page the user can enter a password for the connection.
+
+Under the Connection Node element, at least one Trace Group element must be defined.
+
+===== Trace Group =====
+
+'''Root path''': The absolute root path from where traces will be fetched. For example, ''/home/user'' or ''/C/Users/user''.
+
+'''Recursive''': Check this box to search for traces recursively in the root path.
+
+Under the Trace Group element, at least one Trace element must be defined.
+
+===== Trace =====
+
+'''File pattern''': A regular expression pattern to match against the file name of traces found under the root path. If the '''Recursive''' option is used, the pattern must match against the relative path of the trace, using forward-slash as a path separator. Files that do not match this pattern are ignored. If multiple Trace elements have a matching pattern, the first matching element will be used, and therefore the most specific patterns should be listed first. Following are some pattern examples:
+
+* <pre><nowiki>.*</nowiki></pre> matches any trace in any folder
+* <pre><nowiki>[^/]*\.log</nowiki></pre> matches traces with .log extension in the root path folder
+* <pre><nowiki>.*\.log</nowiki></pre> matches traces with .log extension in any folder
+* <pre><nowiki>folder-[^/]*/[^/]*\.log</nowiki></pre> matches traces with .log extension in folders matching a pattern
+* <pre><nowiki>(.*/)?filename</nowiki></pre> matches traces with a specific name in any folder
+
+'''Trace Type''': The trace type to assign to the traces after fetching, or '''<Automatic Detection>''' to determine the trace type automatically. Note that traces whose trace type can not be assigned according to this setting are not deleted after fetching.
+
+==== Profile editing and management ====
+
+Right-click a profile element to bring up its context menu. A '''New''' child element of the appropriate type can be created. Select '''Delete''' to delete a node, or '''Cut''', '''Copy''' and '''Paste''' to move or copy elements from one profile element to another. The keyboard shortcuts can also be used.
+
+Press the '''Add''' button to create a new element of the same type and following the selected element, or a new profile if the selection is empty.
+
+Press the '''Remove''' button to delete the selected profile elements.
+
+Press the '''Import''' button to import profiles from a previously exported XML file.
+
+Press the '''Export''' button to export the selected profiles to an XML file.
+
+Press the '''Move Up''' or '''Move Down''' buttons to reorder the selected profile element.
+
+The filter text box can be used to filter profiles based on the profile name or connection node.
+
+When the remote profile information is valid and complete, press the '''OK''' button to save the remote profiles preferences.
+
+[[Image:images/RemoteProfilesPreferencesPageFull.png]]
+
+==== Selecting remote traces ====
+
+Back in the '''Remote Profiles''' wizard page, select the desired profile and click '''Next >'''. Clicking '''Finish''' at this point will automatically select and download all matching traces.
+
+[[Image:images/RemoteProfileWizardPageNext.png]]
+
+If required, the selected remote connections are created and connection is established. The user may be prompted for a password. This can be avoided by storing the password for the connection in the '''Remote Connections''' preference page.
+
+[[Image:images/FetchRemoteTracesPassword.png]]
+
+The root path of every Trace Group is scanned for matching files. The result is shown in the '''Remote Traces''' wizard page.
+
+[[Image:images/RemoteTracesWizardPage.png]]
+
+Select the traces to fetch by checking or unchecking the desired connection node, trace group, folder or individual trace. Click '''Finish''' to complete the operation.
+
+If any name conflict occurs, the user will be prompted to rename, overwrite or skip the trace, unless the '''Overwrite existing trace without warning''' option was checked in the '''Remote Profiles''' wizard page.
+
+The downloaded traces will be imported to the initially selected project folder. They will be stored under a folder structure with the pattern ''<connection name>/<path>/<trace name>'' where the path is the trace's remote path relative to its trace group's root path.
+
+[[Image:images/FetchRemoteTracesProject.png]]
+
 === Selecting a Trace Type ===
 
 If no trace type was selected a trace type has to be associated to a trace before it can be opened. To select a trace type select the relevant trace and click the right mouse button. In the context-sensitive menu, select '''Select Trace Type...''' menu item. A sub-menu will show will all available trace type categories. From the relevant category select the required trace type. The examples, below show how to select the '''Common Trace Format''' types '''Linux Kernel Trace''' and '''Generic CTF trace'''.
