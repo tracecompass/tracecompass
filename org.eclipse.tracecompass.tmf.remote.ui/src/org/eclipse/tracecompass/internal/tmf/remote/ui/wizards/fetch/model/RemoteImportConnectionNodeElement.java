@@ -150,7 +150,7 @@ public class RemoteImportConnectionNodeElement extends TracePackageElement {
      */
     public void disconnect() {
         if (fRemoteProxy != null) {
-            fRemoteProxy.disconnect();
+            fRemoteProxy.dispose();
         }
     }
 
