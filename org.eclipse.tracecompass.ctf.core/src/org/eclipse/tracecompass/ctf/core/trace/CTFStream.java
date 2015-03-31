@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -179,16 +178,6 @@ public class CTFStream {
     }
 
     /**
-     *
-     * @return the event header declaration in structdeclaration form
-     * @deprecated use {@link CTFStream#getEventHeaderDeclaration()}
-     */
-    @Deprecated
-    public StructDeclaration getEventHeaderDecl() {
-        return (StructDeclaration) ((fEventHeaderDecl instanceof StructDeclaration) ? fEventHeaderDecl : null);
-    }
-
-    /**
      * Gets the event header declaration
      *
      * @return the event header declaration in declaration form
@@ -227,17 +216,6 @@ public class CTFStream {
      */
     public CTFTrace getTrace() {
         return fTrace;
-    }
-
-    /**
-     *
-     * @return all the event declarations for this stream, using the id as a key
-     *         for the hashmap.
-     * @deprecated use {@link CTFStream#getEventDeclarations()}
-     */
-    @Deprecated
-    public Map<Long, IEventDeclaration> getEvents() {
-        throw new UnsupportedOperationException();
     }
 
     /**
