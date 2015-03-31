@@ -668,6 +668,10 @@ A status row will be displayed before and after the events, dynamically showing 
 
 To clear collapsing, press the right mouse button in the table and select menu item '''Clear Filters''' in the context sensitive menu. ''Note'' that collapsing is also removed when another filter is applied to the table.
 
+=== Customization ===
+
+The table columns can be reordered by the user by dragging the column headers. This column order is saved when the editor is closed. The setting applies to all traces of the same trace type.
+
 == Histogram View ==
 
 The Histogram View displays the trace events distribution with respect to time. When streaming a trace, this view is dynamically updated as the events are received.
