@@ -54,32 +54,6 @@ public final class StructDefinition extends ScopedDefinition implements IComposi
     // ------------------------------------------------------------------------
 
     /**
-     * *DEPRECATED* TODO: To remove once we break the API...
-     *
-     * Not marked with the annotation to not annoy callers using a List, which
-     * is still as valid with the new constructor. But the compiler gives an
-     * error even though a Iterable is a List too...
-     *
-     * @param declaration
-     *            the parent declaration
-     * @param definitionScope
-     *            the parent scope
-     * @param structFieldName
-     *            the field name
-     * @param fieldNames
-     *            the list of fields
-     * @param definitions
-     *            the definitions
-     */
-    public StructDefinition(@NonNull StructDeclaration declaration,
-            IDefinitionScope definitionScope,
-            @NonNull String structFieldName,
-            List<String> fieldNames,
-            Definition[] definitions) {
-        this(declaration, definitionScope, structFieldName, (Iterable<String>) fieldNames, definitions);
-    }
-
-    /**
      * Constructor
      *
      * @param declaration
