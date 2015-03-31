@@ -600,9 +600,9 @@ To clear all matching conditions in the header row, press the '''DEL''' key.
 
 When a searching condition is applied to the header row, the table will select the next matching event starting from the top currently displayed event. Wrapping will occur if there is no match until the end of the trace.
 
-All matching events will have a 'search match' icon in their left margin. Non-matching events will be dimmed.
+All matching events will have a 'search match' icon in their left margin. Non-matching events will be dimmed. The characters in each column which match the regular expression will be highlighted.
 
-[[Image:images/DefaultTmfEvents-Search.png]]
+[[Image:images/TraceEditor-Search.png]]
 
 Pressing the '''ENTER''' key will search and select the next matching event. Pressing the '''SHIFT-ENTER''' key will search and select the previous matching event. Wrapping will occur in both directions.
 
@@ -612,11 +612,11 @@ Press '''DEL''' to clear the header row and reset all events to normal.
 
 ==== Filtering ====
 
-When a filtering condition is entered in the head row, the table will clear all events and fill itself with matching events as they are found from the beginning of the trace.
+When a filtering condition is entered in the head row, the table will clear all events and fill itself with matching events as they are found from the beginning of the trace. The characters in each column which match the regular expression will be highlighted.
 
 A status row will be displayed before and after the matching events, dynamically showing how many matching events were found and how many events were processed so far. Once the filtering is completed, the status row icon in the left margin will change from a 'stop' to a 'filter' icon.
 
-[[Image:images/DefaultTmfEvents-Filter.png]]
+[[Image:images/TraceEditor-Filter.png]]
 
 Press '''ESC''' to stop an ongoing filtering. In this case the status row icon will remain as a 'stop' icon to indicate that not all events were processed.
 
