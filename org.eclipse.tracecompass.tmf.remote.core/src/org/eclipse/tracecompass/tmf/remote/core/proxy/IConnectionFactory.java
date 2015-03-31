@@ -15,7 +15,6 @@ import java.net.URI;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.remote.core.IRemoteConnection;
-import org.eclipse.remote.core.IRemoteConnectionType;
 import org.eclipse.remote.core.exception.RemoteConnectionException;
 
 /**
@@ -29,8 +28,6 @@ import org.eclipse.remote.core.exception.RemoteConnectionException;
 public interface IConnectionFactory {
     /**
      * Creates an {@link IRemoteConnection} for the given URI.
-     * @param remoteConnectionType
-     *                the remote connection type
      * @param hostUri
      *                the host URI to connect to
      * @param hostName
@@ -39,5 +36,5 @@ public interface IConnectionFactory {
      *
      * @throws RemoteConnectionException in case of an error
      */
-    IRemoteConnection createConnection(IRemoteConnectionType remoteConnectionType, URI hostUri, String hostName) throws RemoteConnectionException;
+    IRemoteConnection createConnection(URI hostUri, String hostName) throws RemoteConnectionException;
 }

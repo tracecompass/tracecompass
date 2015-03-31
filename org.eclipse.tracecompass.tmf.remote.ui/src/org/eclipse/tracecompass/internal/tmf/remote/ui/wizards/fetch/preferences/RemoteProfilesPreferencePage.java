@@ -88,7 +88,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePa
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageFilesElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageTraceElement;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
-import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxy;
+import org.eclipse.tracecompass.tmf.remote.core.proxy.TmfRemoteConnectionFactory;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchCommandConstants;
@@ -1081,7 +1081,7 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
                     }
                     try {
                         URI uri = URIUtil.fromString(node.getURI());
-                        IRemoteServicesManager manager = RemoteSystemProxy.getService(IRemoteServicesManager.class);
+                        IRemoteServicesManager manager = TmfRemoteConnectionFactory.getService(IRemoteServicesManager.class);
                         if (manager == null || manager.getConnectionType(uri) == null) {
                             setErrorMessage(prefix + RemoteMessages.RemoteProfilesPreferencePage_UnsupportedURISchemeError);
                             return;

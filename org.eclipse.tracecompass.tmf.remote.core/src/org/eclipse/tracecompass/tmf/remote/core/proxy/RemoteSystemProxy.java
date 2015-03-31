@@ -19,17 +19,10 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.remote.core.IRemoteConnectionChangeListener;
-import org.eclipse.remote.core.IRemoteConnectionType;
-import org.eclipse.remote.core.IRemoteServicesManager;
 import org.eclipse.remote.core.RemoteConnectionChangeEvent;
 import org.eclipse.remote.core.exception.RemoteConnectionException;
-import org.eclipse.tracecompass.internal.tmf.remote.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.remote.core.shell.CommandShell;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandShell;
-
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
 
 /**
  * <p>
@@ -40,9 +33,6 @@ import com.google.common.collect.FluentIterable;
  */
 @NonNullByDefault
 public class RemoteSystemProxy implements IRemoteConnectionChangeListener {
-
-    /** Name of a local connection */
-    public static final String LOCAL_CONNECTION_NAME = "Local"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -144,52 +134,4 @@ public class RemoteSystemProxy implements IRemoteConnectionChangeListener {
         }
     }
 
-    /**
-     * Return the OSGi service with the given service interface.
-     *
-     * @param service
-     *            service interface
-     * @return the specified service or null if it's not registered
-     */
-    public static @Nullable <T> T getService(Class<T> service) {
-        return Activator.getService(service);
-    }
-
-    /**
-     * Return a remote connection using OSGI service.
-     *
-     * @param remoteServicesId
-     *            ID of remote service
-     * @param name
-     *            name of connection
-     * @return the corresponding remote connection or null
-     */
-    public static @Nullable IRemoteConnection getRemoteConnection(final String remoteServicesId, final String name) {
-        IRemoteServicesManager manager = Activator.getService(IRemoteServicesManager.class);
-        if (manager == null) {
-            return null;
-        }
-        FluentIterable<IRemoteConnection> connections = FluentIterable.from(manager.getAllRemoteConnections());
-        Optional<IRemoteConnection> ret = connections.firstMatch(new Predicate<IRemoteConnection>() {
-            @Override
-            public boolean apply(@Nullable IRemoteConnection input) {
-                return ((input != null) && input.getConnectionType().getId().equals(remoteServicesId.toString()) && input.getName().equals(name.toString()));
-            }
-        });
-        return ret.orNull();
-    }
-
-    /**
-     * Return a Local connection.
-     *
-     * @return the local connection
-     */
-    public static @Nullable IRemoteConnection getLocalConnection() {
-        IRemoteServicesManager manager = Activator.getService(IRemoteServicesManager.class);
-        if (manager != null) {
-            IRemoteConnectionType type = manager.getLocalConnectionType();
-            return type.getConnection(LOCAL_CONNECTION_NAME);
-        }
-        return null;
-    }
 }

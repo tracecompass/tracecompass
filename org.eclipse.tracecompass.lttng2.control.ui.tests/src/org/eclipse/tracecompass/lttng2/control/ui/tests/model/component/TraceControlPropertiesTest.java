@@ -53,7 +53,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.property.TraceE
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.property.TraceProbeEventPropertySource;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.property.TraceSessionPropertySource;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.property.UstProviderPropertySource;
-import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxy;
+import org.eclipse.tracecompass.tmf.remote.core.proxy.TmfRemoteConnectionFactory;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.junit.After;
 import org.junit.Test;
@@ -93,7 +93,7 @@ public class TraceControlPropertiesTest {
      */
     @Test
     public void testComponentProperties() throws Exception {
-        IRemoteConnection host = RemoteSystemProxy.getLocalConnection();
+        IRemoteConnection host = TmfRemoteConnectionFactory.getLocalConnection();
         TestRemoteSystemProxy proxy = new TestRemoteSystemProxy(host);
 
         URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path(DIRECTORY + File.separator + TEST_STREAM), null);

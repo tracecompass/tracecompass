@@ -45,7 +45,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.Trac
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceEventComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.UstProviderComponent;
-import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxy;
+import org.eclipse.tracecompass.tmf.remote.core.proxy.TmfRemoteConnectionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,7 +67,7 @@ public class TraceControlUstProviderTests {
     // ------------------------------------------------------------------------
     // Test data
     // ------------------------------------------------------------------------
-    private IRemoteConnection fHost = RemoteSystemProxy.getLocalConnection();
+    private IRemoteConnection fHost = TmfRemoteConnectionFactory.getLocalConnection();
     private TraceControlTestFacility fFacility;
     private @NonNull TestRemoteSystemProxy fProxy = new TestRemoteSystemProxy(fHost);
     private String fTestFile;

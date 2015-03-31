@@ -35,7 +35,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.ILttngC
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlService;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlServiceConstants;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlServiceMI;
-import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxy;
+import org.eclipse.tracecompass.tmf.remote.core.proxy.TmfRemoteConnectionFactory;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.junit.Test;
@@ -46,7 +46,7 @@ import org.junit.Test;
  */
 public class TraceControlComponentTest {
 
-    private IRemoteConnection fHost = RemoteSystemProxy.getLocalConnection();
+    private IRemoteConnection fHost = TmfRemoteConnectionFactory.getLocalConnection();
 
     /**
      * Run the TraceControlComponent(String) constructor test.

@@ -35,7 +35,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.Targ
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceControlContentProvider;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceControlLabelProvider;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceControlRoot;
-import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxy;
+import org.eclipse.tracecompass.tmf.remote.core.proxy.TmfRemoteConnectionFactory;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
@@ -149,7 +149,7 @@ public class ControlView extends ViewPart implements ITraceControlComponentChang
                 if ((id == null) || (name == null)) {
                     break;
                 }
-                IRemoteConnection conn = RemoteSystemProxy.getRemoteConnection(id, name);
+                IRemoteConnection conn = TmfRemoteConnectionFactory.getRemoteConnection(id, name);
                 if (conn != null) {
                     fInitialConnections.add(conn);
                 }

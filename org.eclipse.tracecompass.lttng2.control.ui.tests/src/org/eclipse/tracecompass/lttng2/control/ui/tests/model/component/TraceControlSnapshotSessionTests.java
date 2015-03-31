@@ -37,7 +37,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceCon
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.property.TraceSessionPropertySource;
-import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxy;
+import org.eclipse.tracecompass.tmf.remote.core.proxy.TmfRemoteConnectionFactory;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.junit.After;
@@ -63,7 +63,7 @@ public class TraceControlSnapshotSessionTests {
     // ------------------------------------------------------------------------
 
     private TraceControlTestFacility fFacility;
-    private IRemoteConnection fHost = RemoteSystemProxy.getLocalConnection();
+    private IRemoteConnection fHost = TmfRemoteConnectionFactory.getLocalConnection();
     private @NonNull TestRemoteSystemProxy fProxy = new TestRemoteSystemProxy(fHost);
     private String fTestFile;
 

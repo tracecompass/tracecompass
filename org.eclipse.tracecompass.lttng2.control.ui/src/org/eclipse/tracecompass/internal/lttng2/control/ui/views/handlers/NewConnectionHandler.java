@@ -27,7 +27,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.INewCon
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.TraceControlDialogFactory;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceControlComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent;
-import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxy;
+import org.eclipse.tracecompass.tmf.remote.core.proxy.TmfRemoteConnectionFactory;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -103,7 +103,7 @@ public class NewConnectionHandler extends BaseControlViewHandler {
         Object remoteServicesId = parameters.get(PARAMETER_REMOTE_SERVICES_ID);
         Object connectionName = parameters.get(PARAMETER_CONNECTION_NAME);
         if ((remoteServicesId != null) && (connectionName != null)) {
-            return RemoteSystemProxy.getRemoteConnection(
+            return TmfRemoteConnectionFactory.getRemoteConnection(
                     checkNotNull(remoteServicesId.toString()),
                     checkNotNull(connectionName.toString()));
         }

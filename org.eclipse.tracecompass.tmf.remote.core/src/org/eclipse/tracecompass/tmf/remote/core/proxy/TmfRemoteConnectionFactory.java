@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.remote.core.IRemoteConnectionHostService;
 import org.eclipse.remote.core.IRemoteConnectionType;
@@ -25,7 +26,12 @@ import org.eclipse.remote.core.IRemoteConnectionWorkingCopy;
 import org.eclipse.remote.core.IRemoteServicesManager;
 import org.eclipse.remote.core.exception.RemoteConnectionException;
 import org.eclipse.remote.internal.jsch.core.JSchConnection;
+import org.eclipse.tracecompass.internal.tmf.remote.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.remote.core.messages.Messages;
+
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 
 /**
  * Factory for creation of remote connections programmatically.
@@ -41,12 +47,15 @@ public class TmfRemoteConnectionFactory {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
+    /** Name of a local connection */
+    public static final String LOCAL_CONNECTION_NAME = "Local"; //$NON-NLS-1$
+
     private static final Map<String, IConnectionFactory> CONNECTION_FACTORIES = new HashMap<>();
     private static final DefaultConnectionFactory DEFAULT_CONNECTION_FACTORY = new DefaultConnectionFactory();
 
     static {
         // Add local services
-        IRemoteServicesManager manager = RemoteSystemProxy.getService(IRemoteServicesManager.class);
+        IRemoteServicesManager manager = getService(IRemoteServicesManager.class);
         if (manager != null) {
             CONNECTION_FACTORIES.put(manager.getLocalConnectionType().getId(), new LocalConnectionFactory());
         }
@@ -82,25 +91,13 @@ public class TmfRemoteConnectionFactory {
      */
     public static IRemoteConnection createConnection(URI hostUri, String hostName) throws RemoteConnectionException {
 
-        IRemoteConnection connection = null;
-        IRemoteServicesManager manager = RemoteSystemProxy.getService(IRemoteServicesManager.class);
-        if (manager == null) {
-            throw new RemoteConnectionException(MessageFormat.format(Messages.RemoteConnection_ConnectionError, hostUri));
-        }
-        IRemoteConnectionType connectionType = manager.getConnectionType(hostUri);
-        if (connectionType == null) {
-            throw new RemoteConnectionException(MessageFormat.format(Messages.RemoteConnection_ConnectionError, hostUri));
-        }
-
+        IRemoteConnectionType connectionType = getConnectionType(hostUri);
         IConnectionFactory connectionFactory = CONNECTION_FACTORIES.get(connectionType.getId());
-        // Create a new connection
-        if (connectionFactory != null) {
-            connection = connectionFactory.createConnection(connectionType, hostUri, hostName);
-        } else {
-            connection = DEFAULT_CONNECTION_FACTORY.createConnection(connectionType, hostUri, hostName);
+        if (connectionFactory == null) {
+            connectionFactory = DEFAULT_CONNECTION_FACTORY;
         }
-
-        return connection;
+        // Create and return a new connection
+        return connectionFactory.createConnection(hostUri, hostName);
     }
 
     // ------------------------------------------------------------------------
@@ -113,8 +110,12 @@ public class TmfRemoteConnectionFactory {
     public static class DefaultConnectionFactory implements IConnectionFactory {
 
         @Override
-        public IRemoteConnection createConnection(IRemoteConnectionType connectionType, URI hostUri, String hostName) throws RemoteConnectionException {
+        public IRemoteConnection createConnection(URI hostUri, String hostName) throws RemoteConnectionException {
+
+            IRemoteConnectionType connectionType = getConnectionType(hostUri);
+
             IRemoteConnection connection = null;
+
             // Look for existing connections
             for (IRemoteConnection conn : connectionType.getConnections()) {
                 if (conn.getName().equals(hostName)) {
@@ -166,13 +167,80 @@ public class TmfRemoteConnectionFactory {
      */
     public static class LocalConnectionFactory implements IConnectionFactory {
         @Override
-        public IRemoteConnection createConnection(IRemoteConnectionType connectionType, URI hostUri, String hostName) throws RemoteConnectionException {
-            IRemoteConnection connection = RemoteSystemProxy.getLocalConnection();
+        public IRemoteConnection createConnection(URI hostUri, String hostName) throws RemoteConnectionException {
+            IRemoteConnection connection = getLocalConnection();
             if (connection == null) {
                 throw new RemoteConnectionException(MessageFormat.format(Messages.RemoteConnection_ConnectionError, hostUri));
             }
             return connection;
         }
+    }
+
+    // ------------------------------------------------------------------------
+    // Helper method(s)
+    // ------------------------------------------------------------------------
+    private static IRemoteConnectionType getConnectionType(URI hostUri) throws RemoteConnectionException {
+        IRemoteServicesManager manager = getService(IRemoteServicesManager.class);
+        if (manager == null) {
+            throw new RemoteConnectionException(MessageFormat.format(Messages.RemoteConnection_ConnectionError, hostUri));
+        }
+        IRemoteConnectionType connectionType = manager.getConnectionType(hostUri);
+        if (connectionType == null) {
+            throw new RemoteConnectionException(MessageFormat.format(Messages.RemoteConnection_ConnectionError, hostUri));
+        }
+        return connectionType;
+    }
+
+    // ------------------------------------------------------------------------
+    // Helper methods using OSGI service
+    // ------------------------------------------------------------------------
+    /**
+     * Return the OSGi service with the given service interface.
+     *
+     * @param service
+     *            service interface
+     * @return the specified service or null if it's not registered
+     */
+    public static @Nullable <T> T getService(Class<T> service) {
+        return Activator.getService(service);
+    }
+
+    /**
+     * Return a remote connection using OSGI service.
+     *
+     * @param remoteServicesId
+     *            ID of remote service
+     * @param name
+     *            name of connection
+     * @return the corresponding remote connection or null
+     */
+    public static @Nullable IRemoteConnection getRemoteConnection(final String remoteServicesId, final String name) {
+        IRemoteServicesManager manager = Activator.getService(IRemoteServicesManager.class);
+        if (manager == null) {
+            return null;
+        }
+        FluentIterable<IRemoteConnection> connections = FluentIterable.from(manager.getAllRemoteConnections());
+        Optional<IRemoteConnection> ret = connections.firstMatch(new Predicate<IRemoteConnection>() {
+            @Override
+            public boolean apply(@Nullable IRemoteConnection input) {
+                return ((input != null) && input.getConnectionType().getId().equals(remoteServicesId.toString()) && input.getName().equals(name.toString()));
+            }
+        });
+        return ret.orNull();
+    }
+
+    /**
+     * Return a Local connection.
+     *
+     * @return the local connection
+     */
+    public static @Nullable IRemoteConnection getLocalConnection() {
+        IRemoteServicesManager manager = Activator.getService(IRemoteServicesManager.class);
+        if (manager != null) {
+            IRemoteConnectionType type = manager.getLocalConnectionType();
+            return type.getConnection(LOCAL_CONNECTION_NAME);
+        }
+        return null;
     }
 
 }
