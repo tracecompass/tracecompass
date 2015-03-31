@@ -140,24 +140,6 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
     }
 
     /**
-     * Get the stream context defintiion
-     *
-     * @param input
-     *            the bitbuffer to read from
-     * @return an context definition, can be null
-     * @throws CTFReaderException
-     *             out of bounds exception or such
-     * @deprecated it was not used
-     */
-    @Deprecated
-    public StructDefinition getStreamEventHeaderDefinition(@NonNull BitBuffer input) throws CTFReaderException {
-        if (!(fStreamEventHeaderDecl instanceof StructDeclaration)) {
-            throw new IllegalStateException("Definition is not a struct definition, this is a deprecated method that doesn't work so well, stop using it."); //$NON-NLS-1$
-        }
-        return ((StructDeclaration) fStreamEventHeaderDecl).createDefinition(this, ILexicalScope.STREAM_EVENT_HEADER, input);
-    }
-
-    /**
      * Get the packet context defintiion
      *
      * @param input
@@ -508,17 +490,6 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
         return null;
     }
 
-    /**
-     * Get stream event header
-     *
-     * @return the stream event header
-     * @deprecated use
-     *             {@link CTFStreamInputPacketReader#getStreamEventHeaderDefinition()}
-     */
-    @Deprecated
-    public StructDefinition getCurrentStreamEventHeader() {
-        return (StructDefinition) ((fCurrentStreamEventHeaderDef instanceof StructDefinition) ? fCurrentStreamEventHeaderDef : null);
-    }
 
     /**
      * Get stream event header
