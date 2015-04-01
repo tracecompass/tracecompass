@@ -88,6 +88,28 @@ public final class ConditionHelpers {
     }
 
     /**
+     * Is a table item available
+     *
+     * @param name
+     *            the name of the item
+     * @param table
+     *            the parent table
+     * @return true or false, it should swallow all exceptions
+     */
+    public static ICondition isTableItemAvailable(final String name, final SWTBotTable table) {
+        return new SWTBotTestCondition() {
+            @Override
+            public boolean test() throws Exception {
+                try {
+                    return table.containsItem(name);
+                } catch (Exception e) {
+                }
+                return false;
+            }
+        };
+    }
+
+    /**
      * Is the treeItem's node available
      *
      * @param name

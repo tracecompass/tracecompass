@@ -37,6 +37,7 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
@@ -120,14 +121,16 @@ public final class SWTBotUtils {
     }
 
     /**
-     * Deletes a tracing project
+     * Deletes a project
      *
      * @param projectName
      *            the name of the tracing project
+     * @param deleteResources
+     *            whether or not to deleted resources under the project
      * @param bot
      *            the workbench bot
      */
-    public static void deleteProject(String projectName, SWTWorkbenchBot bot) {
+    public static void deleteProject(final String projectName, boolean deleteResources, SWTWorkbenchBot bot) {
         // Wait for any analysis to complete because it might create
         // supplementary files
         SWTBotUtils.waitForJobs();
@@ -146,16 +149,30 @@ public final class SWTBotUtils {
         SWTBotMenu contextMenu = treeItem.contextMenu("Delete");
         contextMenu.click();
 
-        bot.shell("Delete Resources").setFocus();
-        final SWTBotCheckBox checkBox = bot.checkBox();
-        bot.waitUntil(Conditions.widgetIsEnabled(checkBox));
-        checkBox.click();
+        if (deleteResources) {
+            bot.shell("Delete Resources").setFocus();
+            final SWTBotCheckBox checkBox = bot.checkBox();
+            bot.waitUntil(Conditions.widgetIsEnabled(checkBox));
+            checkBox.click();
+        }
 
         final SWTBotButton okButton = bot.button("OK");
         bot.waitUntil(Conditions.widgetIsEnabled(okButton));
         okButton.click();
 
         SWTBotUtils.waitForJobs();
+    }
+
+    /**
+     * Deletes a project and its resources
+     *
+     * @param projectName
+     *            the name of the tracing project
+     * @param bot
+     *            the workbench bot
+     */
+    public static void deleteProject(String projectName, SWTWorkbenchBot bot) {
+        deleteProject(projectName, true, bot);
     }
 
     /**
@@ -372,15 +389,28 @@ public final class SWTBotUtils {
      * @return a {@link SWTBotTreeItem} of the "Traces" folder
      */
     public static SWTBotTreeItem selectTracesFolder(SWTWorkbenchBot bot, String projectName) {
-        SWTBotView projectExplorerBot = bot.viewByTitle("Project Explorer");
-        projectExplorerBot.show();
-        SWTBotTree tree = projectExplorerBot.bot().tree();
-        bot.waitUntil(ConditionHelpers.IsTreeNodeAvailable(projectName, tree));
-        SWTBotTreeItem projectTreeItem = tree.getTreeItem(projectName);
+        SWTBotTreeItem projectTreeItem = selectProject(bot, projectName);
         projectTreeItem.select();
         SWTBotTreeItem tracesFolderItem = getTraceProjectItem(bot, projectTreeItem, TmfTracesFolder.TRACES_FOLDER_NAME);
         tracesFolderItem.select();
         return tracesFolderItem;
+    }
+
+    /**
+     * Select the project in Project Explorer
+     *
+     * @param bot
+     *            a given workbench bot
+     * @param projectName
+     *            the name of the project (it needs to exist or else it would time out)
+     * @return a {@link SWTBotTreeItem} of the project
+     */
+    public static SWTBotTreeItem selectProject(SWTWorkbenchBot bot, String projectName) {
+        SWTBotView projectExplorerBot = bot.viewByTitle("Project Explorer");
+        projectExplorerBot.show();
+        SWTBotTreeItem treeItem = projectExplorerBot.bot().tree().getTreeItem(projectName);
+        treeItem.select();
+        return treeItem;
     }
 
     /**
@@ -444,5 +474,36 @@ public final class SWTBotUtils {
                 return rect;
             }
         });
+    }
+
+    /**
+     * Get the tree item from a tree at the specified location
+     *
+     * @param bot
+     *            the SWTBot
+     * @param tree
+     *            the tree to find the tree item in
+     * @param nodeNames
+     *            the path to the tree item, in the form of node names (from
+     *            parent to child).
+     * @return the tree item
+     */
+    public static SWTBotTreeItem getTreeItem(SWTBot bot, SWTBotTree tree, String... nodeNames) {
+        if (nodeNames.length == 0) {
+            return null;
+        }
+
+        bot.waitUntil(ConditionHelpers.IsTreeNodeAvailable(nodeNames[0], tree));
+        SWTBotTreeItem currentNode = tree.getTreeItem(nodeNames[0]);
+        for (int i = 1; i < nodeNames.length; i++) {
+            currentNode.expand();
+
+            String nodeName = nodeNames[i];
+            bot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(nodeName, currentNode));
+            SWTBotTreeItem newNode = currentNode.getNode(nodeName);
+            currentNode = newNode;
+        }
+
+        return currentNode;
     }
 }
