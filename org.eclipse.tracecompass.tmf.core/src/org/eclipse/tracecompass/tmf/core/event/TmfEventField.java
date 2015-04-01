@@ -147,7 +147,7 @@ public class TmfEventField implements ITmfEventField {
      * @param labels the list of labels
      * @return the (flat) root list
      */
-    public final static ITmfEventField makeRoot(final String[] labels) {
+    public static final ITmfEventField makeRoot(final String[] labels) {
         final ITmfEventField[] fields = new ITmfEventField[labels.length];
         for (int i = 0; i < labels.length; i++) {
             fields[i] = new TmfEventField(labels[i], null, null);
