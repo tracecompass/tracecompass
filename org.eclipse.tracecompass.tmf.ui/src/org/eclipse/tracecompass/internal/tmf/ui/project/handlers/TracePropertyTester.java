@@ -30,10 +30,10 @@ public class TracePropertyTester extends PropertyTester {
     // Constants
     // ------------------------------------------------------------------------
 
-    private final static String IS_IN_TRACE_FOLDER = "isInTraceFolder"; //$NON-NLS-1$
-    private final static String IS_EXPERIMENT_TRACE = "isExperimentTrace"; //$NON-NLS-1$
-    private final static String HAS_SUPPLEMENTARY_FILES = "hasSupplementaryFiles"; //$NON-NLS-1$
-    private final static String TRACE_TYPE = "traceType"; //$NON-NLS-1$
+    private static final String IS_IN_TRACE_FOLDER = "isInTraceFolder"; //$NON-NLS-1$
+    private static final String IS_EXPERIMENT_TRACE = "isExperimentTrace"; //$NON-NLS-1$
+    private static final String HAS_SUPPLEMENTARY_FILES = "hasSupplementaryFiles"; //$NON-NLS-1$
+    private static final String TRACE_TYPE = "traceType"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Constructor
