@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson
+ * Copyright (c) 2009, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -13,7 +13,9 @@
 package org.eclipse.tracecompass.tmf.tests.stubs.trace;
 
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 
@@ -24,18 +26,21 @@ import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
  */
 public class TmfEmptyTraceStub extends TmfTraceStub {
 
-    /**
-     *
-     */
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
 
     /**
+     * Constructor
      *
+     * @param path
+     *            the empty trace path
+     *
+     * @throws TmfTraceException
+     *             if an exception occurs
      */
-    public TmfEmptyTraceStub() {
-        super();
+    public TmfEmptyTraceStub(String path) throws TmfTraceException {
+        super(path, ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, 0L);
     }
 
     // ------------------------------------------------------------------------

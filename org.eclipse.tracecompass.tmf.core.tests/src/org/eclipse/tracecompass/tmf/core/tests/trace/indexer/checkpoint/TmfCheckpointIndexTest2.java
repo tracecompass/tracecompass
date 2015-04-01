@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -25,10 +25,10 @@ import java.net.URL;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
+import org.eclipse.tracecompass.tmf.core.tests.trace.indexer.checkpoint.AbstractIndexTest.ITestIndexer;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
@@ -79,15 +79,16 @@ public class TmfCheckpointIndexTest2 {
     // Helper classes
     // ------------------------------------------------------------------------
 
-    private static class TestIndexer extends TmfCheckpointIndexer {
-        @SuppressWarnings({ })
+    private static class TestIndexer extends TmfCheckpointIndexer implements ITestIndexer {
         public TestIndexer(TestTrace testTrace) {
             super(testTrace, BLOCK_SIZE);
         }
-        @SuppressWarnings({ })
+
         public TestIndexer(EmptyTestTrace testTrace) {
             super(testTrace, BLOCK_SIZE);
         }
+
+        @Override
         public ITmfCheckpointIndex getCheckpoints() {
             return getTraceIndex();
         }
@@ -104,16 +105,15 @@ public class TmfCheckpointIndexTest2 {
         }
 
         @Override
-        public TestIndexer getIndexer() {
-            return (TestIndexer) super.getIndexer();
+        public ITestIndexer getIndexer() {
+            return (ITestIndexer) super.getIndexer();
         }
     }
 
     private class EmptyTestTrace extends TmfEmptyTraceStub {
 
-        public EmptyTestTrace() {
-            super();
-            init(getClass().getSimpleName(), TmfEvent.class);
+        public EmptyTestTrace(String path) throws TmfTraceException {
+            super(path);
         }
 
         @Override
@@ -122,8 +122,8 @@ public class TmfCheckpointIndexTest2 {
         }
 
         @Override
-        public TestIndexer getIndexer() {
-            return (TestIndexer) super.getIndexer();
+        public ITestIndexer getIndexer() {
+            return (ITestIndexer) super.getIndexer();
         }
     }
 
@@ -148,8 +148,12 @@ public class TmfCheckpointIndexTest2 {
         }
 
         if (fEmptyTrace == null) {
-            fEmptyTrace = new EmptyTestTrace();
-            fEmptyTrace.indexTrace(true);
+            try {
+                File file = File.createTempFile("empty", "txt");
+                fEmptyTrace = new EmptyTestTrace(file.getAbsolutePath());
+            } catch (TmfTraceException | IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

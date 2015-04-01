@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson
+ * Copyright (c) 2009, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -27,7 +27,6 @@ import java.net.URL;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
@@ -98,7 +97,7 @@ public abstract class AbstractIndexTest {
         fEmptyTrace = null;
     }
 
-    interface TestIndexerInterface extends ITmfTraceIndexer {
+    interface ITestIndexer extends ITmfTraceIndexer {
         ITmfCheckpointIndex getCheckpoints();
     }
 
@@ -109,7 +108,7 @@ public abstract class AbstractIndexTest {
     /**
      * A test indexer
      */
-    protected static class TestIndexer extends TmfCheckpointIndexer implements TestIndexerInterface {
+    protected static class TestIndexer extends TmfCheckpointIndexer implements ITestIndexer {
         /**
          * Constructs the test indexer for a normal test trace
          *
@@ -133,7 +132,7 @@ public abstract class AbstractIndexTest {
      *            the trace
      * @return the indexer for testing
      */
-    protected TestIndexerInterface createTestIndexer(TestTrace trace) {
+    protected ITestIndexer createTestIndexer(TestTrace trace) {
         return new TestIndexer(trace);
     }
 
@@ -160,15 +159,14 @@ public abstract class AbstractIndexTest {
         }
 
         @Override
-        public TestIndexerInterface getIndexer() {
-            return (TestIndexerInterface) super.getIndexer();
+        public ITestIndexer getIndexer() {
+            return (ITestIndexer) super.getIndexer();
         }
     }
 
     private class EmptyTestTrace extends TmfEmptyTraceStub {
-        public EmptyTestTrace() {
-            super();
-            init(getClass().getSimpleName(), TmfEvent.class);
+        public EmptyTestTrace(String path) throws TmfTraceException {
+            super(path);
         }
 
         @Override
@@ -177,8 +175,8 @@ public abstract class AbstractIndexTest {
         }
 
         @Override
-        public TestIndexer getIndexer() {
-            return (TestIndexer) super.getIndexer();
+        public ITestIndexer getIndexer() {
+            return (ITestIndexer) super.getIndexer();
         }
     }
 
@@ -221,8 +219,12 @@ public abstract class AbstractIndexTest {
         }
 
         if (fEmptyTrace == null) {
-            fEmptyTrace = new EmptyTestTrace();
-            fEmptyTrace.indexTrace(true);
+            try {
+                File file = File.createTempFile("empty", "txt");
+                fEmptyTrace = new EmptyTestTrace(file.getAbsolutePath());
+            } catch (TmfTraceException | IOException e) {
+                fail(e.getMessage());
+            }
         }
     }
 

@@ -36,11 +36,11 @@ public class TmfBTreeIndexTest extends AbstractIndexTest {
      * @return the indexer for testing
      */
     @Override
-    protected TestIndexerInterface createTestIndexer(TestTrace trace) {
+    protected ITestIndexer createTestIndexer(TestTrace trace) {
         return new TestBTreeIndexer(trace);
     }
 
-    private static class TestBTreeIndexer extends TmfBTreeTraceIndexer implements TestIndexerInterface {
+    private static class TestBTreeIndexer extends TmfBTreeTraceIndexer implements ITestIndexer {
         public TestBTreeIndexer(TestTrace testTrace) {
             super(testTrace, BLOCK_SIZE);
         }
