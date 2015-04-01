@@ -25,7 +25,7 @@ public class TmfSignalTracer {
     /**
      * @return The single instance of the signal tracer object
      */
-    static public TmfSignalTracer getInstance() {
+    public static TmfSignalTracer getInstance() {
         if (fInstance == null) {
             fInstance = new TmfSignalTracer();
         }
