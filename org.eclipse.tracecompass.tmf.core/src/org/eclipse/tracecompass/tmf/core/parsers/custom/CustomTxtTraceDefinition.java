@@ -410,19 +410,19 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
     public static class Cardinality {
 
         /** Representation of infinity */
-        public final static int INF = Integer.MAX_VALUE;
+        public static final int INF = Integer.MAX_VALUE;
 
         /** Preset for [1, 1] */
-        public final static Cardinality ONE = new Cardinality(1, 1);
+        public static final Cardinality ONE = new Cardinality(1, 1);
 
         /** Preset for [1, inf] */
-        public final static Cardinality ONE_OR_MORE = new Cardinality(1, INF);
+        public static final Cardinality ONE_OR_MORE = new Cardinality(1, INF);
 
         /** Preset for [0, 1] */
-        public final static Cardinality ZERO_OR_ONE = new Cardinality(0, 1);
+        public static final Cardinality ZERO_OR_ONE = new Cardinality(0, 1);
 
         /** Preset for [0, inf] */
-        public final static Cardinality ZERO_OR_MORE = new Cardinality(0, INF);
+        public static final Cardinality ZERO_OR_MORE = new Cardinality(0, INF);
 
         private final int min;
         private final int max;
