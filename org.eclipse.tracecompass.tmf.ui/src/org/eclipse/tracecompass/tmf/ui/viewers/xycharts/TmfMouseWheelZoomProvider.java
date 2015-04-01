@@ -27,8 +27,8 @@ public class TmfMouseWheelZoomProvider extends TmfBaseProvider implements MouseW
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-    private final static double ZOOM_FACTOR = 0.8;
-    private final static long MIN_WINDOW_SIZE = 1;
+    private static final double ZOOM_FACTOR = 0.8;
+    private static final long MIN_WINDOW_SIZE = 1;
 
     // ------------------------------------------------------------------------
     // Constructors

@@ -25,7 +25,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.equalsNullable;
  */
 class FileAndName implements Comparable<FileAndName> {
 
-    final private File fFile;
+    private final File fFile;
     private String fTraceTypeId;
     private String fName;
     private boolean fConflict;

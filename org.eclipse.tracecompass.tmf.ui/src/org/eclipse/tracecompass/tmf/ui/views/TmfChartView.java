@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
  *
  * @author Bernd Hufmann
  */
-abstract public class TmfChartView extends TmfView {
+public abstract class TmfChartView extends TmfView {
 
     // ------------------------------------------------------------------------
     // Attributes

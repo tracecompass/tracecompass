@@ -278,7 +278,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private SashForm fSashForm;
     private TmfRawEventViewer fRawViewer;
     private ITmfTrace fTrace;
-    volatile private boolean fPackDone = false;
+    private volatile boolean fPackDone = false;
     private HeaderState fHeaderState = HeaderState.SEARCH;
     private long fSelectedRank = 0;
     private ITmfTimestamp fSelectedBeginTimestamp = null;

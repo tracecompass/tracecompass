@@ -250,42 +250,42 @@ public abstract class GraphNode {
      *            the y coordinate of the point to test containment
      * @return true if contained, false otherwise
      */
-    abstract public boolean contains(int x, int y);
+    public abstract boolean contains(int x, int y);
 
     /**
      * Returns the x coordinate of the graph node
      *
      * @return the x coordinate
      */
-    abstract public int getX();
+    public abstract int getX();
 
     /**
      * Returns the y coordinate of the graph node
      *
      * @return the y coordinate
      */
-    abstract public int getY();
+    public abstract int getY();
 
     /**
      * Returns the graph node height
      *
      * @return the graph node height
      */
-    abstract public int getHeight();
+    public abstract int getHeight();
 
     /**
      * Returns the graph node width
      *
      * @return the graph node width
      */
-    abstract public int getWidth();
+    public abstract int getWidth();
 
     /**
      * Draws the graph node in the given context
      *
      * @param context the graphical context to draw in
      */
-    abstract protected void draw(IGC context);
+    protected abstract void draw(IGC context);
 
     /**
      * Returns the GraphNode visibility for the given visible area. Wrong
@@ -343,7 +343,7 @@ public abstract class GraphNode {
      *
      * @return the node type identifier
      */
-    abstract public String getArrayId();
+    public abstract String getArrayId();
 
     /**
      * Return true if the distance from the GraphNode to the given point is positive

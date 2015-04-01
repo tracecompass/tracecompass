@@ -156,7 +156,7 @@ public class TmfEventPropertySource implements IPropertySource {
         private static final String NAME_FUNCTION_NAME = "Function"; //$NON-NLS-1$
         private static final String NAME_LINE_NUMBER = "Line"; //$NON-NLS-1$
 
-        final private ITmfSourceLookup fSourceLookup;
+        private final ITmfSourceLookup fSourceLookup;
 
         public SourceLookupPropertySource(ITmfSourceLookup lookup) {
             fSourceLookup = lookup;

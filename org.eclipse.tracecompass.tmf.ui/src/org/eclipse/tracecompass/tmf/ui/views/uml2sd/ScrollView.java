@@ -1728,7 +1728,7 @@ public class ScrollView extends Composite {
     }
 
     // static must take place here... cursor is created once.
-    private volatile static Cursor fOverviewCursor;
+    private static volatile Cursor fOverviewCursor;
 
     /** Support for click-and-see overview shell on this ScrollView */
     protected class Overview {

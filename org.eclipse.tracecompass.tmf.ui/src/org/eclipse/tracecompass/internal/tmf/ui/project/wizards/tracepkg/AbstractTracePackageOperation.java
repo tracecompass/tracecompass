@@ -32,7 +32,7 @@ import org.eclipse.ui.internal.wizards.datatransfer.TarFile;
  * @author Marc-Andre Laperle
  */
 @SuppressWarnings("restriction")
-abstract public class AbstractTracePackageOperation {
+public abstract class AbstractTracePackageOperation {
     private IStatus fStatus;
     // Result of this operation, if any
     private TracePackageElement[] fResultElements;

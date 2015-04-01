@@ -32,7 +32,7 @@ public class IndexResponse implements IRelayResponse {
      * fOffset + fPacketSize + fContentSize + fTimestampBegin + fTimestampEnd +
      * fEventsDiscarded + fStreamId + fStatus + fFlags
      */
-    public final static int SIZE =
+    public static final int SIZE =
             (Long.SIZE * 7 + Integer.SIZE * 2) / 8;
 
     /** the offset */

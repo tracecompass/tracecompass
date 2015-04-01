@@ -24,7 +24,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
  *
  * @author Bernd Hufmann
  */
-final public class ControlCommandLogger {
+public final class ControlCommandLogger {
 
     // ------------------------------------------------------------------------
     // Attributes

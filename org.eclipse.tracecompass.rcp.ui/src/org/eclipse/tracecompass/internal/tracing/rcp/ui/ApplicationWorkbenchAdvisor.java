@@ -54,13 +54,13 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
     // The default perspective
     private static final String PERSPECTIVE_ID = "org.eclipse.linuxtools.tmf.ui.perspective"; //$NON-NLS-1$
 
-    private final static String ICONS_PATH = "$nl$/icons/full/"; //$NON-NLS-1$
-    private final static String PATH_ELOCALTOOL = ICONS_PATH + "elcl16/"; //$NON-NLS-1$
-    private final static String PATH_DLOCALTOOL = ICONS_PATH + "dlcl16/"; //$NON-NLS-1$
-    private final static String PATH_ETOOL = ICONS_PATH + "etool16/"; //$NON-NLS-1$
-    private final static String PATH_DTOOL = ICONS_PATH + "dtool16/"; //$NON-NLS-1$
-    private final static String PATH_OBJECT = ICONS_PATH + "obj16/"; //$NON-NLS-1$
-    private final static String PATH_WIZBAN = ICONS_PATH + "wizban/";//$NON-NLS-1$
+    private static final String ICONS_PATH = "$nl$/icons/full/"; //$NON-NLS-1$
+    private static final String PATH_ELOCALTOOL = ICONS_PATH + "elcl16/"; //$NON-NLS-1$
+    private static final String PATH_DLOCALTOOL = ICONS_PATH + "dlcl16/"; //$NON-NLS-1$
+    private static final String PATH_ETOOL = ICONS_PATH + "etool16/"; //$NON-NLS-1$
+    private static final String PATH_DTOOL = ICONS_PATH + "dtool16/"; //$NON-NLS-1$
+    private static final String PATH_OBJECT = ICONS_PATH + "obj16/"; //$NON-NLS-1$
+    private static final String PATH_WIZBAN = ICONS_PATH + "wizban/";//$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Operations

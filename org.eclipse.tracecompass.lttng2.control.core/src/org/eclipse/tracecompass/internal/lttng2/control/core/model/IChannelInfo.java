@@ -31,7 +31,7 @@ public interface IChannelInfo extends ITraceInfo {
     /**
      * Default value for overwrite mode.
      */
-    public final static boolean DEFAULT_OVERWRITE_MODE = false;
+    boolean DEFAULT_OVERWRITE_MODE = false;
 
     /**
      * @return the overwrite mode value.

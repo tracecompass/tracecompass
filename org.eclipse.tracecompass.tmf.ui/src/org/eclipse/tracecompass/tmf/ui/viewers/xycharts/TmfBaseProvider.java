@@ -19,7 +19,7 @@ import org.swtchart.IAxis;
  *
  * @author Bernd Hufmann
  */
-abstract public class TmfBaseProvider {
+public abstract class TmfBaseProvider {
 
     // ------------------------------------------------------------------------
     // Attributes

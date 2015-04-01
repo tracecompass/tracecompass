@@ -53,7 +53,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.Activator;
  *
  * @author Marc-Andre Laperle
  */
-abstract public class AbstractTracePackageWizardPage extends WizardPage {
+public abstract class AbstractTracePackageWizardPage extends WizardPage {
 
     private static final int COMBO_HISTORY_LENGTH = 5;
     private static final String STORE_FILE_PATHS_ID = ".STORE_FILEPATHS_ID"; //$NON-NLS-1$
@@ -217,7 +217,7 @@ abstract public class AbstractTracePackageWizardPage extends WizardPage {
     /**
      * Update the page with the file path the current file path selection
      */
-    abstract protected void updateWithFilePathSelection();
+    protected abstract void updateWithFilePathSelection();
 
     /**
      * Creates the buttons for selecting all or none of the elements.

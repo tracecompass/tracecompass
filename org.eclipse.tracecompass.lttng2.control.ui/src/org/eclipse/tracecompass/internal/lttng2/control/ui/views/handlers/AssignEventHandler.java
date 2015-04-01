@@ -209,7 +209,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
         /**
          * The list of available sessions.
          */
-        final private TraceSessionComponent[] fSessions;
+        private final TraceSessionComponent[] fSessions;
 
         /**
          * Flag for indicating Kernel or UST.

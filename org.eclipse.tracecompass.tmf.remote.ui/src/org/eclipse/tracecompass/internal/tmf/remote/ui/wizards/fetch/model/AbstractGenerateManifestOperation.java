@@ -32,7 +32,7 @@ import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
  * @author Marc-Andre Laperle
  * @author Bernd Hufmann
  */
-abstract public class AbstractGenerateManifestOperation extends AbstractTracePackageOperation {
+public abstract class AbstractGenerateManifestOperation extends AbstractTracePackageOperation {
 
     /** A pattern to find where to substitute groups in the trace name */
     protected static final Pattern GROUP_PATTERN = Pattern.compile("\\(group(\\d+)\\)"); //$NON-NLS-1$

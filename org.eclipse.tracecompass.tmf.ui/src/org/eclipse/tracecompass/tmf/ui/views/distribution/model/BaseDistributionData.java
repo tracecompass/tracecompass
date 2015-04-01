@@ -31,7 +31,7 @@ public class BaseDistributionData {
     /**
      * Constant indication that bucket is not filled.
      */
-    public final static int OUT_OF_RANGE_BUCKET = -1;
+    public static final int OUT_OF_RANGE_BUCKET = -1;
 
     // ------------------------------------------------------------------------
     // Attributes

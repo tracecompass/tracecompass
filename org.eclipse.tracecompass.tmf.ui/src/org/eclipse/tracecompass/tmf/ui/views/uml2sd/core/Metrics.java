@@ -184,7 +184,7 @@ public class Metrics {
      *
      * @param height the character height
      */
-    static public void setLifelineFontHeight(int height) {
+    public static void setLifelineFontHeight(int height) {
         fLifelineFontHeight = height;
     }
 
@@ -193,7 +193,7 @@ public class Metrics {
      *
      * @param width the character width
      */
-    static public void setLifelineFontWidth(int width) {
+    public static void setLifelineFontWidth(int width) {
         fLifelineFontWidth = width;
     }
 
@@ -202,7 +202,7 @@ public class Metrics {
      *
      * @param fontHeight the character height
      */
-    static public void setMessageFontHeight(int fontHeight) {
+    public static void setMessageFontHeight(int fontHeight) {
         fMessageFontHeight = fontHeight;
     }
 
@@ -211,7 +211,7 @@ public class Metrics {
      *
      * @return the character height
      */
-    static public int getFrameFontHeigth() {
+    public static int getFrameFontHeigth() {
         return fFrameFontHeight;
     }
 
@@ -220,7 +220,7 @@ public class Metrics {
      *
      * @param fontHeight the character height
      */
-    static public void setFrameFontHeight(int fontHeight) {
+    public static void setFrameFontHeight(int fontHeight) {
         fFrameFontHeight = fontHeight;
     }
 
@@ -229,7 +229,7 @@ public class Metrics {
      *
      * @return the character height
      */
-    static public int getLifelineHeaderFontHeigth() {
+    public static int getLifelineHeaderFontHeigth() {
         return fLifelineHeaderFontHeight;
     }
 
@@ -238,7 +238,7 @@ public class Metrics {
      *
      * @param fontHeight the character height
      */
-    static public void setLifelineHeaderFontHeight(int fontHeight) {
+    public static void setLifelineHeaderFontHeight(int fontHeight) {
         fLifelineHeaderFontHeight = fontHeight;
     }
 
@@ -247,7 +247,7 @@ public class Metrics {
      *
      * @return the character height
      */
-    static public int getLifelineFontHeigth() {
+    public static int getLifelineFontHeigth() {
         return fLifelineFontHeight;
     }
 
@@ -256,7 +256,7 @@ public class Metrics {
      *
      * @return the character height
      */
-    static public int getMessageFontHeigth() {
+    public static int getMessageFontHeigth() {
         if (fForcedEventSpacing >= 0) {
             return 0;
         }
@@ -268,7 +268,7 @@ public class Metrics {
      *
      * @return the vertical space used by a Lifeline
      */
-    static public int getLifelineWidth() {
+    public static int getLifelineWidth() {
         return fLifeLineWidth;
     }
 
@@ -277,7 +277,7 @@ public class Metrics {
      *
      * @param value the vertical space
      */
-    static public void setLifelineWidth(int value) {
+    public static void setLifelineWidth(int value) {
         fLifeLineWidth = value;
     }
 
@@ -286,7 +286,7 @@ public class Metrics {
      *
      * @return the swimming lane width
      */
-    static public int swimmingLaneWidth() {
+    public static int swimmingLaneWidth() {
         return getLifelineWidth() + LIFELINE_SPACING;
     }
 
@@ -295,7 +295,7 @@ public class Metrics {
      *
      * @return the average character width
      */
-    static public int getAverageCharWidth() {
+    public static int getAverageCharWidth() {
         return fLifelineFontWidth;
     }
 
@@ -304,7 +304,7 @@ public class Metrics {
      *
      * @return the message spacing
      */
-    static public int getMessagesSpacing() {
+    public static int getMessagesSpacing() {
         if (fForcedEventSpacing >= 0) {
             return fForcedEventSpacing;
         }
@@ -317,7 +317,7 @@ public class Metrics {
      * @param eventSpacing
      *            The spacing value
      */
-    static public void setForcedEventSpacing(int eventSpacing) {
+    public static void setForcedEventSpacing(int eventSpacing) {
         fForcedEventSpacing = eventSpacing;
     }
 
@@ -326,7 +326,7 @@ public class Metrics {
      *
      * @return forcedEventSpacing
      */
-    static public int getForcedEventSpacing() {
+    public static int getForcedEventSpacing() {
         return fForcedEventSpacing;
     }
 }

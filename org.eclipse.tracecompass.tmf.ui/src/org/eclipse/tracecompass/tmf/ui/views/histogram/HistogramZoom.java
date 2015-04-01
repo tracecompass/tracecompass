@@ -32,7 +32,7 @@ public class HistogramZoom implements MouseWheelListener, KeyListener {
     // Constants
     // ------------------------------------------------------------------------
 
-    private final static double ZOOM_FACTOR = 0.8;
+    private static final double ZOOM_FACTOR = 0.8;
 
     // ------------------------------------------------------------------------
     // Attributes

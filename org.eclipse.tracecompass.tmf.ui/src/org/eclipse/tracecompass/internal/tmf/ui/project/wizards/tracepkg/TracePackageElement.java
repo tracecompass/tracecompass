@@ -108,7 +108,7 @@ public abstract class TracePackageElement extends WorkbenchAdapter {
      *
      * @return the text representation
      */
-    abstract public String getText();
+    public abstract String getText();
 
     /**
      * Get the children of this element
