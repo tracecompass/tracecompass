@@ -39,7 +39,7 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
      * The base file header, can be extended
      */
     protected class CheckpointCollectionFileHeader {
-        private final static int SIZE = INT_SIZE +
+        private static final int SIZE = INT_SIZE +
                 INT_SIZE +
                 LONG_SIZE +
                 LONG_SIZE;
