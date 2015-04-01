@@ -53,7 +53,7 @@ public abstract class TmfWorkspaceModifyOperation implements IRunnableWithProgre
     }
 
     @Override
-    public synchronized final void run(IProgressMonitor monitor)
+    public final synchronized void run(IProgressMonitor monitor)
             throws InvocationTargetException, InterruptedException {
         final InvocationTargetException[] iteHolder = new InvocationTargetException[1];
         try {
