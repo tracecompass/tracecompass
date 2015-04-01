@@ -26,13 +26,13 @@ public class TmfCallsite implements ITmfCallsite {
     // ------------------------------------------------------------------------
 
     /** The file name string. */
-    final private String fFileName;
+    private final String fFileName;
 
     /** The function name. */
-    final private String fFunctionName;
+    private final String fFunctionName;
 
     /** The line number. */
-    final private long fLineNumber;
+    private final long fLineNumber;
 
     // ------------------------------------------------------------------------
     // Constructors
