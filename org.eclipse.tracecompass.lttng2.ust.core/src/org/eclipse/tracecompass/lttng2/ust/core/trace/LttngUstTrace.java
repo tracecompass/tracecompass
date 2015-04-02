@@ -14,17 +14,15 @@
 
 package org.eclipse.tracecompass.lttng2.ust.core.trace;
 
-import java.nio.BufferOverflowException;
+import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.Activator;
-import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
-import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTraceValidationStatus;
 
 /**
  * Class to contain LTTng-UST traces
@@ -50,22 +48,16 @@ public class LttngUstTrace extends CtfTmfTrace {
      */
     @Override
     public IStatus validate(final IProject project, final String path) {
-        try (CtfTmfTrace temp = new CtfTmfTrace();) {
-            temp.initTrace((IResource) null, path, CtfTmfEvent.class);
-
+        IStatus status = super.validate(project, path);
+        if (status instanceof CtfTraceValidationStatus) {
+            Map<String, String> environment = ((CtfTraceValidationStatus) status).getEnvironment();
             /* Make sure the domain is "ust" in the trace's env vars */
-            String dom = temp.getEnvironment().get("domain"); //$NON-NLS-1$
-            if (dom != null && dom.equals("\"ust\"")) { //$NON-NLS-1$
-                return new TraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID);
+            String domain = environment.get("domain"); //$NON-NLS-1$
+            if (domain == null || !domain.equals("\"ust\"")) { //$NON-NLS-1$
+                return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.LttngUstTrace_DomainError);
             }
-            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.LttngUstTrace_DomainError);
-
-        } catch (TmfTraceException e) {
-            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.toString(), e);
-        } catch (NullPointerException e) {
-            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.toString(), e);
-        } catch (final BufferOverflowException e) {
-            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.LttngUstTrace_TraceReadError + ": " + Messages.LttngUstTrace_MalformedTrace); //$NON-NLS-1$
+            return new TraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID);
         }
+        return status;
     }
 }

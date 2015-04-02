@@ -54,7 +54,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceProperties;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceWithPreDefinedEvents;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfPersistentlyIndexable;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.TmfBTreeTraceIndexer;
@@ -221,28 +220,25 @@ public class CtfTmfTrace extends TmfTrace
      */
     @Override
     public IStatus validate(final IProject project, final String path) {
-        IStatus status = new TraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID);
         try {
-            final CTFTrace temp = new CTFTrace(path);
-            if (!temp.majorIsSet()) {
-                status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_MajorNotSet);
-            } else {
-                try (CTFTraceReader ctfTraceReader = new CTFTraceReader(temp);) {
-                    if (!ctfTraceReader.hasMoreEvents()) {
-                        // TODO: This will need an additional check when we
-                        // support live traces
-                        // because having no event is valid for a live trace
-                        status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_NoEvent);
-                    }
+            final CTFTrace trace = new CTFTrace(path);
+            if (!trace.majorIsSet()) {
+                return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_MajorNotSet);
+            }
+            try (CTFTraceReader ctfTraceReader = new CTFTraceReader(trace)) {
+                if (!ctfTraceReader.hasMoreEvents()) {
+                    // TODO: This will need an additional check when we
+                    // support live traces
+                    // because having no event is valid for a live trace
+                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_NoEvent);
                 }
             }
+            return new CtfTraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID, trace.getEnvironment());
         } catch (final CTFReaderException e) {
-            status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + e.toString()); //$NON-NLS-1$
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + e.toString()); //$NON-NLS-1$
         } catch (final BufferOverflowException e) {
-            status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + Messages.CtfTmfTrace_BufferOverflowErrorMessage); //$NON-NLS-1$
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + Messages.CtfTmfTrace_BufferOverflowErrorMessage); //$NON-NLS-1$
         }
-
-        return status;
     }
 
     @Override
