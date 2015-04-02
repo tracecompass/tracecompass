@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -43,6 +44,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ImageHelper;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.ui.PlatformUI;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -61,7 +63,8 @@ public class FilterColorEditorTest {
     private static final int TIMESTAMP_COLUMN = 1;
     private static final int SOURCE_COLUMN = 2;
     private static final int MESSAGE_COLUMN = 6;
-    private static final RGB YELLOW = new RGB(255, 255, 0);
+    private static final RGB GREEN = new RGB(0, 255, 0);
+    private static final String HIGHLIGHT_COLOR_DEFINITION_ID = "org.eclipse.tracecompass.tmf.ui.color.eventtable.highlight"; //$NON-NLS-1$
     private static final String TRACE_PROJECT_NAME = "test";
     private static final String COLUMN_TRACE = "syslog_collapse";
     private static final String COLUMN_TRACE_PATH = "testfiles/" + COLUMN_TRACE;
@@ -77,6 +80,7 @@ public class FilterColorEditorTest {
     private static final int ROW = 8;
     private RGB fForeground;
     private RGB fBackground;
+    private RGB fHighlight;
 
     /**
      * Test Class setup
@@ -137,6 +141,8 @@ public class FilterColorEditorTest {
         fTableBot = editorBot.bot().table();
         fBackground = fTableBot.backgroundColor().getRGB();
         fForeground = fTableBot.foregroundColor().getRGB();
+        ColorRegistry colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
+        fHighlight = colorRegistry.get(HIGHLIGHT_COLOR_DEFINITION_ID).getRGB();
 
         SWTBotUtils.maximizeTable(fTableBot);
     }
@@ -167,17 +173,17 @@ public class FilterColorEditorTest {
 
         assertTrue(colorBefore.contains(fBackground));
         assertTrue(colorBefore.contains(fForeground));
-        assertFalse(colorBefore.contains(YELLOW));
+        assertFalse(colorBefore.contains(fHighlight));
 
         assertTrue(colorAfter.contains(fBackground));
         assertTrue(colorAfter.contains(fForeground));
-        assertTrue(colorAfter.contains(YELLOW));
+        assertTrue(colorAfter.contains(fHighlight));
 
         /*
-         * Check that some background became yellow.
+         * Check that some background became highlighted.
          */
         assertTrue(colorAfter.count(fBackground) < colorBefore.count(fBackground));
-        assertTrue(colorAfter.count(YELLOW) > colorBefore.count(YELLOW));
+        assertTrue(colorAfter.count(fHighlight) > colorBefore.count(fHighlight));
     }
 
     /**
@@ -200,11 +206,11 @@ public class FilterColorEditorTest {
 
         assertTrue(colorBefore.contains(fBackground));
         assertTrue(colorBefore.contains(fForeground));
-        assertFalse(colorBefore.contains(YELLOW));
+        assertFalse(colorBefore.contains(fHighlight));
 
         assertTrue(colorAfter.contains(fBackground));
         assertTrue(colorAfter.contains(fForeground));
-        assertTrue(colorAfter.contains(YELLOW));
+        assertTrue(colorAfter.contains(fHighlight));
 
         int start = -1;
         int end;
@@ -213,10 +219,10 @@ public class FilterColorEditorTest {
         for (int i = 1; i < pixelRow.size(); i++) {
             RGB prevPixel = pixelRow.get(i - 1);
             RGB pixel = pixelRow.get(i);
-            if (prevPixel.equals(fBackground) && pixel.equals(YELLOW)) {
+            if (prevPixel.equals(fBackground) && pixel.equals(fHighlight)) {
                 start = i;
             }
-            if (prevPixel.equals(YELLOW) && pixel.equals(fBackground)) {
+            if (prevPixel.equals(fHighlight) && pixel.equals(fBackground)) {
                 end = i;
                 if (start == -1) {
                     fail();
@@ -256,14 +262,53 @@ public class FilterColorEditorTest {
             RGB afterPixel = afterLine.get(i);
 
             assertEquals(beforePixel, afterFilterPixel);
-            if (!afterPixel.equals(YELLOW)) {
+            if (!afterPixel.equals(fHighlight)) {
                 assertEquals(beforePixel, afterPixel);
             } else {
-                assertNotEquals(YELLOW, beforePixel);
+                assertNotEquals(fHighlight, beforePixel);
             }
 
         }
         assertEquals(beforeLine, afterFilterLine);
         assertNotEquals(afterLine, beforeLine);
+    }
+
+    /**
+     * Test highlight color preference
+     */
+    @Test
+    public void testPreference() {
+        // change the highlight color preference
+        ColorRegistry colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
+        colorRegistry.put(HIGHLIGHT_COLOR_DEFINITION_ID, GREEN);
+
+        final Rectangle cellBounds = SWTBotUtils.getCellBounds(fTableBot.widget, ROW, SOURCE_COLUMN);
+
+        Multiset<RGB> colorBefore = ImageHelper.grabImage(cellBounds).getHistogram();
+        // Select source column and enter regex
+        fTableBot.click(0, SOURCE_COLUMN);
+        fBot.text().typeText("HostF\n", 100);
+        // make sure selected row is not matching row
+        fTableBot.select(ROW - 1);
+        Multiset<RGB> colorAfter = ImageHelper.grabImage(cellBounds).getHistogram();
+
+        assertTrue(colorBefore.contains(fBackground));
+        assertTrue(colorBefore.contains(fForeground));
+        assertFalse(colorBefore.contains(fHighlight));
+        assertFalse(colorBefore.contains(GREEN));
+
+        assertTrue(colorAfter.contains(fBackground));
+        assertTrue(colorAfter.contains(fForeground));
+        assertFalse(colorAfter.contains(fHighlight));
+        assertTrue(colorAfter.contains(GREEN));
+
+        /*
+         * Check that some background became green.
+         */
+        assertTrue(colorAfter.count(fBackground) < colorBefore.count(fBackground));
+        assertTrue(colorAfter.count(GREEN) > colorBefore.count(GREEN));
+
+        // reset the highlight color preference
+        colorRegistry.put(HIGHLIGHT_COLOR_DEFINITION_ID, fHighlight);
     }
 }
