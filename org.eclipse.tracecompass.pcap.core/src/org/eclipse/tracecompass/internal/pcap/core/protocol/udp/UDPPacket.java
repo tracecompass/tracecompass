@@ -265,28 +265,14 @@ public class UDPPacket extends Packet {
         if (fChecksum != other.fChecksum) {
             return false;
         }
-        final Packet child = fChildPacket;
-        if (child != null) {
-            if (!child.equals(other.fChildPacket)) {
-                return false;
-            }
-        } else {
-            if (other.fChildPacket != null) {
-                return false;
-            }
+        if(!NonNullUtils.equalsNullable(fChildPacket, other.fChildPacket)){
+            return false;
         }
         if (fDestinationPort != other.fDestinationPort) {
             return false;
         }
-        final ByteBuffer payload = fPayload;
-        if (payload != null) {
-            if (!payload.equals(other.fPayload)) {
-                return false;
-            }
-        } else {
-            if (other.fPayload != null) {
-                return false;
-            }
+        if(!NonNullUtils.equalsNullable(fPayload, other.fPayload)){
+            return false;
         }
         if (fSourcePort != other.fSourcePort) {
             return false;

@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.tracecompass.internal.pcap.core.packet.Packet;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.PcapProtocol;
@@ -262,41 +263,16 @@ public class EthernetIIPacket extends Packet {
             return false;
         }
         EthernetIIPacket other = (EthernetIIPacket) obj;
-        if (fChildPacket == null) {
-            if (other.fChildPacket != null) {
-                return false;
-            }
-        } else {
-            final Packet child = fChildPacket;
-            if (child != null) {
-                if (!child.equals(other.fChildPacket)) {
-                    return false;
-                }
-            } else {
-                if (other.fChildPacket != null) {
-                    return false;
-                }
-            }
+        if(!NonNullUtils.equalsNullable(fChildPacket, other.fChildPacket)) {
+            return false;
         }
         if (!Arrays.equals(fDestinationMacAddress, other.fDestinationMacAddress)) {
             return false;
         }
-        if (fPayload == null) {
-            if (other.fPayload != null) {
-                return false;
-            }
-        } else {
-            final ByteBuffer payload = fPayload;
-            if (payload != null) {
-                if (!payload.equals(other.fPayload)) {
-                    return false;
-                }
-            } else {
-                if (other.fPayload != null) {
-                    return false;
-                }
-            }
+        if(!NonNullUtils.equalsNullable(fPayload, other.fPayload)) {
+            return false;
         }
+
         if (!Arrays.equals(fSourceMacAddress, other.fSourceMacAddress)) {
             return false;
         }

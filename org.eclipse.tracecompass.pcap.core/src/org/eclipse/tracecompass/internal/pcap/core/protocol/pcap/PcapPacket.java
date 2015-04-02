@@ -323,17 +323,9 @@ public class PcapPacket extends Packet {
             return false;
         }
         PcapPacket other = (PcapPacket) obj;
-        final Packet child = fChildPacket;
-        if (child != null) {
-            if (!child.equals(other.fChildPacket)) {
-                return false;
-            }
-        } else {
-            if (other.fChildPacket != null) {
-                return false;
-            }
+        if(!NonNullUtils.equalsNullable(fChildPacket, other.fChildPacket)){
+            return false;
         }
-
         if (fIncludedLength != other.fIncludedLength) {
             return false;
         }
@@ -343,17 +335,9 @@ public class PcapPacket extends Packet {
         if (fPacketIndex != other.fPacketIndex) {
             return false;
         }
-        final ByteBuffer payload = fPayload;
-        if (payload != null) {
-            if (!payload.equals(other.fPayload)) {
-                return false;
-            }
-        } else {
-            if (other.fPayload != null) {
-                return false;
-            }
+        if(!NonNullUtils.equalsNullable(fPayload, other.fPayload)) {
+            return false;
         }
-
         if (fTimestamp != other.fTimestamp) {
             return false;
         }

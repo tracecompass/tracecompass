@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.tracecompass.internal.pcap.core.packet.Packet;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.PcapProtocol;
@@ -629,17 +630,9 @@ public class TCPPacket extends Packet {
         if (fChecksum != other.fChecksum) {
             return false;
         }
-        final Packet child = fChildPacket;
-        if (child != null) {
-            if (!child.equals(other.fChildPacket)) {
-                return false;
-            }
-        } else {
-            if (other.fChildPacket != null) {
-                return false;
-            }
+        if(!NonNullUtils.equalsNullable(fChildPacket, other.fChildPacket)){
+            return false;
         }
-
         if (fDataOffset != other.fDataOffset) {
             return false;
         }
@@ -661,15 +654,8 @@ public class TCPPacket extends Packet {
         if (fPSHFlag != other.fPSHFlag) {
             return false;
         }
-        final ByteBuffer fPayload2 = fPayload;
-        if (fPayload2 != null) {
-            if (!fPayload2.equals(other.fPayload)) {
-                return false;
-            }
-        } else {
-            if (other.fPayload != null) {
-                return false;
-            }
+        if(!NonNullUtils.equalsNullable(fPayload, other.fPayload)){
+            return false;
         }
         if (fRSTFlag != other.fRSTFlag) {
             return false;

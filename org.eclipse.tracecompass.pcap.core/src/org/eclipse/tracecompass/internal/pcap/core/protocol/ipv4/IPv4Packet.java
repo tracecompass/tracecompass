@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.tracecompass.internal.pcap.core.packet.Packet;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.PcapProtocol;
@@ -570,17 +571,9 @@ public class IPv4Packet extends Packet {
             return false;
         }
         IPv4Packet other = (IPv4Packet) obj;
-        final Packet child = fChildPacket;
-        if (child != null) {
-            if (!child.equals(other.fChildPacket)) {
-                return false;
-            }
-        } else {
-            if (other.fChildPacket != null) {
-                return false;
-            }
+        if (!NonNullUtils.equalsNullable(fChildPacket, other.fChildPacket)) {
+            return false;
         }
-
         if (fDSCP != other.fDSCP) {
             return false;
         }
@@ -614,15 +607,8 @@ public class IPv4Packet extends Packet {
         if (!Arrays.equals(fOptions, other.fOptions)) {
             return false;
         }
-        final ByteBuffer payload = fPayload;
-        if (payload != null) {
-            if (!payload.equals(other.fPayload)) {
-                return false;
-            }
-        } else {
-            if (other.fPayload != null) {
-                return false;
-            }
+        if (!NonNullUtils.equalsNullable(fPayload, other.fPayload)) {
+            return false;
         }
         if (fReservedFlag != other.fReservedFlag) {
             return false;
@@ -641,5 +627,4 @@ public class IPv4Packet extends Packet {
         }
         return true;
     }
-
 }
