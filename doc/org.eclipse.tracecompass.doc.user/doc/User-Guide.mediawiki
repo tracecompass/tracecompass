@@ -672,7 +672,9 @@ To clear collapsing, press the right mouse button in the table and select menu i
 
 The table columns can be reordered by the user by dragging the column headers. This column order is saved when the editor is closed. The setting applies to all traces of the same trace type.
 
-The table font can be customized by the user by changing the preference in '''Window''' > '''Preferences''' > '''General''' > '''Appearance''' > '''Colors and Fonts''' > '''Tracing'''.
+The table font can be customized by the user by changing the preference in '''Window''' > '''Preferences''' > '''General''' > '''Appearance''' > '''Colors and Fonts''' > '''Tracing''' > '''Trace event table font'''.
+
+The search and filter highlight color can be customized by the user by changing the preference in '''Window''' > '''Preferences''' > '''General''' > '''Appearance''' > '''Colors and Fonts''' > '''Tracing''' > '''Trace event table highlight color'''.
 
 == Histogram View ==
 
