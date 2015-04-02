@@ -1851,5 +1851,12 @@
             isEditable="true"
             label="%font.eventraw.label">
       </fontDefinition>
+      <colorDefinition
+            categoryId="org.eclipse.tracecompass.tmf.ui.theme.category"
+            id="org.eclipse.tracecompass.tmf.ui.color.eventtable.highlight"
+            isEditable="true"
+            label="%color.eventtable.highlight.label"
+            value="COLOR_YELLOW">
+      </colorDefinition>
    </extension>
 </plugin>

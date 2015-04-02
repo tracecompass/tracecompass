@@ -62,6 +62,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -136,8 +137,8 @@ import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEventFilterAppliedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEventSearchAppliedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEventSelectedSignal;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
@@ -193,6 +194,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private static final boolean IS_LINUX = System.getProperty("os.name").contains("Linux") ? true : false; //$NON-NLS-1$ //$NON-NLS-2$
 
     private static final String FONT_DEFINITION_ID = "org.eclipse.tracecompass.tmf.ui.font.eventtable"; //$NON-NLS-1$
+    private static final String HIGHLIGHT_COLOR_DEFINITION_ID = "org.eclipse.tracecompass.tmf.ui.color.eventtable.highlight"; //$NON-NLS-1$
 
     private static final Image BOOKMARK_IMAGE = Activator.getDefault().getImageFromPath(
             "icons/elcl16/bookmark_obj.gif"); //$NON-NLS-1$
@@ -309,6 +311,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private LocalResourceManager fResourceManager = new LocalResourceManager(JFaceResources.getResources());
     private Color fGrayColor;
     private Color fGreenColor;
+    private Color fHighlightColor;
     private Font fFont;
     private Font fBoldFont;
 
@@ -745,6 +748,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         createResources();
 
         initializeFonts();
+        initializeColors();
         PlatformUI.getWorkbench().getThemeManager().addPropertyChangeListener(this);
 
         ColorSettingsManager.addColorSettingsListener(this);
@@ -1331,7 +1335,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         int start = matcher.start();
                         int length = matcher.end() - start;
                         Color foreground = colorSetting.getForegroundColor();
-                        Color background = item.getDisplay().getSystemColor(SWT.COLOR_YELLOW);
+                        Color background = fHighlightColor;
                         StyleRange styleRange = new StyleRange(start, length, foreground, background);
                         styleRange.data = index;
                         styleRanges.add(styleRange);
@@ -2134,6 +2138,15 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     }
 
     /**
+     * Initialize the colors.
+     * @since 1.0
+     */
+    protected void initializeColors() {
+        ColorRegistry colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
+        fHighlightColor = colorRegistry.get(HIGHLIGHT_COLOR_DEFINITION_ID);
+    }
+
+    /**
      * @since 1.0
      */
     @Override
@@ -2141,6 +2154,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         if ((IThemeManager.CHANGE_CURRENT_THEME.equals(event.getProperty())) ||
                 (FONT_DEFINITION_ID.equals(event.getProperty()))) {
             initializeFonts();
+            fTable.refresh();
+        }
+        if ((IThemeManager.CHANGE_CURRENT_THEME.equals(event.getProperty())) ||
+                (HIGHLIGHT_COLOR_DEFINITION_ID.equals(event.getProperty()))) {
+            initializeColors();
             fTable.refresh();
         }
     }
