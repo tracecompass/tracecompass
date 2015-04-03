@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -312,8 +313,9 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
                     }
                     if (createMarker != null && createMarker.exists()) {
                         try {
-                            for (String key : attrs.keySet()) {
-                                String value = attrs.get(key);
+                            for (Entry<String, String> entry : attrs.entrySet()) {
+                                String key = entry.getKey();
+                                String value = entry.getValue();
                                 if (key.equals(IMarker.LOCATION)) {
                                     createMarker.setAttribute(IMarker.LOCATION, Integer.valueOf(value).intValue());
                                 } else {
