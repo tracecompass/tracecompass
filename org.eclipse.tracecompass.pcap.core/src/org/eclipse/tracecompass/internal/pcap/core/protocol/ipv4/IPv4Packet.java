@@ -492,11 +492,7 @@ public class IPv4Packet extends Packet {
         } else {
             sb.append(" Len=0"); //$NON-NLS-1$
         }
-        String string = sb.toString();
-        if (string == null) {
-            return EMPTY_STRING;
-        }
-        return string;
+        return NonNullUtils.nullToEmptyString(sb);
     }
 
     private String generateFlagString() {
@@ -517,11 +513,7 @@ public class IPv4Packet extends Packet {
             sb.append("MF"); //$NON-NLS-1$
             start = false;
         }
-        String string = sb.toString();
-        if (string == null) {
-            return EMPTY_STRING;
-        }
-        return string;
+        return NonNullUtils.nullToEmptyString(sb);
     }
 
     @Override

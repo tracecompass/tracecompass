@@ -487,12 +487,7 @@ public class TCPPacket extends Packet {
         sb.append(" Len=") //$NON-NLS-1$
         .append((fDataOffset * TCPValues.BLOCK_SIZE));
 
-        String string = sb.toString();
-        if (string == null) {
-            return EMPTY_STRING;
-        }
-        return string;
-    }
+        return NonNullUtils.nullToEmptyString(sb);    }
 
     private String generateFlagString() {
         StringBuilder sb = new StringBuilder();
@@ -561,11 +556,7 @@ public class TCPPacket extends Packet {
             sb.append("ECE"); //$NON-NLS-1$
             start = false;
         }
-        String string = sb.toString();
-        if (string == null) {
-            return EMPTY_STRING;
-        }
-        return string;
+        return NonNullUtils.nullToEmptyString(sb);
     }
 
     @Override

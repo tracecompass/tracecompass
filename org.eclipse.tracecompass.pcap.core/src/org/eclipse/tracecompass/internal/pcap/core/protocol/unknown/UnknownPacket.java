@@ -108,7 +108,8 @@ public class UnknownPacket extends Packet {
 
     @Override
     public UnknownEndpoint getSourceEndpoint() {
-        @Nullable UnknownEndpoint endpoint = fSourceEndpoint;
+        @Nullable
+        UnknownEndpoint endpoint = fSourceEndpoint;
         if (endpoint == null) {
             endpoint = new UnknownEndpoint(this, true);
         }
@@ -118,7 +119,8 @@ public class UnknownPacket extends Packet {
 
     @Override
     public UnknownEndpoint getDestinationEndpoint() {
-        @Nullable UnknownEndpoint endpoint = fDestinationEndpoint;
+        @Nullable
+        UnknownEndpoint endpoint = fDestinationEndpoint;
         if (endpoint == null) {
             endpoint = new UnknownEndpoint(this, false);
         }
@@ -168,12 +170,10 @@ public class UnknownPacket extends Packet {
     @Override
     public int hashCode() {
         final int prime = 31;
-        int result = 1;
+        int result = prime;
         final Packet child = fChildPacket;
         if (child != null) {
-            result = prime * result + ((fChildPacket == null) ? 0 : child.hashCode());
-        } else {
-            result = prime * result;
+            result += child.hashCode();
         }
         result = prime * result + fPayload.hashCode();
         return result;
@@ -191,7 +191,7 @@ public class UnknownPacket extends Packet {
             return false;
         }
         UnknownPacket other = (UnknownPacket) obj;
-        if(!NonNullUtils.equalsNullable(fChildPacket, other.fChildPacket)){
+        if (!NonNullUtils.equalsNullable(fChildPacket, other.fChildPacket)) {
             return false;
         }
         if (!fPayload.equals(other.fPayload)) {
