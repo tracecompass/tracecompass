@@ -393,7 +393,7 @@ public class ExportTracePackageWizardPage extends AbstractTracePackageWizardPage
             ret = ret.substring(0, ret.lastIndexOf('.'));
         }
 
-        if (ret.endsWith(ZIP_EXTENSION) | ret.endsWith(TAR_EXTENSION) | ret.endsWith(TGZ_EXTENSION)) {
+        if (ret.endsWith(ZIP_EXTENSION) || ret.endsWith(TAR_EXTENSION) || ret.endsWith(TGZ_EXTENSION)) {
             ret = ret.substring(0, ret.lastIndexOf('.'));
         }
 
