@@ -366,6 +366,12 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
                 fTracepointsViewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
                 return fTracepointsViewer;
             }
+
+            @Override
+            protected void updateToolbar(boolean visible) {
+                super.updateToolbar(visible);
+                treeViewer.expandAll();
+            }
         };
     }
 
