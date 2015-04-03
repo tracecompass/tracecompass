@@ -27,17 +27,14 @@ public final class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.messages"; //$NON-NLS-1$
 
-    public static String EnableChannelDialog_DefaultMessage;
-
-    public static String ImportHandler_LiveTraceElementError;
-
-    public static String ImportHandler_LiveTraceInitError;
-
     // Failures
     public static String TraceControl_ConnectionFailure;
     public static String TraceControl_DisconnectionFailure;
+    public static String TraceControl_LoadSessionFailure;
 
     public static String TraceControl_CommandError;
+    public static String ImportHandler_LiveTraceElementError;
+    public static String ImportHandler_LiveTraceInitError;
     public static String TraceControl_UnexpectedCommandOutputFormat;
     public static String TraceControl_UnexpectedNameError;
     public static String TraceControl_UnexpectedPathError;
@@ -73,6 +70,8 @@ public final class Messages extends NLS {
     public static String TraceControl_CreateSessionJob;
     public static String TraceControl_CreateSessionFailure;
 
+    public static String TraceControl_LoadSessionJob;
+
     public static String TraceControl_DestroySessionJob;
     public static String TraceControl_DestroySessionFailure;
     public static String TraceControl_DestroyConfirmationTitle;
@@ -87,6 +86,20 @@ public final class Messages extends NLS {
 
     public static String TraceControl_CreateChannelStateJob;
     public static String TraceControl_CreateChannelStateFailure;
+
+    public static String EnableChannelDialog_DefaultMessage;
+
+
+    public static String NoSelectionDescription;
+
+
+    public static String ProfileDialog_5;
+
+
+    public static String ProfileDialog_6;
+
+
+    public static String ProfileDialog_LTTNG_Suffix;
 
     public static String TraceControl_ChangeChannelStateJob;
     public static String TraceControl_ChangeChannelStateFailure;
@@ -165,6 +178,9 @@ public final class Messages extends NLS {
     public static String TraceControl_CreateSessionLiveDelayTooltip;
 
     public static String TraceControl_InvalidSessionNameError;
+    public static String TraceControl_SelectBasicProfile;
+
+
     public static String TraceControl_SessionAlreadyExistsError;
     public static String TraceControl_SessionPathAlreadyExistsError;
     public static String TraceControl_InvalidSessionPathError;
@@ -276,7 +292,13 @@ public final class Messages extends NLS {
     public static String TraceControl_OverwriteModePropertyName;
     public static String TraceControl_SubBufferSizePropertyName;
     public static String TraceControl_NbSubBuffersPropertyName;
+
+
+    public static String TraceControl_NoProfileSelected;
     public static String TraceControl_SwitchTimerPropertyName;
+    public static String TraceControl_ReadingPathError;
+
+
     public static String TraceControl_ReadTimerPropertyName;
     public static String TraceControl_OutputTypePropertyName;
     public static String TraceControl_TraceFileCountPropertyName;
@@ -284,6 +306,9 @@ public final class Messages extends NLS {
     public static String TraceControl_HostNamePropertyName;
     public static String TraceControl_HostAddressPropertyName;
     public static String TraceControl_SessionPathPropertyName;
+
+
+    public static String TraceControl_SingleSelectionDescription;
     public static String TraceControl_SnapshotPathPropertyName;
     public static String TraceControl_SnapshotNamePropertyName;
     public static String TraceControl_SnapshotIdPropertyName;
@@ -294,12 +319,18 @@ public final class Messages extends NLS {
     public static String TraceControl_ProbeSymbolPropertyName;
     public static String TraceControl_MaxSizeTraceFilesPropertyName;
     public static String TraceControl_MaxNumTraceFilesPropertyName;
+
+
+    public static String TraceControl_MultipleSelectionDescription;
     public static String TraceControl_ConfigureMetadataChannelName;
 
     // Preferences
     public static String TraceControl_TracingGroupPreference;
     public static String TraceControl_LoggingPreference;
     public static String TraceControl_LogfilePath;
+
+
+    public static String TraceControl_LttngSuffix;
     public static String TraceControl_AppendLogfilePreference;
 
     public static String TraceControl_VerboseLevelsPreference;
@@ -316,6 +347,8 @@ public final class Messages extends NLS {
     public static String TraceControl_ExecuteScriptSelectLabel;
 
     public static String TraceControl_UnknownNode;
+
+    public static String TraceControl_BasicMode;
 
     static {
         // initialize resource bundle

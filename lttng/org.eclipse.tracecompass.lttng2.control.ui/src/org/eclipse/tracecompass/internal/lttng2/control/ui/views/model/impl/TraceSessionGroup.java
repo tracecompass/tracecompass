@@ -142,6 +142,22 @@ public class TraceSessionGroup extends TraceControlComponent {
     }
 
     /**
+     * Loads a session from a path
+     *
+     * @param sessionPath
+     *
+     * @param monitor
+     *            - a progress monitor
+     * @throws ExecutionException
+     *             If the command fails
+     */
+    public void loadSession(String sessionPath, IProgressMonitor monitor) throws ExecutionException {
+       getControlService().loadSession(sessionPath, monitor);
+
+
+    }
+
+    /**
      * Command to execute a list of commands
      * @param monitor
      *            - a progress monitor

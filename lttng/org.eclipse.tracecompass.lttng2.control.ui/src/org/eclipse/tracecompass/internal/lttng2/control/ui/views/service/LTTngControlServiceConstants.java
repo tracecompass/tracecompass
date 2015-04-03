@@ -95,6 +95,10 @@ public interface LTTngControlServiceConstants {
      */
     String COMMAND_START_SESSION = "start"; //$NON-NLS-1$
     /**
+     * Command to load a session.
+     */
+    String COMMAND_LOAD_SESSION = "load"; //$NON-NLS-1$
+    /**
      * Command to destroy a session.
      */
     String COMMAND_STOP_SESSION = "stop"; //$NON-NLS-1$

@@ -669,6 +669,16 @@ public class LTTngControlService implements ILttngControlService {
     }
 
     @Override
+    public void loadSession(String sessionPath, IProgressMonitor monitor) throws ExecutionException {
+
+        ICommandInput command = createCommand(LTTngControlServiceConstants.COMMAND_LOAD_SESSION, "-i", sessionPath); //$NON-NLS-1$
+
+        executeCommand(command, monitor);
+
+        // Session <sessionName> loaded
+    }
+
+    @Override
     public void enableChannels(String sessionName, List<String> channelNames, boolean isKernel, IChannelInfo info, IProgressMonitor monitor) throws ExecutionException {
 
         // no channels to enable
@@ -1535,4 +1545,6 @@ public class LTTngControlService implements ILttngControlService {
 
         return result;
     }
+
+
 }

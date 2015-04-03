@@ -204,6 +204,12 @@
             id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.snapshot"
             name="%commands.control.snapshot">
       </command>
+      <command
+            defaultHandler="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.ProfileHandler"
+            description="%commands.control.wizard.description"
+            id="org.eclipse.tracecompass.lttng2.control.ui.wizard"
+            name="%commands.control.wizard">
+      </command>
 
    </extension>
    <extension
@@ -281,6 +287,12 @@
                commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.import"
                icon="icons/elcl16/import_trace.gif"
                label="%commands.control.import"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.tracecompass.lttng2.control.ui.wizard"
+               icon="icons/elcl16/add_button.gif"
+               label="%commands.control.record"
                style="push">
          </command>
          
@@ -367,15 +379,6 @@
                style="push">
             <visibleWhen
                   checkEnabled="false">
-               <with
-                     variable="activeMenuSelection">
-                  <iterate
-                        operator="or">
-                     <instanceof
-                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionGroup">
-                     </instanceof>
-                  </iterate>
-               </with>
             </visibleWhen>
          </command>
          <command
@@ -828,6 +831,16 @@
                      </count>
                   </and>
                </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.tracecompass.lttng2.control.ui.wizard"
+               icon="icons/obj16/channel_disabled.gif"
+               label="Record..."
+               style="push"
+               >
+            <visibleWhen
+                  checkEnabled="true">
             </visibleWhen>
          </command>
 

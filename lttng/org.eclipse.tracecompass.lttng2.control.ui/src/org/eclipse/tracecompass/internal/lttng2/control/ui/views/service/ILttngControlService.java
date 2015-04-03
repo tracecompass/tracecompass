@@ -400,4 +400,18 @@ public interface ILttngControlService {
      */
     void runCommands(IProgressMonitor monitor, List<String> commands)
             throws ExecutionException;
+
+    /**
+     * Load a session with given session name.
+     *
+     * @param sessionName
+     *            - a session name to start
+     * @param monitor
+     *            - a progress monitor
+     * @throws ExecutionException
+     *             If the command fails
+     */
+    void loadSession(String sessionName, IProgressMonitor monitor)
+            throws ExecutionException;
+
 }
