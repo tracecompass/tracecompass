@@ -25,7 +25,6 @@ import org.eclipse.remote.core.IRemoteConnectionType;
 import org.eclipse.remote.core.IRemoteConnectionWorkingCopy;
 import org.eclipse.remote.core.IRemoteServicesManager;
 import org.eclipse.remote.core.exception.RemoteConnectionException;
-import org.eclipse.remote.internal.jsch.core.JSchConnection;
 import org.eclipse.tracecompass.internal.tmf.remote.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.remote.core.messages.Messages;
 
@@ -40,7 +39,6 @@ import com.google.common.collect.FluentIterable;
  *
  * @author Bernd Hufmann
  */
-@SuppressWarnings("restriction")
 @NonNullByDefault
 public class TmfRemoteConnectionFactory {
 
@@ -133,23 +131,29 @@ public class TmfRemoteConnectionFactory {
 
             if (connection == null) {
                 // Create a new connection
+                IRemoteConnectionWorkingCopy wc = null;
+                wc = connectionType.newConnection(hostName);
+
+                if (wc == null) {
+                    throw new RemoteConnectionException(MessageFormat.format(Messages.RemoteConnection_ConnectionError, hostUri));
+                }
+
+                if (wc.hasService(IRemoteConnectionHostService.class)) {
+                    IRemoteConnectionHostService hostService = wc.getService(IRemoteConnectionHostService.class);
+                    hostService.setHostname(hostUri.getHost());
+                    hostService.setPort(hostUri.getPort());
+                    String user = hostUri.getUserInfo();
+                    if (user == null) {
+                        user = System.getProperty("user.name"); //$NON-NLS-1$
+                    }
+                    hostService.setUsername(user);
+                    hostService.setUsePassword(true);
+                } else {
+                    throw new RemoteConnectionException(MessageFormat.format(Messages.RemoteConnection_ConnectionError, hostUri));
+                }
+
                 try {
-                    IRemoteConnectionWorkingCopy wc = null;
-                    wc = connectionType.newConnection(hostName);
-                    if (wc == null) {
-                        throw new RemoteConnectionException(MessageFormat.format(Messages.RemoteConnection_ConnectionError, hostUri));
-                    }
-                    if (connectionType.getId().equals(JSchConnection.JSCH_ID)) {
-                        wc.setAttribute(JSchConnection.ADDRESS_ATTR, hostUri.getHost());
-                        wc.setAttribute(JSchConnection.PORT_ATTR, Integer.toString(hostUri.getPort()));
-                        String user = hostUri.getUserInfo();
-                        if (user == null) {
-                            user = System.getProperty("user.name"); //$NON-NLS-1$
-                        }
-                        wc.setAttribute(JSchConnection.USERNAME_ATTR, user);
-                        wc.setAttribute(JSchConnection.IS_PASSWORD_ATTR, Boolean.TRUE.toString());
-                        connection = wc.save(); // Save the attributes
-                    }
+                    connection = wc.save(); // Save the attributes
                 } catch (RemoteConnectionException e) {
                     throw new RemoteConnectionException(MessageFormat.format(Messages.RemoteConnection_ConnectionError, hostUri), e);
                 }
@@ -158,6 +162,7 @@ public class TmfRemoteConnectionFactory {
             if (connection == null) {
                 throw new RemoteConnectionException(MessageFormat.format(Messages.RemoteConnection_ConnectionError, hostUri));
             }
+
             return connection;
         }
     }

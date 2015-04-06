@@ -20,16 +20,21 @@
    </license>
 
    <requires>
+      <import plugin="com.google.guava"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.ui.views"/>
-      <import plugin="org.eclipse.core.expressions"/>
+      <import plugin="org.eclipse.core.commands"/>
+      <import plugin="org.eclipse.core.filesystem"/>
+      <import plugin="org.eclipse.jsch.core"/>
+      <import plugin="org.eclipse.jsch.ui"/>
+      <import plugin="org.eclipse.remote.ui" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.remote.core" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.tracecompass.common.core"/>
+      <import plugin="org.eclipse.tracecompass.tmf.core"/>
+      <import plugin="org.eclipse.tracecompass.tmf.ui"/>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.ui.ide"/>
-      <import plugin="org.eclipse.ui.navigator"/>
-      <import plugin="org.eclipse.ui.navigator.resources"/>
-      <import plugin="org.eclipse.emf.common" version="2.5.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.emf.ecore" version="2.5.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.views"/>
    </requires>
 
    <plugin
