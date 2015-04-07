@@ -183,6 +183,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     private TmfTraceFolder fTraceFolderElement;
     // Flag to handle destination folder change event
     private Boolean fIsDestinationChanged = false;
+    private final Object fSyncObject = new Object();
     // Combo box containing trace types
     private Combo fTraceTypes;
     // Button to ignore unrecognized traces or not
@@ -583,12 +584,12 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
         // Avoid overwriting destination path without repeatedly trigger
         // call of handleEvent();
-        synchronized (fIsDestinationChanged) {
+        synchronized (fSyncObject) {
             if (fIsDestinationChanged == false) {
                 event.display.asyncExec(new Runnable() {
                     @Override
                     public void run() {
-                        synchronized (fIsDestinationChanged) {
+                        synchronized (fSyncObject) {
                             fIsDestinationChanged = true;
                             String path = fTargetFolder.getFullPath().toString();
                             setContainerFieldValue(path);
