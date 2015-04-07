@@ -98,6 +98,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.ui.dialogs.FileSystemElement;
 import org.eclipse.ui.dialogs.IOverwriteQuery;
 import org.eclipse.ui.dialogs.WizardResourceImportPage;
+import org.eclipse.ui.ide.dialogs.ResourceTreeAndListGroup;
 import org.eclipse.ui.internal.ide.DialogUtil;
 import org.eclipse.ui.internal.ide.dialogs.IElementFilter;
 import org.eclipse.ui.internal.wizards.datatransfer.ArchiveFileManipulations;
@@ -210,13 +211,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     /** The directory browse button. */
     protected Button directoryBrowseButton;
 
-    /**
-     * ResourceTreeAndListGroup was internal in Kepler and we referenced it. It
-     * is now removed in Luna. To keep our builds compatible with Kepler, we
-     * need to have our own version of this class. Once we stop supporting
-     * Kepler, we can delete this class and use the public one from the
-     * platform.
-     */
     private ResourceTreeAndListGroup fSelectionGroup;
 
     // Keep trace of the selection root so that we can dispose its related
