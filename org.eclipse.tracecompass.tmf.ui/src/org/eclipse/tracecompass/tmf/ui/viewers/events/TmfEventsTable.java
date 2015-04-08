@@ -808,7 +808,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     /**
      * Create a pop-up menu.
      */
-    protected void createPopupMenu() {
+    private void createPopupMenu() {
         final IAction showTableAction = new Action(Messages.TmfEventsTable_ShowTableActionText) {
             @Override
             public void run() {
@@ -1427,7 +1427,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     /**
      * Create an editor for the header.
      */
-    protected void createHeaderEditor() {
+    private void createHeaderEditor() {
         final TableEditor tableEditor = fTable.createTableEditor();
         tableEditor.horizontalAlignment = SWT.LEFT;
         tableEditor.verticalAlignment = SWT.CENTER;
@@ -2119,7 +2119,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     /**
      * Create the resources.
      */
-    protected void createResources() {
+    private void createResources() {
         fGrayColor = fResourceManager.createColor(ColorUtil.blend(fTable.getBackground().getRGB(), fTable
                 .getForeground().getRGB()));
         fGreenColor = fTable.getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN);
@@ -2127,9 +2127,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
     /**
      * Initialize the fonts.
-     * @since 1.0
      */
-    protected void initializeFonts() {
+    private void initializeFonts() {
         FontRegistry fontRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getFontRegistry();
         fFont = fontRegistry.get(FONT_DEFINITION_ID);
         fBoldFont = fontRegistry.getBold(FONT_DEFINITION_ID);
@@ -2139,9 +2138,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
     /**
      * Initialize the colors.
-     * @since 1.0
      */
-    protected void initializeColors() {
+    private void initializeColors() {
         ColorRegistry colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
         fHighlightColor = colorRegistry.get(HIGHLIGHT_COLOR_DEFINITION_ID);
     }
