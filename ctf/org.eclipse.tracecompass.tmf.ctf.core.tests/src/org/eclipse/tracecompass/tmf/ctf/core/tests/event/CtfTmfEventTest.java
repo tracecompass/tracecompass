@@ -56,6 +56,7 @@ public class CtfTmfEventTest {
         assumeTrue(testTrace.exists());
         try (CtfTmfTrace trace = testTrace.getTrace();
                 CtfIterator tr = (CtfIterator) trace.createIterator();) {
+            fixture = tr.getCurrentEvent();
             tr.advance();
             fixture = tr.getCurrentEvent();
             nullEvent = CtfTmfEventFactory.getNullEvent(trace);
@@ -102,7 +103,7 @@ public class CtfTmfEventTest {
      */
     @Test
     public void testGetFieldValue() {
-        String fieldName = "pid";
+        String fieldName = "ret";
         ITmfEventField result = fixture.getContent().getField(fieldName);
 
         assertNotNull(result);
@@ -124,15 +125,15 @@ public class CtfTmfEventTest {
     @Test
     public void testGetSubFieldValue() {
         /* Field exists */
-        String[] names = { "pid" };
+        String[] names = { "ret" };
         assertNotNull(fixture.getContent().getField(names));
 
         /* First field exists, not the second */
-        String[] names2 = { "pid", "abcd" };
+        String[] names2 = { "ret", "abcd" };
         assertNull(fixture.getContent().getField(names2));
 
         /* Both field do not exist */
-        String[] names3 = { "pfid", "abcd" };
+        String[] names3 = { "pid", "abcd" };
         assertNull(fixture.getContent().getField(names3));
 
         /* TODO Missing case of embedded field, need event for it */
@@ -172,7 +173,7 @@ public class CtfTmfEventTest {
 
         assertEquals("channel0_1", reference);
         assertEquals(1, cpu);
-        assertEquals("lttng_statedump_vm_map", type.toString());
+        assertEquals("exit_syscall", type.toString());
     }
 
     /**
@@ -194,7 +195,7 @@ public class CtfTmfEventTest {
     @Test
     public void testToString() {
         String s = fixture.getContent().toString();
-        assertEquals("pid=1922, start=0xb73ea000, end=0xb73ec000, flags=0x8000075, inode=917738, pgoff=0", s);
+        assertEquals("ret=4132", s);
     }
 
     /**

@@ -98,9 +98,9 @@ public class CTFStreamInputReader implements AutoCloseable {
         try {
             fPacketReader = new CTFStreamInputPacketReader(this);
             /*
-             * Get the iterator on the packet index.
+             * Set the packet index to -1 as it is incremented in goToNextPacket
              */
-            fPacketIndex = 0;
+            fPacketIndex = -1;
             /*
              * Make first packet the current one.
              */
