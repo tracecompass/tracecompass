@@ -219,6 +219,352 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private static final int FILTER_SUMMARY_INDEX = 1;
     private static final int EVENT_COLUMNS_START_INDEX = MARGIN_COLUMN_INDEX + 1;
 
+    private final class ColumnMovedListener extends ControlAdapter {
+        /*
+         * Make sure that the margin column is always first and keep the
+         * column order variable up to date.
+         */
+        @Override
+        public void controlMoved(ControlEvent e) {
+            int[] order = fTable.getColumnOrder();
+            if (order[0] == MARGIN_COLUMN_INDEX) {
+                fColumnOrder = order;
+                return;
+            }
+            for (int i = order.length - 1; i > 0; i--) {
+                if (order[i] == MARGIN_COLUMN_INDEX) {
+                    order[i] = order[i - 1];
+                    order[i - 1] = MARGIN_COLUMN_INDEX;
+                }
+            }
+            fTable.setColumnOrder(order);
+            fColumnOrder = fTable.getColumnOrder();
+        }
+    }
+
+    private final class TableSelectionListener extends SelectionAdapter {
+        @Override
+        public void widgetSelected(final SelectionEvent e) {
+            if (e.item == null) {
+                return;
+            }
+            updateStatusLine(null);
+            if (fTable.getSelectionIndices().length > 0) {
+                if (e.item.getData(Key.RANK) instanceof Long) {
+                    fSelectedRank = (Long) e.item.getData(Key.RANK);
+                    fRawViewer.selectAndReveal((Long) e.item.getData(Key.RANK));
+                } else {
+                    fSelectedRank = -1;
+                }
+                if (fTable.getSelectionIndices().length == 1) {
+                    fSelectedBeginRank = fSelectedRank;
+                }
+                if (e.item.getData(Key.TIMESTAMP) instanceof ITmfTimestamp) {
+                    final ITmfTimestamp ts = NonNullUtils.checkNotNull((ITmfTimestamp) e.item.getData(Key.TIMESTAMP));
+                    if (fTable.getSelectionIndices().length == 1) {
+                        fSelectedBeginTimestamp = ts;
+                    }
+                    ITmfTimestamp selectedBeginTimestamp = fSelectedBeginTimestamp;
+                    if (selectedBeginTimestamp != null) {
+                        broadcast(new TmfSelectionRangeUpdatedSignal(TmfEventsTable.this, selectedBeginTimestamp, ts));
+                        if (fTable.getSelectionIndices().length == 2) {
+                            updateStatusLine(ts.getDelta(selectedBeginTimestamp));
+                        }
+                    }
+                } else {
+                    if (fTable.getSelectionIndices().length == 1) {
+                        fSelectedBeginTimestamp = null;
+                    }
+                }
+            }
+            if (e.item.getData() instanceof ITmfEvent) {
+                broadcast(new TmfEventSelectedSignal(TmfEventsTable.this, (ITmfEvent) e.item.getData()));
+                fireSelectionChanged(new SelectionChangedEvent(TmfEventsTable.this, new StructuredSelection(e.item.getData())));
+            } else {
+                fireSelectionChanged(new SelectionChangedEvent(TmfEventsTable.this, StructuredSelection.EMPTY));
+            }
+        }
+    }
+
+    private final class MouseDoubleClickListener extends MouseAdapter {
+        @Override
+        public void mouseDoubleClick(final MouseEvent event) {
+            if (event.button != 1) {
+                return;
+            }
+            // Identify the selected row
+            final Point point = new Point(event.x, event.y);
+            final TableItem item = fTable.getItem(point);
+            if (item != null) {
+                final Rectangle imageBounds = item.getImageBounds(0);
+                imageBounds.width = BOOKMARK_IMAGE.getBounds().width;
+                if (imageBounds.contains(point)) {
+                    final Long rank = (Long) item.getData(Key.RANK);
+                    if (rank != null) {
+                        toggleBookmark(rank);
+                    }
+                }
+            }
+        }
+    }
+
+    private final class RawSelectionListener implements Listener {
+        @Override
+        public void handleEvent(final Event e) {
+            if (fTrace == null) {
+                return;
+            }
+            long rank;
+            if (e.data instanceof Long) {
+                rank = (Long) e.data;
+            } else if (e.data instanceof ITmfLocation) {
+                rank = findRank((ITmfLocation) e.data);
+            } else {
+                return;
+            }
+            int index = (int) rank;
+            if (fTable.getData(Key.FILTER_OBJ) != null) {
+                // +1 for top filter status row
+                index = fCache.getFilteredEventIndex(rank) + 1;
+            }
+            // +1 for header row
+            fTable.setSelection(index + 1);
+            fSelectedRank = rank;
+            fSelectedBeginRank = fSelectedRank;
+            updateStatusLine(null);
+            final TableItem[] selection = fTable.getSelection();
+            if ((selection != null) && (selection.length > 0)) {
+                TableItem item = fTable.getSelection()[0];
+                final TmfTimestamp ts = (TmfTimestamp) item.getData(Key.TIMESTAMP);
+                if (ts != null) {
+                    broadcast(new TmfSelectionRangeUpdatedSignal(TmfEventsTable.this, ts));
+                }
+                if (item.getData() instanceof ITmfEvent) {
+                    broadcast(new TmfEventSelectedSignal(TmfEventsTable.this, (ITmfEvent) item.getData()));
+                    fireSelectionChanged(new SelectionChangedEvent(TmfEventsTable.this, new StructuredSelection(item.getData())));
+                } else {
+                    fireSelectionChanged(new SelectionChangedEvent(TmfEventsTable.this, StructuredSelection.EMPTY));
+                }
+            }
+        }
+
+        private long findRank(final ITmfLocation selectedLocation) {
+            final double selectedRatio = fTrace.getLocationRatio(selectedLocation);
+            long low = 0;
+            long high = fTrace.getNbEvents();
+            long rank = high / 2;
+            double ratio = -1;
+            while (ratio != selectedRatio) {
+                ITmfContext context = fTrace.seekEvent(rank);
+                ratio = fTrace.getLocationRatio(context.getLocation());
+                context.dispose();
+                if (ratio < selectedRatio) {
+                    low = rank;
+                    rank = (rank + high) / 2;
+                } else if (ratio > selectedRatio) {
+                    high = rank;
+                    rank = (rank + low) / 2;
+                }
+                if ((high - low) < 2) {
+                    break;
+                }
+            }
+            return rank;
+        }
+    }
+
+    private final class SetDataListener implements Listener {
+        @Override
+        public void handleEvent(final Event event) {
+
+            final TableItem item = (TableItem) event.item;
+            int index = event.index - 1; // -1 for the header row
+
+            if (event.index == 0) {
+                setHeaderRowItemData(item);
+                return;
+            }
+
+            if (fTable.getData(Key.FILTER_OBJ) != null) {
+                if ((event.index == 1) || (event.index == (fTable.getItemCount() - 1))) {
+                    setFilterStatusRowItemData(item);
+                    return;
+                }
+                /* -1 for top filter status row */
+                index = index - 1;
+            }
+
+            final CachedEvent cachedEvent = fCache.getEvent(index);
+            if (cachedEvent != null) {
+                setItemData(item, cachedEvent, cachedEvent.rank);
+                return;
+            }
+
+            // Else, fill the cache asynchronously (and off the UI thread)
+            event.doit = false;
+        }
+    }
+
+    private final class PainItemListener implements Listener {
+        @Override
+        public void handleEvent(Event event) {
+            TableItem item = (TableItem) event.item;
+
+            // we promised to paint the table item's foreground
+            GC gc = event.gc;
+            Image image = item.getImage(event.index);
+            if (image != null) {
+                Rectangle imageBounds = item.getImageBounds(event.index);
+                /*
+                 * The image bounds don't match the default image position.
+                 */
+                if (IS_LINUX) {
+                    gc.drawImage(image, imageBounds.x + 1, imageBounds.y + 3);
+                } else {
+                    gc.drawImage(image, imageBounds.x, imageBounds.y + 1);
+                }
+            }
+            gc.setForeground(item.getForeground(event.index));
+            gc.setFont(item.getFont(event.index));
+            String text = item.getText(event.index);
+            Rectangle textBounds = item.getTextBounds(event.index);
+            /*
+             * The text bounds don't match the default text position.
+             */
+            if (IS_LINUX) {
+                gc.drawText(text, textBounds.x + 1, textBounds.y + 3, true);
+            } else {
+                gc.drawText(text, textBounds.x - 1, textBounds.y + 2, true);
+            }
+        }
+    }
+
+    private final class EraseItemListener implements Listener {
+        @Override
+        public void handleEvent(Event event) {
+            TableItem item = (TableItem) event.item;
+            List<?> styleRanges = (List<?>) item.getData(Key.STYLE_RANGES);
+
+            GC gc = event.gc;
+            Color background = item.getBackground(event.index);
+            /*
+             * Paint the background if it is not the default system color.
+             * In Windows, if you let the widget draw the background, it
+             * will not show the item's background color if the item is
+             * selected or hot. If there are no style ranges and the item
+             * background is the default system color, we do not want to
+             * paint it or otherwise we would override the platform theme
+             * (e.g. alternating colors).
+             */
+            if (styleRanges != null || !background.equals(item.getParent().getBackground())) {
+                // we will paint the table item's background
+                event.detail &= ~SWT.BACKGROUND;
+
+                // paint the item's default background
+                gc.setBackground(background);
+                gc.fillRectangle(event.x, event.y, event.width, event.height);
+            }
+
+            /*
+             * We will paint the table item's foreground. In Windows, if you
+             * paint the background but let the widget draw the foreground,
+             * it will override your background, unless the item is selected
+             * or hot.
+             */
+            event.detail &= ~SWT.FOREGROUND;
+
+            // paint the highlighted background for all style ranges
+            if (styleRanges != null) {
+                Rectangle textBounds = item.getTextBounds(event.index);
+                String text = item.getText(event.index);
+                for (Object o : styleRanges) {
+                    if (o instanceof StyleRange) {
+                        StyleRange styleRange = (StyleRange) o;
+                        if (styleRange.data.equals(event.index)) {
+                            int startIndex = styleRange.start;
+                            int endIndex = startIndex + styleRange.length;
+                            int startX = gc.textExtent(text.substring(0, startIndex)).x;
+                            int endX = gc.textExtent(text.substring(0, endIndex)).x;
+                            gc.setBackground(styleRange.background);
+                            gc.fillRectangle(textBounds.x + startX, textBounds.y, (endX - startX), textBounds.height);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private final class TooltipListener implements Listener {
+        Shell tooltipShell = null;
+
+        @Override
+        public void handleEvent(final Event event) {
+            switch (event.type) {
+            case SWT.MouseHover:
+                final TableItem item = fTable.getItem(new Point(event.x, event.y));
+                if (item == null) {
+                    return;
+                }
+                final Long rank = (Long) item.getData(Key.RANK);
+                if (rank == null) {
+                    return;
+                }
+                final String tooltipText = (String) item.getData(Key.BOOKMARK);
+                final Rectangle bounds = item.getImageBounds(0);
+                bounds.width = BOOKMARK_IMAGE.getBounds().width;
+                if (!bounds.contains(event.x, event.y)) {
+                    return;
+                }
+                if ((tooltipShell != null) && !tooltipShell.isDisposed()) {
+                    tooltipShell.dispose();
+                }
+                tooltipShell = new Shell(fTable.getShell(), SWT.ON_TOP | SWT.NO_FOCUS | SWT.TOOL);
+                tooltipShell.setBackground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+                final FillLayout layout = new FillLayout();
+                layout.marginWidth = 2;
+                tooltipShell.setLayout(layout);
+                final Label label = new Label(tooltipShell, SWT.WRAP);
+                String text = rank.toString() + (tooltipText != null ? ": " + tooltipText : EMPTY_STRING); //$NON-NLS-1$
+                label.setForeground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
+                label.setBackground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+                label.setText(text);
+                label.addListener(SWT.MouseExit, this);
+                label.addListener(SWT.MouseDown, this);
+                label.addListener(SWT.MouseWheel, this);
+                final Point size = tooltipShell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+                /*
+                 * Bug in Linux. The coordinates of the event have an origin
+                 * that excludes the table header but the method toDisplay()
+                 * expects coordinates relative to an origin that includes
+                 * the table header.
+                 */
+                int y = event.y;
+                if (IS_LINUX) {
+                    y += fTable.getHeaderHeight();
+                }
+                Point pt = fTable.toDisplay(event.x, y);
+                pt.x += BOOKMARK_IMAGE.getBounds().width;
+                pt.y += item.getBounds().height;
+                tooltipShell.setBounds(pt.x, pt.y, size.x, size.y);
+                tooltipShell.setVisible(true);
+                break;
+            case SWT.Dispose:
+            case SWT.KeyDown:
+            case SWT.MouseMove:
+            case SWT.MouseExit:
+            case SWT.MouseDown:
+            case SWT.MouseWheel:
+                if (tooltipShell != null) {
+                    tooltipShell.dispose();
+                    tooltipShell = null;
+                }
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
     /**
      * The events table search/filter/data keys
      *
@@ -477,28 +823,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 column.setMoveable(true);
                 column.setData(Key.WIDTH, -1);
             }
-            column.addControlListener(new ControlAdapter() {
-                /*
-                 * Make sure that the margin column is always first and keep the
-                 * column order variable up to date.
-                 */
-                @Override
-                public void controlMoved(ControlEvent e) {
-                    int[] order = fTable.getColumnOrder();
-                    if (order[0] == MARGIN_COLUMN_INDEX) {
-                        fColumnOrder = order;
-                        return;
-                    }
-                    for (int i = order.length - 1; i > 0; i--) {
-                        if (order[i] == MARGIN_COLUMN_INDEX) {
-                            order[i] = order[i - 1];
-                            order[i - 1] = MARGIN_COLUMN_INDEX;
-                        }
-                    }
-                    fTable.setColumnOrder(order);
-                    fColumnOrder = fTable.getColumnOrder();
-                }
-            });
+            column.addControlListener(new ColumnMovedListener());
         }
         fColumnOrder = fTable.getColumnOrder();
 
@@ -509,87 +834,14 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         createHeaderEditor();
 
         // Handle the table item selection
-        fTable.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                if (e.item == null) {
-                    return;
-                }
-                updateStatusLine(null);
-                if (fTable.getSelectionIndices().length > 0) {
-                    if (e.item.getData(Key.RANK) instanceof Long) {
-                        fSelectedRank = (Long) e.item.getData(Key.RANK);
-                        fRawViewer.selectAndReveal((Long) e.item.getData(Key.RANK));
-                    } else {
-                        fSelectedRank = -1;
-                    }
-                    if (fTable.getSelectionIndices().length == 1) {
-                        fSelectedBeginRank = fSelectedRank;
-                    }
-                    if (e.item.getData(Key.TIMESTAMP) instanceof ITmfTimestamp) {
-                        final ITmfTimestamp ts = NonNullUtils.checkNotNull((ITmfTimestamp) e.item.getData(Key.TIMESTAMP));
-                        if (fTable.getSelectionIndices().length == 1) {
-                            fSelectedBeginTimestamp = ts;
-                        }
-                        ITmfTimestamp selectedBeginTimestamp = fSelectedBeginTimestamp;
-                        if (selectedBeginTimestamp != null) {
-                            broadcast(new TmfSelectionRangeUpdatedSignal(TmfEventsTable.this, selectedBeginTimestamp, ts));
-                            if (fTable.getSelectionIndices().length == 2) {
-                                updateStatusLine(ts.getDelta(selectedBeginTimestamp));
-                            }
-                        }
-                    } else {
-                        if (fTable.getSelectionIndices().length == 1) {
-                            fSelectedBeginTimestamp = null;
-                        }
-                    }
-                }
-                if (e.item.getData() instanceof ITmfEvent) {
-                    broadcast(new TmfEventSelectedSignal(TmfEventsTable.this, (ITmfEvent) e.item.getData()));
-                    fireSelectionChanged(new SelectionChangedEvent(TmfEventsTable.this, new StructuredSelection(e.item.getData())));
-                } else {
-                    fireSelectionChanged(new SelectionChangedEvent(TmfEventsTable.this, StructuredSelection.EMPTY));
-                }
-            }
-        });
+        fTable.addSelectionListener(new TableSelectionListener());
 
         int realCacheSize = Math.max(cacheSize, Display.getDefault().getBounds().height / fTable.getItemHeight());
         realCacheSize = Math.min(realCacheSize, MAX_CACHE_SIZE);
         fCache = new TmfEventsCache(realCacheSize, this);
 
         // Handle the table item requests
-        fTable.addListener(SWT.SetData, new Listener() {
-
-            @Override
-            public void handleEvent(final Event event) {
-
-                final TableItem item = (TableItem) event.item;
-                int index = event.index - 1; // -1 for the header row
-
-                if (event.index == 0) {
-                    setHeaderRowItemData(item);
-                    return;
-                }
-
-                if (fTable.getData(Key.FILTER_OBJ) != null) {
-                    if ((event.index == 1) || (event.index == (fTable.getItemCount() - 1))) {
-                        setFilterStatusRowItemData(item);
-                        return;
-                    }
-                    /* -1 for top filter status row */
-                    index = index - 1;
-                }
-
-                final CachedEvent cachedEvent = fCache.getEvent(index);
-                if (cachedEvent != null) {
-                    setItemData(item, cachedEvent, cachedEvent.rank);
-                    return;
-                }
-
-                // Else, fill the cache asynchronously (and off the UI thread)
-                event.doit = false;
-            }
-        });
+        fTable.addListener(SWT.SetData, new SetDataListener());
 
         fTable.addListener(SWT.MenuDetect, new Listener() {
             @Override
@@ -602,98 +854,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             }
         });
 
-        fTable.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseDoubleClick(final MouseEvent event) {
-                if (event.button != 1) {
-                    return;
-                }
-                // Identify the selected row
-                final Point point = new Point(event.x, event.y);
-                final TableItem item = fTable.getItem(point);
-                if (item != null) {
-                    final Rectangle imageBounds = item.getImageBounds(0);
-                    imageBounds.width = BOOKMARK_IMAGE.getBounds().width;
-                    if (imageBounds.contains(point)) {
-                        final Long rank = (Long) item.getData(Key.RANK);
-                        if (rank != null) {
-                            toggleBookmark(rank);
-                        }
-                    }
-                }
-            }
-        });
+        fTable.addMouseListener(new MouseDoubleClickListener());
 
-        final Listener tooltipListener = new Listener() {
-            Shell tooltipShell = null;
-
-            @Override
-            public void handleEvent(final Event event) {
-                switch (event.type) {
-                case SWT.MouseHover:
-                    final TableItem item = fTable.getItem(new Point(event.x, event.y));
-                    if (item == null) {
-                        return;
-                    }
-                    final Long rank = (Long) item.getData(Key.RANK);
-                    if (rank == null) {
-                        return;
-                    }
-                    final String tooltipText = (String) item.getData(Key.BOOKMARK);
-                    final Rectangle bounds = item.getImageBounds(0);
-                    bounds.width = BOOKMARK_IMAGE.getBounds().width;
-                    if (!bounds.contains(event.x, event.y)) {
-                        return;
-                    }
-                    if ((tooltipShell != null) && !tooltipShell.isDisposed()) {
-                        tooltipShell.dispose();
-                    }
-                    tooltipShell = new Shell(fTable.getShell(), SWT.ON_TOP | SWT.NO_FOCUS | SWT.TOOL);
-                    tooltipShell.setBackground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-                    final FillLayout layout = new FillLayout();
-                    layout.marginWidth = 2;
-                    tooltipShell.setLayout(layout);
-                    final Label label = new Label(tooltipShell, SWT.WRAP);
-                    String text = rank.toString() + (tooltipText != null ? ": " + tooltipText : EMPTY_STRING); //$NON-NLS-1$
-                    label.setForeground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
-                    label.setBackground(PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-                    label.setText(text);
-                    label.addListener(SWT.MouseExit, this);
-                    label.addListener(SWT.MouseDown, this);
-                    label.addListener(SWT.MouseWheel, this);
-                    final Point size = tooltipShell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-                    /*
-                     * Bug in Linux. The coordinates of the event have an origin
-                     * that excludes the table header but the method toDisplay()
-                     * expects coordinates relative to an origin that includes
-                     * the table header.
-                     */
-                    int y = event.y;
-                    if (IS_LINUX) {
-                        y += fTable.getHeaderHeight();
-                    }
-                    Point pt = fTable.toDisplay(event.x, y);
-                    pt.x += BOOKMARK_IMAGE.getBounds().width;
-                    pt.y += item.getBounds().height;
-                    tooltipShell.setBounds(pt.x, pt.y, size.x, size.y);
-                    tooltipShell.setVisible(true);
-                    break;
-                case SWT.Dispose:
-                case SWT.KeyDown:
-                case SWT.MouseMove:
-                case SWT.MouseExit:
-                case SWT.MouseDown:
-                case SWT.MouseWheel:
-                    if (tooltipShell != null) {
-                        tooltipShell.dispose();
-                        tooltipShell = null;
-                    }
-                    break;
-                default:
-                    break;
-                }
-            }
-        };
+        final Listener tooltipListener = new TooltipListener();
 
         fTable.addListener(SWT.MouseHover, tooltipListener);
         fTable.addListener(SWT.Dispose, tooltipListener);
@@ -703,94 +866,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         fTable.addListener(SWT.MouseDown, tooltipListener);
         fTable.addListener(SWT.MouseWheel, tooltipListener);
 
-        fTable.addListener(SWT.EraseItem, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                TableItem item = (TableItem) event.item;
-                List<?> styleRanges = (List<?>) item.getData(Key.STYLE_RANGES);
+        fTable.addListener(SWT.EraseItem, new EraseItemListener());
 
-                GC gc = event.gc;
-                Color background = item.getBackground(event.index);
-                /*
-                 * Paint the background if it is not the default system color.
-                 * In Windows, if you let the widget draw the background, it
-                 * will not show the item's background color if the item is
-                 * selected or hot. If there are no style ranges and the item
-                 * background is the default system color, we do not want to
-                 * paint it or otherwise we would override the platform theme
-                 * (e.g. alternating colors).
-                 */
-                if (styleRanges != null || !background.equals(item.getParent().getBackground())) {
-                    // we will paint the table item's background
-                    event.detail &= ~SWT.BACKGROUND;
-
-                    // paint the item's default background
-                    gc.setBackground(background);
-                    gc.fillRectangle(event.x, event.y, event.width, event.height);
-                }
-
-                /*
-                 * We will paint the table item's foreground. In Windows, if you
-                 * paint the background but let the widget draw the foreground,
-                 * it will override your background, unless the item is selected
-                 * or hot.
-                 */
-                event.detail &= ~SWT.FOREGROUND;
-
-                // paint the highlighted background for all style ranges
-                if (styleRanges != null) {
-                    Rectangle textBounds = item.getTextBounds(event.index);
-                    String text = item.getText(event.index);
-                    for (Object o : styleRanges) {
-                        if (o instanceof StyleRange) {
-                            StyleRange styleRange = (StyleRange) o;
-                            if (styleRange.data.equals(event.index)) {
-                                int startIndex = styleRange.start;
-                                int endIndex = startIndex + styleRange.length;
-                                int startX = gc.textExtent(text.substring(0, startIndex)).x;
-                                int endX = gc.textExtent(text.substring(0, endIndex)).x;
-                                gc.setBackground(styleRange.background);
-                                gc.fillRectangle(textBounds.x + startX, textBounds.y, (endX - startX), textBounds.height);
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        fTable.addListener(SWT.PaintItem, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                TableItem item = (TableItem) event.item;
-
-                // we promised to paint the table item's foreground
-                GC gc = event.gc;
-                Image image = item.getImage(event.index);
-                if (image != null) {
-                    Rectangle imageBounds = item.getImageBounds(event.index);
-                    /*
-                     * The image bounds don't match the default image position.
-                     */
-                    if (IS_LINUX) {
-                        gc.drawImage(image, imageBounds.x + 1, imageBounds.y + 3);
-                    } else {
-                        gc.drawImage(image, imageBounds.x, imageBounds.y + 1);
-                    }
-                }
-                gc.setForeground(item.getForeground(event.index));
-                gc.setFont(item.getFont(event.index));
-                String text = item.getText(event.index);
-                Rectangle textBounds = item.getTextBounds(event.index);
-                /*
-                 * The text bounds don't match the default text position.
-                 */
-                if (IS_LINUX) {
-                    gc.drawText(text, textBounds.x + 1, textBounds.y + 3, true);
-                } else {
-                    gc.drawText(text, textBounds.x - 1, textBounds.y + 2, true);
-                }
-            }
-        });
+        fTable.addListener(SWT.PaintItem, new PainItemListener());
 
         // Create resources
         createResources();
@@ -805,70 +883,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
         fRawViewer = new TmfRawEventViewer(fSashForm, SWT.H_SCROLL | SWT.V_SCROLL);
 
-        fRawViewer.addSelectionListener(new Listener() {
-            @Override
-            public void handleEvent(final Event e) {
-                if (fTrace == null) {
-                    return;
-                }
-                long rank;
-                if (e.data instanceof Long) {
-                    rank = (Long) e.data;
-                } else if (e.data instanceof ITmfLocation) {
-                    rank = findRank((ITmfLocation) e.data);
-                } else {
-                    return;
-                }
-                int index = (int) rank;
-                if (fTable.getData(Key.FILTER_OBJ) != null) {
-                    // +1 for top filter status row
-                    index = fCache.getFilteredEventIndex(rank) + 1;
-                }
-                // +1 for header row
-                fTable.setSelection(index + 1);
-                fSelectedRank = rank;
-                fSelectedBeginRank = fSelectedRank;
-                updateStatusLine(null);
-                final TableItem[] selection = fTable.getSelection();
-                if ((selection != null) && (selection.length > 0)) {
-                    TableItem item = fTable.getSelection()[0];
-                    final TmfTimestamp ts = (TmfTimestamp) item.getData(Key.TIMESTAMP);
-                    if (ts != null) {
-                        broadcast(new TmfSelectionRangeUpdatedSignal(TmfEventsTable.this, ts));
-                    }
-                    if (item.getData() instanceof ITmfEvent) {
-                        broadcast(new TmfEventSelectedSignal(TmfEventsTable.this, (ITmfEvent) item.getData()));
-                        fireSelectionChanged(new SelectionChangedEvent(TmfEventsTable.this, new StructuredSelection(item.getData())));
-                    } else {
-                        fireSelectionChanged(new SelectionChangedEvent(TmfEventsTable.this, StructuredSelection.EMPTY));
-                    }
-                }
-            }
-
-            private long findRank(final ITmfLocation selectedLocation) {
-                final double selectedRatio = fTrace.getLocationRatio(selectedLocation);
-                long low = 0;
-                long high = fTrace.getNbEvents();
-                long rank = high / 2;
-                double ratio = -1;
-                while (ratio != selectedRatio) {
-                    ITmfContext context = fTrace.seekEvent(rank);
-                    ratio = fTrace.getLocationRatio(context.getLocation());
-                    context.dispose();
-                    if (ratio < selectedRatio) {
-                        low = rank;
-                        rank = (rank + high) / 2;
-                    } else if (ratio > selectedRatio) {
-                        high = rank;
-                        rank = (rank + low) / 2;
-                    }
-                    if ((high - low) < 2) {
-                        break;
-                    }
-                }
-                return rank;
-            }
-        });
+        fRawViewer.addSelectionListener(new RawSelectionListener());
 
         fSashForm.setWeights(new int[] { 1, 1 });
         fRawViewer.setVisible(false);
