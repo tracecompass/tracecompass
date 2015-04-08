@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson, École Polytechnique de Montréal, and others
+ * Copyright (c) 2010, 2015 Ericsson, École Polytechnique de Montréal, and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,6 +9,7 @@
  * Contributors:
  *   Alexandre Montplaisir - Initial API and implementation
  *   Florian Wininger - Add Extension and Leaf Node
+ *   Patrick Tasse - Keep interval list sorted on insert
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
@@ -372,7 +373,13 @@ public abstract class HTNode {
             /* Just in case, should be checked before even calling this function */
             assert (newInterval.getIntervalSize() <= this.getNodeFreeSpace());
 
-            intervals.add(newInterval);
+            /* Find the insert position to keep the list sorted */
+            int index = intervals.size();
+            while (index > 0 && newInterval.compareTo(intervals.get(index - 1)) < 0) {
+                index--;
+            }
+
+            intervals.add(index, newInterval);
             sizeOfIntervalSection += newInterval.getIntervalSize();
 
             /* Update the in-node offset "pointer" */
@@ -396,15 +403,9 @@ public abstract class HTNode {
 
             if (!intervals.isEmpty()) {
                 /*
-                 * Sort the intervals by ascending order of their end time. This
-                 * speeds up lookups a bit
-                 */
-                Collections.sort(intervals);
-
-                /*
                  * Make sure there are no intervals in this node with their
                  * EndTime > the one requested. Only need to check the last one
-                 * since they are now sorted
+                 * since they are sorted
                  */
                 assert (endtime >= intervals.get(intervals.size() - 1).getEndTime());
             }
