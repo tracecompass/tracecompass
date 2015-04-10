@@ -158,7 +158,7 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
         }
         Integer cpu = (Integer) cpuObj;
 
-        final String eventName = event.getType().getName();
+        final String eventName = event.getName();
         final long ts = event.getTimestamp().getValue();
 
         try {
