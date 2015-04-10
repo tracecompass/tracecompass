@@ -64,4 +64,12 @@ public interface ITmfEvent extends IAdaptable {
      * @return the event content
      */
     ITmfEventField getContent();
+
+    /**
+     * Gets the name of the event
+     *
+     * @return the name of the event, same as getType().getName()
+     * @since 1.0
+     */
+    String getName();
 }

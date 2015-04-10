@@ -97,6 +97,14 @@ public class TmfEventsCache {
             return event.getRank();
         }
 
+        /**
+         * @since 1.0
+         */
+        @Override
+        public String getName() {
+            return event.getName();
+        }
+
         @Override
         public ITmfTimestamp getTimestamp() {
             return event.getTimestamp();

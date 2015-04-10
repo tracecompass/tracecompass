@@ -168,6 +168,11 @@ public class TmfCollapseFilterTest {
         }
 
         @Override
+        public String getName() {
+            return "";
+        }
+
+        @Override
         public ITmfEventField getContent() {
             return new TmfEventField("testField", "test", null);
         }

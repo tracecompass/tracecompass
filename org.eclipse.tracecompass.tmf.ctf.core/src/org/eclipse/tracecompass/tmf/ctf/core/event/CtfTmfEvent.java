@@ -190,6 +190,11 @@ public class CtfTmfEvent extends TmfEvent
     }
 
     @Override
+    public String getName() {
+        return fEventName;
+    }
+
+    @Override
     public Set<String> listCustomAttributes() {
         if (fEventDeclaration == null) {
             return new HashSet<>();
