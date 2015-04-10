@@ -18,12 +18,14 @@ package org.eclipse.tracecompass.internal.statesystem.core;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.BufferedInputStream;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
-import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -75,70 +77,29 @@ public final class AttributeTree {
      */
     public AttributeTree(StateSystem ss, FileInputStream fis) throws IOException {
         this(ss);
-        DataInputStream in = new DataInputStream(new BufferedInputStream(fis));
-
-        /* Message for exceptions, shouldn't be externalized */
-        final String errorMessage = "The attribute tree file section is either invalid or corrupted."; //$NON-NLS-1$
-
-        ArrayList<String[]> list = new ArrayList<>();
-        byte[] curByteArray;
-        String curFullString;
-        String[] curStringArray;
-        int res, remain, size;
-        int expectedSize = 0;
-        int total = 0;
+        ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(fis));
 
         /* Read the header of the Attribute Tree file (or file section) */
-        res = in.readInt(); /* Magic number */
+        int res = ois.readInt(); /* Magic number */
         if (res != ATTRIB_TREE_MAGIC_NUMBER) {
-            throw new IOException(errorMessage);
+            throw new IOException("The attribute tree file section is either invalid or corrupted."); //$NON-NLS-1$
         }
 
-        /* Expected size of the section */
-        expectedSize = in.readInt();
-        if (expectedSize < 12) {
-            throw new IOException(errorMessage);
-        }
 
-        /* How many entries we have to read */
-        remain = in.readInt();
-        total += 12;
-
-        /* Read each entry */
-        for (; remain > 0; remain--) {
-            /* Read the first byte = the size of the entry */
-            size = in.readByte();
-            curByteArray = new byte[size];
-            res = in.read(curByteArray);
-            if (res != size) {
-                throw new IOException(errorMessage);
-            }
-
-            /*
-             * Go buffer -> byteArray -> String -> String[] -> insert in list.
-             * bleh
-             */
-            curFullString = new String(curByteArray);
-            curStringArray = curFullString.split("/"); //$NON-NLS-1$
-            list.add(curStringArray);
-
-            /* Read the 0'ed confirmation byte */
-            res = in.readByte();
-            if (res != 0) {
-                throw new IOException(errorMessage);
-            }
-            total += curByteArray.length + 2;
-        }
-
-        if (total != expectedSize) {
-            throw new IOException(errorMessage);
+        ArrayList<String[]> attribList;
+        try {
+            @SuppressWarnings("unchecked")
+            ArrayList<String[]> list = (ArrayList<String[]>) ois.readObject();
+            attribList = list;
+        } catch (ClassNotFoundException e) {
+            throw new IOException("Unrecognizable attribute list"); //$NON-NLS-1$
         }
 
         /*
          * Now we have 'list', the ArrayList of String arrays representing all
          * the attributes. Simply create attributes the normal way from them.
          */
-        for (String[] attrib : list) {
+        for (String[] attrib : attribList) {
             this.getQuarkAndAdd(-1, attrib);
         }
     }
@@ -150,52 +111,27 @@ public final class AttributeTree {
      *            The file to write to
      * @param pos
      *            The position (in bytes) in the file where to write
-     * @return The total number of bytes written.
      */
-    public int writeSelf(File file, long pos) {
-        int total = 0;
-        byte[] curByteArray;
+    public void writeSelf(File file, long pos) {
+        try (FileOutputStream fos = new FileOutputStream(file, true);
+                FileChannel fc = fos.getChannel();) {
+            fc.position(pos);
+            try (ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 
-        try (RandomAccessFile raf = new RandomAccessFile(file, "rw");) { //$NON-NLS-1$
-            raf.seek(pos);
+                /* Write the almost-magic number */
+                oos.writeInt(ATTRIB_TREE_MAGIC_NUMBER);
 
-            /* Write the almost-magic number */
-            raf.writeInt(ATTRIB_TREE_MAGIC_NUMBER);
-
-            /* Placeholder for the total size of the section... */
-            raf.writeInt(-8000);
-
-            /* Write the number of entries */
-            raf.writeInt(this.attributeList.size());
-            total += 12;
-
-            /* Write the attributes themselves */
-            for (Attribute entry : this.attributeList) {
-                curByteArray = entry.getFullAttributeName().getBytes();
-                if (curByteArray.length > Byte.MAX_VALUE) {
-                    throw new IOException("Attribute with name \"" //$NON-NLS-1$
-                            + Arrays.toString(curByteArray) + "\" is too long."); //$NON-NLS-1$
+                /* Compute the serialized list of attributes and write it */
+                List<String[]> list = new ArrayList<>(attributeList.size());
+                for (Attribute entry : this.attributeList) {
+                    list.add(entry.getFullAttribute());
                 }
-                /* Write the first byte = size of the array */
-                raf.writeByte((byte) curByteArray.length);
-
-                /* Write the array itself */
-                raf.write(curByteArray);
-
-                /* Write the 0'ed byte */
-                raf.writeByte((byte) 0);
-
-                total += curByteArray.length + 2;
+                oos.writeObject(list);
             }
-
-            /* Now go back and write the actual size of this section */
-            raf.seek(pos + 4);
-            raf.writeInt(total);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return total;
+
     }
 
     /**

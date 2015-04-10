@@ -48,7 +48,7 @@ public class HistoryTree {
     private static final int HISTORY_FILE_MAGIC_NUMBER = 0x05FFA900;
 
     /** File format version. Increment when breaking compatibility. */
-    private static final int FILE_VERSION = 4;
+    private static final int FILE_VERSION = 5;
 
     // ------------------------------------------------------------------------
     // Tree-specific configuration
