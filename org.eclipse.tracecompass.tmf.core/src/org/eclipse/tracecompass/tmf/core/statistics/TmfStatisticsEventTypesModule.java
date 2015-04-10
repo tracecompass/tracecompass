@@ -125,7 +125,7 @@ public class TmfStatisticsEventTypesModule extends TmfStateSystemAnalysisModule 
              * timestamp values to nanoseconds. */
             final long ts = event.getTimestamp().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
 
-            final String eventName = event.getType().getName();
+            final String eventName = event.getName();
 
             try {
                 /* Special handling for lost events */

@@ -79,7 +79,7 @@ public class TmfXmlEventHandler {
     }
 
     private boolean appliesToEvent(ITmfEvent event) {
-        String eventName = event.getType().getName();
+        String eventName = event.getName();
 
         /* test for full name */
         if (eventName.equals(fName)) {

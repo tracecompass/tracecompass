@@ -88,7 +88,7 @@ public class KernelCpuUsageStateProvider extends AbstractTmfStateProvider {
         if (event == null) {
             return;
         }
-        final String eventName = event.getType().getName();
+        final String eventName = event.getName();
 
         if (eventName.equals(fLayout.eventSchedSwitch())) {
             Object cpuObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);

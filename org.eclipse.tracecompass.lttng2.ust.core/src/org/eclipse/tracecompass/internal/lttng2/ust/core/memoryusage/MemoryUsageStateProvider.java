@@ -62,7 +62,7 @@ public class MemoryUsageStateProvider extends AbstractTmfStateProvider {
 
     @Override
     protected void eventHandle(ITmfEvent event) {
-        String name = event.getType().getName();
+        String name = event.getName();
         switch (name) {
         case UstMemoryStrings.MALLOC: {
             Long ptr = (Long) event.getContent().getField(UstMemoryStrings.FIELD_PTR).getValue();

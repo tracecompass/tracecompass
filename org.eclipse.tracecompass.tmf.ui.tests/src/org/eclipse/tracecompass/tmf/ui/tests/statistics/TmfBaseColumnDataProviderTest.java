@@ -105,9 +105,9 @@ public class TmfBaseColumnDataProviderTest {
         fStatsData.getOrCreateNode(fTestName, Messages.TmfStatisticsData_EventTypes);
 
         fStatsData.setTotal(fTestName, true, 3);
-        fStatsData.setTypeCount(fTestName, fEvent1.getType().getName(), true, 1);
-        fStatsData.setTypeCount(fTestName, fEvent2.getType().getName(), true, 1);
-        fStatsData.setTypeCount(fTestName, fEvent3.getType().getName(), true, 1);
+        fStatsData.setTypeCount(fTestName, fEvent1.getName(), true, 1);
+        fStatsData.setTypeCount(fTestName, fEvent2.getName(), true, 1);
+        fStatsData.setTypeCount(fTestName, fEvent3.getName(), true, 1);
 
         provider = new TmfBaseColumnDataProvider();
     }
@@ -126,8 +126,8 @@ public class TmfBaseColumnDataProviderTest {
         assertEquals("getColumnData", 4, columnsData.size());
 
         TmfStatisticsTreeNode parentNode = fStatsData.getNode(fTestName);
-        TmfStatisticsTreeNode treeNode1 = fStatsData.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fEvent1.getType().getName());
-        TmfStatisticsTreeNode treeNode2 = fStatsData.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fEvent3.getType().getName());
+        TmfStatisticsTreeNode treeNode1 = fStatsData.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fEvent1.getName());
+        TmfStatisticsTreeNode treeNode2 = fStatsData.getNode(fTestName, Messages.TmfStatisticsData_EventTypes, fEvent3.getName());
         ViewerComparator vComp = null;
         for (TmfBaseColumnData columnData : columnsData) {
             assertNotNull("getColumnData", columnData);

@@ -300,7 +300,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
                 Activator.logWarning("XML State value: request event name, but event is null"); //$NON-NLS-1$
                 return TmfStateValue.nullValue();
             }
-            return TmfStateValue.newValueString(event.getType().getName());
+            return TmfStateValue.newValueString(event.getName());
         }
 
     }

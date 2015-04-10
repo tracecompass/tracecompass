@@ -78,7 +78,7 @@ public class TcpLttngEventMatching implements ITmfMatchEventDefinition {
      */
     @Override
     public Direction getDirection(ITmfEvent event) {
-        String evname = event.getType().getName();
+        String evname = event.getName();
 
         /* Is the event a tcp socket in or out event */
         if (evname.equals(TcpEventStrings.NETIF_RECEIVE_SKB) && canMatchPacket(event)) {

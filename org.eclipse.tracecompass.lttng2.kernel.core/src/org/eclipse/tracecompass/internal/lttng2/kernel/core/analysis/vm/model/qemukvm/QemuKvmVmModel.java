@@ -95,7 +95,7 @@ public class QemuKvmVmModel implements IVirtualMachineModel {
          * machines are all cached and the method returns earlier
          */
         /* Try to get the virtual machine from the event */
-        String eventName = event.getType().getName();
+        String eventName = event.getName();
         if (eventName.startsWith(KVM)) {
             /* Only the host machine has kvm_* events, so this is a host */
             machine = VirtualMachine.newHostMachine(hostId);
@@ -146,7 +146,7 @@ public class QemuKvmVmModel implements IVirtualMachineModel {
 
     @Override
     public @Nullable VirtualCPU getVCpuExitingHypervisorMode(ITmfEvent event, HostThread ht) {
-        final String eventName = event.getType().getName();
+        final String eventName = event.getName();
 
         /* TODO: Use event layouts for this part also */
         /*
@@ -180,7 +180,7 @@ public class QemuKvmVmModel implements IVirtualMachineModel {
 
     @Override
     public @Nullable VirtualCPU getVCpuEnteringHypervisorMode(ITmfEvent event, HostThread ht) {
-        final String eventName = event.getType().getName();
+        final String eventName = event.getName();
         /*
          * The KVM_EXIT event means we are exiting a virtual CPU, so entering
          * hypervisor mode
@@ -200,7 +200,7 @@ public class QemuKvmVmModel implements IVirtualMachineModel {
     @Override
     public void handleEvent(ITmfEvent event) {
         /* Is the event handled by this model */
-        final String eventName = event.getType().getName();
+        final String eventName = event.getName();
         if (!eventName.equals(QemuKvmStrings.VMSYNC_GH_HOST)) {
             return;
         }

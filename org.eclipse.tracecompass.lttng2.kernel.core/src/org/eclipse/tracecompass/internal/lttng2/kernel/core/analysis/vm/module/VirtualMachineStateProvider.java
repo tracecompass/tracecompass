@@ -152,7 +152,7 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
         }
 
         /* Is the event managed by this analysis */
-        final String eventName = event.getType().getName();
+        final String eventName = event.getName();
 
         /* TODO When requirements work again, don't hardcode this */
         if (!eventName.equals("sched_switch") && //$NON-NLS-1$

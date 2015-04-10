@@ -196,7 +196,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
         public void handleData(final ITmfEvent event) {
             super.handleData(event);
             if (event.getTrace() == trace) {
-                String eventType = event.getType().getName();
+                String eventType = event.getName();
                 /*
                  * Special handling for lost events: instead of counting just
                  * one, we will count how many actual events it represents.

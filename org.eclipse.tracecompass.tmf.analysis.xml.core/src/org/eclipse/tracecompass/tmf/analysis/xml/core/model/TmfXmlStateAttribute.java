@@ -326,7 +326,7 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
                     Activator.logWarning("XML State attribute: looking for an eventname, but event is null"); //$NON-NLS-1$
                     return quark;
                 }
-                quark = getQuarkRelativeAndAdd(startQuark, event.getType().getName());
+                quark = getQuarkRelativeAndAdd(startQuark, event.getName());
                 return quark;
             }
             case SELF:

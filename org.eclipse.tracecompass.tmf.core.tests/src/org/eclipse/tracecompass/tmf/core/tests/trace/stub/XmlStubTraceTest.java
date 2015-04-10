@@ -183,7 +183,7 @@ public class XmlStubTraceTest {
     }
 
     private static IStatus testEvent(ITmfEvent event) {
-        switch (event.getType().getName()) {
+        switch (event.getName()) {
         case EVENT_A: {
             ITmfEventField content = event.getContent();
             if (content.getField(FIELD_A) == null) {

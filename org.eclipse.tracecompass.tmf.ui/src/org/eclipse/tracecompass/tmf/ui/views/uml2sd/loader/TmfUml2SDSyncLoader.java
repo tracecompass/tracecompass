@@ -1468,8 +1468,8 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     protected ITmfSyncSequenceDiagramEvent getSequenceDiagramEvent(ITmfEvent tmfEvent){
         //type = .*RECEIVE.* or .*SEND.*
         //content = sender:<sender name>:receiver:<receiver name>,signal:<signal name>
-        String eventType = tmfEvent.getType().toString();
-        if (eventType.contains(Messages.TmfUml2SDSyncLoader_EventTypeSend) || eventType.contains(Messages.TmfUml2SDSyncLoader_EventTypeReceive)) {
+        String eventName = tmfEvent.getName();
+        if (eventName.contains(Messages.TmfUml2SDSyncLoader_EventTypeSend) || eventName.contains(Messages.TmfUml2SDSyncLoader_EventTypeReceive)) {
             Object sender = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncLoader_FieldSender);
             Object receiver = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncLoader_FieldReceiver);
             Object name = tmfEvent.getContent().getField(Messages.TmfUml2SDSyncLoader_FieldSignal);
