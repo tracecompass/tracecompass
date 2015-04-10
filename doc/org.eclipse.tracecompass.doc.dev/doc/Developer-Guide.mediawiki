@@ -1154,7 +1154,7 @@ The state history is the name of the container for all the intervals created by
 the state system. The exact implementation (how the intervals are stored) is
 determined by the storage backend that is used.
 
-Some backends will use a state history that is peristent on disk, others do not.
+Some backends will use a state history that is persistent on disk, others do not.
 When loading a trace, if a history file is available and the backend supports
 it, it will be loaded right away, skipping the need to go through another
 construction phase.
@@ -1280,7 +1280,7 @@ possible, to avoid potentially costly string re-hashing.
 
 getQuarkAbsolute() takes a variable amount of Strings in parameter, which
 represent the full path to the attribute. Some of them can be constants, some
-can come programatically, often from the event's fields.
+can come programmatically, often from the event's fields.
 
 getQuarkRelative() is to be used when you already know the quark of a certain
 attribute, and want to access on of its sub-attributes. Its first parameter is
@@ -1361,7 +1361,7 @@ modifyAttribute(). Check their Javadoc for more information.
 When the construction phase is done, do not forget to call closeHistory() to
 tell the backend that no more intervals will be received. Depending on the
 backend type, it might have to save files, close descriptors, etc. This ensures
-that a persitent file can then be re-used when the trace is opened again.
+that a persistent file can then be re-used when the trace is opened again.
 
 If you use the AbstractTmfStateProvider, it will call closeHistory()
 automatically when it reaches the end of the trace.
@@ -1573,6 +1573,8 @@ module will also contain code that can query the state system.
 === State Provider ===
 
 <pre>
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -1602,10 +1604,10 @@ public class MyStateProvider extends AbstractTmfStateProvider {
      * @param trace
      *            The trace to which this state provider is associated
      */
-    public MyStateProvider(ITmfTrace trace) {
-        super(trace, CtfTmfEvent.class, "Example"); //$NON-NLS-1$
+    public MyStateProvider(@NonNull ITmfTrace trace) {
+        super(trace, "Example"); //$NON-NLS-1$
         /*
-         * The third parameter here is not important, it's only used to name a
+         * The second parameter here is not important, it's only used to name a
          * thread internally.
          */
     }
@@ -1638,7 +1640,7 @@ public class MyStateProvider extends AbstractTmfStateProvider {
         try {
 
             if (event.getType().getName().equals("sched_switch")) {
-                ITmfStateSystemBuilder ss = getStateSystemBuilder();
+                ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
                 int quark = ss.getQuarkAbsoluteAndAdd("CPUs", String.valueOf(event.getCPU()), "Status");
                 ITmfStateValue value;
                 if (nextTid > 0) {
