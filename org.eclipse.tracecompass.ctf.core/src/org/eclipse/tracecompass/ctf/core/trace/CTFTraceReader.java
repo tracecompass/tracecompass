@@ -567,4 +567,22 @@ public class CTFTraceReader implements AutoCloseable {
     public CTFTrace getTrace() {
         return fTrace;
     }
+
+    /**
+     * This will read the entire trace and populate all the indexes. The reader
+     * will then be reset to the first event in the trace.
+     *
+     * Do not call in the fast path.
+     *
+     * @throws CTFException
+     *             A trace reading error occurred
+     * @since 1.0
+     */
+    public void populateIndex() throws CTFException {
+        for (CTFStreamInputReader sir : fPrio) {
+            sir.goToLastEvent();
+        }
+        seek(0);
+
+    }
 }

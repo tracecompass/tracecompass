@@ -362,17 +362,14 @@ public class CTFStreamInputReader implements AutoCloseable {
      *             if an error occurs
      */
     public void goToLastEvent() throws CTFException {
-        /*
-         * Search in the index for the packet to search in.
-         */
-        final int len = fStreamInput.getIndex().size();
 
         /*
-         * Go to beginning of trace.
+         * Go to the beginning of the trace
          */
         seek(0);
+
         /*
-         * if the trace is empty.
+         * Check that there is at least one event
          */
         if ((fStreamInput.getIndex().isEmpty()) || (!fPacketReader.hasMoreEvents())) {
             /*
@@ -380,12 +377,28 @@ public class CTFStreamInputReader implements AutoCloseable {
              */
             return;
         }
+
+        fPacketIndex = fStreamInput.getIndex().size() - 1;
+        /*
+         * Go to last indexed packet
+         */
+        fPacketReader.setCurrentPacket(getPacket());
+
+        /*
+         * Keep going until you cannot
+         */
+        while (fPacketReader.getCurrentPacket() != null) {
+            goToNextPacket();
+        }
+
+        final int lastPacketIndex = fStreamInput.getIndex().size() - 1;
         /*
          * Go to the last packet that contains events.
          */
-        for (int pos = len - 1; pos > 0; pos--) {
+        for (int pos = lastPacketIndex; pos > 0; pos--) {
             fPacketIndex = pos;
             fPacketReader.setCurrentPacket(getPacket());
+
             if (fPacketReader.hasMoreEvents()) {
                 break;
             }
