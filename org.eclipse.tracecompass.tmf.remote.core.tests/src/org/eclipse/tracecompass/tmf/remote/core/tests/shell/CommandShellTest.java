@@ -21,6 +21,7 @@ import java.util.Arrays;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.tracecompass.internal.tmf.remote.core.shell.CommandShell;
@@ -36,11 +37,11 @@ import org.junit.Test;
  */
 public class CommandShellTest {
 
-    private static final boolean IS_LINUX = System.getProperty("os.name").contains("Linux") ? true : false; //$NON-NLS-1$ //$NON-NLS-2$
+    private static final boolean IS_UNIX = !Platform.getOS().equals(Platform.OS_WIN32);
 
-    private static final @NonNull String[] CMD_INPUT_LINUX = { "ls", "-l" };
-    private static final @NonNull String[] CMD_ERROR_INPUT_LINUX = { "ls", "blablablabla" };
-    private static final @NonNull String[] CMD_UNKNOWN_COMMAND_LINUX = { "blablablabla" };
+    private static final @NonNull String[] CMD_INPUT_UNIX = { "ls", "-l" };
+    private static final @NonNull String[] CMD_ERROR_INPUT_UNIX = { "ls", "blablablabla" };
+    private static final @NonNull String[] CMD_UNKNOWN_COMMAND_UNIX = { "blablablabla" };
 
     private static final IRemoteConnection LOCAL_CONNECTION = TmfRemoteConnectionFactory.getLocalConnection();
     private static final RemoteSystemProxy LOCAL_PROXY = new RemoteSystemProxy(checkNotNull(LOCAL_CONNECTION));
@@ -52,12 +53,12 @@ public class CommandShellTest {
      */
     @Test
     public void testExecuteSuccess() throws ExecutionException {
-        assumeTrue(IS_LINUX);
+        assumeTrue(IS_UNIX);
         LOCAL_PROXY.connect(new NullProgressMonitor());
         ICommandShell shell = LOCAL_PROXY.createCommandShell();
 
         ICommandInput command = shell.createCommand();
-        command.addAll(checkNotNull(Arrays.asList(CMD_INPUT_LINUX)));
+        command.addAll(checkNotNull(Arrays.asList(CMD_INPUT_UNIX)));
         ICommandResult result = shell.executeCommand(command, new NullProgressMonitor());
         assertEquals(0, result.getResult());
     }
@@ -69,13 +70,13 @@ public class CommandShellTest {
      */
     @Test
     public void testExecuteError() throws ExecutionException {
-        assumeTrue(IS_LINUX);
+        assumeTrue(IS_UNIX);
 
         LOCAL_PROXY.connect(new NullProgressMonitor());
         ICommandShell shell = LOCAL_PROXY.createCommandShell();
 
         ICommandInput command = shell.createCommand();
-        command.addAll(checkNotNull(Arrays.asList(CMD_ERROR_INPUT_LINUX)));
+        command.addAll(checkNotNull(Arrays.asList(CMD_ERROR_INPUT_UNIX)));
         ICommandResult result = shell.executeCommand(command, new NullProgressMonitor());
         assertTrue(result.getResult() > 0);
     }
@@ -87,14 +88,14 @@ public class CommandShellTest {
      */
     @Test (expected=ExecutionException.class)
     public void testExecuteException() throws ExecutionException {
-        if (!IS_LINUX) {
+        if (!IS_UNIX) {
             throw new ExecutionException("");
         }
         LOCAL_PROXY.connect(new NullProgressMonitor());
         ICommandShell shell = LOCAL_PROXY.createCommandShell();
 
         ICommandInput command = shell.createCommand();
-        command.addAll(checkNotNull(Arrays.asList(CMD_UNKNOWN_COMMAND_LINUX)));
+        command.addAll(checkNotNull(Arrays.asList(CMD_UNKNOWN_COMMAND_UNIX)));
         ICommandResult result = shell.executeCommand(command, new NullProgressMonitor());
         assertTrue(result.getResult() > 0);
     }
