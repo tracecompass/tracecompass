@@ -10,6 +10,7 @@
  *     Matthew Khouzam - Initial API and implementation
  *     Simon Marchi - Initial API and implementation
  *     Matthew Khouzam - Update for live trace reading support
+ *     Bernd Hufmann - Add method to copy metadata file
  *******************************************************************************/
 
 package org.eclipse.tracecompass.ctf.core.trace;
@@ -25,6 +26,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.UUID;
 
@@ -499,5 +503,21 @@ public class Metadata {
                     + ", ctfMinorVersion=" + fCtfMinorVersion + ']'; //$NON-NLS-1$
         }
 
+    }
+
+    /**
+     * Copies the metadata file to a destination directory.
+     * @param path
+     *             the destination directory
+     * @return the path to the target file
+     * @throws IOException
+     *             if an error occurred
+     *
+     * @since 1.0
+     */
+    public Path copyTo(final File path) throws IOException {
+        Path source = FileSystems.getDefault().getPath(trace.getTraceDirectory().getAbsolutePath(), METADATA_FILENAME);
+        Path destPath = FileSystems.getDefault().getPath(path.getAbsolutePath());
+        return Files.copy(source, destPath.resolve(source.getFileName()));
     }
 }
