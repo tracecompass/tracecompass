@@ -215,7 +215,7 @@ public class CTFStreamInput implements IDefinitionScope {
     public boolean addPacketHeaderIndex() throws CTFException {
         long currentPosBits = 0L;
         if (!fIndex.isEmpty()) {
-            StreamInputPacketIndexEntry pos = fIndex.lastElement();
+            ICTFPacketDescriptor pos = fIndex.lastElement();
             if (pos == null) {
                 throw new IllegalStateException("Index contains null packet entries"); //$NON-NLS-1$
             }
@@ -232,7 +232,7 @@ public class CTFStreamInput implements IDefinitionScope {
         return fFile.length() * Byte.SIZE;
     }
 
-    private StreamInputPacketIndexEntry createPacketIndexEntry(long dataOffsetbits)
+    private ICTFPacketDescriptor createPacketIndexEntry(long dataOffsetbits)
             throws CTFException {
 
         try (FileChannel fc = FileChannel.open(fFile.toPath(), StandardOpenOption.READ)) {
@@ -249,7 +249,7 @@ public class CTFStreamInput implements IDefinitionScope {
              * Read the stream packet context if it exists.
              */
             long size = fc.size();
-            StreamInputPacketIndexEntry packetIndex = parsePacketContext(dataOffsetbits, size, bitBuffer);
+            ICTFPacketDescriptor packetIndex = parsePacketContext(dataOffsetbits, size, bitBuffer);
 
             /* Basic validation */
             if (packetIndex.getContentSizeBits() > packetIndex.getPacketSizeBits()) {
@@ -355,9 +355,9 @@ public class CTFStreamInput implements IDefinitionScope {
         return tracePacketHeaderDef;
     }
 
-    private StreamInputPacketIndexEntry parsePacketContext(long dataOffsetBits, long fileSizeBytes,
+    private ICTFPacketDescriptor parsePacketContext(long dataOffsetBits, long fileSizeBytes,
             BitBuffer bitBuffer) throws CTFException {
-        StreamInputPacketIndexEntry packetIndex;
+        ICTFPacketDescriptor packetIndex;
         StructDefinition streamPacketContextDef = fStreamPacketContextDecl.createDefinition(this, ILexicalScope.STREAM_PACKET_CONTEXT, bitBuffer);
         packetIndex = new StreamInputPacketIndexEntry(dataOffsetBits, streamPacketContextDef, fileSizeBytes, fLostSoFar);
         fLostSoFar = packetIndex.getLostEvents() + fLostSoFar;

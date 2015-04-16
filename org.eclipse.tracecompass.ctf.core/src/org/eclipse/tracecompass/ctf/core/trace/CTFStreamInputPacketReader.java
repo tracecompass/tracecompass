@@ -39,7 +39,6 @@ import org.eclipse.tracecompass.ctf.core.event.types.VariantDefinition;
 import org.eclipse.tracecompass.internal.ctf.core.SafeMappedByteBuffer;
 import org.eclipse.tracecompass.internal.ctf.core.event.EventDeclaration;
 import org.eclipse.tracecompass.internal.ctf.core.event.types.composite.EventHeaderDefinition;
-import org.eclipse.tracecompass.internal.ctf.core.trace.StreamInputPacketIndexEntry;
 
 import com.google.common.collect.ImmutableList;
 
@@ -80,7 +79,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
     private ICompositeDefinition fCurrentStreamEventHeaderDef;
     private ICompositeDefinition fCurrentStreamPacketContextDef;
     /** Reference to the index entry of the current packet. */
-    private StreamInputPacketIndexEntry fCurrentPacket = null;
+    private ICTFPacketDescriptor fCurrentPacket = null;
 
     /**
      * Last timestamp recorded.
@@ -182,7 +181,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
      *
      * @return the current packet
      */
-    StreamInputPacketIndexEntry getCurrentPacket() {
+    ICTFPacketDescriptor getCurrentPacket() {
         return fCurrentPacket;
     }
 
@@ -220,9 +219,10 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
      *            The index entry of the packet to switch to.
      * @throws CTFException
      *             If we get an error reading the packet
+     * @since 1.0
      */
-    void setCurrentPacket(StreamInputPacketIndexEntry currentPacket) throws CTFException {
-        StreamInputPacketIndexEntry prevPacket = null;
+    public void setCurrentPacket(ICTFPacketDescriptor currentPacket) throws CTFException {
+        ICTFPacketDescriptor prevPacket = null;
         fCurrentPacket = currentPacket;
 
         if (fCurrentPacket != null) {
@@ -295,7 +295,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
      */
     public boolean hasMoreEvents() {
         BitBuffer bitBuffer = fBitBuffer;
-        StreamInputPacketIndexEntry currentPacket = fCurrentPacket;
+        ICTFPacketDescriptor currentPacket = fCurrentPacket;
         if (currentPacket != null && bitBuffer != null) {
             return fHasLost || (bitBuffer.position() < currentPacket.getContentSizeBits());
         }

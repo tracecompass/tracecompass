@@ -24,7 +24,6 @@ import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.internal.ctf.core.Activator;
-import org.eclipse.tracecompass.internal.ctf.core.trace.StreamInputPacketIndexEntry;
 
 import com.google.common.collect.ImmutableList;
 
@@ -241,7 +240,7 @@ public class CTFStreamInputReader implements AutoCloseable {
          * Change packet if needed
          */
         if (!fPacketReader.hasMoreEvents()) {
-            final StreamInputPacketIndexEntry prevPacket = fPacketReader
+            final ICTFPacketDescriptor prevPacket = fPacketReader
                     .getCurrentPacket();
             if (prevPacket != null || fLive) {
                 goToNextPacket();
@@ -438,7 +437,7 @@ public class CTFStreamInputReader implements AutoCloseable {
         return fPacketIndex;
     }
 
-    private StreamInputPacketIndexEntry getPacket() {
+    private ICTFPacketDescriptor getPacket() {
         return fStreamInput.getIndex().getElement(getPacketIndex());
     }
 

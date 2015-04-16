@@ -22,13 +22,14 @@ import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StringDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
+import org.eclipse.tracecompass.ctf.core.trace.ICTFPacketDescriptor;
 
 /**
  * <b><u>StreamInputPacketIndexEntry</u></b>
  * <p>
  * Represents an entry in the index of event packets.
  */
-public class StreamInputPacketIndexEntry {
+public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
 
     private static final int UNKNOWN = -1;
 
@@ -203,14 +204,7 @@ public class StreamInputPacketIndexEntry {
     // Operations
     // ------------------------------------------------------------------------
 
-    /**
-     * Returns whether the packet includes (inclusively) the given timestamp in
-     * the begin-end timestamp range.
-     *
-     * @param ts
-     *            The timestamp to check.
-     * @return True if the packet includes the timestamp.
-     */
+    @Override
     public boolean includes(long ts) {
         return (ts >= fTimestampBegin) && (ts <= fTimestampEnd);
     }
@@ -226,44 +220,32 @@ public class StreamInputPacketIndexEntry {
     // Getters and Setters
     // ------------------------------------------------------------------------
 
-    /**
-     * @return the offsetBytes
-     */
+    @Override
     public long getOffsetBits() {
         return fOffsetBits;
     }
 
-    /**
-     * @return the packetSizeBits
-     */
+    @Override
     public long getPacketSizeBits() {
         return fPacketSizeBits;
     }
 
-    /**
-     * @return the contentSizeBits
-     */
+    @Override
     public long getContentSizeBits() {
         return fContentSizeBits;
     }
 
-    /**
-     * @return the timestampBegin
-     */
+    @Override
     public long getTimestampBegin() {
         return fTimestampBegin;
     }
 
-    /**
-     * @return the timestampEnd
-     */
+    @Override
     public long getTimestampEnd() {
         return fTimestampEnd;
     }
 
-    /**
-     * @return the lostEvents in this packet
-     */
+    @Override
     public long getLostEvents() {
         return fLostEvents;
     }
@@ -280,35 +262,22 @@ public class StreamInputPacketIndexEntry {
         fAttributes.put(field, value);
     }
 
-    /**
-     * Retrieve the value of an existing attribute
-     *
-     * @param field
-     *            The name of the attribute
-     * @return The value that was stored, or null if it wasn't found
-     */
+    @Override
     public Object lookupAttribute(String field) {
         return fAttributes.get(field);
     }
 
-    /**
-     * @return The target that is being traced
-     */
+    @Override
     public String getTarget() {
         return fTarget;
     }
 
-    /**
-     * @return The ID of the target
-     */
+    @Override
     public long getTargetId() {
         return fTargetID;
     }
 
-    /**
-     * Get the offset of the packet in bytes
-     * @return The offset of the packet in bytes
-     */
+    @Override
     public long getOffsetBytes() {
         return fOffsetBytes;
     }
