@@ -269,7 +269,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         }
 
         /* Size of the blocking queue to use when building a state history */
-        final int QUEUE_SIZE = 256;
+        final int QUEUE_SIZE = 10000;
 
         try {
             IStateHistoryBackend backend = StateHistoryBackendFactory.createHistoryTreeBackendNewFile(
