@@ -12,7 +12,7 @@
 package org.eclipse.tracecompass.ctf.core.event.types;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
@@ -53,10 +53,10 @@ public abstract class Declaration implements IDeclaration {
      *
      * @param input
      *            The bitbuffer that is being read
-     * @throws CTFReaderException
+     * @throws CTFException
      *             Happens when there is an out of bounds exception
      */
-    protected final void alignRead(BitBuffer input) throws CTFReaderException {
+    protected final void alignRead(BitBuffer input) throws CTFException {
         long mask = getAlignment() - 1;
         /*
          * The alignment is a power of 2

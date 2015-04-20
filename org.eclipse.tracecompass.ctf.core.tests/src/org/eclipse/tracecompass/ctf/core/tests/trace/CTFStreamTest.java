@@ -20,7 +20,7 @@ import java.io.FilenameFilter;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
@@ -57,10 +57,10 @@ public class CTFStreamTest {
     /**
      * Perform pre-test initialization.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      */
     @Before
-    public void setUp() throws CTFReaderException {
+    public void setUp() throws CTFException {
         fixture = new CTFStream(testTrace.getTrace());
         fixture.setEventContext(new StructDeclaration(1L));
         fixture.setPacketContext(new StructDeclaration(1L));
@@ -91,10 +91,10 @@ public class CTFStreamTest {
     /**
      * Run the Stream(CTFTrace) constructor test.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      */
     @Test
-    public void testStream() throws CTFReaderException {
+    public void testStream() throws CTFException {
         CTFTrace trace = testTrace.getTrace();
         CTFStream result = new CTFStream(trace);
         assertNotNull(result);

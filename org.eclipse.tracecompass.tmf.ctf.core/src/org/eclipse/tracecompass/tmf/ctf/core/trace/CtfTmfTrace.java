@@ -33,7 +33,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.CTFCallsite;
 import org.eclipse.tracecompass.ctf.core.event.CTFClock;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
@@ -188,7 +188,7 @@ public class CtfTmfTrace extends TmfTrace
                     }
                 }
             }
-        } catch (final CTFReaderException e) {
+        } catch (final CTFException e) {
             /*
              * If it failed at the init(), we can assume it's because the file
              * was not found or was not recognized as a CTF trace. Throw into
@@ -234,7 +234,7 @@ public class CtfTmfTrace extends TmfTrace
                 }
             }
             return new CtfTraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID, trace.getEnvironment());
-        } catch (final CTFReaderException e) {
+        } catch (final CTFException e) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + e.toString()); //$NON-NLS-1$
         } catch (final BufferOverflowException e) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + Messages.CtfTmfTrace_BufferOverflowErrorMessage); //$NON-NLS-1$
@@ -525,7 +525,7 @@ public class CtfTmfTrace extends TmfTrace
     public ITmfContext createIterator() {
         try {
             return new CtfIterator(fTrace, this);
-        } catch (CTFReaderException e) {
+        } catch (CTFException e) {
             Activator.getDefault().logError(e.getMessage(), e);
         }
         return null;
@@ -544,7 +544,7 @@ public class CtfTmfTrace extends TmfTrace
     public ITmfContext createIterator(CtfLocationInfo ctfLocationData, long rank) {
         try {
             return new CtfIterator(fTrace, this, ctfLocationData, rank);
-        } catch (CTFReaderException e) {
+        } catch (CTFException e) {
             Activator.getDefault().logError(e.getMessage(), e);
         }
         return null;

@@ -17,7 +17,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
@@ -42,10 +42,10 @@ public class CTFTraceReaderTest {
     /**
      * Perform pre-test initialization.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      */
     @Before
-    public void setUp() throws CTFReaderException {
+    public void setUp() throws CTFException {
         assumeTrue(testTrace.exists());
         fixture = new CTFTraceReader(testTrace.getTrace());
     }
@@ -54,10 +54,10 @@ public class CTFTraceReaderTest {
      * Run the CTFTraceReader(CTFTrace) constructor test. Open a known good
      * trace.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      */
     @Test
-    public void testOpen_existing() throws CTFReaderException {
+    public void testOpen_existing() throws CTFException {
         CTFTrace trace = testTrace.getTrace();
         try (CTFTraceReader result = new CTFTraceReader(trace);) {
             assertNotNull(result);
@@ -68,10 +68,10 @@ public class CTFTraceReaderTest {
      * Run the CTFTraceReader(CTFTrace) constructor test. Open a non-existing
      * trace, expect the exception.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      */
-    @Test(expected = org.eclipse.tracecompass.ctf.core.CTFReaderException.class)
-    public void testOpen_nonexisting() throws CTFReaderException {
+    @Test(expected = org.eclipse.tracecompass.ctf.core.CTFException.class)
+    public void testOpen_nonexisting() throws CTFException {
         CTFTrace trace = new CTFTrace("badfile.bad");
         try (CTFTraceReader result = new CTFTraceReader(trace);) {
             assertNotNull(result);
@@ -82,10 +82,10 @@ public class CTFTraceReaderTest {
      * Run the CTFTraceReader(CTFTrace) constructor test. Try to pen an invalid
      * path, expect exception.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      */
-    @Test(expected = org.eclipse.tracecompass.ctf.core.CTFReaderException.class)
-    public void testOpen_invalid() throws CTFReaderException {
+    @Test(expected = org.eclipse.tracecompass.ctf.core.CTFException.class)
+    public void testOpen_invalid() throws CTFException {
         CTFTrace trace = new CTFTrace("");
         try (CTFTraceReader result = new CTFTraceReader(trace);) {
             assertNotNull(result);
@@ -95,11 +95,11 @@ public class CTFTraceReaderTest {
     /**
      * Run the boolean advance() method test. Test advancing normally.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testAdvance_normal() throws CTFReaderException {
+    public void testAdvance_normal() throws CTFException {
         boolean result = fixture.advance();
         assertTrue(result);
     }
@@ -108,11 +108,11 @@ public class CTFTraceReaderTest {
      * Run the boolean advance() method test. Test advancing when we're at the
      * end, so we expect that there is no more events.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testAdvance_end() throws CTFReaderException {
+    public void testAdvance_end() throws CTFException {
         int i = 0;
         boolean result = fixture.advance();
         while (result) {
@@ -135,11 +135,11 @@ public class CTFTraceReaderTest {
     /**
      * Run the CTFTraceReader copy constructor test.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testCopyFrom() throws CTFReaderException {
+    public void testCopyFrom() throws CTFException {
         try (CTFTraceReader result = fixture.copyFrom();) {
             assertNotNull(result);
         }
@@ -161,10 +161,10 @@ public class CTFTraceReaderTest {
      * Both trace reader are different objects, so they shouldn't "equals" each
      * other.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      */
     @Test
-    public void testEquals() throws CTFReaderException {
+    public void testEquals() throws CTFException {
         try (CTFTraceReader fixture2 = new CTFTraceReader(testTrace.getTrace());) {
             assertEquals(fixture, fixture2);
         }
@@ -184,11 +184,11 @@ public class CTFTraceReaderTest {
      * Run the getCurrentEventDef() method test. Get the last event's
      * definition.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testGetCurrentEventDef_last() throws CTFReaderException {
+    public void testGetCurrentEventDef_last() throws CTFException {
         fixture.goToLastEvent();
         EventDefinition result = fixture.getCurrentEventDef();
         assertNotNull(result);
@@ -215,11 +215,11 @@ public class CTFTraceReaderTest {
     /**
      * Run the void goToLastEvent() method test.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testGoToLastEvent() throws CTFReaderException {
+    public void testGoToLastEvent() throws CTFException {
         fixture.goToLastEvent();
         long ts1 = getTimestamp();
         long ts2 = fixture.getEndTime();
@@ -229,7 +229,7 @@ public class CTFTraceReaderTest {
     /**
      * Run the boolean hasMoreEvents() method test.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      */
     @Test
     public void testHasMoreEvents() {
@@ -240,11 +240,11 @@ public class CTFTraceReaderTest {
     /**
      * Run the void printStats() method test with no 'width' parameter.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testPrintStats_noparam() throws CTFReaderException {
+    public void testPrintStats_noparam() throws CTFException {
         fixture.advance();
         fixture.printStats();
     }
@@ -252,11 +252,11 @@ public class CTFTraceReaderTest {
     /**
      * Run the void printStats(int) method test with width = 0.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testPrintStats_width0() throws CTFReaderException {
+    public void testPrintStats_width0() throws CTFException {
         fixture.advance();
         fixture.printStats(0);
     }
@@ -264,11 +264,11 @@ public class CTFTraceReaderTest {
     /**
      * Run the void printStats(int) method test with width = 1.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testPrintStats_width1() throws CTFReaderException {
+    public void testPrintStats_width1() throws CTFException {
         fixture.advance();
         fixture.printStats(1);
     }
@@ -276,11 +276,11 @@ public class CTFTraceReaderTest {
     /**
      * Run the void printStats(int) method test with width = 2.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testPrintStats_width2() throws CTFReaderException {
+    public void testPrintStats_width2() throws CTFException {
         fixture.advance();
         fixture.printStats(2);
     }
@@ -288,11 +288,11 @@ public class CTFTraceReaderTest {
     /**
      * Run the void printStats(int) method test with width = 10.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testPrintStats_width10() throws CTFReaderException {
+    public void testPrintStats_width10() throws CTFException {
         fixture.advance();
         fixture.printStats(10);
     }
@@ -300,11 +300,11 @@ public class CTFTraceReaderTest {
     /**
      * Run the void printStats(int) method test with width = 100.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testPrintStats_100() throws CTFReaderException {
+    public void testPrintStats_100() throws CTFException {
         for (int i = 0; i < 1000; i++) {
             fixture.advance();
         }
@@ -314,11 +314,11 @@ public class CTFTraceReaderTest {
     /**
      * Run the boolean seek(long) method test.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testSeek() throws CTFReaderException {
+    public void testSeek() throws CTFException {
         long timestamp = 1L;
         boolean result = fixture.seek(timestamp);
         assertTrue(result);

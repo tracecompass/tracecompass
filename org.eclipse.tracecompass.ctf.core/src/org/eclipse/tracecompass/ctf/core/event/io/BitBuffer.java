@@ -22,7 +22,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 
 /**
  * <b><u>BitBuffer</u></b>
@@ -107,11 +107,11 @@ public final class BitBuffer {
      * byte order.
      *
      * @return The int value (signed) read from the buffer
-     * @throws CTFReaderException
+     * @throws CTFException
      *             An error occurred reading the long. This exception can be
      *             raised if the buffer tries to read out of bounds
      */
-    public int getInt() throws CTFReaderException {
+    public int getInt() throws CTFException {
         return getInt(BIT_INT, true);
     }
 
@@ -122,11 +122,11 @@ public final class BitBuffer {
      * byte order.
      *
      * @return The long value (signed) read from the buffer
-     * @throws CTFReaderException
+     * @throws CTFException
      *             An error occurred reading the long. This exception can be
      *             raised if the buffer tries to read out of bounds
      */
-    public long getLong() throws CTFReaderException {
+    public long getLong() throws CTFException {
         return get(BIT_LONG, true);
     }
 
@@ -142,14 +142,14 @@ public final class BitBuffer {
      * @param signed
      *            The sign extended flag
      * @return The long value read from the buffer
-     * @throws CTFReaderException
+     * @throws CTFException
      *             An error occurred reading the data. If more than 64 bits at a
      *             time are read, or the buffer is read beyond its end, this
      *             exception will be raised.
      */
-    public long get(int length, boolean signed) throws CTFReaderException {
+    public long get(int length, boolean signed) throws CTFException {
         if (length > BIT_LONG) {
-            throw new CTFReaderException("Cannot read a long longer than 64 bits. Rquested: " + length); //$NON-NLS-1$
+            throw new CTFException("Cannot read a long longer than 64 bits. Rquested: " + length); //$NON-NLS-1$
         }
         if (length > BIT_INT) {
             final int highShift = length - BIT_INT;
@@ -205,11 +205,11 @@ public final class BitBuffer {
      * @param signed
      *            The sign extended flag
      * @return The int value read from the buffer
-     * @throws CTFReaderException
+     * @throws CTFException
      *             An error occurred reading the data. When the buffer is read
      *             beyond its end, this exception will be raised.
      */
-    private int getInt(int length, boolean signed) throws CTFReaderException {
+    private int getInt(int length, boolean signed) throws CTFException {
 
         /* Nothing to read. */
         if (length == 0) {
@@ -218,7 +218,7 @@ public final class BitBuffer {
 
         /* Validate that the buffer has enough bits. */
         if (!canRead(length)) {
-            throw new CTFReaderException("Cannot read the integer, " + //$NON-NLS-1$
+            throw new CTFException("Cannot read the integer, " + //$NON-NLS-1$
                     "the buffer does not have enough remaining space. " + //$NON-NLS-1$
                     "Requested:" + length); //$NON-NLS-1$
         }
@@ -402,11 +402,11 @@ public final class BitBuffer {
      *
      * @param value
      *            The int value to write
-     * @throws CTFReaderException
+     * @throws CTFException
      *             An error occurred writing the data. If the buffer is written
      *             beyond its end, this exception will be raised.
      */
-    public void putInt(int value) throws CTFReaderException {
+    public void putInt(int value) throws CTFException {
         putInt(BIT_INT, value);
     }
 
@@ -423,15 +423,15 @@ public final class BitBuffer {
      *            The number of bits to write
      * @param value
      *            The value to write
-     * @throws CTFReaderException
+     * @throws CTFException
      *             An error occurred writing the data. If the buffer is written
      *             beyond its end, this exception will be raised.
      */
-    public void putInt(int length, int value) throws CTFReaderException {
+    public void putInt(int length, int value) throws CTFException {
         final long curPos = fPosition;
 
         if (!canRead(length)) {
-            throw new CTFReaderException("Cannot write to bitbuffer, " //$NON-NLS-1$
+            throw new CTFException("Cannot write to bitbuffer, " //$NON-NLS-1$
                     + "insufficient space. Requested: " + length); //$NON-NLS-1$
         }
         if (length == 0) {
@@ -618,13 +618,13 @@ public final class BitBuffer {
      *
      * @param newPosition
      *            The new position of the buffer.
-     * @throws CTFReaderException
+     * @throws CTFException
      *             Thrown on out of bounds exceptions
      */
-    public void position(long newPosition) throws CTFReaderException {
+    public void position(long newPosition) throws CTFException {
 
         if (newPosition > fBitCapacity) {
-            throw new CTFReaderException("Out of bounds exception on a position move, attempting to access position: " + newPosition); //$NON-NLS-1$
+            throw new CTFException("Out of bounds exception on a position move, attempting to access position: " + newPosition); //$NON-NLS-1$
         }
         fPosition = newPosition;
     }

@@ -19,7 +19,7 @@ import static org.junit.Assume.assumeTrue;
 import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
@@ -78,7 +78,7 @@ public class TraceReadBenchmark {
                         traceReader.advance();
                     }
                 }
-            } catch (CTFReaderException e) {
+            } catch (CTFException e) {
                 /* Should not happen if assumeTrue() passed above */
                 fail("Test failed at iteration " + loop + ':' + e.getMessage());
             }

@@ -23,7 +23,7 @@ import java.util.Random;
 import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
@@ -56,15 +56,15 @@ public class TraceSeekBenchmark {
     /**
      * Run the benchmark scenario for the trace "kernel"
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             Should not happen
      */
     @Test
-    public void testKernelTrace() throws CTFReaderException {
+    public void testKernelTrace() throws CTFException {
         readAndSeekTrace(CtfTestTrace.KERNEL, "trace-kernel", true);
     }
 
-    private static void readAndSeekTrace(CtfTestTrace testTrace, String testName, boolean inGlobalSummary) throws CTFReaderException {
+    private static void readAndSeekTrace(CtfTestTrace testTrace, String testName, boolean inGlobalSummary) throws CTFException {
         assumeTrue(testTrace.exists());
 
         Performance perf = Performance.getDefault();
@@ -108,7 +108,7 @@ public class TraceSeekBenchmark {
                 }
                 pm.stop();
 
-            } catch (CTFReaderException e) {
+            } catch (CTFException e) {
                 /* Should not happen if assumeTrue() passed above */
                 fail("Test failed at iteration " + loop + ':' + e.getMessage());
             }

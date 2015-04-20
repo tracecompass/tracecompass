@@ -15,7 +15,7 @@ package org.eclipse.tracecompass.ctf.core.event.types;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 
@@ -123,12 +123,12 @@ public class StringDeclaration extends Declaration {
 
     @Override
     public StringDefinition createDefinition(@Nullable IDefinitionScope definitionScope,
-            String fieldName, BitBuffer input) throws CTFReaderException {
+            String fieldName, BitBuffer input) throws CTFException {
         String value = read(input);
         return new StringDefinition(this, definitionScope, fieldName, value);
     }
 
-    private String read(BitBuffer input) throws CTFReaderException {
+    private String read(BitBuffer input) throws CTFException {
         /* Offset the buffer position wrt the current alignment */
         alignRead(input);
 

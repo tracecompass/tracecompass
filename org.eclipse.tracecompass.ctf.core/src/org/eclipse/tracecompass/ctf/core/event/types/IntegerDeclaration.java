@@ -21,7 +21,7 @@ import java.nio.ByteOrder;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 
@@ -347,7 +347,7 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
 
     @Override
     public IntegerDefinition createDefinition(@Nullable IDefinitionScope definitionScope,
-            String fieldName, BitBuffer input) throws CTFReaderException {
+            String fieldName, BitBuffer input) throws CTFException {
         ByteOrder byteOrder = input.getByteOrder();
         input.setByteOrder(fByteOrder);
         long value = read(input);
@@ -400,7 +400,7 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
         return checkNotNull(BigInteger.ONE.shiftLeft(significantBits).negate());
     }
 
-    private long read(BitBuffer input) throws CTFReaderException {
+    private long read(BitBuffer input) throws CTFException {
         /* Offset the buffer position wrt the current alignment */
         alignRead(input);
 
@@ -419,7 +419,7 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
         }
 
         if (length > SIZE_64) {
-            throw new CTFReaderException("Cannot read an integer with over 64 bits. Length given: " + length); //$NON-NLS-1$
+            throw new CTFException("Cannot read an integer with over 64 bits. Length given: " + length); //$NON-NLS-1$
         }
 
         bits = input.get(length, signed);

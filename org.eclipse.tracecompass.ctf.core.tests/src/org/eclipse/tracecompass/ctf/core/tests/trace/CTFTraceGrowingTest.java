@@ -23,7 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
@@ -50,11 +50,11 @@ public class CTFTraceGrowingTest {
      *             an IO error
      * @throws FileNotFoundException
      *             file's not there
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error in metadata
      */
     @Before
-    public void init() throws FileNotFoundException, IOException, CTFReaderException {
+    public void init() throws FileNotFoundException, IOException, CTFException {
         Metadata md = new Metadata(fixture);
         File metadata = new File(fPathName + "/" + "metadata");
 
@@ -73,11 +73,11 @@ public class CTFTraceGrowingTest {
     /**
      * Empty trace test
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             will not happen
      */
     @Test
-    public void testEmptyStream() throws CTFReaderException {
+    public void testEmptyStream() throws CTFException {
         try (CTFTraceReader reader = new CTFTraceReader(fixture);) {
             assertNull(reader.getCurrentEventDef());
         }
@@ -86,11 +86,11 @@ public class CTFTraceGrowingTest {
     /**
      * Add a stream
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             should not happen
      */
     @Test
-    public void testAddStream() throws CTFReaderException {
+    public void testAddStream() throws CTFException {
         File stream = new File(fPathName + "/" + "channel1");
         try (CTFTraceReader reader = new CTFTraceReader(fixture);) {
             fixture.addStreamFile(stream);
@@ -103,11 +103,11 @@ public class CTFTraceGrowingTest {
     /**
      * Adds two a stream
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             should not happen
      */
     @Test
-    public void testAddTwoStreams1() throws CTFReaderException {
+    public void testAddTwoStreams1() throws CTFException {
         File stream = new File(fPathName + "/" + "channel1");
         try (CTFTraceReader reader = new CTFTraceReader(fixture);) {
             fixture.addStreamFile(stream);
@@ -124,11 +124,11 @@ public class CTFTraceGrowingTest {
     /**
      * Adds two a stream
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             should not happen
      */
     @Test
-    public void testAddTwoStreams2() throws CTFReaderException {
+    public void testAddTwoStreams2() throws CTFException {
         File stream = new File(fPathName + "/" + "channel1");
         try (CTFTraceReader reader = new CTFTraceReader(fixture);) {
             fixture.addStreamFile(stream);
@@ -147,11 +147,11 @@ public class CTFTraceGrowingTest {
     /**
      * Tests that update does not change the position
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             should not happen
      */
     @Test
-    public void testAddTwoStreams3() throws CTFReaderException {
+    public void testAddTwoStreams3() throws CTFException {
         File stream = new File(fPathName + "/" + "channel1");
         try (CTFTraceReader reader = new CTFTraceReader(fixture);) {
             fixture.addStreamFile(stream);
@@ -175,11 +175,11 @@ public class CTFTraceGrowingTest {
     /**
      * Test adding a bad stream
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             should happen
      */
-    @Test(expected = CTFReaderException.class)
-    public void testAddStreamFail() throws CTFReaderException {
+    @Test(expected = CTFException.class)
+    public void testAddStreamFail() throws CTFException {
         File stream = new File(fPathName + "/" + "metadata");
         try (CTFTraceReader reader = new CTFTraceReader(fixture);) {
             fixture.addStreamFile(stream);

@@ -23,7 +23,7 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
 import org.junit.Rule;
@@ -191,7 +191,7 @@ public class CtfTestSuiteTests {
 
                 checkIfWeShoudlSucceed();
             }
-        } catch (CTFReaderException e) {
+        } catch (CTFException e) {
             checkIfWeShouldFail(e);
         } catch (OutOfMemoryError e) {
             checkIfWeShouldFail(e);

@@ -25,7 +25,7 @@ import java.io.File;
 import java.nio.ByteOrder;
 import java.util.UUID;
 
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.CTFClock;
 import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
@@ -56,7 +56,7 @@ public class CTFTraceTest {
         assumeTrue(testTrace.exists());
         try {
             fixture = testTrace.getTraceFromFile();
-        } catch (CTFReaderException e) {
+        } catch (CTFException e) {
             /* If the assumeTrue() call passed, this should not happen. */
             fail();
         }
@@ -75,7 +75,7 @@ public class CTFTraceTest {
         try {
             CTFTrace result = testTrace.getTraceFromFile();
             assertNotNull(result.getUUID());
-        } catch (CTFReaderException e) {
+        } catch (CTFException e) {
             fail();
         }
     }
@@ -83,11 +83,11 @@ public class CTFTraceTest {
     /**
      * Run the CTFTrace(File) constructor test with an invalid path.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             is expected
      */
-    @Test(expected = org.eclipse.tracecompass.ctf.core.CTFReaderException.class)
-    public void testOpen_invalid() throws CTFReaderException {
+    @Test(expected = org.eclipse.tracecompass.ctf.core.CTFException.class)
+    public void testOpen_invalid() throws CTFException {
         File path = new File("");
         CTFTrace result = new CTFTrace(path);
         assertNotNull(result);
@@ -116,7 +116,7 @@ public class CTFTraceTest {
             CTFStream stream = new CTFStream(testTrace.getTrace());
             stream.setId(1234);
             fixture.addStream(stream);
-        } catch (CTFReaderException e) {
+        } catch (CTFException e) {
             fail();
         } catch (ParseException e) {
             fail();
@@ -265,7 +265,7 @@ public class CTFTraceTest {
 
             boolean result = fixture2.packetHeaderIsSet();
             assertFalse(result);
-        } catch (CTFReaderException e) {
+        } catch (CTFException e) {
             fail();
         }
     }
@@ -390,11 +390,11 @@ public class CTFTraceTest {
     /**
      * Test for getCallsite(eventName, ip)
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             not expected
      */
     @Test
-    public void callsitePosition() throws CTFReaderException {
+    public void callsitePosition() throws CTFException {
         long ip1 = 2;
         long ip2 = 5;
         long ip3 = 7;

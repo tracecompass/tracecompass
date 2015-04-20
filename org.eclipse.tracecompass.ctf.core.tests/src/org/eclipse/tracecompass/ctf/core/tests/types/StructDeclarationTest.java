@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.nio.ByteBuffer;
 
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.types.Encoding;
 import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
@@ -75,11 +75,11 @@ public class StructDeclarationTest {
      * Run the StructDefinition createDefinition(DefinitionScope,String) method
      * test.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             out of bounds
      */
     @Test
-    public void testCreateDefinition() throws CTFReaderException {
+    public void testCreateDefinition() throws CTFException {
         String fieldName = "";
         ByteBuffer allocate = ByteBuffer.allocate(100);
         if (allocate == null) {

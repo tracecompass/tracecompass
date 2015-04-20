@@ -21,7 +21,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.types.Encoding;
 import org.eclipse.tracecompass.ctf.core.event.types.EnumDeclaration;
@@ -77,11 +77,11 @@ public class CtfTmfEventFieldTest {
      *
      * @throws UnsupportedEncodingException
      *             Thrown when UTF-8 encoding is not available.
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Before
-    public void setUp() throws UnsupportedEncodingException, CTFReaderException {
+    public void setUp() throws UnsupportedEncodingException, CTFException {
         final byte[] testStringBytes = TEST_STRING.getBytes("UTF-8");
 
         int capacity = 2048;

@@ -18,7 +18,7 @@ import static org.junit.Assert.assertNull;
 import java.nio.ByteBuffer;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.types.AbstractArrayDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.Encoding;
@@ -65,11 +65,11 @@ public class StructDefinitionTest {
     /**
      * Perform pre-test initialization.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             won't happen
      */
     @Before
-    public void setUp() throws CTFReaderException {
+    public void setUp() throws CTFException {
         StructDeclaration sDec = new StructDeclaration(12);
         IntegerDeclaration id = IntegerDeclaration.INT_32B_DECL;
         IntegerDeclaration lenDec = IntegerDeclaration.UINT_8_DECL;

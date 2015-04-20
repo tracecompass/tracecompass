@@ -18,7 +18,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,11 +37,11 @@ public class BitBufferTest {
     /**
      * Perform pre-test initialization.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             An error that cannot happen (position is under 128)
      */
     @Before
-    public void setUp() throws CTFReaderException {
+    public void setUp() throws CTFException {
         fixture = new BitBuffer(Util.testMemory(ByteBuffer.allocateDirect(1)));
         fixture.setByteOrder(ByteOrder.BIG_ENDIAN);
         fixture.position(1);
@@ -152,11 +152,11 @@ public class BitBufferTest {
     /**
      * Run the void position(int) method test.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             out of bounds? won't happen
      */
     @Test
-    public void testSetPosition() throws CTFReaderException {
+    public void testSetPosition() throws CTFException {
         int newPosition = 1;
         fixture.position(newPosition);
     }
@@ -194,11 +194,11 @@ public class BitBufferTest {
     /**
      * Test the get function
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             won't happen but we seek in a buffer
      */
     @Test
-    public void testGetBytesMiddle() throws CTFReaderException {
+    public void testGetBytesMiddle() throws CTFException {
         @NonNull
         byte[] data = new byte[5];
         // this string has been carefully selected and tested... don't change

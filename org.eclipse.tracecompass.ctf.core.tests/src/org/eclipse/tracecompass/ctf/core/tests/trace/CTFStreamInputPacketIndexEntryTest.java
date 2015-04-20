@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 import org.eclipse.tracecompass.ctf.core.event.types.Encoding;
@@ -72,11 +72,11 @@ public class CTFStreamInputPacketIndexEntryTest {
     /**
      * Test the constructor
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             exception
      */
     @Test
-    public void testStreamInputPacketIndexEntryConstructor1() throws CTFReaderException {
+    public void testStreamInputPacketIndexEntryConstructor1() throws CTFException {
         StructDeclaration sd = new StructDeclaration(8);
         sd.addField("timestamp_begin", IntegerDeclaration.INT_32B_DECL);
         sd.addField("timestamp_end", IntegerDeclaration.INT_32B_DECL);
@@ -101,11 +101,11 @@ public class CTFStreamInputPacketIndexEntryTest {
     /**
      * Test the constructor
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             exception
      */
     @Test
-    public void testStreamInputPacketIndexEntryConstructor2() throws CTFReaderException {
+    public void testStreamInputPacketIndexEntryConstructor2() throws CTFException {
         StructDeclaration sd = new StructDeclaration(8);
         sd.addField("timestamp_begin", IntegerDeclaration.INT_32B_DECL);
         sd.addField("timestamp_end", IntegerDeclaration.INT_32B_DECL);
@@ -130,11 +130,11 @@ public class CTFStreamInputPacketIndexEntryTest {
     /**
      * Test the constructor
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             exception
      */
     @Test
-    public void testStreamInputPacketIndexEntryConstructor3() throws CTFReaderException {
+    public void testStreamInputPacketIndexEntryConstructor3() throws CTFException {
         StructDeclaration sd = new StructDeclaration(8);
         sd.addField("timestamp_begin", IntegerDeclaration.INT_32B_DECL);
         sd.addField("timestamp_end", IntegerDeclaration.INT_32B_DECL);
@@ -163,11 +163,11 @@ public class CTFStreamInputPacketIndexEntryTest {
     /**
      * Test the constructor
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             exception
      */
     @Test
-    public void testStreamInputPacketIndexEntryConstructor4() throws CTFReaderException {
+    public void testStreamInputPacketIndexEntryConstructor4() throws CTFException {
         StructDeclaration sd = new StructDeclaration(8);
         sd.addField("content_size", IntegerDeclaration.INT_32B_DECL);
         sd.addField("target", StringDeclaration.getStringDeclaration(Encoding.ASCII));
@@ -188,11 +188,11 @@ public class CTFStreamInputPacketIndexEntryTest {
     /**
      * Test the constructor
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             exception
      */
     @Test
-    public void testStreamInputPacketIndexEntryConstructor5() throws CTFReaderException {
+    public void testStreamInputPacketIndexEntryConstructor5() throws CTFException {
         StructDeclaration sd = new StructDeclaration(8);
         sd.addField("timestamp_end", IntegerDeclaration.INT_32B_DECL);
         sd.addField("content_size", IntegerDeclaration.INT_32B_DECL);
@@ -216,11 +216,11 @@ public class CTFStreamInputPacketIndexEntryTest {
     /**
      * Test the constructor
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             exception
      */
     @Test
-    public void testStreamInputPacketIndexEntryConstructor6() throws CTFReaderException {
+    public void testStreamInputPacketIndexEntryConstructor6() throws CTFException {
         StructDeclaration sd = new StructDeclaration(8);
         sd.addField("timestamp_end", IntegerDeclaration.INT_32B_DECL);
         sd.addField("content_size", IntegerDeclaration.INT_32B_DECL);
@@ -246,11 +246,11 @@ public class CTFStreamInputPacketIndexEntryTest {
     /**
      * Run the String toString() method test.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             won't happen
      */
     @Test
-    public void testToString() throws CTFReaderException {
+    public void testToString() throws CTFException {
 
         String expectedResult = "StreamInputPacketIndexEntry [offsetBits=0, timestampBegin=0, timestampEnd=0]";
         StructDeclaration sd = new StructDeclaration(8);

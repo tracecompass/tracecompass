@@ -17,7 +17,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.event.types.AbstractArrayDefinition;
@@ -91,7 +91,7 @@ public class SequenceDeclaration extends CompoundDeclaration {
 
     @Override
     public AbstractArrayDefinition createDefinition(
-            @Nullable IDefinitionScope definitionScope, String fieldName, BitBuffer input) throws CTFReaderException {
+            @Nullable IDefinitionScope definitionScope, String fieldName, BitBuffer input) throws CTFException {
         IDefinition lenDef = null;
 
         if (definitionScope != null) {
@@ -99,22 +99,22 @@ public class SequenceDeclaration extends CompoundDeclaration {
         }
 
         if (lenDef == null) {
-            throw new CTFReaderException("Sequence length field not found"); //$NON-NLS-1$
+            throw new CTFException("Sequence length field not found"); //$NON-NLS-1$
         }
 
         if (!(lenDef instanceof IntegerDefinition)) {
-            throw new CTFReaderException("Sequence length field not integer"); //$NON-NLS-1$
+            throw new CTFException("Sequence length field not integer"); //$NON-NLS-1$
         }
 
         IntegerDefinition lengthDefinition = (IntegerDefinition) lenDef;
 
         if (lengthDefinition.getDeclaration().isSigned()) {
-            throw new CTFReaderException("Sequence length must not be signed"); //$NON-NLS-1$
+            throw new CTFException("Sequence length must not be signed"); //$NON-NLS-1$
         }
 
         long length = lengthDefinition.getValue();
         if ((length > Integer.MAX_VALUE) || (!input.canRead((int) length * fElemType.getMaximumSize()))) {
-            throw new CTFReaderException("Sequence length too long " + length); //$NON-NLS-1$
+            throw new CTFException("Sequence length too long " + length); //$NON-NLS-1$
         }
 
         if (isString()) {

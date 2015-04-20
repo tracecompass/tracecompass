@@ -19,7 +19,7 @@ import static org.junit.Assume.assumeTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDefinition;
@@ -101,7 +101,7 @@ public class TraceReadAllTracesTest {
                 }
                 assertEquals("Event count", fTraceEnum.getNbEvents(), count);
                 assertEquals("Trace duration", fTraceEnum.getDuration(), (end - start) / 1000000000.0, 1.0);
-            } catch (CTFReaderException e) {
+            } catch (CTFException e) {
                 fail(fTraceEnum.getPath() + " " + e.getMessage());
             }
         } else {

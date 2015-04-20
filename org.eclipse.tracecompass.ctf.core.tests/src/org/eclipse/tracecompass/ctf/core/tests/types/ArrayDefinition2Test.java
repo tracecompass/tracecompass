@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
@@ -201,11 +201,11 @@ public class ArrayDefinition2Test {
     /**
      * Run the void read(BitBuffer) method test.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testRead_noDefs() throws CTFReaderException {
+    public void testRead_noDefs() throws CTFException {
         BitBuffer input = new BitBuffer(Util.testMemory(ByteBuffer.allocateDirect(128)));
         charArrayFixture.getDeclaration().createDefinition(null, "test", input);
     }

@@ -15,7 +15,7 @@ package org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.equalsNullable;
 
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInputReader;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
@@ -64,11 +64,11 @@ public class CtfIterator extends CTFTraceReader
      *
      * @param ctfTmfTrace
      *            The {@link CtfTmfTrace} to iterate over
-     * @throws CTFReaderException
+     * @throws CTFException
      *             If the iterator couldn't not be instantiated, probably due to
      *             a read error.
      */
-    public CtfIterator(CTFTrace ctfTrace, CtfTmfTrace ctfTmfTrace) throws CTFReaderException {
+    public CtfIterator(CTFTrace ctfTrace, CtfTmfTrace ctfTmfTrace) throws CTFException {
         super(ctfTrace);
         fTrace = ctfTmfTrace;
         if (hasMoreEvents()) {
@@ -92,12 +92,12 @@ public class CtfIterator extends CTFTraceReader
      *            The initial timestamp the iterator will be pointing to
      * @param rank
      *            The initial rank
-     * @throws CTFReaderException
+     * @throws CTFException
      *             If the iterator couldn't not be instantiated, probably due to
      *             a read error.
      */
     public CtfIterator(CTFTrace ctfTrace, CtfTmfTrace ctfTmfTrace, CtfLocationInfo ctfLocationData, long rank)
-            throws CTFReaderException {
+            throws CTFException {
         super(ctfTrace);
 
         this.fTrace = ctfTmfTrace;
@@ -193,7 +193,7 @@ public class CtfIterator extends CTFTraceReader
             } else {
                 ret = super.seek(offsetTimestamp);
             }
-        } catch (CTFReaderException e) {
+        } catch (CTFException e) {
             Activator.getDefault().logError(e.getMessage(), e);
             return false;
         }
@@ -241,7 +241,7 @@ public class CtfIterator extends CTFTraceReader
         boolean ret = false;
         try {
             ret = super.advance();
-        } catch (CTFReaderException e) {
+        } catch (CTFException e) {
             Activator.getDefault().logError(e.getMessage(), e);
         }
 

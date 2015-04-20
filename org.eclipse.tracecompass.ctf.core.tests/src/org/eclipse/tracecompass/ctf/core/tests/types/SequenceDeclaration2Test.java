@@ -21,7 +21,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.types.AbstractArrayDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.Definition;
@@ -84,11 +84,11 @@ public class SequenceDeclaration2Test {
      * Run the SequenceDefinition createDefinition(DefinitionScope,String)
      * method test.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             an error in the bitbuffer
      */
     @Test
-    public void testCreateDefinition() throws CTFReaderException {
+    public void testCreateDefinition() throws CTFException {
         long seqLen = 2;
         IntegerDeclaration id = IntegerDeclaration.createDeclaration(8, false, 8,
                 ByteOrder.LITTLE_ENDIAN, Encoding.UTF8, "", 32);

@@ -20,7 +20,7 @@ import java.util.TreeSet;
 import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.CTFCallsite;
 import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
@@ -75,7 +75,7 @@ public class CTFTraceCallsitePerformanceTest {
     /**
      * sets up the test by making a new trace.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             an exception from the reader
      * @throws SecurityException
      *             an exception from accessing files illegally
@@ -83,7 +83,7 @@ public class CTFTraceCallsitePerformanceTest {
      *             an exception for passing bad values
      */
     @Before
-    public void setup() throws CTFReaderException, SecurityException,
+    public void setup() throws CTFException, SecurityException,
             IllegalArgumentException {
         assumeTrue(testTrace.exists());
         fTrace = new CTFTrace(testTrace.getPath());

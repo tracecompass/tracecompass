@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 
@@ -117,17 +117,17 @@ public class VariantDeclaration extends Declaration {
 
     @Override
     public VariantDefinition createDefinition(IDefinitionScope definitionScope,
-            String fieldName, BitBuffer input) throws CTFReaderException {
+            String fieldName, BitBuffer input) throws CTFException {
         alignRead(input);
         Definition def = definitionScope.lookupDefinition(fTag);
         EnumDefinition tagDef = (EnumDefinition) ((def instanceof EnumDefinition) ? def : null);
         if (tagDef == null) {
-            throw new CTFReaderException("Tag is not defined " + fTag); //$NON-NLS-1$
+            throw new CTFException("Tag is not defined " + fTag); //$NON-NLS-1$
         }
         String varFieldName = tagDef.getStringValue();
         fDeclarationToPopulate = fFields.get(varFieldName);
         if (fDeclarationToPopulate == null) {
-            throw new CTFReaderException("Unknown enum selector for variant " + //$NON-NLS-1$
+            throw new CTFException("Unknown enum selector for variant " + //$NON-NLS-1$
                     definitionScope.getScopePath().getPath());
         }
         Definition fieldValue = fDeclarationToPopulate.createDefinition(definitionScope, fieldName, input);

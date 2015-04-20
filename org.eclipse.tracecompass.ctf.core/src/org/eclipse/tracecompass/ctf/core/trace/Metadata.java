@@ -30,7 +30,7 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.RewriteCardinalityException;
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.parser.CTFLexer;
 import org.eclipse.tracecompass.ctf.parser.CTFParser;
 import org.eclipse.tracecompass.ctf.parser.CTFParser.parse_return;
@@ -129,10 +129,10 @@ public class Metadata {
     /**
      * Parse the metadata file.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             If there was a problem parsing the metadata
      */
-    public void parseFile() throws CTFReaderException {
+    public void parseFile() throws CTFException {
 
         /*
          * Reader. It will contain a StringReader if we are using packet-based
@@ -151,15 +151,15 @@ public class Metadata {
             readMetaDataText(metadataTextInput);
 
         } catch (FileNotFoundException e) {
-            throw new CTFReaderException("Cannot find metadata file!", e); //$NON-NLS-1$
+            throw new CTFException("Cannot find metadata file!", e); //$NON-NLS-1$
         } catch (IOException | ParseException e) {
-            throw new CTFReaderException(e);
+            throw new CTFException(e);
         } catch (RecognitionException | RewriteCardinalityException e) {
             throw new CtfAntlrException(e);
         }
     }
 
-    private Reader readBinaryMetaData(FileChannel metadataFileChannel) throws CTFReaderException {
+    private Reader readBinaryMetaData(FileChannel metadataFileChannel) throws CTFException {
         /* Create StringBuffer to receive metadata text */
         StringBuffer metadataText = new StringBuffer();
 
@@ -183,17 +183,17 @@ public class Metadata {
      *
      * @param data
      *            the data to read
-     * @throws CTFReaderException
+     * @throws CTFException
      *             this exception wraps a ParseException, IOException or
      *             CtfAntlrException, three exceptions that can be obtained from
      *             parsing a TSDL file
      */
-    public void parseText(String data) throws CTFReaderException {
+    public void parseText(String data) throws CTFException {
         Reader metadataTextInput = new StringReader(data);
         try {
             readMetaDataText(metadataTextInput);
         } catch (IOException | ParseException e) {
-            throw new CTFReaderException(e);
+            throw new CTFException(e);
         } catch (RecognitionException | RewriteCardinalityException e) {
             throw new CtfAntlrException(e);
         }
@@ -213,17 +213,17 @@ public class Metadata {
      *
      * @param dataFragment
      *            the data to read
-     * @throws CTFReaderException
+     * @throws CTFException
      *             this exception wraps a ParseException, IOException or
      *             CtfAntlrException, three exceptions that can be obtained from
      *             parsing a TSDL file
      */
-    public void parseTextFragment(String dataFragment) throws CTFReaderException {
+    public void parseTextFragment(String dataFragment) throws CTFException {
         Reader metadataTextInput = new StringReader(dataFragment);
         try {
             readMetaDataTextFragment(metadataTextInput);
         } catch (IOException | ParseException e) {
-            throw new CTFReaderException(e);
+            throw new CTFException(e);
         } catch (RecognitionException | RewriteCardinalityException e) {
             throw new CtfAntlrException(e);
         }
@@ -258,10 +258,10 @@ public class Metadata {
      * @param metadataFileChannel
      *            FileChannel of the metadata file.
      * @return True if the metadata is packet-based.
-     * @throws CTFReaderException
+     * @throws CTFException
      */
     private boolean isPacketBased(FileChannel metadataFileChannel)
-            throws CTFReaderException {
+            throws CTFException {
         /*
          * Create a ByteBuffer to read the TSDL magic number (default is
          * big-endian)
@@ -272,7 +272,7 @@ public class Metadata {
         try {
             metadataFileChannel.read(magicByteBuffer, 0);
         } catch (IOException e) {
-            throw new CTFReaderException("Unable to read metadata file channel.", e); //$NON-NLS-1$
+            throw new CTFException("Unable to read metadata file channel.", e); //$NON-NLS-1$
         }
 
         /* Get the first int from the file */
@@ -315,11 +315,11 @@ public class Metadata {
      *            StringBuffer to which the metadata text will be appended.
      * @return A structure describing the header of the metadata packet, or null
      *         if the end of the file is reached.
-     * @throws CTFReaderException
+     * @throws CTFException
      */
     private MetadataPacketHeader readMetadataPacket(
             FileChannel metadataFileChannel, StringBuffer metadataText)
-            throws CTFReaderException {
+            throws CTFException {
         /* Allocate a ByteBuffer for the header */
         ByteBuffer headerByteBuffer = ByteBuffer.allocate(METADATA_PACKET_HEADER_SIZE);
 
@@ -333,11 +333,11 @@ public class Metadata {
             }
 
             if (nbBytesRead != METADATA_PACKET_HEADER_SIZE) {
-                throw new CTFReaderException("Error reading the metadata header."); //$NON-NLS-1$
+                throw new CTFException("Error reading the metadata header."); //$NON-NLS-1$
             }
 
         } catch (IOException e) {
-            throw new CTFReaderException("Error reading the metadata header.", e); //$NON-NLS-1$
+            throw new CTFException("Error reading the metadata header.", e); //$NON-NLS-1$
         }
 
         /* Set ByteBuffer's position to 0 */
@@ -350,20 +350,20 @@ public class Metadata {
 
         /* Check TSDL magic number */
         if (!header.isMagicValid()) {
-            throw new CTFReaderException("TSDL magic number does not match"); //$NON-NLS-1$
+            throw new CTFException("TSDL magic number does not match"); //$NON-NLS-1$
         }
 
         /* Check UUID */
         if (!trace.uuidIsSet()) {
             trace.setUUID(header.getUuid());
         } else if (!trace.getUUID().equals(header.getUuid())) {
-            throw new CTFReaderException("UUID mismatch"); //$NON-NLS-1$
+            throw new CTFException("UUID mismatch"); //$NON-NLS-1$
         }
 
         /* Extract the text from the packet */
         int payloadSize = ((header.getContentSize() / BITS_PER_BYTE) - METADATA_PACKET_HEADER_SIZE);
         if (payloadSize < 0) {
-            throw new CTFReaderException("Invalid metadata packet payload size."); //$NON-NLS-1$
+            throw new CTFException("Invalid metadata packet payload size."); //$NON-NLS-1$
         }
         int skipSize = (header.getPacketSize() - header.getContentSize()) / BITS_PER_BYTE;
 
@@ -373,7 +373,7 @@ public class Metadata {
         try {
             metadataFileChannel.read(payloadByteBuffer);
         } catch (IOException e) {
-            throw new CTFReaderException("Error reading metadata packet payload.", e); //$NON-NLS-1$
+            throw new CTFException("Error reading metadata packet payload.", e); //$NON-NLS-1$
         }
         payloadByteBuffer.rewind();
 

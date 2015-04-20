@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.event.types.AbstractArrayDefinition;
@@ -73,11 +73,11 @@ public class ArrayDeclaration2Test {
      * Run the ArrayDefinition createDefinition(DefinitionScope,String) method
      * test.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error in the bitbuffer
      */
     @Test
-    public void testCreateDefinition() throws CTFReaderException {
+    public void testCreateDefinition() throws CTFException {
         String fieldName = "";
         IDefinitionScope definitionScope = null;
         AbstractArrayDefinition result;

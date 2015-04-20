@@ -18,7 +18,7 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.types.Encoding;
 import org.eclipse.tracecompass.ctf.core.event.types.EnumDeclaration;
@@ -324,11 +324,11 @@ public class EventHeaderDeclarationTest {
     /**
      * Test an compact compact header
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             if {@link BitBuffer} is null
      */
     @Test
-    public void testCompactCompact() throws CTFReaderException {
+    public void testCompactCompact() throws CTFException {
         ByteBuffer buffer = ByteBuffer.allocate(16);
         buffer.putInt(0x80000042);
         byte[] validCompact1 = buffer.array();
@@ -345,11 +345,11 @@ public class EventHeaderDeclarationTest {
     /**
      * Test an extended compact header
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             if {@link BitBuffer} is null
      */
     @Test
-    public void testCompactExtended() throws CTFReaderException {
+    public void testCompactExtended() throws CTFException {
         ByteBuffer buffer = ByteBuffer.allocate(16);
         buffer.put((byte) 0xFF);
         buffer.putInt(ID);
@@ -368,11 +368,11 @@ public class EventHeaderDeclarationTest {
     /**
      * Test an compact large header
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             if {@link BitBuffer} is null
      */
     @Test
-    public void testLargeCompact() throws CTFReaderException {
+    public void testLargeCompact() throws CTFException {
         ByteBuffer buffer = ByteBuffer.allocate(16);
         buffer.putShort((short) ID);
         buffer.putInt(TIMESTAMP);
@@ -392,11 +392,11 @@ public class EventHeaderDeclarationTest {
     /**
      * Test an large large header
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             if {@link BitBuffer} is null
      */
     @Test
-    public void testLargeExtended() throws CTFReaderException {
+    public void testLargeExtended() throws CTFException {
         ByteBuffer buffer = ByteBuffer.allocate(16);
         buffer.putShort((short) -1);
         buffer.putInt(ID);

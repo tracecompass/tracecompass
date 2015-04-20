@@ -16,7 +16,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.nio.ByteBuffer;
 
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.event.types.Encoding;
@@ -40,11 +40,11 @@ public class StringDefinitionTest {
     /**
      * Perform pre-test initialization.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             won't happen
      */
     @Before
-    public void setUp() throws CTFReaderException {
+    public void setUp() throws CTFException {
         String name = "testString";
         StringDeclaration stringDec = StringDeclaration.getStringDeclaration(Encoding.UTF8);
         ByteBuffer byteBuffer = ByteBuffer.allocate(100);

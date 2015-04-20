@@ -33,7 +33,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.CTFCallsite;
 import org.eclipse.tracecompass.ctf.core.event.CTFClock;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
@@ -149,10 +149,10 @@ public class CTFTrace implements IDefinitionScope {
      *
      * @param path
      *            Filesystem path of the trace directory
-     * @throws CTFReaderException
+     * @throws CTFException
      *             If no CTF trace was found at the path
      */
-    public CTFTrace(String path) throws CTFReaderException {
+    public CTFTrace(String path) throws CTFException {
         this(new File(path));
     }
 
@@ -161,20 +161,20 @@ public class CTFTrace implements IDefinitionScope {
      *
      * @param path
      *            Filesystem path of the trace directory.
-     * @throws CTFReaderException
+     * @throws CTFException
      *             If no CTF trace was found at the path
      */
-    public CTFTrace(File path) throws CTFReaderException {
+    public CTFTrace(File path) throws CTFException {
         fPath = path;
         final Metadata metadata = new Metadata(this);
 
         /* Set up the internal containers for this trace */
         if (!fPath.exists()) {
-            throw new CTFReaderException("Trace (" + path.getPath() + ") doesn't exist. Deleted or moved?"); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new CTFException("Trace (" + path.getPath() + ") doesn't exist. Deleted or moved?"); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         if (!fPath.isDirectory()) {
-            throw new CTFReaderException("Path must be a valid directory"); //$NON-NLS-1$
+            throw new CTFException("Path must be a valid directory"); //$NON-NLS-1$
         }
 
         /* Open and parse the metadata file */
@@ -190,7 +190,7 @@ public class CTFTrace implements IDefinitionScope {
         fPath = null;
     }
 
-    private void init(File path) throws CTFReaderException {
+    private void init(File path) throws CTFException {
 
         /* Open all the trace files */
 
@@ -442,16 +442,16 @@ public class CTFTrace implements IDefinitionScope {
      * @param index
      *            Which index in the class' streamFileChannel array this file
      *            must use
-     * @throws CTFReaderException
+     * @throws CTFException
      *             if there is a file error
      */
-    private CTFStream openStreamInput(File streamFile) throws CTFReaderException {
+    private CTFStream openStreamInput(File streamFile) throws CTFException {
         ByteBuffer byteBuffer;
         BitBuffer streamBitBuffer;
         CTFStream stream;
 
         if (!streamFile.canRead()) {
-            throw new CTFReaderException("Unreadable file : " //$NON-NLS-1$
+            throw new CTFException("Unreadable file : " //$NON-NLS-1$
                     + streamFile.getPath());
         }
 
@@ -470,7 +470,7 @@ public class CTFTrace implements IDefinitionScope {
             }
         } catch (IOException e) {
             /* Shouldn't happen at this stage if every other check passed */
-            throw new CTFReaderException(e);
+            throw new CTFException(e);
         }
         if (fPacketHeaderDef != null) {
             validateMagicNumber(fPacketHeaderDef);
@@ -495,7 +495,7 @@ public class CTFTrace implements IDefinitionScope {
         }
 
         if (stream == null) {
-            throw new CTFReaderException("Unexpected end of stream"); //$NON-NLS-1$
+            throw new CTFException("Unexpected end of stream"); //$NON-NLS-1$
         }
 
         /*
@@ -507,22 +507,22 @@ public class CTFTrace implements IDefinitionScope {
         return stream;
     }
 
-    private void validateUUID(StructDefinition packetHeaderDef) throws CTFReaderException {
+    private void validateUUID(StructDefinition packetHeaderDef) throws CTFException {
         IDefinition lookupDefinition = packetHeaderDef.lookupDefinition("uuid"); //$NON-NLS-1$
         ArrayDefinition uuidDef = (ArrayDefinition) lookupDefinition;
         if (uuidDef != null) {
             UUID otheruuid = Utils.getUUIDfromDefinition(uuidDef);
             if (!fUuid.equals(otheruuid)) {
-                throw new CTFReaderException("UUID mismatch"); //$NON-NLS-1$
+                throw new CTFException("UUID mismatch"); //$NON-NLS-1$
             }
         }
     }
 
-    private static void validateMagicNumber(StructDefinition packetHeaderDef) throws CTFReaderException {
+    private static void validateMagicNumber(StructDefinition packetHeaderDef) throws CTFException {
         IntegerDefinition magicDef = (IntegerDefinition) packetHeaderDef.lookupDefinition("magic"); //$NON-NLS-1$
         int magic = (int) magicDef.getValue();
         if (magic != Utils.CTF_MAGIC) {
-            throw new CTFReaderException("CTF magic mismatch"); //$NON-NLS-1$
+            throw new CTFException("CTF magic mismatch"); //$NON-NLS-1$
         }
     }
 
@@ -564,10 +564,10 @@ public class CTFTrace implements IDefinitionScope {
      *
      * @param streamFile
      *            the file of the stream
-     * @throws CTFReaderException
+     * @throws CTFException
      *             A stream had an issue being read
      */
-    public void addStreamFile(File streamFile) throws CTFReaderException {
+    public void addStreamFile(File streamFile) throws CTFException {
         openStreamInput(streamFile);
     }
 
@@ -885,14 +885,14 @@ public class CTFTrace implements IDefinitionScope {
      *            the ID of the stream
      * @param streamFile
      *            new file in the stream
-     * @throws CTFReaderException
+     * @throws CTFException
      *             The file must exist
      */
-    public void addStream(long id, File streamFile) throws CTFReaderException {
+    public void addStream(long id, File streamFile) throws CTFException {
         CTFStream stream = null;
         final File file = streamFile;
         if (file == null) {
-            throw new CTFReaderException("cannot create a stream with no file"); //$NON-NLS-1$
+            throw new CTFException("cannot create a stream with no file"); //$NON-NLS-1$
         }
         if (fStreams.containsKey(id)) {
             stream = fStreams.get(id);

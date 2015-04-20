@@ -19,14 +19,14 @@ package org.eclipse.tracecompass.ctf.core;
  * @author Alexandre Montplaisir
  * @since 1.0
  */
-public class CTFReaderException extends Exception {
+public class CTFException extends Exception {
 
     private static final long serialVersionUID = 2065258365219777672L;
 
     /**
      * Default constructor with no message.
      */
-    public CTFReaderException() {
+    public CTFException() {
         super();
     }
 
@@ -36,7 +36,7 @@ public class CTFReaderException extends Exception {
      * @param message
      *            The message attached to this exception
      */
-    public CTFReaderException(String message) {
+    public CTFException(String message) {
         super(message);
     }
 
@@ -46,7 +46,7 @@ public class CTFReaderException extends Exception {
      * @param e
      *            The previous Exception we caught
      */
-    public CTFReaderException(Exception e) {
+    public CTFException(Exception e) {
         super(e);
     }
 
@@ -58,7 +58,7 @@ public class CTFReaderException extends Exception {
      * @param exception
      *            The previous Exception caught
      */
-    public CTFReaderException(String message, Throwable exception) {
+    public CTFException(String message, Throwable exception) {
         super(message, exception);
     }
 

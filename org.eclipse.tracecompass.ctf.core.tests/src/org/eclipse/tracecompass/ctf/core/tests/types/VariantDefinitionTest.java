@@ -19,7 +19,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.event.types.AbstractArrayDefinition;
@@ -75,11 +75,11 @@ public class VariantDefinitionTest {
      *
      * Not sure it needs to be that complicated, oh well...
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             won't happen
      */
     @Before
-    public void setUp() throws CTFReaderException {
+    public void setUp() throws CTFException {
         StructDeclaration sDec = new StructDeclaration(12);
         StructDeclaration smallStruct = new StructDeclaration(8);
         IntegerDeclaration iDec = IntegerDeclaration.createDeclaration(32, false, 32, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 8);
@@ -124,11 +124,11 @@ public class VariantDefinitionTest {
     /**
      * Run the VariantDefinition(VariantDeclaration,DefinitionScope,String)
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             should not happen
      */
     @Test
-    public void testVariantDefinition() throws CTFReaderException {
+    public void testVariantDefinition() throws CTFException {
         VariantDeclaration declaration = new VariantDeclaration();
         declaration.setTag("");
         VariantDeclaration variantDeclaration = new VariantDeclaration();

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStream;
@@ -167,10 +167,10 @@ public class MetadataTest {
     /**
      * Perform pre-test initialization.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      */
     @Before
-    public void setUp() throws CTFReaderException {
+    public void setUp() throws CTFException {
         assumeTrue(testTrace.exists());
         fixture = new Metadata(testTrace.getTrace());
     }
@@ -184,11 +184,11 @@ public class MetadataTest {
     }
 
     @Test
-    public void testTextMD() throws CTFReaderException {
+    public void testTextMD() throws CTFException {
         testSingleFragment();
     }
 
-    protected CTFTrace testSingleFragment() throws CTFReaderException {
+    protected CTFTrace testSingleFragment() throws CTFException {
         fixture = new Metadata();
         CTFTrace trace = fixture.getTrace();
         for (CTFStream s : trace.getStreams()) {
@@ -206,7 +206,7 @@ public class MetadataTest {
     }
 
     @Test
-    public void testStreamTextMD() throws CTFReaderException {
+    public void testStreamTextMD() throws CTFException {
         CTFTrace trace = testSingleFragment();
         fixture.parseTextFragment(mdSecond);
         final List<IEventDeclaration> eventDeclarations = new ArrayList<>(trace.getEventDeclarations(0L));
@@ -217,10 +217,10 @@ public class MetadataTest {
     /**
      * Run the ByteOrder getDetectedByteOrder() method test.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      */
     @Test
-    public void testGetDetectedByteOrder() throws CTFReaderException {
+    public void testGetDetectedByteOrder() throws CTFException {
         setUp();
         ByteOrder result = fixture.getDetectedByteOrder();
         assertNull(result);
@@ -229,10 +229,10 @@ public class MetadataTest {
     /**
      * Test toString
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      */
     @Test
-    public void testToString() throws CTFReaderException {
+    public void testToString() throws CTFException {
         setUp();
         String result = fixture.toString();
         assertNotNull(result);
@@ -241,10 +241,10 @@ public class MetadataTest {
     /**
      * Run the void parse() method test.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      */
     @Test
-    public void testParse() throws CTFReaderException {
+    public void testParse() throws CTFException {
         setUp();
         assertEquals(new UUID(0xd18e637435a1cd42L, 0x8e70a9cffa712793L), testTrace.getTrace().getUUID());
         assertEquals(1332166405241713920.0, testTrace.getTrace().getClock().getClockOffset(), 200.0);

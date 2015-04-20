@@ -17,19 +17,19 @@ import java.lang.reflect.Field;
 
 import org.antlr.runtime.MismatchedTokenException;
 import org.antlr.runtime.RecognitionException;
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.parser.CTFLexer;
 
 /**
  * CTF Reader exception but dealing with Antlr-specific parsing problems.
  *
- * It is separated from the main {@link CTFReaderException} - and is not part of
+ * It is separated from the main {@link CTFException} - and is not part of
  * the API - to isolate the Antlr-specific classes and avoid pushing that
  * dependency to the users of this plugin.
  *
  * @author Matthew Khouzam
  */
-public class CtfAntlrException extends CTFReaderException {
+public class CtfAntlrException extends CTFException {
 
     private static final long serialVersionUID = -7078624493350073777L;
 

@@ -21,7 +21,7 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IEventHeaderDeclaration;
@@ -306,12 +306,12 @@ public class CTFStream {
      *
      * @param events
      *            list of the events to add
-     * @throws CTFReaderException
+     * @throws CTFException
      *             if the list already contains data
      */
-    public void addEvents(Collection<IEventDeclaration> events) throws CTFReaderException {
+    public void addEvents(Collection<IEventDeclaration> events) throws CTFException {
         if (fEventUnsetId) {
-            throw new CTFReaderException("Cannot add to a stream with an unidentified event"); //$NON-NLS-1$
+            throw new CTFException("Cannot add to a stream with an unidentified event"); //$NON-NLS-1$
         }
         if (fEvents.isEmpty()) {
             fEvents.addAll(events);
@@ -322,7 +322,7 @@ public class CTFStream {
                 int index = event.getId().intValue();
                 ensureSize(fEvents, index);
                 if (fEvents.get(index) != null) {
-                    throw new CTFReaderException("Both lists have an event defined at position " + index); //$NON-NLS-1$
+                    throw new CTFException("Both lists have an event defined at position " + index); //$NON-NLS-1$
                 }
                 fEvents.set(index, event);
             }

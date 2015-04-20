@@ -24,7 +24,7 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.tests.CtfCoreTestPlugin;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
@@ -415,11 +415,11 @@ public class IOstructgenTest {
     /**
      * Simple test (only the minimum)
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             something wrong happened
      */
     @Test
-    public void TSDLSimpleTest() throws CTFReaderException {
+    public void TSDLSimpleTest() throws CTFException {
         createDummyTrace(simpleTSDL);
         trace = new CTFTrace(tempTraceDir);
         assertNotNull(trace);
@@ -428,11 +428,11 @@ public class IOstructgenTest {
     /**
      * Test with environment variables
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             something wrong happened
      */
     @Test
-    public void TSDLEnvironmentTest() throws CTFReaderException {
+    public void TSDLEnvironmentTest() throws CTFException {
         createDummyTrace(envTSDL);
         trace = new CTFTrace(tempTraceDir);
         assertNotNull(trace);
@@ -441,11 +441,11 @@ public class IOstructgenTest {
     /**
      * Test with Clocks
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             something wrong happened
      */
     @Test
-    public void TSDLEnumTest() throws CTFReaderException {
+    public void TSDLEnumTest() throws CTFException {
         createDummyTrace(enumTSDL);
         trace = new CTFTrace(tempTraceDir);
         assertNotNull(trace);
@@ -454,11 +454,11 @@ public class IOstructgenTest {
     /**
      * Test with Clocks
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             something wrong happened
      */
     @Test
-    public void TSDLClockTest() throws CTFReaderException {
+    public void TSDLClockTest() throws CTFException {
         createDummyTrace(clockTSDL);
         trace = new CTFTrace(tempTraceDir);
         assertNotNull(trace);
@@ -467,11 +467,11 @@ public class IOstructgenTest {
     /**
      * Test with Contexts
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             something wrong happened
      */
     @Test
-    public void TSDLContextTest() throws CTFReaderException {
+    public void TSDLContextTest() throws CTFException {
         createDummyTrace(contextTSDL);
         trace = new CTFTrace(tempTraceDir);
         assertNotNull(trace);
@@ -480,11 +480,11 @@ public class IOstructgenTest {
     /**
      * Test with Callsites
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             something wrong happened
      */
     @Test
-    public void TSDLCallsiteTest() throws CTFReaderException {
+    public void TSDLCallsiteTest() throws CTFException {
         createDummyTrace(callsiteTSDL);
         trace = new CTFTrace(tempTraceDir);
         assertNotNull(trace);
@@ -493,11 +493,11 @@ public class IOstructgenTest {
     /**
      * Test everything
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             something wrong happened
      */
     @Test
-    public void TSDLAllTest() throws CTFReaderException {
+    public void TSDLAllTest() throws CTFException {
         createDummyTrace(allDressedTSDL);
         trace = new CTFTrace(tempTraceDir);
         assertNotNull(trace);

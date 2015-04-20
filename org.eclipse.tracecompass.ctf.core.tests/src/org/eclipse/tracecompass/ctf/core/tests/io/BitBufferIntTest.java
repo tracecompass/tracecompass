@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,11 +36,11 @@ public class BitBufferIntTest {
     /**
      * Perform pre-test initialization.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             Out of bounds, won't happen
      */
     @Before
-    public void setUp() throws CTFReaderException {
+    public void setUp() throws CTFException {
         ByteBuffer allocateDirect = ByteBuffer.allocateDirect(128);
         if (allocateDirect == null) {
             throw new IllegalStateException("Failed to allocate memory");
@@ -50,11 +50,11 @@ public class BitBufferIntTest {
         fixture = createBuffer();
     }
 
-    private static BitBuffer createBuffer() throws CTFReaderException {
+    private static BitBuffer createBuffer() throws CTFException {
         return createBuffer(16);
     }
 
-    private static BitBuffer createBuffer(int j) throws CTFReaderException {
+    private static BitBuffer createBuffer(int j) throws CTFException {
         final byte[] bytes = new byte[j];
         for (int i = 0; i < j; i++) {
             bytes[i] = (byte) (i % 0xff);
@@ -71,11 +71,11 @@ public class BitBufferIntTest {
     /**
      * Test {@link BitBuffer#getInt} with a basic value
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             Not expected
      */
     @Test
-    public void testGetInt_base() throws CTFReaderException {
+    public void testGetInt_base() throws CTFException {
         int result = fixture.getInt();
         assertEquals(0x020406, result);
     }
@@ -83,11 +83,11 @@ public class BitBufferIntTest {
     /**
      * Test {@link BitBuffer#getInt} with explicit seek at pos 0.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             Not expected
      */
     @Test
-    public void testGetInt_pos0() throws CTFReaderException {
+    public void testGetInt_pos0() throws CTFException {
         fixture.position(0);
         int result = fixture.getInt();
         assertEquals(0x010203, result);
@@ -96,11 +96,11 @@ public class BitBufferIntTest {
     /**
      * Test {@link BitBuffer#get} with seek at pos 1.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             Not expected
      */
     @Test
-    public void testGetInt_pos1() throws CTFReaderException {
+    public void testGetInt_pos1() throws CTFException {
         fixture.position(1);
 
         long result = fixture.get(1, true);
@@ -110,11 +110,11 @@ public class BitBufferIntTest {
     /**
      * Test {@link BitBuffer#get} with seek at pos 2.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             Not expected
      */
     @Test
-    public void testGetInt_pos2() throws CTFReaderException {
+    public void testGetInt_pos2() throws CTFException {
         fixture.position(2);
 
         long result = fixture.get(0, true);
@@ -124,11 +124,11 @@ public class BitBufferIntTest {
     /**
      * Test {@link BitBuffer#get} with explicit little-endian reading.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             Not expected
      */
     @Test
-    public void testGetInt_le2() throws CTFReaderException {
+    public void testGetInt_le2() throws CTFException {
         BitBuffer leFixture = createBuffer(128);
         leFixture.setByteOrder(ByteOrder.LITTLE_ENDIAN);
         leFixture.position(0);
@@ -140,11 +140,11 @@ public class BitBufferIntTest {
      * Test {@link BitBuffer#get} with explicit little-endian reading, with an
      * offset.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             Not expected
      */
     @Test
-    public void testGetInt_le1() throws CTFReaderException {
+    public void testGetInt_le1() throws CTFException {
         BitBuffer leFixture = createBuffer(128);
         leFixture.setByteOrder(ByteOrder.LITTLE_ENDIAN);
         leFixture.position(1);
@@ -156,11 +156,11 @@ public class BitBufferIntTest {
      * Test {@link BitBuffer#get} with a 32-bit out-of-bounds read. Should throw
      * an exception.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             Expected
      */
-    @Test(expected = CTFReaderException.class)
-    public void testGetInt_invalid() throws CTFReaderException {
+    @Test(expected = CTFException.class)
+    public void testGetInt_invalid() throws CTFException {
         BitBuffer smallFixture = createBuffer(2);
         smallFixture.setByteOrder(ByteOrder.BIG_ENDIAN);
 
@@ -174,11 +174,11 @@ public class BitBufferIntTest {
      * Test {@link BitBuffer#get} with a 64-bit out-of-bounds read. Should throw
      * an exception.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             Expected
      */
-    @Test(expected = CTFReaderException.class)
-    public void testGetInt_invalid2() throws CTFReaderException {
+    @Test(expected = CTFException.class)
+    public void testGetInt_invalid2() throws CTFException {
         BitBuffer smallFixture = createBuffer(2);
         smallFixture.setByteOrder(ByteOrder.BIG_ENDIAN);
 
@@ -191,11 +191,11 @@ public class BitBufferIntTest {
     /**
      * Test {@link BitBuffer#getLong}.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testGetLong_pos0() throws CTFReaderException {
+    public void testGetLong_pos0() throws CTFException {
         fixture.position(0);
         long result = fixture.getLong();
         assertEquals(0x01020304050607L, result);
@@ -204,11 +204,11 @@ public class BitBufferIntTest {
     /**
      * Test {@link BitBuffer#getLong} with an offset of 7.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testGetLong_pos7() throws CTFReaderException {
+    public void testGetLong_pos7() throws CTFException {
         fixture.position(7);
         long result = fixture.getLong();
         assertEquals(0x81018202830384L, result);
@@ -217,11 +217,11 @@ public class BitBufferIntTest {
     /**
      * Test {@link BitBuffer#getLong} with an offset of 8.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testGetLong_pos8() throws CTFReaderException {
+    public void testGetLong_pos8() throws CTFException {
         fixture.position(8);
         long result = fixture.getLong();
         assertEquals(0x0102030405060708L, result);
@@ -230,11 +230,11 @@ public class BitBufferIntTest {
     /**
      * Test {@link BitBuffer#getLong} with a little-endian buffer.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testGetLong_pos0LE() throws CTFReaderException {
+    public void testGetLong_pos0LE() throws CTFException {
         fixture.position(0);
         fixture.setByteOrder(ByteOrder.LITTLE_ENDIAN);
         long result = fixture.getLong();
@@ -244,11 +244,11 @@ public class BitBufferIntTest {
     /**
      * Test {@link BitBuffer#getLong} with a little-endian buffer at pos 7.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testGetLong_pos7LE() throws CTFReaderException {
+    public void testGetLong_pos7LE() throws CTFException {
         fixture.position(7);
         fixture.setByteOrder(ByteOrder.LITTLE_ENDIAN);
         long result = fixture.getLong();
@@ -258,11 +258,11 @@ public class BitBufferIntTest {
     /**
      * Test {@link BitBuffer#getLong} with a little-endian buffer at pos 8.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testGetLong_pos8LE() throws CTFReaderException {
+    public void testGetLong_pos8LE() throws CTFException {
         fixture.position(8);
         fixture.setByteOrder(ByteOrder.LITTLE_ENDIAN);
         long result = fixture.getLong();
@@ -272,11 +272,11 @@ public class BitBufferIntTest {
     /**
      * Test {@link BitBuffer#get} for >32 bits in length.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testGet35_pos0BE() throws CTFReaderException {
+    public void testGet35_pos0BE() throws CTFException {
         fixture.position(0);
         long result = fixture.get(35, false);
         assertEquals(0x081018L, result);
@@ -285,11 +285,11 @@ public class BitBufferIntTest {
     /**
      * Test {@link BitBuffer#get} for >32 bits in length at an offset position.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testGet35_pos8BE() throws CTFReaderException {
+    public void testGet35_pos8BE() throws CTFException {
         fixture.position(8);
         long result = fixture.get(35, false);
         assertEquals(0x08101820L, result);
@@ -298,11 +298,11 @@ public class BitBufferIntTest {
     /**
      * Test {@link BitBuffer#get} for >32 bits in length in little-endian.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testGet35_pos0LE() throws CTFReaderException {
+    public void testGet35_pos0LE() throws CTFException {
         fixture.position(0);
         fixture.setByteOrder(ByteOrder.LITTLE_ENDIAN);
         long result = fixture.get(35, false);
@@ -313,11 +313,11 @@ public class BitBufferIntTest {
      * Test {@link BitBuffer#get} for >32 bits in length, in little-endian, at
      * position 7.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testGetLong35_pos7LE() throws CTFReaderException {
+    public void testGetLong35_pos7LE() throws CTFException {
         fixture.position(7);
         fixture.setByteOrder(ByteOrder.LITTLE_ENDIAN);
         long result = fixture.get(35, false);
@@ -328,11 +328,11 @@ public class BitBufferIntTest {
      * Test {@link BitBuffer#get} for >32 bits in length, in little-endian, at
      * position 8.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testGetLong35_pos8LE() throws CTFReaderException {
+    public void testGetLong35_pos8LE() throws CTFException {
         fixture.position(8);
         fixture.setByteOrder(ByteOrder.LITTLE_ENDIAN);
         long result = fixture.get(35, false);
@@ -343,11 +343,11 @@ public class BitBufferIntTest {
      * Test {@link BitBuffer#get} for >32 bits in length, in little-endian, for
      * a signed value.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testGetLong35s_pos0LE() throws CTFReaderException {
+    public void testGetLong35s_pos0LE() throws CTFException {
         fixture.position(0);
         fixture.setByteOrder(ByteOrder.LITTLE_ENDIAN);
         long result = fixture.get(35, true);
@@ -358,11 +358,11 @@ public class BitBufferIntTest {
      * Test {@link BitBuffer#get} for >32 bits in length, in little-endian, for
      * a signed value, at position 7.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testGetLong35s_pos7LE() throws CTFReaderException {
+    public void testGetLong35s_pos7LE() throws CTFException {
         fixture.position(7);
         fixture.setByteOrder(ByteOrder.LITTLE_ENDIAN);
         long result = fixture.get(35, true);
@@ -373,11 +373,11 @@ public class BitBufferIntTest {
      * Test {@link BitBuffer#get} for >32 bits in length, in little-endian, for
      * a signed value, at position 8.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testGetLong35s_pos8LE() throws CTFReaderException {
+    public void testGetLong35s_pos8LE() throws CTFException {
         fixture.position(8);
         fixture.setByteOrder(ByteOrder.LITTLE_ENDIAN);
         long result = fixture.get(35, true);
@@ -387,11 +387,11 @@ public class BitBufferIntTest {
     /**
      * Test reading negative values as signed values.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testGetSigned() throws CTFReaderException {
+    public void testGetSigned() throws CTFException {
         fixture.position(0);
         fixture.putInt(-1);
         fixture.putInt(-1);
@@ -405,11 +405,11 @@ public class BitBufferIntTest {
     /**
      * Test reading negative values as unsigned values.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testGetUnsigned() throws CTFReaderException {
+    public void testGetUnsigned() throws CTFException {
         fixture.position(0);
         fixture.putInt(-1);
         fixture.putInt(-1);
@@ -423,11 +423,11 @@ public class BitBufferIntTest {
     /**
      * Test reading 24 bits of a 32-bit negative value as a signed value.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testGet24Signed() throws CTFReaderException {
+    public void testGet24Signed() throws CTFException {
         fixture.position(0);
         fixture.putInt(-1);
         fixture.putInt(-1);
@@ -441,11 +441,11 @@ public class BitBufferIntTest {
     /**
      * Test reading 24 bits of a 32-bit negative value as an unsigned value.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void testGet24Unsigned() throws CTFReaderException {
+    public void testGet24Unsigned() throws CTFException {
         fixture.position(0);
         fixture.putInt(-1);
         fixture.putInt(-1);
@@ -459,11 +459,11 @@ public class BitBufferIntTest {
     /**
      * Test {@link BitBuffer#putInt(int)}
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             Not expected
      */
     @Test
-    public void testPutInt() throws CTFReaderException {
+    public void testPutInt() throws CTFException {
         fixture.position(1);
         fixture.putInt(1);
     }
@@ -471,11 +471,11 @@ public class BitBufferIntTest {
     /**
      * Test {@link BitBuffer#putInt(int, int)}
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             Not expected
      */
     @Test
-    public void testPutInt_length1() throws CTFReaderException {
+    public void testPutInt_length1() throws CTFException {
         fixture.position(1);
         fixture.putInt(1, 1);
     }
@@ -483,11 +483,11 @@ public class BitBufferIntTest {
     /**
      * Test {@link BitBuffer#putInt(int, int)} with length = 0.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             Not expected
      */
     @Test
-    public void testPutInt_length0() throws CTFReaderException {
+    public void testPutInt_length0() throws CTFException {
         fixture.position(1);
         fixture.putInt(0, 1);
     }
@@ -495,11 +495,11 @@ public class BitBufferIntTest {
     /**
      * Test {@link BitBuffer#putInt(int)} Little endian
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             Not expected
      */
     @Test
-    public void testPutIntLe() throws CTFReaderException {
+    public void testPutIntLe() throws CTFException {
         fixture.setByteOrder(ByteOrder.LITTLE_ENDIAN);
         fixture.position(1);
         fixture.putInt(1);
@@ -508,11 +508,11 @@ public class BitBufferIntTest {
     /**
      * Test {@link BitBuffer#putInt(int, int)} Little endian
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             Not expected
      */
     @Test
-    public void testPutIntLe_length1() throws CTFReaderException {
+    public void testPutIntLe_length1() throws CTFException {
         fixture.setByteOrder(ByteOrder.LITTLE_ENDIAN);
         fixture.position(1);
         fixture.putInt(1, 1);
@@ -521,11 +521,11 @@ public class BitBufferIntTest {
     /**
      * Test {@link BitBuffer#putInt(int, int)} with length = 0. Little endian
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             Not expected
      */
     @Test
-    public void testPutIntLe_length0() throws CTFReaderException {
+    public void testPutIntLe_length0() throws CTFException {
         fixture.setByteOrder(ByteOrder.LITTLE_ENDIAN);
         fixture.position(1);
         fixture.putInt(0, 1);
@@ -534,11 +534,11 @@ public class BitBufferIntTest {
     /**
      * Test writing and reading a value defined in hex format.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             Not expected
      */
     @Test
-    public void testPutInt_hex() throws CTFReaderException {
+    public void testPutInt_hex() throws CTFException {
         final int value = 0x010203;
 
         for (int i = 0; i <= 32; i++) {
@@ -556,11 +556,11 @@ public class BitBufferIntTest {
      * Test {@link BitBuffer#putInt} with an out-of-bounds length. An exception
      * should be thrown.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             Expected
      */
-    @Test(expected = CTFReaderException.class)
-    public void testPutInt_invalid() throws CTFReaderException {
+    @Test(expected = CTFException.class)
+    public void testPutInt_invalid() throws CTFException {
         BitBuffer fixture2;
         fixture2 = createBuffer(4);
         fixture2.setByteOrder(ByteOrder.BIG_ENDIAN);

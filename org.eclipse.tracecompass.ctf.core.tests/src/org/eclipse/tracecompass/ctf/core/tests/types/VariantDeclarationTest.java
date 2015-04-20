@@ -18,7 +18,7 @@ import static org.junit.Assume.assumeTrue;
 
 import java.nio.ByteBuffer;
 
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.event.types.Definition;
@@ -61,7 +61,7 @@ public class VariantDeclarationTest {
         fixture = new VariantDeclaration();
     }
 
-    private static IDefinitionScope createDefinitionScope() throws CTFReaderException {
+    private static IDefinitionScope createDefinitionScope() throws CTFException {
         assumeTrue(testTrace.exists());
         StructDeclaration declaration = new StructDeclaration(8);
         VariantDeclaration variantDeclaration = new VariantDeclaration();
@@ -133,11 +133,11 @@ public class VariantDeclarationTest {
      * Run the VariantDefinition createDefinition(DefinitionScope,String) method
      * test.
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             Should not happen
      */
     @Test
-    public void testCreateDefinition() throws CTFReaderException {
+    public void testCreateDefinition() throws CTFException {
         fixture.setTag("tag");
         fixture.addField("a", IntegerDeclaration.UINT_64B_DECL);
         IDefinitionScope definitionScope = createDefinitionScope();

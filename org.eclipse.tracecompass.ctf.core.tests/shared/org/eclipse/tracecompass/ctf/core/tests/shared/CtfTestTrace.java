@@ -13,7 +13,7 @@ package org.eclipse.tracecompass.ctf.core.tests.shared;
 
 import java.io.File;
 
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.tests.synthetictraces.LttngKernelTraceGenerator;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 
@@ -256,10 +256,10 @@ public enum CtfTestTrace {
      * before calling this!
      *
      * @return The CTFTrace object
-     * @throws CTFReaderException
+     * @throws CTFException
      *             If the trace cannot be found.
      */
-    public CTFTrace getTrace() throws CTFReaderException {
+    public CTFTrace getTrace() throws CTFException {
         if (fTrace == null) {
             fTrace = new CTFTrace(fPath);
         }
@@ -271,10 +271,10 @@ public enum CtfTestTrace {
      * before calling this!
      *
      * @return The CTFTrace object
-     * @throws CTFReaderException
+     * @throws CTFException
      *             If the trace cannot be found.
      */
-    public CTFTrace getTraceFromFile() throws CTFReaderException {
+    public CTFTrace getTraceFromFile() throws CTFException {
         if (fTraceFromFile == null) {
             fTraceFromFile = new CTFTrace(new File(fPath));
         }
@@ -289,7 +289,7 @@ public enum CtfTestTrace {
     public boolean exists() {
         try {
             getTrace();
-        } catch (CTFReaderException e) {
+        } catch (CTFException e) {
             return false;
         }
         return true;

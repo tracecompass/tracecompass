@@ -14,7 +14,7 @@ package org.eclipse.tracecompass.ctf.core.trace;
 
 import java.util.UUID;
 
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.types.AbstractArrayDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.CompoundDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
@@ -104,33 +104,33 @@ public final class Utils {
      * @param uuidDef
      *            the array defintions, must contain integer bytes
      * @return the UUID
-     * @throws CTFReaderException
+     * @throws CTFException
      *             if the definition contains less than 16 elements
      */
-    public static UUID getUUIDfromDefinition(AbstractArrayDefinition uuidDef) throws CTFReaderException {
+    public static UUID getUUIDfromDefinition(AbstractArrayDefinition uuidDef) throws CTFException {
         byte[] uuidArray = new byte[UUID_LEN];
         IDeclaration declaration = uuidDef.getDeclaration();
         if (!(declaration instanceof CompoundDeclaration)) {
-            throw new CTFReaderException("UUID must be a sequence of unsigned bytes"); //$NON-NLS-1$
+            throw new CTFException("UUID must be a sequence of unsigned bytes"); //$NON-NLS-1$
         }
         CompoundDeclaration uuidDec = (CompoundDeclaration) declaration;
 
         IDeclaration uuidElem = uuidDec.getElementType();
         if (!(uuidElem instanceof IntegerDeclaration)) {
-            throw new CTFReaderException("UUID must be a sequence of unsigned bytes"); //$NON-NLS-1$
+            throw new CTFException("UUID must be a sequence of unsigned bytes"); //$NON-NLS-1$
         }
         IntegerDeclaration intUuidElem = (IntegerDeclaration) uuidElem;
         if (!intUuidElem.isUnsignedByte()) {
-            throw new CTFReaderException("UUID must be a sequence of unsigned bytes"); //$NON-NLS-1$
+            throw new CTFException("UUID must be a sequence of unsigned bytes"); //$NON-NLS-1$
         }
         return getUUID(uuidDef, uuidArray);
     }
 
-    private static UUID getUUID(AbstractArrayDefinition uuidDef, byte[] uuidArray) throws CTFReaderException {
+    private static UUID getUUID(AbstractArrayDefinition uuidDef, byte[] uuidArray) throws CTFException {
         for (int i = 0; i < uuidArray.length; i++) {
             IntegerDefinition uuidByteDef = (IntegerDefinition) uuidDef.getDefinitions().get(i);
             if (uuidByteDef == null) {
-                throw new CTFReaderException("UUID incomplete, only " + i + " bytes available"); //$NON-NLS-1$ //$NON-NLS-2$
+                throw new CTFException("UUID incomplete, only " + i + " bytes available"); //$NON-NLS-1$ //$NON-NLS-2$
             }
             uuidArray[i] = (byte) uuidByteDef.getValue();
         }

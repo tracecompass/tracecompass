@@ -20,7 +20,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.ctf.core.CTFReaderException;
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.types.Encoding;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDeclaration;
@@ -67,11 +67,11 @@ public class IntegerEndiannessTest {
     /**
      * Read 32-bits BE
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void test32BE() throws CTFReaderException {
+    public void test32BE() throws CTFException {
         IntegerDeclaration be = IntegerDeclaration.createDeclaration(32, true, 1, ByteOrder.BIG_ENDIAN, Encoding.NONE, clockName, 8);
         IntegerDefinition fixture_be = be.createDefinition(null, name, input);
         assertEquals(0xabcdef12, fixture_be.getValue());
@@ -80,11 +80,11 @@ public class IntegerEndiannessTest {
     /**
      * Read 64-bits BE
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void test64BE() throws CTFReaderException {
+    public void test64BE() throws CTFException {
         IntegerDeclaration be = IntegerDeclaration.createDeclaration(64, true, 1, ByteOrder.BIG_ENDIAN, Encoding.NONE, clockName, 8);
         IntegerDefinition fixture_be = be.createDefinition(null, name, input);
         assertEquals(0xabcdef123456789aL, fixture_be.getValue());
@@ -93,11 +93,11 @@ public class IntegerEndiannessTest {
     /**
      * Read 32-bits LE
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void test32LE() throws CTFReaderException {
+    public void test32LE() throws CTFException {
         IntegerDeclaration le = IntegerDeclaration.createDeclaration(32, true, 1, ByteOrder.LITTLE_ENDIAN, Encoding.NONE, clockName, 8);
         IntegerDefinition fixture_le = le.createDefinition(null, name, input);
         assertEquals(0x12efcdab, fixture_le.getValue());
@@ -106,11 +106,11 @@ public class IntegerEndiannessTest {
     /**
      * Read 64-bits LE
      *
-     * @throws CTFReaderException
+     * @throws CTFException
      *             error
      */
     @Test
-    public void test64LE() throws CTFReaderException {
+    public void test64LE() throws CTFException {
         IntegerDeclaration le = IntegerDeclaration.createDeclaration(64, true, 1, ByteOrder.LITTLE_ENDIAN, Encoding.NONE, clockName, 8);
         IntegerDefinition fixture_le = le.createDefinition(null, name, input);
         assertEquals(0x9a78563412efcdabL, fixture_le.getValue());
