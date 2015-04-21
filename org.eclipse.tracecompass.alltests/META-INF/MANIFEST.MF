@@ -10,6 +10,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.core.runtime,
  org.eclipse.test.performance,
+ org.eclipse.tracecompass.common.core.tests,
  org.eclipse.tracecompass.ctf.core.tests,
  org.eclipse.tracecompass.gdbtrace.core.tests,
  org.eclipse.tracecompass.gdbtrace.ui.tests,

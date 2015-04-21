@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    Alexandre Montplaisir - Initial API and implementation
+ *   Alexandre Montplaisir - Initial API and implementation
  *******************************************************************************/
 
 @org.eclipse.jdt.annotation.NonNullByDefault

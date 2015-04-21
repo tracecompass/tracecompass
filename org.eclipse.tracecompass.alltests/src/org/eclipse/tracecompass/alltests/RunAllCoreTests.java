@@ -20,6 +20,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    org.eclipse.tracecompass.common.core.tests.AllCommonCoreTests.class,
     org.eclipse.tracecompass.btf.core.tests.AllTests.class,
     org.eclipse.tracecompass.ctf.core.tests.AllCtfCoreTests.class,
     org.eclipse.tracecompass.ctf.parser.tests.AllCtfParserTests.class,

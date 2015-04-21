@@ -163,6 +163,7 @@
   <modules>
     <module>doc</module>
     <module>org.eclipse.tracecompass.common.core</module>
+    <module>org.eclipse.tracecompass.common.core.tests</module>
 
     <module>org.eclipse.tracecompass.btf</module>
     <module>org.eclipse.tracecompass.btf.core</module>
