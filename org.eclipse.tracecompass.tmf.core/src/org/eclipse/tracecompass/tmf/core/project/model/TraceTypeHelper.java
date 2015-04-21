@@ -126,7 +126,7 @@ public class TraceTypeHelper {
     public int validateWithConfidence(String path) {
         int result = -1;
         IStatus status = fTrace.validate(null, path);
-        if (status.isOK()) {
+        if (status.getSeverity() != IStatus.ERROR) {
             result = 0;
             if (status instanceof TraceValidationStatus) {
                 result = ((TraceValidationStatus) status).getConfidence();

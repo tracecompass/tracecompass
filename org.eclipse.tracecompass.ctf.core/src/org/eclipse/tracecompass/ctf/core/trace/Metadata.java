@@ -14,6 +14,7 @@
 
 package org.eclipse.tracecompass.ctf.core.trace;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -23,6 +24,8 @@ import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
+import java.nio.file.StandardOpenOption;
 import java.util.UUID;
 
 import org.antlr.runtime.ANTLRReaderStream;
@@ -50,6 +53,9 @@ public class Metadata {
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
+    private static final String TEXT_ONLY_METADATA_HEADER_PREFIX = "/* CTF";  //$NON-NLS-1$
+
+    private static final int PREVALIDATION_SIZE = 8;
 
     private static final int BITS_PER_BYTE = Byte.SIZE;
 
@@ -176,6 +182,48 @@ public class Metadata {
 
         /* Wrap the metadata string with a StringReader */
         return new StringReader(metadataText.toString());
+    }
+
+    /**
+     * Executes a weak validation of the metadata. It checks if a file with
+     * name metadata exists and if one of the following conditions are met:
+     * - For text-only metadata, the file starts with "/* CTF" (without the quotes)
+     * - For packet-based metadata, the file starts with correct magic number
+     *
+     * @param path
+     *            path to CTF trace directory
+     * @return <code>true</code> if pre-validation is ok else <code>false</code>
+     * @throws CTFException
+     *             file channel cannot be created
+     * @since 1.0
+     */
+    public static boolean preValidate(String path) throws CTFException {
+        String metadataPath = path + Utils.SEPARATOR + METADATA_FILENAME;
+        File metadataFile = new File(metadataPath);
+        if (metadataFile.exists() && metadataFile.length() > PREVALIDATION_SIZE) {
+            try (FileChannel fc = FileChannel.open(metadataFile.toPath(), StandardOpenOption.READ)) {
+                ByteBuffer bb = ByteBuffer.allocate(PREVALIDATION_SIZE);
+                bb.clear();
+                fc.read(bb);
+                bb.flip();
+                if (bb.getInt(0) == Utils.TSDL_MAGIC) {
+                    return true;
+                }
+                bb.order(ByteOrder.LITTLE_ENDIAN);
+                if (bb.getInt(0) == Utils.TSDL_MAGIC) {
+                    return true;
+                }
+                bb.position(0);
+                Charset forName = Charset.forName("ASCII"); //$NON-NLS-1$
+                byte bytes[] = new byte[PREVALIDATION_SIZE];
+                bb.get(bytes);
+                String text = new String(bytes, forName);
+                return text.startsWith(TEXT_ONLY_METADATA_HEADER_PREFIX);
+            } catch (IOException e) {
+                throw new CTFException(e.getMessage(), e);
+            }
+        }
+        return false;
     }
 
     /**

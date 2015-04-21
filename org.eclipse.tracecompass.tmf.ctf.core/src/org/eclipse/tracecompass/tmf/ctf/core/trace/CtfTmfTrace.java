@@ -39,6 +39,7 @@ import org.eclipse.tracecompass.ctf.core.event.CTFClock;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
+import org.eclipse.tracecompass.ctf.core.trace.Metadata;
 import org.eclipse.tracecompass.internal.tmf.ctf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator.CtfIterator;
 import org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator.CtfIteratorManager;
@@ -54,6 +55,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceProperties;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceWithPreDefinedEvents;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfPersistentlyIndexable;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.TmfBTreeTraceIndexer;
@@ -110,6 +112,7 @@ public class CtfTmfTrace extends TmfTrace
      */
     private static final String CLOCK_HOST_PROPERTY = "uuid"; //$NON-NLS-1$
     private static final int CONFIDENCE = 10;
+    private static final int MIN_CONFIDENCE = 1;
 
     // -------------------------------------------
     // Fields
@@ -215,30 +218,59 @@ public class CtfTmfTrace extends TmfTrace
     /**
      * {@inheritDoc}
      * <p>
-     * The default implementation sets the confidence to 10 if the trace is a
-     * valid CTF trace.
+     * The default implementation of a CTF trace.
+     *
+     * Firstly a weak validation of the metadata is done to determine if the
+     * path is actually for a CTF trace. After that a full validation is done.
+     *
+     * If the weak and full validation are successful the confidence is set
+     * to 10.
+     *
+     * If the weak validation was successful, but the full validation fails
+     * a TraceValidationStatus with severity warning and confidence of 1 is
+     * returned.
+     *
+     * If both weak and full validation fails an error status is returned.
      */
     @Override
     public IStatus validate(final IProject project, final String path) {
+        boolean isMetadataValid = false;
         try {
-            final CTFTrace trace = new CTFTrace(path);
-            if (!trace.majorIsSet()) {
-                return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_MajorNotSet);
-            }
-            try (CTFTraceReader ctfTraceReader = new CTFTraceReader(trace)) {
-                if (!ctfTraceReader.hasMoreEvents()) {
-                    // TODO: This will need an additional check when we
-                    // support live traces
-                    // because having no event is valid for a live trace
-                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_NoEvent);
-                }
-            }
-            return new CtfTraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID, trace.getEnvironment());
+         isMetadataValid = Metadata.preValidate(path);
         } catch (final CTFException e) {
-            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + e.toString()); //$NON-NLS-1$
-        } catch (final BufferOverflowException e) {
-            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + Messages.CtfTmfTrace_BufferOverflowErrorMessage); //$NON-NLS-1$
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + e.toString(), e); //$NON-NLS-1$
         }
+
+        if (isMetadataValid) {
+            // Trace is pre-validated, continue will full validation
+            try {
+                final CTFTrace trace = new CTFTrace(path);
+                if (!trace.majorIsSet()) {
+                    if (isMetadataValid) {
+                        return new TraceValidationStatus(MIN_CONFIDENCE, IStatus.WARNING, Activator.PLUGIN_ID, Messages.CtfTmfTrace_MajorNotSet, null);
+                    }
+                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_MajorNotSet);
+                }
+
+                // Validate using reader initialization
+                try (CTFTraceReader ctfTraceReader = new CTFTraceReader(trace)) {}
+
+                // Trace is validated, return with confidence
+                return new CtfTraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID, trace.getEnvironment());
+
+            } catch (final CTFException e) {
+                if (isMetadataValid) {
+                    return new TraceValidationStatus(MIN_CONFIDENCE, IStatus.WARNING, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + e.toString(), e); //$NON-NLS-1$
+                }
+                return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + e.toString()); //$NON-NLS-1$
+            } catch (final BufferOverflowException e) {
+                if (isMetadataValid) {
+                    return new TraceValidationStatus(MIN_CONFIDENCE, IStatus.WARNING, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + e.toString(), e); //$NON-NLS-1$
+                }
+                return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + e.toString()); //$NON-NLS-1$
+            }
+        }
+        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError);
     }
 
     @Override

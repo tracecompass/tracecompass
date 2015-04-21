@@ -27,6 +27,7 @@ import java.util.Map;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
@@ -500,7 +501,7 @@ public final class TmfTraceType {
         final Iterable<TraceTypeHelper> traceTypeHelpers = getTraceTypeHelpers();
         for (TraceTypeHelper traceTypeHelper : traceTypeHelpers) {
             if (traceTypeHelper.isDirectoryTraceType() &&
-                    traceTypeHelper.validate(path).isOK()) {
+                    (traceTypeHelper.validate(path).getSeverity() != IStatus.ERROR)) {
                 return true;
             }
         }

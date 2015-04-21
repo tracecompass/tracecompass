@@ -25,11 +25,35 @@ public class TraceValidationStatus extends Status {
     /**
      * Construct a successful validation status with a confidence level
      *
-     * @param confidence the confidence level, 0 is lowest
-     * @param pluginId the unique identifier of the relevant plug-in
+     * @param confidence
+     *            the confidence level, 0 is lowest
+     * @param pluginId
+     *            the unique identifier of the relevant plug-in
      */
     public TraceValidationStatus(int confidence, String pluginId) {
-        super(OK, pluginId, OK_STATUS.getMessage());
+        this(confidence, OK, pluginId, OK_STATUS.getMessage(), null);
+    }
+
+    /**
+     * Full constructor for construct a validation status with a confidence
+     * level, severity and exception
+     *
+     * @param confidence
+     *            the confidence level, 0 is lowest
+     * @param severity
+     *            the severity; one of <code>OK</code>, <code>ERROR</code>,
+     *            <code>INFO</code>, <code>WARNING</code>, or
+     *            <code>CANCEL</code>
+     * @param pluginId
+     *            the unique identifier of the relevant plug-in
+     * @param message
+     *            a human-readable message, localized to the current locale
+     * @param exception
+     *            a low-level exception, or <code>null</code> if not applicable
+     * @since 1.0
+     */
+    public TraceValidationStatus(int confidence, int severity, String pluginId, String message, Throwable exception) {
+        super(severity, pluginId, message, exception);
         if (confidence < 0) {
             throw new IllegalArgumentException();
         }
