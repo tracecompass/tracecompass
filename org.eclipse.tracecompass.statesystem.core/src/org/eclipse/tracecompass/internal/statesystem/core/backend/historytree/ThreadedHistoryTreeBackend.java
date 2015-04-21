@@ -17,10 +17,9 @@ package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.collect.BufferedBlockingQueue;
 import org.eclipse.tracecompass.internal.statesystem.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -37,7 +36,8 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
         implements Runnable {
 
-    private final @NonNull BlockingQueue<HTInterval> intervalQueue;
+    private static final int CHUNK_SIZE = 127;
+    private final @NonNull BufferedBlockingQueue<HTInterval> intervalQueue;
     private final @NonNull Thread shtThread;
 
     /**
@@ -77,7 +77,7 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
                     throws IOException {
         super(ssid, newStateFile, providerVersion, startTime, blockSize, maxChildren);
 
-        intervalQueue = new ArrayBlockingQueue<>(queueSize);
+        intervalQueue = new BufferedBlockingQueue<>(queueSize / CHUNK_SIZE, CHUNK_SIZE);
         shtThread = new Thread(this, "History Tree Thread"); //$NON-NLS-1$
         shtThread.start();
     }
@@ -111,7 +111,7 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
                     throws IOException {
         super(ssid, newStateFile, providerVersion, startTime);
 
-        intervalQueue = new ArrayBlockingQueue<>(queueSize);
+        intervalQueue = new BufferedBlockingQueue<>(queueSize / CHUNK_SIZE, CHUNK_SIZE);
         shtThread = new Thread(this, "History Tree Thread"); //$NON-NLS-1$
         shtThread.start();
     }
@@ -134,11 +134,7 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
          */
         HTInterval interval = new HTInterval(stateStartTime, stateEndTime,
                 quark, (TmfStateValue) value);
-        try {
-            intervalQueue.put(interval);
-        } catch (InterruptedException e) {
-            Activator.getDefault().logError("State system interrupted", e); //$NON-NLS-1$
-        }
+        intervalQueue.put(interval);
     }
 
     @Override
@@ -179,6 +175,7 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
         try {
             HTInterval pill = new HTInterval(-1, endTime, -1, TmfStateValue.nullValue());
             intervalQueue.put(pill);
+            intervalQueue.flushInputBuffer();
             shtThread.join();
         } catch (TimeRangeException e) {
             Activator.getDefault().logError("Error closing state system", e); //$NON-NLS-1$
@@ -207,11 +204,8 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
              */
             getSHT().closeTree(currentInterval.getEndTime());
             return;
-        } catch (InterruptedException e) {
-            /* We've been interrupted abnormally */
-            Activator.getDefault().logError("State History Tree interrupted!", e); //$NON-NLS-1$
         } catch (TimeRangeException e) {
-            /* This also should not happen */
+            /* This should not happen */
             Activator.getDefault().logError("Error starting the state system", e); //$NON-NLS-1$
         }
     }
@@ -258,8 +252,8 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
         /*
          * We couldn't find the interval in the history tree. It's possible that
          * it is currently in the intervalQueue. Look for it there. Note that
-         * ArrayBlockingQueue's iterator() is thread-safe (no need to lock the
-         * queue).
+         * BufferedBlockingQueue's iterator() is thread-safe (no need to lock
+         * the queue).
          */
         for (ITmfStateInterval interval : intervalQueue) {
             if (interval.getAttribute() == attributeQuark && interval.intersects(t)) {
