@@ -88,6 +88,7 @@ public class Messages extends NLS {
     public static String TmfTimeTipHandler_LINK_TARGET;
     public static String TmfTimeTipHandler_LINK_TARGET_TIME;
     public static String TmfTimeTipHandler_LINK_TIME;
+    public static String TmfTimeTipHandler_PERCENT_OF_SELECTION;
     public static String TmfTimeTipHandler_TRACE_DATE;
     public static String TmfTimeTipHandler_TRACE_EVENT_TIME;
     public static String TmfTimeTipHandler_TRACE_START_TIME;
