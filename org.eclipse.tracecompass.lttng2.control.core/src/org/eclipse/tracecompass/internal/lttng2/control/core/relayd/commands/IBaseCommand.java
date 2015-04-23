@@ -11,33 +11,19 @@
  *   Marc-Andre Laperle - Initial implementation and API
  **********************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewerCommands;
+package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands;
 
 /**
- * Get packet return code
+ * Instruction to send to relayd
  *
  * @author Matthew Khouzam
  */
-public enum GetPacketReturnCode implements IBaseCommand {
+public interface IBaseCommand {
 
-    /** Response was OK */
-    VIEWER_GET_PACKET_OK(1),
-    /** Response was RETRY */
-    VIEWER_GET_PACKET_RETRY(2),
-    /** Response was ERROR */
-    VIEWER_GET_PACKET_ERR(3),
-    /** Response was End of File */
-    VIEWER_GET_PACKET_EOF(4);
-
-    private final int fCode;
-
-    private GetPacketReturnCode(int c) {
-        fCode = c;
-    }
-
-    @Override
-    public int getCommand() {
-        return fCode;
-    }
-
+    /**
+     * gets the numerical value of the command
+     *
+     * @return the numerical value of the command
+     */
+    int getCommand();
 }

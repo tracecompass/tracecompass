@@ -11,19 +11,28 @@
  *   Marc-Andre Laperle - Initial implementation and API
  **********************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewerCommands;
+package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands;
 
 /**
- * Instruction to send to relayd
+ * Create new session return code
  *
  * @author Matthew Khouzam
  */
-public interface IBaseCommand {
+public enum CreateSessionReturnCode implements IBaseCommand {
 
-    /**
-     * gets the numerical value of the command
-     *
-     * @return the numerical value of the command
-     */
-    int getCommand();
+    /** If new streams are being sent. */
+    LTTNG_VIEWER_CREATE_SESSION_OK(1),
+    /** Fatal error on the server-side. */
+    LTTNG_VIEWER_CREATE_SESSION_ERR(2);
+
+    private final int fCode;
+
+    private CreateSessionReturnCode(int c) {
+        fCode = c;
+    }
+
+    @Override
+    public int getCommand() {
+        return fCode;
+    }
 }

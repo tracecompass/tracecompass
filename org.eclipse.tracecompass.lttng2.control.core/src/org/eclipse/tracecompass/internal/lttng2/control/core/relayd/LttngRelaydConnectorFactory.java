@@ -17,12 +17,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
+import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.Command;
+import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.ConnectResponse;
+import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.ConnectionType;
+import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.ViewerCommand;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.impl.LttngRelaydConnector_2_4;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.impl.LttngRelaydConnector_Unsupported;
-import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewerCommands.Command;
-import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewerCommands.ConnectResponse;
-import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewerCommands.ConnectionType;
-import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewerCommands.ViewerCommand;
 
 /**
  * LTTng RelayD connector factory

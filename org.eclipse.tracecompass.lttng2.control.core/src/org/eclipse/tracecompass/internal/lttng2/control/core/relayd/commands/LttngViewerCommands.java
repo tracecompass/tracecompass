@@ -10,7 +10,7 @@
  *   Matthew Khouzam - Initial implementation
  **********************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewerCommands;
+package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands;
 
 /**
  * LTTng Relay Daemon API. needs a TCP connection, API is defined from

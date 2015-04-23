@@ -16,7 +16,7 @@ Export-Package: org.eclipse.tracecompass.internal.lttng2.control.core;x-friends:
  org.eclipse.tracecompass.internal.lttng2.control.core.model;x-friends:="org.eclipse.tracecompass.lttng2.control.ui,org.eclipse.tracecompass.lttng2.control.ui.tests,org.eclipse.tracecompass.lttng2.control.core.tests",
  org.eclipse.tracecompass.internal.lttng2.control.core.model.impl;x-friends:="org.eclipse.tracecompass.lttng2.control.ui,org.eclipse.tracecompass.lttng2.control.ui.tests,org.eclipse.tracecompass.lttng2.control.core.tests",
  org.eclipse.tracecompass.internal.lttng2.control.core.relayd;x-friends:="org.eclipse.tracecompass.lttng2.control.core.tests,org.eclipse.tracecompass.lttng2.control.ui,org.eclipse.tracecompass.lttng2.control.ui.tests",
+ org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands;x-friends:="org.eclipse.tracecompass.lttng2.control.core.tests,org.eclipse.tracecompass.lttng2.control.ui,org.eclipse.tracecompass.lttng2.control.ui.tests",
  org.eclipse.tracecompass.internal.lttng2.control.core.relayd.impl;x-friends:="org.eclipse.tracecompass.lttng2.control.core.tests,org.eclipse.tracecompass.lttng2.control.ui,org.eclipse.tracecompass.lttng2.control.ui.tests",
- org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewerCommands;x-friends:="org.eclipse.tracecompass.lttng2.control.core.tests,org.eclipse.tracecompass.lttng2.control.ui,org.eclipse.tracecompass.lttng2.control.ui.tests",
  org.eclipse.tracecompass.lttng2.control.core.session
 Import-Package: com.google.common.collect

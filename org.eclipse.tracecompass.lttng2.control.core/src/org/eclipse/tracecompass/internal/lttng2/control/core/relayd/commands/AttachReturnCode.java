@@ -11,31 +11,31 @@
  *   Marc-Andre Laperle - Initial implementation and API
  **********************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewerCommands;
+package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands;
 
 /**
- * Get next index return code (hope it's viewer_index_ok)
+ * Return codes for "viewer attach" command
  *
  * @author Matthew Khouzam
  */
-public enum NextIndexReturnCode implements IBaseCommand {
+public enum AttachReturnCode implements IBaseCommand {
 
-    /** Index is available. */
-    VIEWER_INDEX_OK(1),
-    /** Index not yet available. */
-    VIEWER_INDEX_RETRY(2),
-    /** Index closed (trace destroyed). */
-    VIEWER_INDEX_HUP(3),
-    /** Unknown error. */
-    VIEWER_INDEX_ERR(4),
-    /** Inactive stream beacon. */
-    VIEWER_INDEX_INACTIVE(5),
-    /** End of index file. */
-    VIEWER_INDEX_EOF(6);
+    /** If the attach command succeeded. */
+    VIEWER_ATTACH_OK(1),
+    /** If a viewer is already attached. */
+    VIEWER_ATTACH_ALREADY(2),
+    /** If the session ID is unknown. */
+    VIEWER_ATTACH_UNK(3),
+    /** If the session is not live. */
+    VIEWER_ATTACH_NOT_LIVE(4),
+    /** Seek error. */
+    VIEWER_ATTACH_SEEK_ERR(5),
+    /** No session */
+    VIEWER_ATTACH_NO_SESSION(6);
 
     private final int fCode;
 
-    private NextIndexReturnCode(int c) {
+    private AttachReturnCode(int c) {
         fCode = c;
     }
 

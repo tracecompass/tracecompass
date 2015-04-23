@@ -11,20 +11,13 @@
  *   Marc-Andre Laperle - Initial implementation and API
  **********************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewerCommands;
-
+package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands;
 
 /**
- * Command sent, needs a getBytes to stream the data
+ * Command response, this will allow sorting commands easier
  *
  * @author Matthew Khouzam
  */
-public interface IRelayCommand {
+public interface IRelayResponse {
 
-    /**
-     * Gets a byte array of the command so that it may be streamed
-     *
-     * @return the byte array of the command
-     */
-    byte[] serialize();
 }

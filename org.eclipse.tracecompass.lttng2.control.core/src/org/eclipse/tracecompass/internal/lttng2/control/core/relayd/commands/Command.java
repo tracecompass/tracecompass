@@ -11,31 +11,40 @@
  *   Marc-Andre Laperle - Initial implementation and API
  **********************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewerCommands;
+package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands;
 
 /**
- * Return codes for "viewer attach" command
+ * Viewer commands
  *
  * @author Matthew Khouzam
  */
-public enum AttachReturnCode implements IBaseCommand {
+public enum Command implements IBaseCommand {
 
-    /** If the attach command succeeded. */
-    VIEWER_ATTACH_OK(1),
-    /** If a viewer is already attached. */
-    VIEWER_ATTACH_ALREADY(2),
-    /** If the session ID is unknown. */
-    VIEWER_ATTACH_UNK(3),
-    /** If the session is not live. */
-    VIEWER_ATTACH_NOT_LIVE(4),
-    /** Seek error. */
-    VIEWER_ATTACH_SEEK_ERR(5),
-    /** No session */
-    VIEWER_ATTACH_NO_SESSION(6);
+    /** get version */
+    VIEWER_CONNECT(1),
+    /** list all lttng sessions */
+    VIEWER_LIST_SESSIONS(2),
+    /** attach to a session */
+    VIEWER_ATTACH_SESSION(3),
+    /** get the next index */
+    VIEWER_GET_NEXT_INDEX(4),
+    /** get packet */
+    VIEWER_GET_PACKET(5),
+    /** get metadata */
+    VIEWER_GET_METADATA(6),
+    /** get new streams */
+    VIEWER_GET_NEW_STREAMS(7),
+    /** create a new session */
+    VIEWER_CREATE_SESSION(8);
+
+    /**
+     * Command size (fCode)
+     */
+    public static final int SIZE = Integer.SIZE / 8;
 
     private final int fCode;
 
-    private AttachReturnCode(int c) {
+    private Command(int c) {
         fCode = c;
     }
 

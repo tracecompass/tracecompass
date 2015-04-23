@@ -11,35 +11,63 @@
  *   Marc-Andre Laperle - Initial implementation and API
  **********************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewerCommands;
+package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * VIEWER_GET_NEXT_INDEX payload.
+ * VIEWER_GET_PACKET payload.
  *
  * @author Matthew Khouzam
  */
-public class GetNextIndex implements IRelayCommand {
+public class GetPacket implements IRelayCommand {
 
     /**
-     * Command size (fStreamId)
+     * Command size
+     *
+     * fStreamId + fOffset + fLength
      */
-    public static final int SIZE = Long.SIZE / 8;
-    /**
-     * the id of the stream
-     */
+    public static final int SIZE = (Long.SIZE + Long.SIZE + Integer.SIZE) / 8;
+    /** the stream Id */
     private final long fStreamId;
+    /** the offset */
+    private final long fOffset;
+    /** the length of the packet */
+    private final int fLength;
 
     /**
-     * Constructor
+     * Get packet constructor
      *
      * @param streamId
-     *            the index stream id
+     *            the stream id
+     * @param offset
+     *            the offset
+     * @param length
+     *            the packet length
      */
-    public GetNextIndex(long streamId) {
+    public GetPacket(long streamId, long offset, int length) {
         fStreamId = streamId;
+        fOffset = offset;
+        fLength = length;
+    }
+
+    /**
+     * Get the length of the packet
+     *
+     * @return the length of the packet in bytes
+     */
+    public int getLength() {
+        return fLength;
+    }
+
+    /**
+     * Gets the offset of the packet
+     *
+     * @return the offset
+     */
+    public long getOffset() {
+        return fOffset;
     }
 
     /**
@@ -57,6 +85,8 @@ public class GetNextIndex implements IRelayCommand {
         ByteBuffer bb = ByteBuffer.wrap(data);
         bb.order(ByteOrder.BIG_ENDIAN);
         bb.putLong(getStreamId());
+        bb.putLong(getOffset());
+        bb.putInt(getLength());
         return data;
     }
 

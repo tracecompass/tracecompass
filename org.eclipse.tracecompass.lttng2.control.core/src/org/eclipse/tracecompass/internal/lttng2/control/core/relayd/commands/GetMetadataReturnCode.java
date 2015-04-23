@@ -11,23 +11,25 @@
  *   Marc-Andre Laperle - Initial implementation and API
  **********************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewerCommands;
+package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands;
 
 /**
- * Create new session return code
+ * Get metadata return code
  *
  * @author Matthew Khouzam
  */
-public enum CreateSessionReturnCode implements IBaseCommand {
+public enum GetMetadataReturnCode implements IBaseCommand {
 
-    /** If new streams are being sent. */
-    LTTNG_VIEWER_CREATE_SESSION_OK(1),
-    /** Fatal error on the server-side. */
-    LTTNG_VIEWER_CREATE_SESSION_ERR(2);
+    /** Response was OK */
+    VIEWER_METADATA_OK(1),
+    /** Response was nothing new */
+    VIEWER_NO_NEW_METADATA(2),
+    /** Response was Error */
+    VIEWER_METADATA_ERR(3);
 
     private final int fCode;
 
-    private CreateSessionReturnCode(int c) {
+    private GetMetadataReturnCode(int c) {
         fCode = c;
     }
 
@@ -35,4 +37,5 @@ public enum CreateSessionReturnCode implements IBaseCommand {
     public int getCommand() {
         return fCode;
     }
+
 }

@@ -11,40 +11,39 @@
  *   Marc-Andre Laperle - Initial implementation and API
  **********************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.lttngviewerCommands;
+package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * VIEWER_GET_METADATA payload.
+ * VIEWER_GET_NEXT_INDEX payload.
  *
  * @author Matthew Khouzam
  */
-public class GetMetadata implements IRelayCommand {
+public class GetNextIndex implements IRelayCommand {
 
     /**
      * Command size (fStreamId)
      */
     public static final int SIZE = Long.SIZE / 8;
-
     /**
-     * The stream id
+     * the id of the stream
      */
     private final long fStreamId;
 
     /**
-     * Set the stream id
+     * Constructor
      *
      * @param streamId
-     *            the stream id
+     *            the index stream id
      */
-    public GetMetadata(long streamId) {
+    public GetNextIndex(long streamId) {
         fStreamId = streamId;
     }
 
     /**
-     * Get the stream id
+     * Gets the stream id
      *
      * @return the stream id
      */
