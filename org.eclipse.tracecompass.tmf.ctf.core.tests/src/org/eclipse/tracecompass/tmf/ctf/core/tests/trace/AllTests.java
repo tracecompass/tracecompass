@@ -21,6 +21,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         CtfTmfTraceTest.class,
+        CtfTmfTraceValidateTest.class,
         FunkyTraceTest.class
 })
 public class AllTests {
