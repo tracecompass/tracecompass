@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysis;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelThreadInformationProvider;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
@@ -346,7 +346,7 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
     private @Nullable HostThread getCurrentHostThread(ITmfEvent event, long ts) {
         /* Get the LTTng kernel analysis for the host */
         String hostId = event.getTrace().getHostId();
-        KernelAnalysis module = TmfExperimentUtils.getAnalysisModuleOfClassForHost(getTrace(), hostId, KernelAnalysis.class);
+        KernelAnalysisModule module = TmfExperimentUtils.getAnalysisModuleOfClassForHost(getTrace(), hostId, KernelAnalysisModule.class);
         if (module == null) {
             return null;
         }

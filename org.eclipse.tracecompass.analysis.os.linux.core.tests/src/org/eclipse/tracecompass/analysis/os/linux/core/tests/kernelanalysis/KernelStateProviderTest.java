@@ -10,13 +10,13 @@
  *
  *******************************************************************************/
 
-package org.eclipse.tracecompass.lttng2.kernel.core.tests.analysis.kernel.statesystem;
+package org.eclipse.tracecompass.analysis.os.linux.core.tests.kernelanalysis;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeTrue;
 
-import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelStateProvider;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEventLayout;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelanalysis.KernelStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.junit.BeforeClass;
@@ -27,7 +27,7 @@ import org.junit.Test;
  *
  * @author Alexandre Montplaisir
  */
-public class LttngKernelStateProviderTest {
+public class KernelStateProviderTest {
 
     private static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.TRACE2;
 
@@ -39,7 +39,7 @@ public class LttngKernelStateProviderTest {
     @BeforeClass
     public static void initialize() {
         assumeTrue(testTrace.exists());
-        input = new KernelStateProvider(testTrace.getTrace(), LttngEventLayout.getInstance());
+        input = new KernelStateProvider(testTrace.getTrace(), IKernelAnalysisEventLayout.DEFAULT_LAYOUT);
     }
 
     /**
@@ -49,7 +49,8 @@ public class LttngKernelStateProviderTest {
     public void testOpening() {
         long testStartTime;
         testStartTime = input.getStartTime();
-        assertEquals(testStartTime, StateSystemTest.startTime);
+        /* Expected start time of "trace2" */
+        assertEquals(testStartTime, 1331668247314038062L);
     }
 
 }

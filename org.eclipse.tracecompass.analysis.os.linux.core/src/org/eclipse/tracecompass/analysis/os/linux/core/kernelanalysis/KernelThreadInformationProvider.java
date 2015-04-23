@@ -54,8 +54,9 @@ public final class KernelThreadInformationProvider {
      *            The timestamp at which we want the running process
      * @return The TID of the thread running on CPU cpuId at time ts or
      *         {@code null} if either no thread is running or we do not know.
+     * @since 1.0
      */
-    public static @Nullable Integer getThreadOnCpu(KernelAnalysis module, long cpuId, long ts) {
+    public static @Nullable Integer getThreadOnCpu(KernelAnalysisModule module, long cpuId, long ts) {
         ITmfStateSystem ss = module.getStateSystem();
         if (ss == null) {
             return null;
@@ -85,8 +86,9 @@ public final class KernelThreadInformationProvider {
      * @param module
      *            The lttng kernel analysis instance to run this method on
      * @return The set of TIDs corresponding to the threads
+     * @since 1.0
      */
-    public static Collection<Integer> getThreadIds(KernelAnalysis module) {
+    public static Collection<Integer> getThreadIds(KernelAnalysisModule module) {
         ITmfStateSystem ss = module.getStateSystem();
         if (ss == null) {
             return NonNullUtils.checkNotNull(Collections.EMPTY_SET);
@@ -114,8 +116,9 @@ public final class KernelThreadInformationProvider {
      * @param ts
      *            The timestamp at which to get the parent
      * @return The parent PID or {@code null} if the PPID is not found.
+     * @since 1.0
      */
-    public static @Nullable Integer getParentPid(KernelAnalysis module, Integer threadId, long ts) {
+    public static @Nullable Integer getParentPid(KernelAnalysisModule module, Integer threadId, long ts) {
         Integer ppid = null;
         ITmfStateSystem ss = module.getStateSystem();
         if (ss == null) {
@@ -154,8 +157,9 @@ public final class KernelThreadInformationProvider {
      *            The thread ID of the process for which to get the name
      * @return The last executable name of this process, or {@code null} if not
      *         found
+     * @since 1.0
      */
-    public static @Nullable String getExecutableName(KernelAnalysis module, Integer threadId) {
+    public static @Nullable String getExecutableName(KernelAnalysisModule module, Integer threadId) {
         String execName = null;
         ITmfStateSystem ss = module.getStateSystem();
         if (ss == null) {
@@ -198,7 +202,7 @@ public final class KernelThreadInformationProvider {
      * @return The priority of this thread, or {@code null} if not found
      * @since 1.0
      */
-    public static @Nullable Integer getThreadPrio(KernelAnalysis module, Integer threadId, long ts) {
+    public static @Nullable Integer getThreadPrio(KernelAnalysisModule module, Integer threadId, long ts) {
         Integer execPrio = null;
         ITmfStateSystem ss = module.getStateSystem();
         if (ss == null) {
@@ -235,8 +239,9 @@ public final class KernelThreadInformationProvider {
      * @return The list of status intervals for this thread, an empty list is
      *         returned if either the state system is {@code null} or the quark
      *         is not found
+     * @since 1.0
      */
-    public static List<ITmfStateInterval> getStatusIntervalsForThread(KernelAnalysis module, Integer threadId, long start, long end, long resolution, IProgressMonitor monitor) {
+    public static List<ITmfStateInterval> getStatusIntervalsForThread(KernelAnalysisModule module, Integer threadId, long start, long end, long resolution, IProgressMonitor monitor) {
         ITmfStateSystem ss = module.getStateSystem();
         if (ss == null) {
             return NonNullUtils.checkNotNull(Collections.EMPTY_LIST);

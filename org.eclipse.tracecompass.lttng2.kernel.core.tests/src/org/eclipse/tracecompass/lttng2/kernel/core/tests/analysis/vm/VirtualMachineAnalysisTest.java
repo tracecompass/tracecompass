@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysis;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.VcpuStateValues;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.VmAttributes;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.module.VirtualMachineCpuAnalysis;
@@ -98,7 +98,7 @@ public class VirtualMachineAnalysisTest {
          */
         for (ITmfTrace trace : experiment.getTraces()) {
             trace = checkNotNull(trace);
-            for (KernelAnalysis module : TmfTraceUtils.getAnalysisModulesOfClass(trace, KernelAnalysis.class)) {
+            for (KernelAnalysisModule module : TmfTraceUtils.getAnalysisModulesOfClass(trace, KernelAnalysisModule.class)) {
                 module.schedule();
                 module.waitForCompletion();
             }

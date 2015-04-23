@@ -30,7 +30,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.Attributes;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysis;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelThreadInformationProvider;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
@@ -241,7 +241,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
 
     @Override
     protected void buildEventList(final ITmfTrace trace, ITmfTrace parentTrace, IProgressMonitor monitor) {
-        ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysis.ID);
+        ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
         if (ssq == null) {
             return;
         }
@@ -391,7 +391,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
 
     private void buildStatusEvents(ITmfTrace trace, ControlFlowEntry entry, @NonNull IProgressMonitor monitor, long start, long end) {
         if (start < entry.getEndTime() && end > entry.getStartTime()) {
-            ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(entry.getTrace(), KernelAnalysis.ID);
+            ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(entry.getTrace(), KernelAnalysisModule.ID);
             if (ssq == null) {
                 return;
             }
@@ -430,7 +430,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
         if (realEnd <= realStart) {
             return null;
         }
-        KernelAnalysis kernelAnalysis = TmfTraceUtils.getAnalysisModuleOfClass(entry.getTrace(), KernelAnalysis.class, KernelAnalysis.ID);
+        KernelAnalysisModule kernelAnalysis = TmfTraceUtils.getAnalysisModuleOfClass(entry.getTrace(), KernelAnalysisModule.class, KernelAnalysisModule.ID);
         if (kernelAnalysis == null) {
 //        ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(entry.getTrace(), KernelAnalysis.ID);
 //        if (ssq == null) {
@@ -484,7 +484,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
             if (trace == null) {
                 continue;
             }
-            ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysis.ID);
+            ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
             if (ssq == null) {
                 continue;
             }
@@ -540,7 +540,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
             if (trace == null) {
                 continue;
             }
-            ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysis.ID);
+            ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
             if (ssq == null) {
                 continue;
             }

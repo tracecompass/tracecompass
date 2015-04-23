@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelanalysis.KernelStateProvider;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement;
@@ -31,8 +32,9 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * State System Module for lttng kernel traces
  *
  * @author Geneviève Bastien
+ * @since 1.0
  */
-public class KernelAnalysis extends TmfStateSystemAnalysisModule {
+public class KernelAnalysisModule extends TmfStateSystemAnalysisModule {
 
     /**
      * The file name of the History Tree

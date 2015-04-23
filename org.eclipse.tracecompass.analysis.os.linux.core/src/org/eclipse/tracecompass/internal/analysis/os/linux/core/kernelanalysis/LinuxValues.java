@@ -12,8 +12,6 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelanalysis;
 
-import org.eclipse.jdt.annotation.NonNullByDefault;
-
 /**
  * Definitions of values used in the Linux kernel code.
  *
@@ -23,7 +21,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  * @author Alexandre Montplaisir
  */
 @SuppressWarnings("javadoc")
-@NonNullByDefault
 public interface LinuxValues {
 
     /*

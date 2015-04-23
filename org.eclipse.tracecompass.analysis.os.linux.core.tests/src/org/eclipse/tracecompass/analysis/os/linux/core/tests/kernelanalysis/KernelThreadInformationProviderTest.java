@@ -28,7 +28,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysis;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelThreadInformationProvider;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.StateValues;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.Activator;
@@ -49,7 +49,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Test analysis-specific methods for the {@link KernelAnalysis} class.
+ * Test analysis-specific methods for the {@link KernelAnalysisModule} class.
  *
  * @author Geneviève Bastien
  */
@@ -58,7 +58,7 @@ public class KernelThreadInformationProviderTest {
     private static final @NonNull String LTTNG_KERNEL_FILE = "testfiles/lttng_kernel_analysis.xml";
 
     private ITmfTrace fTrace;
-    private KernelAnalysis fModule;
+    private KernelAnalysisModule fModule;
 
     private static void deleteSuppFiles(ITmfTrace trace) {
         /* Remove supplementary files */
@@ -87,13 +87,13 @@ public class KernelThreadInformationProviderTest {
         deleteSuppFiles(trace);
         ((TmfTrace) trace).traceOpened(new TmfTraceOpenedSignal(this, trace, null));
         IAnalysisModule module = null;
-        for (IAnalysisModule mod : TmfTraceUtils.getAnalysisModulesOfClass(trace, KernelAnalysis.class)) {
+        for (IAnalysisModule mod : TmfTraceUtils.getAnalysisModulesOfClass(trace, KernelAnalysisModule.class)) {
             module = mod;
         }
         assertNotNull(module);
         module.schedule();
         module.waitForCompletion();
-        fModule = TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelAnalysis.class, KernelAnalysis.ID);
+        fModule = TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelAnalysisModule.class, KernelAnalysisModule.ID);
         fTrace = trace;
     }
 
@@ -108,24 +108,24 @@ public class KernelThreadInformationProviderTest {
 
     /**
      * Test the
-     * {@link KernelThreadInformationProvider#getThreadIds(KernelAnalysis)}
+     * {@link KernelThreadInformationProvider#getThreadIds(KernelAnalysisModule)}
      * method
      */
     @Test
     public void testGetThreadQuarks() {
-        KernelAnalysis module = checkNotNull(fModule);
+        KernelAnalysisModule module = checkNotNull(fModule);
         Collection<Integer> threadIds = KernelThreadInformationProvider.getThreadIds(module);
         assertEquals(7, threadIds.size());
     }
 
     /**
      * Test the
-     * {@link KernelThreadInformationProvider#getThreadOnCpu(KernelAnalysis, long, long)}
+     * {@link KernelThreadInformationProvider#getThreadOnCpu(KernelAnalysisModule, long, long)}
      * method
      */
     @Test
     public void testGetThreadOnCpu() {
-        KernelAnalysis module = checkNotNull(fModule);
+        KernelAnalysisModule module = checkNotNull(fModule);
 
         /* Check with invalid timestamps */
         Integer tid = KernelThreadInformationProvider.getThreadOnCpu(module, 0, -1);
@@ -173,12 +173,12 @@ public class KernelThreadInformationProviderTest {
 
     /**
      * Test the
-     * {@link KernelThreadInformationProvider#getParentPid(KernelAnalysis, Integer, long)}
+     * {@link KernelThreadInformationProvider#getParentPid(KernelAnalysisModule, Integer, long)}
      * method
      */
     @Test
     public void testGetPpid() {
-        KernelAnalysis module = checkNotNull(fModule);
+        KernelAnalysisModule module = checkNotNull(fModule);
 
         /* Check with invalid timestamps */
         Integer ppid = KernelThreadInformationProvider.getParentPid(module, 11, -1);
@@ -218,11 +218,11 @@ public class KernelThreadInformationProviderTest {
     }
 
     /**
-     * Test the {@link KernelThreadInformationProvider#getExecutableName(KernelAnalysis, Integer)} method
+     * Test the {@link KernelThreadInformationProvider#getExecutableName(KernelAnalysisModule, Integer)} method
      */
     @Test
     public void testGetExecutableName() {
-        KernelAnalysis module = checkNotNull(fModule);
+        KernelAnalysisModule module = checkNotNull(fModule);
 
         /* Check with invalid threads */
         String execName = KernelThreadInformationProvider.getExecutableName(module, 101);
@@ -250,12 +250,12 @@ public class KernelThreadInformationProviderTest {
 
     /**
      * Test the
-     * {@link KernelThreadInformationProvider#getStatusIntervalsForThread(KernelAnalysis, Integer, long, long, long, IProgressMonitor)}
+     * {@link KernelThreadInformationProvider#getStatusIntervalsForThread(KernelAnalysisModule, Integer, long, long, long, IProgressMonitor)}
      * method
      */
     @Test
     public void testGetStatusIntervalsForThread() {
-        KernelAnalysis module = checkNotNull(fModule);
+        KernelAnalysisModule module = checkNotNull(fModule);
 
         IProgressMonitor monitor = new NullProgressMonitor();
         Integer process21 = 21;

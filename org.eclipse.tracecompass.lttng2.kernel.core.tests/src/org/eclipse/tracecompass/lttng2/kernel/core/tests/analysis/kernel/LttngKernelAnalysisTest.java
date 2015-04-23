@@ -23,7 +23,7 @@ import static org.junit.Assume.assumeTrue;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysis;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.lttng2.control.core.session.SessionConfigStrings;
 import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -44,14 +44,14 @@ import org.junit.Test;
 import com.google.common.collect.ImmutableSet;
 
 /**
- * Test the {@link KernelAnalysis} class
+ * Test the {@link KernelAnalysisModule} class
  *
  * @author Geneviève Bastien
  */
 public class LttngKernelAnalysisTest {
 
     private LttngKernelTrace fTrace;
-    private KernelAnalysis fKernelAnalysisModule;
+    private KernelAnalysisModule fKernelAnalysisModule;
 
     /**
      * Class setup
@@ -66,7 +66,7 @@ public class LttngKernelAnalysisTest {
      */
     @Before
     public void setUp() {
-        fKernelAnalysisModule = new KernelAnalysis();
+        fKernelAnalysisModule = new KernelAnalysisModule();
         fTrace = new LttngKernelTrace();
         try {
             fTrace.initTrace(null, CtfTmfTestTrace.KERNEL.getPath(), CtfTmfEvent.class);
@@ -134,7 +134,7 @@ public class LttngKernelAnalysisTest {
     }
 
     /**
-     * Test for {@link KernelAnalysis#getAnalysisRequirements()}
+     * Test for {@link KernelAnalysisModule#getAnalysisRequirements()}
      *
      * FIXME Ignored for now because the analysis does not provide any
      * requirements (it doesn't look for particular event names anymore).

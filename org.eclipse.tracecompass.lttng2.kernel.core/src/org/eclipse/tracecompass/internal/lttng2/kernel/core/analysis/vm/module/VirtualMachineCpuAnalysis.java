@@ -22,7 +22,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysis;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelThreadInformationProvider;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.VcpuStateValues;
@@ -97,7 +97,7 @@ public class VirtualMachineCpuAnalysis extends TmfStateSystemAnalysisModule {
         /* Depends on the LTTng Kernel analysis modules */
         for (ITmfTrace trace : TmfTraceManager.getTraceSet(getTrace())) {
             trace = checkNotNull(trace);
-            for (KernelAnalysis module : TmfTraceUtils.getAnalysisModulesOfClass(trace, KernelAnalysis.class)) {
+            for (KernelAnalysisModule module : TmfTraceUtils.getAnalysisModulesOfClass(trace, KernelAnalysisModule.class)) {
                 modules.add(module);
             }
         }
@@ -185,7 +185,7 @@ public class VirtualMachineCpuAnalysis extends TmfStateSystemAnalysisModule {
         }
 
         String vmHostId = NonNullUtils.checkNotNull(ss.getAttributeName(vmQuark));
-        KernelAnalysis kernelModule = TmfExperimentUtils.getAnalysisModuleOfClassForHost((TmfExperiment) trace, vmHostId, KernelAnalysis.class);
+        KernelAnalysisModule kernelModule = TmfExperimentUtils.getAnalysisModuleOfClassForHost((TmfExperiment) trace, vmHostId, KernelAnalysisModule.class);
         if (kernelModule == null) {
             return map;
         }

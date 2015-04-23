@@ -22,7 +22,7 @@ import java.io.File;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysis;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.ThreadPriorityAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelTidAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.Activator;
@@ -105,7 +105,7 @@ public class KernelTidAspectTest {
         /* Make sure the Kernel analysis has run */
         ((TmfTrace) trace).traceOpened(new TmfTraceOpenedSignal(this, trace, null));
         IAnalysisModule module = null;
-        for (IAnalysisModule mod : TmfTraceUtils.getAnalysisModulesOfClass(trace, KernelAnalysis.class)) {
+        for (IAnalysisModule mod : TmfTraceUtils.getAnalysisModulesOfClass(trace, KernelAnalysisModule.class)) {
             module = mod;
         }
         assertNotNull(module);

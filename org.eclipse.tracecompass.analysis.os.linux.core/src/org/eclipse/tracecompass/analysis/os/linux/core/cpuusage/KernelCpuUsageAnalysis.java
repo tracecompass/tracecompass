@@ -22,7 +22,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.Attributes;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysis;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
@@ -88,8 +88,8 @@ public class KernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
          * This analysis depends on the LTTng kernel analysis, so it's added to
          * dependent modules.
          */
-        Iterable<KernelAnalysis> kernelModules = TmfTraceUtils.getAnalysisModulesOfClass(trace, KernelAnalysis.class);
-        for (KernelAnalysis kernelModule : kernelModules) {
+        Iterable<KernelAnalysisModule> kernelModules = TmfTraceUtils.getAnalysisModulesOfClass(trace, KernelAnalysisModule.class);
+        for (KernelAnalysisModule kernelModule : kernelModules) {
             /* Only add the first one we find, if there is one */
             modules.add(kernelModule);
             break;
@@ -115,7 +115,7 @@ public class KernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
         if (trace == null || cpuSs == null) {
             return map;
         }
-        ITmfStateSystem kernelSs = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysis.ID);
+        ITmfStateSystem kernelSs = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
         if (kernelSs == null) {
             return map;
         }

@@ -20,8 +20,9 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    KernelThreadInformationProviderTest.class,
-    KernelTidAspectTest.class
+        KernelStateProviderTest.class,
+        KernelThreadInformationProviderTest.class,
+        KernelTidAspectTest.class
 })
 public class AllTests {
 

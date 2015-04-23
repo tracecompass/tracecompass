@@ -20,7 +20,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 /**
  * This aspect finds the priority of the thread running from this event using
- * the {@link KernelAnalysis}.
+ * the {@link KernelAnalysisModule}.
  *
  * @author Christian Mansky
  * @since 1.0
@@ -45,7 +45,7 @@ public final class ThreadPriorityAspect implements ITmfEventAspect {
 
     @Override
     public @Nullable Integer resolve(ITmfEvent event) {
-        KernelAnalysis kernelAnalysis = TmfTraceUtils.getAnalysisModuleOfClass(event.getTrace(), KernelAnalysis.class, KernelAnalysis.ID);
+        KernelAnalysisModule kernelAnalysis = TmfTraceUtils.getAnalysisModuleOfClass(event.getTrace(), KernelAnalysisModule.class, KernelAnalysisModule.ID);
         if (kernelAnalysis == null) {
             return null;
         }

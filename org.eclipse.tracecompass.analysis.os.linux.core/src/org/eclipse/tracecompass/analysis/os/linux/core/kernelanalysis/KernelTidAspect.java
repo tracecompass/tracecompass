@@ -20,7 +20,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 /**
  * This aspect finds the ID of the thread running from this event using the
- * {@link KernelAnalysis}.
+ * {@link KernelAnalysisModule}.
  *
  * @author Geneviève Bastien
  * @since 1.0
@@ -44,8 +44,8 @@ public final class KernelTidAspect extends LinuxTidAspect {
         Integer cpu = (Integer) cpuObj;
 
         /* Find the analysis module for the trace */
-        KernelAnalysis analysis = TmfTraceUtils.getAnalysisModuleOfClass(event.getTrace(),
-                KernelAnalysis.class, KernelAnalysis.ID);
+        KernelAnalysisModule analysis = TmfTraceUtils.getAnalysisModuleOfClass(event.getTrace(),
+                KernelAnalysisModule.class, KernelAnalysisModule.ID);
         if (analysis == null) {
             return null;
         }

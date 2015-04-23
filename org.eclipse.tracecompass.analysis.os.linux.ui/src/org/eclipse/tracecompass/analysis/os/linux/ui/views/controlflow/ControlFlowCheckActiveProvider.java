@@ -13,7 +13,7 @@
 package org.eclipse.tracecompass.analysis.os.linux.ui.views.controlflow;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.Attributes;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysis;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.StateValues;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -81,7 +81,7 @@ public class ControlFlowCheckActiveProvider implements ITimeGraphEntryActiveProv
             }
 
             ITmfTrace trace = cfe.getTrace();
-            ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysis.ID);
+            ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
             if (ssq != null) {
                 beginTS = Math.max(beginTS, ssq.getStartTime());
                 endTS = Math.min(endTS, ssq.getCurrentEndTime());

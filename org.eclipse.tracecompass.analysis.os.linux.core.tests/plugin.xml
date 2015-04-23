@@ -14,7 +14,7 @@
          </tracetype>
       </module>
       <module
-            analysis_module="org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysis"
+            analysis_module="org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule"
             automatic="false"
             id="org.eclipse.tracecompass.analysis.os.linux.kernel"
             name="Linux Kernel Test Analysis">

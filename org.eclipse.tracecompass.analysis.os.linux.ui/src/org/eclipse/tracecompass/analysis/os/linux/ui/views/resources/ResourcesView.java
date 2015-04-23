@@ -23,7 +23,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.Attributes;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysis;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.ui.views.resources.ResourcesEntry.Type;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -97,7 +97,7 @@ public class ResourcesView extends AbstractTimeGraphView {
 
     @Override
     protected void buildEventList(ITmfTrace trace, ITmfTrace parentTrace, IProgressMonitor monitor) {
-        ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysis.ID);
+        ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
         if (ssq == null) {
             return;
         }
@@ -205,7 +205,7 @@ public class ResourcesView extends AbstractTimeGraphView {
             long startTime, long endTime, long resolution,
             IProgressMonitor monitor) {
         ResourcesEntry resourcesEntry = (ResourcesEntry) entry;
-        ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(resourcesEntry.getTrace(), KernelAnalysis.ID);
+        ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(resourcesEntry.getTrace(), KernelAnalysisModule.ID);
         if (ssq == null) {
             return null;
         }

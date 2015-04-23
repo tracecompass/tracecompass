@@ -19,7 +19,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysis;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelThreadInformationProvider;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
@@ -124,7 +124,7 @@ public class QemuKvmVmModel implements IVirtualMachineModel {
          * Maybe the parent of the current thread has a VM associated, see if we
          * can infer the VM for this thread
          */
-        KernelAnalysis module = getLttngKernelModuleFor(ht.getHost());
+        KernelAnalysisModule module = getLttngKernelModuleFor(ht.getHost());
         if (module == null) {
             return null;
         }
@@ -228,7 +228,7 @@ public class QemuKvmVmModel implements IVirtualMachineModel {
                  * We found the VM being run, let's associate it with the thread
                  * ID
                  */
-                KernelAnalysis module = getLttngKernelModuleFor(hostId);
+                KernelAnalysisModule module = getLttngKernelModuleFor(hostId);
                 if (module == null) {
                     break;
                 }
@@ -256,8 +256,8 @@ public class QemuKvmVmModel implements IVirtualMachineModel {
         }
     }
 
-    private @Nullable KernelAnalysis getLttngKernelModuleFor(String hostId) {
-        return TmfExperimentUtils.getAnalysisModuleOfClassForHost(fExperiment, hostId, KernelAnalysis.class);
+    private @Nullable KernelAnalysisModule getLttngKernelModuleFor(String hostId) {
+        return TmfExperimentUtils.getAnalysisModuleOfClassForHost(fExperiment, hostId, KernelAnalysisModule.class);
     }
 
 }

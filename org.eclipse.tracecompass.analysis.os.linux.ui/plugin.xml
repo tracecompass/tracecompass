@@ -36,14 +36,14 @@
             class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
             id="org.eclipse.tracecompass.analysis.os.linux.views.controlflow">
          <analysisModuleClass
-               class="org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysis">
+               class="org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule">
          </analysisModuleClass>
       </output>
       <output
             class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
             id="org.eclipse.tracecompass.analysis.os.linux.views.resources">
          <analysisModuleClass
-               class="org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysis">
+               class="org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule">
          </analysisModuleClass>
       </output>
       <output
