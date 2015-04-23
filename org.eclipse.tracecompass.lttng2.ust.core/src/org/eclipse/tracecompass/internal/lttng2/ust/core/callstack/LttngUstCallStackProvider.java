@@ -11,7 +11,7 @@
  *   Patrick Tasse - Add support for thread id
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.ust.core.trace.callstack;
+package org.eclipse.tracecompass.internal.lttng2.ust.core.callstack;
 
 import java.util.HashSet;
 import java.util.Set;

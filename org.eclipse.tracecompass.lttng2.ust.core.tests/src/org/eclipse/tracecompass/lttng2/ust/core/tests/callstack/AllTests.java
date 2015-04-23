@@ -10,7 +10,7 @@
  *   Alexandre Montplaisir - Initial implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.lttng2.ust.core.tests.trace.callstack;
+package org.eclipse.tracecompass.lttng2.ust.core.tests.callstack;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

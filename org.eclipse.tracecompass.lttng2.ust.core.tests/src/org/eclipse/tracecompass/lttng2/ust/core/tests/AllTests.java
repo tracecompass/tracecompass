@@ -22,7 +22,7 @@ import org.junit.runner.RunWith;
 @DebugSuite.SuiteClasses({
     ActivatorTest.class,
     org.eclipse.tracecompass.lttng2.ust.core.tests.analysis.memory.AllTests.class,
-    org.eclipse.tracecompass.lttng2.ust.core.tests.trace.callstack.AllTests.class
+    org.eclipse.tracecompass.lttng2.ust.core.tests.callstack.AllTests.class
 })
 public class AllTests {
 

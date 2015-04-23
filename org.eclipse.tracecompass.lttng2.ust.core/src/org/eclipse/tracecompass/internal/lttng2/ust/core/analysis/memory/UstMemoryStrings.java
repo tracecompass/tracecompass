@@ -10,7 +10,7 @@
  *   Matthew Khouzam, Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.ust.core.memoryusage;
+package org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory;
 
 /**
  * Strings for the memory usage state system using the LTTng UST libc

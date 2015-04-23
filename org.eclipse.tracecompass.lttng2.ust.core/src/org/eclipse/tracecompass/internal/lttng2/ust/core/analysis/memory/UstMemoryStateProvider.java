@@ -11,7 +11,7 @@
  *   Geneviève Bastien - Memory is per thread and only total is kept
  **********************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.ust.core.memoryusage;
+package org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
@@ -38,7 +38,7 @@ import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
  * @author Matthew Khouzam
  * @author Geneviève Bastien
  */
-public class MemoryUsageStateProvider extends AbstractTmfStateProvider {
+public class UstMemoryStateProvider extends AbstractTmfStateProvider {
 
     /* Version of this state provider */
     private static final int VERSION = 1;
@@ -56,7 +56,7 @@ public class MemoryUsageStateProvider extends AbstractTmfStateProvider {
      * @param trace
      *            trace
      */
-    public MemoryUsageStateProvider(@NonNull LttngUstTrace trace) {
+    public UstMemoryStateProvider(@NonNull LttngUstTrace trace) {
         super(trace, "Ust:Memory"); //$NON-NLS-1$
     }
 
@@ -128,7 +128,7 @@ public class MemoryUsageStateProvider extends AbstractTmfStateProvider {
 
     @Override
     public ITmfStateProvider getNewInstance() {
-        return new MemoryUsageStateProvider(getTrace());
+        return new UstMemoryStateProvider(getTrace());
     }
 
     @Override

@@ -18,8 +18,8 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.lttng2.ust.core.memoryusage.MemoryUsageStateProvider;
-import org.eclipse.tracecompass.internal.lttng2.ust.core.memoryusage.UstMemoryStrings;
+import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.UstMemoryStateProvider;
+import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.UstMemoryStrings;
 import org.eclipse.tracecompass.lttng2.control.core.session.SessionConfigStrings;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement;
@@ -75,7 +75,7 @@ public class UstMemoryAnalysisModule extends TmfStateSystemAnalysisModule {
 
     @Override
     protected ITmfStateProvider createStateProvider() {
-        return new MemoryUsageStateProvider(checkNotNull(getTrace()));
+        return new UstMemoryStateProvider(checkNotNull(getTrace()));
     }
 
     /**

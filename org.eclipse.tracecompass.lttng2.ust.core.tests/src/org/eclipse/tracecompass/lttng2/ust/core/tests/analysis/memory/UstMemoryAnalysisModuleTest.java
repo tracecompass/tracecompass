@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Set;
 
-import org.eclipse.tracecompass.internal.lttng2.ust.core.memoryusage.UstMemoryStrings;
+import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.UstMemoryStrings;
 import org.eclipse.tracecompass.lttng2.control.core.session.SessionConfigStrings;
 import org.eclipse.tracecompass.lttng2.ust.core.analysis.memory.UstMemoryAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement;

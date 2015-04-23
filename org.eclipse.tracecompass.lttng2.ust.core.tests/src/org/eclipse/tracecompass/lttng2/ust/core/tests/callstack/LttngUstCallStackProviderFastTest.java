@@ -10,7 +10,7 @@
  *   Alexandre Montplaisir - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.lttng2.ust.core.tests.trace.callstack;
+package org.eclipse.tracecompass.lttng2.ust.core.tests.callstack;
 
 import static org.junit.Assume.assumeTrue;
 
@@ -19,32 +19,33 @@ import org.junit.BeforeClass;
 
 /**
  * Test suite for the UST callstack state provider, using the trace of a program
- * instrumented with lttng-ust-cyg-profile.so tracepoints.
+ * instrumented with lttng-ust-cyg-profile-fast.so tracepoints. These do not
+ * contain the function addresses in the func_exit events.
  *
  * @author Alexandre Montplaisir
  */
-public class LttngUstCallStackProviderTest extends AbstractProviderTest {
+public class LttngUstCallStackProviderFastTest extends AbstractProviderTest {
 
-    private static final long[] timestamps = { 1378850463600000000L,
-                                               1378850463770000000L,
-                                               1378850463868753000L };
+    private static final long[] timestamps = { 1379361250310000000L,
+                                               1379361250498400000L,
+                                               1379361250499759000L };
 
     /**
      * Class setup
      */
     @BeforeClass
     public static void setUpClass() {
-        assumeTrue(CtfTmfTestTrace.CYG_PROFILE.exists());
+        assumeTrue(CtfTmfTestTrace.CYG_PROFILE_FAST.exists());
     }
 
     @Override
     protected CtfTmfTestTrace getTestTrace() {
-        return CtfTmfTestTrace.CYG_PROFILE;
+        return CtfTmfTestTrace.CYG_PROFILE_FAST;
     }
 
     @Override
     protected String getProcName() {
-        return "glxgears-16073";
+        return "glxgears-29822";
     }
 
     @Override

@@ -10,7 +10,7 @@
  *   Alexandre Montplaisir - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.lttng2.ust.core.tests.trace.callstack;
+package org.eclipse.tracecompass.lttng2.ust.core.tests.callstack;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.junit.Assert.assertEquals;
@@ -22,7 +22,7 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.util.List;
 
-import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.callstack.LttngUstCallStackProvider;
+import org.eclipse.tracecompass.internal.lttng2.ust.core.callstack.LttngUstCallStackProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
