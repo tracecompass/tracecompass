@@ -23,6 +23,7 @@ import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.Definition;
 import org.eclipse.tracecompass.ctf.core.event.types.Encoding;
+import org.eclipse.tracecompass.ctf.core.event.types.ICompositeDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StringDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StringDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
@@ -137,7 +138,7 @@ public class CTFStreamInputReaderTest {
      */
     @Test
     public void testGetCurrentPacketContext() {
-        StructDefinition result = fixture.getCurrentEvent().getPacketContext();
+        ICompositeDefinition result = fixture.getCurrentEvent().getPacketContext();
         assertNotNull(result);
     }
 

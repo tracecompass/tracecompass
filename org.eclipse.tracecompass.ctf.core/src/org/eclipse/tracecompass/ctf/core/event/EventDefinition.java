@@ -20,6 +20,7 @@ import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
 import org.eclipse.tracecompass.ctf.core.event.types.Definition;
+import org.eclipse.tracecompass.ctf.core.event.types.ICompositeDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
@@ -54,16 +55,16 @@ public final class EventDefinition implements IDefinitionScope {
     /**
      * The event context structure definition.
      */
-    private final StructDefinition fEventContext;
+    private final ICompositeDefinition fEventContext;
 
-    private final StructDefinition fStreamContext;
+    private final ICompositeDefinition fStreamContext;
 
-    private final StructDefinition fPacketContext;
+    private final ICompositeDefinition fPacketContext;
 
     /**
      * The event fields structure definition.
      */
-    private final StructDefinition fFields;
+    private final ICompositeDefinition fFields;
 
     /**
      * The StreamInputReader that reads this event definition.
@@ -91,14 +92,15 @@ public final class EventDefinition implements IDefinitionScope {
      *            the stream context
      * @param fields
      *            The event fields
+     * @since 1.0
      */
     public EventDefinition(IEventDeclaration declaration,
             CTFStreamInputReader streamInputReader,
             long timestamp,
-            StructDefinition streamContext,
-            StructDefinition eventContext,
-            StructDefinition packetContext,
-            StructDefinition fields) {
+            ICompositeDefinition streamContext,
+            ICompositeDefinition eventContext,
+            ICompositeDefinition packetContext,
+            ICompositeDefinition fields) {
         fDeclaration = declaration;
         fStreamInputReader = streamInputReader;
         fTimestamp = timestamp;
@@ -141,8 +143,9 @@ public final class EventDefinition implements IDefinitionScope {
      * Gets the fields of a definition
      *
      * @return the fields of a definition in struct form. Can be null.
+     * @since 1.0
      */
-    public StructDefinition getFields() {
+    public ICompositeDefinition getFields() {
         return fFields;
     }
 
@@ -150,8 +153,9 @@ public final class EventDefinition implements IDefinitionScope {
      * Gets the context of this event without the context of the stream
      *
      * @return the context in struct form
+     * @since 1.0
      */
-    public StructDefinition getEventContext() {
+    public ICompositeDefinition getEventContext() {
         return fEventContext;
     }
 
@@ -159,8 +163,9 @@ public final class EventDefinition implements IDefinitionScope {
      * Gets the context of this event within a stream
      *
      * @return the context in struct form
+     * @since 1.0
      */
-    public StructDefinition getContext() {
+    public ICompositeDefinition getContext() {
 
         /* Most common case so far */
         if (fStreamContext == null) {
@@ -217,8 +222,9 @@ public final class EventDefinition implements IDefinitionScope {
      * Gets the context of packet the event is in.
      *
      * @return the packet context
+     * @since 1.0
      */
-    public StructDefinition getPacketContext() {
+    public ICompositeDefinition getPacketContext() {
         return fPacketContext;
     }
 
