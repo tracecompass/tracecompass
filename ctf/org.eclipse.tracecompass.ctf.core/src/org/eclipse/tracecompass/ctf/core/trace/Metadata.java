@@ -58,7 +58,7 @@ public class Metadata {
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-    private static final String TEXT_ONLY_METADATA_HEADER_PREFIX = "/* CTF";  //$NON-NLS-1$
+    private static final String TEXT_ONLY_METADATA_HEADER_PREFIX = "/* CTF"; //$NON-NLS-1$
 
     private static final int PREVALIDATION_SIZE = 8;
 
@@ -259,6 +259,10 @@ public class Metadata {
         /* Generate IO structures (declarations) */
         fTreeParser = new IOStructGen(tree, trace);
         fTreeParser.generate();
+        ByteOrder localDetectedByteOrder = getDetectedByteOrder();
+        if (detectedByteOrder != null && trace.getByteOrder() != localDetectedByteOrder) {
+            throw new ParseException("Metadata byte order and trace byte order inconsistent."); //$NON-NLS-1$
+        }
     }
 
     /**
