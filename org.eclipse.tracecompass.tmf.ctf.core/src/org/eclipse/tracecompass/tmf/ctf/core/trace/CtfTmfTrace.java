@@ -234,19 +234,19 @@ public class CtfTmfTrace extends TmfTrace
      */
     @Override
     public IStatus validate(final IProject project, final String path) {
-        boolean isMetadataValid = false;
+        boolean isMetadataFile = false;
         try {
-         isMetadataValid = Metadata.preValidate(path);
+            isMetadataFile = Metadata.preValidate(path);
         } catch (final CTFException e) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + e.toString(), e); //$NON-NLS-1$
         }
 
-        if (isMetadataValid) {
+        if (isMetadataFile) {
             // Trace is pre-validated, continue will full validation
             try {
                 final CTFTrace trace = new CTFTrace(path);
                 if (!trace.majorIsSet()) {
-                    if (isMetadataValid) {
+                    if (isMetadataFile) {
                         return new TraceValidationStatus(MIN_CONFIDENCE, IStatus.WARNING, Activator.PLUGIN_ID, Messages.CtfTmfTrace_MajorNotSet, null);
                     }
                     return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_MajorNotSet);
@@ -258,16 +258,9 @@ public class CtfTmfTrace extends TmfTrace
                 // Trace is validated, return with confidence
                 return new CtfTraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID, trace.getEnvironment());
 
-            } catch (final CTFException e) {
-                if (isMetadataValid) {
-                    return new TraceValidationStatus(MIN_CONFIDENCE, IStatus.WARNING, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + e.toString(), e); //$NON-NLS-1$
-                }
-                return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + e.toString()); //$NON-NLS-1$
-            } catch (final BufferOverflowException e) {
-                if (isMetadataValid) {
-                    return new TraceValidationStatus(MIN_CONFIDENCE, IStatus.WARNING, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + e.toString(), e); //$NON-NLS-1$
-                }
-                return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + e.toString()); //$NON-NLS-1$
+            } catch (final CTFException | BufferOverflowException e ) {
+                // return warning since it's a CTF trace but with errors in it
+                return new TraceValidationStatus(MIN_CONFIDENCE, IStatus.WARNING, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + e.toString(), e); //$NON-NLS-1$
             }
         }
         return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError);
