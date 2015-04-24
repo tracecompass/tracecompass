@@ -12,7 +12,7 @@
 
 package org.eclipse.tracecompass.ctf.core.event.scope;
 
-import org.eclipse.tracecompass.ctf.core.event.types.Definition;
+import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
 
 /**
  * The scope of a CTF definition. Used for compound types.
@@ -37,7 +37,7 @@ public interface IDefinitionScope {
      * @param lookupPath
      *            The path to look up
      * @return The Definition that was read
+     * @since 1.0
      */
-    // TODO: change to IDefintion
-    Definition lookupDefinition(String lookupPath);
+    IDefinition lookupDefinition(String lookupPath);
 }

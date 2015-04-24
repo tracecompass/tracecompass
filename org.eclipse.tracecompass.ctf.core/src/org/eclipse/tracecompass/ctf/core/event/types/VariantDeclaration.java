@@ -119,7 +119,7 @@ public class VariantDeclaration extends Declaration {
     public VariantDefinition createDefinition(IDefinitionScope definitionScope,
             String fieldName, BitBuffer input) throws CTFException {
         alignRead(input);
-        Definition def = definitionScope.lookupDefinition(fTag);
+        IDefinition def = definitionScope.lookupDefinition(fTag);
         EnumDefinition tagDef = (EnumDefinition) ((def instanceof EnumDefinition) ? def : null);
         if (tagDef == null) {
             throw new CTFException("Tag is not defined " + fTag); //$NON-NLS-1$

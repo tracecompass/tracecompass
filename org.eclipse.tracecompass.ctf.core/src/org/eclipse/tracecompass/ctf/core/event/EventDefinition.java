@@ -20,6 +20,7 @@ import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
 import org.eclipse.tracecompass.ctf.core.event.types.Definition;
+import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInputReader;
@@ -250,8 +251,11 @@ public final class EventDefinition implements IDefinitionScope {
     // Operations
     // ------------------------------------------------------------------------
 
+    /**
+     * @since 1.0
+     */
     @Override
-    public Definition lookupDefinition(String lookupPath) {
+    public IDefinition lookupDefinition(String lookupPath) {
         if (lookupPath.equals("context")) { //$NON-NLS-1$
             return fEventContext;
         } else if (lookupPath.equals("fields")) { //$NON-NLS-1$

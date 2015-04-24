@@ -69,7 +69,7 @@ public abstract class ScopedDefinition extends Definition implements IDefinition
      * @return the array or null.
      */
     public @Nullable AbstractArrayDefinition lookupArrayDefinition(String name) {
-        Definition def = lookupDefinition(name);
+        IDefinition def = lookupDefinition(name);
         return (AbstractArrayDefinition) ((def instanceof AbstractArrayDefinition) ? def : null);
     }
 
@@ -85,7 +85,7 @@ public abstract class ScopedDefinition extends Definition implements IDefinition
      */
     @Nullable
     public EnumDefinition lookupEnum(String name) {
-        Definition def = lookupDefinition(name);
+        IDefinition def = lookupDefinition(name);
         return (EnumDefinition) ((def instanceof EnumDefinition) ? def : null);
     }
 
@@ -100,7 +100,7 @@ public abstract class ScopedDefinition extends Definition implements IDefinition
      */
     @Nullable
     public IntegerDefinition lookupInteger(String name) {
-        Definition def = lookupDefinition(name);
+        IDefinition def = lookupDefinition(name);
         return (IntegerDefinition) ((def instanceof IntegerDefinition) ? def : null);
     }
 
@@ -115,7 +115,7 @@ public abstract class ScopedDefinition extends Definition implements IDefinition
      */
     @Nullable
     public StringDefinition lookupString(String name) {
-        Definition def = lookupDefinition(name);
+        IDefinition def = lookupDefinition(name);
         return (StringDefinition) ((def instanceof StringDefinition) ? def : null);
     }
 
@@ -130,7 +130,7 @@ public abstract class ScopedDefinition extends Definition implements IDefinition
      */
     @Nullable
     public StructDefinition lookupStruct(String name) {
-        Definition def = lookupDefinition(name);
+        IDefinition def = lookupDefinition(name);
         return (StructDefinition) ((def instanceof StructDefinition) ? def : null);
     }
 
@@ -145,7 +145,7 @@ public abstract class ScopedDefinition extends Definition implements IDefinition
      */
     @Nullable
     public VariantDefinition lookupVariant(String name) {
-        Definition def = lookupDefinition(name);
+        IDefinition def = lookupDefinition(name);
         return (VariantDefinition) ((def instanceof VariantDefinition) ? def : null);
     }
 }

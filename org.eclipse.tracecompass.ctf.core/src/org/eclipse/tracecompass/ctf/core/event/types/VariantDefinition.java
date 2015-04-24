@@ -95,8 +95,11 @@ public final class VariantDefinition extends ScopedDefinition {
     // Operations
     // ------------------------------------------------------------------------
 
+    /**
+     * @since 1.0
+     */
     @Override
-    public Definition lookupDefinition(String lookupPath) {
+    public IDefinition lookupDefinition(String lookupPath) {
         if (lookupPath == null) {
             return null;
         }
