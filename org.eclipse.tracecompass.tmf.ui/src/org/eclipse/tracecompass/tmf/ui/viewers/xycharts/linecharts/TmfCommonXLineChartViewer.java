@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2015 École Polytechnique de Montréal and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -205,8 +205,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      *            The number of steps in the x axis.
      * @return The time values (converted to double) to match every step.
      */
-    protected final double[] getXAxis(long start, long end, int nb) {
-        setTimeOffset(start - 1);
+    protected final static double[] getXAxis(long start, long end, int nb) {
 
         double timestamps[] = new double[nb];
         long steps = (end - start);
