@@ -56,14 +56,14 @@ public class HistogramScaledData {
      */
     public HistogramBucket[] fData;
     /**
-     * Array of scaled values combined including the lost events.
-     * This array contains the number of lost events for each bar in the histogram
+     * Array of scaled values combined including the lost events. This array
+     * contains the number of lost events for each bar in the histogram
      */
     public final int[] fLostEventsData;
     /**
      * The bucket duration of a scaled data bucket.
      */
-    public long fBucketDuration;
+    public double fBucketDuration;
     /**
      * The maximum number of events of all buckets.
      */
@@ -89,11 +89,13 @@ public class HistogramScaledData {
      */
     public double fScalingFactor;
     /**
-     * The scaling factor used to fill the scaled data including the lost events.
+     * The scaling factor used to fill the scaled data including the lost
+     * events.
      */
     public double fScalingFactorCombined;
     /**
-     * The scaling factor used to fill the combining scaled data including lost events
+     * The scaling factor used to fill the combining scaled data including lost
+     * events
      */
     /**
      * Time of first bucket.
@@ -114,9 +116,13 @@ public class HistogramScaledData {
 
     /**
      * Constructor.
-     * @param width the canvas width
-     * @param height the canvas height
-     * @param barWidth the required bar width
+     *
+     * @param width
+     *            the canvas width
+     * @param height
+     *            the canvas height
+     * @param barWidth
+     *            the required bar width
      */
     public HistogramScaledData(int width, int height, int barWidth) {
         fWidth = width;
@@ -137,14 +143,16 @@ public class HistogramScaledData {
 
     /**
      * Copy constructor
-     * @param other another scaled data.
+     *
+     * @param other
+     *            another scaled data.
      */
     public HistogramScaledData(HistogramScaledData other) {
         fWidth = other.fWidth;
         fHeight = other.fHeight;
         fBarWidth = other.fBarWidth;
         fData = Arrays.copyOf(other.fData, other.fData.length);
-        fLostEventsData  = Arrays.copyOf(other.fLostEventsData, other.fLostEventsData.length);
+        fLostEventsData = Arrays.copyOf(other.fLostEventsData, other.fLostEventsData.length);
         fBucketDuration = other.fBucketDuration;
         fMaxValue = other.fMaxValue;
         fMaxCombinedValue = other.fMaxCombinedValue;
@@ -162,6 +170,7 @@ public class HistogramScaledData {
 
     /**
      * Returns the time of the first bucket of the scaled data.
+     *
      * @return the time of the first bucket.
      */
     public long getFirstBucketTime() {
@@ -170,7 +179,9 @@ public class HistogramScaledData {
 
     /**
      * Set the first event time.
-     * @param firstEventTime The time to set
+     *
+     * @param firstEventTime
+     *            The time to set
      */
     public void setFirstBucketTime(long firstEventTime) {
         fFirstBucketTime = firstEventTime;
@@ -178,6 +189,7 @@ public class HistogramScaledData {
 
     /**
      * Returns the time of the last bucket.
+     *
      * @return last bucket time
      */
     public long getLastBucketTime() {
@@ -186,19 +198,36 @@ public class HistogramScaledData {
 
     /**
      * Returns the time of the bucket start time for given index.
-     * @param index A bucket index.
+     *
+     * @param index
+     *            A bucket index.
      * @return the time of the bucket start time
      */
     public long getBucketStartTime(int index) {
-        return fFirstBucketTime + index * fBucketDuration;
+        return fFirstBucketTime + (long) (getOffsetIndex(index) * fBucketDuration);
+    }
+
+    private int getOffsetIndex(int index) {
+        if (fBucketDuration != 0) {
+            double nbBuckets = fWidth * fBucketDuration;
+            /**
+             * Add half a bucket to get the offset right, this is so we show 1/2
+             * of the last bucket
+             */
+            double threshold = (0.5 / nbBuckets) * fWidth;
+            return (int) (index + threshold);
+        }
+        return index;
     }
 
     /**
      * Returns the time of the bucket end time for given index.
-     * @param index A bucket index.
+     *
+     * @param index
+     *            A bucket index.
      * @return the time of the bucket end time
      */
     public long getBucketEndTime(int index) {
-        return getBucketStartTime(index) + fBucketDuration;
+        return getBucketStartTime(index + 1);
     }
 }
