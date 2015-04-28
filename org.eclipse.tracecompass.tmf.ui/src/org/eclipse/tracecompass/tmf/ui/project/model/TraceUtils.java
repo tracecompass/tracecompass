@@ -22,8 +22,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.TmfProjectNature;
 import org.eclipse.ui.PlatformUI;
@@ -45,10 +46,8 @@ public class TraceUtils {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                final MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-                mb.setText(boxTitle);
-                mb.setMessage(errorMsg);
-                mb.open();
+                final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+                MessageDialog.openError(shell, boxTitle, errorMsg);
             }
         });
     }
