@@ -19,10 +19,14 @@ import java.util.Map.Entry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.TmfUiRefreshHandler;
+import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
+import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfChartTimeStampFormat;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.swtchart.IAxisTick;
@@ -352,6 +356,16 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                         getSwtChart().getAxisSet().getYAxis(0).setRange(new Range(miny, maxy));
                     }
                     getSwtChart().redraw();
+
+                    if (isSendTimeAlignSignals()) {
+                        // The width of the chart might have changed and its time
+                        // axis might be misaligned with the other views
+                        Point viewPos = TmfCommonXLineChartViewer.this.getParent().getParent().toDisplay(0, 0);
+                        int axisPos = getSwtChart().toDisplay(0, 0).x + getPointAreaOffset();
+                        int timeAxisOffset = axisPos - viewPos.x;
+                        TmfTimeViewAlignmentInfo timeAlignmentInfo = new TmfTimeViewAlignmentInfo(getControl().getShell(), viewPos, timeAxisOffset);
+                        TmfSignalManager.dispatchSignal(new TmfTimeViewAlignmentSignal(TmfCommonXLineChartViewer.this, timeAlignmentInfo, true));
+                    }
                 }
             }
         });

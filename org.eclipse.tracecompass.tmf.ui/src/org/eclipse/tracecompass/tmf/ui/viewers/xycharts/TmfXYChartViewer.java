@@ -16,10 +16,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfTimeViewer;
 import org.swtchart.Chart;
@@ -51,6 +51,12 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     private TmfBaseProvider fToolTipProvider;
     /** The middle mouse drag provider */
     private TmfBaseProvider fMouseDragProvider;
+    /**
+     * Whether or not to send time alignment signals. This should be set to true
+     * for viewers that are part of an aligned view.
+     */
+    private boolean fSendTimeAlignSignals = false;
+
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -354,4 +360,72 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
         return display;
     }
 
+    /**
+     * Get the offset of the point area, relative to the XY chart viewer
+     * control. We consider the point area to be from where the first point
+     * could be drawn to where the last point could be drawn.
+     *
+     * @return the offset in pixels
+     *
+     * @since 1.0
+     */
+    public int getPointAreaOffset() {
+        int pixelCoordinate = 0;
+        IAxis[] xAxes = getSwtChart().getAxisSet().getXAxes();
+        if (xAxes.length > 0) {
+            IAxis axis = xAxes[0];
+            long windowStartTime = getWindowStartTime() - getTimeOffset();
+            pixelCoordinate = axis.getPixelCoordinate(windowStartTime - 1);
+        }
+        return getSwtChart().toControl(getSwtChart().getPlotArea().toDisplay(pixelCoordinate, 0)).x;
+    }
+
+    /**
+     * Get the width of the point area. We consider the point area to be from
+     * where the first point could be drawn to where the last point could be
+     * drawn. The point area differs from the plot area because there might be a
+     * gap between where the plot area start and where the fist point is drawn.
+     * This also matches the width that the use can select.
+     *
+     * @return the width in pixels
+     *
+     * @since 1.0
+     */
+    public int getPointAreaWidth() {
+        IAxis[] xAxes = getSwtChart().getAxisSet().getXAxes();
+        if (xAxes.length > 0 && fSwtChart.getSeriesSet().getSeries().length > 0) {
+            IAxis axis = xAxes[0];
+            int x1 = getPointAreaOffset();
+            long windowEndTime = getWindowEndTime() - getTimeOffset();
+            int x2 = axis.getPixelCoordinate(windowEndTime - 1);
+            x2 = getSwtChart().toControl(getSwtChart().getPlotArea().toDisplay(x2, 0)).x;
+            int width = x2 - x1;
+            return width;
+        }
+
+        return getSwtChart().getPlotArea().getSize().x;
+    }
+
+
+    /**
+     * Sets whether or not to send time alignment signals. This should be set to
+     * true for viewers that are part of an aligned view.
+     *
+     * @param sendTimeAlignSignals
+     *            whether or not to send time alignment signals
+     * @since 1.0
+     */
+    public void setSendTimeAlignSignals(boolean sendTimeAlignSignals) {
+        fSendTimeAlignSignals = sendTimeAlignSignals;
+    }
+
+    /**
+     * Returns whether or not to send time alignment signals.
+     *
+     * @return whether or not to send time alignment signals.
+     * @since 1.0
+     */
+    public boolean isSendTimeAlignSignals() {
+        return fSendTimeAlignSignals;
+    }
 }
