@@ -14,6 +14,7 @@
 package org.eclipse.tracecompass.btf.core.event;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.tracecompass.btf.core.Messages;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
@@ -87,8 +88,8 @@ public class BTFPayload {
 
         EVENT_DESCRIPTIONS = builder.build();
         ImmutableMap.Builder<String, TmfEventField[]> fieldBuilder = new Builder<>();
-        for (String key : EVENT_DESCRIPTIONS.keySet()) {
-            fieldBuilder.put(key, new TmfEventField[] { new TmfEventField(DESCRIPTION, EVENT_DESCRIPTIONS.get(key), null) });
+        for (Entry<String, String> entry : EVENT_DESCRIPTIONS.entrySet()) {
+            fieldBuilder.put(entry.getKey(), new TmfEventField[] { new TmfEventField(DESCRIPTION, entry.getValue(), null) });
         }
         FIELDS = fieldBuilder.build();
     }

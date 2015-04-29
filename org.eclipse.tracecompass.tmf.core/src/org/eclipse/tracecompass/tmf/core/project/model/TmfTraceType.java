@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -188,21 +189,22 @@ public final class TmfTraceType {
     }
 
     /**
-     * Returns a list of trace type labels "category : name", ... sorted by given comparator.
+     * Returns a list of trace type labels "category : name", ... sorted by
+     * given comparator.
      *
      * Returns only trace types, not experiment types
      *
      * @param comparator
      *            Comparator class (type String) or null for alphabetical order.
-     * @return a list of trace type labels sorted according to the given comparator
+     * @return a list of trace type labels sorted according to the given
+     *         comparator
      */
     public static String[] getAvailableTraceTypes(Comparator<String> comparator) {
 
         // Generate the list of Category:TraceType to populate the ComboBox
         List<String> traceTypes = new ArrayList<>();
 
-        for (String key : TRACE_TYPES.keySet()) {
-            TraceTypeHelper tt = TRACE_TYPES.get(key);
+        for (TraceTypeHelper tt : TRACE_TYPES.values()) {
             if (!tt.isExperimentType()) {
                 traceTypes.add(tt.getLabel());
             }
@@ -244,7 +246,8 @@ public final class TmfTraceType {
             String traceTypeId = trace.getTraceTypeId();
             TraceTypeHelper tt = new TraceTypeHelper(traceTypeId, def.categoryName, def.definitionName, trace, false, TraceElementType.TRACE);
             TRACE_TYPES.put(traceTypeId, tt);
-            // Deregister trace as signal handler because it is only used for validation
+            // Deregister trace as signal handler because it is only used for
+            // validation
             TmfSignalManager.deregister(trace);
         }
         for (CustomXmlTraceDefinition def : CustomXmlTraceDefinition.loadAll()) {
@@ -252,7 +255,8 @@ public final class TmfTraceType {
             String traceTypeId = trace.getTraceTypeId();
             TraceTypeHelper tt = new TraceTypeHelper(traceTypeId, def.categoryName, def.definitionName, trace, false, TraceElementType.TRACE);
             TRACE_TYPES.put(traceTypeId, tt);
-            // Deregister trace as signal handler because it is only used for validation
+            // Deregister trace as signal handler because it is only used for
+            // validation
             TmfSignalManager.deregister(trace);
         }
     }
@@ -293,7 +297,8 @@ public final class TmfTraceType {
             }
             TraceTypeHelper tt = new TraceTypeHelper(traceTypeId, category, definitionName, trace, false, TraceElementType.TRACE);
             TRACE_TYPES.put(traceTypeId, tt);
-            // Deregister trace as signal handler because it is only used for validation
+            // Deregister trace as signal handler because it is only used for
+            // validation
             TmfSignalManager.deregister(trace);
         }
     }
@@ -353,8 +358,8 @@ public final class TmfTraceType {
                 }
             }
             // create the trace types
-            for (String typeId : TRACE_TYPE_ATTRIBUTES.keySet()) {
-                IConfigurationElement ce = TRACE_TYPE_ATTRIBUTES.get(typeId);
+            for (Entry<String, IConfigurationElement> entry : TRACE_TYPE_ATTRIBUTES.entrySet()) {
+                IConfigurationElement ce = entry.getValue();
                 final String category = getCategory(ce);
                 final String attribute = ce.getAttribute(TmfTraceType.NAME_ATTR);
                 ITmfTrace trace = null;
@@ -376,6 +381,7 @@ public final class TmfTraceType {
                     final String dirString = ce.getAttribute(TmfTraceType.IS_DIR_ATTR);
                     boolean isDir = Boolean.parseBoolean(dirString);
 
+                    final String typeId = entry.getKey();
                     TraceTypeHelper tt = new TraceTypeHelper(typeId, category, attribute, trace, isDir, elementType);
                     TRACE_TYPES.put(typeId, tt);
                 } catch (CoreException e) {
@@ -423,11 +429,11 @@ public final class TmfTraceType {
      */
     public static List<TraceTypeHelper> getTraceTypes(String categoryName) {
         List<TraceTypeHelper> traceNames = new ArrayList<>();
-        for (String key : TRACE_TYPES.keySet()) {
-            if (!TRACE_TYPES.get(key).isExperimentType()) {
-                final String storedCategoryName = TRACE_TYPES.get(key).getCategoryName();
+        for (TraceTypeHelper traceTypeHelper : TRACE_TYPES.values()) {
+            if (!traceTypeHelper.isExperimentType()) {
+                final String storedCategoryName = traceTypeHelper.getCategoryName();
                 if (storedCategoryName.equals(categoryName)) {
-                    traceNames.add(TRACE_TYPES.get(key));
+                    traceNames.add(traceTypeHelper);
                 }
             }
         }
@@ -483,9 +489,9 @@ public final class TmfTraceType {
      * @return the trace type id
      */
     public static String getTraceTypeId(String label) {
-        for (String key : TRACE_TYPES.keySet()) {
-            if (TRACE_TYPES.get(key).getLabel().equals(label)) {
-                return key;
+        for (Entry<String, TraceTypeHelper> entry : TRACE_TYPES.entrySet()) {
+            if (entry.getValue().getLabel().equals(label)) {
+                return entry.getKey();
             }
         }
         return null;
@@ -493,9 +499,11 @@ public final class TmfTraceType {
 
     /**
      * Checks if a trace is a valid directory trace
+     *
      * @param path
      *            the file name (and path)
-     * @return <code>true</code> if the trace is a valid directory trace else <code>false</code>
+     * @return <code>true</code> if the trace is a valid directory trace else
+     *         <code>false</code>
      */
     public static boolean isDirectoryTrace(String path) {
         final Iterable<TraceTypeHelper> traceTypeHelpers = getTraceTypeHelpers();
@@ -510,8 +518,9 @@ public final class TmfTraceType {
 
     /**
      * @param traceType
-     *              the trace type
-     * @return <code>true</code> it is a directory trace type else else <code>false</code>
+     *            the trace type
+     * @return <code>true</code> it is a directory trace type else else
+     *         <code>false</code>
      */
     public static boolean isDirectoryTraceType(String traceType) {
         if (traceType != null) {
@@ -557,7 +566,8 @@ public final class TmfTraceType {
      * @return the trace type ID in Trace Compass format
      */
     public static String buildCompatibilityTraceTypeId(String traceTypeId) {
-        // Fix custom trace type id with old class name or without category name for backward compatibility
+        // Fix custom trace type id with old class name or without category name
+        // for backward compatibility
         if (traceTypeId != null) {
             String newTraceType = CustomTxtTrace.buildCompatibilityTraceTypeId(traceTypeId);
             if (newTraceType.equals(traceTypeId)) {
