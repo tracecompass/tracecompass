@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson, others
+ * Copyright (c) 2012, 2015 Ericsson, others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -53,10 +53,13 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
@@ -64,6 +67,10 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
+import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
+import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
+import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.ITimeGraphEntryActiveProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TimeGraphFilterDialog;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
@@ -130,6 +137,9 @@ public class TimeGraphCombo extends Composite {
 
     /** List of all expanded items whose parents are also expanded */
     private List<TreeItem> fVisibleExpandedItems = null;
+
+    private Listener fSashDragListener;
+    private SashForm fSashForm;
 
     // ------------------------------------------------------------------------
     // Classes
@@ -358,21 +368,21 @@ public class TimeGraphCombo extends Composite {
      * @param style
      *            the style of widget to construct
      * @param weights
-     *            The relative weights of each side of the sash form
+     *            The array (length 2) of relative weights of each side of the sash form
      */
     public TimeGraphCombo(Composite parent, int style, int[] weights) {
         super(parent, style);
         setLayout(new FillLayout());
 
-        final SashForm sash = new SashForm(this, SWT.NONE);
+        fSashForm = new SashForm(this, SWT.NONE);
 
-        fTreeViewer = new TreeViewer(sash, SWT.FULL_SELECTION | SWT.H_SCROLL);
+        fTreeViewer = new TreeViewer(fSashForm, SWT.FULL_SELECTION | SWT.H_SCROLL);
         fTreeViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
         final Tree tree = fTreeViewer.getTree();
         tree.setHeaderVisible(true);
         tree.setLinesVisible(true);
 
-        fTimeGraphViewer = new TimeGraphViewer(sash, SWT.NONE);
+        fTimeGraphViewer = new TimeGraphViewer(fSashForm, SWT.NONE);
         fTimeGraphViewer.setItemHeight(getItemHeight(tree));
         fTimeGraphViewer.setHeaderHeight(tree.getHeaderHeight());
         fTimeGraphViewer.setBorderWidth(tree.getBorderWidth());
@@ -619,7 +629,37 @@ public class TimeGraphCombo extends Composite {
         // to a value that would cause blank space to be drawn at the bottom of the tree.
         fNumFillerRows = Display.getDefault().getBounds().height / getItemHeight(tree);
 
-        sash.setWeights(weights);
+        fSashForm.setWeights(weights);
+
+        fTimeGraphViewer.getTimeGraphControl().addPaintListener(new PaintListener() {
+            @Override
+            public void paintControl(PaintEvent e) {
+                // Sashes in a SashForm are being created on layout so add the
+                // drag listener here
+                if (fSashDragListener == null) {
+                    for (Control control : fSashForm.getChildren()) {
+                        if (control instanceof Sash) {
+                            fSashDragListener = new Listener() {
+
+                                @Override
+                                public void handleEvent(Event event) {
+                                    sendTimeViewAlignmentChanged();
+
+                                }
+                            };
+                            control.removePaintListener(this);
+                            control.addListener(SWT.Selection, fSashDragListener);
+                            // There should be only one sash
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    private void sendTimeViewAlignmentChanged() {
+        TmfSignalManager.dispatchSignal(new TmfTimeViewAlignmentSignal(fSashForm, getTimeViewAlignmentInfo()));
     }
 
     // ------------------------------------------------------------------------
@@ -1134,4 +1174,64 @@ public class TimeGraphCombo extends Composite {
         }
     }
 
+    /**
+     * Return the time alignment information
+     *
+     * @return the time alignment information
+     *
+     * @see ITmfTimeAligned
+     *
+     * @since 1.0
+     */
+    public TmfTimeViewAlignmentInfo getTimeViewAlignmentInfo() {
+        int[] weights = fSashForm.getWeights();
+        int leftWidth = (int) (((float) weights[0] / (weights[0] + weights[1])) * fSashForm.getBounds().width) + fSashForm.getSashWidth();
+        Point location = fSashForm.toDisplay(0, 0);
+        return new TmfTimeViewAlignmentInfo(fSashForm.getShell(), location, leftWidth);
+    }
+
+    /**
+     * Return the available width for the time-axis.
+     *
+     * @see ITmfTimeAligned
+     *
+     * @param requestedOffset
+     *            the requested offset
+     * @return the available width for the time-axis
+     *
+     * @since 1.0
+     */
+    public int getAvailableWidth(int requestedOffset) {
+        int totalWidth = fSashForm.getBounds().width;
+        int timeWidth = totalWidth - requestedOffset;
+        return timeWidth;
+    }
+
+    /**
+     * Perform the alignment operation.
+     *
+     * @param offset
+     *            the alignment offset
+     * @param width
+     *            the alignment width
+     *
+     * @see ITmfTimeAligned
+     *
+     * @since 1.0
+     */
+    public void performAlign(int offset, int width) {
+        int total = fSashForm.getBounds().width;
+        int timeAxisOffset = Math.min(offset, total);
+        int sash1Width = (int) (timeAxisOffset / (float) total * 1000);
+        int sash2Width = (int) ((total - timeAxisOffset) / (float) total * 1000);
+        fSashForm.setWeights(new int[] { sash1Width, sash2Width });
+        fSashForm.layout();
+
+        Composite composite = fTimeGraphViewer.getTimeAlignedComposite();
+        GridLayout layout = (GridLayout) composite.getLayout();
+        int timeBasedControlsWidth = composite.getSize().x;
+        int marginSize = timeBasedControlsWidth - width;
+        layout.marginRight = Math.max(0, marginSize);
+        composite.layout();
+    }
 }

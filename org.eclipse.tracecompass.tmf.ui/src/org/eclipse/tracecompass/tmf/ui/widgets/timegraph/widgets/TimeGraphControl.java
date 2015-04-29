@@ -63,6 +63,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
+import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
+import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
+import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphColorListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider2;
@@ -2002,6 +2006,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         } else if (DRAG_SPLIT_LINE == fDragState) {
             fDragX = e.x;
             fTimeProvider.setNameSpace(e.x);
+            TmfSignalManager.dispatchSignal(new TmfTimeViewAlignmentSignal(this, getTimeViewAlignmentInfo()));
         } else if (DRAG_SELECTION == fDragState) {
             fDragX = Math.min(Math.max(e.x, fTimeProvider.getNameSpace()), size.x - RIGHT_MARGIN);
             redraw();
@@ -2035,6 +2040,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
                     redraw();
                 }
                 fMouseOverSplitLine = mouseOverSplitLine;
+                TmfSignalManager.dispatchSignal(new TmfTimeViewAlignmentSignal(this, getTimeViewAlignmentInfo()));
                 return;
             }
             int idx = getItemIndexAtY(e.y);
@@ -2630,6 +2636,32 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
     }
 
+    /**
+     * Perform the alignment operation.
+     *
+     * @param offset
+     *            the alignment offset
+     *
+     * @see ITmfTimeAligned
+     *
+     * @since 1.0
+     */
+    public void performAlign(int offset) {
+        fTimeProvider.setNameSpace(offset);
+    }
+
+    /**
+     * Return the time alignment information
+     *
+     * @return the time alignment information
+     *
+     * @see ITmfTimeAligned
+     *
+     * @since 1.0
+     */
+    public TmfTimeViewAlignmentInfo getTimeViewAlignmentInfo() {
+        return new TmfTimeViewAlignmentInfo(getShell(), toDisplay(0, 0), fTimeProvider.getNameSpace());
+    }
 }
 
 

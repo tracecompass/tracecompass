@@ -31,13 +31,13 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEventFilterAppliedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEventSearchAppliedSignal;
-import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -45,6 +45,8 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
+import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 import org.eclipse.tracecompass.tmf.ui.views.colors.ColorSetting;
 import org.eclipse.tracecompass.tmf.ui.views.colors.ColorSettingsManager;
@@ -68,7 +70,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeForma
  * @version 1.0
  * @author Patrick Tasse
  */
-public class TimeChartView extends TmfView implements ITimeGraphRangeListener, ITimeGraphSelectionListener, ITimeGraphTimeListener, IColorSettingsListener, IResourceChangeListener {
+public class TimeChartView extends TmfView implements ITimeGraphRangeListener, ITimeGraphSelectionListener, ITimeGraphTimeListener, IColorSettingsListener, IResourceChangeListener, ITmfTimeAligned {
 
     /** TimeChartView's ID */
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.timechart"; //$NON-NLS-1$
@@ -99,6 +101,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
 
     @Override
     public void createPartControl(Composite parent) {
+        super.createPartControl(parent);
         fViewer = new TimeGraphViewer(parent, SWT.NONE);
         fPresentationProvider = new TimeChartAnalysisProvider();
         fViewer.setTimeGraphProvider(fPresentationProvider);
@@ -750,4 +753,30 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
         redecorate();
     }
 
+    /**
+     * @since 1.0
+     */
+    @Override
+    public TmfTimeViewAlignmentInfo getTimeViewAlignmentInfo() {
+        if (fViewer == null) {
+            return null;
+        }
+        return fViewer.getTimeViewAlignmentInfo();
+    }
+
+    /**
+     * @since 1.0
+     */
+    @Override
+    public int getAvailableWidth(int requestedOffset) {
+        return fViewer.getAvailableWidth(requestedOffset);
+    }
+
+    /**
+     * @since 1.0
+     */
+    @Override
+    public void performAlign(int offset, int width) {
+        fViewer.performAlign(offset, width);
+    }
 }

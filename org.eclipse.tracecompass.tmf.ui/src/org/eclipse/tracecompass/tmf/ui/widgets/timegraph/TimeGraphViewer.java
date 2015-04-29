@@ -49,6 +49,8 @@ import org.eclipse.swt.widgets.Slider;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
+import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
+import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TimeGraphLegend;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -136,6 +138,8 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
     private ListenerNotifier fListenerNotifier;
     private final Object fListenerNotifierLock = new Object();
+
+    private Composite fTimeAlignedComposite;
 
     private class ListenerNotifier extends Thread {
         private static final long DELAY = 400L;
@@ -365,7 +369,22 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         gl.horizontalSpacing = 0;
         fDataViewer.setLayout(gl);
 
-        fTimeScaleCtrl = new TimeGraphScale(fDataViewer, fColorScheme);
+        fTimeAlignedComposite = new Composite(fDataViewer, style) {
+            @Override
+            public void redraw() {
+                fDataViewer.redraw();
+                super.redraw();
+            }
+        };
+        GridLayout gl2 = new GridLayout(1, false);
+        gl2.marginHeight = fBorderWidth;
+        gl2.marginWidth = 0;
+        gl2.verticalSpacing = 0;
+        gl2.horizontalSpacing = 0;
+        fTimeAlignedComposite.setLayout(gl2);
+        fTimeAlignedComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+        fTimeScaleCtrl = new TimeGraphScale(fTimeAlignedComposite, fColorScheme);
         fTimeScaleCtrl.setTimeProvider(fTimeDataProvider);
         fTimeScaleCtrl.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
         fTimeScaleCtrl.setHeight(fTimeScaleHeight);
@@ -376,16 +395,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             }
         });
 
-        fVerticalScrollBar = new Slider(fDataViewer, SWT.VERTICAL | SWT.NO_FOCUS);
-        fVerticalScrollBar.setLayoutData(new GridData(SWT.DEFAULT, SWT.FILL, false, true, 1, 2));
-        fVerticalScrollBar.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                setTopIndex(fVerticalScrollBar.getSelection());
-            }
-        });
-
-        fTimeGraphCtrl = createTimeGraphControl(fDataViewer, fColorScheme);
+        fTimeGraphCtrl = createTimeGraphControl(fTimeAlignedComposite, fColorScheme);
 
         fTimeGraphCtrl.setTimeProvider(this);
         fTimeGraphCtrl.setTimeGraphScale(fTimeScaleCtrl);
@@ -406,6 +416,15 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
                     zoomOut();
                 }
                 adjustVerticalScrollBar();
+            }
+        });
+
+        fVerticalScrollBar = new Slider(fDataViewer, SWT.VERTICAL | SWT.NO_FOCUS);
+        fVerticalScrollBar.setLayoutData(new GridData(SWT.DEFAULT, SWT.FILL, false, true, 1, 1));
+        fVerticalScrollBar.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                setTopIndex(fVerticalScrollBar.getSelection());
             }
         });
 
@@ -1278,6 +1297,17 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     }
 
     /**
+     * Returns the composite containing all the controls that are time aligned,
+     * i.e. TimeGraphScale, TimeGraphControl.
+     *
+     * @return the time based composite
+     * @since 1.0
+     */
+    public Composite getTimeAlignedComposite() {
+        return fTimeAlignedComposite;
+    }
+
+    /**
      * Return the x coordinate corresponding to a time
      *
      * @param time
@@ -1800,6 +1830,56 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     public void removeFilter(ViewerFilter filter) {
         fTimeGraphCtrl.removeFilter(filter);
         refresh();
+    }
+
+    /**
+     * Return the time alignment information
+     *
+     * @return the time alignment information
+     *
+     * @see ITmfTimeAligned
+     *
+     * @since 1.0
+     */
+    public TmfTimeViewAlignmentInfo getTimeViewAlignmentInfo() {
+        return fTimeGraphCtrl.getTimeViewAlignmentInfo();
+    }
+
+    /**
+     * Return the available width for the time-axis.
+     *
+     * @see ITmfTimeAligned
+     *
+     * @param requestedOffset
+     *            the requested offset
+     * @return the available width for the time-axis
+     *
+     * @since 1.0
+     */
+    public int getAvailableWidth(int requestedOffset) {
+        return fTimeAlignedComposite.getSize().x - requestedOffset;
+    }
+
+    /**
+     * Perform the alignment operation.
+     *
+     * @param offset
+     *            the alignment offset
+     * @param width
+     *            the alignment width
+     *
+     * @see ITmfTimeAligned
+     *
+     * @since 1.0
+     */
+    public void performAlign(int offset, int width) {
+        fTimeGraphCtrl.performAlign(offset);
+        int alignmentWidth = width;
+        int size = fTimeAlignedComposite.getSize().x;
+        GridLayout layout = (GridLayout) fTimeAlignedComposite.getLayout();
+        int marginSize = size - alignmentWidth - offset;
+        layout.marginRight = Math.max(0, marginSize);
+        fTimeAlignedComposite.layout();
     }
 
 }

@@ -44,13 +44,13 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
@@ -58,6 +58,8 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.TmfUiRefreshHandler;
+import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
+import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphContentProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider2;
@@ -83,7 +85,7 @@ import org.eclipse.ui.IActionBars;
  * This view contains either a time graph viewer, or a time graph combo which is
  * divided between a tree viewer on the left and a time graph viewer on the right.
  */
-public abstract class AbstractTimeGraphView extends TmfView {
+public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeAligned {
 
     /** Constant indicating that all levels of the time graph should be expanded */
     protected static final int ALL_LEVELS = AbstractTreeViewer.ALL_LEVELS;
@@ -197,6 +199,11 @@ public abstract class AbstractTimeGraphView extends TmfView {
 
         void setAutoExpandLevel(int level);
 
+        void performAlign(int offset, int width);
+
+        TmfTimeViewAlignmentInfo getTimeViewAlignmentInfo();
+
+        int getAvailableWidth(int requestedOffset);
     }
 
     private class TimeGraphViewerWrapper implements ITimeGraphWrapper {
@@ -264,6 +271,21 @@ public abstract class AbstractTimeGraphView extends TmfView {
         @Override
         public void setAutoExpandLevel(int level) {
             viewer.setAutoExpandLevel(level);
+        }
+
+        @Override
+        public void performAlign(int offset, int width) {
+            viewer.performAlign(offset, width);
+        }
+
+        @Override
+        public TmfTimeViewAlignmentInfo getTimeViewAlignmentInfo() {
+            return viewer.getTimeViewAlignmentInfo();
+        }
+
+        @Override
+        public int getAvailableWidth(int requestedOffset) {
+            return viewer.getAvailableWidth(requestedOffset);
         }
     }
 
@@ -344,6 +366,21 @@ public abstract class AbstractTimeGraphView extends TmfView {
 
         IAction getShowFilterAction() {
             return combo.getShowFilterAction();
+        }
+
+        @Override
+        public void performAlign(int offset, int width) {
+            combo.performAlign(offset, width);
+        }
+
+        @Override
+        public TmfTimeViewAlignmentInfo getTimeViewAlignmentInfo() {
+            return combo.getTimeViewAlignmentInfo();
+        }
+
+        @Override
+        public int getAvailableWidth(int requestedOffset) {
+            return combo.getAvailableWidth(requestedOffset);
         }
     }
 
@@ -810,6 +847,7 @@ public abstract class AbstractTimeGraphView extends TmfView {
 
     @Override
     public void createPartControl(Composite parent) {
+        super.createPartControl(parent);
         if (fColumns == null || fLabelProvider == null) {
             fTimeGraphWrapper = new TimeGraphViewerWrapper(parent, SWT.NONE);
             TimeGraphViewer viewer = fTimeGraphWrapper.getTimeGraphViewer();
@@ -1258,5 +1296,37 @@ public abstract class AbstractTimeGraphView extends TmfView {
         manager.add(fTimeGraphWrapper.getTimeGraphViewer().getZoomInAction());
         manager.add(fTimeGraphWrapper.getTimeGraphViewer().getZoomOutAction());
         manager.add(new Separator());
+    }
+
+    /**
+     * @since 1.0
+     */
+    @Override
+    public TmfTimeViewAlignmentInfo getTimeViewAlignmentInfo() {
+        if (fTimeGraphWrapper == null) {
+            return null;
+        }
+        return fTimeGraphWrapper.getTimeViewAlignmentInfo();
+    }
+
+    /**
+     * @since 1.0
+     */
+    @Override
+    public int getAvailableWidth(int requestedOffset) {
+        if (fTimeGraphWrapper == null) {
+            return 0;
+        }
+        return fTimeGraphWrapper.getAvailableWidth(requestedOffset);
+    }
+
+    /**
+     * @since 1.0
+     */
+    @Override
+    public void performAlign(int offset, int width) {
+        if (fTimeGraphWrapper != null) {
+            fTimeGraphWrapper.performAlign(offset, width);
+        }
     }
 }

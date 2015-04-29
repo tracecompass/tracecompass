@@ -90,7 +90,7 @@ public class HistogramView extends TmfView {
      */
     public static final @NonNull String ID = "org.eclipse.linuxtools.tmf.ui.views.histogram"; //$NON-NLS-1$
 
-    private static final Image LINK_IMG = Activator.getDefault().getImageFromPath("/icons/etool16/link.gif"); //$NON-NLS-1$
+    private static final Image LINK_IMG = Activator.getDefault().getImageFromPath(ITmfImageConstants.IMG_UI_LINK);
 
     // ------------------------------------------------------------------------
     // Attributes
