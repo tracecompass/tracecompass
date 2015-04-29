@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.internal.lttng2.ust.ui.views.memusage;
 
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 
 /**
@@ -33,12 +34,11 @@ public class MemoryUsageView extends TmfChartView {
     }
 
     @Override
-    public void createPartControl(Composite parent) {
-        setChartViewer( new MemoryUsageViewer(parent));
-        super.createPartControl(parent);
+    public void setFocus() {
     }
 
     @Override
-    public void setFocus() {
+    protected TmfXYChartViewer createChartViewer(Composite parent) {
+        return new MemoryUsageViewer(parent);
     }
 }

@@ -13,6 +13,7 @@ package org.eclipse.tracecompass.examples.ui.views.histogram;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.examples.ui.viewers.histogram.NewHistogramViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 
 /**
@@ -32,12 +33,11 @@ public class NewHistogramView extends TmfChartView {
     }
 
     @Override
-    public void createPartControl(Composite parent) {
-        setChartViewer(new NewHistogramViewer(parent));
-        super.createPartControl(parent);
+    public void setFocus() {
     }
 
     @Override
-    public void setFocus() {
+    protected TmfXYChartViewer createChartViewer(Composite parent) {
+        return new NewHistogramViewer(parent);
     }
 }

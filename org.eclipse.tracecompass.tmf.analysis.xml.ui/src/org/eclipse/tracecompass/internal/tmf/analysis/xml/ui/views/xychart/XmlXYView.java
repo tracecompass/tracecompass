@@ -69,12 +69,6 @@ public class XmlXYView extends TmfChartView {
     }
 
     @Override
-    public void createPartControl(@Nullable Composite parent) {
-        setChartViewer(new XmlXYViewer(parent, fViewInfo));
-        super.createPartControl(parent);
-    }
-
-    @Override
     public void setFocus() {
 
     }
@@ -100,6 +94,11 @@ public class XmlXYView extends TmfChartView {
                 setPartName(viewTitle);
             }
         });
+    }
+
+    @Override
+    protected TmfXYChartViewer createChartViewer(@Nullable Composite parent) {
+        return new XmlXYViewer(parent, fViewInfo);
     }
 
 }

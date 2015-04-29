@@ -11,9 +11,22 @@
  **********************************************************************/
 package org.eclipse.tracecompass.tmf.ui.views;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Sash;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
+import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 
 /**
@@ -23,7 +36,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
  *
  * @author Bernd Hufmann
  */
-public abstract class TmfChartView extends TmfView {
+public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -32,6 +45,10 @@ public abstract class TmfChartView extends TmfView {
     private TmfXYChartViewer fChartViewer;
     /** The Trace reference */
     private ITmfTrace fTrace;
+    /** A composite that allows us to add margins */
+    private Composite fXYViewerContainer;
+    private SashForm fSashForm;
+    private Listener fSashDragListener;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -59,14 +76,15 @@ public abstract class TmfChartView extends TmfView {
     }
 
     /**
-     * Sets the TMF XY chart viewer implementation.
+     * Create the TMF XY chart viewer implementation
      *
-     * @param chartViewer
-     *            The TMF XY chart viewer {@link TmfXYChartViewer}
+     * @param parent
+     *            the parent control
+     *
+     * @return The TMF XY chart viewer {@link TmfXYChartViewer}
+     * @since 1.0
      */
-    protected void setChartViewer(TmfXYChartViewer chartViewer) {
-        fChartViewer = chartViewer;
-    }
+    abstract protected TmfXYChartViewer createChartViewer(Composite parent);
 
     /**
      * Returns the ITmfTrace implementation
@@ -92,6 +110,45 @@ public abstract class TmfChartView extends TmfView {
     // ------------------------------------------------------------------------
     @Override
     public void createPartControl(Composite parent) {
+        super.createPartControl(parent);
+        fSashForm = new SashForm(parent, SWT.NONE);
+        new Composite(fSashForm, SWT.NONE);
+        fXYViewerContainer = new Composite(fSashForm, SWT.NONE);
+        GridLayout layout = new GridLayout();
+        layout.marginHeight = 0;
+        layout.marginWidth = 0;
+        fXYViewerContainer.setLayout(layout);
+
+        fChartViewer = createChartViewer(fXYViewerContainer);
+        fChartViewer.setSendTimeAlignSignals(true);
+        fChartViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+
+        fChartViewer.getControl().addPaintListener(new PaintListener() {
+            @Override
+            public void paintControl(PaintEvent e) {
+                // Sashes in a SashForm are being created on layout so add the
+                // drag listener here
+                if (fSashDragListener == null) {
+                    for (Control control : fSashForm.getChildren()) {
+                        if (control instanceof Sash) {
+                            fSashDragListener = new Listener() {
+
+                                @Override
+                                public void handleEvent(Event event) {
+                                    TmfSignalManager.dispatchSignal(new TmfTimeViewAlignmentSignal(fSashForm, getTimeViewAlignmentInfo()));
+                                }
+                            };
+                            control.removePaintListener(this);
+                            control.addListener(SWT.Selection, fSashDragListener);
+                            // There should be only one sash
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
         if (trace != null) {
             setTrace(trace);
@@ -115,4 +172,67 @@ public abstract class TmfChartView extends TmfView {
         }
     }
 
+    /**
+     * @since 1.0
+     */
+    @Override
+    public TmfTimeViewAlignmentInfo getTimeViewAlignmentInfo() {
+        if (fChartViewer == null) {
+            return null;
+        }
+
+        return new TmfTimeViewAlignmentInfo(fChartViewer.getControl().getShell(), fSashForm.toDisplay(0, 0), getTimeAxisOffset());
+    }
+
+    private int getTimeAxisOffset() {
+        int[] weights = fSashForm.getWeights();
+        int width = (int) (((float) weights[0] / (weights[0] + weights[1])) * fSashForm.getBounds().width);
+        int curTimeAxisOffset = width + fSashForm.getSashWidth() + fChartViewer.getPointAreaOffset();
+        return curTimeAxisOffset;
+    }
+
+    /**
+     * @since 1.0
+     */
+    @Override
+    public int getAvailableWidth(int requestedOffset) {
+        if (fChartViewer == null) {
+            return 0;
+        }
+
+        int pointAreaWidth = fChartViewer.getPointAreaWidth();
+        int curTimeAxisOffset = getTimeAxisOffset();
+        if (pointAreaWidth <= 0) {
+            pointAreaWidth = fSashForm.getBounds().width - curTimeAxisOffset;
+        }
+
+        // TODO this is just an approximation that assumes that the end will be at the same position but that can change for a different data range/scaling
+        int endOffset = curTimeAxisOffset + pointAreaWidth;
+        GridLayout layout = (GridLayout) fXYViewerContainer.getLayout();
+        int endOffsetWithoutMargin = endOffset + layout.marginRight;
+        int availableWidth = endOffsetWithoutMargin - requestedOffset;
+        availableWidth = Math.min(fSashForm.getBounds().width, Math.max(0, availableWidth));
+        return availableWidth;
+    }
+
+    /**
+     * @since 1.0
+     */
+    @Override
+    public void performAlign(int offset, int width) {
+        int plotAreaOffset = fChartViewer.getPointAreaOffset();
+        int sashOffset = Math.max(1, offset - plotAreaOffset);
+        int total = fSashForm.getBounds().width;
+        int width1 = (int) (sashOffset / (float) total * 1000);
+        int width2 = (int) ((total - sashOffset) / (float) total * 1000);
+        fSashForm.setWeights(new int[] { width1, width2 });
+        fSashForm.layout();
+
+        Composite composite = fXYViewerContainer;
+        GridLayout layout = (GridLayout) composite.getLayout();
+        int timeAxisWidth = getAvailableWidth(offset);
+        int marginSize = timeAxisWidth - width;
+        layout.marginRight = Math.max(0, marginSize);
+        composite.layout();
+    }
 }
