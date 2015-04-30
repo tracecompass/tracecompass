@@ -43,10 +43,14 @@ public class CTFStreamOutputWriter {
     // Attributes
     // ------------------------------------------------------------------------
     // Stream input when copying stream from an input
-    // It is @Nullable for future implementations that doesn't use an input stream
-    @Nullable private final CTFStreamInput fStreamInput;
-    @NonNull private final CTFStreamPacketOutputWriter fStreamPacketOutputWriter;
-    @NonNull private final File fOutFile;
+    // It is @Nullable for future implementations that doesn't use an input
+    // stream
+    @Nullable
+    private final CTFStreamInput fStreamInput;
+    @NonNull
+    private final CTFStreamPacketOutputWriter fStreamPacketOutputWriter;
+    @NonNull
+    private final File fOutFile;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -60,7 +64,7 @@ public class CTFStreamOutputWriter {
      * @param file
      *            The output trace directory.
      * @throws CTFException
-     *            If a reading or writing error occurs
+     *             If a reading or writing error occurs
      */
     public CTFStreamOutputWriter(@NonNull CTFStreamInput streamInput, @NonNull File file) throws CTFException {
         fStreamInput = streamInput;
@@ -70,7 +74,7 @@ public class CTFStreamOutputWriter {
         try {
             fOutFile = checkNotNull(Files.createFile(outFilePath).toFile());
         } catch (IOException e) {
-            throw new CTFIOException("Output file can't be created: " + outFilePath); //$NON-NLS-1$
+            throw new CTFIOException("Output file can't be created: " + outFilePath, e); //$NON-NLS-1$
         }
 
         fStreamPacketOutputWriter = new CTFStreamPacketOutputWriter();
@@ -79,8 +83,7 @@ public class CTFStreamOutputWriter {
     /**
      * Copies packets from the relevant input this input stream to a
      * corresponding output stream based on a given time range. The following
-     * condition has to be met so that a packet is written to the output
-     * stream:
+     * condition has to be met so that a packet is written to the output stream:
      *
      * startTime <= packet.getTimestampBegin() <= endTime
      *
@@ -89,7 +92,7 @@ public class CTFStreamOutputWriter {
      * @param endTime
      *            the end time for packets to be written
      * @throws CTFException
-     *            if a reading or writing error occurs
+     *             if a reading or writing error occurs
      * @since 1.0
      */
     public void copyPackets(long startTime, long endTime) throws CTFException {
@@ -112,11 +115,11 @@ public class CTFStreamOutputWriter {
                 }
             }
 
-            // If no packet was written delete the channel file
-            if (count == 0) {
-               if (fOutFile.exists()) {
-                  fOutFile.delete();
-               }
+            if (count == 0 && fOutFile.exists()) {
+                boolean deleteResult = fOutFile.delete();
+                if (!deleteResult) {
+                    throw new CTFIOException("Could not delete " + fOutFile.getAbsolutePath()); //$NON-NLS-1$
+                }
             }
         } catch (IOException e) {
             throw new CTFIOException("Error copying packets: " + e.toString(), e); //$NON-NLS-1$
