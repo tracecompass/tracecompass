@@ -205,7 +205,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      *            The number of steps in the x axis.
      * @return The time values (converted to double) to match every step.
      */
-    protected final static double[] getXAxis(long start, long end, int nb) {
+    protected static final double[] getXAxis(long start, long end, int nb) {
 
         double timestamps[] = new double[nb];
         long steps = (end - start);
