@@ -20,6 +20,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.trace.VirtualMachineExperiment;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 
 /**
  * List virtual machine experiments that can be used in unit tests
@@ -57,7 +58,7 @@ public enum VmTestExperiment {
      * @return A VirtualMachineExperiment object corresponding to this
      *         experiment
      */
-    public synchronized VirtualMachineExperiment getExperiment(boolean deleteSuppFiles) {
+    public synchronized TmfExperiment getExperiment(boolean deleteSuppFiles) {
         Set<ITmfTrace> traces = new HashSet<>();
         for (VmTraces trace : fTraces) {
             traces.add(trace.getTrace());

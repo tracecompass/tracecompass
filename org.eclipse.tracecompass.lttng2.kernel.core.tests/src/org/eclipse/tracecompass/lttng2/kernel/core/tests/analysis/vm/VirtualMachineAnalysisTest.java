@@ -26,7 +26,6 @@ import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnal
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.VcpuStateValues;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.VmAttributes;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.module.VirtualMachineCpuAnalysis;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.trace.VirtualMachineExperiment;
 import org.eclipse.tracecompass.lttng2.lttng.kernel.core.tests.shared.vm.VmTestExperiment;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
@@ -39,6 +38,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
+import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 import org.junit.Test;
 
 import com.google.common.collect.Multimap;
@@ -84,7 +84,7 @@ public class VirtualMachineAnalysisTest {
     public void testStubTracesOneQemuKvm() {
 
         assumeTrue(VmTestExperiment.ONE_QEMUKVM.exists());
-        VirtualMachineExperiment experiment = VmTestExperiment.ONE_QEMUKVM.getExperiment(true);
+        TmfExperiment experiment = VmTestExperiment.ONE_QEMUKVM.getExperiment(true);
 
         /* Open the traces */
         for (ITmfTrace trace : experiment.getTraces()) {
