@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,22 +10,17 @@
  *   Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.swtbot.tests;
+package org.eclipse.tracecompass.tmf.ui.swtbot.tests.wizards;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * SWTBot test suite for tmf.ui
- *
- * @author Matthew Khouzam
+ * SWTBot test suite for testing of the TMF events table.
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        org.eclipse.tracecompass.tmf.ui.swtbot.tests.parsers.custom.AllTests.class,
-        org.eclipse.tracecompass.tmf.ui.swtbot.tests.perspectives.TracingPerspectiveChecker.class,
-        org.eclipse.tracecompass.tmf.ui.swtbot.tests.viewers.events.AllTests.class,
-        org.eclipse.tracecompass.tmf.ui.swtbot.tests.wizards.AllTests.class
+    StandardImportGzipTraceTest.class
 })
-public class AllTmfUISWTBotTests {
+public class AllTests {
 }
