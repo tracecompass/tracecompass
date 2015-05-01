@@ -130,21 +130,20 @@ public class KernelCpuUsageStateProvider extends AbstractTmfStateProvider {
                  * We add the time from startTime until now to the cumulative
                  * time of the thread
                  */
-                if (startTime != null) {
-                    ITmfStateValue value = ss.queryOngoingState(cumulativeTimeQuark);
+                ITmfStateValue value = ss.queryOngoingState(cumulativeTimeQuark);
 
-                    /*
-                     * Modify cumulative time for this CPU/TID combo: The total
-                     * time changes when the process is scheduled out. Nothing
-                     * happens when the process is scheduled in.
-                     */
-                    long prevCumulativeTime = Math.max(0, value.unboxLong());
-                    long newCumulativeTime = prevCumulativeTime + (ts - startTime);
+                /*
+                 * Modify cumulative time for this CPU/TID combo: The total time
+                 * changes when the process is scheduled out. Nothing happens
+                 * when the process is scheduled in.
+                 */
+                long prevCumulativeTime = Math.max(0, value.unboxLong());
+                long newCumulativeTime = prevCumulativeTime + (ts - startTime);
 
-                    value = TmfStateValue.newValueLong(newCumulativeTime);
-                    ss.modifyAttribute(ts, value, cumulativeTimeQuark);
-                    fLastStartTimes.put(cpu, ts);
-                }
+                value = TmfStateValue.newValueLong(newCumulativeTime);
+                ss.modifyAttribute(ts, value, cumulativeTimeQuark);
+                fLastStartTimes.put(cpu, ts);
+
             } catch (AttributeNotFoundException e) {
                 Activator.getDefault().logError("Attribute not found in LttngKernelCpuStateProvider", e); //$NON-NLS-1$
             }
