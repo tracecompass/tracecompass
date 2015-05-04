@@ -50,15 +50,30 @@ public class TimeRangeHistogram extends Histogram {
     // Constructor
     // ------------------------------------------------------------------------
     /**
-     * Constructor
+     * Constructor.
+     *
+     * @param view
+     *            A reference to the parent TMF view.
+     * @param parent
+     *            A parent composite
+     */
+    public TimeRangeHistogram(HistogramView view, Composite parent) {
+        this(view, parent, false);
+    }
+
+    /**
+     * Full Constructor
      *
      * @param view
      *            The parent histogram view
      * @param parent
      *            The parent composite
+     * @param sendTimeAlignSignals
+     *            Flag to send time alignment signals or not
+     * @since 1.0
      */
-    public TimeRangeHistogram(HistogramView view, Composite parent) {
-        super(view, parent);
+    public TimeRangeHistogram(HistogramView view, Composite parent, boolean sendTimeAlignSignals) {
+        super(view, parent, sendTimeAlignSignals);
         fZoom = new HistogramZoom(this, getStartTime(), getTimeLimit());
     }
 
