@@ -27,6 +27,8 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
@@ -34,6 +36,7 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -92,6 +95,12 @@ public class HistogramView extends TmfView {
 
     private static final Image LINK_IMG = Activator.getDefault().getImageFromPath(ITmfImageConstants.IMG_UI_LINK);
 
+    private static final int HISTOGRAM_MARGIN_TOP = 5;
+    private static final int HISTOGRAM_MARGIN_LEFT = 5;
+    private static final int HISTOGRAM_MARGIN_RIGHT = 5;
+
+    private static final int[] DEFAULT_WEIGHTS = {1, 3};
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -110,6 +119,9 @@ public class HistogramView extends TmfView {
     private long fWindowSpan;
     private long fSelectionBeginTime;
     private long fSelectionEndTime;
+
+    private ScrolledComposite fScrollComposite;
+    private Composite fTimeControlsComposite;
 
     // Time controls
     private HistogramTextControl fSelectionStartControl;
@@ -198,93 +210,96 @@ public class HistogramView extends TmfView {
         // --------------------------------------------------------------------
         // Set the HistogramView layout
         // --------------------------------------------------------------------
-
         Composite viewComposite = new Composite(fParent, SWT.FILL);
-        GridLayout gridLayout = new GridLayout();
-        gridLayout.numColumns = 2;
-        gridLayout.horizontalSpacing = 5;
+        GridLayout gridLayout = new GridLayout(1, false);
         gridLayout.verticalSpacing = 0;
         gridLayout.marginHeight = 0;
         gridLayout.marginWidth = 0;
         viewComposite.setLayout(gridLayout);
 
         // --------------------------------------------------------------------
+        // Add a sash for time controls and time range histogram
+        // --------------------------------------------------------------------
+        SashForm sashForm = new SashForm(viewComposite, SWT.NONE);
+        GridData gridData = new GridData(GridData.FILL, GridData.FILL, false, true);
+        sashForm.setLayoutData(gridData);
+
+        // --------------------------------------------------------------------
         // Time controls
         // --------------------------------------------------------------------
+        fScrollComposite = new PackedScrolledComposite(sashForm, SWT.H_SCROLL | SWT.V_SCROLL);
+        fTimeControlsComposite = new Composite(fScrollComposite, SWT.NONE);
+        fScrollComposite.setContent(fTimeControlsComposite);
+        gridLayout = new GridLayout(1, false);
+        gridLayout.marginHeight = 0;
+        gridLayout.marginWidth = 0;
+        fScrollComposite.setLayout(gridLayout);
+        fScrollComposite.setExpandHorizontal(true);
+        fScrollComposite.setExpandVertical(true);
 
-        Composite controlsComposite = new Composite(viewComposite, SWT.NONE);
-        gridLayout = new GridLayout();
-        gridLayout.numColumns = 2;
+        gridLayout = new GridLayout(1, false);
+        gridLayout.marginHeight = 0;
+        gridLayout.marginWidth = 0;
+        fTimeControlsComposite.setLayout(gridLayout);
+        gridData = new GridData(GridData.FILL, GridData.CENTER, false, true);
+        fTimeControlsComposite.setLayoutData(gridData);
+
+        Composite innerComp = new Composite(fTimeControlsComposite, SWT.NONE);
+
+        gridLayout = new GridLayout(2, false);
+        innerComp.setLayout(gridLayout);
         gridLayout.marginHeight = 0;
         gridLayout.marginWidth = 0;
         gridLayout.horizontalSpacing = 5;
         gridLayout.verticalSpacing = 1;
-        gridLayout.makeColumnsEqualWidth = false;
-        controlsComposite.setLayout(gridLayout);
-        GridData gridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
-        controlsComposite.setLayoutData(gridData);
+        gridData = new GridData(GridData.FILL, GridData.CENTER, false, true);
+        innerComp.setLayoutData(gridData);
 
-        Composite selectionGroup = new Composite(controlsComposite, SWT.BORDER);
-        gridLayout = new GridLayout();
+        Composite selectionGroup = new Composite(innerComp, SWT.BORDER);
+        gridLayout = new GridLayout(1, false);
         gridLayout.marginHeight = 0;
         gridLayout.marginWidth = 0;
-        gridLayout.horizontalSpacing = 0;
-        gridLayout.verticalSpacing = 0;
         selectionGroup.setLayout(gridLayout);
+        gridData = new GridData(GridData.BEGINNING, GridData.CENTER, false, false);
+        selectionGroup.setLayoutData(gridData);
 
         // Selection start control
-        gridData = new GridData();
-        gridData.horizontalAlignment = SWT.FILL;
-        gridData.verticalAlignment = SWT.CENTER;
+        gridData = new GridData(GridData.FILL, GridData.CENTER, false, false);
         fSelectionStartControl = new HistogramSelectionStartControl(this, selectionGroup, selectionStartLabel, 0L);
         fSelectionStartControl.setLayoutData(gridData);
         fSelectionStartControl.setValue(Long.MIN_VALUE);
 
         // Selection end control
-        gridData = new GridData();
-        gridData.horizontalAlignment = SWT.FILL;
-        gridData.verticalAlignment = SWT.CENTER;
+        gridData = new GridData(GridData.FILL, GridData.CENTER, false, false);
         fSelectionEndControl = new HistogramSelectionEndControl(this, selectionGroup, selectionEndLabel, 0L);
         fSelectionEndControl.setLayoutData(gridData);
         fSelectionEndControl.setValue(Long.MIN_VALUE);
 
         // Link button
-        gridData = new GridData();
-        fLinkButton = new Label(controlsComposite, SWT.NONE);
+        gridData = new GridData(GridData.BEGINNING, GridData.CENTER, false, false);
+        fLinkButton = new Label(innerComp, SWT.NONE);
         fLinkButton.setImage(LINK_IMG);
         fLinkButton.setLayoutData(gridData);
         addLinkButtonListeners();
 
         // Window span time control
-        gridData = new GridData();
-        gridData.horizontalAlignment = SWT.FILL;
-        gridData.verticalAlignment = SWT.CENTER;
-        fTimeSpanControl = new HistogramTimeRangeControl(this, controlsComposite, windowSpanLabel, 0L);
+        gridData = new GridData(GridData.FILL, GridData.CENTER, false, false);
+        fTimeSpanControl = new HistogramTimeRangeControl(this, innerComp, windowSpanLabel, 0L);
         fTimeSpanControl.setLayoutData(gridData);
         fTimeSpanControl.setValue(Long.MIN_VALUE);
 
         // --------------------------------------------------------------------
         // Time range histogram
         // --------------------------------------------------------------------
-
-        Composite timeRangeComposite = new Composite(viewComposite, SWT.NONE);
-        gridLayout = new GridLayout();
-        gridLayout.numColumns = 1;
-        gridLayout.marginHeight = 0;
-        gridLayout.marginWidth = 0;
-        gridLayout.marginTop = 5;
-        gridLayout.horizontalSpacing = 0;
-        gridLayout.verticalSpacing = 0;
-        gridLayout.marginLeft = 5;
-        gridLayout.marginRight = 5;
+        Composite timeRangeComposite = new Composite(sashForm, SWT.NONE);
+        gridLayout = new GridLayout(1, true);
+        gridLayout.marginTop = 0;
+        gridLayout.marginLeft = HISTOGRAM_MARGIN_LEFT;
+        gridLayout.marginRight = HISTOGRAM_MARGIN_RIGHT;
         timeRangeComposite.setLayout(gridLayout);
 
         // Use remaining horizontal space
-        gridData = new GridData();
-        gridData.horizontalAlignment = SWT.FILL;
-        gridData.verticalAlignment = SWT.FILL;
-        gridData.grabExcessHorizontalSpace = true;
-        gridData.grabExcessVerticalSpace = true;
+        gridData = new GridData(GridData.FILL, GridData.FILL, true, true);
         timeRangeComposite.setLayoutData(gridData);
 
         // Histogram
@@ -293,26 +308,17 @@ public class HistogramView extends TmfView {
         // --------------------------------------------------------------------
         // Full range histogram
         // --------------------------------------------------------------------
-
-        Composite fullRangeComposite = new Composite(viewComposite, SWT.FILL);
-        gridLayout = new GridLayout();
-        gridLayout.numColumns = 1;
+        final Composite fullRangeComposite = new Composite(viewComposite, SWT.FILL);
+        gridLayout = new GridLayout(1, true);
+        gridLayout.marginTop = HISTOGRAM_MARGIN_TOP;
+        gridLayout.marginLeft = HISTOGRAM_MARGIN_LEFT;
+        gridLayout.marginRight = HISTOGRAM_MARGIN_RIGHT;
         gridLayout.marginHeight = 0;
         gridLayout.marginWidth = 0;
-        gridLayout.marginTop = 5;
-        gridLayout.horizontalSpacing = 0;
-        gridLayout.verticalSpacing = 0;
-        gridLayout.marginLeft = 5;
-        gridLayout.marginRight = 5;
         fullRangeComposite.setLayout(gridLayout);
 
         // Use remaining horizontal space
-        gridData = new GridData();
-        gridData.horizontalAlignment = SWT.FILL;
-        gridData.verticalAlignment = SWT.FILL;
-        gridData.horizontalSpan = 2;
-        gridData.grabExcessHorizontalSpace = true;
-        gridData.grabExcessVerticalSpace = true;
+        gridData = new GridData(GridData.FILL, GridData.FILL, true, true, 2, 1);
         fullRangeComposite.setLayoutData(gridData);
 
         // Histogram
@@ -326,7 +332,6 @@ public class HistogramView extends TmfView {
         MouseWheelListener listener = fFullTraceHistogram.getZoom();
         fTimeSpanControl.addMouseWheelListener(listener);
 
-
         // View Action Handling
         contributeToActionBars();
 
@@ -334,6 +339,9 @@ public class HistogramView extends TmfView {
         if (trace != null) {
             traceSelected(new TmfTraceSelectedSignal(this, trace));
         }
+
+        sashForm.setVisible(true);
+        sashForm.setWeights(DEFAULT_WEIGHTS);
     }
 
     @Override
@@ -750,6 +758,8 @@ public class HistogramView extends TmfView {
         fSelectionStartControl.setValue(fSelectionBeginTime);
         fSelectionEndControl.setValue(fSelectionEndTime);
 
+        // make sure that the scrollbar is setup properly
+        fScrollComposite.setMinSize(fTimeControlsComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
         fTimeSpanControl.setValue(duration);
 
         Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(fTrace);
@@ -886,5 +896,26 @@ public class HistogramView extends TmfView {
                 }
             }
         });
+    }
+
+    private static class PackedScrolledComposite extends ScrolledComposite {
+        Point fScrollBarSize;  // Size of OS-specific scrollbar
+
+        public PackedScrolledComposite(Composite parent, int style) {
+            super(parent, style);
+            Composite composite = new Composite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+            composite.setSize(1, 1);
+            fScrollBarSize = composite.computeSize(0, 0);
+            composite.dispose();
+        }
+
+        @Override
+        public Point computeSize(int wHint, int hHint, boolean changed) {
+            Point point = super.computeSize(wHint, hHint, changed);
+            // Remove scrollbar size if applicable
+            point.x += ((getStyle() & SWT.V_SCROLL) != 0) ? -fScrollBarSize.x : 0;
+            point.y += ((getStyle() & SWT.H_SCROLL) != 0) ? -fScrollBarSize.y : 0;
+            return point;
+        }
     }
 }
