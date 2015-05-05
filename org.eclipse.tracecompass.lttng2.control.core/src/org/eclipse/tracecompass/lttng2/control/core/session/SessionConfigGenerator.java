@@ -35,6 +35,7 @@ import javax.xml.validation.Validator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.internal.lttng2.control.core.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
@@ -151,12 +152,7 @@ public final class SessionConfigGenerator {
         /* Generate the session configuration file */
         try {
             Document sessionConfigDocument = generateSessionConfig(sessions);
-
-            if (sessionConfigDocument != null) {
-                saveSessionConfig(sessionConfigDocument, sessionFileDestination.toString());
-            } else {
-                return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.SessionConfigXML_SessionConfigGenerationError);
-            }
+            saveSessionConfig(sessionConfigDocument, sessionFileDestination.toString());
         } catch (TransformerException | IllegalArgumentException | ParserConfigurationException e) {
             Activator.getDefault().logError("Error generating the session configuration file: " + sessionFileDestination.toString(), e); //$NON-NLS-1$
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
@@ -176,7 +172,7 @@ public final class SessionConfigGenerator {
      * @throws ParserConfigurationException
      *             On an parser configuration error
      */
-    private static Document generateSessionConfig(Iterable<ISessionInfo> sessions) throws IllegalArgumentException, ParserConfigurationException {
+    private static @NonNull Document generateSessionConfig(Iterable<ISessionInfo> sessions) throws IllegalArgumentException, ParserConfigurationException {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
