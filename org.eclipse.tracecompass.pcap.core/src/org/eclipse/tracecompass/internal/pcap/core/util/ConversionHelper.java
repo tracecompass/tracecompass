@@ -18,6 +18,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.ethernet2.EthernetIIValues;
 
 /**
@@ -173,11 +174,7 @@ public final class ConversionHelper {
                 .append('.')
                 .append(String.format("%03d", ns)); //$NON-NLS-1$
 
-        String string = sb.toString();
-        if (string == null) {
-            return EMPTY_STRING;
-        }
-        return string;
+        return NonNullUtils.nullToEmptyString(sb);
 
     }
 
