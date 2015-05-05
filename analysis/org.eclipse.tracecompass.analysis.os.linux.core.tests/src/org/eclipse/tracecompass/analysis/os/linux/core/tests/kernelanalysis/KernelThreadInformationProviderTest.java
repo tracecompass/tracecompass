@@ -48,6 +48,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
  * Test analysis-specific methods for the {@link KernelAnalysisModule} class.
  *
@@ -115,7 +117,7 @@ public class KernelThreadInformationProviderTest {
     public void testGetThreadQuarks() {
         KernelAnalysisModule module = checkNotNull(fModule);
         Collection<Integer> threadIds = KernelThreadInformationProvider.getThreadIds(module);
-        assertEquals(7, threadIds.size());
+        assertEquals(ImmutableSet.<Integer>of(10,11,20,21,30,100), threadIds);
     }
 
     /**

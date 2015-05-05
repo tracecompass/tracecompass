@@ -24,14 +24,9 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
  * @author Alexandre Montplaisir
  */
 interface TestValues {
-
-    int size = 1031;
+    int size = 1032;
 
     long[] startTimes = {
-        1331668247314038062L,
-        1331668247314038062L,
-        1331668248014145796L,
-        1331668247314038062L,
         1331668247314038062L,
         1331668247314038062L,
         1331668247314038062L,
@@ -41,6 +36,9 @@ interface TestValues {
         1331668247314046266L,
         1331668247316120937L,
         1331668247314038062L,
+        1331668247314038062L,
+        1331668247314038062L,
+        1331668248014145796L,
         1331668248014183954L,
         1331668247314038062L,
         1331668247327098502L,
@@ -72,6 +70,7 @@ interface TestValues {
         1331668247959041965L,
         1331668248011129576L,
         1331668247314038062L,
+        1331668247314038062L,
         1331668247335106720L,
         1331668247335106720L,
         1331668247315471788L,
@@ -91,6 +90,7 @@ interface TestValues {
         1331668247314038062L,
         1331668248004935409L,
         1331668248004770916L,
+        1331668247314038062L,
         1331668248004925240L,
         1331668247316553071L,
         1331668247314038062L,
@@ -1064,10 +1064,6 @@ interface TestValues {
     long[] endTimes = {
         1331668259054285979L,
         1331668259054285979L,
-        1331668248014620024L,
-        1331668259054285979L,
-        1331668259054285979L,
-        1331668259054285979L,
         1331668259054285979L,
         1331668259054130388L,
         1331668259054285979L,
@@ -1075,6 +1071,9 @@ interface TestValues {
         1331668259054285979L,
         1331668259054285979L,
         1331668259054285979L,
+        1331668259054285979L,
+        1331668259054285979L,
+        1331668248014620024L,
         1331668248014185078L,
         1331668259054285979L,
         1331668259054285979L,
@@ -1111,6 +1110,7 @@ interface TestValues {
         1331668259054285979L,
         1331668259054285979L,
         1331668259054285979L,
+        1331668259054285979L,
         1331668248483009726L,
         1331668259054285979L,
         1331668259054285979L,
@@ -1125,6 +1125,7 @@ interface TestValues {
         1331668259054285979L,
         1331668248016172023L,
         1331668248016172023L,
+        1331668259054285979L,
         1331668248016194935L,
         1331668259054285979L,
         1331668259054285979L,
@@ -2098,10 +2099,6 @@ interface TestValues {
     ITmfStateValue[] values = {
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
-        TmfStateValue.newValueInt(1397),
-        TmfStateValue.nullValue(),
-        TmfStateValue.nullValue(),
-        TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
         TmfStateValue.newValueInt(1),
         TmfStateValue.newValueString("sys_poll"),
@@ -2109,6 +2106,9 @@ interface TestValues {
         TmfStateValue.newValueString("lttng-consumerd"),
         TmfStateValue.newValueInt(20),
         TmfStateValue.nullValue(),
+        TmfStateValue.nullValue(),
+        TmfStateValue.nullValue(),
+        TmfStateValue.newValueInt(1397),
         TmfStateValue.newValueInt(1),
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
@@ -2145,6 +2145,7 @@ interface TestValues {
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
+        TmfStateValue.nullValue(),
         TmfStateValue.newValueString("sys_poll"),
         TmfStateValue.newValueString("lttng-consumerd"),
         TmfStateValue.nullValue(),
@@ -2159,6 +2160,7 @@ interface TestValues {
         TmfStateValue.nullValue(),
         TmfStateValue.newValueInt(1),
         TmfStateValue.newValueInt(-6),
+        TmfStateValue.nullValue(),
         TmfStateValue.newValueString("sys_ppoll"),
         TmfStateValue.newValueString("alsa-sink"),
         TmfStateValue.nullValue(),
@@ -3128,5 +3130,6 @@ interface TestValues {
         TmfStateValue.nullValue(),
         TmfStateValue.nullValue(),
     };
+
 }
 
