@@ -716,7 +716,7 @@ public abstract class GraphNode {
 
         GraphNode last = null;
         int nodesCount = 0;
-        if (list.size() < 0) {
+        if (list.isEmpty()) {
             return 0;
         }
 
