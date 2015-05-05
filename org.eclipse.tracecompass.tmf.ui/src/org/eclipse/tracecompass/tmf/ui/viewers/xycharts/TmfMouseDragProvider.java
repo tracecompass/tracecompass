@@ -129,6 +129,7 @@ public class TmfMouseDragProvider extends TmfBaseProvider implements MouseListen
             }
 
             xAxis.setRange(new Range(fStartTime - viewer.getTimeOffset(), fEndTime - viewer.getTimeOffset()));
+            xAxis.adjustRange();
         }
     }
 }
