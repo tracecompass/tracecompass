@@ -17,8 +17,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -207,9 +209,9 @@ public class BufferedBlockingQueueTest {
     }
 
     /**
-     * Test like multi-threaded with a producer and consumer but now with an
-     * inquisitor checking up on the queue. A buffered blocking queue smoke
-     * test.
+     * Test iterating on the queue while a producer and a consumer threads are
+     * using it. The iteration should not affect the elements taken by the
+     * consumer.
      *
      * @throws InterruptedException
      *             The test was interrupted
@@ -218,23 +220,21 @@ public class BufferedBlockingQueueTest {
      *             not happen
      */
     @Test
-    public void testMultiThreadWithInterruptions() throws InterruptedException, ExecutionException {
-        final BufferedBlockingQueue<String> isq = new BufferedBlockingQueue<>(15, 15);
-        final BufferedBlockingQueue<String> queryQueue = new BufferedBlockingQueue<>(15, 15);
+    public void testConcurrentIteration() throws InterruptedException, ExecutionException {
+        final BufferedBlockingQueue<String> queue = new BufferedBlockingQueue<>(15, 15);
 
-        ExecutorService pool = Executors.newFixedThreadPool(4);
+        ExecutorService pool = Executors.newFixedThreadPool(3);
 
         final String poisonPill = "That's all folks!";
-        final String lastElement = "END";
 
         Runnable producer = new Runnable() {
             @Override
             public void run() {
                 for (int i = 0; i < testString.length(); i++) {
-                    isq.put(nullToEmptyString(String.valueOf(testString.charAt(i))));
+                    queue.put(nullToEmptyString(String.valueOf(testString.charAt(i))));
                 }
-                isq.put(poisonPill);
-                isq.flushInputBuffer();
+                queue.put(poisonPill);
+                queue.flushInputBuffer();
             }
         };
 
@@ -242,11 +242,10 @@ public class BufferedBlockingQueueTest {
             @Override
             public String call() {
                 StringBuilder sb = new StringBuilder();
-                String s = null;
-                s = isq.take();
+                String s = queue.take();
                 while (!s.equals(poisonPill)) {
                     sb.append(s);
-                    s = isq.take();
+                    s = queue.take();
                 }
                 return sb.toString();
             }
@@ -255,44 +254,27 @@ public class BufferedBlockingQueueTest {
         Runnable inquisitor = new Runnable() {
             @Override
             public void run() {
-                while (!isq.isEmpty()) {
+                for (int i = 0; i < 10; i++) {
+                    final Set<String> results = new HashSet<>();
                     /*
                      * The interest of this test is here: we are iterating on
                      * the queue while it is being used.
                      */
-                    for (String input : isq) {
-                        queryQueue.put(nullToEmptyString(input));
+                    for (String input : queue) {
+                        results.add(input);
                     }
                 }
-                queryQueue.put(lastElement);
-                queryQueue.flushInputBuffer();
-            }
-        };
-
-        Callable<Boolean> auditor = new Callable<Boolean>() {
-            @Override
-            public Boolean call() {
-                String val = queryQueue.take();
-                while (!val.equals(lastElement)) {
-                    if (testString.indexOf(val) == -1) {
-                        return true;
-                    }
-                    val = queryQueue.take();
-                }
-                return false;
             }
         };
 
         pool.submit(producer);
         pool.submit(inquisitor);
         Future<String> message = pool.submit(consumer);
-        Future<Boolean> fail = pool.submit(auditor);
 
         pool.shutdown();
         pool.awaitTermination(2, TimeUnit.MINUTES);
 
         assertEquals(testString, message.get());
-        assertFalse(fail.get());
     }
 
     /**
