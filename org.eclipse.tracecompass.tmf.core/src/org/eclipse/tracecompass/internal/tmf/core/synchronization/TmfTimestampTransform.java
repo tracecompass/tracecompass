@@ -58,19 +58,6 @@ public final class TmfTimestampTransform implements ITmfTimestampTransformInvert
     }
 
     @Override
-    public boolean equals(Object other) {
-        return other.getClass().equals(TmfTimestampTransform.class);
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = (prime * result) + TmfTimestampTransform.class.hashCode();
-        return result;
-    }
-
-    @Override
     public String toString() {
         return "TmfTimestampTransform [ IDENTITY ]"; //$NON-NLS-1$
     }
