@@ -455,7 +455,7 @@ public class DsfGdbAdaptor {
                                             String type = breakpoint.getBreakpointType();
                                             // Only save info if the current breakpoint is of type tracepoint
                                             if(type.compareTo(MIBreakpoints.TRACEPOINT) == 0 ) {
-                                                fTpInfo.put(new Integer(breakpoint.getReference()), breakpoint);
+                                                fTpInfo.put(Integer.valueOf(breakpoint.getReference()), breakpoint);
                                             }
                                         }
                                         drm.done();
