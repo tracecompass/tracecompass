@@ -35,11 +35,6 @@
                     <type>target</type>
                     <classifier>tracecompass-eStaging</classifier>
                   </artifact>
-                  <artifact>
-                    <file>tracecompass-e4.4.target</file>
-                    <type>target</type>
-                    <classifier>tracecompass-e4.4</classifier>
-                  </artifact>
                   <!-- More targets could be added here -->
                 </artifacts>
               </configuration>

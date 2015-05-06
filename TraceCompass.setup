@@ -64,9 +64,6 @@
     <choice
         value="tracecompass-eStaging"
         label="Trace Compass Eclipse Mars - 4.5"/>
-    <choice
-        value="tracecompass-e4.4"
-        label="Trace Compass Eclipse Luna - 4.4"/>
     <description>Choose the compatibly level of the target platform</description>
   </setupTask>
   <setupTask
