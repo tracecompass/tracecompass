@@ -78,7 +78,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     private static final int MIN_NAME_WIDTH = 6;
     private static final int MAX_NAME_WIDTH = 1000;
     private static final int DEFAULT_HEIGHT = 22;
-    private static final long RECENTERING_MARGIN_FACTOR = 50;
     private static final String HIDE_ARROWS_KEY = "hide.arrows"; //$NON-NLS-1$
     private static final long DEFAULT_FREQUENCY = 1000000000L;
     private static final int H_SCROLLBAR_MAX = Integer.MAX_VALUE - 1;
@@ -782,11 +781,17 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
     @Override
     public void setSelectionRangeNotify(long beginTime, long endTime) {
+        long time0 = fTime0;
+        long time1 = fTime1;
         boolean changed = (beginTime != fSelectionBegin || endTime != fSelectionEnd);
         fSelectionBegin = Math.max(fTime0Bound, Math.min(fTime1Bound, beginTime));
         fSelectionEnd = Math.max(fTime0Bound, Math.min(fTime1Bound, endTime));
+        ensureVisible(fSelectionEnd);
         fTimeGraphCtrl.redraw();
         fTimeScaleCtrl.redraw();
+        if ((time0 != fTime0) || (time1 != fTime1)) {
+            notifyRangeListeners();
+        }
         if (changed) {
             notifyTimeListeners();
         }
@@ -804,29 +809,8 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         long time0 = fTime0;
         long time1 = fTime1;
         if (ensureVisible) {
-            long timeSpace = (fTime1 - fTime0) / RECENTERING_MARGIN_FACTOR;
-            long timeMid = (fTime1 - fTime0) / 2;
-            if (time < fTime0 + timeSpace) {
-                long dt = fTime0 - time + timeMid;
-                fTime0 -= dt;
-                fTime1 -= dt;
-            } else if (time > fTime1 - timeSpace) {
-                long dt = time - fTime1 + timeMid;
-                fTime0 += dt;
-                fTime1 += dt;
-            }
-            if (fTime0 < fTime0Bound) {
-                fTime1 = Math.min(fTime1Bound, fTime1 + (fTime0Bound - fTime0));
-                fTime0 = fTime0Bound;
-            } else if (fTime1 > fTime1Bound) {
-                fTime0 = Math.max(fTime0Bound, fTime0 - (fTime1 - fTime1Bound));
-                fTime1 = fTime1Bound;
-            }
+            ensureVisible(time);
         }
-        if (fTime1 - fTime0 < fMinTimeInterval) {
-            fTime1 = Math.min(fTime1Bound, fTime0 + fMinTimeInterval);
-        }
-        adjustHorizontalScrollBar();
         fTimeGraphCtrl.redraw();
         fTimeScaleCtrl.redraw();
 
@@ -841,6 +825,30 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         if (doNotify && notifySelectedTime) {
             notifyTimeListeners();
         }
+    }
+
+    private void ensureVisible(long time) {
+        long timeMid = (fTime1 - fTime0) / 2;
+        if (time < fTime0) {
+            long dt = fTime0 - time + timeMid;
+            fTime0 -= dt;
+            fTime1 -= dt;
+        } else if (time > fTime1) {
+            long dt = time - fTime1 + timeMid;
+            fTime0 += dt;
+            fTime1 += dt;
+        }
+        if (fTime0 < fTime0Bound) {
+            fTime1 = Math.min(fTime1Bound, fTime1 + (fTime0Bound - fTime0));
+            fTime0 = fTime0Bound;
+        } else if (fTime1 > fTime1Bound) {
+            fTime0 = Math.max(fTime0Bound, fTime0 - (fTime1 - fTime1Bound));
+            fTime1 = fTime1Bound;
+        }
+        if (fTime1 - fTime0 < fMinTimeInterval) {
+            fTime1 = Math.min(fTime1Bound, fTime0 + fMinTimeInterval);
+        }
+        adjustHorizontalScrollBar();
     }
 
     @Override
@@ -861,17 +869,25 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
     /**
      * Callback for when the next event is selected
+     *
+     * @param extend
+     *            true to extend selection range, false for single selection
+     * @since 1.0
      */
-    public void selectNextEvent() {
-        fTimeGraphCtrl.selectNextEvent();
+    public void selectNextEvent(boolean extend) {
+        fTimeGraphCtrl.selectNextEvent(extend);
         adjustVerticalScrollBar();
     }
 
     /**
      * Callback for when the previous event is selected
+     *
+     * @param extend
+     *            true to extend selection range, false for single selection
+     * @since 1.0
      */
-    public void selectPrevEvent() {
-        fTimeGraphCtrl.selectPrevEvent();
+    public void selectPrevEvent(boolean extend) {
+        fTimeGraphCtrl.selectPrevEvent(extend);
         adjustVerticalScrollBar();
     }
 
@@ -1534,8 +1550,9 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         if (fNextEventAction == null) {
             fNextEventAction = new Action() {
                 @Override
-                public void run() {
-                    selectNextEvent();
+                public void runWithEvent(Event event) {
+                    boolean extend = (event.stateMask & SWT.SHIFT) != 0;
+                    selectNextEvent(extend);
                 }
             };
 
@@ -1556,8 +1573,9 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         if (fPrevEventAction == null) {
             fPrevEventAction = new Action() {
                 @Override
-                public void run() {
-                    selectPrevEvent();
+                public void runWithEvent(Event event) {
+                    boolean extend = (event.stateMask & SWT.SHIFT) != 0;
+                    selectPrevEvent(extend);
                 }
             };
 
@@ -1705,8 +1723,9 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         if (fFollowArrowFwdAction == null) {
             fFollowArrowFwdAction = new Action() {
                 @Override
-                public void run() {
-                    fTimeGraphCtrl.followArrowFwd();
+                public void runWithEvent(Event event) {
+                    boolean extend = (event.stateMask & SWT.SHIFT) != 0;
+                    fTimeGraphCtrl.followArrowFwd(extend);
                     adjustVerticalScrollBar();
                 }
             };
@@ -1729,8 +1748,9 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         if (fFollowArrowBwdAction == null) {
             fFollowArrowBwdAction = new Action() {
                 @Override
-                public void run() {
-                    fTimeGraphCtrl.followArrowBwd();
+                public void runWithEvent(Event event) {
+                    boolean extend = (event.stateMask & SWT.SHIFT) != 0;
+                    fTimeGraphCtrl.followArrowBwd(extend);
                     adjustVerticalScrollBar();
                 }
             };

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson
+ * Copyright (c) 2009, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -398,7 +398,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
             public void run() {
                 TimeGraphViewer inFocusViewer = getActiveTsfCtrl();
                 if (inFocusViewer != null) {
-                    inFocusViewer.selectNextEvent();
+                    inFocusViewer.selectNextEvent(false);
                 }
             }
         };
@@ -411,7 +411,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
             public void run() {
                 TimeGraphViewer inFocusViewer = getActiveTsfCtrl();
                 if (inFocusViewer != null) {
-                    inFocusViewer.selectPrevEvent();
+                    inFocusViewer.selectPrevEvent(false);
                 }
             }
         };
