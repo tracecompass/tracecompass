@@ -128,6 +128,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private int fMinimumItemWidth = 0;
     private int fTopIndex = 0;
     private int fDragState = DRAG_NONE;
+    private boolean fDragBeginMarker = false;
     private int fDragButton;
     private int fDragX0 = 0;
     private int fDragX = 0;
@@ -1948,32 +1949,32 @@ public class TimeGraphControl extends TimeGraphBaseControl
                         new Object[] {
                                 tf == TimeFormat.CALENDAR ? Utils.formatDate(time) + ' ' : "", //$NON-NLS-1$
                                 Utils.formatTime(time, tf, res),
-                                tf == TimeFormat.CALENDAR ? Utils.formatDate(Math.min(selectionBegin, selectionEnd)) + ' ' : "", //$NON-NLS-1$
-                                Utils.formatTime(Math.min(selectionBegin, selectionEnd), tf, res)
+                                tf == TimeFormat.CALENDAR ? Utils.formatDate(selectionBegin) + ' ' : "", //$NON-NLS-1$
+                                Utils.formatTime(selectionBegin, tf, res)
                         }));
                 if (selectionBegin != selectionEnd) {
                     message.append(NLS.bind("     T2: {0}{1}     \u0394: {2}", //$NON-NLS-1$
                             new Object[] {
-                                    tf == TimeFormat.CALENDAR ? Utils.formatDate(Math.max(selectionBegin, selectionEnd)) + ' ' : "", //$NON-NLS-1$
-                                    Utils.formatTime(Math.max(selectionBegin, selectionEnd), tf, res),
-                                    Utils.formatDelta(Math.abs(selectionBegin - selectionEnd), tf, res)
+                                    tf == TimeFormat.CALENDAR ? Utils.formatDate(selectionEnd) + ' ' : "", //$NON-NLS-1$
+                                    Utils.formatTime(selectionEnd, tf, res),
+                                    Utils.formatDelta(selectionEnd - selectionBegin, tf, res)
                             }));
                 }
             }
         } else if (fDragState == DRAG_SELECTION || fDragState == DRAG_ZOOM) {
-            long time0 = fDragTime0;
-            long time = getTimeAtX(fDragX);
+            long time0 = fDragBeginMarker ? getTimeAtX(fDragX0) : fDragTime0;
+            long time = fDragBeginMarker ? fDragTime0 : getTimeAtX(fDragX);
             if (tdp instanceof ITimeDataProviderConverter) {
                 time0 = ((ITimeDataProviderConverter) tdp).convertTime(time0);
                 time = ((ITimeDataProviderConverter) tdp).convertTime(time);
             }
             message.append(NLS.bind("T1: {0}{1}     T2: {2}{3}     \u0394: {4}", //$NON-NLS-1$
                     new Object[] {
-                            tf == TimeFormat.CALENDAR ? Utils.formatDate(Math.min(time, time0)) + ' ' : "", //$NON-NLS-1$
-                            Utils.formatTime(Math.min(time, time0), tf, res),
-                            tf == TimeFormat.CALENDAR ? Utils.formatDate(Math.max(time, time0)) + ' ' : "", //$NON-NLS-1$
-                            Utils.formatTime(Math.max(time, time0), tf, res),
-                            Utils.formatDelta(Math.abs(time - time0), tf, res)
+                            tf == TimeFormat.CALENDAR ? Utils.formatDate(time0) + ' ' : "", //$NON-NLS-1$
+                            Utils.formatTime(time0, tf, res),
+                            tf == TimeFormat.CALENDAR ? Utils.formatDate(time) + ' ' : "", //$NON-NLS-1$
+                            Utils.formatTime(time, tf, res),
+                            Utils.formatDelta(time - time0, tf, res)
                     }));
         }
         fStatusLineManager.setMessage(message.toString());
@@ -2008,7 +2009,11 @@ public class TimeGraphControl extends TimeGraphBaseControl
             fTimeProvider.setNameSpace(e.x);
             TmfSignalManager.dispatchSignal(new TmfTimeViewAlignmentSignal(this, getTimeViewAlignmentInfo()));
         } else if (DRAG_SELECTION == fDragState) {
-            fDragX = Math.min(Math.max(e.x, fTimeProvider.getNameSpace()), size.x - RIGHT_MARGIN);
+            if (fDragBeginMarker) {
+                fDragX0 = Math.min(Math.max(e.x, fTimeProvider.getNameSpace()), size.x - RIGHT_MARGIN);
+            } else {
+                fDragX = Math.min(Math.max(e.x, fTimeProvider.getNameSpace()), size.x - RIGHT_MARGIN);
+            }
             redraw();
             fTimeGraphScale.setDragRange(fDragX0, fDragX);
             fireDragSelectionChanged(getTimeAtX(fDragX0), getTimeAtX(fDragX));
@@ -2093,6 +2098,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 setCapture(true);
 
                 fDragState = DRAG_SELECTION;
+                fDragBeginMarker = false;
                 fDragButton = e.button;
                 fDragX = e.x;
                 fDragX0 = fDragX;
@@ -2104,7 +2110,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 if ((e.stateMask & SWT.MODIFIER_MASK) == SWT.SHIFT) {
                     long time = getTimeAtX(e.x);
                     if (Math.abs(time - selectionBegin) < Math.abs(time - selectionEnd)) {
-                        fDragX0 = xEnd;
+                        fDragBeginMarker = true;
+                        fDragX = xEnd;
+                        fDragX0 = e.x;
                         fDragTime0 = selectionEnd;
                     } else {
                         fDragX0 = xBegin;
@@ -2113,7 +2121,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 } else {
                     long time = getTimeAtX(e.x);
                     if (Math.abs(e.x - xBegin) < SNAP_WIDTH && Math.abs(time - selectionBegin) <= Math.abs(time - selectionEnd)) {
-                        fDragX0 = xEnd;
+                        fDragBeginMarker = true;
+                        fDragX = xEnd;
+                        fDragX0 = e.x;
                         fDragTime0 = selectionEnd;
                     } else if (Math.abs(e.x - xEnd) < SNAP_WIDTH && Math.abs(time - selectionEnd) <= Math.abs(time - selectionBegin)) {
                         fDragX0 = xBegin;
@@ -2171,13 +2181,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
                     long time = getTimeAtX(e.x);
                     fTimeProvider.setSelectedTimeNotify(time, false);
                 } else {
-                    long time0 = fDragTime0;
-                    long time1 = getTimeAtX(fDragX);
-                    if (time0 <= time1) {
-                        fTimeProvider.setSelectionRangeNotify(time0, time1);
-                    } else {
-                        fTimeProvider.setSelectionRangeNotify(time1, time0);
-                    }
+                    long time0 = fDragBeginMarker ? getTimeAtX(fDragX0) : fDragTime0;
+                    long time1 = fDragBeginMarker ? fDragTime0 : getTimeAtX(fDragX);
+                    fTimeProvider.setSelectionRangeNotify(time0, time1);
                 }
                 fDragState = DRAG_NONE;
                 redraw();

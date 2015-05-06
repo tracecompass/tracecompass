@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2014 Intel Corporation, Ericsson
+ * Copyright (c) 2007, 2015 Intel Corporation, Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -345,8 +345,8 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
 
         // draw range decorators
         if (DRAG_EXTERNAL == fDragState) {
-            int x1 = leftSpace + Math.min(fDragX0, fDragX);
-            int x2 = leftSpace + Math.max(fDragX0, fDragX);
+            int x1 = leftSpace + fDragX0;
+            int x2 = leftSpace + fDragX;
             drawRangeDecorators(rect0, gc, x1, x2);
         } else {
             int x1;
@@ -432,16 +432,17 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         int ym = (y1 + y2) / 2;
         if (x1 >= rect.x) {
             // T1
-            gc.drawLine(x1 - 3, y1, x1 - 3, y2);
-            gc.drawLine(x1 - 4, y1, x1 - 2, y1);
-            gc.drawLine(x1, y1, x1, y2);
+            gc.drawLine(x1 - 2, y1, x1 - 2, y2);
+            gc.drawLine(x1 - 3, y1, x1 - 1, y1);
+            gc.drawLine(x1 + 1, y1, x1 + 1, y2);
         }
-        if (x2 >= rect.x && x2 - x1 > 3) {
-            // T2
+        if (x2 >= rect.x && Math.abs(x2 - x1 - 2) > 3) {
+            // T of T2
             gc.drawLine(x2 - 2, y1, x2 - 2, y2);
             gc.drawLine(x2 - 3, y1, x2 - 1, y1);
         }
-        if (x2 >= rect.x && x2 - x1 > 0) {
+        if (x2 >= rect.x && Math.abs(x2 - x1 + 3) > 3) {
+            // 2 of T2
             gc.drawLine(x2 + 1, y1, x2 + 3, y1);
             gc.drawLine(x2 + 3, y1, x2 + 3, ym);
             gc.drawLine(x2 + 1, ym, x2 + 3, ym);
