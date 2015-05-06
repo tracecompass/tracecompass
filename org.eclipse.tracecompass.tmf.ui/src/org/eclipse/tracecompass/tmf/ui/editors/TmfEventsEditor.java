@@ -141,7 +141,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                     final TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject(), true);
                     for (final TmfTraceElement traceElement : project.getTracesFolder().getTraces()) {
                         if (traceElement.getResource().equals(fFile.getParent())) {
-                            setPartName(traceElement.getName());
+                            setPartName(traceElement.getElementPath());
                             super.setSite(site);
                             super.setInput(fileEditorInput);
                             TmfOpenTraceHelper.reopenTraceFromElement(traceElement, this);
@@ -152,7 +152,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                     final TmfProjectElement project = TmfProjectRegistry.getProject(fFile.getProject(), true);
                     for (final TmfTraceElement traceElement : project.getTracesFolder().getTraces()) {
                         if (traceElement.getResource().equals(fFile)) {
-                            setPartName(traceElement.getName());
+                            setPartName(traceElement.getElementPath());
                             super.setSite(site);
                             super.setInput(fileEditorInput);
                             TmfOpenTraceHelper.reopenTraceFromElement(traceElement, this);
@@ -206,29 +206,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             fTrace = ((TmfEditorInput) getEditorInput()).getTrace();
             /* change the input to a FileEditorInput to allow open handlers to find this editor */
             super.setInput(new FileEditorInput(fFile));
-            if (fTrace != null) {
-                setPartName(fTrace.getName());
-                fEventsTable = createEventsTable(fParent, fTrace.getCacheSize());
-                fEventsTable.setColumnOrder(TmfTraceColumnManager.loadColumnOrder(fTrace.getTraceTypeId()));
-                fEventsTable.addSelectionChangedListener(this);
-                fEventsTable.setTrace(fTrace, true);
-                fEventsTable.refreshBookmarks(fFile);
-                if (fPendingGotoMarker != null) {
-                    fEventsTable.gotoMarker(fPendingGotoMarker);
-                    fPendingGotoMarker = null;
-                }
-
-                /* ensure start time is set */
-                final ITmfContext context = fTrace.seekEvent(0);
-                fTrace.getNext(context);
-                context.dispose();
-
-                broadcast(new TmfTraceOpenedSignal(this, fTrace, fFile));
-            } else {
-                setPartName(getEditorInput().getName());
-                fEventsTable = new TmfEventsTable(fParent, 0);
-                fEventsTable.addSelectionChangedListener(this);
-            }
+            createAndInitializeTable();
             fParent.layout();
         }
     }
@@ -236,13 +214,28 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     @Override
     public void createPartControl(final Composite parent) {
         fParent = parent;
+        createAndInitializeTable();
+        addPropertyListener(this);
+        ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
+        // we need to wrap the ISelectionProvider interface in the editor because
+        // the events table can be replaced later while the selection changed listener
+        // is only added once by the platform to the selection provider set here
+        getSite().setSelectionProvider(this);
+        getSite().getPage().addPartListener(this);
+    }
+
+    private void createAndInitializeTable() {
         if (fTrace != null) {
             setPartName(fTrace.getName());
-            fEventsTable = createEventsTable(parent, fTrace.getCacheSize());
+            fEventsTable = createEventsTable(fParent, fTrace.getCacheSize());
             fEventsTable.setColumnOrder(TmfTraceColumnManager.loadColumnOrder(fTrace.getTraceTypeId()));
             fEventsTable.addSelectionChangedListener(this);
             fEventsTable.setTrace(fTrace, true);
             fEventsTable.refreshBookmarks(fFile);
+            if (fPendingGotoMarker != null) {
+                fEventsTable.gotoMarker(fPendingGotoMarker);
+                fPendingGotoMarker = null;
+            }
 
             /* ensure start time is set */
             final ITmfContext context = fTrace.seekEvent(0);
@@ -251,18 +244,11 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
 
             broadcast(new TmfTraceOpenedSignal(this, fTrace, fFile));
         } else {
-            fEventsTable = new TmfEventsTable(parent, 0);
+            fEventsTable = new TmfEventsTable(fParent, 0);
             fEventsTable.addSelectionChangedListener(this);
         }
         IStatusLineManager statusLineManager = getEditorSite().getActionBars().getStatusLineManager();
         fEventsTable.setStatusLineManager(statusLineManager);
-        addPropertyListener(this);
-        ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
-        // we need to wrap the ISelectionProvider interface in the editor because
-        // the events table can be replaced later while the selection changed listener
-        // is only added once by the platform to the selection provider set here
-        getSite().setSelectionProvider(this);
-        getSite().getPage().addPartListener(this);
     }
 
     @Override
