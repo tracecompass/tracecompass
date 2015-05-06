@@ -111,7 +111,7 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
                     int procNameQuark = ss.getQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_PROCNAME_ATTRIBUTE);
                     try {
                         ITmfStateValue procnameValue = ss.querySingleState(start, procNameQuark).getStateValue();
-                        String procname = new String();
+                        String procname = ""; //$NON-NLS-1$
                         if (!procnameValue.isNull()) {
                             procname = procnameValue.unboxStr();
                         }
@@ -122,10 +122,10 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
                 }
 
                 /*
-                 * TODO: It should only show active threads in the time range. If a
-                 * tid does not have any memory value (only 1 interval in the time
-                 * range with value null or 0), then its series should not be
-                 * displayed.
+                 * TODO: It should only show active threads in the time range.
+                 * If a tid does not have any memory value (only 1 interval in
+                 * the time range with value null or 0), then its series should
+                 * not be displayed.
                  */
                 double yvalue = 0.0;
                 for (int i = 0; i < xvalues.length; i++) {
