@@ -395,8 +395,6 @@ public class TimeGraphCombo extends Composite {
 
         // Feature in Windows. The tree vertical bar reappears when
         // the control is resized so we need to hide it again.
-        // Bug in Linux. The tree header height is 0 in constructor,
-        // so we need to reset it later when the control is resized.
         tree.addControlListener(new ControlAdapter() {
             private int depth = 0;
             @Override
@@ -408,7 +406,20 @@ public class TimeGraphCombo extends Composite {
                     tree.getVerticalBar().setVisible(false);
                     depth--;
                 }
-                fTimeGraphViewer.setHeaderHeight(tree.getHeaderHeight());
+            }
+        });
+        // Bug in Linux. The tree header height is 0 in constructor,
+        // so we need to reset it later when the control is painted.
+        // This work around used to be done on control resized but the header
+        // height was not initialized on the initial resize on GTK3.
+        tree.addPaintListener(new PaintListener() {
+            @Override
+            public void paintControl(PaintEvent e) {
+                int headerHeight = tree.getHeaderHeight();
+                if (headerHeight > 0) {
+                    fTimeGraphViewer.setHeaderHeight(headerHeight);
+                    tree.removePaintListener(this);
+                }
             }
         });
 
