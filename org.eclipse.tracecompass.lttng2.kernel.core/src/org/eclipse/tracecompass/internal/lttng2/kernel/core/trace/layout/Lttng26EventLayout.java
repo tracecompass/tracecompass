@@ -20,7 +20,10 @@ package org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout;
  */
 public class Lttng26EventLayout extends LttngEventLayout {
 
-    private Lttng26EventLayout() {}
+    /**
+     * Constructor
+     */
+    protected Lttng26EventLayout() {}
 
     private static final Lttng26EventLayout INSTANCE = new Lttng26EventLayout();
 

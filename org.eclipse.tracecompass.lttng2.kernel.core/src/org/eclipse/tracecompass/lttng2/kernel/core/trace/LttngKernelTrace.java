@@ -28,6 +28,7 @@ import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Activator;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.Lttng26EventLayout;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.Lttng27EventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.PerfEventLayout;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -53,6 +54,7 @@ public class LttngKernelTrace extends CtfTmfTrace implements IKernelTrace {
     private enum OriginTracer {
         LTTNG(LttngEventLayout.getInstance()),
         LTTNG26(Lttng26EventLayout.getInstance()),
+        LTTNG27(Lttng27EventLayout.INSTANCE),
         PERF(PerfEventLayout.getInstance());
 
         private final @NonNull IKernelAnalysisEventLayout fLayout;
@@ -104,27 +106,33 @@ public class LttngKernelTrace extends CtfTmfTrace implements IKernelTrace {
     public void initTrace(IResource resource, String path,
             Class<? extends ITmfEvent> eventType) throws TmfTraceException {
         super.initTrace(resource, path, eventType);
+        fOriginTracer = getTracerFromEnv(this.getEnvironment());
+    }
 
-        /*
-         * Set the 'fOriginTracer' in accordance to what is found in the
-         * metadata
-         */
-        Map<String, String> traceEnv = this.getEnvironment();
+    /**
+     * Identify which tracer generated a trace from its metadata.
+     */
+    private static OriginTracer getTracerFromEnv(Map<String, String> traceEnv) {
         String tracerName = traceEnv.get("tracer_name"); //$NON-NLS-1$
         String tracerMajor = traceEnv.get("tracer_major"); //$NON-NLS-1$
         String tracerMinor = traceEnv.get("tracer_minor"); //$NON-NLS-1$
 
         if ("\"perf\"".equals(tracerName)) { //$NON-NLS-1$
-            fOriginTracer = OriginTracer.PERF;
+            return OriginTracer.PERF;
 
-        } else if ("\"lttng-modules\"".equals(tracerName) && //$NON-NLS-1$
-                tracerMajor != null && (Integer.valueOf(tracerMajor) >= 2) &&
-                tracerMinor != null && (Integer.valueOf(tracerMinor) >= 6)) {
-            fOriginTracer = OriginTracer.LTTNG26;
-
-        } else {
-            fOriginTracer = OriginTracer.LTTNG;
+        } else if ("\"lttng-modules\"".equals(tracerName) && tracerMajor != null && tracerMinor != null) { //$NON-NLS-1$
+            /* Look for specific versions of LTTng */
+            if (Integer.valueOf(tracerMajor) >= 2) {
+                if (Integer.valueOf(tracerMinor) >= 7) {
+                    return OriginTracer.LTTNG27;
+                } else if (Integer.valueOf(tracerMinor) >= 6) {
+                    return OriginTracer.LTTNG26;
+                }
+            }
         }
+
+        /* Use base LTTng layout as default */
+        return OriginTracer.LTTNG;
     }
 
     /**
