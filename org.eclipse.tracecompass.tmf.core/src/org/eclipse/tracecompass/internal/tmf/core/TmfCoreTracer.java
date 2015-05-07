@@ -43,7 +43,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * @author Francois Chouinard
  */
 @SuppressWarnings("nls")
-public class TmfCoreTracer {
+public final class TmfCoreTracer {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -65,14 +65,24 @@ public class TmfCoreTracer {
     // ------------------------------------------------------------------------
 
     // Classes tracing flags
-    private static boolean fComponentClassEnabled = false;
-    private static boolean fRequestClassEnabled   = false;
-    private static boolean fSignalClassEnabled    = false;
-    private static boolean fEventClassEnabled     = false;
-    private static boolean fAnalysisClassEnabled  = false;
+    private static volatile boolean fComponentClassEnabled = false;
+    private static volatile boolean fRequestClassEnabled   = false;
+    private static volatile boolean fSignalClassEnabled    = false;
+    private static volatile boolean fEventClassEnabled     = false;
+    private static volatile boolean fAnalysisClassEnabled  = false;
 
     // Trace log file
     private static BufferedWriter fTraceFile;
+
+    // ------------------------------------------------------------------------
+    // Constructor
+    // ------------------------------------------------------------------------
+    /**
+     * Constructor
+     */
+    private TmfCoreTracer() {
+        // Do nothing
+    }
 
     // ------------------------------------------------------------------------
     // Start/stop tracing - controlled by the plug-in
@@ -81,7 +91,7 @@ public class TmfCoreTracer {
     /**
      * Set the tracing flags according to the launch configuration
      */
-    public static void init() {
+    public static synchronized void init() {
 
         String traceKey;
         boolean isTracing = false;
@@ -130,7 +140,7 @@ public class TmfCoreTracer {
     /**
      * Close the trace log file
      */
-    public static void stop() {
+    public static synchronized void stop() {
         if (fTraceFile != null) {
             try {
                 fTraceFile.close();

@@ -300,7 +300,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
     /**
      * Update the default time and default interval formats
      */
-    public static void updateDefaultFormats() {
+    public static synchronized void updateDefaultFormats() {
         fDefaultTimeFormat = new TmfTimestampFormat(
                 TmfTimePreferences.getTimePattern(),
                 TmfTimePreferences.getTimeZone(),
@@ -311,7 +311,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
     /**
      * @return the default time format pattern
      */
-    public static TmfTimestampFormat getDefaulTimeFormat() {
+    public static synchronized TmfTimestampFormat getDefaulTimeFormat() {
         if (fDefaultTimeFormat == null) {
             fDefaultTimeFormat = new TmfTimestampFormat(
                     TmfTimePreferences.getTimePattern(),
@@ -324,7 +324,7 @@ public class TmfTimestampFormat extends SimpleDateFormat {
     /**
      * @return the default interval format pattern
      */
-    public static TmfTimestampFormat getDefaulIntervalFormat() {
+    public static synchronized TmfTimestampFormat getDefaulIntervalFormat() {
         if (fDefaultIntervalFormat == null) {
             fDefaultIntervalFormat = new TmfTimestampFormat(TmfTimePreferences.getIntervalPattern());
         }
