@@ -104,7 +104,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     private final Color fLastEventColor = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED);
 
     // Application colors, they need to be disposed
-    private final Color[] fHistoBarColors = new Color[] {new Color(Display.getDefault(), 90, 90, 255), // blue
+    private final Color[] fHistoBarColors = new Color[] { new Color(Display.getDefault(), 90, 90, 255), // blue
             new Color(Display.getDefault(), 0, 240, 0), // green
             new Color(Display.getDefault(), 255, 0, 0), // red
             new Color(Display.getDefault(), 0, 255, 255), // cyan
@@ -199,6 +199,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     /**
      * The drag state
+     *
      * @see #DRAG_NONE
      * @see #DRAG_SELECTION
      * @see #DRAG_RANGE
@@ -228,8 +229,10 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     /**
      * Full constructor.
      *
-     * @param view A reference to the parent TMF view.
-     * @param parent A parent composite
+     * @param view
+     *            A reference to the parent TMF view.
+     * @param parent
+     *            A parent composite
      */
     public Histogram(final TmfView view, final Composite parent) {
         fParentView = view;
@@ -376,6 +379,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     /**
      * Returns the start time (equal first bucket time)
+     *
      * @return the start time.
      */
     public long getStartTime() {
@@ -384,6 +388,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     /**
      * Returns the end time.
+     *
      * @return the end time.
      */
     public long getEndTime() {
@@ -392,6 +397,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     /**
      * Returns the time limit (end of last bucket)
+     *
      * @return the time limit.
      */
     public long getTimeLimit() {
@@ -400,6 +406,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     /**
      * Returns a data model reference.
+     *
      * @return data model.
      */
     public HistogramDataModel getDataModel() {
@@ -419,8 +426,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     }
 
     /**
-     * Return <code>true</code> if the traces must be displayed in the histogram,
-     * <code>false</code> otherwise.
+     * Return <code>true</code> if the traces must be displayed in the
+     * histogram, <code>false</code> otherwise.
+     *
      * @return whether the traces should be displayed
      */
     public boolean showTraces() {
@@ -428,8 +436,10 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     }
 
     /**
-     * Returns the maximum number of traces the histogram can display with separate colors.
-     * If there is more traces, histogram will use only one color to display them.
+     * Returns the maximum number of traces the histogram can display with
+     * separate colors. If there is more traces, histogram will use only one
+     * color to display them.
+     *
      * @return the maximum number of traces the histogram can display.
      */
     public int getMaxNbTraces() {
@@ -438,7 +448,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     /**
      * Returns the color used to display the trace at the given index.
-     * @param traceIndex a trace index
+     *
+     * @param traceIndex
+     *            a trace index
      * @return a {@link Color}
      */
     public Color getTraceColor(int traceIndex) {
@@ -450,8 +462,11 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // ------------------------------------------------------------------------
     /**
      * Updates the time range.
-     * @param startTime A start time
-     * @param endTime A end time.
+     *
+     * @param startTime
+     *            A start time
+     * @param endTime
+     *            A end time.
      */
     public void updateTimeRange(long startTime, long endTime) {
         if (fDragState == DRAG_NONE) {
@@ -477,8 +492,10 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     /**
      * Sets the current selection time range and refresh the display
      *
-     * @param beginTime The begin time of the current selection
-     * @param endTime The end time of the current selection
+     * @param beginTime
+     *            The begin time of the current selection
+     * @param endTime
+     *            The end time of the current selection
      */
     public void setSelection(final long beginTime, final long endTime) {
         fSelectionBegin = (beginTime > 0) ? beginTime : 0;
@@ -489,7 +506,8 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     /**
      * Computes the timestamp of the bucket at [offset]
      *
-     * @param offset offset from the left on the histogram
+     * @param offset
+     *            offset from the left on the histogram
      * @return the start timestamp of the corresponding bucket
      */
     public synchronized long getTimestamp(final int offset) {
@@ -504,7 +522,8 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     /**
      * Computes the offset of the timestamp in the histogram
      *
-     * @param timestamp the timestamp
+     * @param timestamp
+     *            the timestamp
      * @return the offset of the corresponding bucket (-1 if invalid)
      */
     public synchronized int getOffset(final long timestamp) {
@@ -527,7 +546,8 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     /**
      * Move the currently selected bar cursor to a non-empty bucket.
      *
-     * @param keyCode the SWT key code
+     * @param keyCode
+     *            the SWT key code
      */
     protected void moveCursor(final int keyCode) {
 
@@ -623,7 +643,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     /**
      * Add a mouse wheel listener to the histogram
-     * @param listener the mouse wheel listener
+     *
+     * @param listener
+     *            the mouse wheel listener
      */
     public void addMouseWheelListener(MouseWheelListener listener) {
         fCanvas.addMouseWheelListener(listener);
@@ -631,7 +653,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     /**
      * Remove a mouse wheel listener from the histogram
-     * @param listener the mouse wheel listener
+     *
+     * @param listener
+     *            the mouse wheel listener
      */
     public void removeMouseWheelListener(MouseWheelListener listener) {
         fCanvas.removeMouseWheelListener(listener);
@@ -639,7 +663,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     /**
      * Add a key listener to the histogram
-     * @param listener the key listener
+     *
+     * @param listener
+     *            the key listener
      */
     public void addKeyListener(KeyListener listener) {
         fCanvas.addKeyListener(listener);
@@ -647,7 +673,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     /**
      * Remove a key listener from the histogram
-     * @param listener the key listener
+     *
+     * @param listener
+     *            the key listener
      */
     public void removeKeyListener(KeyListener listener) {
         fCanvas.removeKeyListener(listener);
@@ -743,14 +771,18 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                 int value = (int) Math.ceil(totalNbEvents * factor);
                 int x = i + fOffset;
 
-                // in Linux, the last pixel in a line is not drawn,
-                // so draw lost events first, one pixel too far
+                /*
+                 * in Linux, the last pixel in a line is not drawn, so draw lost
+                 * events first, one pixel too far
+                 */
                 if (!HistogramScaledData.hideLostEvents) {
                     imageGC.setForeground(fLostEventColor);
                     final int lostEventValue = (int) Math.ceil(scaledData.fLostEventsData[i] * factor);
                     if (lostEventValue != 0) {
-                        // drawing a line is inclusive, so we should remove 1 from y2
-                        // but we don't because Linux
+                        /*
+                         * drawing a line is inclusive, so we should remove 1
+                         * from y2 but we don't because Linux
+                         */
                         imageGC.drawLine(x, height - value - lostEventValue, x, height - value);
                     }
                 }
@@ -962,7 +994,10 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     private String formatToolTipLabel(final int index) {
         long startTime = fScaledData.getBucketStartTime(index);
-        // negative values are possible if time values came into the model in decreasing order
+        /*
+         * negative values are possible if time values came into the model in
+         * decreasing order
+         */
         if (startTime < 0) {
             startTime = 0;
         }
