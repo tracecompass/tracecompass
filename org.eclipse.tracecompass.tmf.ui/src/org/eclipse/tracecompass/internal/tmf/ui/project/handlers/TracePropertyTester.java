@@ -54,7 +54,7 @@ public class TracePropertyTester extends PropertyTester {
 
         // Check if the selected elements are in the trace folder
         if (IS_IN_TRACE_FOLDER.equals(property)) {
-            if (receiver != null && receiver instanceof IStructuredSelection) {
+            if (receiver instanceof IStructuredSelection) {
                 Iterator<?> iter = ((IStructuredSelection) receiver).iterator();
                 while (iter.hasNext()) {
                     Object item = iter.next();
@@ -73,7 +73,7 @@ public class TracePropertyTester extends PropertyTester {
 
         // Check if the parent of a trace element is an experiment
         if (IS_EXPERIMENT_TRACE.equals(property)) {
-            if (receiver != null && receiver instanceof TmfTraceElement) {
+            if (receiver instanceof TmfTraceElement) {
                 TmfTraceElement trace = (TmfTraceElement) receiver;
                 return trace.getParent() instanceof TmfExperimentElement;
             }
@@ -82,10 +82,6 @@ public class TracePropertyTester extends PropertyTester {
 
         // Check if traces has supplementary files
         if (HAS_SUPPLEMENTARY_FILES.equals(property)) {
-            if (receiver == null) {
-                return false;
-            }
-
             if (receiver instanceof TmfTraceElement) {
                 TmfTraceElement trace = (TmfTraceElement) receiver;
                 return trace.hasSupplementaryResources();
@@ -103,7 +99,7 @@ public class TracePropertyTester extends PropertyTester {
 
         // Check if the trace element is of a specific trace type
         if (TRACE_TYPE.equals(property)) {
-            if (receiver != null && receiver instanceof TmfTraceElement) {
+            if (receiver instanceof TmfTraceElement) {
                 TmfTraceElement trace = (TmfTraceElement) receiver;
                 if (expectedValue instanceof String && expectedValue.equals(trace.getTraceType())) {
                     return true;

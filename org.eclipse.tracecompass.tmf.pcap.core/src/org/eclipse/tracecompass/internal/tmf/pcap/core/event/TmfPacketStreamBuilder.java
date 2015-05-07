@@ -50,7 +50,7 @@ public class TmfPacketStreamBuilder {
      */
     public synchronized void addEventToStream(PcapEvent event) {
         Packet packet = event.getPacket().getPacket(PcapProtocol.PCAP);
-        if (packet == null || !(packet instanceof PcapPacket)) {
+        if (!(packet instanceof PcapPacket)) {
             return;
         }
         PcapPacket pcapPacket = (PcapPacket) packet;

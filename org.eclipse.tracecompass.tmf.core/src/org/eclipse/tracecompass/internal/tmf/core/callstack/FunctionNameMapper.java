@@ -187,7 +187,7 @@ public final class FunctionNameMapper {
                 IBinaryFile binFile;
                 try {
                     binFile = parser.getBinary(hintBuffer, filePath);
-                    if (binFile != null && binFile instanceof IBinaryParser.IBinaryObject) {
+                    if (binFile instanceof IBinaryParser.IBinaryObject) {
                         return (IBinaryParser.IBinaryObject)binFile;
                     }
                 } catch (IOException e) {
