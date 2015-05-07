@@ -12,16 +12,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>org.eclipse.tracecompass</artifactId>
+    <artifactId>org.eclipse.tracecompass.btf-parent</artifactId>
     <groupId>org.eclipse.tracecompass</groupId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>org.eclipse.tracecompass.btf.ui</artifactId>
+  <artifactId>org.eclipse.tracecompass.btf.core</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
 
-  <name>Best Trace Format UI Plug-in</name>
+  <name>Best Trace Format Plug-in</name>
 
  <build>
     <plugins>
