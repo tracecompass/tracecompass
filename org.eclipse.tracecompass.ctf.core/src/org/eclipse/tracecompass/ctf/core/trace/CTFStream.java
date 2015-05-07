@@ -43,7 +43,7 @@ public class CTFStream {
     /**
      * The numerical ID of the stream
      */
-    private Long fId = null;
+    private long fId = 0;
 
     /**
      * Declarations of the stream-specific structures
@@ -63,6 +63,7 @@ public class CTFStream {
     private final ArrayList<IEventDeclaration> fEvents = new ArrayList<>();
 
     private boolean fEventUnsetId = false;
+    private boolean fStreamIdSet = false;
 
     /**
      * The inputs associated to this stream
@@ -95,14 +96,16 @@ public class CTFStream {
      */
     public void setId(long id) {
         fId = id;
+        fStreamIdSet = true;
     }
 
     /**
      * Gets the id of a stream
      *
      * @return id the id of a stream
+     * @since 1.0
      */
-    public Long getId() {
+    public long getId() {
         return fId;
     }
 
@@ -112,7 +115,7 @@ public class CTFStream {
      * @return If the ID is set or not
      */
     public boolean isIdSet() {
-        return fId != null;
+        return fStreamIdSet;
     }
 
     /**

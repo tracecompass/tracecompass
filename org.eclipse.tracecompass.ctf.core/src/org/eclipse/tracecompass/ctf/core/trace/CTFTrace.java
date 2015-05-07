@@ -235,6 +235,9 @@ public class CTFTrace implements IDefinitionScope {
      * @return Stream the stream that we need
      */
     public CTFStream getStream(Long id) {
+        if (id == null) {
+            return fStreams.get(0L);
+        }
         return fStreams.get(id);
     }
 
@@ -486,12 +489,12 @@ public class CTFTrace implements IDefinitionScope {
                 stream = fStreams.get(streamID);
             } else {
                 /* No stream_id in the packet header */
-                stream = fStreams.get(null);
+                stream = getStream(null);
             }
 
         } else {
             /* No packet header, we suppose there is only one stream */
-            stream = fStreams.get(null);
+            stream = getStream(null);
         }
 
         if (stream == null) {
@@ -589,10 +592,10 @@ public class CTFTrace implements IDefinitionScope {
         }
 
         /*
-         * If the stream we try to add has the null key, it must be the only
+         * If the stream we try to add has no key set, it must be the only
          * one. Thus, if the streams container is not empty, it is not valid.
          */
-        if ((stream.getId() == null) && (!fStreams.isEmpty())) {
+        if ((!stream.isIdSet()) && (!fStreams.isEmpty())) {
             throw new ParseException("Stream without id with multiple streams"); //$NON-NLS-1$
         }
 
