@@ -2011,12 +2011,13 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
         @Override
         protected IStatus run(final IProgressMonitor monitor) {
-            if (fTrace == null) {
+            final ITmfTrace trace = fTrace;
+            if (trace == null) {
                 return Status.OK_STATUS;
             }
             final Display display = Display.getDefault();
             if (startIndex < 0) {
-                rank = (int) fTrace.getNbEvents() - 1;
+                rank = (int) trace.getNbEvents() - 1;
                 /*
                  * -1 for header row, -3 for header and top and bottom filter
                  * status rows
@@ -2045,23 +2046,23 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 if (foundRank == -1) {
                     if (direction == Direction.FORWARD) {
                         rank++;
-                        if (rank > (fTrace.getNbEvents() - 1)) {
+                        if (rank > (trace.getNbEvents() - 1)) {
                             rank = 0;
                         }
                     } else {
                         rank--;
                         if (rank < 0) {
-                            rank = (int) fTrace.getNbEvents() - 1;
+                            rank = (int) trace.getNbEvents() - 1;
                         }
                     }
                 }
             }
             final int startRank = (int) rank;
             boolean wrapped = false;
-            while (!monitor.isCanceled() && (foundRank == -1) && (fTrace != null)) {
-                int nbRequested = (direction == Direction.FORWARD ? Integer.MAX_VALUE : Math.min((int) rank + 1, fTrace.getCacheSize()));
+            while (!monitor.isCanceled() && (foundRank == -1)) {
+                int nbRequested = (direction == Direction.FORWARD ? Integer.MAX_VALUE : Math.min((int) rank + 1, trace.getCacheSize()));
                 if (direction == Direction.BACKWARD) {
-                    rank = Math.max(0, rank - fTrace.getCacheSize() + 1);
+                    rank = Math.max(0, rank - trace.getCacheSize() + 1);
                 }
                 request = new TmfEventRequest(ITmfEvent.class, TmfTimeRange.ETERNITY,
                         (int) rank, nbRequested, ExecutionType.BACKGROUND) {
@@ -2081,7 +2082,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         currentRank++;
                     }
                 };
-                ((ITmfEventProvider) fTrace).sendRequest(request);
+                ((ITmfEventProvider) trace).sendRequest(request);
                 try {
                     request.waitForCompletion();
                     if (request.isCancelled()) {
@@ -2107,7 +2108,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     } else {
                         rank--;
                         if (rank < 0) {
-                            rank = (int) fTrace.getNbEvents() - 1;
+                            rank = (int) trace.getNbEvents() - 1;
                             wrapped = true;
                         }
                         if ((rank <= startRank) && wrapped) {
@@ -2371,12 +2372,12 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             @Override
             public void run() {
                 fTable.removeAll();
-                fCache.setTrace(fTrace); // Clear the cache
-                if (fTrace != null) {
-                    if (!fTable.isDisposed() && (fTrace != null)) {
+                fCache.setTrace(trace); // Clear the cache
+                if (trace != null) {
+                    if (!fTable.isDisposed()) {
                         if (fTable.getData(Key.FILTER_OBJ) == null) {
                             // +1 for header row
-                            fTable.setItemCount((int) fTrace.getNbEvents() + 1);
+                            fTable.setItemCount((int) trace.getNbEvents() + 1);
                         } else {
                             stopFilterThread();
                             fFilterMatchCount = 0;
@@ -2390,7 +2391,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         }
                     }
                 }
-                fRawViewer.setTrace(fTrace);
+                fRawViewer.setTrace(trace);
             }
         });
     }
