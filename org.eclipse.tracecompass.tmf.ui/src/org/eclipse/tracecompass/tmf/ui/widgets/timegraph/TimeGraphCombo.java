@@ -1203,8 +1203,7 @@ public class TimeGraphCombo extends Composite {
      */
     public int getAvailableWidth(int requestedOffset) {
         int totalWidth = fSashForm.getBounds().width;
-        int timeWidth = totalWidth - requestedOffset;
-        return timeWidth;
+        return Math.min(totalWidth, Math.max(0, totalWidth - requestedOffset));
     }
 
     /**
