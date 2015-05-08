@@ -655,8 +655,7 @@ public class Frame extends BasicFrame {
             if (fHighlightLifeline != null) {
                 if (toDraw == fHighlightLifeline) {
                     toDraw.highlightExecOccurrenceRegion(context, fStartEvent, fNbEvent, fHighlightColor);
-                } else if ((toDraw.getIndex() < fHighlightLifeline.getIndex()) || ((toDraw.getIndex() < fHighlightLifeline.getIndex()))) {
-
+                } else if (toDraw.getIndex() < fHighlightLifeline.getIndex()) {
                     int acIndex = toDraw.getExecOccurrenceDrawIndex();
                     // acIndex = first visible execution occurrence
                     // for drawing speed reason with only search on the visible subset
