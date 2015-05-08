@@ -25,6 +25,10 @@
   <version>1.0.0-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
 
+  <properties>
+    <ctfTestSuiteCommit>0f8beba86ae551f42adeb81d1bfddd5645f31013</ctfTestSuiteCommit>
+  </properties>
+
   <!-- Do not download the test traces if "maven.test.skip" is set -->
   <profiles>
     <profile>
@@ -47,6 +51,7 @@
                 <phase>pre-integration-test</phase>
                 <configuration>
                   <target>
+                    <property name="ctf-test-suite-commit" value="${ctfTestSuiteCommit}"/>
                     <ant antfile="get-traces.xml" dir="traces" />
                   </target>
                 </configuration>

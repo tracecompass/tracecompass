@@ -101,8 +101,19 @@
 </target>
 
 <target name="pullTestSuite" if="testSuiteExists">
+  <!-- Update the local 'master' branch -->
+  <exec executable = "git" failifexecutionfails="false" dir="ctf-testsuite" timeout="20000">
+    <arg value = "checkout"/>
+    <arg value = "master"/>
+  </exec>
   <exec executable = "git" failifexecutionfails="false" dir="ctf-testsuite" timeout="20000">
     <arg value = "pull"/>
+  </exec>
+
+  <!-- Checkout the commit requested by the current build -->
+  <exec executable = "git" failifexecutionfails="false" dir="ctf-testsuite" timeout="20000">
+    <arg value = "checkout"/>
+    <arg value = "${ctf-test-suite-commit}"/>
   </exec>
 </target>
 
