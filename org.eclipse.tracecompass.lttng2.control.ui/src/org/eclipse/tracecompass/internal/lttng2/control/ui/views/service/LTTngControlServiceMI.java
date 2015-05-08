@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IDomainInfo;
@@ -961,7 +962,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
     private static @Nullable Node getFirstOf(NodeList nodeList, String tagName) {
         Node node = null;
         for (int i = 0; i < nodeList.getLength(); i++) {
-            if (nodeList.item(i).getNodeName() == tagName) {
+            if (NonNullUtils.equalsNullable(nodeList.item(i).getNodeName(), tagName)) {
                 node = nodeList.item(i);
                 break;
             }

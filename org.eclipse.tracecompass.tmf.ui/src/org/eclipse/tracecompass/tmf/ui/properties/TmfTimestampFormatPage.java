@@ -347,7 +347,7 @@ public class TmfTimestampFormatPage extends PreferencePage implements IWorkbench
         Object source = event.getSource();
         Object value = event.getNewValue();
         if (source instanceof RadioGroupFieldEditor && value instanceof String &&
-                !(value.equals(fChangedProperty) && source == fProperty))
+                !(value.equals(fChangedProperty) && source.equals(fProperty)))
         {
             fProperty = ((RadioGroupFieldEditor) source).getPreferenceName();
             fChangedProperty = (String) value;
