@@ -153,17 +153,12 @@
   <modules>
     <module>btf</module>
     <module>common</module>
+    <module>ctf</module>
     <module>doc</module>
     <module>gdbtrace</module>
     <module>pcap</module>
     <module>rcp</module>
     <module>statesystem</module>
-
-    <module>org.eclipse.tracecompass.ctf</module>
-    <module>org.eclipse.tracecompass.ctf.core</module>
-    <module>org.eclipse.tracecompass.ctf.core.tests</module>
-    <module>org.eclipse.tracecompass.ctf.parser</module>
-    <module>org.eclipse.tracecompass.ctf.parser.tests</module>
 
     <module>org.eclipse.tracecompass.tmf</module>
     <module>org.eclipse.tracecompass.tmf.core</module>
@@ -171,11 +166,6 @@
     <module>org.eclipse.tracecompass.tmf.ui</module>
     <module>org.eclipse.tracecompass.tmf.ui.tests</module>
     <module>org.eclipse.tracecompass.tmf.ui.swtbot.tests</module>
-
-    <module>org.eclipse.tracecompass.tmf.ctf</module>
-    <module>org.eclipse.tracecompass.tmf.ctf.core</module>
-    <module>org.eclipse.tracecompass.tmf.ctf.core.tests</module>
-    <module>org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests</module>
 
     <module>org.eclipse.tracecompass.tmf.analysis.xml.core</module>
     <module>org.eclipse.tracecompass.tmf.analysis.xml.core.tests</module>

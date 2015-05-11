@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-   Copyright (c) 2013 Ericsson
+   Copyright (C) 2011, Red Hat, Inc.
 
    All rights reserved. This program and the accompanying materials
    are made available under the terms of the Eclipse Public License v1.0
@@ -12,27 +12,46 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>org.eclipse.tracecompass</artifactId>
+    <artifactId>org.eclipse.tracecompass.ctf-parent</artifactId>
     <groupId>org.eclipse.tracecompass</groupId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>org.eclipse.tracecompass.ctf.parser.tests</artifactId>
-  <groupId>org.eclipse.tracecompass</groupId>
+  <artifactId>org.eclipse.tracecompass.tmf.ctf.core.tests</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
 
-  <name>Trace Compass CTF Parser Tests Plug-in</name>
+  <name>CTF Support for TMF Core Tests Plug-in</name>
 
  <build>
     <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.8</version>
+            <executions>
+                <execution>
+                    <id>prepare</id>
+                    <phase>validate</phase>
+                    <configuration>
+                    <target>
+                        <echo message="prepare phase" />
+                    </target>
+                    </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                </execution>
+            </executions>
+        </plugin>
         <plugin>
             <groupId>org.eclipse.tycho</groupId>
             <artifactId>tycho-surefire-plugin</artifactId>
             <version>${tycho-version}</version>
             <configuration>
-                <testSuite>org.eclipse.tracecompass.ctf.parser.tests</testSuite>
-                <testClass>org.eclipse.tracecompass.ctf.parser.tests.AllCtfParserTests</testClass>
+                <includes>
+                    <include>**/AllTests.*</include>
+                </includes>
                 <useUIHarness>false</useUIHarness>
                 <useUIThread>false</useUIThread>
                 <product>org.eclipse.platform.ide</product>
@@ -41,4 +60,5 @@
     </plugins>
   </build>
 
+ <groupId>org.eclipse.tracecompass</groupId>
 </project>
