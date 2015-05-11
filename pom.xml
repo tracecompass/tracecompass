@@ -162,15 +162,13 @@
     <module>doc</module>
     <module>gdbtrace</module>
     <module>pcap</module>
+    <module>statesystem</module>
 
     <module>org.eclipse.tracecompass.ctf</module>
     <module>org.eclipse.tracecompass.ctf.core</module>
     <module>org.eclipse.tracecompass.ctf.core.tests</module>
     <module>org.eclipse.tracecompass.ctf.parser</module>
     <module>org.eclipse.tracecompass.ctf.parser.tests</module>
-
-    <module>org.eclipse.tracecompass.statesystem.core</module>
-    <module>org.eclipse.tracecompass.statesystem.core.tests</module>
 
     <module>org.eclipse.tracecompass.tmf</module>
     <module>org.eclipse.tracecompass.tmf.core</module>
