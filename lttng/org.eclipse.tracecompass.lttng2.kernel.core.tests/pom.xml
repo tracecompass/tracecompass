@@ -12,31 +12,31 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>org.eclipse.tracecompass</artifactId>
+    <artifactId>org.eclipse.tracecompass.lttng-parent</artifactId>
     <groupId>org.eclipse.tracecompass</groupId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>org.eclipse.tracecompass.lttng2.control.core.tests</artifactId>
+  <artifactId>org.eclipse.tracecompass.lttng2.kernel.core.tests</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
 
-  <name>Trace Compass LTTng Control Core Tests Plug-in</name>
+  <name>Trace Compass LTTng Kernel Analysis Core Tests Plug-in</name>
 
  <build>
     <plugins>
-        <plugin>
-            <groupId>org.eclipse.tycho</groupId>
-            <artifactId>tycho-surefire-plugin</artifactId>
-            <version>${tycho-version}</version>
-            <configuration>
-                <testSuite>org.eclipse.tracecompass.lttng2.control.core.tests</testSuite>
-                <testClass>org.eclipse.tracecompass.lttng2.control.core.tests.AllTests</testClass>
-                <useUIHarness>false</useUIHarness>
-                <useUIThread>false</useUIThread>
-                <product>org.eclipse.platform.ide</product>
-            </configuration>
-        </plugin>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-surefire-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <configuration>
+          <testSuite>org.eclipse.tracecompass.lttng2.kernel.core.tests</testSuite>
+          <testClass>org.eclipse.tracecompass.lttng2.kernel.core.tests.AllTests</testClass>
+          <useUIHarness>false</useUIHarness>
+          <useUIThread>false</useUIThread>
+          <product>org.eclipse.platform.ide</product>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
