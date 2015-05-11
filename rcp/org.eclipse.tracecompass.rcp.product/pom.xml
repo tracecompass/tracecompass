@@ -10,7 +10,7 @@
     <name>Trace Compass RCP Product</name>
 
     <parent>
-      <artifactId>org.eclipse.tracecompass</artifactId>
+      <artifactId>org.eclipse.tracecompass.rcp-parent</artifactId>
       <groupId>org.eclipse.tracecompass</groupId>
       <version>1.0.0-SNAPSHOT</version>
     </parent>

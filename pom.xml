@@ -71,12 +71,6 @@
 
 <profiles>
   <profile>
-    <id>build-rcp</id>
-      <modules>
-        <module>org.eclipse.tracecompass.rcp.product</module>
-      </modules>
-  </profile>
-  <profile>
     <id>sign-update-site</id>
     <build>
       <plugins>
@@ -162,6 +156,7 @@
     <module>doc</module>
     <module>gdbtrace</module>
     <module>pcap</module>
+    <module>rcp</module>
     <module>statesystem</module>
 
     <module>org.eclipse.tracecompass.ctf</module>
@@ -220,11 +215,6 @@
     <module>org.eclipse.tracecompass.lttng2.ust.core.tests</module>
     <module>org.eclipse.tracecompass.lttng2.ust.ui</module>
     <module>org.eclipse.tracecompass.lttng2.ust.ui.tests</module>
-
-    <module>org.eclipse.tracecompass.rcp.branding</module>
-    <module>org.eclipse.tracecompass.rcp.branding.feature</module>
-    <module>org.eclipse.tracecompass.rcp</module>
-    <module>org.eclipse.tracecompass.rcp.ui</module>
 
     <module>org.eclipse.tracecompass.examples</module>
   </modules>
