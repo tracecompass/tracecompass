@@ -151,6 +151,7 @@
 </profiles>
 
   <modules>
+    <module>analysis</module>
     <module>btf</module>
     <module>common</module>
     <module>ctf</module>
@@ -184,10 +185,6 @@
     <module>org.eclipse.tracecompass.releng-site</module>
     <module>org.eclipse.tracecompass.target</module>
     <module>org.eclipse.tracecompass.testing</module>
-
-    <module>org.eclipse.tracecompass.analysis.os.linux.core</module>
-    <module>org.eclipse.tracecompass.analysis.os.linux.core.tests</module>
-    <module>org.eclipse.tracecompass.analysis.os.linux.ui</module>
 
     <module>org.eclipse.tracecompass.examples</module>
   </modules>

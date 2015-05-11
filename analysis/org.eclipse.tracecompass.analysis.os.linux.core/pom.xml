@@ -12,17 +12,17 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>org.eclipse.tracecompass</artifactId>
+    <artifactId>org.eclipse.tracecompass.analysis-parent</artifactId>
     <groupId>org.eclipse.tracecompass</groupId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>org.eclipse.tracecompass.analysis.os.linux.ui</artifactId>
+  <artifactId>org.eclipse.tracecompass.analysis.os.linux.core</artifactId>
   <groupId>org.eclipse.tracecompass</groupId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
 
-  <name>Trace Compass Linux Kernel Analysis UI Plug-in</name>
+  <name>Trace Compass Linux Kernel Analysis Core Plug-in</name>
 
   <build>
     <plugins>
