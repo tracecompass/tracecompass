@@ -159,6 +159,7 @@
   <modules>
     <module>btf</module>
     <module>doc</module>
+    <module>gdbtrace</module>
     <module>pcap</module>
 
     <module>org.eclipse.tracecompass.common.core</module>
@@ -223,12 +224,6 @@
     <module>org.eclipse.tracecompass.lttng2.ust.core.tests</module>
     <module>org.eclipse.tracecompass.lttng2.ust.ui</module>
     <module>org.eclipse.tracecompass.lttng2.ust.ui.tests</module>
-
-    <module>org.eclipse.tracecompass.gdbtrace</module>
-    <module>org.eclipse.tracecompass.gdbtrace.core</module>
-    <module>org.eclipse.tracecompass.gdbtrace.core.tests</module>
-    <module>org.eclipse.tracecompass.gdbtrace.ui</module>
-    <module>org.eclipse.tracecompass.gdbtrace.ui.tests</module>
 
     <module>org.eclipse.tracecompass.rcp.branding</module>
     <module>org.eclipse.tracecompass.rcp.branding.feature</module>
