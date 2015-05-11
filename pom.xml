@@ -157,8 +157,6 @@
     <module>releng</module>
     <module>statesystem</module>
     <module>tmf</module>
-
-    <module>org.eclipse.tracecompass.examples</module>
   </modules>
 
     <build>

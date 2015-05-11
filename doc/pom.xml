@@ -40,6 +40,8 @@
     <module>org.eclipse.tracecompass.gdbtrace.doc.user</module>
     <module>org.eclipse.tracecompass.rcp.doc.user</module>
     <module>org.eclipse.tracecompass.tmf.pcap.doc.user</module>
+
+    <module>org.eclipse.tracecompass.examples</module>
   </modules>
 
 </project>
