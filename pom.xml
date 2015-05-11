@@ -161,26 +161,7 @@
     <module>pcap</module>
     <module>rcp</module>
     <module>statesystem</module>
-
-    <module>org.eclipse.tracecompass.tmf</module>
-    <module>org.eclipse.tracecompass.tmf.core</module>
-    <module>org.eclipse.tracecompass.tmf.core.tests</module>
-    <module>org.eclipse.tracecompass.tmf.ui</module>
-    <module>org.eclipse.tracecompass.tmf.ui.tests</module>
-    <module>org.eclipse.tracecompass.tmf.ui.swtbot.tests</module>
-
-    <module>org.eclipse.tracecompass.tmf.analysis.xml.core</module>
-    <module>org.eclipse.tracecompass.tmf.analysis.xml.core.tests</module>
-    <module>org.eclipse.tracecompass.tmf.analysis.xml.ui</module>
-    <module>org.eclipse.tracecompass.tmf.analysis.xml.ui.tests</module>
-
-    <module>org.eclipse.tracecompass.tmf.remote</module>
-    <module>org.eclipse.tracecompass.tmf.remote.core</module>
-    <module>org.eclipse.tracecompass.tmf.remote.core.tests</module>
-    <module>org.eclipse.tracecompass.tmf.remote.ui</module>
-    <module>org.eclipse.tracecompass.tmf.remote.ui.swtbot.tests</module>
-
-    <module>org.eclipse.tracecompass.tmf.remote.ui.tests</module>
+    <module>tmf</module>
 
     <module>org.eclipse.tracecompass.releng-site</module>
     <module>org.eclipse.tracecompass.target</module>
