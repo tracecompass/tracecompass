@@ -158,12 +158,10 @@
 
   <modules>
     <module>btf</module>
+    <module>common</module>
     <module>doc</module>
     <module>gdbtrace</module>
     <module>pcap</module>
-
-    <module>org.eclipse.tracecompass.common.core</module>
-    <module>org.eclipse.tracecompass.common.core.tests</module>
 
     <module>org.eclipse.tracecompass.ctf</module>
     <module>org.eclipse.tracecompass.ctf.core</module>
