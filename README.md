@@ -51,7 +51,7 @@ This will build the RCP for all supported architectures. The resulting archives
 will be placed in `rcp/org.eclipse.tracecompass.rcp.product/target/products`.
 
 These commands will also build the p2 update site, which will be placed in
-`org.eclipse.tracecompass.releng-site/target/repository`.
+`releng/org.eclipse.tracecompass.releng-site/target/repository`.
 
 
 Maven profiles and properties

@@ -120,12 +120,6 @@
     </build>
   </profile>
   <profile>
-    <id>performance</id>
-    <modules>
-      <module>org.eclipse.tracecompass.alltests</module>
-    </modules>
-  </profile>
-  <profile>
     <id>macosx</id>
     <activation>
       <os>
@@ -160,12 +154,9 @@
     <module>lttng</module>
     <module>pcap</module>
     <module>rcp</module>
+    <module>releng</module>
     <module>statesystem</module>
     <module>tmf</module>
-
-    <module>org.eclipse.tracecompass.releng-site</module>
-    <module>org.eclipse.tracecompass.target</module>
-    <module>org.eclipse.tracecompass.testing</module>
 
     <module>org.eclipse.tracecompass.examples</module>
   </modules>
