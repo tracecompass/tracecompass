@@ -12,16 +12,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>org.eclipse.tracecompass</artifactId>
+    <artifactId>org.eclipse.tracecompass.pcap-parent</artifactId>
     <groupId>org.eclipse.tracecompass</groupId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>org.eclipse.tracecompass.tmf.pcap.ui</artifactId>
+  <artifactId>org.eclipse.tracecompass.pcap.core</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
 
-  <name>Pcap support for TMF UI Plug-in</name>
+  <name>Trace Compass Pcap Parser Core Plug-in</name>
 
  <build>
     <plugins>

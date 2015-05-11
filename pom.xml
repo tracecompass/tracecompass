@@ -159,6 +159,7 @@
   <modules>
     <module>btf</module>
     <module>doc</module>
+    <module>pcap</module>
 
     <module>org.eclipse.tracecompass.common.core</module>
     <module>org.eclipse.tracecompass.common.core.tests</module>
@@ -168,9 +169,6 @@
     <module>org.eclipse.tracecompass.ctf.core.tests</module>
     <module>org.eclipse.tracecompass.ctf.parser</module>
     <module>org.eclipse.tracecompass.ctf.parser.tests</module>
-
-    <module>org.eclipse.tracecompass.pcap.core</module>
-    <module>org.eclipse.tracecompass.pcap.core.tests</module>
 
     <module>org.eclipse.tracecompass.statesystem.core</module>
     <module>org.eclipse.tracecompass.statesystem.core.tests</module>
@@ -186,12 +184,6 @@
     <module>org.eclipse.tracecompass.tmf.ctf.core</module>
     <module>org.eclipse.tracecompass.tmf.ctf.core.tests</module>
     <module>org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests</module>
-
-    <module>org.eclipse.tracecompass.tmf.pcap</module>
-    <module>org.eclipse.tracecompass.tmf.pcap.core</module>
-    <module>org.eclipse.tracecompass.tmf.pcap.core.tests</module>
-    <module>org.eclipse.tracecompass.tmf.pcap.ui</module>
-    <module>org.eclipse.tracecompass.tmf.pcap.ui.swtbot.tests</module>
 
     <module>org.eclipse.tracecompass.tmf.analysis.xml.core</module>
     <module>org.eclipse.tracecompass.tmf.analysis.xml.core.tests</module>
