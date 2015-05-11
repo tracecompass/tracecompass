@@ -6,18 +6,21 @@ Eclipse.
 
 The plugins are categorized as follows:
 
-    org.eclipse.tracecompass.analysis.*    | Generic extensions to the base framework
-    org.eclipse.tracecompass.btf.*         | Best Trace Format (BTF) integration
-    org.eclipse.tracecompass.ctf.*         | Common Trace Format (CTF) reader library
-    org.eclipse.tracecompass.gdbtrace.*    | Support for reading and viewing GDB traces
-    org.eclipse.tracecompass.lttng2.*      | LTTng 2.x integration
-    org.eclipse.tracecompass.pcap.*        | libpcap integration
-    org.eclipse.tracecompass.rcp.*         | Code specific to the RCP version
-    org.eclipse.tracecompass.statesystem.* | State System library
-    org.eclipse.tracecompass.tmf.*         | Core framework
+    analysis/    | Generic extensions to the base framework
+    btf/         | Best Trace Format (BTF) integration
+    common/      | Generic utilities that can be used by other plugins
+    ctf/         | Common Trace Format (CTF) reader library
+    doc/         | Documentation and code examples
+    gdbtrace/    | Support for reading and viewing GDB traces
+    lttng/       | LTTng integration
+    pcap/        | libpcap integration
+    rcp/         | Code specific to the RCP version
+    releng/      | Releng-related plugins
+    statesystem/ | State System library
+    tmf/         | Core framework
 
-See the `plugins.svg` file for a diagram showing the dependencies between the
-different plugins.
+See the `components.svg` file for a diagram showing the dependencies between the
+different components.
 
 
 Setting up the development environment
