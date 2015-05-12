@@ -156,7 +156,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private @NonNull ITimeGraphContentProvider fTimeGraphContentProvider = new TimeGraphContentProvider();
 
     /** The relative weight of the sash, ignored if combo is not used */
-    private int[] fWeight = { 1, 1 };
+    private int[] fWeight = { 1, 3 };
 
     /** The filter column label array, or null if filter is not used */
     private String[] fFilterColumns;

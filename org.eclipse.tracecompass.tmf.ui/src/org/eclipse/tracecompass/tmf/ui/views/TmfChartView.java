@@ -38,6 +38,8 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
  */
 public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
 
+    private static final int[] DEFAULT_WEIGHTS = {1, 3};
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -123,7 +125,6 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
         fChartViewer.setSendTimeAlignSignals(true);
         fChartViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-
         fChartViewer.getControl().addPaintListener(new PaintListener() {
             @Override
             public void paintControl(PaintEvent e) {
@@ -148,7 +149,7 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
                 }
             }
         });
-
+        fSashForm.setWeights(DEFAULT_WEIGHTS);
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
         if (trace != null) {
             setTrace(trace);

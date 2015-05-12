@@ -51,6 +51,8 @@ public class CpuUsageView extends TmfView implements ITmfTimeAligned {
     /** ID string */
     public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.views.cpuusage"; //$NON-NLS-1$
 
+    private static final int[] DEFAULT_WEIGHTS = {1, 3};
+
     private CpuUsageComposite fTreeViewer = null;
     private CpuUsageXYViewer fXYViewer = null;
 
@@ -138,6 +140,8 @@ public class CpuUsageView extends TmfView implements ITmfTimeAligned {
                 }
             }
         });
+
+        fSashForm.setWeights(DEFAULT_WEIGHTS);
     }
 
     @Override
