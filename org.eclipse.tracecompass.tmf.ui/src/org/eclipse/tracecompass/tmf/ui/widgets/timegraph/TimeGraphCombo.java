@@ -1213,8 +1213,9 @@ public class TimeGraphCombo extends Composite {
      * @since 1.0
      */
     public int getAvailableWidth(int requestedOffset) {
+        int vBarWidth = ((fTimeGraphViewer.getVerticalBar() != null) && (fTimeGraphViewer.getVerticalBar().isVisible())) ? fTimeGraphViewer.getVerticalBar().getSize().x : 0;
         int totalWidth = fSashForm.getBounds().width;
-        return Math.min(totalWidth, Math.max(0, totalWidth - requestedOffset));
+        return Math.min(totalWidth, Math.max(0, totalWidth - requestedOffset - vBarWidth));
     }
 
     /**
