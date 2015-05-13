@@ -370,12 +370,13 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
      * @since 1.0
      */
     public int getPointAreaOffset() {
+
         int pixelCoordinate = 0;
         IAxis[] xAxes = getSwtChart().getAxisSet().getXAxes();
-        if (xAxes.length > 0) {
+        if (xAxes.length > 0 && fSwtChart.getSeriesSet().getSeries().length > 0) {
             IAxis axis = xAxes[0];
             long windowStartTime = getWindowStartTime() - getTimeOffset();
-            pixelCoordinate = axis.getPixelCoordinate(windowStartTime - 1);
+            pixelCoordinate = axis.getPixelCoordinate(windowStartTime);
         }
         return getSwtChart().toControl(getSwtChart().getPlotArea().toDisplay(pixelCoordinate, 0)).x;
     }
@@ -397,7 +398,7 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
             IAxis axis = xAxes[0];
             int x1 = getPointAreaOffset();
             long windowEndTime = getWindowEndTime() - getTimeOffset();
-            int x2 = axis.getPixelCoordinate(windowEndTime - 1);
+            int x2 = axis.getPixelCoordinate(windowEndTime);
             x2 = getSwtChart().toControl(getSwtChart().getPlotArea().toDisplay(x2, 0)).x;
             int width = x2 - x1;
             return width;
