@@ -16,7 +16,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.cdt.dsf,
  org.eclipse.cdt.dsf.gdb
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.eclipse.tracecompass.internal.gdbtrace.core;x-friends:="org.eclipse.tracecompass.gdbtrace.core.tests",
  org.eclipse.tracecompass.internal.gdbtrace.core.event;x-friends:="org.eclipse.tracecompass.gdbtrace.ui",

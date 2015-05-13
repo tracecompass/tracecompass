@@ -397,7 +397,6 @@ public class TmfStatisticsViewer extends TmfViewer {
             public void handleEvent(Event event) {
                 String eventTypeName = event.text;
                 if (getStatisticData().getRootNode() == null ||
-                        fTreeViewer == null ||
                         fTreeViewer.getTree() == null) {
                     return;
                 }

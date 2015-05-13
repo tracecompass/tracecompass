@@ -7,7 +7,7 @@ Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.analysis.timing.core;singleton:=true
 Bundle-Activator: org.eclipse.tracecompass.internal.analysis.timing.core.Activator
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,

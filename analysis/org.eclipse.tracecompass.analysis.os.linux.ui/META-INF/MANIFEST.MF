@@ -7,7 +7,7 @@ Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.analysis.os.linux.ui;singleton:=true
 Bundle-Activator: org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.core.resources,
