@@ -441,11 +441,10 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
      */
     @Override
     public void performAlign(int offset, int width) {
-        int plotAreaOffset = fTimeRangeHistogram.getPointAreaOffset();
-        int sashOffset = Math.max(1, offset - plotAreaOffset);
         int total = fSashForm.getBounds().width;
-        int width1 = (int) (sashOffset / (float) total * 1000);
-        int width2 = (int) ((total - sashOffset) / (float) total * 1000);
+        int plotAreaOffset = fTimeRangeHistogram.getPointAreaOffset();
+        int width1 = Math.max(0, offset - plotAreaOffset - fSashForm.getSashWidth());
+        int width2 = Math.max(0, total - width1 - fSashForm.getSashWidth());
         fSashForm.setWeights(new int[] { width1, width2 });
         fSashForm.layout();
 

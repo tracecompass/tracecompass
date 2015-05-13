@@ -1233,9 +1233,9 @@ public class TimeGraphCombo extends Composite {
     public void performAlign(int offset, int width) {
         int total = fSashForm.getBounds().width;
         int timeAxisOffset = Math.min(offset, total);
-        int sash1Width = (int) (timeAxisOffset / (float) total * 1000);
-        int sash2Width = (int) ((total - timeAxisOffset) / (float) total * 1000);
-        fSashForm.setWeights(new int[] { sash1Width, sash2Width });
+        int width1 = Math.max(0, timeAxisOffset - fSashForm.getSashWidth());
+        int width2 = total - timeAxisOffset;
+        fSashForm.setWeights(new int[] { width1, width2 });
         fSashForm.layout();
 
         Composite composite = fTimeGraphViewer.getTimeAlignedComposite();
