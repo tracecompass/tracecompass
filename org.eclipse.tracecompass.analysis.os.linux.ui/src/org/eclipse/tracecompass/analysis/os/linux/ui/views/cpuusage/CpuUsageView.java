@@ -84,6 +84,7 @@ public class CpuUsageView extends TmfView implements ITmfTimeAligned {
 
         /* Build the XY chart part of the view */
         fXYViewer = new CpuUsageXYViewer(fXYViewerContainer);
+        fXYViewer.setSendTimeAlignSignals(true);
         fXYViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         /* Add selection listener to tree viewer */
