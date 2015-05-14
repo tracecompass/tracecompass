@@ -1195,10 +1195,9 @@ public class TimeGraphCombo extends Composite {
      * @since 1.0
      */
     public TmfTimeViewAlignmentInfo getTimeViewAlignmentInfo() {
-        int[] weights = fSashForm.getWeights();
-        int leftWidth = (int) (((float) weights[0] / (weights[0] + weights[1])) * fSashForm.getBounds().width) + fSashForm.getSashWidth();
         Point location = fSashForm.toDisplay(0, 0);
-        return new TmfTimeViewAlignmentInfo(fSashForm.getShell(), location, leftWidth);
+        int timeAxisOffset = fTreeViewer.getControl().getSize().x + fSashForm.getSashWidth();
+        return new TmfTimeViewAlignmentInfo(fSashForm.getShell(), location, timeAxisOffset);
     }
 
     /**

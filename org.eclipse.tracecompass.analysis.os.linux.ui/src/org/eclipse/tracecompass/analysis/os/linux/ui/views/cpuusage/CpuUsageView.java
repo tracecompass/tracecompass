@@ -173,10 +173,7 @@ public class CpuUsageView extends TmfView implements ITmfTimeAligned {
     }
 
     private int getTimeAxisOffset() {
-        int[] weights = fSashForm.getWeights();
-        int width = (int) (((float) weights[0] / (weights[0] + weights[1])) * fSashForm.getBounds().width);
-        int curTimeAxisOffset = width + fSashForm.getSashWidth() + fXYViewer.getPointAreaOffset();
-        return curTimeAxisOffset;
+        return fTreeViewer.getControl().getSize().x + fSashForm.getSashWidth() + fXYViewer.getPointAreaOffset();
     }
 
     /**

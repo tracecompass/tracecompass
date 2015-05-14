@@ -186,10 +186,7 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
     }
 
     private int getTimeAxisOffset() {
-        int[] weights = fSashForm.getWeights();
-        int width = (int) (((float) weights[0] / (weights[0] + weights[1])) * fSashForm.getBounds().width);
-        int curTimeAxisOffset = width + fSashForm.getSashWidth() + fChartViewer.getPointAreaOffset();
-        return curTimeAxisOffset;
+        return fSashForm.getChildren()[0].getSize().x + fSashForm.getSashWidth() + fChartViewer.getPointAreaOffset();
     }
 
     /**

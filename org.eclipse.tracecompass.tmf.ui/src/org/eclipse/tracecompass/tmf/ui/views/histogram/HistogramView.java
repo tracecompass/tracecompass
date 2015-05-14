@@ -410,10 +410,7 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
     }
 
     private int getTimeAxisOffset() {
-        int[] weights = fSashForm.getWeights();
-        int width = (int) (((float) weights[0] / (weights[0] + weights[1])) * fSashForm.getBounds().width);
-        int curTimeAxisOffset = width + fSashForm.getSashWidth() + fTimeRangeHistogram.getPointAreaOffset();
-        return curTimeAxisOffset;
+        return fScrollComposite.getSize().x + fSashForm.getSashWidth() + fTimeRangeHistogram.getPointAreaOffset();
     }
 
     /**
