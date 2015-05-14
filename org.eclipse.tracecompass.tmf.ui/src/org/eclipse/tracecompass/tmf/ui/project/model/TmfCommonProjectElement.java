@@ -539,7 +539,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
         IFolder supplFolder = prepareTraceSupplementaryFolder(getSupplementaryFolderPath(), true);
 
         try {
-            fResource.setPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER, supplFolder.getLocationURI().getPath());
+            fResource.setPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER, supplFolder.getLocation().toOSString());
         } catch (CoreException e) {
             Activator.getDefault().logError("Error setting persistant property " + TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER, e); //$NON-NLS-1$
         }

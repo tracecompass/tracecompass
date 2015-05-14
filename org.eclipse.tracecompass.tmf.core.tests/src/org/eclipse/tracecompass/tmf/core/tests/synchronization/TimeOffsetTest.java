@@ -80,7 +80,7 @@ public class TimeOffsetTest {
             final InputStream source = new ByteArrayInputStream(new byte[0]);
             fResource.create(source, true, null);
         }
-        fResource.setPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER, fResource.getParent().getLocationURI().getPath());
+        fResource.setPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER, fResource.getParent().getLocation().toOSString());
     }
 
     @After

@@ -251,7 +251,7 @@ public final class TmfTraceManager {
             String supplFolderPath = getSupplementaryFileDir(trace);
             IProject project = resource.getProject();
             /* Remove the project's path from the supplementary path dir */
-            if (!supplFolderPath.startsWith(project.getLocationURI().getPath())) {
+            if (!supplFolderPath.startsWith(project.getLocation().toOSString())) {
                 Activator.logWarning(String.format("Supplementary files folder for trace %s is not within the project.", trace.getName())); //$NON-NLS-1$
                 return;
             }
