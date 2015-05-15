@@ -143,7 +143,7 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
                     }
                 }
 
-                double prevX = xvalues[0];
+                double prevX = xvalues[0] - 1;
                 long prevTime = (long) prevX + offset;
                 /*
                  * make sure that time is in the trace range after double to
@@ -152,7 +152,7 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
                 prevTime = Math.max(traceStart, prevTime);
                 prevTime = Math.min(traceEnd, prevTime);
                 /* Get CPU usage statistics for each x value */
-                for (int i = 1; i < xvalues.length; i++) {
+                for (int i = 0; i < xvalues.length; i++) {
                     if (monitor.isCanceled()) {
                         return;
                     }
@@ -161,6 +161,13 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
                     long time = (long) x + offset;
                     time = Math.max(traceStart, time);
                     time = Math.min(traceEnd, time);
+                    if (time == prevTime) {
+                        /*
+                         * we need at least 1 time unit to be able to get cpu
+                         * usage when zoomed in
+                         */
+                        prevTime = time - 1;
+                    }
 
                     cpuUsageMap = fModule.getCpuUsageInRange(prevTime, time);
 
