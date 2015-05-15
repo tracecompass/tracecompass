@@ -36,8 +36,6 @@ import org.eclipse.tracecompass.internal.ctf.core.event.types.SequenceDeclaratio
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableList;
-
 /**
  * The class <code>SequenceDeclarationTest</code> contains tests for the class
  * <code>{@link SequenceDeclaration}</code>.
@@ -98,7 +96,6 @@ public class SequenceDeclaration2Test {
                 structDec,
                 null,
                 "x",
-                ImmutableList.of(FIELD_NAME),
                 new Definition[] {
                         new IntegerDefinition(
                                 id,

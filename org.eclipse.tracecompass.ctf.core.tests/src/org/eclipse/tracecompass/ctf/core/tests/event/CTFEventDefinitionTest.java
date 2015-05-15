@@ -18,8 +18,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
@@ -59,8 +57,8 @@ public class CTFEventDefinitionTest {
         streamContextDec.addField("pid", pidDec);
         streamContextDec.addField("ctx", ctxDec);
         StructDeclaration eventContextDec = new StructDeclaration(8);
-        streamContextDec.addField("pod", pidDec);
-        streamContextDec.addField("ctx", pidDec);
+        eventContextDec.addField("pod", pidDec);
+        eventContextDec.addField("ctx", pidDec);
         StructDeclaration fDec = new StructDeclaration(8);
         EventDeclaration eventDeclaration = new EventDeclaration();
 
@@ -68,20 +66,16 @@ public class CTFEventDefinitionTest {
         fDec.addField("ctx", ctxDec);
         fDec.addField("pod", pidDec);
 
-        List<String> sFieldNames = Arrays.asList("pid", "ctx");
-        List<String> eFieldNames = Arrays.asList("pod", "ctx");
-        List<String> fieldNames = Arrays.asList("pid", "ctx", "pod");
-
         Definition[] sDefs = { pid, ctx };
         Definition[] eDefs = { pod, ctx };
         Definition[] fDefs = { pid, ctx, pod };
 
         StructDeclaration pContextDec = new StructDeclaration(8);
 
-        StructDefinition sContext = new StructDefinition(streamContextDec, null, ILexicalScope.STREAM_PACKET_CONTEXT.getPath(), sFieldNames, sDefs);
-        StructDefinition eContext = new StructDefinition(eventContextDec, null, ILexicalScope.STREAM_EVENT_CONTEXT.getPath(), eFieldNames, eDefs);
-        StructDefinition pContext = new StructDefinition(pContextDec, null, ILexicalScope.FIELDS.getPath(), Collections.EMPTY_LIST, new Definition[0]);
-        StructDefinition fields = new StructDefinition(fDec, null, ILexicalScope.FIELDS.getPath(), fieldNames, fDefs);
+        StructDefinition sContext = new StructDefinition(streamContextDec, null, ILexicalScope.STREAM_PACKET_CONTEXT.getPath(), sDefs);
+        StructDefinition eContext = new StructDefinition(eventContextDec, null, ILexicalScope.STREAM_EVENT_CONTEXT.getPath(), eDefs);
+        StructDefinition pContext = new StructDefinition(pContextDec, null, ILexicalScope.FIELDS.getPath(), new Definition[0]);
+        StructDefinition fields = new StructDefinition(fDec, null, ILexicalScope.FIELDS.getPath(), fDefs);
 
         fixture.add(new EventDefinition(eventDeclaration, null, 100, null, null, null, null));
         fixture.add(new EventDefinition(eventDeclaration, null, 100, null, null, null, fields));

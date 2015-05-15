@@ -23,7 +23,6 @@ import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
-import org.eclipse.tracecompass.ctf.core.event.types.Declaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
@@ -116,11 +115,11 @@ public class EventDeclaration implements IEventDeclaration {
      */
     public static synchronized EventDeclaration getLostEventDeclaration() {
         EventDeclaration lostEvent = new EventDeclaration();
-        String[] fieldNames = new String[] { CTFStrings.LOST_EVENTS_FIELD, CTFStrings.LOST_EVENTS_DURATION };
-        Declaration[] fieldDeclarations = new Declaration[] { IntegerDeclaration.UINT_32B_DECL, IntegerDeclaration.UINT_64B_DECL };
-        lostEvent.fFields = new StructDeclaration(fieldNames, fieldDeclarations);
+        lostEvent.fFields = new StructDeclaration(0);
         lostEvent.fId = (int) LOST_EVENT_ID;
         lostEvent.fName = CTFStrings.LOST_EVENT_NAME;
+        lostEvent.getFields().addField(CTFStrings.LOST_EVENTS_FIELD, IntegerDeclaration.UINT_32B_DECL);
+        lostEvent.getFields().addField(CTFStrings.LOST_EVENTS_DURATION, IntegerDeclaration.UINT_64B_DECL);
         return lostEvent;
     }
 
@@ -248,7 +247,7 @@ public class EventDeclaration implements IEventDeclaration {
      * @return is the id set?
      */
     public boolean idIsSet() {
-        return (fId  != UNSET_EVENT_ID);
+        return (fId != UNSET_EVENT_ID);
     }
 
     /**

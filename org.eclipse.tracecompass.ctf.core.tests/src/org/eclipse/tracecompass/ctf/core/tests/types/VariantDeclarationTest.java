@@ -38,8 +38,6 @@ import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableList;
-
 /**
  * The class <code>VariantDeclarationTest</code> contains tests for the class
  * <code>{@link VariantDeclaration}</code>.
@@ -100,7 +98,6 @@ public class VariantDeclarationTest {
                 declaration,
                 variantDefinition,
                 "",
-                ImmutableList.of("tag", variantDefinition.getCurrentFieldName()),
                 new Definition[] { tagDef, variantDefinition }
                 );
 

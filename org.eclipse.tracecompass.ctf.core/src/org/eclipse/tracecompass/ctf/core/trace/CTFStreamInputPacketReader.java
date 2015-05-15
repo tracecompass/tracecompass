@@ -40,8 +40,6 @@ import org.eclipse.tracecompass.internal.ctf.core.SafeMappedByteBuffer;
 import org.eclipse.tracecompass.internal.ctf.core.event.EventDeclaration;
 import org.eclipse.tracecompass.internal.ctf.core.event.types.composite.EventHeaderDefinition;
 
-import com.google.common.collect.ImmutableList;
-
 /**
  * CTF trace packet reader. Reads the events of a packet of a trace file.
  *
@@ -332,8 +330,6 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
             IntegerDefinition lostDurationDef = new IntegerDefinition(lostFieldsDecl, null, CTFStrings.LOST_EVENTS_DURATION, fLostEventsDuration);
             IntegerDefinition lostCountDef = new IntegerDefinition(lostEventsDurationDecl, null, CTFStrings.LOST_EVENTS_FIELD, fLostEventsInThisPacket);
             IntegerDefinition[] fields = new IntegerDefinition[] { lostCountDef, lostDurationDef };
-            /* this is weird notation, but it's the java notation */
-            final ImmutableList<String> fieldNameList = ImmutableList.<String> builder().add(CTFStrings.LOST_EVENTS_FIELD).add(CTFStrings.LOST_EVENTS_DURATION).build();
             return new EventDefinition(
                     lostEventDeclaration,
                     fStreamInputReader,
@@ -344,7 +340,6 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
                     new StructDefinition(
                             lostFields,
                             this, "fields", //$NON-NLS-1$
-                            fieldNameList,
                             fields
                     ));
 

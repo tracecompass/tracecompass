@@ -67,22 +67,6 @@ public class StructDeclaration extends Declaration {
         fMaxAlign = Math.max(align, 1);
     }
 
-    /**
-     * Struct declaration constructor
-     *
-     * @param names
-     *            the names of all the fields
-     * @param declarations
-     *            all the fields
-     */
-    public StructDeclaration(String[] names, Declaration[] declarations) {
-        fMaxAlign = 1;
-
-        for (int i = 0; i < names.length; i++) {
-            addField(names[i], declarations[i]);
-        }
-    }
-
     // ------------------------------------------------------------------------
     // Getters/Setters/Predicates
     // ------------------------------------------------------------------------
@@ -161,7 +145,7 @@ public class StructDeclaration extends Declaration {
             String fieldName, BitBuffer input) throws CTFException {
         alignRead(input);
         final Definition[] myFields = new Definition[fFieldMap.size()];
-        StructDefinition structDefinition = new StructDefinition(this, definitionScope, fieldName, fFieldMap.keySet(), myFields);
+        StructDefinition structDefinition = new StructDefinition(this, definitionScope, fieldName, myFields);
         fillStruct(input, myFields, structDefinition);
         return structDefinition;
     }

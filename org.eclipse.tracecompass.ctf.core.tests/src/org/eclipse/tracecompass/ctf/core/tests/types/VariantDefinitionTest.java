@@ -43,8 +43,6 @@ import org.eclipse.tracecompass.internal.ctf.core.event.types.ArrayDeclaration;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableList;
-
 /**
  * The class <code>VariantDefinitionTest</code> contains tests for the class
  * <code>{@link VariantDefinition}</code>.
@@ -158,11 +156,13 @@ public class VariantDefinitionTest {
                         "A",
                         1
                 ));
+        final StructDeclaration declarationScope = new StructDeclaration(1L);
+        declarationScope.addField("", enumDefinition.getDeclaration());
+        declarationScope.addField("variant", variantDeclaration);
         IDefinitionScope definitionScope = new StructDefinition(
-                new StructDeclaration(1L),
+                declarationScope,
                 variantDefinition,
                 "",
-                ImmutableList.<String> of("", "variant"),
                 new Definition[] { enumDefinition, variantDefinition }
                 );
         String fieldName = "";

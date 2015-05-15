@@ -32,8 +32,6 @@ import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
 import org.eclipse.tracecompass.internal.ctf.core.event.types.SequenceDeclaration;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableList;
-
 /**
  * The class <code>CTFEventFieldTest</code> contains tests for the class
  * <code>{@link CTFEventField}</code>.
@@ -70,7 +68,6 @@ public class CTFEventFieldTest {
                 structDec,
                 null,
                 lengthName,
-                ImmutableList.of(lengthName),
                 new Definition[] {
                         new IntegerDefinition(
                                 id,

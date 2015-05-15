@@ -208,7 +208,6 @@ public final class EventDefinition implements IDefinitionScope {
         }
         fieldNames = builder.build();
         StructDefinition mergedContext = new StructDefinition(mergedDeclaration, this, "context", //$NON-NLS-1$
-                fieldNames,
                 fieldValues.toArray(new Definition[fieldValues.size()]));
         return mergedContext;
     }
@@ -275,7 +274,7 @@ public final class EventDefinition implements IDefinitionScope {
         retString.append("Timestamp: " + Long.toString(fTimestamp) + cr); //$NON-NLS-1$
 
         if (fEventContext != null) {
-            list = fEventContext.getDeclaration().getFieldsList();
+            list = fEventContext.getFieldNames();
 
             for (String field : list) {
                 retString.append(field
@@ -284,7 +283,7 @@ public final class EventDefinition implements IDefinitionScope {
         }
 
         if (fFields != null) {
-            list = fFields.getDeclaration().getFieldsList();
+            list = fFields.getFieldNames();
 
             for (String field : list) {
                 retString.append(field

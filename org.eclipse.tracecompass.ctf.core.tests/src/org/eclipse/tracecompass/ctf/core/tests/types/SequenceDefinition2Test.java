@@ -30,8 +30,6 @@ import org.eclipse.tracecompass.internal.ctf.core.event.types.SequenceDeclaratio
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableList;
-
 /**
  * The class <code>SequenceDefinition2Test</code> contains tests for the class
  * <code>{@link SequenceDefinition2}</code>.
@@ -44,10 +42,6 @@ public class SequenceDefinition2Test {
 
     private ByteArrayDefinition fixture;
     private final static int seqLen = 15;
-
-    private static ImmutableList<String> wrap(String s) {
-        return ImmutableList.<String> builder().add(s).build();
-    }
 
     /**
      * Perform pre-test initialization.
@@ -70,7 +64,7 @@ public class SequenceDefinition2Test {
         structDec = new StructDeclaration(0);
         structDec.addField(lengthName, id);
 
-        structDef = new StructDefinition(structDec, null, "x", wrap(lengthName), new Definition[] { new IntegerDefinition(id, null, lengthName, seqLen) });
+        structDef = new StructDefinition(structDec, null, "x",  new Definition[] { new IntegerDefinition(id, null, lengthName, seqLen) });
 
         SequenceDeclaration sd = new SequenceDeclaration(lengthName, id);
         ByteBuffer allocateDirect = java.nio.ByteBuffer.allocateDirect(seqLen * len);

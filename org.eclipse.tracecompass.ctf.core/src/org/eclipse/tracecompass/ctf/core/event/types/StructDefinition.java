@@ -62,18 +62,16 @@ public final class StructDefinition extends ScopedDefinition implements IComposi
      *            the parent scope
      * @param structFieldName
      *            the field name
-     * @param fieldNames
-     *            the list of fields
      * @param definitions
      *            the definitions
+     * @since 1.0
      */
     public StructDefinition(@NonNull StructDeclaration declaration,
             IDefinitionScope definitionScope,
             @NonNull String structFieldName,
-            Iterable<String> fieldNames,
             Definition[] definitions) {
         super(declaration, definitionScope, structFieldName);
-        fFieldNames = ImmutableList.copyOf(fieldNames);
+        fFieldNames = ImmutableList.copyOf(declaration.getFieldsList());
         fDefinitions = definitions;
         if (fFieldNames.isEmpty()) {
             fDefinitionsMap = Collections.EMPTY_MAP;
