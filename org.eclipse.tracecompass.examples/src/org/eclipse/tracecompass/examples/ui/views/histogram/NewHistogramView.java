@@ -33,10 +33,6 @@ public class NewHistogramView extends TmfChartView {
     }
 
     @Override
-    public void setFocus() {
-    }
-
-    @Override
     protected TmfXYChartViewer createChartViewer(Composite parent) {
         return new NewHistogramViewer(parent);
     }

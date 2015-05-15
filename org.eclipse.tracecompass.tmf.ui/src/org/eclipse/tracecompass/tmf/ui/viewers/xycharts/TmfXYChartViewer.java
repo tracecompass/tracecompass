@@ -9,10 +9,13 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *   Geneviève Bastien - Moved some methods to TmfTimeViewer
+ *   Patrick Tasse - Fix setFocus
  **********************************************************************/
 package org.eclipse.tracecompass.tmf.ui.viewers.xycharts;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -76,7 +79,18 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
      */
     public TmfXYChartViewer(Composite parent, String title, String xLabel, String yLabel) {
         super(parent, title);
-        fSwtChart = new Chart(parent, SWT.NONE);
+        fSwtChart = new Chart(parent, SWT.NONE) {
+            @Override
+            public boolean setFocus() {
+                return fSwtChart.getPlotArea().setFocus();
+            }
+        };
+        fSwtChart.getPlotArea().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDown(MouseEvent e) {
+                fSwtChart.getPlotArea().setFocus();
+            }
+        });
 
         IAxis xAxis = fSwtChart.getAxisSet().getXAxis(0);
         IAxis yAxis = fSwtChart.getAxisSet().getYAxis(0);

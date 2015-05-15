@@ -147,6 +147,7 @@ public class CpuUsageView extends TmfView implements ITmfTimeAligned {
 
     @Override
     public void setFocus() {
+        fXYViewer.getControl().setFocus();
     }
 
     @Override
