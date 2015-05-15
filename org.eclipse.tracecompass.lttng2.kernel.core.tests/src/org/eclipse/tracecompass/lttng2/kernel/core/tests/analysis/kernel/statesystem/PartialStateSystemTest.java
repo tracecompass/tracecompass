@@ -28,6 +28,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -35,6 +36,7 @@ import org.junit.Test;
  *
  * @author Alexandre Montplaisir
  */
+@Ignore
 public class PartialStateSystemTest extends StateSystemTest {
 
     private static final @NonNull String TEST_FILE_NAME = "test-partial";
