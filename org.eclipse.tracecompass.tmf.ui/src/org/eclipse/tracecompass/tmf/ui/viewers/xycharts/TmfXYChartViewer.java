@@ -373,10 +373,13 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
 
         int pixelCoordinate = 0;
         IAxis[] xAxes = getSwtChart().getAxisSet().getXAxes();
-        if (xAxes.length > 0 && fSwtChart.getSeriesSet().getSeries().length > 0) {
+        ISeries[] series = fSwtChart.getSeriesSet().getSeries();
+        if ((xAxes.length > 0) && (series.length > 0) &&
+                (series[0].getXSeries() != null) && (series[0].getXSeries().length > 0)) {
             IAxis axis = xAxes[0];
-            long windowStartTime = getWindowStartTime() - getTimeOffset();
-            pixelCoordinate = axis.getPixelCoordinate(windowStartTime);
+            // All series have the same X series
+            double[] xSeries = series[0].getXSeries();
+            pixelCoordinate = axis.getPixelCoordinate(xSeries[0]);
         }
         return getSwtChart().toControl(getSwtChart().getPlotArea().toDisplay(pixelCoordinate, 0)).x;
     }
@@ -394,11 +397,14 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
      */
     public int getPointAreaWidth() {
         IAxis[] xAxes = getSwtChart().getAxisSet().getXAxes();
-        if (xAxes.length > 0 && fSwtChart.getSeriesSet().getSeries().length > 0) {
+        ISeries[] series = fSwtChart.getSeriesSet().getSeries();
+        if ((xAxes.length > 0) && (series.length > 0) &&
+                (series[0].getXSeries() != null) && (series[0].getXSeries().length > 0)) {
             IAxis axis = xAxes[0];
+            // All series have the same X series
+            double[] xSeries = series[0].getXSeries();
             int x1 = getPointAreaOffset();
-            long windowEndTime = getWindowEndTime() - getTimeOffset();
-            int x2 = axis.getPixelCoordinate(windowEndTime);
+            int x2 = axis.getPixelCoordinate(xSeries[xSeries.length - 1]);
             x2 = getSwtChart().toControl(getSwtChart().getPlotArea().toDisplay(x2, 0)).x;
             int width = x2 - x1;
             return width;
@@ -406,7 +412,6 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
 
         return getSwtChart().getPlotArea().getSize().x;
     }
-
 
     /**
      * Sets whether or not to send time alignment signals. This should be set to
