@@ -18,13 +18,11 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.ctf.core.CTFException;
-import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 import org.eclipse.tracecompass.ctf.core.event.types.ICompositeDefinition;
-import org.eclipse.tracecompass.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStream;
@@ -35,12 +33,6 @@ import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInputReader;
  * events.
  */
 public class EventDeclaration implements IEventDeclaration {
-
-    /** Id of lost events */
-    public static final long LOST_EVENT_ID = -1L;
-
-    /** Id of events when not set */
-    public static final long UNSET_EVENT_ID = -2L;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -106,22 +98,6 @@ public class EventDeclaration implements IEventDeclaration {
                 eventContext,
                 packetContext,
                 eventPayload);
-    }
-
-    /**
-     * Creates a "lost" event. This is a synthetic event that is there to show
-     * that there should be something there.
-     *
-     * @return the lost event
-     */
-    public static synchronized EventDeclaration getLostEventDeclaration() {
-        EventDeclaration lostEvent = new EventDeclaration();
-        lostEvent.fFields = new StructDeclaration(0);
-        lostEvent.fId = (int) LOST_EVENT_ID;
-        lostEvent.fName = CTFStrings.LOST_EVENT_NAME;
-        lostEvent.getFields().addField(CTFStrings.LOST_EVENTS_FIELD, IntegerDeclaration.UINT_32B_DECL);
-        lostEvent.getFields().addField(CTFStrings.LOST_EVENTS_DURATION, IntegerDeclaration.UINT_64B_DECL);
-        return lostEvent;
     }
 
     // ------------------------------------------------------------------------

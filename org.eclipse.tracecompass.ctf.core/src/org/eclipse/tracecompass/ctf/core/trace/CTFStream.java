@@ -244,7 +244,7 @@ public class CTFStream {
      *             If the passed ID is invalid
      */
     public @Nullable IEventDeclaration getEventDeclaration(int eventId) {
-        int eventIndex = (eventId == EventDeclaration.UNSET_EVENT_ID) ? 0 : eventId;
+        int eventIndex = (eventId == IEventDeclaration.UNSET_EVENT_ID) ? 0 : eventId;
         if (eventIndex < 0) {
             /* Any negative value other than UNSET_EVENT_ID is invalid */
             throw new IllegalArgumentException("Event ID cannot be negative."); //$NON-NLS-1$
@@ -285,7 +285,7 @@ public class CTFStream {
          * If there is an event without id (the null key), it must be the only
          * one
          */
-        if (id == EventDeclaration.UNSET_EVENT_ID) {
+        if (id == IEventDeclaration.UNSET_EVENT_ID) {
             if (!fEvents.isEmpty()) {
                 throw new ParseException("Event without id with multiple events in a stream"); //$NON-NLS-1$
             }

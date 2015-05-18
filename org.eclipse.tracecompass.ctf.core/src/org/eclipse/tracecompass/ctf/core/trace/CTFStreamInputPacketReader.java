@@ -21,6 +21,7 @@ import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
+import org.eclipse.tracecompass.ctf.core.event.LostEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
@@ -37,7 +38,6 @@ import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.VariantDefinition;
 import org.eclipse.tracecompass.internal.ctf.core.SafeMappedByteBuffer;
-import org.eclipse.tracecompass.internal.ctf.core.event.EventDeclaration;
 import org.eclipse.tracecompass.internal.ctf.core.event.types.composite.EventHeaderDefinition;
 
 /**
@@ -311,11 +311,11 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
     public EventDefinition readNextEvent() throws CTFException {
         /* Default values for those fields */
         // compromise since we cannot have 64 bit addressing of arrays yet.
-        int eventID = (int) EventDeclaration.UNSET_EVENT_ID;
+        int eventID = (int) IEventDeclaration.UNSET_EVENT_ID;
         long timestamp = 0;
         if (fHasLost) {
             fHasLost = false;
-            EventDeclaration lostEventDeclaration = EventDeclaration.getLostEventDeclaration();
+            IEventDeclaration lostEventDeclaration = LostEventDeclaration.INSTANCE;
             StructDeclaration lostFields = lostEventDeclaration.getFields();
             // this is a hard coded map, we know it's not null
             IntegerDeclaration lostFieldsDecl = (IntegerDeclaration) lostFields.getField(CTFStrings.LOST_EVENTS_FIELD);
