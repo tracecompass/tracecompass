@@ -305,7 +305,7 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
             return null;
         }
 
-        if ((result.getCapabilities() & IRemoteConnectionType.CAPABILITY_ADD_CONNECTIONS) == 0) {
+        if (!result.canAdd()) {
             return null;
         }
 
@@ -316,8 +316,7 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         if (conn == null) {
             return false;
         }
-        IRemoteConnectionType rs = conn.getConnectionType();
-        return (rs.getCapabilities() & IRemoteConnectionType.CAPABILITY_EDIT_CONNECTIONS) != 0;
+        return conn.getConnectionType().canEdit();
     }
 
     private void onNewConnection() {
