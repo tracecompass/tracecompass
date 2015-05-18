@@ -17,7 +17,6 @@ import java.util.Comparator;
 
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInputReader;
-import org.eclipse.tracecompass.ctf.core.trace.Utils;
 
 /**
  * <b><u>StreamInputReaderTimestampComparator</u></b>

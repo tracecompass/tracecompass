@@ -16,7 +16,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.UUID;
 
-import org.eclipse.tracecompass.ctf.core.trace.Utils;
+import org.eclipse.tracecompass.internal.ctf.core.trace.Utils;
 import org.junit.Test;
 
 /**

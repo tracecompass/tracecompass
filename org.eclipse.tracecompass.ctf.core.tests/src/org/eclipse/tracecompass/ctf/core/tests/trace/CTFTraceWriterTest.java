@@ -31,7 +31,7 @@ import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceWriter;
-import org.eclipse.tracecompass.ctf.core.trace.Utils;
+import org.eclipse.tracecompass.internal.ctf.core.trace.Utils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
