@@ -623,7 +623,7 @@ public class HistogramDataModel implements IHistogramDataModel {
         if ((width <= 0) || (height <= 0) || (barWidth <= 0)) {
             throw new AssertionError("Invalid histogram dimensions (" + width + "x" + height + ", barWidth=" + barWidth + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
         }
-        if (fLastBucket == 0 || fBucketDuration == 0) {
+        if (fBucketDuration == 0) {
             throw new IllegalStateException("Bucket width is 0, that should be impossible"); //$NON-NLS-1$
         }
 
@@ -637,10 +637,16 @@ public class HistogramDataModel implements IHistogramDataModel {
         double bucketsPerBar = ((double) fLastBucket / nbBars);
         final long modelBucketStartTime = fFirstBucketTime;
         final long modelBucketEndTime = fEndTime;
-        result.fBucketDuration = (modelBucketEndTime - modelBucketStartTime) / (double) nbBars;
+        /*
+         * If there is only one model bucket, use a duration of 1 to spread the
+         * value over the scaled width, but store a scaled bucket duration of 0
+         * to prevent the half-bucket offset in the bucket time calculations.
+         */
+        double bucketDuration = Math.max(modelBucketEndTime - modelBucketStartTime, 1) / (double) nbBars;
+        result.fBucketDuration = fLastBucket == 0 ? 0 : bucketDuration;
         int scaledCount = 0;
         int scaledCountLostEvent = 0;
-        int offset = (int) (0.5 / result.fBucketDuration);
+        int offset = (int) (0.5 / bucketDuration);
         for (int i = 0; i < result.fData.length; i++) {
             result.fData[i] = new HistogramBucket(getNbTraces());
         }

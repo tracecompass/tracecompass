@@ -130,7 +130,7 @@ public class HistogramDataModelTest {
      * {@link HistogramDataModel#countEvent(long,long, ITmfTrace)} and
      * {@link HistogramDataModel#scaleTo(int,int,int)}.
      */
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testCountEvent_2() {
         final int nbBuckets = 100;
         final int maxHeight = 10;
@@ -139,9 +139,11 @@ public class HistogramDataModelTest {
         model.countEvent(0, 1, null);
 
         HistogramScaledData result = model.scaleTo(nbBuckets, maxHeight, 1);
-        assertEquals(_1, result.fData[0]);
 
-        assertArrayEqualsInt(1, result.fData, 1);
+        for (int i = 0; i < result.fData.length - 1; i++) {
+            assertEquals(_1, result.fData[i]);
+        }
+        assertEquals(_0, result.fData[result.fData.length - 1]);
 
         testModelConsistency(model, nbBuckets, 1, 1, 1, 1, 1, nbBuckets + 1);
     }
