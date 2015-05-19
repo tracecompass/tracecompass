@@ -125,7 +125,8 @@ public class TraceControlPropertiesTest {
         assertNotNull(source.getPropertyDescriptors());
 
         assertEquals("myNode", source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_NAME_PROPERTY_ID));
-        assertEquals("localhost",  source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_ADDRESS_PROPERTY_ID));
+        // Don't check the address property because the string can vary on the machine the test is running
+//        assertEquals("localhost",  source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_ADDRESS_PROPERTY_ID));
         assertEquals(TargetNodeState.CONNECTED.name(), source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_STATE_PROPERTY_ID));
         assertEquals("2.5.0", source.getPropertyValue(TargetNodePropertySource.TARGET_NODE_VERSION_PROPERTY_ID));
         assertNull(source.getPropertyValue("test"));
