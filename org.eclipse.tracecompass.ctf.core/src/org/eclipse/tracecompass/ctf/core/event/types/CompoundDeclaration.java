@@ -55,6 +55,7 @@ public abstract class CompoundDeclaration extends Declaration {
      *
      * @return true if this array 1 byte aligned. false if it's a "normal" array
      *         of generic Definition's.
+     * @since 1.0
      */
     public boolean isAlignedBytes() {
         IDeclaration elementType = getElementType();

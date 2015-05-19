@@ -52,6 +52,7 @@ public abstract class AbstractArrayDefinition extends Definition {
      * Get the the number of elements in the array
      *
      * @return how many elements in the array
+     * @since 1.0
      */
     public abstract int getLength();
 
