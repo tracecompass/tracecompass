@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson
+ * Copyright (c) 2011, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -724,7 +724,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      * Update the range text controls
      */
     private void updateRangeTextControls() {
-        if (fDataModel.getStartTime() < fDataModel.getEndTime()) {
+        if (fDataModel.getNbEvents() != 0) {
             fTimeRangeStartLabel.setText(TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getStartTime()));
             fTimeRangeEndLabel.setText(TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getEndTime()));
         } else {
@@ -1020,7 +1020,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     @Override
     public void mouseHover(final MouseEvent event) {
-        if (fDataModel.getStartTime() < fDataModel.getEndTime() && fScaledData != null) {
+        if (fDataModel.getNbEvents() != 0 && fScaledData != null) {
             final String tooltip = formatToolTipLabel(event.x - fOffset);
             fCanvas.setToolTipText(tooltip);
             return;
