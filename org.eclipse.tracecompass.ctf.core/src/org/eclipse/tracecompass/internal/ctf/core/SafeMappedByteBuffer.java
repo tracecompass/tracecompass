@@ -51,6 +51,7 @@ public class SafeMappedByteBuffer {
         if (IS_WIN32) {
             byteBuffer = ByteBuffer.allocate((int) size);
             fc.read(byteBuffer, position);
+            byteBuffer.flip();
         } else {
             byteBuffer = fc.map(mode, position, size);
         }
