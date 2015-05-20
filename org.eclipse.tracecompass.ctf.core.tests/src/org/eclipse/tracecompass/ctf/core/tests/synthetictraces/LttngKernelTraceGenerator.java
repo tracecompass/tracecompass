@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -284,8 +284,8 @@ public class LttngKernelTraceGenerator {
         }
         // determine the number of events per channel
         long evPerChan = fNbEvents / fNbChans;
-        int delta = (int) (fDuration / evPerChan);
-        int offsetTime = 0;
+        long delta = (int) (fDuration / evPerChan);
+        long offsetTime = 0;
         for (int chan = 0; chan < fNbChans; chan++) {
             int currentSpace = 0;
             ByteBuffer bb = ByteBuffer.allocate(65536);
@@ -300,7 +300,7 @@ public class LttngKernelTraceGenerator {
             int prevPrio = 0;
             int prevPos = -1;
             for (int eventNb = 0; eventNb < evPerChan; eventNb++) {
-                int ts = eventNb * delta + delta / (fNbChans + 1) * chan;
+                long ts = eventNb * delta + delta / (fNbChans + 1) * chan;
 
                 int pos = rnd.nextInt((int) (fProcesses.size() * 1.5));
                 if (pos >= fProcesses.size()) {
@@ -325,9 +325,9 @@ public class LttngKernelTraceGenerator {
                     }
                     // write new packet
                     PacketWriter pw = new PacketWriter(bb);
-                    int tsBegin = ts;
+                    long tsBegin = ts;
                     offsetTime = ts;
-                    int tsEnd = (eventNb + (PacketWriter.SIZE / EventWriter.SIZE)) * delta + 1;
+                    long tsEnd = (eventNb + (PacketWriter.SIZE / EventWriter.SIZE)) * delta + 1;
                     pw.writeNewHeader(tsBegin, tsEnd, chan);
                     currentSpace = PacketWriter.CONTENT_SIZE;
                 }
@@ -336,13 +336,13 @@ public class LttngKernelTraceGenerator {
                 if (prev_state != 0) {
                     prev_state = 1;
                 }
-                final int shrunkenTimestamp = ts - offsetTime;
+                final long shrunkenTimestamp = ts - offsetTime;
                 final int tsMask = (1 << 27) - 1;
                 if (shrunkenTimestamp > ((1 << 27) + tsMask)) {
-                    new Object();
-                    System.err.println("PROBLEM");
+                    /* allow only one compact timestamp overflow per packet */
+                    throw new IllegalStateException("Invalid timestamp overflow:" + shrunkenTimestamp);
                 }
-                final int clampedTs = ts & tsMask;
+                final int clampedTs = (int) (ts & tsMask);
                 int evSize = ew.writeEvent(clampedTs, prevComm, prevPID, prevPrio, prev_state, nextComm, nextPID, nextPrio);
                 currentSpace -= evSize;
                 prevComm = nextComm;
@@ -432,7 +432,7 @@ public class LttngKernelTraceGenerator {
             data = bb;
         }
 
-        public void writeNewHeader(int tsBegin, int tsEnd, int cpu) {
+        public void writeNewHeader(long tsBegin, long tsEnd, int cpu) {
             final int magicLE = 0xC1FC1FC1;
             byte uuid[] = {
                     0x11, 0x11, 0x11, 0x11,
