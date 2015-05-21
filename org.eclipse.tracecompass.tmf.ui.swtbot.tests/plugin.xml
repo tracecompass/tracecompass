@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.eclipse.tracecompass.tmf.ui.swtbot.tests.viewers.events.TmfAlignTimeAxisTest$AlignPerspectiveFactory2"
+            id="org.eclipse.linuxtools.tmf.test.align.2"
+            name="Align2">
+      </perspective>
+      <perspective
+            class="org.eclipse.tracecompass.tmf.ui.swtbot.tests.viewers.events.TmfAlignTimeAxisTest$AlignPerspectiveFactory3"
+            id="org.eclipse.linuxtools.tmf.test.align.3"
+            name="Align3">
+      </perspective>
+      <perspective
+            class="org.eclipse.tracecompass.tmf.ui.swtbot.tests.viewers.events.TmfAlignTimeAxisTest$AlignPerspectiveFactory1"
+            id="org.eclipse.linuxtools.tmf.test.align.1"
+            name="Align1">
+      </perspective>
+   </extension>
+
+</plugin>

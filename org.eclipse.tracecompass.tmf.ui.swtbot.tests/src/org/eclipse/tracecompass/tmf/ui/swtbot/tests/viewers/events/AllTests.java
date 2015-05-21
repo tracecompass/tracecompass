@@ -28,7 +28,9 @@ import org.junit.runners.Suite;
         FontEventEditorTest.class,
         MovableColumnEventsEditorTest.class,
         SDViewTest.class,
-        TestTraceOffsetting.class
+        TestTraceOffsetting.class,
+        TmfAlignTimeAxisTest.class
+
 })
 public class AllTests {
 }
