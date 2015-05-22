@@ -29,6 +29,8 @@ import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.ui.IEditorReference;
 import org.hamcrest.Matcher;
 
@@ -54,7 +56,7 @@ public final class ConditionHelpers {
         }
 
         @Override
-        public final String getFailureMessage() {
+        public String getFailureMessage() {
             return null;
         }
     }
@@ -292,6 +294,50 @@ public final class ConditionHelpers {
             public boolean test() throws Exception {
                 Matcher<IEditorReference> withPartName = withPartName(title);
                 return !bot.editors(withPartName).isEmpty();
+            }
+        };
+    }
+
+    /**
+     * Condition to check if the selection range equals the specified range.
+     *
+     * @param range
+     *            the selection range
+     * @return ICondition for verification
+     */
+    public static ICondition selectionRange(final TmfTimeRange range) {
+        return new SWTBotTestCondition() {
+            @Override
+            public boolean test() throws Exception {
+                return TmfTraceManager.getInstance().getCurrentTraceContext().getSelectionRange().equals(range);
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return NLS.bind("Selection range: {0} expected: {1}",
+                        TmfTraceManager.getInstance().getCurrentTraceContext().getSelectionRange(), range);
+            }
+        };
+    }
+
+    /**
+     * Condition to check if the window range equals the specified range.
+     *
+     * @param range
+     *            the window range
+     * @return ICondition for verification
+     */
+    public static ICondition windowRange(final TmfTimeRange range) {
+        return new SWTBotTestCondition() {
+            @Override
+            public boolean test() throws Exception {
+                return TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().equals(range);
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return NLS.bind("Window range: {0} expected: {1}",
+                        TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange(), range);
             }
         };
     }

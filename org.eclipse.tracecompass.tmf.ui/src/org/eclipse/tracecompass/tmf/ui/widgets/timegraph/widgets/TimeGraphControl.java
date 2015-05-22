@@ -22,6 +22,7 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -407,10 +408,21 @@ public class TimeGraphControl extends TimeGraphBaseControl
     /**
      * Refresh the links (arrows) of this widget
      *
-     * @param events The link events to refresh
+     * @param events The link event list
      */
     public void refreshArrows(List<ILinkEvent> events) {
         fItemData.refreshArrows(events);
+    }
+
+    /**
+     * Get the links (arrows) of this widget
+     *
+     * @return The unmodifiable link event list
+     *
+     * @since 1.0
+     */
+    public List<ILinkEvent> getArrows() {
+        return Collections.unmodifiableList(fItemData.fLinks);
     }
 
     boolean ensureVisibleItem(int idx, boolean redraw) {
