@@ -659,8 +659,7 @@ public class HistogramDataModel implements IHistogramDataModel {
             final HistogramBucket currentModelBucket = fBuckets[modelIndex];
             if (currentModelBucket != null) {
                 do {
-                    // Make sure last model bucket is counted in last scaled
-                    // index
+                    // Make sure last model bucket counted in last scaled index
                     scaledIndex = Math.min(scaledIndex, nbBars - 1);
                     if (result.fData[scaledIndex].getNbEvents() == 0) {
                         scaledCount = 0;
@@ -670,7 +669,9 @@ public class HistogramDataModel implements IHistogramDataModel {
                     result.fLostEventsData[scaledIndex] += fLostEventsBuckets[modelIndex];
                     scaledCountLostEvent += fLostEventsBuckets[modelIndex];
                     scaledCount += currentModelBucket.getNbEvents();
-                    result.fLastBucket = scaledIndex;
+                    if (!currentModelBucket.isEmpty()) {
+                        result.fLastBucket = scaledIndex;
+                    }
                     if (result.fMaxValue < scaledCount) {
                         result.fMaxValue = scaledCount;
                     }
@@ -691,9 +692,21 @@ public class HistogramDataModel implements IHistogramDataModel {
         }
 
         fBucketDuration = Math.max(fBucketDuration, 1);
+
         // Set selection begin and end index in the scaled histogram
-        result.fSelectionBeginBucket = (int) ((int) ((fSelectionBegin - fFirstBucketTime) / fBucketDuration) / bucketsPerBar);
-        result.fSelectionEndBucket = (int) ((int) ((fSelectionEnd - fFirstBucketTime) / fBucketDuration) / bucketsPerBar);
+        if (fSelectionBegin == fEndTime) {
+            // make sure selection is visible at the end
+            result.fSelectionBeginBucket = result.fWidth - 1;
+        } else {
+            result.fSelectionBeginBucket = (int) Math.round(((fSelectionBegin - fFirstBucketTime) / (double) fBucketDuration) / bucketsPerBar);
+        }
+
+        if (fSelectionEnd == fEndTime) {
+            // make sure selection is visible at the end
+            result.fSelectionEndBucket = result.fWidth - 1;
+        } else {
+            result.fSelectionEndBucket = (int) Math.round(((fSelectionEnd - fFirstBucketTime) / (double) fBucketDuration) / bucketsPerBar);
+        }
 
         result.fFirstBucketTime = fFirstBucketTime;
         result.fFirstEventTime = fFirstEventTime;
