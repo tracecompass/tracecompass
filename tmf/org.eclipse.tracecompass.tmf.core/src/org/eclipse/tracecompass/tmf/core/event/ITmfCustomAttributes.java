@@ -14,12 +14,16 @@ package org.eclipse.tracecompass.tmf.core.event;
 
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+
 /**
  * Interface for events to implement to provide information about custom
  * attributes.
  *
  * @author Simon Delisle
  */
+@NonNullByDefault
 public interface ITmfCustomAttributes {
 
     /**
@@ -38,5 +42,5 @@ public interface ITmfCustomAttributes {
      * @return Value of this attribute, or null if there is no attribute with
      *         that name
      */
-    String getCustomAttribute(String name);
+    @Nullable String getCustomAttribute(String name);
 }

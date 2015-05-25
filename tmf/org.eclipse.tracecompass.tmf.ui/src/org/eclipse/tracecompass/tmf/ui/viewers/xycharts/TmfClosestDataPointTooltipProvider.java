@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.tmf.ui.viewers.xycharts;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -36,7 +35,6 @@ import org.swtchart.ISeries;
  * @author Bernd Hufmann
  * @since 2.0
  */
-@NonNullByDefault(false)
 public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implements MouseTrackListener, MouseMoveListener, PaintListener {
 
     // ------------------------------------------------------------------------

@@ -110,9 +110,9 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
         return new ITmfTreeColumnDataProvider() {
 
             @Override
-            public List<TmfTreeColumnData> getColumnData() {
+            public List<@Nullable TmfTreeColumnData> getColumnData() {
                 /* All columns are sortable */
-                List<TmfTreeColumnData> columns = new ArrayList<>();
+                List<@Nullable TmfTreeColumnData> columns = new ArrayList<>();
                 TmfTreeColumnData column = new TmfTreeColumnData(COLUMN_NAMES[0]);
                 column.setComparator(new ViewerComparator() {
                     @Override

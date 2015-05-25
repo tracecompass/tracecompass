@@ -85,7 +85,7 @@ public class TmfXmlCondition {
 
         Element rootNode = node;
         /* Process the conditions: in each case, only process Element nodes */
-        List<Element> childElements = XmlUtils.getChildElements(rootNode);
+        List<@Nullable Element> childElements = XmlUtils.getChildElements(rootNode);
 
         /*
          * If the node is an if, take the child as the root condition
@@ -98,6 +98,10 @@ public class TmfXmlCondition {
             }
             rootNode = childElements.get(0);
             childElements = XmlUtils.getChildElements(rootNode);
+        }
+
+        if (rootNode == null) {
+            throw new IllegalArgumentException();
         }
 
         switch (rootNode.getNodeName()) {
@@ -141,8 +145,13 @@ public class TmfXmlCondition {
              * A state value is either preceded by an eventField or a number of
              * state attributes
              */
-            if (childElements.size() == 1 && childElements.get(0).getNodeName().equals(TmfXmlStrings.ELEMENT_FIELD)) {
-                String attribute = childElements.get(0).getAttribute(TmfXmlStrings.NAME);
+            @Nullable Element firstChild = childElements.get(0);
+            if (firstChild == null) {
+                throw new IllegalStateException();
+            }
+
+            if (childElements.size() == 1 && firstChild.getNodeName().equals(TmfXmlStrings.ELEMENT_FIELD)) {
+                String attribute = firstChild.getAttribute(TmfXmlStrings.NAME);
                 if (attribute == null) {
                     throw new IllegalArgumentException();
                 }
@@ -150,7 +159,7 @@ public class TmfXmlCondition {
             } else {
                 List<ITmfXmlStateAttribute> attributes = new ArrayList<>();
                 for (Element element : childElements) {
-                    if (!element.getNodeName().equals(TmfXmlStrings.STATE_ATTRIBUTE)) {
+                    if (element == null || !element.getNodeName().equals(TmfXmlStrings.STATE_ATTRIBUTE)) {
                         throw new IllegalArgumentException("TmfXmlCondition: a condition either has a eventField element or a number of TmfXmlStateAttribute elements before the state value"); //$NON-NLS-1$
                     }
                     ITmfXmlStateAttribute attribute = modelFactory.createStateAttribute(element, fContainer);

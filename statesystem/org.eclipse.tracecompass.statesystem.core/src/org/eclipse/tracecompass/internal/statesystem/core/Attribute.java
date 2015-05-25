@@ -198,7 +198,7 @@ public final class Attribute {
      *
      * @return The full attribute path elements
      */
-    public @NonNull String[] getFullAttribute() {
+    public String @NonNull [] getFullAttribute() {
         LinkedList<String> list = new LinkedList<>();
         Attribute curNode = this;
 

@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.model;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 
 import com.google.common.collect.HashBasedTable;
@@ -25,7 +26,7 @@ import com.google.common.collect.Table;
  */
 public class VirtualCPU {
 
-    private static final Table<VirtualMachine, Long, VirtualCPU> VIRTUAL_CPU_TABLE = NonNullUtils.checkNotNull(HashBasedTable.<VirtualMachine, Long, VirtualCPU> create());
+    private static final Table<VirtualMachine, Long, @Nullable VirtualCPU> VIRTUAL_CPU_TABLE = NonNullUtils.checkNotNull(HashBasedTable.<VirtualMachine, Long, VirtualCPU> create());
 
     private final VirtualMachine fVm;
     private final Long fCpuId;

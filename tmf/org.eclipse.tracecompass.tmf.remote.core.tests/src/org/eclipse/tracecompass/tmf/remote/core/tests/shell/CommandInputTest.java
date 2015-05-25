@@ -30,7 +30,7 @@ import org.junit.Test;
 public class CommandInputTest {
 
     private static final @NonNull String COMMAND = "my-command";
-    private static final @NonNull String[] CMD_INPUT = { "This", "are", "the", "params" };
+    private static final String @NonNull [] CMD_INPUT = { "This", "are", "the", "params" };
 
     /**
      * Test suite for the {@link CommandInput#add(String)} and {@link CommandInput#addAll(List)}

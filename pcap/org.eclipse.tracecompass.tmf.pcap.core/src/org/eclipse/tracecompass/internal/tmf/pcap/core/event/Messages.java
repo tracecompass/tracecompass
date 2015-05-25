@@ -16,7 +16,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 
-@NonNullByDefault(false)
+@NonNullByDefault({})
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {
 

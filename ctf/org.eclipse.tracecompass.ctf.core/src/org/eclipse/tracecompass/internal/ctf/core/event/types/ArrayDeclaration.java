@@ -123,8 +123,8 @@ public final class ArrayDeclaration extends CompoundDeclaration {
         return "[declaration] array[" + Integer.toHexString(hashCode()) + ']'; //$NON-NLS-1$
     }
 
-    private @NonNull List<Definition> read(@NonNull BitBuffer input, @Nullable IDefinitionScope definitionScope, String fieldName) throws CTFException {
-        Builder<Definition> definitions = new ImmutableList.Builder<>();
+    private @NonNull List<@NonNull Definition> read(@NonNull BitBuffer input, @Nullable IDefinitionScope definitionScope, String fieldName) throws CTFException {
+        Builder<@NonNull Definition> definitions = new ImmutableList.Builder<>();
         if (!fChildrenNames.containsKey(fieldName)) {
             for (int i = 0; i < fLength; i++) {
                 fChildrenNames.put(fieldName, fieldName + '[' + i + ']');

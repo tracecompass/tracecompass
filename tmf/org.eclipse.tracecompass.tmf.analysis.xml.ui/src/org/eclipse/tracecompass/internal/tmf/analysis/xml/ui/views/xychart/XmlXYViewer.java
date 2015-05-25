@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
@@ -85,7 +86,7 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
     private class SeriesData {
 
         private final double[] fYValues;
-        private final @Nullable double[] fYAbsoluteValues;
+        private final double @Nullable [] fYAbsoluteValues;
         private final Integer fDisplayQuark;
         private final String fName;
         private final DisplayType fType;
@@ -177,7 +178,7 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
         }
 
         @Override
-        public @Nullable Iterable<TmfXmlLocation> getLocations() {
+        public @NonNull Iterable<@NonNull TmfXmlLocation> getLocations() {
             return Collections.EMPTY_SET;
         }
 
@@ -365,10 +366,8 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
                 ((TmfStateSystemAnalysisModule) module).waitForInitialization();
             }
             for (ITmfStateSystem ssq : module.getStateSystems()) {
-                if (ssq != null) {
-                    ss = ssq;
-                    break;
-                }
+                ss = ssq;
+                break;
             }
         }
         if (ss == null) {
@@ -389,24 +388,18 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
         fEntry = entry;
 
         /* Get the display element to use */
-        List<Element> displayElements = XmlUtils.getChildElements(entryElement, TmfXmlUiStrings.DISPLAY_ELEMENT);
+        List<@NonNull Element> displayElements = XmlUtils.getChildElements(entryElement, TmfXmlUiStrings.DISPLAY_ELEMENT);
         if (displayElements.isEmpty()) {
             Activator.logWarning(String.format("XML view: entry for %s should have a display element", path)); //$NON-NLS-1$
             return;
         }
         Element displayElement = displayElements.get(0);
-        if (displayElement == null) {
-            throw new IllegalStateException();
-        }
         fDisplay = fFactory.createStateAttribute(displayElement, entry);
 
         /* Get the series name element to use */
         List<Element> seriesNameElements = XmlUtils.getChildElements(entryElement, TmfXmlUiStrings.NAME_ELEMENT);
         if (!seriesNameElements.isEmpty()) {
             Element seriesNameElement = seriesNameElements.get(0);
-            if (seriesNameElement == null) {
-                throw new IllegalStateException();
-            }
             fSeriesName = fFactory.createStateAttribute(seriesNameElement, entry);
         }
 

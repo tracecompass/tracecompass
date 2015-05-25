@@ -24,7 +24,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * Utility methods for arbitrary objects.
  *
  * @author Patrick Tasse
- * @since 1.2
+ * @since 2.0
  */
 public final class ObjectUtils {
 

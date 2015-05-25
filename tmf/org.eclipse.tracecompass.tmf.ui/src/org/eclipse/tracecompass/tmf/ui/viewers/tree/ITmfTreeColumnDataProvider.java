@@ -15,6 +15,8 @@ package org.eclipse.tracecompass.tmf.ui.viewers.tree;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 /**
  * Basic methods that must be implemented in a column data provider. Tree
  * viewers will use class implementing this to populate the columns.
@@ -28,5 +30,5 @@ public interface ITmfTreeColumnDataProvider {
      *
      * @return columns list
      */
-    List<TmfTreeColumnData> getColumnData();
+    @NonNull List<TmfTreeColumnData> getColumnData();
 }

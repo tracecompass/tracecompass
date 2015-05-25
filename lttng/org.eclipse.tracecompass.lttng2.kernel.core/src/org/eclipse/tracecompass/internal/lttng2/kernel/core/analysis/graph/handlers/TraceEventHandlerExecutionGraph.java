@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.hand
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.Nullable;
@@ -62,7 +63,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
 
     private final Table<String, Integer, LttngWorker> fKernel;
     private final IMatchProcessingUnit fMatchProcessing;
-    private HashMap<ITmfEvent, TmfVertex> fTcpNodes;
+    private Map<ITmfEvent, TmfVertex> fTcpNodes;
     private TmfEventMatching fTcpMatching;
 
     /**
@@ -100,7 +101,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
             }
 
             @Override
-            public void init(@Nullable Collection<ITmfTrace> fTraces) {
+            public void init(Collection<ITmfTrace> fTraces) {
 
             }
 

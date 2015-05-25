@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.treemap.TreeMapStore;
@@ -35,7 +36,7 @@ import com.google.common.collect.Lists;
  */
 public class TreeMapStoreTest {
 
-    private TreeMapStore<ISegment> fSegmentStore;
+    private TreeMapStore<@NonNull ISegment> fSegmentStore;
 
     private static final ISegment SEGMENT_2_6 = new BasicSegment(2, 6);
     private static final ISegment SEGMENT_4_6 = new BasicSegment(4, 6);
@@ -112,7 +113,7 @@ public class TreeMapStoreTest {
      */
     @Test
     public void testToSpecifyArraySubtype() {
-        TreeMapStore<BasicSegment> tms2 = new TreeMapStore<>();
+        TreeMapStore<@NonNull BasicSegment> tms2 = new TreeMapStore<>();
         BasicSegment otherSegment = new BasicSegment(2, 6);
         tms2.add(otherSegment);
         BasicSegment[] array = tms2.toArray(new BasicSegment[0]);
@@ -153,7 +154,7 @@ public class TreeMapStoreTest {
     @Test
     public void testIterationOrderNonSortedInsertion() {
         /* Prepare the segment store, we don't use the 'fixture' in this test */
-        TreeMapStore<ISegment> store = new TreeMapStore<>();
+        TreeMapStore<@NonNull ISegment> store = new TreeMapStore<>();
         for (ISegment segment : REVERSE_SEGMENTS) {
             store.add(checkNotNull(segment));
         }
@@ -291,7 +292,7 @@ public class TreeMapStoreTest {
      */
     @Test
     public void testDispose() {
-        TreeMapStore<ISegment> store = new TreeMapStore<>();
+        TreeMapStore<@NonNull ISegment> store = new TreeMapStore<>();
         store.add(SEGMENT_2_6);
         store.dispose();
         assertEquals(0, store.size());

@@ -208,7 +208,7 @@ public class EthernetIIPacket extends Packet {
     public Map<String, String> getFields() {
         Map<String, String> map = fFields;
         if (map == null) {
-            ImmutableMap.Builder<String, String> builder = ImmutableMap.<String, String> builder();
+            ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
             builder.put("Source MAC Address", ConversionHelper.toMacAddress(fSourceMacAddress)); //$NON-NLS-1$
             builder.put("Destination MAC Address", ConversionHelper.toMacAddress(fDestinationMacAddress)); //$NON-NLS-1$
             builder.put("Ethertype", String.valueOf(EthertypeHelper.toEtherType(fType))); //$NON-NLS-1$

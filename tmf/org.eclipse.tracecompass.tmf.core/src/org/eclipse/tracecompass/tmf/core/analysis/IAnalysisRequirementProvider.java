@@ -13,6 +13,8 @@
 
 package org.eclipse.tracecompass.tmf.core.analysis;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * Interface that provides the necessary methods for an analysis to define its
  * requirements.
@@ -20,6 +22,7 @@ package org.eclipse.tracecompass.tmf.core.analysis;
  * @author Guilliano Molaire
  * @author Mathieu Rail
  */
+@NonNullByDefault
 public interface IAnalysisRequirementProvider {
 
     /**

@@ -138,9 +138,6 @@ public class LttngSystemModel {
             return LttngInterruptContext.DEFAULT_CONTEXT;
         }
         LttngInterruptContext peek = stack.peek();
-        if (peek == null) {
-            peek = LttngInterruptContext.DEFAULT_CONTEXT;
-        }
         return peek;
     }
 

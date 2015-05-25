@@ -283,9 +283,6 @@ public class StreamListView extends TmfView {
                 }
                 for (Entry<TmfPcapProtocol, Table> protocolEntry : tables.entrySet()) {
                     TmfPcapProtocol protocol = protocolEntry.getKey();
-                    if (protocol == null) {
-                        throw new IllegalStateException();
-                    }
                     TmfPacketStreamBuilder builder = analysis.getBuilder(protocol);
                     Table table = protocolEntry.getValue();
                     if (builder != null && !(table.isDisposed())) {

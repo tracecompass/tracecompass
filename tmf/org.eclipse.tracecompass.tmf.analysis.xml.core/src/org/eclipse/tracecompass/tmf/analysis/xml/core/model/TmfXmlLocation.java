@@ -64,7 +64,7 @@ public class TmfXmlLocation {
         fId = id;
         fContainer = container;
 
-        List<Element> childElements = XmlUtils.getChildElements(location);
+        List<@Nullable Element> childElements = XmlUtils.getChildElements(location);
         for (Element attribute : childElements) {
             if (attribute == null) {
                 continue;

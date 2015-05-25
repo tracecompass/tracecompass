@@ -134,7 +134,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
             break;
         case TmfXmlStrings.TYPE_QUERY:
             /* Value is the result of a query */
-            List<Element> children = XmlUtils.getChildElements(node);
+            List<@Nullable Element> children = XmlUtils.getChildElements(node);
             List<ITmfXmlStateAttribute> childAttributes = new ArrayList<>();
             for (Element child : children) {
                 if (child == null) {

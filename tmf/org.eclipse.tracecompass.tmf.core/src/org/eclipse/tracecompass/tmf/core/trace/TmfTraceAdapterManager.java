@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IAdapterFactory;
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -97,14 +98,14 @@ public class TmfTraceAdapterManager {
         Collection<Entry<Class<? extends ITmfTrace>, IAdapterFactory>> entries = fFactoriesByClass.entries();
         List<T> adapters = new ArrayList<>(factoriesById.size() + entries.size());
         for (IAdapterFactory factory : factoriesById) {
-            T adapter = factory.getAdapter(trace, adapterType);
+            @Nullable T adapter = factory.getAdapter(trace, adapterType);
             if (adapter != null) {
                 adapters.add(adapter);
             }
         }
         for (Entry<Class<? extends ITmfTrace>, IAdapterFactory> entry : entries) {
             if (entry.getKey().isInstance(trace)) {
-                T adapter = entry.getValue().getAdapter(trace, adapterType);
+                @Nullable T adapter = entry.getValue().getAdapter(trace, adapterType);
                 if (adapter != null) {
                     adapters.add(adapter);
                 }

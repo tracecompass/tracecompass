@@ -18,7 +18,7 @@ import org.eclipse.osgi.util.NLS;
  * @author Francis Giraldeau <francis.giraldeau@gmail.com>
  *
  */
-@NonNullByDefault(false)
+@NonNullByDefault({})
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.handlers.messages"; //$NON-NLS-1$
 

@@ -17,6 +17,7 @@ package org.eclipse.tracecompass.tmf.core.event;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
@@ -66,19 +67,15 @@ public class TmfEventField implements ITmfEventField {
      * @throws IllegalArgumentException
      *             If 'name' is null, or if 'fields' has duplicate field names.
      */
-    public TmfEventField(@NonNull String name, @Nullable Object value, @Nullable ITmfEventField[] fields) {
+    public TmfEventField(@NonNull String name, @Nullable Object value, ITmfEventField @Nullable [] fields) {
         fName = name;
         fValue = value;
 
         if (fields == null) {
             fFields = checkNotNull(ImmutableMap.<String, ITmfEventField> of());
         } else {
-            /* Java 8 streams will make this even more simple! */
             ImmutableMap.Builder<String, ITmfEventField> mapBuilder = new ImmutableMap.Builder<>();
-            for (ITmfEventField field : fields) {
-                final String curName = field.getName();
-                mapBuilder.put(curName, field);
-            }
+            Arrays.stream(fields).forEach(t -> mapBuilder.put(t.getName(), t));
             fFields = checkNotNull(mapBuilder.build());
         }
     }

@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.core.tests.trace.text;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -188,6 +189,7 @@ public class TextTraceTest {
     public void testTraceParsing() {
         ITmfContext context = fTrace.seekEvent(0);
         SyslogEvent event = fTrace.getNext(context);
+        assertNotNull(event);
         TextTraceEventContent content = event.getContent();
         assertEquals("getTimestamp", "Jan 1 01:01:01", event.getTimestamp().toString());
         assertEquals("getField:HOST", "HostA", content.getFieldValue(Field.HOST));
@@ -196,6 +198,7 @@ public class TextTraceTest {
         assertEquals("getField:LINE", "4", content.getFieldValue(Field.LINE));
         assertEquals("getField:MESSAGE", "Message A", content.getFieldValue(Field.MESSAGE).toString());
         event = fTrace.getNext(context);
+        assertNotNull(event);
         content = event.getContent();
         assertEquals("getTimestamp", "Jan 1 02:02:02", event.getTimestamp().toString());
         assertEquals("getField:HOST", "HostB", content.getFieldValue(Field.HOST));
@@ -204,6 +207,7 @@ public class TextTraceTest {
         assertEquals("getField:LINE", "5", content.getFieldValue(Field.LINE));
         assertEquals("getField:MESSAGE", "Message B", content.getFieldValue(Field.MESSAGE).toString());
         event = fTrace.getNext(context);
+        assertNotNull(event);
         content = event.getContent();
         assertEquals("getTimestamp", "Jan 1 03:03:03", event.getTimestamp().toString());
         assertEquals("getField:HOST", "HostC", content.getFieldValue(Field.HOST));
@@ -212,6 +216,7 @@ public class TextTraceTest {
         assertEquals("getField:LINE", "6", content.getFieldValue(Field.LINE));
         assertEquals("getField:MESSAGE", "Message C", content.getFieldValue(Field.MESSAGE).toString());
         event = fTrace.getNext(context);
+        assertNotNull(event);
         content = event.getContent();
         assertEquals("getTimestamp", "Jan 1 04:04:04", event.getTimestamp().toString());
         assertEquals("getField:HOST", "HostD", content.getFieldValue(Field.HOST));
@@ -220,6 +225,7 @@ public class TextTraceTest {
         assertEquals("getField:LINE", "7", content.getFieldValue(Field.LINE));
         assertEquals("getField:MESSAGE", "Message D", content.getFieldValue(Field.MESSAGE).toString());
         event = fTrace.getNext(context);
+        assertNotNull(event);
         content = event.getContent();
         assertEquals("getTimestamp", "Jan 1 05:05:05", event.getTimestamp().toString());
         assertEquals("getField:HOST", "HostE", content.getFieldValue(Field.HOST));
@@ -228,6 +234,7 @@ public class TextTraceTest {
         assertEquals("getField:LINE", "8", content.getFieldValue(Field.LINE));
         assertEquals("getField:MESSAGE", "", content.getFieldValue(Field.MESSAGE).toString());
         event = fTrace.getNext(context);
+        assertNotNull(event);
         content = event.getContent();
         assertEquals("getTimestamp", "Jan 1 06:06:06", event.getTimestamp().toString());
         assertEquals("getField:HOST", "HostF", content.getFieldValue(Field.HOST));
@@ -245,16 +252,19 @@ public class TextTraceTest {
         ITmfContext context = fTrace.seekEvent(3);
         double ratio = fTrace.getLocationRatio(context.getLocation());
         SyslogEvent event = fTrace.getNext(context);
+        assertNotNull(event);
         TextTraceEventContent content = event.getContent();
         Object logger = content.getFieldValue(Field.LOGGER);
         context.dispose();
         context = fTrace.seekEvent(ratio);
         event = fTrace.getNext(context);
+        assertNotNull(event);
         content = event.getContent();
         assertEquals("getField:LOGGER", logger.toString(), content.getFieldValue(Field.LOGGER).toString());
         context.dispose();
         context = fTrace.seekEvent(0.0);
         event = fTrace.getNext(context);
+        assertNotNull(event);
         content = event.getContent();
         assertEquals("getField:LOGGER", "LoggerA", content.getFieldValue(Field.LOGGER));
         context.dispose();

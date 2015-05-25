@@ -46,7 +46,7 @@ public class TextTraceEventContent implements ITmfEventField {
      * @throws IllegalArgumentException
      *             if any one of the field names is null
      */
-    public TextTraceEventContent(@NonNull String[] fieldNames) {
+    public TextTraceEventContent(String @NonNull [] fieldNames) {
         fName = ITmfEventField.ROOT_FIELD_ID;
         fValue = null;
         fFields = new ArrayList<>(fieldNames.length);

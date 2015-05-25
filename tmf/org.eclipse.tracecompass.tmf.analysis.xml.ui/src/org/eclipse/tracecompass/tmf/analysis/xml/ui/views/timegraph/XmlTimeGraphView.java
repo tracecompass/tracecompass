@@ -279,9 +279,6 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
                     ((TmfStateSystemAnalysisModule) module).waitForInitialization();
                 }
                 for (ITmfStateSystem ssq : module.getStateSystems()) {
-                    if (ssq == null) {
-                        return;
-                    }
                     ssq.waitUntilBuilt();
 
                     long startTime = ssq.getStartTime();

@@ -14,6 +14,8 @@ package org.eclipse.tracecompass.tmf.core.trace;
 
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * Interface for trace types to implement when they can provide additional
  * trace-wide properties.
@@ -23,6 +25,7 @@ import java.util.Map;
  *
  * @author Alexandre Montplaisir
  */
+@NonNullByDefault
 public interface ITmfTraceProperties {
 
     /**

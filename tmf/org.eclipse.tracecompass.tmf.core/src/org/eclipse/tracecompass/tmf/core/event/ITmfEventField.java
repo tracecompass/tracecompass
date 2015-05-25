@@ -80,6 +80,6 @@ public interface ITmfEventField {
      * @param path The path to the subfield
      * @return a specific subfield by path (null if inexistent)
      */
-    ITmfEventField getField(@NonNull String... path);
+    ITmfEventField getField(String @NonNull ... path);
 
 }

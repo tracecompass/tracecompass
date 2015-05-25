@@ -36,7 +36,7 @@ public class SegmentStoreContentProvider implements ISortingLazyContentProvider 
     /**
      * Array of all the segments in the segment store of the current trace
      */
-    private @Nullable ISegment[] fSegmentArray = null;
+    private ISegment @Nullable [] fSegmentArray = null;
 
     /**
      * Table viewer of the latency table viewer
@@ -67,8 +67,8 @@ public class SegmentStoreContentProvider implements ISortingLazyContentProvider 
     @Override
     public void inputChanged(@Nullable Viewer viewer, @Nullable Object oldInput, @Nullable Object newInput) {
         fTableViewer = (TableViewer) viewer;
-        if (newInput instanceof ISegmentStore<?>) {
-            ISegmentStore<?> segmentStore = (ISegmentStore<?>) newInput;
+        if (newInput instanceof ISegmentStore) {
+            ISegmentStore<ISegment> segmentStore = (ISegmentStore<ISegment>) newInput;
             fSegmentArray = Iterables.toArray(segmentStore, ISegment.class);
             if (fComparator != null) {
                 Arrays.sort(fSegmentArray, fComparator);

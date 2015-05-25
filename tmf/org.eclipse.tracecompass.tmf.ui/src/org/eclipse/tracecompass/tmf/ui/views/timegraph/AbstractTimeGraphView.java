@@ -1439,7 +1439,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *            The progress monitor object
      * @return The list of events for the entry
      */
-    protected abstract @Nullable List<ITimeEvent> getEventList(@NonNull TimeGraphEntry entry,
+    protected abstract @Nullable List<@NonNull ITimeEvent> getEventList(@NonNull TimeGraphEntry entry,
             long startTime, long endTime, long resolution,
             @NonNull IProgressMonitor monitor);
 
@@ -1457,7 +1457,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *            The progress monitor object
      * @return The list of link events
      */
-    protected @Nullable List<ILinkEvent> getLinkList(long startTime, long endTime,
+    protected @Nullable List<@NonNull ILinkEvent> getLinkList(long startTime, long endTime,
             long resolution, @NonNull IProgressMonitor monitor) {
         return new ArrayList<>();
     }

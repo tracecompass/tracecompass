@@ -39,9 +39,9 @@ public class CommandShellTest {
 
     private static final boolean IS_UNIX = !Platform.getOS().equals(Platform.OS_WIN32);
 
-    private static final @NonNull String[] CMD_INPUT_UNIX = { "ls", "-l" };
-    private static final @NonNull String[] CMD_ERROR_INPUT_UNIX = { "ls", "blablablabla" };
-    private static final @NonNull String[] CMD_UNKNOWN_COMMAND_UNIX = { "blablablabla" };
+    private static final String @NonNull [] CMD_INPUT_UNIX = { "ls", "-l" };
+    private static final String @NonNull [] CMD_ERROR_INPUT_UNIX = { "ls", "blablablabla" };
+    private static final String @NonNull [] CMD_UNKNOWN_COMMAND_UNIX = { "blablablabla" };
 
     private static final IRemoteConnection LOCAL_CONNECTION = TmfRemoteConnectionFactory.getLocalConnection();
     private static final RemoteSystemProxy LOCAL_PROXY = new RemoteSystemProxy(checkNotNull(LOCAL_CONNECTION));

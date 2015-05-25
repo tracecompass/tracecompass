@@ -98,7 +98,7 @@ public abstract class TmfXmlStateAttribute implements ITmfXmlStateAttribute {
             fName = fContainer.getAttributeValue(attribute.getAttribute(TmfXmlStrings.VALUE));
             break;
         case TmfXmlStrings.TYPE_QUERY:
-            List<Element> childElements = XmlUtils.getChildElements(attribute);
+            List<@Nullable Element> childElements = XmlUtils.getChildElements(attribute);
             for (Element subAttributeNode : childElements) {
                 if (subAttributeNode == null) {
                     continue;

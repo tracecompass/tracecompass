@@ -60,7 +60,7 @@ public class CTFStream {
     /**
      * Maps event ids to events
      */
-    private final ArrayList<IEventDeclaration> fEvents = new ArrayList<>();
+    private final ArrayList<@Nullable IEventDeclaration> fEvents = new ArrayList<>();
 
     private boolean fEventUnsetId = false;
     private boolean fStreamIdSet = false;
@@ -332,7 +332,7 @@ public class CTFStream {
         }
     }
 
-    private static void ensureSize(ArrayList<? extends Object> list, int index) {
+    private static void ensureSize(ArrayList<@Nullable ? extends Object> list, int index) {
         list.ensureCapacity(index);
         while (list.size() <= index) {
             list.add(null);

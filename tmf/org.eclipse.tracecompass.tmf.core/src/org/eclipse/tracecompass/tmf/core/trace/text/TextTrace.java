@@ -26,6 +26,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
@@ -249,12 +250,12 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
     }
 
     @Override
-    public synchronized T getNext(ITmfContext context) {
+    public synchronized @Nullable T getNext(ITmfContext context) {
         if (!(context instanceof TextTraceContext)) {
             throw new IllegalArgumentException();
         }
         TextTraceContext savedContext = new TextTraceContext(context.getLocation(), context.getRank());
-        T event = parse((TextTraceContext) context);
+        @Nullable T event = parse((TextTraceContext) context);
         if (event != null) {
             updateAttributes(savedContext, event);
             context.increaseRank();
@@ -269,7 +270,7 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
      *            the context
      * @return the next event or null
      */
-    protected synchronized T parse(TextTraceContext tmfContext) {
+    protected synchronized @Nullable T parse(TextTraceContext tmfContext) {
         if (fFile == null) {
             return null;
         }

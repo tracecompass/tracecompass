@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -96,7 +97,7 @@ public final class KernelThreadInformationProvider {
         int threadQuark;
         try {
             threadQuark = ss.getQuarkAbsolute(Attributes.THREADS);
-            Set<Integer> tids = new TreeSet<>();
+            Set<@NonNull Integer> tids = new TreeSet<>();
             for (Integer quark : ss.getSubAttributes(threadQuark, false)) {
                 tids.add(Integer.parseInt(ss.getAttributeName(quark)));
             }

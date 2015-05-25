@@ -62,7 +62,7 @@ public class IPv4Packet extends Packet {
     private final int fHeaderChecksum;
     private final Inet4Address fSourceIpAddress;
     private final Inet4Address fDestinationIpAddress;
-    private final @Nullable byte[] fOptions;
+    private final byte @Nullable [] fOptions;
 
     private @Nullable IPv4Endpoint fSourceEndpoint;
     private @Nullable IPv4Endpoint fDestinationEndpoint;
@@ -392,7 +392,7 @@ public class IPv4Packet extends Packet {
      *
      * @return The options of the packet.
      */
-    public @Nullable byte[] getOptions() {
+    public byte @Nullable [] getOptions() {
         final byte[] options = fOptions;
         if (options == null) {
             return null;

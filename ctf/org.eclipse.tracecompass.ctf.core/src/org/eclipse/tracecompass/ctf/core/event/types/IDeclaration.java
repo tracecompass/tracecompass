@@ -47,7 +47,7 @@ public interface IDeclaration {
      * @throws CTFException
      *             error in reading
      */
-    Definition createDefinition(IDefinitionScope definitionScope, @NonNull String fieldName, @NonNull BitBuffer input) throws CTFException;
+    @NonNull Definition createDefinition(IDefinitionScope definitionScope, @NonNull String fieldName, @NonNull BitBuffer input) throws CTFException;
 
     /**
      * Get the path of a definition

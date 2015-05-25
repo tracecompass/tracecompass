@@ -59,7 +59,7 @@ public class TCPPacket extends Packet {
     private final int fWindowSize;
     private final int fChecksum;
     private final int fUrgentPointer;
-    private final @Nullable byte[] fOptions; // TODO Interpret options.
+    private final byte @Nullable [] fOptions; // TODO Interpret options.
 
     private @Nullable TCPEndpoint fSourceEndpoint;
     private @Nullable TCPEndpoint fDestinationEndpoint;
@@ -382,7 +382,7 @@ public class TCPPacket extends Packet {
      *
      * @return The options of the packet.
      */
-    public @Nullable byte[] getOptions() {
+    public byte @Nullable [] getOptions() {
         byte[] options = fOptions;
         if (options == null) {
             return null;

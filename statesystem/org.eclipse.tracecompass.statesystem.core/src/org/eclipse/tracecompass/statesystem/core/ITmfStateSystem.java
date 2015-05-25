@@ -259,7 +259,7 @@ public interface ITmfStateSystem {
      *             If the attribute quark is out of range
      * @since 1.0
      */
-    @NonNull String[] getFullAttributePathArray(int attributeQuark);
+    String @NonNull [] getFullAttributePathArray(int attributeQuark);
 
     /**
      * Returns the parent quark of the attribute.

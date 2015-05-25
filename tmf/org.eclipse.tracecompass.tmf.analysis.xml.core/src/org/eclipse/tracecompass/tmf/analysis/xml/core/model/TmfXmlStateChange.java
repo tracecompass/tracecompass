@@ -187,7 +187,7 @@ public class TmfXmlStateChange {
         private final ITmfXmlStateValue fValue;
 
         public XmlStateValueChange(ITmfXmlModelFactory modelFactory, Element statechange) {
-            List<Element> childElements = XmlUtils.getChildElements(statechange);
+            List<@Nullable Element> childElements = XmlUtils.getChildElements(statechange);
 
             /*
              * Last child element is the state value, the others are attributes
@@ -199,7 +199,7 @@ public class TmfXmlStateChange {
             }
             List<ITmfXmlStateAttribute> attributes = new ArrayList<>();
             for (Element element : childElements) {
-                if (!element.getNodeName().equals(TmfXmlStrings.STATE_ATTRIBUTE)) {
+                if (element == null || !element.getNodeName().equals(TmfXmlStrings.STATE_ATTRIBUTE)) {
                     throw new IllegalArgumentException("TmfXmlStateChange: a state change must have only TmfXmlStateAttribute elements before the state value"); //$NON-NLS-1$
                 }
                 ITmfXmlStateAttribute attribute = modelFactory.createStateAttribute(element, fContainer);

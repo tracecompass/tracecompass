@@ -216,7 +216,7 @@ public class TmfAnalysisManager {
                         provider = providerClass.newInstance();
                         fParamProviderInstances.put(providerClass, provider);
                     }
-                    if (provider != null && provider.appliesToTrace(trace)) {
+                    if (provider.appliesToTrace(trace)) {
                         providerSet.add(provider);
                     }
                 } catch (IllegalArgumentException | SecurityException | InstantiationException | IllegalAccessException e) {

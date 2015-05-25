@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.analysis.xml.core.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
@@ -67,12 +68,9 @@ public class TmfXmlEventHandler {
         }
         fName = name;
 
-        List<Element> childElements = XmlUtils.getChildElements(node, TmfXmlStrings.STATE_CHANGE);
+        List<@NonNull Element> childElements = XmlUtils.getChildElements(node, TmfXmlStrings.STATE_CHANGE);
         /* load state changes */
         for (Element childElem : childElements) {
-            if (childElem == null) {
-                continue;
-            }
             TmfXmlStateChange stateChange = modelFactory.createStateChange(childElem, fParent);
             fStateChangeList.add(stateChange);
         }

@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.analysis.xml.core.module;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlLocation;
 
@@ -47,6 +48,6 @@ public interface IXmlStateSystemContainer extends ITmfXmlTopLevelElement {
      *
      * @return The list of {@link TmfXmlLocation}
      */
-    Iterable<TmfXmlLocation> getLocations();
+    @NonNull Iterable<@NonNull TmfXmlLocation> getLocations();
 
 }

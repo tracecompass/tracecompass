@@ -26,9 +26,9 @@ import org.junit.Test;
  */
 public class CommandResultTest {
 
-    private static final @NonNull String[] CMD_OUTPUT = { "This", "is", "the", "output" };
-    private static final @NonNull String[] CMD_NO_ERROR_OUTPUT = {};
-    private static final @NonNull String[] CMD_ERROR_OUTPUT = { "This", "is", "the", "error", "output" };
+    private static final String @NonNull [] CMD_OUTPUT = { "This", "is", "the", "output" };
+    private static final String @NonNull [] CMD_NO_ERROR_OUTPUT = {};
+    private static final String @NonNull [] CMD_ERROR_OUTPUT = { "This", "is", "the", "error", "output" };
 
     /**
      * Test suite for the {@link CommandResult} class

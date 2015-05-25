@@ -187,7 +187,7 @@ public final class BitBuffer {
      *             - If there are fewer than length bytes remaining in this
      *             buffer
      */
-    public void get(@NonNull byte[] dst) {
+    public void get(byte @NonNull [] dst) {
         fBuffer.position((int) (fPosition / BIT_CHAR));
         fBuffer.get(dst);
         fPosition += dst.length * BIT_CHAR;

@@ -18,7 +18,7 @@ import org.eclipse.osgi.util.NLS;
 /**
  * @author France Lapointe Nguyen
  */
-@NonNullByDefault(false)
+@NonNullByDefault({})
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.messages"; //$NON-NLS-1$
 

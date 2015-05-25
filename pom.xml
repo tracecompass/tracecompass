@@ -201,15 +201,6 @@
                         <version>2.0.0</version>
                       </artifact>
                     </target>
-                    <filters>
-                      <filter>
-                        <type>eclipse-plugin</type>
-                        <id>org.eclipse.jdt.annotation</id>
-                        <restrictTo>
-                          <versionRange>[1.0,2.0)</versionRange>
-                        </restrictTo>
-                      </filter>
-                    </filters>
                 </configuration>
             </plugin>
             <plugin>
@@ -319,6 +310,9 @@
           <configuration>
             <encoding>UTF-8</encoding>
             <useProjectSettings>true</useProjectSettings>
+            <compilerArguments>
+              <annotationpath>common/org.eclipse.tracecompass.common.core/annotations</annotationpath>
+            </compilerArguments>
           </configuration>
         </plugin>
         <plugin>

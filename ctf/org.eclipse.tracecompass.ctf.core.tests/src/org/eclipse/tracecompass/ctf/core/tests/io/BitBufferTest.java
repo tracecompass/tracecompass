@@ -175,8 +175,7 @@ public class BitBufferTest {
      */
     @Test
     public void testGetBytes() {
-        @NonNull
-        byte[] data = new byte[2];
+        byte @NonNull [] data = new byte[2];
         ByteBuffer bb = ByteBuffer.allocate(10);
         bb.put((byte) 0);
         bb.put((byte) 1);
@@ -199,8 +198,7 @@ public class BitBufferTest {
      */
     @Test
     public void testGetBytesMiddle() throws CTFException {
-        @NonNull
-        byte[] data = new byte[5];
+        byte @NonNull [] data = new byte[5];
         // this string has been carefully selected and tested... don't change
         // the string and expect the result to be the same.
         fixture = new BitBuffer(Util.testMemory(ByteBuffer.wrap(new String("hello world").getBytes())));

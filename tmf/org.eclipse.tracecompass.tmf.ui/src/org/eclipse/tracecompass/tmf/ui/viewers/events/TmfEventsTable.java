@@ -201,7 +201,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     /**
      * Empty string array, used by {@link #getItemStrings}.
      */
-    protected static final @NonNull String[] EMPTY_STRING_ARRAY = new String[0];
+    protected static final String @NonNull [] EMPTY_STRING_ARRAY = new String[0];
 
     /**
      * Empty string

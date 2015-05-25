@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
@@ -159,9 +160,9 @@ public class XmlUtils {
      *            The parent element to get children from
      * @return The list of children Element of the parent
      */
-    public static List<Element> getChildElements(Element parent) {
+    public static List<@Nullable Element> getChildElements(Element parent) {
         NodeList childNodes = parent.getChildNodes();
-        List<Element> childElements = new ArrayList<>();
+        List<@Nullable Element> childElements = new ArrayList<>();
         for (int index = 0; index < childNodes.getLength(); index++) {
             if (childNodes.item(index).getNodeType() == Node.ELEMENT_NODE) {
                 childElements.add((Element) childNodes.item(index));
@@ -180,10 +181,10 @@ public class XmlUtils {
      *            The tag of the elements to return
      * @return The list of children {@link Element} of the parent
      */
-    public static List<Element> getChildElements(Element parent, String elementTag) {
+    public static List<@NonNull Element> getChildElements(Element parent, String elementTag) {
         /* get the state providers and find the corresponding one */
         NodeList nodes = parent.getElementsByTagName(elementTag);
-        List<Element> childElements = new ArrayList<>();
+        List<@NonNull Element> childElements = new ArrayList<>();
 
         for (int i = 0; i < nodes.getLength(); i++) {
             Element node = (Element) nodes.item(i);

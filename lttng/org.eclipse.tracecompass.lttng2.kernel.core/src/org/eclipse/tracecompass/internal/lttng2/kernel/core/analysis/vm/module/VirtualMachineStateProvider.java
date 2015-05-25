@@ -83,7 +83,7 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
 
     /* TODO: An analysis should support many hypervisor models */
     private IVirtualMachineModel fModel;
-    private final Table<ITmfTrace, String, Integer> fEventNames;
+    private final Table<ITmfTrace, String, @Nullable Integer> fEventNames;
     private final Map<ITmfTrace, IKernelAnalysisEventLayout> fLayouts;
 
     // ------------------------------------------------------------------------
@@ -100,7 +100,7 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
         super(experiment, "Virtual Machine State Provider"); //$NON-NLS-1$
 
         fModel = new QemuKvmVmModel(experiment);
-        Table<ITmfTrace, String, Integer> table = NonNullUtils.checkNotNull(HashBasedTable.<ITmfTrace, String, Integer> create());
+        Table<ITmfTrace, String, @Nullable Integer> table = NonNullUtils.checkNotNull(HashBasedTable.<ITmfTrace, String, Integer> create());
         fEventNames = table;
         fLayouts = new HashMap<>();
     }

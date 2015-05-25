@@ -164,9 +164,6 @@ public class LttngKernelExecGraphProvider extends AbstractTmfGraphProvider {
             }
         }
         for (LttngWorker k : kernelWorker) {
-            if (k == null) {
-                throw new NullPointerException();
-            }
             List<TmfVertex> nodes = graph.getNodesOf(k);
             for (TmfVertex node : nodes) {
                 /*

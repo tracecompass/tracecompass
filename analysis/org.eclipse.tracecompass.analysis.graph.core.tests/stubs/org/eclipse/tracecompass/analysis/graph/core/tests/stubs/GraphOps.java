@@ -54,9 +54,6 @@ public class GraphOps {
                 assertEquals("Node timestamps", v1.getTs(), v2.getTs());
                 /* Check each edge */
                 for (EdgeDirection dir : EdgeDirection.values()) {
-                    if (dir == null) {
-                        throw new NullPointerException();
-                    }
                     TmfEdge edge1 = v1.getEdge(dir);
                     TmfEdge edge2 = v2.getEdge(dir);
                     if (edge1 == null) {

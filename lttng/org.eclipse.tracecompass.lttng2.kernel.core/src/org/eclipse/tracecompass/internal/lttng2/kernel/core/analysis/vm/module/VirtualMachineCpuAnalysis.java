@@ -110,7 +110,7 @@ public class VirtualMachineCpuAnalysis extends TmfStateSystemAnalysisModule {
          * Create the multimap for threads with the appropriate comparator
          * objects for keys and values
          */
-        final Multimap<Integer, ITmfStateInterval> map = NonNullUtils.checkNotNull(TreeMultimap.<Integer, ITmfStateInterval> create(
+        final Multimap<Integer, ITmfStateInterval> map = NonNullUtils.checkNotNull(TreeMultimap.<@NonNull Integer, @NonNull ITmfStateInterval> create(
                 new Comparator<Integer>() {
                     @Override
                     public int compare(@Nullable Integer arg0, @Nullable Integer arg1) {
@@ -195,9 +195,6 @@ public class VirtualMachineCpuAnalysis extends TmfStateSystemAnalysisModule {
          * module
          */
         for (Integer tid : KernelThreadInformationProvider.getThreadIds(kernelModule)) {
-            if (tid == null) {
-                throw new IllegalStateException();
-            }
             map.putAll(tid, KernelThreadInformationProvider.getStatusIntervalsForThread(kernelModule, tid, start, end, resolution, monitor));
             if (monitor.isCanceled()) {
                 return map;

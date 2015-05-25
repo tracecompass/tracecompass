@@ -46,7 +46,7 @@ public abstract class AbstractArrayDefinition extends Definition {
      *
      * @return the definitions
      */
-    public abstract List<Definition> getDefinitions();
+    public abstract List<@Nullable Definition> getDefinitions();
 
     /**
      * Get the the number of elements in the array

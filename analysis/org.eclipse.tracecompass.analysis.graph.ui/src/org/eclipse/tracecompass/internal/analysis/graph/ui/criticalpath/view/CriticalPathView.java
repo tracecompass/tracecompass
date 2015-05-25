@@ -323,7 +323,7 @@ public class CriticalPathView extends AbstractTimeGraphView {
 
             /* find vertical links */
             graph.scanLineTraverse(vertex, new VerticalLinksVisitor(graph, graphLinks, entryMap));
-            fLinks.put(trace, fCurrentObject, graphLinks);
+            fLinks.put(trace, checkNotNull(fCurrentObject), graphLinks);
             links = graphLinks;
 
             List<ILinkEvent> linksInRange = new ArrayList<>();
@@ -346,7 +346,7 @@ public class CriticalPathView extends AbstractTimeGraphView {
         }
 
         @Override
-        public @Nullable ITimeGraphEntry[] getChildren(@Nullable Object parentElement) {
+        public ITimeGraphEntry @Nullable [] getChildren(@Nullable Object parentElement) {
             if (parentElement instanceof CriticalPathEntry) {
                 List<? extends ITimeGraphEntry> children = ((CriticalPathEntry) parentElement).getChildren();
                 return children.toArray(new TimeGraphEntry[children.size()]);

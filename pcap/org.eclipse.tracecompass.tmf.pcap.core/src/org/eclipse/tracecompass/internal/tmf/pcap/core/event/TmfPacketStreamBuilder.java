@@ -13,12 +13,12 @@
 package org.eclipse.tracecompass.internal.tmf.pcap.core.event;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.eclipse.tracecompass.internal.pcap.core.packet.Packet;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.pcap.PcapPacket;
-import org.eclipse.tracecompass.internal.pcap.core.stream.PacketStream;
 import org.eclipse.tracecompass.internal.pcap.core.stream.PacketStreamBuilder;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.protocol.TmfPcapProtocol;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.util.ProtocolConversion;
@@ -74,13 +74,8 @@ public class TmfPacketStreamBuilder {
     public synchronized Iterable<TmfPacketStream> getStreams() {
         // We can't store in immutable list since the stream number/content can
         // change dynamically.
-        List<TmfPacketStream> list = new ArrayList<>();
-        for (PacketStream stream : fBuilder.getStreams()) {
-            if (stream != null) {
-                list.add(new TmfPacketStream(stream));
-            }
-        }
-        return list;
+        return StreamSupport.stream(fBuilder.getStreams().spliterator(), false)
+                .map(e -> new TmfPacketStream(e))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
-
 }

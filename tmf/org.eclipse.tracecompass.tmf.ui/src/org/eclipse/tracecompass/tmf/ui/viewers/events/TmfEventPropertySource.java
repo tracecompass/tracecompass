@@ -312,7 +312,7 @@ public class TmfEventPropertySource implements IPropertySource {
         /* Display custom attributes, if available */
         if (fEvent instanceof ITmfCustomAttributes) {
             ITmfCustomAttributes event = (ITmfCustomAttributes) fEvent;
-            if (event.listCustomAttributes() != null && !event.listCustomAttributes().isEmpty()) {
+            if (!event.listCustomAttributes().isEmpty()) {
                 descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_CUSTOM_ATTRIBUTE, NAME_CUSTOM_ATTRIBUTES));
             }
         }

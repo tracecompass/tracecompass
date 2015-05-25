@@ -98,11 +98,7 @@ public class TransientState {
         fRWLock.readLock().lock();
         try {
             checkValidAttribute(quark);
-            ITmfStateValue ret = fOngoingStateInfo.get(quark);
-            if (ret == null) {
-                throw new IllegalStateException("Null interval stored in transient state"); //$NON-NLS-1$
-            }
-            return ret;
+            return fOngoingStateInfo.get(quark);
         } finally {
             fRWLock.readLock().unlock();
         }

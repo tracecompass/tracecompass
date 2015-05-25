@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.tmf.core.event.matching;
 
 import java.util.Collection;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -24,6 +25,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  *
  * @author Geneviève Bastien
  */
+@NonNullByDefault
 public interface IMatchProcessingUnit {
 
     /**

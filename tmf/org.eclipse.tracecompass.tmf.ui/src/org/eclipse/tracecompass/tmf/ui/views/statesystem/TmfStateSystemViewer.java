@@ -217,9 +217,7 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
                 ((TmfStateSystemAnalysisModule) module).waitForInitialization();
             }
             for (ITmfStateSystem ss : module.getStateSystems()) {
-                if (ss != null) {
-                    traceEntry.addChild(new StateSystemEntry(ss));
-                }
+                traceEntry.addChild(new StateSystemEntry(ss));
             }
         }
         return traceEntry;

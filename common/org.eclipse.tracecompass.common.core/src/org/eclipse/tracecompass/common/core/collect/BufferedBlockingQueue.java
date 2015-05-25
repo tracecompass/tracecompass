@@ -311,7 +311,7 @@ public class BufferedBlockingQueue<T> implements Iterable<T> {
         @Override
         public T next() {
             if (hasNext()) {
-                T next = fNext;
+                @Nullable T next = fNext;
                 if (next != null) {
                     fNext = null;
                     return next;

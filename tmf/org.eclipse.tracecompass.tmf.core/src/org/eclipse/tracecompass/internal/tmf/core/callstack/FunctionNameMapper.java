@@ -123,7 +123,7 @@ public final class FunctionNameMapper {
         return REMOVE_ZEROS_PATTERN.matcher(address).replaceFirst(""); //$NON-NLS-1$
     }
 
-    private static @Nullable IBinaryParser.IBinaryObject getBinaryObject(File file) {
+    private static IBinaryParser.@Nullable IBinaryObject getBinaryObject(File file) {
         IPath filePath = new Path(file.toString());
 
         /* Get all the available binary parsers */

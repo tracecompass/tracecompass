@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.core.analysis;
 
+import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * Interface that module sources must implement. A module source provides a list
@@ -31,6 +32,6 @@ public interface IAnalysisModuleSource {
      *
      * @return The analysis module helpers in iterable format
      */
-    Iterable<IAnalysisModuleHelper> getAnalysisModules();
+    @NonNull Iterable<IAnalysisModuleHelper> getAnalysisModules();
 
 }

@@ -42,9 +42,9 @@ import com.google.common.collect.ImmutableSet;
  */
 public class TcpLttngEventMatching implements ITmfMatchEventDefinition {
 
-    private static final @NonNull String[] KEY_SEQ = { TcpEventStrings.TRANSPORT_FIELDS, TcpEventStrings.TYPE_TCP, TcpEventStrings.SEQ };
-    private static final @NonNull String[] KEY_ACKSEQ = { TcpEventStrings.TRANSPORT_FIELDS, TcpEventStrings.TYPE_TCP, TcpEventStrings.ACKSEQ };
-    private static final @NonNull String[] KEY_FLAGS = { TcpEventStrings.TRANSPORT_FIELDS, TcpEventStrings.TYPE_TCP, TcpEventStrings.FLAGS };
+    private static final String @NonNull [] KEY_SEQ = { TcpEventStrings.TRANSPORT_FIELDS, TcpEventStrings.TYPE_TCP, TcpEventStrings.SEQ };
+    private static final String @NonNull [] KEY_ACKSEQ = { TcpEventStrings.TRANSPORT_FIELDS, TcpEventStrings.TYPE_TCP, TcpEventStrings.ACKSEQ };
+    private static final String @NonNull [] KEY_FLAGS = { TcpEventStrings.TRANSPORT_FIELDS, TcpEventStrings.TYPE_TCP, TcpEventStrings.FLAGS };
 
     private static final ImmutableSet<String> REQUIRED_EVENTS = ImmutableSet.of(
             TcpEventStrings.NET_DEV_QUEUE,

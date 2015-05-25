@@ -57,7 +57,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
     private @Nullable String fId;
     private boolean fAutomatic = false, fStarted = false;
     private volatile @Nullable ITmfTrace fTrace;
-    private final Map<String, Object> fParameters = new HashMap<>();
+    private final Map<String, @Nullable Object> fParameters = new HashMap<>();
     private final List<String> fParameterNames = new ArrayList<>();
     private final List<IAnalysisOutput> fOutputs = new ArrayList<>();
     private Set<IAnalysisParameterProvider> fParameterProviders = new HashSet<>();
