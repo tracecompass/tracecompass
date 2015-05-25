@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.analysis;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
@@ -32,7 +34,6 @@ import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestHelper;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -125,7 +126,9 @@ public class StatisticsAnalysisBenchmark {
                  */
                 try {
                     for (Entry<String, Long> entry : testCases.entrySet()) {
-                        Assert.assertTrue(map.get(entry.getKey()).equals(entry.getValue()));
+                        Long value = map.get(entry.getKey());
+                        assertNotNull(value);
+                        assertTrue(value.equals(entry.getValue()));
                     }
                 } catch (NullPointerException e) {
                     fail(e.getMessage());

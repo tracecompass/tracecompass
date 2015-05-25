@@ -149,10 +149,11 @@ public class OffsetDialog extends Dialog {
 
         @Override
         protected Object getValue(Object element) {
-            if (map.get(element) == null) {
+            ITmfTimestamp ts = map.get(element);
+            if (ts == null) {
                 return ""; //$NON-NLS-1$
             }
-            return TIME_FORMAT.format(map.get(element).normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
+            return TIME_FORMAT.format(ts.normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
         }
     }
 
@@ -193,10 +194,11 @@ public class OffsetDialog extends Dialog {
 
         @Override
         protected Object getValue(Object element) {
-            if (fOffsetMap.get(element) == 0) {
+            Long offset = fOffsetMap.get(element);
+            if (offset == null || offset == 0) {
                 return ""; //$NON-NLS-1$
             }
-            return OFFSET_FORMAT.format((long) fOffsetMap.get(element));
+            return OFFSET_FORMAT.format(offset.longValue());
         }
     }
 
@@ -345,10 +347,11 @@ public class OffsetDialog extends Dialog {
         column.setLabelProvider(new ColumnLabelProvider() {
             @Override
             public String getText(Object element) {
-                if (fOffsetMap.get(element) != 0) {
-                    return super.getText(OFFSET_FORMAT.format((long) fOffsetMap.get(element)));
+                Long offset = fOffsetMap.get(element);
+                if (offset == null || offset == 0) {
+                    return ""; //$NON-NLS-1$
                 }
-                return ""; //$NON-NLS-1$
+                return super.getText(OFFSET_FORMAT.format(offset.longValue()));
             }
         });
         column.setEditingSupport(new OffsetEditingSupport(fViewer.getViewer(), textCellEditor));

@@ -320,7 +320,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
                 next = next.nextInput;
             }
             if (parentInput != null && parentInput.level > 0) {
-                int parentCount = countMap.get(parentInput);
+                int parentCount = checkNotNull(countMap.get(parentInput));
                 if (parentCount < parentInput.getMaxCount()) {
                     nextInputs.add(parentInput);
                 }

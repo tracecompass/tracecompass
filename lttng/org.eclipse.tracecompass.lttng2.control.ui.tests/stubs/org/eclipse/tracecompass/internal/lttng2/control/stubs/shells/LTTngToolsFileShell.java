@@ -246,7 +246,7 @@ public class LTTngToolsFileShell extends TestCommandShell {
 
     @Override
     public synchronized ICommandResult executeCommand(ICommandInput command, IProgressMonitor monitor) throws ExecutionException {
-        Map<String, ICommandResult> commands = fScenarioMap.get(fScenario);
+        Map<String, ICommandResult> commands = checkNotNull(fScenarioMap.get(fScenario));
         String commandLine = command.toString();
         String fullCommand = commandLine;
 

@@ -361,32 +361,36 @@ public class SDViewPref implements ISDPreferences, IPropertyChangeListener {
 
         for (int i = 0; i < FONT_LIST.length; i++) {
             FontData fontData = PreferenceConverter.getFontData(fPrefStore, FONT_LIST[i]);
-            if (fFontPref.get(FONT_LIST[i]) != null) {
-                fFontPref.get(FONT_LIST[i]).dispose();
+            IFont font = fFontPref.get(FONT_LIST[i]);
+            if (font != null) {
+                font.dispose();
             }
             fFontPref.put(FONT_LIST[i], new FontImpl(display, fontData));
         }
 
         for (int i = 0; i < PREF_BACK_COLOR_LIST.length; i++) {
             RGB rgb = PreferenceConverter.getColor(fPrefStore, PREF_BACK_COLOR_LIST[i] + BACK_COLOR_POSTFIX);
-            if (fBackColorPref.get(PREF_BACK_COLOR_LIST[i] + BACK_COLOR_POSTFIX) != null) {
-                fBackColorPref.get(PREF_BACK_COLOR_LIST[i] + BACK_COLOR_POSTFIX).dispose();
+            IColor color = fBackColorPref.get(PREF_BACK_COLOR_LIST[i] + BACK_COLOR_POSTFIX);
+            if (color != null) {
+                color.dispose();
             }
             fBackColorPref.put(PREF_BACK_COLOR_LIST[i] + BACK_COLOR_POSTFIX, new ColorImpl(display, rgb.red, rgb.green, rgb.blue));
         }
 
         for (int i = 0; i < PREF_FORE_COLOR_LIST.length; i++) {
             RGB rgb = PreferenceConverter.getColor(fPrefStore, PREF_FORE_COLOR_LIST[i] + FORE_COLOR_POSTFIX);
-            if (fForeColorPref.get(PREF_FORE_COLOR_LIST[i] + FORE_COLOR_POSTFIX) != null) {
-                fForeColorPref.get(PREF_FORE_COLOR_LIST[i] + FORE_COLOR_POSTFIX).dispose();
+            IColor color = fForeColorPref.get(PREF_FORE_COLOR_LIST[i] + FORE_COLOR_POSTFIX);
+            if (color != null) {
+                color.dispose();
             }
             fForeColorPref.put(PREF_FORE_COLOR_LIST[i] + FORE_COLOR_POSTFIX, new ColorImpl(display, rgb.red, rgb.green, rgb.blue));
         }
 
         for (int i = 0; i < PREF_TEXT_COLOR_LIST.length; i++) {
             RGB rgb = PreferenceConverter.getColor(fPrefStore, PREF_TEXT_COLOR_LIST[i] + TEXT_COLOR_POSTFIX);
-            if (fTextColorPref.get(PREF_TEXT_COLOR_LIST[i] + TEXT_COLOR_POSTFIX) != null) {
-                fTextColorPref.get(PREF_TEXT_COLOR_LIST[i] + TEXT_COLOR_POSTFIX).dispose();
+            IColor color = fTextColorPref.get(PREF_TEXT_COLOR_LIST[i] + TEXT_COLOR_POSTFIX);
+            if (color != null) {
+                color.dispose();
             }
             fTextColorPref.put(PREF_TEXT_COLOR_LIST[i] + TEXT_COLOR_POSTFIX, new ColorImpl(display, rgb.red, rgb.green, rgb.blue));
         }

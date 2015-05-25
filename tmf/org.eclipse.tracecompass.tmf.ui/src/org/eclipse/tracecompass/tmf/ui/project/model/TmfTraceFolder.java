@@ -123,7 +123,9 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
                 } else {
                     childrenMap.remove(name);
                 }
-                ((TmfProjectModelElement) element).refreshChildren();
+                if (element != null) {
+                    ((TmfProjectModelElement) element).refreshChildren();
+                }
             }
         } catch (CoreException e) {
         }

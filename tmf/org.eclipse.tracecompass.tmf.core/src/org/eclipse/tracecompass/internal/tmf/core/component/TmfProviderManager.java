@@ -50,11 +50,13 @@ public class TmfProviderManager {
      * @param provider
      *            The data provider
      */
-    public static <T extends ITmfEvent> void register(Class<T> eventType, TmfEventProvider provider) {
-        if (fProviders.get(eventType) == null) {
-            fProviders.put(eventType, new ArrayList<TmfEventProvider>());
+    public static synchronized <T extends ITmfEvent> void register(Class<T> eventType, TmfEventProvider provider) {
+        List<TmfEventProvider> typeProviders = fProviders.get(eventType);
+        if (typeProviders == null) {
+            typeProviders = new ArrayList<>();
+            fProviders.put(eventType, typeProviders);
         }
-        fProviders.get(eventType).add(provider);
+        typeProviders.add(provider);
     }
 
     /**
@@ -65,7 +67,7 @@ public class TmfProviderManager {
      * @param provider
      *            The data provider
      */
-    public static <T extends ITmfEvent> void deregister(Class<T> eventType, TmfEventProvider provider) {
+    public static synchronized <T extends ITmfEvent> void deregister(Class<T> eventType, TmfEventProvider provider) {
         List<TmfEventProvider> list = fProviders.get(eventType);
         if (list != null) {
             list.remove(provider);

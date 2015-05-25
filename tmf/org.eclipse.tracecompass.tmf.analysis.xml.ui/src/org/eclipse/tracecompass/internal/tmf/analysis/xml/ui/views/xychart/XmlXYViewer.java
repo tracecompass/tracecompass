@@ -292,16 +292,18 @@ public class XmlXYViewer extends TmfCommonXLineChartViewer {
                     time = time > traceEnd ? traceEnd : time;
 
                     for (int quark : quarks) {
+                        SeriesData data = checkNotNull(fSeriesData.get(quark));
                         try {
-                            yvalue = ss.querySingleState(time, fSeriesData.get(quark).getDisplayQuark()).getStateValue().unboxLong();
-                            fSeriesData.get(quark).setYValue(i, yvalue);
+                            yvalue = ss.querySingleState(time, data.getDisplayQuark()).getStateValue().unboxLong();
+                            data.setYValue(i, yvalue);
                         } catch (TimeRangeException e) {
-                            fSeriesData.get(quark).setYValue(i, 0);
+                            data.setYValue(i, 0);
                         }
                     }
                 }
                 for (int quark : quarks) {
-                    setSeries(fSeriesData.get(quark).getSeriesName(), fSeriesData.get(quark).getYValues());
+                    SeriesData data = checkNotNull(fSeriesData.get(quark));
+                    setSeries(data.getSeriesName(), data.getYValues());
                 }
                 updateDisplay();
             } catch (AttributeNotFoundException | StateValueTypeException e) {

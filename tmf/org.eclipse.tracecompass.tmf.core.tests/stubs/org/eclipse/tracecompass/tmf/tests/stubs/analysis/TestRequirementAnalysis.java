@@ -69,15 +69,17 @@ public class TestRequirementAnalysis extends TmfAbstractAnalysisModule {
         Map<String, TmfAnalysisRequirement> requirements = new HashMap<>();
 
         /* Event type requirement and values */
-        requirements.put(EVENT_TYPE, new TmfAnalysisRequirement(EVENT_TYPE));
-        requirements.get(EVENT_TYPE).addValue(EXIT_SYSCALL, ValuePriorityLevel.MANDATORY);
-        requirements.get(EVENT_TYPE).addValue(SCHED_SWITCH, ValuePriorityLevel.MANDATORY);
-        requirements.get(EVENT_TYPE).addValue(SCHED_WAKEUP, ValuePriorityLevel.MANDATORY);
+        TmfAnalysisRequirement eventReqs = new TmfAnalysisRequirement(EVENT_TYPE);
+        eventReqs.addValue(EXIT_SYSCALL, ValuePriorityLevel.MANDATORY);
+        eventReqs.addValue(SCHED_SWITCH, ValuePriorityLevel.MANDATORY);
+        eventReqs.addValue(SCHED_WAKEUP, ValuePriorityLevel.MANDATORY);
+        requirements.put(EVENT_TYPE, eventReqs);
 
         /* Field type requirement and values */
-        requirements.put(FIELD_TYPE, new TmfAnalysisRequirement(FIELD_TYPE));
-        requirements.get(FIELD_TYPE).addValue(PID, ValuePriorityLevel.MANDATORY);
-        requirements.get(FIELD_TYPE).addValue(TID, ValuePriorityLevel.MANDATORY);
+        TmfAnalysisRequirement fieldReqs = new TmfAnalysisRequirement(FIELD_TYPE);
+        fieldReqs.addValue(PID, ValuePriorityLevel.MANDATORY);
+        fieldReqs.addValue(TID, ValuePriorityLevel.MANDATORY);
+        requirements.put(FIELD_TYPE, fieldReqs);
 
         @SuppressWarnings("null")
         @NonNull Collection<TmfAnalysisRequirement> values = requirements.values();

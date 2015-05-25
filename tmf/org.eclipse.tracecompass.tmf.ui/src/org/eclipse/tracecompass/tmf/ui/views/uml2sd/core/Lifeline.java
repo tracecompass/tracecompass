@@ -147,10 +147,8 @@ public class Lifeline extends GraphNode {
         if (!hasChildren()) {
             return 0;
         }
-        if (getIndexes().get(BasicExecutionOccurrence.EXEC_OCC_TAG) != null) {
-            return getIndexes().get(BasicExecutionOccurrence.EXEC_OCC_TAG).intValue();
-        }
-        return 0;
+        Integer ret = getIndexes().get(BasicExecutionOccurrence.EXEC_OCC_TAG);
+        return (ret == null ? 0 : ret.intValue());
     }
 
     /**

@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.uml2sd.core;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -292,10 +294,9 @@ public class Frame extends BasicFrame {
     public int getFirstVisibleLifeline() {
         if (!hasChildren()) {
             return 0;
-        } else if (getIndexes().get(Lifeline.LIFELINE_TAG) != null) {
-            return getIndexes().get(Lifeline.LIFELINE_TAG).intValue();
         }
-        return 0;
+        Integer ret = getIndexes().get(Lifeline.LIFELINE_TAG);
+        return (ret == null ? 0 : ret.intValue());
     }
 
     /**
@@ -306,10 +307,9 @@ public class Frame extends BasicFrame {
     public int getFirstVisibleSyncMessage() {
         if (!hasChildren()) {
             return 0;
-        } else if (getIndexes().get(SyncMessage.SYNC_MESS_TAG) != null) {
-            return getIndexes().get(SyncMessage.SYNC_MESS_TAG).intValue();
         }
-        return 0;
+        Integer ret = getIndexes().get(SyncMessage.SYNC_MESS_TAG);
+        return (ret == null ? 0 : ret.intValue());
     }
 
     /**
@@ -320,10 +320,9 @@ public class Frame extends BasicFrame {
     public int getFirstVisibleSyncMessageReturn() {
         if (!hasChildren()) {
             return 0;
-        } else if (getIndexes().get(SyncMessageReturn.SYNC_MESS_RET_TAG) != null) {
-            return getIndexes().get(SyncMessageReturn.SYNC_MESS_RET_TAG).intValue();
         }
-        return 0;
+        Integer ret = getIndexes().get(SyncMessageReturn.SYNC_MESS_RET_TAG);
+        return (ret == null ? 0 : ret.intValue());
     }
 
     /**
@@ -334,10 +333,9 @@ public class Frame extends BasicFrame {
     public int getFirstVisibleAsyncMessage() {
         if (!hasChildren()) {
             return 0;
-        } else if (getIndexes().get(AsyncMessage.ASYNC_MESS_TAG) != null) {
-            return getIndexes().get(AsyncMessage.ASYNC_MESS_TAG).intValue();
         }
-        return 0;
+        Integer ret = getIndexes().get(AsyncMessage.ASYNC_MESS_TAG);
+        return (ret == null ? 0 : ret.intValue());
     }
 
     /**
@@ -348,10 +346,9 @@ public class Frame extends BasicFrame {
     public int getFirstVisibleAsyncMessageReturn() {
         if (!hasChildren()) {
             return 0;
-        } else if (getIndexes().get(AsyncMessageReturn.ASYNC_MESS_RET_TAG) != null) {
-            return getIndexes().get(AsyncMessageReturn.ASYNC_MESS_RET_TAG).intValue();
         }
-        return 0;
+        Integer ret = getIndexes().get(AsyncMessageReturn.ASYNC_MESS_RET_TAG);
+        return (ret == null ? 0 : ret.intValue());
     }
 
     /**
@@ -644,9 +641,10 @@ public class Frame extends BasicFrame {
         if (getIndexes().size() == 0) {
             return;
         }
-        int lifeLineDrawIndex = getIndexes().get(Lifeline.LIFELINE_TAG).intValue();
-        for (int i = lifeLineDrawIndex; i < getNodeMap().get(Lifeline.LIFELINE_TAG).size(); i = i + lifelineArryStep) {
-            Lifeline toDraw = (Lifeline) getNodeMap().get(Lifeline.LIFELINE_TAG).get(i);
+        int lifeLineDrawIndex = checkNotNull(getIndexes().get(Lifeline.LIFELINE_TAG)).intValue();
+        List<GraphNode> nodeList = checkNotNull(getNodeMap().get(Lifeline.LIFELINE_TAG));
+        for (int i = lifeLineDrawIndex; i < nodeList.size(); i = i + lifelineArryStep) {
+            Lifeline toDraw = (Lifeline) nodeList.get(i);
             if (toDraw.getX() - Metrics.LIFELINE_SPACING / 2 > context.getContentsX() + context.getVisibleWidth()) {
                 break;
             }
@@ -691,8 +689,9 @@ public class Frame extends BasicFrame {
         List<SDTimeEvent> timeArray = super.buildTimeArray();
         fExecutionOccurrencesWithTime = null;
         if (getLifelines() != null) {
-            for (int i = 0; i < getNodeMap().get(Lifeline.LIFELINE_TAG).size(); i++) {
-                Lifeline lifeline = (Lifeline) getNodeMap().get(Lifeline.LIFELINE_TAG).get(i);
+            List<GraphNode> nodeList = checkNotNull(getNodeMap().get(Lifeline.LIFELINE_TAG));
+            for (int i = 0; i < nodeList.size(); i++) {
+                Lifeline lifeline = (Lifeline) nodeList.get(i);
                 if (lifeline.hasTimeInfo() && lifeline.getExecutions() != null) {
                     for (Iterator<GraphNode> j = lifeline.getExecutions().iterator(); j.hasNext();) {
                         GraphNode o = j.next();

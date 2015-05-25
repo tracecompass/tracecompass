@@ -14,6 +14,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.filter;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -718,7 +720,7 @@ class FilterViewer extends Composite {
             fTypeCombo.addModifyListener(new ModifyListener() {
                 @Override
                 public void modifyText(ModifyEvent e) {
-                    TraceTypeHelper helper = fTraceTypeMap.get(fTypeCombo.getText());
+                    TraceTypeHelper helper = checkNotNull(fTraceTypeMap.get(fTypeCombo.getText()));
                     fNode.setTraceTypeId(helper.getTraceTypeId());
                     fNode.setTraceClass(helper.getTraceClass());
                     fNode.setName(fTypeCombo.getText());

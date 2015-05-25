@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.internal.pcap.core.stream;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -83,7 +85,7 @@ public class PacketStreamBuilder {
      */
     public synchronized @Nullable PacketStream getStream(ProtocolEndpoint endpointA, ProtocolEndpoint endpointB) {
         ProtocolEndpointPair set = new ProtocolEndpointPair(endpointA, endpointB);
-        int id = fIDs.get(set);
+        Integer id = checkNotNull(fIDs.get(set));
         return fStreams.get(id);
     }
 
@@ -113,12 +115,14 @@ public class PacketStreamBuilder {
             ProtocolEndpointPair endpointSet = new ProtocolEndpointPair(newPacket);
             if (!fIDs.containsKey(endpointSet)) {
                 fIDs.put(endpointSet, fCurrentId);
-                fStreams.put(fCurrentId, new PacketStream(fProtocol, fCurrentId, endpointSet));
-                fStreams.get(fCurrentId).add(packet);
+
+                PacketStream stream = new PacketStream(fProtocol, fCurrentId, endpointSet);
+                stream.add(packet);
+                fStreams.put(fCurrentId, stream);
                 fCurrentId++;
             } else {
                 Integer id = fIDs.get(endpointSet);
-                fStreams.get(id).add(packet);
+                checkNotNull(fStreams.get(id)).add(packet);
             }
         }
         return;

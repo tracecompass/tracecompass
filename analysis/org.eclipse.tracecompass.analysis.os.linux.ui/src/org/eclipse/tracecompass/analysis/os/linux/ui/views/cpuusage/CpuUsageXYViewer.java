@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.ui.views.cpuusage;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -183,11 +185,13 @@ public class CpuUsageXYViewer extends TmfCommonXLineChartViewer {
 
                         if (entry.getKey().equals(stringSelectedThread)) {
                             /* This is the total cpu usage for a thread */
-                            fYValues.get(entry.getKey())[i] = (double) cpuEntry / (double) (time - prevTime) * 100;
+                            double[] key = checkNotNull(fYValues.get(entry.getKey()));
+                            key[i] = (double) cpuEntry / (double) (time - prevTime) * 100;
                         }
 
                     }
-                    fYValues.get(Messages.CpuUsageXYViewer_Total)[i] = (double) totalCpu / (double) (time - prevTime) * 100;
+                    double[] key = checkNotNull(fYValues.get(Messages.CpuUsageXYViewer_Total));
+                    key[i] = (double) totalCpu / (double) (time - prevTime) * 100;
                     prevTime = time;
                 }
                 for (Entry<String, double[]> entry : fYValues.entrySet()) {

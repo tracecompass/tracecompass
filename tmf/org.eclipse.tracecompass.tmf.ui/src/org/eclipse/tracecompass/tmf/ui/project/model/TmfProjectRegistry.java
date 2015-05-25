@@ -76,8 +76,8 @@ public class TmfProjectRegistry implements IResourceChangeListener {
     public static synchronized TmfProjectElement getProject(IProject project, boolean force) {
         TmfProjectElement element = registry.get(project);
         if (element == null && force) {
-            registry.put(project, new TmfProjectElement(project.getName(), project, null));
-            element = registry.get(project);
+            element = new TmfProjectElement(project.getName(), project, null);
+            registry.put(project, element);
             // force the model to be populated
             element.refreshChildren();
         }

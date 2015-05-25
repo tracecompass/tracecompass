@@ -162,7 +162,8 @@ public class TmfAnalysisManager {
             if (!fParameterProviders.containsKey(analysisId)) {
                 fParameterProviders.put(analysisId, new ArrayList<Class<? extends IAnalysisParameterProvider>>());
             }
-            fParameterProviders.get(analysisId).add(paramProvider);
+            /* We checked via containsKey() above, get() should not return null */
+            checkNotNull(fParameterProviders.get(analysisId)).add(paramProvider);
         }
     }
 
@@ -181,14 +182,16 @@ public class TmfAnalysisManager {
             if (!fParameterProviders.containsKey(module.getId())) {
                 return providerList;
             }
-            for (Class<? extends IAnalysisParameterProvider> providerClass : fParameterProviders.get(module.getId())) {
+            /* We checked  via containsKey, get() should not return null */
+            List<Class<? extends IAnalysisParameterProvider>> parameterProviders = checkNotNull(fParameterProviders.get(module.getId()));
+            for (Class<? extends IAnalysisParameterProvider> providerClass : parameterProviders) {
                 try {
                     IAnalysisParameterProvider provider = fParamProviderInstances.get(providerClass);
                     if (provider == null) {
                         provider = providerClass.newInstance();
                         fParamProviderInstances.put(providerClass, provider);
                     }
-                    if (provider != null && provider.appliesToTrace(trace)) {
+                    if (provider.appliesToTrace(trace)) {
                         providerList.add(provider);
                     }
                 } catch (IllegalArgumentException | SecurityException | InstantiationException | IllegalAccessException e) {

@@ -13,6 +13,8 @@
 
 package org.eclipse.tracecompass.tmf.analysis.xml.ui.views.timegraph;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -87,8 +89,8 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
             int value = tcEvent.getValue();
 
             if (entry.getType() == EntryDisplayType.DISPLAY) {
-                Integer index = stateIndex.get(value);
-                String rgb = stateValues.get(index).getStateString();
+                Integer index = checkNotNull(stateIndex.get(value));
+                String rgb = stateValues.get(index.intValue()).getStateString();
                 return rgb;
             }
             return null;

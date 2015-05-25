@@ -372,6 +372,7 @@ public class CTFTraceTest {
         String key = "test";
         fixture.addEnvironmentVar(key, key);
         String result = fixture.getEnvironment().get(key);
+        assertNotNull(result);
         assertTrue(result.equals(key));
     }
 

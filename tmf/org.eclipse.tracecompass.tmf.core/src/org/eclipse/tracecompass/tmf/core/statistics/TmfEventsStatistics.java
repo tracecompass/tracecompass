@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.core.statistics;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -214,7 +216,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
 
         private void incrementStats(String key, long count) {
             if (stats.containsKey(key)) {
-                long curValue = stats.get(key);
+                long curValue = checkNotNull(stats.get(key));
                 stats.put(key, curValue + count);
             } else {
                 stats.put(key, count);
@@ -275,7 +277,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
         }
 
         private void incrementValue(Long key) {
-            long value = results.get(key);
+            long value = checkNotNull(results.get(key));
             value++;
             results.put(key, value);
         }

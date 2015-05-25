@@ -417,10 +417,9 @@ public class SelectTracesWizardPage extends WizardPage {
 
                 // Remove traces that were unchecked (thus left in
                 // fPreviousTraces)
-                keys = fPreviousTraces.keySet();
-                for (String key : keys) {
+                for (Map.Entry<String, TmfTraceElement> entry : fPreviousTraces.entrySet()) {
                     ModalContext.checkCanceled(progressMonitor);
-                    TmfTraceElement trace = fPreviousTraces.get(key);
+                    TmfTraceElement trace = entry.getValue();
                     subMonitor.setTaskName(Messages.SelectTracesWizardPage_TraceRemovalTask + " " + trace.getElementPath()); //$NON-NLS-1$
 
                     try {

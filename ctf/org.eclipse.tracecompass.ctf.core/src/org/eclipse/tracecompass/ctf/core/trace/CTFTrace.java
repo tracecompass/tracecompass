@@ -221,7 +221,11 @@ public class CTFTrace implements IDefinitionScope {
      * @return The list of event declarations
      */
     public Collection<IEventDeclaration> getEventDeclarations(Long streamId) {
-        return fStreams.get(streamId).getEventDeclarations();
+        CTFStream stream = fStreams.get(streamId);
+        if (stream == null) {
+            return null;
+        }
+        return stream.getEventDeclarations();
     }
 
     /**
@@ -798,14 +802,12 @@ public class CTFTrace implements IDefinitionScope {
      *             The file must exist
      */
     public void addStream(long id, File streamFile) throws CTFException {
-        CTFStream stream = null;
         final File file = streamFile;
         if (file == null) {
             throw new CTFException("cannot create a stream with no file"); //$NON-NLS-1$
         }
-        if (fStreams.containsKey(id)) {
-            stream = fStreams.get(id);
-        } else {
+        CTFStream stream = fStreams.get(id);
+        if (stream == null) {
             stream = new CTFStream(this);
             fStreams.put(id, stream);
         }

@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.uml2sd.core;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -553,7 +555,7 @@ public class BasicFrame extends GraphNode {
         List<SDTimeEvent> timeArray = new ArrayList<>();
         while (it.hasNext()) {
             String nodeType = it.next();
-            List<GraphNode> list = getNodeMap().get(nodeType);
+            List<GraphNode> list = checkNotNull(getNodeMap().get(nodeType));
             for (int i = 0; i < list.size(); i++) {
                 Object timedNode = list.get(i);
                 if ((timedNode instanceof ITimeRange) && ((ITimeRange) timedNode).hasTimeInfo()) {

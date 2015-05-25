@@ -13,6 +13,8 @@
 
 package org.eclipse.tracecompass.internal.lttng2.ust.ui.views.memusage;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,11 +142,13 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
                     time = time > traceEnd ? traceEnd : time;
 
                     for (int quark : tidQuarks) {
+                        double[] values = checkNotNull(fYValues.get(quark));
                         try {
-                            yvalue = ss.querySingleState(time, fMemoryQuarks.get(quark)).getStateValue().unboxLong() / BYTES_TO_KB;
-                            fYValues.get(quark)[i] = yvalue;
+                            Integer memQuark = checkNotNull(fMemoryQuarks.get(quark));
+                            yvalue = ss.querySingleState(time, memQuark.intValue()).getStateValue().unboxLong() / BYTES_TO_KB;
+                            values[i] = yvalue;
                         } catch (TimeRangeException e) {
-                            fYValues.get(quark)[i] = 0;
+                            values[i] = 0;
                         }
                     }
                 }

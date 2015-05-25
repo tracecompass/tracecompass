@@ -410,8 +410,8 @@ public final class TmfTraceType {
      */
     public static List<String> getTraceCategories() {
         List<String> categoryNames = new ArrayList<>();
-        for (String key : TRACE_TYPES.keySet()) {
-            final String categoryName = TRACE_TYPES.get(key).getCategoryName();
+        for (Map.Entry<String, TraceTypeHelper> entry : TRACE_TYPES.entrySet()) {
+            final String categoryName = entry.getValue().getCategoryName();
             if (!categoryNames.contains(categoryName)) {
                 categoryNames.add(categoryName);
             }

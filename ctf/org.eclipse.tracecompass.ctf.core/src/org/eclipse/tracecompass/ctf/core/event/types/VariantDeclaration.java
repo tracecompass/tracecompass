@@ -239,7 +239,7 @@ public class VariantDeclaration extends Declaration {
                     return false;
                 }
                 IDeclaration field2 = other.fFields.get(field.getKey());
-                if (!field2.isBinaryEquivalent(field.getValue())) {
+                if ((field2 == null) || (!field2.isBinaryEquivalent(field.getValue()))) {
                     return false;
                 }
             }

@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.internal.tmf.ui.parsers.wizards;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -733,7 +735,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                                     }
                                 }
                             } else {
-                                if (countMap.get(currentInput) >= currentInput.getMinCount()) {
+                                if (checkNotNull(countMap.get(currentInput)) >= currentInput.getMinCount()) {
                                     List<InputLine> nextInputs = currentInput.getNextInputs(countMap);
                                     if (nextInputs.size() == 0 || nextInputs.get(nextInputs.size() - 1).getMinCount() == 0) {
                                         for (InputLine input : definition.inputs) {
@@ -761,7 +763,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                                             if (countMap.get(currentInput) == null) {
                                                 countMap.put(currentInput, 1);
                                             } else {
-                                                countMap.put(currentInput, countMap.get(currentInput) + 1);
+                                                countMap.put(currentInput, checkNotNull(countMap.get(currentInput)) + 1);
                                             }
                                             Iterator<InputLine> iter = countMap.keySet().iterator();
                                             while (iter.hasNext()) {
@@ -774,7 +776,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                                                 currentInput = currentInput.childrenInputs.get(0);
                                                 countMap.put(currentInput, 0);
                                             } else {
-                                                if (countMap.get(currentInput) >= currentInput.getMaxCount()) {
+                                                if (checkNotNull(countMap.get(currentInput)) >= currentInput.getMaxCount()) {
                                                     if (currentInput.getNextInputs(countMap).size() > 0) {
                                                         currentInput = currentInput.getNextInputs(countMap).get(0);
                                                         if (countMap.get(currentInput) == null) {
@@ -807,12 +809,12 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                                         inputText.setStyleRange(new StyleRange(rawPos, length,
                                                 COLOR_BLACK, COLOR_LIGHT_YELLOW, SWT.ITALIC));
                                         updatePreviewLine(currentInput, matcher, data, rawPos, rootLineMatches);
-                                        countMap.put(currentInput, countMap.get(currentInput) + 1);
+                                        countMap.put(currentInput, checkNotNull(countMap.get(currentInput)) + 1);
                                         if (currentInput.childrenInputs != null && currentInput.childrenInputs.size() > 0) {
                                             currentInput = currentInput.childrenInputs.get(0);
                                             countMap.put(currentInput, 0);
                                         } else {
-                                            if (countMap.get(currentInput) >= currentInput.getMaxCount()) {
+                                            if (checkNotNull(countMap.get(currentInput)) >= currentInput.getMaxCount()) {
                                                 if (currentInput.getNextInputs(countMap).size() > 0) {
                                                     currentInput = currentInput.getNextInputs(countMap).get(0);
                                                     if (countMap.get(currentInput) == null) {

@@ -112,8 +112,8 @@ public class StreamListAnalysis extends TmfAbstractAnalysisModule {
                     return;
                 }
                 PcapEvent event = (PcapEvent) data;
-                for (TmfPcapProtocol protocol : fBuilders.keySet()) {
-                    fBuilders.get(protocol).addEventToStream(event);
+                for (Map.Entry<TmfPcapProtocol, TmfPacketStreamBuilder> entry : fBuilders.entrySet()) {
+                    entry.getValue().addEventToStream(event);
                 }
 
             }
