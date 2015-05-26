@@ -15,19 +15,27 @@ package org.eclipse.tracecompass.lttng2.control.ui.tests.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.net.URL;
 import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.IDomainInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.IEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISessionInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceChannelOutputType;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEventType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.SessionInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.ILttngControlService;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlServiceConstants;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlServiceMI;
+import org.junit.Test;
 
 /**
  * @author ejorajo
@@ -36,6 +44,8 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngCo
 public class LTTngControlServiceMiTest extends LTTngControlServiceTest {
 
     private static final String MI_TEST_STREAM = "LTTngServiceMiTest.cfg";
+
+    private static final String SCEN_SESSION_WITH_SYSCALLS = "GetSessionWithSyscalls";
 
     @Override
     protected ILttngControlService getControlService() {
@@ -145,5 +155,57 @@ public class LTTngControlServiceMiTest extends LTTngControlServiceTest {
     @Override
     public void testCreateSnapshotSession2_5() {
         // not applicable for MI
+    }
+
+    /**
+     * Tests the listing of syscalls
+     */
+    @Test
+    public void testListSycallEvents() {
+        try {
+            fShell.setScenario(SCEN_SESSION_WITH_SYSCALLS);
+            ISessionInfo session = fService.getSession("mysession", new NullProgressMonitor());
+
+            // Verify Session
+            assertNotNull(session);
+            assertEquals("mysession", session.getName());
+            assertEquals("/home/user/lttng-traces/mysession-20120129-084256", session.getSessionPath());
+            assertEquals(TraceSessionState.INACTIVE, session.getSessionState());
+
+            IDomainInfo[] domains = session.getDomains();
+            assertNotNull(domains);
+            assertEquals(1, domains.length);
+
+            // Verify Kernel domain
+            assertEquals("Kernel", domains[0].getName());
+            IChannelInfo[] channels =  domains[0].getChannels();
+            assertNotNull(channels);
+            assertEquals(1, channels.length);
+
+            // Verify Kernel's channel0
+            assertEquals("channel0", channels[0].getName());
+            assertEquals(4, channels[0].getNumberOfSubBuffers());
+            assertEquals("splice()", channels[0].getOutputType().getInName());
+            assertEquals(TraceChannelOutputType.SPLICE, channels[0].getOutputType());
+            assertEquals(false, channels[0].isOverwriteMode());
+            assertEquals(200, channels[0].getReadTimer());
+            assertEquals(TraceEnablement.ENABLED, channels[0].getState());
+            assertEquals(262144, channels[0].getSubBufferSize());
+            assertEquals(0, channels[0].getSwitchTimer());
+
+            // Verify event info
+            IEventInfo[] channel0Events = channels[0].getEvents();
+            assertNotNull(channel0Events);
+            assertEquals(2, channel0Events.length);
+            assertEquals("read", channel0Events[0].getName());
+            assertEquals(TraceEventType.SYSCALL, channel0Events[0].getEventType());
+            assertEquals(TraceEnablement.ENABLED, channel0Events[0].getState());
+
+            assertEquals("write", channel0Events[1].getName());
+            assertEquals(TraceEventType.SYSCALL, channel0Events[1].getEventType());
+            assertEquals(TraceEnablement.ENABLED, channel0Events[1].getState());
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
     }
 }
