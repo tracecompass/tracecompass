@@ -900,12 +900,6 @@ public class LTTngControlServiceMI extends LTTngControlService {
                     }
                 }
 
-                // Syscalls does not have name.
-                // Let put one to make sure this is user friendly via UI
-                if (eventInfo.getEventType().equals(TraceEventType.SYSCALL)) {
-                    eventInfo.setName(TraceEventType.SYSCALL.getInName());
-                }
-
                 // Add the event
                 events.add(eventInfo);
             }
