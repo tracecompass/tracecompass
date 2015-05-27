@@ -1462,8 +1462,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 // Header row selected
                 if ((item != null) && (fTable.indexOf(item) == 0)) {
 
-                    // Icon selected
-                    if (item.getImageBounds(0).contains(point)) {
+                    // Margin column selected
+                    if (item.getBounds(0).contains(point)) {
                         if (fHeaderState == HeaderState.SEARCH) {
                             fHeaderState = HeaderState.FILTER;
                         } else if (fHeaderState == HeaderState.FILTER) {
