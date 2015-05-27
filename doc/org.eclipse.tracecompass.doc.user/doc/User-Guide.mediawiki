@@ -1598,6 +1598,23 @@ The states flow is usable with the mouse. The following actions are set:
 
 When the current time indicator is changed (when clicking in the states flow), all the other views are '''synchronized'''. For example, the [[#LTTng Kernel Events Editor|Events Editor]] will show the event matching the current time indicator. The reverse behaviour is also implemented: selecting an event within the Events View will update the Control Flow View current time indicator.
 
+==== Using the keyboard ====
+
+The states flow is usable with the keyboard. The following actions are set:
+*'''arrow-right key''': selects the next state for the selected process.
+*'''arrow-left key''': selects the previous state for the selected process.
+*'''Shift + arrow-right key''': updates the selection end time of the current selection range by selecting the next state of the current process.
+*'''Shift + arrow-left key''': updates the selection end time of the current selection range by selecting the previous state of the current process.
+*'''arrow-down''': selects the next process
+*'''arrow-up''': selects the previous process
+*'''Page Down''': selects the process down one page
+*'''Page Up''': selects the process up one page
+*'''Home''': selects the first process
+*'''End''': selects the last process
+*'''Enter''': toggles the expansion state of the current process in the tree
+
+When the selection indicators are changed, all the other views are '''synchronized'''. For example, the [[#LTTng Kernel Events Editor|Events Editor]] will show the event matching the current time indicator. The reverse behaviour is also implemented: selecting an event within the Events View will update the Control Flow View current time indicator.
+
 ==== Incomplete regions ====
 
 You'll notice '''small dots''' over the colored bars at some places:
@@ -1654,11 +1671,11 @@ The Control Flow View '''toolbar''', located at the top right of the view, has s
 |-
 | [[Image:images/prev_event.gif]]
 | Select Previous Event
-| Selects the previous state for the selected process
+| Selects the previous state for the selected process. Pressing the '''Shift''' key at the same time will update the selection end time of the current selection range.
 |-
 | [[Image:images/next_event.gif]]
 | Select Next Event
-| Selects the next state for the selected process
+| Selects the next state for the selected process. Pressing the '''Shift''' key at the same time will update the selection end time of the current selection range.
 |-
 | [[Image:images/prev_menu.gif]]
 | Select Previous Process
@@ -1682,11 +1699,11 @@ The Control Flow View '''toolbar''', located at the top right of the view, has s
 |-
 | [[Image:images/follow_arrow_bwd.gif]]
 | Follow CPU Backward
-| Selects the previous state following CPU execution across processes
+| Selects the previous state following CPU execution across processes. Pressing the '''Shift''' key at the same time will update the selection end time of the current selection range.
 |-
 | [[Image:images/follow_arrow_fwd.gif]]
 | Follow CPU Forward
-| Selects the next state following CPU execution across processes
+| Selects the next state following CPU execution across processes. Pressing the '''Shift''' key at the same time will update the selection end time of the current selection range.
 |}
 
 == Resources View ==
@@ -1710,7 +1727,7 @@ To go through the state of a resource, you first have to select the resource and
 
 [[Image:images/RV_infobox1.png|Shows the state of an IRQ]]
 
-Then, by selecting '''Next Event''', it will show the next state transition and the event that occured at this time.
+Then, by selecting '''Next Event''', it will show the next state transition and the event that occurred at this time.
 
 [[Image:images/RV_infobox2.png|Shows the next state of the IRQ]]
 
@@ -1718,7 +1735,7 @@ This view is also synchronized with the others : [[#Histogram_View | Histogram V
 
 === Navigation ===
 
-See Control Flow View's '''[[#Using_the_mouse | Using the mouse]]''' and '''[[#Zoom_region | Zoom region]]'''.
+See Control Flow View's '''[[#Using_the_mouse | Using the mouse]]''', '''[[#Using_the_keyboard | Using the keyboard]]''' and '''[[#Zoom_region | Zoom region]]'''.
 
 === Incomplete regions ===
 
@@ -1739,11 +1756,11 @@ The Resources View '''toolbar''', located at the top right of the view, has shor
 |-
 | [[Image:images/prev_event.gif]]
 | Select Previous Event
-| Selects the previous state for the selected resource
+| Selects the previous state for the selected resource. Pressing the '''Shift''' key at the same time will update the selection end time of the current selection range.
 |-
 | [[Image:images/next_event.gif]]
 | Select Next Event
-| Selects the next state for the selected resource
+| Selects the next state for the selected resource. Pressing the '''Shift''' key at the same time will update the selection end time of the current selection range.
 |-
 | [[Image:images/prev_menu.gif]]
 | Select Previous Resource
@@ -1839,7 +1856,7 @@ Shift-clicking on the time graph will select a time range. When the selection is
 
 Double-clicking on a call stack event will zoom the time graph to the selected function's range of execution.
 
-Clicking the '''Select Next Event''' or '''Select Previous Event''' or using the left and right arrows will navigate to the next or previous call stack event, and select the function currently at the top of the call stack.
+Clicking the '''Select Next Event''' or '''Select Previous Event''' or using the left and right arrows will navigate to the next or previous call stack event, and select the function currently at the top of the call stack. Note that pressing the '''Shift''' key at the same time will update the selection end time of the current selection.
 
 Clicking the '''Import Mapping File''' ([[Image:images/import.gif]]) icon will open a file selection dialog, allowing you to import a text file containing mappings from function addresses to function names. If the callstack provider for the current trace type only provides function addresses, a mapping file will be required to get the function names in the view. See the following sections for an example with LTTng-UST traces.
 
