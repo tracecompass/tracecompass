@@ -73,11 +73,6 @@ public class IOStructGen {
     private static final @NonNull String BASE = "base"; //$NON-NLS-1$
     private static final @NonNull String SIZE = "size"; //$NON-NLS-1$
     private static final @NonNull String SIGNED = "signed"; //$NON-NLS-1$
-    private static final @NonNull String LINE = "line"; //$NON-NLS-1$
-    private static final @NonNull String FILE = "file"; //$NON-NLS-1$
-    private static final @NonNull String IP = "ip"; //$NON-NLS-1$
-    private static final @NonNull String FUNC = "func"; //$NON-NLS-1$
-    private static final @NonNull String NAME = "name"; //$NON-NLS-1$
     private static final @NonNull String EMPTY_STRING = ""; //$NON-NLS-1$
     private static final int INTEGER_BASE_16 = 16;
     private static final int INTEGER_BASE_10 = 10;
@@ -201,9 +196,6 @@ public class IOStructGen {
             case CTFParser.ENV:
                 parseEnvironment(child);
                 break;
-            case CTFParser.CALLSITE:
-                parseCallsite(child);
-                break;
             default:
                 throw childTypeError(child);
             }
@@ -253,9 +245,6 @@ public class IOStructGen {
             case CTFParser.ENV:
                 parseEnvironment(child);
                 break;
-            case CTFParser.CALLSITE:
-                parseCallsite(child);
-                break;
             default:
                 throw childTypeError(child);
             }
@@ -266,40 +255,6 @@ public class IOStructGen {
 
     private void resetScope() {
         fScope = fRoot;
-    }
-
-    private void parseCallsite(CommonTree callsite) {
-
-        List<CommonTree> children = callsite.getChildren();
-        String name = null;
-        String funcName = null;
-        long lineNumber = -1;
-        long ip = -1;
-        String fileName = null;
-
-        for (CommonTree child : children) {
-            String left;
-            /* this is a regex to find the leading and trailing quotes */
-            final String regex = "^\"|\"$"; //$NON-NLS-1$
-            /*
-             * this is to replace the previous quotes with nothing...
-             * effectively deleting them
-             */
-            final String nullString = EMPTY_STRING;
-            left = child.getChild(0).getChild(0).getChild(0).getText();
-            if (left.equals(NAME)) {
-                name = child.getChild(1).getChild(0).getChild(0).getText().replaceAll(regex, nullString);
-            } else if (left.equals(FUNC)) {
-                funcName = child.getChild(1).getChild(0).getChild(0).getText().replaceAll(regex, nullString);
-            } else if (left.equals(IP)) {
-                ip = Long.decode(child.getChild(1).getChild(0).getChild(0).getText());
-            } else if (left.equals(FILE)) {
-                fileName = child.getChild(1).getChild(0).getChild(0).getText().replaceAll(regex, nullString);
-            } else if (left.equals(LINE)) {
-                lineNumber = Long.parseLong(child.getChild(1).getChild(0).getChild(0).getText());
-            }
-        }
-        fTrace.addCallsite(name, funcName, ip, fileName, lineNumber);
     }
 
     private void parseEnvironment(CommonTree environment) {

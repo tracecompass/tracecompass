@@ -386,29 +386,4 @@ public class CTFTraceTest {
         String result = fixture.getEnvironment().get(key);
         assertNotNull(result);
     }
-
-    /**
-     * Test for getCallsite(eventName, ip)
-     *
-     * @throws CTFException
-     *             not expected
-     */
-    @Test
-    public void callsitePosition() throws CTFException {
-        long ip1 = 2;
-        long ip2 = 5;
-        long ip3 = 7;
-        CTFTrace callsiteTest = testTrace.getTraceFromFile();
-        callsiteTest.addCallsite("testEvent", null, ip1, null, 23);
-        callsiteTest.addCallsite("testEvent", null, ip2, null, 50);
-        callsiteTest.addCallsite("testEvent", null, ip3, null, 15);
-
-        assertEquals(2, (callsiteTest.getCallsite("testEvent", 1)).getIp());
-        assertEquals(2, (callsiteTest.getCallsite("testEvent", 2)).getIp());
-        assertEquals(5, (callsiteTest.getCallsite("testEvent", 3)).getIp());
-        assertEquals(5, (callsiteTest.getCallsite("testEvent", 5)).getIp());
-        assertEquals(7, (callsiteTest.getCallsite("testEvent", 6)).getIp());
-        assertEquals(7, (callsiteTest.getCallsite("testEvent", 7)).getIp());
-        assertEquals(7, (callsiteTest.getCallsite("testEvent", 8)).getIp());
-    }
 }

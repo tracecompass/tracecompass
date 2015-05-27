@@ -32,9 +32,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.CTFException;
-import org.eclipse.tracecompass.ctf.core.event.CTFCallsite;
 import org.eclipse.tracecompass.ctf.core.event.CTFClock;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
@@ -71,7 +69,6 @@ import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEventType;
 import org.eclipse.tracecompass.tmf.ctf.core.event.aspect.CtfChannelAspect;
 import org.eclipse.tracecompass.tmf.ctf.core.event.aspect.CtfCpuAspect;
-import org.eclipse.tracecompass.tmf.ctf.core.event.lookup.CtfTmfCallsite;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -387,38 +384,6 @@ public class CtfTmfTrace extends TmfTrace
             }
         }
         return super.getHostId();
-    }
-
-    /**
-     * Get the first callsite that matches the event name
-     *
-     * @param eventName The event name to look for
-     * @return The best callsite candidate
-     */
-    public @Nullable CtfTmfCallsite getCallsite(String eventName) {
-        CTFCallsite callsite = fTrace.getCallsite(eventName);
-        if (callsite != null) {
-            return new CtfTmfCallsite(callsite);
-        }
-        return null;
-    }
-
-    /**
-     * Get the closest matching callsite for given event name and instruction
-     * pointer
-     *
-     * @param eventName
-     *            The event name
-     * @param ip
-     *            The instruction pointer
-     * @return The closest matching callsite
-     */
-    public @Nullable CtfTmfCallsite getCallsite(String eventName, long ip) {
-        CTFCallsite calliste = fTrace.getCallsite(eventName, ip);
-        if (calliste != null) {
-            return new CtfTmfCallsite(calliste);
-        }
-        return null;
     }
 
     /**

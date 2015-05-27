@@ -56,10 +56,6 @@ COMPLEXTOK       : '_Complex' ;
 IMAGINARYTOK     : '_Imaginary' ;
 ENVTOK           : 'env' ;
 CLOCKTOK         : 'clock' ;
-/*
- * Callsite tokens (CTF v1.9)
- */
-CALLSITETOK      : 'callsite' ;
 
 
 /*

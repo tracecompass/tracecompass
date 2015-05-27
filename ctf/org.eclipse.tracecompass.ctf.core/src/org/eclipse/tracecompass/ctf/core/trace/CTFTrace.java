@@ -30,12 +30,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.UUID;
 
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.CTFStrings;
-import org.eclipse.tracecompass.ctf.core.event.CTFCallsite;
 import org.eclipse.tracecompass.ctf.core.event.CTFClock;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
@@ -49,7 +47,6 @@ import org.eclipse.tracecompass.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
 import org.eclipse.tracecompass.internal.ctf.core.SafeMappedByteBuffer;
-import org.eclipse.tracecompass.internal.ctf.core.event.CTFCallsiteComparator;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.MetadataStrings;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.exceptions.ParseException;
 import org.eclipse.tracecompass.internal.ctf.core.trace.Utils;
@@ -137,14 +134,6 @@ public class CTFTrace implements IDefinitionScope {
     /** Handlers for the metadata files */
     private static final FileFilter METADATA_FILE_FILTER = new MetadataFileFilter();
     private static final Comparator<File> METADATA_COMPARATOR = new MetadataComparator();
-
-    /** Callsite helpers */
-    private CTFCallsiteComparator fCtfCallsiteComparator = new CTFCallsiteComparator();
-
-    private Map<String, TreeSet<CTFCallsite>> fCallsitesByName = new HashMap<>();
-
-    /** Callsite helpers */
-    private TreeSet<CTFCallsite> fCallsitesByIP = new TreeSet<>();
 
     private final DeclarationScope fScope = new DeclarationScope(null, MetadataStrings.TRACE);
 
@@ -796,100 +785,6 @@ public class CTFTrace implements IDefinitionScope {
             retVal = nanos;
         }
         return retVal - getOffset();
-    }
-
-    /**
-     * Adds a callsite
-     *
-     * @param eventName
-     *            the event name of the callsite
-     * @param funcName
-     *            the name of the callsite function
-     * @param ip
-     *            the ip of the callsite
-     * @param fileName
-     *            the filename of the callsite
-     * @param lineNumber
-     *            the line number of the callsite
-     */
-    public void addCallsite(String eventName, String funcName, long ip,
-            String fileName, long lineNumber) {
-        final CTFCallsite cs = new CTFCallsite(eventName, funcName, ip,
-                fileName, lineNumber);
-        TreeSet<CTFCallsite> csl = fCallsitesByName.get(eventName);
-        if (csl == null) {
-            csl = new TreeSet<>(fCtfCallsiteComparator);
-            fCallsitesByName.put(eventName, csl);
-        }
-
-        csl.add(cs);
-
-        fCallsitesByIP.add(cs);
-    }
-
-    /**
-     * Gets the set of callsites associated to an event name. O(1)
-     *
-     * @param eventName
-     *            the event name
-     * @return the callsite set can be empty
-     */
-    public TreeSet<CTFCallsite> getCallsiteCandidates(String eventName) {
-        TreeSet<CTFCallsite> retVal = fCallsitesByName.get(eventName);
-        if (retVal == null) {
-            retVal = new TreeSet<>(fCtfCallsiteComparator);
-        }
-        return retVal;
-    }
-
-    /**
-     * The I'm feeling lucky of getCallsiteCandidates O(1)
-     *
-     * @param eventName
-     *            the event name
-     * @return the first callsite that has that event name, can be null
-     */
-    public CTFCallsite getCallsite(String eventName) {
-        TreeSet<CTFCallsite> callsites = fCallsitesByName.get(eventName);
-        if (callsites != null) {
-            return callsites.first();
-        }
-        return null;
-    }
-
-    /**
-     * Gets a callsite from the instruction pointer O(log(n))
-     *
-     * @param ip
-     *            the instruction pointer to lookup
-     * @return the callsite just before that IP in the list remember the IP is
-     *         backwards on X86, can be null if no callsite is before the IP.
-     */
-    public CTFCallsite getCallsite(long ip) {
-        CTFCallsite cs = new CTFCallsite(null, null, ip, null, 0L);
-        return fCallsitesByIP.ceiling(cs);
-    }
-
-    /**
-     * Gets a callsite using the event name and instruction pointer O(log(n))
-     *
-     * @param eventName
-     *            the name of the event
-     * @param ip
-     *            the instruction pointer
-     * @return the closest matching callsite, can be null
-     */
-    public CTFCallsite getCallsite(String eventName, long ip) {
-        final TreeSet<CTFCallsite> candidates = fCallsitesByName.get(eventName);
-        if (candidates == null) {
-            return null;
-        }
-        final CTFCallsite dummyCs = new CTFCallsite(null, null, ip, null, -1);
-        final CTFCallsite callsite = candidates.ceiling(dummyCs);
-        if (callsite == null) {
-            return candidates.floor(dummyCs);
-        }
-        return callsite;
     }
 
     /**

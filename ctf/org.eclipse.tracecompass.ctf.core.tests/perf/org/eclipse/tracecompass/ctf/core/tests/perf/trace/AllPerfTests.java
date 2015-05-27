@@ -20,7 +20,6 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        CTFTraceCallsitePerformanceTest.class,
         TraceReadBenchmark.class,
         TraceSeekBenchmark.class
 })
