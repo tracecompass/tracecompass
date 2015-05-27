@@ -18,8 +18,8 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.lttng2.ust.core.LttngUstEventStrings;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.UstMemoryStateProvider;
-import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.UstMemoryStrings;
 import org.eclipse.tracecompass.lttng2.control.core.session.SessionConfigStrings;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement;
@@ -45,12 +45,12 @@ public class UstMemoryAnalysisModule extends TmfStateSystemAnalysisModule {
     public static final @NonNull String ID = "org.eclipse.linuxtools.lttng2.ust.analysis.memory"; //$NON-NLS-1$
 
     private static final ImmutableSet<String> REQUIRED_EVENTS = ImmutableSet.of(
-            UstMemoryStrings.MALLOC,
-            UstMemoryStrings.FREE,
-            UstMemoryStrings.CALLOC,
-            UstMemoryStrings.REALLOC,
-            UstMemoryStrings.MEMALIGN,
-            UstMemoryStrings.POSIX_MEMALIGN
+            LttngUstEventStrings.MALLOC,
+            LttngUstEventStrings.FREE,
+            LttngUstEventStrings.CALLOC,
+            LttngUstEventStrings.REALLOC,
+            LttngUstEventStrings.MEMALIGN,
+            LttngUstEventStrings.POSIX_MEMALIGN
             );
 
     /** The requirements as an immutable set */

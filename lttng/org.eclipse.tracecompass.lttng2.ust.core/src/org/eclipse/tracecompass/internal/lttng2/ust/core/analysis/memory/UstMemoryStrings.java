@@ -19,33 +19,16 @@ package org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory;
  * @author Matthew Khouzam
  * @author Geneviève Bastien
  */
-@SuppressWarnings({ "nls", "javadoc" })
+@SuppressWarnings("nls")
 public interface UstMemoryStrings {
 
     /** Memory state system attribute name */
-    static final String UST_MEMORY_MEMORY_ATTRIBUTE = "Memory"; //$NON-NLS-1$
+    String UST_MEMORY_MEMORY_ATTRIBUTE = "Memory";
+
     /** Procname state system attribute name */
-    static final String UST_MEMORY_PROCNAME_ATTRIBUTE = "Procname"; //$NON-NLS-1$
+    String UST_MEMORY_PROCNAME_ATTRIBUTE = "Procname";
+
     /** Name of the attribute to store memory usage of events with no context */
-    static final String OTHERS = "Others";
-
-    /* UST_libc event names */
-    static final String MALLOC = "ust_libc:malloc";
-    static final String CALLOC = "ust_libc:calloc";
-    static final String REALLOC = "ust_libc:realloc";
-    static final String FREE = "ust_libc:free";
-    static final String MEMALIGN = "ust_libc:memalign";
-    static final String POSIX_MEMALIGN = "ust_libc:posix_memalign";
-
-    /* Possible contexts */
-    static final String CONTEXT_VTID = "context._vtid";
-    static final String CONTEXT_PROCNAME = "context._procname";
-
-    /* Event fields */
-    static final String FIELD_PTR = "ptr";
-    static final String FIELD_NMEMB = "nmemb";
-    static final String FIELD_SIZE = "size";
-    static final String FIELD_OUTPTR = "out_ptr";
-    static final String FIELD_INPTR = "in_ptr";
+    String OTHERS = "Others";
 
 }
