@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.tracecompass.tmf.core.event.ITmfCustomAttributes;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
+import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfModelLookup;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfSourceLookup;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
@@ -164,8 +165,9 @@ public class TmfEventPropertySource implements IPropertySource {
 
         @Override
         public Object getEditableValue() {
-            if (fSourceLookup.getCallsite() != null) {
-                return fSourceLookup.getCallsite().toString();
+            ITmfCallsite cs = fSourceLookup.getCallsite();
+            if (cs != null) {
+                return cs.toString();
             }
             return null;
         }
@@ -173,11 +175,12 @@ public class TmfEventPropertySource implements IPropertySource {
         @Override
         public IPropertyDescriptor[] getPropertyDescriptors() {
             List<IPropertyDescriptor> descriptors= new ArrayList<>();
-            if (fSourceLookup.getCallsite() != null) {
+            ITmfCallsite cs = fSourceLookup.getCallsite();
+            if (cs != null) {
                 descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_FILE_NAME, NAME_FILE_NAME));
                 descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_LINE_NUMBER, NAME_LINE_NUMBER));
                 // only display function if available
-                if (fSourceLookup.getCallsite().getFunctionName() != null) {
+                if (cs.getFunctionName() != null) {
                     descriptors.add(new ReadOnlyTextPropertyDescriptor(ID_FUNCTION_NAME, NAME_FUNCTION_NAME));
                 }
             }
@@ -186,14 +189,29 @@ public class TmfEventPropertySource implements IPropertySource {
 
         @Override
         public Object getPropertyValue(Object id) {
-            if  (id.equals(ID_FILE_NAME)) {
-                return fSourceLookup.getCallsite().getFileName();
-            } else if (id.equals(ID_FUNCTION_NAME)) {
-                return fSourceLookup.getCallsite().getFunctionName();
-            } else if (id.equals(ID_LINE_NUMBER)) {
-                return Long.valueOf(fSourceLookup.getCallsite().getLineNumber());
+            ITmfCallsite cs = fSourceLookup.getCallsite();
+            if (cs == null) {
+                /*
+                 * The callsite should not be null here, we would not have
+                 * created the descriptors otherwise
+                 */
+                throw new IllegalStateException();
             }
-            return null;
+
+            if (!(id instanceof String)) {
+                return null;
+            }
+
+            switch ((String) id) {
+            case ID_FILE_NAME:
+                return cs.getFileName();
+            case ID_FUNCTION_NAME:
+                return cs.getFunctionName();
+            case ID_LINE_NUMBER:
+                return Long.valueOf(cs.getLineNumber());
+            default:
+                return null;
+            }
         }
 
         @Override

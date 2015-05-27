@@ -9,8 +9,10 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.tracecompass.tmf.core.event.lookup;
 
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * Interface for events to implement to provide information for source lookup.
@@ -18,10 +20,12 @@ package org.eclipse.tracecompass.tmf.core.event.lookup;
  * @author Bernd Hufmann
  */
 public interface ITmfSourceLookup {
+
     /**
-     * Returns a call site instance.
+     * Returns the call site of this event, or 'null' if there is no call site
+     * information available.
      *
-     * @return a call site instance.
+     * @return The call site instance
      */
-    public ITmfCallsite getCallsite();
+    @Nullable ITmfCallsite getCallsite();
 }

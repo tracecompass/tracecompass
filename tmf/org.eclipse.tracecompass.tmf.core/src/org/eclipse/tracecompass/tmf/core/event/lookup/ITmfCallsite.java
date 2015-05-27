@@ -26,21 +26,25 @@ package org.eclipse.tracecompass.tmf.core.event.lookup;
  * @see TmfCallsite
  */
 public interface ITmfCallsite {
+
     /**
      * Returns the file name of the call site.
+     *
      * @return the file name
      */
-    public String getFileName();
+    String getFileName();
 
     /**
      * Returns the function name of the call site.
+     *
      * @return the function name or null
      */
-    public String getFunctionName();
+    String getFunctionName();
 
     /**
      * Returns the line number of the call site.
+     *
      * @return the line number
      */
-    public long getLineNumber();
+    long getLineNumber();
 }
