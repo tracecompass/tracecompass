@@ -13,6 +13,7 @@
  *   Ansgar Radermacher - Support navigation to model URIs (Bug 396956)
  *   Bernd Hufmann - Updated call site and model URI implementation
  *   Alexandre Montplaisir - Update to new column API
+ *   Matthew Khouzam - Add hide columns
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.ui.viewers.events;
@@ -107,6 +108,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
@@ -214,7 +216,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private static final int EVENT_COLUMNS_START_INDEX = MARGIN_COLUMN_INDEX + 1;
 
     /**
-     * The events table search/filter keys
+     * The events table search/filter/data keys
      *
      * @version 1.0
      * @author Patrick Tasse
@@ -250,6 +252,13 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
          * @since 1.0
          */
         String STYLE_RANGES = "$style_ranges"; //$NON-NLS-1$
+
+        /**
+         * The width of a table item
+         *
+         * @since 1.0
+         */
+        String WIDTH = "$width"; //$NON-NLS-1$
     }
 
     /**
@@ -331,6 +340,12 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private int[] fColumnOrder;
 
     private boolean fDisposeOnClose;
+
+    private Menu fHeaderMenu;
+
+    private Menu fTablePopup;
+
+    private Menu fRawTablePopup;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -436,6 +451,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         TmfMarginColumn collapseCol = new TmfMarginColumn();
         fColumns.add(MARGIN_COLUMN_INDEX, collapseCol);
 
+        fHeaderMenu = new Menu(fTable);
         // Create the UI columns in the table
         for (TmfEventTableColumn col : fColumns) {
             TableColumn column = fTable.newTableColumn(SWT.LEFT);
@@ -447,6 +463,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 column.setResizable(false);
             } else {
                 column.setMoveable(true);
+                createHeaderMenuItem(fHeaderMenu, column);
             }
             column.addControlListener(new ControlAdapter() {
                 /*
@@ -554,6 +571,16 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
                 // Else, fill the cache asynchronously (and off the UI thread)
                 event.doit = false;
+            }
+        });
+
+        fTable.addListener(SWT.MenuDetect, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                Point pt = fTable.getDisplay().map(null, fTable, new Point(event.x, event.y));
+                Rectangle clientArea = fTable.getClientArea();
+                boolean header = clientArea.y <= pt.y && pt.y < (clientArea.y + fTable.getHeaderHeight());
+                fTable.setMenu(header ? fHeaderMenu : fTablePopup);
             }
         });
 
@@ -810,6 +837,67 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         createPopupMenu();
     }
 
+    /**
+     * Checked menu creator to make columns visible or not.
+     *
+     * @param parent
+     *            the parent menu
+     * @param column
+     *            the column
+     */
+    private static void createHeaderMenuItem(Menu parent, final TableColumn column) {
+        final MenuItem columnMenuItem = new MenuItem(parent, SWT.CHECK);
+        columnMenuItem.setText(column.getText());
+        columnMenuItem.setSelection(column.getResizable());
+        columnMenuItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (columnMenuItem.getSelection()) {
+                    column.setWidth((int) column.getData(Key.WIDTH));
+                    column.setResizable(true);
+                } else {
+                    column.setData(Key.WIDTH, column.getWidth());
+                    column.setWidth(0);
+                    column.setResizable(false);
+                }
+            }
+        });
+    }
+
+    private void createResetHeaderMenuItem() {
+        final MenuItem resetMenu = new MenuItem(fHeaderMenu, SWT.PUSH);
+        resetMenu.setText(Messages.TmfEventsTable_showAll);
+        resetMenu.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                for (TableColumn column : fTable.getColumns()) {
+                    final Object widthVal = column.getData(Key.WIDTH);
+                    if (widthVal instanceof Integer) {
+                        Integer width = (Integer) widthVal;
+                        if (!column.getResizable()) {
+                            column.setWidth(width);
+                            column.setResizable(true);
+                            /*
+                             * This is because Linux always resizes the last
+                             * column to fill in the void, this means that
+                             * hiding a column resizes others and we can have 10
+                             * columns that are 1000 pixels wide by hiding the
+                             * last one progressively.
+                             */
+                            if (IS_LINUX) {
+                                column.pack();
+                            }
+                        }
+                    }
+                }
+                for (MenuItem menuItem : fHeaderMenu.getItems()) {
+                    menuItem.setSelection(true);
+                }
+
+            }
+        });
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -818,6 +906,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * Create a pop-up menu.
      */
     private void createPopupMenu() {
+        createResetHeaderMenuItem();
         final IAction showTableAction = new Action(Messages.TmfEventsTable_ShowTableActionText) {
             @Override
             public void run() {
@@ -1177,11 +1266,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             }
         });
 
-        Menu menu = tablePopupMenu.createContextMenu(fTable);
-        fTable.setMenu(menu);
+        fTablePopup = tablePopupMenu.createContextMenu(fTable);
+        fTable.setMenu(fTablePopup);
 
-        menu = rawViewerPopupMenu.createContextMenu(fRawViewer);
-        fRawViewer.setMenu(menu);
+        fRawTablePopup = rawViewerPopupMenu.createContextMenu(fRawViewer);
+        fRawViewer.setMenu(fRawTablePopup);
     }
 
     /**
@@ -2213,7 +2302,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             for (int i = 0; i < tableColumns.length; i++) {
                 final TableColumn column = tableColumns[i];
                 packSingleColumn(i, column);
+                column.setData(Key.WIDTH, column.getWidth());
             }
+
         } finally {
             // Make sure that redraw is always enabled.
             fTable.setRedraw(true);
