@@ -94,6 +94,20 @@ public class LttngUst20EventLayout implements ILttngUstEventLayout {
     }
 
     // ------------------------------------------------------------------------
+    // Event names used in liblttng-ust-dl
+    // ------------------------------------------------------------------------
+
+    @Override
+    public String eventDlOpen() {
+        return "lttng_ust_dl:dlopen";
+    }
+
+    @Override
+    public String eventDlClose() {
+        return "lttng_ust_dl:dlclose";
+    }
+
+    // ------------------------------------------------------------------------
     // Field names
     // ------------------------------------------------------------------------
 
@@ -133,6 +147,11 @@ public class LttngUst20EventLayout implements ILttngUstEventLayout {
     // ------------------------------------------------------------------------
 
     @Override
+    public String contextVpid() {
+        return "context._vpid";
+    }
+
+    @Override
     public String contextVtid() {
         return "context._vtid";
     }
@@ -140,5 +159,10 @@ public class LttngUst20EventLayout implements ILttngUstEventLayout {
     @Override
     public String contextProcname() {
         return "context._procname";
+    }
+
+    @Override
+    public String contextIp() {
+        return "context._ip";
     }
 }
