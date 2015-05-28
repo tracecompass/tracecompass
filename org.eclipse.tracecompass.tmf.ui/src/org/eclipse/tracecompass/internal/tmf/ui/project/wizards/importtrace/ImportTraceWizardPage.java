@@ -827,9 +827,10 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 GzipFile zipFile = null;
                 try {
                     zipFile = new GzipFile(archivePath);
+                    leveledImportStructureProvider = new FileSystemObjectLeveledImportStructureProvider(new GzipLeveledStructureProvider(zipFile), archivePath);
                 } catch (IOException e) {
+                    // do nothing
                 }
-                leveledImportStructureProvider = new FileSystemObjectLeveledImportStructureProvider(new GzipLeveledStructureProvider(zipFile), archivePath);
             }
             if (leveledImportStructureProvider == null) {
                 return null;
@@ -996,6 +997,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 specifiedTarSourceFile.close();
                 return true;
             } catch (IOException e) {
+                // ignore
             }
         }
         return false;
