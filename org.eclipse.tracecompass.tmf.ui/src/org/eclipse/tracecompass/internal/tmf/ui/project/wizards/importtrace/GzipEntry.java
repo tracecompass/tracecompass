@@ -16,6 +16,8 @@ package org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace;
  * GZip entry
  */
 public class GzipEntry {
+    private static final int MILLIS_PER_SECOND = 1000;
+    private static final int READ_WRITE_USER_READ_GROUP = 0644;
     private static final String ROOT_DIR = "/"; //$NON-NLS-1$
     private final String fName;
     private final long fMode;
@@ -39,9 +41,9 @@ public class GzipEntry {
      */
     public GzipEntry() {
         fName = ROOT_DIR;
-        fMode = 0644;
+        fMode = READ_WRITE_USER_READ_GROUP;
         fType = DIRECTORY;
-        fTime = System.currentTimeMillis() / 1000;
+        fTime = System.currentTimeMillis() / MILLIS_PER_SECOND;
     }
 
     /**
@@ -53,9 +55,9 @@ public class GzipEntry {
      */
     public GzipEntry(String name) {
         fName = name;
-        fMode = 0644;
+        fMode = READ_WRITE_USER_READ_GROUP;
         fType = FILE;
-        fTime = System.currentTimeMillis() / 1000;
+        fTime = System.currentTimeMillis() / MILLIS_PER_SECOND;
     }
 
     /**
