@@ -678,9 +678,11 @@ The search and filter highlight color can be customized by the user by changing 
 
 == Histogram View ==
 
-The Histogram View displays the trace events distribution with respect to time. When streaming a trace, this view is dynamically updated as the events are received.
+The Histogram View displays the trace events distribution with respect to time. When streaming a trace, this view is dynamically updated as the events are received. The time axis is aligned with other views that support automatic time axis alignment (see [[#Automatic Time Axis Alignment | Automatic Time Axis Alignment]]).
 
 [[Image:images/HistogramView.png]]
+
+The '''Align Views''' toggle button [[Image:images/link.gif]] in the local toolbar allows to disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in the Histogram view will disable this feature across all the views because it's a workspace preference.
 
 The '''Hide Lost Events''' toggle button [[Image:images/hide_lost_events.gif]] in the local toolbar allows to hide the bars of lost events. When the button is selected it can be toggled again to show the lost events.
 
@@ -696,7 +698,7 @@ The controls can be used to modify their respective value. After validation, the
 
 The large (full) histogram, at the bottom, shows the event distribution over the whole trace or set of traces. It also has a smaller semi-transparent orange window, with a cross-hair, that shows the current zoom window.
 
-The smaller (zoom) histogram, on top right, corresponds to the current zoom window, a sub-range of the event set.
+The smaller (zoom) histogram, on top right, corresponds to the current zoom window, a sub-range of the event set. The window size can be adjusted by dragging the sash left beside the zoom window.
 
 The x-axis of each histogram corresponds to the event timestamps. The start time and end time of the histogram range is displayed. The y-axis shows the maximum number of events in the corresponding histogram bars.
 
@@ -784,7 +786,7 @@ To apply a saved preset filter in an events table, right-click on the table and 
 
 [[Image:images/TimeChartView.png]]
 
-The Time Chart view allows the user to visualize every open trace in a common time chart. Each trace is display in its own row and ticks are display for every punctual event. As the user zooms using the mouse wheel or by right-clicking and dragging in the time scale, more detailed event data is computed from the traces.
+The Time Chart view allows the user to visualize every open trace in a common time chart. Each trace is display in its own row and ticks are display for every punctual event. As the user zooms using the mouse wheel or by right-clicking and dragging in the time scale, more detailed event data is computed from the traces. The time axis is aligned with other views that support automatic time axis alignment (see [[#Automatic Time Axis Alignment | Automatic Time Axis Alignment]]).
 
 Time synchronization is enabled between the time chart view and other trace viewers such as the events table.
 
@@ -797,6 +799,8 @@ When a bookmark is applied in the events table, the ticks corresponding to the b
 When a filter is applied in the events table, the non-matching ticks are removed from the Time Chart view.
 
 The Time Chart only supports traces that are opened in an editor. The use of an editor is specified in the plug-in extension for that trace type, or is enabled by default for custom traces.
+
+The '''Align Views''' toggle button [[Image:images/link.gif]] in the local toolbar allows to disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in the this view will disable this feature across all the views because it's a workspace preference.
 
 == State System Explorer View ==
 
@@ -996,6 +1000,12 @@ To do so:
 * Double-click the trace or right-click it and select '''Open'''
 
 The trace will be opened in an editor showing the events table, and an entry will be added for it in the Time Chart view.
+
+== Automatic Time Axis Alignment ==
+
+Trace Compass supports automatic alignment of the time axis for time base views. The user now can resize the time window of one view and all other open views will align to the new window size and position. The automatic alignment is optional and can be disabled and enabled using the '''Align Views''' toolbar button. Disabling or enabling it in one view it will disable and enable it for all view since it's a workspace wide setting.
+
+[[Image:images/TimeAlignment_sash.png]]
 
 = LTTng Tracer Control =
 
@@ -1549,7 +1559,7 @@ You should get something like this:
 
 [[Image:images/Cfv_global.png]]
 
-The view is divided into the following important sections: '''process tree and information''', '''control flow''' and the '''toolbar'''.
+The view is divided into the following important sections: '''process tree and information''', '''control flow''' and the '''toolbar'''. The time axis is aligned with other views that support automatic time axis alignment (see [[#Automatic Time Axis Alignment | Automatic Time Axis Alignment]]).
 
 The following sections provide detailed information for each part of the Control Flow View.
 
@@ -1657,6 +1667,10 @@ The tooltip indicates:
 The Control Flow View '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions:
 
 {|
+| [[Image:images/link.gif]]
+| Align Views
+| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in the this view will disable this feature across all the views because it's a workspace preference
+|-
 | [[Image:images/filter_items.gif]]
 | Show View Filter
 | Opens the process filter dialog
@@ -1714,10 +1728,12 @@ Alternatively, go in '''Window''' -> '''Show View''' -> '''Other...''' and selec
 
 [[Image:images/Rv_example.png|Example of resources view with all trace points and syscalls enabled]]
 
-This view shows the state of system resources i.e. if changes occured during the trace either on '''CPUs''', '''IRQs''' or '''soft IRQs''', it will appear in this view. The left side of the view present a list of resources that are affected by at least one event of the trace. The right side illustrate the state in which each resource is at some point in time. For state '''USERMODE''' it also prints the process name in the state bar. For state '''SYSCALL''' the name of the system call is
+This view shows the state of system resources i.e. if changes occurred during the trace either on '''CPUs''', '''IRQs''' or '''soft IRQs''', it will appear in this view. The left side of the view present a list of resources that are affected by at least one event of the trace. The right side illustrate the state in which each resource is at some point in time. For state '''USERMODE''' it also prints the process name in the state bar. For state '''SYSCALL''' the name of the system call is
 displayed in the state region.
 
 Just like other views, according to which trace points and system calls are activated, the content of this view may change from one trace to another.
+
+The time axis is aligned with other views that support automatic time axis alignment (see [[#Automatic Time Axis Alignment | Automatic Time Axis Alignment]]).
 
 Each state are represented by one color so it is faster to say what is happening.
 
@@ -1746,6 +1762,10 @@ See Control Flow View's '''[[#Incomplete_regions | Incomplete regions]]'''.
 The Resources View '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions:
 
 {|
+| [[Image:images/link.gif]]
+| Align Views
+| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in the this view will disable this feature across all the views because it's a workspace preference
+|-
 | [[Image:images/show_legend.gif]]
 | Show Legend
 | Displays the states legend
@@ -1789,7 +1809,7 @@ Now, the CPU Usage view will show:
 
 [[Image:images/LTTng_CpuUsageView.png]]
 
-The view is divided into the following important sections: '''Process Information''' and the '''CPU Usage Chart'''.
+The view is divided into the following important sections: '''Process Information''' and the '''CPU Usage Chart'''. The time axis is aligned with other views that support automatic time axis alignment (see [[#Automatic Time Axis Alignment | Automatic Time Axis Alignment]]).
 
 
 === Process Information ===
@@ -1806,7 +1826,6 @@ The CPU Usage Chart on the right side of the view, plots the total time spent on
 The CPU Usage chart is usable with the mouse. The following actions are set:
 
 * '''left-click''': select a time or time range begin time
-* '''Shift-left-click''': select a time range end time
 * '''left-drag horizontally''': select a time range or change the time range begin or end time
 * '''middle-drag''': pan left or right
 * '''right-drag horizontally''': zoom region
@@ -1820,8 +1839,18 @@ Hover the cursor over a line of the chart and a tooltip will pop up with the fol
 * '''Total''': The total CPU usage
 
 
-[[Image:images/LTTng_CpuUsageViewToolTip.png]]
+==== Toolbar ====
 
+The CPU Usage View '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions:
+
+{|
+| [[Image:images/link.gif]]
+| Align Views
+| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in the this view will disable this feature across all the views because it's a workspace preference
+|-
+|}
+
+[[Image:images/LTTng_CpuUsageViewToolTip.png]]
 
 == LTTng Kernel Events Editor ==
 
@@ -1903,7 +1932,33 @@ If thread information is not available it will look like this:
 
 [[Image:images/memoryUsage/memory-usage-no-thread-info.png]]
 
-The view allows selection of a specific time by left-clicking on a point in the chart. Left mouse dragging will select a time range. Right mouse dragging on the area will zoom in on that window. Middle mouse dragging will move the display window. Mouse wheel operations will zoom in and out also.
+The time axis is aligned with other views that support automatic time axis alignment (see [[#Automatic Time Axis Alignment | Automatic Time Axis Alignment]]).
+
+Please note this view will not show shared memory or stack memory usage.
+
+=== Using the mouse ===
+
+The Memory Usage chart is usable with the mouse. The following actions are set:
+
+* '''left-click''': select a time or time range begin time
+* '''left-drag horizontally''': select a time range or change the time range begin or end time
+* '''middle-drag''': pan left or right
+* '''right-drag horizontally''': zoom region
+* '''mouse wheel up/down''': zoom in or out
+
+
+=== Toolbar ===
+
+The Memory Usage View '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions:
+
+{|
+| [[Image:images/link.gif]]
+| Align Views
+| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in the this view will disable this feature across all the views because it's a workspace preference
+|-
+|}
+
+[[Image:images/LTTng_CpuUsageViewToolTip.png]]
 
 Please note this view will not show shared memory or stack memory usage.
 
