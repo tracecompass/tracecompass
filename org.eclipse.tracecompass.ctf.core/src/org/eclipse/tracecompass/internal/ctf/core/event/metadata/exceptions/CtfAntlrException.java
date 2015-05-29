@@ -23,9 +23,9 @@ import org.eclipse.tracecompass.ctf.parser.CTFLexer;
 /**
  * CTF Reader exception but dealing with Antlr-specific parsing problems.
  *
- * It is separated from the main {@link CTFException} - and is not part of
- * the API - to isolate the Antlr-specific classes and avoid pushing that
- * dependency to the users of this plugin.
+ * It is separated from the main {@link CTFException} - and is not part of the
+ * API - to isolate the Antlr-specific classes and avoid pushing that dependency
+ * to the users of this plugin.
  *
  * @author Matthew Khouzam
  */
@@ -33,24 +33,14 @@ public class CtfAntlrException extends CTFException {
 
     private static final long serialVersionUID = -7078624493350073777L;
 
-    private int fErrorLine = -1;
-    private String fFile = ""; //$NON-NLS-1$
+    private final int fErrorLine;
+    private final String fFile;
     private String fExpectingName = ""; //$NON-NLS-1$
     private int fExpectedValue = -1;
     private String fActualName = ""; //$NON-NLS-1$
     private int fActualValue = -1;
 
-    /**
-     * Re-throw the exception but read its data
-     *
-     * @param e
-     *            the previous recognition exception (Antlr specific)
-     */
-    public CtfAntlrException(RecognitionException e) {
-        super(e);
-        this.fErrorLine = e.line;
-        this.fFile = "metadata"; //$NON-NLS-1$ // we're in CTF, the only thing using antlr is metadata
-    }
+    private final int fCharPositionInLine;
 
     /**
      * Re-throw the exception but read its data
@@ -60,9 +50,23 @@ public class CtfAntlrException extends CTFException {
      */
     public CtfAntlrException(MismatchedTokenException e) {
         super(e);
-        this.fErrorLine = e.line;
-        this.fFile = "metadata"; //$NON-NLS-1$ // we're in CTF, the only thing using antlr is metadata
+        fErrorLine = e.line;
+        fCharPositionInLine = e.charPositionInLine;
+        fFile = "metadata"; //$NON-NLS-1$ // we're in CTF, the only thing using antlr is metadata
         parseMismatchedException(e);
+    }
+
+    /**
+     * Re-throw the exception but read its data
+     *
+     * @param e
+     *            the previous recognition exception (Antlr specific)
+     */
+    public CtfAntlrException(RecognitionException e) {
+        super(e);
+        fErrorLine = e.line;
+        fCharPositionInLine = e.charPositionInLine;
+        fFile = "metadata"; //$NON-NLS-1$ // we're in CTF, the only thing using antlr is metadata
     }
 
     /**
@@ -73,8 +77,9 @@ public class CtfAntlrException extends CTFException {
      */
     public CtfAntlrException(Exception e) {
         super(e);
-        this.fErrorLine = -1;
-        this.fFile = "metadata"; //$NON-NLS-1$ // we're in CTF, the only thing using antlr is metadata
+        fErrorLine = -1;
+        fCharPositionInLine = -1;
+        fFile = "metadata"; //$NON-NLS-1$ // we're in CTF, the only thing using antlr is metadata
     }
 
     private void parseMismatchedException(MismatchedTokenException m) {
@@ -123,7 +128,7 @@ public class CtfAntlrException extends CTFException {
         String actual = "" + this.fActualValue; //$NON-NLS-1$
         String newMessage = message.replaceAll(expected, this.fExpectingName);
         newMessage = newMessage.replaceAll(actual, this.fActualName);
-        return newMessage + " at " + fFile + ":" + fErrorLine; //$NON-NLS-1$ //$NON-NLS-2$
+        return newMessage + " at " + fFile + ":" + fErrorLine + ":" + fCharPositionInLine; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
 }
