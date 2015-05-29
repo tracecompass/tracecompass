@@ -142,7 +142,7 @@ public interface ITimeDataProvider {
     void setSelectedTime(long time, boolean ensureVisible);
 
     /**
-     * Reset the start and end times
+     * Reset the start and end times and notify the registered listeners
      */
     void resetStartFinishTime();
 

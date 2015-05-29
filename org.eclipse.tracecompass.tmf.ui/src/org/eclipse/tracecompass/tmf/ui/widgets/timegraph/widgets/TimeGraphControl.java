@@ -2060,7 +2060,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
                     time0 = fTimeProvider.getMinTime();
                     time1 = time0 + (fTime1bak - fTime0bak);
                 }
-                fTimeProvider.setStartFinishTime(time0, time1);
+                fTimeProvider.setStartFinishTimeNotify(time0, time1);
             }
         } else if (DRAG_SPLIT_LINE == fDragState) {
             fDragX = e.x;

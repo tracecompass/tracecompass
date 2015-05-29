@@ -571,10 +571,10 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
                 }
                 long interval = (long) ((fTime1bak - fTime0bak) * ((double) fDragX0 / fDragX));
                 if (interval == Long.MAX_VALUE) {
-                    fTimeProvider.setStartFinishTime(fTime0bak, Long.MAX_VALUE);
+                    fTimeProvider.setStartFinishTimeNotify(fTime0bak, Long.MAX_VALUE);
                 } else {
                     long time1 = fTime0bak + (long) ((fTime1bak - fTime0bak) * ((double) fDragX0 / fDragX));
-                    fTimeProvider.setStartFinishTime(fTime0bak, time1);
+                    fTimeProvider.setStartFinishTimeNotify(fTime0bak, time1);
                 }
             }
         }
@@ -584,7 +584,6 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     public void mouseDoubleClick(MouseEvent e) {
         if (e.button == 1 && null != fTimeProvider && fTimeProvider.getTime0() != fTimeProvider.getTime1() && (e.stateMask & SWT.BUTTON_MASK) == 0) {
             fTimeProvider.resetStartFinishTime();
-            fTimeProvider.notifyStartFinishTime();
             fTime0bak = fTimeProvider.getTime0();
             fTime1bak = fTimeProvider.getTime1();
         }
