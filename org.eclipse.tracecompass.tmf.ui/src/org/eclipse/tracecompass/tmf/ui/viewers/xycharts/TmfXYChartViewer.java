@@ -29,6 +29,7 @@ import org.swtchart.Chart;
 import org.swtchart.IAxis;
 import org.swtchart.ISeries;
 import org.swtchart.ISeriesSet;
+import org.swtchart.Range;
 
 /**
  * Base class for a XY-Chart based on SWT chart. It provides a methods to define
@@ -286,6 +287,8 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     @Override
     public void reset() {
         super.reset();
+        setStartTime(0);
+        setEndTime(0);
         clearContent();
     }
 
@@ -355,6 +358,9 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
             ISeries[] series = set.getSeries();
             for (int i = 0; i < series.length; i++) {
                 set.deleteSeries(series[i].getId());
+            }
+            for (IAxis axis: fSwtChart.getAxisSet().getAxes()){
+                axis.setRange(new Range(0,1));
             }
             fSwtChart.redraw();
         }

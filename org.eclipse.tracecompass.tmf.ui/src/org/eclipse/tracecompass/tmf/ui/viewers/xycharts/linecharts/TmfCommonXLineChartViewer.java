@@ -379,4 +379,10 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
     }
 
+    @Override
+    protected void clearContent() {
+        getSwtChart().getAxisSet().getXAxis(0).getTick().setFormat(null);
+        super.clearContent();
+    }
+
 }
