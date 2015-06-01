@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ericsson
+ * Copyright (c) 2010, 2015 Ericsson and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -39,6 +39,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -85,6 +86,7 @@ public class TmfVirtualTable extends Composite {
 
     // The slider
     private Slider fSlider;
+    private SliderThrottler fSliderThrottler;
 
     private int fLinuxItemHeight = 0;            // Calculated item height for Linux workaround
     private TooltipProvider tooltipProvider = null;
@@ -92,6 +94,39 @@ public class TmfVirtualTable extends Composite {
 
     private boolean fResetTopIndex = false;      // Flag to trigger reset of top index
     private ControlAdapter fResizeListener;      // Resize listener to update visible rows
+
+    // ------------------------------------------------------------------------
+    // Classes
+    // ------------------------------------------------------------------------
+
+    private class SliderThrottler extends Thread {
+        private static final long DELAY = 400L;
+        private static final long POLLING_INTERVAL = 10L;
+
+        @Override
+        public void run() {
+            final long startTime = System.currentTimeMillis();
+            while ((System.currentTimeMillis() - startTime) < DELAY) {
+                try {
+                    Thread.sleep(POLLING_INTERVAL);
+                } catch (InterruptedException e) {
+                }
+            }
+            Display.getDefault().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    if (fSliderThrottler != SliderThrottler.this) {
+                        return;
+                    }
+                    fSliderThrottler = null;
+                    if (SliderThrottler.this.isInterrupted() || fTable.isDisposed()) {
+                        return;
+                    }
+                    refreshTable();
+                }
+            });
+        }
+    }
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -587,8 +622,19 @@ public class TmfVirtualTable extends Composite {
                     refreshTable();
                     break;
                 }
-                // Not handled because of bug on Linux described below.
+                case SWT.DRAG:
                 case SWT.NONE:
+                    /*
+                     * While the slider thumb is being dragged, only perform the
+                     * refresh periodically. The event detail during the drag is
+                     * SWT.DRAG on Windows and SWT.NONE on Linux.
+                     */
+                    fTableTopEventRank = fSlider.getSelection();
+                    if (fSliderThrottler == null) {
+                        fSliderThrottler = new SliderThrottler();
+                        fSliderThrottler.start();
+                    }
+                    break;
                 default:
                     break;
                 }
@@ -596,13 +642,16 @@ public class TmfVirtualTable extends Composite {
         });
 
         /*
-         * In Linux, the selection event above has event.detail set to SWT.NONE
-         * instead of SWT.DRAG during dragging of the thumb. To prevent refresh
-         * overflow, only update the table when the mouse button is released.
+         * When the mouse button is released, perform the refresh immediately
+         * and interrupt and discard the slider throttler.
          */
         fSlider.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseUp(MouseEvent e) {
+                if (fSliderThrottler != null) {
+                    fSliderThrottler.interrupt();
+                    fSliderThrottler = null;
+                }
                 fTableTopEventRank = fSlider.getSelection();
                 refreshTable();
             }
