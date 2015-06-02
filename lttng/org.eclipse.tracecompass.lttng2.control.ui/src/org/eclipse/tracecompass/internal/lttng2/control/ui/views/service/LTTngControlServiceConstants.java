@@ -98,10 +98,6 @@ public interface LTTngControlServiceConstants {
      */
     String COMMAND_START_SESSION = "start"; //$NON-NLS-1$
     /**
-     * Command to load a session.
-     */
-    String COMMAND_LOAD_SESSION = "load"; //$NON-NLS-1$
-    /**
      * Command to destroy a session.
      */
     String COMMAND_STOP_SESSION = "stop"; //$NON-NLS-1$
@@ -141,6 +137,14 @@ public interface LTTngControlServiceConstants {
      * Command to record a snapshot
      */
     String COMMAND_RECORD_SNAPSHOT = "record"; //$NON-NLS-1$
+    /**
+     * Command to load a session.
+     */
+    String COMMAND_LOAD_SESSION = "load"; //$NON-NLS-1$
+    /**
+     * Command to save a session
+     */
+    String COMMAND_SAVE_SESSION = "save"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Command line options constants
@@ -293,7 +297,6 @@ public interface LTTngControlServiceConstants {
      * Command line option for specifying input path
      */
     String OPTION_INPUT_PATH = "-i"; //$NON-NLS-1$
-
     /**
      * Maximum live timer interval value
      */

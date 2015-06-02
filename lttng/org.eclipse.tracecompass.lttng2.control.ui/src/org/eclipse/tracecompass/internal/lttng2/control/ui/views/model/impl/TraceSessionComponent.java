@@ -451,6 +451,24 @@ public class TraceSessionComponent extends TraceControlComponent {
     }
 
     /**
+     * Save all or a given session.
+     *
+     * @param session
+     *            a session name to save or null for all
+     * @param outputPath
+     *            a path to save session or null for default location
+     * @param isForce
+     *            flag whether to overwrite existing or not
+     * @param monitor
+     *            a progress monitor
+     * @throws ExecutionException
+     *             If the command fails
+     */
+    public void saveSession(String session, String outputPath, boolean isForce, IProgressMonitor monitor) throws ExecutionException {
+        getControlService().saveSession(session, outputPath, isForce, monitor);
+    }
+
+    /**
      * Returns if session is live.
      * @return <code>true</code> if session if live else <code>false</code>
      */

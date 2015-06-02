@@ -211,6 +211,12 @@
             id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.load"
             name="%commands.control.load">
       </command>
+      <command
+            categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
+            description="%commands.control.save.description"
+            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.save"
+            name="%commands.control.save">
+      </command>
 
    </extension>
    <extension
@@ -495,6 +501,24 @@
                            value="1">
                       </count>
                   </and>   
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.save"
+               icon="icons/elcl16/export_button.png"
+               label="%commands.control.save"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                    <iterate
+                         operator="or">
+                         <instanceof
+                               value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
+                         </instanceof>
+                      </iterate>
                </with>
             </visibleWhen>
          </command>
@@ -1011,6 +1035,21 @@
                         value="1">
                   </count>
                </and>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.SaveHandler"
+            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.save">
+         <activeWhen>
+            <with
+                  variable="selection">
+                  <iterate
+                        operator="or">
+                     <instanceof
+                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent">
+                     </instanceof>
+                  </iterate>
             </with>
          </activeWhen>
       </handler>
