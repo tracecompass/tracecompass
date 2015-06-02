@@ -24,6 +24,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.utils.TableCollection;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
@@ -338,6 +339,39 @@ public final class ConditionHelpers {
             public String getFailureMessage() {
                 return NLS.bind("Window range: {0} expected: {1}",
                         TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange(), range);
+            }
+        };
+    }
+
+    /**
+     * Condition to check if the selection contains the specified text at the
+     * specified column. The text is checked in any item of the tree selection.
+     *
+     * @param tree
+     *            the SWTBot tree
+     * @param column
+     *            the column index
+     * @param text
+     *            the expected text
+     * @return ICondition for verification
+     */
+    public static ICondition treeSelectionContains(final SWTBotTree tree, final int column, final String text) {
+        return new SWTBotTestCondition() {
+            @Override
+            public boolean test() throws Exception {
+                TableCollection selection = tree.selection();
+                for (int row = 0; row < selection.rowCount(); row++) {
+                    if (selection.get(row, column).equals(text)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return NLS.bind("Tree selection [0,{0}]: {1} expected: {2}",
+                        new Object[] { column, tree.selection().get(0, column), text});
             }
         };
     }

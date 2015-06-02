@@ -12,12 +12,12 @@
 
 package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.keyboard.Keyboard;
@@ -191,30 +191,19 @@ public class ControlFlowViewTest extends KernelTest {
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME3, TID1_TIME3)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME3));
 
-//        /* shift-click "Select Next Event" 3 times */
-//        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
-//        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
-//        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
-//        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME3, TID1_TIME6)));
-        /* click "Select Next Event" 3 times */
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click();
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click();
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click();
-        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME6, TID1_TIME6)));
+        /* shift-click "Select Next Event" 3 times */
+        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
+        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
+        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
+        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME3, TID1_TIME6)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME6));
 
-//        /* shift-click "Select Previous Event" 4 times */
-//        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
-//        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
-//        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
-//        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
-//        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME3, TID1_TIME2)));
-        /* click "Select Previous Event" 4 times */
-        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click();
-        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click();
-        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click();
-        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click();
-        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME2, TID1_TIME2)));
+        /* shift-click "Select Previous Event" 4 times */
+        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
+        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
+        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
+        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
+        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME3, TID1_TIME2)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME2));
 
         /* click "Select Next Event" 2 times */
@@ -223,30 +212,19 @@ public class ControlFlowViewTest extends KernelTest {
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME4, TID1_TIME4)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME4));
 
-//        /* shift-click "Select Previous Event" 3 times */
-//        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
-//        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
-//        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
-//        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME4, TID1_TIME1)));
-        /* click "Select Previous Event" 3 times */
-        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click();
-        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click();
-        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click();
-        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME1, TID1_TIME1)));
+        /* shift-click "Select Previous Event" 3 times */
+        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
+        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
+        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
+        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME4, TID1_TIME1)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME1));
 
-//        /* shift-click "Select Next Event" 4 times */
-//        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
-//        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
-//        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
-//        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
-//        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME4, TID1_TIME5)));
-        /* click "Select Next Event" 4 times */
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click();
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click();
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click();
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click();
-        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME5, TID1_TIME5)));
+        /* shift-click "Select Next Event" 4 times */
+        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
+        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
+        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
+        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
+        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME4, TID1_TIME5)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME5));
 
         /* click "Select Previous Event" 5 times */
@@ -307,70 +285,48 @@ public class ControlFlowViewTest extends KernelTest {
         fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
         fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME2, TID2_TIME2)));
-        assertEquals("2", tree.selection().get(0, 1));
+        fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "2"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID2_TIME2));
 
-//        /* shift-click "Follow CPU Forward" 3 times */
-//        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
-//        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
-//        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
-//        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME2, TID5_TIME1)));
-        /* click "Follow CPU Forward" 3 times */
-        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
-        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
-        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
-        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID5_TIME1, TID5_TIME1)));
-        assertEquals("5", tree.selection().get(0, 1));
+        /* shift-click "Follow CPU Forward" 3 times */
+        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
+        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
+        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
+        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME2, TID5_TIME1)));
+        fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "5"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID5_TIME1));
 
-//        /* shift-click "Follow CPU Backward" 4 times */
-//        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
-//        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
-//        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
-//        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
-//        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME2, TID2_TIME1)));
-        /* click "Follow CPU Backward" 4 times */
-        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
-        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
-        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
-        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
-        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME1, TID2_TIME1)));
-        assertEquals("2", tree.selection().get(0, 1));
+        /* shift-click "Follow CPU Backward" 4 times */
+        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
+        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
+        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
+        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
+        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME2, TID2_TIME1)));
+        fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "2"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID2_TIME1));
 
         /* click "Follow CPU Forward" 2 times */
         fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
         fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME3, TID2_TIME3)));
-        assertEquals("2", tree.selection().get(0, 1));
+        fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "2"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID2_TIME3));
 
-//        /* shift-click "Follow CPU Backward" 3 times */
-//        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
-//        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
-//        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
-//        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME3, TID1_TIME1)));
-        /* click "Follow CPU Backward" 3 times */
-        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
-        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
-        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
-        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME1, TID1_TIME1)));
-        assertEquals("1", tree.selection().get(0, 1));
+        /* shift-click "Follow CPU Backward" 3 times */
+        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
+        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
+        fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
+        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME3, TID1_TIME1)));
+        fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "1"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME1));
 
-//        /* shift-click "Follow CPU Forward" 4 times */
-//        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
-//        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
-//        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
-//        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
-//        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME3, TID2_TIME4)));
-        /* click "Follow CPU Forward" 4 times */
-        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
-        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
-        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
-        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
-        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME4, TID2_TIME4)));
-        assertEquals("2", tree.selection().get(0, 1));
+        /* shift-click "Follow CPU Forward" 4 times */
+        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
+        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
+        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
+        fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
+        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME3, TID2_TIME4)));
+        fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "2"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID2_TIME4));
 
         /* click "Follow CPU Backward" 5 times */
