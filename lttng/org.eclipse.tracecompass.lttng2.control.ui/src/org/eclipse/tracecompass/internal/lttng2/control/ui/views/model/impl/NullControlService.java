@@ -147,4 +147,8 @@ class NullControlService implements ILttngControlService {
     @Override
     public void loadSession(@Nullable String inputPath, boolean isForce, IProgressMonitor monitor) throws ExecutionException {
     }
+
+    @Override
+    public void saveSession(String session, String outputPath, boolean isForce, IProgressMonitor monitor) throws ExecutionException {
+    }
 }

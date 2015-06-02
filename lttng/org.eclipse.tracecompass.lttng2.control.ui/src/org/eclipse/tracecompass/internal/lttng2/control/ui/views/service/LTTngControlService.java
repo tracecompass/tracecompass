@@ -1037,6 +1037,25 @@ public class LTTngControlService implements ILttngControlService {
     }
 
     @Override
+    public void saveSession(String session, String outputPath, boolean isForce, IProgressMonitor monitor) throws ExecutionException {
+        ICommandInput command = createCommand(LTTngControlServiceConstants.COMMAND_SAVE_SESSION);
+
+        if (outputPath != null) {
+            command.add(LTTngControlServiceConstants.OPTION_OUTPUT_PATH);
+            command.add(outputPath);
+        }
+
+        if (isForce) {
+            command.add(LTTngControlServiceConstants.OPTION_FORCE);
+        }
+
+        if (session != null) {
+            command.add(session);
+        }
+        executeCommand(command, monitor);
+    }
+
+    @Override
     public void runCommands(IProgressMonitor monitor, List<String> commandLines) throws ExecutionException {
         for (String commandLine : commandLines) {
             if (monitor.isCanceled()) {
