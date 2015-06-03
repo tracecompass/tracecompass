@@ -44,8 +44,13 @@ public class GzipFile implements AutoCloseable {
         fFile = source;
 
         InputStream in = new FileInputStream(source);
-        // Check if it's a GZIPInputStream.
-        fInternalEntryStream = new GZIPInputStream(in);
+        try {
+            // Check if it's a GZIPInputStream.
+            fInternalEntryStream = new GZIPInputStream(in);
+        } catch (IOException e) {
+            in.close();
+            throw e;
+        }
         String name = source.getName();
         fEntry = new GzipEntry(name.substring(0, name.lastIndexOf(GZIP_EXTENSION)));
         fCurEntry = fEntry;
