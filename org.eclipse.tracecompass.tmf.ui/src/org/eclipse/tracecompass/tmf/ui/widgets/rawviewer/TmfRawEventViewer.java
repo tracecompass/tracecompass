@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.ui.widgets.rawviewer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -70,9 +71,9 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 
     private static final Color COLOR_BACKGROUND_ODD = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
     private static final Color COLOR_BACKGROUND_EVEN = new Color(Display.getDefault(), 242, 242, 242);
-    private static final Color COLOR_BACKGROUND_SELECTED = new Color(Display.getDefault(), 231, 246, 254);
-    private static final Color COLOR_BACKGROUND_HIGHLIGHTED = new Color(Display.getDefault(), 246, 252, 255);
     private static final String FONT_DEFINITION_ID = "org.eclipse.tracecompass.tmf.ui.font.eventraw"; //$NON-NLS-1$
+    private static final String HIGHLIGHT_COLOR_DEFINITION_ID = "org.eclipse.tracecompass.tmf.ui.color.eventraw.highlight"; //$NON-NLS-1$
+    private static final String SELECTION_COLOR_DEFINITION_ID = "org.eclipse.tracecompass.tmf.ui.color.eventraw.selection"; //$NON-NLS-1$
     private static final int MAX_LINE_DATA_SIZE = 1000;
     private static final int SLIDER_MAX = 1000000;
 
@@ -83,6 +84,8 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     private Composite fTextArea;
     private StyledText fStyledText;
     private Font fFixedFont;
+    private Color fHighlightColor;
+    private Color fSelectionColor;
     private Slider fSlider;
 
     private final List<LineData> fLines = new ArrayList<>();
@@ -161,7 +164,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     }
 
     // ------------------------------------------------------------------------
-    // Font handling
+    // Font and color handling
     // ------------------------------------------------------------------------
 
     /**
@@ -175,6 +178,16 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     }
 
     /**
+     * Initialize the colors.
+     * @since 1.0
+     */
+    protected void initializeColors() {
+        ColorRegistry colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
+        fHighlightColor = colorRegistry.get(HIGHLIGHT_COLOR_DEFINITION_ID);
+        fSelectionColor = colorRegistry.get(SELECTION_COLOR_DEFINITION_ID);
+    }
+
+    /**
      * @since 1.0
      */
     @Override
@@ -182,6 +195,12 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         if ((IThemeManager.CHANGE_CURRENT_THEME.equals(event.getProperty())) ||
                 (FONT_DEFINITION_ID.equals(event.getProperty()))) {
             initializeFonts();
+            refreshTextArea();
+        }
+        if ((IThemeManager.CHANGE_CURRENT_THEME.equals(event.getProperty())) ||
+                (HIGHLIGHT_COLOR_DEFINITION_ID.equals(event.getProperty())) ||
+                (SELECTION_COLOR_DEFINITION_ID.equals(event.getProperty()))) {
+            initializeColors();
             refreshTextArea();
         }
     }
@@ -214,6 +233,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         fStyledText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
         initializeFonts();
+        initializeColors();
         PlatformUI.getWorkbench().getThemeManager().addPropertyChangeListener(this);
 
         fStyledText.addCaretListener(this);
@@ -624,9 +644,9 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 
     private void setLineBackground(int index, LineData lineData) {
         if (lineData.location.equals(fSelectedLocation)) {
-            fStyledText.setLineBackground(index, 1, COLOR_BACKGROUND_SELECTED);
+            fStyledText.setLineBackground(index, 1, fSelectionColor);
         } else if (lineData.rank == fHighlightedRank) {
-            fStyledText.setLineBackground(index, 1, COLOR_BACKGROUND_HIGHLIGHTED);
+            fStyledText.setLineBackground(index, 1, fHighlightColor);
         } else if (lineData.rank % 2 == 0) {
             fStyledText.setLineBackground(index, 1, COLOR_BACKGROUND_EVEN);
         } else {

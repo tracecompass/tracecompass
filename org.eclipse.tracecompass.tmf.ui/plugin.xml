@@ -1839,10 +1839,12 @@
       </themeElementCategory>
       <fontDefinition
             categoryId="org.eclipse.tracecompass.tmf.ui.theme.category"
-            defaultsTo="org.eclipse.jface.dialogfont"
             id="org.eclipse.tracecompass.tmf.ui.font.eventtable"
             isEditable="true"
             label="%font.eventtable.label">
+         <description>
+            %font.eventtable.description
+         </description>
       </fontDefinition>
       <fontDefinition
             categoryId="org.eclipse.tracecompass.tmf.ui.theme.category"
@@ -1850,6 +1852,9 @@
             id="org.eclipse.tracecompass.tmf.ui.font.eventraw"
             isEditable="true"
             label="%font.eventraw.label">
+         <description>
+            %font.eventraw.description
+         </description>
       </fontDefinition>
       <colorDefinition
             categoryId="org.eclipse.tracecompass.tmf.ui.theme.category"
@@ -1857,6 +1862,29 @@
             isEditable="true"
             label="%color.eventtable.highlight.label"
             value="COLOR_YELLOW">
+         <description>
+            %color.eventtable.highlight.description
+         </description>
+      </colorDefinition>
+      <colorDefinition
+            categoryId="org.eclipse.tracecompass.tmf.ui.theme.category"
+            id="org.eclipse.tracecompass.tmf.ui.color.eventraw.highlight"
+            isEditable="true"
+            label="%color.eventraw.highlight.label"
+            value="246,252,255">
+         <description>
+            %color.eventraw.highlight.description
+         </description>
+      </colorDefinition>
+      <colorDefinition
+            categoryId="org.eclipse.tracecompass.tmf.ui.theme.category"
+            id="org.eclipse.tracecompass.tmf.ui.color.eventraw.selection"
+            isEditable="true"
+            label="%color.eventraw.selection.label"
+            value="231,246,254">
+         <description>
+            %color.eventraw.selection.description
+         </description>
       </colorDefinition>
    </extension>
 </plugin>
