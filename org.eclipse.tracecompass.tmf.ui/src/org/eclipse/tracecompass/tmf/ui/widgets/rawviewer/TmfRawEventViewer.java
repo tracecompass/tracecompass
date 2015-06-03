@@ -30,6 +30,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.MouseWheelListener;
@@ -66,7 +67,7 @@ import org.eclipse.ui.themes.IThemeManager;
  * @version 1.0
  * @author Patrick Tasse
  */
-public class TmfRawEventViewer extends Composite implements ControlListener, SelectionListener,
+public class TmfRawEventViewer extends Composite implements ControlListener, SelectionListener, MouseListener,
         KeyListener, CaretListener, MouseMoveListener, MouseTrackListener, MouseWheelListener, IPropertyChangeListener {
 
     private static final Color COLOR_BACKGROUND_ODD = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
@@ -87,6 +88,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     private Color fHighlightColor;
     private Color fSelectionColor;
     private Slider fSlider;
+    private SliderThrottler fSliderThrottler;
 
     private final List<LineData> fLines = new ArrayList<>();
     private boolean fActualRanks = false;
@@ -99,6 +101,10 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     private long fHighlightedRank = Long.MIN_VALUE;
     private int fCursorYCoordinate = -1;
     private int fHoldSelection = 0;
+
+    // ------------------------------------------------------------------------
+    // Classes
+    // ------------------------------------------------------------------------
 
     private static class LineData {
         long rank;
@@ -125,6 +131,38 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         public CaretPosition(int time, int caretOffset) {
             this.time = time;
             this.caretOffset = caretOffset;
+        }
+    }
+
+    private class SliderThrottler extends Thread {
+        private static final long DELAY = 400L;
+        private static final long POLLING_INTERVAL = 10L;
+
+        @Override
+        public void run() {
+            final long startTime = System.currentTimeMillis();
+            while ((System.currentTimeMillis() - startTime) < DELAY) {
+                try {
+                    Thread.sleep(POLLING_INTERVAL);
+                } catch (InterruptedException e) {
+                }
+            }
+            Display.getDefault().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    if (fSliderThrottler != SliderThrottler.this) {
+                        return;
+                    }
+                    fSliderThrottler = null;
+                    if (SliderThrottler.this.isInterrupted() || fSlider.isDisposed()) {
+                        return;
+                    }
+                    Event event = new Event();
+                    event.widget = TmfRawEventViewer.this;
+                    event.detail = SWT.NONE;
+                    widgetSelected(new SelectionEvent(event));
+                }
+            });
         }
     }
 
@@ -262,6 +300,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         fSlider.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
         fSlider.setValues(0, 0, SLIDER_MAX, SLIDER_MAX, 1, 1);
         fSlider.addSelectionListener(this);
+        fSlider.addMouseListener(this);
         if ((style & SWT.V_SCROLL) == 0) {
             fSlider.setVisible(false);
         }
@@ -727,12 +766,26 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         if (fLines.size() == 0) {
             return;
         }
-        if (e.detail == SWT.DRAG) {
-            return;
-        }
         fHoldSelection++;
         switch (e.detail) {
+            case SWT.DRAG:
             case SWT.NONE: {
+                if (e.widget == fSlider) {
+                    /*
+                     * While the slider thumb is being dragged, only perform the
+                     * refresh periodically. The event detail during the drag is
+                     * SWT.DRAG on Windows and SWT.NONE on Linux.
+                     */
+                    if (fSliderThrottler == null) {
+                        fSliderThrottler = new SliderThrottler();
+                        fSliderThrottler.start();
+                    }
+                    fHoldSelection = 0;
+                    return;
+                }
+                /*
+                 * The selection event was sent by the viewer, refresh now.
+                 */
                 //long rank = (long) (fTrace.getNbEvents() * ((double) fSlider.getSelection() / SLIDER_MAX));
                 //setTopRank(rank);
                 if (fSlider.getSelection() == 0 || fSlider.getThumb() == SLIDER_MAX) {
@@ -819,6 +872,46 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 
     @Override
     public void widgetDefaultSelected(SelectionEvent e) {
+    }
+
+    // ------------------------------------------------------------------------
+    // MouseListener (Slider)
+    // ------------------------------------------------------------------------
+
+    /**
+     * @since 1.0
+     */
+    @Override
+    public void mouseDown(MouseEvent e) {
+    }
+
+    /**
+     * @since 1.0
+     */
+    @Override
+    public void mouseUp(MouseEvent e) {
+        if (e.button != 1) {
+            return;
+        }
+        /*
+         * When the mouse button is released, perform the refresh immediately
+         * and interrupt and discard the slider throttler.
+         */
+        if (fSliderThrottler != null) {
+            fSliderThrottler.interrupt();
+            fSliderThrottler = null;
+        }
+        Event event = new Event();
+        event.widget = this;
+        event.detail = SWT.NONE;
+        widgetSelected(new SelectionEvent(event));
+    }
+
+    /**
+     * @since 1.0
+     */
+    @Override
+    public void mouseDoubleClick(MouseEvent e) {
     }
 
     // ------------------------------------------------------------------------
