@@ -790,30 +790,26 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         fRawViewer.addSelectionListener(new Listener() {
             @Override
             public void handleEvent(final Event e) {
-                if (e.data instanceof Long) {
-                    final long rank = (Long) e.data;
-                    int index = (int) rank;
-                    if (fTable.getData(Key.FILTER_OBJ) != null) {
-                        // +1 for top filter status row
-                        index = fCache.getFilteredEventIndex(rank) + 1;
-                    }
-                    // +1 for header row
-                    fTable.setSelection(index + 1);
-                    fSelectedRank = rank;
-                    updateStatusLine(null);
-                } else if (e.data instanceof ITmfLocation) {
-                    /**
-                     * DOES NOT WORK: rank undefined in context from
-                     * seekLocation() <code>
-                     * ITmfLocation<?> location = (ITmfLocation<?>) e.data;
-                     * TmfContext context = fTrace.seekLocation(location);
-                     * fTable.setSelection((int) context.getRank());
-                     *  </code>
-                     */
+                if (fTrace == null) {
                     return;
+                }
+                long rank;
+                if (e.data instanceof Long) {
+                    rank = (Long) e.data;
+                } else if (e.data instanceof ITmfLocation) {
+                    rank = findRank((ITmfLocation) e.data);
                 } else {
                     return;
                 }
+                int index = (int) rank;
+                if (fTable.getData(Key.FILTER_OBJ) != null) {
+                    // +1 for top filter status row
+                    index = fCache.getFilteredEventIndex(rank) + 1;
+                }
+                // +1 for header row
+                fTable.setSelection(index + 1);
+                fSelectedRank = rank;
+                updateStatusLine(null);
                 final TableItem[] selection = fTable.getSelection();
                 if ((selection != null) && (selection.length > 0)) {
                     TableItem item = fTable.getSelection()[0];
@@ -828,6 +824,30 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         fireSelectionChanged(new SelectionChangedEvent(TmfEventsTable.this, StructuredSelection.EMPTY));
                     }
                 }
+            }
+
+            private long findRank(final ITmfLocation selectedLocation) {
+                final double selectedRatio = fTrace.getLocationRatio(selectedLocation);
+                long low = 0;
+                long high = fTrace.getNbEvents();
+                long rank = high / 2;
+                double ratio = -1;
+                while (ratio != selectedRatio) {
+                    ITmfContext context = fTrace.seekEvent(rank);
+                    ratio = fTrace.getLocationRatio(context.getLocation());
+                    context.dispose();
+                    if (ratio < selectedRatio) {
+                        low = rank;
+                        rank = (rank + high) / 2;
+                    } else if (ratio > selectedRatio) {
+                        high = rank;
+                        rank = (rank + low) / 2;
+                    }
+                    if ((high - low) < 2) {
+                        break;
+                    }
+                }
+                return rank;
             }
         });
 
