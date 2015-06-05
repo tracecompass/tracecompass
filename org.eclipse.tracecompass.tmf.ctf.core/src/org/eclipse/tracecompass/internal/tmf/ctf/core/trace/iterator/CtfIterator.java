@@ -183,6 +183,8 @@ public class CtfIterator extends CTFTraceReader
         if (fCurLocation.getLocationInfo().equals(ctfLocationData)) {
             return super.hasMoreEvents();
         }
+        /* Update location to make sure the current event is updated */
+        fCurLocation = new CtfLocation(ctfLocationData);
 
         /* Adjust the timestamp depending on the trace's offset */
         long currTimestamp = ctfLocationData.getTimestamp();
