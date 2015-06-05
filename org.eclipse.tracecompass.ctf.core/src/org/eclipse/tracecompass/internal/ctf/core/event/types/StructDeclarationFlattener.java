@@ -39,7 +39,7 @@ public final class StructDeclarationFlattener {
      * @return The flattened struct. Or if it couldn't be flattened, the 'sd'
      *         struct itself
      */
-    public static StructDeclaration tryFlattenStruct(@NonNull StructDeclaration sd) {
+    public static @NonNull StructDeclaration tryFlattenStruct(@NonNull StructDeclaration sd) {
         if (canBeFlattened(sd)) {
             return newFlattenedStruct(sd);
         }
@@ -77,7 +77,7 @@ public final class StructDeclarationFlattener {
         return false;
     }
 
-    private static StructDeclaration newFlattenedStruct(@NonNull StructDeclaration sd) {
+    private static @NonNull StructDeclaration newFlattenedStruct(@NonNull StructDeclaration sd) {
         StructDeclaration flatStruct = new StructDeclaration(sd.getAlignment());
         for (String name : sd.getFieldsList()) {
             depthFirstAdd(name, flatStruct, sd.getField(name));
