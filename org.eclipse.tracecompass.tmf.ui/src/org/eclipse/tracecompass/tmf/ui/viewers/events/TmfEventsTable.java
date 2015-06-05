@@ -108,7 +108,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
@@ -463,7 +462,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 column.setResizable(false);
             } else {
                 column.setMoveable(true);
-                createHeaderMenuItem(fHeaderMenu, column);
+                column.setData(Key.WIDTH, -1);
             }
             column.addControlListener(new ControlAdapter() {
                 /*
@@ -865,14 +864,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * @param column
      *            the column
      */
-    private static void createHeaderMenuItem(Menu parent, final TableColumn column) {
-        final MenuItem columnMenuItem = new MenuItem(parent, SWT.CHECK);
-        columnMenuItem.setText(column.getText());
-        columnMenuItem.setSelection(column.getResizable());
-        columnMenuItem.addSelectionListener(new SelectionAdapter() {
+    private static IAction createHeaderAction(final TableColumn column) {
+        final IAction columnMenuAction = new Action(column.getText(), IAction.AS_CHECK_BOX) {
             @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (columnMenuItem.getSelection()) {
+            public void run() {
+                if (isChecked()) {
                     column.setWidth((int) column.getData(Key.WIDTH));
                     column.setResizable(true);
                 } else {
@@ -881,15 +877,15 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     column.setResizable(false);
                 }
             }
-        });
+        };
+        columnMenuAction.setChecked(column.getResizable());
+        return columnMenuAction;
     }
 
-    private void createResetHeaderMenuItem() {
-        final MenuItem resetMenu = new MenuItem(fHeaderMenu, SWT.PUSH);
-        resetMenu.setText(Messages.TmfEventsTable_showAll);
-        resetMenu.addSelectionListener(new SelectionAdapter() {
+    private IAction createResetHeaderAction() {
+        return new Action(Messages.TmfEventsTable_ShowAll) {
             @Override
-            public void widgetSelected(SelectionEvent e) {
+            public void run() {
                 for (TableColumn column : fTable.getColumns()) {
                     final Object widthVal = column.getData(Key.WIDTH);
                     if (widthVal instanceof Integer) {
@@ -910,12 +906,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         }
                     }
                 }
-                for (MenuItem menuItem : fHeaderMenu.getItems()) {
-                    menuItem.setSelection(true);
-                }
-
             }
-        });
+        };
     }
 
     // ------------------------------------------------------------------------
@@ -926,7 +918,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * Create a pop-up menu.
      */
     private void createPopupMenu() {
-        createResetHeaderMenuItem();
         final IAction showTableAction = new Action(Messages.TmfEventsTable_ShowTableActionText) {
             @Override
             public void run() {
@@ -1157,6 +1148,21 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             }
         }
 
+        final MenuManager headerPopupMenu = new MenuManager();
+        headerPopupMenu.setRemoveAllWhenShown(true);
+        headerPopupMenu.addMenuListener(new IMenuListener() {
+            @Override
+            public void menuAboutToShow(IMenuManager manager) {
+                for (int index : fTable.getColumnOrder()) {
+                    if (fTable.getColumns()[index].getData(Key.WIDTH) != null) {
+                        headerPopupMenu.add(createHeaderAction(fTable.getColumns()[index]));
+                    }
+                }
+                headerPopupMenu.add(new Separator());
+                headerPopupMenu.add(createResetHeaderAction());
+            }
+        });
+
         final MenuManager tablePopupMenu = new MenuManager();
         tablePopupMenu.setRemoveAllWhenShown(true);
         tablePopupMenu.addMenuListener(new IMenuListener() {
@@ -1285,6 +1291,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 appendToRawPopupMenu(tablePopupMenu);
             }
         });
+
+        fHeaderMenu = headerPopupMenu.createContextMenu(fTable);
 
         fTablePopup = tablePopupMenu.createContextMenu(fTable);
         fTable.setMenu(fTablePopup);
@@ -2322,7 +2330,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             for (int i = 0; i < tableColumns.length; i++) {
                 final TableColumn column = tableColumns[i];
                 packSingleColumn(i, column);
-                column.setData(Key.WIDTH, column.getWidth());
             }
 
         } finally {

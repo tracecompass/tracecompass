@@ -56,7 +56,7 @@ public class Messages extends NLS {
     public static String TmfEventsTable_SearchHint;
     public static String TmfEventsTable_SearchingJobName;
 
-    public static String TmfEventsTable_showAll;
+    public static String TmfEventsTable_ShowAll;
     public static String TmfEventsTable_ShowFilterBarActionText;
     public static String TmfEventsTable_ShowRawActionText;
     public static String TmfEventsTable_ShowSearchBarActionText;
