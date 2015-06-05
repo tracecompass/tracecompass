@@ -72,9 +72,12 @@ public class CtfTmfContext implements ITmfContext {
 
     @Override
     public synchronized void setLocation(ITmfLocation location) {
-        fCurLocation = (CtfLocation) location;
-        if (fCurLocation != null) {
-            getIterator().seek(fCurLocation.getLocationInfo());
+        if (location instanceof CtfLocation) {
+            CtfIterator iterator = getIterator();
+            iterator.seek(((CtfLocation) location).getLocationInfo());
+            fCurLocation = iterator.getLocation();
+        } else {
+            fCurLocation = null;
         }
     }
 
@@ -151,8 +154,10 @@ public class CtfTmfContext implements ITmfContext {
      * @return success or not
      */
     public synchronized boolean seek(final long timestamp) {
-        fCurLocation = new CtfLocation(timestamp, 0);
-        return getIterator().seek(timestamp);
+        CtfIterator iterator = getIterator();
+        boolean ret = iterator.seek(timestamp);
+        fCurLocation = iterator.getLocation();
+        return ret;
     }
 
     /**

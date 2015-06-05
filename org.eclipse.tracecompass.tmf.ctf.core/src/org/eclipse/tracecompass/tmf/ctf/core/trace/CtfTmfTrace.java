@@ -319,18 +319,14 @@ public class CtfTmfTrace extends TmfTrace
         if (currentLocation == null) {
             currentLocation = new CtfLocation(new CtfLocationInfo(0L, 0L));
             context.setRank(0);
-        }
-        if (currentLocation.getLocationInfo() == CtfLocation.INVALID_LOCATION) {
-            currentLocation = new CtfLocation(fTrace.getCurrentEndTime() + 1, 0L);
-        }
-        context.setLocation(currentLocation);
-        if (location == null) {
-            long timestamp = fIteratorManager.getIterator(context).getCurrentTimestamp();
-            currentLocation = new CtfLocation(timestamp, 0);
-        }
-        if (context.getRank() != 0) {
+        } else {
             context.setRank(ITmfContext.UNKNOWN_RANK);
+            if (currentLocation.getLocationInfo() == CtfLocation.INVALID_LOCATION) {
+                currentLocation = new CtfLocation(fTrace.getCurrentEndTime() + 1, 0L);
+            }
         }
+        /* This will seek and update the location after the seek */
+        context.setLocation(currentLocation);
         return context;
     }
 
