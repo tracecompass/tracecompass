@@ -9,6 +9,7 @@
  * Contributors:
  *   Matthew Khouzam - Initial generation with CodePro tools
  *   Alexandre Montplaisir - Clean up, consolidate redundant tests
+ *   Patrick Tasse - Fix location ratio
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.ctf.core.tests.trace;
@@ -106,6 +107,7 @@ public class CtfTmfTraceTest {
         fixture.getNext(ctx);
         CtfTmfEvent event = fixture.parseEvent(ctx);
         assertNotNull(event);
+        ctx.dispose();
     }
 
     /**
@@ -210,11 +212,20 @@ public class CtfTmfTraceTest {
      */
     @Test
     public void testGetLocationRatio() {
-        final CtfLocationInfo location2 = new CtfLocationInfo(1, 0);
-        CtfLocation location = new CtfLocation(location2);
-        double result = fixture.getLocationRatio(location);
-
-        assertEquals(Double.NEGATIVE_INFINITY, result, 0.1);
+        ITmfContext context = fixture.seekEvent(0);
+        long t1 = ((CtfLocationInfo) context.getLocation().getLocationInfo()).getTimestamp();
+        fixture.getNext(context);
+        long t2 = ((CtfLocationInfo) context.getLocation().getLocationInfo()).getTimestamp();
+        fixture.getNext(context);
+        long t3 = ((CtfLocationInfo) context.getLocation().getLocationInfo()).getTimestamp();
+        fixture.getNext(context);
+        context.dispose();
+        double ratio1 = fixture.getLocationRatio(new CtfLocation(t1, 0));
+        assertEquals(0.0, ratio1, 0.01);
+        double ratio2 = fixture.getLocationRatio(new CtfLocation(t2, 0));
+        assertEquals((double) (t2 - t1) / (t3 - t1), ratio2, 0.01);
+        double ratio3 = fixture.getLocationRatio(new CtfLocation(t3, 0));
+        assertEquals(1.0, ratio3, 0.01);
     }
 
     /**
@@ -252,6 +263,7 @@ public class CtfTmfTraceTest {
         ITmfContext context = fixture.seekEvent(0);
         CtfTmfEvent result = fixture.getNext(context);
         assertNotNull(result);
+        context.dispose();
     }
 
     /**
@@ -307,6 +319,7 @@ public class CtfTmfTraceTest {
         ITmfContext context = fixture.seekEvent(0);
         CtfTmfEvent result = fixture.getNext(context);
         assertNotNull(result);
+        context.dispose();
     }
 
     /**
@@ -314,9 +327,23 @@ public class CtfTmfTraceTest {
      */
     @Test
     public void testSeekEvent_ratio() {
-        double ratio = 0.99;
-        ITmfContext result = fixture.seekEvent(ratio);
-        assertNotNull(result);
+        ITmfContext context = fixture.seekEvent(0);
+        long t1 = ((CtfLocationInfo) context.getLocation().getLocationInfo()).getTimestamp();
+        fixture.getNext(context);
+        long t2 = ((CtfLocationInfo) context.getLocation().getLocationInfo()).getTimestamp();
+        fixture.getNext(context);
+        long t3 = ((CtfLocationInfo) context.getLocation().getLocationInfo()).getTimestamp();
+        fixture.getNext(context);
+        context.dispose();
+        context = fixture.seekEvent(0.0);
+        assertEquals(t1, ((CtfLocationInfo) context.getLocation().getLocationInfo()).getTimestamp());
+        context.dispose();
+        context = fixture.seekEvent(0.5);
+        assertEquals(t2, ((CtfLocationInfo) context.getLocation().getLocationInfo()).getTimestamp());
+        context.dispose();
+        context = fixture.seekEvent(1.0);
+        assertEquals(t3, ((CtfLocationInfo) context.getLocation().getLocationInfo()).getTimestamp());
+        context.dispose();
     }
 
     /**
@@ -327,6 +354,7 @@ public class CtfTmfTraceTest {
         long rank = 1L;
         ITmfContext result = fixture.seekEvent(rank);
         assertNotNull(result);
+        result.dispose();
     }
 
     /**
@@ -337,6 +365,7 @@ public class CtfTmfTraceTest {
         ITmfTimestamp timestamp = new TmfTimestamp();
         ITmfContext result = fixture.seekEvent(timestamp);
         assertNotNull(result);
+        result.dispose();
     }
 
     /**
@@ -348,6 +377,7 @@ public class CtfTmfTraceTest {
         CtfLocation ctfLocation = new CtfLocation(location2);
         ITmfContext result = fixture.seekEvent(ctfLocation);
         assertNotNull(result);
+        result.dispose();
     }
 
     /**

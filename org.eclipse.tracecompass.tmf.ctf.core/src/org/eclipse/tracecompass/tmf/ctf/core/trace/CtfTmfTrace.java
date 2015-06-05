@@ -285,14 +285,10 @@ public class CtfTmfTrace extends TmfTrace
     @Override
     public double getLocationRatio(ITmfLocation location) {
         final CtfLocation curLocation = (CtfLocation) location;
-        final CtfTmfContext context = new CtfTmfContext(this);
-        context.setLocation(curLocation);
-        context.seek(curLocation.getLocationInfo());
-        final CtfLocationInfo currentTime = ((CtfLocationInfo) context.getLocation().getLocationInfo());
-        final long startTime = fIteratorManager.getIterator(context).getStartTime();
-        final long endTime = fIteratorManager.getIterator(context).getEndTime();
-        return ((double) currentTime.getTimestamp() - startTime)
-                / (endTime - startTime);
+        final long startTime = getStartTime().getValue();
+        final double diff = curLocation.getLocationInfo().getTimestamp() - startTime;
+        final double total = getEndTime().getValue() - startTime;
+        return Math.max(0.0, Math.min(1.0, diff / total));
     }
 
     /**
@@ -338,8 +334,8 @@ public class CtfTmfTrace extends TmfTrace
             context.setRank(ITmfContext.UNKNOWN_RANK);
             return context;
         }
-        final long end = fTrace.getCurrentEndTime();
-        final long start = fTrace.getCurrentStartTime();
+        final long end = getEndTime().getValue();
+        final long start = getStartTime().getValue();
         final long diff = end - start;
         final long ratioTs = Math.round(diff * ratio) + start;
         context.seek(ratioTs);
