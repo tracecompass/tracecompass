@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson, Ecole Polytechnique de Montreal and others
+ * Copyright (c) 2011, 2015 Ericsson, Ecole Polytechnique de Montreal and others
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -10,7 +10,7 @@
  * Contributors: Simon Marchi    - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.ctf.core.event.metadata;
+package org.eclipse.tracecompass.ctf.core.event.metadata;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,9 +35,10 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.exceptions.Pars
  *
  * @author Matthew Khouzam
  * @author Simon Marchi
+ * @since 1.1
  *
  */
-class DeclarationScope {
+public class DeclarationScope {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -402,8 +403,8 @@ class DeclarationScope {
     }
 
     /**
-     * Lookup query for an identifier through this scope and its ancestors.
-     * An ancestor scope is a scope in which this scope is nested.
+     * Lookup query for an identifier through this scope and its ancestors. An
+     * ancestor scope is a scope in which this scope is nested.
      *
      * @param identifier
      *            the name of the identifier to search for. In the case of int
