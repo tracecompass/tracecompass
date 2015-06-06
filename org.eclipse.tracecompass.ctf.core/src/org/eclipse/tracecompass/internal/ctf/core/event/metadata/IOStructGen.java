@@ -198,7 +198,7 @@ public class IOStructGen {
                 parseCallsite(child);
                 break;
             default:
-                childTypeError(child);
+                throw childTypeError(child);
             }
         }
         if (traceNode == null) {
@@ -252,7 +252,7 @@ public class IOStructGen {
                 parseCallsite(child);
                 break;
             default:
-                childTypeError(child);
+                throw childTypeError(child);
             }
         }
         parseEvents(events, !Iterables.isEmpty(fTrace.getStreams()));
@@ -364,8 +364,7 @@ public class IOStructGen {
                 parseTraceDeclaration(child);
                 break;
             default:
-                childTypeError(child);
-                break;
+                throw childTypeError(child);
             }
         }
 
@@ -558,8 +557,7 @@ public class IOStructGen {
                 parseStreamDeclaration(child, stream);
                 break;
             default:
-                childTypeError(child);
-                break;
+                throw childTypeError(child);
             }
         }
 
@@ -686,8 +684,7 @@ public class IOStructGen {
                 parseEventDeclaration(child, event);
                 break;
             default:
-                childTypeError(child);
-                break;
+                throw childTypeError(child);
             }
         }
 
@@ -854,7 +851,7 @@ public class IOStructGen {
                 parseTypeSpecifierList(child, null);
                 break;
             default:
-                childTypeError(child);
+                throw childTypeError(child);
             }
         }
     }
@@ -883,8 +880,7 @@ public class IOStructGen {
                 alias = child;
                 break;
             default:
-                childTypeError(child);
-                break;
+                throw childTypeError(child);
             }
         }
 
@@ -928,8 +924,7 @@ public class IOStructGen {
                 typeDeclaratorList = child;
                 break;
             default:
-                childTypeError(child);
-                break;
+                throw childTypeError(child);
             }
         }
 
@@ -995,8 +990,7 @@ public class IOStructGen {
                 typeDeclaratorList = child;
                 break;
             default:
-                childTypeError(child);
-                break;
+                throw childTypeError(child);
             }
         }
 
@@ -1024,8 +1018,7 @@ public class IOStructGen {
                     throw new ParseException("Identifier (" + child.getText() //$NON-NLS-1$
                             + ") not expected in the typealias target"); //$NON-NLS-1$
                 default:
-                    childTypeError(child);
-                    break;
+                    throw childTypeError(child);
                 }
             }
         }
@@ -1108,8 +1101,7 @@ public class IOStructGen {
                     lengths.add(child);
                     break;
                 default:
-                    childTypeError(child);
-                    break;
+                    throw childTypeError(child);
                 }
             }
 
@@ -1160,7 +1152,7 @@ public class IOStructGen {
                     declaration = new SequenceDeclaration(lengthName,
                             declaration);
                 } else {
-                    childTypeError(first);
+                    throw childTypeError(first);
                 }
             }
         }
@@ -1249,7 +1241,7 @@ public class IOStructGen {
             declaration = parseTypeDeclaration(typeSpecifierList, pointerList);
             break;
         default:
-            childTypeError(firstChild);
+            throw childTypeError(firstChild);
         }
 
         return declaration;
@@ -1308,8 +1300,7 @@ public class IOStructGen {
 
                 break;
             default:
-                childTypeError(child);
-                break;
+                throw childTypeError(child);
             }
         }
         int size = mantissa + exponent;
@@ -1428,8 +1419,7 @@ public class IOStructGen {
 
                 break;
             default:
-                childTypeError(child);
-                break;
+                throw childTypeError(child);
             }
         }
 
@@ -1490,8 +1480,7 @@ public class IOStructGen {
 
                     break;
                 default:
-                    childTypeError(child);
-                    break;
+                    throw childTypeError(child);
                 }
             }
 
@@ -1555,9 +1544,7 @@ public class IOStructGen {
                 break;
             }
             default:
-                childTypeError(child);
-
-                break;
+                throw childTypeError(child);
             }
         }
 
@@ -1657,8 +1644,7 @@ public class IOStructGen {
                     parseStructDeclaration(declarationNode, structDeclaration);
                     break;
                 default:
-                    childTypeError(declarationNode);
-                    break;
+                    throw childTypeError(declarationNode);
                 }
             }
             popScope();
@@ -1750,8 +1736,7 @@ public class IOStructGen {
                 break;
             }
             default:
-                childTypeError(child);
-                break;
+                throw childTypeError(child);
             }
         }
 
@@ -1908,7 +1893,7 @@ public class IOStructGen {
                 low = parseUnaryInteger((CommonTree) child.getChild(0));
                 high = parseUnaryInteger((CommonTree) child.getChild(1));
             } else {
-                childTypeError(child);
+                throw childTypeError(child);
             }
         }
 
@@ -2003,8 +1988,7 @@ public class IOStructGen {
 
                 break;
             default:
-                childTypeError(child);
-                break;
+                throw childTypeError(child);
             }
         }
 
@@ -2094,8 +2078,7 @@ public class IOStructGen {
                 parseVariantDeclaration(declarationNode, variantDeclaration);
                 break;
             default:
-                childTypeError(declarationNode);
-                break;
+                throw childTypeError(declarationNode);
             }
         }
 
@@ -2256,8 +2239,7 @@ public class IOStructGen {
         case CTFParser.STRING:
             throw new ParseException("CTF type found in createTypeSpecifierString"); //$NON-NLS-1$
         default:
-            childTypeError(typeSpecifier);
-            break;
+            throw childTypeError(typeSpecifier);
         }
     }
 
@@ -2734,15 +2716,15 @@ public class IOStructGen {
      *
      * @param child
      *            The invalid child node.
-     * @throws ParseException
+     * @return ParseException with details
      */
-    private static void childTypeError(CommonTree child) throws ParseException {
+    private static ParseException childTypeError(CommonTree child) {
         CommonTree parent = (CommonTree) child.getParent();
         String error = "Parent " + CTFParser.tokenNames[parent.getType()] //$NON-NLS-1$
                 + " can't have a child of type " //$NON-NLS-1$
                 + CTFParser.tokenNames[child.getType()] + "."; //$NON-NLS-1$
 
-        throw new ParseException(error);
+        return new ParseException(error);
     }
 
     // ------------------------------------------------------------------------
