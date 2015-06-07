@@ -11,6 +11,8 @@
 
 package org.eclipse.tracecompass.internal.ctf.core.event.metadata;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * Strings generated from the TSDL grammar. Note that they are static final so
  * they get quarked. See CTF specs for more details
@@ -18,6 +20,7 @@ package org.eclipse.tracecompass.internal.ctf.core.event.metadata;
  * @author Matthew Khouzam and All
  */
 @SuppressWarnings("nls")
+@NonNullByDefault
 public interface MetadataStrings {
 
     /** None */
@@ -37,7 +40,7 @@ public interface MetadataStrings {
     String OCT = "oct";
     /** Octal like octal177 */
     String OCTAL = "octal";
-    /** Pointer (memory address for all the hardcore Java gurus out there)*/
+    /** Pointer (memory address for all the hardcore Java gurus out there) */
     String POINTER = "p";
     /** X for hex */
     String X2 = "X";
@@ -57,9 +60,9 @@ public interface MetadataStrings {
     String DEC = "dec";
     /** Decimal */
     String DECIMAL = "decimal";
-    /** native for byteorders*/
+    /** native for byteorders */
     String NATIVE = "native";
-    /** network for byteorders*/
+    /** network for byteorders */
     String NETWORK = "network";
     /** Big endian */
     String BE = "be";
@@ -103,9 +106,21 @@ public interface MetadataStrings {
     String TRUE2 = "TRUE";
     /** True */
     String TRUE = "true";
-    /** Minor (Version)*/
+    /** Minor (Version) */
     String MINOR = "minor";
-    /** Major (Version)*/
+    /** Major (Version) */
     String MAJOR = "major";
+    /** event */
+    String EVENT = "event";
+    /** trace */
+    String TRACE = "trace";
+    /** stream */
+    String STREAM = "stream";
+    /** struct */
+    String STRUCT = "struct";
+    /** variant */
+    String VARIANT = "variant";
+    /** enum */
+    String ENUM = "enum";
 
 }
