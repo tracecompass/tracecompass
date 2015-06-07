@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.event.types.EnumDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
@@ -41,13 +43,15 @@ class DeclarationScope {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private DeclarationScope fParentScope = null;
+    private DeclarationScope fParentScope;
+    private @NonNull HashMap<String, DeclarationScope> fChildren = new HashMap<>();
 
     private final Map<String, StructDeclaration> fStructs = new HashMap<>();
     private final Map<String, EnumDeclaration> fEnums = new HashMap<>();
     private final Map<String, VariantDeclaration> fVariants = new HashMap<>();
     private final Map<String, IDeclaration> fTypes = new HashMap<>();
     private final Map<String, IDeclaration> fIdentifiers = new HashMap<>();
+    private String fName;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -64,9 +68,18 @@ class DeclarationScope {
      *
      * @param parentScope
      *            The parent of the newly created scope.
+     * @param name scope name
      */
-    public DeclarationScope(DeclarationScope parentScope) {
+    public DeclarationScope(DeclarationScope parentScope, String name) {
         fParentScope = parentScope;
+        fName = name;
+        if (parentScope != null) {
+            parentScope.registerChild(name, this);
+        }
+    }
+
+    private void registerChild(String name, DeclarationScope declarationScope) {
+        fChildren.put(name, declarationScope);
     }
 
     // ------------------------------------------------------------------------
@@ -80,6 +93,18 @@ class DeclarationScope {
      */
     public DeclarationScope getParentScope() {
         return fParentScope;
+    }
+
+    /**
+     * Sets the name of the scope
+     * @param name the name
+     */
+    public void setName(String name) {
+        if (hasParent()) {
+            fParentScope.fChildren.remove(fName);
+            fParentScope.fChildren.put(name, this);
+            fName = name;
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -207,6 +232,32 @@ class DeclarationScope {
     // ------------------------------------------------------------------------
 
     /**
+     * Lookup the children scopes of this scope
+     *
+     * @param name
+     *            the child to lookup
+     * @return the scope or null
+     */
+    public @Nullable DeclarationScope lookupChild(String name) {
+        return fChildren.get(name);
+    }
+
+    /**
+     * Lookup the children scopes of this scope and this scope's parents
+     *
+     * @param name
+     *            the child to lookup
+     * @return the scope or null
+     */
+    public @Nullable DeclarationScope lookupChildRecursive(String name) {
+        final DeclarationScope declarationScope = fChildren.get(name);
+        if (declarationScope == null && hasParent()) {
+            return fParentScope.lookupChildRecursive(name);
+        }
+        return declarationScope;
+    }
+
+    /**
      * Looks up a type declaration in the current scope.
      *
      * @param name
@@ -231,7 +282,7 @@ class DeclarationScope {
         IDeclaration declaration = lookupType(name);
         if (declaration != null) {
             return declaration;
-        } else if (fParentScope != null) {
+        } else if (hasParent()) {
             return fParentScope.lookupTypeRecursive(name);
         } else {
             return null;
@@ -263,7 +314,7 @@ class DeclarationScope {
         StructDeclaration declaration = lookupStruct(name);
         if (declaration != null) {
             return declaration;
-        } else if (fParentScope != null) {
+        } else if (hasParent()) {
             return fParentScope.lookupStructRecursive(name);
         } else {
             return null;
@@ -295,7 +346,7 @@ class DeclarationScope {
         EnumDeclaration declaration = lookupEnum(name);
         if (declaration != null) {
             return declaration;
-        } else if (fParentScope != null) {
+        } else if (hasParent()) {
             return fParentScope.lookupEnumRecursive(name);
         } else {
             return null;
@@ -327,11 +378,15 @@ class DeclarationScope {
         VariantDeclaration declaration = lookupVariant(name);
         if (declaration != null) {
             return declaration;
-        } else if (fParentScope != null) {
+        } else if (hasParent()) {
             return fParentScope.lookupVariantRecursive(name);
         } else {
             return null;
         }
+    }
+
+    private boolean hasParent() {
+        return fParentScope != null;
     }
 
     /**
@@ -359,7 +414,7 @@ class DeclarationScope {
         IDeclaration declaration = lookupIdentifier(identifier);
         if (declaration != null) {
             return declaration;
-        } else if (fParentScope != null) {
+        } else if (hasParent()) {
             return fParentScope.lookupIdentifierRecursive(identifier);
         }
         return null;
@@ -392,4 +447,18 @@ class DeclarationScope {
         }
     }
 
+    /**
+     * Add a child scope
+     *
+     * @param scope
+     *            the child
+     */
+    public void addChild(DeclarationScope scope) {
+        final DeclarationScope oldParent = scope.getParentScope();
+        if (oldParent != null) {
+            oldParent.fChildren.remove(scope.fName);
+        }
+        fChildren.put(scope.fName, scope);
+        scope.fParentScope = this;
+    }
 }
