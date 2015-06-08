@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -92,7 +92,6 @@ public class TmfVirtualTable extends Composite {
 
     private boolean fResetTopIndex = false;      // Flag to trigger reset of top index
     private ControlAdapter fResizeListener;      // Resize listener to update visible rows
-    private ControlAdapter fColumnMoveListener;  // Column move listener to redraw column headers
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -171,14 +170,6 @@ public class TmfVirtualTable extends Composite {
             }
         };
         fTable.addControlListener(fResizeListener);
-
-        fColumnMoveListener = new ControlAdapter() {
-            @Override
-            public void controlMoved(ControlEvent e) {
-                fTable.setHeaderVisible(false);
-                fTable.setHeaderVisible(true);
-            }
-        };
 
         // Implement a "fake" tooltip
         final String TOOLTIP_DATA_KEY = "_TABLEITEM"; //$NON-NLS-1$
@@ -646,13 +637,6 @@ public class TmfVirtualTable extends Composite {
          * table column to properly update the number of fully visible rows.
          */
         column.addControlListener(fResizeListener);
-
-        /*
-         * Work around a display glitch (probably a GTK glitch) where
-         * the moved column's header becomes invisible and unselectable
-         * until you focus on another one.
-         */
-        column.addControlListener(fColumnMoveListener);
 
         return column;
     }
