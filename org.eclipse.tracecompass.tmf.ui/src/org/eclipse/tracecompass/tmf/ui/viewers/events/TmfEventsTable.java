@@ -21,6 +21,7 @@ package org.eclipse.tracecompass.tmf.ui.viewers.events;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.FileNotFoundException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -63,6 +64,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.JFaceResources;
@@ -117,6 +119,7 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.filter.TmfCollapseFilter;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
+import org.eclipse.tracecompass.internal.tmf.ui.commands.CopyToClipboardOperation;
 import org.eclipse.tracecompass.internal.tmf.ui.commands.ExportToTextCommandHandler;
 import org.eclipse.tracecompass.internal.tmf.ui.dialogs.MultiLineInputDialog;
 import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
@@ -292,7 +295,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private ITmfTrace fTrace;
     private volatile boolean fPackDone = false;
     private HeaderState fHeaderState = HeaderState.SEARCH;
-    private long fSelectedRank = 0;
+    private long fSelectedRank = -1;
+    private long fSelectedBeginRank = -1;
     private ITmfTimestamp fSelectedBeginTimestamp = null;
     private IStatusLineManager fStatusLineManager = null;
 
@@ -507,6 +511,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     if (e.item.getData(Key.RANK) instanceof Long) {
                         fSelectedRank = (Long) e.item.getData(Key.RANK);
                         fRawViewer.selectAndReveal((Long) e.item.getData(Key.RANK));
+                    } else {
+                        fSelectedRank = -1;
+                    }
+                    if (fTable.getSelectionIndices().length == 1) {
+                        fSelectedBeginRank = fSelectedRank;
                     }
                     if (e.item.getData(Key.TIMESTAMP) instanceof ITmfTimestamp) {
                         final ITmfTimestamp ts = NonNullUtils.checkNotNull((ITmfTimestamp) e.item.getData(Key.TIMESTAMP));
@@ -808,6 +817,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 // +1 for header row
                 fTable.setSelection(index + 1);
                 fSelectedRank = rank;
+                fSelectedBeginRank = fSelectedRank;
                 updateStatusLine(null);
                 final TableItem[] selection = fTable.getSelection();
                 if ((selection != null) && (selection.length > 0)) {
@@ -918,6 +928,37 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * Create a pop-up menu.
      */
     private void createPopupMenu() {
+        final IAction copyAction = new Action(Messages.TmfEventsTable_CopyToClipboardActionText) {
+            @Override
+            public void run() {
+                ITmfTrace trace = fTrace;
+                if (trace == null || (fSelectedRank == -1 && fSelectedBeginRank == -1)) {
+                    return;
+                }
+
+                List<TmfEventTableColumn> columns = new ArrayList<>();
+                for (int i : fTable.getColumnOrder()) {
+                    TableColumn column = fTable.getColumns()[i];
+                    // Omit the margin column and hidden columns
+                    if (i >= EVENT_COLUMNS_START_INDEX && (column.getResizable() || column.getWidth() > 0)) {
+                        columns.add(fColumns.get(i));
+                    }
+                }
+
+                long start = Math.min(fSelectedBeginRank, fSelectedRank);
+                long end = Math.max(fSelectedBeginRank, fSelectedRank);
+                final ITmfFilter filter = (ITmfFilter) fTable.getData(Key.FILTER_OBJ);
+                IRunnableWithProgress operation = new CopyToClipboardOperation(trace, filter, columns, start, end);
+                try {
+                    PlatformUI.getWorkbench().getProgressService().busyCursorWhile(operation);
+                } catch (InvocationTargetException e) {
+                    Activator.getDefault().logError("Invocation target exception copying to clipboard ", e); //$NON-NLS-1$
+                } catch (InterruptedException e) {
+                    /* ignored */
+                }
+            }
+        };
+
         final IAction showTableAction = new Action(Messages.TmfEventsTable_ShowTableActionText) {
             @Override
             public void run() {
@@ -1088,8 +1129,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     IEvaluationContext context = handlerService.getCurrentState();
                     List<TmfEventTableColumn> exportColumns = new ArrayList<>();
                     for (int i : fTable.getColumnOrder()) {
-                        // Omit the margin column
-                        if (i >= EVENT_COLUMNS_START_INDEX) {
+                        TableColumn column = fTable.getColumns()[i];
+                        // Omit the margin column and hidden columns
+                        if (i >= EVENT_COLUMNS_START_INDEX && (column.getResizable() || column.getWidth() > 0)) {
                             exportColumns.add(fColumns.get(i));
                         }
                     }
@@ -1168,7 +1210,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         tablePopupMenu.addMenuListener(new IMenuListener() {
             @Override
             public void menuAboutToShow(final IMenuManager manager) {
-                if (fTable.getSelectionIndex() == 0) {
+                if (fTable.getSelectionIndices().length == 1 && fTable.getSelectionIndices()[0] == 0) {
                     // Right-click on header row
                     if (fHeaderState == HeaderState.FILTER) {
                         tablePopupMenu.add(showSearchBarAction);
@@ -1199,6 +1241,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 }
 
                 // Right-click on table
+                if (fSelectedRank != -1 && fSelectedBeginRank != -1) {
+                    tablePopupMenu.add(copyAction);
+                    tablePopupMenu.add(new Separator());
+                }
                 if (fTable.isVisible() && fRawViewer.isVisible()) {
                     tablePopupMenu.add(hideTableAction);
                     tablePopupMenu.add(hideRawAction);
@@ -2250,6 +2296,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     }
                     fTable.setSelection(selection);
                     fSelectedRank = foundRank;
+                    fSelectedBeginRank = fSelectedRank;
                     fRawViewer.selectAndReveal(fSelectedRank);
                     if (foundTimestamp != null) {
                         broadcast(new TmfSelectionRangeUpdatedSignal(TmfEventsTable.this, foundTimestamp));
@@ -2477,13 +2524,14 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         }
         fTrace = trace;
         fPackDone = false;
-        fSelectedRank = 0;
         fDisposeOnClose = disposeOnClose;
 
         // Perform the updates on the UI thread
         fTable.getDisplay().syncExec(new Runnable() {
             @Override
             public void run() {
+                fSelectedRank = -1;
+                fSelectedBeginRank = -1;
                 fTable.removeAll();
                 fCache.setTrace(trace); // Clear the cache
                 if (trace != null) {
@@ -2768,6 +2816,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 fPendingGotoRank = rank;
             }
             fSelectedRank = rank;
+            fSelectedBeginRank = fSelectedRank;
             fTable.setSelection(index + 1); // +1 for header row
             updateStatusLine(null);
         }
@@ -2874,7 +2923,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     final ITmfContext context = fTrace.seekEvent(timestamp);
                     final long rank = context.getRank();
                     context.dispose();
-                    fSelectedRank = rank;
 
                     fTable.getDisplay().asyncExec(new Runnable() {
                         @Override
@@ -2884,10 +2932,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                                 return;
                             }
 
+                            fSelectedRank = rank;
+                            fSelectedBeginRank = fSelectedRank;
                             int index = (int) rank;
-                            if (fTable.isDisposed()) {
-                                return;
-                            }
                             if (fTable.getData(Key.FILTER_OBJ) != null) {
                                 /* +1 for top filter status row */
                                 index = fCache.getFilteredEventIndex(rank) + 1;

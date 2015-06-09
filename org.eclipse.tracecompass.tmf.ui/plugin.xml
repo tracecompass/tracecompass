@@ -1165,6 +1165,12 @@
       </command>
       <command
             categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
+            description="%command.copy_to_clipboard.description"
+            id="org.eclipse.tracecompass.tmf.ui.copy_to_clipboard"
+            name="%command.copy_to_clipboard">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
             description="%command.export_to_text.description"
             id="org.eclipse.linuxtools.tmf.ui.exportToText"
             name="%command.export_to_text">

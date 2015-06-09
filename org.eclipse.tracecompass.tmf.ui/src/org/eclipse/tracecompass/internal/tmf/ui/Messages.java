@@ -41,6 +41,7 @@ public class Messages extends NLS {
     public static String TmfEventsTable_ClearFiltersActionText;
     public static String TmfEventsTable_CollapseFilterMenuName;
     public static String TmfEventsTable_ContentColumnHeader;
+    public static String TmfEventsTable_CopyToClipboardActionText;
     public static String TmfEventsTable_Export_to_text;
     public static String TmfEventsTable_FilterHint;
     public static String TmfEventsTable_HideRawActionText;
@@ -303,6 +304,10 @@ public class Messages extends NLS {
     public static String CallStackView_ImportBinaryFileButtonText;
     public static String CallStackView_ImportBinaryFileButtonTooltip;
     public static String CallStackView_ImportBinaryFileDialogTitle;
+
+    public static String CopyToClipboardOperation_TaskName;
+    public static String CopyToClipboardOperation_OutOfMemoryErrorTitle;
+    public static String CopyToClipboardOperation_OutOfMemoryErrorMessage;
 
     public static String ExportToTextJob_Export_to;
     public static String ExportToTextJob_Export_trace_to;
