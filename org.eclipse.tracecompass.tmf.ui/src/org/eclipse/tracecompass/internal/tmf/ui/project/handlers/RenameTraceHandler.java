@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson
+ * Copyright (c) 2009, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -29,6 +29,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
@@ -93,7 +94,12 @@ public class RenameTraceHandler extends AbstractHandler {
                         throw new OperationCanceledException();
                     }
                     // Close the trace if open
-                    oldTrace.closeEditors();
+                    Display.getDefault().syncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            oldTrace.closeEditors();
+                        }
+                    });
 
                     if (oldTrace.getResource() instanceof IFolder) {
                         IFolder folder = (IFolder) oldTrace.getResource();
