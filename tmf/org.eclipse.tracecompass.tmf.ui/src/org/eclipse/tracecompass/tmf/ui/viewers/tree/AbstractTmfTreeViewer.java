@@ -408,6 +408,10 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
                     Display.getDefault().asyncExec(new Runnable() {
                         @Override
                         public void run() {
+                            if (fTreeViewer.getControl().isDisposed()) {
+                                return;
+                            }
+
                             if (rootEntry != fTreeViewer.getInput()) {
                                 fTreeViewer.setInput(rootEntry);
                                 contentChanged(rootEntry);
