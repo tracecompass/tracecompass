@@ -91,4 +91,11 @@ public interface CTFStrings {
      * @since 1.0
      */
     String CONTENT_SIZE = "content_size";
+
+    /**
+     * Magic number
+     *
+     * @since 1.0
+     */
+    String MAGIC = "magic";
 }

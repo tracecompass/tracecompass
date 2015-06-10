@@ -34,6 +34,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 import org.eclipse.tracecompass.ctf.core.CTFException;
+import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.ctf.core.event.CTFCallsite;
 import org.eclipse.tracecompass.ctf.core.event.CTFClock;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
@@ -523,10 +524,12 @@ public class CTFTrace implements IDefinitionScope {
     }
 
     private static void validateMagicNumber(StructDefinition packetHeaderDef) throws CTFException {
-        IntegerDefinition magicDef = (IntegerDefinition) packetHeaderDef.lookupDefinition("magic"); //$NON-NLS-1$
-        int magic = (int) magicDef.getValue();
-        if (magic != Utils.CTF_MAGIC) {
-            throw new CTFException("CTF magic mismatch"); //$NON-NLS-1$
+        IntegerDefinition magicDef = (IntegerDefinition) packetHeaderDef.lookupDefinition(CTFStrings.MAGIC);
+        if (magicDef != null) {
+            int magic = (int) magicDef.getValue();
+            if (magic != Utils.CTF_MAGIC) {
+                throw new CTFException("CTF magic mismatch"); //$NON-NLS-1$
+            }
         }
     }
 
@@ -593,8 +596,8 @@ public class CTFTrace implements IDefinitionScope {
         }
 
         /*
-         * If the stream we try to add has no key set, it must be the only
-         * one. Thus, if the streams container is not empty, it is not valid.
+         * If the stream we try to add has no key set, it must be the only one.
+         * Thus, if the streams container is not empty, it is not valid.
          */
         if ((!stream.isIdSet()) && (!fStreams.isEmpty())) {
             throw new ParseException("Stream without id with multiple streams"); //$NON-NLS-1$
