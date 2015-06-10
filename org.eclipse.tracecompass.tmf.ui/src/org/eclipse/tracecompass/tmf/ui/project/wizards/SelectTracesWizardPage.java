@@ -53,6 +53,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
@@ -431,7 +432,12 @@ public class SelectTracesWizardPage extends WizardPage {
                     subMonitor.worked(1);
                 }
                 if (changed) {
-                    fExperiment.closeEditors();
+                    Display.getDefault().syncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            fExperiment.closeEditors();
+                        }
+                    });
                     fExperiment.deleteSupplementaryResources();
                 }
                 setStatus(Status.OK_STATUS);
