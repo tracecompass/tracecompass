@@ -223,9 +223,14 @@ postfixExpressionSuffix
       -> ^($ref ^(UNARY_EXPRESSION_STRING IDENTIFIER))
   ;
 
+postfixCtfExpression
+  : (ref=DOT) ctfSpecifierHead
+      -> ^($ref ^(UNARY_EXPRESSION_STRING ctfSpecifierHead))
+  ;
+
 postfixExpression
-  : primaryExpression postfixExpressionSuffix*
-  | ctfSpecifierHead postfixExpressionSuffix+  // added for ctf-v1.8
+  : (primaryExpression postfixExpressionSuffix*)
+  | (ctfSpecifierHead postfixCtfExpression* postfixExpressionSuffix+) // added for ctf-v1.8
   ;
 
 unaryExpression

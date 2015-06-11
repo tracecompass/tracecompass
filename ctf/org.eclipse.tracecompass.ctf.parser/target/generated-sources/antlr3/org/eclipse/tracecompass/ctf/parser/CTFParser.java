@@ -1,4 +1,4 @@
-// $ANTLR 3.5.2 org/eclipse/tracecompass/ctf/parser/CTFParser.g 2014-10-20 18:17:49
+// $ANTLR 3.5.2 org/eclipse/tracecompass/ctf/parser/CTFParser.g 2015-06-22 18:09:20
 
 /*******************************************************************************
  * Copyright (c) 2010, 2013 Ericsson, Ecole Polytechnique de Montréal and others
@@ -556,7 +556,7 @@ public class CTFParser extends Parser {
 					if ( state.backtracking==0 ) stream_DECIMAL_LITERAL.add(DECIMAL_LITERAL5);
 
 					// AST REWRITE
-					// elements: SIGN, DECIMAL_LITERAL
+					// elements: DECIMAL_LITERAL, SIGN
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -1096,6 +1096,103 @@ public class CTFParser extends Parser {
 	// $ANTLR end "postfixExpressionSuffix"
 
 
+	public static class postfixCtfExpression_return extends ParserRuleReturnScope {
+		CommonTree tree;
+		@Override
+		public CommonTree getTree() { return tree; }
+	};
+
+
+	// $ANTLR start "postfixCtfExpression"
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:226:1: postfixCtfExpression : (ref= DOT ) ctfSpecifierHead -> ^( $ref ^( UNARY_EXPRESSION_STRING ctfSpecifierHead ) ) ;
+	public final CTFParser.postfixCtfExpression_return postfixCtfExpression() throws RecognitionException {
+		CTFParser.postfixCtfExpression_return retval = new CTFParser.postfixCtfExpression_return();
+		retval.start = input.LT(1);
+
+		CommonTree root_0 = null;
+
+		Token ref=null;
+		ParserRuleReturnScope ctfSpecifierHead17 =null;
+
+		CommonTree ref_tree=null;
+		RewriteRuleTokenStream stream_DOT=new RewriteRuleTokenStream(adaptor,"token DOT");
+		RewriteRuleSubtreeStream stream_ctfSpecifierHead=new RewriteRuleSubtreeStream(adaptor,"rule ctfSpecifierHead");
+
+		try {
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:227:3: ( (ref= DOT ) ctfSpecifierHead -> ^( $ref ^( UNARY_EXPRESSION_STRING ctfSpecifierHead ) ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:227:5: (ref= DOT ) ctfSpecifierHead
+			{
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:227:5: (ref= DOT )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:227:6: ref= DOT
+			{
+			ref=(Token)match(input,DOT,FOLLOW_DOT_in_postfixCtfExpression719); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_DOT.add(ref);
+
+			}
+
+			pushFollow(FOLLOW_ctfSpecifierHead_in_postfixCtfExpression722);
+			ctfSpecifierHead17=ctfSpecifierHead();
+			state._fsp--;
+			if (state.failed) return retval;
+			if ( state.backtracking==0 ) stream_ctfSpecifierHead.add(ctfSpecifierHead17.getTree());
+			// AST REWRITE
+			// elements: ctfSpecifierHead, ref
+			// token labels: ref
+			// rule labels: retval
+			// token list labels: 
+			// rule list labels: 
+			// wildcard labels: 
+			if ( state.backtracking==0 ) {
+			retval.tree = root_0;
+			RewriteRuleTokenStream stream_ref=new RewriteRuleTokenStream(adaptor,"token ref",ref);
+			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
+
+			root_0 = (CommonTree)adaptor.nil();
+			// 228:7: -> ^( $ref ^( UNARY_EXPRESSION_STRING ctfSpecifierHead ) )
+			{
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:228:10: ^( $ref ^( UNARY_EXPRESSION_STRING ctfSpecifierHead ) )
+				{
+				CommonTree root_1 = (CommonTree)adaptor.nil();
+				root_1 = (CommonTree)adaptor.becomeRoot(stream_ref.nextNode(), root_1);
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:228:17: ^( UNARY_EXPRESSION_STRING ctfSpecifierHead )
+				{
+				CommonTree root_2 = (CommonTree)adaptor.nil();
+				root_2 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(UNARY_EXPRESSION_STRING, "UNARY_EXPRESSION_STRING"), root_2);
+				adaptor.addChild(root_2, stream_ctfSpecifierHead.nextTree());
+				adaptor.addChild(root_1, root_2);
+				}
+
+				adaptor.addChild(root_0, root_1);
+				}
+
+			}
+
+
+			retval.tree = root_0;
+			}
+
+			}
+
+			retval.stop = input.LT(-1);
+
+			if ( state.backtracking==0 ) {
+			retval.tree = (CommonTree)adaptor.rulePostProcessing(root_0);
+			adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
+			}
+		}
+
+		    catch (RecognitionException e) {
+		        throw e;
+		    }
+
+		finally {
+			// do for sure before leaving
+		}
+		return retval;
+	}
+	// $ANTLR end "postfixCtfExpression"
+
+
 	public static class postfixExpression_return extends ParserRuleReturnScope {
 		CommonTree tree;
 		@Override
@@ -1104,22 +1201,23 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "postfixExpression"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:226:1: postfixExpression : ( primaryExpression ( postfixExpressionSuffix )* | ctfSpecifierHead ( postfixExpressionSuffix )+ );
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:231:1: postfixExpression : ( ( primaryExpression ( postfixExpressionSuffix )* ) | ( ctfSpecifierHead ( postfixCtfExpression )* ( postfixExpressionSuffix )+ ) );
 	public final CTFParser.postfixExpression_return postfixExpression() throws RecognitionException {
 		CTFParser.postfixExpression_return retval = new CTFParser.postfixExpression_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		ParserRuleReturnScope primaryExpression17 =null;
-		ParserRuleReturnScope postfixExpressionSuffix18 =null;
-		ParserRuleReturnScope ctfSpecifierHead19 =null;
-		ParserRuleReturnScope postfixExpressionSuffix20 =null;
+		ParserRuleReturnScope primaryExpression18 =null;
+		ParserRuleReturnScope postfixExpressionSuffix19 =null;
+		ParserRuleReturnScope ctfSpecifierHead20 =null;
+		ParserRuleReturnScope postfixCtfExpression21 =null;
+		ParserRuleReturnScope postfixExpressionSuffix22 =null;
 
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:227:3: ( primaryExpression ( postfixExpressionSuffix )* | ctfSpecifierHead ( postfixExpressionSuffix )+ )
-			int alt9=2;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:232:3: ( ( primaryExpression ( postfixExpressionSuffix )* ) | ( ctfSpecifierHead ( postfixCtfExpression )* ( postfixExpressionSuffix )+ ) )
+			int alt10=2;
 			switch ( input.LA(1) ) {
 			case ALIGNTOK:
 			case CHARACTER_LITERAL:
@@ -1132,12 +1230,12 @@ public class CTFParser extends Parser {
 			case STRINGTOK:
 			case STRING_LITERAL:
 				{
-				alt9=1;
+				alt10=1;
 				}
 				break;
 			case EVENTTOK:
 				{
-				alt9=1;
+				alt10=1;
 				}
 				break;
 			case CALLSITETOK:
@@ -1146,29 +1244,32 @@ public class CTFParser extends Parser {
 			case STREAMTOK:
 			case TRACETOK:
 				{
-				alt9=2;
+				alt10=2;
 				}
 				break;
 			default:
 				if (state.backtracking>0) {state.failed=true; return retval;}
 				NoViableAltException nvae =
-					new NoViableAltException("", 9, 0, input);
+					new NoViableAltException("", 10, 0, input);
 				throw nvae;
 			}
-			switch (alt9) {
+			switch (alt10) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:227:5: primaryExpression ( postfixExpressionSuffix )*
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:232:5: ( primaryExpression ( postfixExpressionSuffix )* )
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					pushFollow(FOLLOW_primaryExpression_in_postfixExpression716);
-					primaryExpression17=primaryExpression();
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:232:5: ( primaryExpression ( postfixExpressionSuffix )* )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:232:6: primaryExpression ( postfixExpressionSuffix )*
+					{
+					pushFollow(FOLLOW_primaryExpression_in_postfixExpression755);
+					primaryExpression18=primaryExpression();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) adaptor.addChild(root_0, primaryExpression17.getTree());
+					if ( state.backtracking==0 ) adaptor.addChild(root_0, primaryExpression18.getTree());
 
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:227:23: ( postfixExpressionSuffix )*
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:232:24: ( postfixExpressionSuffix )*
 					loop7:
 					while (true) {
 						int alt7=2;
@@ -1179,13 +1280,13 @@ public class CTFParser extends Parser {
 
 						switch (alt7) {
 						case 1 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:227:23: postfixExpressionSuffix
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:232:24: postfixExpressionSuffix
 							{
-							pushFollow(FOLLOW_postfixExpressionSuffix_in_postfixExpression718);
-							postfixExpressionSuffix18=postfixExpressionSuffix();
+							pushFollow(FOLLOW_postfixExpressionSuffix_in_postfixExpression757);
+							postfixExpressionSuffix19=postfixExpressionSuffix();
 							state._fsp--;
 							if (state.failed) return retval;
-							if ( state.backtracking==0 ) adaptor.addChild(root_0, postfixExpressionSuffix18.getTree());
+							if ( state.backtracking==0 ) adaptor.addChild(root_0, postfixExpressionSuffix19.getTree());
 
 							}
 							break;
@@ -1196,49 +1297,87 @@ public class CTFParser extends Parser {
 					}
 
 					}
+
+					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:228:5: ctfSpecifierHead ( postfixExpressionSuffix )+
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:233:5: ( ctfSpecifierHead ( postfixCtfExpression )* ( postfixExpressionSuffix )+ )
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ctfSpecifierHead_in_postfixExpression725);
-					ctfSpecifierHead19=ctfSpecifierHead();
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:233:5: ( ctfSpecifierHead ( postfixCtfExpression )* ( postfixExpressionSuffix )+ )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:233:6: ctfSpecifierHead ( postfixCtfExpression )* ( postfixExpressionSuffix )+
+					{
+					pushFollow(FOLLOW_ctfSpecifierHead_in_postfixExpression766);
+					ctfSpecifierHead20=ctfSpecifierHead();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) adaptor.addChild(root_0, ctfSpecifierHead19.getTree());
+					if ( state.backtracking==0 ) adaptor.addChild(root_0, ctfSpecifierHead20.getTree());
 
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:228:22: ( postfixExpressionSuffix )+
-					int cnt8=0;
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:233:23: ( postfixCtfExpression )*
 					loop8:
 					while (true) {
 						int alt8=2;
 						int LA8_0 = input.LA(1);
-						if ( (LA8_0==ARROW||LA8_0==DOT||LA8_0==OPENBRAC) ) {
-							alt8=1;
+						if ( (LA8_0==DOT) ) {
+							int LA8_2 = input.LA(2);
+							if ( (LA8_2==CALLSITETOK||LA8_2==CLOCKTOK||LA8_2==ENVTOK||LA8_2==EVENTTOK||LA8_2==STREAMTOK||LA8_2==TRACETOK) ) {
+								alt8=1;
+							}
+
 						}
 
 						switch (alt8) {
 						case 1 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:228:22: postfixExpressionSuffix
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:233:23: postfixCtfExpression
 							{
-							pushFollow(FOLLOW_postfixExpressionSuffix_in_postfixExpression727);
-							postfixExpressionSuffix20=postfixExpressionSuffix();
+							pushFollow(FOLLOW_postfixCtfExpression_in_postfixExpression768);
+							postfixCtfExpression21=postfixCtfExpression();
 							state._fsp--;
 							if (state.failed) return retval;
-							if ( state.backtracking==0 ) adaptor.addChild(root_0, postfixExpressionSuffix20.getTree());
+							if ( state.backtracking==0 ) adaptor.addChild(root_0, postfixCtfExpression21.getTree());
 
 							}
 							break;
 
 						default :
-							if ( cnt8 >= 1 ) break loop8;
+							break loop8;
+						}
+					}
+
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:233:45: ( postfixExpressionSuffix )+
+					int cnt9=0;
+					loop9:
+					while (true) {
+						int alt9=2;
+						int LA9_0 = input.LA(1);
+						if ( (LA9_0==ARROW||LA9_0==DOT||LA9_0==OPENBRAC) ) {
+							alt9=1;
+						}
+
+						switch (alt9) {
+						case 1 :
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:233:45: postfixExpressionSuffix
+							{
+							pushFollow(FOLLOW_postfixExpressionSuffix_in_postfixExpression771);
+							postfixExpressionSuffix22=postfixExpressionSuffix();
+							state._fsp--;
+							if (state.failed) return retval;
+							if ( state.backtracking==0 ) adaptor.addChild(root_0, postfixExpressionSuffix22.getTree());
+
+							}
+							break;
+
+						default :
+							if ( cnt9 >= 1 ) break loop9;
 							if (state.backtracking>0) {state.failed=true; return retval;}
-							EarlyExitException eee = new EarlyExitException(8, input);
+							EarlyExitException eee = new EarlyExitException(9, input);
 							throw eee;
 						}
-						cnt8++;
+						cnt9++;
+					}
+
 					}
 
 					}
@@ -1273,28 +1412,28 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "unaryExpression"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:231:1: unaryExpression : postfixExpression ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:236:1: unaryExpression : postfixExpression ;
 	public final CTFParser.unaryExpression_return unaryExpression() throws RecognitionException {
 		CTFParser.unaryExpression_return retval = new CTFParser.unaryExpression_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		ParserRuleReturnScope postfixExpression21 =null;
+		ParserRuleReturnScope postfixExpression23 =null;
 
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:232:3: ( postfixExpression )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:232:5: postfixExpression
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:237:3: ( postfixExpression )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:237:5: postfixExpression
 			{
 			root_0 = (CommonTree)adaptor.nil();
 
 
-			pushFollow(FOLLOW_postfixExpression_in_unaryExpression743);
-			postfixExpression21=postfixExpression();
+			pushFollow(FOLLOW_postfixExpression_in_unaryExpression787);
+			postfixExpression23=postfixExpression();
 			state._fsp--;
 			if (state.failed) return retval;
-			if ( state.backtracking==0 ) adaptor.addChild(root_0, postfixExpression21.getTree());
+			if ( state.backtracking==0 ) adaptor.addChild(root_0, postfixExpression23.getTree());
 
 			}
 
@@ -1326,35 +1465,35 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "enumConstant"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:236:1: enumConstant : ( STRING_LITERAL -> ^( UNARY_EXPRESSION_STRING_QUOTES STRING_LITERAL ) | IDENTIFIER -> ^( UNARY_EXPRESSION_STRING IDENTIFIER ) | ctfKeyword -> ^( UNARY_EXPRESSION_STRING ctfKeyword ) );
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:241:1: enumConstant : ( STRING_LITERAL -> ^( UNARY_EXPRESSION_STRING_QUOTES STRING_LITERAL ) | IDENTIFIER -> ^( UNARY_EXPRESSION_STRING IDENTIFIER ) | ctfKeyword -> ^( UNARY_EXPRESSION_STRING ctfKeyword ) );
 	public final CTFParser.enumConstant_return enumConstant() throws RecognitionException {
 		CTFParser.enumConstant_return retval = new CTFParser.enumConstant_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token STRING_LITERAL22=null;
-		Token IDENTIFIER23=null;
-		ParserRuleReturnScope ctfKeyword24 =null;
+		Token STRING_LITERAL24=null;
+		Token IDENTIFIER25=null;
+		ParserRuleReturnScope ctfKeyword26 =null;
 
-		CommonTree STRING_LITERAL22_tree=null;
-		CommonTree IDENTIFIER23_tree=null;
+		CommonTree STRING_LITERAL24_tree=null;
+		CommonTree IDENTIFIER25_tree=null;
 		RewriteRuleTokenStream stream_STRING_LITERAL=new RewriteRuleTokenStream(adaptor,"token STRING_LITERAL");
 		RewriteRuleTokenStream stream_IDENTIFIER=new RewriteRuleTokenStream(adaptor,"token IDENTIFIER");
 		RewriteRuleSubtreeStream stream_ctfKeyword=new RewriteRuleSubtreeStream(adaptor,"rule ctfKeyword");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:237:3: ( STRING_LITERAL -> ^( UNARY_EXPRESSION_STRING_QUOTES STRING_LITERAL ) | IDENTIFIER -> ^( UNARY_EXPRESSION_STRING IDENTIFIER ) | ctfKeyword -> ^( UNARY_EXPRESSION_STRING ctfKeyword ) )
-			int alt10=3;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:242:3: ( STRING_LITERAL -> ^( UNARY_EXPRESSION_STRING_QUOTES STRING_LITERAL ) | IDENTIFIER -> ^( UNARY_EXPRESSION_STRING IDENTIFIER ) | ctfKeyword -> ^( UNARY_EXPRESSION_STRING ctfKeyword ) )
+			int alt11=3;
 			switch ( input.LA(1) ) {
 			case STRING_LITERAL:
 				{
-				alt10=1;
+				alt11=1;
 				}
 				break;
 			case IDENTIFIER:
 				{
-				alt10=2;
+				alt11=2;
 				}
 				break;
 			case ALIGNTOK:
@@ -1362,21 +1501,21 @@ public class CTFParser extends Parser {
 			case SIGNEDTOK:
 			case STRINGTOK:
 				{
-				alt10=3;
+				alt11=3;
 				}
 				break;
 			default:
 				if (state.backtracking>0) {state.failed=true; return retval;}
 				NoViableAltException nvae =
-					new NoViableAltException("", 10, 0, input);
+					new NoViableAltException("", 11, 0, input);
 				throw nvae;
 			}
-			switch (alt10) {
+			switch (alt11) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:237:5: STRING_LITERAL
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:242:5: STRING_LITERAL
 					{
-					STRING_LITERAL22=(Token)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_enumConstant760); if (state.failed) return retval; 
-					if ( state.backtracking==0 ) stream_STRING_LITERAL.add(STRING_LITERAL22);
+					STRING_LITERAL24=(Token)match(input,STRING_LITERAL,FOLLOW_STRING_LITERAL_in_enumConstant804); if (state.failed) return retval; 
+					if ( state.backtracking==0 ) stream_STRING_LITERAL.add(STRING_LITERAL24);
 
 					// AST REWRITE
 					// elements: STRING_LITERAL
@@ -1390,9 +1529,9 @@ public class CTFParser extends Parser {
 					RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 					root_0 = (CommonTree)adaptor.nil();
-					// 237:20: -> ^( UNARY_EXPRESSION_STRING_QUOTES STRING_LITERAL )
+					// 242:20: -> ^( UNARY_EXPRESSION_STRING_QUOTES STRING_LITERAL )
 					{
-						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:237:23: ^( UNARY_EXPRESSION_STRING_QUOTES STRING_LITERAL )
+						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:242:23: ^( UNARY_EXPRESSION_STRING_QUOTES STRING_LITERAL )
 						{
 						CommonTree root_1 = (CommonTree)adaptor.nil();
 						root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(UNARY_EXPRESSION_STRING_QUOTES, "UNARY_EXPRESSION_STRING_QUOTES"), root_1);
@@ -1409,10 +1548,10 @@ public class CTFParser extends Parser {
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:238:5: IDENTIFIER
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:243:5: IDENTIFIER
 					{
-					IDENTIFIER23=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_enumConstant774); if (state.failed) return retval; 
-					if ( state.backtracking==0 ) stream_IDENTIFIER.add(IDENTIFIER23);
+					IDENTIFIER25=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_enumConstant818); if (state.failed) return retval; 
+					if ( state.backtracking==0 ) stream_IDENTIFIER.add(IDENTIFIER25);
 
 					// AST REWRITE
 					// elements: IDENTIFIER
@@ -1426,9 +1565,9 @@ public class CTFParser extends Parser {
 					RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 					root_0 = (CommonTree)adaptor.nil();
-					// 238:16: -> ^( UNARY_EXPRESSION_STRING IDENTIFIER )
+					// 243:16: -> ^( UNARY_EXPRESSION_STRING IDENTIFIER )
 					{
-						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:238:19: ^( UNARY_EXPRESSION_STRING IDENTIFIER )
+						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:243:19: ^( UNARY_EXPRESSION_STRING IDENTIFIER )
 						{
 						CommonTree root_1 = (CommonTree)adaptor.nil();
 						root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(UNARY_EXPRESSION_STRING, "UNARY_EXPRESSION_STRING"), root_1);
@@ -1445,13 +1584,13 @@ public class CTFParser extends Parser {
 					}
 					break;
 				case 3 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:239:5: ctfKeyword
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:244:5: ctfKeyword
 					{
-					pushFollow(FOLLOW_ctfKeyword_in_enumConstant788);
-					ctfKeyword24=ctfKeyword();
+					pushFollow(FOLLOW_ctfKeyword_in_enumConstant832);
+					ctfKeyword26=ctfKeyword();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_ctfKeyword.add(ctfKeyword24.getTree());
+					if ( state.backtracking==0 ) stream_ctfKeyword.add(ctfKeyword26.getTree());
 					// AST REWRITE
 					// elements: ctfKeyword
 					// token labels: 
@@ -1464,9 +1603,9 @@ public class CTFParser extends Parser {
 					RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 					root_0 = (CommonTree)adaptor.nil();
-					// 239:16: -> ^( UNARY_EXPRESSION_STRING ctfKeyword )
+					// 244:16: -> ^( UNARY_EXPRESSION_STRING ctfKeyword )
 					{
-						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:239:19: ^( UNARY_EXPRESSION_STRING ctfKeyword )
+						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:244:19: ^( UNARY_EXPRESSION_STRING ctfKeyword )
 						{
 						CommonTree root_1 = (CommonTree)adaptor.nil();
 						root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(UNARY_EXPRESSION_STRING, "UNARY_EXPRESSION_STRING"), root_1);
@@ -1512,77 +1651,77 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "declaration"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:244:1: declaration : ( declarationSpecifiers ( declaratorList )? TERM -> {inTypedef()}? ^( DECLARATION ^( TYPEDEF declaratorList declarationSpecifiers ) ) -> ^( DECLARATION declarationSpecifiers ( declaratorList )? ) | ctfSpecifier TERM !);
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:249:1: declaration : ( declarationSpecifiers ( declaratorList )? TERM -> {inTypedef()}? ^( DECLARATION ^( TYPEDEF declaratorList declarationSpecifiers ) ) -> ^( DECLARATION declarationSpecifiers ( declaratorList )? ) | ctfSpecifier TERM !);
 	public final CTFParser.declaration_return declaration() throws RecognitionException {
 		CTFParser.declaration_return retval = new CTFParser.declaration_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token TERM27=null;
 		Token TERM29=null;
-		ParserRuleReturnScope declarationSpecifiers25 =null;
-		ParserRuleReturnScope declaratorList26 =null;
-		ParserRuleReturnScope ctfSpecifier28 =null;
+		Token TERM31=null;
+		ParserRuleReturnScope declarationSpecifiers27 =null;
+		ParserRuleReturnScope declaratorList28 =null;
+		ParserRuleReturnScope ctfSpecifier30 =null;
 
-		CommonTree TERM27_tree=null;
 		CommonTree TERM29_tree=null;
+		CommonTree TERM31_tree=null;
 		RewriteRuleTokenStream stream_TERM=new RewriteRuleTokenStream(adaptor,"token TERM");
 		RewriteRuleSubtreeStream stream_declaratorList=new RewriteRuleSubtreeStream(adaptor,"rule declaratorList");
 		RewriteRuleSubtreeStream stream_declarationSpecifiers=new RewriteRuleSubtreeStream(adaptor,"rule declarationSpecifiers");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:250:3: ( declarationSpecifiers ( declaratorList )? TERM -> {inTypedef()}? ^( DECLARATION ^( TYPEDEF declaratorList declarationSpecifiers ) ) -> ^( DECLARATION declarationSpecifiers ( declaratorList )? ) | ctfSpecifier TERM !)
-			int alt12=2;
-			int LA12_0 = input.LA(1);
-			if ( (LA12_0==BOOLTOK||LA12_0==CHARTOK||(LA12_0 >= COMPLEXTOK && LA12_0 <= CONSTTOK)||LA12_0==DOUBLETOK||LA12_0==ENUMTOK||(LA12_0 >= FLOATINGPOINTTOK && LA12_0 <= FLOATTOK)||LA12_0==IMAGINARYTOK||LA12_0==INTEGERTOK||LA12_0==INTTOK||LA12_0==LONGTOK||LA12_0==SHORTTOK||LA12_0==SIGNEDTOK||LA12_0==STRINGTOK||LA12_0==STRUCTTOK||LA12_0==TYPEDEFTOK||(LA12_0 >= UNSIGNEDTOK && LA12_0 <= VOIDTOK)) ) {
-				alt12=1;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:255:3: ( declarationSpecifiers ( declaratorList )? TERM -> {inTypedef()}? ^( DECLARATION ^( TYPEDEF declaratorList declarationSpecifiers ) ) -> ^( DECLARATION declarationSpecifiers ( declaratorList )? ) | ctfSpecifier TERM !)
+			int alt13=2;
+			int LA13_0 = input.LA(1);
+			if ( (LA13_0==BOOLTOK||LA13_0==CHARTOK||(LA13_0 >= COMPLEXTOK && LA13_0 <= CONSTTOK)||LA13_0==DOUBLETOK||LA13_0==ENUMTOK||(LA13_0 >= FLOATINGPOINTTOK && LA13_0 <= FLOATTOK)||LA13_0==IMAGINARYTOK||LA13_0==INTEGERTOK||LA13_0==INTTOK||LA13_0==LONGTOK||LA13_0==SHORTTOK||LA13_0==SIGNEDTOK||LA13_0==STRINGTOK||LA13_0==STRUCTTOK||LA13_0==TYPEDEFTOK||(LA13_0 >= UNSIGNEDTOK && LA13_0 <= VOIDTOK)) ) {
+				alt13=1;
 			}
-			else if ( (LA12_0==IDENTIFIER) && (( inTypealiasAlias() || isTypeName(input.LT(1).getText()) ))) {
-				alt12=1;
+			else if ( (LA13_0==IDENTIFIER) && (( inTypealiasAlias() || isTypeName(input.LT(1).getText()) ))) {
+				alt13=1;
 			}
-			else if ( (LA12_0==CALLSITETOK||LA12_0==CLOCKTOK||LA12_0==ENVTOK||LA12_0==EVENTTOK||LA12_0==STREAMTOK||(LA12_0 >= TRACETOK && LA12_0 <= TYPEALIASTOK)) ) {
-				alt12=2;
+			else if ( (LA13_0==CALLSITETOK||LA13_0==CLOCKTOK||LA13_0==ENVTOK||LA13_0==EVENTTOK||LA13_0==STREAMTOK||(LA13_0 >= TRACETOK && LA13_0 <= TYPEALIASTOK)) ) {
+				alt13=2;
 			}
 
 			else {
 				if (state.backtracking>0) {state.failed=true; return retval;}
 				NoViableAltException nvae =
-					new NoViableAltException("", 12, 0, input);
+					new NoViableAltException("", 13, 0, input);
 				throw nvae;
 			}
 
-			switch (alt12) {
+			switch (alt13) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:250:5: declarationSpecifiers ( declaratorList )? TERM
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:255:5: declarationSpecifiers ( declaratorList )? TERM
 					{
-					pushFollow(FOLLOW_declarationSpecifiers_in_declaration816);
-					declarationSpecifiers25=declarationSpecifiers();
+					pushFollow(FOLLOW_declarationSpecifiers_in_declaration860);
+					declarationSpecifiers27=declarationSpecifiers();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_declarationSpecifiers.add(declarationSpecifiers25.getTree());
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:250:27: ( declaratorList )?
-					int alt11=2;
-					int LA11_0 = input.LA(1);
-					if ( (LA11_0==IDENTIFIER||LA11_0==POINTER) ) {
-						alt11=1;
+					if ( state.backtracking==0 ) stream_declarationSpecifiers.add(declarationSpecifiers27.getTree());
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:255:27: ( declaratorList )?
+					int alt12=2;
+					int LA12_0 = input.LA(1);
+					if ( (LA12_0==IDENTIFIER||LA12_0==POINTER) ) {
+						alt12=1;
 					}
-					switch (alt11) {
+					switch (alt12) {
 						case 1 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:250:27: declaratorList
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:255:27: declaratorList
 							{
-							pushFollow(FOLLOW_declaratorList_in_declaration818);
-							declaratorList26=declaratorList();
+							pushFollow(FOLLOW_declaratorList_in_declaration862);
+							declaratorList28=declaratorList();
 							state._fsp--;
 							if (state.failed) return retval;
-							if ( state.backtracking==0 ) stream_declaratorList.add(declaratorList26.getTree());
+							if ( state.backtracking==0 ) stream_declaratorList.add(declaratorList28.getTree());
 							}
 							break;
 
 					}
 
-					TERM27=(Token)match(input,TERM,FOLLOW_TERM_in_declaration821); if (state.failed) return retval; 
-					if ( state.backtracking==0 ) stream_TERM.add(TERM27);
+					TERM29=(Token)match(input,TERM,FOLLOW_TERM_in_declaration865); if (state.failed) return retval; 
+					if ( state.backtracking==0 ) stream_TERM.add(TERM29);
 
 					// AST REWRITE
 					// elements: declaratorList, declaratorList, declarationSpecifiers, declarationSpecifiers
@@ -1596,13 +1735,13 @@ public class CTFParser extends Parser {
 					RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 					root_0 = (CommonTree)adaptor.nil();
-					// 253:7: -> {inTypedef()}? ^( DECLARATION ^( TYPEDEF declaratorList declarationSpecifiers ) )
+					// 258:7: -> {inTypedef()}? ^( DECLARATION ^( TYPEDEF declaratorList declarationSpecifiers ) )
 					if (inTypedef()) {
-						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:254:10: ^( DECLARATION ^( TYPEDEF declaratorList declarationSpecifiers ) )
+						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:259:10: ^( DECLARATION ^( TYPEDEF declaratorList declarationSpecifiers ) )
 						{
 						CommonTree root_1 = (CommonTree)adaptor.nil();
 						root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(DECLARATION, "DECLARATION"), root_1);
-						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:254:24: ^( TYPEDEF declaratorList declarationSpecifiers )
+						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:259:24: ^( TYPEDEF declaratorList declarationSpecifiers )
 						{
 						CommonTree root_2 = (CommonTree)adaptor.nil();
 						root_2 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(TYPEDEF, "TYPEDEF"), root_2);
@@ -1616,14 +1755,14 @@ public class CTFParser extends Parser {
 
 					}
 
-					else // 255:7: -> ^( DECLARATION declarationSpecifiers ( declaratorList )? )
+					else // 260:7: -> ^( DECLARATION declarationSpecifiers ( declaratorList )? )
 					{
-						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:255:10: ^( DECLARATION declarationSpecifiers ( declaratorList )? )
+						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:260:10: ^( DECLARATION declarationSpecifiers ( declaratorList )? )
 						{
 						CommonTree root_1 = (CommonTree)adaptor.nil();
 						root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(DECLARATION, "DECLARATION"), root_1);
 						adaptor.addChild(root_1, stream_declarationSpecifiers.nextTree());
-						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:255:46: ( declaratorList )?
+						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:260:46: ( declaratorList )?
 						if ( stream_declaratorList.hasNext() ) {
 							adaptor.addChild(root_1, stream_declaratorList.nextTree());
 						}
@@ -1641,18 +1780,18 @@ public class CTFParser extends Parser {
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:256:5: ctfSpecifier TERM !
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:261:5: ctfSpecifier TERM !
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ctfSpecifier_in_declaration889);
-					ctfSpecifier28=ctfSpecifier();
+					pushFollow(FOLLOW_ctfSpecifier_in_declaration933);
+					ctfSpecifier30=ctfSpecifier();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) adaptor.addChild(root_0, ctfSpecifier28.getTree());
+					if ( state.backtracking==0 ) adaptor.addChild(root_0, ctfSpecifier30.getTree());
 
-					TERM29=(Token)match(input,TERM,FOLLOW_TERM_in_declaration891); if (state.failed) return retval;
+					TERM31=(Token)match(input,TERM,FOLLOW_TERM_in_declaration935); if (state.failed) return retval;
 					}
 					break;
 
@@ -1690,48 +1829,48 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "declarationSpecifiers"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:259:1: declarationSpecifiers : ( storageClassSpecifier | typeQualifier | typeSpecifier )+ -> ^( TYPE_SPECIFIER_LIST ( typeQualifier )* ( typeSpecifier )* ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:264:1: declarationSpecifiers : ( storageClassSpecifier | typeQualifier | typeSpecifier )+ -> ^( TYPE_SPECIFIER_LIST ( typeQualifier )* ( typeSpecifier )* ) ;
 	public final CTFParser.declarationSpecifiers_return declarationSpecifiers() throws RecognitionException {
 		CTFParser.declarationSpecifiers_return retval = new CTFParser.declarationSpecifiers_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		ParserRuleReturnScope storageClassSpecifier30 =null;
-		ParserRuleReturnScope typeQualifier31 =null;
-		ParserRuleReturnScope typeSpecifier32 =null;
+		ParserRuleReturnScope storageClassSpecifier32 =null;
+		ParserRuleReturnScope typeQualifier33 =null;
+		ParserRuleReturnScope typeSpecifier34 =null;
 
 		RewriteRuleSubtreeStream stream_typeSpecifier=new RewriteRuleSubtreeStream(adaptor,"rule typeSpecifier");
 		RewriteRuleSubtreeStream stream_typeQualifier=new RewriteRuleSubtreeStream(adaptor,"rule typeQualifier");
 		RewriteRuleSubtreeStream stream_storageClassSpecifier=new RewriteRuleSubtreeStream(adaptor,"rule storageClassSpecifier");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:260:3: ( ( storageClassSpecifier | typeQualifier | typeSpecifier )+ -> ^( TYPE_SPECIFIER_LIST ( typeQualifier )* ( typeSpecifier )* ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:260:5: ( storageClassSpecifier | typeQualifier | typeSpecifier )+
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:265:3: ( ( storageClassSpecifier | typeQualifier | typeSpecifier )+ -> ^( TYPE_SPECIFIER_LIST ( typeQualifier )* ( typeSpecifier )* ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:265:5: ( storageClassSpecifier | typeQualifier | typeSpecifier )+
 			{
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:260:5: ( storageClassSpecifier | typeQualifier | typeSpecifier )+
-			int cnt13=0;
-			loop13:
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:265:5: ( storageClassSpecifier | typeQualifier | typeSpecifier )+
+			int cnt14=0;
+			loop14:
 			while (true) {
-				int alt13=4;
+				int alt14=4;
 				switch ( input.LA(1) ) {
 				case IDENTIFIER:
 					{
-					int LA13_2 = input.LA(2);
+					int LA14_2 = input.LA(2);
 					if ( ((( inTypealiasAlias() || isTypeName(input.LT(1).getText()) )&&(inTypealiasAlias() || isTypeName(input.LT(1).getText())))) ) {
-						alt13=3;
+						alt14=3;
 					}
 
 					}
 					break;
 				case TYPEDEFTOK:
 					{
-					alt13=1;
+					alt14=1;
 					}
 					break;
 				case CONSTTOK:
 					{
-					alt13=2;
+					alt14=2;
 					}
 					break;
 				case BOOLTOK:
@@ -1753,53 +1892,53 @@ public class CTFParser extends Parser {
 				case VARIANTTOK:
 				case VOIDTOK:
 					{
-					alt13=3;
+					alt14=3;
 					}
 					break;
 				}
-				switch (alt13) {
+				switch (alt14) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:263:9: storageClassSpecifier
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:268:9: storageClassSpecifier
 					{
-					pushFollow(FOLLOW_storageClassSpecifier_in_declarationSpecifiers929);
-					storageClassSpecifier30=storageClassSpecifier();
+					pushFollow(FOLLOW_storageClassSpecifier_in_declarationSpecifiers973);
+					storageClassSpecifier32=storageClassSpecifier();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_storageClassSpecifier.add(storageClassSpecifier30.getTree());
+					if ( state.backtracking==0 ) stream_storageClassSpecifier.add(storageClassSpecifier32.getTree());
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:264:9: typeQualifier
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:269:9: typeQualifier
 					{
-					pushFollow(FOLLOW_typeQualifier_in_declarationSpecifiers939);
-					typeQualifier31=typeQualifier();
+					pushFollow(FOLLOW_typeQualifier_in_declarationSpecifiers983);
+					typeQualifier33=typeQualifier();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_typeQualifier.add(typeQualifier31.getTree());
+					if ( state.backtracking==0 ) stream_typeQualifier.add(typeQualifier33.getTree());
 					}
 					break;
 				case 3 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:265:9: typeSpecifier
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:270:9: typeSpecifier
 					{
-					pushFollow(FOLLOW_typeSpecifier_in_declarationSpecifiers949);
-					typeSpecifier32=typeSpecifier();
+					pushFollow(FOLLOW_typeSpecifier_in_declarationSpecifiers993);
+					typeSpecifier34=typeSpecifier();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_typeSpecifier.add(typeSpecifier32.getTree());
+					if ( state.backtracking==0 ) stream_typeSpecifier.add(typeSpecifier34.getTree());
 					}
 					break;
 
 				default :
-					if ( cnt13 >= 1 ) break loop13;
+					if ( cnt14 >= 1 ) break loop14;
 					if (state.backtracking>0) {state.failed=true; return retval;}
-					EarlyExitException eee = new EarlyExitException(13, input);
+					EarlyExitException eee = new EarlyExitException(14, input);
 					throw eee;
 				}
-				cnt13++;
+				cnt14++;
 			}
 
 			// AST REWRITE
-			// elements: typeQualifier, typeSpecifier
+			// elements: typeSpecifier, typeQualifier
 			// token labels: 
 			// rule labels: retval
 			// token list labels: 
@@ -1810,19 +1949,19 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 266:6: -> ^( TYPE_SPECIFIER_LIST ( typeQualifier )* ( typeSpecifier )* )
+			// 271:6: -> ^( TYPE_SPECIFIER_LIST ( typeQualifier )* ( typeSpecifier )* )
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:266:9: ^( TYPE_SPECIFIER_LIST ( typeQualifier )* ( typeSpecifier )* )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:271:9: ^( TYPE_SPECIFIER_LIST ( typeQualifier )* ( typeSpecifier )* )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.nil();
 				root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(TYPE_SPECIFIER_LIST, "TYPE_SPECIFIER_LIST"), root_1);
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:266:31: ( typeQualifier )*
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:271:31: ( typeQualifier )*
 				while ( stream_typeQualifier.hasNext() ) {
 					adaptor.addChild(root_1, stream_typeQualifier.nextTree());
 				}
 				stream_typeQualifier.reset();
 
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:266:46: ( typeSpecifier )*
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:271:46: ( typeSpecifier )*
 				while ( stream_typeSpecifier.hasNext() ) {
 					adaptor.addChild(root_1, stream_typeSpecifier.nextTree());
 				}
@@ -1867,56 +2006,56 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "declaratorList"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:269:1: declaratorList : declarator ( SEPARATOR declarator )* -> ^( TYPE_DECLARATOR_LIST ( declarator )+ ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:274:1: declaratorList : declarator ( SEPARATOR declarator )* -> ^( TYPE_DECLARATOR_LIST ( declarator )+ ) ;
 	public final CTFParser.declaratorList_return declaratorList() throws RecognitionException {
 		CTFParser.declaratorList_return retval = new CTFParser.declaratorList_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token SEPARATOR34=null;
-		ParserRuleReturnScope declarator33 =null;
+		Token SEPARATOR36=null;
 		ParserRuleReturnScope declarator35 =null;
+		ParserRuleReturnScope declarator37 =null;
 
-		CommonTree SEPARATOR34_tree=null;
+		CommonTree SEPARATOR36_tree=null;
 		RewriteRuleTokenStream stream_SEPARATOR=new RewriteRuleTokenStream(adaptor,"token SEPARATOR");
 		RewriteRuleSubtreeStream stream_declarator=new RewriteRuleSubtreeStream(adaptor,"rule declarator");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:270:3: ( declarator ( SEPARATOR declarator )* -> ^( TYPE_DECLARATOR_LIST ( declarator )+ ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:270:5: declarator ( SEPARATOR declarator )*
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:275:3: ( declarator ( SEPARATOR declarator )* -> ^( TYPE_DECLARATOR_LIST ( declarator )+ ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:275:5: declarator ( SEPARATOR declarator )*
 			{
-			pushFollow(FOLLOW_declarator_in_declaratorList979);
-			declarator33=declarator();
+			pushFollow(FOLLOW_declarator_in_declaratorList1023);
+			declarator35=declarator();
 			state._fsp--;
 			if (state.failed) return retval;
-			if ( state.backtracking==0 ) stream_declarator.add(declarator33.getTree());
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:270:16: ( SEPARATOR declarator )*
-			loop14:
+			if ( state.backtracking==0 ) stream_declarator.add(declarator35.getTree());
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:275:16: ( SEPARATOR declarator )*
+			loop15:
 			while (true) {
-				int alt14=2;
-				int LA14_0 = input.LA(1);
-				if ( (LA14_0==SEPARATOR) ) {
-					alt14=1;
+				int alt15=2;
+				int LA15_0 = input.LA(1);
+				if ( (LA15_0==SEPARATOR) ) {
+					alt15=1;
 				}
 
-				switch (alt14) {
+				switch (alt15) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:270:17: SEPARATOR declarator
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:275:17: SEPARATOR declarator
 					{
-					SEPARATOR34=(Token)match(input,SEPARATOR,FOLLOW_SEPARATOR_in_declaratorList982); if (state.failed) return retval; 
-					if ( state.backtracking==0 ) stream_SEPARATOR.add(SEPARATOR34);
+					SEPARATOR36=(Token)match(input,SEPARATOR,FOLLOW_SEPARATOR_in_declaratorList1026); if (state.failed) return retval; 
+					if ( state.backtracking==0 ) stream_SEPARATOR.add(SEPARATOR36);
 
-					pushFollow(FOLLOW_declarator_in_declaratorList984);
-					declarator35=declarator();
+					pushFollow(FOLLOW_declarator_in_declaratorList1028);
+					declarator37=declarator();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_declarator.add(declarator35.getTree());
+					if ( state.backtracking==0 ) stream_declarator.add(declarator37.getTree());
 					}
 					break;
 
 				default :
-					break loop14;
+					break loop15;
 				}
 			}
 
@@ -1932,9 +2071,9 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 271:7: -> ^( TYPE_DECLARATOR_LIST ( declarator )+ )
+			// 276:7: -> ^( TYPE_DECLARATOR_LIST ( declarator )+ )
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:271:10: ^( TYPE_DECLARATOR_LIST ( declarator )+ )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:276:10: ^( TYPE_DECLARATOR_LIST ( declarator )+ )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.nil();
 				root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(TYPE_DECLARATOR_LIST, "TYPE_DECLARATOR_LIST"), root_1);
@@ -1985,56 +2124,56 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "abstractDeclaratorList"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:274:1: abstractDeclaratorList : abstractDeclarator ( SEPARATOR abstractDeclarator )* -> ^( TYPE_DECLARATOR_LIST ( abstractDeclarator )+ ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:279:1: abstractDeclaratorList : abstractDeclarator ( SEPARATOR abstractDeclarator )* -> ^( TYPE_DECLARATOR_LIST ( abstractDeclarator )+ ) ;
 	public final CTFParser.abstractDeclaratorList_return abstractDeclaratorList() throws RecognitionException {
 		CTFParser.abstractDeclaratorList_return retval = new CTFParser.abstractDeclaratorList_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token SEPARATOR37=null;
-		ParserRuleReturnScope abstractDeclarator36 =null;
+		Token SEPARATOR39=null;
 		ParserRuleReturnScope abstractDeclarator38 =null;
+		ParserRuleReturnScope abstractDeclarator40 =null;
 
-		CommonTree SEPARATOR37_tree=null;
+		CommonTree SEPARATOR39_tree=null;
 		RewriteRuleTokenStream stream_SEPARATOR=new RewriteRuleTokenStream(adaptor,"token SEPARATOR");
 		RewriteRuleSubtreeStream stream_abstractDeclarator=new RewriteRuleSubtreeStream(adaptor,"rule abstractDeclarator");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:275:3: ( abstractDeclarator ( SEPARATOR abstractDeclarator )* -> ^( TYPE_DECLARATOR_LIST ( abstractDeclarator )+ ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:275:5: abstractDeclarator ( SEPARATOR abstractDeclarator )*
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:280:3: ( abstractDeclarator ( SEPARATOR abstractDeclarator )* -> ^( TYPE_DECLARATOR_LIST ( abstractDeclarator )+ ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:280:5: abstractDeclarator ( SEPARATOR abstractDeclarator )*
 			{
-			pushFollow(FOLLOW_abstractDeclarator_in_abstractDeclaratorList1014);
-			abstractDeclarator36=abstractDeclarator();
+			pushFollow(FOLLOW_abstractDeclarator_in_abstractDeclaratorList1058);
+			abstractDeclarator38=abstractDeclarator();
 			state._fsp--;
 			if (state.failed) return retval;
-			if ( state.backtracking==0 ) stream_abstractDeclarator.add(abstractDeclarator36.getTree());
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:275:24: ( SEPARATOR abstractDeclarator )*
-			loop15:
+			if ( state.backtracking==0 ) stream_abstractDeclarator.add(abstractDeclarator38.getTree());
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:280:24: ( SEPARATOR abstractDeclarator )*
+			loop16:
 			while (true) {
-				int alt15=2;
-				int LA15_0 = input.LA(1);
-				if ( (LA15_0==SEPARATOR) ) {
-					alt15=1;
+				int alt16=2;
+				int LA16_0 = input.LA(1);
+				if ( (LA16_0==SEPARATOR) ) {
+					alt16=1;
 				}
 
-				switch (alt15) {
+				switch (alt16) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:275:25: SEPARATOR abstractDeclarator
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:280:25: SEPARATOR abstractDeclarator
 					{
-					SEPARATOR37=(Token)match(input,SEPARATOR,FOLLOW_SEPARATOR_in_abstractDeclaratorList1017); if (state.failed) return retval; 
-					if ( state.backtracking==0 ) stream_SEPARATOR.add(SEPARATOR37);
+					SEPARATOR39=(Token)match(input,SEPARATOR,FOLLOW_SEPARATOR_in_abstractDeclaratorList1061); if (state.failed) return retval; 
+					if ( state.backtracking==0 ) stream_SEPARATOR.add(SEPARATOR39);
 
-					pushFollow(FOLLOW_abstractDeclarator_in_abstractDeclaratorList1019);
-					abstractDeclarator38=abstractDeclarator();
+					pushFollow(FOLLOW_abstractDeclarator_in_abstractDeclaratorList1063);
+					abstractDeclarator40=abstractDeclarator();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_abstractDeclarator.add(abstractDeclarator38.getTree());
+					if ( state.backtracking==0 ) stream_abstractDeclarator.add(abstractDeclarator40.getTree());
 					}
 					break;
 
 				default :
-					break loop15;
+					break loop16;
 				}
 			}
 
@@ -2050,9 +2189,9 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 276:7: -> ^( TYPE_DECLARATOR_LIST ( abstractDeclarator )+ )
+			// 281:7: -> ^( TYPE_DECLARATOR_LIST ( abstractDeclarator )+ )
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:276:10: ^( TYPE_DECLARATOR_LIST ( abstractDeclarator )+ )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:281:10: ^( TYPE_DECLARATOR_LIST ( abstractDeclarator )+ )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.nil();
 				root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(TYPE_DECLARATOR_LIST, "TYPE_DECLARATOR_LIST"), root_1);
@@ -2103,28 +2242,28 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "storageClassSpecifier"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:279:1: storageClassSpecifier : TYPEDEFTOK ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:284:1: storageClassSpecifier : TYPEDEFTOK ;
 	public final CTFParser.storageClassSpecifier_return storageClassSpecifier() throws RecognitionException {
 		CTFParser.storageClassSpecifier_return retval = new CTFParser.storageClassSpecifier_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token TYPEDEFTOK39=null;
+		Token TYPEDEFTOK41=null;
 
-		CommonTree TYPEDEFTOK39_tree=null;
+		CommonTree TYPEDEFTOK41_tree=null;
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:280:3: ( TYPEDEFTOK )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:280:5: TYPEDEFTOK
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:285:3: ( TYPEDEFTOK )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:285:5: TYPEDEFTOK
 			{
 			root_0 = (CommonTree)adaptor.nil();
 
 
-			TYPEDEFTOK39=(Token)match(input,TYPEDEFTOK,FOLLOW_TYPEDEFTOK_in_storageClassSpecifier1049); if (state.failed) return retval;
+			TYPEDEFTOK41=(Token)match(input,TYPEDEFTOK,FOLLOW_TYPEDEFTOK_in_storageClassSpecifier1093); if (state.failed) return retval;
 			if ( state.backtracking==0 ) {
-			TYPEDEFTOK39_tree = (CommonTree)adaptor.create(TYPEDEFTOK39);
-			adaptor.addChild(root_0, TYPEDEFTOK39_tree);
+			TYPEDEFTOK41_tree = (CommonTree)adaptor.create(TYPEDEFTOK41);
+			adaptor.addChild(root_0, TYPEDEFTOK41_tree);
 			}
 
 			if ( state.backtracking==0 ) { typedefOn(); }
@@ -2158,327 +2297,327 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "typeSpecifier"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:283:1: typeSpecifier : ( FLOATTOK | INTTOK | LONGTOK | SHORTTOK | SIGNEDTOK | UNSIGNEDTOK | CHARTOK | DOUBLETOK | VOIDTOK | BOOLTOK | COMPLEXTOK | IMAGINARYTOK | structSpecifier | variantSpecifier | enumSpecifier | ctfTypeSpecifier |{...}? => typedefName );
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:288:1: typeSpecifier : ( FLOATTOK | INTTOK | LONGTOK | SHORTTOK | SIGNEDTOK | UNSIGNEDTOK | CHARTOK | DOUBLETOK | VOIDTOK | BOOLTOK | COMPLEXTOK | IMAGINARYTOK | structSpecifier | variantSpecifier | enumSpecifier | ctfTypeSpecifier |{...}? => typedefName );
 	public final CTFParser.typeSpecifier_return typeSpecifier() throws RecognitionException {
 		CTFParser.typeSpecifier_return retval = new CTFParser.typeSpecifier_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token FLOATTOK40=null;
-		Token INTTOK41=null;
-		Token LONGTOK42=null;
-		Token SHORTTOK43=null;
-		Token SIGNEDTOK44=null;
-		Token UNSIGNEDTOK45=null;
-		Token CHARTOK46=null;
-		Token DOUBLETOK47=null;
-		Token VOIDTOK48=null;
-		Token BOOLTOK49=null;
-		Token COMPLEXTOK50=null;
-		Token IMAGINARYTOK51=null;
-		ParserRuleReturnScope structSpecifier52 =null;
-		ParserRuleReturnScope variantSpecifier53 =null;
-		ParserRuleReturnScope enumSpecifier54 =null;
-		ParserRuleReturnScope ctfTypeSpecifier55 =null;
-		ParserRuleReturnScope typedefName56 =null;
+		Token FLOATTOK42=null;
+		Token INTTOK43=null;
+		Token LONGTOK44=null;
+		Token SHORTTOK45=null;
+		Token SIGNEDTOK46=null;
+		Token UNSIGNEDTOK47=null;
+		Token CHARTOK48=null;
+		Token DOUBLETOK49=null;
+		Token VOIDTOK50=null;
+		Token BOOLTOK51=null;
+		Token COMPLEXTOK52=null;
+		Token IMAGINARYTOK53=null;
+		ParserRuleReturnScope structSpecifier54 =null;
+		ParserRuleReturnScope variantSpecifier55 =null;
+		ParserRuleReturnScope enumSpecifier56 =null;
+		ParserRuleReturnScope ctfTypeSpecifier57 =null;
+		ParserRuleReturnScope typedefName58 =null;
 
-		CommonTree FLOATTOK40_tree=null;
-		CommonTree INTTOK41_tree=null;
-		CommonTree LONGTOK42_tree=null;
-		CommonTree SHORTTOK43_tree=null;
-		CommonTree SIGNEDTOK44_tree=null;
-		CommonTree UNSIGNEDTOK45_tree=null;
-		CommonTree CHARTOK46_tree=null;
-		CommonTree DOUBLETOK47_tree=null;
-		CommonTree VOIDTOK48_tree=null;
-		CommonTree BOOLTOK49_tree=null;
-		CommonTree COMPLEXTOK50_tree=null;
-		CommonTree IMAGINARYTOK51_tree=null;
+		CommonTree FLOATTOK42_tree=null;
+		CommonTree INTTOK43_tree=null;
+		CommonTree LONGTOK44_tree=null;
+		CommonTree SHORTTOK45_tree=null;
+		CommonTree SIGNEDTOK46_tree=null;
+		CommonTree UNSIGNEDTOK47_tree=null;
+		CommonTree CHARTOK48_tree=null;
+		CommonTree DOUBLETOK49_tree=null;
+		CommonTree VOIDTOK50_tree=null;
+		CommonTree BOOLTOK51_tree=null;
+		CommonTree COMPLEXTOK52_tree=null;
+		CommonTree IMAGINARYTOK53_tree=null;
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:284:3: ( FLOATTOK | INTTOK | LONGTOK | SHORTTOK | SIGNEDTOK | UNSIGNEDTOK | CHARTOK | DOUBLETOK | VOIDTOK | BOOLTOK | COMPLEXTOK | IMAGINARYTOK | structSpecifier | variantSpecifier | enumSpecifier | ctfTypeSpecifier |{...}? => typedefName )
-			int alt16=17;
-			int LA16_0 = input.LA(1);
-			if ( (LA16_0==FLOATTOK) ) {
-				alt16=1;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:289:3: ( FLOATTOK | INTTOK | LONGTOK | SHORTTOK | SIGNEDTOK | UNSIGNEDTOK | CHARTOK | DOUBLETOK | VOIDTOK | BOOLTOK | COMPLEXTOK | IMAGINARYTOK | structSpecifier | variantSpecifier | enumSpecifier | ctfTypeSpecifier |{...}? => typedefName )
+			int alt17=17;
+			int LA17_0 = input.LA(1);
+			if ( (LA17_0==FLOATTOK) ) {
+				alt17=1;
 			}
-			else if ( (LA16_0==INTTOK) ) {
-				alt16=2;
+			else if ( (LA17_0==INTTOK) ) {
+				alt17=2;
 			}
-			else if ( (LA16_0==LONGTOK) ) {
-				alt16=3;
+			else if ( (LA17_0==LONGTOK) ) {
+				alt17=3;
 			}
-			else if ( (LA16_0==SHORTTOK) ) {
-				alt16=4;
+			else if ( (LA17_0==SHORTTOK) ) {
+				alt17=4;
 			}
-			else if ( (LA16_0==SIGNEDTOK) ) {
-				alt16=5;
+			else if ( (LA17_0==SIGNEDTOK) ) {
+				alt17=5;
 			}
-			else if ( (LA16_0==UNSIGNEDTOK) ) {
-				alt16=6;
+			else if ( (LA17_0==UNSIGNEDTOK) ) {
+				alt17=6;
 			}
-			else if ( (LA16_0==CHARTOK) ) {
-				alt16=7;
+			else if ( (LA17_0==CHARTOK) ) {
+				alt17=7;
 			}
-			else if ( (LA16_0==DOUBLETOK) ) {
-				alt16=8;
+			else if ( (LA17_0==DOUBLETOK) ) {
+				alt17=8;
 			}
-			else if ( (LA16_0==VOIDTOK) ) {
-				alt16=9;
+			else if ( (LA17_0==VOIDTOK) ) {
+				alt17=9;
 			}
-			else if ( (LA16_0==BOOLTOK) ) {
-				alt16=10;
+			else if ( (LA17_0==BOOLTOK) ) {
+				alt17=10;
 			}
-			else if ( (LA16_0==COMPLEXTOK) ) {
-				alt16=11;
+			else if ( (LA17_0==COMPLEXTOK) ) {
+				alt17=11;
 			}
-			else if ( (LA16_0==IMAGINARYTOK) ) {
-				alt16=12;
+			else if ( (LA17_0==IMAGINARYTOK) ) {
+				alt17=12;
 			}
-			else if ( (LA16_0==STRUCTTOK) ) {
-				alt16=13;
+			else if ( (LA17_0==STRUCTTOK) ) {
+				alt17=13;
 			}
-			else if ( (LA16_0==VARIANTTOK) ) {
-				alt16=14;
+			else if ( (LA17_0==VARIANTTOK) ) {
+				alt17=14;
 			}
-			else if ( (LA16_0==ENUMTOK) ) {
-				alt16=15;
+			else if ( (LA17_0==ENUMTOK) ) {
+				alt17=15;
 			}
-			else if ( (LA16_0==FLOATINGPOINTTOK||LA16_0==INTEGERTOK||LA16_0==STRINGTOK) ) {
-				alt16=16;
+			else if ( (LA17_0==FLOATINGPOINTTOK||LA17_0==INTEGERTOK||LA17_0==STRINGTOK) ) {
+				alt17=16;
 			}
-			else if ( (LA16_0==IDENTIFIER) && (( inTypealiasAlias() || isTypeName(input.LT(1).getText()) ))) {
-				alt16=17;
+			else if ( (LA17_0==IDENTIFIER) && (( inTypealiasAlias() || isTypeName(input.LT(1).getText()) ))) {
+				alt17=17;
 			}
 
-			switch (alt16) {
+			switch (alt17) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:284:5: FLOATTOK
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:289:5: FLOATTOK
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					FLOATTOK40=(Token)match(input,FLOATTOK,FOLLOW_FLOATTOK_in_typeSpecifier1065); if (state.failed) return retval;
+					FLOATTOK42=(Token)match(input,FLOATTOK,FOLLOW_FLOATTOK_in_typeSpecifier1109); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
-					FLOATTOK40_tree = (CommonTree)adaptor.create(FLOATTOK40);
-					adaptor.addChild(root_0, FLOATTOK40_tree);
+					FLOATTOK42_tree = (CommonTree)adaptor.create(FLOATTOK42);
+					adaptor.addChild(root_0, FLOATTOK42_tree);
 					}
 
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:285:5: INTTOK
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:290:5: INTTOK
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					INTTOK41=(Token)match(input,INTTOK,FOLLOW_INTTOK_in_typeSpecifier1071); if (state.failed) return retval;
+					INTTOK43=(Token)match(input,INTTOK,FOLLOW_INTTOK_in_typeSpecifier1115); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
-					INTTOK41_tree = (CommonTree)adaptor.create(INTTOK41);
-					adaptor.addChild(root_0, INTTOK41_tree);
+					INTTOK43_tree = (CommonTree)adaptor.create(INTTOK43);
+					adaptor.addChild(root_0, INTTOK43_tree);
 					}
 
 					}
 					break;
 				case 3 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:286:5: LONGTOK
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:291:5: LONGTOK
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					LONGTOK42=(Token)match(input,LONGTOK,FOLLOW_LONGTOK_in_typeSpecifier1077); if (state.failed) return retval;
+					LONGTOK44=(Token)match(input,LONGTOK,FOLLOW_LONGTOK_in_typeSpecifier1121); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
-					LONGTOK42_tree = (CommonTree)adaptor.create(LONGTOK42);
-					adaptor.addChild(root_0, LONGTOK42_tree);
+					LONGTOK44_tree = (CommonTree)adaptor.create(LONGTOK44);
+					adaptor.addChild(root_0, LONGTOK44_tree);
 					}
 
 					}
 					break;
 				case 4 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:287:5: SHORTTOK
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:292:5: SHORTTOK
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					SHORTTOK43=(Token)match(input,SHORTTOK,FOLLOW_SHORTTOK_in_typeSpecifier1083); if (state.failed) return retval;
+					SHORTTOK45=(Token)match(input,SHORTTOK,FOLLOW_SHORTTOK_in_typeSpecifier1127); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
-					SHORTTOK43_tree = (CommonTree)adaptor.create(SHORTTOK43);
-					adaptor.addChild(root_0, SHORTTOK43_tree);
+					SHORTTOK45_tree = (CommonTree)adaptor.create(SHORTTOK45);
+					adaptor.addChild(root_0, SHORTTOK45_tree);
 					}
 
 					}
 					break;
 				case 5 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:288:5: SIGNEDTOK
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:293:5: SIGNEDTOK
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					SIGNEDTOK44=(Token)match(input,SIGNEDTOK,FOLLOW_SIGNEDTOK_in_typeSpecifier1089); if (state.failed) return retval;
+					SIGNEDTOK46=(Token)match(input,SIGNEDTOK,FOLLOW_SIGNEDTOK_in_typeSpecifier1133); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
-					SIGNEDTOK44_tree = (CommonTree)adaptor.create(SIGNEDTOK44);
-					adaptor.addChild(root_0, SIGNEDTOK44_tree);
+					SIGNEDTOK46_tree = (CommonTree)adaptor.create(SIGNEDTOK46);
+					adaptor.addChild(root_0, SIGNEDTOK46_tree);
 					}
 
 					}
 					break;
 				case 6 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:289:5: UNSIGNEDTOK
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:294:5: UNSIGNEDTOK
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					UNSIGNEDTOK45=(Token)match(input,UNSIGNEDTOK,FOLLOW_UNSIGNEDTOK_in_typeSpecifier1095); if (state.failed) return retval;
+					UNSIGNEDTOK47=(Token)match(input,UNSIGNEDTOK,FOLLOW_UNSIGNEDTOK_in_typeSpecifier1139); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
-					UNSIGNEDTOK45_tree = (CommonTree)adaptor.create(UNSIGNEDTOK45);
-					adaptor.addChild(root_0, UNSIGNEDTOK45_tree);
+					UNSIGNEDTOK47_tree = (CommonTree)adaptor.create(UNSIGNEDTOK47);
+					adaptor.addChild(root_0, UNSIGNEDTOK47_tree);
 					}
 
 					}
 					break;
 				case 7 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:290:5: CHARTOK
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:295:5: CHARTOK
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					CHARTOK46=(Token)match(input,CHARTOK,FOLLOW_CHARTOK_in_typeSpecifier1101); if (state.failed) return retval;
+					CHARTOK48=(Token)match(input,CHARTOK,FOLLOW_CHARTOK_in_typeSpecifier1145); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
-					CHARTOK46_tree = (CommonTree)adaptor.create(CHARTOK46);
-					adaptor.addChild(root_0, CHARTOK46_tree);
+					CHARTOK48_tree = (CommonTree)adaptor.create(CHARTOK48);
+					adaptor.addChild(root_0, CHARTOK48_tree);
 					}
 
 					}
 					break;
 				case 8 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:291:5: DOUBLETOK
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:296:5: DOUBLETOK
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					DOUBLETOK47=(Token)match(input,DOUBLETOK,FOLLOW_DOUBLETOK_in_typeSpecifier1107); if (state.failed) return retval;
+					DOUBLETOK49=(Token)match(input,DOUBLETOK,FOLLOW_DOUBLETOK_in_typeSpecifier1151); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
-					DOUBLETOK47_tree = (CommonTree)adaptor.create(DOUBLETOK47);
-					adaptor.addChild(root_0, DOUBLETOK47_tree);
+					DOUBLETOK49_tree = (CommonTree)adaptor.create(DOUBLETOK49);
+					adaptor.addChild(root_0, DOUBLETOK49_tree);
 					}
 
 					}
 					break;
 				case 9 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:292:5: VOIDTOK
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:297:5: VOIDTOK
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					VOIDTOK48=(Token)match(input,VOIDTOK,FOLLOW_VOIDTOK_in_typeSpecifier1113); if (state.failed) return retval;
+					VOIDTOK50=(Token)match(input,VOIDTOK,FOLLOW_VOIDTOK_in_typeSpecifier1157); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
-					VOIDTOK48_tree = (CommonTree)adaptor.create(VOIDTOK48);
-					adaptor.addChild(root_0, VOIDTOK48_tree);
+					VOIDTOK50_tree = (CommonTree)adaptor.create(VOIDTOK50);
+					adaptor.addChild(root_0, VOIDTOK50_tree);
 					}
 
 					}
 					break;
 				case 10 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:293:5: BOOLTOK
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:298:5: BOOLTOK
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					BOOLTOK49=(Token)match(input,BOOLTOK,FOLLOW_BOOLTOK_in_typeSpecifier1119); if (state.failed) return retval;
+					BOOLTOK51=(Token)match(input,BOOLTOK,FOLLOW_BOOLTOK_in_typeSpecifier1163); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
-					BOOLTOK49_tree = (CommonTree)adaptor.create(BOOLTOK49);
-					adaptor.addChild(root_0, BOOLTOK49_tree);
+					BOOLTOK51_tree = (CommonTree)adaptor.create(BOOLTOK51);
+					adaptor.addChild(root_0, BOOLTOK51_tree);
 					}
 
 					}
 					break;
 				case 11 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:294:5: COMPLEXTOK
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:299:5: COMPLEXTOK
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					COMPLEXTOK50=(Token)match(input,COMPLEXTOK,FOLLOW_COMPLEXTOK_in_typeSpecifier1125); if (state.failed) return retval;
+					COMPLEXTOK52=(Token)match(input,COMPLEXTOK,FOLLOW_COMPLEXTOK_in_typeSpecifier1169); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
-					COMPLEXTOK50_tree = (CommonTree)adaptor.create(COMPLEXTOK50);
-					adaptor.addChild(root_0, COMPLEXTOK50_tree);
+					COMPLEXTOK52_tree = (CommonTree)adaptor.create(COMPLEXTOK52);
+					adaptor.addChild(root_0, COMPLEXTOK52_tree);
 					}
 
 					}
 					break;
 				case 12 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:295:5: IMAGINARYTOK
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:300:5: IMAGINARYTOK
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					IMAGINARYTOK51=(Token)match(input,IMAGINARYTOK,FOLLOW_IMAGINARYTOK_in_typeSpecifier1131); if (state.failed) return retval;
+					IMAGINARYTOK53=(Token)match(input,IMAGINARYTOK,FOLLOW_IMAGINARYTOK_in_typeSpecifier1175); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
-					IMAGINARYTOK51_tree = (CommonTree)adaptor.create(IMAGINARYTOK51);
-					adaptor.addChild(root_0, IMAGINARYTOK51_tree);
+					IMAGINARYTOK53_tree = (CommonTree)adaptor.create(IMAGINARYTOK53);
+					adaptor.addChild(root_0, IMAGINARYTOK53_tree);
 					}
 
 					}
 					break;
 				case 13 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:296:5: structSpecifier
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:301:5: structSpecifier
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					pushFollow(FOLLOW_structSpecifier_in_typeSpecifier1137);
-					structSpecifier52=structSpecifier();
+					pushFollow(FOLLOW_structSpecifier_in_typeSpecifier1181);
+					structSpecifier54=structSpecifier();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) adaptor.addChild(root_0, structSpecifier52.getTree());
+					if ( state.backtracking==0 ) adaptor.addChild(root_0, structSpecifier54.getTree());
 
 					}
 					break;
 				case 14 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:297:5: variantSpecifier
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:302:5: variantSpecifier
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					pushFollow(FOLLOW_variantSpecifier_in_typeSpecifier1143);
-					variantSpecifier53=variantSpecifier();
+					pushFollow(FOLLOW_variantSpecifier_in_typeSpecifier1187);
+					variantSpecifier55=variantSpecifier();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) adaptor.addChild(root_0, variantSpecifier53.getTree());
+					if ( state.backtracking==0 ) adaptor.addChild(root_0, variantSpecifier55.getTree());
 
 					}
 					break;
 				case 15 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:298:5: enumSpecifier
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:303:5: enumSpecifier
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					pushFollow(FOLLOW_enumSpecifier_in_typeSpecifier1149);
-					enumSpecifier54=enumSpecifier();
+					pushFollow(FOLLOW_enumSpecifier_in_typeSpecifier1193);
+					enumSpecifier56=enumSpecifier();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) adaptor.addChild(root_0, enumSpecifier54.getTree());
+					if ( state.backtracking==0 ) adaptor.addChild(root_0, enumSpecifier56.getTree());
 
 					}
 					break;
 				case 16 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:299:5: ctfTypeSpecifier
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:304:5: ctfTypeSpecifier
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					pushFollow(FOLLOW_ctfTypeSpecifier_in_typeSpecifier1155);
-					ctfTypeSpecifier55=ctfTypeSpecifier();
+					pushFollow(FOLLOW_ctfTypeSpecifier_in_typeSpecifier1199);
+					ctfTypeSpecifier57=ctfTypeSpecifier();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) adaptor.addChild(root_0, ctfTypeSpecifier55.getTree());
+					if ( state.backtracking==0 ) adaptor.addChild(root_0, ctfTypeSpecifier57.getTree());
 
 					}
 					break;
 				case 17 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:300:5: {...}? => typedefName
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:305:5: {...}? => typedefName
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
@@ -2487,11 +2626,11 @@ public class CTFParser extends Parser {
 						if (state.backtracking>0) {state.failed=true; return retval;}
 						throw new FailedPredicateException(input, "typeSpecifier", " inTypealiasAlias() || isTypeName(input.LT(1).getText()) ");
 					}
-					pushFollow(FOLLOW_typedefName_in_typeSpecifier1165);
-					typedefName56=typedefName();
+					pushFollow(FOLLOW_typedefName_in_typeSpecifier1209);
+					typedefName58=typedefName();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) adaptor.addChild(root_0, typedefName56.getTree());
+					if ( state.backtracking==0 ) adaptor.addChild(root_0, typedefName58.getTree());
 
 					}
 					break;
@@ -2525,28 +2664,28 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "typeQualifier"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:303:1: typeQualifier : CONSTTOK ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:308:1: typeQualifier : CONSTTOK ;
 	public final CTFParser.typeQualifier_return typeQualifier() throws RecognitionException {
 		CTFParser.typeQualifier_return retval = new CTFParser.typeQualifier_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token CONSTTOK57=null;
+		Token CONSTTOK59=null;
 
-		CommonTree CONSTTOK57_tree=null;
+		CommonTree CONSTTOK59_tree=null;
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:304:3: ( CONSTTOK )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:304:5: CONSTTOK
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:309:3: ( CONSTTOK )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:309:5: CONSTTOK
 			{
 			root_0 = (CommonTree)adaptor.nil();
 
 
-			CONSTTOK57=(Token)match(input,CONSTTOK,FOLLOW_CONSTTOK_in_typeQualifier1178); if (state.failed) return retval;
+			CONSTTOK59=(Token)match(input,CONSTTOK,FOLLOW_CONSTTOK_in_typeQualifier1222); if (state.failed) return retval;
 			if ( state.backtracking==0 ) {
-			CONSTTOK57_tree = (CommonTree)adaptor.create(CONSTTOK57);
-			adaptor.addChild(root_0, CONSTTOK57_tree);
+			CONSTTOK59_tree = (CommonTree)adaptor.create(CONSTTOK59);
+			adaptor.addChild(root_0, CONSTTOK59_tree);
 			}
 
 			}
@@ -2579,43 +2718,43 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "alignAttribute"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:307:1: alignAttribute : ALIGNTOK LPAREN unaryExpression RPAREN -> ^( ALIGN unaryExpression ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:312:1: alignAttribute : ALIGNTOK LPAREN unaryExpression RPAREN -> ^( ALIGN unaryExpression ) ;
 	public final CTFParser.alignAttribute_return alignAttribute() throws RecognitionException {
 		CTFParser.alignAttribute_return retval = new CTFParser.alignAttribute_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token ALIGNTOK58=null;
-		Token LPAREN59=null;
-		Token RPAREN61=null;
-		ParserRuleReturnScope unaryExpression60 =null;
+		Token ALIGNTOK60=null;
+		Token LPAREN61=null;
+		Token RPAREN63=null;
+		ParserRuleReturnScope unaryExpression62 =null;
 
-		CommonTree ALIGNTOK58_tree=null;
-		CommonTree LPAREN59_tree=null;
-		CommonTree RPAREN61_tree=null;
+		CommonTree ALIGNTOK60_tree=null;
+		CommonTree LPAREN61_tree=null;
+		CommonTree RPAREN63_tree=null;
 		RewriteRuleTokenStream stream_RPAREN=new RewriteRuleTokenStream(adaptor,"token RPAREN");
 		RewriteRuleTokenStream stream_ALIGNTOK=new RewriteRuleTokenStream(adaptor,"token ALIGNTOK");
 		RewriteRuleTokenStream stream_LPAREN=new RewriteRuleTokenStream(adaptor,"token LPAREN");
 		RewriteRuleSubtreeStream stream_unaryExpression=new RewriteRuleSubtreeStream(adaptor,"rule unaryExpression");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:308:3: ( ALIGNTOK LPAREN unaryExpression RPAREN -> ^( ALIGN unaryExpression ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:308:5: ALIGNTOK LPAREN unaryExpression RPAREN
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:313:3: ( ALIGNTOK LPAREN unaryExpression RPAREN -> ^( ALIGN unaryExpression ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:313:5: ALIGNTOK LPAREN unaryExpression RPAREN
 			{
-			ALIGNTOK58=(Token)match(input,ALIGNTOK,FOLLOW_ALIGNTOK_in_alignAttribute1191); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_ALIGNTOK.add(ALIGNTOK58);
+			ALIGNTOK60=(Token)match(input,ALIGNTOK,FOLLOW_ALIGNTOK_in_alignAttribute1235); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_ALIGNTOK.add(ALIGNTOK60);
 
-			LPAREN59=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_alignAttribute1193); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_LPAREN.add(LPAREN59);
+			LPAREN61=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_alignAttribute1237); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_LPAREN.add(LPAREN61);
 
-			pushFollow(FOLLOW_unaryExpression_in_alignAttribute1195);
-			unaryExpression60=unaryExpression();
+			pushFollow(FOLLOW_unaryExpression_in_alignAttribute1239);
+			unaryExpression62=unaryExpression();
 			state._fsp--;
 			if (state.failed) return retval;
-			if ( state.backtracking==0 ) stream_unaryExpression.add(unaryExpression60.getTree());
-			RPAREN61=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_alignAttribute1197); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN61);
+			if ( state.backtracking==0 ) stream_unaryExpression.add(unaryExpression62.getTree());
+			RPAREN63=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_alignAttribute1241); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_RPAREN.add(RPAREN63);
 
 			// AST REWRITE
 			// elements: unaryExpression
@@ -2629,9 +2768,9 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 308:44: -> ^( ALIGN unaryExpression )
+			// 313:44: -> ^( ALIGN unaryExpression )
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:308:47: ^( ALIGN unaryExpression )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:313:47: ^( ALIGN unaryExpression )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.nil();
 				root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(ALIGN, "ALIGN"), root_1);
@@ -2675,7 +2814,7 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "structBody"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:312:1: structBody : LCURL ( structOrVariantDeclarationList )? RCURL -> ^( STRUCT_BODY ( structOrVariantDeclarationList )? ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:317:1: structBody : LCURL ( structOrVariantDeclarationList )? RCURL -> ^( STRUCT_BODY ( structOrVariantDeclarationList )? ) ;
 	public final CTFParser.structBody_return structBody() throws RecognitionException {
 		Symbols_stack.push(new Symbols_scope());
 
@@ -2684,12 +2823,12 @@ public class CTFParser extends Parser {
 
 		CommonTree root_0 = null;
 
-		Token LCURL62=null;
-		Token RCURL64=null;
-		ParserRuleReturnScope structOrVariantDeclarationList63 =null;
+		Token LCURL64=null;
+		Token RCURL66=null;
+		ParserRuleReturnScope structOrVariantDeclarationList65 =null;
 
-		CommonTree LCURL62_tree=null;
-		CommonTree RCURL64_tree=null;
+		CommonTree LCURL64_tree=null;
+		CommonTree RCURL66_tree=null;
 		RewriteRuleTokenStream stream_LCURL=new RewriteRuleTokenStream(adaptor,"token LCURL");
 		RewriteRuleTokenStream stream_RCURL=new RewriteRuleTokenStream(adaptor,"token RCURL");
 		RewriteRuleSubtreeStream stream_structOrVariantDeclarationList=new RewriteRuleSubtreeStream(adaptor,"rule structOrVariantDeclarationList");
@@ -2698,40 +2837,40 @@ public class CTFParser extends Parser {
 		    Symbols_stack.peek().types = new HashSet<String>();
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:317:3: ( LCURL ( structOrVariantDeclarationList )? RCURL -> ^( STRUCT_BODY ( structOrVariantDeclarationList )? ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:317:5: LCURL ( structOrVariantDeclarationList )? RCURL
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:322:3: ( LCURL ( structOrVariantDeclarationList )? RCURL -> ^( STRUCT_BODY ( structOrVariantDeclarationList )? ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:322:5: LCURL ( structOrVariantDeclarationList )? RCURL
 			{
-			LCURL62=(Token)match(input,LCURL,FOLLOW_LCURL_in_structBody1231); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_LCURL.add(LCURL62);
+			LCURL64=(Token)match(input,LCURL,FOLLOW_LCURL_in_structBody1275); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_LCURL.add(LCURL64);
 
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:317:11: ( structOrVariantDeclarationList )?
-			int alt17=2;
-			int LA17_0 = input.LA(1);
-			if ( (LA17_0==BOOLTOK||LA17_0==CHARTOK||(LA17_0 >= COMPLEXTOK && LA17_0 <= CONSTTOK)||LA17_0==DOUBLETOK||LA17_0==ENUMTOK||(LA17_0 >= FLOATINGPOINTTOK && LA17_0 <= FLOATTOK)||LA17_0==IMAGINARYTOK||LA17_0==INTEGERTOK||LA17_0==INTTOK||LA17_0==LONGTOK||LA17_0==SHORTTOK||LA17_0==SIGNEDTOK||LA17_0==STRINGTOK||LA17_0==STRUCTTOK||LA17_0==TYPEDEFTOK||(LA17_0 >= UNSIGNEDTOK && LA17_0 <= VOIDTOK)) ) {
-				alt17=1;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:322:11: ( structOrVariantDeclarationList )?
+			int alt18=2;
+			int LA18_0 = input.LA(1);
+			if ( (LA18_0==BOOLTOK||LA18_0==CHARTOK||(LA18_0 >= COMPLEXTOK && LA18_0 <= CONSTTOK)||LA18_0==DOUBLETOK||LA18_0==ENUMTOK||(LA18_0 >= FLOATINGPOINTTOK && LA18_0 <= FLOATTOK)||LA18_0==IMAGINARYTOK||LA18_0==INTEGERTOK||LA18_0==INTTOK||LA18_0==LONGTOK||LA18_0==SHORTTOK||LA18_0==SIGNEDTOK||LA18_0==STRINGTOK||LA18_0==STRUCTTOK||LA18_0==TYPEDEFTOK||(LA18_0 >= UNSIGNEDTOK && LA18_0 <= VOIDTOK)) ) {
+				alt18=1;
 			}
-			else if ( (LA17_0==IDENTIFIER) && (( inTypealiasAlias() || isTypeName(input.LT(1).getText()) ))) {
-				alt17=1;
+			else if ( (LA18_0==IDENTIFIER) && (( inTypealiasAlias() || isTypeName(input.LT(1).getText()) ))) {
+				alt18=1;
 			}
-			else if ( (LA17_0==TYPEALIASTOK) ) {
-				alt17=1;
+			else if ( (LA18_0==TYPEALIASTOK) ) {
+				alt18=1;
 			}
-			switch (alt17) {
+			switch (alt18) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:317:11: structOrVariantDeclarationList
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:322:11: structOrVariantDeclarationList
 					{
-					pushFollow(FOLLOW_structOrVariantDeclarationList_in_structBody1233);
-					structOrVariantDeclarationList63=structOrVariantDeclarationList();
+					pushFollow(FOLLOW_structOrVariantDeclarationList_in_structBody1277);
+					structOrVariantDeclarationList65=structOrVariantDeclarationList();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_structOrVariantDeclarationList.add(structOrVariantDeclarationList63.getTree());
+					if ( state.backtracking==0 ) stream_structOrVariantDeclarationList.add(structOrVariantDeclarationList65.getTree());
 					}
 					break;
 
 			}
 
-			RCURL64=(Token)match(input,RCURL,FOLLOW_RCURL_in_structBody1236); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_RCURL.add(RCURL64);
+			RCURL66=(Token)match(input,RCURL,FOLLOW_RCURL_in_structBody1280); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_RCURL.add(RCURL66);
 
 			// AST REWRITE
 			// elements: structOrVariantDeclarationList
@@ -2745,13 +2884,13 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 318:7: -> ^( STRUCT_BODY ( structOrVariantDeclarationList )? )
+			// 323:7: -> ^( STRUCT_BODY ( structOrVariantDeclarationList )? )
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:318:10: ^( STRUCT_BODY ( structOrVariantDeclarationList )? )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:323:10: ^( STRUCT_BODY ( structOrVariantDeclarationList )? )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.nil();
 				root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(STRUCT_BODY, "STRUCT_BODY"), root_1);
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:318:24: ( structOrVariantDeclarationList )?
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:323:24: ( structOrVariantDeclarationList )?
 				if ( stream_structOrVariantDeclarationList.hasNext() ) {
 					adaptor.addChild(root_1, stream_structOrVariantDeclarationList.nextTree());
 				}
@@ -2798,69 +2937,69 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "structSpecifier"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:321:1: structSpecifier : STRUCTTOK ( ( structName ( alignAttribute | ( structBody ( alignAttribute |) ) |) ) | ( structBody ( alignAttribute |) ) ) -> ^( STRUCT ( structName )? ( structBody )? ( alignAttribute )? ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:326:1: structSpecifier : STRUCTTOK ( ( structName ( alignAttribute | ( structBody ( alignAttribute |) ) |) ) | ( structBody ( alignAttribute |) ) ) -> ^( STRUCT ( structName )? ( structBody )? ( alignAttribute )? ) ;
 	public final CTFParser.structSpecifier_return structSpecifier() throws RecognitionException {
 		CTFParser.structSpecifier_return retval = new CTFParser.structSpecifier_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token STRUCTTOK65=null;
-		ParserRuleReturnScope structName66 =null;
-		ParserRuleReturnScope alignAttribute67 =null;
-		ParserRuleReturnScope structBody68 =null;
+		Token STRUCTTOK67=null;
+		ParserRuleReturnScope structName68 =null;
 		ParserRuleReturnScope alignAttribute69 =null;
 		ParserRuleReturnScope structBody70 =null;
 		ParserRuleReturnScope alignAttribute71 =null;
+		ParserRuleReturnScope structBody72 =null;
+		ParserRuleReturnScope alignAttribute73 =null;
 
-		CommonTree STRUCTTOK65_tree=null;
+		CommonTree STRUCTTOK67_tree=null;
 		RewriteRuleTokenStream stream_STRUCTTOK=new RewriteRuleTokenStream(adaptor,"token STRUCTTOK");
 		RewriteRuleSubtreeStream stream_structName=new RewriteRuleSubtreeStream(adaptor,"rule structName");
 		RewriteRuleSubtreeStream stream_structBody=new RewriteRuleSubtreeStream(adaptor,"rule structBody");
 		RewriteRuleSubtreeStream stream_alignAttribute=new RewriteRuleSubtreeStream(adaptor,"rule alignAttribute");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:322:3: ( STRUCTTOK ( ( structName ( alignAttribute | ( structBody ( alignAttribute |) ) |) ) | ( structBody ( alignAttribute |) ) ) -> ^( STRUCT ( structName )? ( structBody )? ( alignAttribute )? ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:322:5: STRUCTTOK ( ( structName ( alignAttribute | ( structBody ( alignAttribute |) ) |) ) | ( structBody ( alignAttribute |) ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:327:3: ( STRUCTTOK ( ( structName ( alignAttribute | ( structBody ( alignAttribute |) ) |) ) | ( structBody ( alignAttribute |) ) ) -> ^( STRUCT ( structName )? ( structBody )? ( alignAttribute )? ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:327:5: STRUCTTOK ( ( structName ( alignAttribute | ( structBody ( alignAttribute |) ) |) ) | ( structBody ( alignAttribute |) ) )
 			{
-			STRUCTTOK65=(Token)match(input,STRUCTTOK,FOLLOW_STRUCTTOK_in_structSpecifier1264); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_STRUCTTOK.add(STRUCTTOK65);
+			STRUCTTOK67=(Token)match(input,STRUCTTOK,FOLLOW_STRUCTTOK_in_structSpecifier1308); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_STRUCTTOK.add(STRUCTTOK67);
 
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:323:3: ( ( structName ( alignAttribute | ( structBody ( alignAttribute |) ) |) ) | ( structBody ( alignAttribute |) ) )
-			int alt21=2;
-			int LA21_0 = input.LA(1);
-			if ( (LA21_0==IDENTIFIER) ) {
-				alt21=1;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:328:3: ( ( structName ( alignAttribute | ( structBody ( alignAttribute |) ) |) ) | ( structBody ( alignAttribute |) ) )
+			int alt22=2;
+			int LA22_0 = input.LA(1);
+			if ( (LA22_0==IDENTIFIER) ) {
+				alt22=1;
 			}
-			else if ( (LA21_0==LCURL) ) {
-				alt21=2;
+			else if ( (LA22_0==LCURL) ) {
+				alt22=2;
 			}
 
 			else {
 				if (state.backtracking>0) {state.failed=true; return retval;}
 				NoViableAltException nvae =
-					new NoViableAltException("", 21, 0, input);
+					new NoViableAltException("", 22, 0, input);
 				throw nvae;
 			}
 
-			switch (alt21) {
+			switch (alt22) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:325:5: ( structName ( alignAttribute | ( structBody ( alignAttribute |) ) |) )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:330:5: ( structName ( alignAttribute | ( structBody ( alignAttribute |) ) |) )
 					{
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:325:5: ( structName ( alignAttribute | ( structBody ( alignAttribute |) ) |) )
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:326:9: structName ( alignAttribute | ( structBody ( alignAttribute |) ) |)
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:330:5: ( structName ( alignAttribute | ( structBody ( alignAttribute |) ) |) )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:331:9: structName ( alignAttribute | ( structBody ( alignAttribute |) ) |)
 					{
-					pushFollow(FOLLOW_structName_in_structSpecifier1289);
-					structName66=structName();
+					pushFollow(FOLLOW_structName_in_structSpecifier1333);
+					structName68=structName();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_structName.add(structName66.getTree());
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:327:9: ( alignAttribute | ( structBody ( alignAttribute |) ) |)
-					int alt19=3;
+					if ( state.backtracking==0 ) stream_structName.add(structName68.getTree());
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:332:9: ( alignAttribute | ( structBody ( alignAttribute |) ) |)
+					int alt20=3;
 					switch ( input.LA(1) ) {
 					case ALIGNTOK:
 						{
-						alt19=1;
+						alt20=1;
 						}
 						break;
 					case LCURL:
@@ -2887,17 +3026,17 @@ public class CTFParser extends Parser {
 						case VARIANTTOK:
 						case VOIDTOK:
 							{
-							alt19=2;
+							alt20=2;
 							}
 							break;
 						case SIGNEDTOK:
 							{
-							int LA19_5 = input.LA(3);
-							if ( (LA19_5==BOOLTOK||LA19_5==CHARTOK||(LA19_5 >= COMPLEXTOK && LA19_5 <= CONSTTOK)||LA19_5==DOUBLETOK||LA19_5==ENUMTOK||(LA19_5 >= FLOATINGPOINTTOK && LA19_5 <= FLOATTOK)||(LA19_5 >= IDENTIFIER && LA19_5 <= IMAGINARYTOK)||LA19_5==INTEGERTOK||LA19_5==INTTOK||LA19_5==LONGTOK||LA19_5==POINTER||LA19_5==SHORTTOK||LA19_5==SIGNEDTOK||LA19_5==STRINGTOK||LA19_5==STRUCTTOK||LA19_5==TYPEDEFTOK||(LA19_5 >= UNSIGNEDTOK && LA19_5 <= VOIDTOK)) ) {
-								alt19=2;
+							int LA20_5 = input.LA(3);
+							if ( (LA20_5==BOOLTOK||LA20_5==CHARTOK||(LA20_5 >= COMPLEXTOK && LA20_5 <= CONSTTOK)||LA20_5==DOUBLETOK||LA20_5==ENUMTOK||(LA20_5 >= FLOATINGPOINTTOK && LA20_5 <= FLOATTOK)||(LA20_5 >= IDENTIFIER && LA20_5 <= IMAGINARYTOK)||LA20_5==INTEGERTOK||LA20_5==INTTOK||LA20_5==LONGTOK||LA20_5==POINTER||LA20_5==SHORTTOK||LA20_5==SIGNEDTOK||LA20_5==STRINGTOK||LA20_5==STRUCTTOK||LA20_5==TYPEDEFTOK||(LA20_5 >= UNSIGNEDTOK && LA20_5 <= VOIDTOK)) ) {
+								alt20=2;
 							}
-							else if ( (LA19_5==ASSIGNMENT||LA19_5==RCURL||LA19_5==SEPARATOR) ) {
-								alt19=3;
+							else if ( (LA20_5==ASSIGNMENT||LA20_5==RCURL||LA20_5==SEPARATOR) ) {
+								alt20=3;
 							}
 
 							else {
@@ -2908,7 +3047,7 @@ public class CTFParser extends Parser {
 										input.consume();
 									}
 									NoViableAltException nvae =
-										new NoViableAltException("", 19, 5, input);
+										new NoViableAltException("", 20, 5, input);
 									throw nvae;
 								} finally {
 									input.rewind(nvaeMark);
@@ -2919,12 +3058,12 @@ public class CTFParser extends Parser {
 							break;
 						case STRINGTOK:
 							{
-							int LA19_6 = input.LA(3);
-							if ( (LA19_6==BOOLTOK||LA19_6==CHARTOK||(LA19_6 >= COMPLEXTOK && LA19_6 <= CONSTTOK)||LA19_6==DOUBLETOK||LA19_6==ENUMTOK||(LA19_6 >= FLOATINGPOINTTOK && LA19_6 <= FLOATTOK)||(LA19_6 >= IDENTIFIER && LA19_6 <= IMAGINARYTOK)||LA19_6==INTEGERTOK||(LA19_6 >= INTTOK && LA19_6 <= LCURL)||LA19_6==LONGTOK||LA19_6==POINTER||LA19_6==SHORTTOK||LA19_6==SIGNEDTOK||LA19_6==STRINGTOK||LA19_6==STRUCTTOK||LA19_6==TYPEDEFTOK||(LA19_6 >= UNSIGNEDTOK && LA19_6 <= VOIDTOK)) ) {
-								alt19=2;
+							int LA20_6 = input.LA(3);
+							if ( (LA20_6==BOOLTOK||LA20_6==CHARTOK||(LA20_6 >= COMPLEXTOK && LA20_6 <= CONSTTOK)||LA20_6==DOUBLETOK||LA20_6==ENUMTOK||(LA20_6 >= FLOATINGPOINTTOK && LA20_6 <= FLOATTOK)||(LA20_6 >= IDENTIFIER && LA20_6 <= IMAGINARYTOK)||LA20_6==INTEGERTOK||(LA20_6 >= INTTOK && LA20_6 <= LCURL)||LA20_6==LONGTOK||LA20_6==POINTER||LA20_6==SHORTTOK||LA20_6==SIGNEDTOK||LA20_6==STRINGTOK||LA20_6==STRUCTTOK||LA20_6==TYPEDEFTOK||(LA20_6 >= UNSIGNEDTOK && LA20_6 <= VOIDTOK)) ) {
+								alt20=2;
 							}
-							else if ( (LA19_6==ASSIGNMENT||LA19_6==RCURL||LA19_6==SEPARATOR) ) {
-								alt19=3;
+							else if ( (LA20_6==ASSIGNMENT||LA20_6==RCURL||LA20_6==SEPARATOR) ) {
+								alt20=3;
 							}
 
 							else {
@@ -2935,7 +3074,7 @@ public class CTFParser extends Parser {
 										input.consume();
 									}
 									NoViableAltException nvae =
-										new NoViableAltException("", 19, 6, input);
+										new NoViableAltException("", 20, 6, input);
 									throw nvae;
 								} finally {
 									input.rewind(nvaeMark);
@@ -2946,12 +3085,12 @@ public class CTFParser extends Parser {
 							break;
 						case IDENTIFIER:
 							{
-							int LA19_7 = input.LA(3);
-							if ( (LA19_7==BOOLTOK||LA19_7==CHARTOK||(LA19_7 >= COMPLEXTOK && LA19_7 <= CONSTTOK)||LA19_7==DOUBLETOK||LA19_7==ENUMTOK||(LA19_7 >= FLOATINGPOINTTOK && LA19_7 <= FLOATTOK)||(LA19_7 >= IDENTIFIER && LA19_7 <= IMAGINARYTOK)||LA19_7==INTEGERTOK||LA19_7==INTTOK||LA19_7==LONGTOK||LA19_7==POINTER||LA19_7==SHORTTOK||LA19_7==SIGNEDTOK||LA19_7==STRINGTOK||LA19_7==STRUCTTOK||LA19_7==TYPEDEFTOK||(LA19_7 >= UNSIGNEDTOK && LA19_7 <= VOIDTOK)) ) {
-								alt19=2;
+							int LA20_7 = input.LA(3);
+							if ( (LA20_7==BOOLTOK||LA20_7==CHARTOK||(LA20_7 >= COMPLEXTOK && LA20_7 <= CONSTTOK)||LA20_7==DOUBLETOK||LA20_7==ENUMTOK||(LA20_7 >= FLOATINGPOINTTOK && LA20_7 <= FLOATTOK)||(LA20_7 >= IDENTIFIER && LA20_7 <= IMAGINARYTOK)||LA20_7==INTEGERTOK||LA20_7==INTTOK||LA20_7==LONGTOK||LA20_7==POINTER||LA20_7==SHORTTOK||LA20_7==SIGNEDTOK||LA20_7==STRINGTOK||LA20_7==STRUCTTOK||LA20_7==TYPEDEFTOK||(LA20_7 >= UNSIGNEDTOK && LA20_7 <= VOIDTOK)) ) {
+								alt20=2;
 							}
-							else if ( (LA19_7==ASSIGNMENT||LA19_7==RCURL||LA19_7==SEPARATOR) ) {
-								alt19=3;
+							else if ( (LA20_7==ASSIGNMENT||LA20_7==RCURL||LA20_7==SEPARATOR) ) {
+								alt20=3;
 							}
 
 							else {
@@ -2962,7 +3101,7 @@ public class CTFParser extends Parser {
 										input.consume();
 									}
 									NoViableAltException nvae =
-										new NoViableAltException("", 19, 7, input);
+										new NoViableAltException("", 20, 7, input);
 									throw nvae;
 								} finally {
 									input.rewind(nvaeMark);
@@ -2975,7 +3114,7 @@ public class CTFParser extends Parser {
 						case EVENTTOK:
 						case STRING_LITERAL:
 							{
-							alt19=3;
+							alt20=3;
 							}
 							break;
 						default:
@@ -2984,7 +3123,7 @@ public class CTFParser extends Parser {
 							try {
 								input.consume();
 								NoViableAltException nvae =
-									new NoViableAltException("", 19, 2, input);
+									new NoViableAltException("", 20, 2, input);
 								throw nvae;
 							} finally {
 								input.rewind(nvaeMark);
@@ -3019,67 +3158,67 @@ public class CTFParser extends Parser {
 					case VARIANTTOK:
 					case VOIDTOK:
 						{
-						alt19=3;
+						alt20=3;
 						}
 						break;
 					default:
 						if (state.backtracking>0) {state.failed=true; return retval;}
 						NoViableAltException nvae =
-							new NoViableAltException("", 19, 0, input);
+							new NoViableAltException("", 20, 0, input);
 						throw nvae;
 					}
-					switch (alt19) {
+					switch (alt20) {
 						case 1 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:328:11: alignAttribute
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:333:11: alignAttribute
 							{
-							pushFollow(FOLLOW_alignAttribute_in_structSpecifier1311);
-							alignAttribute67=alignAttribute();
+							pushFollow(FOLLOW_alignAttribute_in_structSpecifier1355);
+							alignAttribute69=alignAttribute();
 							state._fsp--;
 							if (state.failed) return retval;
-							if ( state.backtracking==0 ) stream_alignAttribute.add(alignAttribute67.getTree());
+							if ( state.backtracking==0 ) stream_alignAttribute.add(alignAttribute69.getTree());
 							}
 							break;
 						case 2 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:330:11: ( structBody ( alignAttribute |) )
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:335:11: ( structBody ( alignAttribute |) )
 							{
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:330:11: ( structBody ( alignAttribute |) )
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:331:13: structBody ( alignAttribute |)
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:335:11: ( structBody ( alignAttribute |) )
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:336:13: structBody ( alignAttribute |)
 							{
-							pushFollow(FOLLOW_structBody_in_structSpecifier1347);
-							structBody68=structBody();
+							pushFollow(FOLLOW_structBody_in_structSpecifier1391);
+							structBody70=structBody();
 							state._fsp--;
 							if (state.failed) return retval;
-							if ( state.backtracking==0 ) stream_structBody.add(structBody68.getTree());
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:332:13: ( alignAttribute |)
-							int alt18=2;
-							int LA18_0 = input.LA(1);
-							if ( (LA18_0==ALIGNTOK) ) {
-								alt18=1;
+							if ( state.backtracking==0 ) stream_structBody.add(structBody70.getTree());
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:337:13: ( alignAttribute |)
+							int alt19=2;
+							int LA19_0 = input.LA(1);
+							if ( (LA19_0==ALIGNTOK) ) {
+								alt19=1;
 							}
-							else if ( (LA18_0==EOF||LA18_0==BOOLTOK||LA18_0==CHARTOK||(LA18_0 >= COMPLEXTOK && LA18_0 <= CONSTTOK)||LA18_0==DOUBLETOK||LA18_0==ENUMTOK||(LA18_0 >= FLOATINGPOINTTOK && LA18_0 <= FLOATTOK)||(LA18_0 >= IDENTIFIER && LA18_0 <= IMAGINARYTOK)||LA18_0==INTEGERTOK||(LA18_0 >= INTTOK && LA18_0 <= LCURL)||(LA18_0 >= LONGTOK && LA18_0 <= LPAREN)||LA18_0==POINTER||LA18_0==SHORTTOK||LA18_0==SIGNEDTOK||LA18_0==STRINGTOK||(LA18_0 >= STRUCTTOK && LA18_0 <= TERM)||(LA18_0 >= TYPEDEFTOK && LA18_0 <= TYPE_ASSIGNMENT)||(LA18_0 >= UNSIGNEDTOK && LA18_0 <= VOIDTOK)) ) {
-								alt18=2;
+							else if ( (LA19_0==EOF||LA19_0==BOOLTOK||LA19_0==CHARTOK||(LA19_0 >= COMPLEXTOK && LA19_0 <= CONSTTOK)||LA19_0==DOUBLETOK||LA19_0==ENUMTOK||(LA19_0 >= FLOATINGPOINTTOK && LA19_0 <= FLOATTOK)||(LA19_0 >= IDENTIFIER && LA19_0 <= IMAGINARYTOK)||LA19_0==INTEGERTOK||(LA19_0 >= INTTOK && LA19_0 <= LCURL)||(LA19_0 >= LONGTOK && LA19_0 <= LPAREN)||LA19_0==POINTER||LA19_0==SHORTTOK||LA19_0==SIGNEDTOK||LA19_0==STRINGTOK||(LA19_0 >= STRUCTTOK && LA19_0 <= TERM)||(LA19_0 >= TYPEDEFTOK && LA19_0 <= TYPE_ASSIGNMENT)||(LA19_0 >= UNSIGNEDTOK && LA19_0 <= VOIDTOK)) ) {
+								alt19=2;
 							}
 
 							else {
 								if (state.backtracking>0) {state.failed=true; return retval;}
 								NoViableAltException nvae =
-									new NoViableAltException("", 18, 0, input);
+									new NoViableAltException("", 19, 0, input);
 								throw nvae;
 							}
 
-							switch (alt18) {
+							switch (alt19) {
 								case 1 :
-									// org/eclipse/tracecompass/ctf/parser/CTFParser.g:333:14: alignAttribute
+									// org/eclipse/tracecompass/ctf/parser/CTFParser.g:338:14: alignAttribute
 									{
-									pushFollow(FOLLOW_alignAttribute_in_structSpecifier1378);
-									alignAttribute69=alignAttribute();
+									pushFollow(FOLLOW_alignAttribute_in_structSpecifier1422);
+									alignAttribute71=alignAttribute();
 									state._fsp--;
 									if (state.failed) return retval;
-									if ( state.backtracking==0 ) stream_alignAttribute.add(alignAttribute69.getTree());
+									if ( state.backtracking==0 ) stream_alignAttribute.add(alignAttribute71.getTree());
 									}
 									break;
 								case 2 :
-									// org/eclipse/tracecompass/ctf/parser/CTFParser.g:336:13: 
+									// org/eclipse/tracecompass/ctf/parser/CTFParser.g:341:13: 
 									{
 									}
 									break;
@@ -3091,7 +3230,7 @@ public class CTFParser extends Parser {
 							}
 							break;
 						case 3 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:340:9: 
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:345:9: 
 							{
 							}
 							break;
@@ -3103,46 +3242,46 @@ public class CTFParser extends Parser {
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:344:5: ( structBody ( alignAttribute |) )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:349:5: ( structBody ( alignAttribute |) )
 					{
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:344:5: ( structBody ( alignAttribute |) )
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:345:7: structBody ( alignAttribute |)
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:349:5: ( structBody ( alignAttribute |) )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:350:7: structBody ( alignAttribute |)
 					{
-					pushFollow(FOLLOW_structBody_in_structSpecifier1494);
-					structBody70=structBody();
+					pushFollow(FOLLOW_structBody_in_structSpecifier1538);
+					structBody72=structBody();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_structBody.add(structBody70.getTree());
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:346:7: ( alignAttribute |)
-					int alt20=2;
-					int LA20_0 = input.LA(1);
-					if ( (LA20_0==ALIGNTOK) ) {
-						alt20=1;
+					if ( state.backtracking==0 ) stream_structBody.add(structBody72.getTree());
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:351:7: ( alignAttribute |)
+					int alt21=2;
+					int LA21_0 = input.LA(1);
+					if ( (LA21_0==ALIGNTOK) ) {
+						alt21=1;
 					}
-					else if ( (LA20_0==EOF||LA20_0==BOOLTOK||LA20_0==CHARTOK||(LA20_0 >= COMPLEXTOK && LA20_0 <= CONSTTOK)||LA20_0==DOUBLETOK||LA20_0==ENUMTOK||(LA20_0 >= FLOATINGPOINTTOK && LA20_0 <= FLOATTOK)||(LA20_0 >= IDENTIFIER && LA20_0 <= IMAGINARYTOK)||LA20_0==INTEGERTOK||(LA20_0 >= INTTOK && LA20_0 <= LCURL)||(LA20_0 >= LONGTOK && LA20_0 <= LPAREN)||LA20_0==POINTER||LA20_0==SHORTTOK||LA20_0==SIGNEDTOK||LA20_0==STRINGTOK||(LA20_0 >= STRUCTTOK && LA20_0 <= TERM)||(LA20_0 >= TYPEDEFTOK && LA20_0 <= TYPE_ASSIGNMENT)||(LA20_0 >= UNSIGNEDTOK && LA20_0 <= VOIDTOK)) ) {
-						alt20=2;
+					else if ( (LA21_0==EOF||LA21_0==BOOLTOK||LA21_0==CHARTOK||(LA21_0 >= COMPLEXTOK && LA21_0 <= CONSTTOK)||LA21_0==DOUBLETOK||LA21_0==ENUMTOK||(LA21_0 >= FLOATINGPOINTTOK && LA21_0 <= FLOATTOK)||(LA21_0 >= IDENTIFIER && LA21_0 <= IMAGINARYTOK)||LA21_0==INTEGERTOK||(LA21_0 >= INTTOK && LA21_0 <= LCURL)||(LA21_0 >= LONGTOK && LA21_0 <= LPAREN)||LA21_0==POINTER||LA21_0==SHORTTOK||LA21_0==SIGNEDTOK||LA21_0==STRINGTOK||(LA21_0 >= STRUCTTOK && LA21_0 <= TERM)||(LA21_0 >= TYPEDEFTOK && LA21_0 <= TYPE_ASSIGNMENT)||(LA21_0 >= UNSIGNEDTOK && LA21_0 <= VOIDTOK)) ) {
+						alt21=2;
 					}
 
 					else {
 						if (state.backtracking>0) {state.failed=true; return retval;}
 						NoViableAltException nvae =
-							new NoViableAltException("", 20, 0, input);
+							new NoViableAltException("", 21, 0, input);
 						throw nvae;
 					}
 
-					switch (alt20) {
+					switch (alt21) {
 						case 1 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:347:9: alignAttribute
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:352:9: alignAttribute
 							{
-							pushFollow(FOLLOW_alignAttribute_in_structSpecifier1512);
-							alignAttribute71=alignAttribute();
+							pushFollow(FOLLOW_alignAttribute_in_structSpecifier1556);
+							alignAttribute73=alignAttribute();
 							state._fsp--;
 							if (state.failed) return retval;
-							if ( state.backtracking==0 ) stream_alignAttribute.add(alignAttribute71.getTree());
+							if ( state.backtracking==0 ) stream_alignAttribute.add(alignAttribute73.getTree());
 							}
 							break;
 						case 2 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:350:7: 
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:355:7: 
 							{
 							}
 							break;
@@ -3168,25 +3307,25 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 352:5: -> ^( STRUCT ( structName )? ( structBody )? ( alignAttribute )? )
+			// 357:5: -> ^( STRUCT ( structName )? ( structBody )? ( alignAttribute )? )
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:352:8: ^( STRUCT ( structName )? ( structBody )? ( alignAttribute )? )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:357:8: ^( STRUCT ( structName )? ( structBody )? ( alignAttribute )? )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.nil();
 				root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(STRUCT, "STRUCT"), root_1);
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:352:17: ( structName )?
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:357:17: ( structName )?
 				if ( stream_structName.hasNext() ) {
 					adaptor.addChild(root_1, stream_structName.nextTree());
 				}
 				stream_structName.reset();
 
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:352:29: ( structBody )?
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:357:29: ( structBody )?
 				if ( stream_structBody.hasNext() ) {
 					adaptor.addChild(root_1, stream_structBody.nextTree());
 				}
 				stream_structBody.reset();
 
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:352:41: ( alignAttribute )?
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:357:41: ( alignAttribute )?
 				if ( stream_alignAttribute.hasNext() ) {
 					adaptor.addChild(root_1, stream_alignAttribute.nextTree());
 				}
@@ -3231,24 +3370,24 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "structName"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:355:1: structName : IDENTIFIER -> ^( STRUCT_NAME IDENTIFIER ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:360:1: structName : IDENTIFIER -> ^( STRUCT_NAME IDENTIFIER ) ;
 	public final CTFParser.structName_return structName() throws RecognitionException {
 		CTFParser.structName_return retval = new CTFParser.structName_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token IDENTIFIER72=null;
+		Token IDENTIFIER74=null;
 
-		CommonTree IDENTIFIER72_tree=null;
+		CommonTree IDENTIFIER74_tree=null;
 		RewriteRuleTokenStream stream_IDENTIFIER=new RewriteRuleTokenStream(adaptor,"token IDENTIFIER");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:356:3: ( IDENTIFIER -> ^( STRUCT_NAME IDENTIFIER ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:356:5: IDENTIFIER
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:361:3: ( IDENTIFIER -> ^( STRUCT_NAME IDENTIFIER ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:361:5: IDENTIFIER
 			{
-			IDENTIFIER72=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_structName1578); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_IDENTIFIER.add(IDENTIFIER72);
+			IDENTIFIER74=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_structName1622); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_IDENTIFIER.add(IDENTIFIER74);
 
 			// AST REWRITE
 			// elements: IDENTIFIER
@@ -3262,9 +3401,9 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 356:16: -> ^( STRUCT_NAME IDENTIFIER )
+			// 361:16: -> ^( STRUCT_NAME IDENTIFIER )
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:356:19: ^( STRUCT_NAME IDENTIFIER )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:361:19: ^( STRUCT_NAME IDENTIFIER )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.nil();
 				root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(STRUCT_NAME, "STRUCT_NAME"), root_1);
@@ -3308,59 +3447,59 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "structOrVariantDeclarationList"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:359:1: structOrVariantDeclarationList : ( structOrVariantDeclaration )+ ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:364:1: structOrVariantDeclarationList : ( structOrVariantDeclaration )+ ;
 	public final CTFParser.structOrVariantDeclarationList_return structOrVariantDeclarationList() throws RecognitionException {
 		CTFParser.structOrVariantDeclarationList_return retval = new CTFParser.structOrVariantDeclarationList_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		ParserRuleReturnScope structOrVariantDeclaration73 =null;
+		ParserRuleReturnScope structOrVariantDeclaration75 =null;
 
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:360:3: ( ( structOrVariantDeclaration )+ )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:360:5: ( structOrVariantDeclaration )+
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:365:3: ( ( structOrVariantDeclaration )+ )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:365:5: ( structOrVariantDeclaration )+
 			{
 			root_0 = (CommonTree)adaptor.nil();
 
 
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:360:5: ( structOrVariantDeclaration )+
-			int cnt22=0;
-			loop22:
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:365:5: ( structOrVariantDeclaration )+
+			int cnt23=0;
+			loop23:
 			while (true) {
-				int alt22=2;
-				int LA22_0 = input.LA(1);
-				if ( (LA22_0==BOOLTOK||LA22_0==CHARTOK||(LA22_0 >= COMPLEXTOK && LA22_0 <= CONSTTOK)||LA22_0==DOUBLETOK||LA22_0==ENUMTOK||(LA22_0 >= FLOATINGPOINTTOK && LA22_0 <= FLOATTOK)||LA22_0==IMAGINARYTOK||LA22_0==INTEGERTOK||LA22_0==INTTOK||LA22_0==LONGTOK||LA22_0==SHORTTOK||LA22_0==SIGNEDTOK||LA22_0==STRINGTOK||LA22_0==STRUCTTOK||LA22_0==TYPEDEFTOK||(LA22_0 >= UNSIGNEDTOK && LA22_0 <= VOIDTOK)) ) {
-					alt22=1;
+				int alt23=2;
+				int LA23_0 = input.LA(1);
+				if ( (LA23_0==BOOLTOK||LA23_0==CHARTOK||(LA23_0 >= COMPLEXTOK && LA23_0 <= CONSTTOK)||LA23_0==DOUBLETOK||LA23_0==ENUMTOK||(LA23_0 >= FLOATINGPOINTTOK && LA23_0 <= FLOATTOK)||LA23_0==IMAGINARYTOK||LA23_0==INTEGERTOK||LA23_0==INTTOK||LA23_0==LONGTOK||LA23_0==SHORTTOK||LA23_0==SIGNEDTOK||LA23_0==STRINGTOK||LA23_0==STRUCTTOK||LA23_0==TYPEDEFTOK||(LA23_0 >= UNSIGNEDTOK && LA23_0 <= VOIDTOK)) ) {
+					alt23=1;
 				}
-				else if ( (LA22_0==IDENTIFIER) && (( inTypealiasAlias() || isTypeName(input.LT(1).getText()) ))) {
-					alt22=1;
+				else if ( (LA23_0==IDENTIFIER) && (( inTypealiasAlias() || isTypeName(input.LT(1).getText()) ))) {
+					alt23=1;
 				}
-				else if ( (LA22_0==TYPEALIASTOK) ) {
-					alt22=1;
+				else if ( (LA23_0==TYPEALIASTOK) ) {
+					alt23=1;
 				}
 
-				switch (alt22) {
+				switch (alt23) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:360:5: structOrVariantDeclaration
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:365:5: structOrVariantDeclaration
 					{
-					pushFollow(FOLLOW_structOrVariantDeclaration_in_structOrVariantDeclarationList1599);
-					structOrVariantDeclaration73=structOrVariantDeclaration();
+					pushFollow(FOLLOW_structOrVariantDeclaration_in_structOrVariantDeclarationList1643);
+					structOrVariantDeclaration75=structOrVariantDeclaration();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) adaptor.addChild(root_0, structOrVariantDeclaration73.getTree());
+					if ( state.backtracking==0 ) adaptor.addChild(root_0, structOrVariantDeclaration75.getTree());
 
 					}
 					break;
 
 				default :
-					if ( cnt22 >= 1 ) break loop22;
+					if ( cnt23 >= 1 ) break loop23;
 					if (state.backtracking>0) {state.failed=true; return retval;}
-					EarlyExitException eee = new EarlyExitException(22, input);
+					EarlyExitException eee = new EarlyExitException(23, input);
 					throw eee;
 				}
-				cnt22++;
+				cnt23++;
 			}
 
 			}
@@ -3393,20 +3532,20 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "structOrVariantDeclaration"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:363:1: structOrVariantDeclaration : ( ( declarationSpecifiers ({...}? => declaratorList -> ^( TYPEDEF declaratorList declarationSpecifiers ) | structOrVariantDeclaratorList -> ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList ) ) ) | typealiasDecl -> typealiasDecl ) TERM ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:368:1: structOrVariantDeclaration : ( ( declarationSpecifiers ({...}? => declaratorList -> ^( TYPEDEF declaratorList declarationSpecifiers ) | structOrVariantDeclaratorList -> ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList ) ) ) | typealiasDecl -> typealiasDecl ) TERM ;
 	public final CTFParser.structOrVariantDeclaration_return structOrVariantDeclaration() throws RecognitionException {
 		CTFParser.structOrVariantDeclaration_return retval = new CTFParser.structOrVariantDeclaration_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token TERM78=null;
-		ParserRuleReturnScope declarationSpecifiers74 =null;
-		ParserRuleReturnScope declaratorList75 =null;
-		ParserRuleReturnScope structOrVariantDeclaratorList76 =null;
-		ParserRuleReturnScope typealiasDecl77 =null;
+		Token TERM80=null;
+		ParserRuleReturnScope declarationSpecifiers76 =null;
+		ParserRuleReturnScope declaratorList77 =null;
+		ParserRuleReturnScope structOrVariantDeclaratorList78 =null;
+		ParserRuleReturnScope typealiasDecl79 =null;
 
-		CommonTree TERM78_tree=null;
+		CommonTree TERM80_tree=null;
 		RewriteRuleTokenStream stream_TERM=new RewriteRuleTokenStream(adaptor,"token TERM");
 		RewriteRuleSubtreeStream stream_declaratorList=new RewriteRuleSubtreeStream(adaptor,"rule declaratorList");
 		RewriteRuleSubtreeStream stream_typealiasDecl=new RewriteRuleSubtreeStream(adaptor,"rule typealiasDecl");
@@ -3414,57 +3553,57 @@ public class CTFParser extends Parser {
 		RewriteRuleSubtreeStream stream_structOrVariantDeclaratorList=new RewriteRuleSubtreeStream(adaptor,"rule structOrVariantDeclaratorList");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:364:3: ( ( ( declarationSpecifiers ({...}? => declaratorList -> ^( TYPEDEF declaratorList declarationSpecifiers ) | structOrVariantDeclaratorList -> ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList ) ) ) | typealiasDecl -> typealiasDecl ) TERM )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:365:3: ( ( declarationSpecifiers ({...}? => declaratorList -> ^( TYPEDEF declaratorList declarationSpecifiers ) | structOrVariantDeclaratorList -> ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList ) ) ) | typealiasDecl -> typealiasDecl ) TERM
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:369:3: ( ( ( declarationSpecifiers ({...}? => declaratorList -> ^( TYPEDEF declaratorList declarationSpecifiers ) | structOrVariantDeclaratorList -> ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList ) ) ) | typealiasDecl -> typealiasDecl ) TERM )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:370:3: ( ( declarationSpecifiers ({...}? => declaratorList -> ^( TYPEDEF declaratorList declarationSpecifiers ) | structOrVariantDeclaratorList -> ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList ) ) ) | typealiasDecl -> typealiasDecl ) TERM
 			{
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:365:3: ( ( declarationSpecifiers ({...}? => declaratorList -> ^( TYPEDEF declaratorList declarationSpecifiers ) | structOrVariantDeclaratorList -> ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList ) ) ) | typealiasDecl -> typealiasDecl )
-			int alt24=2;
-			int LA24_0 = input.LA(1);
-			if ( (LA24_0==BOOLTOK||LA24_0==CHARTOK||(LA24_0 >= COMPLEXTOK && LA24_0 <= CONSTTOK)||LA24_0==DOUBLETOK||LA24_0==ENUMTOK||(LA24_0 >= FLOATINGPOINTTOK && LA24_0 <= FLOATTOK)||LA24_0==IMAGINARYTOK||LA24_0==INTEGERTOK||LA24_0==INTTOK||LA24_0==LONGTOK||LA24_0==SHORTTOK||LA24_0==SIGNEDTOK||LA24_0==STRINGTOK||LA24_0==STRUCTTOK||LA24_0==TYPEDEFTOK||(LA24_0 >= UNSIGNEDTOK && LA24_0 <= VOIDTOK)) ) {
-				alt24=1;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:370:3: ( ( declarationSpecifiers ({...}? => declaratorList -> ^( TYPEDEF declaratorList declarationSpecifiers ) | structOrVariantDeclaratorList -> ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList ) ) ) | typealiasDecl -> typealiasDecl )
+			int alt25=2;
+			int LA25_0 = input.LA(1);
+			if ( (LA25_0==BOOLTOK||LA25_0==CHARTOK||(LA25_0 >= COMPLEXTOK && LA25_0 <= CONSTTOK)||LA25_0==DOUBLETOK||LA25_0==ENUMTOK||(LA25_0 >= FLOATINGPOINTTOK && LA25_0 <= FLOATTOK)||LA25_0==IMAGINARYTOK||LA25_0==INTEGERTOK||LA25_0==INTTOK||LA25_0==LONGTOK||LA25_0==SHORTTOK||LA25_0==SIGNEDTOK||LA25_0==STRINGTOK||LA25_0==STRUCTTOK||LA25_0==TYPEDEFTOK||(LA25_0 >= UNSIGNEDTOK && LA25_0 <= VOIDTOK)) ) {
+				alt25=1;
 			}
-			else if ( (LA24_0==IDENTIFIER) && (( inTypealiasAlias() || isTypeName(input.LT(1).getText()) ))) {
-				alt24=1;
+			else if ( (LA25_0==IDENTIFIER) && (( inTypealiasAlias() || isTypeName(input.LT(1).getText()) ))) {
+				alt25=1;
 			}
-			else if ( (LA24_0==TYPEALIASTOK) ) {
-				alt24=2;
+			else if ( (LA25_0==TYPEALIASTOK) ) {
+				alt25=2;
 			}
 
 			else {
 				if (state.backtracking>0) {state.failed=true; return retval;}
 				NoViableAltException nvae =
-					new NoViableAltException("", 24, 0, input);
+					new NoViableAltException("", 25, 0, input);
 				throw nvae;
 			}
 
-			switch (alt24) {
+			switch (alt25) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:366:7: ( declarationSpecifiers ({...}? => declaratorList -> ^( TYPEDEF declaratorList declarationSpecifiers ) | structOrVariantDeclaratorList -> ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList ) ) )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:371:7: ( declarationSpecifiers ({...}? => declaratorList -> ^( TYPEDEF declaratorList declarationSpecifiers ) | structOrVariantDeclaratorList -> ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList ) ) )
 					{
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:366:7: ( declarationSpecifiers ({...}? => declaratorList -> ^( TYPEDEF declaratorList declarationSpecifiers ) | structOrVariantDeclaratorList -> ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList ) ) )
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:367:8: declarationSpecifiers ({...}? => declaratorList -> ^( TYPEDEF declaratorList declarationSpecifiers ) | structOrVariantDeclaratorList -> ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList ) )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:371:7: ( declarationSpecifiers ({...}? => declaratorList -> ^( TYPEDEF declaratorList declarationSpecifiers ) | structOrVariantDeclaratorList -> ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList ) ) )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:372:8: declarationSpecifiers ({...}? => declaratorList -> ^( TYPEDEF declaratorList declarationSpecifiers ) | structOrVariantDeclaratorList -> ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList ) )
 					{
-					pushFollow(FOLLOW_declarationSpecifiers_in_structOrVariantDeclaration1632);
-					declarationSpecifiers74=declarationSpecifiers();
+					pushFollow(FOLLOW_declarationSpecifiers_in_structOrVariantDeclaration1676);
+					declarationSpecifiers76=declarationSpecifiers();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_declarationSpecifiers.add(declarationSpecifiers74.getTree());
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:368:10: ({...}? => declaratorList -> ^( TYPEDEF declaratorList declarationSpecifiers ) | structOrVariantDeclaratorList -> ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList ) )
-					int alt23=2;
-					alt23 = dfa23.predict(input);
-					switch (alt23) {
+					if ( state.backtracking==0 ) stream_declarationSpecifiers.add(declarationSpecifiers76.getTree());
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:373:10: ({...}? => declaratorList -> ^( TYPEDEF declaratorList declarationSpecifiers ) | structOrVariantDeclaratorList -> ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList ) )
+					int alt24=2;
+					alt24 = dfa24.predict(input);
+					switch (alt24) {
 						case 1 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:370:12: {...}? => declaratorList
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:375:12: {...}? => declaratorList
 							{
 							if ( !((inTypedef())) ) {
 								if (state.backtracking>0) {state.failed=true; return retval;}
 								throw new FailedPredicateException(input, "structOrVariantDeclaration", "inTypedef()");
 							}
-							pushFollow(FOLLOW_declaratorList_in_structOrVariantDeclaration1673);
-							declaratorList75=declaratorList();
+							pushFollow(FOLLOW_declaratorList_in_structOrVariantDeclaration1717);
+							declaratorList77=declaratorList();
 							state._fsp--;
 							if (state.failed) return retval;
-							if ( state.backtracking==0 ) stream_declaratorList.add(declaratorList75.getTree());
+							if ( state.backtracking==0 ) stream_declaratorList.add(declaratorList77.getTree());
 							if ( state.backtracking==0 ) {typedefOff();}
 							// AST REWRITE
 							// elements: declaratorList, declarationSpecifiers
@@ -3478,9 +3617,9 @@ public class CTFParser extends Parser {
 							RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 							root_0 = (CommonTree)adaptor.nil();
-							// 371:14: -> ^( TYPEDEF declaratorList declarationSpecifiers )
+							// 376:14: -> ^( TYPEDEF declaratorList declarationSpecifiers )
 							{
-								// org/eclipse/tracecompass/ctf/parser/CTFParser.g:371:17: ^( TYPEDEF declaratorList declarationSpecifiers )
+								// org/eclipse/tracecompass/ctf/parser/CTFParser.g:376:17: ^( TYPEDEF declaratorList declarationSpecifiers )
 								{
 								CommonTree root_1 = (CommonTree)adaptor.nil();
 								root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(TYPEDEF, "TYPEDEF"), root_1);
@@ -3498,13 +3637,13 @@ public class CTFParser extends Parser {
 							}
 							break;
 						case 2 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:372:14: structOrVariantDeclaratorList
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:377:14: structOrVariantDeclaratorList
 							{
-							pushFollow(FOLLOW_structOrVariantDeclaratorList_in_structOrVariantDeclaration1713);
-							structOrVariantDeclaratorList76=structOrVariantDeclaratorList();
+							pushFollow(FOLLOW_structOrVariantDeclaratorList_in_structOrVariantDeclaration1757);
+							structOrVariantDeclaratorList78=structOrVariantDeclaratorList();
 							state._fsp--;
 							if (state.failed) return retval;
-							if ( state.backtracking==0 ) stream_structOrVariantDeclaratorList.add(structOrVariantDeclaratorList76.getTree());
+							if ( state.backtracking==0 ) stream_structOrVariantDeclaratorList.add(structOrVariantDeclaratorList78.getTree());
 							// AST REWRITE
 							// elements: structOrVariantDeclaratorList, declarationSpecifiers
 							// token labels: 
@@ -3517,9 +3656,9 @@ public class CTFParser extends Parser {
 							RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 							root_0 = (CommonTree)adaptor.nil();
-							// 373:14: -> ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList )
+							// 378:14: -> ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList )
 							{
-								// org/eclipse/tracecompass/ctf/parser/CTFParser.g:373:17: ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList )
+								// org/eclipse/tracecompass/ctf/parser/CTFParser.g:378:17: ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList )
 								{
 								CommonTree root_1 = (CommonTree)adaptor.nil();
 								root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(SV_DECLARATION, "SV_DECLARATION"), root_1);
@@ -3544,13 +3683,13 @@ public class CTFParser extends Parser {
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:378:5: typealiasDecl
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:383:5: typealiasDecl
 					{
-					pushFollow(FOLLOW_typealiasDecl_in_structOrVariantDeclaration1772);
-					typealiasDecl77=typealiasDecl();
+					pushFollow(FOLLOW_typealiasDecl_in_structOrVariantDeclaration1816);
+					typealiasDecl79=typealiasDecl();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_typealiasDecl.add(typealiasDecl77.getTree());
+					if ( state.backtracking==0 ) stream_typealiasDecl.add(typealiasDecl79.getTree());
 					// AST REWRITE
 					// elements: typealiasDecl
 					// token labels: 
@@ -3563,7 +3702,7 @@ public class CTFParser extends Parser {
 					RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 					root_0 = (CommonTree)adaptor.nil();
-					// 378:19: -> typealiasDecl
+					// 383:19: -> typealiasDecl
 					{
 						adaptor.addChild(root_0, stream_typealiasDecl.nextTree());
 					}
@@ -3577,8 +3716,8 @@ public class CTFParser extends Parser {
 
 			}
 
-			TERM78=(Token)match(input,TERM,FOLLOW_TERM_in_structOrVariantDeclaration1784); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_TERM.add(TERM78);
+			TERM80=(Token)match(input,TERM,FOLLOW_TERM_in_structOrVariantDeclaration1828); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_TERM.add(TERM80);
 
 			}
 
@@ -3610,68 +3749,68 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "specifierQualifierList"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:383:1: specifierQualifierList : ( typeQualifier | typeSpecifier )+ -> ^( TYPE_SPECIFIER_LIST ( typeQualifier )* ( typeSpecifier )* ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:388:1: specifierQualifierList : ( typeQualifier | typeSpecifier )+ -> ^( TYPE_SPECIFIER_LIST ( typeQualifier )* ( typeSpecifier )* ) ;
 	public final CTFParser.specifierQualifierList_return specifierQualifierList() throws RecognitionException {
 		CTFParser.specifierQualifierList_return retval = new CTFParser.specifierQualifierList_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		ParserRuleReturnScope typeQualifier79 =null;
-		ParserRuleReturnScope typeSpecifier80 =null;
+		ParserRuleReturnScope typeQualifier81 =null;
+		ParserRuleReturnScope typeSpecifier82 =null;
 
 		RewriteRuleSubtreeStream stream_typeSpecifier=new RewriteRuleSubtreeStream(adaptor,"rule typeSpecifier");
 		RewriteRuleSubtreeStream stream_typeQualifier=new RewriteRuleSubtreeStream(adaptor,"rule typeQualifier");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:384:3: ( ( typeQualifier | typeSpecifier )+ -> ^( TYPE_SPECIFIER_LIST ( typeQualifier )* ( typeSpecifier )* ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:384:5: ( typeQualifier | typeSpecifier )+
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:389:3: ( ( typeQualifier | typeSpecifier )+ -> ^( TYPE_SPECIFIER_LIST ( typeQualifier )* ( typeSpecifier )* ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:389:5: ( typeQualifier | typeSpecifier )+
 			{
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:384:5: ( typeQualifier | typeSpecifier )+
-			int cnt25=0;
-			loop25:
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:389:5: ( typeQualifier | typeSpecifier )+
+			int cnt26=0;
+			loop26:
 			while (true) {
-				int alt25=3;
-				int LA25_0 = input.LA(1);
-				if ( (LA25_0==CONSTTOK) ) {
-					alt25=1;
+				int alt26=3;
+				int LA26_0 = input.LA(1);
+				if ( (LA26_0==CONSTTOK) ) {
+					alt26=1;
 				}
-				else if ( (LA25_0==BOOLTOK||LA25_0==CHARTOK||LA25_0==COMPLEXTOK||LA25_0==DOUBLETOK||LA25_0==ENUMTOK||(LA25_0 >= FLOATINGPOINTTOK && LA25_0 <= FLOATTOK)||LA25_0==IMAGINARYTOK||LA25_0==INTEGERTOK||LA25_0==INTTOK||LA25_0==LONGTOK||LA25_0==SHORTTOK||LA25_0==SIGNEDTOK||LA25_0==STRINGTOK||LA25_0==STRUCTTOK||(LA25_0 >= UNSIGNEDTOK && LA25_0 <= VOIDTOK)) ) {
-					alt25=2;
+				else if ( (LA26_0==BOOLTOK||LA26_0==CHARTOK||LA26_0==COMPLEXTOK||LA26_0==DOUBLETOK||LA26_0==ENUMTOK||(LA26_0 >= FLOATINGPOINTTOK && LA26_0 <= FLOATTOK)||LA26_0==IMAGINARYTOK||LA26_0==INTEGERTOK||LA26_0==INTTOK||LA26_0==LONGTOK||LA26_0==SHORTTOK||LA26_0==SIGNEDTOK||LA26_0==STRINGTOK||LA26_0==STRUCTTOK||(LA26_0 >= UNSIGNEDTOK && LA26_0 <= VOIDTOK)) ) {
+					alt26=2;
 				}
-				else if ( (LA25_0==IDENTIFIER) && (( inTypealiasAlias() || isTypeName(input.LT(1).getText()) ))) {
-					alt25=2;
+				else if ( (LA26_0==IDENTIFIER) && (( inTypealiasAlias() || isTypeName(input.LT(1).getText()) ))) {
+					alt26=2;
 				}
 
-				switch (alt25) {
+				switch (alt26) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:384:6: typeQualifier
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:389:6: typeQualifier
 					{
-					pushFollow(FOLLOW_typeQualifier_in_specifierQualifierList1798);
-					typeQualifier79=typeQualifier();
+					pushFollow(FOLLOW_typeQualifier_in_specifierQualifierList1842);
+					typeQualifier81=typeQualifier();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_typeQualifier.add(typeQualifier79.getTree());
+					if ( state.backtracking==0 ) stream_typeQualifier.add(typeQualifier81.getTree());
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:384:22: typeSpecifier
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:389:22: typeSpecifier
 					{
-					pushFollow(FOLLOW_typeSpecifier_in_specifierQualifierList1802);
-					typeSpecifier80=typeSpecifier();
+					pushFollow(FOLLOW_typeSpecifier_in_specifierQualifierList1846);
+					typeSpecifier82=typeSpecifier();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_typeSpecifier.add(typeSpecifier80.getTree());
+					if ( state.backtracking==0 ) stream_typeSpecifier.add(typeSpecifier82.getTree());
 					}
 					break;
 
 				default :
-					if ( cnt25 >= 1 ) break loop25;
+					if ( cnt26 >= 1 ) break loop26;
 					if (state.backtracking>0) {state.failed=true; return retval;}
-					EarlyExitException eee = new EarlyExitException(25, input);
+					EarlyExitException eee = new EarlyExitException(26, input);
 					throw eee;
 				}
-				cnt25++;
+				cnt26++;
 			}
 
 			// AST REWRITE
@@ -3686,19 +3825,19 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 385:7: -> ^( TYPE_SPECIFIER_LIST ( typeQualifier )* ( typeSpecifier )* )
+			// 390:7: -> ^( TYPE_SPECIFIER_LIST ( typeQualifier )* ( typeSpecifier )* )
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:385:10: ^( TYPE_SPECIFIER_LIST ( typeQualifier )* ( typeSpecifier )* )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:390:10: ^( TYPE_SPECIFIER_LIST ( typeQualifier )* ( typeSpecifier )* )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.nil();
 				root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(TYPE_SPECIFIER_LIST, "TYPE_SPECIFIER_LIST"), root_1);
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:385:32: ( typeQualifier )*
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:390:32: ( typeQualifier )*
 				while ( stream_typeQualifier.hasNext() ) {
 					adaptor.addChild(root_1, stream_typeQualifier.nextTree());
 				}
 				stream_typeQualifier.reset();
 
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:385:47: ( typeSpecifier )*
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:390:47: ( typeSpecifier )*
 				while ( stream_typeSpecifier.hasNext() ) {
 					adaptor.addChild(root_1, stream_typeSpecifier.nextTree());
 				}
@@ -3743,56 +3882,56 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "structOrVariantDeclaratorList"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:388:1: structOrVariantDeclaratorList : structOrVariantDeclarator ( SEPARATOR structOrVariantDeclarator )* -> ^( TYPE_DECLARATOR_LIST ( structOrVariantDeclarator )+ ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:393:1: structOrVariantDeclaratorList : structOrVariantDeclarator ( SEPARATOR structOrVariantDeclarator )* -> ^( TYPE_DECLARATOR_LIST ( structOrVariantDeclarator )+ ) ;
 	public final CTFParser.structOrVariantDeclaratorList_return structOrVariantDeclaratorList() throws RecognitionException {
 		CTFParser.structOrVariantDeclaratorList_return retval = new CTFParser.structOrVariantDeclaratorList_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token SEPARATOR82=null;
-		ParserRuleReturnScope structOrVariantDeclarator81 =null;
+		Token SEPARATOR84=null;
 		ParserRuleReturnScope structOrVariantDeclarator83 =null;
+		ParserRuleReturnScope structOrVariantDeclarator85 =null;
 
-		CommonTree SEPARATOR82_tree=null;
+		CommonTree SEPARATOR84_tree=null;
 		RewriteRuleTokenStream stream_SEPARATOR=new RewriteRuleTokenStream(adaptor,"token SEPARATOR");
 		RewriteRuleSubtreeStream stream_structOrVariantDeclarator=new RewriteRuleSubtreeStream(adaptor,"rule structOrVariantDeclarator");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:389:3: ( structOrVariantDeclarator ( SEPARATOR structOrVariantDeclarator )* -> ^( TYPE_DECLARATOR_LIST ( structOrVariantDeclarator )+ ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:389:5: structOrVariantDeclarator ( SEPARATOR structOrVariantDeclarator )*
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:394:3: ( structOrVariantDeclarator ( SEPARATOR structOrVariantDeclarator )* -> ^( TYPE_DECLARATOR_LIST ( structOrVariantDeclarator )+ ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:394:5: structOrVariantDeclarator ( SEPARATOR structOrVariantDeclarator )*
 			{
-			pushFollow(FOLLOW_structOrVariantDeclarator_in_structOrVariantDeclaratorList1835);
-			structOrVariantDeclarator81=structOrVariantDeclarator();
+			pushFollow(FOLLOW_structOrVariantDeclarator_in_structOrVariantDeclaratorList1879);
+			structOrVariantDeclarator83=structOrVariantDeclarator();
 			state._fsp--;
 			if (state.failed) return retval;
-			if ( state.backtracking==0 ) stream_structOrVariantDeclarator.add(structOrVariantDeclarator81.getTree());
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:389:31: ( SEPARATOR structOrVariantDeclarator )*
-			loop26:
+			if ( state.backtracking==0 ) stream_structOrVariantDeclarator.add(structOrVariantDeclarator83.getTree());
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:394:31: ( SEPARATOR structOrVariantDeclarator )*
+			loop27:
 			while (true) {
-				int alt26=2;
-				int LA26_0 = input.LA(1);
-				if ( (LA26_0==SEPARATOR) ) {
-					alt26=1;
+				int alt27=2;
+				int LA27_0 = input.LA(1);
+				if ( (LA27_0==SEPARATOR) ) {
+					alt27=1;
 				}
 
-				switch (alt26) {
+				switch (alt27) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:389:32: SEPARATOR structOrVariantDeclarator
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:394:32: SEPARATOR structOrVariantDeclarator
 					{
-					SEPARATOR82=(Token)match(input,SEPARATOR,FOLLOW_SEPARATOR_in_structOrVariantDeclaratorList1838); if (state.failed) return retval; 
-					if ( state.backtracking==0 ) stream_SEPARATOR.add(SEPARATOR82);
+					SEPARATOR84=(Token)match(input,SEPARATOR,FOLLOW_SEPARATOR_in_structOrVariantDeclaratorList1882); if (state.failed) return retval; 
+					if ( state.backtracking==0 ) stream_SEPARATOR.add(SEPARATOR84);
 
-					pushFollow(FOLLOW_structOrVariantDeclarator_in_structOrVariantDeclaratorList1840);
-					structOrVariantDeclarator83=structOrVariantDeclarator();
+					pushFollow(FOLLOW_structOrVariantDeclarator_in_structOrVariantDeclaratorList1884);
+					structOrVariantDeclarator85=structOrVariantDeclarator();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_structOrVariantDeclarator.add(structOrVariantDeclarator83.getTree());
+					if ( state.backtracking==0 ) stream_structOrVariantDeclarator.add(structOrVariantDeclarator85.getTree());
 					}
 					break;
 
 				default :
-					break loop26;
+					break loop27;
 				}
 			}
 
@@ -3808,9 +3947,9 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 390:7: -> ^( TYPE_DECLARATOR_LIST ( structOrVariantDeclarator )+ )
+			// 395:7: -> ^( TYPE_DECLARATOR_LIST ( structOrVariantDeclarator )+ )
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:390:10: ^( TYPE_DECLARATOR_LIST ( structOrVariantDeclarator )+ )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:395:10: ^( TYPE_DECLARATOR_LIST ( structOrVariantDeclarator )+ )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.nil();
 				root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(TYPE_DECLARATOR_LIST, "TYPE_DECLARATOR_LIST"), root_1);
@@ -3861,52 +4000,52 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "structOrVariantDeclarator"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:393:1: structOrVariantDeclarator : ( declarator ( COLON numberLiteral )? ) -> declarator ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:398:1: structOrVariantDeclarator : ( declarator ( COLON numberLiteral )? ) -> declarator ;
 	public final CTFParser.structOrVariantDeclarator_return structOrVariantDeclarator() throws RecognitionException {
 		CTFParser.structOrVariantDeclarator_return retval = new CTFParser.structOrVariantDeclarator_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token COLON85=null;
-		ParserRuleReturnScope declarator84 =null;
-		ParserRuleReturnScope numberLiteral86 =null;
+		Token COLON87=null;
+		ParserRuleReturnScope declarator86 =null;
+		ParserRuleReturnScope numberLiteral88 =null;
 
-		CommonTree COLON85_tree=null;
+		CommonTree COLON87_tree=null;
 		RewriteRuleTokenStream stream_COLON=new RewriteRuleTokenStream(adaptor,"token COLON");
 		RewriteRuleSubtreeStream stream_declarator=new RewriteRuleSubtreeStream(adaptor,"rule declarator");
 		RewriteRuleSubtreeStream stream_numberLiteral=new RewriteRuleSubtreeStream(adaptor,"rule numberLiteral");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:394:3: ( ( declarator ( COLON numberLiteral )? ) -> declarator )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:396:5: ( declarator ( COLON numberLiteral )? )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:399:3: ( ( declarator ( COLON numberLiteral )? ) -> declarator )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:401:5: ( declarator ( COLON numberLiteral )? )
 			{
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:396:5: ( declarator ( COLON numberLiteral )? )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:396:6: declarator ( COLON numberLiteral )?
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:401:5: ( declarator ( COLON numberLiteral )? )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:401:6: declarator ( COLON numberLiteral )?
 			{
-			pushFollow(FOLLOW_declarator_in_structOrVariantDeclarator1879);
-			declarator84=declarator();
+			pushFollow(FOLLOW_declarator_in_structOrVariantDeclarator1923);
+			declarator86=declarator();
 			state._fsp--;
 			if (state.failed) return retval;
-			if ( state.backtracking==0 ) stream_declarator.add(declarator84.getTree());
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:396:17: ( COLON numberLiteral )?
-			int alt27=2;
-			int LA27_0 = input.LA(1);
-			if ( (LA27_0==COLON) ) {
-				alt27=1;
+			if ( state.backtracking==0 ) stream_declarator.add(declarator86.getTree());
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:401:17: ( COLON numberLiteral )?
+			int alt28=2;
+			int LA28_0 = input.LA(1);
+			if ( (LA28_0==COLON) ) {
+				alt28=1;
 			}
-			switch (alt27) {
+			switch (alt28) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:396:18: COLON numberLiteral
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:401:18: COLON numberLiteral
 					{
-					COLON85=(Token)match(input,COLON,FOLLOW_COLON_in_structOrVariantDeclarator1882); if (state.failed) return retval; 
-					if ( state.backtracking==0 ) stream_COLON.add(COLON85);
+					COLON87=(Token)match(input,COLON,FOLLOW_COLON_in_structOrVariantDeclarator1926); if (state.failed) return retval; 
+					if ( state.backtracking==0 ) stream_COLON.add(COLON87);
 
-					pushFollow(FOLLOW_numberLiteral_in_structOrVariantDeclarator1884);
-					numberLiteral86=numberLiteral();
+					pushFollow(FOLLOW_numberLiteral_in_structOrVariantDeclarator1928);
+					numberLiteral88=numberLiteral();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_numberLiteral.add(numberLiteral86.getTree());
+					if ( state.backtracking==0 ) stream_numberLiteral.add(numberLiteral88.getTree());
 					}
 					break;
 
@@ -3926,7 +4065,7 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 396:41: -> declarator
+			// 401:41: -> declarator
 			{
 				adaptor.addChild(root_0, stream_declarator.nextTree());
 			}
@@ -3965,104 +4104,104 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "variantSpecifier"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:400:1: variantSpecifier : VARIANTTOK ( ( variantName ( ( variantTag ( variantBody |) ) | variantBody ) ) | ( variantTag variantBody ) | variantBody ) -> ^( VARIANT ( variantName )? ( variantTag )? ( variantBody )? ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:405:1: variantSpecifier : VARIANTTOK ( ( variantName ( ( variantTag ( variantBody |) ) | variantBody ) ) | ( variantTag variantBody ) | variantBody ) -> ^( VARIANT ( variantName )? ( variantTag )? ( variantBody )? ) ;
 	public final CTFParser.variantSpecifier_return variantSpecifier() throws RecognitionException {
 		CTFParser.variantSpecifier_return retval = new CTFParser.variantSpecifier_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token VARIANTTOK87=null;
-		ParserRuleReturnScope variantName88 =null;
-		ParserRuleReturnScope variantTag89 =null;
-		ParserRuleReturnScope variantBody90 =null;
-		ParserRuleReturnScope variantBody91 =null;
-		ParserRuleReturnScope variantTag92 =null;
+		Token VARIANTTOK89=null;
+		ParserRuleReturnScope variantName90 =null;
+		ParserRuleReturnScope variantTag91 =null;
+		ParserRuleReturnScope variantBody92 =null;
 		ParserRuleReturnScope variantBody93 =null;
-		ParserRuleReturnScope variantBody94 =null;
+		ParserRuleReturnScope variantTag94 =null;
+		ParserRuleReturnScope variantBody95 =null;
+		ParserRuleReturnScope variantBody96 =null;
 
-		CommonTree VARIANTTOK87_tree=null;
+		CommonTree VARIANTTOK89_tree=null;
 		RewriteRuleTokenStream stream_VARIANTTOK=new RewriteRuleTokenStream(adaptor,"token VARIANTTOK");
 		RewriteRuleSubtreeStream stream_variantName=new RewriteRuleSubtreeStream(adaptor,"rule variantName");
 		RewriteRuleSubtreeStream stream_variantTag=new RewriteRuleSubtreeStream(adaptor,"rule variantTag");
 		RewriteRuleSubtreeStream stream_variantBody=new RewriteRuleSubtreeStream(adaptor,"rule variantBody");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:401:3: ( VARIANTTOK ( ( variantName ( ( variantTag ( variantBody |) ) | variantBody ) ) | ( variantTag variantBody ) | variantBody ) -> ^( VARIANT ( variantName )? ( variantTag )? ( variantBody )? ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:401:5: VARIANTTOK ( ( variantName ( ( variantTag ( variantBody |) ) | variantBody ) ) | ( variantTag variantBody ) | variantBody )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:406:3: ( VARIANTTOK ( ( variantName ( ( variantTag ( variantBody |) ) | variantBody ) ) | ( variantTag variantBody ) | variantBody ) -> ^( VARIANT ( variantName )? ( variantTag )? ( variantBody )? ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:406:5: VARIANTTOK ( ( variantName ( ( variantTag ( variantBody |) ) | variantBody ) ) | ( variantTag variantBody ) | variantBody )
 			{
-			VARIANTTOK87=(Token)match(input,VARIANTTOK,FOLLOW_VARIANTTOK_in_variantSpecifier1908); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_VARIANTTOK.add(VARIANTTOK87);
+			VARIANTTOK89=(Token)match(input,VARIANTTOK,FOLLOW_VARIANTTOK_in_variantSpecifier1952); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_VARIANTTOK.add(VARIANTTOK89);
 
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:402:3: ( ( variantName ( ( variantTag ( variantBody |) ) | variantBody ) ) | ( variantTag variantBody ) | variantBody )
-			int alt30=3;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:407:3: ( ( variantName ( ( variantTag ( variantBody |) ) | variantBody ) ) | ( variantTag variantBody ) | variantBody )
+			int alt31=3;
 			switch ( input.LA(1) ) {
 			case IDENTIFIER:
 				{
-				alt30=1;
+				alt31=1;
 				}
 				break;
 			case LT:
 				{
-				alt30=2;
+				alt31=2;
 				}
 				break;
 			case LCURL:
 				{
-				alt30=3;
+				alt31=3;
 				}
 				break;
 			default:
 				if (state.backtracking>0) {state.failed=true; return retval;}
 				NoViableAltException nvae =
-					new NoViableAltException("", 30, 0, input);
+					new NoViableAltException("", 31, 0, input);
 				throw nvae;
 			}
-			switch (alt30) {
+			switch (alt31) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:403:5: ( variantName ( ( variantTag ( variantBody |) ) | variantBody ) )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:408:5: ( variantName ( ( variantTag ( variantBody |) ) | variantBody ) )
 					{
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:403:5: ( variantName ( ( variantTag ( variantBody |) ) | variantBody ) )
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:404:7: variantName ( ( variantTag ( variantBody |) ) | variantBody )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:408:5: ( variantName ( ( variantTag ( variantBody |) ) | variantBody ) )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:409:7: variantName ( ( variantTag ( variantBody |) ) | variantBody )
 					{
-					pushFollow(FOLLOW_variantName_in_variantSpecifier1926);
-					variantName88=variantName();
+					pushFollow(FOLLOW_variantName_in_variantSpecifier1970);
+					variantName90=variantName();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_variantName.add(variantName88.getTree());
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:405:7: ( ( variantTag ( variantBody |) ) | variantBody )
-					int alt29=2;
-					int LA29_0 = input.LA(1);
-					if ( (LA29_0==LT) ) {
-						alt29=1;
+					if ( state.backtracking==0 ) stream_variantName.add(variantName90.getTree());
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:410:7: ( ( variantTag ( variantBody |) ) | variantBody )
+					int alt30=2;
+					int LA30_0 = input.LA(1);
+					if ( (LA30_0==LT) ) {
+						alt30=1;
 					}
-					else if ( (LA29_0==LCURL) ) {
-						alt29=2;
+					else if ( (LA30_0==LCURL) ) {
+						alt30=2;
 					}
 
 					else {
 						if (state.backtracking>0) {state.failed=true; return retval;}
 						NoViableAltException nvae =
-							new NoViableAltException("", 29, 0, input);
+							new NoViableAltException("", 30, 0, input);
 						throw nvae;
 					}
 
-					switch (alt29) {
+					switch (alt30) {
 						case 1 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:406:9: ( variantTag ( variantBody |) )
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:411:9: ( variantTag ( variantBody |) )
 							{
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:406:9: ( variantTag ( variantBody |) )
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:407:11: variantTag ( variantBody |)
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:411:9: ( variantTag ( variantBody |) )
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:412:11: variantTag ( variantBody |)
 							{
-							pushFollow(FOLLOW_variantTag_in_variantSpecifier1956);
-							variantTag89=variantTag();
+							pushFollow(FOLLOW_variantTag_in_variantSpecifier2000);
+							variantTag91=variantTag();
 							state._fsp--;
 							if (state.failed) return retval;
-							if ( state.backtracking==0 ) stream_variantTag.add(variantTag89.getTree());
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:408:11: ( variantBody |)
-							int alt28=2;
-							int LA28_0 = input.LA(1);
-							if ( (LA28_0==LCURL) ) {
+							if ( state.backtracking==0 ) stream_variantTag.add(variantTag91.getTree());
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:413:11: ( variantBody |)
+							int alt29=2;
+							int LA29_0 = input.LA(1);
+							if ( (LA29_0==LCURL) ) {
 								switch ( input.LA(2) ) {
 								case BOOLTOK:
 								case CHARTOK:
@@ -4084,17 +4223,17 @@ public class CTFParser extends Parser {
 								case VARIANTTOK:
 								case VOIDTOK:
 									{
-									alt28=1;
+									alt29=1;
 									}
 									break;
 								case SIGNEDTOK:
 									{
-									int LA28_4 = input.LA(3);
-									if ( (LA28_4==BOOLTOK||LA28_4==CHARTOK||(LA28_4 >= COMPLEXTOK && LA28_4 <= CONSTTOK)||LA28_4==DOUBLETOK||LA28_4==ENUMTOK||(LA28_4 >= FLOATINGPOINTTOK && LA28_4 <= FLOATTOK)||(LA28_4 >= IDENTIFIER && LA28_4 <= IMAGINARYTOK)||LA28_4==INTEGERTOK||LA28_4==INTTOK||LA28_4==LONGTOK||LA28_4==POINTER||LA28_4==SHORTTOK||LA28_4==SIGNEDTOK||LA28_4==STRINGTOK||LA28_4==STRUCTTOK||LA28_4==TYPEDEFTOK||(LA28_4 >= UNSIGNEDTOK && LA28_4 <= VOIDTOK)) ) {
-										alt28=1;
+									int LA29_4 = input.LA(3);
+									if ( (LA29_4==BOOLTOK||LA29_4==CHARTOK||(LA29_4 >= COMPLEXTOK && LA29_4 <= CONSTTOK)||LA29_4==DOUBLETOK||LA29_4==ENUMTOK||(LA29_4 >= FLOATINGPOINTTOK && LA29_4 <= FLOATTOK)||(LA29_4 >= IDENTIFIER && LA29_4 <= IMAGINARYTOK)||LA29_4==INTEGERTOK||LA29_4==INTTOK||LA29_4==LONGTOK||LA29_4==POINTER||LA29_4==SHORTTOK||LA29_4==SIGNEDTOK||LA29_4==STRINGTOK||LA29_4==STRUCTTOK||LA29_4==TYPEDEFTOK||(LA29_4 >= UNSIGNEDTOK && LA29_4 <= VOIDTOK)) ) {
+										alt29=1;
 									}
-									else if ( (LA28_4==ASSIGNMENT||LA28_4==RCURL||LA28_4==SEPARATOR) ) {
-										alt28=2;
+									else if ( (LA29_4==ASSIGNMENT||LA29_4==RCURL||LA29_4==SEPARATOR) ) {
+										alt29=2;
 									}
 
 									else {
@@ -4105,7 +4244,7 @@ public class CTFParser extends Parser {
 												input.consume();
 											}
 											NoViableAltException nvae =
-												new NoViableAltException("", 28, 4, input);
+												new NoViableAltException("", 29, 4, input);
 											throw nvae;
 										} finally {
 											input.rewind(nvaeMark);
@@ -4116,12 +4255,12 @@ public class CTFParser extends Parser {
 									break;
 								case STRINGTOK:
 									{
-									int LA28_5 = input.LA(3);
-									if ( (LA28_5==BOOLTOK||LA28_5==CHARTOK||(LA28_5 >= COMPLEXTOK && LA28_5 <= CONSTTOK)||LA28_5==DOUBLETOK||LA28_5==ENUMTOK||(LA28_5 >= FLOATINGPOINTTOK && LA28_5 <= FLOATTOK)||(LA28_5 >= IDENTIFIER && LA28_5 <= IMAGINARYTOK)||LA28_5==INTEGERTOK||(LA28_5 >= INTTOK && LA28_5 <= LCURL)||LA28_5==LONGTOK||LA28_5==POINTER||LA28_5==SHORTTOK||LA28_5==SIGNEDTOK||LA28_5==STRINGTOK||LA28_5==STRUCTTOK||LA28_5==TYPEDEFTOK||(LA28_5 >= UNSIGNEDTOK && LA28_5 <= VOIDTOK)) ) {
-										alt28=1;
+									int LA29_5 = input.LA(3);
+									if ( (LA29_5==BOOLTOK||LA29_5==CHARTOK||(LA29_5 >= COMPLEXTOK && LA29_5 <= CONSTTOK)||LA29_5==DOUBLETOK||LA29_5==ENUMTOK||(LA29_5 >= FLOATINGPOINTTOK && LA29_5 <= FLOATTOK)||(LA29_5 >= IDENTIFIER && LA29_5 <= IMAGINARYTOK)||LA29_5==INTEGERTOK||(LA29_5 >= INTTOK && LA29_5 <= LCURL)||LA29_5==LONGTOK||LA29_5==POINTER||LA29_5==SHORTTOK||LA29_5==SIGNEDTOK||LA29_5==STRINGTOK||LA29_5==STRUCTTOK||LA29_5==TYPEDEFTOK||(LA29_5 >= UNSIGNEDTOK && LA29_5 <= VOIDTOK)) ) {
+										alt29=1;
 									}
-									else if ( (LA28_5==ASSIGNMENT||LA28_5==RCURL||LA28_5==SEPARATOR) ) {
-										alt28=2;
+									else if ( (LA29_5==ASSIGNMENT||LA29_5==RCURL||LA29_5==SEPARATOR) ) {
+										alt29=2;
 									}
 
 									else {
@@ -4132,7 +4271,7 @@ public class CTFParser extends Parser {
 												input.consume();
 											}
 											NoViableAltException nvae =
-												new NoViableAltException("", 28, 5, input);
+												new NoViableAltException("", 29, 5, input);
 											throw nvae;
 										} finally {
 											input.rewind(nvaeMark);
@@ -4143,12 +4282,12 @@ public class CTFParser extends Parser {
 									break;
 								case IDENTIFIER:
 									{
-									int LA28_6 = input.LA(3);
-									if ( (LA28_6==BOOLTOK||LA28_6==CHARTOK||(LA28_6 >= COMPLEXTOK && LA28_6 <= CONSTTOK)||LA28_6==DOUBLETOK||LA28_6==ENUMTOK||(LA28_6 >= FLOATINGPOINTTOK && LA28_6 <= FLOATTOK)||(LA28_6 >= IDENTIFIER && LA28_6 <= IMAGINARYTOK)||LA28_6==INTEGERTOK||LA28_6==INTTOK||LA28_6==LONGTOK||LA28_6==POINTER||LA28_6==SHORTTOK||LA28_6==SIGNEDTOK||LA28_6==STRINGTOK||LA28_6==STRUCTTOK||LA28_6==TYPEDEFTOK||(LA28_6 >= UNSIGNEDTOK && LA28_6 <= VOIDTOK)) ) {
-										alt28=1;
+									int LA29_6 = input.LA(3);
+									if ( (LA29_6==BOOLTOK||LA29_6==CHARTOK||(LA29_6 >= COMPLEXTOK && LA29_6 <= CONSTTOK)||LA29_6==DOUBLETOK||LA29_6==ENUMTOK||(LA29_6 >= FLOATINGPOINTTOK && LA29_6 <= FLOATTOK)||(LA29_6 >= IDENTIFIER && LA29_6 <= IMAGINARYTOK)||LA29_6==INTEGERTOK||LA29_6==INTTOK||LA29_6==LONGTOK||LA29_6==POINTER||LA29_6==SHORTTOK||LA29_6==SIGNEDTOK||LA29_6==STRINGTOK||LA29_6==STRUCTTOK||LA29_6==TYPEDEFTOK||(LA29_6 >= UNSIGNEDTOK && LA29_6 <= VOIDTOK)) ) {
+										alt29=1;
 									}
-									else if ( (LA28_6==ASSIGNMENT||LA28_6==RCURL||LA28_6==SEPARATOR) ) {
-										alt28=2;
+									else if ( (LA29_6==ASSIGNMENT||LA29_6==RCURL||LA29_6==SEPARATOR) ) {
+										alt29=2;
 									}
 
 									else {
@@ -4159,7 +4298,7 @@ public class CTFParser extends Parser {
 												input.consume();
 											}
 											NoViableAltException nvae =
-												new NoViableAltException("", 28, 6, input);
+												new NoViableAltException("", 29, 6, input);
 											throw nvae;
 										} finally {
 											input.rewind(nvaeMark);
@@ -4172,7 +4311,7 @@ public class CTFParser extends Parser {
 								case EVENTTOK:
 								case STRING_LITERAL:
 									{
-									alt28=2;
+									alt29=2;
 									}
 									break;
 								default:
@@ -4181,37 +4320,37 @@ public class CTFParser extends Parser {
 									try {
 										input.consume();
 										NoViableAltException nvae =
-											new NoViableAltException("", 28, 1, input);
+											new NoViableAltException("", 29, 1, input);
 										throw nvae;
 									} finally {
 										input.rewind(nvaeMark);
 									}
 								}
 							}
-							else if ( (LA28_0==EOF||LA28_0==BOOLTOK||LA28_0==CHARTOK||(LA28_0 >= COMPLEXTOK && LA28_0 <= CONSTTOK)||LA28_0==DOUBLETOK||LA28_0==ENUMTOK||(LA28_0 >= FLOATINGPOINTTOK && LA28_0 <= FLOATTOK)||(LA28_0 >= IDENTIFIER && LA28_0 <= IMAGINARYTOK)||LA28_0==INTEGERTOK||LA28_0==INTTOK||(LA28_0 >= LONGTOK && LA28_0 <= LPAREN)||LA28_0==POINTER||LA28_0==SHORTTOK||LA28_0==SIGNEDTOK||LA28_0==STRINGTOK||(LA28_0 >= STRUCTTOK && LA28_0 <= TERM)||(LA28_0 >= TYPEDEFTOK && LA28_0 <= TYPE_ASSIGNMENT)||(LA28_0 >= UNSIGNEDTOK && LA28_0 <= VOIDTOK)) ) {
-								alt28=2;
+							else if ( (LA29_0==EOF||LA29_0==BOOLTOK||LA29_0==CHARTOK||(LA29_0 >= COMPLEXTOK && LA29_0 <= CONSTTOK)||LA29_0==DOUBLETOK||LA29_0==ENUMTOK||(LA29_0 >= FLOATINGPOINTTOK && LA29_0 <= FLOATTOK)||(LA29_0 >= IDENTIFIER && LA29_0 <= IMAGINARYTOK)||LA29_0==INTEGERTOK||LA29_0==INTTOK||(LA29_0 >= LONGTOK && LA29_0 <= LPAREN)||LA29_0==POINTER||LA29_0==SHORTTOK||LA29_0==SIGNEDTOK||LA29_0==STRINGTOK||(LA29_0 >= STRUCTTOK && LA29_0 <= TERM)||(LA29_0 >= TYPEDEFTOK && LA29_0 <= TYPE_ASSIGNMENT)||(LA29_0 >= UNSIGNEDTOK && LA29_0 <= VOIDTOK)) ) {
+								alt29=2;
 							}
 
 							else {
 								if (state.backtracking>0) {state.failed=true; return retval;}
 								NoViableAltException nvae =
-									new NoViableAltException("", 28, 0, input);
+									new NoViableAltException("", 29, 0, input);
 								throw nvae;
 							}
 
-							switch (alt28) {
+							switch (alt29) {
 								case 1 :
-									// org/eclipse/tracecompass/ctf/parser/CTFParser.g:409:13: variantBody
+									// org/eclipse/tracecompass/ctf/parser/CTFParser.g:414:13: variantBody
 									{
-									pushFollow(FOLLOW_variantBody_in_variantSpecifier1982);
-									variantBody90=variantBody();
+									pushFollow(FOLLOW_variantBody_in_variantSpecifier2026);
+									variantBody92=variantBody();
 									state._fsp--;
 									if (state.failed) return retval;
-									if ( state.backtracking==0 ) stream_variantBody.add(variantBody90.getTree());
+									if ( state.backtracking==0 ) stream_variantBody.add(variantBody92.getTree());
 									}
 									break;
 								case 2 :
-									// org/eclipse/tracecompass/ctf/parser/CTFParser.g:412:11: 
+									// org/eclipse/tracecompass/ctf/parser/CTFParser.g:417:11: 
 									{
 									}
 									break;
@@ -4223,13 +4362,13 @@ public class CTFParser extends Parser {
 							}
 							break;
 						case 2 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:415:9: variantBody
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:420:9: variantBody
 							{
-							pushFollow(FOLLOW_variantBody_in_variantSpecifier2050);
-							variantBody91=variantBody();
+							pushFollow(FOLLOW_variantBody_in_variantSpecifier2094);
+							variantBody93=variantBody();
 							state._fsp--;
 							if (state.failed) return retval;
-							if ( state.backtracking==0 ) stream_variantBody.add(variantBody91.getTree());
+							if ( state.backtracking==0 ) stream_variantBody.add(variantBody93.getTree());
 							}
 							break;
 
@@ -4240,33 +4379,33 @@ public class CTFParser extends Parser {
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:418:5: ( variantTag variantBody )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:423:5: ( variantTag variantBody )
 					{
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:418:5: ( variantTag variantBody )
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:418:6: variantTag variantBody
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:423:5: ( variantTag variantBody )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:423:6: variantTag variantBody
 					{
-					pushFollow(FOLLOW_variantTag_in_variantSpecifier2071);
-					variantTag92=variantTag();
+					pushFollow(FOLLOW_variantTag_in_variantSpecifier2115);
+					variantTag94=variantTag();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_variantTag.add(variantTag92.getTree());
-					pushFollow(FOLLOW_variantBody_in_variantSpecifier2073);
-					variantBody93=variantBody();
+					if ( state.backtracking==0 ) stream_variantTag.add(variantTag94.getTree());
+					pushFollow(FOLLOW_variantBody_in_variantSpecifier2117);
+					variantBody95=variantBody();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_variantBody.add(variantBody93.getTree());
+					if ( state.backtracking==0 ) stream_variantBody.add(variantBody95.getTree());
 					}
 
 					}
 					break;
 				case 3 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:419:5: variantBody
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:424:5: variantBody
 					{
-					pushFollow(FOLLOW_variantBody_in_variantSpecifier2080);
-					variantBody94=variantBody();
+					pushFollow(FOLLOW_variantBody_in_variantSpecifier2124);
+					variantBody96=variantBody();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_variantBody.add(variantBody94.getTree());
+					if ( state.backtracking==0 ) stream_variantBody.add(variantBody96.getTree());
 					}
 					break;
 
@@ -4284,25 +4423,25 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 420:5: -> ^( VARIANT ( variantName )? ( variantTag )? ( variantBody )? )
+			// 425:5: -> ^( VARIANT ( variantName )? ( variantTag )? ( variantBody )? )
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:420:8: ^( VARIANT ( variantName )? ( variantTag )? ( variantBody )? )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:425:8: ^( VARIANT ( variantName )? ( variantTag )? ( variantBody )? )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.nil();
 				root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(VARIANT, "VARIANT"), root_1);
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:420:18: ( variantName )?
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:425:18: ( variantName )?
 				if ( stream_variantName.hasNext() ) {
 					adaptor.addChild(root_1, stream_variantName.nextTree());
 				}
 				stream_variantName.reset();
 
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:420:31: ( variantTag )?
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:425:31: ( variantTag )?
 				if ( stream_variantTag.hasNext() ) {
 					adaptor.addChild(root_1, stream_variantTag.nextTree());
 				}
 				stream_variantTag.reset();
 
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:420:43: ( variantBody )?
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:425:43: ( variantBody )?
 				if ( stream_variantBody.hasNext() ) {
 					adaptor.addChild(root_1, stream_variantBody.nextTree());
 				}
@@ -4347,24 +4486,24 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "variantName"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:423:1: variantName : IDENTIFIER -> ^( VARIANT_NAME IDENTIFIER ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:428:1: variantName : IDENTIFIER -> ^( VARIANT_NAME IDENTIFIER ) ;
 	public final CTFParser.variantName_return variantName() throws RecognitionException {
 		CTFParser.variantName_return retval = new CTFParser.variantName_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token IDENTIFIER95=null;
+		Token IDENTIFIER97=null;
 
-		CommonTree IDENTIFIER95_tree=null;
+		CommonTree IDENTIFIER97_tree=null;
 		RewriteRuleTokenStream stream_IDENTIFIER=new RewriteRuleTokenStream(adaptor,"token IDENTIFIER");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:424:3: ( IDENTIFIER -> ^( VARIANT_NAME IDENTIFIER ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:424:5: IDENTIFIER
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:429:3: ( IDENTIFIER -> ^( VARIANT_NAME IDENTIFIER ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:429:5: IDENTIFIER
 			{
-			IDENTIFIER95=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_variantName2112); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_IDENTIFIER.add(IDENTIFIER95);
+			IDENTIFIER97=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_variantName2156); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_IDENTIFIER.add(IDENTIFIER97);
 
 			// AST REWRITE
 			// elements: IDENTIFIER
@@ -4378,9 +4517,9 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 424:16: -> ^( VARIANT_NAME IDENTIFIER )
+			// 429:16: -> ^( VARIANT_NAME IDENTIFIER )
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:424:19: ^( VARIANT_NAME IDENTIFIER )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:429:19: ^( VARIANT_NAME IDENTIFIER )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.nil();
 				root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(VARIANT_NAME, "VARIANT_NAME"), root_1);
@@ -4424,7 +4563,7 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "variantBody"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:427:1: variantBody : LCURL structOrVariantDeclarationList RCURL -> ^( VARIANT_BODY structOrVariantDeclarationList ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:432:1: variantBody : LCURL structOrVariantDeclarationList RCURL -> ^( VARIANT_BODY structOrVariantDeclarationList ) ;
 	public final CTFParser.variantBody_return variantBody() throws RecognitionException {
 		Symbols_stack.push(new Symbols_scope());
 
@@ -4433,12 +4572,12 @@ public class CTFParser extends Parser {
 
 		CommonTree root_0 = null;
 
-		Token LCURL96=null;
-		Token RCURL98=null;
-		ParserRuleReturnScope structOrVariantDeclarationList97 =null;
+		Token LCURL98=null;
+		Token RCURL100=null;
+		ParserRuleReturnScope structOrVariantDeclarationList99 =null;
 
-		CommonTree LCURL96_tree=null;
-		CommonTree RCURL98_tree=null;
+		CommonTree LCURL98_tree=null;
+		CommonTree RCURL100_tree=null;
 		RewriteRuleTokenStream stream_LCURL=new RewriteRuleTokenStream(adaptor,"token LCURL");
 		RewriteRuleTokenStream stream_RCURL=new RewriteRuleTokenStream(adaptor,"token RCURL");
 		RewriteRuleSubtreeStream stream_structOrVariantDeclarationList=new RewriteRuleSubtreeStream(adaptor,"rule structOrVariantDeclarationList");
@@ -4447,19 +4586,19 @@ public class CTFParser extends Parser {
 		    Symbols_stack.peek().types = new HashSet<String>();
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:432:3: ( LCURL structOrVariantDeclarationList RCURL -> ^( VARIANT_BODY structOrVariantDeclarationList ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:432:5: LCURL structOrVariantDeclarationList RCURL
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:437:3: ( LCURL structOrVariantDeclarationList RCURL -> ^( VARIANT_BODY structOrVariantDeclarationList ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:437:5: LCURL structOrVariantDeclarationList RCURL
 			{
-			LCURL96=(Token)match(input,LCURL,FOLLOW_LCURL_in_variantBody2143); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_LCURL.add(LCURL96);
+			LCURL98=(Token)match(input,LCURL,FOLLOW_LCURL_in_variantBody2187); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_LCURL.add(LCURL98);
 
-			pushFollow(FOLLOW_structOrVariantDeclarationList_in_variantBody2145);
-			structOrVariantDeclarationList97=structOrVariantDeclarationList();
+			pushFollow(FOLLOW_structOrVariantDeclarationList_in_variantBody2189);
+			structOrVariantDeclarationList99=structOrVariantDeclarationList();
 			state._fsp--;
 			if (state.failed) return retval;
-			if ( state.backtracking==0 ) stream_structOrVariantDeclarationList.add(structOrVariantDeclarationList97.getTree());
-			RCURL98=(Token)match(input,RCURL,FOLLOW_RCURL_in_variantBody2147); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_RCURL.add(RCURL98);
+			if ( state.backtracking==0 ) stream_structOrVariantDeclarationList.add(structOrVariantDeclarationList99.getTree());
+			RCURL100=(Token)match(input,RCURL,FOLLOW_RCURL_in_variantBody2191); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_RCURL.add(RCURL100);
 
 			// AST REWRITE
 			// elements: structOrVariantDeclarationList
@@ -4473,9 +4612,9 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 433:7: -> ^( VARIANT_BODY structOrVariantDeclarationList )
+			// 438:7: -> ^( VARIANT_BODY structOrVariantDeclarationList )
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:433:10: ^( VARIANT_BODY structOrVariantDeclarationList )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:438:10: ^( VARIANT_BODY structOrVariantDeclarationList )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.nil();
 				root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(VARIANT_BODY, "VARIANT_BODY"), root_1);
@@ -4521,36 +4660,36 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "variantTag"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:436:1: variantTag : LT IDENTIFIER GT -> ^( VARIANT_TAG IDENTIFIER ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:441:1: variantTag : LT IDENTIFIER GT -> ^( VARIANT_TAG IDENTIFIER ) ;
 	public final CTFParser.variantTag_return variantTag() throws RecognitionException {
 		CTFParser.variantTag_return retval = new CTFParser.variantTag_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token LT99=null;
-		Token IDENTIFIER100=null;
-		Token GT101=null;
+		Token LT101=null;
+		Token IDENTIFIER102=null;
+		Token GT103=null;
 
-		CommonTree LT99_tree=null;
-		CommonTree IDENTIFIER100_tree=null;
-		CommonTree GT101_tree=null;
+		CommonTree LT101_tree=null;
+		CommonTree IDENTIFIER102_tree=null;
+		CommonTree GT103_tree=null;
 		RewriteRuleTokenStream stream_GT=new RewriteRuleTokenStream(adaptor,"token GT");
 		RewriteRuleTokenStream stream_LT=new RewriteRuleTokenStream(adaptor,"token LT");
 		RewriteRuleTokenStream stream_IDENTIFIER=new RewriteRuleTokenStream(adaptor,"token IDENTIFIER");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:437:3: ( LT IDENTIFIER GT -> ^( VARIANT_TAG IDENTIFIER ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:437:5: LT IDENTIFIER GT
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:442:3: ( LT IDENTIFIER GT -> ^( VARIANT_TAG IDENTIFIER ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:442:5: LT IDENTIFIER GT
 			{
-			LT99=(Token)match(input,LT,FOLLOW_LT_in_variantTag2174); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_LT.add(LT99);
+			LT101=(Token)match(input,LT,FOLLOW_LT_in_variantTag2218); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_LT.add(LT101);
 
-			IDENTIFIER100=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_variantTag2176); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_IDENTIFIER.add(IDENTIFIER100);
+			IDENTIFIER102=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_variantTag2220); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_IDENTIFIER.add(IDENTIFIER102);
 
-			GT101=(Token)match(input,GT,FOLLOW_GT_in_variantTag2178); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_GT.add(GT101);
+			GT103=(Token)match(input,GT,FOLLOW_GT_in_variantTag2222); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_GT.add(GT103);
 
 			// AST REWRITE
 			// elements: IDENTIFIER
@@ -4564,9 +4703,9 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 437:22: -> ^( VARIANT_TAG IDENTIFIER )
+			// 442:22: -> ^( VARIANT_TAG IDENTIFIER )
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:437:25: ^( VARIANT_TAG IDENTIFIER )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:442:25: ^( VARIANT_TAG IDENTIFIER )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.nil();
 				root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(VARIANT_TAG, "VARIANT_TAG"), root_1);
@@ -4610,75 +4749,75 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "enumSpecifier"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:440:1: enumSpecifier : ENUMTOK ( ( enumName ( enumContainerType enumBody | enumBody |) ) | ( enumContainerType enumBody | enumBody ) ) -> ^( ENUM ( enumName )? ( enumContainerType )? ( enumBody )? ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:445:1: enumSpecifier : ENUMTOK ( ( enumName ( enumContainerType enumBody | enumBody |) ) | ( enumContainerType enumBody | enumBody ) ) -> ^( ENUM ( enumName )? ( enumContainerType )? ( enumBody )? ) ;
 	public final CTFParser.enumSpecifier_return enumSpecifier() throws RecognitionException {
 		CTFParser.enumSpecifier_return retval = new CTFParser.enumSpecifier_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token ENUMTOK102=null;
-		ParserRuleReturnScope enumName103 =null;
-		ParserRuleReturnScope enumContainerType104 =null;
-		ParserRuleReturnScope enumBody105 =null;
-		ParserRuleReturnScope enumBody106 =null;
-		ParserRuleReturnScope enumContainerType107 =null;
+		Token ENUMTOK104=null;
+		ParserRuleReturnScope enumName105 =null;
+		ParserRuleReturnScope enumContainerType106 =null;
+		ParserRuleReturnScope enumBody107 =null;
 		ParserRuleReturnScope enumBody108 =null;
-		ParserRuleReturnScope enumBody109 =null;
+		ParserRuleReturnScope enumContainerType109 =null;
+		ParserRuleReturnScope enumBody110 =null;
+		ParserRuleReturnScope enumBody111 =null;
 
-		CommonTree ENUMTOK102_tree=null;
+		CommonTree ENUMTOK104_tree=null;
 		RewriteRuleTokenStream stream_ENUMTOK=new RewriteRuleTokenStream(adaptor,"token ENUMTOK");
 		RewriteRuleSubtreeStream stream_enumName=new RewriteRuleSubtreeStream(adaptor,"rule enumName");
 		RewriteRuleSubtreeStream stream_enumContainerType=new RewriteRuleSubtreeStream(adaptor,"rule enumContainerType");
 		RewriteRuleSubtreeStream stream_enumBody=new RewriteRuleSubtreeStream(adaptor,"rule enumBody");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:441:3: ( ENUMTOK ( ( enumName ( enumContainerType enumBody | enumBody |) ) | ( enumContainerType enumBody | enumBody ) ) -> ^( ENUM ( enumName )? ( enumContainerType )? ( enumBody )? ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:441:5: ENUMTOK ( ( enumName ( enumContainerType enumBody | enumBody |) ) | ( enumContainerType enumBody | enumBody ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:446:3: ( ENUMTOK ( ( enumName ( enumContainerType enumBody | enumBody |) ) | ( enumContainerType enumBody | enumBody ) ) -> ^( ENUM ( enumName )? ( enumContainerType )? ( enumBody )? ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:446:5: ENUMTOK ( ( enumName ( enumContainerType enumBody | enumBody |) ) | ( enumContainerType enumBody | enumBody ) )
 			{
-			ENUMTOK102=(Token)match(input,ENUMTOK,FOLLOW_ENUMTOK_in_enumSpecifier2199); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_ENUMTOK.add(ENUMTOK102);
+			ENUMTOK104=(Token)match(input,ENUMTOK,FOLLOW_ENUMTOK_in_enumSpecifier2243); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_ENUMTOK.add(ENUMTOK104);
 
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:442:5: ( ( enumName ( enumContainerType enumBody | enumBody |) ) | ( enumContainerType enumBody | enumBody ) )
-			int alt33=2;
-			int LA33_0 = input.LA(1);
-			if ( (LA33_0==IDENTIFIER) ) {
-				alt33=1;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:447:5: ( ( enumName ( enumContainerType enumBody | enumBody |) ) | ( enumContainerType enumBody | enumBody ) )
+			int alt34=2;
+			int LA34_0 = input.LA(1);
+			if ( (LA34_0==IDENTIFIER) ) {
+				alt34=1;
 			}
-			else if ( (LA33_0==COLON||LA33_0==LCURL) ) {
-				alt33=2;
+			else if ( (LA34_0==COLON||LA34_0==LCURL) ) {
+				alt34=2;
 			}
 
 			else {
 				if (state.backtracking>0) {state.failed=true; return retval;}
 				NoViableAltException nvae =
-					new NoViableAltException("", 33, 0, input);
+					new NoViableAltException("", 34, 0, input);
 				throw nvae;
 			}
 
-			switch (alt33) {
+			switch (alt34) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:444:9: ( enumName ( enumContainerType enumBody | enumBody |) )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:449:9: ( enumName ( enumContainerType enumBody | enumBody |) )
 					{
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:444:9: ( enumName ( enumContainerType enumBody | enumBody |) )
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:445:13: enumName ( enumContainerType enumBody | enumBody |)
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:449:9: ( enumName ( enumContainerType enumBody | enumBody |) )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:450:13: enumName ( enumContainerType enumBody | enumBody |)
 					{
-					pushFollow(FOLLOW_enumName_in_enumSpecifier2238);
-					enumName103=enumName();
+					pushFollow(FOLLOW_enumName_in_enumSpecifier2282);
+					enumName105=enumName();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_enumName.add(enumName103.getTree());
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:446:13: ( enumContainerType enumBody | enumBody |)
-					int alt31=3;
+					if ( state.backtracking==0 ) stream_enumName.add(enumName105.getTree());
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:451:13: ( enumContainerType enumBody | enumBody |)
+					int alt32=3;
 					switch ( input.LA(1) ) {
 					case COLON:
 						{
-						alt31=1;
+						alt32=1;
 						}
 						break;
 					case LCURL:
 						{
-						alt31=2;
+						alt32=2;
 						}
 						break;
 					case EOF:
@@ -4708,43 +4847,43 @@ public class CTFParser extends Parser {
 					case VARIANTTOK:
 					case VOIDTOK:
 						{
-						alt31=3;
+						alt32=3;
 						}
 						break;
 					default:
 						if (state.backtracking>0) {state.failed=true; return retval;}
 						NoViableAltException nvae =
-							new NoViableAltException("", 31, 0, input);
+							new NoViableAltException("", 32, 0, input);
 						throw nvae;
 					}
-					switch (alt31) {
+					switch (alt32) {
 						case 1 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:447:17: enumContainerType enumBody
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:452:17: enumContainerType enumBody
 							{
-							pushFollow(FOLLOW_enumContainerType_in_enumSpecifier2270);
-							enumContainerType104=enumContainerType();
+							pushFollow(FOLLOW_enumContainerType_in_enumSpecifier2314);
+							enumContainerType106=enumContainerType();
 							state._fsp--;
 							if (state.failed) return retval;
-							if ( state.backtracking==0 ) stream_enumContainerType.add(enumContainerType104.getTree());
-							pushFollow(FOLLOW_enumBody_in_enumSpecifier2272);
-							enumBody105=enumBody();
+							if ( state.backtracking==0 ) stream_enumContainerType.add(enumContainerType106.getTree());
+							pushFollow(FOLLOW_enumBody_in_enumSpecifier2316);
+							enumBody107=enumBody();
 							state._fsp--;
 							if (state.failed) return retval;
-							if ( state.backtracking==0 ) stream_enumBody.add(enumBody105.getTree());
+							if ( state.backtracking==0 ) stream_enumBody.add(enumBody107.getTree());
 							}
 							break;
 						case 2 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:449:17: enumBody
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:454:17: enumBody
 							{
-							pushFollow(FOLLOW_enumBody_in_enumSpecifier2302);
-							enumBody106=enumBody();
+							pushFollow(FOLLOW_enumBody_in_enumSpecifier2346);
+							enumBody108=enumBody();
 							state._fsp--;
 							if (state.failed) return retval;
-							if ( state.backtracking==0 ) stream_enumBody.add(enumBody106.getTree());
+							if ( state.backtracking==0 ) stream_enumBody.add(enumBody108.getTree());
 							}
 							break;
 						case 3 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:452:13: 
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:457:13: 
 							{
 							}
 							break;
@@ -4756,49 +4895,49 @@ public class CTFParser extends Parser {
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:456:9: ( enumContainerType enumBody | enumBody )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:461:9: ( enumContainerType enumBody | enumBody )
 					{
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:456:9: ( enumContainerType enumBody | enumBody )
-					int alt32=2;
-					int LA32_0 = input.LA(1);
-					if ( (LA32_0==COLON) ) {
-						alt32=1;
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:461:9: ( enumContainerType enumBody | enumBody )
+					int alt33=2;
+					int LA33_0 = input.LA(1);
+					if ( (LA33_0==COLON) ) {
+						alt33=1;
 					}
-					else if ( (LA32_0==LCURL) ) {
-						alt32=2;
+					else if ( (LA33_0==LCURL) ) {
+						alt33=2;
 					}
 
 					else {
 						if (state.backtracking>0) {state.failed=true; return retval;}
 						NoViableAltException nvae =
-							new NoViableAltException("", 32, 0, input);
+							new NoViableAltException("", 33, 0, input);
 						throw nvae;
 					}
 
-					switch (alt32) {
+					switch (alt33) {
 						case 1 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:457:13: enumContainerType enumBody
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:462:13: enumContainerType enumBody
 							{
-							pushFollow(FOLLOW_enumContainerType_in_enumSpecifier2394);
-							enumContainerType107=enumContainerType();
+							pushFollow(FOLLOW_enumContainerType_in_enumSpecifier2438);
+							enumContainerType109=enumContainerType();
 							state._fsp--;
 							if (state.failed) return retval;
-							if ( state.backtracking==0 ) stream_enumContainerType.add(enumContainerType107.getTree());
-							pushFollow(FOLLOW_enumBody_in_enumSpecifier2396);
-							enumBody108=enumBody();
+							if ( state.backtracking==0 ) stream_enumContainerType.add(enumContainerType109.getTree());
+							pushFollow(FOLLOW_enumBody_in_enumSpecifier2440);
+							enumBody110=enumBody();
 							state._fsp--;
 							if (state.failed) return retval;
-							if ( state.backtracking==0 ) stream_enumBody.add(enumBody108.getTree());
+							if ( state.backtracking==0 ) stream_enumBody.add(enumBody110.getTree());
 							}
 							break;
 						case 2 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:459:13: enumBody
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:464:13: enumBody
 							{
-							pushFollow(FOLLOW_enumBody_in_enumSpecifier2420);
-							enumBody109=enumBody();
+							pushFollow(FOLLOW_enumBody_in_enumSpecifier2464);
+							enumBody111=enumBody();
 							state._fsp--;
 							if (state.failed) return retval;
-							if ( state.backtracking==0 ) stream_enumBody.add(enumBody109.getTree());
+							if ( state.backtracking==0 ) stream_enumBody.add(enumBody111.getTree());
 							}
 							break;
 
@@ -4810,7 +4949,7 @@ public class CTFParser extends Parser {
 			}
 
 			// AST REWRITE
-			// elements: enumContainerType, enumName, enumBody
+			// elements: enumName, enumContainerType, enumBody
 			// token labels: 
 			// rule labels: retval
 			// token list labels: 
@@ -4821,25 +4960,25 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 461:7: -> ^( ENUM ( enumName )? ( enumContainerType )? ( enumBody )? )
+			// 466:7: -> ^( ENUM ( enumName )? ( enumContainerType )? ( enumBody )? )
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:461:10: ^( ENUM ( enumName )? ( enumContainerType )? ( enumBody )? )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:466:10: ^( ENUM ( enumName )? ( enumContainerType )? ( enumBody )? )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.nil();
 				root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(ENUM, "ENUM"), root_1);
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:461:17: ( enumName )?
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:466:17: ( enumName )?
 				if ( stream_enumName.hasNext() ) {
 					adaptor.addChild(root_1, stream_enumName.nextTree());
 				}
 				stream_enumName.reset();
 
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:461:27: ( enumContainerType )?
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:466:27: ( enumContainerType )?
 				if ( stream_enumContainerType.hasNext() ) {
 					adaptor.addChild(root_1, stream_enumContainerType.nextTree());
 				}
 				stream_enumContainerType.reset();
 
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:461:46: ( enumBody )?
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:466:46: ( enumBody )?
 				if ( stream_enumBody.hasNext() ) {
 					adaptor.addChild(root_1, stream_enumBody.nextTree());
 				}
@@ -4884,24 +5023,24 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "enumName"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:464:1: enumName : IDENTIFIER -> ^( ENUM_NAME IDENTIFIER ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:469:1: enumName : IDENTIFIER -> ^( ENUM_NAME IDENTIFIER ) ;
 	public final CTFParser.enumName_return enumName() throws RecognitionException {
 		CTFParser.enumName_return retval = new CTFParser.enumName_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token IDENTIFIER110=null;
+		Token IDENTIFIER112=null;
 
-		CommonTree IDENTIFIER110_tree=null;
+		CommonTree IDENTIFIER112_tree=null;
 		RewriteRuleTokenStream stream_IDENTIFIER=new RewriteRuleTokenStream(adaptor,"token IDENTIFIER");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:465:3: ( IDENTIFIER -> ^( ENUM_NAME IDENTIFIER ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:465:5: IDENTIFIER
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:470:3: ( IDENTIFIER -> ^( ENUM_NAME IDENTIFIER ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:470:5: IDENTIFIER
 			{
-			IDENTIFIER110=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_enumName2464); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_IDENTIFIER.add(IDENTIFIER110);
+			IDENTIFIER112=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_enumName2508); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_IDENTIFIER.add(IDENTIFIER112);
 
 			// AST REWRITE
 			// elements: IDENTIFIER
@@ -4915,9 +5054,9 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 465:16: -> ^( ENUM_NAME IDENTIFIER )
+			// 470:16: -> ^( ENUM_NAME IDENTIFIER )
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:465:19: ^( ENUM_NAME IDENTIFIER )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:470:19: ^( ENUM_NAME IDENTIFIER )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.nil();
 				root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(ENUM_NAME, "ENUM_NAME"), root_1);
@@ -4961,58 +5100,58 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "enumBody"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:468:1: enumBody : LCURL enumeratorList ( SEPARATOR )? RCURL -> ^( ENUM_BODY enumeratorList ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:473:1: enumBody : LCURL enumeratorList ( SEPARATOR )? RCURL -> ^( ENUM_BODY enumeratorList ) ;
 	public final CTFParser.enumBody_return enumBody() throws RecognitionException {
 		CTFParser.enumBody_return retval = new CTFParser.enumBody_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token LCURL111=null;
-		Token SEPARATOR113=null;
-		Token RCURL114=null;
-		ParserRuleReturnScope enumeratorList112 =null;
+		Token LCURL113=null;
+		Token SEPARATOR115=null;
+		Token RCURL116=null;
+		ParserRuleReturnScope enumeratorList114 =null;
 
-		CommonTree LCURL111_tree=null;
-		CommonTree SEPARATOR113_tree=null;
-		CommonTree RCURL114_tree=null;
+		CommonTree LCURL113_tree=null;
+		CommonTree SEPARATOR115_tree=null;
+		CommonTree RCURL116_tree=null;
 		RewriteRuleTokenStream stream_LCURL=new RewriteRuleTokenStream(adaptor,"token LCURL");
 		RewriteRuleTokenStream stream_SEPARATOR=new RewriteRuleTokenStream(adaptor,"token SEPARATOR");
 		RewriteRuleTokenStream stream_RCURL=new RewriteRuleTokenStream(adaptor,"token RCURL");
 		RewriteRuleSubtreeStream stream_enumeratorList=new RewriteRuleSubtreeStream(adaptor,"rule enumeratorList");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:469:3: ( LCURL enumeratorList ( SEPARATOR )? RCURL -> ^( ENUM_BODY enumeratorList ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:469:5: LCURL enumeratorList ( SEPARATOR )? RCURL
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:474:3: ( LCURL enumeratorList ( SEPARATOR )? RCURL -> ^( ENUM_BODY enumeratorList ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:474:5: LCURL enumeratorList ( SEPARATOR )? RCURL
 			{
-			LCURL111=(Token)match(input,LCURL,FOLLOW_LCURL_in_enumBody2485); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_LCURL.add(LCURL111);
+			LCURL113=(Token)match(input,LCURL,FOLLOW_LCURL_in_enumBody2529); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_LCURL.add(LCURL113);
 
-			pushFollow(FOLLOW_enumeratorList_in_enumBody2487);
-			enumeratorList112=enumeratorList();
+			pushFollow(FOLLOW_enumeratorList_in_enumBody2531);
+			enumeratorList114=enumeratorList();
 			state._fsp--;
 			if (state.failed) return retval;
-			if ( state.backtracking==0 ) stream_enumeratorList.add(enumeratorList112.getTree());
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:469:26: ( SEPARATOR )?
-			int alt34=2;
-			int LA34_0 = input.LA(1);
-			if ( (LA34_0==SEPARATOR) ) {
-				alt34=1;
+			if ( state.backtracking==0 ) stream_enumeratorList.add(enumeratorList114.getTree());
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:474:26: ( SEPARATOR )?
+			int alt35=2;
+			int LA35_0 = input.LA(1);
+			if ( (LA35_0==SEPARATOR) ) {
+				alt35=1;
 			}
-			switch (alt34) {
+			switch (alt35) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:469:26: SEPARATOR
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:474:26: SEPARATOR
 					{
-					SEPARATOR113=(Token)match(input,SEPARATOR,FOLLOW_SEPARATOR_in_enumBody2489); if (state.failed) return retval; 
-					if ( state.backtracking==0 ) stream_SEPARATOR.add(SEPARATOR113);
+					SEPARATOR115=(Token)match(input,SEPARATOR,FOLLOW_SEPARATOR_in_enumBody2533); if (state.failed) return retval; 
+					if ( state.backtracking==0 ) stream_SEPARATOR.add(SEPARATOR115);
 
 					}
 					break;
 
 			}
 
-			RCURL114=(Token)match(input,RCURL,FOLLOW_RCURL_in_enumBody2492); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_RCURL.add(RCURL114);
+			RCURL116=(Token)match(input,RCURL,FOLLOW_RCURL_in_enumBody2536); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_RCURL.add(RCURL116);
 
 			// AST REWRITE
 			// elements: enumeratorList
@@ -5026,9 +5165,9 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 469:43: -> ^( ENUM_BODY enumeratorList )
+			// 474:43: -> ^( ENUM_BODY enumeratorList )
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:469:46: ^( ENUM_BODY enumeratorList )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:474:46: ^( ENUM_BODY enumeratorList )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.nil();
 				root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(ENUM_BODY, "ENUM_BODY"), root_1);
@@ -5072,32 +5211,32 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "enumContainerType"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:472:1: enumContainerType : COLON declarationSpecifiers -> ^( ENUM_CONTAINER_TYPE declarationSpecifiers ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:477:1: enumContainerType : COLON declarationSpecifiers -> ^( ENUM_CONTAINER_TYPE declarationSpecifiers ) ;
 	public final CTFParser.enumContainerType_return enumContainerType() throws RecognitionException {
 		CTFParser.enumContainerType_return retval = new CTFParser.enumContainerType_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token COLON115=null;
-		ParserRuleReturnScope declarationSpecifiers116 =null;
+		Token COLON117=null;
+		ParserRuleReturnScope declarationSpecifiers118 =null;
 
-		CommonTree COLON115_tree=null;
+		CommonTree COLON117_tree=null;
 		RewriteRuleTokenStream stream_COLON=new RewriteRuleTokenStream(adaptor,"token COLON");
 		RewriteRuleSubtreeStream stream_declarationSpecifiers=new RewriteRuleSubtreeStream(adaptor,"rule declarationSpecifiers");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:473:3: ( COLON declarationSpecifiers -> ^( ENUM_CONTAINER_TYPE declarationSpecifiers ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:473:5: COLON declarationSpecifiers
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:478:3: ( COLON declarationSpecifiers -> ^( ENUM_CONTAINER_TYPE declarationSpecifiers ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:478:5: COLON declarationSpecifiers
 			{
-			COLON115=(Token)match(input,COLON,FOLLOW_COLON_in_enumContainerType2513); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_COLON.add(COLON115);
+			COLON117=(Token)match(input,COLON,FOLLOW_COLON_in_enumContainerType2557); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_COLON.add(COLON117);
 
-			pushFollow(FOLLOW_declarationSpecifiers_in_enumContainerType2515);
-			declarationSpecifiers116=declarationSpecifiers();
+			pushFollow(FOLLOW_declarationSpecifiers_in_enumContainerType2559);
+			declarationSpecifiers118=declarationSpecifiers();
 			state._fsp--;
 			if (state.failed) return retval;
-			if ( state.backtracking==0 ) stream_declarationSpecifiers.add(declarationSpecifiers116.getTree());
+			if ( state.backtracking==0 ) stream_declarationSpecifiers.add(declarationSpecifiers118.getTree());
 			// AST REWRITE
 			// elements: declarationSpecifiers
 			// token labels: 
@@ -5110,9 +5249,9 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 473:33: -> ^( ENUM_CONTAINER_TYPE declarationSpecifiers )
+			// 478:33: -> ^( ENUM_CONTAINER_TYPE declarationSpecifiers )
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:473:36: ^( ENUM_CONTAINER_TYPE declarationSpecifiers )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:478:36: ^( ENUM_CONTAINER_TYPE declarationSpecifiers )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.nil();
 				root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(ENUM_CONTAINER_TYPE, "ENUM_CONTAINER_TYPE"), root_1);
@@ -5156,60 +5295,60 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "enumeratorList"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:476:1: enumeratorList : enumerator ( SEPARATOR enumerator )* -> ( ^( ENUM_ENUMERATOR enumerator ) )+ ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:481:1: enumeratorList : enumerator ( SEPARATOR enumerator )* -> ( ^( ENUM_ENUMERATOR enumerator ) )+ ;
 	public final CTFParser.enumeratorList_return enumeratorList() throws RecognitionException {
 		CTFParser.enumeratorList_return retval = new CTFParser.enumeratorList_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token SEPARATOR118=null;
-		ParserRuleReturnScope enumerator117 =null;
+		Token SEPARATOR120=null;
 		ParserRuleReturnScope enumerator119 =null;
+		ParserRuleReturnScope enumerator121 =null;
 
-		CommonTree SEPARATOR118_tree=null;
+		CommonTree SEPARATOR120_tree=null;
 		RewriteRuleTokenStream stream_SEPARATOR=new RewriteRuleTokenStream(adaptor,"token SEPARATOR");
 		RewriteRuleSubtreeStream stream_enumerator=new RewriteRuleSubtreeStream(adaptor,"rule enumerator");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:477:3: ( enumerator ( SEPARATOR enumerator )* -> ( ^( ENUM_ENUMERATOR enumerator ) )+ )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:477:5: enumerator ( SEPARATOR enumerator )*
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:482:3: ( enumerator ( SEPARATOR enumerator )* -> ( ^( ENUM_ENUMERATOR enumerator ) )+ )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:482:5: enumerator ( SEPARATOR enumerator )*
 			{
-			pushFollow(FOLLOW_enumerator_in_enumeratorList2536);
-			enumerator117=enumerator();
+			pushFollow(FOLLOW_enumerator_in_enumeratorList2580);
+			enumerator119=enumerator();
 			state._fsp--;
 			if (state.failed) return retval;
-			if ( state.backtracking==0 ) stream_enumerator.add(enumerator117.getTree());
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:477:16: ( SEPARATOR enumerator )*
-			loop35:
+			if ( state.backtracking==0 ) stream_enumerator.add(enumerator119.getTree());
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:482:16: ( SEPARATOR enumerator )*
+			loop36:
 			while (true) {
-				int alt35=2;
-				int LA35_0 = input.LA(1);
-				if ( (LA35_0==SEPARATOR) ) {
-					int LA35_1 = input.LA(2);
-					if ( (LA35_1==ALIGNTOK||LA35_1==EVENTTOK||LA35_1==IDENTIFIER||LA35_1==SIGNEDTOK||LA35_1==STRINGTOK||LA35_1==STRING_LITERAL) ) {
-						alt35=1;
+				int alt36=2;
+				int LA36_0 = input.LA(1);
+				if ( (LA36_0==SEPARATOR) ) {
+					int LA36_1 = input.LA(2);
+					if ( (LA36_1==ALIGNTOK||LA36_1==EVENTTOK||LA36_1==IDENTIFIER||LA36_1==SIGNEDTOK||LA36_1==STRINGTOK||LA36_1==STRING_LITERAL) ) {
+						alt36=1;
 					}
 
 				}
 
-				switch (alt35) {
+				switch (alt36) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:477:17: SEPARATOR enumerator
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:482:17: SEPARATOR enumerator
 					{
-					SEPARATOR118=(Token)match(input,SEPARATOR,FOLLOW_SEPARATOR_in_enumeratorList2539); if (state.failed) return retval; 
-					if ( state.backtracking==0 ) stream_SEPARATOR.add(SEPARATOR118);
+					SEPARATOR120=(Token)match(input,SEPARATOR,FOLLOW_SEPARATOR_in_enumeratorList2583); if (state.failed) return retval; 
+					if ( state.backtracking==0 ) stream_SEPARATOR.add(SEPARATOR120);
 
-					pushFollow(FOLLOW_enumerator_in_enumeratorList2541);
-					enumerator119=enumerator();
+					pushFollow(FOLLOW_enumerator_in_enumeratorList2585);
+					enumerator121=enumerator();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_enumerator.add(enumerator119.getTree());
+					if ( state.backtracking==0 ) stream_enumerator.add(enumerator121.getTree());
 					}
 					break;
 
 				default :
-					break loop35;
+					break loop36;
 				}
 			}
 
@@ -5225,13 +5364,13 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 477:40: -> ( ^( ENUM_ENUMERATOR enumerator ) )+
+			// 482:40: -> ( ^( ENUM_ENUMERATOR enumerator ) )+
 			{
 				if ( !(stream_enumerator.hasNext()) ) {
 					throw new RewriteEarlyExitException();
 				}
 				while ( stream_enumerator.hasNext() ) {
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:477:44: ^( ENUM_ENUMERATOR enumerator )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:482:44: ^( ENUM_ENUMERATOR enumerator )
 					{
 					CommonTree root_1 = (CommonTree)adaptor.nil();
 					root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(ENUM_ENUMERATOR, "ENUM_ENUMERATOR"), root_1);
@@ -5278,45 +5417,45 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "enumerator"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:480:1: enumerator : enumConstant ( enumeratorValue )? ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:485:1: enumerator : enumConstant ( enumeratorValue )? ;
 	public final CTFParser.enumerator_return enumerator() throws RecognitionException {
 		CTFParser.enumerator_return retval = new CTFParser.enumerator_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		ParserRuleReturnScope enumConstant120 =null;
-		ParserRuleReturnScope enumeratorValue121 =null;
+		ParserRuleReturnScope enumConstant122 =null;
+		ParserRuleReturnScope enumeratorValue123 =null;
 
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:481:3: ( enumConstant ( enumeratorValue )? )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:481:5: enumConstant ( enumeratorValue )?
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:486:3: ( enumConstant ( enumeratorValue )? )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:486:5: enumConstant ( enumeratorValue )?
 			{
 			root_0 = (CommonTree)adaptor.nil();
 
 
-			pushFollow(FOLLOW_enumConstant_in_enumerator2567);
-			enumConstant120=enumConstant();
+			pushFollow(FOLLOW_enumConstant_in_enumerator2611);
+			enumConstant122=enumConstant();
 			state._fsp--;
 			if (state.failed) return retval;
-			if ( state.backtracking==0 ) adaptor.addChild(root_0, enumConstant120.getTree());
+			if ( state.backtracking==0 ) adaptor.addChild(root_0, enumConstant122.getTree());
 
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:481:18: ( enumeratorValue )?
-			int alt36=2;
-			int LA36_0 = input.LA(1);
-			if ( (LA36_0==ASSIGNMENT) ) {
-				alt36=1;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:486:18: ( enumeratorValue )?
+			int alt37=2;
+			int LA37_0 = input.LA(1);
+			if ( (LA37_0==ASSIGNMENT) ) {
+				alt37=1;
 			}
-			switch (alt36) {
+			switch (alt37) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:481:18: enumeratorValue
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:486:18: enumeratorValue
 					{
-					pushFollow(FOLLOW_enumeratorValue_in_enumerator2569);
-					enumeratorValue121=enumeratorValue();
+					pushFollow(FOLLOW_enumeratorValue_in_enumerator2613);
+					enumeratorValue123=enumeratorValue();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) adaptor.addChild(root_0, enumeratorValue121.getTree());
+					if ( state.backtracking==0 ) adaptor.addChild(root_0, enumeratorValue123.getTree());
 
 					}
 					break;
@@ -5353,56 +5492,56 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "enumeratorValue"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:484:1: enumeratorValue : ASSIGNMENT e1= unaryExpression ( -> ^( ENUM_VALUE $e1) | ELIPSES e2= unaryExpression -> ^( ENUM_VALUE_RANGE $e1 $e2) ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:489:1: enumeratorValue : ASSIGNMENT e1= unaryExpression ( -> ^( ENUM_VALUE $e1) | ELIPSES e2= unaryExpression -> ^( ENUM_VALUE_RANGE $e1 $e2) ) ;
 	public final CTFParser.enumeratorValue_return enumeratorValue() throws RecognitionException {
 		CTFParser.enumeratorValue_return retval = new CTFParser.enumeratorValue_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token ASSIGNMENT122=null;
-		Token ELIPSES123=null;
+		Token ASSIGNMENT124=null;
+		Token ELIPSES125=null;
 		ParserRuleReturnScope e1 =null;
 		ParserRuleReturnScope e2 =null;
 
-		CommonTree ASSIGNMENT122_tree=null;
-		CommonTree ELIPSES123_tree=null;
+		CommonTree ASSIGNMENT124_tree=null;
+		CommonTree ELIPSES125_tree=null;
 		RewriteRuleTokenStream stream_ASSIGNMENT=new RewriteRuleTokenStream(adaptor,"token ASSIGNMENT");
 		RewriteRuleTokenStream stream_ELIPSES=new RewriteRuleTokenStream(adaptor,"token ELIPSES");
 		RewriteRuleSubtreeStream stream_unaryExpression=new RewriteRuleSubtreeStream(adaptor,"rule unaryExpression");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:485:3: ( ASSIGNMENT e1= unaryExpression ( -> ^( ENUM_VALUE $e1) | ELIPSES e2= unaryExpression -> ^( ENUM_VALUE_RANGE $e1 $e2) ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:485:5: ASSIGNMENT e1= unaryExpression ( -> ^( ENUM_VALUE $e1) | ELIPSES e2= unaryExpression -> ^( ENUM_VALUE_RANGE $e1 $e2) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:490:3: ( ASSIGNMENT e1= unaryExpression ( -> ^( ENUM_VALUE $e1) | ELIPSES e2= unaryExpression -> ^( ENUM_VALUE_RANGE $e1 $e2) ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:490:5: ASSIGNMENT e1= unaryExpression ( -> ^( ENUM_VALUE $e1) | ELIPSES e2= unaryExpression -> ^( ENUM_VALUE_RANGE $e1 $e2) )
 			{
-			ASSIGNMENT122=(Token)match(input,ASSIGNMENT,FOLLOW_ASSIGNMENT_in_enumeratorValue2583); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_ASSIGNMENT.add(ASSIGNMENT122);
+			ASSIGNMENT124=(Token)match(input,ASSIGNMENT,FOLLOW_ASSIGNMENT_in_enumeratorValue2627); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_ASSIGNMENT.add(ASSIGNMENT124);
 
-			pushFollow(FOLLOW_unaryExpression_in_enumeratorValue2587);
+			pushFollow(FOLLOW_unaryExpression_in_enumeratorValue2631);
 			e1=unaryExpression();
 			state._fsp--;
 			if (state.failed) return retval;
 			if ( state.backtracking==0 ) stream_unaryExpression.add(e1.getTree());
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:486:7: ( -> ^( ENUM_VALUE $e1) | ELIPSES e2= unaryExpression -> ^( ENUM_VALUE_RANGE $e1 $e2) )
-			int alt37=2;
-			int LA37_0 = input.LA(1);
-			if ( (LA37_0==RCURL||LA37_0==SEPARATOR) ) {
-				alt37=1;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:491:7: ( -> ^( ENUM_VALUE $e1) | ELIPSES e2= unaryExpression -> ^( ENUM_VALUE_RANGE $e1 $e2) )
+			int alt38=2;
+			int LA38_0 = input.LA(1);
+			if ( (LA38_0==RCURL||LA38_0==SEPARATOR) ) {
+				alt38=1;
 			}
-			else if ( (LA37_0==ELIPSES) ) {
-				alt37=2;
+			else if ( (LA38_0==ELIPSES) ) {
+				alt38=2;
 			}
 
 			else {
 				if (state.backtracking>0) {state.failed=true; return retval;}
 				NoViableAltException nvae =
-					new NoViableAltException("", 37, 0, input);
+					new NoViableAltException("", 38, 0, input);
 				throw nvae;
 			}
 
-			switch (alt37) {
+			switch (alt38) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:487:11: 
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:492:11: 
 					{
 					// AST REWRITE
 					// elements: e1
@@ -5417,9 +5556,9 @@ public class CTFParser extends Parser {
 					RewriteRuleSubtreeStream stream_e1=new RewriteRuleSubtreeStream(adaptor,"rule e1",e1!=null?e1.getTree():null);
 
 					root_0 = (CommonTree)adaptor.nil();
-					// 487:11: -> ^( ENUM_VALUE $e1)
+					// 492:11: -> ^( ENUM_VALUE $e1)
 					{
-						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:487:14: ^( ENUM_VALUE $e1)
+						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:492:14: ^( ENUM_VALUE $e1)
 						{
 						CommonTree root_1 = (CommonTree)adaptor.nil();
 						root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(ENUM_VALUE, "ENUM_VALUE"), root_1);
@@ -5436,18 +5575,18 @@ public class CTFParser extends Parser {
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:488:9: ELIPSES e2= unaryExpression
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:493:9: ELIPSES e2= unaryExpression
 					{
-					ELIPSES123=(Token)match(input,ELIPSES,FOLLOW_ELIPSES_in_enumeratorValue2626); if (state.failed) return retval; 
-					if ( state.backtracking==0 ) stream_ELIPSES.add(ELIPSES123);
+					ELIPSES125=(Token)match(input,ELIPSES,FOLLOW_ELIPSES_in_enumeratorValue2670); if (state.failed) return retval; 
+					if ( state.backtracking==0 ) stream_ELIPSES.add(ELIPSES125);
 
-					pushFollow(FOLLOW_unaryExpression_in_enumeratorValue2630);
+					pushFollow(FOLLOW_unaryExpression_in_enumeratorValue2674);
 					e2=unaryExpression();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_unaryExpression.add(e2.getTree());
 					// AST REWRITE
-					// elements: e1, e2
+					// elements: e2, e1
 					// token labels: 
 					// rule labels: retval, e1, e2
 					// token list labels: 
@@ -5460,9 +5599,9 @@ public class CTFParser extends Parser {
 					RewriteRuleSubtreeStream stream_e2=new RewriteRuleSubtreeStream(adaptor,"rule e2",e2!=null?e2.getTree():null);
 
 					root_0 = (CommonTree)adaptor.nil();
-					// 489:11: -> ^( ENUM_VALUE_RANGE $e1 $e2)
+					// 494:11: -> ^( ENUM_VALUE_RANGE $e1 $e2)
 					{
-						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:489:14: ^( ENUM_VALUE_RANGE $e1 $e2)
+						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:494:14: ^( ENUM_VALUE_RANGE $e1 $e2)
 						{
 						CommonTree root_1 = (CommonTree)adaptor.nil();
 						root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(ENUM_VALUE_RANGE, "ENUM_VALUE_RANGE"), root_1);
@@ -5512,56 +5651,56 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "declarator"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:493:1: declarator : ( pointer )* directDeclarator -> ^( TYPE_DECLARATOR ( pointer )* directDeclarator ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:498:1: declarator : ( pointer )* directDeclarator -> ^( TYPE_DECLARATOR ( pointer )* directDeclarator ) ;
 	public final CTFParser.declarator_return declarator() throws RecognitionException {
 		CTFParser.declarator_return retval = new CTFParser.declarator_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		ParserRuleReturnScope pointer124 =null;
-		ParserRuleReturnScope directDeclarator125 =null;
+		ParserRuleReturnScope pointer126 =null;
+		ParserRuleReturnScope directDeclarator127 =null;
 
 		RewriteRuleSubtreeStream stream_directDeclarator=new RewriteRuleSubtreeStream(adaptor,"rule directDeclarator");
 		RewriteRuleSubtreeStream stream_pointer=new RewriteRuleSubtreeStream(adaptor,"rule pointer");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:494:3: ( ( pointer )* directDeclarator -> ^( TYPE_DECLARATOR ( pointer )* directDeclarator ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:494:5: ( pointer )* directDeclarator
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:499:3: ( ( pointer )* directDeclarator -> ^( TYPE_DECLARATOR ( pointer )* directDeclarator ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:499:5: ( pointer )* directDeclarator
 			{
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:494:5: ( pointer )*
-			loop38:
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:499:5: ( pointer )*
+			loop39:
 			while (true) {
-				int alt38=2;
-				int LA38_0 = input.LA(1);
-				if ( (LA38_0==POINTER) ) {
-					alt38=1;
+				int alt39=2;
+				int LA39_0 = input.LA(1);
+				if ( (LA39_0==POINTER) ) {
+					alt39=1;
 				}
 
-				switch (alt38) {
+				switch (alt39) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:494:5: pointer
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:499:5: pointer
 					{
-					pushFollow(FOLLOW_pointer_in_declarator2673);
-					pointer124=pointer();
+					pushFollow(FOLLOW_pointer_in_declarator2717);
+					pointer126=pointer();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_pointer.add(pointer124.getTree());
+					if ( state.backtracking==0 ) stream_pointer.add(pointer126.getTree());
 					}
 					break;
 
 				default :
-					break loop38;
+					break loop39;
 				}
 			}
 
-			pushFollow(FOLLOW_directDeclarator_in_declarator2676);
-			directDeclarator125=directDeclarator();
+			pushFollow(FOLLOW_directDeclarator_in_declarator2720);
+			directDeclarator127=directDeclarator();
 			state._fsp--;
 			if (state.failed) return retval;
-			if ( state.backtracking==0 ) stream_directDeclarator.add(directDeclarator125.getTree());
+			if ( state.backtracking==0 ) stream_directDeclarator.add(directDeclarator127.getTree());
 			// AST REWRITE
-			// elements: directDeclarator, pointer
+			// elements: pointer, directDeclarator
 			// token labels: 
 			// rule labels: retval
 			// token list labels: 
@@ -5572,13 +5711,13 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 495:7: -> ^( TYPE_DECLARATOR ( pointer )* directDeclarator )
+			// 500:7: -> ^( TYPE_DECLARATOR ( pointer )* directDeclarator )
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:495:10: ^( TYPE_DECLARATOR ( pointer )* directDeclarator )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:500:10: ^( TYPE_DECLARATOR ( pointer )* directDeclarator )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.nil();
 				root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(TYPE_DECLARATOR, "TYPE_DECLARATOR"), root_1);
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:495:28: ( pointer )*
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:500:28: ( pointer )*
 				while ( stream_pointer.hasNext() ) {
 					adaptor.addChild(root_1, stream_pointer.nextTree());
 				}
@@ -5624,62 +5763,62 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "directDeclarator"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:498:1: directDeclarator : ( IDENTIFIER ) ( directDeclaratorSuffix )* ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:503:1: directDeclarator : ( IDENTIFIER ) ( directDeclaratorSuffix )* ;
 	public final CTFParser.directDeclarator_return directDeclarator() throws RecognitionException {
 		CTFParser.directDeclarator_return retval = new CTFParser.directDeclarator_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token IDENTIFIER126=null;
-		ParserRuleReturnScope directDeclaratorSuffix127 =null;
+		Token IDENTIFIER128=null;
+		ParserRuleReturnScope directDeclaratorSuffix129 =null;
 
-		CommonTree IDENTIFIER126_tree=null;
+		CommonTree IDENTIFIER128_tree=null;
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:499:3: ( ( IDENTIFIER ) ( directDeclaratorSuffix )* )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:499:5: ( IDENTIFIER ) ( directDeclaratorSuffix )*
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:504:3: ( ( IDENTIFIER ) ( directDeclaratorSuffix )* )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:504:5: ( IDENTIFIER ) ( directDeclaratorSuffix )*
 			{
 			root_0 = (CommonTree)adaptor.nil();
 
 
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:499:5: ( IDENTIFIER )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:500:7: IDENTIFIER
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:504:5: ( IDENTIFIER )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:505:7: IDENTIFIER
 			{
-			IDENTIFIER126=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_directDeclarator2714); if (state.failed) return retval;
+			IDENTIFIER128=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_directDeclarator2758); if (state.failed) return retval;
 			if ( state.backtracking==0 ) {
-			IDENTIFIER126_tree = (CommonTree)adaptor.create(IDENTIFIER126);
-			adaptor.addChild(root_0, IDENTIFIER126_tree);
+			IDENTIFIER128_tree = (CommonTree)adaptor.create(IDENTIFIER128);
+			adaptor.addChild(root_0, IDENTIFIER128_tree);
 			}
 
-			if ( state.backtracking==0 ) { if (inTypedef()) addTypeName((IDENTIFIER126!=null?IDENTIFIER126.getText():null)); }
-			if ( state.backtracking==0 ) { debug_print((IDENTIFIER126!=null?IDENTIFIER126.getText():null)); }
+			if ( state.backtracking==0 ) { if (inTypedef()) addTypeName((IDENTIFIER128!=null?IDENTIFIER128.getText():null)); }
+			if ( state.backtracking==0 ) { debug_print((IDENTIFIER128!=null?IDENTIFIER128.getText():null)); }
 			}
 
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:505:5: ( directDeclaratorSuffix )*
-			loop39:
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:510:5: ( directDeclaratorSuffix )*
+			loop40:
 			while (true) {
-				int alt39=2;
-				int LA39_0 = input.LA(1);
-				if ( (LA39_0==OPENBRAC) ) {
-					alt39=1;
+				int alt40=2;
+				int LA40_0 = input.LA(1);
+				if ( (LA40_0==OPENBRAC) ) {
+					alt40=1;
 				}
 
-				switch (alt39) {
+				switch (alt40) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:505:5: directDeclaratorSuffix
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:510:5: directDeclaratorSuffix
 					{
-					pushFollow(FOLLOW_directDeclaratorSuffix_in_directDeclarator2754);
-					directDeclaratorSuffix127=directDeclaratorSuffix();
+					pushFollow(FOLLOW_directDeclaratorSuffix_in_directDeclarator2798);
+					directDeclaratorSuffix129=directDeclaratorSuffix();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) adaptor.addChild(root_0, directDeclaratorSuffix127.getTree());
+					if ( state.backtracking==0 ) adaptor.addChild(root_0, directDeclaratorSuffix129.getTree());
 
 					}
 					break;
 
 				default :
-					break loop39;
+					break loop40;
 				}
 			}
 
@@ -5713,37 +5852,37 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "directDeclaratorSuffix"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:508:1: directDeclaratorSuffix : OPENBRAC directDeclaratorLength CLOSEBRAC -> ^( LENGTH directDeclaratorLength ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:513:1: directDeclaratorSuffix : OPENBRAC directDeclaratorLength CLOSEBRAC -> ^( LENGTH directDeclaratorLength ) ;
 	public final CTFParser.directDeclaratorSuffix_return directDeclaratorSuffix() throws RecognitionException {
 		CTFParser.directDeclaratorSuffix_return retval = new CTFParser.directDeclaratorSuffix_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token OPENBRAC128=null;
-		Token CLOSEBRAC130=null;
-		ParserRuleReturnScope directDeclaratorLength129 =null;
+		Token OPENBRAC130=null;
+		Token CLOSEBRAC132=null;
+		ParserRuleReturnScope directDeclaratorLength131 =null;
 
-		CommonTree OPENBRAC128_tree=null;
-		CommonTree CLOSEBRAC130_tree=null;
+		CommonTree OPENBRAC130_tree=null;
+		CommonTree CLOSEBRAC132_tree=null;
 		RewriteRuleTokenStream stream_OPENBRAC=new RewriteRuleTokenStream(adaptor,"token OPENBRAC");
 		RewriteRuleTokenStream stream_CLOSEBRAC=new RewriteRuleTokenStream(adaptor,"token CLOSEBRAC");
 		RewriteRuleSubtreeStream stream_directDeclaratorLength=new RewriteRuleSubtreeStream(adaptor,"rule directDeclaratorLength");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:509:3: ( OPENBRAC directDeclaratorLength CLOSEBRAC -> ^( LENGTH directDeclaratorLength ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:509:5: OPENBRAC directDeclaratorLength CLOSEBRAC
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:514:3: ( OPENBRAC directDeclaratorLength CLOSEBRAC -> ^( LENGTH directDeclaratorLength ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:514:5: OPENBRAC directDeclaratorLength CLOSEBRAC
 			{
-			OPENBRAC128=(Token)match(input,OPENBRAC,FOLLOW_OPENBRAC_in_directDeclaratorSuffix2768); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_OPENBRAC.add(OPENBRAC128);
+			OPENBRAC130=(Token)match(input,OPENBRAC,FOLLOW_OPENBRAC_in_directDeclaratorSuffix2812); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_OPENBRAC.add(OPENBRAC130);
 
-			pushFollow(FOLLOW_directDeclaratorLength_in_directDeclaratorSuffix2770);
-			directDeclaratorLength129=directDeclaratorLength();
+			pushFollow(FOLLOW_directDeclaratorLength_in_directDeclaratorSuffix2814);
+			directDeclaratorLength131=directDeclaratorLength();
 			state._fsp--;
 			if (state.failed) return retval;
-			if ( state.backtracking==0 ) stream_directDeclaratorLength.add(directDeclaratorLength129.getTree());
-			CLOSEBRAC130=(Token)match(input,CLOSEBRAC,FOLLOW_CLOSEBRAC_in_directDeclaratorSuffix2772); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_CLOSEBRAC.add(CLOSEBRAC130);
+			if ( state.backtracking==0 ) stream_directDeclaratorLength.add(directDeclaratorLength131.getTree());
+			CLOSEBRAC132=(Token)match(input,CLOSEBRAC,FOLLOW_CLOSEBRAC_in_directDeclaratorSuffix2816); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_CLOSEBRAC.add(CLOSEBRAC132);
 
 			// AST REWRITE
 			// elements: directDeclaratorLength
@@ -5757,9 +5896,9 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 510:7: -> ^( LENGTH directDeclaratorLength )
+			// 515:7: -> ^( LENGTH directDeclaratorLength )
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:510:10: ^( LENGTH directDeclaratorLength )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:515:10: ^( LENGTH directDeclaratorLength )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.nil();
 				root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(LENGTH, "LENGTH"), root_1);
@@ -5803,28 +5942,28 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "directDeclaratorLength"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:513:1: directDeclaratorLength : unaryExpression ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:518:1: directDeclaratorLength : unaryExpression ;
 	public final CTFParser.directDeclaratorLength_return directDeclaratorLength() throws RecognitionException {
 		CTFParser.directDeclaratorLength_return retval = new CTFParser.directDeclaratorLength_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		ParserRuleReturnScope unaryExpression131 =null;
+		ParserRuleReturnScope unaryExpression133 =null;
 
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:514:3: ( unaryExpression )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:514:5: unaryExpression
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:519:3: ( unaryExpression )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:519:5: unaryExpression
 			{
 			root_0 = (CommonTree)adaptor.nil();
 
 
-			pushFollow(FOLLOW_unaryExpression_in_directDeclaratorLength2800);
-			unaryExpression131=unaryExpression();
+			pushFollow(FOLLOW_unaryExpression_in_directDeclaratorLength2844);
+			unaryExpression133=unaryExpression();
 			state._fsp--;
 			if (state.failed) return retval;
-			if ( state.backtracking==0 ) adaptor.addChild(root_0, unaryExpression131.getTree());
+			if ( state.backtracking==0 ) adaptor.addChild(root_0, unaryExpression133.getTree());
 
 			}
 
@@ -5856,95 +5995,95 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "abstractDeclarator"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:517:1: abstractDeclarator : ( ( pointer )+ ( directAbstractDeclarator )? -> ^( TYPE_DECLARATOR ( pointer )+ ( directAbstractDeclarator )? ) | directAbstractDeclarator -> ^( TYPE_DECLARATOR directAbstractDeclarator ) );
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:522:1: abstractDeclarator : ( ( pointer )+ ( directAbstractDeclarator )? -> ^( TYPE_DECLARATOR ( pointer )+ ( directAbstractDeclarator )? ) | directAbstractDeclarator -> ^( TYPE_DECLARATOR directAbstractDeclarator ) );
 	public final CTFParser.abstractDeclarator_return abstractDeclarator() throws RecognitionException {
 		CTFParser.abstractDeclarator_return retval = new CTFParser.abstractDeclarator_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		ParserRuleReturnScope pointer132 =null;
-		ParserRuleReturnScope directAbstractDeclarator133 =null;
-		ParserRuleReturnScope directAbstractDeclarator134 =null;
+		ParserRuleReturnScope pointer134 =null;
+		ParserRuleReturnScope directAbstractDeclarator135 =null;
+		ParserRuleReturnScope directAbstractDeclarator136 =null;
 
 		RewriteRuleSubtreeStream stream_pointer=new RewriteRuleSubtreeStream(adaptor,"rule pointer");
 		RewriteRuleSubtreeStream stream_directAbstractDeclarator=new RewriteRuleSubtreeStream(adaptor,"rule directAbstractDeclarator");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:518:3: ( ( pointer )+ ( directAbstractDeclarator )? -> ^( TYPE_DECLARATOR ( pointer )+ ( directAbstractDeclarator )? ) | directAbstractDeclarator -> ^( TYPE_DECLARATOR directAbstractDeclarator ) )
-			int alt42=2;
-			int LA42_0 = input.LA(1);
-			if ( (LA42_0==POINTER) ) {
-				alt42=1;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:523:3: ( ( pointer )+ ( directAbstractDeclarator )? -> ^( TYPE_DECLARATOR ( pointer )+ ( directAbstractDeclarator )? ) | directAbstractDeclarator -> ^( TYPE_DECLARATOR directAbstractDeclarator ) )
+			int alt43=2;
+			int LA43_0 = input.LA(1);
+			if ( (LA43_0==POINTER) ) {
+				alt43=1;
 			}
-			else if ( (LA42_0==IDENTIFIER||LA42_0==LPAREN) ) {
-				alt42=2;
+			else if ( (LA43_0==IDENTIFIER||LA43_0==LPAREN) ) {
+				alt43=2;
 			}
 
 			else {
 				if (state.backtracking>0) {state.failed=true; return retval;}
 				NoViableAltException nvae =
-					new NoViableAltException("", 42, 0, input);
+					new NoViableAltException("", 43, 0, input);
 				throw nvae;
 			}
 
-			switch (alt42) {
+			switch (alt43) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:518:5: ( pointer )+ ( directAbstractDeclarator )?
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:523:5: ( pointer )+ ( directAbstractDeclarator )?
 					{
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:518:5: ( pointer )+
-					int cnt40=0;
-					loop40:
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:523:5: ( pointer )+
+					int cnt41=0;
+					loop41:
 					while (true) {
-						int alt40=2;
-						int LA40_0 = input.LA(1);
-						if ( (LA40_0==POINTER) ) {
-							alt40=1;
+						int alt41=2;
+						int LA41_0 = input.LA(1);
+						if ( (LA41_0==POINTER) ) {
+							alt41=1;
 						}
 
-						switch (alt40) {
+						switch (alt41) {
 						case 1 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:518:5: pointer
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:523:5: pointer
 							{
-							pushFollow(FOLLOW_pointer_in_abstractDeclarator2813);
-							pointer132=pointer();
+							pushFollow(FOLLOW_pointer_in_abstractDeclarator2857);
+							pointer134=pointer();
 							state._fsp--;
 							if (state.failed) return retval;
-							if ( state.backtracking==0 ) stream_pointer.add(pointer132.getTree());
+							if ( state.backtracking==0 ) stream_pointer.add(pointer134.getTree());
 							}
 							break;
 
 						default :
-							if ( cnt40 >= 1 ) break loop40;
+							if ( cnt41 >= 1 ) break loop41;
 							if (state.backtracking>0) {state.failed=true; return retval;}
-							EarlyExitException eee = new EarlyExitException(40, input);
+							EarlyExitException eee = new EarlyExitException(41, input);
 							throw eee;
 						}
-						cnt40++;
+						cnt41++;
 					}
 
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:518:14: ( directAbstractDeclarator )?
-					int alt41=2;
-					int LA41_0 = input.LA(1);
-					if ( (LA41_0==IDENTIFIER||LA41_0==LPAREN) ) {
-						alt41=1;
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:523:14: ( directAbstractDeclarator )?
+					int alt42=2;
+					int LA42_0 = input.LA(1);
+					if ( (LA42_0==IDENTIFIER||LA42_0==LPAREN) ) {
+						alt42=1;
 					}
-					switch (alt41) {
+					switch (alt42) {
 						case 1 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:518:14: directAbstractDeclarator
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:523:14: directAbstractDeclarator
 							{
-							pushFollow(FOLLOW_directAbstractDeclarator_in_abstractDeclarator2816);
-							directAbstractDeclarator133=directAbstractDeclarator();
+							pushFollow(FOLLOW_directAbstractDeclarator_in_abstractDeclarator2860);
+							directAbstractDeclarator135=directAbstractDeclarator();
 							state._fsp--;
 							if (state.failed) return retval;
-							if ( state.backtracking==0 ) stream_directAbstractDeclarator.add(directAbstractDeclarator133.getTree());
+							if ( state.backtracking==0 ) stream_directAbstractDeclarator.add(directAbstractDeclarator135.getTree());
 							}
 							break;
 
 					}
 
 					// AST REWRITE
-					// elements: pointer, directAbstractDeclarator
+					// elements: directAbstractDeclarator, pointer
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -5955,9 +6094,9 @@ public class CTFParser extends Parser {
 					RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 					root_0 = (CommonTree)adaptor.nil();
-					// 519:7: -> ^( TYPE_DECLARATOR ( pointer )+ ( directAbstractDeclarator )? )
+					// 524:7: -> ^( TYPE_DECLARATOR ( pointer )+ ( directAbstractDeclarator )? )
 					{
-						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:519:10: ^( TYPE_DECLARATOR ( pointer )+ ( directAbstractDeclarator )? )
+						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:524:10: ^( TYPE_DECLARATOR ( pointer )+ ( directAbstractDeclarator )? )
 						{
 						CommonTree root_1 = (CommonTree)adaptor.nil();
 						root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(TYPE_DECLARATOR, "TYPE_DECLARATOR"), root_1);
@@ -5969,7 +6108,7 @@ public class CTFParser extends Parser {
 						}
 						stream_pointer.reset();
 
-						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:519:37: ( directAbstractDeclarator )?
+						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:524:37: ( directAbstractDeclarator )?
 						if ( stream_directAbstractDeclarator.hasNext() ) {
 							adaptor.addChild(root_1, stream_directAbstractDeclarator.nextTree());
 						}
@@ -5987,13 +6126,13 @@ public class CTFParser extends Parser {
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:520:5: directAbstractDeclarator
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:525:5: directAbstractDeclarator
 					{
-					pushFollow(FOLLOW_directAbstractDeclarator_in_abstractDeclarator2841);
-					directAbstractDeclarator134=directAbstractDeclarator();
+					pushFollow(FOLLOW_directAbstractDeclarator_in_abstractDeclarator2885);
+					directAbstractDeclarator136=directAbstractDeclarator();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_directAbstractDeclarator.add(directAbstractDeclarator134.getTree());
+					if ( state.backtracking==0 ) stream_directAbstractDeclarator.add(directAbstractDeclarator136.getTree());
 					// AST REWRITE
 					// elements: directAbstractDeclarator
 					// token labels: 
@@ -6006,9 +6145,9 @@ public class CTFParser extends Parser {
 					RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 					root_0 = (CommonTree)adaptor.nil();
-					// 521:7: -> ^( TYPE_DECLARATOR directAbstractDeclarator )
+					// 526:7: -> ^( TYPE_DECLARATOR directAbstractDeclarator )
 					{
-						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:521:10: ^( TYPE_DECLARATOR directAbstractDeclarator )
+						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:526:10: ^( TYPE_DECLARATOR directAbstractDeclarator )
 						{
 						CommonTree root_1 = (CommonTree)adaptor.nil();
 						root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(TYPE_DECLARATOR, "TYPE_DECLARATOR"), root_1);
@@ -6054,85 +6193,85 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "directAbstractDeclarator"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:529:1: directAbstractDeclarator : ( IDENTIFIER | ( LPAREN abstractDeclarator RPAREN ) ) ( OPENBRAC ( unaryExpression )? CLOSEBRAC )? ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:534:1: directAbstractDeclarator : ( IDENTIFIER | ( LPAREN abstractDeclarator RPAREN ) ) ( OPENBRAC ( unaryExpression )? CLOSEBRAC )? ;
 	public final CTFParser.directAbstractDeclarator_return directAbstractDeclarator() throws RecognitionException {
 		CTFParser.directAbstractDeclarator_return retval = new CTFParser.directAbstractDeclarator_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token IDENTIFIER135=null;
-		Token LPAREN136=null;
-		Token RPAREN138=null;
-		Token OPENBRAC139=null;
-		Token CLOSEBRAC141=null;
-		ParserRuleReturnScope abstractDeclarator137 =null;
-		ParserRuleReturnScope unaryExpression140 =null;
+		Token IDENTIFIER137=null;
+		Token LPAREN138=null;
+		Token RPAREN140=null;
+		Token OPENBRAC141=null;
+		Token CLOSEBRAC143=null;
+		ParserRuleReturnScope abstractDeclarator139 =null;
+		ParserRuleReturnScope unaryExpression142 =null;
 
-		CommonTree IDENTIFIER135_tree=null;
-		CommonTree LPAREN136_tree=null;
-		CommonTree RPAREN138_tree=null;
-		CommonTree OPENBRAC139_tree=null;
-		CommonTree CLOSEBRAC141_tree=null;
+		CommonTree IDENTIFIER137_tree=null;
+		CommonTree LPAREN138_tree=null;
+		CommonTree RPAREN140_tree=null;
+		CommonTree OPENBRAC141_tree=null;
+		CommonTree CLOSEBRAC143_tree=null;
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:530:3: ( ( IDENTIFIER | ( LPAREN abstractDeclarator RPAREN ) ) ( OPENBRAC ( unaryExpression )? CLOSEBRAC )? )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:530:5: ( IDENTIFIER | ( LPAREN abstractDeclarator RPAREN ) ) ( OPENBRAC ( unaryExpression )? CLOSEBRAC )?
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:535:3: ( ( IDENTIFIER | ( LPAREN abstractDeclarator RPAREN ) ) ( OPENBRAC ( unaryExpression )? CLOSEBRAC )? )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:535:5: ( IDENTIFIER | ( LPAREN abstractDeclarator RPAREN ) ) ( OPENBRAC ( unaryExpression )? CLOSEBRAC )?
 			{
 			root_0 = (CommonTree)adaptor.nil();
 
 
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:530:5: ( IDENTIFIER | ( LPAREN abstractDeclarator RPAREN ) )
-			int alt43=2;
-			int LA43_0 = input.LA(1);
-			if ( (LA43_0==IDENTIFIER) ) {
-				alt43=1;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:535:5: ( IDENTIFIER | ( LPAREN abstractDeclarator RPAREN ) )
+			int alt44=2;
+			int LA44_0 = input.LA(1);
+			if ( (LA44_0==IDENTIFIER) ) {
+				alt44=1;
 			}
-			else if ( (LA43_0==LPAREN) ) {
-				alt43=2;
+			else if ( (LA44_0==LPAREN) ) {
+				alt44=2;
 			}
 
 			else {
 				if (state.backtracking>0) {state.failed=true; return retval;}
 				NoViableAltException nvae =
-					new NoViableAltException("", 43, 0, input);
+					new NoViableAltException("", 44, 0, input);
 				throw nvae;
 			}
 
-			switch (alt43) {
+			switch (alt44) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:531:7: IDENTIFIER
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:536:7: IDENTIFIER
 					{
-					IDENTIFIER135=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_directAbstractDeclarator2878); if (state.failed) return retval;
+					IDENTIFIER137=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_directAbstractDeclarator2922); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
-					IDENTIFIER135_tree = (CommonTree)adaptor.create(IDENTIFIER135);
-					adaptor.addChild(root_0, IDENTIFIER135_tree);
+					IDENTIFIER137_tree = (CommonTree)adaptor.create(IDENTIFIER137);
+					adaptor.addChild(root_0, IDENTIFIER137_tree);
 					}
 
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:532:9: ( LPAREN abstractDeclarator RPAREN )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:537:9: ( LPAREN abstractDeclarator RPAREN )
 					{
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:532:9: ( LPAREN abstractDeclarator RPAREN )
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:532:10: LPAREN abstractDeclarator RPAREN
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:537:9: ( LPAREN abstractDeclarator RPAREN )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:537:10: LPAREN abstractDeclarator RPAREN
 					{
-					LPAREN136=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_directAbstractDeclarator2889); if (state.failed) return retval;
+					LPAREN138=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_directAbstractDeclarator2933); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
-					LPAREN136_tree = (CommonTree)adaptor.create(LPAREN136);
-					adaptor.addChild(root_0, LPAREN136_tree);
+					LPAREN138_tree = (CommonTree)adaptor.create(LPAREN138);
+					adaptor.addChild(root_0, LPAREN138_tree);
 					}
 
-					pushFollow(FOLLOW_abstractDeclarator_in_directAbstractDeclarator2891);
-					abstractDeclarator137=abstractDeclarator();
+					pushFollow(FOLLOW_abstractDeclarator_in_directAbstractDeclarator2935);
+					abstractDeclarator139=abstractDeclarator();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) adaptor.addChild(root_0, abstractDeclarator137.getTree());
+					if ( state.backtracking==0 ) adaptor.addChild(root_0, abstractDeclarator139.getTree());
 
-					RPAREN138=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_directAbstractDeclarator2893); if (state.failed) return retval;
+					RPAREN140=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_directAbstractDeclarator2937); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
-					RPAREN138_tree = (CommonTree)adaptor.create(RPAREN138);
-					adaptor.addChild(root_0, RPAREN138_tree);
+					RPAREN140_tree = (CommonTree)adaptor.create(RPAREN140);
+					adaptor.addChild(root_0, RPAREN140_tree);
 					}
 
 					}
@@ -6142,47 +6281,47 @@ public class CTFParser extends Parser {
 
 			}
 
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:533:5: ( OPENBRAC ( unaryExpression )? CLOSEBRAC )?
-			int alt45=2;
-			int LA45_0 = input.LA(1);
-			if ( (LA45_0==OPENBRAC) ) {
-				alt45=1;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:538:5: ( OPENBRAC ( unaryExpression )? CLOSEBRAC )?
+			int alt46=2;
+			int LA46_0 = input.LA(1);
+			if ( (LA46_0==OPENBRAC) ) {
+				alt46=1;
 			}
-			switch (alt45) {
+			switch (alt46) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:534:7: OPENBRAC ( unaryExpression )? CLOSEBRAC
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:539:7: OPENBRAC ( unaryExpression )? CLOSEBRAC
 					{
-					OPENBRAC139=(Token)match(input,OPENBRAC,FOLLOW_OPENBRAC_in_directAbstractDeclarator2908); if (state.failed) return retval;
+					OPENBRAC141=(Token)match(input,OPENBRAC,FOLLOW_OPENBRAC_in_directAbstractDeclarator2952); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
-					OPENBRAC139_tree = (CommonTree)adaptor.create(OPENBRAC139);
-					adaptor.addChild(root_0, OPENBRAC139_tree);
+					OPENBRAC141_tree = (CommonTree)adaptor.create(OPENBRAC141);
+					adaptor.addChild(root_0, OPENBRAC141_tree);
 					}
 
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:534:16: ( unaryExpression )?
-					int alt44=2;
-					int LA44_0 = input.LA(1);
-					if ( (LA44_0==ALIGNTOK||(LA44_0 >= CALLSITETOK && LA44_0 <= CHARACTER_LITERAL)||LA44_0==CLOCKTOK||LA44_0==DECIMAL_LITERAL||LA44_0==ENVTOK||LA44_0==EVENTTOK||LA44_0==HEX_LITERAL||LA44_0==IDENTIFIER||LA44_0==OCTAL_LITERAL||(LA44_0 >= SIGN && LA44_0 <= SIGNEDTOK)||LA44_0==STREAMTOK||LA44_0==STRINGTOK||LA44_0==STRING_LITERAL||LA44_0==TRACETOK) ) {
-						alt44=1;
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:539:16: ( unaryExpression )?
+					int alt45=2;
+					int LA45_0 = input.LA(1);
+					if ( (LA45_0==ALIGNTOK||(LA45_0 >= CALLSITETOK && LA45_0 <= CHARACTER_LITERAL)||LA45_0==CLOCKTOK||LA45_0==DECIMAL_LITERAL||LA45_0==ENVTOK||LA45_0==EVENTTOK||LA45_0==HEX_LITERAL||LA45_0==IDENTIFIER||LA45_0==OCTAL_LITERAL||(LA45_0 >= SIGN && LA45_0 <= SIGNEDTOK)||LA45_0==STREAMTOK||LA45_0==STRINGTOK||LA45_0==STRING_LITERAL||LA45_0==TRACETOK) ) {
+						alt45=1;
 					}
-					switch (alt44) {
+					switch (alt45) {
 						case 1 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:534:16: unaryExpression
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:539:16: unaryExpression
 							{
-							pushFollow(FOLLOW_unaryExpression_in_directAbstractDeclarator2910);
-							unaryExpression140=unaryExpression();
+							pushFollow(FOLLOW_unaryExpression_in_directAbstractDeclarator2954);
+							unaryExpression142=unaryExpression();
 							state._fsp--;
 							if (state.failed) return retval;
-							if ( state.backtracking==0 ) adaptor.addChild(root_0, unaryExpression140.getTree());
+							if ( state.backtracking==0 ) adaptor.addChild(root_0, unaryExpression142.getTree());
 
 							}
 							break;
 
 					}
 
-					CLOSEBRAC141=(Token)match(input,CLOSEBRAC,FOLLOW_CLOSEBRAC_in_directAbstractDeclarator2913); if (state.failed) return retval;
+					CLOSEBRAC143=(Token)match(input,CLOSEBRAC,FOLLOW_CLOSEBRAC_in_directAbstractDeclarator2957); if (state.failed) return retval;
 					if ( state.backtracking==0 ) {
-					CLOSEBRAC141_tree = (CommonTree)adaptor.create(CLOSEBRAC141);
-					adaptor.addChild(root_0, CLOSEBRAC141_tree);
+					CLOSEBRAC143_tree = (CommonTree)adaptor.create(CLOSEBRAC143);
+					adaptor.addChild(root_0, CLOSEBRAC143_tree);
 					}
 
 					}
@@ -6220,42 +6359,42 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "pointer"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:538:1: pointer : POINTER ( typeQualifierList )? -> ^( POINTER ( typeQualifierList )? ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:543:1: pointer : POINTER ( typeQualifierList )? -> ^( POINTER ( typeQualifierList )? ) ;
 	public final CTFParser.pointer_return pointer() throws RecognitionException {
 		CTFParser.pointer_return retval = new CTFParser.pointer_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token POINTER142=null;
-		ParserRuleReturnScope typeQualifierList143 =null;
+		Token POINTER144=null;
+		ParserRuleReturnScope typeQualifierList145 =null;
 
-		CommonTree POINTER142_tree=null;
+		CommonTree POINTER144_tree=null;
 		RewriteRuleTokenStream stream_POINTER=new RewriteRuleTokenStream(adaptor,"token POINTER");
 		RewriteRuleSubtreeStream stream_typeQualifierList=new RewriteRuleSubtreeStream(adaptor,"rule typeQualifierList");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:539:3: ( POINTER ( typeQualifierList )? -> ^( POINTER ( typeQualifierList )? ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:539:5: POINTER ( typeQualifierList )?
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:544:3: ( POINTER ( typeQualifierList )? -> ^( POINTER ( typeQualifierList )? ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:544:5: POINTER ( typeQualifierList )?
 			{
-			POINTER142=(Token)match(input,POINTER,FOLLOW_POINTER_in_pointer2931); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_POINTER.add(POINTER142);
+			POINTER144=(Token)match(input,POINTER,FOLLOW_POINTER_in_pointer2975); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_POINTER.add(POINTER144);
 
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:539:13: ( typeQualifierList )?
-			int alt46=2;
-			int LA46_0 = input.LA(1);
-			if ( (LA46_0==CONSTTOK) ) {
-				alt46=1;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:544:13: ( typeQualifierList )?
+			int alt47=2;
+			int LA47_0 = input.LA(1);
+			if ( (LA47_0==CONSTTOK) ) {
+				alt47=1;
 			}
-			switch (alt46) {
+			switch (alt47) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:539:13: typeQualifierList
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:544:13: typeQualifierList
 					{
-					pushFollow(FOLLOW_typeQualifierList_in_pointer2933);
-					typeQualifierList143=typeQualifierList();
+					pushFollow(FOLLOW_typeQualifierList_in_pointer2977);
+					typeQualifierList145=typeQualifierList();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_typeQualifierList.add(typeQualifierList143.getTree());
+					if ( state.backtracking==0 ) stream_typeQualifierList.add(typeQualifierList145.getTree());
 					}
 					break;
 
@@ -6273,13 +6412,13 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 539:32: -> ^( POINTER ( typeQualifierList )? )
+			// 544:32: -> ^( POINTER ( typeQualifierList )? )
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:539:35: ^( POINTER ( typeQualifierList )? )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:544:35: ^( POINTER ( typeQualifierList )? )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.nil();
 				root_1 = (CommonTree)adaptor.becomeRoot(stream_POINTER.nextNode(), root_1);
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:539:45: ( typeQualifierList )?
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:544:45: ( typeQualifierList )?
 				if ( stream_typeQualifierList.hasNext() ) {
 					adaptor.addChild(root_1, stream_typeQualifierList.nextTree());
 				}
@@ -6324,53 +6463,53 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "typeQualifierList"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:542:1: typeQualifierList : ( typeQualifier )+ ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:547:1: typeQualifierList : ( typeQualifier )+ ;
 	public final CTFParser.typeQualifierList_return typeQualifierList() throws RecognitionException {
 		CTFParser.typeQualifierList_return retval = new CTFParser.typeQualifierList_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		ParserRuleReturnScope typeQualifier144 =null;
+		ParserRuleReturnScope typeQualifier146 =null;
 
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:543:3: ( ( typeQualifier )+ )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:543:5: ( typeQualifier )+
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:548:3: ( ( typeQualifier )+ )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:548:5: ( typeQualifier )+
 			{
 			root_0 = (CommonTree)adaptor.nil();
 
 
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:543:5: ( typeQualifier )+
-			int cnt47=0;
-			loop47:
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:548:5: ( typeQualifier )+
+			int cnt48=0;
+			loop48:
 			while (true) {
-				int alt47=2;
-				int LA47_0 = input.LA(1);
-				if ( (LA47_0==CONSTTOK) ) {
-					alt47=1;
+				int alt48=2;
+				int LA48_0 = input.LA(1);
+				if ( (LA48_0==CONSTTOK) ) {
+					alt48=1;
 				}
 
-				switch (alt47) {
+				switch (alt48) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:543:5: typeQualifier
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:548:5: typeQualifier
 					{
-					pushFollow(FOLLOW_typeQualifier_in_typeQualifierList2956);
-					typeQualifier144=typeQualifier();
+					pushFollow(FOLLOW_typeQualifier_in_typeQualifierList3000);
+					typeQualifier146=typeQualifier();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) adaptor.addChild(root_0, typeQualifier144.getTree());
+					if ( state.backtracking==0 ) adaptor.addChild(root_0, typeQualifier146.getTree());
 
 					}
 					break;
 
 				default :
-					if ( cnt47 >= 1 ) break loop47;
+					if ( cnt48 >= 1 ) break loop48;
 					if (state.backtracking>0) {state.failed=true; return retval;}
-					EarlyExitException eee = new EarlyExitException(47, input);
+					EarlyExitException eee = new EarlyExitException(48, input);
 					throw eee;
 				}
-				cnt47++;
+				cnt48++;
 			}
 
 			}
@@ -6403,20 +6542,20 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "typedefName"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:546:1: typedefName :{...}? IDENTIFIER ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:551:1: typedefName :{...}? IDENTIFIER ;
 	public final CTFParser.typedefName_return typedefName() throws RecognitionException {
 		CTFParser.typedefName_return retval = new CTFParser.typedefName_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token IDENTIFIER145=null;
+		Token IDENTIFIER147=null;
 
-		CommonTree IDENTIFIER145_tree=null;
+		CommonTree IDENTIFIER147_tree=null;
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:547:3: ({...}? IDENTIFIER )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:547:5: {...}? IDENTIFIER
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:552:3: ({...}? IDENTIFIER )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:552:5: {...}? IDENTIFIER
 			{
 			root_0 = (CommonTree)adaptor.nil();
 
@@ -6425,13 +6564,13 @@ public class CTFParser extends Parser {
 				if (state.backtracking>0) {state.failed=true; return retval;}
 				throw new FailedPredicateException(input, "typedefName", "inTypealiasAlias() || isTypeName(input.LT(1).getText())");
 			}
-			IDENTIFIER145=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_typedefName2972); if (state.failed) return retval;
+			IDENTIFIER147=(Token)match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_typedefName3016); if (state.failed) return retval;
 			if ( state.backtracking==0 ) {
-			IDENTIFIER145_tree = (CommonTree)adaptor.create(IDENTIFIER145);
-			adaptor.addChild(root_0, IDENTIFIER145_tree);
+			IDENTIFIER147_tree = (CommonTree)adaptor.create(IDENTIFIER147);
+			adaptor.addChild(root_0, IDENTIFIER147_tree);
 			}
 
-			if ( state.backtracking==0 ) { if ((inTypedef() || inTypealiasAlias()) && !isTypeName((IDENTIFIER145!=null?IDENTIFIER145.getText():null))) { addTypeName((IDENTIFIER145!=null?IDENTIFIER145.getText():null)); } }
+			if ( state.backtracking==0 ) { if ((inTypedef() || inTypealiasAlias()) && !isTypeName((IDENTIFIER147!=null?IDENTIFIER147.getText():null))) { addTypeName((IDENTIFIER147!=null?IDENTIFIER147.getText():null)); } }
 			}
 
 			retval.stop = input.LT(-1);
@@ -6462,45 +6601,45 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "typealiasTarget"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:556:1: typealiasTarget : declarationSpecifiers ( abstractDeclaratorList )? ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:561:1: typealiasTarget : declarationSpecifiers ( abstractDeclaratorList )? ;
 	public final CTFParser.typealiasTarget_return typealiasTarget() throws RecognitionException {
 		CTFParser.typealiasTarget_return retval = new CTFParser.typealiasTarget_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		ParserRuleReturnScope declarationSpecifiers146 =null;
-		ParserRuleReturnScope abstractDeclaratorList147 =null;
+		ParserRuleReturnScope declarationSpecifiers148 =null;
+		ParserRuleReturnScope abstractDeclaratorList149 =null;
 
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:557:3: ( declarationSpecifiers ( abstractDeclaratorList )? )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:557:5: declarationSpecifiers ( abstractDeclaratorList )?
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:562:3: ( declarationSpecifiers ( abstractDeclaratorList )? )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:562:5: declarationSpecifiers ( abstractDeclaratorList )?
 			{
 			root_0 = (CommonTree)adaptor.nil();
 
 
-			pushFollow(FOLLOW_declarationSpecifiers_in_typealiasTarget2989);
-			declarationSpecifiers146=declarationSpecifiers();
+			pushFollow(FOLLOW_declarationSpecifiers_in_typealiasTarget3033);
+			declarationSpecifiers148=declarationSpecifiers();
 			state._fsp--;
 			if (state.failed) return retval;
-			if ( state.backtracking==0 ) adaptor.addChild(root_0, declarationSpecifiers146.getTree());
+			if ( state.backtracking==0 ) adaptor.addChild(root_0, declarationSpecifiers148.getTree());
 
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:557:27: ( abstractDeclaratorList )?
-			int alt48=2;
-			int LA48_0 = input.LA(1);
-			if ( (LA48_0==IDENTIFIER||LA48_0==LPAREN||LA48_0==POINTER) ) {
-				alt48=1;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:562:27: ( abstractDeclaratorList )?
+			int alt49=2;
+			int LA49_0 = input.LA(1);
+			if ( (LA49_0==IDENTIFIER||LA49_0==LPAREN||LA49_0==POINTER) ) {
+				alt49=1;
 			}
-			switch (alt48) {
+			switch (alt49) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:557:27: abstractDeclaratorList
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:562:27: abstractDeclaratorList
 					{
-					pushFollow(FOLLOW_abstractDeclaratorList_in_typealiasTarget2991);
-					abstractDeclaratorList147=abstractDeclaratorList();
+					pushFollow(FOLLOW_abstractDeclaratorList_in_typealiasTarget3035);
+					abstractDeclaratorList149=abstractDeclaratorList();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) adaptor.addChild(root_0, abstractDeclaratorList147.getTree());
+					if ( state.backtracking==0 ) adaptor.addChild(root_0, abstractDeclaratorList149.getTree());
 
 					}
 					break;
@@ -6537,39 +6676,39 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "typealiasAlias"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:566:1: typealiasAlias : ( abstractDeclaratorList | declarationSpecifiers ( abstractDeclaratorList )? );
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:571:1: typealiasAlias : ( abstractDeclaratorList | declarationSpecifiers ( abstractDeclaratorList )? );
 	public final CTFParser.typealiasAlias_return typealiasAlias() throws RecognitionException {
 		CTFParser.typealiasAlias_return retval = new CTFParser.typealiasAlias_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		ParserRuleReturnScope abstractDeclaratorList148 =null;
-		ParserRuleReturnScope declarationSpecifiers149 =null;
 		ParserRuleReturnScope abstractDeclaratorList150 =null;
+		ParserRuleReturnScope declarationSpecifiers151 =null;
+		ParserRuleReturnScope abstractDeclaratorList152 =null;
 
 
 
 		    typealiasAliasOn();
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:573:3: ( abstractDeclaratorList | declarationSpecifiers ( abstractDeclaratorList )? )
-			int alt50=2;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:578:3: ( abstractDeclaratorList | declarationSpecifiers ( abstractDeclaratorList )? )
+			int alt51=2;
 			switch ( input.LA(1) ) {
 			case LPAREN:
 			case POINTER:
 				{
-				alt50=1;
+				alt51=1;
 				}
 				break;
 			case IDENTIFIER:
 				{
-				int LA50_2 = input.LA(2);
+				int LA51_2 = input.LA(2);
 				if ( (!(((( inTypealiasAlias() || isTypeName(input.LT(1).getText()) )&&(inTypealiasAlias() || isTypeName(input.LT(1).getText())))))) ) {
-					alt50=1;
+					alt51=1;
 				}
 				else if ( ((( inTypealiasAlias() || isTypeName(input.LT(1).getText()) )&&(inTypealiasAlias() || isTypeName(input.LT(1).getText())))) ) {
-					alt50=2;
+					alt51=2;
 				}
 
 				else {
@@ -6578,7 +6717,7 @@ public class CTFParser extends Parser {
 					try {
 						input.consume();
 						NoViableAltException nvae =
-							new NoViableAltException("", 50, 2, input);
+							new NoViableAltException("", 51, 2, input);
 						throw nvae;
 					} finally {
 						input.rewind(nvaeMark);
@@ -6608,57 +6747,57 @@ public class CTFParser extends Parser {
 			case VARIANTTOK:
 			case VOIDTOK:
 				{
-				alt50=2;
+				alt51=2;
 				}
 				break;
 			default:
 				if (state.backtracking>0) {state.failed=true; return retval;}
 				NoViableAltException nvae =
-					new NoViableAltException("", 50, 0, input);
+					new NoViableAltException("", 51, 0, input);
 				throw nvae;
 			}
-			switch (alt50) {
+			switch (alt51) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:573:5: abstractDeclaratorList
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:578:5: abstractDeclaratorList
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					pushFollow(FOLLOW_abstractDeclaratorList_in_typealiasAlias3017);
-					abstractDeclaratorList148=abstractDeclaratorList();
+					pushFollow(FOLLOW_abstractDeclaratorList_in_typealiasAlias3061);
+					abstractDeclaratorList150=abstractDeclaratorList();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) adaptor.addChild(root_0, abstractDeclaratorList148.getTree());
+					if ( state.backtracking==0 ) adaptor.addChild(root_0, abstractDeclaratorList150.getTree());
 
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:574:5: declarationSpecifiers ( abstractDeclaratorList )?
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:579:5: declarationSpecifiers ( abstractDeclaratorList )?
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					pushFollow(FOLLOW_declarationSpecifiers_in_typealiasAlias3023);
-					declarationSpecifiers149=declarationSpecifiers();
+					pushFollow(FOLLOW_declarationSpecifiers_in_typealiasAlias3067);
+					declarationSpecifiers151=declarationSpecifiers();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) adaptor.addChild(root_0, declarationSpecifiers149.getTree());
+					if ( state.backtracking==0 ) adaptor.addChild(root_0, declarationSpecifiers151.getTree());
 
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:574:27: ( abstractDeclaratorList )?
-					int alt49=2;
-					int LA49_0 = input.LA(1);
-					if ( (LA49_0==IDENTIFIER||LA49_0==LPAREN||LA49_0==POINTER) ) {
-						alt49=1;
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:579:27: ( abstractDeclaratorList )?
+					int alt50=2;
+					int LA50_0 = input.LA(1);
+					if ( (LA50_0==IDENTIFIER||LA50_0==LPAREN||LA50_0==POINTER) ) {
+						alt50=1;
 					}
-					switch (alt49) {
+					switch (alt50) {
 						case 1 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:574:27: abstractDeclaratorList
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:579:27: abstractDeclaratorList
 							{
-							pushFollow(FOLLOW_abstractDeclaratorList_in_typealiasAlias3025);
-							abstractDeclaratorList150=abstractDeclaratorList();
+							pushFollow(FOLLOW_abstractDeclaratorList_in_typealiasAlias3069);
+							abstractDeclaratorList152=abstractDeclaratorList();
 							state._fsp--;
 							if (state.failed) return retval;
-							if ( state.backtracking==0 ) adaptor.addChild(root_0, abstractDeclaratorList150.getTree());
+							if ( state.backtracking==0 ) adaptor.addChild(root_0, abstractDeclaratorList152.getTree());
 
 							}
 							break;
@@ -6700,47 +6839,47 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "typealiasDecl"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:577:1: typealiasDecl : TYPEALIASTOK typealiasTarget TYPE_ASSIGNMENT typealiasAlias -> ^( TYPEALIAS ^( TYPEALIAS_TARGET typealiasTarget ) ^( TYPEALIAS_ALIAS typealiasAlias ) ) ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:582:1: typealiasDecl : TYPEALIASTOK typealiasTarget TYPE_ASSIGNMENT typealiasAlias -> ^( TYPEALIAS ^( TYPEALIAS_TARGET typealiasTarget ) ^( TYPEALIAS_ALIAS typealiasAlias ) ) ;
 	public final CTFParser.typealiasDecl_return typealiasDecl() throws RecognitionException {
 		CTFParser.typealiasDecl_return retval = new CTFParser.typealiasDecl_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token TYPEALIASTOK151=null;
-		Token TYPE_ASSIGNMENT153=null;
-		ParserRuleReturnScope typealiasTarget152 =null;
-		ParserRuleReturnScope typealiasAlias154 =null;
+		Token TYPEALIASTOK153=null;
+		Token TYPE_ASSIGNMENT155=null;
+		ParserRuleReturnScope typealiasTarget154 =null;
+		ParserRuleReturnScope typealiasAlias156 =null;
 
-		CommonTree TYPEALIASTOK151_tree=null;
-		CommonTree TYPE_ASSIGNMENT153_tree=null;
+		CommonTree TYPEALIASTOK153_tree=null;
+		CommonTree TYPE_ASSIGNMENT155_tree=null;
 		RewriteRuleTokenStream stream_TYPE_ASSIGNMENT=new RewriteRuleTokenStream(adaptor,"token TYPE_ASSIGNMENT");
 		RewriteRuleTokenStream stream_TYPEALIASTOK=new RewriteRuleTokenStream(adaptor,"token TYPEALIASTOK");
 		RewriteRuleSubtreeStream stream_typealiasAlias=new RewriteRuleSubtreeStream(adaptor,"rule typealiasAlias");
 		RewriteRuleSubtreeStream stream_typealiasTarget=new RewriteRuleSubtreeStream(adaptor,"rule typealiasTarget");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:578:3: ( TYPEALIASTOK typealiasTarget TYPE_ASSIGNMENT typealiasAlias -> ^( TYPEALIAS ^( TYPEALIAS_TARGET typealiasTarget ) ^( TYPEALIAS_ALIAS typealiasAlias ) ) )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:578:5: TYPEALIASTOK typealiasTarget TYPE_ASSIGNMENT typealiasAlias
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:583:3: ( TYPEALIASTOK typealiasTarget TYPE_ASSIGNMENT typealiasAlias -> ^( TYPEALIAS ^( TYPEALIAS_TARGET typealiasTarget ) ^( TYPEALIAS_ALIAS typealiasAlias ) ) )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:583:5: TYPEALIASTOK typealiasTarget TYPE_ASSIGNMENT typealiasAlias
 			{
-			TYPEALIASTOK151=(Token)match(input,TYPEALIASTOK,FOLLOW_TYPEALIASTOK_in_typealiasDecl3039); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_TYPEALIASTOK.add(TYPEALIASTOK151);
+			TYPEALIASTOK153=(Token)match(input,TYPEALIASTOK,FOLLOW_TYPEALIASTOK_in_typealiasDecl3083); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_TYPEALIASTOK.add(TYPEALIASTOK153);
 
-			pushFollow(FOLLOW_typealiasTarget_in_typealiasDecl3041);
-			typealiasTarget152=typealiasTarget();
+			pushFollow(FOLLOW_typealiasTarget_in_typealiasDecl3085);
+			typealiasTarget154=typealiasTarget();
 			state._fsp--;
 			if (state.failed) return retval;
-			if ( state.backtracking==0 ) stream_typealiasTarget.add(typealiasTarget152.getTree());
-			TYPE_ASSIGNMENT153=(Token)match(input,TYPE_ASSIGNMENT,FOLLOW_TYPE_ASSIGNMENT_in_typealiasDecl3043); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_TYPE_ASSIGNMENT.add(TYPE_ASSIGNMENT153);
+			if ( state.backtracking==0 ) stream_typealiasTarget.add(typealiasTarget154.getTree());
+			TYPE_ASSIGNMENT155=(Token)match(input,TYPE_ASSIGNMENT,FOLLOW_TYPE_ASSIGNMENT_in_typealiasDecl3087); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_TYPE_ASSIGNMENT.add(TYPE_ASSIGNMENT155);
 
-			pushFollow(FOLLOW_typealiasAlias_in_typealiasDecl3045);
-			typealiasAlias154=typealiasAlias();
+			pushFollow(FOLLOW_typealiasAlias_in_typealiasDecl3089);
+			typealiasAlias156=typealiasAlias();
 			state._fsp--;
 			if (state.failed) return retval;
-			if ( state.backtracking==0 ) stream_typealiasAlias.add(typealiasAlias154.getTree());
+			if ( state.backtracking==0 ) stream_typealiasAlias.add(typealiasAlias156.getTree());
 			// AST REWRITE
-			// elements: typealiasTarget, typealiasAlias
+			// elements: typealiasAlias, typealiasTarget
 			// token labels: 
 			// rule labels: retval
 			// token list labels: 
@@ -6751,13 +6890,13 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 579:7: -> ^( TYPEALIAS ^( TYPEALIAS_TARGET typealiasTarget ) ^( TYPEALIAS_ALIAS typealiasAlias ) )
+			// 584:7: -> ^( TYPEALIAS ^( TYPEALIAS_TARGET typealiasTarget ) ^( TYPEALIAS_ALIAS typealiasAlias ) )
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:579:10: ^( TYPEALIAS ^( TYPEALIAS_TARGET typealiasTarget ) ^( TYPEALIAS_ALIAS typealiasAlias ) )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:584:10: ^( TYPEALIAS ^( TYPEALIAS_TARGET typealiasTarget ) ^( TYPEALIAS_ALIAS typealiasAlias ) )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.nil();
 				root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(TYPEALIAS, "TYPEALIAS"), root_1);
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:580:14: ^( TYPEALIAS_TARGET typealiasTarget )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:585:14: ^( TYPEALIAS_TARGET typealiasTarget )
 				{
 				CommonTree root_2 = (CommonTree)adaptor.nil();
 				root_2 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(TYPEALIAS_TARGET, "TYPEALIAS_TARGET"), root_2);
@@ -6765,7 +6904,7 @@ public class CTFParser extends Parser {
 				adaptor.addChild(root_1, root_2);
 				}
 
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:581:14: ^( TYPEALIAS_ALIAS typealiasAlias )
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:586:14: ^( TYPEALIAS_ALIAS typealiasAlias )
 				{
 				CommonTree root_2 = (CommonTree)adaptor.nil();
 				root_2 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(TYPEALIAS_ALIAS, "TYPEALIAS_ALIAS"), root_2);
@@ -6812,28 +6951,28 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "ctfKeyword"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:587:1: ctfKeyword : ( ALIGNTOK | EVENTTOK | SIGNEDTOK | STRINGTOK );
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:592:1: ctfKeyword : ( ALIGNTOK | EVENTTOK | SIGNEDTOK | STRINGTOK );
 	public final CTFParser.ctfKeyword_return ctfKeyword() throws RecognitionException {
 		CTFParser.ctfKeyword_return retval = new CTFParser.ctfKeyword_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token set155=null;
+		Token set157=null;
 
-		CommonTree set155_tree=null;
+		CommonTree set157_tree=null;
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:588:3: ( ALIGNTOK | EVENTTOK | SIGNEDTOK | STRINGTOK )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:593:3: ( ALIGNTOK | EVENTTOK | SIGNEDTOK | STRINGTOK )
 			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:
 			{
 			root_0 = (CommonTree)adaptor.nil();
 
 
-			set155=input.LT(1);
+			set157=input.LT(1);
 			if ( input.LA(1)==ALIGNTOK||input.LA(1)==EVENTTOK||input.LA(1)==SIGNEDTOK||input.LA(1)==STRINGTOK ) {
 				input.consume();
-				if ( state.backtracking==0 ) adaptor.addChild(root_0, (CommonTree)adaptor.create(set155));
+				if ( state.backtracking==0 ) adaptor.addChild(root_0, (CommonTree)adaptor.create(set157));
 				state.errorRecovery=false;
 				state.failed=false;
 			}
@@ -6872,55 +7011,55 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "ctfSpecifier"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:594:1: ctfSpecifier : ( ctfSpecifierHead ctfBody -> ^( ctfSpecifierHead ctfBody ) | typealiasDecl -> ^( DECLARATION typealiasDecl ) );
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:599:1: ctfSpecifier : ( ctfSpecifierHead ctfBody -> ^( ctfSpecifierHead ctfBody ) | typealiasDecl -> ^( DECLARATION typealiasDecl ) );
 	public final CTFParser.ctfSpecifier_return ctfSpecifier() throws RecognitionException {
 		CTFParser.ctfSpecifier_return retval = new CTFParser.ctfSpecifier_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		ParserRuleReturnScope ctfSpecifierHead156 =null;
-		ParserRuleReturnScope ctfBody157 =null;
-		ParserRuleReturnScope typealiasDecl158 =null;
+		ParserRuleReturnScope ctfSpecifierHead158 =null;
+		ParserRuleReturnScope ctfBody159 =null;
+		ParserRuleReturnScope typealiasDecl160 =null;
 
 		RewriteRuleSubtreeStream stream_ctfSpecifierHead=new RewriteRuleSubtreeStream(adaptor,"rule ctfSpecifierHead");
 		RewriteRuleSubtreeStream stream_typealiasDecl=new RewriteRuleSubtreeStream(adaptor,"rule typealiasDecl");
 		RewriteRuleSubtreeStream stream_ctfBody=new RewriteRuleSubtreeStream(adaptor,"rule ctfBody");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:596:3: ( ctfSpecifierHead ctfBody -> ^( ctfSpecifierHead ctfBody ) | typealiasDecl -> ^( DECLARATION typealiasDecl ) )
-			int alt51=2;
-			int LA51_0 = input.LA(1);
-			if ( (LA51_0==CALLSITETOK||LA51_0==CLOCKTOK||LA51_0==ENVTOK||LA51_0==EVENTTOK||LA51_0==STREAMTOK||LA51_0==TRACETOK) ) {
-				alt51=1;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:601:3: ( ctfSpecifierHead ctfBody -> ^( ctfSpecifierHead ctfBody ) | typealiasDecl -> ^( DECLARATION typealiasDecl ) )
+			int alt52=2;
+			int LA52_0 = input.LA(1);
+			if ( (LA52_0==CALLSITETOK||LA52_0==CLOCKTOK||LA52_0==ENVTOK||LA52_0==EVENTTOK||LA52_0==STREAMTOK||LA52_0==TRACETOK) ) {
+				alt52=1;
 			}
-			else if ( (LA51_0==TYPEALIASTOK) ) {
-				alt51=2;
+			else if ( (LA52_0==TYPEALIASTOK) ) {
+				alt52=2;
 			}
 
 			else {
 				if (state.backtracking>0) {state.failed=true; return retval;}
 				NoViableAltException nvae =
-					new NoViableAltException("", 51, 0, input);
+					new NoViableAltException("", 52, 0, input);
 				throw nvae;
 			}
 
-			switch (alt51) {
+			switch (alt52) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:596:5: ctfSpecifierHead ctfBody
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:601:5: ctfSpecifierHead ctfBody
 					{
-					pushFollow(FOLLOW_ctfSpecifierHead_in_ctfSpecifier3145);
-					ctfSpecifierHead156=ctfSpecifierHead();
+					pushFollow(FOLLOW_ctfSpecifierHead_in_ctfSpecifier3189);
+					ctfSpecifierHead158=ctfSpecifierHead();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_ctfSpecifierHead.add(ctfSpecifierHead156.getTree());
-					pushFollow(FOLLOW_ctfBody_in_ctfSpecifier3147);
-					ctfBody157=ctfBody();
+					if ( state.backtracking==0 ) stream_ctfSpecifierHead.add(ctfSpecifierHead158.getTree());
+					pushFollow(FOLLOW_ctfBody_in_ctfSpecifier3191);
+					ctfBody159=ctfBody();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_ctfBody.add(ctfBody157.getTree());
+					if ( state.backtracking==0 ) stream_ctfBody.add(ctfBody159.getTree());
 					// AST REWRITE
-					// elements: ctfSpecifierHead, ctfBody
+					// elements: ctfBody, ctfSpecifierHead
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -6931,9 +7070,9 @@ public class CTFParser extends Parser {
 					RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 					root_0 = (CommonTree)adaptor.nil();
-					// 596:30: -> ^( ctfSpecifierHead ctfBody )
+					// 601:30: -> ^( ctfSpecifierHead ctfBody )
 					{
-						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:596:33: ^( ctfSpecifierHead ctfBody )
+						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:601:33: ^( ctfSpecifierHead ctfBody )
 						{
 						CommonTree root_1 = (CommonTree)adaptor.nil();
 						root_1 = (CommonTree)adaptor.becomeRoot(stream_ctfSpecifierHead.nextNode(), root_1);
@@ -6950,13 +7089,13 @@ public class CTFParser extends Parser {
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:598:5: typealiasDecl
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:603:5: typealiasDecl
 					{
-					pushFollow(FOLLOW_typealiasDecl_in_ctfSpecifier3164);
-					typealiasDecl158=typealiasDecl();
+					pushFollow(FOLLOW_typealiasDecl_in_ctfSpecifier3208);
+					typealiasDecl160=typealiasDecl();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_typealiasDecl.add(typealiasDecl158.getTree());
+					if ( state.backtracking==0 ) stream_typealiasDecl.add(typealiasDecl160.getTree());
 					// AST REWRITE
 					// elements: typealiasDecl
 					// token labels: 
@@ -6969,9 +7108,9 @@ public class CTFParser extends Parser {
 					RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 					root_0 = (CommonTree)adaptor.nil();
-					// 598:19: -> ^( DECLARATION typealiasDecl )
+					// 603:19: -> ^( DECLARATION typealiasDecl )
 					{
-						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:598:22: ^( DECLARATION typealiasDecl )
+						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:603:22: ^( DECLARATION typealiasDecl )
 						{
 						CommonTree root_1 = (CommonTree)adaptor.nil();
 						root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(DECLARATION, "DECLARATION"), root_1);
@@ -7017,26 +7156,26 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "ctfSpecifierHead"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:601:1: ctfSpecifierHead : ( EVENTTOK -> EVENT | STREAMTOK -> STREAM | TRACETOK -> TRACE | ENVTOK -> ENV | CLOCKTOK -> CLOCK | CALLSITETOK -> CALLSITE );
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:606:1: ctfSpecifierHead : ( EVENTTOK -> EVENT | STREAMTOK -> STREAM | TRACETOK -> TRACE | ENVTOK -> ENV | CLOCKTOK -> CLOCK | CALLSITETOK -> CALLSITE );
 	public final CTFParser.ctfSpecifierHead_return ctfSpecifierHead() throws RecognitionException {
 		CTFParser.ctfSpecifierHead_return retval = new CTFParser.ctfSpecifierHead_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token EVENTTOK159=null;
-		Token STREAMTOK160=null;
-		Token TRACETOK161=null;
-		Token ENVTOK162=null;
-		Token CLOCKTOK163=null;
-		Token CALLSITETOK164=null;
+		Token EVENTTOK161=null;
+		Token STREAMTOK162=null;
+		Token TRACETOK163=null;
+		Token ENVTOK164=null;
+		Token CLOCKTOK165=null;
+		Token CALLSITETOK166=null;
 
-		CommonTree EVENTTOK159_tree=null;
-		CommonTree STREAMTOK160_tree=null;
-		CommonTree TRACETOK161_tree=null;
-		CommonTree ENVTOK162_tree=null;
-		CommonTree CLOCKTOK163_tree=null;
-		CommonTree CALLSITETOK164_tree=null;
+		CommonTree EVENTTOK161_tree=null;
+		CommonTree STREAMTOK162_tree=null;
+		CommonTree TRACETOK163_tree=null;
+		CommonTree ENVTOK164_tree=null;
+		CommonTree CLOCKTOK165_tree=null;
+		CommonTree CALLSITETOK166_tree=null;
 		RewriteRuleTokenStream stream_EVENTTOK=new RewriteRuleTokenStream(adaptor,"token EVENTTOK");
 		RewriteRuleTokenStream stream_CALLSITETOK=new RewriteRuleTokenStream(adaptor,"token CALLSITETOK");
 		RewriteRuleTokenStream stream_STREAMTOK=new RewriteRuleTokenStream(adaptor,"token STREAMTOK");
@@ -7045,51 +7184,51 @@ public class CTFParser extends Parser {
 		RewriteRuleTokenStream stream_TRACETOK=new RewriteRuleTokenStream(adaptor,"token TRACETOK");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:602:3: ( EVENTTOK -> EVENT | STREAMTOK -> STREAM | TRACETOK -> TRACE | ENVTOK -> ENV | CLOCKTOK -> CLOCK | CALLSITETOK -> CALLSITE )
-			int alt52=6;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:607:3: ( EVENTTOK -> EVENT | STREAMTOK -> STREAM | TRACETOK -> TRACE | ENVTOK -> ENV | CLOCKTOK -> CLOCK | CALLSITETOK -> CALLSITE )
+			int alt53=6;
 			switch ( input.LA(1) ) {
 			case EVENTTOK:
 				{
-				alt52=1;
+				alt53=1;
 				}
 				break;
 			case STREAMTOK:
 				{
-				alt52=2;
+				alt53=2;
 				}
 				break;
 			case TRACETOK:
 				{
-				alt52=3;
+				alt53=3;
 				}
 				break;
 			case ENVTOK:
 				{
-				alt52=4;
+				alt53=4;
 				}
 				break;
 			case CLOCKTOK:
 				{
-				alt52=5;
+				alt53=5;
 				}
 				break;
 			case CALLSITETOK:
 				{
-				alt52=6;
+				alt53=6;
 				}
 				break;
 			default:
 				if (state.backtracking>0) {state.failed=true; return retval;}
 				NoViableAltException nvae =
-					new NoViableAltException("", 52, 0, input);
+					new NoViableAltException("", 53, 0, input);
 				throw nvae;
 			}
-			switch (alt52) {
+			switch (alt53) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:602:5: EVENTTOK
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:607:5: EVENTTOK
 					{
-					EVENTTOK159=(Token)match(input,EVENTTOK,FOLLOW_EVENTTOK_in_ctfSpecifierHead3185); if (state.failed) return retval; 
-					if ( state.backtracking==0 ) stream_EVENTTOK.add(EVENTTOK159);
+					EVENTTOK161=(Token)match(input,EVENTTOK,FOLLOW_EVENTTOK_in_ctfSpecifierHead3229); if (state.failed) return retval; 
+					if ( state.backtracking==0 ) stream_EVENTTOK.add(EVENTTOK161);
 
 					// AST REWRITE
 					// elements: 
@@ -7103,7 +7242,7 @@ public class CTFParser extends Parser {
 					RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 					root_0 = (CommonTree)adaptor.nil();
-					// 602:14: -> EVENT
+					// 607:14: -> EVENT
 					{
 						adaptor.addChild(root_0, (CommonTree)adaptor.create(EVENT, "EVENT"));
 					}
@@ -7115,10 +7254,10 @@ public class CTFParser extends Parser {
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:603:5: STREAMTOK
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:608:5: STREAMTOK
 					{
-					STREAMTOK160=(Token)match(input,STREAMTOK,FOLLOW_STREAMTOK_in_ctfSpecifierHead3195); if (state.failed) return retval; 
-					if ( state.backtracking==0 ) stream_STREAMTOK.add(STREAMTOK160);
+					STREAMTOK162=(Token)match(input,STREAMTOK,FOLLOW_STREAMTOK_in_ctfSpecifierHead3239); if (state.failed) return retval; 
+					if ( state.backtracking==0 ) stream_STREAMTOK.add(STREAMTOK162);
 
 					// AST REWRITE
 					// elements: 
@@ -7132,7 +7271,7 @@ public class CTFParser extends Parser {
 					RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 					root_0 = (CommonTree)adaptor.nil();
-					// 603:15: -> STREAM
+					// 608:15: -> STREAM
 					{
 						adaptor.addChild(root_0, (CommonTree)adaptor.create(STREAM, "STREAM"));
 					}
@@ -7144,10 +7283,10 @@ public class CTFParser extends Parser {
 					}
 					break;
 				case 3 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:604:5: TRACETOK
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:609:5: TRACETOK
 					{
-					TRACETOK161=(Token)match(input,TRACETOK,FOLLOW_TRACETOK_in_ctfSpecifierHead3205); if (state.failed) return retval; 
-					if ( state.backtracking==0 ) stream_TRACETOK.add(TRACETOK161);
+					TRACETOK163=(Token)match(input,TRACETOK,FOLLOW_TRACETOK_in_ctfSpecifierHead3249); if (state.failed) return retval; 
+					if ( state.backtracking==0 ) stream_TRACETOK.add(TRACETOK163);
 
 					// AST REWRITE
 					// elements: 
@@ -7161,7 +7300,7 @@ public class CTFParser extends Parser {
 					RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 					root_0 = (CommonTree)adaptor.nil();
-					// 604:14: -> TRACE
+					// 609:14: -> TRACE
 					{
 						adaptor.addChild(root_0, (CommonTree)adaptor.create(TRACE, "TRACE"));
 					}
@@ -7173,10 +7312,10 @@ public class CTFParser extends Parser {
 					}
 					break;
 				case 4 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:605:5: ENVTOK
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:610:5: ENVTOK
 					{
-					ENVTOK162=(Token)match(input,ENVTOK,FOLLOW_ENVTOK_in_ctfSpecifierHead3215); if (state.failed) return retval; 
-					if ( state.backtracking==0 ) stream_ENVTOK.add(ENVTOK162);
+					ENVTOK164=(Token)match(input,ENVTOK,FOLLOW_ENVTOK_in_ctfSpecifierHead3259); if (state.failed) return retval; 
+					if ( state.backtracking==0 ) stream_ENVTOK.add(ENVTOK164);
 
 					// AST REWRITE
 					// elements: 
@@ -7190,7 +7329,7 @@ public class CTFParser extends Parser {
 					RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 					root_0 = (CommonTree)adaptor.nil();
-					// 605:12: -> ENV
+					// 610:12: -> ENV
 					{
 						adaptor.addChild(root_0, (CommonTree)adaptor.create(ENV, "ENV"));
 					}
@@ -7202,10 +7341,10 @@ public class CTFParser extends Parser {
 					}
 					break;
 				case 5 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:606:5: CLOCKTOK
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:611:5: CLOCKTOK
 					{
-					CLOCKTOK163=(Token)match(input,CLOCKTOK,FOLLOW_CLOCKTOK_in_ctfSpecifierHead3225); if (state.failed) return retval; 
-					if ( state.backtracking==0 ) stream_CLOCKTOK.add(CLOCKTOK163);
+					CLOCKTOK165=(Token)match(input,CLOCKTOK,FOLLOW_CLOCKTOK_in_ctfSpecifierHead3269); if (state.failed) return retval; 
+					if ( state.backtracking==0 ) stream_CLOCKTOK.add(CLOCKTOK165);
 
 					// AST REWRITE
 					// elements: 
@@ -7219,7 +7358,7 @@ public class CTFParser extends Parser {
 					RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 					root_0 = (CommonTree)adaptor.nil();
-					// 606:14: -> CLOCK
+					// 611:14: -> CLOCK
 					{
 						adaptor.addChild(root_0, (CommonTree)adaptor.create(CLOCK, "CLOCK"));
 					}
@@ -7231,10 +7370,10 @@ public class CTFParser extends Parser {
 					}
 					break;
 				case 6 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:607:5: CALLSITETOK
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:612:5: CALLSITETOK
 					{
-					CALLSITETOK164=(Token)match(input,CALLSITETOK,FOLLOW_CALLSITETOK_in_ctfSpecifierHead3235); if (state.failed) return retval; 
-					if ( state.backtracking==0 ) stream_CALLSITETOK.add(CALLSITETOK164);
+					CALLSITETOK166=(Token)match(input,CALLSITETOK,FOLLOW_CALLSITETOK_in_ctfSpecifierHead3279); if (state.failed) return retval; 
+					if ( state.backtracking==0 ) stream_CALLSITETOK.add(CALLSITETOK166);
 
 					// AST REWRITE
 					// elements: 
@@ -7248,7 +7387,7 @@ public class CTFParser extends Parser {
 					RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 					root_0 = (CommonTree)adaptor.nil();
-					// 607:17: -> CALLSITE
+					// 612:17: -> CALLSITE
 					{
 						adaptor.addChild(root_0, (CommonTree)adaptor.create(CALLSITE, "CALLSITE"));
 					}
@@ -7289,65 +7428,65 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "ctfTypeSpecifier"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:610:1: ctfTypeSpecifier : ( FLOATINGPOINTTOK ctfBody -> ^( FLOATING_POINT ( ctfBody )? ) | INTEGERTOK ctfBody -> ^( INTEGER ( ctfBody )? ) | STRINGTOK ( ctfBody )? -> ^( STRING ( ctfBody )? ) );
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:615:1: ctfTypeSpecifier : ( FLOATINGPOINTTOK ctfBody -> ^( FLOATING_POINT ( ctfBody )? ) | INTEGERTOK ctfBody -> ^( INTEGER ( ctfBody )? ) | STRINGTOK ( ctfBody )? -> ^( STRING ( ctfBody )? ) );
 	public final CTFParser.ctfTypeSpecifier_return ctfTypeSpecifier() throws RecognitionException {
 		CTFParser.ctfTypeSpecifier_return retval = new CTFParser.ctfTypeSpecifier_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token FLOATINGPOINTTOK165=null;
-		Token INTEGERTOK167=null;
-		Token STRINGTOK169=null;
-		ParserRuleReturnScope ctfBody166 =null;
+		Token FLOATINGPOINTTOK167=null;
+		Token INTEGERTOK169=null;
+		Token STRINGTOK171=null;
 		ParserRuleReturnScope ctfBody168 =null;
 		ParserRuleReturnScope ctfBody170 =null;
+		ParserRuleReturnScope ctfBody172 =null;
 
-		CommonTree FLOATINGPOINTTOK165_tree=null;
-		CommonTree INTEGERTOK167_tree=null;
-		CommonTree STRINGTOK169_tree=null;
+		CommonTree FLOATINGPOINTTOK167_tree=null;
+		CommonTree INTEGERTOK169_tree=null;
+		CommonTree STRINGTOK171_tree=null;
 		RewriteRuleTokenStream stream_FLOATINGPOINTTOK=new RewriteRuleTokenStream(adaptor,"token FLOATINGPOINTTOK");
 		RewriteRuleTokenStream stream_STRINGTOK=new RewriteRuleTokenStream(adaptor,"token STRINGTOK");
 		RewriteRuleTokenStream stream_INTEGERTOK=new RewriteRuleTokenStream(adaptor,"token INTEGERTOK");
 		RewriteRuleSubtreeStream stream_ctfBody=new RewriteRuleSubtreeStream(adaptor,"rule ctfBody");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:612:3: ( FLOATINGPOINTTOK ctfBody -> ^( FLOATING_POINT ( ctfBody )? ) | INTEGERTOK ctfBody -> ^( INTEGER ( ctfBody )? ) | STRINGTOK ( ctfBody )? -> ^( STRING ( ctfBody )? ) )
-			int alt54=3;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:617:3: ( FLOATINGPOINTTOK ctfBody -> ^( FLOATING_POINT ( ctfBody )? ) | INTEGERTOK ctfBody -> ^( INTEGER ( ctfBody )? ) | STRINGTOK ( ctfBody )? -> ^( STRING ( ctfBody )? ) )
+			int alt55=3;
 			switch ( input.LA(1) ) {
 			case FLOATINGPOINTTOK:
 				{
-				alt54=1;
+				alt55=1;
 				}
 				break;
 			case INTEGERTOK:
 				{
-				alt54=2;
+				alt55=2;
 				}
 				break;
 			case STRINGTOK:
 				{
-				alt54=3;
+				alt55=3;
 				}
 				break;
 			default:
 				if (state.backtracking>0) {state.failed=true; return retval;}
 				NoViableAltException nvae =
-					new NoViableAltException("", 54, 0, input);
+					new NoViableAltException("", 55, 0, input);
 				throw nvae;
 			}
-			switch (alt54) {
+			switch (alt55) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:612:5: FLOATINGPOINTTOK ctfBody
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:617:5: FLOATINGPOINTTOK ctfBody
 					{
-					FLOATINGPOINTTOK165=(Token)match(input,FLOATINGPOINTTOK,FOLLOW_FLOATINGPOINTTOK_in_ctfTypeSpecifier3258); if (state.failed) return retval; 
-					if ( state.backtracking==0 ) stream_FLOATINGPOINTTOK.add(FLOATINGPOINTTOK165);
+					FLOATINGPOINTTOK167=(Token)match(input,FLOATINGPOINTTOK,FOLLOW_FLOATINGPOINTTOK_in_ctfTypeSpecifier3302); if (state.failed) return retval; 
+					if ( state.backtracking==0 ) stream_FLOATINGPOINTTOK.add(FLOATINGPOINTTOK167);
 
-					pushFollow(FOLLOW_ctfBody_in_ctfTypeSpecifier3260);
-					ctfBody166=ctfBody();
+					pushFollow(FOLLOW_ctfBody_in_ctfTypeSpecifier3304);
+					ctfBody168=ctfBody();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_ctfBody.add(ctfBody166.getTree());
+					if ( state.backtracking==0 ) stream_ctfBody.add(ctfBody168.getTree());
 					// AST REWRITE
 					// elements: ctfBody
 					// token labels: 
@@ -7360,13 +7499,13 @@ public class CTFParser extends Parser {
 					RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 					root_0 = (CommonTree)adaptor.nil();
-					// 612:30: -> ^( FLOATING_POINT ( ctfBody )? )
+					// 617:30: -> ^( FLOATING_POINT ( ctfBody )? )
 					{
-						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:612:33: ^( FLOATING_POINT ( ctfBody )? )
+						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:617:33: ^( FLOATING_POINT ( ctfBody )? )
 						{
 						CommonTree root_1 = (CommonTree)adaptor.nil();
 						root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(FLOATING_POINT, "FLOATING_POINT"), root_1);
-						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:612:50: ( ctfBody )?
+						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:617:50: ( ctfBody )?
 						if ( stream_ctfBody.hasNext() ) {
 							adaptor.addChild(root_1, stream_ctfBody.nextTree());
 						}
@@ -7384,16 +7523,16 @@ public class CTFParser extends Parser {
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:613:5: INTEGERTOK ctfBody
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:618:5: INTEGERTOK ctfBody
 					{
-					INTEGERTOK167=(Token)match(input,INTEGERTOK,FOLLOW_INTEGERTOK_in_ctfTypeSpecifier3275); if (state.failed) return retval; 
-					if ( state.backtracking==0 ) stream_INTEGERTOK.add(INTEGERTOK167);
+					INTEGERTOK169=(Token)match(input,INTEGERTOK,FOLLOW_INTEGERTOK_in_ctfTypeSpecifier3319); if (state.failed) return retval; 
+					if ( state.backtracking==0 ) stream_INTEGERTOK.add(INTEGERTOK169);
 
-					pushFollow(FOLLOW_ctfBody_in_ctfTypeSpecifier3277);
-					ctfBody168=ctfBody();
+					pushFollow(FOLLOW_ctfBody_in_ctfTypeSpecifier3321);
+					ctfBody170=ctfBody();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_ctfBody.add(ctfBody168.getTree());
+					if ( state.backtracking==0 ) stream_ctfBody.add(ctfBody170.getTree());
 					// AST REWRITE
 					// elements: ctfBody
 					// token labels: 
@@ -7406,13 +7545,13 @@ public class CTFParser extends Parser {
 					RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 					root_0 = (CommonTree)adaptor.nil();
-					// 613:24: -> ^( INTEGER ( ctfBody )? )
+					// 618:24: -> ^( INTEGER ( ctfBody )? )
 					{
-						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:613:27: ^( INTEGER ( ctfBody )? )
+						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:618:27: ^( INTEGER ( ctfBody )? )
 						{
 						CommonTree root_1 = (CommonTree)adaptor.nil();
 						root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(INTEGER, "INTEGER"), root_1);
-						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:613:37: ( ctfBody )?
+						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:618:37: ( ctfBody )?
 						if ( stream_ctfBody.hasNext() ) {
 							adaptor.addChild(root_1, stream_ctfBody.nextTree());
 						}
@@ -7430,26 +7569,26 @@ public class CTFParser extends Parser {
 					}
 					break;
 				case 3 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:614:5: STRINGTOK ( ctfBody )?
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:619:5: STRINGTOK ( ctfBody )?
 					{
-					STRINGTOK169=(Token)match(input,STRINGTOK,FOLLOW_STRINGTOK_in_ctfTypeSpecifier3292); if (state.failed) return retval; 
-					if ( state.backtracking==0 ) stream_STRINGTOK.add(STRINGTOK169);
+					STRINGTOK171=(Token)match(input,STRINGTOK,FOLLOW_STRINGTOK_in_ctfTypeSpecifier3336); if (state.failed) return retval; 
+					if ( state.backtracking==0 ) stream_STRINGTOK.add(STRINGTOK171);
 
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:614:15: ( ctfBody )?
-					int alt53=2;
-					int LA53_0 = input.LA(1);
-					if ( (LA53_0==LCURL) ) {
-						alt53=1;
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:619:15: ( ctfBody )?
+					int alt54=2;
+					int LA54_0 = input.LA(1);
+					if ( (LA54_0==LCURL) ) {
+						alt54=1;
 					}
-					switch (alt53) {
+					switch (alt54) {
 						case 1 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:614:15: ctfBody
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:619:15: ctfBody
 							{
-							pushFollow(FOLLOW_ctfBody_in_ctfTypeSpecifier3294);
-							ctfBody170=ctfBody();
+							pushFollow(FOLLOW_ctfBody_in_ctfTypeSpecifier3338);
+							ctfBody172=ctfBody();
 							state._fsp--;
 							if (state.failed) return retval;
-							if ( state.backtracking==0 ) stream_ctfBody.add(ctfBody170.getTree());
+							if ( state.backtracking==0 ) stream_ctfBody.add(ctfBody172.getTree());
 							}
 							break;
 
@@ -7467,13 +7606,13 @@ public class CTFParser extends Parser {
 					RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 					root_0 = (CommonTree)adaptor.nil();
-					// 614:24: -> ^( STRING ( ctfBody )? )
+					// 619:24: -> ^( STRING ( ctfBody )? )
 					{
-						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:614:27: ^( STRING ( ctfBody )? )
+						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:619:27: ^( STRING ( ctfBody )? )
 						{
 						CommonTree root_1 = (CommonTree)adaptor.nil();
 						root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(STRING, "STRING"), root_1);
-						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:614:36: ( ctfBody )?
+						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:619:36: ( ctfBody )?
 						if ( stream_ctfBody.hasNext() ) {
 							adaptor.addChild(root_1, stream_ctfBody.nextTree());
 						}
@@ -7520,7 +7659,7 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "ctfBody"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:617:1: ctfBody : LCURL ( ctfAssignmentExpressionList )? RCURL -> ( ctfAssignmentExpressionList )? ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:622:1: ctfBody : LCURL ( ctfAssignmentExpressionList )? RCURL -> ( ctfAssignmentExpressionList )? ;
 	public final CTFParser.ctfBody_return ctfBody() throws RecognitionException {
 		Symbols_stack.push(new Symbols_scope());
 
@@ -7529,12 +7668,12 @@ public class CTFParser extends Parser {
 
 		CommonTree root_0 = null;
 
-		Token LCURL171=null;
-		Token RCURL173=null;
-		ParserRuleReturnScope ctfAssignmentExpressionList172 =null;
+		Token LCURL173=null;
+		Token RCURL175=null;
+		ParserRuleReturnScope ctfAssignmentExpressionList174 =null;
 
-		CommonTree LCURL171_tree=null;
-		CommonTree RCURL173_tree=null;
+		CommonTree LCURL173_tree=null;
+		CommonTree RCURL175_tree=null;
 		RewriteRuleTokenStream stream_LCURL=new RewriteRuleTokenStream(adaptor,"token LCURL");
 		RewriteRuleTokenStream stream_RCURL=new RewriteRuleTokenStream(adaptor,"token RCURL");
 		RewriteRuleSubtreeStream stream_ctfAssignmentExpressionList=new RewriteRuleSubtreeStream(adaptor,"rule ctfAssignmentExpressionList");
@@ -7543,34 +7682,34 @@ public class CTFParser extends Parser {
 		    Symbols_stack.peek().types = new HashSet<String>();
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:622:3: ( LCURL ( ctfAssignmentExpressionList )? RCURL -> ( ctfAssignmentExpressionList )? )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:622:5: LCURL ( ctfAssignmentExpressionList )? RCURL
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:627:3: ( LCURL ( ctfAssignmentExpressionList )? RCURL -> ( ctfAssignmentExpressionList )? )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:627:5: LCURL ( ctfAssignmentExpressionList )? RCURL
 			{
-			LCURL171=(Token)match(input,LCURL,FOLLOW_LCURL_in_ctfBody3327); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_LCURL.add(LCURL171);
+			LCURL173=(Token)match(input,LCURL,FOLLOW_LCURL_in_ctfBody3371); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_LCURL.add(LCURL173);
 
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:622:11: ( ctfAssignmentExpressionList )?
-			int alt55=2;
-			int LA55_0 = input.LA(1);
-			if ( (LA55_0==ALIGNTOK||(LA55_0 >= BOOLTOK && LA55_0 <= CHARTOK)||LA55_0==CLOCKTOK||(LA55_0 >= COMPLEXTOK && LA55_0 <= DECIMAL_LITERAL)||LA55_0==DOUBLETOK||(LA55_0 >= ENUMTOK && LA55_0 <= ENVTOK)||(LA55_0 >= EVENTTOK && LA55_0 <= FLOATTOK)||LA55_0==HEX_LITERAL||(LA55_0 >= IDENTIFIER && LA55_0 <= IMAGINARYTOK)||LA55_0==INTEGERTOK||LA55_0==INTTOK||LA55_0==LONGTOK||LA55_0==OCTAL_LITERAL||(LA55_0 >= SHORTTOK && LA55_0 <= SIGNEDTOK)||LA55_0==STREAMTOK||LA55_0==STRINGTOK||(LA55_0 >= STRING_LITERAL && LA55_0 <= STRUCTTOK)||(LA55_0 >= TRACETOK && LA55_0 <= TYPEDEFTOK)||(LA55_0 >= UNSIGNEDTOK && LA55_0 <= VOIDTOK)) ) {
-				alt55=1;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:627:11: ( ctfAssignmentExpressionList )?
+			int alt56=2;
+			int LA56_0 = input.LA(1);
+			if ( (LA56_0==ALIGNTOK||(LA56_0 >= BOOLTOK && LA56_0 <= CHARTOK)||LA56_0==CLOCKTOK||(LA56_0 >= COMPLEXTOK && LA56_0 <= DECIMAL_LITERAL)||LA56_0==DOUBLETOK||(LA56_0 >= ENUMTOK && LA56_0 <= ENVTOK)||(LA56_0 >= EVENTTOK && LA56_0 <= FLOATTOK)||LA56_0==HEX_LITERAL||(LA56_0 >= IDENTIFIER && LA56_0 <= IMAGINARYTOK)||LA56_0==INTEGERTOK||LA56_0==INTTOK||LA56_0==LONGTOK||LA56_0==OCTAL_LITERAL||(LA56_0 >= SHORTTOK && LA56_0 <= SIGNEDTOK)||LA56_0==STREAMTOK||LA56_0==STRINGTOK||(LA56_0 >= STRING_LITERAL && LA56_0 <= STRUCTTOK)||(LA56_0 >= TRACETOK && LA56_0 <= TYPEDEFTOK)||(LA56_0 >= UNSIGNEDTOK && LA56_0 <= VOIDTOK)) ) {
+				alt56=1;
 			}
-			switch (alt55) {
+			switch (alt56) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:622:11: ctfAssignmentExpressionList
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:627:11: ctfAssignmentExpressionList
 					{
-					pushFollow(FOLLOW_ctfAssignmentExpressionList_in_ctfBody3329);
-					ctfAssignmentExpressionList172=ctfAssignmentExpressionList();
+					pushFollow(FOLLOW_ctfAssignmentExpressionList_in_ctfBody3373);
+					ctfAssignmentExpressionList174=ctfAssignmentExpressionList();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_ctfAssignmentExpressionList.add(ctfAssignmentExpressionList172.getTree());
+					if ( state.backtracking==0 ) stream_ctfAssignmentExpressionList.add(ctfAssignmentExpressionList174.getTree());
 					}
 					break;
 
 			}
 
-			RCURL173=(Token)match(input,RCURL,FOLLOW_RCURL_in_ctfBody3332); if (state.failed) return retval; 
-			if ( state.backtracking==0 ) stream_RCURL.add(RCURL173);
+			RCURL175=(Token)match(input,RCURL,FOLLOW_RCURL_in_ctfBody3376); if (state.failed) return retval; 
+			if ( state.backtracking==0 ) stream_RCURL.add(RCURL175);
 
 			// AST REWRITE
 			// elements: ctfAssignmentExpressionList
@@ -7584,9 +7723,9 @@ public class CTFParser extends Parser {
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 			root_0 = (CommonTree)adaptor.nil();
-			// 622:46: -> ( ctfAssignmentExpressionList )?
+			// 627:46: -> ( ctfAssignmentExpressionList )?
 			{
-				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:622:49: ( ctfAssignmentExpressionList )?
+				// org/eclipse/tracecompass/ctf/parser/CTFParser.g:627:49: ( ctfAssignmentExpressionList )?
 				if ( stream_ctfAssignmentExpressionList.hasNext() ) {
 					adaptor.addChild(root_0, stream_ctfAssignmentExpressionList.nextTree());
 				}
@@ -7630,56 +7769,56 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "ctfAssignmentExpressionList"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:625:1: ctfAssignmentExpressionList : ( ctfAssignmentExpression TERM !)+ ;
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:630:1: ctfAssignmentExpressionList : ( ctfAssignmentExpression TERM !)+ ;
 	public final CTFParser.ctfAssignmentExpressionList_return ctfAssignmentExpressionList() throws RecognitionException {
 		CTFParser.ctfAssignmentExpressionList_return retval = new CTFParser.ctfAssignmentExpressionList_return();
 		retval.start = input.LT(1);
 
 		CommonTree root_0 = null;
 
-		Token TERM175=null;
-		ParserRuleReturnScope ctfAssignmentExpression174 =null;
+		Token TERM177=null;
+		ParserRuleReturnScope ctfAssignmentExpression176 =null;
 
-		CommonTree TERM175_tree=null;
+		CommonTree TERM177_tree=null;
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:626:3: ( ( ctfAssignmentExpression TERM !)+ )
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:626:5: ( ctfAssignmentExpression TERM !)+
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:631:3: ( ( ctfAssignmentExpression TERM !)+ )
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:631:5: ( ctfAssignmentExpression TERM !)+
 			{
 			root_0 = (CommonTree)adaptor.nil();
 
 
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:626:5: ( ctfAssignmentExpression TERM !)+
-			int cnt56=0;
-			loop56:
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:631:5: ( ctfAssignmentExpression TERM !)+
+			int cnt57=0;
+			loop57:
 			while (true) {
-				int alt56=2;
-				int LA56_0 = input.LA(1);
-				if ( (LA56_0==ALIGNTOK||(LA56_0 >= BOOLTOK && LA56_0 <= CHARTOK)||LA56_0==CLOCKTOK||(LA56_0 >= COMPLEXTOK && LA56_0 <= DECIMAL_LITERAL)||LA56_0==DOUBLETOK||(LA56_0 >= ENUMTOK && LA56_0 <= ENVTOK)||(LA56_0 >= EVENTTOK && LA56_0 <= FLOATTOK)||LA56_0==HEX_LITERAL||(LA56_0 >= IDENTIFIER && LA56_0 <= IMAGINARYTOK)||LA56_0==INTEGERTOK||LA56_0==INTTOK||LA56_0==LONGTOK||LA56_0==OCTAL_LITERAL||(LA56_0 >= SHORTTOK && LA56_0 <= SIGNEDTOK)||LA56_0==STREAMTOK||LA56_0==STRINGTOK||(LA56_0 >= STRING_LITERAL && LA56_0 <= STRUCTTOK)||(LA56_0 >= TRACETOK && LA56_0 <= TYPEDEFTOK)||(LA56_0 >= UNSIGNEDTOK && LA56_0 <= VOIDTOK)) ) {
-					alt56=1;
+				int alt57=2;
+				int LA57_0 = input.LA(1);
+				if ( (LA57_0==ALIGNTOK||(LA57_0 >= BOOLTOK && LA57_0 <= CHARTOK)||LA57_0==CLOCKTOK||(LA57_0 >= COMPLEXTOK && LA57_0 <= DECIMAL_LITERAL)||LA57_0==DOUBLETOK||(LA57_0 >= ENUMTOK && LA57_0 <= ENVTOK)||(LA57_0 >= EVENTTOK && LA57_0 <= FLOATTOK)||LA57_0==HEX_LITERAL||(LA57_0 >= IDENTIFIER && LA57_0 <= IMAGINARYTOK)||LA57_0==INTEGERTOK||LA57_0==INTTOK||LA57_0==LONGTOK||LA57_0==OCTAL_LITERAL||(LA57_0 >= SHORTTOK && LA57_0 <= SIGNEDTOK)||LA57_0==STREAMTOK||LA57_0==STRINGTOK||(LA57_0 >= STRING_LITERAL && LA57_0 <= STRUCTTOK)||(LA57_0 >= TRACETOK && LA57_0 <= TYPEDEFTOK)||(LA57_0 >= UNSIGNEDTOK && LA57_0 <= VOIDTOK)) ) {
+					alt57=1;
 				}
 
-				switch (alt56) {
+				switch (alt57) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:626:6: ctfAssignmentExpression TERM !
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:631:6: ctfAssignmentExpression TERM !
 					{
-					pushFollow(FOLLOW_ctfAssignmentExpression_in_ctfAssignmentExpressionList3351);
-					ctfAssignmentExpression174=ctfAssignmentExpression();
+					pushFollow(FOLLOW_ctfAssignmentExpression_in_ctfAssignmentExpressionList3395);
+					ctfAssignmentExpression176=ctfAssignmentExpression();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) adaptor.addChild(root_0, ctfAssignmentExpression174.getTree());
+					if ( state.backtracking==0 ) adaptor.addChild(root_0, ctfAssignmentExpression176.getTree());
 
-					TERM175=(Token)match(input,TERM,FOLLOW_TERM_in_ctfAssignmentExpressionList3353); if (state.failed) return retval;
+					TERM177=(Token)match(input,TERM,FOLLOW_TERM_in_ctfAssignmentExpressionList3397); if (state.failed) return retval;
 					}
 					break;
 
 				default :
-					if ( cnt56 >= 1 ) break loop56;
+					if ( cnt57 >= 1 ) break loop57;
 					if (state.backtracking>0) {state.failed=true; return retval;}
-					EarlyExitException eee = new EarlyExitException(56, input);
+					EarlyExitException eee = new EarlyExitException(57, input);
 					throw eee;
 				}
-				cnt56++;
+				cnt57++;
 			}
 
 			}
@@ -7712,7 +7851,7 @@ public class CTFParser extends Parser {
 
 
 	// $ANTLR start "ctfAssignmentExpression"
-	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:629:1: ctfAssignmentExpression : (left= unaryExpression (assignment= ASSIGNMENT right1= unaryExpression -> ^( CTF_EXPRESSION_VAL ^( CTF_LEFT $left) ^( CTF_RIGHT $right1) ) |type_assignment= TYPE_ASSIGNMENT right2= typeSpecifier -> ^( CTF_EXPRESSION_TYPE ^( CTF_LEFT $left) ^( CTF_RIGHT ^( TYPE_SPECIFIER_LIST $right2) ) ) ) | ( declarationSpecifiers {...}? declaratorList ) -> ^( TYPEDEF declaratorList declarationSpecifiers ) | typealiasDecl );
+	// org/eclipse/tracecompass/ctf/parser/CTFParser.g:634:1: ctfAssignmentExpression : (left= unaryExpression (assignment= ASSIGNMENT right1= unaryExpression -> ^( CTF_EXPRESSION_VAL ^( CTF_LEFT $left) ^( CTF_RIGHT $right1) ) |type_assignment= TYPE_ASSIGNMENT right2= typeSpecifier -> ^( CTF_EXPRESSION_TYPE ^( CTF_LEFT $left) ^( CTF_RIGHT ^( TYPE_SPECIFIER_LIST $right2) ) ) ) | ( declarationSpecifiers {...}? declaratorList ) -> ^( TYPEDEF declaratorList declarationSpecifiers ) | typealiasDecl );
 	public final CTFParser.ctfAssignmentExpression_return ctfAssignmentExpression() throws RecognitionException {
 		CTFParser.ctfAssignmentExpression_return retval = new CTFParser.ctfAssignmentExpression_return();
 		retval.start = input.LT(1);
@@ -7724,9 +7863,9 @@ public class CTFParser extends Parser {
 		ParserRuleReturnScope left =null;
 		ParserRuleReturnScope right1 =null;
 		ParserRuleReturnScope right2 =null;
-		ParserRuleReturnScope declarationSpecifiers176 =null;
-		ParserRuleReturnScope declaratorList177 =null;
-		ParserRuleReturnScope typealiasDecl178 =null;
+		ParserRuleReturnScope declarationSpecifiers178 =null;
+		ParserRuleReturnScope declaratorList179 =null;
+		ParserRuleReturnScope typealiasDecl180 =null;
 
 		CommonTree assignment_tree=null;
 		CommonTree type_assignment_tree=null;
@@ -7738,17 +7877,17 @@ public class CTFParser extends Parser {
 		RewriteRuleSubtreeStream stream_typeSpecifier=new RewriteRuleSubtreeStream(adaptor,"rule typeSpecifier");
 
 		try {
-			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:635:3: (left= unaryExpression (assignment= ASSIGNMENT right1= unaryExpression -> ^( CTF_EXPRESSION_VAL ^( CTF_LEFT $left) ^( CTF_RIGHT $right1) ) |type_assignment= TYPE_ASSIGNMENT right2= typeSpecifier -> ^( CTF_EXPRESSION_TYPE ^( CTF_LEFT $left) ^( CTF_RIGHT ^( TYPE_SPECIFIER_LIST $right2) ) ) ) | ( declarationSpecifiers {...}? declaratorList ) -> ^( TYPEDEF declaratorList declarationSpecifiers ) | typealiasDecl )
-			int alt58=3;
+			// org/eclipse/tracecompass/ctf/parser/CTFParser.g:640:3: (left= unaryExpression (assignment= ASSIGNMENT right1= unaryExpression -> ^( CTF_EXPRESSION_VAL ^( CTF_LEFT $left) ^( CTF_RIGHT $right1) ) |type_assignment= TYPE_ASSIGNMENT right2= typeSpecifier -> ^( CTF_EXPRESSION_TYPE ^( CTF_LEFT $left) ^( CTF_RIGHT ^( TYPE_SPECIFIER_LIST $right2) ) ) ) | ( declarationSpecifiers {...}? declaratorList ) -> ^( TYPEDEF declaratorList declarationSpecifiers ) | typealiasDecl )
+			int alt59=3;
 			switch ( input.LA(1) ) {
 			case IDENTIFIER:
 				{
-				int LA58_1 = input.LA(2);
-				if ( ((LA58_1 >= ARROW && LA58_1 <= ASSIGNMENT)||LA58_1==DOT||LA58_1==OPENBRAC||LA58_1==TYPE_ASSIGNMENT) ) {
-					alt58=1;
+				int LA59_1 = input.LA(2);
+				if ( ((LA59_1 >= ARROW && LA59_1 <= ASSIGNMENT)||LA59_1==DOT||LA59_1==OPENBRAC||LA59_1==TYPE_ASSIGNMENT) ) {
+					alt59=1;
 				}
-				else if ( (LA58_1==BOOLTOK||LA58_1==CHARTOK||(LA58_1 >= COMPLEXTOK && LA58_1 <= CONSTTOK)||LA58_1==DOUBLETOK||LA58_1==ENUMTOK||(LA58_1 >= FLOATINGPOINTTOK && LA58_1 <= FLOATTOK)||(LA58_1 >= IDENTIFIER && LA58_1 <= IMAGINARYTOK)||LA58_1==INTEGERTOK||LA58_1==INTTOK||LA58_1==LONGTOK||LA58_1==POINTER||LA58_1==SHORTTOK||LA58_1==SIGNEDTOK||LA58_1==STRINGTOK||LA58_1==STRUCTTOK||LA58_1==TYPEDEFTOK||(LA58_1 >= UNSIGNEDTOK && LA58_1 <= VOIDTOK)) && (( inTypealiasAlias() || isTypeName(input.LT(1).getText()) ))) {
-					alt58=2;
+				else if ( (LA59_1==BOOLTOK||LA59_1==CHARTOK||(LA59_1 >= COMPLEXTOK && LA59_1 <= CONSTTOK)||LA59_1==DOUBLETOK||LA59_1==ENUMTOK||(LA59_1 >= FLOATINGPOINTTOK && LA59_1 <= FLOATTOK)||(LA59_1 >= IDENTIFIER && LA59_1 <= IMAGINARYTOK)||LA59_1==INTEGERTOK||LA59_1==INTTOK||LA59_1==LONGTOK||LA59_1==POINTER||LA59_1==SHORTTOK||LA59_1==SIGNEDTOK||LA59_1==STRINGTOK||LA59_1==STRUCTTOK||LA59_1==TYPEDEFTOK||(LA59_1 >= UNSIGNEDTOK && LA59_1 <= VOIDTOK)) && (( inTypealiasAlias() || isTypeName(input.LT(1).getText()) ))) {
+					alt59=2;
 				}
 
 				}
@@ -7767,7 +7906,7 @@ public class CTFParser extends Parser {
 			case STRING_LITERAL:
 			case TRACETOK:
 				{
-				alt58=1;
+				alt59=1;
 				}
 				break;
 			case SIGNEDTOK:
@@ -7779,7 +7918,7 @@ public class CTFParser extends Parser {
 				case OPENBRAC:
 				case TYPE_ASSIGNMENT:
 					{
-					alt58=1;
+					alt59=1;
 					}
 					break;
 				case BOOLTOK:
@@ -7804,12 +7943,12 @@ public class CTFParser extends Parser {
 				case VARIANTTOK:
 				case VOIDTOK:
 					{
-					alt58=2;
+					alt59=2;
 					}
 					break;
 				case TYPEDEFTOK:
 					{
-					alt58=2;
+					alt59=2;
 					}
 					break;
 				default:
@@ -7818,7 +7957,7 @@ public class CTFParser extends Parser {
 					try {
 						input.consume();
 						NoViableAltException nvae =
-							new NoViableAltException("", 58, 3, input);
+							new NoViableAltException("", 59, 3, input);
 						throw nvae;
 					} finally {
 						input.rewind(nvaeMark);
@@ -7845,7 +7984,7 @@ public class CTFParser extends Parser {
 			case VARIANTTOK:
 			case VOIDTOK:
 				{
-				alt58=2;
+				alt59=2;
 				}
 				break;
 			case STRINGTOK:
@@ -7857,7 +7996,7 @@ public class CTFParser extends Parser {
 				case OPENBRAC:
 				case TYPE_ASSIGNMENT:
 					{
-					alt58=1;
+					alt59=1;
 					}
 					break;
 				case BOOLTOK:
@@ -7883,12 +8022,12 @@ public class CTFParser extends Parser {
 				case VARIANTTOK:
 				case VOIDTOK:
 					{
-					alt58=2;
+					alt59=2;
 					}
 					break;
 				case TYPEDEFTOK:
 					{
-					alt58=2;
+					alt59=2;
 					}
 					break;
 				default:
@@ -7897,7 +8036,7 @@ public class CTFParser extends Parser {
 					try {
 						input.consume();
 						NoViableAltException nvae =
-							new NoViableAltException("", 58, 5, input);
+							new NoViableAltException("", 59, 5, input);
 						throw nvae;
 					} finally {
 						input.rewind(nvaeMark);
@@ -7907,55 +8046,55 @@ public class CTFParser extends Parser {
 				break;
 			case TYPEALIASTOK:
 				{
-				alt58=3;
+				alt59=3;
 				}
 				break;
 			default:
 				if (state.backtracking>0) {state.failed=true; return retval;}
 				NoViableAltException nvae =
-					new NoViableAltException("", 58, 0, input);
+					new NoViableAltException("", 59, 0, input);
 				throw nvae;
 			}
-			switch (alt58) {
+			switch (alt59) {
 				case 1 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:635:5: left= unaryExpression (assignment= ASSIGNMENT right1= unaryExpression -> ^( CTF_EXPRESSION_VAL ^( CTF_LEFT $left) ^( CTF_RIGHT $right1) ) |type_assignment= TYPE_ASSIGNMENT right2= typeSpecifier -> ^( CTF_EXPRESSION_TYPE ^( CTF_LEFT $left) ^( CTF_RIGHT ^( TYPE_SPECIFIER_LIST $right2) ) ) )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:640:5: left= unaryExpression (assignment= ASSIGNMENT right1= unaryExpression -> ^( CTF_EXPRESSION_VAL ^( CTF_LEFT $left) ^( CTF_RIGHT $right1) ) |type_assignment= TYPE_ASSIGNMENT right2= typeSpecifier -> ^( CTF_EXPRESSION_TYPE ^( CTF_LEFT $left) ^( CTF_RIGHT ^( TYPE_SPECIFIER_LIST $right2) ) ) )
 					{
-					pushFollow(FOLLOW_unaryExpression_in_ctfAssignmentExpression3376);
+					pushFollow(FOLLOW_unaryExpression_in_ctfAssignmentExpression3420);
 					left=unaryExpression();
 					state._fsp--;
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_unaryExpression.add(left.getTree());
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:636:7: (assignment= ASSIGNMENT right1= unaryExpression -> ^( CTF_EXPRESSION_VAL ^( CTF_LEFT $left) ^( CTF_RIGHT $right1) ) |type_assignment= TYPE_ASSIGNMENT right2= typeSpecifier -> ^( CTF_EXPRESSION_TYPE ^( CTF_LEFT $left) ^( CTF_RIGHT ^( TYPE_SPECIFIER_LIST $right2) ) ) )
-					int alt57=2;
-					int LA57_0 = input.LA(1);
-					if ( (LA57_0==ASSIGNMENT) ) {
-						alt57=1;
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:641:7: (assignment= ASSIGNMENT right1= unaryExpression -> ^( CTF_EXPRESSION_VAL ^( CTF_LEFT $left) ^( CTF_RIGHT $right1) ) |type_assignment= TYPE_ASSIGNMENT right2= typeSpecifier -> ^( CTF_EXPRESSION_TYPE ^( CTF_LEFT $left) ^( CTF_RIGHT ^( TYPE_SPECIFIER_LIST $right2) ) ) )
+					int alt58=2;
+					int LA58_0 = input.LA(1);
+					if ( (LA58_0==ASSIGNMENT) ) {
+						alt58=1;
 					}
-					else if ( (LA57_0==TYPE_ASSIGNMENT) ) {
-						alt57=2;
+					else if ( (LA58_0==TYPE_ASSIGNMENT) ) {
+						alt58=2;
 					}
 
 					else {
 						if (state.backtracking>0) {state.failed=true; return retval;}
 						NoViableAltException nvae =
-							new NoViableAltException("", 57, 0, input);
+							new NoViableAltException("", 58, 0, input);
 						throw nvae;
 					}
 
-					switch (alt57) {
+					switch (alt58) {
 						case 1 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:636:9: assignment= ASSIGNMENT right1= unaryExpression
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:641:9: assignment= ASSIGNMENT right1= unaryExpression
 							{
-							assignment=(Token)match(input,ASSIGNMENT,FOLLOW_ASSIGNMENT_in_ctfAssignmentExpression3388); if (state.failed) return retval; 
+							assignment=(Token)match(input,ASSIGNMENT,FOLLOW_ASSIGNMENT_in_ctfAssignmentExpression3432); if (state.failed) return retval; 
 							if ( state.backtracking==0 ) stream_ASSIGNMENT.add(assignment);
 
-							pushFollow(FOLLOW_unaryExpression_in_ctfAssignmentExpression3392);
+							pushFollow(FOLLOW_unaryExpression_in_ctfAssignmentExpression3436);
 							right1=unaryExpression();
 							state._fsp--;
 							if (state.failed) return retval;
 							if ( state.backtracking==0 ) stream_unaryExpression.add(right1.getTree());
 							// AST REWRITE
-							// elements: right1, left
+							// elements: left, right1
 							// token labels: 
 							// rule labels: retval, left, right1
 							// token list labels: 
@@ -7968,13 +8107,13 @@ public class CTFParser extends Parser {
 							RewriteRuleSubtreeStream stream_right1=new RewriteRuleSubtreeStream(adaptor,"rule right1",right1!=null?right1.getTree():null);
 
 							root_0 = (CommonTree)adaptor.nil();
-							// 637:11: -> ^( CTF_EXPRESSION_VAL ^( CTF_LEFT $left) ^( CTF_RIGHT $right1) )
+							// 642:11: -> ^( CTF_EXPRESSION_VAL ^( CTF_LEFT $left) ^( CTF_RIGHT $right1) )
 							{
-								// org/eclipse/tracecompass/ctf/parser/CTFParser.g:637:14: ^( CTF_EXPRESSION_VAL ^( CTF_LEFT $left) ^( CTF_RIGHT $right1) )
+								// org/eclipse/tracecompass/ctf/parser/CTFParser.g:642:14: ^( CTF_EXPRESSION_VAL ^( CTF_LEFT $left) ^( CTF_RIGHT $right1) )
 								{
 								CommonTree root_1 = (CommonTree)adaptor.nil();
 								root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(CTF_EXPRESSION_VAL, "CTF_EXPRESSION_VAL"), root_1);
-								// org/eclipse/tracecompass/ctf/parser/CTFParser.g:638:18: ^( CTF_LEFT $left)
+								// org/eclipse/tracecompass/ctf/parser/CTFParser.g:643:18: ^( CTF_LEFT $left)
 								{
 								CommonTree root_2 = (CommonTree)adaptor.nil();
 								root_2 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(CTF_LEFT, "CTF_LEFT"), root_2);
@@ -7982,7 +8121,7 @@ public class CTFParser extends Parser {
 								adaptor.addChild(root_1, root_2);
 								}
 
-								// org/eclipse/tracecompass/ctf/parser/CTFParser.g:639:18: ^( CTF_RIGHT $right1)
+								// org/eclipse/tracecompass/ctf/parser/CTFParser.g:644:18: ^( CTF_RIGHT $right1)
 								{
 								CommonTree root_2 = (CommonTree)adaptor.nil();
 								root_2 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(CTF_RIGHT, "CTF_RIGHT"), root_2);
@@ -8002,18 +8141,18 @@ public class CTFParser extends Parser {
 							}
 							break;
 						case 2 :
-							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:640:9: type_assignment= TYPE_ASSIGNMENT right2= typeSpecifier
+							// org/eclipse/tracecompass/ctf/parser/CTFParser.g:645:9: type_assignment= TYPE_ASSIGNMENT right2= typeSpecifier
 							{
-							type_assignment=(Token)match(input,TYPE_ASSIGNMENT,FOLLOW_TYPE_ASSIGNMENT_in_ctfAssignmentExpression3468); if (state.failed) return retval; 
+							type_assignment=(Token)match(input,TYPE_ASSIGNMENT,FOLLOW_TYPE_ASSIGNMENT_in_ctfAssignmentExpression3512); if (state.failed) return retval; 
 							if ( state.backtracking==0 ) stream_TYPE_ASSIGNMENT.add(type_assignment);
 
-							pushFollow(FOLLOW_typeSpecifier_in_ctfAssignmentExpression3472);
+							pushFollow(FOLLOW_typeSpecifier_in_ctfAssignmentExpression3516);
 							right2=typeSpecifier();
 							state._fsp--;
 							if (state.failed) return retval;
 							if ( state.backtracking==0 ) stream_typeSpecifier.add(right2.getTree());
 							// AST REWRITE
-							// elements: right2, left
+							// elements: left, right2
 							// token labels: 
 							// rule labels: retval, left, right2
 							// token list labels: 
@@ -8026,13 +8165,13 @@ public class CTFParser extends Parser {
 							RewriteRuleSubtreeStream stream_right2=new RewriteRuleSubtreeStream(adaptor,"rule right2",right2!=null?right2.getTree():null);
 
 							root_0 = (CommonTree)adaptor.nil();
-							// 641:11: -> ^( CTF_EXPRESSION_TYPE ^( CTF_LEFT $left) ^( CTF_RIGHT ^( TYPE_SPECIFIER_LIST $right2) ) )
+							// 646:11: -> ^( CTF_EXPRESSION_TYPE ^( CTF_LEFT $left) ^( CTF_RIGHT ^( TYPE_SPECIFIER_LIST $right2) ) )
 							{
-								// org/eclipse/tracecompass/ctf/parser/CTFParser.g:641:14: ^( CTF_EXPRESSION_TYPE ^( CTF_LEFT $left) ^( CTF_RIGHT ^( TYPE_SPECIFIER_LIST $right2) ) )
+								// org/eclipse/tracecompass/ctf/parser/CTFParser.g:646:14: ^( CTF_EXPRESSION_TYPE ^( CTF_LEFT $left) ^( CTF_RIGHT ^( TYPE_SPECIFIER_LIST $right2) ) )
 								{
 								CommonTree root_1 = (CommonTree)adaptor.nil();
 								root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(CTF_EXPRESSION_TYPE, "CTF_EXPRESSION_TYPE"), root_1);
-								// org/eclipse/tracecompass/ctf/parser/CTFParser.g:642:18: ^( CTF_LEFT $left)
+								// org/eclipse/tracecompass/ctf/parser/CTFParser.g:647:18: ^( CTF_LEFT $left)
 								{
 								CommonTree root_2 = (CommonTree)adaptor.nil();
 								root_2 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(CTF_LEFT, "CTF_LEFT"), root_2);
@@ -8040,11 +8179,11 @@ public class CTFParser extends Parser {
 								adaptor.addChild(root_1, root_2);
 								}
 
-								// org/eclipse/tracecompass/ctf/parser/CTFParser.g:643:18: ^( CTF_RIGHT ^( TYPE_SPECIFIER_LIST $right2) )
+								// org/eclipse/tracecompass/ctf/parser/CTFParser.g:648:18: ^( CTF_RIGHT ^( TYPE_SPECIFIER_LIST $right2) )
 								{
 								CommonTree root_2 = (CommonTree)adaptor.nil();
 								root_2 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(CTF_RIGHT, "CTF_RIGHT"), root_2);
-								// org/eclipse/tracecompass/ctf/parser/CTFParser.g:643:30: ^( TYPE_SPECIFIER_LIST $right2)
+								// org/eclipse/tracecompass/ctf/parser/CTFParser.g:648:30: ^( TYPE_SPECIFIER_LIST $right2)
 								{
 								CommonTree root_3 = (CommonTree)adaptor.nil();
 								root_3 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(TYPE_SPECIFIER_LIST, "TYPE_SPECIFIER_LIST"), root_3);
@@ -8072,25 +8211,25 @@ public class CTFParser extends Parser {
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:645:5: ( declarationSpecifiers {...}? declaratorList )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:650:5: ( declarationSpecifiers {...}? declaratorList )
 					{
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:645:5: ( declarationSpecifiers {...}? declaratorList )
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:645:6: declarationSpecifiers {...}? declaratorList
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:650:5: ( declarationSpecifiers {...}? declaratorList )
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:650:6: declarationSpecifiers {...}? declaratorList
 					{
-					pushFollow(FOLLOW_declarationSpecifiers_in_ctfAssignmentExpression3555);
-					declarationSpecifiers176=declarationSpecifiers();
+					pushFollow(FOLLOW_declarationSpecifiers_in_ctfAssignmentExpression3599);
+					declarationSpecifiers178=declarationSpecifiers();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_declarationSpecifiers.add(declarationSpecifiers176.getTree());
+					if ( state.backtracking==0 ) stream_declarationSpecifiers.add(declarationSpecifiers178.getTree());
 					if ( !((inTypedef())) ) {
 						if (state.backtracking>0) {state.failed=true; return retval;}
 						throw new FailedPredicateException(input, "ctfAssignmentExpression", "inTypedef()");
 					}
-					pushFollow(FOLLOW_declaratorList_in_ctfAssignmentExpression3559);
-					declaratorList177=declaratorList();
+					pushFollow(FOLLOW_declaratorList_in_ctfAssignmentExpression3603);
+					declaratorList179=declaratorList();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) stream_declaratorList.add(declaratorList177.getTree());
+					if ( state.backtracking==0 ) stream_declaratorList.add(declaratorList179.getTree());
 					}
 
 					// AST REWRITE
@@ -8105,9 +8244,9 @@ public class CTFParser extends Parser {
 					RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.getTree():null);
 
 					root_0 = (CommonTree)adaptor.nil();
-					// 646:7: -> ^( TYPEDEF declaratorList declarationSpecifiers )
+					// 651:7: -> ^( TYPEDEF declaratorList declarationSpecifiers )
 					{
-						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:646:10: ^( TYPEDEF declaratorList declarationSpecifiers )
+						// org/eclipse/tracecompass/ctf/parser/CTFParser.g:651:10: ^( TYPEDEF declaratorList declarationSpecifiers )
 						{
 						CommonTree root_1 = (CommonTree)adaptor.nil();
 						root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(TYPEDEF, "TYPEDEF"), root_1);
@@ -8125,16 +8264,16 @@ public class CTFParser extends Parser {
 					}
 					break;
 				case 3 :
-					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:647:5: typealiasDecl
+					// org/eclipse/tracecompass/ctf/parser/CTFParser.g:652:5: typealiasDecl
 					{
 					root_0 = (CommonTree)adaptor.nil();
 
 
-					pushFollow(FOLLOW_typealiasDecl_in_ctfAssignmentExpression3582);
-					typealiasDecl178=typealiasDecl();
+					pushFollow(FOLLOW_typealiasDecl_in_ctfAssignmentExpression3626);
+					typealiasDecl180=typealiasDecl();
 					state._fsp--;
 					if (state.failed) return retval;
-					if ( state.backtracking==0 ) adaptor.addChild(root_0, typealiasDecl178.getTree());
+					if ( state.backtracking==0 ) adaptor.addChild(root_0, typealiasDecl180.getTree());
 
 					}
 					break;
@@ -8249,20 +8388,20 @@ public class CTFParser extends Parser {
 	}
 
 
-	protected DFA23 dfa23 = new DFA23(this);
-	static final String DFA23_eotS =
+	protected DFA24 dfa24 = new DFA24(this);
+	static final String DFA24_eotS =
 		"\10\uffff";
-	static final String DFA23_eofS =
+	static final String DFA24_eofS =
 		"\10\uffff";
-	static final String DFA23_minS =
+	static final String DFA24_minS =
 		"\1\46\1\24\1\0\1\24\1\0\2\uffff\1\0";
-	static final String DFA23_maxS =
+	static final String DFA24_maxS =
 		"\2\72\1\0\1\72\1\0\2\uffff\1\0";
-	static final String DFA23_acceptS =
+	static final String DFA24_acceptS =
 		"\5\uffff\1\1\1\2\1\uffff";
-	static final String DFA23_specialS =
+	static final String DFA24_specialS =
 		"\2\uffff\1\2\1\uffff\1\1\2\uffff\1\0}>";
-	static final String[] DFA23_transitionS = {
+	static final String[] DFA24_transitionS = {
 			"\1\2\23\uffff\1\1",
 			"\1\3\21\uffff\1\4\23\uffff\1\1",
 			"\1\uffff",
@@ -8273,38 +8412,38 @@ public class CTFParser extends Parser {
 			"\1\uffff"
 	};
 
-	static final short[] DFA23_eot = DFA.unpackEncodedString(DFA23_eotS);
-	static final short[] DFA23_eof = DFA.unpackEncodedString(DFA23_eofS);
-	static final char[] DFA23_min = DFA.unpackEncodedStringToUnsignedChars(DFA23_minS);
-	static final char[] DFA23_max = DFA.unpackEncodedStringToUnsignedChars(DFA23_maxS);
-	static final short[] DFA23_accept = DFA.unpackEncodedString(DFA23_acceptS);
-	static final short[] DFA23_special = DFA.unpackEncodedString(DFA23_specialS);
-	static final short[][] DFA23_transition;
+	static final short[] DFA24_eot = DFA.unpackEncodedString(DFA24_eotS);
+	static final short[] DFA24_eof = DFA.unpackEncodedString(DFA24_eofS);
+	static final char[] DFA24_min = DFA.unpackEncodedStringToUnsignedChars(DFA24_minS);
+	static final char[] DFA24_max = DFA.unpackEncodedStringToUnsignedChars(DFA24_maxS);
+	static final short[] DFA24_accept = DFA.unpackEncodedString(DFA24_acceptS);
+	static final short[] DFA24_special = DFA.unpackEncodedString(DFA24_specialS);
+	static final short[][] DFA24_transition;
 
 	static {
-		int numStates = DFA23_transitionS.length;
-		DFA23_transition = new short[numStates][];
+		int numStates = DFA24_transitionS.length;
+		DFA24_transition = new short[numStates][];
 		for (int i=0; i<numStates; i++) {
-			DFA23_transition[i] = DFA.unpackEncodedString(DFA23_transitionS[i]);
+			DFA24_transition[i] = DFA.unpackEncodedString(DFA24_transitionS[i]);
 		}
 	}
 
-	protected class DFA23 extends DFA {
+	protected class DFA24 extends DFA {
 
-		public DFA23(BaseRecognizer recognizer) {
+		public DFA24(BaseRecognizer recognizer) {
 			this.recognizer = recognizer;
-			this.decisionNumber = 23;
-			this.eot = DFA23_eot;
-			this.eof = DFA23_eof;
-			this.min = DFA23_min;
-			this.max = DFA23_max;
-			this.accept = DFA23_accept;
-			this.special = DFA23_special;
-			this.transition = DFA23_transition;
+			this.decisionNumber = 24;
+			this.eot = DFA24_eot;
+			this.eof = DFA24_eof;
+			this.min = DFA24_min;
+			this.max = DFA24_max;
+			this.accept = DFA24_accept;
+			this.special = DFA24_special;
+			this.transition = DFA24_transition;
 		}
 		@Override
 		public String getDescription() {
-			return "368:10: ({...}? => declaratorList -> ^( TYPEDEF declaratorList declarationSpecifiers ) | structOrVariantDeclaratorList -> ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList ) )";
+			return "373:10: ({...}? => declaratorList -> ^( TYPEDEF declaratorList declarationSpecifiers ) | structOrVariantDeclaratorList -> ^( SV_DECLARATION declarationSpecifiers structOrVariantDeclaratorList ) )";
 		}
 		@Override
 		public int specialStateTransition(int s, IntStream _input) throws NoViableAltException {
@@ -8312,47 +8451,47 @@ public class CTFParser extends Parser {
 			int _s = s;
 			switch ( s ) {
 					case 0 : 
-						int LA23_7 = input.LA(1);
+						int LA24_7 = input.LA(1);
 						 
-						int index23_7 = input.index();
+						int index24_7 = input.index();
 						input.rewind();
 						s = -1;
 						if ( ((inTypedef())) ) {s = 5;}
 						else if ( (true) ) {s = 6;}
 						 
-						input.seek(index23_7);
+						input.seek(index24_7);
 						if ( s>=0 ) return s;
 						break;
 
 					case 1 : 
-						int LA23_4 = input.LA(1);
+						int LA24_4 = input.LA(1);
 						 
-						int index23_4 = input.index();
+						int index24_4 = input.index();
 						input.rewind();
 						s = -1;
 						if ( ((inTypedef())) ) {s = 5;}
 						else if ( (true) ) {s = 6;}
 						 
-						input.seek(index23_4);
+						input.seek(index24_4);
 						if ( s>=0 ) return s;
 						break;
 
 					case 2 : 
-						int LA23_2 = input.LA(1);
+						int LA24_2 = input.LA(1);
 						 
-						int index23_2 = input.index();
+						int index24_2 = input.index();
 						input.rewind();
 						s = -1;
 						if ( ((inTypedef())) ) {s = 5;}
 						else if ( (true) ) {s = 6;}
 						 
-						input.seek(index23_2);
+						input.seek(index24_2);
 						if ( s>=0 ) return s;
 						break;
 			}
 			if (state.backtracking>0) {state.failed=true; return -1;}
 			NoViableAltException nvae =
-				new NoViableAltException(getDescription(), 23, _s, input);
+				new NoViableAltException(getDescription(), 24, _s, input);
 			error(nvae);
 			throw nvae;
 		}
@@ -8376,174 +8515,177 @@ public class CTFParser extends Parser {
 	public static final BitSet FOLLOW_DOT_in_postfixExpressionSuffix675 = new BitSet(new long[]{0x0000004000000000L});
 	public static final BitSet FOLLOW_ARROW_in_postfixExpressionSuffix681 = new BitSet(new long[]{0x0000004000000000L});
 	public static final BitSet FOLLOW_IDENTIFIER_in_postfixExpressionSuffix684 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_primaryExpression_in_postfixExpression716 = new BitSet(new long[]{0x0200000000800022L});
-	public static final BitSet FOLLOW_postfixExpressionSuffix_in_postfixExpression718 = new BitSet(new long[]{0x0200000000800022L});
-	public static final BitSet FOLLOW_ctfSpecifierHead_in_postfixExpression725 = new BitSet(new long[]{0x0200000000800020L});
-	public static final BitSet FOLLOW_postfixExpressionSuffix_in_postfixExpression727 = new BitSet(new long[]{0x0200000000800022L});
-	public static final BitSet FOLLOW_postfixExpression_in_unaryExpression743 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_STRING_LITERAL_in_enumConstant760 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_IDENTIFIER_in_enumConstant774 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ctfKeyword_in_enumConstant788 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_declarationSpecifiers_in_declaration816 = new BitSet(new long[]{0x0400004000000000L,0x0000000000000100L});
-	public static final BitSet FOLLOW_declaratorList_in_declaration818 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
-	public static final BitSet FOLLOW_TERM_in_declaration821 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ctfSpecifier_in_declaration889 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
-	public static final BitSet FOLLOW_TERM_in_declaration891 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_storageClassSpecifier_in_declarationSpecifiers929 = new BitSet(new long[]{0x40004AC18A180902L,0x000000000001C891L});
-	public static final BitSet FOLLOW_typeQualifier_in_declarationSpecifiers939 = new BitSet(new long[]{0x40004AC18A180902L,0x000000000001C891L});
-	public static final BitSet FOLLOW_typeSpecifier_in_declarationSpecifiers949 = new BitSet(new long[]{0x40004AC18A180902L,0x000000000001C891L});
-	public static final BitSet FOLLOW_declarator_in_declaratorList979 = new BitSet(new long[]{0x2000000000000002L});
-	public static final BitSet FOLLOW_SEPARATOR_in_declaratorList982 = new BitSet(new long[]{0x0400004000000000L});
-	public static final BitSet FOLLOW_declarator_in_declaratorList984 = new BitSet(new long[]{0x2000000000000002L});
-	public static final BitSet FOLLOW_abstractDeclarator_in_abstractDeclaratorList1014 = new BitSet(new long[]{0x2000000000000002L});
-	public static final BitSet FOLLOW_SEPARATOR_in_abstractDeclaratorList1017 = new BitSet(new long[]{0x0400804000000000L});
-	public static final BitSet FOLLOW_abstractDeclarator_in_abstractDeclaratorList1019 = new BitSet(new long[]{0x2000000000000002L});
-	public static final BitSet FOLLOW_TYPEDEFTOK_in_storageClassSpecifier1049 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FLOATTOK_in_typeSpecifier1065 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_INTTOK_in_typeSpecifier1071 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_LONGTOK_in_typeSpecifier1077 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_SHORTTOK_in_typeSpecifier1083 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_SIGNEDTOK_in_typeSpecifier1089 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_UNSIGNEDTOK_in_typeSpecifier1095 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_CHARTOK_in_typeSpecifier1101 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_DOUBLETOK_in_typeSpecifier1107 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_VOIDTOK_in_typeSpecifier1113 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_BOOLTOK_in_typeSpecifier1119 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_COMPLEXTOK_in_typeSpecifier1125 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_IMAGINARYTOK_in_typeSpecifier1131 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_structSpecifier_in_typeSpecifier1137 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_variantSpecifier_in_typeSpecifier1143 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_enumSpecifier_in_typeSpecifier1149 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ctfTypeSpecifier_in_typeSpecifier1155 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_typedefName_in_typeSpecifier1165 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_CONSTTOK_in_typeQualifier1178 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ALIGNTOK_in_alignAttribute1191 = new BitSet(new long[]{0x0000800000000000L});
-	public static final BitSet FOLLOW_LPAREN_in_alignAttribute1193 = new BitSet(new long[]{0x8040005050202610L,0x0000000000000255L});
-	public static final BitSet FOLLOW_unaryExpression_in_alignAttribute1195 = new BitSet(new long[]{0x1000000000000000L});
-	public static final BitSet FOLLOW_RPAREN_in_alignAttribute1197 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_LCURL_in_structBody1231 = new BitSet(new long[]{0x48004AC18A180900L,0x000000000001CC91L});
-	public static final BitSet FOLLOW_structOrVariantDeclarationList_in_structBody1233 = new BitSet(new long[]{0x0800000000000000L});
-	public static final BitSet FOLLOW_RCURL_in_structBody1236 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_STRUCTTOK_in_structSpecifier1264 = new BitSet(new long[]{0x0000104000000000L});
-	public static final BitSet FOLLOW_structName_in_structSpecifier1289 = new BitSet(new long[]{0x0000100000000012L});
-	public static final BitSet FOLLOW_alignAttribute_in_structSpecifier1311 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_structBody_in_structSpecifier1347 = new BitSet(new long[]{0x0000000000000012L});
-	public static final BitSet FOLLOW_alignAttribute_in_structSpecifier1378 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_structBody_in_structSpecifier1494 = new BitSet(new long[]{0x0000000000000012L});
-	public static final BitSet FOLLOW_alignAttribute_in_structSpecifier1512 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_IDENTIFIER_in_structName1578 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_structOrVariantDeclaration_in_structOrVariantDeclarationList1599 = new BitSet(new long[]{0x40004AC18A180902L,0x000000000001CC91L});
-	public static final BitSet FOLLOW_declarationSpecifiers_in_structOrVariantDeclaration1632 = new BitSet(new long[]{0x0400004000000000L});
-	public static final BitSet FOLLOW_declaratorList_in_structOrVariantDeclaration1673 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
-	public static final BitSet FOLLOW_structOrVariantDeclaratorList_in_structOrVariantDeclaration1713 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
-	public static final BitSet FOLLOW_typealiasDecl_in_structOrVariantDeclaration1772 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
-	public static final BitSet FOLLOW_TERM_in_structOrVariantDeclaration1784 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_typeQualifier_in_specifierQualifierList1798 = new BitSet(new long[]{0x40004AC18A180902L,0x000000000001C091L});
-	public static final BitSet FOLLOW_typeSpecifier_in_specifierQualifierList1802 = new BitSet(new long[]{0x40004AC18A180902L,0x000000000001C091L});
-	public static final BitSet FOLLOW_structOrVariantDeclarator_in_structOrVariantDeclaratorList1835 = new BitSet(new long[]{0x2000000000000002L});
-	public static final BitSet FOLLOW_SEPARATOR_in_structOrVariantDeclaratorList1838 = new BitSet(new long[]{0x0400004000000000L});
-	public static final BitSet FOLLOW_structOrVariantDeclarator_in_structOrVariantDeclaratorList1840 = new BitSet(new long[]{0x2000000000000002L});
-	public static final BitSet FOLLOW_declarator_in_structOrVariantDeclarator1879 = new BitSet(new long[]{0x0000000000008002L});
-	public static final BitSet FOLLOW_COLON_in_structOrVariantDeclarator1882 = new BitSet(new long[]{0x8040001000200000L});
-	public static final BitSet FOLLOW_numberLiteral_in_structOrVariantDeclarator1884 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_VARIANTTOK_in_variantSpecifier1908 = new BitSet(new long[]{0x0001104000000000L});
-	public static final BitSet FOLLOW_variantName_in_variantSpecifier1926 = new BitSet(new long[]{0x0001100000000000L});
-	public static final BitSet FOLLOW_variantTag_in_variantSpecifier1956 = new BitSet(new long[]{0x0000100000000002L});
-	public static final BitSet FOLLOW_variantBody_in_variantSpecifier1982 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_variantBody_in_variantSpecifier2050 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_variantTag_in_variantSpecifier2071 = new BitSet(new long[]{0x0000100000000000L});
-	public static final BitSet FOLLOW_variantBody_in_variantSpecifier2073 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_variantBody_in_variantSpecifier2080 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_IDENTIFIER_in_variantName2112 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_LCURL_in_variantBody2143 = new BitSet(new long[]{0x40004AC18A180900L,0x000000000001CC91L});
-	public static final BitSet FOLLOW_structOrVariantDeclarationList_in_variantBody2145 = new BitSet(new long[]{0x0800000000000000L});
-	public static final BitSet FOLLOW_RCURL_in_variantBody2147 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_LT_in_variantTag2174 = new BitSet(new long[]{0x0000004000000000L});
-	public static final BitSet FOLLOW_IDENTIFIER_in_variantTag2176 = new BitSet(new long[]{0x0000000200000000L});
-	public static final BitSet FOLLOW_GT_in_variantTag2178 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ENUMTOK_in_enumSpecifier2199 = new BitSet(new long[]{0x0000104000008000L});
-	public static final BitSet FOLLOW_enumName_in_enumSpecifier2238 = new BitSet(new long[]{0x0000100000008002L});
-	public static final BitSet FOLLOW_enumContainerType_in_enumSpecifier2270 = new BitSet(new long[]{0x0000100000000000L});
-	public static final BitSet FOLLOW_enumBody_in_enumSpecifier2272 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_enumBody_in_enumSpecifier2302 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_enumContainerType_in_enumSpecifier2394 = new BitSet(new long[]{0x0000100000000000L});
-	public static final BitSet FOLLOW_enumBody_in_enumSpecifier2396 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_enumBody_in_enumSpecifier2420 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_IDENTIFIER_in_enumName2464 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_LCURL_in_enumBody2485 = new BitSet(new long[]{0x0000004040000010L,0x0000000000000051L});
-	public static final BitSet FOLLOW_enumeratorList_in_enumBody2487 = new BitSet(new long[]{0x2800000000000000L});
-	public static final BitSet FOLLOW_SEPARATOR_in_enumBody2489 = new BitSet(new long[]{0x0800000000000000L});
-	public static final BitSet FOLLOW_RCURL_in_enumBody2492 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_COLON_in_enumContainerType2513 = new BitSet(new long[]{0x40004AC18A180900L,0x000000000001C891L});
-	public static final BitSet FOLLOW_declarationSpecifiers_in_enumContainerType2515 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_enumerator_in_enumeratorList2536 = new BitSet(new long[]{0x2000000000000002L});
-	public static final BitSet FOLLOW_SEPARATOR_in_enumeratorList2539 = new BitSet(new long[]{0x0000004040000010L,0x0000000000000051L});
-	public static final BitSet FOLLOW_enumerator_in_enumeratorList2541 = new BitSet(new long[]{0x2000000000000002L});
-	public static final BitSet FOLLOW_enumConstant_in_enumerator2567 = new BitSet(new long[]{0x0000000000000042L});
-	public static final BitSet FOLLOW_enumeratorValue_in_enumerator2569 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ASSIGNMENT_in_enumeratorValue2583 = new BitSet(new long[]{0x8040005050202610L,0x0000000000000255L});
-	public static final BitSet FOLLOW_unaryExpression_in_enumeratorValue2587 = new BitSet(new long[]{0x0000000004000002L});
-	public static final BitSet FOLLOW_ELIPSES_in_enumeratorValue2626 = new BitSet(new long[]{0x8040005050202610L,0x0000000000000255L});
-	public static final BitSet FOLLOW_unaryExpression_in_enumeratorValue2630 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_pointer_in_declarator2673 = new BitSet(new long[]{0x0400004000000000L});
-	public static final BitSet FOLLOW_directDeclarator_in_declarator2676 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_IDENTIFIER_in_directDeclarator2714 = new BitSet(new long[]{0x0200000000000002L});
-	public static final BitSet FOLLOW_directDeclaratorSuffix_in_directDeclarator2754 = new BitSet(new long[]{0x0200000000000002L});
-	public static final BitSet FOLLOW_OPENBRAC_in_directDeclaratorSuffix2768 = new BitSet(new long[]{0x8040005050202610L,0x0000000000000255L});
-	public static final BitSet FOLLOW_directDeclaratorLength_in_directDeclaratorSuffix2770 = new BitSet(new long[]{0x0000000000004000L});
-	public static final BitSet FOLLOW_CLOSEBRAC_in_directDeclaratorSuffix2772 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_unaryExpression_in_directDeclaratorLength2800 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_pointer_in_abstractDeclarator2813 = new BitSet(new long[]{0x0400804000000002L});
-	public static final BitSet FOLLOW_directAbstractDeclarator_in_abstractDeclarator2816 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_directAbstractDeclarator_in_abstractDeclarator2841 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_IDENTIFIER_in_directAbstractDeclarator2878 = new BitSet(new long[]{0x0200000000000002L});
-	public static final BitSet FOLLOW_LPAREN_in_directAbstractDeclarator2889 = new BitSet(new long[]{0x0400804000000000L});
-	public static final BitSet FOLLOW_abstractDeclarator_in_directAbstractDeclarator2891 = new BitSet(new long[]{0x1000000000000000L});
-	public static final BitSet FOLLOW_RPAREN_in_directAbstractDeclarator2893 = new BitSet(new long[]{0x0200000000000002L});
-	public static final BitSet FOLLOW_OPENBRAC_in_directAbstractDeclarator2908 = new BitSet(new long[]{0x8040005050206610L,0x0000000000000255L});
-	public static final BitSet FOLLOW_unaryExpression_in_directAbstractDeclarator2910 = new BitSet(new long[]{0x0000000000004000L});
-	public static final BitSet FOLLOW_CLOSEBRAC_in_directAbstractDeclarator2913 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_POINTER_in_pointer2931 = new BitSet(new long[]{0x0000000000100002L});
-	public static final BitSet FOLLOW_typeQualifierList_in_pointer2933 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_typeQualifier_in_typeQualifierList2956 = new BitSet(new long[]{0x0000000000100002L});
-	public static final BitSet FOLLOW_IDENTIFIER_in_typedefName2972 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_declarationSpecifiers_in_typealiasTarget2989 = new BitSet(new long[]{0x0400804000000002L});
-	public static final BitSet FOLLOW_abstractDeclaratorList_in_typealiasTarget2991 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_abstractDeclaratorList_in_typealiasAlias3017 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_declarationSpecifiers_in_typealiasAlias3023 = new BitSet(new long[]{0x0400804000000002L});
-	public static final BitSet FOLLOW_abstractDeclaratorList_in_typealiasAlias3025 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_TYPEALIASTOK_in_typealiasDecl3039 = new BitSet(new long[]{0x40004AC18A180900L,0x000000000001C891L});
-	public static final BitSet FOLLOW_typealiasTarget_in_typealiasDecl3041 = new BitSet(new long[]{0x0000000000000000L,0x0000000000001000L});
-	public static final BitSet FOLLOW_TYPE_ASSIGNMENT_in_typealiasDecl3043 = new BitSet(new long[]{0x4400CAC18A180900L,0x000000000001C891L});
-	public static final BitSet FOLLOW_typealiasAlias_in_typealiasDecl3045 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ctfSpecifierHead_in_ctfSpecifier3145 = new BitSet(new long[]{0x0000100000000000L});
-	public static final BitSet FOLLOW_ctfBody_in_ctfSpecifier3147 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_typealiasDecl_in_ctfSpecifier3164 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_EVENTTOK_in_ctfSpecifierHead3185 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_STREAMTOK_in_ctfSpecifierHead3195 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_TRACETOK_in_ctfSpecifierHead3205 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ENVTOK_in_ctfSpecifierHead3215 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_CLOCKTOK_in_ctfSpecifierHead3225 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_CALLSITETOK_in_ctfSpecifierHead3235 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FLOATINGPOINTTOK_in_ctfTypeSpecifier3258 = new BitSet(new long[]{0x0000100000000000L});
-	public static final BitSet FOLLOW_ctfBody_in_ctfTypeSpecifier3260 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_INTEGERTOK_in_ctfTypeSpecifier3275 = new BitSet(new long[]{0x0000100000000000L});
-	public static final BitSet FOLLOW_ctfBody_in_ctfTypeSpecifier3277 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_STRINGTOK_in_ctfTypeSpecifier3292 = new BitSet(new long[]{0x0000100000000002L});
-	public static final BitSet FOLLOW_ctfBody_in_ctfTypeSpecifier3294 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_LCURL_in_ctfBody3327 = new BitSet(new long[]{0xC8404AD1DA382F10L,0x000000000001CED5L});
-	public static final BitSet FOLLOW_ctfAssignmentExpressionList_in_ctfBody3329 = new BitSet(new long[]{0x0800000000000000L});
-	public static final BitSet FOLLOW_RCURL_in_ctfBody3332 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ctfAssignmentExpression_in_ctfAssignmentExpressionList3351 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
-	public static final BitSet FOLLOW_TERM_in_ctfAssignmentExpressionList3353 = new BitSet(new long[]{0xC0404AD1DA382F12L,0x000000000001CED5L});
-	public static final BitSet FOLLOW_unaryExpression_in_ctfAssignmentExpression3376 = new BitSet(new long[]{0x0000000000000040L,0x0000000000001000L});
-	public static final BitSet FOLLOW_ASSIGNMENT_in_ctfAssignmentExpression3388 = new BitSet(new long[]{0x8040005050202610L,0x0000000000000255L});
-	public static final BitSet FOLLOW_unaryExpression_in_ctfAssignmentExpression3392 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_TYPE_ASSIGNMENT_in_ctfAssignmentExpression3468 = new BitSet(new long[]{0x40004AC18A080900L,0x000000000001C091L});
-	public static final BitSet FOLLOW_typeSpecifier_in_ctfAssignmentExpression3472 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_declarationSpecifiers_in_ctfAssignmentExpression3555 = new BitSet(new long[]{0x0400004000000000L});
-	public static final BitSet FOLLOW_declaratorList_in_ctfAssignmentExpression3559 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_typealiasDecl_in_ctfAssignmentExpression3582 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_DOT_in_postfixCtfExpression719 = new BitSet(new long[]{0x0000000050002200L,0x0000000000000204L});
+	public static final BitSet FOLLOW_ctfSpecifierHead_in_postfixCtfExpression722 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_primaryExpression_in_postfixExpression755 = new BitSet(new long[]{0x0200000000800022L});
+	public static final BitSet FOLLOW_postfixExpressionSuffix_in_postfixExpression757 = new BitSet(new long[]{0x0200000000800022L});
+	public static final BitSet FOLLOW_ctfSpecifierHead_in_postfixExpression766 = new BitSet(new long[]{0x0200000000800020L});
+	public static final BitSet FOLLOW_postfixCtfExpression_in_postfixExpression768 = new BitSet(new long[]{0x0200000000800020L});
+	public static final BitSet FOLLOW_postfixExpressionSuffix_in_postfixExpression771 = new BitSet(new long[]{0x0200000000800022L});
+	public static final BitSet FOLLOW_postfixExpression_in_unaryExpression787 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_STRING_LITERAL_in_enumConstant804 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_IDENTIFIER_in_enumConstant818 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ctfKeyword_in_enumConstant832 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_declarationSpecifiers_in_declaration860 = new BitSet(new long[]{0x0400004000000000L,0x0000000000000100L});
+	public static final BitSet FOLLOW_declaratorList_in_declaration862 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
+	public static final BitSet FOLLOW_TERM_in_declaration865 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ctfSpecifier_in_declaration933 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
+	public static final BitSet FOLLOW_TERM_in_declaration935 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_storageClassSpecifier_in_declarationSpecifiers973 = new BitSet(new long[]{0x40004AC18A180902L,0x000000000001C891L});
+	public static final BitSet FOLLOW_typeQualifier_in_declarationSpecifiers983 = new BitSet(new long[]{0x40004AC18A180902L,0x000000000001C891L});
+	public static final BitSet FOLLOW_typeSpecifier_in_declarationSpecifiers993 = new BitSet(new long[]{0x40004AC18A180902L,0x000000000001C891L});
+	public static final BitSet FOLLOW_declarator_in_declaratorList1023 = new BitSet(new long[]{0x2000000000000002L});
+	public static final BitSet FOLLOW_SEPARATOR_in_declaratorList1026 = new BitSet(new long[]{0x0400004000000000L});
+	public static final BitSet FOLLOW_declarator_in_declaratorList1028 = new BitSet(new long[]{0x2000000000000002L});
+	public static final BitSet FOLLOW_abstractDeclarator_in_abstractDeclaratorList1058 = new BitSet(new long[]{0x2000000000000002L});
+	public static final BitSet FOLLOW_SEPARATOR_in_abstractDeclaratorList1061 = new BitSet(new long[]{0x0400804000000000L});
+	public static final BitSet FOLLOW_abstractDeclarator_in_abstractDeclaratorList1063 = new BitSet(new long[]{0x2000000000000002L});
+	public static final BitSet FOLLOW_TYPEDEFTOK_in_storageClassSpecifier1093 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FLOATTOK_in_typeSpecifier1109 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_INTTOK_in_typeSpecifier1115 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_LONGTOK_in_typeSpecifier1121 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_SHORTTOK_in_typeSpecifier1127 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_SIGNEDTOK_in_typeSpecifier1133 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_UNSIGNEDTOK_in_typeSpecifier1139 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_CHARTOK_in_typeSpecifier1145 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_DOUBLETOK_in_typeSpecifier1151 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_VOIDTOK_in_typeSpecifier1157 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_BOOLTOK_in_typeSpecifier1163 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_COMPLEXTOK_in_typeSpecifier1169 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_IMAGINARYTOK_in_typeSpecifier1175 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_structSpecifier_in_typeSpecifier1181 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_variantSpecifier_in_typeSpecifier1187 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_enumSpecifier_in_typeSpecifier1193 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ctfTypeSpecifier_in_typeSpecifier1199 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_typedefName_in_typeSpecifier1209 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_CONSTTOK_in_typeQualifier1222 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ALIGNTOK_in_alignAttribute1235 = new BitSet(new long[]{0x0000800000000000L});
+	public static final BitSet FOLLOW_LPAREN_in_alignAttribute1237 = new BitSet(new long[]{0x8040005050202610L,0x0000000000000255L});
+	public static final BitSet FOLLOW_unaryExpression_in_alignAttribute1239 = new BitSet(new long[]{0x1000000000000000L});
+	public static final BitSet FOLLOW_RPAREN_in_alignAttribute1241 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_LCURL_in_structBody1275 = new BitSet(new long[]{0x48004AC18A180900L,0x000000000001CC91L});
+	public static final BitSet FOLLOW_structOrVariantDeclarationList_in_structBody1277 = new BitSet(new long[]{0x0800000000000000L});
+	public static final BitSet FOLLOW_RCURL_in_structBody1280 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_STRUCTTOK_in_structSpecifier1308 = new BitSet(new long[]{0x0000104000000000L});
+	public static final BitSet FOLLOW_structName_in_structSpecifier1333 = new BitSet(new long[]{0x0000100000000012L});
+	public static final BitSet FOLLOW_alignAttribute_in_structSpecifier1355 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_structBody_in_structSpecifier1391 = new BitSet(new long[]{0x0000000000000012L});
+	public static final BitSet FOLLOW_alignAttribute_in_structSpecifier1422 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_structBody_in_structSpecifier1538 = new BitSet(new long[]{0x0000000000000012L});
+	public static final BitSet FOLLOW_alignAttribute_in_structSpecifier1556 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_IDENTIFIER_in_structName1622 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_structOrVariantDeclaration_in_structOrVariantDeclarationList1643 = new BitSet(new long[]{0x40004AC18A180902L,0x000000000001CC91L});
+	public static final BitSet FOLLOW_declarationSpecifiers_in_structOrVariantDeclaration1676 = new BitSet(new long[]{0x0400004000000000L});
+	public static final BitSet FOLLOW_declaratorList_in_structOrVariantDeclaration1717 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
+	public static final BitSet FOLLOW_structOrVariantDeclaratorList_in_structOrVariantDeclaration1757 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
+	public static final BitSet FOLLOW_typealiasDecl_in_structOrVariantDeclaration1816 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
+	public static final BitSet FOLLOW_TERM_in_structOrVariantDeclaration1828 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_typeQualifier_in_specifierQualifierList1842 = new BitSet(new long[]{0x40004AC18A180902L,0x000000000001C091L});
+	public static final BitSet FOLLOW_typeSpecifier_in_specifierQualifierList1846 = new BitSet(new long[]{0x40004AC18A180902L,0x000000000001C091L});
+	public static final BitSet FOLLOW_structOrVariantDeclarator_in_structOrVariantDeclaratorList1879 = new BitSet(new long[]{0x2000000000000002L});
+	public static final BitSet FOLLOW_SEPARATOR_in_structOrVariantDeclaratorList1882 = new BitSet(new long[]{0x0400004000000000L});
+	public static final BitSet FOLLOW_structOrVariantDeclarator_in_structOrVariantDeclaratorList1884 = new BitSet(new long[]{0x2000000000000002L});
+	public static final BitSet FOLLOW_declarator_in_structOrVariantDeclarator1923 = new BitSet(new long[]{0x0000000000008002L});
+	public static final BitSet FOLLOW_COLON_in_structOrVariantDeclarator1926 = new BitSet(new long[]{0x8040001000200000L});
+	public static final BitSet FOLLOW_numberLiteral_in_structOrVariantDeclarator1928 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_VARIANTTOK_in_variantSpecifier1952 = new BitSet(new long[]{0x0001104000000000L});
+	public static final BitSet FOLLOW_variantName_in_variantSpecifier1970 = new BitSet(new long[]{0x0001100000000000L});
+	public static final BitSet FOLLOW_variantTag_in_variantSpecifier2000 = new BitSet(new long[]{0x0000100000000002L});
+	public static final BitSet FOLLOW_variantBody_in_variantSpecifier2026 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_variantBody_in_variantSpecifier2094 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_variantTag_in_variantSpecifier2115 = new BitSet(new long[]{0x0000100000000000L});
+	public static final BitSet FOLLOW_variantBody_in_variantSpecifier2117 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_variantBody_in_variantSpecifier2124 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_IDENTIFIER_in_variantName2156 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_LCURL_in_variantBody2187 = new BitSet(new long[]{0x40004AC18A180900L,0x000000000001CC91L});
+	public static final BitSet FOLLOW_structOrVariantDeclarationList_in_variantBody2189 = new BitSet(new long[]{0x0800000000000000L});
+	public static final BitSet FOLLOW_RCURL_in_variantBody2191 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_LT_in_variantTag2218 = new BitSet(new long[]{0x0000004000000000L});
+	public static final BitSet FOLLOW_IDENTIFIER_in_variantTag2220 = new BitSet(new long[]{0x0000000200000000L});
+	public static final BitSet FOLLOW_GT_in_variantTag2222 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ENUMTOK_in_enumSpecifier2243 = new BitSet(new long[]{0x0000104000008000L});
+	public static final BitSet FOLLOW_enumName_in_enumSpecifier2282 = new BitSet(new long[]{0x0000100000008002L});
+	public static final BitSet FOLLOW_enumContainerType_in_enumSpecifier2314 = new BitSet(new long[]{0x0000100000000000L});
+	public static final BitSet FOLLOW_enumBody_in_enumSpecifier2316 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_enumBody_in_enumSpecifier2346 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_enumContainerType_in_enumSpecifier2438 = new BitSet(new long[]{0x0000100000000000L});
+	public static final BitSet FOLLOW_enumBody_in_enumSpecifier2440 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_enumBody_in_enumSpecifier2464 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_IDENTIFIER_in_enumName2508 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_LCURL_in_enumBody2529 = new BitSet(new long[]{0x0000004040000010L,0x0000000000000051L});
+	public static final BitSet FOLLOW_enumeratorList_in_enumBody2531 = new BitSet(new long[]{0x2800000000000000L});
+	public static final BitSet FOLLOW_SEPARATOR_in_enumBody2533 = new BitSet(new long[]{0x0800000000000000L});
+	public static final BitSet FOLLOW_RCURL_in_enumBody2536 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_COLON_in_enumContainerType2557 = new BitSet(new long[]{0x40004AC18A180900L,0x000000000001C891L});
+	public static final BitSet FOLLOW_declarationSpecifiers_in_enumContainerType2559 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_enumerator_in_enumeratorList2580 = new BitSet(new long[]{0x2000000000000002L});
+	public static final BitSet FOLLOW_SEPARATOR_in_enumeratorList2583 = new BitSet(new long[]{0x0000004040000010L,0x0000000000000051L});
+	public static final BitSet FOLLOW_enumerator_in_enumeratorList2585 = new BitSet(new long[]{0x2000000000000002L});
+	public static final BitSet FOLLOW_enumConstant_in_enumerator2611 = new BitSet(new long[]{0x0000000000000042L});
+	public static final BitSet FOLLOW_enumeratorValue_in_enumerator2613 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ASSIGNMENT_in_enumeratorValue2627 = new BitSet(new long[]{0x8040005050202610L,0x0000000000000255L});
+	public static final BitSet FOLLOW_unaryExpression_in_enumeratorValue2631 = new BitSet(new long[]{0x0000000004000002L});
+	public static final BitSet FOLLOW_ELIPSES_in_enumeratorValue2670 = new BitSet(new long[]{0x8040005050202610L,0x0000000000000255L});
+	public static final BitSet FOLLOW_unaryExpression_in_enumeratorValue2674 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_pointer_in_declarator2717 = new BitSet(new long[]{0x0400004000000000L});
+	public static final BitSet FOLLOW_directDeclarator_in_declarator2720 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_IDENTIFIER_in_directDeclarator2758 = new BitSet(new long[]{0x0200000000000002L});
+	public static final BitSet FOLLOW_directDeclaratorSuffix_in_directDeclarator2798 = new BitSet(new long[]{0x0200000000000002L});
+	public static final BitSet FOLLOW_OPENBRAC_in_directDeclaratorSuffix2812 = new BitSet(new long[]{0x8040005050202610L,0x0000000000000255L});
+	public static final BitSet FOLLOW_directDeclaratorLength_in_directDeclaratorSuffix2814 = new BitSet(new long[]{0x0000000000004000L});
+	public static final BitSet FOLLOW_CLOSEBRAC_in_directDeclaratorSuffix2816 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_unaryExpression_in_directDeclaratorLength2844 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_pointer_in_abstractDeclarator2857 = new BitSet(new long[]{0x0400804000000002L});
+	public static final BitSet FOLLOW_directAbstractDeclarator_in_abstractDeclarator2860 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_directAbstractDeclarator_in_abstractDeclarator2885 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_IDENTIFIER_in_directAbstractDeclarator2922 = new BitSet(new long[]{0x0200000000000002L});
+	public static final BitSet FOLLOW_LPAREN_in_directAbstractDeclarator2933 = new BitSet(new long[]{0x0400804000000000L});
+	public static final BitSet FOLLOW_abstractDeclarator_in_directAbstractDeclarator2935 = new BitSet(new long[]{0x1000000000000000L});
+	public static final BitSet FOLLOW_RPAREN_in_directAbstractDeclarator2937 = new BitSet(new long[]{0x0200000000000002L});
+	public static final BitSet FOLLOW_OPENBRAC_in_directAbstractDeclarator2952 = new BitSet(new long[]{0x8040005050206610L,0x0000000000000255L});
+	public static final BitSet FOLLOW_unaryExpression_in_directAbstractDeclarator2954 = new BitSet(new long[]{0x0000000000004000L});
+	public static final BitSet FOLLOW_CLOSEBRAC_in_directAbstractDeclarator2957 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_POINTER_in_pointer2975 = new BitSet(new long[]{0x0000000000100002L});
+	public static final BitSet FOLLOW_typeQualifierList_in_pointer2977 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_typeQualifier_in_typeQualifierList3000 = new BitSet(new long[]{0x0000000000100002L});
+	public static final BitSet FOLLOW_IDENTIFIER_in_typedefName3016 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_declarationSpecifiers_in_typealiasTarget3033 = new BitSet(new long[]{0x0400804000000002L});
+	public static final BitSet FOLLOW_abstractDeclaratorList_in_typealiasTarget3035 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_abstractDeclaratorList_in_typealiasAlias3061 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_declarationSpecifiers_in_typealiasAlias3067 = new BitSet(new long[]{0x0400804000000002L});
+	public static final BitSet FOLLOW_abstractDeclaratorList_in_typealiasAlias3069 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_TYPEALIASTOK_in_typealiasDecl3083 = new BitSet(new long[]{0x40004AC18A180900L,0x000000000001C891L});
+	public static final BitSet FOLLOW_typealiasTarget_in_typealiasDecl3085 = new BitSet(new long[]{0x0000000000000000L,0x0000000000001000L});
+	public static final BitSet FOLLOW_TYPE_ASSIGNMENT_in_typealiasDecl3087 = new BitSet(new long[]{0x4400CAC18A180900L,0x000000000001C891L});
+	public static final BitSet FOLLOW_typealiasAlias_in_typealiasDecl3089 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ctfSpecifierHead_in_ctfSpecifier3189 = new BitSet(new long[]{0x0000100000000000L});
+	public static final BitSet FOLLOW_ctfBody_in_ctfSpecifier3191 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_typealiasDecl_in_ctfSpecifier3208 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_EVENTTOK_in_ctfSpecifierHead3229 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_STREAMTOK_in_ctfSpecifierHead3239 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_TRACETOK_in_ctfSpecifierHead3249 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ENVTOK_in_ctfSpecifierHead3259 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_CLOCKTOK_in_ctfSpecifierHead3269 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_CALLSITETOK_in_ctfSpecifierHead3279 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FLOATINGPOINTTOK_in_ctfTypeSpecifier3302 = new BitSet(new long[]{0x0000100000000000L});
+	public static final BitSet FOLLOW_ctfBody_in_ctfTypeSpecifier3304 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_INTEGERTOK_in_ctfTypeSpecifier3319 = new BitSet(new long[]{0x0000100000000000L});
+	public static final BitSet FOLLOW_ctfBody_in_ctfTypeSpecifier3321 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_STRINGTOK_in_ctfTypeSpecifier3336 = new BitSet(new long[]{0x0000100000000002L});
+	public static final BitSet FOLLOW_ctfBody_in_ctfTypeSpecifier3338 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_LCURL_in_ctfBody3371 = new BitSet(new long[]{0xC8404AD1DA382F10L,0x000000000001CED5L});
+	public static final BitSet FOLLOW_ctfAssignmentExpressionList_in_ctfBody3373 = new BitSet(new long[]{0x0800000000000000L});
+	public static final BitSet FOLLOW_RCURL_in_ctfBody3376 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ctfAssignmentExpression_in_ctfAssignmentExpressionList3395 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000100L});
+	public static final BitSet FOLLOW_TERM_in_ctfAssignmentExpressionList3397 = new BitSet(new long[]{0xC0404AD1DA382F12L,0x000000000001CED5L});
+	public static final BitSet FOLLOW_unaryExpression_in_ctfAssignmentExpression3420 = new BitSet(new long[]{0x0000000000000040L,0x0000000000001000L});
+	public static final BitSet FOLLOW_ASSIGNMENT_in_ctfAssignmentExpression3432 = new BitSet(new long[]{0x8040005050202610L,0x0000000000000255L});
+	public static final BitSet FOLLOW_unaryExpression_in_ctfAssignmentExpression3436 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_TYPE_ASSIGNMENT_in_ctfAssignmentExpression3512 = new BitSet(new long[]{0x40004AC18A080900L,0x000000000001C091L});
+	public static final BitSet FOLLOW_typeSpecifier_in_ctfAssignmentExpression3516 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_declarationSpecifiers_in_ctfAssignmentExpression3599 = new BitSet(new long[]{0x0400004000000000L});
+	public static final BitSet FOLLOW_declaratorList_in_ctfAssignmentExpression3603 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_typealiasDecl_in_ctfAssignmentExpression3626 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_IDENTIFIER_in_synpred1_CTFParser560 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_ctfKeyword_in_synpred2_CTFParser586 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_STRING_LITERAL_in_synpred3_CTFParser606 = new BitSet(new long[]{0x0000000000000002L});
