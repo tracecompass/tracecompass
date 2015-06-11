@@ -22,4 +22,9 @@ public interface ITmfUIPreferences {
      * Preference for aligning the views based on the time axis
      */
     String PREF_ALIGN_VIEWS = "PREF_ALIGN_VIEWS"; //$NON-NLS-1$
+
+    /**
+     * Preference (not user visible) for saving the last location used when using "Open Trace"
+     */
+    String PREF_SAVED_OPEN_FILE_LOCATION = "PREF_LAST_OPEN_FILE_LOCATION"; //$NON-NLS-1$
 }

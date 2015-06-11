@@ -13,16 +13,21 @@
 
 package org.eclipse.tracecompass.internal.tmf.ui.commands;
 
+import java.io.File;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.ITmfUIPreferences;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
@@ -49,6 +54,14 @@ public class OpenFileHandler extends AbstractHandler {
         final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
         FileDialog fd = new FileDialog(shell);
         fd.setText(Messages.OpenFileHandler_SelectTraceFile);
+        IEclipsePreferences defaultPreferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+        String lastLocation = defaultPreferences.get(ITmfUIPreferences.PREF_SAVED_OPEN_FILE_LOCATION, null);
+        if (lastLocation != null && !lastLocation.isEmpty()) {
+            File parentFile = new File(lastLocation).getParentFile();
+            if (parentFile != null && parentFile.exists()) {
+                fd.setFilterPath(parentFile.toString());
+            }
+        }
         String filePath = fd.open();
         if (filePath == null) {
             return null;
@@ -74,6 +87,8 @@ public class OpenFileHandler extends AbstractHandler {
         } catch (CoreException e) {
             Activator.getDefault().logError(e.getMessage(), e);
         }
+
+        InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put(ITmfUIPreferences.PREF_SAVED_OPEN_FILE_LOCATION, filePath);
         return null;
     }
 }
