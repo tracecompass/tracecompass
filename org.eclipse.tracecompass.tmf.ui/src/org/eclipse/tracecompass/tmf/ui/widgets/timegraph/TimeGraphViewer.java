@@ -136,6 +136,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     private Action fFollowArrowBwdAction;
 
     private ListenerNotifier fListenerNotifier;
+    private final Object fListenerNotifierLock = new Object();
 
     private Composite fTimeAlignedComposite;
 
@@ -156,27 +157,28 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
                     return;
                 }
             }
-            Display.getDefault().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    if (fListenerNotifier != ListenerNotifier.this) {
-                        return;
+            synchronized (fListenerNotifierLock) {
+                fListenerNotifier = null;
+            }
+            if (!isInterrupted()) {
+                Display.getDefault().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (fDataViewer.isDisposed()) {
+                            return;
+                        }
+                        if (fSelectionChanged) {
+                            fireSelectionChanged(fSelectedEntry);
+                        }
+                        if (fTimeRangeUpdated) {
+                            fireTimeRangeUpdated(fTime0, fTime1);
+                        }
+                        if (fTimeSelected) {
+                            fireTimeSelected(fSelectionBegin, fSelectionEnd);
+                        }
                     }
-                    fListenerNotifier = null;
-                    if (ListenerNotifier.this.isInterrupted() || fDataViewer.isDisposed()) {
-                        return;
-                    }
-                    if (fSelectionChanged) {
-                        fireSelectionChanged(fSelectedEntry);
-                    }
-                    if (fTimeRangeUpdated) {
-                        fireTimeRangeUpdated(fTime0, fTime1);
-                    }
-                    if (fTimeSelected) {
-                        fireTimeSelected(fSelectionBegin, fSelectionEnd);
-                    }
-                }
-            });
+                });
+            }
         }
 
         public void selectionChanged() {
@@ -192,18 +194,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         public void timeSelected() {
             fTimeSelected = true;
             fLastUpdateTime = System.currentTimeMillis();
-        }
-
-        public boolean hasSelectionChanged() {
-            return fSelectionChanged;
-        }
-
-        public boolean hasTimeRangeUpdated() {
-            return fTimeRangeUpdated;
-        }
-
-        public boolean hasTimeSelected() {
-            return fTimeSelected;
         }
     }
 
@@ -264,7 +254,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     public void setInput(Object inputElement) {
         fInputElement = inputElement;
         ITimeGraphEntry[] input = fTimeGraphContentProvider.getElements(inputElement);
-        fListenerNotifier = null;
+
         if (fTimeGraphCtrl != null) {
             setTimeRange(input);
             setTopIndex(0);
@@ -750,10 +740,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
     @Override
     public void setStartFinishTime(long time0, long time1) {
-        /* if there is a pending time range, ignore this one */
-        if (fListenerNotifier != null && fListenerNotifier.hasTimeRangeUpdated()) {
-            return;
-        }
         fTime0 = time0;
         if (fTime0 < fTime0Bound) {
             fTime0 = fTime0Bound;
@@ -790,10 +776,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
     @Override
     public void setSelectedTime(long time, boolean ensureVisible) {
-        /* if there is a pending time selection, ignore this one */
-        if (fListenerNotifier != null && fListenerNotifier.hasTimeSelected()) {
-            return;
-        }
         setSelectedTimeInt(time, ensureVisible, false);
     }
 
@@ -817,10 +799,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
     @Override
     public void setSelectionRange(long beginTime, long endTime) {
-        /* if there is a pending time selection, ignore this one */
-        if (fListenerNotifier != null && fListenerNotifier.hasTimeSelected()) {
-            return;
-        }
         fSelectionBegin = Math.max(fTime0Bound, Math.min(fTime1Bound, beginTime));
         fSelectionEnd = Math.max(fTime0Bound, Math.min(fTime1Bound, endTime));
         fTimeGraphCtrl.redraw();
@@ -979,11 +957,13 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     }
 
     private void notifySelectionListeners() {
-        if (fListenerNotifier == null) {
-            fListenerNotifier = new ListenerNotifier();
-            fListenerNotifier.start();
+        synchronized (fListenerNotifierLock) {
+            if (fListenerNotifier == null) {
+                fListenerNotifier = new ListenerNotifier();
+                fListenerNotifier.start();
+            }
+            fListenerNotifier.selectionChanged();
         }
-        fListenerNotifier.selectionChanged();
     }
 
     private void fireSelectionChanged(ITimeGraphEntry selection) {
@@ -1015,11 +995,13 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     }
 
     private void notifyTimeListeners() {
-        if (fListenerNotifier == null) {
-            fListenerNotifier = new ListenerNotifier();
-            fListenerNotifier.start();
+        synchronized (fListenerNotifierLock) {
+            if (fListenerNotifier == null) {
+                fListenerNotifier = new ListenerNotifier();
+                fListenerNotifier.start();
+            }
+            fListenerNotifier.timeSelected();
         }
-        fListenerNotifier.timeSelected();
     }
 
     private void fireTimeSelected(long startTime, long endTime) {
@@ -1051,11 +1033,13 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     }
 
     private void notifyRangeListeners() {
-        if (fListenerNotifier == null) {
-            fListenerNotifier = new ListenerNotifier();
-            fListenerNotifier.start();
+        synchronized (fListenerNotifierLock) {
+            if (fListenerNotifier == null) {
+                fListenerNotifier = new ListenerNotifier();
+                fListenerNotifier.start();
+            }
+            fListenerNotifier.timeRangeUpdated();
         }
-        fListenerNotifier.timeRangeUpdated();
     }
 
     private void fireTimeRangeUpdated(long startTime, long endTime) {
@@ -1119,10 +1103,6 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      *            The trace that was selected
      */
     public void setSelection(ITimeGraphEntry trace) {
-        /* if there is a pending selection, ignore this one */
-        if (fListenerNotifier != null && fListenerNotifier.hasSelectionChanged()) {
-            return;
-        }
         fSelectedEntry = trace;
         fTimeGraphCtrl.selectItem(trace, false);
         adjustVerticalScrollBar();
