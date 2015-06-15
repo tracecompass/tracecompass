@@ -15,14 +15,14 @@
 # (by copying the contents of tmf.core's settings)
 
 # Plugins from which we will copy the settings
-RUNTIME_REFERENCE="org.eclipse.tracecompass.tmf.core"
-TEST_REFERENCE="org.eclipse.tracecompass.tmf.core.tests"
+RUNTIME_REFERENCE="tmf/org.eclipse.tracecompass.tmf.core"
+TEST_REFERENCE="tmf/org.eclipse.tracecompass.tmf.core.tests"
 
 RUNTIME_FILES=$RUNTIME_REFERENCE/.settings/*.prefs
 TEST_FILES=$TEST_REFERENCE/.settings/*.prefs
 
 # Runtime plugins
-for DIR in *.core *.ui org.eclipse.tracecompass.examples
+for DIR in */*.core */*.ui doc/org.eclipse.tracecompass.examples
 do
   # Skip non-directories
   if [ ! -d $DIR ]; then
@@ -42,7 +42,7 @@ done
 
 
 # Test plugins
-for DIR in *.tests *.alltests
+for DIR in */*.tests */*.alltests
 do
   # Skip non-directories
   if [ ! -d $DIR ]; then
