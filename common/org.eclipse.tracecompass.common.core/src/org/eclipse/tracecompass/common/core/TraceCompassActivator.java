@@ -12,6 +12,9 @@
 
 package org.eclipse.tracecompass.common.core;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +37,7 @@ public abstract class TraceCompassActivator extends Plugin {
 
     /** Map of all the registered activators, indexed by plugin ID */
     private static final Map<String, TraceCompassActivator> ACTIVATORS =
-            new HashMap<>();
+            checkNotNull(Collections.synchronizedMap(new HashMap<String, TraceCompassActivator>()));
 
     /** This instance's plug-in ID */
     private final String fPluginId;
@@ -105,10 +108,12 @@ public abstract class TraceCompassActivator extends Plugin {
     public final void start(@Nullable BundleContext context) throws Exception {
         super.start(context);
         String id = this.getPluginId();
-        if (ACTIVATORS.containsKey(id)) {
-            logError("Duplicate Activator ID : " + id); //$NON-NLS-1$
+        synchronized (ACTIVATORS) {
+            if (ACTIVATORS.containsKey(id)) {
+                logError("Duplicate Activator ID : " + id); //$NON-NLS-1$
+            }
+            ACTIVATORS.put(id, this);
         }
-        ACTIVATORS.put(id, this);
         startActions();
     }
 
