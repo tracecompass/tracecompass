@@ -566,13 +566,11 @@ The Events editor shows the basic trace data elements (events) in a tabular form
 
 The header displays the current trace (or experiment) name.
 
-Being part of the '''Tracing and Monitoring''' Framework, the default table displays the following fields:
+The columns of the table are defined by the fields (aspects) of the specific trace type. These are the defaults:
 
 * '''Timestamp''': the event timestamp
-* '''Source''': the source of the event
-* '''Type''': the event type and localization
-* '''Reference''' the event reference
-* '''Content''': the raw event content
+* '''Type''': the event type
+* '''Contents''': the fields (or payload) of this event
 
 The first row of the table is the header row a.k.a. the Search and Filter row.
 
@@ -638,6 +636,10 @@ To remove a bookmark, double-click its icon, select '''Remove Bookmark''' from t
 
 [[Image:images/Bookmarks.png]]
 
+=== Copy to Clipboard ===
+
+The text of selected events can be copied to the clipboard by right-clicking on the table and selecting '''Copy to Clipboard''' in the context menu. The clipboard contents will be prefixed by the column header names. For every event in the table selection, the column text will be copied to the clipboard. The column text will be tab-separated. Hidden columns will not be included in the clipboard contents.
+
 === Event Source Lookup ===
 
 For CTF traces using specification v1.8.2 or above, information can optionally be embedded in the trace to indicate the source of a trace event. This is accessed through the event context menu by right-clicking on an event in the table.
@@ -651,11 +653,13 @@ If a source file is available in the trace for the selected event, the item '''O
 If an EMF model URI is available in the trace for the selected event, the item '''Open Model Element''' is shown in the context menu. Selecting this menu item will attempt to open the model file in the project specified in the URI. The model file will be opened in its default model editor. If the model file is not found, an error dialog is shown displaying the URI information.
 
 === Exporting To Text ===
+
 It is possible to export the content of the trace to a text file based on the columns displayed in the events table. If a filter (see '''[[#Filtering| Filtering]]''') was defined prior exporting only events that match the filter will be exported to the file. To export the trace to text, press the right mouse button on the events table. A context-sensitive menu will show. Select the '''Export To Text...''' menu option. A file locater dialog will open. Fill in the file name and location and then press on '''OK'''. A window with a progress bar will open till the export is finished.
 
 ''Note'':  The columns in the text file are separated by tabs.
 
 === Collapsing of Repetitive Events ===
+
 The implementation for collapsing of repetitive events is trace type specific and is only available for certain trace types. For example, a trace type could allow collapsing of consecutive events that have the same event content but not the same timestamp. If a trace type supports this feature then it is possible to select the '''Collapse Events''' menu item after pressing the right mouse button in the table.
 
 When the collapsing of events is executing, the table will clear all events and fill itself with all relevant events. If the collapse condition is met, the first column of the table will show the number of times this event was repeated consecutively.
@@ -671,6 +675,8 @@ To clear collapsing, press the right mouse button in the table and select menu i
 === Customization ===
 
 The table columns can be reordered by the user by dragging the column headers. This column order is saved when the editor is closed. The setting applies to all traces of the same trace type.
+
+The table columns can be hidden or restored by right-clicking on any column header and clicking on an item in the context menu to toggle its state. Clicking '''Show All''' will restore all table columns.
 
 The table font can be customized by the user by changing the preference in '''Window''' > '''Preferences''' > '''General''' > '''Appearance''' > '''Colors and Fonts''' > '''Tracing''' > '''Trace event table font'''.
 
@@ -1858,8 +1864,11 @@ The LTTng Kernel Events editor '''is''' the plain TMF [[#Events_Editor | Events 
 
 * '''Timestamp''': the event timestamp
 * '''Channel''': the event channel (data collector)
+* '''CPU''': the CPU on which the event was taken
 * '''Event Type''': the event type (or kernel marker)
-* '''Content''': the raw event content
+* '''Contents''': the fields (or payload) of this event
+* '''TID''': The ID of the thread this event belongs to
+* '''Prio''': The priority of the thread this event belongs to
 
 [[Image:images/LTTng2EventsEditor.png]]
 
