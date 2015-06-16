@@ -2327,7 +2327,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      */
     private void createResources() {
         fGrayColor = fResourceManager.createColor(ColorUtil.blend(fTable.getBackground().getRGB(), fTable.getForeground().getRGB()));
-        fGreenColor = fTable.getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN);
+        fGreenColor = PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN);
     }
 
     /**
@@ -2529,7 +2529,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         fDisposeOnClose = disposeOnClose;
 
         // Perform the updates on the UI thread
-        fTable.getDisplay().syncExec(new Runnable() {
+        PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
             @Override
             public void run() {
                 fSelectedRank = -1;
@@ -2604,27 +2604,25 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             fCacheUpdateBusy = true;
         }
         // Event cache is now updated. Perform update on the UI thread
-        if (!fTable.isDisposed()) {
-            fTable.getDisplay().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    if (!fTable.isDisposed()) {
-                        fTable.refresh();
-                        packColumns();
-                    }
-                    if (completed) {
-                        populateCompleted();
-                    }
-                    synchronized (fCacheUpdateSyncObj) {
-                        fCacheUpdateBusy = false;
-                        if (fCacheUpdatePending) {
-                            fCacheUpdatePending = false;
-                            cacheUpdated(fCacheUpdateCompleted);
-                        }
+        PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                if (!fTable.isDisposed()) {
+                    fTable.refresh();
+                    packColumns();
+                }
+                if (completed) {
+                    populateCompleted();
+                }
+                synchronized (fCacheUpdateSyncObj) {
+                    fCacheUpdateBusy = false;
+                    if (fCacheUpdatePending) {
+                        fCacheUpdatePending = false;
+                        cacheUpdated(fCacheUpdateCompleted);
                     }
                 }
-            });
-        }
+            }
+        });
     }
 
     /**
@@ -2926,7 +2924,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     final long rank = context.getRank();
                     context.dispose();
 
-                    fTable.getDisplay().asyncExec(new Runnable() {
+                    PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
                         @Override
                         public void run() {
                             // Return if table is disposed
