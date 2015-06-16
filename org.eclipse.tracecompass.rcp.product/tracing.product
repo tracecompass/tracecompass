@@ -42,11 +42,11 @@ http://www.eclipse.org/legal/epl-v10.html
    <splash
       location="org.eclipse.tracecompass.rcp.branding" />
    <launcher name="tracecompass">
-      <linux icon="../../../../org.eclipse.tracecompass.rcp.branding/icons/xpm/tc_icon_256x256.xpm"/>
-      <macosx icon="../../../../org.eclipse.tracecompass.rcp.branding/icons/icns/tc_icon.icns"/>
+      <linux icon="../org.eclipse.tracecompass.rcp.branding/icons/xpm/tc_icon_256x256.xpm"/>
+      <macosx icon="../org.eclipse.tracecompass.rcp.branding/icons/icns/tc_icon.icns"/>
       <solaris/>
       <win useIco="true">
-         <ico path="../../../../org.eclipse.tracecompass.rcp.branding/icons/ico/tc_icon.ico"/>
+         <ico path="../org.eclipse.tracecompass.rcp.branding/icons/ico/tc_icon.ico"/>
          <bmp/>
       </win>
    </launcher>
