@@ -287,6 +287,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
     protected IStatus executeAnalysis() {
         MultiStatus status = new MultiStatus(Activator.PLUGIN_ID, IStatus.OK, null, null);
 
+        /* First modules are initialized */
         Multimap<String, IAnalysisModuleHelper> modules = TmfAnalysisManager.getAnalysisModules();
         for (IAnalysisModuleHelper helper : modules.values()) {
             try {
@@ -295,11 +296,15 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
                     continue;
                 }
                 fAnalysisModules.put(module.getId(), module);
-                if (module.isAutomatic()) {
-                    status.add(module.schedule());
-                }
             } catch (TmfAnalysisException e) {
                 status.add(new Status(IStatus.WARNING, Activator.PLUGIN_ID, e.getMessage()));
+            }
+        }
+
+        /* Once all modules are initialized, automatic modules are executed */
+        for (IAnalysisModule module : getAnalysisModules()) {
+            if (module.isAutomatic()) {
+                status.add(module.schedule());
             }
         }
         return status;
