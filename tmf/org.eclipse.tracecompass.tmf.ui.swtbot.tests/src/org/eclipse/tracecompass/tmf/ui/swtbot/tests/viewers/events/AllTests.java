@@ -23,6 +23,7 @@ import org.junit.runners.Suite;
         CallsiteEventsInTableTest.class,
         CollapseEventsInTableTest.class,
         ColorsViewTest.class,
+        ColumnHeaderMenuTest.class,
         FilterColorEditorTest.class,
         FilterViewerTest.class,
         FontEventEditorTest.class,
