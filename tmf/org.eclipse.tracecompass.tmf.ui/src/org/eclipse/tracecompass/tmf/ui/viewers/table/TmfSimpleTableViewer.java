@@ -54,7 +54,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
  * calling {@link TableViewer#getTable()} with
  * {@link Table#addSelectionListener(SelectionListener)}
  *
- * @since 1.0
+ * @since 2.0
  */
 public class TmfSimpleTableViewer extends TmfViewer {
 

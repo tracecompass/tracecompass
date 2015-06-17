@@ -419,7 +419,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *
      * @return The unmodifiable link event list
      *
-     * @since 1.0
+     * @since 2.0
      */
     public List<ILinkEvent> getArrows() {
         return Collections.unmodifiableList(fItemData.fLinks);
