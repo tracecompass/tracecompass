@@ -135,19 +135,19 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     /**
      * No drag in progress
      */
-    protected static final int DRAG_NONE = 0;
+    protected final int DRAG_NONE = 0;
     /**
      * Drag the selection
      */
-    protected static final int DRAG_SELECTION = 1;
+    protected final int DRAG_SELECTION = 1;
     /**
      * Drag the time range
      */
-    protected static final int DRAG_RANGE = 2;
+    protected final int DRAG_RANGE = 2;
     /**
      * Drag the zoom range
      */
-    protected static final int DRAG_ZOOM = 3;
+    protected final int DRAG_ZOOM = 3;
 
     // ------------------------------------------------------------------------
     // Attributes

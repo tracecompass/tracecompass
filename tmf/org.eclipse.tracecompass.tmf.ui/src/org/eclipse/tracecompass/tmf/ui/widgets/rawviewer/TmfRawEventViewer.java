@@ -217,7 +217,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 
     /**
      * Initialize the colors.
-     * @since 1.0
+     * @since 1.1
      */
     protected void initializeColors() {
         ColorRegistry colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
@@ -879,14 +879,14 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     // ------------------------------------------------------------------------
 
     /**
-     * @since 1.0
+     * @since 1.1
      */
     @Override
     public void mouseDown(MouseEvent e) {
     }
 
     /**
-     * @since 1.0
+     * @since 1.1
      */
     @Override
     public void mouseUp(MouseEvent e) {
@@ -908,7 +908,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     }
 
     /**
-     * @since 1.0
+     * @since 1.1
      */
     @Override
     public void mouseDoubleClick(MouseEvent e) {

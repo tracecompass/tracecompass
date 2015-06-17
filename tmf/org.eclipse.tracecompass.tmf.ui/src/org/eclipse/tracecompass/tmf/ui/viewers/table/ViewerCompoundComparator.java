@@ -19,7 +19,7 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
  * ViewerCompoundComparator that can be used to make compound comparisons (1st
  * key 2nd key etc...)
  *
- * @since 1.0
+ * @since 1.1
  *
  */
 public abstract class ViewerCompoundComparator extends ViewerComparator {

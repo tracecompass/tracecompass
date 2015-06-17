@@ -20,6 +20,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  * names, etc.)
  *
  * @author Alexandre Montplaisir
+ * @noimplement This interface only contains static definitions.
  */
 @SuppressWarnings("nls")
 @NonNullByDefault
@@ -95,7 +96,7 @@ public interface CTFStrings {
     /**
      * Magic number
      *
-     * @since 1.0
+     * @since 1.1
      */
     String MAGIC = "magic";
 }

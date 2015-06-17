@@ -220,10 +220,12 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     /**
      * The events table search/filter/data keys
      *
-     * @version 1.0
      * @author Patrick Tasse
+     * @noimplement This interface only contains Event Table specific
+     *              static definitions.
      */
     public interface Key {
+
         /** Search text */
         String SEARCH_TXT = "$srch_txt"; //$NON-NLS-1$
 
@@ -258,7 +260,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         /**
          * The width of a table item
          *
-         * @since 1.0
+         * @since 1.1
          */
         String WIDTH = "$width"; //$NON-NLS-1$
     }
