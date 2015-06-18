@@ -45,7 +45,7 @@
   <target-platform>tracecompass-eStaging</target-platform>
   <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
   <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-  <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
+  <sonar.jacoco.reportPath>${project.basedir}/../../target/jacoco.exec</sonar.jacoco.reportPath>
   <sonar.java.source>1.7</sonar.java.source>
   <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   <help-docs-eclipserun-repo>http://download.eclipse.org/eclipse/updates/4.4</help-docs-eclipserun-repo>
