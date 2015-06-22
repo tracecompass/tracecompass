@@ -1,13 +1,15 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson, Ecole Polytechnique de Montreal and others
+ * Copyright (c) 2011, 2015 Ericsson, Ecole Polytechnique de Montreal and others
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: Matthew Khouzam - Initial API and implementation
- * Contributors: Simon Marchi - Initial API and implementation
+ * Contributors:
+ *   Matthew Khouzam - Initial API and implementation
+ *   Simon Marchi - Initial API and implementation
+ *   Patrick Tasse - Bug 470754 - Incorrect time range in CTF Lost Event
  *******************************************************************************/
 package org.eclipse.tracecompass.ctf.core.trace;
 
@@ -91,8 +93,6 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
     private int fCurrentCpu = 0;
 
     private int fLostEventsInThisPacket;
-
-    private long fLostEventsDuration;
 
     private boolean fHasLost = false;
 
@@ -220,7 +220,6 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
      * @since 1.0
      */
     public void setCurrentPacket(ICTFPacketDescriptor currentPacket) throws CTFException {
-        ICTFPacketDescriptor prevPacket = null;
         fCurrentPacket = currentPacket;
 
         if (fCurrentPacket != null) {
@@ -258,20 +257,6 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
                 fLostEventsInThisPacket = (int) getCurrentPacket().getLostEvents();
                 if (fLostEventsInThisPacket != 0) {
                     fHasLost = true;
-                    /*
-                     * Compute the duration of the lost event time range. If the
-                     * current packet is the first packet, duration will be set
-                     * to 1.
-                     */
-                    long lostEventsStartTime;
-                    int index = fStreamInputReader.getStreamInput().getIndex().indexOf(currentPacket);
-                    if (index == 0) {
-                        lostEventsStartTime = currentPacket.getTimestampBegin() + 1;
-                    } else {
-                        prevPacket = fStreamInputReader.getStreamInput().getIndex().getElement(index - 1);
-                        lostEventsStartTime = prevPacket.getTimestampEnd();
-                    }
-                    fLostEventsDuration = Math.abs(lostEventsStartTime - currentPacket.getTimestampBegin());
                 }
             }
 
@@ -313,7 +298,16 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
         // compromise since we cannot have 64 bit addressing of arrays yet.
         int eventID = (int) IEventDeclaration.UNSET_EVENT_ID;
         long timestamp = 0;
-        if (fHasLost) {
+        final BitBuffer currentBitBuffer = fBitBuffer;
+        final ICTFPacketDescriptor currentPacket = fCurrentPacket;
+        if (currentBitBuffer == null || currentPacket == null) {
+            return null;
+        }
+        final long posStart = currentBitBuffer.position();
+        /*
+         * Return the Lost Event after all other events in this packet.
+         */
+        if (fHasLost && posStart >= currentPacket.getContentSizeBits()) {
             fHasLost = false;
             IEventDeclaration lostEventDeclaration = LostEventDeclaration.INSTANCE;
             StructDeclaration lostFields = lostEventDeclaration.getFields();
@@ -327,13 +321,15 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
             if (lostEventsDurationDecl == null) {
                 throw new IllegalStateException("Lost events duration not declared!"); //$NON-NLS-1$
             }
-            IntegerDefinition lostDurationDef = new IntegerDefinition(lostFieldsDecl, null, CTFStrings.LOST_EVENTS_DURATION, fLostEventsDuration);
+            long lostEventsTimestamp = fLastTimestamp;
+            long lostEventsDuration = currentPacket.getTimestampEnd() - lostEventsTimestamp;
+            IntegerDefinition lostDurationDef = new IntegerDefinition(lostFieldsDecl, null, CTFStrings.LOST_EVENTS_DURATION, lostEventsDuration);
             IntegerDefinition lostCountDef = new IntegerDefinition(lostEventsDurationDecl, null, CTFStrings.LOST_EVENTS_FIELD, fLostEventsInThisPacket);
             IntegerDefinition[] fields = new IntegerDefinition[] { lostCountDef, lostDurationDef };
             return new EventDefinition(
                     lostEventDeclaration,
                     fStreamInputReader,
-                    fLastTimestamp,
+                    lostEventsTimestamp,
                     null,
                     null,
                     null,
@@ -345,11 +341,6 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
 
         }
 
-        final BitBuffer currentBitBuffer = fBitBuffer;
-        if (currentBitBuffer == null) {
-            return null;
-        }
-        final long posStart = currentBitBuffer.position();
         /* Read the stream event header. */
         if (fStreamEventHeaderDecl != null) {
             if (fStreamEventHeaderDecl instanceof IEventHeaderDeclaration) {

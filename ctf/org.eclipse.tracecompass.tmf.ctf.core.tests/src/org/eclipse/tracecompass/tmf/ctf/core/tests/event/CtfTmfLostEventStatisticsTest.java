@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -164,6 +164,6 @@ public class CtfTmfLostEventStatisticsTest {
     public void testLostEventsTypesInRange() {
         Map<String, Long> eventsInRange = fStats.getEventTypesInRange(rangeStart, rangeEnd);
         long lostEventsInRange = eventsInRange.get(CTFStrings.LOST_EVENT_NAME);
-        assertEquals(363494L, lostEventsInRange);
+        assertEquals(365752L, lostEventsInRange);
     }
 }
