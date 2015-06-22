@@ -657,7 +657,8 @@ public class HistogramDataModel implements IHistogramDataModel {
             final int scaledEnd = Math.min((int) (doneNext * nbBars) - offset, nbBars - 1);
             int scaledIndex = scaledStart;
             final HistogramBucket currentModelBucket = fBuckets[modelIndex];
-            if (currentModelBucket != null) {
+            final long lostEvents = fLostEventsBuckets[modelIndex];
+            if (currentModelBucket != null || lostEvents != 0) {
                 do {
                     // Make sure last model bucket counted in last scaled index
                     scaledIndex = Math.min(scaledIndex, nbBars - 1);
@@ -665,19 +666,17 @@ public class HistogramDataModel implements IHistogramDataModel {
                         scaledCount = 0;
                         scaledCountLostEvent = 0;
                     }
-                    result.fData[scaledIndex].add(currentModelBucket);
-                    result.fLostEventsData[scaledIndex] += fLostEventsBuckets[modelIndex];
-                    scaledCountLostEvent += fLostEventsBuckets[modelIndex];
-                    scaledCount += currentModelBucket.getNbEvents();
-                    if (!currentModelBucket.isEmpty()) {
-                        result.fLastBucket = scaledIndex;
+                    if (currentModelBucket != null) {
+                        result.fData[scaledIndex].add(currentModelBucket);
+                        scaledCount += currentModelBucket.getNbEvents();
+                        if (!currentModelBucket.isEmpty()) {
+                            result.fLastBucket = scaledIndex;
+                        }
                     }
-                    if (result.fMaxValue < scaledCount) {
-                        result.fMaxValue = scaledCount;
-                    }
-                    if (result.fMaxCombinedValue < scaledCount + scaledCountLostEvent) {
-                        result.fMaxCombinedValue = scaledCount + scaledCountLostEvent;
-                    }
+                    result.fLostEventsData[scaledIndex] += lostEvents;
+                    scaledCountLostEvent += lostEvents;
+                    result.fMaxValue = Math.max(result.fMaxValue, scaledCount);
+                    result.fMaxCombinedValue = Math.max(result.fMaxCombinedValue, scaledCount + scaledCountLostEvent);
                     scaledIndex++;
                 } while (scaledIndex < scaledEnd);
             }
