@@ -54,6 +54,10 @@
                             <archiveFileName>trace-compass-${unqualifiedVersion}-${build.timestamp}</archiveFileName>
                             <id>${productId}</id>
                             <rootFolder>trace-compass</rootFolder>
+                            <rootFolders>
+                            <!-- for MacOSX, make sure you use a folder ending with .app , see bug 463670 -->
+                                <macosx>trace-compass.app</macosx>
+                            </rootFolders>
                         </product>
                     </products>
                 </configuration>
