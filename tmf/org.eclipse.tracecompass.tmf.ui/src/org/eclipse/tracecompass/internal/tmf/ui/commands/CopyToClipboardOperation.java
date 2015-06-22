@@ -94,14 +94,16 @@ public class CopyToClipboardOperation implements IRunnableWithProgress {
                 if (sb.length() == 0) {
                     return;
                 }
+                Clipboard clipboard = new Clipboard(Display.getDefault());
                 try {
-                    Clipboard clipboard = new Clipboard(Display.getDefault());
                     clipboard.setContents(new Object[] { sb.toString() },
                             new Transfer[] { TextTransfer.getInstance() });
                 } catch (OutOfMemoryError e) {
                     sb.setLength(0);
                     sb.trimToSize();
                     showErrorDialog();
+                } finally {
+                    clipboard.dispose();
                 }
             }
         });
