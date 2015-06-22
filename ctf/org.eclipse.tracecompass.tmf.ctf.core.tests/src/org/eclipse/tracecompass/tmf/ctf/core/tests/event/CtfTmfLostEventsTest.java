@@ -25,7 +25,6 @@ import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
@@ -101,9 +100,9 @@ public class CtfTmfLostEventsTest {
      */
     @Test
     public void testFirstLostEvent() {
-        final long rank = 153;
-        final ITmfTimestamp start = new TmfNanoTimestamp(1376592664828848222L);
-        final ITmfTimestamp end   = new TmfNanoTimestamp(1376592664828848540L);
+        final long rank = 190;
+        final ITmfTimestamp start = new TmfNanoTimestamp(1376592664828900165L);
+        final ITmfTimestamp end   = new TmfNanoTimestamp(1376592664829403076L);
         final long nbLost = 859;
 
         final CtfTmfEvent ev = getOneEventTime(start);
@@ -125,9 +124,9 @@ public class CtfTmfLostEventsTest {
      */
     @Test
     public void testSecondLostEvent() {
-        final long rank = 191;
-        final ITmfTimestamp start = new TmfNanoTimestamp(1376592664829402521L);
-        final ITmfTimestamp end   = new TmfNanoTimestamp(1376592664829403076L);
+        final long rank = 229;
+        final ITmfTimestamp start = new TmfNanoTimestamp(1376592664829477058L);
+        final ITmfTimestamp end   = new TmfNanoTimestamp(1376592664829824514L);
         final long nbLost = 488;
 
         final CtfTmfEvent ev = getOneEventTime(start);
@@ -151,7 +150,7 @@ public class CtfTmfLostEventsTest {
     @Test
     public void testNormalEvent() {
         final long rank = 200;
-        final ITmfTimestamp ts = new TmfNanoTimestamp(1376592664829423928L);
+        final ITmfTimestamp ts = new TmfNanoTimestamp(1376592664829425780L);
 
         final CtfTmfEvent event = getOneEventTime(ts);
         /* Make sure seeking by rank yields the same event */
@@ -213,8 +212,8 @@ public class CtfTmfLostEventsTest {
 
         public OneEventRequestPerTs(@NonNull ITmfTimestamp ts) {
             super(CtfTmfEvent.class,
-                    new TmfTimeRange(ts, TmfTimestamp.BIG_CRUNCH),
-                    0, 1, ExecutionType.FOREGROUND);
+                    new TmfTimeRange(ts, ts),
+                    0, ITmfEventRequest.ALL_DATA, ExecutionType.FOREGROUND);
         }
 
         @Override
