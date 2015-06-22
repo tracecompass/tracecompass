@@ -81,12 +81,12 @@ public class Metadata {
     /**
      * Byte order as detected when reading the TSDL magic number.
      */
-    private ByteOrder detectedByteOrder = null;
+    private ByteOrder fDetectedByteOrder = null;
 
     /**
      * The trace file to which belongs this metadata file.
      */
-    private final CTFTrace trace;
+    private final CTFTrace fTrace;
 
     private IOStructGen fTreeParser;
 
@@ -101,14 +101,14 @@ public class Metadata {
      *            The trace to which belongs this metadata file.
      */
     public Metadata(CTFTrace trace) {
-        this.trace = trace;
+        fTrace = trace;
     }
 
     /**
      * For network streaming
      */
     public Metadata() {
-        trace = new CTFTrace();
+        fTrace = new CTFTrace();
     }
 
     // ------------------------------------------------------------------------
@@ -121,7 +121,7 @@ public class Metadata {
      * @return The byte order.
      */
     public ByteOrder getDetectedByteOrder() {
-        return detectedByteOrder;
+        return fDetectedByteOrder;
     }
 
     /**
@@ -130,7 +130,7 @@ public class Metadata {
      * @return the parent trace
      */
     public CTFTrace getTrace() {
-        return trace;
+        return fTrace;
     }
 
     // ------------------------------------------------------------------------
@@ -257,10 +257,11 @@ public class Metadata {
         CommonTree tree = createAST(metadataTextInput);
 
         /* Generate IO structures (declarations) */
-        fTreeParser = new IOStructGen(tree, trace);
+        fTreeParser = new IOStructGen(tree, fTrace);
         fTreeParser.generate();
-        ByteOrder localDetectedByteOrder = getDetectedByteOrder();
-        if (detectedByteOrder != null && trace.getByteOrder() != localDetectedByteOrder) {
+        /* store locally in case of concurrent modification */
+        ByteOrder detectedByteOrder = getDetectedByteOrder();
+        if (detectedByteOrder != null && fTrace.getByteOrder() != detectedByteOrder) {
             throw new ParseException("Metadata byte order and trace byte order inconsistent."); //$NON-NLS-1$
         }
     }
@@ -337,7 +338,7 @@ public class Metadata {
 
         /* Check if it matches */
         if (Utils.TSDL_MAGIC == magic) {
-            detectedByteOrder = ByteOrder.BIG_ENDIAN;
+            fDetectedByteOrder = ByteOrder.BIG_ENDIAN;
             return true;
         }
 
@@ -346,7 +347,7 @@ public class Metadata {
         magic = magicByteBuffer.getInt(0);
 
         if (Utils.TSDL_MAGIC == magic) {
-            detectedByteOrder = ByteOrder.LITTLE_ENDIAN;
+            fDetectedByteOrder = ByteOrder.LITTLE_ENDIAN;
             return true;
         }
 
@@ -355,10 +356,10 @@ public class Metadata {
 
     private String getMetadataPath() {
         /* Path of metadata file = trace directory path + metadata filename */
-        if (trace.getTraceDirectory() == null) {
+        if (fTrace.getTraceDirectory() == null) {
             return new String();
         }
-        return trace.getTraceDirectory().getPath()
+        return fTrace.getTraceDirectory().getPath()
                 + Utils.SEPARATOR + METADATA_FILENAME;
     }
 
@@ -401,7 +402,7 @@ public class Metadata {
         headerByteBuffer.position(0);
 
         /* Use byte order that was detected with the magic number */
-        headerByteBuffer.order(detectedByteOrder);
+        headerByteBuffer.order(fDetectedByteOrder);
 
         MetadataPacketHeader header = new MetadataPacketHeader(headerByteBuffer);
 
@@ -411,9 +412,9 @@ public class Metadata {
         }
 
         /* Check UUID */
-        if (!trace.uuidIsSet()) {
-            trace.setUUID(header.getUuid());
-        } else if (!trace.getUUID().equals(header.getUuid())) {
+        if (!fTrace.uuidIsSet()) {
+            fTrace.setUUID(header.getUuid());
+        } else if (!fTrace.getUUID().equals(header.getUuid())) {
             throw new CTFException("UUID mismatch"); //$NON-NLS-1$
         }
 
@@ -521,7 +522,7 @@ public class Metadata {
      * @since 1.0
      */
     public Path copyTo(final File path) throws IOException {
-        Path source = FileSystems.getDefault().getPath(trace.getTraceDirectory().getAbsolutePath(), METADATA_FILENAME);
+        Path source = FileSystems.getDefault().getPath(fTrace.getTraceDirectory().getAbsolutePath(), METADATA_FILENAME);
         Path destPath = FileSystems.getDefault().getPath(path.getAbsolutePath());
         return Files.copy(source, destPath.resolve(source.getFileName()));
     }
