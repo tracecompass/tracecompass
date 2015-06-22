@@ -24,6 +24,7 @@ import org.junit.runners.Suite;
         CollapseEventsInTableTest.class,
         ColorsViewTest.class,
         ColumnHeaderMenuTest.class,
+        CopyToClipboardTest.class,
         FilterColorEditorTest.class,
         FilterViewerTest.class,
         FontEventEditorTest.class,
