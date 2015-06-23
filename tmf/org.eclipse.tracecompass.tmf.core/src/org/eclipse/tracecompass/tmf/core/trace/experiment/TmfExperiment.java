@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2009, 2015 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -414,7 +414,7 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
         if (trace != TmfExperimentContext.NO_TRACE) {
             event = expContext.getEvent(trace);
             if (event != null) {
-                updateAttributes(expContext, event.getTimestamp());
+                updateAttributes(expContext, event);
                 expContext.increaseRank();
                 expContext.setLastTrace(trace);
                 final ITmfContext traceContext = expContext.getContext(trace);

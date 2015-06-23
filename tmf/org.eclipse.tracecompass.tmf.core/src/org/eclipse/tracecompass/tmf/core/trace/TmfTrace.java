@@ -39,6 +39,8 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
 import org.eclipse.tracecompass.tmf.core.component.TmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.ITmfLostEvent;
+import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
@@ -553,8 +555,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
         // parseEvent() does not update the context
         final ITmfEvent event = parseEvent(context);
         if (event != null) {
-            ITmfTimestamp timestamp = event.getTimestamp();
-            updateAttributes(context, timestamp);
+            updateAttributes(context, event);
             context.setLocation(getCurrentLocation());
             context.increaseRank();
         }
@@ -566,13 +567,31 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
      *
      * @param context the current trace context
      * @param timestamp the corresponding timestamp
+     * @deprecated Use {@link #updateAttributes(ITmfContext, ITmfEvent)}
      */
+    @Deprecated
     protected synchronized void updateAttributes(final ITmfContext context, final @NonNull ITmfTimestamp timestamp) {
+        updateAttributes(context, new TmfEvent(this, context.getRank(), timestamp, null, null));
+    }
+
+    /**
+     * Update the trace attributes
+     *
+     * @param context the current trace context
+     * @param event the corresponding event
+     * @since 1.1
+     */
+    protected synchronized void updateAttributes(final ITmfContext context, final @NonNull ITmfEvent event) {
+        ITmfTimestamp timestamp = event.getTimestamp();
+        ITmfTimestamp endTime = timestamp;
+        if (event instanceof ITmfLostEvent) {
+            endTime = ((ITmfLostEvent) event).getTimeRange().getEndTime();
+        }
         if (fStartTime.equals(TmfTimestamp.BIG_BANG) || (fStartTime.compareTo(timestamp) > 0)) {
             fStartTime = timestamp;
         }
-        if (fEndTime.equals(TmfTimestamp.BIG_CRUNCH) || (fEndTime.compareTo(timestamp) < 0)) {
-            fEndTime = timestamp;
+        if (fEndTime.equals(TmfTimestamp.BIG_CRUNCH) || (fEndTime.compareTo(endTime) < 0)) {
+            fEndTime = endTime;
         }
         if (context.hasValidRank()) {
             long rank = context.getRank();

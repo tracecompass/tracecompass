@@ -294,7 +294,7 @@ public class TmfXmlTraceStub extends TmfTrace {
          */
         ITmfTimestamp timestamp = new TmfNanoTimestamp(event.getTimestamp().getValue() / SECONDS_TO_NS);
         TmfEvent newEvent = new TmfEvent(this, ITmfContext.UNKNOWN_RANK, timestamp, eventType, eventFields);
-        updateAttributes(savedContext, event.getTimestamp());
+        updateAttributes(savedContext, event);
         context.increaseRank();
 
         return newEvent;
