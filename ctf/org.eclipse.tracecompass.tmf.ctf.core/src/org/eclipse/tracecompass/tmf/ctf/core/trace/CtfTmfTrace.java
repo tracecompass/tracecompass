@@ -365,7 +365,7 @@ public class CtfTmfTrace extends TmfTrace
             event = ctfContext.getCurrentEvent();
 
             if (event != null) {
-                updateAttributes(context, event.getTimestamp());
+                updateAttributes(context, event);
                 ctfContext.advance();
                 ctfContext.increaseRank();
             }

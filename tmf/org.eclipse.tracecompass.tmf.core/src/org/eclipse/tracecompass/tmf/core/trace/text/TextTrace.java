@@ -236,7 +236,7 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
         TextTraceContext savedContext = new TextTraceContext(context.getLocation(), context.getRank());
         T event = parse((TextTraceContext) context);
         if (event != null) {
-            updateAttributes(savedContext, event.getTimestamp());
+            updateAttributes(savedContext, event);
             context.increaseRank();
         }
         return event;

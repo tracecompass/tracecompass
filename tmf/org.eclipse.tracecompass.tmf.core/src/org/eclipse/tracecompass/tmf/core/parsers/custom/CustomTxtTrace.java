@@ -234,7 +234,7 @@ public class CustomTxtTrace extends TmfTrace implements ITmfPersistentlyIndexabl
         final ITmfContext savedContext = new TmfContext(context.getLocation(), context.getRank());
         final CustomTxtEvent event = parse(context);
         if (event != null) {
-            updateAttributes(savedContext, event.getTimestamp());
+            updateAttributes(savedContext, event);
             context.increaseRank();
         }
         return event;
