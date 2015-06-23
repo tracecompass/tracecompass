@@ -70,6 +70,30 @@ public class LttngUst20EventLayout implements ILttngUstEventLayout {
     }
 
     // ------------------------------------------------------------------------
+    // Event names used in liblttng-cyg-profile
+    // ------------------------------------------------------------------------
+
+    @Override
+    public String eventCygProfileFuncEntry() {
+        return "lttng_ust_cyg_profile:func_entry";
+    }
+
+    @Override
+    public String eventCygProfileFastFuncEntry() {
+        return "lttng_ust_cyg_profile_fast:func_entry";
+    }
+
+    @Override
+    public String eventCygProfileFuncExit() {
+        return "lttng_ust_cyg_profile:func_exit";
+    }
+
+    @Override
+    public String eventCygProfileFastFuncExit() {
+        return "lttng_ust_cyg_profile_fast:func_exit";
+    }
+
+    // ------------------------------------------------------------------------
     // Field names
     // ------------------------------------------------------------------------
 
@@ -96,6 +120,11 @@ public class LttngUst20EventLayout implements ILttngUstEventLayout {
     @Override
     public String fieldInPtr() {
         return "in_ptr";
+    }
+
+    @Override
+    public String fieldAddr() {
+        return "addr";
     }
 
     // ------------------------------------------------------------------------

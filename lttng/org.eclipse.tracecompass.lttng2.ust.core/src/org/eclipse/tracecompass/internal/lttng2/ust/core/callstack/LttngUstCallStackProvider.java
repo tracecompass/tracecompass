@@ -13,15 +13,21 @@
 
 package org.eclipse.tracecompass.internal.lttng2.ust.core.callstack;
 
-import java.util.HashSet;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.LttngUst20EventLayout;
+import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
+import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
 import org.eclipse.tracecompass.tmf.core.callstack.CallStackStateProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Callstack provider for LTTng-UST traces.
@@ -38,39 +44,19 @@ import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
  */
 public class LttngUstCallStackProvider extends CallStackStateProvider {
 
-    // ------------------------------------------------------------------------
-    // Event strings
-    // ------------------------------------------------------------------------
-
-    /** Name of the fake field for the vtid contexts */
-    private static final String CONTEXT_VTID = "context._vtid"; //$NON-NLS-1$
-
-    /** Name of the fake field for the procname context */
-    private static final String CONTEXT_PROCNAME = "context._procname"; //$NON-NLS-1$
-
-    /** Field name for the target function address */
-    private static final String FIELD_ADDR = "addr"; //$NON-NLS-1$
-
-    /** Event names indicating function entry */
-    private static final Set<String> FUNC_ENTRY_EVENTS = new HashSet<>();
-
-    /** Event names indicating function exit */
-    private static final Set<String> FUNC_EXIT_EVENTS = new HashSet<>();
-
-    static {
-        /* This seems overkill, but it will be checked every event. Gotta go FAST! */
-        FUNC_ENTRY_EVENTS.add("lttng_ust_cyg_profile:func_entry"); //$NON-NLS-1$
-        FUNC_ENTRY_EVENTS.add("lttng_ust_cyg_profile_fast:func_entry"); //$NON-NLS-1$
-
-        FUNC_EXIT_EVENTS.add("lttng_ust_cyg_profile:func_exit"); //$NON-NLS-1$
-        FUNC_EXIT_EVENTS.add("lttng_ust_cyg_profile_fast:func_exit"); //$NON-NLS-1$
-    }
-
     /**
      * Version number of this state provider. Please bump this if you modify
      * the contents of the generated state history in some way.
      */
     private static final int VERSION = 2;
+
+    /** Event names indicating function entry */
+    private final @NonNull Set<String> funcEntryEvents;
+
+    /** Event names indicating function exit */
+    private final @NonNull Set<String> funcExitEvents;
+
+    private final @NonNull ILttngUstEventLayout fLayout;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -84,6 +70,21 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
      */
     public LttngUstCallStackProvider(@NonNull ITmfTrace trace) {
         super(trace);
+
+        if (trace instanceof LttngUstTrace) {
+            fLayout = ((LttngUstTrace) trace).getEventLayout();
+        } else {
+            /* For impostor trace types, assume they use the LTTng 2.0 layout */
+            fLayout = LttngUst20EventLayout.getInstance();
+        }
+
+        funcEntryEvents = checkNotNull(ImmutableSet.of(
+                fLayout.eventCygProfileFuncEntry(),
+                fLayout.eventCygProfileFastFuncEntry()));
+
+        funcExitEvents = checkNotNull(ImmutableSet.of(
+                fLayout.eventCygProfileFuncExit(),
+                fLayout.eventCygProfileFastFuncExit()));
     }
 
     // ------------------------------------------------------------------------
@@ -115,8 +116,8 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
             return false;
         }
         ITmfEventField content = ((CtfTmfEvent) event).getContent();
-        if (content.getField(CONTEXT_VTID) == null ||
-                content.getField(CONTEXT_PROCNAME) == null) {
+        if (content.getField(fLayout.contextVtid()) == null ||
+                content.getField(fLayout.contextProcname()) == null) {
             return false;
         }
         return true;
@@ -125,24 +126,24 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
     @Override
     public String functionEntry(ITmfEvent event) {
         String eventName = event.getName();
-        if (!FUNC_ENTRY_EVENTS.contains(eventName)) {
+        if (!funcEntryEvents.contains(eventName)) {
             return null;
         }
-        Long address = (Long) event.getContent().getField(FIELD_ADDR).getValue();
+        Long address = (Long) event.getContent().getField(fLayout.fieldAddr()).getValue();
         return Long.toHexString(address);
     }
 
     @Override
     public String functionExit(ITmfEvent event) {
         String eventName = event.getName();
-        if (!FUNC_EXIT_EVENTS.contains(eventName)) {
+        if (!funcExitEvents.contains(eventName)) {
             return null;
         }
         /*
          * The 'addr' field may or may not be present in func_exit events,
          * depending on if cyg-profile.so or cyg-profile-fast.so was used.
          */
-        ITmfEventField field = event.getContent().getField(FIELD_ADDR);
+        ITmfEventField field = event.getContent().getField(fLayout.fieldAddr());
         if (field == null) {
             return CallStackStateProvider.UNDEFINED;
         }
@@ -154,8 +155,8 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
     public String getThreadName(ITmfEvent event) {
         /* Class type and content was already checked if we get called here */
         ITmfEventField content = ((CtfTmfEvent) event).getContent();
-        String procName = (String) content.getField(CONTEXT_PROCNAME).getValue();
-        Long vtid = (Long) content.getField(CONTEXT_VTID).getValue();
+        String procName = (String) content.getField(fLayout.contextProcname()).getValue();
+        Long vtid = (Long) content.getField(fLayout.contextVtid()).getValue();
 
         if (procName == null || vtid == null) {
             throw new IllegalStateException();
@@ -167,6 +168,6 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
     @Override
     protected Long getThreadId(ITmfEvent event) {
         ITmfEventField content = ((CtfTmfEvent) event).getContent();
-        return (Long) content.getField(CONTEXT_VTID).getValue();
+        return (Long) content.getField(fLayout.contextVtid()).getValue();
     }
 }
