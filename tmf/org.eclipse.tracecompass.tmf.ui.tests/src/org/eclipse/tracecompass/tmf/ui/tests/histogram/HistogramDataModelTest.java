@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson
+ * Copyright (c) 2011, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -692,7 +692,7 @@ public class HistogramDataModelTest {
         final int nbEvents = 3 * nbBuckets;
         final int nbLostEvents_0 = 23;
         final int nbCombinedEvents = nbEvents + 1;
-        final int[] expectedLostEventsResult = new int[] { 0, 0, 5, 5, 5, 5, 5, 5, 3, 0 };
+        final int[] expectedLostEventsResult = new int[] { 0, 0, 5, 5, 4, 5, 5, 4, 5, 0 };
 
         HistogramDataModel model = new HistogramDataModel(nbBuckets);
         countEventsInModel(nbEvents, model);
@@ -722,7 +722,7 @@ public class HistogramDataModelTest {
         final int nbLostEvents_1 = 9;
         final int nbCombinedEvents = nbEvents + 2;
         final HistogramBucket[] expectedResult = new HistogramBucket[] { _3, _4, _4, _4, _4, _4, _4, _4, _4, _3 };
-        final int[] expectedLostEventsResult = new int[] { 4, 2, 0, 0, 3, 3, 3, 3, 0, 0 };
+        final int[] expectedLostEventsResult = new int[] { 3, 1, 0, 0, 3, 3, 3, 3, 0, 0 };
 
         HistogramDataModel model = new HistogramDataModel(nbBuckets);
 
