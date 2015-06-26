@@ -1,7 +1,7 @@
-// $ANTLR 3.5.2 org/eclipse/tracecompass/ctf/parser/CTFParser.g 2015-06-22 18:13:24
+// $ANTLR 3.5.2 org/eclipse/tracecompass/ctf/parser/CTFParser.g 2015-07-09 14:10:52
 
 /*******************************************************************************
- * Copyright (c) 2010, 2013 Ericsson, Ecole Polytechnique de Montréal and others
+ * Copyright (c) 2010, 2015 Ericsson, Ecole Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -512,7 +512,7 @@ public class CTFParser extends Parser {
 					if ( state.backtracking==0 ) stream_HEX_LITERAL.add(HEX_LITERAL4);
 
 					// AST REWRITE
-					// elements: HEX_LITERAL, SIGN
+					// elements: SIGN, HEX_LITERAL
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -596,7 +596,7 @@ public class CTFParser extends Parser {
 					if ( state.backtracking==0 ) stream_OCTAL_LITERAL.add(OCTAL_LITERAL6);
 
 					// AST REWRITE
-					// elements: SIGN, OCTAL_LITERAL
+					// elements: OCTAL_LITERAL, SIGN
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -1035,7 +1035,7 @@ public class CTFParser extends Parser {
 					if ( state.backtracking==0 ) stream_IDENTIFIER.add(IDENTIFIER16);
 
 					// AST REWRITE
-					// elements: ref, IDENTIFIER
+					// elements: IDENTIFIER, ref
 					// token labels: ref
 					// rule labels: retval
 					// token list labels: 
@@ -1134,7 +1134,7 @@ public class CTFParser extends Parser {
 			if (state.failed) return retval;
 			if ( state.backtracking==0 ) stream_ctfSpecifierHead.add(ctfSpecifierHead17.getTree());
 			// AST REWRITE
-			// elements: ctfSpecifierHead, ref
+			// elements: ref, ctfSpecifierHead
 			// token labels: ref
 			// rule labels: retval
 			// token list labels: 
@@ -1731,7 +1731,7 @@ public class CTFParser extends Parser {
 					if ( state.backtracking==0 ) stream_TERM.add(TERM29);
 
 					// AST REWRITE
-					// elements: declaratorList, declarationSpecifiers, declarationSpecifiers, declaratorList
+					// elements: declarationSpecifiers, declaratorList, declarationSpecifiers, declaratorList
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -1941,7 +1941,7 @@ public class CTFParser extends Parser {
 			}
 
 			// AST REWRITE
-			// elements: typeSpecifier, typeQualifier
+			// elements: typeQualifier, typeSpecifier
 			// token labels: 
 			// rule labels: retval
 			// token list labels: 
@@ -3299,7 +3299,7 @@ public class CTFParser extends Parser {
 			}
 
 			// AST REWRITE
-			// elements: structBody, structName, alignAttribute
+			// elements: structBody, alignAttribute, structName
 			// token labels: 
 			// rule labels: retval
 			// token list labels: 
@@ -3647,7 +3647,7 @@ public class CTFParser extends Parser {
 							if (state.failed) return retval;
 							if ( state.backtracking==0 ) stream_structOrVariantDeclaratorList.add(structOrVariantDeclaratorList78.getTree());
 							// AST REWRITE
-							// elements: declarationSpecifiers, structOrVariantDeclaratorList
+							// elements: structOrVariantDeclaratorList, declarationSpecifiers
 							// token labels: 
 							// rule labels: retval
 							// token list labels: 
@@ -4414,7 +4414,7 @@ public class CTFParser extends Parser {
 			}
 
 			// AST REWRITE
-			// elements: variantTag, variantName, variantBody
+			// elements: variantName, variantTag, variantBody
 			// token labels: 
 			// rule labels: retval
 			// token list labels: 
@@ -6085,7 +6085,7 @@ public class CTFParser extends Parser {
 					}
 
 					// AST REWRITE
-					// elements: pointer, directAbstractDeclarator
+					// elements: directAbstractDeclarator, pointer
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -6881,7 +6881,7 @@ public class CTFParser extends Parser {
 			if (state.failed) return retval;
 			if ( state.backtracking==0 ) stream_typealiasAlias.add(typealiasAlias156.getTree());
 			// AST REWRITE
-			// elements: typealiasAlias, typealiasTarget
+			// elements: typealiasTarget, typealiasAlias
 			// token labels: 
 			// rule labels: retval
 			// token list labels: 
@@ -7061,7 +7061,7 @@ public class CTFParser extends Parser {
 					if (state.failed) return retval;
 					if ( state.backtracking==0 ) stream_ctfBody.add(ctfBody159.getTree());
 					// AST REWRITE
-					// elements: ctfSpecifierHead, ctfBody
+					// elements: ctfBody, ctfSpecifierHead
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -8154,7 +8154,7 @@ public class CTFParser extends Parser {
 							if (state.failed) return retval;
 							if ( state.backtracking==0 ) stream_typeSpecifier.add(right2.getTree());
 							// AST REWRITE
-							// elements: left, right2
+							// elements: right2, left
 							// token labels: 
 							// rule labels: retval, left, right2
 							// token list labels: 
