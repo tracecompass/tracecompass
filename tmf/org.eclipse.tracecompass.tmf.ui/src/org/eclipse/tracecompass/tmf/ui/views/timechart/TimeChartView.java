@@ -110,6 +110,7 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
         fViewer.addRangeListener(this);
         fViewer.addSelectionListener(this);
         fViewer.setMinimumItemWidth(1);
+        fViewer.getTimeGraphControl().setBlendSubPixelEvents(true);
 
         IStatusLineManager statusLineManager = getViewSite().getActionBars().getStatusLineManager();
         fViewer.getTimeGraphControl().setStatusLineManager(statusLineManager);

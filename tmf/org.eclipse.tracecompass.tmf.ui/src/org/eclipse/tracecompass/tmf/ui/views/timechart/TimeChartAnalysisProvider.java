@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -36,9 +36,6 @@ public class TimeChartAnalysisProvider extends TimeGraphPresentationProvider {
     private static final Color BOOKMARK_OUTER_COLOR = new Color(Display.getDefault(), 2, 70, 140);
     private static final Color SEARCH_MATCH_COLOR = new Color(Display.getDefault(), 177, 118, 14);
 
-    private int lastX = Integer.MIN_VALUE;
-    private int currX = Integer.MIN_VALUE;
-    private int lastPriority;
     private int lastBookmarkX = Integer.MIN_VALUE;
 
     @Override
@@ -57,12 +54,7 @@ public class TimeChartAnalysisProvider extends TimeGraphPresentationProvider {
         if (! ((TimeChartEvent) event).isVisible()) {
             return ITimeGraphPresentationProvider.INVISIBLE;
         }
-        int priority = ((TimeChartEvent) event).getColorSettingPriority();
-        if (currX == lastX) {
-            priority = Math.min(priority, lastPriority);
-        }
-        lastPriority = priority;
-        return priority;
+        return ((TimeChartEvent) event).getColorSettingPriority();
     }
 
     @Override
@@ -70,8 +62,6 @@ public class TimeChartAnalysisProvider extends TimeGraphPresentationProvider {
         if (! ((TimeChartEvent) event).isVisible()) {
             return;
         }
-        lastX = currX;
-        currX = rect.x;
         if (lastBookmarkX == rect.x || ((TimeChartEvent) event).isBookmarked()) {
             drawBookmark(rect, gc);
             lastBookmarkX = rect.x;

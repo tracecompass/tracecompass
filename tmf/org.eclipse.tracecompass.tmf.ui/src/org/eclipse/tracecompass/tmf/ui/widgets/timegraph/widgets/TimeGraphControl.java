@@ -127,6 +127,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private boolean fIsInFocus = false;
     private boolean fMouseOverSplitLine = false;
     private int fGlobalItemHeight = CUSTOM_ITEM_HEIGHT;
+    private boolean fBlendSubPixelEvents = false;
     private int fMinimumItemWidth = 0;
     private int fTopIndex = 0;
     private int fDragState = DRAG_NONE;
@@ -1488,7 +1489,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 }
                 boolean timeSelected = selectedTime >= event.getTime() && selectedTime < event.getTime() + event.getDuration();
                 if (drawState(getColorScheme(), event, stateRect, gc, selected, timeSelected)) {
-                    lastX = x;
+                    lastX = stateRect.x;
                 }
             }
             gc.setClipping((Rectangle) null);
@@ -1763,37 +1764,45 @@ public class TimeGraphControl extends TimeGraphBaseControl
             return false;
         }
         boolean visible = rect.width == 0 ? false : true;
+        rect.width = Math.max(1, rect.width);
         Color black =  Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
         gc.setForeground(black);
 
-        if (visible) {
-            if (colorIdx == ITimeGraphPresentationProvider.TRANSPARENT) {
+        if (colorIdx == ITimeGraphPresentationProvider.TRANSPARENT) {
+            if (visible) {
                 // Only draw the top and bottom borders
                 gc.drawLine(rect.x, rect.y, rect.x + rect.width - 1, rect.y);
                 gc.drawLine(rect.x, rect.y + rect.height - 1, rect.x + rect.width - 1, rect.y + rect.height - 1);
                 if (rect.width == 1) {
                     gc.drawPoint(rect.x, rect.y - 2);
                 }
-                fTimeGraphProvider.postDrawEvent(event, rect, gc);
-                return false;
             }
-            Color stateColor = null;
-            if (colorIdx < fEventColorMap.length) {
-                stateColor = fEventColorMap[colorIdx];
-            } else {
-                stateColor = black;
-            }
-
-            boolean reallySelected = timeSelected && selected;
-            // fill all rect area
-            gc.setBackground(stateColor);
-            gc.fillRectangle(rect);
-
-            if (reallySelected) {
-                gc.drawLine(rect.x, rect.y - 1, rect.x + rect.width - 1, rect.y - 1);
-                gc.drawLine(rect.x, rect.y + rect.height, rect.x + rect.width - 1, rect.y + rect.height);
-            }
+            fTimeGraphProvider.postDrawEvent(event, rect, gc);
+            return false;
+        }
+        Color stateColor = null;
+        if (colorIdx < fEventColorMap.length) {
+            stateColor = fEventColorMap[colorIdx];
         } else {
+            stateColor = black;
+        }
+
+        boolean reallySelected = timeSelected && selected;
+        // fill all rect area
+        gc.setBackground(stateColor);
+        if (visible) {
+            gc.fillRectangle(rect);
+        } else if (fBlendSubPixelEvents) {
+            gc.setAlpha(128);
+            gc.fillRectangle(rect);
+            gc.setAlpha(255);
+        }
+
+        if (reallySelected) {
+            gc.drawLine(rect.x, rect.y - 1, rect.x + rect.width - 1, rect.y - 1);
+            gc.drawLine(rect.x, rect.y + rect.height, rect.x + rect.width - 1, rect.y + rect.height);
+        }
+        if (!visible) {
             gc.drawPoint(rect.x, rect.y - 2);
         }
         fTimeGraphProvider.postDrawEvent(event, rect, gc);
@@ -2427,6 +2436,20 @@ public class TimeGraphControl extends TimeGraphBaseControl
      */
     public int getMinimumItemWidth() {
         return fMinimumItemWidth;
+    }
+
+    /**
+     * Set whether all time events with a duration shorter than one pixel should
+     * be blended in. If false, only the first such time event will be drawn and
+     * the subsequent time events in the same pixel will be discarded. The
+     * default value is false.
+     *
+     * @param blend
+     *            true if sub-pixel events should be blended, false otherwise.
+     * @since 1.1
+     */
+    public void setBlendSubPixelEvents(boolean blend) {
+        fBlendSubPixelEvents = blend;
     }
 
     /**
