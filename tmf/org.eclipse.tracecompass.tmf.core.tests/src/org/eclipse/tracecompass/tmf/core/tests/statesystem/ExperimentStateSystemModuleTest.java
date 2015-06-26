@@ -17,6 +17,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -45,7 +47,7 @@ public class ExperimentStateSystemModuleTest {
 
     /** Time-out tests after some time */
     @Rule
-    public TestRule globalTimeout = new Timeout(60000);
+    public TestRule globalTimeout = new Timeout(1, TimeUnit.MINUTES);
 
     /** ID of the test state system analysis module */
     public static final String MODULE_SS = "org.eclipse.linuxtools.tmf.core.tests.experiment";

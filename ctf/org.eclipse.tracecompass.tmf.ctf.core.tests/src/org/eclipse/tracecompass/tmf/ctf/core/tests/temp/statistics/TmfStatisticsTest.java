@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.tracecompass.tmf.core.statistics.ITmfStatistics;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
@@ -33,7 +34,7 @@ import org.junit.rules.Timeout;
 public abstract class TmfStatisticsTest {
 
     /** Time-out tests after 30 seconds */
-    @Rule public TestRule globalTimeout= new Timeout(30000);
+    @Rule public TestRule globalTimeout= new Timeout(30, TimeUnit.SECONDS);
 
     /** Test trace used for these tests */
     protected static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.KERNEL;

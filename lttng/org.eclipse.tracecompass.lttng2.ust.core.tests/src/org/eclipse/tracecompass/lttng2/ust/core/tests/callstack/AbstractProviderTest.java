@@ -21,6 +21,7 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.tracecompass.internal.lttng2.ust.core.callstack.LttngUstCallStackProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -51,7 +52,7 @@ import org.junit.rules.Timeout;
 public abstract class AbstractProviderTest {
 
     /** Time-out tests after 20 seconds */
-    @Rule public TestRule globalTimeout= new Timeout(20000);
+    @Rule public TestRule globalTimeout= new Timeout(20, TimeUnit.SECONDS);
 
     // ------------------------------------------------------------------------
     // Attributes

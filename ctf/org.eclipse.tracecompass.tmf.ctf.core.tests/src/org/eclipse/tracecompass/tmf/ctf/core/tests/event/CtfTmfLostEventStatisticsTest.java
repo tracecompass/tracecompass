@@ -19,6 +19,7 @@ import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -46,7 +47,7 @@ public class CtfTmfLostEventStatisticsTest {
 
     /** Time-out tests after 30 seconds */
     @Rule
-    public TestRule globalTimeout= new Timeout(30000);
+    public TestRule globalTimeout= new Timeout(30, TimeUnit.SECONDS);
 
     /**Test trace with lost events */
     private static final CtfTmfTestTrace lostEventsTrace = CtfTmfTestTrace.HELLO_LOST;

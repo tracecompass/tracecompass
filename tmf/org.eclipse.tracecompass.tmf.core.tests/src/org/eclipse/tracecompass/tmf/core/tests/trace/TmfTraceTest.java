@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
@@ -66,7 +67,7 @@ public class TmfTraceTest {
 
     /** Time-out tests after 20 seconds */
     @Rule
-    public TestRule globalTimeout= new Timeout(20000);
+    public TestRule globalTimeout= new Timeout(20, TimeUnit.SECONDS);
 
     // ------------------------------------------------------------------------
     // Variables
