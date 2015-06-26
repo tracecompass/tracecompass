@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.ctf.core.event.metadata;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -69,7 +70,8 @@ public class DeclarationScope {
      *
      * @param parentScope
      *            The parent of the newly created scope.
-     * @param name scope name
+     * @param name
+     *            scope name
      */
     public DeclarationScope(DeclarationScope parentScope, String name) {
         fParentScope = parentScope;
@@ -98,7 +100,9 @@ public class DeclarationScope {
 
     /**
      * Sets the name of the scope
-     * @param name the name
+     *
+     * @param name
+     *            the name
      */
     public void setName(String name) {
         if (hasParent()) {
@@ -412,11 +416,81 @@ public class DeclarationScope {
      * @return the declaration of the type associated to that identifier
      */
     public IDeclaration lookupIdentifierRecursive(String identifier) {
+        if (identifier.contains(".")) { //$NON-NLS-1$
+            String[] scopes = identifier.split("\\."); //$NON-NLS-1$
+            return lookupIdentifierRecursive(scopes);
+        }
         IDeclaration declaration = lookupIdentifier(identifier);
         if (declaration != null) {
             return declaration;
         } else if (hasParent()) {
             return fParentScope.lookupIdentifierRecursive(identifier);
+        }
+        return null;
+    }
+
+    private IDeclaration lookupIdentifierRecursive(String[] scopes) {
+        if (scopes.length < 1) {
+            return null;
+        }
+        // find first element
+        DeclarationScope scope = this;
+        scope = lookupRoot(scopes, scope);
+        if (scope == null) {
+            return null;
+        }
+        for (int i = 1; i < scopes.length; i++) {
+            final String scopeName = scopes[i];
+            if (scope == null) {
+                return null;
+            }
+            IDeclaration declaration = lookupIdentifierElement(scope, scopeName, Arrays.copyOfRange(scopes, i, scopes.length));
+            if (declaration != null) {
+                return declaration;
+            }
+            scope = scope.fChildren.get(scopeName);
+        }
+        return null;
+    }
+
+    private static DeclarationScope lookupRoot(String[] scopes, DeclarationScope originScope) {
+        DeclarationScope scope = originScope;
+        final String rootElement = scopes[0];
+        while (!rootElement.equals(scope.fName)) {
+            if (!scope.hasParent()) {
+                return scope.fChildren.get(rootElement);
+            }
+            scope = scope.getParentScope();
+        }
+        return scope;
+    }
+
+    private IDeclaration lookupIdentifierElement(DeclarationScope scope, String scopeName, String[] scopes) {
+        if (scope.fStructs.containsKey(scopeName)) {
+            final IDeclaration structDeclaration = scope.fStructs.get(scopeName);
+            if (scopes.length <= 1) {
+                return structDeclaration;
+            }
+            return lookupIdentifierStructElement((StructDeclaration) structDeclaration, scopes[1], Arrays.copyOfRange(scopes, 2, scopes.length));
+
+        } else if (scope.fTypes.containsKey(scopeName)) {
+            return scope.fTypes.get(scopeName);
+        } else if (scope.fEnums.containsKey(scopeName)) {
+            return scope.fEnums.get(scopeName);
+        } else if (scope.fIdentifiers.containsKey(scopeName)) {
+            return scope.fIdentifiers.get(scopeName);
+        }
+        return null;
+    }
+
+    private IDeclaration lookupIdentifierStructElement(StructDeclaration structDeclaration, String string, String[] children) {
+        IDeclaration field = structDeclaration.getField(string);
+        if (children == null || children.length <= 0) {
+            return field;
+        }
+        if (field instanceof StructDeclaration) {
+            StructDeclaration fieldStructDeclaration = (StructDeclaration) field;
+            return lookupIdentifierStructElement(fieldStructDeclaration, children[0], Arrays.copyOfRange(children, 1, children.length));
         }
         return null;
     }
