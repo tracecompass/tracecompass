@@ -54,7 +54,7 @@ public class BufferedBlockingQueueTest {
 
     /** Timeout the tests after 2 minutes */
     @Rule
-    public TestRule timeoutRule = new Timeout(120000);
+    public TestRule timeoutRule = new Timeout(2, TimeUnit.MINUTES);
 
     private static final String testString = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz" +
             "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz" +

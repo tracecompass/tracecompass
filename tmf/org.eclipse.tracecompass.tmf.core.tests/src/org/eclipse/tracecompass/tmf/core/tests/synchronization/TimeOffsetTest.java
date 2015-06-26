@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -52,7 +53,7 @@ public class TimeOffsetTest {
 
     /** Time-out tests after 20 seconds */
     @Rule
-    public TestRule globalTimeout= new Timeout(20000);
+    public TestRule globalTimeout= new Timeout(20, TimeUnit.SECONDS);
 
     // ------------------------------------------------------------------------
     // Variables

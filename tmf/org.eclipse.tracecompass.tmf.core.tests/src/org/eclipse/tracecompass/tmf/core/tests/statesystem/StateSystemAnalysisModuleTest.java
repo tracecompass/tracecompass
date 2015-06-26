@@ -16,6 +16,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -38,7 +40,7 @@ public class StateSystemAnalysisModuleTest {
 
     /** Time-out tests after 20 seconds */
     @Rule
-    public TestRule globalTimeout= new Timeout(20000);
+    public TestRule globalTimeout= new Timeout(20, TimeUnit.SECONDS);
 
     /** ID of the test state system analysis module */
     public static final String MODULE_SS = "org.eclipse.linuxtools.tmf.core.tests.analysis.sstest";

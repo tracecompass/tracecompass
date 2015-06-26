@@ -21,6 +21,7 @@ import static org.junit.Assume.assumeTrue;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -49,7 +50,7 @@ public class TmfSchedulerTest {
 
     /** Time-out tests after 60 seconds */
     @Rule
-    public TestRule globalTimeout= new Timeout(60000);
+    public TestRule globalTimeout= new Timeout(1, TimeUnit.MINUTES);
 
     // ------------------------------------------------------------------------
     // Constants

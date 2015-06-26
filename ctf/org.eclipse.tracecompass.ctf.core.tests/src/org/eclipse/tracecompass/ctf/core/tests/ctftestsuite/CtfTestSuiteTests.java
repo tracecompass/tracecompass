@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
@@ -46,7 +47,7 @@ public class CtfTestSuiteTests {
 
     /** Time-out tests after 10 seconds. */
     @Rule
-    public TestRule globalTimeout = new Timeout(10000);
+    public TestRule globalTimeout = new Timeout(10, TimeUnit.SECONDS);
 
     private static final Path BASE_PATH = Paths.get("traces", "ctf-testsuite", "tests", "1.8");
 

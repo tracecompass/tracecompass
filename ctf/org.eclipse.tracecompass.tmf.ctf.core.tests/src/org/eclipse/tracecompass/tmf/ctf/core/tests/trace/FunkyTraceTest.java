@@ -16,6 +16,8 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeTrue;
 
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
@@ -42,7 +44,7 @@ public class FunkyTraceTest {
 
     /** Time-out tests after 20 seconds */
     @Rule
-    public TestRule globalTimeout= new Timeout(20000);
+    public TestRule globalTimeout= new Timeout(20, TimeUnit.SECONDS);
 
     // ------------------------------------------------------------------------
     // Attributes

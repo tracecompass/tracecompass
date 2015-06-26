@@ -18,6 +18,7 @@ import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.CTFStrings;
@@ -45,7 +46,7 @@ public class TraceReadAllTracesTest {
 
     /** Time-out tests after 20 seconds. */
     @Rule
-    public TestRule globalTimeout = new Timeout(20000);
+    public TestRule globalTimeout = new Timeout(20, TimeUnit.SECONDS);
 
     /**
      * Get the list of traces

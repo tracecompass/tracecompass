@@ -18,6 +18,7 @@ import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -46,7 +47,7 @@ public abstract class StateSystemTest {
 
     /** Timeout the tests after 2 minutes */
     @Rule
-    public TestRule timeoutRule = new Timeout(120000);
+    public TestRule timeoutRule = new Timeout(2, TimeUnit.MINUTES);
 
     /** Test trace used for these tests */
     protected static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.TRACE2;
