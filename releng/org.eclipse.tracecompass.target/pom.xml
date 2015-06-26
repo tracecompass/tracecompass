@@ -31,6 +31,11 @@
               <configuration>
                 <artifacts>
                   <artifact>
+                    <file>tracecompass-e4.5.target</file>
+                    <type>target</type>
+                    <classifier>tracecompass-e4.5</classifier>
+                  </artifact>
+                  <artifact>
                     <file>tracecompass-eStaging.target</file>
                     <type>target</type>
                     <classifier>tracecompass-eStaging</classifier>

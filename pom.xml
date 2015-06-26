@@ -42,7 +42,7 @@
   <tycho-version>0.23.0</tycho-version>
   <tycho-extras-version>0.23.0</tycho-extras-version>
   <tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/tracecompass/org.eclipse.tracecompass.git</tycho.scmUrl>
-  <target-platform>tracecompass-eStaging</target-platform>
+  <target-platform>tracecompass-e4.5</target-platform>
   <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
   <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
   <sonar.jacoco.reportPath>${project.basedir}/../../target/jacoco.exec</sonar.jacoco.reportPath>
