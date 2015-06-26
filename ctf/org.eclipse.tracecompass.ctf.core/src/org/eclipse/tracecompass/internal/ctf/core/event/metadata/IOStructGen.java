@@ -28,6 +28,7 @@ import org.antlr.runtime.tree.CommonTree;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.ctf.core.event.CTFClock;
 import org.eclipse.tracecompass.ctf.core.event.metadata.DeclarationScope;
 import org.eclipse.tracecompass.ctf.core.event.types.Encoding;
@@ -114,7 +115,7 @@ public class IOStructGen {
     public IOStructGen(CommonTree tree, CTFTrace trace) {
         fTrace = trace;
         fTree = tree;
-        fRoot = new DeclarationScope();
+        fRoot = trace.getScope();
         fScope = fRoot;
     }
 
@@ -352,7 +353,7 @@ public class IOStructGen {
             throw new ParseException("Trace block is empty"); //$NON-NLS-1$
         }
 
-        pushScope(MetadataStrings.TRACE);
+        resetScope();
 
         for (CommonTree child : children) {
             switch (child.getType()) {
@@ -378,8 +379,6 @@ public class IOStructGen {
         if (fTrace.getByteOrder() == null) {
             throw new ParseException("Trace byte order not set"); //$NON-NLS-1$
         }
-
-        popScope();
     }
 
     private void parseTraceDeclaration(CommonTree traceDecl)
@@ -442,14 +441,14 @@ public class IOStructGen {
                 }
             } else {
                 fTrace.setByteOrder(byteOrder);
-                final DeclarationScope parentScope = fScope.getParentScope();
 
-                for (String type : parentScope.getTypeNames()) {
-                    IDeclaration d = parentScope.lookupType(type);
+                final DeclarationScope currentScope = getCurrentScope();
+                for (String type : currentScope.getTypeNames()) {
+                    IDeclaration d = currentScope.lookupType(type);
                     if (d instanceof IntegerDeclaration) {
-                        addByteOrder(byteOrder, parentScope, type, (IntegerDeclaration) d);
+                        addByteOrder(byteOrder, currentScope, type, (IntegerDeclaration) d);
                     } else if (d instanceof StructDeclaration) {
-                        setAlign(parentScope, (StructDeclaration) d, byteOrder);
+                        setAlign(currentScope, (StructDeclaration) d, byteOrder);
                     }
                 }
             }
@@ -611,7 +610,15 @@ public class IOStructGen {
 
             IDeclaration eventHeaderDecl = parseTypeSpecifierList(
                     typeSpecifier, null);
-
+            DeclarationScope scope = getCurrentScope();
+            DeclarationScope eventHeaderScope = scope.lookupChildRecursive(MetadataStrings.STRUCT);
+            if (eventHeaderScope == null) {
+                throw new ParseException("event.header scope not found"); //$NON-NLS-1$
+            }
+            pushScope(MetadataStrings.EVENT);
+            getCurrentScope().addChild(eventHeaderScope);
+            eventHeaderScope.setName(CTFStrings.HEADER);
+            popScope();
             if (eventHeaderDecl instanceof StructDeclaration) {
                 stream.setEventHeader((StructDeclaration) eventHeaderDecl);
             } else if (eventHeaderDecl instanceof IEventHeaderDeclaration) {
@@ -1154,6 +1161,40 @@ public class IOStructGen {
                     /* Create the sequence declaration. */
                     declaration = new SequenceDeclaration(lengthName,
                             declaration);
+                } else if (isTrace(first)) {
+                    /* Sequence */
+                    String lengthName = parseTraceScope(lengthChildren);
+
+                    /* check that lengthName was declared */
+                    if (isSignedIntegerField(lengthName)) {
+                        throw new ParseException("Sequence declared with length that is not an unsigned integer"); //$NON-NLS-1$
+                    }
+                    /* Create the sequence declaration. */
+                    declaration = new SequenceDeclaration(lengthName,
+                            declaration);
+
+                } else if (isStream(first)) {
+                    /* Sequence */
+                    String lengthName = parseStreamScope(lengthChildren);
+
+                    /* check that lengthName was declared */
+                    if (isSignedIntegerField(lengthName)) {
+                        throw new ParseException("Sequence declared with length that is not an unsigned integer"); //$NON-NLS-1$
+                    }
+                    /* Create the sequence declaration. */
+                    declaration = new SequenceDeclaration(lengthName,
+                            declaration);
+                } else if (isEvent(first)) {
+                    /* Sequence */
+                    String lengthName = parseEventScope(lengthChildren);
+
+                    /* check that lengthName was declared */
+                    if (isSignedIntegerField(lengthName)) {
+                        throw new ParseException("Sequence declared with length that is not an unsigned integer"); //$NON-NLS-1$
+                    }
+                    /* Create the sequence declaration. */
+                    declaration = new SequenceDeclaration(lengthName,
+                            declaration);
                 } else {
                     throw childTypeError(first);
                 }
@@ -1161,10 +1202,93 @@ public class IOStructGen {
         }
 
         if (identifier != null) {
-            identifierSB.append(identifier.getText());
+            final String text = identifier.getText();
+            identifierSB.append(text);
+            registerType(declaration, text);
         }
 
         return declaration;
+    }
+
+    private void registerType(IDeclaration declaration, String identifier) throws ParseException {
+        final DeclarationScope currentScope = getCurrentScope();
+        if (declaration instanceof StructDeclaration) {
+            currentScope.registerStruct(identifier, (StructDeclaration) declaration);
+        } else if (declaration instanceof EnumDeclaration) {
+            currentScope.registerEnum(identifier, (EnumDeclaration) declaration);
+        } else if (declaration instanceof VariantDeclaration) {
+            currentScope.registerVariant(identifier, (VariantDeclaration) declaration);
+        }
+    }
+
+    private static String parseStreamScope(List<CommonTree> lengthChildren) throws ParseException {
+        List<CommonTree> sublist = lengthChildren.subList(1, lengthChildren.size());
+
+        CommonTree nextElem = (CommonTree) lengthChildren.get(1).getChild(0);
+        String lengthName = null;
+        if (isUnaryString(nextElem)) {
+            lengthName = parseUnaryString(nextElem);
+        }
+
+        int type = nextElem.getType();
+        if ((CTFParser.tokenNames[CTFParser.EVENT]).equals(lengthName)) {
+            type = CTFParser.EVENT;
+        }
+        switch (type) {
+        case CTFParser.IDENTIFIER:
+            lengthName = concatenateUnaryStrings(sublist);
+            break;
+        case CTFParser.EVENT:
+            lengthName = parseEventScope(sublist);
+            break;
+        default:
+            if (lengthName == null) {
+                throw new ParseException("Unsupported scope stream." + nextElem); //$NON-NLS-1$
+            }
+        }
+        return MetadataStrings.STREAM + '.' + lengthName;
+    }
+
+    private static String parseEventScope(List<CommonTree> lengthChildren) throws ParseException {
+        CommonTree nextElem = (CommonTree) lengthChildren.get(1).getChild(0);
+        String lengthName;
+        switch (nextElem.getType()) {
+        case CTFParser.UNARY_EXPRESSION_STRING:
+        case CTFParser.IDENTIFIER:
+            List<CommonTree> sublist = lengthChildren.subList(1, lengthChildren.size());
+            lengthName = MetadataStrings.EVENT + '.' + concatenateUnaryStrings(sublist);
+            break;
+        default:
+            throw new ParseException("Unsupported scope event." + nextElem); //$NON-NLS-1$
+        }
+        return lengthName;
+    }
+
+    private static String parseTraceScope(List<CommonTree> lengthChildren) throws ParseException {
+        CommonTree nextElem = (CommonTree) lengthChildren.get(1).getChild(0);
+        String lengthName;
+        switch (nextElem.getType()) {
+        case CTFParser.IDENTIFIER:
+            lengthName = concatenateUnaryStrings(lengthChildren.subList(1, lengthChildren.size()));
+            break;
+        case CTFParser.STREAM:
+            return parseStreamScope(lengthChildren.subList(1, lengthChildren.size()));
+        default:
+            throw new ParseException("Unsupported scope trace." + nextElem); //$NON-NLS-1$
+        }
+        return lengthName;
+    }
+
+    private static boolean isEvent(CommonTree first) {
+        return first.getType() == CTFParser.EVENT;
+    }
+
+    private static boolean isStream(CommonTree first) {
+        return first.getType() == CTFParser.STREAM;
+    }
+
+    private static boolean isTrace(CommonTree first) {
+        return first.getType() == CTFParser.TRACE;
     }
 
     private boolean isSignedIntegerField(String lengthName) throws ParseException {
@@ -1622,7 +1746,6 @@ public class IOStructGen {
      */
     private void parseStructBody(CommonTree structBody,
             StructDeclaration structDeclaration, @Nullable String structName) throws ParseException {
-
         List<CommonTree> structDeclarations = structBody.getChildren();
         if (structDeclarations == null) {
             structDeclarations = Collections.emptyList();
@@ -2314,6 +2437,9 @@ public class IOStructGen {
     private static String parseUnaryString(CommonTree unaryString) {
 
         CommonTree value = (CommonTree) unaryString.getChild(0);
+        if (value.getType() == CTFParser.UNARY_EXPRESSION_STRING) {
+            value = (CommonTree) value.getChild(0);
+        }
         String strval = value.getText();
 
         /* Remove quotes */
@@ -2737,14 +2863,14 @@ public class IOStructGen {
      * Adds a new declaration scope on the top of the scope stack.
      */
     private void pushScope(String name) {
-        fScope = new DeclarationScope(fScope, name);
+        fScope = new DeclarationScope(getCurrentScope(), name);
     }
 
     /**
      * Removes the top declaration scope from the scope stack.
      */
     private void popScope() {
-        fScope = fScope.getParentScope();
+        fScope = getCurrentScope().getParentScope();
     }
 
     private void pushNamedScope(@Nullable String name, String defaultName) {
