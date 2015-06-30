@@ -1,0 +1,23 @@
+<trace>
+	<event timestamp="1" name="take">
+		<field name="player" value="1" type="int" />
+	</event>
+	<event timestamp="2" name="pass">
+		<field name="from" value="1" type="int" />
+		<field name="to" value="2" type="int" />
+	</event>
+	<event timestamp="5" name="pass">
+		<field name="from" value="2" type="int" />
+		<field name="to" value="1" type="int" />
+	</event>
+	<event timestamp="7" name="kick">
+		<field name="player" value="1" type="int" />
+	</event>
+	<event timestamp="10" name="take">
+		<field name="player" value="2" type="int" />
+	</event>
+	<event timestamp="12" name="pass">
+		<field name="from" value="2" type="int" />
+		<field name="to" value="1" type="int" />
+	</event>
+</trace>
