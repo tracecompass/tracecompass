@@ -22,6 +22,8 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.common.core.ObjectUtils;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
@@ -110,12 +112,12 @@ public class TmfEventField implements ITmfEventField {
     }
 
     @Override
-    public Collection<String> getFieldNames() {
+    public final Collection<String> getFieldNames() {
         return checkNotNull(fFields.keySet());
     }
 
     @Override
-    public Collection<ITmfEventField> getFields() {
+    public final Collection<ITmfEventField> getFields() {
         return checkNotNull(fFields.values());
     }
 
@@ -160,11 +162,10 @@ public class TmfEventField implements ITmfEventField {
 
     @Override
     public int hashCode() {
-        Object value = fValue;
         final int prime = 31;
         int result = 1;
-        result = prime * result + fName.hashCode();
-        result = prime * result + ((value == null) ? 0 : value.hashCode());
+        result = prime * result + getName().hashCode();
+        result = prime * result + ObjectUtils.deepHashCode(getValue());
         result = prime * result + fFields.hashCode();
         return result;
     }
@@ -177,28 +178,29 @@ public class TmfEventField implements ITmfEventField {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof TmfEventField)) {
+
+        /* We only consider equals fields of the exact same class. */
+        if (!(this.getClass().equals(obj.getClass()))) {
             return false;
         }
 
         final TmfEventField other = (TmfEventField) obj;
 
-        /* Check that 'fName' is the same */
-        if (!fName.equals(other.fName)) {
+        /* Check that the field names are the same. */
+        if (!NonNullUtils.equalsNullable(getName(), other.getName())) {
             return false;
         }
 
-        /* Check that 'fValue' is the same */
-        Object value = this.fValue;
-        if (value == null) {
-            if (other.fValue != null) {
-                return false;
-            }
-        } else if (!value.equals(other.fValue)) {
+        /*
+         * Check that the field values are the same. We use ObjectUtils to
+         * handle cases where the Object values may be primitive and/or nested
+         * arrays.
+         */
+        if (!ObjectUtils.deepEquals(this.getValue(), other.getValue())) {
             return false;
         }
 
-        /* Check that 'fFields' are the same */
+        /* Check that sub-fields are the same. */
         if (!fFields.equals(other.fFields)) {
             return false;
         }

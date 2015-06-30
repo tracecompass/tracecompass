@@ -579,7 +579,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
      *
      * @param context the current trace context
      * @param event the corresponding event
-     * @since 1.1
+     * @since 2.0
      */
     protected synchronized void updateAttributes(final ITmfContext context, final @NonNull ITmfEvent event) {
         ITmfTimestamp timestamp = event.getTimestamp();
