@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.core.event;
 
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
@@ -156,11 +157,11 @@ public class TmfEvent extends PlatformObject implements ITmfEvent {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((fTrace == null) ? 0 : fTrace.hashCode());
-        result = prime * result + (int) (fRank ^ (fRank >>> 32));
-        result = prime * result + fTimestamp.hashCode();
-        result = prime * result + ((fType == null) ? 0 : fType.hashCode());
-        result = prime * result + ((fContent == null) ? 0 : fContent.hashCode());
+        result = prime * result + ((fTrace == null) ? 0 : getTrace().hashCode());
+        result = prime * result + (int) (getRank() ^ (getRank() >>> 32));
+        result = prime * result + getTimestamp().hashCode();
+        result = prime * result + ((getType() == null) ? 0 : getType().hashCode());
+        result = prime * result + ((getContent() == null) ? 0 : getContent().hashCode());
         return result;
     }
 
@@ -172,35 +173,31 @@ public class TmfEvent extends PlatformObject implements ITmfEvent {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof TmfEvent)) {
+
+        /* Two events must be of the exact same class to be equal */
+        if (!(this.getClass().equals(obj.getClass()))) {
             return false;
         }
         final TmfEvent other = (TmfEvent) obj;
+
         if (fTrace == null) {
             if (other.fTrace != null) {
                 return false;
             }
-        } else if (!fTrace.equals(other.fTrace)) {
+        } else if (!getTrace().equals(other.getTrace())) {
             return false;
         }
-        if (fRank != other.fRank) {
+
+        if (getRank() != other.getRank()) {
             return false;
         }
-        if (!fTimestamp.equals(other.fTimestamp)) {
+        if (!getTimestamp().equals(other.getTimestamp())) {
             return false;
         }
-        if (fType == null) {
-            if (other.fType != null) {
-                return false;
-            }
-        } else if (!fType.equals(other.fType)) {
+        if (!NonNullUtils.equalsNullable(getType(), other.getType())) {
             return false;
         }
-        if (fContent == null) {
-            if (other.fContent != null) {
-                return false;
-            }
-        } else if (!fContent.equals(other.fContent)) {
+        if (!NonNullUtils.equalsNullable(getContent(), other.getContent())) {
             return false;
         }
         return true;
