@@ -24,6 +24,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     TmfEventFieldTest.class,
+    TmfEventFieldValueEqualsTest.class,
     TmfEventTest.class,
     TmfEventTypeTest.class,
     TmfNanoTimestampTest.class,
