@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -11,6 +11,8 @@
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.tmf.ui.parsers.wizards;
+
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -263,7 +265,7 @@ public class CustomXmlParserOutputWizardPage extends WizardPage {
             final Output output = outputs.get(i);
             if (output.enabledButton.getSelection()) {
                 final OutputColumn column = new OutputColumn();
-                column.name = output.nameLabel.getText();
+                column.name = checkNotNull(output.nameLabel.getText());
                 outputColumns.add(column);
             }
         }

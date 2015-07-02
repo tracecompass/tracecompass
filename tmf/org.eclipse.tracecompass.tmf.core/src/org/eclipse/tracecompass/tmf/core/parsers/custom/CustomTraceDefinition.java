@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -16,6 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
@@ -66,19 +67,21 @@ public abstract class CustomTraceDefinition {
     public static class OutputColumn {
 
         /** Name of this column */
-        public String name;
+        public @NonNull String name;
 
         /**
          * Default constructor (empty)
          */
-        public OutputColumn() {}
+        public OutputColumn() {
+            this(""); //$NON-NLS-1$
+        }
 
         /**
          * Constructor
          *
          * @param name Name of this output column
          */
-        public OutputColumn(String name) {
+        public OutputColumn(@NonNull String name) {
             this.name = name;
         }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -94,9 +94,7 @@ public class CustomEventAspects {
         List<OutputColumn> outputs = definition.outputs;
         for (int i = 0; i < outputs.size(); i++) {
             String name = outputs.get(i).name;
-            if (name != null) {
-                builder.add(new CustomEventFieldAspect(name, i));
-            }
+            builder.add(new CustomEventFieldAspect(name, i));
         }
         return checkNotNull(builder.build());
     }
