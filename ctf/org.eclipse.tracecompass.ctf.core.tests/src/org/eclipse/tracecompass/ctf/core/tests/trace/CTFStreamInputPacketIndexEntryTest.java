@@ -26,6 +26,7 @@ import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 import org.eclipse.tracecompass.ctf.core.event.types.Encoding;
 import org.eclipse.tracecompass.ctf.core.event.types.EnumDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.FloatDeclaration;
+import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StringDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
@@ -242,6 +243,59 @@ public class CTFStreamInputPacketIndexEntryTest {
         assertEquals(200, sipie.getLostEvents());
         assertEquals(0, sipie.getOffsetBits());
         assertEquals(1024, sipie.getPacketSizeBits());
+    }
+
+    /**
+     * Test the constructor
+     *
+     * @throws CTFException
+     *             exception
+     */
+    @Test
+    public void testStreamInputPacketIndexEntryConstructor7() throws CTFException {
+        StructDeclaration sd = new StructDeclaration(8);
+        sd.addField("timestamp_end", IntegerDeclaration.INT_32B_DECL);
+        sd.addField("content_size", IntegerDeclaration.INT_32B_DECL);
+        final EnumDeclaration declaration = new EnumDeclaration(IntegerDeclaration.createDeclaration(16, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 8));
+        declaration.add(313, 315, "CPU-PI");
+        sd.addField("device", declaration);
+        @SuppressWarnings("null")
+        BitBuffer bb = new BitBuffer(ByteBuffer.allocate(128));
+        bb.getByteBuffer().putInt(-1);
+        bb.getByteBuffer().putInt(0);
+        bb.getByteBuffer().putShort((short) 314);
+        StructDefinition sdef = sd.createDefinition(null, ILexicalScope.PACKET_HEADER, bb);
+        ICTFPacketDescriptor sipie = new StreamInputPacketIndexEntry(0, sdef, 128, 0);
+        assertEquals(Long.MIN_VALUE, sipie.getTimestampBegin());
+        assertEquals(Long.MAX_VALUE, sipie.getTimestampEnd());
+        assertEquals("CPU-PI", sipie.getTarget());
+        assertEquals(314, sipie.getTargetId());
+    }
+
+    /**
+     * Test the constructor
+     *
+     * @throws CTFException
+     *             exception
+     */
+    @Test
+    public void testStreamInputPacketIndexEntryConstructor8() throws CTFException {
+        StructDeclaration sd = new StructDeclaration(8);
+        sd.addField("timestamp_end", IntegerDeclaration.INT_32B_DECL);
+        sd.addField("content_size", IntegerDeclaration.INT_32B_DECL);
+        final IDeclaration declaration = IntegerDeclaration.createDeclaration(16, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 8);
+        sd.addField("device", declaration);
+        @SuppressWarnings("null")
+        BitBuffer bb = new BitBuffer(ByteBuffer.allocate(128));
+        bb.getByteBuffer().putInt(-1);
+        bb.getByteBuffer().putInt(0);
+        bb.getByteBuffer().putShort((short) 314);
+        StructDefinition sdef = sd.createDefinition(null, ILexicalScope.PACKET_HEADER, bb);
+        ICTFPacketDescriptor sipie = new StreamInputPacketIndexEntry(0, sdef, 128, 0);
+        assertEquals(Long.MIN_VALUE, sipie.getTimestampBegin());
+        assertEquals(Long.MAX_VALUE, sipie.getTimestampEnd());
+        assertEquals("314", sipie.getTarget());
+        assertEquals(314, sipie.getTargetId());
     }
 
     /**
