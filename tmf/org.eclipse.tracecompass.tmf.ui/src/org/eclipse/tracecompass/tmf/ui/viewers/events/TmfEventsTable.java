@@ -352,6 +352,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
     private Menu fRawTablePopup;
 
+    private MenuManager fRawViewerPopupMenuManager;
+    private MenuManager fTablePopupMenuManager;
+    private MenuManager fHeaderPopupMenuManager;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -1192,32 +1196,32 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             }
         }
 
-        final MenuManager headerPopupMenu = new MenuManager();
-        headerPopupMenu.setRemoveAllWhenShown(true);
-        headerPopupMenu.addMenuListener(new IMenuListener() {
+        fHeaderPopupMenuManager = new MenuManager();
+        fHeaderPopupMenuManager.setRemoveAllWhenShown(true);
+        fHeaderPopupMenuManager.addMenuListener(new IMenuListener() {
             @Override
             public void menuAboutToShow(IMenuManager manager) {
                 for (int index : fTable.getColumnOrder()) {
                     if (fTable.getColumns()[index].getData(Key.WIDTH) != null) {
-                        headerPopupMenu.add(createHeaderAction(fTable.getColumns()[index]));
+                        fHeaderPopupMenuManager.add(createHeaderAction(fTable.getColumns()[index]));
                     }
                 }
-                headerPopupMenu.add(new Separator());
-                headerPopupMenu.add(createResetHeaderAction());
+                fHeaderPopupMenuManager.add(new Separator());
+                fHeaderPopupMenuManager.add(createResetHeaderAction());
             }
         });
 
-        final MenuManager tablePopupMenu = new MenuManager();
-        tablePopupMenu.setRemoveAllWhenShown(true);
-        tablePopupMenu.addMenuListener(new IMenuListener() {
+        fTablePopupMenuManager = new MenuManager();
+        fTablePopupMenuManager.setRemoveAllWhenShown(true);
+        fTablePopupMenuManager.addMenuListener(new IMenuListener() {
             @Override
             public void menuAboutToShow(final IMenuManager manager) {
                 if (fTable.getSelectionIndices().length == 1 && fTable.getSelectionIndices()[0] == 0) {
                     // Right-click on header row
                     if (fHeaderState == HeaderState.FILTER) {
-                        tablePopupMenu.add(showSearchBarAction);
+                        fTablePopupMenuManager.add(showSearchBarAction);
                     } else {
-                        tablePopupMenu.add(showFilterBarAction);
+                        fTablePopupMenuManager.add(showFilterBarAction);
                     }
                     return;
                 }
@@ -1231,10 +1235,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         final Long rank = (Long) item.getData(Key.RANK);
                         if ((rank != null) && (fBookmarksFile != null)) {
                             if (fBookmarksMap.containsKey(rank)) {
-                                tablePopupMenu.add(new ToggleBookmarkAction(
+                                fTablePopupMenuManager.add(new ToggleBookmarkAction(
                                         Messages.TmfEventsTable_RemoveBookmarkActionText, rank));
                             } else {
-                                tablePopupMenu.add(new ToggleBookmarkAction(
+                                fTablePopupMenuManager.add(new ToggleBookmarkAction(
                                         Messages.TmfEventsTable_AddBookmarkActionText, rank));
                             }
                         }
@@ -1244,19 +1248,19 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
                 // Right-click on table
                 if (fSelectedRank != -1 && fSelectedBeginRank != -1) {
-                    tablePopupMenu.add(copyAction);
-                    tablePopupMenu.add(new Separator());
+                    fTablePopupMenuManager.add(copyAction);
+                    fTablePopupMenuManager.add(new Separator());
                 }
                 if (fTable.isVisible() && fRawViewer.isVisible()) {
-                    tablePopupMenu.add(hideTableAction);
-                    tablePopupMenu.add(hideRawAction);
+                    fTablePopupMenuManager.add(hideTableAction);
+                    fTablePopupMenuManager.add(hideRawAction);
                 } else if (!fTable.isVisible()) {
-                    tablePopupMenu.add(showTableAction);
+                    fTablePopupMenuManager.add(showTableAction);
                 } else if (!fRawViewer.isVisible()) {
-                    tablePopupMenu.add(showRawAction);
+                    fTablePopupMenuManager.add(showRawAction);
                 }
-                tablePopupMenu.add(exportToTextAction);
-                tablePopupMenu.add(new Separator());
+                fTablePopupMenuManager.add(exportToTextAction);
+                fTablePopupMenuManager.add(new Separator());
 
                 if (item != null) {
                     final Object data = item.getData();
@@ -1264,7 +1268,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     if (data instanceof ITmfSourceLookup) {
                         ITmfSourceLookup event = (ITmfSourceLookup) data;
                         if (event.getCallsite() != null) {
-                            tablePopupMenu.add(openCallsiteAction);
+                            fTablePopupMenuManager.add(openCallsiteAction);
                             separator = new Separator();
                         }
                     }
@@ -1272,12 +1276,12 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     if (data instanceof ITmfModelLookup) {
                         ITmfModelLookup event = (ITmfModelLookup) data;
                         if (event.getModelUri() != null) {
-                            tablePopupMenu.add(openModelAction);
+                            fTablePopupMenuManager.add(openModelAction);
                             separator = new Separator();
                         }
 
                         if (separator != null) {
-                            tablePopupMenu.add(separator);
+                            fTablePopupMenuManager.add(separator);
                         }
                     }
                 }
@@ -1298,11 +1302,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 }
 
                 if (isCollapsible && !(fTable.getData(Key.FILTER_OBJ) instanceof TmfCollapseFilter)) {
-                    tablePopupMenu.add(collapseAction);
-                    tablePopupMenu.add(new Separator());
+                    fTablePopupMenuManager.add(collapseAction);
+                    fTablePopupMenuManager.add(new Separator());
                 }
 
-                tablePopupMenu.add(clearFiltersAction);
+                fTablePopupMenuManager.add(clearFiltersAction);
                 final ITmfFilterTreeNode[] savedFilters = FilterManager.getSavedFilters();
                 if (savedFilters.length > 0) {
                     final MenuManager subMenu = new MenuManager(Messages.TmfEventsTable_ApplyPresetFilterMenuName);
@@ -1317,35 +1321,35 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                             });
                         }
                     }
-                    tablePopupMenu.add(subMenu);
+                    fTablePopupMenuManager.add(subMenu);
                 }
-                appendToTablePopupMenu(tablePopupMenu, item);
+                appendToTablePopupMenu(fTablePopupMenuManager, item);
             }
         });
 
-        final MenuManager rawViewerPopupMenu = new MenuManager();
-        rawViewerPopupMenu.setRemoveAllWhenShown(true);
-        rawViewerPopupMenu.addMenuListener(new IMenuListener() {
+        fRawViewerPopupMenuManager = new MenuManager();
+        fRawViewerPopupMenuManager.setRemoveAllWhenShown(true);
+        fRawViewerPopupMenuManager.addMenuListener(new IMenuListener() {
             @Override
             public void menuAboutToShow(final IMenuManager manager) {
                 if (fTable.isVisible() && fRawViewer.isVisible()) {
-                    rawViewerPopupMenu.add(hideTableAction);
-                    rawViewerPopupMenu.add(hideRawAction);
+                    fRawViewerPopupMenuManager.add(hideTableAction);
+                    fRawViewerPopupMenuManager.add(hideRawAction);
                 } else if (!fTable.isVisible()) {
-                    rawViewerPopupMenu.add(showTableAction);
+                    fRawViewerPopupMenuManager.add(showTableAction);
                 } else if (!fRawViewer.isVisible()) {
-                    rawViewerPopupMenu.add(showRawAction);
+                    fRawViewerPopupMenuManager.add(showRawAction);
                 }
-                appendToRawPopupMenu(tablePopupMenu);
+                appendToRawPopupMenu(fTablePopupMenuManager);
             }
         });
 
-        fHeaderMenu = headerPopupMenu.createContextMenu(fTable);
+        fHeaderMenu = fHeaderPopupMenuManager.createContextMenu(fTable);
 
-        fTablePopup = tablePopupMenu.createContextMenu(fTable);
+        fTablePopup = fTablePopupMenuManager.createContextMenu(fTable);
         fTable.setMenu(fTablePopup);
 
-        fRawTablePopup = rawViewerPopupMenu.createContextMenu(fRawViewer);
+        fRawTablePopup = fRawViewerPopupMenuManager.createContextMenu(fRawViewer);
         fRawViewer.setMenu(fRawTablePopup);
     }
 
@@ -1383,6 +1387,16 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         }
         fResourceManager.dispose();
         fRawViewer.dispose();
+        if (fRawViewerPopupMenuManager != null) {
+            fRawViewerPopupMenuManager.dispose();
+        }
+        if (fHeaderPopupMenuManager != null) {
+            fHeaderPopupMenuManager.dispose();
+        }
+        if (fTablePopupMenuManager != null) {
+            fTablePopupMenuManager.dispose();
+        }
+
         super.dispose();
     }
 
