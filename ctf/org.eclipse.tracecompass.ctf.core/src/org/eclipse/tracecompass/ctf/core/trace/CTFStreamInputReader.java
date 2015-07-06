@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson, Ecole Polytechnique de Montreal and others
+ * Copyright (c) 2011, 2015 Ericsson, Ecole Polytechnique de Montreal and others
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -95,15 +95,24 @@ public class CTFStreamInputReader implements AutoCloseable {
         } catch (IOException e) {
             throw new CTFIOException(e);
         }
-        fPacketReader = new CTFStreamInputPacketReader(this);
-        /*
-         * Get the iterator on the packet index.
-         */
-        fPacketIndex = 0;
-        /*
-         * Make first packet the current one.
-         */
-        goToNextPacket();
+        try {
+            fPacketReader = new CTFStreamInputPacketReader(this);
+            /*
+             * Get the iterator on the packet index.
+             */
+            fPacketIndex = 0;
+            /*
+             * Make first packet the current one.
+             */
+            goToNextPacket();
+        } catch (Exception e) {
+            try {
+                close();
+            } catch (IOException e1) {
+                // Ignore
+            }
+            throw e;
+        }
     }
 
     /**
@@ -115,8 +124,12 @@ public class CTFStreamInputReader implements AutoCloseable {
      */
     @Override
     public void close() throws IOException {
-        fFileChannel.close();
-        fPacketReader.close();
+        if (fFileChannel != null) {
+            fFileChannel.close();
+        }
+        if (fPacketReader != null) {
+            fPacketReader.close();
+        }
     }
 
     // ------------------------------------------------------------------------
