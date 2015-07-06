@@ -25,6 +25,7 @@ import static org.junit.Assert.fail;
 
 import java.util.Collection;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
@@ -41,8 +42,8 @@ public class TmfEventFieldTest {
     // Variables
     // ------------------------------------------------------------------------
 
-    private final String fFieldName1 = "Field-1";
-    private final String fFieldName2 = "Field-2";
+    private final @NonNull String fFieldName1 = "Field-1";
+    private final @NonNull String fFieldName2 = "Field-2";
 
     private final Object fValue1 = "Value";
     private final Object fValue2 = Integer.valueOf(10);
@@ -51,7 +52,7 @@ public class TmfEventFieldTest {
     private final TmfEventField fField2 = new TmfEventField(fFieldName2, fValue2, null);
     private final TmfEventField fField3 = new TmfEventField(fFieldName1, fValue2, null);
 
-    private final String fStructRootFieldName = "Root-S";
+    private final @NonNull String fStructRootFieldName = "Root-S";
     private final String[] fStructFieldNames = new String[] { fFieldName1, fFieldName2 };
     private final TmfEventField fStructTerminalField1 = new TmfEventField(fFieldName1, null, null);
     private final TmfEventField fStructTerminalField2 = new TmfEventField(fFieldName2, null, null);
@@ -59,7 +60,7 @@ public class TmfEventFieldTest {
     private final TmfEventField fStructRootField = new TmfEventField(fStructRootFieldName, null,
             new ITmfEventField[] { fStructTerminalField1, fStructTerminalField2 });
 
-    private final String fRootFieldName = "Root";
+    private final @NonNull String fRootFieldName = "Root";
     private final String[] fFieldNames = new String[] { fFieldName1, fFieldName2 };
     private final TmfEventField fRootField = new TmfEventField(fRootFieldName, null,
             new ITmfEventField[] { fField1, fField2 });
@@ -115,15 +116,6 @@ public class TmfEventFieldTest {
         final Collection<String> names = fRootField.getFieldNames();
         assertEquals("getFieldNames length", 2, names.size());
         assertArrayEquals(fFieldNames, names.toArray(new String[names.size()]));
-    }
-
-    @Test
-    public void testConstructorBadArg() {
-        try {
-            new TmfEventField(null, fValue1, null);
-            fail("Invalid (null) field name");
-        } catch (final IllegalArgumentException e) {
-        }
     }
 
     @Test

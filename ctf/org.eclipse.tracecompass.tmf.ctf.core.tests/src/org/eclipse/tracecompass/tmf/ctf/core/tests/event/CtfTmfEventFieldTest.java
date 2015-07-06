@@ -60,7 +60,7 @@ public class CtfTmfEventFieldTest {
     private static final String FLOAT = "float";
     private static final String LEN = "len";
     private static final String INT = "int";
-    private static final String NAME = "test";
+    private static final @NonNull String NAME = "test";
     private static final String STRUCT = "struct";
     private static final String VARIANT = "variant";
     private static final String ENUM = "enum";

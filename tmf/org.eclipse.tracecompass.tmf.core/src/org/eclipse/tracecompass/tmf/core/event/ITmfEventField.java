@@ -46,7 +46,7 @@ public interface ITmfEventField {
     /**
      * @return the field name
      */
-    String getName();
+    @NonNull String getName();
 
     /**
      * @return the field value
@@ -64,7 +64,7 @@ public interface ITmfEventField {
      *
      * @return The subfield names (empty Collection if none)
      */
-    Collection<String> getFieldNames();
+    @NonNull Collection<String> getFieldNames();
 
     /**
      * Return the subfields. The iteration order is the same as
@@ -72,7 +72,7 @@ public interface ITmfEventField {
      *
      * @return The subfields (empty Collection if none)
      */
-    Collection<? extends ITmfEventField> getFields();
+    @NonNull Collection<? extends ITmfEventField> getFields();
 
     /**
      * Return a subfield by its path relative to this field.

@@ -49,8 +49,8 @@ public class TmfEventTest {
     private final @NonNull ITmfTrace fTrace = STUB_TRACE.getTrace();
 
     private final String fTypeId = "TestType";
-    private final String fLabel1 = "AString";
-    private final String fLabel2 = "AnInteger";
+    private final @NonNull String fLabel1 = "AString";
+    private final @NonNull String fLabel2 = "AnInteger";
     private final String[] fLabels = new String[] { fLabel1, fLabel2 };
     private final TmfEventType fType = new TmfEventType(fTypeId, TmfEventField.makeRoot(fLabels));
 
@@ -59,7 +59,7 @@ public class TmfEventTest {
     private final ITmfEventField fField1a = new TmfEventField(fLabel1, fValue1a, null);
     private final ITmfEventField fField1b = new TmfEventField(fLabel2, fValue1b, null);
     private final ITmfEventField[] fFields1 = new ITmfEventField[] { fField1a, fField1b };
-    private final String fRawContent1 = fField1a.toString() + fField1b.toString();
+    private final @NonNull String fRawContent1 = fField1a.toString() + fField1b.toString();
     private final ITmfEventField fContent1 = new TmfEventField(fRawContent1, null, fFields1);
     private final TmfTimestamp fTimestamp1 = new TmfTimestamp(12345, 2);
     private final @NonNull ITmfEvent fEvent1 = new TmfEvent(fTrace, 0, fTimestamp1, fType, fContent1);
@@ -69,7 +69,7 @@ public class TmfEventTest {
     private final ITmfEventField fField2a = new TmfEventField(fLabel1, fValue2a, null);
     private final ITmfEventField fField2b = new TmfEventField(fLabel2, fValue2b, null);
     private final ITmfEventField[] fFields2 = new ITmfEventField[] { fField2a, fField2b };
-    private final String fRawContent2 = fField2a.toString() + fField2b.toString();
+    private final @NonNull String fRawContent2 = fField2a.toString() + fField2b.toString();
     private final ITmfEventField fContent2 = new TmfEventField(fRawContent2, null, fFields2);
     private final TmfTimestamp fTimestamp2 = new TmfTimestamp(12350, 2);
     private final @NonNull ITmfEvent fEvent2 = new TmfEvent(fTrace, 1, fTimestamp2, fType, fContent2);

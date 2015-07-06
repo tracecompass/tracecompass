@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.core.parsers.custom;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 
@@ -44,7 +45,7 @@ public class CustomEventContent extends TmfEventField {
      * @param fields
      *            The array of sub-fields
      */
-    public CustomEventContent(String name, Object content, ITmfEventField[] fields) {
+    public CustomEventContent(@NonNull String name, Object content, ITmfEventField[] fields) {
         super(name, content, fields);
     }
 

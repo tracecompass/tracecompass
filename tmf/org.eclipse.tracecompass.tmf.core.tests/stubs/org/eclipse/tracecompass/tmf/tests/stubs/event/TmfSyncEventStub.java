@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.tests.stubs.event;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
@@ -25,7 +26,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  */
 public class TmfSyncEventStub extends TmfEvent {
 
-    private static final String stub = "stub"; //$NON-NLS-1$
+    private static final @NonNull String stub = "stub"; //$NON-NLS-1$
 
     /**
      * Constructor

@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.btf.core.event;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.btf.core.Messages;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 
@@ -30,7 +31,7 @@ import com.google.common.collect.ImmutableMap.Builder;
 public class BTFPayload {
 
     /** Description subfield name */
-    public static final String DESCRIPTION = "description"; //$NON-NLS-1$
+    public static final @NonNull String DESCRIPTION = "description"; //$NON-NLS-1$
 
     private static final Map<String, String> EVENT_DESCRIPTIONS;
     private static final String EMPTY = ""; //$NON-NLS-1$

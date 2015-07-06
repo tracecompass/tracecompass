@@ -17,11 +17,14 @@
 
 package org.eclipse.tracecompass.tmf.ctf.core.event;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.ctf.core.event.types.AbstractArrayDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.CompoundDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.Definition;
@@ -62,9 +65,9 @@ public abstract class CtfTmfEventField extends TmfEventField {
      * @param fields
      *            The children fields. Useful for composite fields
      */
-    protected CtfTmfEventField(String name, Object value, ITmfEventField[] fields) {
+    protected CtfTmfEventField(@NonNull String name, Object value, ITmfEventField[] fields) {
         super(/* Strip the underscore from the field name if there is one */
-                name.startsWith("_") ? name.substring(1) : name, //$NON-NLS-1$
+                name.startsWith("_") ? checkNotNull(name.substring(1)) : name, //$NON-NLS-1$
                 value,
                 fields);
     }
@@ -85,7 +88,7 @@ public abstract class CtfTmfEventField extends TmfEventField {
      */
     @Deprecated
     public static CtfTmfEventField parseField(Definition fieldDef,
-            String fieldName) {
+            @NonNull String fieldName) {
         return parseField((IDefinition) fieldDef, fieldName);
     }
 
@@ -99,7 +102,7 @@ public abstract class CtfTmfEventField extends TmfEventField {
      * @return The resulting CtfTmfEventField object
      */
     public static CtfTmfEventField parseField(IDefinition fieldDef,
-            String fieldName) {
+            @NonNull String fieldName) {
         CtfTmfEventField field = null;
 
         /* Determine the Definition type */
@@ -174,14 +177,15 @@ public abstract class CtfTmfEventField extends TmfEventField {
             List<ITmfEventField> list = new ArrayList<>();
             /* Recursively parse the fields */
             for (String curFieldName : strDef.getFieldNames()) {
-                list.add(CtfTmfEventField.parseField(strDef.getDefinition(curFieldName), curFieldName));
+                String fn = checkNotNull(curFieldName);
+                list.add(CtfTmfEventField.parseField((IDefinition) strDef.getDefinition(fn), fn));
             }
             field = new CTFStructField(fieldName, list.toArray(new CtfTmfEventField[list.size()]));
 
         } else if (fieldDef instanceof VariantDefinition) {
             VariantDefinition varDef = (VariantDefinition) fieldDef;
 
-            String curFieldName = varDef.getCurrentFieldName();
+            String curFieldName = checkNotNull(varDef.getCurrentFieldName());
             IDefinition curFieldDef = varDef.getCurrentField();
             if (curFieldDef != null) {
                 CtfTmfEventField subField = CtfTmfEventField.parseField(curFieldDef, curFieldName);
@@ -229,7 +233,7 @@ final class CTFIntegerField extends CtfTmfEventField {
      * @param signed
      *            Is the value signed or not
      */
-    CTFIntegerField(String name, long longValue, int base, boolean signed) {
+    CTFIntegerField(@NonNull String name, long longValue, int base, boolean signed) {
         super(name, longValue, null);
         fSigned = signed;
         fBase = base;
@@ -262,7 +266,7 @@ final class CTFStringField extends CtfTmfEventField {
      * @param name
      *            The name of this field
      */
-    CTFStringField(String name, String strValue) {
+    CTFStringField(@NonNull String name, String strValue) {
         super(name, strValue, null);
     }
 
@@ -294,7 +298,7 @@ final class CTFIntegerArrayField extends CtfTmfEventField {
      * @param signed
      *            Are the values in the array signed or not
      */
-    CTFIntegerArrayField(String name, long[] longValues, int base, boolean signed) {
+    CTFIntegerArrayField(@NonNull String name, long[] longValues, int base, boolean signed) {
         super(name, longValues, null);
         fBase = base;
         fSigned = signed;
@@ -336,7 +340,7 @@ final class CTFArrayField extends CtfTmfEventField {
      * @param elements
      *            The array elements of this field
      */
-    CTFArrayField(String name, CtfTmfEventField[] elements) {
+    CTFArrayField(@NonNull String name, CtfTmfEventField[] elements) {
         super(name, elements, elements);
     }
 
@@ -373,7 +377,7 @@ final class CTFFloatField extends CtfTmfEventField {
      * @param name
      *            The name of this field
      */
-    protected CTFFloatField(String name, double value) {
+    protected CTFFloatField(@NonNull String name, double value) {
         super(name, value, null);
     }
 
@@ -399,7 +403,7 @@ final class CTFEnumField extends CtfTmfEventField {
      * @param name
      *            The name of this field
      */
-    CTFEnumField(String name, CtfEnumPair enumValue) {
+    CTFEnumField(@NonNull String name, CtfEnumPair enumValue) {
         super(name, new CtfEnumPair(enumValue.getFirst(),
                 enumValue.getSecond()), null);
     }
@@ -425,7 +429,7 @@ final class CTFStructField extends CtfTmfEventField {
      * @param name
      *            The name of this field
      */
-    CTFStructField(String name, CtfTmfEventField[] fields) {
+    CTFStructField(@NonNull String name, CtfTmfEventField[] fields) {
         super(name, fields, fields);
     }
 
@@ -456,7 +460,7 @@ final class CTFVariantField extends CtfTmfEventField {
      * @param name
      *            The name of this field
      */
-    CTFVariantField(String name, CtfTmfEventField field) {
+    CTFVariantField(@NonNull String name, CtfTmfEventField field) {
         super(name, field, new CtfTmfEventField[] { field });
     }
 

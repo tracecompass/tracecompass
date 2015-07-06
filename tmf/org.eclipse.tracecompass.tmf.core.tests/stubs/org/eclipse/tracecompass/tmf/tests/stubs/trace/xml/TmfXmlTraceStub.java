@@ -13,6 +13,8 @@
 
 package org.eclipse.tracecompass.tmf.tests.stubs.trace.xml;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -272,7 +274,7 @@ public class TmfXmlTraceStub extends TmfTrace {
                     break;
                 }
             }
-            fieldsArray[i] = new TmfEventField(fields[i], val, null);
+            fieldsArray[i] = new TmfEventField(checkNotNull(fields[i]), val, null);
         }
 
         /* Generate the aspects for this trace if it is the aspects special event */
@@ -310,9 +312,6 @@ public class TmfXmlTraceStub extends TmfTrace {
         /* Add custom aspects in between */
         for (ITmfEventField field : fieldsArray) {
             String name = field.getName();
-            if (name == null) {
-                break;
-            }
             final ITmfEventAspect aspect = new TmfContentFieldAspect(name, name);
             if (name.equals(ASPECT_CPU)) {
                 builder.add(new TmfCpuAspect() {

@@ -13,6 +13,8 @@
 
 package org.eclipse.tracecompass.tmf.ctf.core.event;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -258,7 +260,8 @@ public class CtfTmfEvent extends TmfEvent
         if (structFields != null) {
             if (structFields.getFieldNames() != null) {
                 for (String curFieldName : structFields.getFieldNames()) {
-                    fields.add(CtfTmfEventField.parseField((IDefinition) structFields.getDefinition(curFieldName), curFieldName));
+                    String fn = checkNotNull(curFieldName);
+                    fields.add(CtfTmfEventField.parseField((IDefinition) structFields.getDefinition(fn), fn));
                 }
             }
         }

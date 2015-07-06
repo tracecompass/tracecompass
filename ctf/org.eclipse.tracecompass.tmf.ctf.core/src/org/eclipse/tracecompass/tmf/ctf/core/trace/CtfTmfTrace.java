@@ -178,7 +178,7 @@ public class CtfTmfTrace extends TmfTrace
                         List<ITmfEventField> content = new ArrayList<>();
                         /* Should only return null the first time */
                         for (String fieldName : ied.getFields().getFieldsList()) {
-                            content.add(new TmfEventField(fieldName, null, null));
+                            content.add(new TmfEventField(checkNotNull(fieldName), null, null));
                         }
                         ITmfEventField contentTree = new TmfEventField(
                                 ITmfEventField.ROOT_FIELD_ID,

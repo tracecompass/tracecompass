@@ -64,10 +64,7 @@ public class TmfEventField implements ITmfEventField {
      * @throws IllegalArgumentException
      *             If 'name' is null, or if 'fields' has duplicate field names.
      */
-    public TmfEventField(String name, @Nullable Object value, @Nullable ITmfEventField[] fields) {
-        if (name == null) {
-            throw new IllegalArgumentException();
-        }
+    public TmfEventField(@NonNull String name, @Nullable Object value, @Nullable ITmfEventField[] fields) {
         fName = name;
         fValue = value;
 
@@ -114,12 +111,12 @@ public class TmfEventField implements ITmfEventField {
 
     @Override
     public Collection<String> getFieldNames() {
-        return fFields.keySet();
+        return checkNotNull(fFields.keySet());
     }
 
     @Override
     public Collection<ITmfEventField> getFields() {
-        return fFields.values();
+        return checkNotNull(fFields.values());
     }
 
     @Override
@@ -150,7 +147,8 @@ public class TmfEventField implements ITmfEventField {
     public static final ITmfEventField makeRoot(final String[] labels) {
         final ITmfEventField[] fields = new ITmfEventField[labels.length];
         for (int i = 0; i < labels.length; i++) {
-            fields[i] = new TmfEventField(labels[i], null, null);
+            String label = checkNotNull(labels[i]);
+            fields[i] = new TmfEventField(label, null, null);
         }
         // Return a new root field;
         return new TmfEventField(ITmfEventField.ROOT_FIELD_ID, null, fields);
