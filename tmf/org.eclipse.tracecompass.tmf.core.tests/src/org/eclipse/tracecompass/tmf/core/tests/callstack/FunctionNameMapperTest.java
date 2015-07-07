@@ -37,7 +37,7 @@ public class FunctionNameMapperTest {
      */
     @Test
     public void testNmFile() {
-        Path nmOutput = Paths.get("..", "org.eclipse.tracecompass.tmf.core.tests",
+        Path nmOutput = Paths.get("..", "..", "tmf", "org.eclipse.tracecompass.tmf.core.tests",
                 "testfiles", "callstack" , "nm-output-example");
         assertTrue(Files.exists(nmOutput));
         Map<String, String> results = FunctionNameMapper.mapFromNmTextFile(nmOutput.toFile());
