@@ -45,8 +45,8 @@ public class SessionConfigGeneratorTest {
     // ------------------------------------------------------------------------
 
     /** Session files for validation */
-    private static final File VALID_SESSION_FILE = new File("../org.eclipse.tracecompass.lttng2.control.core.tests/test_session_config_files/test_valid.lttng");
-    private static final File INVALID_SESSION_FILE = new File("../org.eclipse.tracecompass.lttng2.control.core.tests/test_session_config_files/test_invalid.lttng");
+    private static final File VALID_SESSION_FILE = new File("../../lttng/org.eclipse.tracecompass.lttng2.control.core.tests/test_session_config_files/test_valid.lttng");
+    private static final File INVALID_SESSION_FILE = new File("../../lttng/org.eclipse.tracecompass.lttng2.control.core.tests/test_session_config_files/test_invalid.lttng");
 
     private static final String SESSION_FILENAME = "test_session." + SessionConfigStrings.SESSION_CONFIG_FILE_EXTENSION;
     private static final IPath SESSION_FILE_PATH = Activator.getDefault().getStateLocation().addTrailingSeparator().append(SESSION_FILENAME);
