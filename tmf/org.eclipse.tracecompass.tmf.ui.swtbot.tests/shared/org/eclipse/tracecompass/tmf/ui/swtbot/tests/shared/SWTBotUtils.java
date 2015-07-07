@@ -336,20 +336,21 @@ public final class SWTBotUtils {
      * @return TmfEventsEditor the opened editor
      */
     public static TmfEventsEditor openEditor(SWTWorkbenchBot bot, String projectName, IPath elementPath) {
-        final SWTBotView projectExplorerBot = bot.viewById(IPageLayout.ID_PROJECT_EXPLORER);
-        projectExplorerBot.setFocus();
+        final SWTBotView projectExplorerView = bot.viewById(IPageLayout.ID_PROJECT_EXPLORER);
+        projectExplorerView.setFocus();
+        SWTBot projectExplorerBot = projectExplorerView.bot();
 
-        final SWTBotTree tree = bot.tree();
-        bot.waitUntil(ConditionHelpers.IsTreeNodeAvailable(projectName, tree));
+        final SWTBotTree tree = projectExplorerBot.tree();
+        projectExplorerBot.waitUntil(ConditionHelpers.IsTreeNodeAvailable(projectName, tree));
         final SWTBotTreeItem treeItem = tree.getTreeItem(projectName);
         treeItem.expand();
 
-        SWTBotTreeItem tracesNode = getTraceProjectItem(bot, treeItem, TmfTracesFolder.TRACES_FOLDER_NAME);
+        SWTBotTreeItem tracesNode = getTraceProjectItem(projectExplorerBot, treeItem, TmfTracesFolder.TRACES_FOLDER_NAME);
         tracesNode.expand();
 
         SWTBotTreeItem currentItem = tracesNode;
         for (String segment : elementPath.segments()) {
-            currentItem = getTraceProjectItem(bot, currentItem, segment);
+            currentItem = getTraceProjectItem(projectExplorerBot, currentItem, segment);
             currentItem.select();
             currentItem.doubleClick();
         }
@@ -372,7 +373,7 @@ public final class SWTBotUtils {
      *            the desired child element name (without suffix)
      * @return the a {@link SWTBotTreeItem} with the specified name
      */
-    public static SWTBotTreeItem getTraceProjectItem(SWTWorkbenchBot bot, final SWTBotTreeItem parentItem, final String name) {
+    public static SWTBotTreeItem getTraceProjectItem(SWTBot bot, final SWTBotTreeItem parentItem, final String name) {
         ProjectElementHasChild condition = new ProjectElementHasChild(parentItem, name);
         bot.waitUntil(condition);
         return condition.getItem();
