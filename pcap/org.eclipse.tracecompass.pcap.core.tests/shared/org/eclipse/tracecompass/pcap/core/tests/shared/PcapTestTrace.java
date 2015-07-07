@@ -28,31 +28,31 @@ import org.eclipse.tracecompass.internal.pcap.core.trace.PcapFile;
 public enum PcapTestTrace {
 
     /** A bad pcap file. */
-    BAD_PCAPFILE("..", "org.eclipse.tracecompass.pcap.core.tests", "rsc", "BadPcapFile.pcap"),
+    BAD_PCAPFILE("..", "..", "pcap", "org.eclipse.tracecompass.pcap.core.tests", "rsc", "BadPcapFile.pcap"),
 
     /** A Valid Pcap that is empty. */
-    EMPTY_PCAP("..", "org.eclipse.tracecompass.pcap.core.tests", "rsc", "EmptyPcap.pcap"),
+    EMPTY_PCAP("..", "..", "pcap", "org.eclipse.tracecompass.pcap.core.tests", "rsc", "EmptyPcap.pcap"),
 
     /** A Pcap that mostly contains TCP packets. */
-    MOSTLY_TCP("..", "org.eclipse.tracecompass.pcap.core.tests", "rsc", "mostlyTCP.pcap"),
+    MOSTLY_TCP("..", "..", "pcap", "org.eclipse.tracecompass.pcap.core.tests", "rsc", "mostlyTCP.pcap"),
 
     /** A Pcap that mostly contains UDP packets. */
-    MOSTLY_UDP("..", "org.eclipse.tracecompass.pcap.core.tests", "rsc", "mostlyUDP.pcap"),
+    MOSTLY_UDP("..", "..", "pcap", "org.eclipse.tracecompass.pcap.core.tests", "rsc", "mostlyUDP.pcap"),
 
     /** A big-endian trace that contains two packets. */
-    SHORT_BIG_ENDIAN("..", "org.eclipse.tracecompass.pcap.core.tests", "rsc", "Short_BigEndian.pcap"),
+    SHORT_BIG_ENDIAN("..", "..", "pcap", "org.eclipse.tracecompass.pcap.core.tests", "rsc", "Short_BigEndian.pcap"),
 
     /** A little-endian trace that contains two packets. */
-    SHORT_LITTLE_ENDIAN("..", "org.eclipse.tracecompass.pcap.core.tests", "rsc", "Short_LittleEndian.pcap"),
+    SHORT_LITTLE_ENDIAN("..", "..", "pcap", "org.eclipse.tracecompass.pcap.core.tests", "rsc", "Short_LittleEndian.pcap"),
 
     /** A large trace for benchmarking. */
-    BENCHMARK_TRACE("..", "org.eclipse.tracecompass.pcap.core.tests", "rsc", "benchmarkTrace.pcap"),
+    BENCHMARK_TRACE("..", "..", "pcap", "org.eclipse.tracecompass.pcap.core.tests", "rsc", "benchmarkTrace.pcap"),
 
     /** A Kernel trace directory. */
-    KERNEL_DIRECTORY("..", "org.eclipse.tracecompass.pcap.core.tests", "rsc", "kernel"),
+    KERNEL_DIRECTORY("..", "..", "pcap", "org.eclipse.tracecompass.pcap.core.tests", "rsc", "kernel"),
 
     /** A Kernel trace file. */
-    KERNEL_TRACE("..", "org.eclipse.tracecompass.pcap.core.tests", "rsc", "kernel", "channel0_0");
+    KERNEL_TRACE("..", "..", "pcap", "org.eclipse.tracecompass.pcap.core.tests", "rsc", "kernel", "channel0_0");
 
     private final @NonNull Path fPath;
 
