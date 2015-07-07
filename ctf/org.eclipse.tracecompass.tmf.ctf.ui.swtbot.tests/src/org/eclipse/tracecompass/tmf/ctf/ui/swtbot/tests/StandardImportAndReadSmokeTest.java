@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -77,6 +78,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
 
     private static final String TRACE_FOLDER_PARENT_PATH = fTrace.getPath() + File.separator + ".." + File.separator + ".." + File.separator;
     private static final String ARCHIVE_FILE_NAME = "synctraces.tar.gz";
+    private static final String EMPTY_ARCHIVE_FOLDER = "emptyArchiveFolder";
     private static final String TRACE_ARCHIVE_PATH = TRACE_FOLDER_PARENT_PATH + ARCHIVE_FILE_NAME;
     private static final String TRACE_FOLDER_PARENT_NAME = "traces";
     private static final String TRACE_PROJECT_NAME = "Tracing";
@@ -229,6 +231,117 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         testImportAndExtractArchives(ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES | ImportTraceWizardPage.OPTION_PRESERVE_FOLDER_STRUCTURE, true);
     }
 
+    /**
+     * Test import from an empty archive. This should not import anything.
+     *
+     * @throws Exception
+     *             on error
+     */
+    @Test
+    public void testEmptyArchive() throws Exception {
+        createProject();
+        String testArchivePath = createEmptyArchive();
+
+        openImportWizard();
+        selectImportFromArchive(testArchivePath);
+        selectFolder(ARCHIVE_ROOT_ELEMENT_NAME);
+        setOptions(0, ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
+        importFinish();
+
+        assertNoTraces();
+
+        SWTBotUtils.deleteProject(getProjectName(), fBot);
+    }
+
+    /**
+     * Test import from an empty directory. This should not import anything.
+     *
+     * @throws Exception
+     *             on error
+     */
+    @Test
+    public void testEmptyDirectory() throws Exception {
+        createProject();
+        String testDirectoryPath = createEmptyDirectory().getLocation().toOSString();
+
+        openImportWizard();
+        selectImportFromDirectory(testDirectoryPath);
+        selectFolder(EMPTY_ARCHIVE_FOLDER);
+        setOptions(0, ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
+        importFinish();
+
+        assertNoTraces();
+
+        SWTBotUtils.deleteProject(getProjectName(), fBot);
+    }
+
+    /**
+     * Test import from a directory containing an empty archive. This should not import anything.
+     *
+     * @throws Exception
+     *             on error
+     */
+    @Test
+    public void testDirectoryWithEmptyArchive() throws Exception {
+        createProject();
+        createEmptyArchive();
+
+        openImportWizard();
+        selectImportFromDirectory(getProjectResource().getLocation().toOSString());
+        selectFile(GENERATED_ARCHIVE_NAME, getProjectName());
+        setOptions(0, ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
+        importFinish();
+
+        assertNoTraces();
+
+        SWTBotUtils.deleteProject(getProjectName(), fBot);
+    }
+
+    /**
+     * Test import from a nested empty archive. This should not import anything.
+     *
+     * @throws Exception
+     *             on error
+     */
+    @Test
+    public void testNestedEmptyArchive() throws Exception {
+        createProject();
+        IProject project = getProjectResource();
+
+        // Create the empty archive from an empty folder
+        String testArchivePath = createEmptyArchive();
+
+        // Rename archive so that we can create a new one with the same name
+        project.refreshLocal(IResource.DEPTH_ONE, null);
+        IFile[] files = project.getWorkspace().getRoot().findFilesForLocationURI(new File(testArchivePath).toURI());
+        IFile archiveFile = files[0];
+        String newEmptyArchiveName = "nested" + archiveFile.getName();
+        IPath dest = archiveFile.getFullPath().removeLastSegments(1).append(newEmptyArchiveName);
+        archiveFile.move(dest, true, null);
+        IFile renamedArchiveFile = archiveFile.getWorkspace().getRoot().getFile(dest);
+
+        createArchive(renamedArchiveFile);
+
+        openImportWizard();
+        selectImportFromArchive(testArchivePath);
+        selectFolder(ARCHIVE_ROOT_ELEMENT_NAME);
+        setOptions(0, ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
+        importFinish();
+
+        assertNoTraces();
+
+        SWTBotUtils.deleteProject(getProjectName(), fBot);
+    }
+
+    private void assertNoTraces() {
+        TmfProjectElement tmfProject = TmfProjectRegistry.getProject(getProjectResource(), true);
+        assertNotNull(tmfProject);
+        TmfTraceFolder tracesFolder = tmfProject.getTracesFolder();
+        assertNotNull(tracesFolder);
+        List<TmfTraceElement> traces = tracesFolder.getTraces();
+        assertTrue(traces.isEmpty());
+    }
+
     private void testImport(int options, boolean testViews, boolean fromArchive) throws Exception {
         createProject();
         String expectedSourceLocation = null;
@@ -271,7 +384,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         String expectedSourceLocation;
         IPath expectedElementPath;
         if (fromArchive) {
-            String testArchivePath = createArchive();
+            String testArchivePath = createNestedArchive();
             openImportWizard();
             selectImportFromArchive(testArchivePath);
             selectFile(ARCHIVE_FILE_NAME, ARCHIVE_ROOT_ELEMENT_NAME, TRACE_PROJECT_NAME, TRACE_FOLDER_PARENT_NAME);
@@ -307,14 +420,36 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
      * Create a temporary archive containing a nested archive. For example,
      * testtraces.zip/synctraces.tar.gz can be used to test a nested archive.
      */
-    private String createArchive() throws URISyntaxException, CoreException, IOException {
-
+    private String createNestedArchive() throws IOException, CoreException, URISyntaxException {
         // Link to the test traces folder. We use a link so that we can safely
         // delete the entire project when we are done.
         IProject project = getProjectResource();
         String canonicalPath = new File(TRACE_FOLDER_PARENT_PATH).getCanonicalPath();
         IFolder folder = project.getFolder(TRACE_FOLDER_PARENT_NAME);
         folder.createLink(new Path(canonicalPath), IResource.REPLACE, null);
+        IFile file = folder.getFile(ARCHIVE_FILE_NAME);
+        return createArchive(file);
+    }
+
+    /**
+     * Create the empty archive from an empty folder
+     */
+    private String createEmptyArchive() throws CoreException, URISyntaxException {
+        return createArchive(createEmptyDirectory());
+    }
+
+    private IFolder createEmptyDirectory() throws CoreException {
+        IProject project = getProjectResource();
+        IFolder folder = project.getFolder(EMPTY_ARCHIVE_FOLDER);
+        folder.create(true, true, null);
+        return folder;
+    }
+
+    /**
+     * Create a temporary archive from the specified resource.
+     */
+    private static String createArchive(IResource sourceResource) throws URISyntaxException {
+        IPath exportedPath = sourceResource.getFullPath();
 
         SWTBotTreeItem traceFilesProject = SWTBotUtils.selectProject(fBot, TRACE_PROJECT_NAME);
         traceFilesProject.contextMenu("Export...").click();
@@ -326,7 +461,14 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         treeItem.select();
         fBot.button("Next >").click();
         fBot.button("&Deselect All").click();
-        selectFile(ARCHIVE_FILE_NAME, TRACE_PROJECT_NAME, TRACE_FOLDER_PARENT_NAME);
+
+        if (sourceResource instanceof IFile) {
+            String[] folderPath = exportedPath.removeLastSegments(1).segments();
+            String fileName = exportedPath.lastSegment();
+            selectFile(fileName, folderPath);
+        } else {
+            selectFolder(exportedPath.segments());
+        }
 
         String workspacePath = URIUtil.toFile(URIUtil.fromString(System.getProperty("osgi.instance.area"))).getAbsolutePath();
         final String archiveDestinationPath = workspacePath + File.separator + TRACE_PROJECT_NAME + File.separator + GENERATED_ARCHIVE_NAME;
@@ -389,17 +531,22 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
     }
 
     private static void selectFolder(String... treePath) {
+        selectFolder(true, treePath);
+    }
+
+    private static void selectFolder(boolean check, String... treePath) {
         SWTBotTree tree = fBot.tree();
         fBot.waitUntil(Conditions.widgetIsEnabled(tree));
         SWTBotTreeItem folderNode = SWTBotUtils.getTreeItem(fBot, tree, treePath);
-        folderNode.check();
+        if (check) {
+            folderNode.check();
+        } else {
+            folderNode.select();
+        }
     }
 
     private static void selectFile(String fileName, String... folderTreePath) {
-        SWTBotTree folderTree = fBot.tree();
-        fBot.waitUntil(Conditions.widgetIsEnabled(folderTree));
-        SWTBotTreeItem folderNode = SWTBotUtils.getTreeItem(fBot, folderTree, folderTreePath);
-        folderNode.select();
+        selectFolder(false, folderTreePath);
 
         SWTBotTable fileTable = fBot.table();
         fBot.waitUntil(Conditions.widgetIsEnabled(fileTable));

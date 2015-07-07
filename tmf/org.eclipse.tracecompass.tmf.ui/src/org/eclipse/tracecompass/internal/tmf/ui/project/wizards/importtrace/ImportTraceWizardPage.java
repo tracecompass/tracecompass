@@ -1484,7 +1484,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 destTempFolder.create(IResource.HIDDEN, true, monitor);
 
                 subMonitor = SubMonitor.convert(progressMonitor, 2);
-                String baseSourceLocation;
+                String baseSourceLocation = null;
                 if (fImportFromArchive) {
                     // When importing from archive, we first extract the
                     // *selected* files to a temporary folder then create new
@@ -1495,11 +1495,13 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                     // Extract selected files from source archive to temporary folder
                     extractArchiveContent(selectedFileSystemElements.iterator(), destTempFolder, archiveMonitor.newChild(1));
 
-                    // Even if the files were extracted to temporary folder, they have to look like they originate from the source archive
-                    baseSourceLocation = getRootElement(selectedFileSystemElements.get(0)).getSourceLocation();
-                    // Extract additional archives contained in the extracted files (archives in archives)
-                    List<TraceFileSystemElement> tempFolderFileSystemElements = createElementsForFolder(destTempFolder);
-                    extractAllArchiveFiles(tempFolderFileSystemElements, destTempFolder, destTempFolder.getLocation(), archiveMonitor.newChild(1));
+                    if (!selectedFileSystemElements.isEmpty()) {
+                        // Even if the files were extracted to temporary folder, they have to look like they originate from the source archive
+                        baseSourceLocation = getRootElement(selectedFileSystemElements.get(0)).getSourceLocation();
+                        // Extract additional archives contained in the extracted files (archives in archives)
+                        List<TraceFileSystemElement> tempFolderFileSystemElements = createElementsForFolder(destTempFolder);
+                        extractAllArchiveFiles(tempFolderFileSystemElements, destTempFolder, destTempFolder.getLocation(), archiveMonitor.newChild(1));
+                    }
                 } else {
                     SubMonitor directoryMonitor = SubMonitor.convert(subMonitor.newChild(1), 2);
                     // Import selected files, excluding archives (done in a later step)
@@ -1518,13 +1520,14 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 // wrong trace folders otherwise.
                 fBaseSourceContainerPath = destTempFolder.getLocation();
                 List<TraceFileSystemElement> tempFolderFileSystemElements = createElementsForFolder(destTempFolder);
-                calculateSourceLocations(tempFolderFileSystemElements, baseSourceLocation);
-                // Never import extracted files as links, they would link to the
-                // temporary directory that will be deleted
-                fImportOptionFlags = fImportOptionFlags & ~OPTION_CREATE_LINKS_IN_WORKSPACE;
-                SubMonitor importTempMonitor = subMonitor.newChild(1);
-                importFileSystemElements(importTempMonitor, tempFolderFileSystemElements);
-
+                if (!tempFolderFileSystemElements.isEmpty()) {
+                    calculateSourceLocations(tempFolderFileSystemElements, baseSourceLocation);
+                    // Never import extracted files as links, they would link to the
+                    // temporary directory that will be deleted
+                    fImportOptionFlags = fImportOptionFlags & ~OPTION_CREATE_LINKS_IN_WORKSPACE;
+                    SubMonitor importTempMonitor = subMonitor.newChild(1);
+                    importFileSystemElements(importTempMonitor, tempFolderFileSystemElements);
+                }
                 if (destTempFolder.exists()) {
                     destTempFolder.delete(true, progressMonitor);
                 }
@@ -1718,6 +1721,10 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                     }
                 }
                 subList.add(element);
+            }
+
+            if (subList.isEmpty()) {
+                return;
             }
 
             TraceFileSystemElement root = getRootElement(subList.get(0));
