@@ -139,30 +139,31 @@ public abstract class AbstractProviderTest {
     public void testOtherUstTrace() {
         /* Initialize the trace and analysis module */
         File suppDir;
-        try (CtfTmfTrace ustTrace = otherUstTrace.getTrace();) {
-            TestLttngCallStackModule module = null;
+        CtfTmfTrace ustTrace = otherUstTrace.getTrace();
+        TestLttngCallStackModule module = null;
+        try {
+            module = new TestLttngCallStackModule();
             try {
-                module = new TestLttngCallStackModule();
-                try {
-                    assertTrue(module.setTrace(ustTrace));
-                } catch (TmfAnalysisException e) {
-                    fail();
-                }
-                module.schedule();
-                assertTrue(module.waitForCompletion());
-
-                /* Make sure the generated state system exists, but is empty */
-                ITmfStateSystem ss = module.getStateSystem();
-                assertNotNull(ss);
-                assertTrue(ss.getStartTime() >= ustTrace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
-                assertEquals(0, ss.getNbAttributes());
-            } finally {
-                if (module != null) {
-                    module.dispose();
-                }
+                assertTrue(module.setTrace(ustTrace));
+            } catch (TmfAnalysisException e) {
+                fail();
             }
-            suppDir = new File(TmfTraceManager.getSupplementaryFileDir(ustTrace));
+            module.schedule();
+            assertTrue(module.waitForCompletion());
+
+            /* Make sure the generated state system exists, but is empty */
+            ITmfStateSystem ss = module.getStateSystem();
+            assertNotNull(ss);
+            assertTrue(ss.getStartTime() >= ustTrace.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue());
+            assertEquals(0, ss.getNbAttributes());
+        } finally {
+            if (module != null) {
+                module.dispose();
+            }
         }
+        suppDir = new File(TmfTraceManager.getSupplementaryFileDir(ustTrace));
+
+        ustTrace.dispose();
         deleteDirectory(suppDir);
         assertFalse(suppDir.exists());
     }

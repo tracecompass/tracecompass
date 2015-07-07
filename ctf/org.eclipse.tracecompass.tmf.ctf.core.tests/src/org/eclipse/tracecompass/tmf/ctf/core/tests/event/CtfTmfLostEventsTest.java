@@ -104,23 +104,24 @@ public class CtfTmfLostEventsTest {
     public void testNbEventsBug475007() {
         final CtfTmfTestTrace tmfTestTrace = CtfTmfTestTrace.DYNSCOPE;
         assumeTrue(tmfTestTrace.exists());
-        try (CtfTmfTrace trace = tmfTestTrace.getTrace()) {
-            trace.indexTrace(true);
+        CtfTmfTrace trace = tmfTestTrace.getTrace();
+        trace.indexTrace(true);
 
-            final long expectedReal = 100003;
-            final long expectedLost = 1;
+        final long expectedReal = 100003;
+        final long expectedLost = 1;
 
-            EventCountRequest req = new EventCountRequest();
-            trace.sendRequest(req);
-            try {
-                req.waitForCompletion();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            assertEquals(expectedReal, req.getReal());
-            assertEquals(expectedLost, req.getLost());
+        EventCountRequest req = new EventCountRequest();
+        trace.sendRequest(req);
+        try {
+            req.waitForCompletion();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+
+        assertEquals(expectedReal, req.getReal());
+        assertEquals(expectedLost, req.getLost());
+
+        trace.dispose();
     }
 
     /**

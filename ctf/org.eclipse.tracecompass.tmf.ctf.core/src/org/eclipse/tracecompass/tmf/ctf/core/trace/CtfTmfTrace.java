@@ -84,7 +84,7 @@ import com.google.common.collect.ImmutableSet;
  */
 public class CtfTmfTrace extends TmfTrace
         implements ITmfTraceProperties, ITmfPersistentlyIndexable,
-        ITmfTraceWithPreDefinedEvents, AutoCloseable {
+        ITmfTraceWithPreDefinedEvents {
 
     // -------------------------------------------
     // Constants
@@ -203,11 +203,6 @@ public class CtfTmfTrace extends TmfTrace
              */
             throw new TmfTraceException(e.getMessage(), e);
         }
-    }
-
-    @Override
-    public void close() {
-        dispose();
     }
 
     @Override

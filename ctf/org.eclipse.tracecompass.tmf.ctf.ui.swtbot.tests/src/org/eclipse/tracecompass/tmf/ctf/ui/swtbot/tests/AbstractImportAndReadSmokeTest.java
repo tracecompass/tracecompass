@@ -236,18 +236,20 @@ public abstract class AbstractImportAndReadSmokeTest {
 
     /**
      * Gets an event at a given rank
+     *
      * @param rank
      *            a rank
      * @return the event at given rank
      */
     protected CtfTmfEvent getEvent(int rank) {
-        try (CtfTmfTrace trace = fTrace.getTrace()) {
-            ITmfContext ctx = trace.seekEvent(0);
-            for (int i = 0; i < rank; i++) {
-                trace.getNext(ctx);
-            }
-            return trace.getNext(ctx);
+        CtfTmfTrace trace = fTrace.getTrace();
+        ITmfContext ctx = trace.seekEvent(0);
+        for (int i = 0; i < rank; i++) {
+            trace.getNext(ctx);
         }
+        CtfTmfEvent ret = trace.getNext(ctx);
+        trace.dispose();
+        return ret;
     }
 
     /**

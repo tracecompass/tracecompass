@@ -90,13 +90,16 @@ public class StateProviderModuleTest {
 
         fModule.setXmlFile(TmfXmlTestFiles.VALID_FILE.getPath());
 
-        try (CtfTmfTrace trace = CtfTmfTestTrace.KERNEL.getTrace();) {
+        CtfTmfTrace trace = CtfTmfTestTrace.KERNEL.getTrace();
+        try {
             fModule.setTrace(trace);
             fModule.schedule();
-
             assertTrue(fModule.waitForCompletion(new NullProgressMonitor()));
+
         } catch (TmfAnalysisException e) {
             fail("Cannot set trace " + e.getMessage());
+        } finally {
+            trace.dispose();
         }
 
     }

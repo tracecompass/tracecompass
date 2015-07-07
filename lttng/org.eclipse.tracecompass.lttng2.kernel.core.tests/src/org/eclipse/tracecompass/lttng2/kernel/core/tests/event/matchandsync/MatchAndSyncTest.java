@@ -46,31 +46,32 @@ public class MatchAndSyncTest {
     public void testMatching() {
         assumeTrue(CtfTmfTestTrace.SYNC_SRC.exists());
         assumeTrue(CtfTmfTestTrace.SYNC_DEST.exists());
-        try (CtfTmfTrace trace1 = CtfTmfTestTrace.SYNC_SRC.getTrace();
-                CtfTmfTrace trace2 = CtfTmfTestTrace.SYNC_DEST.getTrace();) {
+        CtfTmfTrace trace1 = CtfTmfTestTrace.SYNC_SRC.getTrace();
+        CtfTmfTrace trace2 = CtfTmfTestTrace.SYNC_DEST.getTrace();
 
-            List<ITmfTrace> tracearr = new LinkedList<>();
-            tracearr.add(trace1);
-            tracearr.add(trace2);
+        List<ITmfTrace> tracearr = new LinkedList<>();
+        tracearr.add(trace1);
+        tracearr.add(trace2);
 
-            TmfEventMatching.registerMatchObject(new TcpEventMatching());
-            TmfEventMatching.registerMatchObject(new TcpLttngEventMatching());
+        TmfEventMatching.registerMatchObject(new TcpEventMatching());
+        TmfEventMatching.registerMatchObject(new TcpLttngEventMatching());
 
-            TmfEventMatching twoTraceMatch = new TmfEventMatching(tracearr);
-            assertTrue(twoTraceMatch.matchEvents());
+        TmfEventMatching twoTraceMatch = new TmfEventMatching(tracearr);
+        assertTrue(twoTraceMatch.matchEvents());
 
-            /* Set method and fields accessible to make sure the counts are ok */
-            try {
-                /* Verify number of matches */
-                Method method = TmfEventMatching.class.getDeclaredMethod("getProcessingUnit");
-                method.setAccessible(true);
-                IMatchProcessingUnit procUnit = (IMatchProcessingUnit) method.invoke(twoTraceMatch);
-                assertEquals(46, procUnit.countMatches());
+        /* Set method and fields accessible to make sure the counts are ok */
+        try {
+            /* Verify number of matches */
+            Method method = TmfEventMatching.class.getDeclaredMethod("getProcessingUnit");
+            method.setAccessible(true);
+            IMatchProcessingUnit procUnit = (IMatchProcessingUnit) method.invoke(twoTraceMatch);
+            assertEquals(46, procUnit.countMatches());
 
-            } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                fail(e.getMessage());
-            }
-
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            fail(e.getMessage());
+        } finally {
+            trace1.dispose();
+            trace2.dispose();
         }
     }
 

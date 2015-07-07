@@ -56,10 +56,10 @@ public class GenerateTestValues {
 
         /* Prepare the files */
         File logFile = File.createTempFile("TestValues", ".java");
-        try (final CtfTmfTrace trace = testTrace.getTrace();
-                PrintWriter writer = new PrintWriter(new FileWriter(logFile), true);) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(logFile), true);) {
 
             /* Build and query the state system */
+            final CtfTmfTrace trace = testTrace.getTrace();
             TmfStateSystemAnalysisModule module = new KernelAnalysisModule() {
                 @Override
                 protected String getSsFileName() {
@@ -133,6 +133,7 @@ public class GenerateTestValues {
             writer.println();
 
             module.dispose();
+            trace.dispose();
         }
         System.exit(0);
     }

@@ -68,10 +68,10 @@ public class ImportAndReadKernelSmokeTest extends KernelTest {
         Matcher<IEditorReference> matcher = WidgetMatcherFactory.withPartName(CTT.getTrace().getName());
         IEditorPart iep = fBot.editor(matcher).getReference().getEditor(true);
         final TmfEventsEditor tmfEd = (TmfEventsEditor) iep;
-        try (CtfTmfTrace trace = CtfTmfTestTrace.SYNTHETIC_TRACE.getTrace();) {
-            fDesired1 = getEvent(trace, 100);
-            fDesired2 = getEvent(trace, 10000);
-        }
+        CtfTmfTrace trace = CtfTmfTestTrace.SYNTHETIC_TRACE.getTrace();
+        fDesired1 = getEvent(trace, 100);
+        fDesired2 = getEvent(trace, 10000);
+
         UIThreadRunnable.syncExec(new VoidResult() {
             @Override
             public void run() {
@@ -82,6 +82,7 @@ public class ImportAndReadKernelSmokeTest extends KernelTest {
         testHV(getViewPart("Histogram"));
         testCFV((ControlFlowView) getViewPart("Control Flow"));
         testRV((ResourcesView) getViewPart("Resources"));
+        trace.dispose();
     }
 
     private static void testCFV(ControlFlowView vp) {

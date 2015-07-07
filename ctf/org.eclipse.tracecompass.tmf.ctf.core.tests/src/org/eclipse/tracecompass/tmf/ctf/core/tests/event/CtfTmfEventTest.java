@@ -54,12 +54,13 @@ public class CtfTmfEventTest {
     @Before
     public void setUp() {
         assumeTrue(testTrace.exists());
-        try (CtfTmfTrace trace = testTrace.getTrace();
-                CtfIterator tr = (CtfIterator) trace.createIterator();) {
+        CtfTmfTrace trace = testTrace.getTrace();
+        try (CtfIterator tr = (CtfIterator) trace.createIterator();) {
             tr.advance();
             fixture = tr.getCurrentEvent();
             nullEvent = CtfTmfEventFactory.getNullEvent(trace);
         }
+        trace.dispose();
     }
 
     /**
@@ -153,9 +154,9 @@ public class CtfTmfEventTest {
     @Test
     public void testGetters() {
         long rank = fixture.getRank();
-        try (CtfTmfTrace trace = fixture.getTrace();) {
-            assertEquals("kernel", trace.getName());
-        }
+        CtfTmfTrace trace = fixture.getTrace();
+        assertEquals("kernel", trace.getName());
+
         String reference = fixture.getChannel();
         int cpu = fixture.getCPU();
         ITmfEventType type = fixture.getType();

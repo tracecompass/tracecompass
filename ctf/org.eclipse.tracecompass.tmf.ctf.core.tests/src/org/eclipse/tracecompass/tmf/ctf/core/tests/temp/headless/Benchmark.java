@@ -44,41 +44,42 @@ public class Benchmark {
         long start, stop;
         for (int loops = 0; loops < NUM_LOOPS; loops++) {
             nbEvent = 0L;
-            try (CtfTmfTrace trace = new CtfTmfTrace();) {
-                try {
-                    trace.initTrace(null, TRACE_PATH, CtfTmfEvent.class);
-                } catch (final TmfTraceException e) {
-                    loops = NUM_LOOPS + 1;
-                    break;
-                }
+            CtfTmfTrace trace = new CtfTmfTrace();
+            try {
+                trace.initTrace(null, TRACE_PATH, CtfTmfEvent.class);
+            } catch (final TmfTraceException e) {
+                loops = NUM_LOOPS + 1;
+                break;
+            }
+
+            start = System.nanoTime();
+            if (nbEvent != -1) {
+                final CtfTmfContext traceReader = (CtfTmfContext) trace.seekEvent(0);
 
                 start = System.nanoTime();
-                if (nbEvent != -1) {
-                    final CtfTmfContext traceReader = (CtfTmfContext) trace.seekEvent(0);
+                CtfTmfEvent current = traceReader.getCurrentEvent();
+                while (current != null) {
+                    nbEvent++;
+                    if (USE_TEXT) {
 
-                    start = System.nanoTime();
-                    CtfTmfEvent current = traceReader.getCurrentEvent();
-                    while (current != null) {
-                        nbEvent++;
-                        if (USE_TEXT) {
-
-                            System.out.println("Event " + nbEvent + " Time "
-                                    + current.getTimestamp().toString() + " type " + current.getType().getName()
-                                    + " on CPU " + current.getCPU() + " " + current.getContent().toString());
-                        }
-                        // advance the trace to the next event.
-                        boolean hasMore = traceReader.advance();
-                        if (hasMore) {
-                            // you can know the trace has more events.
-                        }
-                        current = traceReader.getCurrentEvent();
+                        System.out.println("Event " + nbEvent + " Time "
+                                + current.getTimestamp().toString() + " type " + current.getType().getName()
+                                + " on CPU " + current.getCPU() + " " + current.getContent().toString());
                     }
+                    // advance the trace to the next event.
+                    boolean hasMore = traceReader.advance();
+                    if (hasMore) {
+                        // you can know the trace has more events.
+                    }
+                    current = traceReader.getCurrentEvent();
                 }
-                stop = System.nanoTime();
-                System.out.print('.');
-                final double time = (stop - start) / (double) nbEvent;
-                benchs.add(time);
-            } // trace.close()
+            }
+            stop = System.nanoTime();
+            System.out.print('.');
+            final double time = (stop - start) / (double) nbEvent;
+            benchs.add(time);
+
+            trace.dispose();
         }
         System.out.println("");
         double avg = 0;

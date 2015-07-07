@@ -58,11 +58,16 @@ public class EventMatchingBenchmark {
     public void testSmallTraces() {
         assumeTrue(CtfTmfTestTrace.SYNC_SRC.exists());
         assumeTrue(CtfTmfTestTrace.SYNC_DEST.exists());
-        try (CtfTmfTrace trace1 = CtfTmfTestTrace.SYNC_SRC.getTrace();
-                CtfTmfTrace trace2 = CtfTmfTestTrace.SYNC_DEST.getTrace();) {
-            Set<ITmfTrace> traces = ImmutableSet.of((ITmfTrace) trace1, trace2);
-            runCpuTest(traces, "Match TCP events", 100);
-        }
+
+        CtfTmfTrace trace1 = CtfTmfTestTrace.SYNC_SRC.getTrace();
+        CtfTmfTrace trace2 = CtfTmfTestTrace.SYNC_DEST.getTrace();
+
+        Set<ITmfTrace> traces = ImmutableSet.of((ITmfTrace) trace1, trace2);
+        runCpuTest(traces, "Match TCP events", 100);
+
+        trace1.dispose();
+        trace2.dispose();
+
     }
 
     /**
@@ -73,13 +78,18 @@ public class EventMatchingBenchmark {
         assumeTrue(CtfTmfTestTrace.DJANGO_CLIENT.exists());
         assumeTrue(CtfTmfTestTrace.DJANGO_DB.exists());
         assumeTrue(CtfTmfTestTrace.DJANGO_HTTPD.exists());
-        try (CtfTmfTrace trace1 = CtfTmfTestTrace.DJANGO_CLIENT.getTrace();
-                CtfTmfTrace trace2 = CtfTmfTestTrace.DJANGO_DB.getTrace();
-                CtfTmfTrace trace3 = CtfTmfTestTrace.DJANGO_HTTPD.getTrace();) {
-            Set<ITmfTrace> traces = ImmutableSet.of((ITmfTrace) trace1, trace2, trace3);
-            runCpuTest(traces, "Django traces", 10);
-            runMemoryTest(traces, "Django traces", 10);
-        }
+
+        CtfTmfTrace trace1 = CtfTmfTestTrace.DJANGO_CLIENT.getTrace();
+        CtfTmfTrace trace2 = CtfTmfTestTrace.DJANGO_DB.getTrace();
+        CtfTmfTrace trace3 = CtfTmfTestTrace.DJANGO_HTTPD.getTrace();
+
+        Set<ITmfTrace> traces = ImmutableSet.of((ITmfTrace) trace1, trace2, trace3);
+        runCpuTest(traces, "Django traces", 10);
+        runMemoryTest(traces, "Django traces", 10);
+
+        trace1.dispose();
+        trace2.dispose();
+        trace3.dispose();
     }
 
     private static void runCpuTest(Set<ITmfTrace> testTraces, String testName, int loop_count) {

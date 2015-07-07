@@ -105,38 +105,38 @@ public class CtfTmfTraceValidateTest {
      */
     @Test
     public void testValidate() {
-        try (CtfTmfTrace trace = new CtfTmfTrace();) {
-            IStatus status = trace.validate(null, fTrace);
-            assertEquals(toString(), fServerity, status.getSeverity());
+        CtfTmfTrace trace = new CtfTmfTrace();
+        IStatus status = trace.validate(null, fTrace);
+        assertEquals(toString(), fServerity, status.getSeverity());
 
-            if (fHasException) {
-                assertNotNull(toString(), status.getException());
-            }
-            switch (status.getSeverity()) {
-            case IStatus.OK: {
-                assertTrue(status instanceof CtfTraceValidationStatus);
-                CtfTraceValidationStatus ctfStatus = (CtfTraceValidationStatus) status;
-                assertEquals(toString(), fConfidence, ctfStatus.getConfidence());
-                assertNotNull(ctfStatus.getEnvironment());
-                break;
-            }
-            case IStatus.WARNING: {
-                assertTrue(status instanceof TraceValidationStatus);
-                TraceValidationStatus ctfStatus = (TraceValidationStatus) status;
-                assertEquals(fConfidence, ctfStatus.getConfidence());
-                break;
-            }
-            case IStatus.ERROR: {
-                // nothing else to check here
-                break;
-            }
-            default:
-                // no other severity should be returned
-                fail();
-                break;
-            }
-            assertEquals(fServerity, status.getSeverity());
+        if (fHasException) {
+            assertNotNull(toString(), status.getException());
         }
+        switch (status.getSeverity()) {
+        case IStatus.OK: {
+            assertTrue(status instanceof CtfTraceValidationStatus);
+            CtfTraceValidationStatus ctfStatus = (CtfTraceValidationStatus) status;
+            assertEquals(toString(), fConfidence, ctfStatus.getConfidence());
+            assertNotNull(ctfStatus.getEnvironment());
+            break;
+        }
+        case IStatus.WARNING: {
+            assertTrue(status instanceof TraceValidationStatus);
+            TraceValidationStatus ctfStatus = (TraceValidationStatus) status;
+            assertEquals(fConfidence, ctfStatus.getConfidence());
+            break;
+        }
+        case IStatus.ERROR: {
+            // nothing else to check here
+            break;
+        }
+        default:
+            // no other severity should be returned
+            fail();
+            break;
+        }
+        assertEquals(fServerity, status.getSeverity());
+        trace.dispose();
     }
 
 }

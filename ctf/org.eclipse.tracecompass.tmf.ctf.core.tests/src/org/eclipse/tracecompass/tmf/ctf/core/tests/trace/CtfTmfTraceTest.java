@@ -88,14 +88,16 @@ public class CtfTmfTraceTest {
      */
     @Test
     public void testCtfTmfTrace() {
-        try (CtfTmfTrace result = new CtfTmfTrace();) {
-            assertNotNull(result);
-            assertEquals(1000, result.getCacheSize());
-            assertEquals(0L, result.getNbEvents());
-            assertEquals(0L, result.getStreamingInterval());
-            assertNull(result.getResource());
-            assertNull(result.getType());
-        }
+        CtfTmfTrace result = new CtfTmfTrace();
+
+        assertNotNull(result);
+        assertEquals(1000, result.getCacheSize());
+        assertEquals(0L, result.getNbEvents());
+        assertEquals(0L, result.getStreamingInterval());
+        assertNull(result.getResource());
+        assertNull(result.getType());
+
+        result.dispose();
     }
 
     /**
@@ -123,9 +125,9 @@ public class CtfTmfTraceTest {
      * Run the void dispose() method test.
      */
     @Test
-    public void testClose() {
-        try (CtfTmfTrace emptyFixture = new CtfTmfTrace();) {
-        }
+    public void testDispose() {
+        CtfTmfTrace emptyFixture = new CtfTmfTrace();
+        emptyFixture.dispose();
     }
 
     /**
@@ -133,10 +135,11 @@ public class CtfTmfTraceTest {
      */
     @Test
     public void testGetCacheSize() {
-        try (CtfTmfTrace emptyFixture = new CtfTmfTrace();) {
-            int result = emptyFixture.getCacheSize();
-            assertEquals(1000, result);
-        }
+        CtfTmfTrace emptyFixture = new CtfTmfTrace();
+        int result = emptyFixture.getCacheSize();
+        assertEquals(1000, result);
+
+        emptyFixture.dispose();
     }
 
     /**

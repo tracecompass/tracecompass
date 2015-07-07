@@ -64,27 +64,28 @@ public class ExperimentSyncTest {
     public void testExperimentSync() {
         assumeTrue(CtfTmfTestTrace.SYNC_SRC.exists());
         assumeTrue(CtfTmfTestTrace.SYNC_DEST.exists());
-        try (CtfTmfTrace trace1 = CtfTmfTestTrace.SYNC_SRC.getTrace();
-                CtfTmfTrace trace2 = CtfTmfTestTrace.SYNC_DEST.getTrace();) {
+        CtfTmfTrace trace1 = CtfTmfTestTrace.SYNC_SRC.getTrace();
+        CtfTmfTrace trace2 = CtfTmfTestTrace.SYNC_DEST.getTrace();
 
-            ITmfTrace[] traces = { trace1, trace2 };
-            TmfExperiment experiment = new TmfExperiment(traces[0].getEventType(), EXPERIMENT, traces, BLOCK_SIZE, null);
+        ITmfTrace[] traces = { trace1, trace2 };
+        TmfExperiment experiment = new TmfExperiment(traces[0].getEventType(), EXPERIMENT, traces, BLOCK_SIZE, null);
 
-            SynchronizationAlgorithm syncAlgo = experiment.synchronizeTraces(true);
+        SynchronizationAlgorithm syncAlgo = experiment.synchronizeTraces(true);
 
-            ITmfTimestampTransform tt1 = syncAlgo.getTimestampTransform(trace1);
-            ITmfTimestampTransform tt2 = syncAlgo.getTimestampTransform(trace2);
+        ITmfTimestampTransform tt1 = syncAlgo.getTimestampTransform(trace1);
+        ITmfTimestampTransform tt2 = syncAlgo.getTimestampTransform(trace2);
 
-            trace1.setTimestampTransform(tt1);
-            trace2.setTimestampTransform(tt2);
+        trace1.setTimestampTransform(tt1);
+        trace2.setTimestampTransform(tt2);
 
-            assertEquals("TmfTimestampTransformLinearFast [ slope = 0.9999413783703139011056845831168394, offset = 79796507913179.33347660124688298171 ]", tt1.toString());
-            assertEquals(TimestampTransformFactory.getDefaultTransform(), tt2);
+        assertEquals("TmfTimestampTransformLinearFast [ slope = 0.9999413783703139011056845831168394, offset = 79796507913179.33347660124688298171 ]", tt1.toString());
+        assertEquals(TimestampTransformFactory.getDefaultTransform(), tt2);
 
-            assertEquals(syncAlgo.getTimestampTransform(trace1.getHostId()), trace1.getTimestampTransform());
-            assertEquals(syncAlgo.getTimestampTransform(trace2.getHostId()), trace2.getTimestampTransform());
+        assertEquals(syncAlgo.getTimestampTransform(trace1.getHostId()), trace1.getTimestampTransform());
+        assertEquals(syncAlgo.getTimestampTransform(trace2.getHostId()), trace2.getTimestampTransform());
 
-        }
+        trace1.dispose();
+        trace2.dispose();
     }
 
     /**
@@ -96,26 +97,30 @@ public class ExperimentSyncTest {
         assumeTrue(CtfTmfTestTrace.DJANGO_CLIENT.exists());
         assumeTrue(CtfTmfTestTrace.DJANGO_DB.exists());
         assumeTrue(CtfTmfTestTrace.DJANGO_HTTPD.exists());
-        try (CtfTmfTrace trace1 = CtfTmfTestTrace.DJANGO_CLIENT.getTrace();
-                CtfTmfTrace trace2 = CtfTmfTestTrace.DJANGO_DB.getTrace();
-                CtfTmfTrace trace3 = CtfTmfTestTrace.DJANGO_HTTPD.getTrace();) {
-            ITmfTrace[] traces = { trace1, trace2, trace3 };
-            TmfExperiment experiment = new TmfExperiment(traces[0].getEventType(), EXPERIMENT, traces, BLOCK_SIZE, null);
 
-            SynchronizationAlgorithm syncAlgo = experiment.synchronizeTraces(true);
+        CtfTmfTrace trace1 = CtfTmfTestTrace.DJANGO_CLIENT.getTrace();
+        CtfTmfTrace trace2 = CtfTmfTestTrace.DJANGO_DB.getTrace();
+        CtfTmfTrace trace3 = CtfTmfTestTrace.DJANGO_HTTPD.getTrace();
 
-            ITmfTimestampTransform tt1 = syncAlgo.getTimestampTransform(trace1);
-            ITmfTimestampTransform tt2 = syncAlgo.getTimestampTransform(trace2);
-            ITmfTimestampTransform tt3 = syncAlgo.getTimestampTransform(trace3);
+        ITmfTrace[] traces = { trace1, trace2, trace3 };
+        TmfExperiment experiment = new TmfExperiment(traces[0].getEventType(), EXPERIMENT, traces, BLOCK_SIZE, null);
 
-            trace1.setTimestampTransform(tt1);
-            trace2.setTimestampTransform(tt2);
-            trace3.setTimestampTransform(tt3);
+        SynchronizationAlgorithm syncAlgo = experiment.synchronizeTraces(true);
 
-            assertEquals(TimestampTransformFactory.getDefaultTransform(), tt1);
-            assertEquals("TmfTimestampTransformLinearFast [ slope = 0.9999996313017589597204633828681240, offset = 498490309972.0038068817738527724192 ]", tt2.toString());
-            assertEquals("TmfTimestampTransformLinearFast [ slope = 1.000000119014882262265342419815932, offset = -166652893534.6189900382736187431134 ]", tt3.toString());
+        ITmfTimestampTransform tt1 = syncAlgo.getTimestampTransform(trace1);
+        ITmfTimestampTransform tt2 = syncAlgo.getTimestampTransform(trace2);
+        ITmfTimestampTransform tt3 = syncAlgo.getTimestampTransform(trace3);
 
-        }
+        trace1.setTimestampTransform(tt1);
+        trace2.setTimestampTransform(tt2);
+        trace3.setTimestampTransform(tt3);
+
+        assertEquals(TimestampTransformFactory.getDefaultTransform(), tt1);
+        assertEquals("TmfTimestampTransformLinearFast [ slope = 0.9999996313017589597204633828681240, offset = 498490309972.0038068817738527724192 ]", tt2.toString());
+        assertEquals("TmfTimestampTransformLinearFast [ slope = 1.000000119014882262265342419815932, offset = -166652893534.6189900382736187431134 ]", tt3.toString());
+
+        trace1.dispose();
+        trace2.dispose();
+        trace3.dispose();
     }
 }

@@ -124,13 +124,13 @@ public class LttngKernelAnalysisTest {
 
         /* Test with a CTF trace that does not have required events */
         assumeTrue(CtfTmfTestTrace.CYG_PROFILE.exists());
-        try (CtfTmfTrace trace = CtfTmfTestTrace.CYG_PROFILE.getTrace();) {
-            /*
-             * TODO: This should be false, but for now there is no mandatory
-             * events in the kernel analysis so it will return true.
-             */
-            assertTrue(fKernelAnalysisModule.canExecute(trace));
-        }
+        CtfTmfTrace trace = CtfTmfTestTrace.CYG_PROFILE.getTrace();
+        /*
+         * TODO: This should be false, but for now there is no mandatory events
+         * in the kernel analysis so it will return true.
+         */
+        assertTrue(fKernelAnalysisModule.canExecute(trace));
+        trace.dispose();
     }
 
     /**
