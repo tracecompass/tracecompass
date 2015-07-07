@@ -15,6 +15,8 @@ package org.eclipse.tracecompass.lttng2.kernel.core.tests.event.matchandsync;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeTrue;
 
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpEventMatching;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpLttngEventMatching;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching;
@@ -26,7 +28,10 @@ import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
+import org.junit.rules.Timeout;
 
 /**
  * Tests for experiment syncing
@@ -35,6 +40,10 @@ import org.junit.Test;
  */
 @SuppressWarnings("nls")
 public class ExperimentSyncTest {
+
+    /** Timeout the tests after 2 minutes */
+    @Rule
+    public TestRule timeoutRule = new Timeout(2, TimeUnit.MINUTES);
 
     private static final String EXPERIMENT = "MyExperiment";
     private static int BLOCK_SIZE = 1000;
