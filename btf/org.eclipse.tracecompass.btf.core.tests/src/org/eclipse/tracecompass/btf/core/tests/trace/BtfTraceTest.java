@@ -13,7 +13,6 @@ package org.eclipse.tracecompass.btf.core.tests.trace;
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
 import java.util.Map;
 
 import org.eclipse.tracecompass.btf.core.tests.utils.BtfTestTrace;
@@ -50,9 +49,7 @@ public class BtfTraceTest {
      */
     @After
     public void cleanup() {
-        try {
-            fixture.close();
-        } catch (IOException e) {}
+        fixture.dispose();
     }
 
     /**

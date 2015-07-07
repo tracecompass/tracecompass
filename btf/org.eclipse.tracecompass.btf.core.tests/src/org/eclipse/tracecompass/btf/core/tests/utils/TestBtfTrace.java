@@ -12,8 +12,6 @@
 
 package org.eclipse.tracecompass.btf.core.tests.utils;
 
-import java.io.IOException;
-
 import org.eclipse.tracecompass.btf.core.trace.BtfTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
@@ -36,26 +34,26 @@ public class TestBtfTrace {
      *             exception
      */
     public static void main(String[] args) throws TmfTraceException {
-        try (BtfTrace trace = new BtfTrace()) {
-            trace.initTrace(null, BtfTestTrace.BTF_TEST.getFullPath(), null);
-            System.out.println(trace.toString());
-            ITmfContext ctx = trace.seekEvent(0);
-            ITmfContext ctx1 = trace.seekEvent(10);
-            ITmfEvent event = trace.getNext(ctx);
-            ITmfEvent compare = null;
-            while (event != null) {
-                if (event.getRank() == 10) {
-                    compare = event;
-                }
-                printEvent(event);
-                event = trace.getNext(ctx);
+        BtfTrace trace = new BtfTrace();
+        trace.initTrace(null, BtfTestTrace.BTF_TEST.getFullPath(), null);
+        System.out.println(trace.toString());
+
+        ITmfContext ctx = trace.seekEvent(0);
+        ITmfContext ctx1 = trace.seekEvent(10);
+        ITmfEvent event = trace.getNext(ctx);
+        ITmfEvent compare = null;
+        while (event != null) {
+            if (event.getRank() == 10) {
+                compare = event;
             }
-            ITmfEvent other = trace.getNext(ctx1);
-            printEvent(other);
-            printEvent(compare);
-        } catch (IOException e) {
-            e.printStackTrace();
+            printEvent(event);
+            event = trace.getNext(ctx);
         }
+        ITmfEvent other = trace.getNext(ctx1);
+        printEvent(other);
+        printEvent(compare);
+
+        trace.dispose();
     }
 
     private static void printEvent(ITmfEvent event) {

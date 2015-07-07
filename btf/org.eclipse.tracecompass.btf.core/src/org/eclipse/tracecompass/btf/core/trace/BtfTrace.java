@@ -59,7 +59,7 @@ import com.google.common.collect.ImmutableMap;
  *
  * @author Matthew Khouzam
  */
-public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITmfTraceProperties, AutoCloseable {
+public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITmfTraceProperties {
 
     private static final int MAX_FIELDS = 7;
 
@@ -450,10 +450,15 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
     }
 
     @Override
-    public void close() throws IOException {
-        if (fFileInput != null) {
-            fFileInput.close();
+    public synchronized void dispose() {
+        RandomAccessFile raf = fFileInput;
+        if (raf != null) {
+            try {
+                raf.close();
+            } catch (IOException e) {
+            }
         }
+        super.dispose();
     }
 
 }
