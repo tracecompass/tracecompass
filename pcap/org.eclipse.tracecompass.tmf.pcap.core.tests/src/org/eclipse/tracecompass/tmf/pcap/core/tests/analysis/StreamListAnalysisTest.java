@@ -63,14 +63,15 @@ public class StreamListAnalysisTest {
         PcapTestTrace trace = PcapTestTrace.MOSTLY_TCP;
         assumeTrue(trace.exists());
         String path = trace.getPath().toString();
-        try (PcapTrace pcapTrace = new PcapTrace();) {
-            StreamListAnalysis analysis = new StreamListAnalysis();
-            analysis.setId(StreamListAnalysis.ID);
-            pcapTrace.initTrace(null, path, null);
-            assertTrue(analysis.canExecute(pcapTrace));
+        PcapTrace pcapTrace = new PcapTrace();
+        StreamListAnalysis analysis = new StreamListAnalysis();
 
-            analysis.dispose();
-        }
+        analysis.setId(StreamListAnalysis.ID);
+        pcapTrace.initTrace(null, path, null);
+        assertTrue(analysis.canExecute(pcapTrace));
+
+        analysis.dispose();
+        pcapTrace.dispose();
     }
 
     /**
@@ -87,46 +88,46 @@ public class StreamListAnalysisTest {
         PcapTestTrace trace = PcapTestTrace.MOSTLY_TCP;
         assumeTrue(trace.exists());
         String path = trace.getPath().toString();
-        try (PcapTrace pcapTrace = new PcapTrace();) {
-            StreamListAnalysis analysis = new StreamListAnalysis();
+        PcapTrace pcapTrace = new PcapTrace();
+        StreamListAnalysis analysis = new StreamListAnalysis();
 
-            pcapTrace.initTrace(null, path, null);
-            analysis.setId(StreamListAnalysis.ID);
-            analysis.setTrace(pcapTrace);
-            analysis.schedule();
-            analysis.waitForCompletion();
+        pcapTrace.initTrace(null, path, null);
+        analysis.setId(StreamListAnalysis.ID);
+        analysis.setTrace(pcapTrace);
+        analysis.schedule();
+        analysis.waitForCompletion();
 
-            // Verify that builders are not empty.
-            TmfPacketStreamBuilder builder = analysis.getBuilder(TmfPcapProtocol.ETHERNET_II);
-            if (builder == null) {
-                fail("The PacketStreamBuilder is null!");
-                return;
-            }
-            assertEquals(1, builder.getNbStreams());
-
-            builder = analysis.getBuilder(TmfPcapProtocol.IPV4);
-            if (builder == null) {
-                fail("The PacketStreamBuilder is null!");
-                return;
-            }
-            assertEquals(3, builder.getNbStreams());
-
-            builder = analysis.getBuilder(TmfPcapProtocol.TCP);
-            if (builder == null) {
-                fail("The PacketStreamBuilder is null!");
-                return;
-            }
-            assertEquals(2, builder.getNbStreams());
-
-            builder = analysis.getBuilder(TmfPcapProtocol.UDP);
-            if (builder == null) {
-                fail("The PacketStreamBuilder is null!");
-                return;
-            }
-            assertEquals(1, builder.getNbStreams());
-
-            analysis.dispose();
+        // Verify that builders are not empty.
+        TmfPacketStreamBuilder builder = analysis.getBuilder(TmfPcapProtocol.ETHERNET_II);
+        if (builder == null) {
+            fail("The PacketStreamBuilder is null!");
+            return;
         }
+        assertEquals(1, builder.getNbStreams());
+
+        builder = analysis.getBuilder(TmfPcapProtocol.IPV4);
+        if (builder == null) {
+            fail("The PacketStreamBuilder is null!");
+            return;
+        }
+        assertEquals(3, builder.getNbStreams());
+
+        builder = analysis.getBuilder(TmfPcapProtocol.TCP);
+        if (builder == null) {
+            fail("The PacketStreamBuilder is null!");
+            return;
+        }
+        assertEquals(2, builder.getNbStreams());
+
+        builder = analysis.getBuilder(TmfPcapProtocol.UDP);
+        if (builder == null) {
+            fail("The PacketStreamBuilder is null!");
+            return;
+        }
+        assertEquals(1, builder.getNbStreams());
+
+        analysis.dispose();
+        pcapTrace.dispose();
     }
 
 }

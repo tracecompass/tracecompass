@@ -229,14 +229,14 @@ public class ImportAndReadPcapTest {
     }
 
     private static ITmfEvent getEvent(int rank) {
-        try (PcapTrace trace = pttt.getTrace()) {
-            ITmfContext ctx = trace.seekEvent(0);
-            for (int i = 0; i < rank; i++) {
-                trace.getNext(ctx);
-            }
-            return trace.getNext(ctx);
+        PcapTrace trace = pttt.getTrace();
+        ITmfContext ctx = trace.seekEvent(0);
+        for (int i = 0; i < rank; i++) {
+            trace.getNext(ctx);
         }
-
+        ITmfEvent ret = trace.getNext(ctx);
+        trace.dispose();
+        return ret;
     }
 
     private static IViewPart getViewPart(final String viewTile) {

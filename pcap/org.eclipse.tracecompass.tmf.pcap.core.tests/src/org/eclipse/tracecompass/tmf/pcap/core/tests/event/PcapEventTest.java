@@ -60,10 +60,11 @@ public class PcapEventTest {
 
         PcapTestTrace trace = PcapTestTrace.MOSTLY_TCP;
         assumeTrue(trace.exists());
-        try (PcapFile pcap = new PcapFile(trace.getPath());
-                PcapTrace pcapTrace = new PcapTrace();) {
+        try (PcapFile pcap = new PcapFile(trace.getPath());) {
+            PcapTrace pcapTrace = new PcapTrace();
             pcapTrace.initTrace(null, trace.getPath().toString(), PcapEvent.class);
             fEvent = pcapTrace.parseEvent(new TmfContext(new TmfLongLocation(3), 3));
+            pcapTrace.dispose();
         }
 
         // Initialize protocol list.

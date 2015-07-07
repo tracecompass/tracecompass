@@ -63,7 +63,7 @@ import com.google.common.collect.ImmutableMap;
  *
  * @author Vincent Perot
  */
-public class PcapTrace extends TmfTrace implements ITmfTraceProperties, AutoCloseable {
+public class PcapTrace extends TmfTrace implements ITmfTraceProperties {
 
     /** pcap trace type id as defined in plugin.xml */
     public static final String TRACE_TYPE_ID = "org.eclipse.linuxtools.tmf.pcap.core.pcaptrace"; //$NON-NLS-1$
@@ -264,10 +264,5 @@ public class PcapTrace extends TmfTrace implements ITmfTraceProperties, AutoClos
         }
 
         return properties;
-    }
-
-    @Override
-    public void close() {
-        dispose();
     }
 }

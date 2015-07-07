@@ -74,14 +74,16 @@ public class PcapTraceTest {
      */
     @Test
     public void testPcapTrace() {
-        try (PcapTrace result = new PcapTrace();) {
-            assertNotNull(result);
-            assertEquals(1000, result.getCacheSize());
-            assertEquals(0L, result.getNbEvents());
-            assertEquals(0L, result.getStreamingInterval());
-            assertNull(result.getResource());
-            assertNull(result.getType());
-        }
+        PcapTrace result = new PcapTrace();
+
+        assertNotNull(result);
+        assertEquals(1000, result.getCacheSize());
+        assertEquals(0L, result.getNbEvents());
+        assertEquals(0L, result.getStreamingInterval());
+        assertNull(result.getResource());
+        assertNull(result.getType());
+
+        result.dispose();
     }
 
     /**
@@ -105,23 +107,14 @@ public class PcapTraceTest {
     }
 
     /**
-     * Run the void dispose() method test.
-     */
-    @Test
-    public void testClose() {
-        try (PcapTrace emptyFixture = new PcapTrace();) {
-        }
-    }
-
-    /**
      * Run the int getCacheSize() method test.
      */
     @Test
     public void testGetCacheSize() {
-        try (PcapTrace emptyFixture = new PcapTrace();) {
-            int result = emptyFixture.getCacheSize();
-            assertEquals(1000, result);
-        }
+        PcapTrace emptyFixture = new PcapTrace();
+        int result = emptyFixture.getCacheSize();
+        assertEquals(1000, result);
+        emptyFixture.dispose();
     }
 
     /**
