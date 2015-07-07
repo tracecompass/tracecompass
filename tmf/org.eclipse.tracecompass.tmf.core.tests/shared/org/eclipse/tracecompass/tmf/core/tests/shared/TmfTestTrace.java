@@ -45,7 +45,7 @@ public enum TmfTestTrace {
     R_TEST_10K("R-Test-10K");
 
     private final @NonNull String fPath;
-    private final String fDirectory = "../org.eclipse.tracecompass.tmf.core.tests/testfiles";
+    private final String fDirectory = "../../tmf/org.eclipse.tracecompass.tmf.core.tests/testfiles";
     private ITmfTrace fTrace = null;
 
     private TmfTestTrace(@NonNull String file) {

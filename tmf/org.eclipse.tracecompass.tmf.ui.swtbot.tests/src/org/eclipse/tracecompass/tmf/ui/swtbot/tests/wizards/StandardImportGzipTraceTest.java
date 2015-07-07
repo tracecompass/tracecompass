@@ -54,6 +54,7 @@ import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -102,6 +103,14 @@ public class StandardImportGzipTraceTest {
     @AfterClass
     public static void destroy() {
         fLogger.removeAllAppenders();
+    }
+
+    /**
+     * Tear down the test
+     */
+    @After
+    public void tearDown() {
+        SWTBotUtils.deleteProject(PROJECT_NAME, fBot);
     }
 
     private void createProject() {
