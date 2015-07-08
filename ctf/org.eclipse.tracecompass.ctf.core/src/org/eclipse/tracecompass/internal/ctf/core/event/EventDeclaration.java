@@ -79,6 +79,43 @@ public class EventDeclaration implements IEventDeclaration {
     public EventDeclaration() {
     }
 
+    /**
+     * Creates an instance of EventDefinition corresponding to this declaration.
+     *
+     * @param streamInputReader
+     *            The StreamInputReader for which this definition is created.
+     * @param eventHeaderDef
+     *            The event header definition
+     * @param input
+     *            the bitbuffer input source
+     * @param timestamp
+     *            The timestamp when the event was taken
+     * @return A new EventDefinition.
+     * @throws CTFException
+     *             As a bitbuffer is used to read, it could have wrapped
+     *             IOExceptions.
+     */
+    public EventDefinition createDefinition(CTFStreamInputReader streamInputReader, ICompositeDefinition eventHeaderDef, @NonNull BitBuffer input, long timestamp) throws CTFException {
+        StructDeclaration streamEventContextDecl = streamInputReader.getStreamEventContextDecl();
+        StructDefinition streamEventContext = streamEventContextDecl != null ? streamEventContextDecl.createDefinition(fStream.getTrace(), ILexicalScope.STREAM_EVENT_CONTEXT, input) : null;
+        ICompositeDefinition packetContext = streamInputReader.getPacketReader().getCurrentPacketEventHeader();
+        StructDefinition eventContext = fContext != null ? fContext.createFieldDefinition(eventHeaderDef, fStream.getTrace(), ILexicalScope.CONTEXT, input) : null;
+        StructDefinition eventPayload = fFields != null ? fFields.createFieldDefinition(eventHeaderDef, fStream.getTrace(), ILexicalScope.FIELDS, input) : null;
+
+        // a bit lttng specific
+        // CTF doesn't require a timestamp,
+        // but it's passed to us
+        return new EventDefinition(
+                this,
+                streamInputReader,
+                timestamp,
+                eventHeaderDef,
+                streamEventContext,
+                eventContext,
+                packetContext,
+                eventPayload);
+    }
+
     @Override
     public EventDefinition createDefinition(CTFStreamInputReader streamInputReader, @NonNull BitBuffer input, long timestamp) throws CTFException {
         StructDeclaration streamEventContextDecl = streamInputReader.getStreamEventContextDecl();

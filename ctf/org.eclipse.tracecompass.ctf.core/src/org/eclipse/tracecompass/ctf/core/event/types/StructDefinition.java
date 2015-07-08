@@ -156,7 +156,7 @@ public final class StructDefinition extends ScopedDefinition implements IComposi
         if (val != -1) {
             return fDefinitions[val];
         }
-        return null;
+        return (Definition) getDefinitionScope().lookupDefinition(lookupPath);
     }
 
     @Override

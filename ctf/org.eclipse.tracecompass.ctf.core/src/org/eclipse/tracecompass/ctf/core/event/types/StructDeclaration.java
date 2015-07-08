@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -145,7 +146,14 @@ public class StructDeclaration extends Declaration {
             String fieldName, BitBuffer input) throws CTFException {
         alignRead(input);
         final Definition[] myFields = new Definition[fFieldMap.size()];
-        StructDefinition structDefinition = new StructDefinition(this, definitionScope, fieldName, myFields);
+        StructDefinition structDefinition = null;
+        if (definitionScope == null) {
+            InternalDef localDefinitionScope = new InternalDef(null, null);
+            structDefinition = new StructDefinition(this, localDefinitionScope, fieldName, myFields);
+            localDefinitionScope.setDefinition(structDefinition);
+        } else {
+            structDefinition = new StructDefinition(this, definitionScope, fieldName, myFields);
+        }
         fillStruct(input, myFields, structDefinition);
         return structDefinition;
     }
@@ -171,7 +179,7 @@ public class StructDeclaration extends Declaration {
         alignRead(input);
         final Definition[] myFields = new Definition[fFieldMap.size()];
 
-        StructDefinition structDefinition = new StructDefinition(this,definitionScope,
+        StructDefinition structDefinition = new StructDefinition(this, definitionScope,
                 fieldScope, fieldScope.getName(), checkNotNull(fFieldMap.keySet()), myFields);
         fillStruct(input, myFields, structDefinition);
         return structDefinition;
@@ -198,6 +206,95 @@ public class StructDeclaration extends Declaration {
             String key = checkNotNull(entry.getKey());
             myFields[i] = entry.getValue().createDefinition(structDefinition, key, input);
         }
+    }
+
+    /**
+     * Special constructor for fields
+     *
+     * @param eventHeaderDef
+     *            the event header, used for scopes
+     * @param definitionScope
+     *            the definition scope, in this case, the trace
+     * @param fields
+     *            event fields
+     * @param input
+     *            the input {@link BitBuffer}
+     * @return the fields definition
+     * @throws CTFException
+     *             something went wrong
+     * @since 1.1
+     */
+    public StructDefinition createFieldDefinition(ICompositeDefinition eventHeaderDef, IDefinitionScope definitionScope, ILexicalScope fields, @NonNull BitBuffer input) throws CTFException {
+        alignRead(input);
+        final Definition[] myFields = new Definition[fFieldMap.size()];
+        IDefinitionScope merged = definitionScope;
+        if (eventHeaderDef != null) {
+            merged = new InternalDef(definitionScope, eventHeaderDef);
+        }
+        StructDefinition structDefinition = new StructDefinition(this, merged,
+                fields, fields.getName(), checkNotNull(fFieldMap.keySet()), myFields);
+        if (merged instanceof InternalDef) {
+            InternalDef internalDef = (InternalDef) merged;
+            internalDef.setDefinition(structDefinition);
+        }
+        fillStruct(input, myFields, structDefinition);
+        return structDefinition;
+    }
+
+    private static final Pattern EVENT_HEADER = Pattern.compile(ILexicalScope.EVENT_HEADER.getPath().replaceAll("\\.", "\\\\.") + "\\."); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+
+    private class InternalDef implements IDefinitionScope {
+
+        private final ICompositeDefinition fEventHeaderDef;
+        private final IDefinitionScope fTraceDef;
+        private StructDefinition fDefinition;
+
+        public InternalDef(IDefinitionScope definitionScope, ICompositeDefinition eventHeaderDef) {
+            fTraceDef = definitionScope;
+            fEventHeaderDef = eventHeaderDef;
+        }
+
+        @Override
+        public ILexicalScope getScopePath() {
+            return ILexicalScope.EVENT;
+        }
+
+        @Override
+        public IDefinition lookupDefinition(String lookupPath) {
+            IDefinition lookupDefinition = null;
+            if (fTraceDef != null) {
+                lookupDefinition = fTraceDef.lookupDefinition(lookupPath);
+            }
+            if (lookupDefinition == null) {
+                if (fEventHeaderDef != null) {
+                    String[] paths = EVENT_HEADER.split(lookupPath);
+                    if (paths.length > 1) {
+                        String[] childLookup = paths[1].split("\\."); //$NON-NLS-1$
+                        return getRecursiveDef(fEventHeaderDef.getDefinition(childLookup[0]), childLookup, 1);
+                    }
+                    if (fDefinition != null) {
+                        return fDefinition.lookupDefinition(lookupPath);
+                    }
+                }
+            }
+            return lookupDefinition;
+        }
+
+        private IDefinition getRecursiveDef(Definition definition, String[] childLookup, int i) {
+            if (i == childLookup.length) {
+                return definition;
+            }
+            if (definition instanceof ICompositeDefinition) {
+                ICompositeDefinition compositeDefinition = (ICompositeDefinition) definition;
+                return getRecursiveDef(compositeDefinition.getDefinition(childLookup[i]), childLookup, i + 1);
+            }
+            return null;
+        }
+
+        public void setDefinition(StructDefinition definition) {
+            fDefinition = definition;
+        }
+
     }
 
     @Override
@@ -252,7 +349,7 @@ public class StructDeclaration extends Declaration {
         List<IDeclaration> otherDecs = new ArrayList<>();
         otherDecs.addAll(other.fFieldMap.values());
 
-        //check fields in order
+        // check fields in order
         for (int i = 0; i < fFieldMap.size(); i++) {
             if ((!localFieldNames.get(i).equals(otherFieldNames.get(i))) ||
                     (!otherDecs.get(i).equals(localDecs.get(i)))) {
