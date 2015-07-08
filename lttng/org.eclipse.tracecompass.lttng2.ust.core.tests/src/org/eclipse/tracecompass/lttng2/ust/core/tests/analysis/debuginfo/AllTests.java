@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2015 EfficiOS inc. and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,20 +10,17 @@
  *   Alexandre Montplaisir - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.lttng2.ust.core.tests;
+package org.eclipse.tracecompass.lttng2.ust.core.tests.analysis.debuginfo;
 
-import org.eclipse.tracecompass.tmf.core.tests.shared.DebugSuite;
 import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
 /**
- * Runner for the lttng2.kernel unit tests.
+ * Test suite
  */
-@RunWith(DebugSuite.class)
-@DebugSuite.SuiteClasses({
-    ActivatorTest.class,
-    org.eclipse.tracecompass.lttng2.ust.core.tests.analysis.debuginfo.AllTests.class,
-    org.eclipse.tracecompass.lttng2.ust.core.tests.analysis.memory.AllTests.class,
-    org.eclipse.tracecompass.lttng2.ust.core.tests.callstack.AllTests.class
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+    UstDebugInfoAnalysisModuleTest.class
 })
 public class AllTests {
 
