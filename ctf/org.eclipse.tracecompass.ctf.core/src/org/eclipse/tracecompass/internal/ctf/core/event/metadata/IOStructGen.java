@@ -463,8 +463,7 @@ public class IOStructGen {
                 throw new ParseException("packet.header expects a type specifier"); //$NON-NLS-1$
             }
 
-            IDeclaration packetHeaderDecl = parseTypeSpecifierList(
-                    typeSpecifier, null);
+            IDeclaration packetHeaderDecl = parseTypeSpecifierList(typeSpecifier);
 
             if (!(packetHeaderDecl instanceof StructDeclaration)) {
                 throw new ParseException("packet.header expects a struct"); //$NON-NLS-1$
@@ -608,8 +607,7 @@ public class IOStructGen {
                 throw new ParseException("event.header expects a type specifier"); //$NON-NLS-1$
             }
 
-            IDeclaration eventHeaderDecl = parseTypeSpecifierList(
-                    typeSpecifier, null);
+            IDeclaration eventHeaderDecl = parseTypeSpecifierList(typeSpecifier);
             DeclarationScope scope = getCurrentScope();
             DeclarationScope eventHeaderScope = scope.lookupChildRecursive(MetadataStrings.STRUCT);
             if (eventHeaderScope == null) {
@@ -638,8 +636,7 @@ public class IOStructGen {
                 throw new ParseException("event.context expects a type specifier"); //$NON-NLS-1$
             }
 
-            IDeclaration eventContextDecl = parseTypeSpecifierList(
-                    typeSpecifier, null);
+            IDeclaration eventContextDecl = parseTypeSpecifierList(typeSpecifier);
 
             if (!(eventContextDecl instanceof StructDeclaration)) {
                 throw new ParseException("event.context expects a struct"); //$NON-NLS-1$
@@ -657,8 +654,7 @@ public class IOStructGen {
                 throw new ParseException("packet.context expects a type specifier"); //$NON-NLS-1$
             }
 
-            IDeclaration packetContextDecl = parseTypeSpecifierList(
-                    typeSpecifier, null);
+            IDeclaration packetContextDecl = parseTypeSpecifierList(typeSpecifier);
 
             if (!(packetContextDecl instanceof StructDeclaration)) {
                 throw new ParseException("packet.context expects a struct"); //$NON-NLS-1$
@@ -796,8 +792,7 @@ public class IOStructGen {
                 throw new ParseException("context expects a type specifier"); //$NON-NLS-1$
             }
 
-            IDeclaration contextDecl = parseTypeSpecifierList(typeSpecifier,
-                    null);
+            IDeclaration contextDecl = parseTypeSpecifierList(typeSpecifier);
 
             if (!(contextDecl instanceof StructDeclaration)) {
                 throw new ParseException("context expects a struct"); //$NON-NLS-1$
@@ -816,7 +811,7 @@ public class IOStructGen {
             }
 
             IDeclaration fieldsDecl;
-            fieldsDecl = parseTypeSpecifierList(typeSpecifier, null);
+            fieldsDecl = parseTypeSpecifierList(typeSpecifier);
 
             if (!(fieldsDecl instanceof StructDeclaration)) {
                 throw new ParseException("fields expects a struct"); //$NON-NLS-1$
@@ -858,7 +853,7 @@ public class IOStructGen {
                 parseTypealias(child);
                 break;
             case CTFParser.TYPE_SPECIFIER_LIST:
-                parseTypeSpecifierList(child, null);
+                parseTypeSpecifierList(child);
                 break;
             default:
                 throw childTypeError(child);
@@ -1121,7 +1116,7 @@ public class IOStructGen {
          * Parse the type specifier list, which is the "base" type. For example,
          * it would be int in int a[3][len].
          */
-        declaration = parseTypeSpecifierList(typeSpecifierList, pointers);
+        declaration = parseTypeSpecifierList(typeSpecifierList, pointers, identifier);
 
         /*
          * Each length subscript means that we must create a nested array or
@@ -1212,9 +1207,7 @@ public class IOStructGen {
 
     private void registerType(IDeclaration declaration, String identifier) throws ParseException {
         final DeclarationScope currentScope = getCurrentScope();
-        if (declaration instanceof StructDeclaration) {
-            currentScope.registerStruct(identifier, (StructDeclaration) declaration);
-        } else if (declaration instanceof EnumDeclaration) {
+        if (declaration instanceof EnumDeclaration) {
             currentScope.registerEnum(identifier, (EnumDeclaration) declaration);
         } else if (declaration instanceof VariantDeclaration) {
             currentScope.registerVariant(identifier, (VariantDeclaration) declaration);
@@ -1300,6 +1293,10 @@ public class IOStructGen {
 
     }
 
+    private IDeclaration parseTypeSpecifierList(CommonTree typeSpecifierList) throws ParseException {
+        return parseTypeSpecifierList(typeSpecifierList, null, null);
+    }
+
     /**
      * Parses a type specifier list and returns the corresponding declaration.
      *
@@ -1313,7 +1310,7 @@ public class IOStructGen {
      *             creating the declaration.
      */
     private IDeclaration parseTypeSpecifierList(CommonTree typeSpecifierList,
-            List<CommonTree> pointerList) throws ParseException {
+            List<CommonTree> pointerList, CommonTree identifier) throws ParseException {
         IDeclaration declaration = null;
 
         /*
@@ -1333,7 +1330,7 @@ public class IOStructGen {
             declaration = parseString(firstChild);
             break;
         case CTFParser.STRUCT:
-            declaration = parseStruct(firstChild);
+            declaration = parseStruct(firstChild, identifier);
             StructDeclaration structDeclaration = (StructDeclaration) declaration;
             IDeclaration idEnumDecl = structDeclaration.getFields().get("id"); //$NON-NLS-1$
             if (idEnumDecl instanceof EnumDeclaration) {
@@ -1627,7 +1624,7 @@ public class IOStructGen {
      * @return The corresponding struct declaration.
      * @throws ParseException
      */
-    private StructDeclaration parseStruct(CommonTree struct)
+    private StructDeclaration parseStruct(CommonTree struct, CommonTree identifier)
             throws ParseException {
 
         List<CommonTree> children = struct.getChildren();
@@ -1670,6 +1667,11 @@ public class IOStructGen {
             default:
                 throw childTypeError(child);
             }
+        }
+
+        if (!hasName && identifier != null) {
+            structName = identifier.getText();
+            hasName = true;
         }
 
         /*
@@ -1764,6 +1766,7 @@ public class IOStructGen {
                 break;
             case CTFParser.TYPEDEF:
                 parseTypedef(declarationNode);
+                parseStructDeclaration(declarationNode, structDeclaration);
                 break;
             case CTFParser.SV_DECLARATION:
                 parseStructDeclaration(declarationNode, structDeclaration);
@@ -2061,7 +2064,7 @@ public class IOStructGen {
         CommonTree typeSpecifierList = (CommonTree) enumContainerType.getChild(0);
 
         /* Parse it and get the corresponding declaration */
-        IDeclaration decl = parseTypeSpecifierList(typeSpecifierList, null);
+        IDeclaration decl = parseTypeSpecifierList(typeSpecifierList);
 
         /* If is is an integer, return it, else throw an error */
         if (decl instanceof IntegerDeclaration) {

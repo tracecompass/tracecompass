@@ -40,6 +40,7 @@ import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.VariantDefinition;
 import org.eclipse.tracecompass.internal.ctf.core.SafeMappedByteBuffer;
+import org.eclipse.tracecompass.internal.ctf.core.event.EventDeclaration;
 import org.eclipse.tracecompass.internal.ctf.core.event.types.composite.EventHeaderDefinition;
 
 /**
@@ -55,6 +56,19 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
     // ------------------------------------------------------------------------
 
     private static final int BITS_PER_BYTE = Byte.SIZE;
+
+    private static final IDefinitionScope EVENT_HEADER_SCOPE = new IDefinitionScope() {
+
+        @Override
+        public IDefinition lookupDefinition(String lookupPath) {
+            return null;
+        }
+
+        @Override
+        public ILexicalScope getScopePath() {
+            return null;
+        }
+    };
 
     /** BitBuffer used to read the trace file. */
     @Nullable
@@ -344,12 +358,12 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
         /* Read the stream event header. */
         if (fStreamEventHeaderDecl != null) {
             if (fStreamEventHeaderDecl instanceof IEventHeaderDeclaration) {
-                fCurrentStreamEventHeaderDef = (ICompositeDefinition) fStreamEventHeaderDecl.createDefinition(null, "", currentBitBuffer); //$NON-NLS-1$
+                fCurrentStreamEventHeaderDef = (ICompositeDefinition) fStreamEventHeaderDecl.createDefinition(EVENT_HEADER_SCOPE, "", currentBitBuffer); //$NON-NLS-1$
                 EventHeaderDefinition ehd = (EventHeaderDefinition) fCurrentStreamEventHeaderDef;
                 eventID = ehd.getId();
                 timestamp = calculateTimestamp(ehd.getTimestamp(), ehd.getTimestampLength());
             } else {
-                fCurrentStreamEventHeaderDef = ((StructDeclaration) fStreamEventHeaderDecl).createDefinition(null, ILexicalScope.EVENT_HEADER, currentBitBuffer);
+                fCurrentStreamEventHeaderDef = ((StructDeclaration) fStreamEventHeaderDecl).createDefinition(EVENT_HEADER_SCOPE, ILexicalScope.EVENT_HEADER, currentBitBuffer);
                 StructDefinition StructEventHeaderDef = (StructDefinition) fCurrentStreamEventHeaderDef;
                 /* Check for the event id. */
                 IDefinition idDef = StructEventHeaderDef.lookupDefinition("id"); //$NON-NLS-1$
@@ -398,11 +412,11 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
             }
         }
         /* Get the right event definition using the event id. */
-        IEventDeclaration eventDeclaration = fStreamInputReader.getStreamInput().getStream().getEventDeclaration(eventID);
+        EventDeclaration eventDeclaration = (EventDeclaration) fStreamInputReader.getStreamInput().getStream().getEventDeclaration(eventID);
         if (eventDeclaration == null) {
             throw new CTFIOException("Incorrect event id : " + eventID); //$NON-NLS-1$
         }
-        EventDefinition eventDef = eventDeclaration.createDefinition(fStreamInputReader, currentBitBuffer, timestamp);
+        EventDefinition eventDef = eventDeclaration.createDefinition(fStreamInputReader, fCurrentStreamEventHeaderDef, currentBitBuffer, timestamp);
 
         /*
          * Set the event timestamp using the timestamp calculated by

@@ -52,6 +52,8 @@ public final class EventDefinition implements IDefinitionScope {
      */
     private final long fTimestamp;
 
+    private final ICompositeDefinition fEventHeaderDefinition;
+
     /**
      * The event context structure definition.
      */
@@ -101,7 +103,41 @@ public final class EventDefinition implements IDefinitionScope {
             ICompositeDefinition eventContext,
             ICompositeDefinition packetContext,
             ICompositeDefinition fields) {
+        this(declaration, streamInputReader, timestamp, null, streamContext,
+                eventContext, packetContext, fields);
+    }
+
+    /**
+     * Constructs an event definition.
+     *
+     * @param declaration
+     *            The corresponding event declaration
+     * @param streamInputReader
+     *            The SIR from where this EventDef was read
+     * @param timestamp
+     *            event timestamp
+     * @param eventHeaderDefinition
+     *            the event header definition, can be null
+     * @param eventContext
+     *            The event context
+     * @param packetContext
+     *            the packet context
+     * @param streamContext
+     *            the stream context
+     * @param fields
+     *            The event fields
+     * @since 1.1
+     */
+    public EventDefinition(IEventDeclaration declaration,
+            CTFStreamInputReader streamInputReader,
+            long timestamp,
+            ICompositeDefinition eventHeaderDefinition,
+            ICompositeDefinition streamContext,
+            ICompositeDefinition eventContext,
+            ICompositeDefinition packetContext,
+            ICompositeDefinition fields) {
         fDeclaration = declaration;
+        fEventHeaderDefinition = eventHeaderDefinition;
         fStreamInputReader = streamInputReader;
         fTimestamp = timestamp;
         fFields = fields;
@@ -137,6 +173,16 @@ public final class EventDefinition implements IDefinitionScope {
      */
     public IEventDeclaration getDeclaration() {
         return fDeclaration;
+    }
+
+    /**
+     * Get the event header
+     *
+     * @return the event header
+     * @since 1.1
+     */
+    public ICompositeDefinition getEventHeader() {
+        return fEventHeaderDefinition;
     }
 
     /**
