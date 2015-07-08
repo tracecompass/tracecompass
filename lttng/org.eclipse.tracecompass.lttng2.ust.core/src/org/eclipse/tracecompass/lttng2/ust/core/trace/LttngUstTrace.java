@@ -31,6 +31,7 @@ import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTraceValidationStatus;
+import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfUtils;
 
 /**
  * Class to contain LTTng-UST traces
@@ -71,17 +72,17 @@ public class LttngUstTrace extends CtfTmfTrace {
         super.initTrace(resource, path, eventType);
 
         /* Determine the event layout to use from the tracer's version */
-        fLayout = getLayoutFromEnv(this.getEnvironment());
+        fLayout = getLayoutFromEnv();
     }
 
-    private static @NonNull ILttngUstEventLayout getLayoutFromEnv(Map<String, String> traceEnv) {
-        String tracerName = traceEnv.get("tracer_name"); //$NON-NLS-1$
-        String tracerMajor = traceEnv.get("tracer_major"); //$NON-NLS-1$
-        String tracerMinor = traceEnv.get("tracer_minor"); //$NON-NLS-1$
+    private @NonNull ILttngUstEventLayout getLayoutFromEnv() {
+        String tracerName = CtfUtils.getTracerName(this);
+        int tracerMajor = CtfUtils.getTracerMajorVersion(this);
+        int tracerMinor = CtfUtils.getTracerMinorVersion(this);
 
-        if ("\"lttng-ust\"".equals(tracerName) && tracerMajor != null && tracerMinor != null) { //$NON-NLS-1$
-            if (Integer.valueOf(tracerMajor) >= 2) {
-                if (Integer.valueOf(tracerMinor) >= 7) {
+        if ("lttng-ust".equals(tracerName)) { //$NON-NLS-1$
+            if (tracerMajor >= 2) {
+                if (tracerMinor >= 7) {
                     return LttngUst27EventLayout.getInstance();
                 }
                 return LttngUst20EventLayout.getInstance();
