@@ -40,7 +40,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.8</version>
             <executions>
               <execution>
                 <id>prepare</id>
@@ -66,7 +65,6 @@
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-surefire-plugin</artifactId>
-        <version>${tycho-version}</version>
         <configuration>
           <testSuite>org.eclipse.tracecompass.pcap.core.tests</testSuite>
           <testClass>org.eclipse.tracecompass.pcap.core.tests.AllPcapCoreTests</testClass>
@@ -79,7 +77,6 @@
       <!-- We don't use the ant file to clean because of http://jira.codehaus.org/browse/MANTRUN-78 -->
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
-        <version>2.6.1</version>
         <executions>
           <execution>
             <id>clean-traces</id>
@@ -112,5 +109,4 @@
     </plugins>
   </build>
 
- <groupId>org.eclipse.tracecompass</groupId>
 </project>

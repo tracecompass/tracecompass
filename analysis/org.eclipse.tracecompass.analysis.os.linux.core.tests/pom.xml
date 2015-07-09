@@ -18,7 +18,6 @@
   </parent>
 
   <artifactId>org.eclipse.tracecompass.analysis.os.linux.core.tests</artifactId>
-  <groupId>org.eclipse.tracecompass</groupId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
 
@@ -29,7 +28,6 @@
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.8</version>
             <executions>
                 <execution>
                     <id>prepare</id>
@@ -48,7 +46,6 @@
         <plugin>
             <groupId>org.eclipse.tycho</groupId>
             <artifactId>tycho-surefire-plugin</artifactId>
-            <version>${tycho-version}</version>
             <configuration>
                 <includes>
                     <include>**/AllTests.*</include>

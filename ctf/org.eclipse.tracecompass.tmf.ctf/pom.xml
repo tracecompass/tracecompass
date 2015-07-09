@@ -18,8 +18,6 @@
   </parent>
 
   <artifactId>org.eclipse.tracecompass.tmf.ctf</artifactId>
-  <groupId>org.eclipse.tracecompass</groupId>
-  <version>2.0.0-SNAPSHOT</version>
   <packaging>eclipse-feature</packaging>
 
   <name>CTF support for TMF Feature</name>
@@ -42,7 +40,6 @@
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-p2-plugin</artifactId>
-        <version>${tycho-version}</version>
         <executions>
           <execution>
             <id>attached-p2-metadata</id>

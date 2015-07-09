@@ -30,7 +30,6 @@
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-surefire-plugin</artifactId>
-        <version>${tycho-version}</version>
         <configuration>
           <testSuite>org.eclipse.tracecompass.common.core.tests</testSuite>
           <testClass>org.eclipse.tracecompass.common.core.tests.AllCommonCoreTests</testClass>
@@ -42,5 +41,4 @@
     </plugins>
   </build>
 
- <groupId>org.eclipse.tracecompass</groupId>
 </project>

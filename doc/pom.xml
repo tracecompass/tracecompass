@@ -24,7 +24,6 @@
   </parent>
 
   <artifactId>org.eclipse.tracecompass.doc</artifactId>
-  <groupId>org.eclipse.tracecompass</groupId>
   <packaging>pom</packaging>
 
   <name>Trace Compass Documentation</name>

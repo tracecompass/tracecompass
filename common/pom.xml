@@ -24,10 +24,9 @@
   </parent>
 
   <artifactId>org.eclipse.tracecompass.common-parent</artifactId>
-  <groupId>org.eclipse.tracecompass</groupId>
   <packaging>pom</packaging>
 
-  <name>race Compass Common Utilities Parent</name>
+  <name>Trace Compass Common Utilities Parent</name>
 
   <modules>
     <module>org.eclipse.tracecompass.common.core</module>

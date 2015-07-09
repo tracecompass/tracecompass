@@ -24,7 +24,6 @@
   </parent>
 
   <artifactId>org.eclipse.tracecompass.releng-parent</artifactId>
-  <groupId>org.eclipse.tracecompass</groupId>
   <packaging>pom</packaging>
 
   <name>Trace Compass Release Engineering Parent</name>
