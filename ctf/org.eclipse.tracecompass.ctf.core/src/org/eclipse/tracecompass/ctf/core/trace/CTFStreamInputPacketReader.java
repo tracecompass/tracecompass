@@ -278,7 +278,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
              * Use the timestamp begin of the packet as the reference for the
              * timestamp reconstitution.
              */
-            fLastTimestamp = currentPacket.getTimestampBegin();
+            fLastTimestamp = Math.max(currentPacket.getTimestampBegin(), 0);
         } else {
             fBitBuffer = null;
             fLastTimestamp = 0;
@@ -311,7 +311,6 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
         /* Default values for those fields */
         // compromise since we cannot have 64 bit addressing of arrays yet.
         int eventID = (int) IEventDeclaration.UNSET_EVENT_ID;
-        long timestamp = 0;
         final BitBuffer currentBitBuffer = fBitBuffer;
         final ICTFPacketDescriptor currentPacket = fCurrentPacket;
         if (currentBitBuffer == null || currentPacket == null) {
@@ -361,7 +360,6 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
                 fCurrentStreamEventHeaderDef = (ICompositeDefinition) fStreamEventHeaderDecl.createDefinition(EVENT_HEADER_SCOPE, "", currentBitBuffer); //$NON-NLS-1$
                 EventHeaderDefinition ehd = (EventHeaderDefinition) fCurrentStreamEventHeaderDef;
                 eventID = ehd.getId();
-                timestamp = calculateTimestamp(ehd.getTimestamp(), ehd.getTimestampLength());
             } else {
                 fCurrentStreamEventHeaderDef = ((StructDeclaration) fStreamEventHeaderDecl).createDefinition(EVENT_HEADER_SCOPE, ILexicalScope.EVENT_HEADER, currentBitBuffer);
                 StructDefinition StructEventHeaderDef = (StructDefinition) fCurrentStreamEventHeaderDef;
@@ -373,13 +371,6 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
                 } else if (idDef != null) {
                     throw new CTFIOException("Id defintion not an integer, enum or float definiton in event header."); //$NON-NLS-1$
                 }
-
-                /*
-                 * Get the timestamp from the event header (may be overridden
-                 * later on)
-                 */
-                IntegerDefinition timestampDef = StructEventHeaderDef.lookupInteger("timestamp"); //$NON-NLS-1$
-
                 /* Check for the variant v. */
                 IDefinition variantDef = StructEventHeaderDef.lookupDefinition("v"); //$NON-NLS-1$
                 if (variantDef instanceof VariantDefinition) {
@@ -397,18 +388,10 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
                         simpleIdDef = (SimpleDatatypeDefinition) vIdDef;
                     }
 
-                    /*
-                     * Get the timestamp. This would overwrite any previous
-                     * timestamp definition
-                     */
-                    timestampDef = variantCurrentField.lookupInteger("timestamp"); //$NON-NLS-1$
                 }
                 if (simpleIdDef != null) {
                     eventID = simpleIdDef.getIntegerValue().intValue();
                 }
-                if (timestampDef != null) {
-                    timestamp = calculateTimestamp(timestampDef);
-                } // else timestamp remains 0
             }
         }
         /* Get the right event definition using the event id. */
@@ -416,8 +399,8 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
         if (eventDeclaration == null) {
             throw new CTFIOException("Incorrect event id : " + eventID); //$NON-NLS-1$
         }
-        EventDefinition eventDef = eventDeclaration.createDefinition(fStreamInputReader, fCurrentStreamEventHeaderDef, currentBitBuffer, timestamp);
-
+        EventDefinition eventDef = eventDeclaration.createDefinition(fStreamInputReader, fCurrentStreamEventHeaderDef, currentBitBuffer, fLastTimestamp);
+        fLastTimestamp = eventDef.getTimestamp();
         /*
          * Set the event timestamp using the timestamp calculated by
          * updateTimestamp.
@@ -428,55 +411,6 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
         }
 
         return eventDef;
-    }
-
-    /**
-     * Calculates the timestamp value of the event, possibly using the timestamp
-     * from the last event.
-     *
-     * @param timestampDef
-     *            Integer definition of the timestamp.
-     * @return The calculated timestamp value.
-     */
-    private long calculateTimestamp(IntegerDefinition timestampDef) {
-        int len = timestampDef.getDeclaration().getLength();
-        final long value = timestampDef.getValue();
-
-        return calculateTimestamp(value, len);
-    }
-
-    private long calculateTimestamp(final long value, int len) {
-        long newval;
-        long majorasbitmask;
-        /*
-         * If the timestamp length is 64 bits, it is a full timestamp.
-         */
-        if (len == Long.SIZE) {
-            fLastTimestamp = value;
-            return fLastTimestamp;
-        }
-
-        /*
-         * Bit mask to keep / remove all old / new bits.
-         */
-        majorasbitmask = (1L << len) - 1;
-
-        /*
-         * If the new value is smaller than the corresponding bits of the last
-         * timestamp, we assume an overflow of the compact representation.
-         */
-        newval = value;
-        if (newval < (fLastTimestamp & majorasbitmask)) {
-            newval = newval + (1L << len);
-        }
-
-        /* Keep only the high bits of the old value */
-        fLastTimestamp = fLastTimestamp & ~majorasbitmask;
-
-        /* Then add the low bits of the new value */
-        fLastTimestamp = fLastTimestamp + newval;
-
-        return fLastTimestamp;
     }
 
     @Override

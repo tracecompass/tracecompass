@@ -243,7 +243,7 @@ public class StructDeclaration extends Declaration {
 
     private static final Pattern EVENT_HEADER = Pattern.compile(ILexicalScope.EVENT_HEADER.getPath().replaceAll("\\.", "\\\\.") + "\\."); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 
-    private class InternalDef implements IDefinitionScope {
+    static class InternalDef implements IDefinitionScope {
 
         private final ICompositeDefinition fEventHeaderDef;
         private final IDefinitionScope fTraceDef;
@@ -274,6 +274,23 @@ public class StructDeclaration extends Declaration {
                     }
                     if (fDefinition != null) {
                         return fDefinition.lookupDefinition(lookupPath);
+                    }
+                }
+            }
+            return lookupDefinition;
+        }
+
+        public IDefinition lookupDefinitionBreakLoop(String lookupPath) {
+            IDefinition lookupDefinition = null;
+            if (fTraceDef != null) {
+                lookupDefinition = fTraceDef.lookupDefinition(lookupPath);
+            }
+            if (lookupDefinition == null) {
+                if (fEventHeaderDef != null) {
+                    String[] paths = EVENT_HEADER.split(lookupPath);
+                    if (paths.length > 1) {
+                        String[] childLookup = paths[1].split("\\."); //$NON-NLS-1$
+                        return getRecursiveDef(fEventHeaderDef.getDefinition(childLookup[0]), childLookup, 1);
                     }
                 }
             }

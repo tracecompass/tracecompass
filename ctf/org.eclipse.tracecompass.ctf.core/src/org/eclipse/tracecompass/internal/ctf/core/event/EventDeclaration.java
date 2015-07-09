@@ -17,16 +17,22 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.CTFException;
+import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
+import org.eclipse.tracecompass.ctf.core.event.types.Definition;
 import org.eclipse.tracecompass.ctf.core.event.types.ICompositeDefinition;
+import org.eclipse.tracecompass.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
+import org.eclipse.tracecompass.ctf.core.trace.CTFIOException;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStream;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInputReader;
+import org.eclipse.tracecompass.internal.ctf.core.event.types.composite.EventHeaderDefinition;
 
 /**
  * Representation of one type of event. A bit like "int" or "long" but for trace
@@ -88,23 +94,21 @@ public class EventDeclaration implements IEventDeclaration {
      *            The event header definition
      * @param input
      *            the bitbuffer input source
-     * @param timestamp
+     * @param prevTimestamp
      *            The timestamp when the event was taken
      * @return A new EventDefinition.
      * @throws CTFException
      *             As a bitbuffer is used to read, it could have wrapped
      *             IOExceptions.
      */
-    public EventDefinition createDefinition(CTFStreamInputReader streamInputReader, ICompositeDefinition eventHeaderDef, @NonNull BitBuffer input, long timestamp) throws CTFException {
+    public EventDefinition createDefinition(CTFStreamInputReader streamInputReader, ICompositeDefinition eventHeaderDef, @NonNull BitBuffer input, long prevTimestamp) throws CTFException {
         StructDeclaration streamEventContextDecl = streamInputReader.getStreamEventContextDecl();
         StructDefinition streamEventContext = streamEventContextDecl != null ? streamEventContextDecl.createDefinition(fStream.getTrace(), ILexicalScope.STREAM_EVENT_CONTEXT, input) : null;
         ICompositeDefinition packetContext = streamInputReader.getPacketReader().getCurrentPacketEventHeader();
         StructDefinition eventContext = fContext != null ? fContext.createFieldDefinition(eventHeaderDef, fStream.getTrace(), ILexicalScope.CONTEXT, input) : null;
         StructDefinition eventPayload = fFields != null ? fFields.createFieldDefinition(eventHeaderDef, fStream.getTrace(), ILexicalScope.FIELDS, input) : null;
+        long timestamp = calculateTimestamp(eventHeaderDef, prevTimestamp, eventPayload);
 
-        // a bit lttng specific
-        // CTF doesn't require a timestamp,
-        // but it's passed to us
         return new EventDefinition(
                 this,
                 streamInputReader,
@@ -114,6 +118,28 @@ public class EventDeclaration implements IEventDeclaration {
                 eventContext,
                 packetContext,
                 eventPayload);
+    }
+
+    private static long calculateTimestamp(@Nullable ICompositeDefinition eventHeaderDef, long prevTimestamp, StructDefinition eventPayload) throws CTFIOException {
+        long timestamp = 0;
+        Definition def = null;
+        if (eventHeaderDef instanceof EventHeaderDefinition) {
+            EventHeaderDefinition eventHeaderDefinition = (EventHeaderDefinition) eventHeaderDef;
+            timestamp = calculateTimestamp(eventHeaderDefinition.getTimestamp(), eventHeaderDefinition.getTimestampLength(), prevTimestamp);
+        } else if (eventHeaderDef instanceof StructDefinition) {
+            StructDefinition structDefinition = (StructDefinition) eventHeaderDef;
+            def = structDefinition.lookupDefinition(CTFStrings.TIMESTAMP);
+        } else if (eventHeaderDef != null) {
+            throw new CTFIOException("Event header def is not a Struct or an Event Header"); //$NON-NLS-1$
+        }
+        if (def == null && eventPayload != null) {
+            def = eventPayload.lookupDefinition(CTFStrings.TIMESTAMP);
+        }
+        if (def instanceof IntegerDefinition) {
+            IntegerDefinition timestampDef = (IntegerDefinition) def;
+            timestamp = calculateTimestamp(timestampDef, prevTimestamp);
+        }
+        return timestamp;
     }
 
     @Override
@@ -308,6 +334,56 @@ public class EventDeclaration implements IEventDeclaration {
      */
     public void setCustomAttribute(String key, String value) {
         fCustomAttributes.put(key, value);
+    }
+
+    /**
+     * Calculates the timestamp value of the event, possibly using the timestamp
+     * from the last event.
+     *
+     * @param timestampDef
+     *            Integer definition of the timestamp.
+     * @return The calculated timestamp value.
+     */
+    private static long calculateTimestamp(IntegerDefinition timestampDef, long lastTimestamp) {
+        int len = timestampDef.getDeclaration().getLength();
+        final long value = timestampDef.getValue();
+
+        return calculateTimestamp(value, len, lastTimestamp);
+    }
+
+    private static long calculateTimestamp(final long value, int len, long prevTimestamp) {
+        long newval;
+        long majorasbitmask;
+        long lastTimestamp = prevTimestamp;
+        /*
+         * If the timestamp length is 64 bits, it is a full timestamp.
+         */
+        if (len == Long.SIZE) {
+            lastTimestamp = value;
+            return lastTimestamp;
+        }
+
+        /*
+         * Bit mask to keep / remove all old / new bits.
+         */
+        majorasbitmask = (1L << len) - 1;
+
+        /*
+         * If the new value is smaller than the corresponding bits of the last
+         * timestamp, we assume an overflow of the compact representation.
+         */
+        newval = value;
+        if (newval < (lastTimestamp & majorasbitmask)) {
+            newval = newval + (1L << len);
+        }
+
+        /* Keep only the high bits of the old value */
+        lastTimestamp = lastTimestamp & ~majorasbitmask;
+
+        /* Then add the low bits of the new value */
+        lastTimestamp = lastTimestamp + newval;
+
+        return lastTimestamp;
     }
 
     // ------------------------------------------------------------------------
