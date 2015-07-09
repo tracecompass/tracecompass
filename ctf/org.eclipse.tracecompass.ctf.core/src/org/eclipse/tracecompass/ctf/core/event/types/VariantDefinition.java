@@ -106,7 +106,18 @@ public final class VariantDefinition extends ScopedDefinition {
         if (lookupPath.equals(fFieldName)) {
             return fDefinition;
         }
-        return getDefinitionScope().lookupDefinition(lookupPath);
+        if (fDefinition instanceof ScopedDefinition) {
+            IDefinition def = ((ScopedDefinition) fDefinition).lookupDefinition(lookupPath);
+            if (def != null) {
+                return def;
+            }
+        }
+        final IDefinitionScope definitionScope = getDefinitionScope();
+        if (definitionScope instanceof StructDefinition) {
+            StructDefinition structDefinition = (StructDefinition) definitionScope;
+            return structDefinition.lookupDefinition(lookupPath, this);
+        }
+        return definitionScope.lookupDefinition(lookupPath);
     }
 
     @Override

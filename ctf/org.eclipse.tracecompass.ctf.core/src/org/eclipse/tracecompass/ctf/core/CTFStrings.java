@@ -117,4 +117,10 @@ public interface CTFStrings {
      * @since 1.1
      */
     String PACKET = "packet";
+    /**
+     * Timestamp
+     *
+     * @since 1.1
+     */
+    String TIMESTAMP = "timestamp";
 }

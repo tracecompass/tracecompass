@@ -14,6 +14,7 @@
 
 package org.eclipse.tracecompass.tmf.ctf.core.tests.context;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
@@ -37,7 +38,9 @@ import org.junit.Test;
 public class CtfTmfContextTest {
 
     private static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.KERNEL;
-    private static final long begin = 1332170682440133097L; /* Trace start time */
+    private static final long begin = 1332170682440133097L; /*
+                                                             * Trace start time
+                                                             */
     private static final long end = 1332170692664579801L; /* Trace end time */
 
     private CtfTmfTrace trace;
@@ -101,7 +104,7 @@ public class CtfTmfContextTest {
                     CtfTmfContext lwc = new CtfTmfContext(trace);
                     lwc.seek(val);
                     trace.getNext(lwc);
-                    synchronized(trace){
+                    synchronized (trace) {
                         if (lwc.getCurrentEvent() != null) {
                             vals.add(lwc.getCurrentEvent().getTimestamp().getValue());
                         }
@@ -109,18 +112,18 @@ public class CtfTmfContextTest {
                     }
                 }
             };
-            thread.setVal((long)i);
+            thread.setVal((long) i);
             threads.add(thread);
             thread.start();
         }
 
-        for (Thread t: threads){
+        for (Thread t : threads) {
             t.join();
         }
-
-        for (long val : vals){
-            assertTrue(val >= begin);
-            assertTrue(val <= end);
+        assertEquals("seeks done ", lwcCount + 1, vals.size());
+        for (long val : vals) {
+            assertTrue("val >= begin, " + val + " " + begin, val >= begin);
+            assertTrue("val >= end, " + val + " " + end, val <= end);
         }
     }
 }

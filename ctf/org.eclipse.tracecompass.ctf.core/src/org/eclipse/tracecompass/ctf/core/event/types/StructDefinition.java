@@ -20,6 +20,7 @@ import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
+import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration.InternalDef;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -142,21 +143,7 @@ public final class StructDefinition extends ScopedDefinition implements IComposi
 
     @Override
     public Definition lookupDefinition(String lookupPath) {
-        /*
-         * The fields are created in order of appearance, so if a variant or
-         * sequence refers to a field that is after it, the field's definition
-         * will not be there yet in the hashmap.
-         */
-        int val = fFieldNames.indexOf(lookupPath);
-        if (val != -1) {
-            return fDefinitions[val];
-        }
-        String lookupUnderscored = "_" + lookupPath; //$NON-NLS-1$
-        val = fFieldNames.indexOf(lookupUnderscored);
-        if (val != -1) {
-            return fDefinitions[val];
-        }
-        return (Definition) getDefinitionScope().lookupDefinition(lookupPath);
+        return lookupDefinition(lookupPath, null);
     }
 
     @Override
@@ -178,6 +165,47 @@ public final class StructDefinition extends ScopedDefinition implements IComposi
         builder.append(" }"); //$NON-NLS-1$
 
         return builder.toString();
+    }
+
+    /**
+     * Lookup definition while exclusing the caller
+     *
+     * @param lookupPath
+     *            the path to lookup
+     * @param defintionToExclude
+     *            the definition to exclude, can be null
+     * @return the definition or null
+     * @since 1.1
+     */
+    public Definition lookupDefinition(String lookupPath, ScopedDefinition defintionToExclude) {
+        /*
+         * The fields are created in order of appearance, so if a variant or
+         * sequence refers to a field that is after it, the field's definition
+         * will not be there yet in the hashmap.
+         */
+        int val = fFieldNames.indexOf(lookupPath);
+        if (val != -1) {
+            return fDefinitions[val];
+        }
+        String lookupUnderscored = "_" + lookupPath; //$NON-NLS-1$
+        val = fFieldNames.indexOf(lookupUnderscored);
+        if (val != -1) {
+            return fDefinitions[val];
+        }
+        for (IDefinition child : fDefinitions) {
+            if (child instanceof ScopedDefinition) {
+                if (!child.equals(defintionToExclude)) {
+                    IDefinition def = ((ScopedDefinition) child).lookupDefinition(lookupPath);
+                    if (def instanceof Definition) {
+                        return (Definition) def;
+                    }
+                }
+            }
+        }
+        if (getDefinitionScope() instanceof InternalDef) {
+            return (Definition) ((InternalDef) getDefinitionScope()).lookupDefinitionBreakLoop(lookupPath);
+        }
+        return (Definition) getDefinitionScope().lookupDefinition(lookupPath);
     }
 
 }
