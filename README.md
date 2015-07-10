@@ -73,6 +73,12 @@ the build system. You can set them by using `-P[profile name]` and
 
   Builds the RCP archives. Refer to the previous section for details.
 
+* `-Prun-custom-test-suite`
+
+  Runs a test suite present in `releng/org.eclipse.tracecompass.alltests`. The
+  test suite to run has to be defined by `-DcustomTestSuite=[name]`, for example
+  `-DcustomTestSuite=RunAllCoreTests`.
+
 * `-Pdeploy-rcp`
 
   Mainly for use on build servers. Copies the generated RCP archives, as well as

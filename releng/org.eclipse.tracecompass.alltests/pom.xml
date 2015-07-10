@@ -44,6 +44,33 @@
   </build>
 
   <profiles>
+    <!-- Profile to run a test suite present in this plugin, defined by
+         putting -DcustomTestSuite=<name> on the command line. -->
+    <profile>
+      <id>run-custom-test-suite</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.tycho</groupId>
+            <artifactId>tycho-surefire-plugin</artifactId>
+            <version>${tycho-version}</version>
+            <configuration>
+              <includes>
+                <include>**/${customTestSuite}.java</include>
+              </includes>
+              <useUIHarness>true</useUIHarness>
+              <useUIThread>false</useUIThread>
+              <argLine>${tycho.testArgLine} ${base.ui.test.vmargs}</argLine>
+              <product>org.eclipse.platform.ide</product>
+              <environmentVariables>
+                <SWT_GTK3>${SWT_GTK3}</SWT_GTK3>
+              </environmentVariables>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
     <!-- Profile to run the performance tests -->
     <profile>
       <id>performance</id>
