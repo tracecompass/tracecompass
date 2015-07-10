@@ -187,7 +187,7 @@ public class StandardImportGzipTraceTest {
 
             try (GZIPOutputStream gzos = new GZIPOutputStream(new FileOutputStream(fGzipTrace));) {
 
-                try (FileInputStream in = new FileInputStream(TmfTestTrace.A_TEST_10K2.getFullPath());) {
+                try (FileInputStream in = new FileInputStream(TmfTestTrace.A_TEST_10K2.getPath());) {
 
                     int len;
                     while ((len = in.read(buffer)) > 0) {

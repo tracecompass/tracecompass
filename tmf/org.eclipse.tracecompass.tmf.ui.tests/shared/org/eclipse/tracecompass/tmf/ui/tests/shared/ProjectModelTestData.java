@@ -69,7 +69,7 @@ public class ProjectModelTestData {
         IFolder traceFolder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
 
         /* Create a trace, if it exist, it will be replaced */
-        File file = new File(testTrace.getFullPath());
+        File file = new File(testTrace.getPath());
         String path = file.getAbsolutePath();
         final IPath pathString = Path.fromOSString(path);
         IResource linkedTrace = TmfImportHelper.createLink(traceFolder, pathString, pathString.lastSegment());

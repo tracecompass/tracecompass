@@ -52,7 +52,7 @@ public class TmfEventProviderStub extends TmfEventProvider {
     }
 
     public TmfEventProviderStub() throws IOException {
-        this(TmfTestTrace.A_TEST_10K.getFullPath());
+        this(TmfTestTrace.A_TEST_10K.getPath());
     }
 
     @Override

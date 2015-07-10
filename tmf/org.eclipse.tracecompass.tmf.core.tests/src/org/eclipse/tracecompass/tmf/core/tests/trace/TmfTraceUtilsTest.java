@@ -17,14 +17,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Collection;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -33,7 +27,6 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
-import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.tests.analysis.AnalysisManagerTest;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
@@ -99,12 +92,10 @@ public class TmfTraceUtilsTest {
     @Before
     public void setUp() {
         try {
-            final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TEST_TRACE.getFullPath()), null);
-            final File test = new File(FileLocator.toFileURL(location).toURI());
-            fTrace = new TmfTraceStubWithAspects(test.toURI().getPath());
+            fTrace = new TmfTraceStubWithAspects(TEST_TRACE.getPath());
             TmfSignalManager.deregister(fTrace);
             fTrace.indexTrace(true);
-        } catch (final TmfTraceException | URISyntaxException | IOException e) {
+        } catch (final TmfTraceException e) {
             fail(e.getMessage());
         }
     }

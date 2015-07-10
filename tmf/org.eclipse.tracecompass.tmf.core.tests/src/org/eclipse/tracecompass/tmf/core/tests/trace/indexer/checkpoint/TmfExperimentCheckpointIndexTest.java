@@ -85,11 +85,11 @@ public class TmfExperimentCheckpointIndexTest {
 
         fTestTraces = new ITmfTrace[2];
         try {
-            URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TEST_TRACE1.getFullPath()), null);
+            URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TEST_TRACE1.getPath()), null);
             File test = new File(FileLocator.toFileURL(location).toURI());
             final TmfTraceStub trace1 = new TmfTraceStub(test.getPath(), 0, true, null);
             fTestTraces[0] = trace1;
-            location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TEST_TRACE2.getFullPath()), null);
+            location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TEST_TRACE2.getPath()), null);
             test = new File(FileLocator.toFileURL(location).toURI());
             final TmfTraceStub trace2 = new TmfTraceStub(test.getPath(), 0, true, null);
             fTestTraces[1] = trace2;
@@ -139,11 +139,11 @@ public class TmfExperimentCheckpointIndexTest {
     public void testGrowingIndex() {
         ITmfTrace[] testTraces = new TmfTraceStub[2];
         try {
-            URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TEST_TRACE1.getFullPath()), null);
+            URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TEST_TRACE1.getPath()), null);
             File test = new File(FileLocator.toFileURL(location).toURI());
             final TmfTraceStub trace1 = new TmfTraceStub(test.getPath(), 0, false, null);
             testTraces[0] = trace1;
-            location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TEST_TRACE2.getFullPath()), null);
+            location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TEST_TRACE2.getPath()), null);
             test = new File(FileLocator.toFileURL(location).toURI());
             final TmfTraceStub trace2 = new TmfTraceStub(test.getPath(), 0, false, null);
             testTraces[1] = trace2;

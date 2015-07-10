@@ -77,8 +77,8 @@ public class TmfExperimentUtilsTest {
     public void testGetModuleById() {
         String commonModule = AnalysisManagerTest.MODULE_PARAM;
         String notCommonModule = AnalysisManagerTest.MODULE_SECOND;
-        String host1 = TmfTestTrace.A_TEST_10K.getPath();
-        String host2 = TmfTestTrace.A_TEST_10K2.getPath();
+        String host1 = TmfTestTrace.A_TEST_10K.getFileName();
+        String host2 = TmfTestTrace.A_TEST_10K2.getFileName();
         TmfExperiment experiment = fExperiment;
         assertNotNull(experiment);
 
@@ -118,8 +118,8 @@ public class TmfExperimentUtilsTest {
     public void testGetModuleByClass() {
         Class<TestAnalysis> commonClass = TestAnalysis.class;
         Class<TestAnalysis2> notCommonClass = TestAnalysis2.class;
-        String host1 = TmfTestTrace.A_TEST_10K.getPath();
-        String host2 = TmfTestTrace.A_TEST_10K2.getPath();
+        String host1 = TmfTestTrace.A_TEST_10K.getFileName();
+        String host2 = TmfTestTrace.A_TEST_10K2.getFileName();
         TmfExperiment experiment = fExperiment;
         assertNotNull(experiment);
 

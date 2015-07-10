@@ -64,7 +64,7 @@ public class TmfCheckpointIndexTest2 {
     public void setUp() {
         // Trace has 3 events at t=101 at rank 99, 100, 101
         // Trace has events with same timestamp (ts=102) for ranks 102..702 -> 2 checkpoints with same timestamp are created
-        setupTrace(TmfTestTrace.A_TEST_10K2.getFullPath());
+        setupTrace(TmfTestTrace.A_TEST_10K2.getPath());
     }
 
     @After

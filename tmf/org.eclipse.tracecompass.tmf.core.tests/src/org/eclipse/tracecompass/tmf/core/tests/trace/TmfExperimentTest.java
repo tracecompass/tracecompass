@@ -107,7 +107,7 @@ public class TmfExperimentTest {
 
     @Before
     public void setUp() {
-        setupTrace(TmfTestTrace.A_TEST_10K.getFullPath());
+        setupTrace(TmfTestTrace.A_TEST_10K.getPath());
         setupExperiment();
     }
 

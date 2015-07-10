@@ -12,17 +12,13 @@
 
 package org.eclipse.tracecompass.tmf.core.tests.shared;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
+import java.nio.file.Paths;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
-import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub2;
@@ -34,22 +30,24 @@ import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub2;
  */
 public enum TmfTestTrace {
     /** A test */
-    A_TEST_10K("A-Test-10K"),
+    A_TEST_10K("../../tmf/org.eclipse.tracecompass.tmf.core.tests/testfiles/A-Test-10K"),
     /** A second trace */
-    A_TEST_10K2("A-Test-10K-2"),
+    A_TEST_10K2("../../tmf/org.eclipse.tracecompass.tmf.core.tests/testfiles/A-Test-10K-2"),
     /** A third trace */
-    E_TEST_10K("E-Test-10K"),
+    E_TEST_10K("../../tmf/org.eclipse.tracecompass.tmf.core.tests/testfiles/E-Test-10K"),
     /** A fourth trace */
-    O_TEST_10K("O-Test-10K"),
+    O_TEST_10K("../../tmf/org.eclipse.tracecompass.tmf.core.tests/testfiles/O-Test-10K"),
     /** And oh! a fifth trace */
-    R_TEST_10K("R-Test-10K");
+    R_TEST_10K("../../tmf/org.eclipse.tracecompass.tmf.core.tests/testfiles/R-Test-10K");
 
     private final @NonNull String fPath;
-    private final String fDirectory = "../../tmf/org.eclipse.tracecompass.tmf.core.tests/testfiles";
+    private final @NonNull String fFileName;
+
     private ITmfTrace fTrace = null;
 
     private TmfTestTrace(@NonNull String file) {
         fPath = file;
+        fFileName = checkNotNull(Paths.get(fPath).getFileName().toString());
     }
 
     /**
@@ -62,12 +60,12 @@ public enum TmfTestTrace {
     }
 
     /**
-     * Get the full path of the trace
+     * Return the file name (or base name of the full path) of this trace.
      *
-     * @return The full path of the trace
+     * @return The trace's file name
      */
-    public String getFullPath() {
-        return fDirectory + File.separator + fPath;
+    public @NonNull String getFileName() {
+        return fFileName;
     }
 
     /**
@@ -84,13 +82,11 @@ public enum TmfTestTrace {
         if (fTrace != null) {
             fTrace.dispose();
         }
-        final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(fDirectory + File.separator + fPath), null);
         try {
-            File test = new File(FileLocator.toFileURL(location).toURI());
-            ITmfTrace trace = new TmfTraceStub(test.toURI().getPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null);
+            ITmfTrace trace = new TmfTraceStub(fPath, ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null);
             fTrace = trace;
             return trace;
-        } catch (URISyntaxException | IOException | TmfTraceException  e) {
+        } catch (TmfTraceException  e) {
             throw new IllegalStateException(e);
         }
 
@@ -105,13 +101,11 @@ public enum TmfTestTrace {
      */
     public ITmfTrace getTraceAsStub2() {
         ITmfTrace trace = null;
-        final URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(fDirectory + File.separator + fPath), null);
         try {
-            File test = new File(FileLocator.toFileURL(location).toURI());
-            trace = new TmfTraceStub2(test.toURI().getPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null);
+            trace = new TmfTraceStub2(fPath, ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null);
             TmfSignalManager.deregister(trace);
 
-        } catch (URISyntaxException | IOException | TmfTraceException  e) {
+        } catch (TmfTraceException  e) {
             throw new IllegalStateException(e);
         }
         return trace;

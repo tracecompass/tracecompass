@@ -455,7 +455,7 @@ public class TmfCoalescedEventRequestTest {
 
     public void runCoalescedRequest(long startIndex) throws InterruptedException {
 
-        fTrace = setupTrace(TEST_TRACE.getFullPath());
+        fTrace = setupTrace(TEST_TRACE.getPath());
 
         TmfSignalManager.register(this);
         TmfTestTriggerSignal signal = new TmfTestTriggerSignal(this, startIndex, false);
@@ -502,7 +502,7 @@ public class TmfCoalescedEventRequestTest {
     @Test
     public void testCancelCoalescedRequest() throws InterruptedException {
 
-        fTrace = setupTrace(TEST_TRACE.getFullPath());
+        fTrace = setupTrace(TEST_TRACE.getPath());
 
         TmfSignalManager.register(this);
         TmfTestTriggerSignal signal = new TmfTestTriggerSignal(this, 0, true);
@@ -538,7 +538,7 @@ public class TmfCoalescedEventRequestTest {
     @Test
     public void testSingleTimeRequest() throws InterruptedException {
 
-        fTrace = setupTrace(TEST_TRACE.getFullPath());
+        fTrace = setupTrace(TEST_TRACE.getPath());
 
         TmfSignalManager.register(this);
         TmfTestTriggerSignal2 signal = new TmfTestTriggerSignal2(this);
