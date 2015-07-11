@@ -54,7 +54,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class TestInvalidCtfTrace {
 
     private static final String PROJET_NAME = "TestInvalidCtfTraces";
-    private static final Path BASE_PATH = Paths.get("../org.eclipse.tracecompass.ctf.core.tests", "traces", "ctf-testsuite", "tests", "1.8");
+    private static final Path BASE_PATH = Paths.get("../../ctf/org.eclipse.tracecompass.ctf.core.tests", "traces", "ctf-testsuite", "tests", "1.8");
 
     /** The Log4j logger instance. */
     private static final Logger fLogger = Logger.getRootLogger();
