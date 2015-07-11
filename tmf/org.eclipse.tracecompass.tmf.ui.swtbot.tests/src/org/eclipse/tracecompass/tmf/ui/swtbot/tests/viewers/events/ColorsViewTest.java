@@ -211,6 +211,7 @@ public class ColorsViewTest {
     public void tearDown() {
         fBot.closeAllEditors();
         SWTBotUtils.deleteProject(PROJECT_NAME, fBot);
+        SWTBotUtils.closeViewById(ColorsView.ID, fBot);
     }
 
     /**
