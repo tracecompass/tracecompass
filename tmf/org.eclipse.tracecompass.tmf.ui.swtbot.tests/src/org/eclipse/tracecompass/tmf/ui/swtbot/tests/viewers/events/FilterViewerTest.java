@@ -134,6 +134,7 @@ public class FilterViewerTest {
         fFileLocation.delete();
         SWTBotUtils.deleteProject(PROJECT_NAME, fBot);
         fLogger.removeAllAppenders();
+        SWTBotUtils.closeViewById(FilterView.ID, fBot);
     }
 
     /**

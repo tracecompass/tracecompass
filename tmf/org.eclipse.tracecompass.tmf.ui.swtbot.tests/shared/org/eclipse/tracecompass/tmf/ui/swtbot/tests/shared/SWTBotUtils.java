@@ -208,6 +208,20 @@ public final class SWTBotUtils {
     }
 
     /**
+     * Close a view with an id
+     *
+     * @param viewId
+     *            the view id, like "org.eclipse.linuxtools.tmf.ui.views.histogram"
+     * @param bot
+     *            the workbench bot
+     */
+    public static void closeViewById(String viewId, SWTWorkbenchBot bot) {
+        final SWTBotView view = bot.viewById(viewId);
+        view.close();
+        bot.waitUntil(ConditionHelpers.ViewIsClosed(view));
+    }
+
+    /**
      * Switch to the tracing perspective
      */
     public static void switchToTracingPerspective() {

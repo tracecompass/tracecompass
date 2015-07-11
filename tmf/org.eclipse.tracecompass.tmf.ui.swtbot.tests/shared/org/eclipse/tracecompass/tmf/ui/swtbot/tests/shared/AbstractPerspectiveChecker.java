@@ -115,7 +115,7 @@ public abstract class AbstractPerspectiveChecker {
         SWTBotUtils.switchToPerspective(fPerspectiveId);
         SWTBotUtils.waitForJobs();
         for (SWTBotView view : fBot.views()) {
-            assertTrue("view " + view.toString() + " is present", fViewIds.contains(view.getViewReference().getId()));
+            assertTrue("view " + view.getViewReference().getId() + " is present", fViewIds.contains(view.getViewReference().getId()));
         }
     }
 
