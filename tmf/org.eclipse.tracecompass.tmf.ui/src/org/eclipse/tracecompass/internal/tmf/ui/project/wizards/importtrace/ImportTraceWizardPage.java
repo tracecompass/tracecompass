@@ -22,27 +22,14 @@
 package org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
-import java.util.zip.ZipFile;
 
 import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -53,12 +40,9 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -86,36 +70,20 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.TmfProjectNature;
-import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceImportException;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
-import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
-import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceTypeUIUtils;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
-import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.ui.dialogs.FileSystemElement;
-import org.eclipse.ui.dialogs.IOverwriteQuery;
 import org.eclipse.ui.dialogs.WizardResourceImportPage;
+import org.eclipse.ui.ide.dialogs.IElementFilter;
 import org.eclipse.ui.ide.dialogs.ResourceTreeAndListGroup;
 import org.eclipse.ui.internal.ide.DialogUtil;
-import org.eclipse.ui.internal.ide.dialogs.IElementFilter;
-import org.eclipse.ui.internal.wizards.datatransfer.ArchiveFileManipulations;
-import org.eclipse.ui.internal.wizards.datatransfer.ILeveledImportStructureProvider;
-import org.eclipse.ui.internal.wizards.datatransfer.TarEntry;
-import org.eclipse.ui.internal.wizards.datatransfer.TarException;
-import org.eclipse.ui.internal.wizards.datatransfer.TarFile;
-import org.eclipse.ui.internal.wizards.datatransfer.TarLeveledStructureProvider;
-import org.eclipse.ui.internal.wizards.datatransfer.ZipLeveledStructureProvider;
-import org.eclipse.ui.model.AdaptableList;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.model.WorkbenchViewerComparator;
-import org.eclipse.ui.wizards.datatransfer.FileSystemStructureProvider;
-import org.eclipse.ui.wizards.datatransfer.IImportStructureProvider;
-import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 
 /**
  * A variant of the standard resource import wizard for importing traces to
@@ -148,7 +116,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
     // constant from WizardArchiveFileResourceImportPage1
     private static final String[] FILE_IMPORT_MASK = { "*.jar;*.zip;*.tar;*.tar.gz;*.tgz;*.gz", "*.*" }; //$NON-NLS-1$ //$NON-NLS-2$
-    private static final String TRACE_IMPORT_TEMP_FOLDER = ".traceImport"; //$NON-NLS-1$
 
     /**
      * A special trace type value to communicate that automatic trace type
@@ -785,245 +752,11 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     }
 
     private TraceFileSystemElement getFileSystemTree() {
-        Pair<IFileSystemObject, FileSystemObjectImportStructureProvider> rootObjectAndProvider = getRootObjectAndProvider(getSourceFile());
+        Pair<IFileSystemObject, FileSystemObjectImportStructureProvider> rootObjectAndProvider = ArchiveUtil.getRootObjectAndProvider(getSourceFile(), getContainer().getShell());
         if (rootObjectAndProvider == null) {
             return null;
         }
         return selectFiles(rootObjectAndProvider.getFirst(), rootObjectAndProvider.getSecond());
-    }
-
-    @SuppressWarnings("resource")
-    private Pair<IFileSystemObject, FileSystemObjectImportStructureProvider> getRootObjectAndProvider(File sourceFile) {
-        if (sourceFile == null) {
-            return null;
-        }
-
-        IFileSystemObject rootElement = null;
-        FileSystemObjectImportStructureProvider importStructureProvider = null;
-
-        // Import from directory
-        if (!isArchiveFile(sourceFile)) {
-            importStructureProvider = new FileSystemObjectImportStructureProvider(FileSystemStructureProvider.INSTANCE, null);
-            rootElement = importStructureProvider.getIFileSystemObject(sourceFile);
-        } else {
-            // Import from archive
-            FileSystemObjectLeveledImportStructureProvider leveledImportStructureProvider = null;
-            String archivePath = sourceFile.getAbsolutePath();
-            if (isTarFile(archivePath)) {
-                if (ensureTarSourceIsValid(archivePath)) {
-                    // We close the file when we dispose the import provider,
-                    // see disposeSelectionGroupRoot
-                    TarFile tarFile = getSpecifiedTarSourceFile(archivePath);
-                    leveledImportStructureProvider = new FileSystemObjectLeveledImportStructureProvider(new TarLeveledStructureProvider(tarFile), archivePath);
-                }
-            } else if (ensureZipSourceIsValid(archivePath)) {
-                // We close the file when we dispose the import provider, see
-                // disposeSelectionGroupRoot
-                ZipFile zipFile = getSpecifiedZipSourceFile(archivePath);
-                leveledImportStructureProvider = new FileSystemObjectLeveledImportStructureProvider(new ZipLeveledStructureProvider(zipFile), archivePath);
-            } else if (ensureGzipSourceIsValid(archivePath)) {
-                // We close the file when we dispose the import provider, see
-                // disposeSelectionGroupRoot
-                GzipFile zipFile = null;
-                try {
-                    zipFile = new GzipFile(archivePath);
-                    leveledImportStructureProvider = new FileSystemObjectLeveledImportStructureProvider(new GzipLeveledStructureProvider(zipFile), archivePath);
-                } catch (IOException e) {
-                    // do nothing
-                }
-            }
-            if (leveledImportStructureProvider == null) {
-                return null;
-            }
-            rootElement = leveledImportStructureProvider.getRoot();
-            importStructureProvider = leveledImportStructureProvider;
-        }
-
-        if (rootElement == null) {
-            return null;
-        }
-
-        return new Pair<>(rootElement, importStructureProvider);
-    }
-
-    /**
-     * An import provider that makes use of the IFileSystemObject abstraction
-     * instead of using plain file system objects (File, TarEntry, ZipEntry, etc)
-     */
-    private static class FileSystemObjectImportStructureProvider implements IImportStructureProvider {
-
-        private IImportStructureProvider fImportProvider;
-        private String fArchivePath;
-
-        private FileSystemObjectImportStructureProvider(IImportStructureProvider importStructureProvider, String archivePath) {
-            fImportProvider = importStructureProvider;
-            fArchivePath = archivePath;
-        }
-
-        @Override
-        public List<IFileSystemObject> getChildren(Object element) {
-            @SuppressWarnings("rawtypes")
-            List children = fImportProvider.getChildren(((IFileSystemObject) element).getRawFileSystemObject());
-            List<IFileSystemObject> adapted = new ArrayList<>(children.size());
-            for (Object o : children) {
-                adapted.add(getIFileSystemObject(o));
-            }
-            return adapted;
-        }
-
-        public IFileSystemObject getIFileSystemObject(Object o) {
-            if (o == null) {
-                return null;
-            }
-
-            if (o instanceof File) {
-                return new FileFileSystemObject((File) o);
-            } else if (o instanceof TarEntry) {
-                return new TarFileSystemObject((TarEntry) o, fArchivePath);
-            } else if (o instanceof ZipEntry) {
-                return new ZipFileSystemObject((ZipEntry) o, fArchivePath);
-            } else if (o instanceof GzipEntry) {
-                return new GzipFileSystemObject((GzipEntry) o, fArchivePath);
-            }
-
-            throw new IllegalArgumentException("Object type not handled"); //$NON-NLS-1$
-        }
-
-        @Override
-        public InputStream getContents(Object element) {
-            return fImportProvider.getContents(((IFileSystemObject) element).getRawFileSystemObject());
-        }
-
-        @Override
-        public String getFullPath(Object element) {
-            return fImportProvider.getFullPath(((IFileSystemObject) element).getRawFileSystemObject());
-        }
-
-        @Override
-        public String getLabel(Object element) {
-            return fImportProvider.getLabel(((IFileSystemObject) element).getRawFileSystemObject());
-        }
-
-        @Override
-        public boolean isFolder(Object element) {
-            return fImportProvider.isFolder(((IFileSystemObject) element).getRawFileSystemObject());
-        }
-
-        /**
-         * Disposes of the resources associated with the provider.
-         */
-        public void dispose() {
-        }
-    }
-
-    /**
-     * An import provider that both supports using IFileSystemObject and adds
-     * "archive functionality" by delegating to a leveled import provider
-     * (TarLeveledStructureProvider, ZipLeveledStructureProvider)
-     */
-    private static class FileSystemObjectLeveledImportStructureProvider extends FileSystemObjectImportStructureProvider implements ILeveledImportStructureProvider {
-
-        private ILeveledImportStructureProvider fLeveledImportProvider;
-
-        private FileSystemObjectLeveledImportStructureProvider(ILeveledImportStructureProvider importStructureProvider, String archivePath) {
-            super(importStructureProvider, archivePath);
-            fLeveledImportProvider = importStructureProvider;
-        }
-
-        @Override
-        public IFileSystemObject getRoot() {
-            return getIFileSystemObject(fLeveledImportProvider.getRoot());
-        }
-
-        @Override
-        public void setStrip(int level) {
-            fLeveledImportProvider.setStrip(level);
-        }
-
-        @Override
-        public int getStrip() {
-            return fLeveledImportProvider.getStrip();
-        }
-
-        @Override
-        public boolean closeArchive() {
-            return fLeveledImportProvider.closeArchive();
-        }
-
-        @Override
-        public void dispose() {
-            super.dispose();
-            closeArchive();
-        }
-    }
-
-    @SuppressWarnings("resource")
-    private boolean ensureZipSourceIsValid(String archivePath) {
-        ZipFile specifiedFile = getSpecifiedZipSourceFile(archivePath);
-        if (specifiedFile == null) {
-            return false;
-        }
-        return ArchiveFileManipulations.closeZipFile(specifiedFile, getShell());
-    }
-
-    private boolean ensureTarSourceIsValid(String archivePath) {
-        TarFile specifiedFile = getSpecifiedTarSourceFile(archivePath);
-        if (specifiedFile == null) {
-            return false;
-        }
-        return ArchiveFileManipulations.closeTarFile(specifiedFile, getShell());
-    }
-
-    private static ZipFile getSpecifiedZipSourceFile(String fileName) {
-        if (fileName.length() == 0) {
-            return null;
-        }
-
-        try {
-            return new ZipFile(fileName);
-        } catch (ZipException e) {
-            // ignore
-        } catch (IOException e) {
-            // ignore
-        }
-
-        return null;
-    }
-
-    private static boolean isTarFile(String fileName) {
-        TarFile specifiedTarSourceFile = getSpecifiedTarSourceFile(fileName);
-        if (specifiedTarSourceFile != null) {
-            try {
-                specifiedTarSourceFile.close();
-                return true;
-            } catch (IOException e) {
-                // ignore
-            }
-        }
-        return false;
-    }
-
-    private static TarFile getSpecifiedTarSourceFile(String fileName) {
-        if (fileName.length() == 0) {
-            return null;
-        }
-
-        // FIXME: Work around Bug 463633. Remove this block once we move to Eclipse 4.5.
-        if (new File(fileName).length() < 512) {
-            return null;
-        }
-
-        try {
-            return new TarFile(fileName);
-        } catch (TarException | IOException e) {
-            // ignore
-        }
-
-        return null;
-    }
-
-    private static boolean ensureGzipSourceIsValid(String archivePath) {
-        return isGzipFile(archivePath);
     }
 
     private TraceFileSystemElement selectFiles(final IFileSystemObject rootFileSystemObject,
@@ -1033,35 +766,10 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             @Override
             public void run() {
                 // Create the root element from the supplied file system object
-                results[0] = createRootTraceFileElement(rootFileSystemObject, structureProvider);
+                results[0] = TraceFileSystemElement.createRootTraceFileElement(rootFileSystemObject, structureProvider);
             }
         });
         return results[0];
-    }
-
-    private static TraceFileSystemElement createRootTraceFileElement(IFileSystemObject element,
-            FileSystemObjectImportStructureProvider provider) {
-        boolean isContainer = provider.isFolder(element);
-        String elementLabel = provider.getLabel(element);
-
-        // Use an empty label so that display of the element's full name
-        // doesn't include a confusing label
-        TraceFileSystemElement dummyParent = new TraceFileSystemElement("", null, true, provider);//$NON-NLS-1$
-        Object dummyParentFileSystemObject = element;
-        Object rawFileSystemObject = element.getRawFileSystemObject();
-        if (rawFileSystemObject instanceof File) {
-            dummyParentFileSystemObject = provider.getIFileSystemObject(((File) rawFileSystemObject).getParentFile());
-        }
-        dummyParent.setFileSystemObject(dummyParentFileSystemObject);
-        dummyParent.setPopulated();
-        TraceFileSystemElement result = new TraceFileSystemElement(
-                elementLabel, dummyParent, isContainer, provider);
-        result.setFileSystemObject(element);
-
-        // Get the files for the element so as to build the first level
-        result.getFiles();
-
-        return dummyParent;
     }
 
     // ------------------------------------------------------------------------
@@ -1164,7 +872,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             return false;
         }
 
-        if (!isImportFromDirectory() && !ensureTarSourceIsValid(source.getAbsolutePath()) && !ensureZipSourceIsValid(source.getAbsolutePath()) && !ensureGzipSourceIsValid(source.getAbsolutePath())) {
+        if (!isImportFromDirectory() && !ArchiveUtil.ensureTarSourceIsValid(source.getAbsolutePath(), getContainer().getShell()) && !ArchiveUtil.ensureZipSourceIsValid(source.getAbsolutePath(), getContainer().getShell()) && !ArchiveUtil.ensureGzipSourceIsValid(source.getAbsolutePath())) {
             setMessage(null);
             setErrorMessage(Messages.ImportTraceWizard_BadArchiveFormat);
             return false;
@@ -1200,21 +908,6 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
     private boolean isImportFromDirectory() {
         return fImportFromDirectoryRadio != null && fImportFromDirectoryRadio.getSelection();
-    }
-
-    private static boolean isArchiveFile(File sourceFile) {
-        String absolutePath = sourceFile.getAbsolutePath();
-        return isTarFile(absolutePath) || ArchiveFileManipulations.isZipFile(absolutePath) || isGzipFile(absolutePath);
-    }
-
-    private static boolean isGzipFile(String fileName) {
-        if (!fileName.isEmpty()) {
-            try (GzipFile specifiedTarSourceFile = new GzipFile(fileName);) {
-                return true;
-            } catch (IOException e) {
-            }
-        }
-        return false;
     }
 
     @Override
@@ -1326,44 +1019,66 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
      */
     public boolean finish() {
         String traceTypeLabel = getImportTraceTypeId();
-        String traceId = null;
-        if (!TRACE_TYPE_AUTO_DETECT.equals(traceTypeLabel)) {
-            traceId = TmfTraceType.getTraceTypeId(traceTypeLabel);
-        }
+        final String traceId = !TRACE_TYPE_AUTO_DETECT.equals(traceTypeLabel) ? TmfTraceType.getTraceTypeId(traceTypeLabel) : null;
 
         // Save dialog settings
         saveWidgetValues();
 
-        IPath baseSourceContainerPath = new Path(getSourceContainerPath());
-        boolean importFromArchive = getSourceArchiveFile() != null;
-        int importOptionFlags = getImportOptionFlags();
+        final IPath baseSourceContainerPath = new Path(getSourceContainerPath());
+        final boolean importFromArchive = getSourceArchiveFile() != null;
+        final int importOptionFlags = getImportOptionFlags();
+        final IPath destinationContainerPath = getContainerFullPath();
 
-        final TraceValidateAndImportOperation operation = new TraceValidateAndImportOperation(traceId, baseSourceContainerPath, getContainerFullPath(), importFromArchive,
-                importOptionFlags);
-
-        IStatus status = Status.OK_STATUS;
+        final IStatus[] operationStatus = new IStatus[1];
+        operationStatus[0] = Status.OK_STATUS;
         try {
             getContainer().run(true, true, new IRunnableWithProgress() {
                 @Override
                 public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+                    final List<TraceFileSystemElement> selectedFileSystemElements = new LinkedList<>();
+                    IElementFilter passThroughFilter = new IElementFilter() {
+
+                        @Override
+                        public void filterElements(Collection elements, IProgressMonitor m) {
+                            selectedFileSystemElements.addAll(elements);
+                        }
+
+                        @Override
+                        public void filterElements(Object[] elements, IProgressMonitor m) {
+                            for (int i = 0; i < elements.length; i++) {
+                                selectedFileSystemElements.add((TraceFileSystemElement) elements[i]);
+                            }
+                        }
+                    };
+
+                    // List fileSystemElements will be filled using the
+                    // passThroughFilter
+                    SubMonitor subMonitor = SubMonitor.convert(monitor, 1);
+                    fSelectionGroup.getAllCheckedListItems(passThroughFilter, subMonitor);
+
+                    final TraceValidateAndImportOperation operation = new TraceValidateAndImportOperation(getContainer().getShell(), selectedFileSystemElements, traceId, baseSourceContainerPath, destinationContainerPath, importFromArchive,
+                            importOptionFlags, fTraceFolderElement);
                     operation.run(monitor);
                     monitor.done();
+                    operationStatus[0] = operation.getStatus();
                 }
             });
 
-            status = operation.getStatus();
         } catch (InvocationTargetException e) {
-            status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.ImportTraceWizard_ImportProblem, e);
+            operationStatus[0] = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.ImportTraceWizard_ImportProblem, e.getTargetException());
         } catch (InterruptedException e) {
-            status = Status.CANCEL_STATUS;
+            operationStatus[0] = Status.CANCEL_STATUS;
         }
-        if (!status.isOK()) {
-            if (status.getSeverity() == IStatus.CANCEL) {
+        if (!operationStatus[0].isOK()) {
+            if (operationStatus[0].getSeverity() == IStatus.CANCEL) {
                 setMessage(Messages.ImportTraceWizard_ImportOperationCancelled);
                 setErrorMessage(null);
             } else {
-                if (status.getException() != null) {
-                    displayErrorDialog(status.getMessage() + ": " + status.getException()); //$NON-NLS-1$
+                Throwable exception = operationStatus[0].getException();
+                if (exception != null) {
+                    Activator.getDefault().logError(exception.getMessage(), exception);
+                    displayErrorDialog(operationStatus[0].getMessage() + ": " + exception); //$NON-NLS-1$
                 }
                 setMessage(null);
                 setErrorMessage(Messages.ImportTraceWizard_ImportProblem);
@@ -1416,957 +1131,5 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     public void dispose() {
         super.dispose();
         disposeSelectionGroupRoot();
-    }
-
-    // ------------------------------------------------------------------------
-    // Classes
-    // ------------------------------------------------------------------------
-
-    private class TraceValidateAndImportOperation {
-        private IStatus fStatus;
-        private String fTraceType;
-        private IPath fDestinationContainerPath;
-        private IPath fBaseSourceContainerPath;
-        private boolean fImportFromArchive;
-        private int fImportOptionFlags;
-        private ImportConflictHandler fConflictHandler;
-        private String fCurrentPath;
-
-        private TraceValidateAndImportOperation(String traceId, IPath baseSourceContainerPath, IPath destinationContainerPath, boolean importFromArchive, int importOptionFlags) {
-            fTraceType = traceId;
-            fBaseSourceContainerPath = baseSourceContainerPath;
-            fDestinationContainerPath = destinationContainerPath;
-            fImportOptionFlags = importOptionFlags;
-            fImportFromArchive = importFromArchive;
-
-            boolean overwriteExistingResources = (importOptionFlags & OPTION_OVERWRITE_EXISTING_RESOURCES) != 0;
-            if (overwriteExistingResources) {
-                fConflictHandler = new ImportConflictHandler(getContainer().getShell(), fTraceFolderElement, ImportConfirmation.OVERWRITE_ALL);
-            } else {
-                fConflictHandler = new ImportConflictHandler(getContainer().getShell(), fTraceFolderElement, ImportConfirmation.SKIP);
-            }
-        }
-
-        public void run(IProgressMonitor progressMonitor) {
-            try {
-
-                final List<TraceFileSystemElement> selectedFileSystemElements = new LinkedList<>();
-                IElementFilter passThroughFilter = new IElementFilter() {
-
-                    @Override
-                    public void filterElements(Collection elements, IProgressMonitor monitor) {
-                        selectedFileSystemElements.addAll(elements);
-                    }
-
-                    @Override
-                    public void filterElements(Object[] elements, IProgressMonitor monitor) {
-                        for (int i = 0; i < elements.length; i++) {
-                            selectedFileSystemElements.add((TraceFileSystemElement) elements[i]);
-                        }
-                    }
-                };
-
-                // List fileSystemElements will be filled using the
-                // passThroughFilter
-                SubMonitor subMonitor = SubMonitor.convert(progressMonitor, 1);
-                fSelectionGroup.getAllCheckedListItems(passThroughFilter, subMonitor);
-
-                // Check if operation was cancelled.
-                ModalContext.checkCanceled(subMonitor);
-
-                // Temporary directory to contain any extracted files
-                IFolder destTempFolder = fTargetFolder.getProject().getFolder(TRACE_IMPORT_TEMP_FOLDER);
-                if (destTempFolder.exists()) {
-                    SubProgressMonitor monitor = new SubProgressMonitor(subMonitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
-                    destTempFolder.delete(true, monitor);
-                }
-                SubProgressMonitor monitor = new SubProgressMonitor(subMonitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
-                destTempFolder.create(IResource.HIDDEN, true, monitor);
-
-                subMonitor = SubMonitor.convert(progressMonitor, 2);
-                String baseSourceLocation = null;
-                if (fImportFromArchive) {
-                    // When importing from archive, we first extract the
-                    // *selected* files to a temporary folder then create new
-                    // TraceFileSystemElements
-
-                    SubMonitor archiveMonitor = SubMonitor.convert(subMonitor.newChild(1), 2);
-
-                    // Extract selected files from source archive to temporary folder
-                    extractArchiveContent(selectedFileSystemElements.iterator(), destTempFolder, archiveMonitor.newChild(1));
-
-                    if (!selectedFileSystemElements.isEmpty()) {
-                        // Even if the files were extracted to temporary folder, they have to look like they originate from the source archive
-                        baseSourceLocation = getRootElement(selectedFileSystemElements.get(0)).getSourceLocation();
-                        // Extract additional archives contained in the extracted files (archives in archives)
-                        List<TraceFileSystemElement> tempFolderFileSystemElements = createElementsForFolder(destTempFolder);
-                        extractAllArchiveFiles(tempFolderFileSystemElements, destTempFolder, destTempFolder.getLocation(), archiveMonitor.newChild(1));
-                    }
-                } else {
-                    SubMonitor directoryMonitor = SubMonitor.convert(subMonitor.newChild(1), 2);
-                    // Import selected files, excluding archives (done in a later step)
-                    importFileSystemElements(directoryMonitor.newChild(1), selectedFileSystemElements);
-
-                    // Extract archives in selected files (if any) to temporary folder
-                    extractAllArchiveFiles(selectedFileSystemElements, destTempFolder, fBaseSourceContainerPath, directoryMonitor.newChild(1));
-                    // Even if the files were extracted to temporary folder, they have to look like they originate from the source folder
-                    baseSourceLocation = URIUtil.toUnencodedString(fBaseSourceContainerPath.toFile().getCanonicalFile().toURI());
-                }
-
-                /* Import extracted files that are now in the temporary folder, if any */
-
-                // We need to update the source container path because the
-                // "preserve folder structure" option would create the
-                // wrong trace folders otherwise.
-                fBaseSourceContainerPath = destTempFolder.getLocation();
-                List<TraceFileSystemElement> tempFolderFileSystemElements = createElementsForFolder(destTempFolder);
-                if (!tempFolderFileSystemElements.isEmpty()) {
-                    calculateSourceLocations(tempFolderFileSystemElements, baseSourceLocation);
-                    // Never import extracted files as links, they would link to the
-                    // temporary directory that will be deleted
-                    fImportOptionFlags = fImportOptionFlags & ~OPTION_CREATE_LINKS_IN_WORKSPACE;
-                    SubMonitor importTempMonitor = subMonitor.newChild(1);
-                    importFileSystemElements(importTempMonitor, tempFolderFileSystemElements);
-                }
-                if (destTempFolder.exists()) {
-                    destTempFolder.delete(true, progressMonitor);
-                }
-
-                setStatus(Status.OK_STATUS);
-            } catch (InterruptedException e) {
-                setStatus(Status.CANCEL_STATUS);
-            } catch (Exception e) {
-                String errorMessage = Messages.ImportTraceWizard_ImportProblem + ": " + //$NON-NLS-1$
-                        (fCurrentPath != null ? fCurrentPath : ""); //$NON-NLS-1$
-                Activator.getDefault().logError(errorMessage, e);
-                setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, errorMessage, e));
-            }
-        }
-
-        /**
-         * Import a collection of file system elements into the workspace.
-         */
-        private void importFileSystemElements(IProgressMonitor monitor, List<TraceFileSystemElement> fileSystemElements)
-                throws InterruptedException, TmfTraceImportException, CoreException, InvocationTargetException {
-            SubMonitor subMonitor = SubMonitor.convert(monitor, fileSystemElements.size());
-
-            ListIterator<TraceFileSystemElement> fileSystemElementsIter = fileSystemElements.listIterator();
-
-            // Map to remember already imported directory traces
-            final Map<String, TraceFileSystemElement> directoryTraces = new HashMap<>();
-            while (fileSystemElementsIter.hasNext()) {
-                ModalContext.checkCanceled(monitor);
-                fCurrentPath = null;
-                TraceFileSystemElement element = fileSystemElementsIter.next();
-                IFileSystemObject fileSystemObject = element.getFileSystemObject();
-                String resourcePath = element.getFileSystemObject().getAbsolutePath(fBaseSourceContainerPath.toOSString());
-                element.setDestinationContainerPath(computeDestinationContainerPath(new Path(resourcePath)));
-
-                fCurrentPath = resourcePath;
-                SubMonitor sub = subMonitor.newChild(1);
-                if (element.isDirectory()) {
-                    if (!directoryTraces.containsKey(resourcePath) && isDirectoryTrace(element)) {
-                        directoryTraces.put(resourcePath, element);
-                        validateAndImportTrace(element, sub);
-                    }
-                } else {
-                    TraceFileSystemElement parentElement = (TraceFileSystemElement) element.getParent();
-                    String parentPath = parentElement.getFileSystemObject().getAbsolutePath(fBaseSourceContainerPath.toOSString());
-                    parentElement.setDestinationContainerPath(computeDestinationContainerPath(new Path(parentPath)));
-                    fCurrentPath = parentPath;
-                    if (!directoryTraces.containsKey(parentPath)) {
-                        if (isDirectoryTrace(parentElement)) {
-                            directoryTraces.put(parentPath, parentElement);
-                            validateAndImportTrace(parentElement, sub);
-                        } else {
-                            boolean validateFile = true;
-                            TraceFileSystemElement grandParentElement = (TraceFileSystemElement) parentElement.getParent();
-                            // Special case for LTTng trace that may contain index directory and files
-                            if (grandParentElement != null) {
-                                String grandParentPath = grandParentElement.getFileSystemObject().getAbsolutePath(fBaseSourceContainerPath.toOSString());
-                                grandParentElement.setDestinationContainerPath(computeDestinationContainerPath(new Path(parentPath)));
-                                fCurrentPath = grandParentPath;
-                                if (directoryTraces.containsKey(grandParentPath)) {
-                                    validateFile = false;
-                                } else if (isDirectoryTrace(grandParentElement)) {
-                                    directoryTraces.put(grandParentPath, grandParentElement);
-                                    validateAndImportTrace(grandParentElement, sub);
-                                    validateFile = false;
-                                }
-                            }
-                            if (validateFile && (fileSystemObject.exists())) {
-                                validateAndImportTrace(element, sub);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        /**
-         * Generate a new list of file system elements for the specified folder.
-         */
-        private List<TraceFileSystemElement> createElementsForFolder(IFolder folder) {
-            // Create the new import provider and root element based on the specified folder
-            FileSystemObjectImportStructureProvider importStructureProvider = new FileSystemObjectImportStructureProvider(FileSystemStructureProvider.INSTANCE, null);
-            IFileSystemObject rootElement = importStructureProvider.getIFileSystemObject(new File(folder.getLocation().toOSString()));
-            TraceFileSystemElement createRootElement = createRootTraceFileElement(rootElement, importStructureProvider);
-            List<TraceFileSystemElement> list = new LinkedList<>();
-            getAllChildren(list, createRootElement);
-            return list;
-        }
-
-        /**
-         * Extract all file system elements (File) to destination folder (typically workspace/TraceProject/.traceImport)
-         */
-        private void extractAllArchiveFiles(List<TraceFileSystemElement> fileSystemElements, IFolder destFolder, IPath baseSourceContainerPath, IProgressMonitor progressMonitor) throws InterruptedException, CoreException, InvocationTargetException {
-            SubMonitor subMonitor = SubMonitor.convert(progressMonitor, fileSystemElements.size());
-            ListIterator<TraceFileSystemElement> fileSystemElementsIter = fileSystemElements.listIterator();
-            while (fileSystemElementsIter.hasNext()) {
-                ModalContext.checkCanceled(subMonitor);
-
-                SubMonitor elementProgress = subMonitor.newChild(1);
-                TraceFileSystemElement element = fileSystemElementsIter.next();
-                File archiveFile = (File) element.getFileSystemObject().getRawFileSystemObject();
-                boolean isArchiveFileElement = element.getFileSystemObject() instanceof FileFileSystemObject && isArchiveFile(archiveFile);
-                if (isArchiveFileElement) {
-                    elementProgress = SubMonitor.convert(elementProgress, 4);
-                    IPath relativeToSourceContainer = new Path(element.getFileSystemObject().getAbsolutePath(null)).makeRelativeTo(baseSourceContainerPath);
-                    IFolder folder = safeCreateExtractedFolder(destFolder, relativeToSourceContainer, elementProgress.newChild(1));
-                    extractArchiveToFolder(archiveFile, folder, elementProgress.newChild(1));
-
-                    // Delete original archive, we don't want to import this, just the extracted content
-                    IFile fileRes = destFolder.getFile(relativeToSourceContainer);
-                    fileRes.delete(true, elementProgress.newChild(1));
-                    IPath newPath = destFolder.getFullPath().append(relativeToSourceContainer);
-                    // Rename extracted folder (.extract) to original archive name
-                    folder.move(newPath, true, elementProgress.newChild(1));
-                    folder = ResourcesPlugin.getWorkspace().getRoot().getFolder(newPath);
-
-                    // Create the new import provider and root element based on
-                    // the newly extracted temporary folder
-                    FileSystemObjectImportStructureProvider importStructureProvider = new FileSystemObjectImportStructureProvider(FileSystemStructureProvider.INSTANCE, null);
-                    IFileSystemObject rootElement = importStructureProvider.getIFileSystemObject(new File(folder.getLocation().toOSString()));
-                    TraceFileSystemElement newElement = createRootTraceFileElement(rootElement, importStructureProvider);
-                    List<TraceFileSystemElement> extractedChildren = new ArrayList<>();
-                    getAllChildren(extractedChildren, newElement);
-                    extractAllArchiveFiles(extractedChildren, folder, folder.getLocation(), progressMonitor);
-                }
-            }
-        }
-
-        /**
-         * Extract a file (File) to a destination folder
-         */
-        private void extractArchiveToFolder(File sourceFile, IFolder destinationFolder, IProgressMonitor progressMonitor) throws InvocationTargetException, InterruptedException {
-            Pair<IFileSystemObject, FileSystemObjectImportStructureProvider> rootObjectAndProvider = getRootObjectAndProvider(sourceFile);
-            TraceFileSystemElement rootElement = createRootTraceFileElement(rootObjectAndProvider.getFirst(), rootObjectAndProvider.getSecond());
-            List<TraceFileSystemElement> fileSystemElements = new ArrayList<>();
-            getAllChildren(fileSystemElements, rootElement);
-            extractArchiveContent(fileSystemElements.listIterator(), destinationFolder, progressMonitor);
-            rootObjectAndProvider.getSecond().dispose();
-        }
-
-        /**
-         * Safely create a folder meant to receive extracted content by making sure there is no name clash.
-         */
-        private IFolder safeCreateExtractedFolder(IFolder destinationFolder, IPath relativeContainerRelativePath, IProgressMonitor monitor) throws CoreException {
-            SubMonitor subMonitor = SubMonitor.convert(monitor, 2);
-            IFolder extractedFolder;
-            String suffix = ""; //$NON-NLS-1$
-            int i = 2;
-            while (true) {
-                IPath fullPath = destinationFolder.getFullPath().append(relativeContainerRelativePath + ".extract" + suffix); //$NON-NLS-1$
-                IFolder folder = ResourcesPlugin.getWorkspace().getRoot().getFolder(fullPath);
-                if (!folder.exists()) {
-                    extractedFolder = folder;
-                    break;
-                }
-                suffix = "(" + i + ")"; //$NON-NLS-1$//$NON-NLS-2$
-                i++;
-            }
-            subMonitor.worked(1);
-
-            TraceUtils.createFolder(extractedFolder, subMonitor.newChild(1));
-            return extractedFolder;
-        }
-
-        private void calculateSourceLocations(List<TraceFileSystemElement> fileSystemElements, String baseSourceLocation) {
-            for (TraceFileSystemElement element : fileSystemElements) {
-                IPath tempRelative = new Path(element.getFileSystemObject().getAbsolutePath(null)).makeRelativeTo(fBaseSourceContainerPath);
-                String sourceLocation = baseSourceLocation + tempRelative;
-                element.setSourceLocation(sourceLocation);
-
-                TraceFileSystemElement parentElement = (TraceFileSystemElement) element.getParent();
-                tempRelative = new Path(parentElement.getFileSystemObject().getAbsolutePath(null)).makeRelativeTo(fBaseSourceContainerPath);
-                sourceLocation = baseSourceLocation + tempRelative + '/';
-                parentElement.setSourceLocation(sourceLocation);
-            }
-        }
-
-        /**
-         * Extract all file system elements (Tar, Zip elements) to destination folder (typically workspace/TraceProject/.traceImport or a subfolder of it)
-         */
-        private void extractArchiveContent(Iterator<TraceFileSystemElement> fileSystemElementsIter, IFolder tempFolder, IProgressMonitor progressMonitor) throws InterruptedException,
-                InvocationTargetException {
-            List<TraceFileSystemElement> subList = new ArrayList<>();
-            // Collect all the elements
-            while (fileSystemElementsIter.hasNext()) {
-                ModalContext.checkCanceled(progressMonitor);
-                TraceFileSystemElement element = fileSystemElementsIter.next();
-                if (element.isDirectory()) {
-                    Object[] array = element.getFiles().getChildren();
-                    for (int i = 0; i < array.length; i++) {
-                        subList.add((TraceFileSystemElement) array[i]);
-                    }
-                }
-                subList.add(element);
-            }
-
-            if (subList.isEmpty()) {
-                return;
-            }
-
-            TraceFileSystemElement root = getRootElement(subList.get(0));
-
-            ImportProvider fileSystemStructureProvider = new ImportProvider();
-
-            IOverwriteQuery myQueryImpl = new IOverwriteQuery() {
-                @Override
-                public String queryOverwrite(String file) {
-                    return IOverwriteQuery.NO_ALL;
-                }
-            };
-
-            progressMonitor.setTaskName(Messages.ImportTraceWizard_ExtractImportOperationTaskName);
-            IPath containerPath = tempFolder.getFullPath();
-            ImportOperation operation = new ImportOperation(containerPath, root, fileSystemStructureProvider, myQueryImpl, subList);
-            operation.setContext(getShell());
-
-            operation.setCreateContainerStructure(true);
-            operation.setOverwriteResources(false);
-            operation.setVirtualFolders(false);
-
-            operation.run(new SubProgressMonitor(progressMonitor, subList.size(), SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
-        }
-
-        private TraceFileSystemElement getRootElement(TraceFileSystemElement element) {
-            TraceFileSystemElement root = element;
-            while (root.getParent() != null) {
-                root = (TraceFileSystemElement) root.getParent();
-            }
-            return root;
-        }
-
-        /**
-         * Get all the TraceFileSystemElements recursively.
-         *
-         * @param result
-         *            the list accumulating the result
-         * @param rootElement
-         *            the root element of the file system to be imported
-         */
-        private void getAllChildren(List<TraceFileSystemElement> result, TraceFileSystemElement rootElement) {
-            AdaptableList files = rootElement.getFiles();
-            for (Object file : files.getChildren()) {
-                result.add((TraceFileSystemElement) file);
-            }
-
-            AdaptableList folders = rootElement.getFolders();
-            for (Object folder : folders.getChildren()) {
-                getAllChildren(result, (TraceFileSystemElement) folder);
-            }
-        }
-
-        private IPath computeDestinationContainerPath(Path resourcePath) {
-            IPath destinationContainerPath = fDestinationContainerPath;
-
-            // We need to figure out the new destination path relative to the
-            // selected "base" source directory.
-            // Here for example, the selected source directory is /home/user
-            if ((fImportOptionFlags & OPTION_PRESERVE_FOLDER_STRUCTURE) != 0) {
-                // /home/user/bar/foo/trace -> /home/user/bar/foo
-                IPath sourceContainerPath = resourcePath.removeLastSegments(1);
-                if (fBaseSourceContainerPath.equals(resourcePath)) {
-                    // Use resourcePath directory if fBaseSourceContainerPath
-                    // points to a directory trace
-                    sourceContainerPath = resourcePath;
-                }
-                // /home/user/bar/foo, /home/user -> bar/foo
-                IPath relativeContainerPath = sourceContainerPath.makeRelativeTo(fBaseSourceContainerPath);
-                // project/Traces + bar/foo -> project/Traces/bar/foo
-                destinationContainerPath = fDestinationContainerPath.append(relativeContainerPath);
-            }
-            return destinationContainerPath;
-        }
-
-        /**
-         * Import a single file system element into the workspace.
-         */
-        private void validateAndImportTrace(TraceFileSystemElement fileSystemElement, IProgressMonitor monitor)
-                throws TmfTraceImportException, CoreException, InvocationTargetException, InterruptedException {
-            String parentContainerPath = fBaseSourceContainerPath.toOSString();
-            String path = fileSystemElement.getFileSystemObject().getAbsolutePath(parentContainerPath);
-            TraceTypeHelper traceTypeHelper = null;
-
-            File file = (File) fileSystemElement.getFileSystemObject().getRawFileSystemObject();
-            boolean isArchiveFileElement = fileSystemElement.getFileSystemObject() instanceof FileFileSystemObject && isArchiveFile(file);
-            if (isArchiveFileElement) {
-                // We'll be extracting this later, do not import as a trace
-                return;
-            }
-
-            if (fTraceType == null) {
-                // Auto Detection
-                try {
-                    traceTypeHelper = TmfTraceTypeUIUtils.selectTraceType(path, null, null);
-                } catch (TmfTraceImportException e) {
-                    // the trace did not match any trace type
-                }
-                if (traceTypeHelper == null) {
-                    if ((fImportOptionFlags & OPTION_IMPORT_UNRECOGNIZED_TRACES) != 0) {
-                        importResource(fileSystemElement, monitor);
-                    }
-                    return;
-                }
-            } else {
-                boolean isDirectoryTraceType = TmfTraceType.isDirectoryTraceType(fTraceType);
-                if (fileSystemElement.isDirectory() != isDirectoryTraceType) {
-                    return;
-                }
-                traceTypeHelper = TmfTraceType.getTraceType(fTraceType);
-
-                if (traceTypeHelper == null) {
-                    // Trace type not found
-                    throw new TmfTraceImportException(Messages.ImportTraceWizard_TraceTypeNotFound);
-                }
-
-                if (!traceTypeHelper.validate(path).isOK()) {
-                    // Trace type exist but doesn't validate for given trace.
-                    return;
-                }
-            }
-
-            // Finally import trace
-            IResource importedResource = importResource(fileSystemElement, monitor);
-            if (importedResource != null) {
-                TmfTraceTypeUIUtils.setTraceType(importedResource, traceTypeHelper);
-            }
-
-        }
-
-        /**
-         * Imports a trace resource to project. In case of name collision the
-         * user will be asked to confirm overwriting the existing trace,
-         * overwriting or skipping the trace to be imported.
-         *
-         * @param fileSystemElement
-         *            trace file system object to import
-         * @param monitor
-         *            a progress monitor
-         * @return the imported resource or null if no resource was imported
-         *
-         * @throws InvocationTargetException
-         *             if problems during import operation
-         * @throws InterruptedException
-         *             if cancelled
-         * @throws CoreException
-         *             if problems with workspace
-         */
-        private IResource importResource(TraceFileSystemElement fileSystemElement, IProgressMonitor monitor)
-                throws InvocationTargetException, InterruptedException, CoreException {
-
-            IPath tracePath = getInitialDestinationPath(fileSystemElement);
-            String newName = fConflictHandler.checkAndHandleNameClash(tracePath, monitor);
-            if (newName == null) {
-                return null;
-            }
-            fileSystemElement.setLabel(newName);
-
-            List<TraceFileSystemElement> subList = new ArrayList<>();
-
-            FileSystemElement parentFolder = fileSystemElement.getParent();
-
-            IPath containerPath = fileSystemElement.getDestinationContainerPath();
-            tracePath = containerPath.addTrailingSeparator().append(fileSystemElement.getLabel());
-            boolean createLinksInWorkspace = (fImportOptionFlags & OPTION_CREATE_LINKS_IN_WORKSPACE) != 0;
-            if (fileSystemElement.isDirectory() && !createLinksInWorkspace) {
-                containerPath = tracePath;
-
-                Object[] array = fileSystemElement.getFiles().getChildren();
-                for (int i = 0; i < array.length; i++) {
-                    subList.add((TraceFileSystemElement) array[i]);
-                }
-                parentFolder = fileSystemElement;
-
-            } else {
-                subList.add(fileSystemElement);
-            }
-
-            ImportProvider fileSystemStructureProvider = new ImportProvider();
-
-            IOverwriteQuery myQueryImpl = new IOverwriteQuery() {
-                @Override
-                public String queryOverwrite(String file) {
-                    return IOverwriteQuery.NO_ALL;
-                }
-            };
-
-            monitor.setTaskName(Messages.ImportTraceWizard_ImportOperationTaskName + " " + fileSystemElement.getFileSystemObject().getAbsolutePath(fBaseSourceContainerPath.toOSString())); //$NON-NLS-1$
-            ImportOperation operation = new ImportOperation(containerPath, parentFolder, fileSystemStructureProvider, myQueryImpl, subList);
-            operation.setContext(getShell());
-
-            operation.setCreateContainerStructure(false);
-            operation.setOverwriteResources(false);
-            operation.setCreateLinks(createLinksInWorkspace);
-            operation.setVirtualFolders(false);
-
-            operation.run(new SubProgressMonitor(monitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
-            String sourceLocation = fileSystemElement.getSourceLocation();
-            IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(tracePath);
-            if (sourceLocation != null) {
-                resource.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
-            }
-
-            return resource;
-        }
-
-        private boolean isDirectoryTrace(TraceFileSystemElement fileSystemElement) {
-            String path = fileSystemElement.getFileSystemObject().getAbsolutePath(fBaseSourceContainerPath.toOSString());
-            if (TmfTraceType.isDirectoryTrace(path)) {
-                return true;
-            }
-            return false;
-        }
-
-        /**
-         * @return the initial destination path, before rename, if any
-         */
-        private IPath getInitialDestinationPath(TraceFileSystemElement fileSystemElement) {
-            IPath traceFolderPath = fileSystemElement.getDestinationContainerPath();
-            return traceFolderPath.append(fileSystemElement.getFileSystemObject().getLabel());
-        }
-
-        /**
-         * Set the status for this operation
-         *
-         * @param status
-         *            the status
-         */
-        protected void setStatus(IStatus status) {
-            fStatus = status;
-        }
-
-        public IStatus getStatus() {
-            return fStatus;
-        }
-    }
-
-    /**
-     * The <code>TraceFileSystemElement</code> is a
-     * <code>FileSystemElement</code> that knows if it has been populated or
-     * not.
-     */
-    private static class TraceFileSystemElement extends FileSystemElement {
-
-        private boolean fIsPopulated = false;
-        private String fLabel = null;
-        private IPath fDestinationContainerPath;
-        private FileSystemObjectImportStructureProvider fProvider;
-        private String fSourceLocation;
-
-        public TraceFileSystemElement(String name, FileSystemElement parent, boolean isDirectory, FileSystemObjectImportStructureProvider provider) {
-            super(name, parent, isDirectory);
-            fProvider = provider;
-        }
-
-        public void setDestinationContainerPath(IPath destinationContainerPath) {
-            fDestinationContainerPath = destinationContainerPath;
-        }
-
-        public void setPopulated() {
-            fIsPopulated = true;
-        }
-
-        public boolean isPopulated() {
-            return fIsPopulated;
-        }
-
-        @Override
-        public AdaptableList getFiles() {
-            if (!fIsPopulated) {
-                populateElementChildren();
-            }
-            return super.getFiles();
-        }
-
-        @Override
-        public AdaptableList getFolders() {
-            if (!fIsPopulated) {
-                populateElementChildren();
-            }
-            return super.getFolders();
-        }
-
-        /**
-         * Sets the label for the trace to be used when importing at trace.
-         *
-         * @param name
-         *            the label for the trace
-         */
-        public void setLabel(String name) {
-            fLabel = name;
-        }
-
-        /**
-         * Returns the label for the trace to be used when importing at trace.
-         *
-         * @return the label of trace resource
-         */
-        public String getLabel() {
-            if (fLabel == null) {
-                return getFileSystemObject().getLabel();
-            }
-            return fLabel;
-        }
-
-        /**
-         * The full path to the container that will contain the trace
-         *
-         * @return the destination container path
-         */
-        public IPath getDestinationContainerPath() {
-            return fDestinationContainerPath;
-        }
-
-        /**
-         * Populates the children of the specified parent
-         * <code>FileSystemElement</code>
-         */
-        private void populateElementChildren() {
-            List<IFileSystemObject> allchildren = fProvider.getChildren(this.getFileSystemObject());
-            Object child = null;
-            TraceFileSystemElement newelement = null;
-            Iterator<IFileSystemObject> iter = allchildren.iterator();
-            while (iter.hasNext()) {
-                child = iter.next();
-                newelement = new TraceFileSystemElement(fProvider.getLabel(child), this, fProvider.isFolder(child), fProvider);
-                newelement.setFileSystemObject(child);
-            }
-            setPopulated();
-        }
-
-        public FileSystemObjectImportStructureProvider getProvider() {
-            return fProvider;
-        }
-
-        @Override
-        public IFileSystemObject getFileSystemObject() {
-            Object fileSystemObject = super.getFileSystemObject();
-            return (IFileSystemObject) fileSystemObject;
-        }
-
-        public String getSourceLocation() {
-            if (fSourceLocation == null) {
-                fSourceLocation = getFileSystemObject().getSourceLocation();
-            }
-            return fSourceLocation;
-        }
-
-        public void setSourceLocation(String sourceLocation) {
-            fSourceLocation = sourceLocation;
-        }
-    }
-
-    /**
-     * This interface abstracts the differences between different kinds of
-     * FileSystemObjects such as File, TarEntry, ZipEntry, etc. This allows
-     * clients (TraceFileSystemElement, TraceValidateAndImportOperation) to
-     * handle all the types transparently.
-     */
-    private interface IFileSystemObject {
-        String getLabel();
-
-        String getName();
-
-        String getAbsolutePath(String parentContainerPath);
-
-        String getSourceLocation();
-
-        Object getRawFileSystemObject();
-
-        boolean exists();
-    }
-
-    /**
-     * The "File" implementation of an IFileSystemObject
-     */
-    private static class FileFileSystemObject implements IFileSystemObject {
-
-        private File fFileSystemObject;
-
-        private FileFileSystemObject(File fileSystemObject) {
-            fFileSystemObject = fileSystemObject;
-        }
-
-        @Override
-        public String getLabel() {
-            String name = fFileSystemObject.getName();
-            if (name.length() == 0) {
-                return fFileSystemObject.getPath();
-            }
-            return name;
-        }
-
-        @Override
-        public String getName() {
-            return fFileSystemObject.getName();
-        }
-
-        @Override
-        public String getAbsolutePath(String parentContainerPath) {
-            return fFileSystemObject.getAbsolutePath();
-        }
-
-        @Override
-        public boolean exists() {
-            return fFileSystemObject.exists();
-        }
-
-        @Override
-        public String getSourceLocation() {
-            IResource sourceResource;
-            String sourceLocation = null;
-            if (fFileSystemObject.isDirectory()) {
-                sourceResource = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(Path.fromOSString(fFileSystemObject.getAbsolutePath()));
-            } else {
-                sourceResource = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(Path.fromOSString(fFileSystemObject.getAbsolutePath()));
-            }
-            if (sourceResource != null && sourceResource.exists()) {
-                try {
-                    sourceLocation = sourceResource.getPersistentProperty(TmfCommonConstants.SOURCE_LOCATION);
-                } catch (CoreException e) {
-                    // Something went wrong with the already existing resource.
-                    // This is not a problem, we'll assign a new location below.
-                }
-            }
-            if (sourceLocation == null) {
-                try {
-                    sourceLocation = URIUtil.toUnencodedString(fFileSystemObject.getCanonicalFile().toURI());
-                } catch (IOException e) {
-                    // Something went wrong canonicalizing the file. We can still use the URI but there might be extra ../ in it.
-                    sourceLocation = URIUtil.toUnencodedString(fFileSystemObject.toURI());
-                }
-            }
-            return sourceLocation;
-        }
-
-        @Override
-        public Object getRawFileSystemObject() {
-            return fFileSystemObject;
-        }
-    }
-
-    /**
-     * The "Tar" implementation of an IFileSystemObject, entries can also be Gzipped and are uncompressed transparently.
-     */
-    private static class TarFileSystemObject implements IFileSystemObject {
-
-        private TarEntry fFileSystemObject;
-        private String fArchivePath;
-
-        private TarFileSystemObject(TarEntry fileSystemObject, String archivePath) {
-            fFileSystemObject = fileSystemObject;
-            fArchivePath = archivePath;
-        }
-
-        @Override
-        public String getLabel() {
-            return new Path(fFileSystemObject.getName()).lastSegment();
-        }
-
-        @Override
-        public String getName() {
-            return fFileSystemObject.getName();
-        }
-
-        @Override
-        public String getAbsolutePath(String parentContainerPath) {
-            return new Path(parentContainerPath).append(fFileSystemObject.getName()).toOSString();
-        }
-
-        @Override
-        public boolean exists() {
-            return true;
-        }
-
-        @Override
-        public String getSourceLocation() {
-            File file = new File(fArchivePath);
-            try {
-                file = file.getCanonicalFile();
-            } catch (IOException e) {
-                // Will still work but might have extra ../ in the path
-            }
-            URI uri = file.toURI();
-            IPath entryPath = new Path(fFileSystemObject.getName());
-
-            URI jarURI = entryPath.isRoot() ? URIUtil.toJarURI(uri, Path.EMPTY) : URIUtil.toJarURI(uri, entryPath);
-            return URIUtil.toUnencodedString(jarURI);
-        }
-
-        @Override
-        public Object getRawFileSystemObject() {
-            return fFileSystemObject;
-        }
-    }
-
-    /**
-     * The "GZIP" implementation of an IFileSystemObject. For a GZIP file that is not in a tar.
-     */
-    private static class GzipFileSystemObject implements IFileSystemObject {
-
-        private GzipEntry fFileSystemObject;
-        private String fArchivePath;
-
-        private GzipFileSystemObject(GzipEntry fileSystemObject, String archivePath) {
-            fFileSystemObject = fileSystemObject;
-            fArchivePath = archivePath;
-        }
-
-        @Override
-        public String getLabel() {
-            return new Path(fFileSystemObject.getName()).lastSegment();
-        }
-
-        @Override
-        public String getName() {
-            return fFileSystemObject.getName();
-        }
-
-        @Override
-        public String getAbsolutePath(String parentContainerPath) {
-            return new Path(parentContainerPath).append(fFileSystemObject.getName()).toOSString();
-        }
-
-        @Override
-        public boolean exists() {
-            return true;
-        }
-
-        @Override
-        public String getSourceLocation() {
-            File file = new File(fArchivePath);
-            try {
-                file = file.getCanonicalFile();
-            } catch (IOException e) {
-                // Will still work but might have extra ../ in the path
-            }
-            URI uri = file.toURI();
-            IPath entryPath = new Path(fFileSystemObject.getName());
-
-            URI jarURI = entryPath.isRoot() ? URIUtil.toJarURI(uri, Path.EMPTY) : URIUtil.toJarURI(uri, entryPath);
-            return URIUtil.toUnencodedString(jarURI);
-        }
-
-        @Override
-        public Object getRawFileSystemObject() {
-            return fFileSystemObject;
-        }
-    }
-
-    /**
-     * The "Zip" implementation of an IFileSystemObject
-     */
-    private static class ZipFileSystemObject implements IFileSystemObject {
-
-        private ZipEntry fFileSystemObject;
-        private String fArchivePath;
-
-        private ZipFileSystemObject(ZipEntry fileSystemObject, String archivePath) {
-            fFileSystemObject = fileSystemObject;
-            fArchivePath = archivePath;
-        }
-
-        @Override
-        public String getLabel() {
-            return new Path(fFileSystemObject.getName()).lastSegment();
-        }
-
-        @Override
-        public String getName() {
-            return fFileSystemObject.getName();
-        }
-
-        @Override
-        public String getAbsolutePath(String parentContainerPath) {
-            return new Path(parentContainerPath).append(fFileSystemObject.getName()).toOSString();
-        }
-
-        @Override
-        public boolean exists() {
-            return true;
-        }
-
-        @Override
-        public String getSourceLocation() {
-            File file = new File(fArchivePath);
-            try {
-                file = file.getCanonicalFile();
-            } catch (IOException e) {
-                // Will still work but might have extra ../ in the path
-            }
-            URI uri = file.toURI();
-            IPath entryPath = new Path(fFileSystemObject.getName());
-
-            URI jarURI = entryPath.isRoot() ? URIUtil.toJarURI(uri, Path.EMPTY) : URIUtil.toJarURI(uri, entryPath);
-            return URIUtil.toUnencodedString(jarURI);
-        }
-
-        @Override
-        public Object getRawFileSystemObject() {
-            return fFileSystemObject;
-        }
-    }
-
-    private class ImportProvider implements IImportStructureProvider {
-
-        ImportProvider() {
-        }
-
-        @Override
-        public String getLabel(Object element) {
-            TraceFileSystemElement resource = (TraceFileSystemElement) element;
-            return resource.getLabel();
-        }
-
-        @Override
-        public List getChildren(Object element) {
-            TraceFileSystemElement resource = (TraceFileSystemElement) element;
-            Object[] array = resource.getFiles().getChildren();
-            List<Object> list = new ArrayList<>();
-            for (int i = 0; i < array.length; i++) {
-                list.add(array[i]);
-            }
-            return list;
-        }
-
-        @Override
-        public InputStream getContents(Object element) {
-            TraceFileSystemElement resource = (TraceFileSystemElement) element;
-            return resource.getProvider().getContents(resource.getFileSystemObject());
-        }
-
-        @Override
-        public String getFullPath(Object element) {
-            TraceFileSystemElement resource = (TraceFileSystemElement) element;
-            return resource.getProvider().getFullPath(resource.getFileSystemObject());
-        }
-
-        @Override
-        public boolean isFolder(Object element) {
-            TraceFileSystemElement resource = (TraceFileSystemElement) element;
-            return resource.isDirectory();
-        }
     }
 }
