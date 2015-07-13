@@ -1497,7 +1497,7 @@ public class IOStructGen {
         }
 
         if (alignment == 0) {
-            alignment = ((size % DEFAULT_ALIGNMENT) == 0) ? 1 : DEFAULT_ALIGNMENT;
+            alignment = DEFAULT_ALIGNMENT;
         }
 
         floatDeclaration = new FloatDeclaration(exponent, mantissa, byteOrder, alignment);
@@ -1618,7 +1618,7 @@ public class IOStructGen {
         }
 
         if (alignment == 0) {
-            alignment = ((size % DEFAULT_ALIGNMENT) == 0) ? 1 : DEFAULT_ALIGNMENT;
+            alignment = DEFAULT_ALIGNMENT;
         }
 
         integerDeclaration = IntegerDeclaration.createDeclaration((int) size, signed, base,
