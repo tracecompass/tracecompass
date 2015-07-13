@@ -265,16 +265,14 @@ public class StructDeclaration extends Declaration {
             if (fTraceDef != null) {
                 lookupDefinition = fTraceDef.lookupDefinition(lookupPath);
             }
-            if (lookupDefinition == null) {
-                if (fEventHeaderDef != null) {
-                    String[] paths = EVENT_HEADER.split(lookupPath);
-                    if (paths.length > 1) {
-                        String[] childLookup = paths[1].split("\\."); //$NON-NLS-1$
-                        return getRecursiveDef(fEventHeaderDef.getDefinition(childLookup[0]), childLookup, 1);
-                    }
-                    if (fDefinition != null) {
-                        return fDefinition.lookupDefinition(lookupPath);
-                    }
+            if (lookupDefinition == null && fEventHeaderDef != null) {
+                String[] paths = EVENT_HEADER.split(lookupPath);
+                if (paths.length > 1) {
+                    String[] childLookup = paths[1].split("\\."); //$NON-NLS-1$
+                    return getRecursiveDef(fEventHeaderDef.getDefinition(childLookup[0]), childLookup, 1);
+                }
+                if (fDefinition != null) {
+                    return fDefinition.lookupDefinition(lookupPath);
                 }
             }
             return lookupDefinition;
