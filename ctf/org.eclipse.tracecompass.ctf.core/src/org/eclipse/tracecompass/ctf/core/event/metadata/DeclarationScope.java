@@ -46,7 +46,7 @@ public class DeclarationScope {
     // ------------------------------------------------------------------------
 
     private DeclarationScope fParentScope;
-    private @NonNull HashMap<String, DeclarationScope> fChildren = new HashMap<>();
+    private @NonNull Map<String, DeclarationScope> fChildren = new HashMap<>();
 
     private final Map<String, StructDeclaration> fStructs = new HashMap<>();
     private final Map<String, EnumDeclaration> fEnums = new HashMap<>();
@@ -471,12 +471,7 @@ public class DeclarationScope {
 
     private IDeclaration lookupIdentifierElement(DeclarationScope scope, String scopeName, String[] scopes) {
         if (scope.fStructs.containsKey(scopeName)) {
-            final IDeclaration structDeclaration = scope.fStructs.get(scopeName);
-            if (scopes.length <= 1) {
-                return structDeclaration;
-            }
-            return lookupIdentifierStructElement((StructDeclaration) structDeclaration, scopes[1], Arrays.copyOfRange(scopes, 2, scopes.length));
-
+            return lookupStructScope(scope, scopeName, scopes);
         } else if (scope.fTypes.containsKey(scopeName)) {
             return scope.fTypes.get(scopeName);
         } else if (scope.fEnums.containsKey(scopeName)) {
@@ -485,6 +480,14 @@ public class DeclarationScope {
             return scope.fIdentifiers.get(scopeName);
         }
         return null;
+    }
+
+    private IDeclaration lookupStructScope(DeclarationScope scope, String scopeName, String[] scopes) {
+        final IDeclaration structDeclaration = scope.fStructs.get(scopeName);
+        if (scopes.length <= 1) {
+            return structDeclaration;
+        }
+        return lookupIdentifierStructElement((StructDeclaration) structDeclaration, scopes[1], Arrays.copyOfRange(scopes, 2, scopes.length));
     }
 
     private IDeclaration lookupIdentifierStructElement(StructDeclaration structDeclaration, String string, String[] children) {
