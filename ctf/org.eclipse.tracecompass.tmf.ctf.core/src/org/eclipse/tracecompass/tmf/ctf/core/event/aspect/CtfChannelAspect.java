@@ -38,7 +38,6 @@ public class CtfChannelAspect implements ITmfEventAspect {
         if (!(event instanceof CtfTmfEvent)) {
             return EMPTY_STRING;
         }
-        String ret = ((CtfTmfEvent) event).getReference();
-        return (ret == null ? EMPTY_STRING : ret);
+        return ((CtfTmfEvent) event).getChannel();
     }
 }

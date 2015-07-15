@@ -75,7 +75,7 @@ public class CtfTmfEventTest {
      */
     @Test
     public void testGetCPU() {
-        int result = nullEvent.getCPU();
+        int result = nullEvent.getCpu();
         assertEquals(-1, result);
     }
 
@@ -139,15 +139,6 @@ public class CtfTmfEventTest {
     }
 
     /**
-     * Run the long getID() method test.
-     */
-    @Test
-    public void testGetID() {
-        long result = nullEvent.getID();
-        assertEquals(-1L, result);
-    }
-
-    /**
      * Run the long getTimestamp() method test.
      */
     @Test
@@ -165,8 +156,8 @@ public class CtfTmfEventTest {
         try (CtfTmfTrace trace = fixture.getTrace();) {
             assertEquals("kernel", trace.getName());
         }
-        String reference = fixture.getReference();
-        int cpu = fixture.getCPU();
+        String reference = fixture.getChannel();
+        int cpu = fixture.getCpu();
         ITmfEventType type = fixture.getType();
         assertEquals(ITmfContext.UNKNOWN_RANK, rank);
 
@@ -206,11 +197,10 @@ public class CtfTmfEventTest {
         CtfTmfEvent nullEvent2 = CtfTmfEventFactory.getNullEvent(fixture.getTrace());
         assertSame(nullEvent2, nullEvent);
         assertNotNull(nullEvent);
-        assertEquals(-1, nullEvent.getCPU());
+        assertEquals(-1, nullEvent.getCpu());
         assertEquals("Empty CTF event", nullEvent.getType().getName());
-        assertNull(nullEvent.getReference());
+        assertEquals("", nullEvent.getChannel());
         assertEquals(0, nullEvent.getContent().getFields().size());
-        assertEquals(-1L, nullEvent.getID());
         assertEquals(-1L, nullEvent.getTimestamp().getValue());
     }
 }

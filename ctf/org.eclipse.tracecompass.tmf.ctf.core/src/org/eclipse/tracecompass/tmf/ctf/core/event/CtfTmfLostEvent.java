@@ -12,7 +12,10 @@
 
 package org.eclipse.tracecompass.tmf.ctf.core.event;
 
-import org.eclipse.jdt.annotation.NonNull;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.tmf.core.event.ITmfLostEvent;
@@ -20,11 +23,14 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 
+import com.google.common.primitives.Longs;
+
 /**
  * An implementation of {@link ITmfLostEvent} for use in the CTF adaptor.
  *
  * @author Alexandre Montplaisir
  */
+@NonNullByDefault
 public class CtfTmfLostEvent extends CtfTmfEvent implements ITmfLostEvent {
 
     private final TmfTimeRange fTimeRange;
@@ -57,10 +63,10 @@ public class CtfTmfLostEvent extends CtfTmfEvent implements ITmfLostEvent {
             IEventDeclaration declaration,
             TmfTimeRange timeRange,
             long nbLost,
-            @NonNull EventDefinition def) {
+            EventDefinition def) {
         /*
-         * Only the factory should call this method, the case to
-         * (CtfTmfTimestamp) should be safe.
+         * Only the factory should call this method, the cast to
+         * (TmfNanoTimestamp) should be safe.
          */
         super(trace, rank, (TmfNanoTimestamp) timeRange.getStartTime(), fileName, cpu, declaration, def);
         fTimeRange = timeRange;
@@ -75,6 +81,35 @@ public class CtfTmfLostEvent extends CtfTmfEvent implements ITmfLostEvent {
     @Override
     public long getNbLostEvents() {
         return fNbLost;
+    }
+
+    // ------------------------------------------------------------------------
+    // Object
+    // ------------------------------------------------------------------------
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + getTimeRange().hashCode();
+        result = prime * result + Longs.hashCode(getNbLostEvents());
+        return result;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        /* super.equals() checks that the classes are the same */
+        CtfTmfLostEvent other = checkNotNull((CtfTmfLostEvent) obj);
+        if (!getTimeRange().equals(other.getTimeRange())) {
+            return false;
+        }
+        if (getNbLostEvents() != other.getNbLostEvents()) {
+            return false;
+        }
+        return true;
     }
 
 }

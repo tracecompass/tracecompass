@@ -20,7 +20,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.ICompositeDefinition;
@@ -44,6 +45,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
  *
  * @author Alexandre Montplaisir
  */
+@NonNullByDefault
 public class CtfTmfEvent extends TmfEvent
         implements ITmfSourceLookup, ITmfModelLookup, ITmfCustomAttributes {
 
@@ -54,20 +56,30 @@ public class CtfTmfEvent extends TmfEvent
     private static final String EMPTY_CTF_EVENT_NAME = "Empty CTF event"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
+    // Support attributes
+    // Not part of this event's "definition", but used to populate lazy-loaded
+    // fields.
+    // ------------------------------------------------------------------------
+
+    private final @Nullable IEventDeclaration fEventDeclaration;
+    private final EventDefinition fEvent;
+
+    // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final int fSourceCPU;
-    private final long fTypeId;
+    /* Fields that are introduced by and part of this event's definition. */
+    private final int fSourceCpu;
+    private final String fChannel;
+
+    /** Field to override {@link TmfEvent#getName()}, to bypass the type-getting */
     private final String fEventName;
-    private final IEventDeclaration fEventDeclaration;
-    private final @NonNull EventDefinition fEvent;
-    private final String fReference;
 
     /** Lazy-loaded field containing the event's payload */
-    private ITmfEventField fContent;
+    private transient @Nullable ITmfEventField fContent;
 
-    private CtfTmfEventType fCtfTmfEventType;
+    /** Lazy-loaded field for the type, overriding TmfEvent's field */
+    private transient @Nullable CtfTmfEventType fEventType;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -77,7 +89,7 @@ public class CtfTmfEvent extends TmfEvent
      * Constructor used by {@link CtfTmfEventFactory#createEvent}
      */
     CtfTmfEvent(CtfTmfTrace trace, long rank, TmfNanoTimestamp timestamp,
-            String fileName, int cpu, IEventDeclaration declaration, @NonNull EventDefinition eventDefinition) {
+            String channel, int cpu, IEventDeclaration declaration, EventDefinition eventDefinition) {
         super(trace,
                 rank,
                 timestamp,
@@ -93,11 +105,10 @@ public class CtfTmfEvent extends TmfEvent
                 null);
 
         fEventDeclaration = declaration;
-        fSourceCPU = cpu;
-        fTypeId = declaration.getId().longValue();
-        fEventName = declaration.getName();
+        fSourceCpu = cpu;
+        fEventName = checkNotNull(declaration.getName());
         fEvent = eventDefinition;
-        fReference = fileName;
+        fChannel = channel;
     }
 
     /**
@@ -117,21 +128,28 @@ public class CtfTmfEvent extends TmfEvent
                 new TmfNanoTimestamp(-1),
                 null,
                 new TmfEventField("", null, new CtfTmfEventField[0])); //$NON-NLS-1$
-        fSourceCPU = -1;
-        fTypeId = -1;
+        fSourceCpu = -1;
         fEventName = EMPTY_CTF_EVENT_NAME;
         fEventDeclaration = null;
         fEvent = EventDefinition.NULL_EVENT;
-        fReference = null;
+        fChannel = ""; //$NON-NLS-1$
     }
 
     /**
      * Default constructor. Do not use directly, but it needs to be present
      * because it's used in extension points, and the framework will use this
      * constructor to get the class type.
+     *
+     * @deprecated Should not be called by normal code
      */
+    @Deprecated
     public CtfTmfEvent() {
-        this(null);
+        super();
+        fSourceCpu = -1;
+        fEventName = EMPTY_CTF_EVENT_NAME;
+        fEventDeclaration = null;
+        fEvent = EventDefinition.NULL_EVENT;
+        fChannel = ""; //$NON-NLS-1$
     }
 
     // ------------------------------------------------------------------------
@@ -142,31 +160,25 @@ public class CtfTmfEvent extends TmfEvent
      * Gets the cpu core the event was recorded on.
      *
      * @return The cpu id for a given source. In lttng it's from CPUINFO
+     * @since 2.0
      */
-    public int getCPU() {
-        return fSourceCPU;
+    public int getCpu() {
+        return fSourceCpu;
     }
 
     /**
-     * Return this event's ID, according to the trace's metadata.
+     * Return the CTF trace's channel from which this event originates.
      *
-     * Watch out, this ID is not constant from one trace to another for the same
-     * event types! Use "getEventName()" for a constant reference.
-     *
-     * @return The event ID
+     * @return The event's channel
+     * @since 2.0
      */
-    public long getID() {
-        return fTypeId;
+    public String getChannel() {
+        return fChannel;
     }
 
-    /**
-     * Return this event's reference
-     *
-     * @return The event's reference
-     */
-    public String getReference() {
-        return fReference;
-    }
+    // ------------------------------------------------------------------------
+    // TmfEvent
+    // ------------------------------------------------------------------------
 
     @Override
     public CtfTmfTrace getTrace() {
@@ -178,17 +190,19 @@ public class CtfTmfEvent extends TmfEvent
     }
 
     @Override
-    public ITmfEventType getType() {
-        if (fCtfTmfEventType == null) {
-            fCtfTmfEventType = new CtfTmfEventType(fEventName, getContent());
+    public synchronized ITmfEventType getType() {
+        CtfTmfEventType type = fEventType;
+        if (type == null) {
+            type = new CtfTmfEventType(fEventName, getContent());
 
             /*
              * Register the event type in the owning trace, but only if there is
              * one
              */
-            getTrace().registerEventType(fCtfTmfEventType);
+            getTrace().registerEventType(type);
+            fEventType = type;
         }
-        return fCtfTmfEventType;
+        return type;
     }
 
     @Override
@@ -197,63 +211,21 @@ public class CtfTmfEvent extends TmfEvent
     }
 
     @Override
-    public Set<String> listCustomAttributes() {
-        if (fEventDeclaration == null) {
-            return new HashSet<>();
-        }
-        return fEventDeclaration.getCustomAttributes();
-    }
-
-    @Override
-    public String getCustomAttribute(String name) {
-        if (fEventDeclaration == null) {
-            return null;
-        }
-        return fEventDeclaration.getCustomAttribute(name);
-    }
-
-    /**
-     * Get the call site for this event.
-     *
-     * @return the call site information, or null if there is none
-     */
-    @Override
-    public CtfTmfCallsite getCallsite() {
-        CtfTmfCallsite callsite = null;
-        CtfTmfTrace trace = getTrace();
-
-        if (getContent() != null) {
-            ITmfEventField ipField = getContent().getField(CtfConstants.CONTEXT_FIELD_PREFIX + CtfConstants.IP_KEY);
-            if (ipField != null && ipField.getValue() instanceof Long) {
-                long ip = (Long) ipField.getValue();
-                callsite = trace.getCallsite(fEventName, ip);
-            }
-        }
-        if (callsite == null) {
-            callsite = trace.getCallsite(fEventName);
-        }
-        return callsite;
-    }
-
-    @Override
-    public String getModelUri() {
-        return getCustomAttribute(CtfConstants.MODEL_URI_KEY);
-    }
-
-    @Override
     public synchronized ITmfEventField getContent() {
-        if (fContent == null) {
-            fContent = new TmfEventField(
+        ITmfEventField content = fContent;
+        if (content == null) {
+            content = new TmfEventField(
                     ITmfEventField.ROOT_FIELD_ID, null, parseFields(fEvent));
+            fContent = content;
         }
-        return fContent;
+        return content;
     }
 
     /**
      * Extract the field information from the structDefinition haze-inducing
      * mess, and put them into something ITmfEventField can cope with.
      */
-    private static CtfTmfEventField[] parseFields(@NonNull EventDefinition eventDef) {
+    private static CtfTmfEventField[] parseFields(EventDefinition eventDef) {
         List<CtfTmfEventField> fields = new ArrayList<>();
 
         ICompositeDefinition structFields = eventDef.getFields();
@@ -275,7 +247,92 @@ public class CtfTmfEvent extends TmfEvent
             }
         }
 
-        return fields.toArray(new CtfTmfEventField[fields.size()]);
+        return checkNotNull(fields.toArray(new CtfTmfEventField[fields.size()]));
+    }
+
+    // ------------------------------------------------------------------------
+    // ITmfCustomAttributes
+    // ------------------------------------------------------------------------
+
+    @Override
+    public Set<String> listCustomAttributes() {
+        IEventDeclaration declaration = fEventDeclaration;
+        if (declaration == null) {
+            return new HashSet<>();
+        }
+        return checkNotNull(declaration.getCustomAttributes());
+    }
+
+    @Override
+    public @Nullable String getCustomAttribute(@Nullable String name) {
+        IEventDeclaration declaration = fEventDeclaration;
+        if (declaration == null) {
+            return null;
+        }
+        return declaration.getCustomAttribute(name);
+    }
+
+    // ------------------------------------------------------------------------
+    // ITmfSourceLookup
+    // ------------------------------------------------------------------------
+
+    /**
+     * Get the call site for this event.
+     *
+     * @return the call site information, or null if there is none
+     */
+    @Override
+    public @Nullable CtfTmfCallsite getCallsite() {
+        CtfTmfCallsite callsite = null;
+
+        ITmfEventField ipField = getContent().getField(CtfConstants.CONTEXT_FIELD_PREFIX + CtfConstants.IP_KEY);
+        if (ipField != null && ipField.getValue() instanceof Long) {
+            long ip = (Long) ipField.getValue();
+            callsite = getTrace().getCallsite(fEventName, ip);
+        }
+
+        if (callsite == null) {
+            callsite = getTrace().getCallsite(fEventName);
+        }
+        return callsite;
+    }
+
+    // ------------------------------------------------------------------------
+    // ITmfModelLookup
+    // ------------------------------------------------------------------------
+
+    @Override
+    public @Nullable String getModelUri() {
+        return getCustomAttribute(CtfConstants.MODEL_URI_KEY);
+    }
+
+    // ------------------------------------------------------------------------
+    // Object
+    // ------------------------------------------------------------------------
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + getCpu();
+        result = prime * result + getChannel().hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        /* super.equals() checks that the classes are the same */
+        CtfTmfEvent other = checkNotNull((CtfTmfEvent) obj);
+        if (getCpu() != other.getCpu()) {
+            return false;
+        }
+        if (!getChannel().equals(other.getChannel())) {
+            return false;
+        }
+        return true;
     }
 
 }
