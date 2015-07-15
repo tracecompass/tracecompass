@@ -21,6 +21,7 @@ import static org.junit.Assert.fail;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -37,12 +38,19 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.tests.stubs.analysis.TestAnalysis;
 import org.eclipse.tracecompass.tmf.tests.stubs.analysis.TestAnalysis2;
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
+import org.junit.rules.Timeout;
 
 /**
  * Test suite for the {@link TmfAbstractAnalysisModule} class
  */
 public class AnalysisModuleTest {
+
+    /** Test timeout */
+    @Rule
+    public TestRule timeoutRule = new Timeout(30, TimeUnit.SECONDS);
 
     private static final @NonNull String MODULE_GENERIC_ID = "test.id";
     private static final @NonNull String MODULE_GENERIC_NAME = "Test analysis";
