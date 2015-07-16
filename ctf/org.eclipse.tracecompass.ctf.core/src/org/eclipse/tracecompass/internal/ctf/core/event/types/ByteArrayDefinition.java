@@ -109,4 +109,14 @@ public final class ByteArrayDefinition extends AbstractArrayDefinition {
         b.append(']');
         return checkNotNull(b.toString());
     }
+
+    /**
+     * Get a byte of the byte array
+     * @param index the index of the byte
+     *
+     * @return the byte
+     */
+    public byte getByte(int index) {
+        return fContent[index];
+    }
 }

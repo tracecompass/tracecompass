@@ -21,7 +21,6 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -37,6 +36,7 @@ import org.eclipse.tracecompass.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StringDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.VariantDefinition;
+import org.eclipse.tracecompass.internal.ctf.core.event.types.ByteArrayDefinition;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.ctf.core.CtfEnumPair;
@@ -130,8 +130,20 @@ public abstract class CtfTmfEventField extends TmfEventField {
             }
             CompoundDeclaration arrDecl = (CompoundDeclaration) decl;
             IDeclaration elemType = null;
-            Collection<Definition> definitions = arrayDef.getDefinitions();
             elemType = arrDecl.getElementType();
+            if (arrayDef instanceof ByteArrayDefinition) {
+                ByteArrayDefinition byteArrayDefinition = (ByteArrayDefinition) arrayDef;
+                /* it's a CTFIntegerArrayField */
+                int size = arrayDef.getLength();
+                long[] values = new long[size];
+                for (int i = 0; i < size; i++) {
+                    values[i] = Byte.toUnsignedLong(byteArrayDefinition.getByte(i));
+                }
+                field = new CTFIntegerArrayField(fieldName, values,
+                        16,
+                        false);
+
+            }
             if (elemType instanceof IntegerDeclaration) {
                 /*
                  * Array of integers => CTFIntegerArrayField, unless it's a
@@ -144,7 +156,7 @@ public abstract class CtfTmfEventField extends TmfEventField {
                     field = new CTFStringField(fieldName, arrayDef.toString());
                 } else {
                     /* it's a CTFIntegerArrayField */
-                    int size = arrayDef.getDefinitions().size();
+                    int size = arrayDef.getLength();
                     long[] values = new long[size];
                     for (int i = 0; i < size; i++) {
                         IDefinition elem = arrayDef.getDefinitions().get(i);
@@ -162,6 +174,7 @@ public abstract class CtfTmfEventField extends TmfEventField {
                 CtfTmfEventField[] elements = new CtfTmfEventField[arrayDef.getLength()];
                 /* Parse the elements of the array. */
                 int i = 0;
+                List<Definition> definitions = arrayDef.getDefinitions();
                 for (IDefinition definition : definitions) {
                     CtfTmfEventField curField = CtfTmfEventField.parseField(
                             definition, fieldName + '[' + i + ']');
