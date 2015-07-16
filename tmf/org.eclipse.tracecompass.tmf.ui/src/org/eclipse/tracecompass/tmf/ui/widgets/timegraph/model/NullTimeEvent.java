@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -30,6 +30,20 @@ public class NullTimeEvent extends TimeEvent {
      */
     public NullTimeEvent(ITimeGraphEntry entry, long time, long duration) {
         super(entry, time, duration);
+    }
+
+    @Override
+    public ITimeEvent splitBefore(long splitTime) {
+        return (splitTime > fTime ?
+                new NullTimeEvent(fEntry, fTime, Math.min(fDuration, splitTime - fTime)) :
+                null);
+    }
+
+    @Override
+    public ITimeEvent splitAfter(long splitTime) {
+        return (splitTime < fTime + fDuration ?
+                new NullTimeEvent(fEntry, Math.max(fTime, splitTime), fDuration - Math.max(0, splitTime - fTime)) :
+                null);
     }
 
 }

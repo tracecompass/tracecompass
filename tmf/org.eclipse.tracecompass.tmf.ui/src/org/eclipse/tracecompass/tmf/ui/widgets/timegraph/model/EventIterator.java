@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -19,7 +19,17 @@ import java.util.NoSuchElementException;
 
 /**
  * An iterator for time events. Events from the zoomed event list override any
- * events from the underlying event list.
+ * events from the underlying event list. Gaps in the zoomed event list will not
+ * allow the underlying events to be included in the iterator, e.g. no
+ * underlying event will be included between the start of the first zoomed event
+ * and the end of the last zoomed event.
+ *
+ * <pre>
+ * example:
+ * zoomed list    [D][E][F]       [G]
+ * event list  [      A      ] [   B   ][C]
+ * iterator    [A][D][E][F]       [G][B][C]
+ * </pre>
  */
 public class EventIterator implements Iterator<ITimeEvent> {
 
