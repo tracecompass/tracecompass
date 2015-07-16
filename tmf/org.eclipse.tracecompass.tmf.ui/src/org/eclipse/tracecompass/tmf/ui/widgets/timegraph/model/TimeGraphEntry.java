@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.SWT;
 
 /**
@@ -37,8 +38,8 @@ public class TimeGraphEntry implements ITimeGraphEntry {
     private String fName;
     private long fStartTime = SWT.DEFAULT;
     private long fEndTime = SWT.DEFAULT;
-    private List<ITimeEvent> fEventList = new ArrayList<>();
-    private List<ITimeEvent> fZoomedEventList = new ArrayList<>();
+    private @NonNull List<ITimeEvent> fEventList = new ArrayList<>();
+    private @NonNull List<ITimeEvent> fZoomedEventList = new ArrayList<>();
     private Comparator<ITimeGraphEntry> fComparator;
 
     /**
@@ -167,47 +168,76 @@ public class TimeGraphEntry implements ITimeGraphEntry {
     public void addEvent(ITimeEvent event) {
         long start = event.getTime();
         long end = start + event.getDuration();
-        synchronized (fEventList) {
-            int lastIndex = fEventList.size() - 1;
-            if (lastIndex >= 0 && fEventList.get(lastIndex).getTime() == event.getTime()) {
-                fEventList.set(lastIndex, event);
-            } else {
-                fEventList.add(event);
-            }
-            if (fStartTime == SWT.DEFAULT || start < fStartTime) {
-                fStartTime = start;
-            }
-            if (fEndTime == SWT.DEFAULT || end > fEndTime) {
-                fEndTime = end;
-            }
+        int lastIndex = fEventList.size() - 1;
+        if (lastIndex >= 0 && fEventList.get(lastIndex).getTime() == event.getTime()) {
+            fEventList.set(lastIndex, event);
+        } else {
+            fEventList.add(event);
+        }
+        if (fStartTime == SWT.DEFAULT || start < fStartTime) {
+            fStartTime = start;
+        }
+        if (fEndTime == SWT.DEFAULT || end > fEndTime) {
+            fEndTime = end;
         }
     }
 
     /**
-     * Set the general event list of this entry.
+     * Set the general event list of this entry. The list should be modifiable
+     * but will only increase in size over time.
      *
      * @param eventList
-     *            The list of time events
+     *            The modifiable list of time events, or null to clear the list
      */
     public void setEventList(List<ITimeEvent> eventList) {
         if (eventList != null) {
-            fEventList = new ArrayList<>(eventList);
+            fEventList = eventList;
         } else {
             fEventList = new ArrayList<>();
         }
     }
 
     /**
-     * Set the zoomed event list of this entry.
+     * Set the zoomed event list of this entry. The list should be modifiable
+     * but will only increase in size over time.
      *
      * @param eventList
-     *            The list of time events
+     *            The modifiable list of time events, or null to clear the list
      */
     public void setZoomedEventList(List<ITimeEvent> eventList) {
         if (eventList != null) {
-            fZoomedEventList = new ArrayList<>(eventList);
+            fZoomedEventList = eventList;
         } else {
             fZoomedEventList = new ArrayList<>();
+        }
+    }
+
+    /**
+     * Add an event to this entry's zoomed event list. If necessary, update the
+     * start and end time of the entry. If the zoomed event list's last event
+     * starts at the same time as the event to add, it is replaced by the new
+     * event. If the new event starts before the zoomed event list's last event,
+     * the new event is ignored and is assumed to be already part of the list.
+     *
+     * @param event
+     *            The time event to add
+     * @since 1.1
+     */
+    public void addZoomedEvent(ITimeEvent event) {
+        long start = event.getTime();
+        long end = start + event.getDuration();
+        int lastIndex = fZoomedEventList.size() - 1;
+        long lastStart = lastIndex >= 0 ? fZoomedEventList.get(lastIndex).getTime() : Long.MIN_VALUE;
+        if (start > lastStart) {
+            fZoomedEventList.add(event);
+        } else if (start == lastStart) {
+            fZoomedEventList.set(lastIndex, event);
+        }
+        if (fStartTime == SWT.DEFAULT || start < fStartTime) {
+            fStartTime = start;
+        }
+        if (fEndTime == SWT.DEFAULT || end > fEndTime) {
+            fEndTime = end;
         }
     }
 
