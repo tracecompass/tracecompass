@@ -1505,7 +1505,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @param timeProvider
      *            The time provider
      * @param links
-     *            The array items to draw
+     *            The list of link events
      * @param nameSpace
      *            The width reserved for the names
      * @param gc
@@ -1517,8 +1517,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
             return;
         }
         gc.setClipping(new Rectangle(nameSpace, 0, bounds.width - nameSpace, bounds.height));
-        for (ILinkEvent event : links) {
-            drawLink(event, bounds, timeProvider, nameSpace, gc);
+        /* the list can grow concurrently but cannot shrink */
+        for (int i = 0; i < links.size(); i++) {
+            drawLink(links.get(i), bounds, timeProvider, nameSpace, gc);
         }
         gc.setClipping((Rectangle) null);
     }

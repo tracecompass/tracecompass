@@ -460,35 +460,91 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
     }
 
-    private class ZoomThread extends Thread {
-        private final @NonNull List<TimeGraphEntry> fZoomEntryList;
+    /**
+     * Zoom thread
+     * @since 1.1
+     */
+    protected abstract class ZoomThread extends Thread {
         private final long fZoomStartTime;
         private final long fZoomEndTime;
         private final long fResolution;
         private final @NonNull  IProgressMonitor fMonitor;
 
-        public ZoomThread(@NonNull List<TimeGraphEntry> entryList, long startTime, long endTime, String name) {
-            super(name + " zoom"); //$NON-NLS-1$
-            fZoomEntryList = entryList;
+        /**
+         * Constructor
+         *
+         * @param startTime
+         *            the start time
+         * @param endTime
+         *            the end time
+         * @param resolution
+         *            the resolution
+         */
+        public ZoomThread(long startTime, long endTime, long resolution) {
+            super(AbstractTimeGraphView.this.getName() + " zoom"); //$NON-NLS-1$
             fZoomStartTime = startTime;
             fZoomEndTime = endTime;
-            fResolution = Math.max(1, (fZoomEndTime - fZoomStartTime) / fDisplayWidth);
+            fResolution = resolution;
             fMonitor = new NullProgressMonitor();
+        }
+
+        /**
+         * @return the zoom start time
+         */
+        public long getZoomStartTime() {
+            return fZoomStartTime;
+        }
+
+        /**
+         * @return the zoom end time
+         */
+        public long getZoomEndTime() {
+            return fZoomEndTime;
+        }
+
+        /**
+         * @return the resolution
+         */
+        public long getResolution() {
+            return fResolution;
+        }
+
+        /**
+         * @return the monitor
+         */
+        public @NonNull IProgressMonitor getMonitor() {
+            return fMonitor;
+        }
+
+        /**
+         * Cancel the zoom thread
+         */
+        public void cancel() {
+            fMonitor.setCanceled(true);
+        }
+    }
+
+    private class ZoomThreadByEntry extends ZoomThread {
+        private final @NonNull List<TimeGraphEntry> fZoomEntryList;
+
+        public ZoomThreadByEntry(@NonNull List<TimeGraphEntry> entryList, long startTime, long endTime, long resolution) {
+            super(startTime, endTime, resolution);
+            fZoomEntryList = entryList;
         }
 
         @Override
         public void run() {
             for (TimeGraphEntry entry : fZoomEntryList) {
-                if (fMonitor.isCanceled()) {
+                if (getMonitor().isCanceled()) {
                     return;
                 }
                 if (entry == null) {
                     break;
                 }
-                zoom(entry, fMonitor);
+                zoom(entry, getMonitor());
             }
             /* Refresh the arrows when zooming */
-            List<ILinkEvent> events = getLinkList(fZoomStartTime, fZoomEndTime, fResolution, fMonitor);
+            List<ILinkEvent> events = getLinkList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
             if (events != null) {
                 fTimeGraphWrapper.getTimeGraphViewer().setLinks(events);
                 redraw();
@@ -496,17 +552,17 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
 
         private void zoom(@NonNull TimeGraphEntry entry, @NonNull IProgressMonitor monitor) {
-            if (fZoomStartTime <= fStartTime && fZoomEndTime >= fEndTime) {
+            if (getZoomStartTime() <= fStartTime && getZoomEndTime() >= fEndTime) {
                 entry.setZoomedEventList(null);
             } else {
-                List<ITimeEvent> zoomedEventList = getEventList(entry, fZoomStartTime, fZoomEndTime, fResolution, monitor);
+                List<ITimeEvent> zoomedEventList = getEventList(entry, getZoomStartTime(), getZoomEndTime(), getResolution(), monitor);
                 if (zoomedEventList != null) {
                     entry.setZoomedEventList(zoomedEventList);
                 }
             }
             redraw();
             for (ITimeGraphEntry child : entry.getChildren()) {
-                if (fMonitor.isCanceled()) {
+                if (monitor.isCanceled()) {
                     return;
                 }
                 if (child instanceof TimeGraphEntry) {
@@ -515,9 +571,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             }
         }
 
-        public void cancel() {
-            fMonitor.setCanceled(true);
-        }
     }
 
     // ------------------------------------------------------------------------
@@ -939,7 +992,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             return;
         }
         fTrace = signal.getTrace();
-
         loadTrace();
     }
 
@@ -968,6 +1020,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             fEndTime = 0;
             if (fZoomThread != null) {
                 fZoomThread.cancel();
+                fZoomThread = null;
             }
             refresh();
         }
@@ -1048,6 +1101,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     // ------------------------------------------------------------------------
 
     private void loadTrace() {
+        if (fZoomThread != null) {
+            fZoomThread.cancel();
+            fZoomThread = null;
+        }
         synchronized (fEntryListMap) {
             fEntryList = fEntryListMap.get(fTrace);
             if (fEntryList == null) {
@@ -1167,6 +1224,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * Refresh the display
      */
     protected void refresh() {
+        final boolean zoomThread = Thread.currentThread() instanceof ZoomThread;
         TmfUiRefreshHandler.getInstance().queueUpdate(this, new Runnable() {
             @Override
             public void run() {
@@ -1188,6 +1246,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 }
                 if (fEntryList != fTimeGraphWrapper.getInput()) {
                     fTimeGraphWrapper.setInput(fEntryList);
+                    fTimeGraphWrapper.getTimeGraphViewer().setLinks(null);
                 } else {
                     fTimeGraphWrapper.refresh();
                 }
@@ -1212,7 +1271,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     }
                 }
 
-                startZoomThread(startTime, endTime);
+                if (!zoomThread) {
+                    startZoomThread(startTime, endTime);
+                }
             }
         });
     }
@@ -1250,15 +1311,40 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     }
 
     private void startZoomThread(long startTime, long endTime) {
+        boolean restart = false;
         if (fZoomThread != null) {
             fZoomThread.cancel();
+            if (fZoomThread.fZoomStartTime == startTime && fZoomThread.fZoomEndTime == endTime) {
+                restart = true;
+            }
         }
+        long resolution = Math.max(1, (endTime - startTime) / fDisplayWidth);
+        fZoomThread = createZoomThread(startTime, endTime, resolution, restart);
+        if (fZoomThread != null) {
+            fZoomThread.start();
+        }
+    }
+
+    /**
+     * Create a zoom thread.
+     *
+     * @param startTime
+     *            the zoom start time
+     * @param endTime
+     *            the zoom end time
+     * @param resolution
+     *            the resolution
+     * @param restart
+     *            true if restarting zoom for the same time range
+     * @return a zoom thread
+     * @since 1.1
+     */
+    protected @Nullable ZoomThread createZoomThread(long startTime, long endTime, long resolution, boolean restart) {
         final List<TimeGraphEntry> entryList = fEntryList;
         if (entryList == null) {
-            return;
+            return null;
         }
-        fZoomThread = new ZoomThread(entryList, startTime, endTime, getName());
-        fZoomThread.start();
+        return new ZoomThreadByEntry(entryList, startTime, endTime, resolution);
     }
 
     private void makeActions() {
