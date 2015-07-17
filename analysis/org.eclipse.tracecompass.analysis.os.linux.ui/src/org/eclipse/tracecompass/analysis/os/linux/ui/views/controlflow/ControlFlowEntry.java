@@ -24,7 +24,7 @@ public class ControlFlowEntry extends TimeGraphEntry {
 
     private final @NonNull ITmfTrace fTrace;
     private final int fThreadId;
-    private final int fParentThreadId;
+    private int fParentThreadId;
     private final int fThreadQuark;
 
     /**
@@ -78,6 +78,17 @@ public class ControlFlowEntry extends TimeGraphEntry {
      */
     public int getParentThreadId() {
         return fParentThreadId;
+    }
+
+    /**
+     * Set this thread's parent TID
+     *
+     * @param ptid
+     *            The "PTID"
+     * @since 1.1
+     */
+    public void setParentThreadId(int ptid) {
+        fParentThreadId = ptid;
     }
 
     /**

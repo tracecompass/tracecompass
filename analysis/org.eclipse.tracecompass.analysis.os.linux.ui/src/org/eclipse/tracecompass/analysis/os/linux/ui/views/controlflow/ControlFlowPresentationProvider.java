@@ -40,6 +40,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 
@@ -98,6 +99,9 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
         if (event instanceof TimeEvent && ((TimeEvent) event).hasValue()) {
             int status = ((TimeEvent) event).getValue();
             return getMatchingState(status).ordinal();
+        }
+        if (event instanceof NullTimeEvent) {
+            return INVISIBLE;
         }
         return TRANSPARENT;
     }
