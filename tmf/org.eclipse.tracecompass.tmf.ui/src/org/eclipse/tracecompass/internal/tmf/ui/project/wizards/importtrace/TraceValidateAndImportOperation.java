@@ -56,7 +56,8 @@ import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 
 /**
  * An operation that performs validation and importing of traces. Its primary
- * inputs are a collection of TraceFileSystemElement and several flags that control
+ * inputs are a collection of TraceFileSystemElement and several flags that
+ * control
  *
  */
 public class TraceValidateAndImportOperation implements IRunnableWithProgress {
@@ -110,7 +111,8 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
      * @param traceFolderElement
      *            the destination trace folder of the import operation.
      */
-    public TraceValidateAndImportOperation(Shell shell, List<TraceFileSystemElement> traceFileSystemElements, String traceId, IPath baseSourceContainerPath, IPath destinationContainerPath, boolean importFromArchive, int importOptionFlags, TmfTraceFolder traceFolderElement) {
+    public TraceValidateAndImportOperation(Shell shell, List<TraceFileSystemElement> traceFileSystemElements, String traceId, IPath baseSourceContainerPath, IPath destinationContainerPath, boolean importFromArchive, int importOptionFlags,
+            TmfTraceFolder traceFolderElement) {
         fTraceType = traceId;
         fBaseSourceContainerPath = baseSourceContainerPath;
         fDestinationContainerPath = destinationContainerPath;
@@ -121,9 +123,9 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
 
         boolean overwriteExistingResources = (importOptionFlags & ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES) != 0;
         if (overwriteExistingResources) {
-            fConflictHandler = new ImportConflictHandler(fShell, fTraceFolderElement, ImportConfirmation.OVERWRITE_ALL);
+            setConflictHandler(new ImportConflictHandler(fShell, fTraceFolderElement, ImportConfirmation.OVERWRITE_ALL));
         } else {
-            fConflictHandler = new ImportConflictHandler(fShell, fTraceFolderElement, ImportConfirmation.SKIP);
+            setConflictHandler(new ImportConflictHandler(fShell, fTraceFolderElement, ImportConfirmation.SKIP));
         }
         fImportedResources = new ArrayList<>();
         fSelectedFileSystemElements = traceFileSystemElements;
@@ -175,12 +177,10 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
                 }
             } else {
                 SubMonitor directoryMonitor = SubMonitor.convert(subMonitor.newChild(1), 2);
-                // Import selected files, excluding archives (done in a later
-                // step)
+                // Import selected files, excluding archives (done in a later step)
                 importFileSystemElements(directoryMonitor.newChild(1), selectedFileSystemElements);
 
-                // Extract archives in selected files (if any) to temporary
-                // folder
+                // Extract archives in selected files (if any) to temporary folder
                 extractAllArchiveFiles(selectedFileSystemElements, destTempFolder, fBaseSourceContainerPath, directoryMonitor.newChild(1));
                 // Even if the files were extracted to temporary folder, they
                 // have to look like they originate from the source folder
@@ -188,8 +188,7 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
             }
 
             /*
-             * Import extracted files that are now in the temporary folder, if
-             * any
+             * Import extracted files that are now in the temporary folder, if any
              */
 
             // We need to update the source container path because the
@@ -323,7 +322,8 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
             boolean isArchiveFileElement = element.getFileSystemObject() instanceof FileFileSystemObject && ArchiveUtil.isArchiveFile(archiveFile);
             if (isArchiveFileElement) {
                 elementProgress = SubMonitor.convert(elementProgress, 4);
-                IPath relativeToSourceContainer = new Path(element.getFileSystemObject().getAbsolutePath()).makeRelativeTo(baseSourceContainerPath);
+                IPath makeAbsolute = baseSourceContainerPath.makeAbsolute();
+                IPath relativeToSourceContainer = new Path(element.getFileSystemObject().getAbsolutePath()).makeRelativeTo(makeAbsolute);
                 IFolder folder = safeCreateExtractedFolder(destFolder, relativeToSourceContainer, elementProgress.newChild(1));
                 extractArchiveToFolder(archiveFile, folder, elementProgress.newChild(1));
 
@@ -682,5 +682,15 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
             TraceFileSystemElement resource = (TraceFileSystemElement) element;
             return resource.isDirectory();
         }
+    }
+
+    /**
+     * Sets the conflict handler
+     *
+     * @param conflictHandler
+     *            the conflict handler
+     */
+    public void setConflictHandler(ImportConflictHandler conflictHandler) {
+        fConflictHandler = conflictHandler;
     }
 }

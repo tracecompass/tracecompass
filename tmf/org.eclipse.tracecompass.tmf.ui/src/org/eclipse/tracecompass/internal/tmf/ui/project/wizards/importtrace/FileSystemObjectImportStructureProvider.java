@@ -31,7 +31,15 @@ public class FileSystemObjectImportStructureProvider implements IImportStructure
     private IImportStructureProvider fImportProvider;
     private String fArchivePath;
 
-    FileSystemObjectImportStructureProvider(IImportStructureProvider importStructureProvider, String archivePath) {
+    /**
+     * Constructor
+     *
+     * @param importStructureProvider
+     *            the {@link IImportStructureProvider}
+     * @param archivePath
+     *            the path of the archive file
+     */
+    public FileSystemObjectImportStructureProvider(IImportStructureProvider importStructureProvider, String archivePath) {
         fImportProvider = importStructureProvider;
         fArchivePath = archivePath;
     }
