@@ -39,6 +39,7 @@ import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstants;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
@@ -341,8 +342,13 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
      */
     public void removeTrace(TmfTraceElement trace) throws CoreException {
 
-        // Close the experiment if open
-        closeEditors();
+        // Close editors in UI Thread
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                closeEditors();
+            }
+        });
 
         /* Finally, remove the trace from experiment*/
         removeChild(trace);
