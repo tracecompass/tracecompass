@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.antlr.runtime.tree.CommonTree;
+import org.antlr.runtime.tree.Tree;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -609,7 +610,7 @@ public class IOStructGen {
 
             IDeclaration eventHeaderDecl = parseTypeSpecifierList(typeSpecifier);
             DeclarationScope scope = getCurrentScope();
-            DeclarationScope eventHeaderScope = scope.lookupChildRecursive(MetadataStrings.STRUCT);
+            DeclarationScope eventHeaderScope = lookupStructName(typeSpecifier, scope);
             if (eventHeaderScope == null) {
                 throw new ParseException("event.header scope not found"); //$NON-NLS-1$
             }
@@ -664,6 +665,32 @@ public class IOStructGen {
         } else {
             Activator.log(IStatus.WARNING, Messages.IOStructGen_UnknownStreamAttributeWarning + " " + left); //$NON-NLS-1$
         }
+    }
+
+    private static DeclarationScope lookupStructName(CommonTree typeSpecifier, DeclarationScope scope) {
+        /*
+         * This needs a struct.struct_name.name to work, luckily, that is 99.99%
+         * of traces we receive.
+         */
+        final Tree potentialStruct = typeSpecifier.getChild(0);
+        DeclarationScope eventHeaderScope = null;
+        if (potentialStruct.getType() == (CTFParser.STRUCT)) {
+            final Tree potentialStructName = potentialStruct.getChild(0);
+            if (potentialStructName.getType() == (CTFParser.STRUCT_NAME)) {
+                final String name = potentialStructName.getChild(0).getText();
+                eventHeaderScope = scope.lookupChildRecursive(name);
+            }
+        }
+        /*
+         * If that fails, maybe the struct is anonymous
+         */
+        if (eventHeaderScope == null) {
+            eventHeaderScope = scope.lookupChildRecursive(MetadataStrings.STRUCT);
+        }
+        /*
+         * This can still be null
+         */
+        return eventHeaderScope;
     }
 
     private void parseEvent(CommonTree eventNode) throws ParseException {
