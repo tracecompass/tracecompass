@@ -186,13 +186,15 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
 
     @Override
     public void run() {
-        HTInterval currentInterval;
         try {
-            currentInterval = intervalQueue.take();
+            HTInterval currentInterval = intervalQueue.blockingPeek();
             while (currentInterval.getStartTime() != -1) {
                 /* Send the interval to the History Tree */
                 getSHT().insertInterval(currentInterval);
-                currentInterval = intervalQueue.take();
+                /* Actually remove the interval from the queue */
+                // FIXME Replace with remove() once it is implemented.
+                intervalQueue.take();
+                currentInterval = intervalQueue.blockingPeek();
             }
             if (currentInterval.getAttribute() != -1) {
                 /* Make sure this is the "poison pill" we are waiting for */
