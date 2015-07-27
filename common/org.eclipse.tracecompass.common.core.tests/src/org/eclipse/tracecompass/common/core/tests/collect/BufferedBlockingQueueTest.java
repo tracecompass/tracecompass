@@ -224,6 +224,56 @@ public class BufferedBlockingQueueTest {
     }
 
     /**
+     * Read with a producer and a consumer using
+     * {@link BufferedBlockingQueue#blockingPeek()}.
+     *
+     * @throws InterruptedException
+     *             The test was interrupted
+     */
+    @Test
+    public void testBlockingPeek() throws InterruptedException {
+        /* A character not found in the test string */
+        final Character lastElement = '%';
+
+        final StringBuilder sb = new StringBuilder();
+
+        Thread consumer = new Thread() {
+            @Override
+            public void run() {
+                boolean isFinished = false;
+                while (!isFinished) {
+                    // Read last element without removing it
+                    Character s = charQueue.blockingPeek();
+                    isFinished = s.equals(lastElement);
+                    if (!isFinished) {
+                        sb.append(s);
+                    }
+                    // Remove element
+                    charQueue.take();
+                }
+            }
+        };
+        consumer.start();
+
+        Thread producer = new Thread() {
+            @Override
+            public void run() {
+                for (char c : testString.toCharArray()) {
+                    charQueue.put(c);
+                }
+                charQueue.put(lastElement);
+                charQueue.flushInputBuffer();
+            }
+        };
+        producer.start();
+
+        producer.join();
+        consumer.join();
+
+        assertEquals(testString, sb.toString());
+    }
+
+    /**
      * Test the contents returned by {@link BufferedBlockingQueue#iterator()}.
      *
      * The test is sequential, because the iterator has no guarantee wrt to its
