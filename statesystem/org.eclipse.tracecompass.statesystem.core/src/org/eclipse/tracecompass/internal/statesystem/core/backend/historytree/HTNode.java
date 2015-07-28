@@ -206,7 +206,9 @@ public abstract class HTNode {
          * should only have the intervals left
          */
         for (i = 0; i < intervalCount; i++) {
-            newNode.intervals.add(HTInterval.readFrom(buffer));
+            HTInterval interval = HTInterval.readFrom(buffer);
+            newNode.intervals.add(interval);
+            newNode.sizeOfIntervalSection += interval.getIntervalSize();
         }
 
         /* Assign the node's other information we have read previously */
