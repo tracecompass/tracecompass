@@ -64,7 +64,7 @@ public class TreeMapStore<T extends ISegment> implements ISegmentStore<T> {
     @Override
     public synchronized void addElement(T val) {
         fStartTimesIndex.put(Long.valueOf(val.getStart()), val);
-        fEndTimesIndex.put(Long.valueOf(val.getStart()), val);
+        fEndTimesIndex.put(Long.valueOf(val.getEnd()), val);
         fPositionMap.put(fSize, val);
         fSize++;
     }
