@@ -1340,7 +1340,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 } else if (!fRawViewer.isVisible()) {
                     fRawViewerPopupMenuManager.add(showRawAction);
                 }
-                appendToRawPopupMenu(fTablePopupMenuManager);
+                appendToRawPopupMenu(fRawViewerPopupMenuManager);
             }
         });
 
