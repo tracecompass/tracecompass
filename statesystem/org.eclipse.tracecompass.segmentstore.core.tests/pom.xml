@@ -36,8 +36,6 @@
           <testClass>org.eclipse.tracecompass.segmentstore.core.tests.AllTests</testClass>
           <useUIHarness>false</useUIHarness>
           <useUIThread>false</useUIThread>
-          <!-- Skipping for now, until there are actual tests! -->
-          <skipTests>true</skipTests>
           <product>org.eclipse.platform.ide</product>
         </configuration>
       </plugin>

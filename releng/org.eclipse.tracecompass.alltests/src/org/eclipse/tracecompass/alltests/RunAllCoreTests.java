@@ -32,6 +32,7 @@ import org.junit.runners.Suite;
     org.eclipse.tracecompass.lttng2.ust.core.tests.AllTests.class,
     org.eclipse.tracecompass.pcap.core.tests.AllPcapCoreTests.class,
     org.eclipse.tracecompass.statesystem.core.tests.AllTests.class,
+    org.eclipse.tracecompass.segmentstore.core.tests.AllTests.class,
     org.eclipse.tracecompass.tmf.analysis.xml.core.tests.AllAnalysisXmlCoreTests.class,
     org.eclipse.tracecompass.tmf.core.tests.AllTmfCoreTests.class,
     org.eclipse.tracecompass.tmf.remote.core.tests.AllTmfRemoteCoreTests.class,
