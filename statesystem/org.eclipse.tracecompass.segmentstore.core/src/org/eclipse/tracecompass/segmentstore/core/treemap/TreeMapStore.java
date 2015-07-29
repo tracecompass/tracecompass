@@ -44,7 +44,8 @@ public class TreeMapStore<T extends ISegment> implements ISegmentStore<T> {
     private final TreeMultimap<Long, T> fEndTimesIndex;
 
     private final Map<Long, T> fPositionMap;
-    private long fSize;
+
+    private volatile long fSize;
 
     /**
      *Constructor
@@ -100,10 +101,11 @@ public class TreeMapStore<T extends ISegment> implements ISegmentStore<T> {
     }
 
     @Override
-    public void dispose() {
+    public synchronized void dispose() {
         fStartTimesIndex.clear();
         fEndTimesIndex.clear();
         fPositionMap.clear();
+        fSize = 0;
     }
 
     // ------------------------------------------------------------------------
