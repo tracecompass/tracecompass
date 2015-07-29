@@ -77,10 +77,21 @@ public class ControlFlowViewTest extends KernelTest {
         fViewBot = fBot.viewByTitle("Control Flow");
     }
 
+    @Test
+    public void testBug() {
+        testToolBarFollowCPUForwardBackward();
+        after();
+        before();
+        testKeyboardLeftRight();
+        after();
+        before();
+        testToolBarSelectNextPreviousEvent();
+    }
+
     /**
      * Test keyboard navigation using ARROW_RIGHT and ARROW_LEFT
      */
-    @Test
+//    @Test
     public void testKeyboardLeftRight() {
         /* change window range to 10 ms */
         TmfTimeRange range = new TmfTimeRange(START_TIME, START_TIME.normalize(10000000L, ITmfTimestamp.NANOSECOND_SCALE));
@@ -160,7 +171,7 @@ public class ControlFlowViewTest extends KernelTest {
     /**
      * Test tool bar buttons "Select Next Event" and "Select Previous Event"
      */
-    @Test
+//    @Test
     public void testToolBarSelectNextPreviousEvent() {
         /* change window range to 10 ms */
         TmfTimeRange range = new TmfTimeRange(START_TIME, START_TIME.normalize(10000000L, ITmfTimestamp.NANOSECOND_SCALE));
@@ -240,7 +251,7 @@ public class ControlFlowViewTest extends KernelTest {
     /**
      * Test tool bar buttons "Follow CPU Forward" and "Follow CPU Backward"
      */
-    @Test
+//    @Test
     public void testToolBarFollowCPUForwardBackward() {
         /* change window range to 10 ms */
         TmfTimeRange range = new TmfTimeRange(START_TIME, START_TIME.normalize(10000000L, ITmfTimestamp.NANOSECOND_SCALE));
