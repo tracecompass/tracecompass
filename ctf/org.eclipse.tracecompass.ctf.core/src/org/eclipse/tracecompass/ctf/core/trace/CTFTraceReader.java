@@ -153,6 +153,7 @@ public class CTFTraceReader implements AutoCloseable {
             }
             fStreamInputReaders.clear();
         }
+        fPrio.clear();
         fClosed = true;
     }
 
