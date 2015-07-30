@@ -180,7 +180,15 @@ public class CtfIteratorManager {
             final int pos = fRnd.nextInt(size);
             final CtfTmfContext victim = fRandomAccess.get(pos);
             fRandomAccess.set(pos, context);
-            final CtfIterator elem = fMap.remove(victim);
+            CtfIterator elem = fMap.remove(victim);
+            if (elem.isClosed()) {
+                /*
+                 * In case the iterator streams have been closed, we need to
+                 * replace it by a fresh new one to access the trace.
+                 */
+                elem.dispose();
+                elem = (CtfIterator) fTrace.createIterator();
+            }
             fMap.put(context, elem);
             victim.dispose();
             return elem;

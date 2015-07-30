@@ -78,6 +78,11 @@ public class CTFTraceReader implements AutoCloseable {
      */
     private long fEndTime;
 
+    /**
+     * Boolean to indicate if the CTFTraceReader has been closed
+     */
+    private boolean fClosed = false;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -148,6 +153,7 @@ public class CTFTraceReader implements AutoCloseable {
             }
             fStreamInputReaders.clear();
         }
+        fClosed = true;
     }
 
     // ------------------------------------------------------------------------
@@ -215,6 +221,16 @@ public class CTFTraceReader implements AutoCloseable {
          * Create the array to count the number of event per trace file.
          */
         fEventCountPerTraceFile = new long[fStreamInputReaders.size()];
+    }
+
+    /**
+     * Returns whether or not this CTFTraceReader has been closed
+     *
+     * @return true if it has been closed, false else
+     * @since 1.1
+     */
+    public boolean isClosed() {
+        return fClosed;
     }
 
     /**
