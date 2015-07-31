@@ -45,6 +45,7 @@ public class TmfUml2SDSyncLoaderPagesTest {
     @BeforeClass
     public static void setUpClass() {
         fFacility = Uml2SDTestFacility.getInstance();
+        fFacility.init();
         fFacility.selectExperiment();
     }
 
@@ -54,6 +55,7 @@ public class TmfUml2SDSyncLoaderPagesTest {
     @AfterClass
     public static void tearDownClass() {
         fFacility.disposeExperiment();
+        fFacility.dispose();
         fFacility = null;
     }
 

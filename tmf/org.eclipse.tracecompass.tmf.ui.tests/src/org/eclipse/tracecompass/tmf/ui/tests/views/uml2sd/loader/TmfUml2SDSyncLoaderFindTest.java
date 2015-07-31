@@ -95,6 +95,7 @@ public class TmfUml2SDSyncLoaderFindTest {
     @BeforeClass
     public static void setUpClass() {
         fFacility = Uml2SDTestFacility.getInstance();
+        fFacility.init();
         fFacility.selectExperiment();
         fTmfComponent = new Uml2SDSignalValidator();
     }
@@ -106,6 +107,7 @@ public class TmfUml2SDSyncLoaderFindTest {
     public static void tearDownClass() {
         fTmfComponent.dispose();
         fFacility.disposeExperiment();
+        fFacility.dispose();
         fFacility = null;
     }
 

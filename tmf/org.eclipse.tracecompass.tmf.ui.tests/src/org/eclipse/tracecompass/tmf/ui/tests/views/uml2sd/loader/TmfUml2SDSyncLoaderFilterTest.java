@@ -46,6 +46,7 @@ public class TmfUml2SDSyncLoaderFilterTest {
     @BeforeClass
     public static void setUpClass() {
         fFacility = Uml2SDTestFacility.getInstance();
+        fFacility.init();
         fFacility.selectExperiment();
 
         /* Create Filter Criteria */
@@ -72,6 +73,7 @@ public class TmfUml2SDSyncLoaderFilterTest {
     @AfterClass
     public static void tearDownClass() {
         fFacility.disposeExperiment();
+        fFacility.dispose();
         fFacility = null;
     }
 

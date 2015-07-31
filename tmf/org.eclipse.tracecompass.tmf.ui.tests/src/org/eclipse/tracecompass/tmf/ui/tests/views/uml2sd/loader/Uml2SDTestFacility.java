@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.tmf.ui.tests.views.uml2sd.loader;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -54,6 +56,11 @@ import org.osgi.framework.FrameworkUtil;
 public class Uml2SDTestFacility {
 
     // ------------------------------------------------------------------------
+    // Constants
+    // ------------------------------------------------------------------------
+    private static final String SD_VIEW_ID = "org.eclipse.linuxtools.tmf.ui.tmfUml2SDSyncView";
+
+    // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
     private static Uml2SDTestFacility fInstance = null;
@@ -70,6 +77,9 @@ public class Uml2SDTestFacility {
     // Constructors
     // ------------------------------------------------------------------------
     private Uml2SDTestFacility() {
+        fParser = new TmfUml2SDTestTrace();
+        fTrace = setupTrace(fParser);
+        fParser.setTrace(fTrace);
     }
 
     // ------------------------------------------------------------------------
@@ -81,7 +91,6 @@ public class Uml2SDTestFacility {
     public synchronized static Uml2SDTestFacility getInstance() {
         if (fInstance == null) {
             fInstance = new Uml2SDTestFacility();
-            fInstance.init();
         }
         return fInstance;
     }
@@ -92,30 +101,11 @@ public class Uml2SDTestFacility {
     public void init() {
 
         if (!fIsInitialized) {
-
-            fParser = new TmfUml2SDTestTrace();
-            fTrace = setupTrace(fParser);
-            fParser.setTrace(fTrace);
-
             IViewPart view;
             try {
                 // Remove welcome view to avoid interference during test execution
-                view = PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow()
-                        .getActivePage()
-                        .findView("org.eclipse.ui.internal.introview");
-
-                if (view != null) {
-                    PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow()
-                    .getActivePage().hideView(view);
-                }
-
-                view = PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow()
-                        .getActivePage()
-                        .showView("org.eclipse.linuxtools.tmf.ui.tmfUml2SDSyncView");
-
+                hideView("org.eclipse.ui.internal.introview");
+                view = showView(SD_VIEW_ID);
             } catch (final PartInitException e) {
                 throw new RuntimeException(e);
             }
@@ -124,11 +114,9 @@ public class Uml2SDTestFacility {
             fLoader = (TmfUml2SDSyncLoader) LoadersManager.getInstance().createLoader(
                     "org.eclipse.tracecompass.tmf.ui.views.uml2sd.loader.TmfUml2SDSyncLoader", fSdView);
 
-            delay(3000);
             fIsInitialized = true;
         }
     }
-
 
     private TmfTraceStub setupTrace(final ITmfEventParser parser) {
 
@@ -154,19 +142,10 @@ public class Uml2SDTestFacility {
      */
     public void dispose() {
         if (fIsInitialized) {
-            ITmfTrace trace = fTrace;
-            TmfExperiment experiment = fExperiment;
-            if (trace == null || experiment == null) {
-                throw new IllegalStateException();
-            }
-
-            trace.broadcast(new TmfTraceClosedSignal(this, experiment));
-            experiment.dispose();
-
             // Wait for all Eclipse jobs to finish
             waitForJobs();
-
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().hideView(fSdView);
+            hideView(SD_VIEW_ID);
+            delay(200);
             fIsInitialized = false;
         }
     }
@@ -198,6 +177,61 @@ public class Uml2SDTestFacility {
                 // Ignored
             }
         }
+    }
+
+    /**
+     * Waits for a view to be closed
+     *
+     * @param viewId
+     *                a view id
+     */
+    public void waitForViewClosed(String viewId) {
+        for (int i = 1; i < 5000 && (getViewPart(viewId) != null); i *= 2) {
+            delay(i);
+        }
+    }
+
+    /**
+     * Waits for a view to be opened
+     *
+     * @param viewId
+     *                a view id
+     */
+    public void waitForViewOpened(String viewId) {
+        for (int i = 1; i < 5000 && (getViewPart(viewId) == null); i *= 2) {
+            delay(i);
+        }
+    }
+
+    private IViewPart showView(String viewId) throws PartInitException {
+        IViewPart view = getViewPart(viewId);
+
+        if (view == null) {
+            view = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow()
+            .getActivePage().showView(viewId);
+
+            waitForViewOpened(viewId);
+        }
+        assertNotNull(view);
+        return view;
+    }
+
+    private void hideView(String viewId) {
+        IViewPart view = getViewPart(viewId);
+        if (view != null) {
+            PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow()
+            .getActivePage().hideView(view);
+        }
+        waitForViewClosed(viewId);
+    }
+
+    private static IViewPart getViewPart(String viewId) {
+        return PlatformUI.getWorkbench()
+        .getActiveWorkbenchWindow()
+        .getActivePage()
+        .findView(viewId);
     }
 
     /**

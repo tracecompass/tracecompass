@@ -46,6 +46,7 @@ public class TmfUml2SDSyncLoaderSignalTest {
     @BeforeClass
     public static void setUpClass() {
         fFacility = Uml2SDTestFacility.getInstance();
+        fFacility.init();
         fFacility.selectExperiment();
 
         range = new TmfTimeRange(new Uml2SDTestTimestamp(9789689220871L), new Uml2SDTestTimestamp(9789773881426L));
@@ -66,6 +67,7 @@ public class TmfUml2SDSyncLoaderSignalTest {
     @AfterClass
     public static void tearDownClass() {
         fFacility.disposeExperiment();
+        fFacility.dispose();
         fFacility = null;
     }
 

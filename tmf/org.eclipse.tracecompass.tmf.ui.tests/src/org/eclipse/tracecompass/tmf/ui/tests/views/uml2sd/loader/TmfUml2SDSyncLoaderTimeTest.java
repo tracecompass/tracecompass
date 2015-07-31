@@ -109,6 +109,7 @@ public class TmfUml2SDSyncLoaderTimeTest {
     @BeforeClass
     public static void setUpClass() {
         fFacility = Uml2SDTestFacility.getInstance();
+        fFacility.init();
         fFacility.selectExperiment();
     }
 
@@ -118,6 +119,7 @@ public class TmfUml2SDSyncLoaderTimeTest {
     @AfterClass
     public static void tearDownClass() {
         fFacility.disposeExperiment();
+        fFacility.dispose();
         fFacility = null;
     }
 
