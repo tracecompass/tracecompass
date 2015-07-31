@@ -103,6 +103,20 @@ public class TraceControlTestFacility {
 
             fControlView = (ControlView) view;
 
+            /*
+             * It is possible that the connections are saved due to the
+             * auto-save feature of the workbench which calls
+             * ControlView.saveState(IMemento). This can happen at any
+             * time (e.g. when calling delay()).
+             *
+             * When showing the view above ControlView.init(IMemento) is
+             * called which restores saved connections.
+             *
+             * The tests require that the ControlView is empty. So
+             * we remove all the connection nodes from the root.
+             */
+            fControlView.getTraceControlRoot().removeAllChildren();
+
             delay(3000);
             fIsInitialized = true;
         }
