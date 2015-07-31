@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,46 +7,48 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Mathieu Denis <mathieu.denis@polymtl.ca> - Initial API and Implementation
+ *   Alexis Cabana-Loriaux - Initial API and Implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.viewers.statistics;
+package org.eclipse.tracecompass.tmf.ui.viewers.piecharts;
 
 import org.eclipse.osgi.util.NLS;
 
 /**
  * Messages file for statistics view strings.
  *
- * @author Mathieu Denis
+ * @author Alexis Cabana-Loriaux
+ * @since 2.0
  */
 public class Messages extends NLS {
 
-    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.tmf.ui.viewers.statistics.messages"; //$NON-NLS-1$
-
-    /**
-     * String for unknown trace name.
-     */
-    public static String TmfStatisticsView_UnknownTraceName;
+    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.tmf.ui.viewers.piecharts.messages"; //$NON-NLS-1$
 
     /**
      * String shown on top of the time-range selection piechart
-     *
-     * @since 2.0
      */
     public static String TmfStatisticsView_TimeRangeSelectionPieChartName;
 
     /**
      * String given to the slice in the piechart containing the too little
      * slices
-     * @since 2.0
      */
     public static String TmfStatisticsView_PieChartOthersSliceName;
 
     /**
      * String for the top of the global selection piechart
-     * @since 2.0
      */
     public static String TmfStatisticsView_GlobalSelectionPieChartName;
+
+    /**
+     * The string in the tooltip text of the piecharts
+     */
+    public static String TmfStatisticsView_PieChartToolTipTextName;
+
+    /**
+     * The string in the tooltip text of the piecharts
+     */
+    public static String TmfStatisticsView_PieChartToolTipTextEventCount;
 
     static {
         // initialize resource bundle

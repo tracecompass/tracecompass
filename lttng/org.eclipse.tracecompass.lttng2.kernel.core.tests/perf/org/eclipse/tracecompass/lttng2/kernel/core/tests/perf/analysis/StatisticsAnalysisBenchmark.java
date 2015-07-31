@@ -97,7 +97,7 @@ public class StatisticsAnalysisBenchmark {
         PerformanceMeter pm = perf.createPerformanceMeter(TEST_ID + '#' + testName);
         perf.tagAsSummary(pm, "Statistics Analysis: " + testName, Dimension.CPU_TIME);
 
-        if (testTrace == CtfTmfTestTrace.DJANGO_CLIENT) {
+        if (testTrace == CtfTmfTestTrace.DJANGO_CLIENT || testTrace == CtfTmfTestTrace.DJANGO_HTTPD) {
             /* Do not show all traces in the global summary */
             perf.tagAsGlobalSummary(pm, "Statistics Analysis: " + testName, Dimension.CPU_TIME);
         }

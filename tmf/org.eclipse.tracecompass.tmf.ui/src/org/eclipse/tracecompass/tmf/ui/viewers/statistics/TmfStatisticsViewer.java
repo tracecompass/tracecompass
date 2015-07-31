@@ -22,15 +22,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -40,14 +38,11 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceRangeUpdatedSignal;
-import org.eclipse.tracecompass.tmf.core.statistics.ITmfStatistics;
-import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsEventTypesModule;
 import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsModule;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
@@ -56,8 +51,9 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
-import org.eclipse.tracecompass.tmf.ui.TmfUiRefreshHandler;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.piecharts.TmfPieChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.piecharts.model.TmfPieChartStatisticsModel;
 import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfBaseColumnData;
 import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfBaseColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfStatisticsFormatter;
@@ -75,20 +71,14 @@ import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfTreeContentPr
  */
 public class TmfStatisticsViewer extends TmfViewer {
 
-    /** Timestamp scale used for all statistics (nanosecond) */
-    private static final byte TIME_SCALE = ITmfTimestamp.NANOSECOND_SCALE;
-
-    /** The delay (in ms) between each update in live-reading mode */
-    private static final long LIVE_UPDATE_DELAY = 1000;
-
     /** The actual tree viewer to display */
     private TreeViewer fTreeViewer;
 
-    /** The statistics tree linked to this viewer */
-    private TmfStatisticsTree fStatisticsData;
-
     /** Update range synchronization object */
     private final Object fStatisticsRangeUpdateSyncObj = new Object();
+
+    /** The statistics tree linked to this viewer */
+    private TmfStatisticsTree fStatisticsData;
 
     /** The trace that is displayed by this viewer */
     private ITmfTrace fTrace;
@@ -118,9 +108,11 @@ public class TmfStatisticsViewer extends TmfViewer {
     private final Map<ITmfTrace, Job> fUpdateJobsPartial = new HashMap<>();
     private final Map<ITmfTrace, Job> fUpdateJobsGlobal = new HashMap<>();
 
-    private TmfTimeRange fTimeRange;
+    private TmfPieChartViewer fPieChartViewer;
 
-    private TmfTimeRange fTimeRangePartial;
+    private SashForm fSash;
+
+    private TmfPieChartStatisticsModel fPieChartModel;
 
     /**
      * Create a basic statistics viewer. To be used in conjunction with
@@ -179,6 +171,7 @@ public class TmfStatisticsViewer extends TmfViewer {
 
         // Clean the model for this viewer
         TmfStatisticsTreeManager.removeStatTreeRoot(getTreeID());
+        fPieChartViewer.reinitializeCharts();
     }
 
     // ------------------------------------------------------------------------
@@ -242,7 +235,7 @@ public class TmfStatisticsViewer extends TmfViewer {
      */
     @Override
     public Control getControl() {
-        return fTreeViewer.getControl();
+        return fSash;
     }
 
     /**
@@ -268,6 +261,17 @@ public class TmfStatisticsViewer extends TmfViewer {
     }
 
     /**
+     * @return the model of the piecharts in this viewer
+     * @since 2.0
+     */
+    public TmfPieChartStatisticsModel getPieChartModel(){
+        if (fPieChartModel == null) {
+            fPieChartModel = new TmfPieChartStatisticsModel();
+         }
+         return fPieChartModel;
+    }
+
+    /**
      * Returns a unique ID based on name to be associated with the statistics
      * tree for this viewer. For a same name, it will always return the same ID.
      *
@@ -284,12 +288,48 @@ public class TmfStatisticsViewer extends TmfViewer {
         if (viewerControl.isDisposed()) {
             return;
         }
+        refreshTree();
+        refreshPieCharts(true, true);
+    }
 
-        TmfUiRefreshHandler.getInstance().queueUpdate(this, new Runnable() {
+    /**
+     * Only refreshes the Tree viewer
+     */
+    private void refreshTree(){
+        final Control viewerControl = getControl();
+        // Ignore update if disposed
+        if (viewerControl.isDisposed()) {
+            return;
+        }
+
+        Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
                 if (!viewerControl.isDisposed()) {
                     fTreeViewer.refresh();
+                }
+            }
+        });
+    }
+
+    /**
+     * Only refreshes the piecharts depending on the parameters
+     * @param refreshGlobal if we have to refresh the global piechart
+     * @param refreshSelection if we have to refresh the selection piechart
+     * @since 2.0
+     */
+    protected void refreshPieCharts(final boolean refreshGlobal, final boolean refreshSelection) {
+        final Control viewerControl = getControl();
+        // Ignore update if disposed
+        if (viewerControl.isDisposed()) {
+            return;
+        }
+
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                if (!viewerControl.isDisposed()) {
+                    fPieChartViewer.refresh(refreshGlobal, refreshSelection);
                 }
             }
         });
@@ -340,9 +380,15 @@ public class TmfStatisticsViewer extends TmfViewer {
      *            The parent of the control to create
      */
     protected void initContent(Composite parent) {
+
         final List<TmfBaseColumnData> columnDataList = getColumnDataProvider().getColumnData();
 
-        fTreeViewer = new TreeViewer(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+        fSash = new SashForm(parent, SWT.HORIZONTAL );
+
+        fTreeViewer = new TreeViewer(fSash, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+        fPieChartViewer = new TmfPieChartViewer(fSash);
+        fSash.setWeights(new int[]{100,100});
+
         fTreeViewer.setContentProvider(new TmfTreeContentProvider());
         fTreeViewer.getTree().setHeaderVisible(true);
         fTreeViewer.setUseHashlookup(true);
@@ -532,6 +578,8 @@ public class TmfStatisticsViewer extends TmfViewer {
 
         // Sets the input to a clean data model
         fTreeViewer.setInput(statisticsTreeNode);
+        /* Set a new model for the piecharts and keep a reference */
+        fPieChartViewer.setInput(getPieChartModel());
     }
 
     /**
@@ -556,27 +604,7 @@ public class TmfStatisticsViewer extends TmfViewer {
      *            request.
      */
     protected void modelComplete(boolean global) {
-        refresh();
-        waitCursor(false);
-    }
-
-    /**
-     * Called when an trace request has failed or has been cancelled.
-     *
-     * @param isGlobalRequest
-     *            Tells if the request is a global or time range (partial)
-     *            request.
-     */
-    protected void modelIncomplete(boolean isGlobalRequest) {
-        if (isGlobalRequest) { // Clean the global statistics
-            /*
-             * No need to reset the global number of events, since the index of
-             * the last requested event is known.
-             */
-        } else { // Clean the partial statistics
-            resetTimeRangeValue();
-        }
-        refresh();
+        refreshTree();
         waitCursor(false);
     }
 
@@ -629,10 +657,8 @@ public class TmfStatisticsViewer extends TmfViewer {
         Map<ITmfTrace, Job> updateJobs;
         if (isGlobal) {
             updateJobs = fUpdateJobsGlobal;
-            fTimeRange = timeRange;
         } else {
             updateJobs = fUpdateJobsPartial;
-            fTimeRangePartial = timeRange;
         }
 
         for (ITmfTrace aTrace : TmfTraceManager.getTraceSet(trace)) {
@@ -650,146 +676,11 @@ public class TmfStatisticsViewer extends TmfViewer {
 
             Job job = updateJobs.get(aTrace);
             if (job == null) {
-                job = new UpdateJob("Statistics update", aTrace, isGlobal, statsMod); //$NON-NLS-1$
+                job = new StatisticsUpdateJob("Statistics update", aTrace, isGlobal, timeRange, statsMod, this); //$NON-NLS-1$
                 updateJobs.put(aTrace, job);
                 job.setSystem(true);
                 job.schedule();
             }
-        }
-    }
-
-    private class UpdateJob extends Job {
-
-        private final ITmfTrace fJobTrace;
-        private final boolean fIsGlobal;
-        private final TmfStatisticsModule fStatsMod;
-
-        private UpdateJob(String name, ITmfTrace trace, boolean isGlobal, TmfStatisticsModule statsMod) {
-            super(name);
-            fJobTrace = trace;
-            fIsGlobal = isGlobal;
-            fStatsMod = statsMod;
-        }
-
-        @Override
-        protected IStatus run(IProgressMonitor monitor) {
-
-            /* Wait until the analysis is ready to be queried */
-            fStatsMod.waitForInitialization();
-            ITmfStatistics stats = fStatsMod.getStatistics();
-            if (stats == null) {
-                /* It should have worked, but didn't */
-                throw new IllegalStateException();
-            }
-
-            /*
-             * TODO Eventually this could be exposed through the
-             * TmfStateSystemAnalysisModule directly.
-             */
-            ITmfStateSystem ss = fStatsMod.getStateSystem(TmfStatisticsEventTypesModule.ID);
-            if (ss == null) {
-                /* It should be instantiated after the
-                 * statsMod.waitForInitialization() above. */
-                throw new IllegalStateException();
-            }
-
-
-            /*
-             * Periodically update the statistics while they are
-             * being built (or, if the back-end is already completely
-             * built, it will skip over the while() immediately.
-             */
-            long start = 0;
-            long end = 0;
-            boolean finished = false;
-            do {
-                if (monitor.isCanceled()) {
-                    return Status.CANCEL_STATUS;
-                }
-                finished = ss.waitUntilBuilt(LIVE_UPDATE_DELAY);
-
-                TmfTimeRange localtimeRange = fIsGlobal ? fTimeRange : fTimeRangePartial;
-                /*
-                 * The generic statistics are stored in nanoseconds, so
-                 * we must make sure the time range is scaled correctly.
-                 */
-                start = localtimeRange.getStartTime().normalize(0, TIME_SCALE).getValue();
-                end = localtimeRange.getEndTime().normalize(0, TIME_SCALE).getValue();
-
-                Map<String, Long> map = stats.getEventTypesInRange(start, end);
-                updateStats(map);
-            } while (!finished);
-
-            /* Query one last time for the final values */
-            Map<String, Long> map = stats.getEventTypesInRange(start, end);
-            updateStats(map);
-
-            /*
-             * Remove job from map so that new range selection updates can
-             * be processed.
-             */
-            Map<ITmfTrace, Job> updateJobs;
-            if (fIsGlobal) {
-                updateJobs = fUpdateJobsGlobal;
-            } else {
-                updateJobs = fUpdateJobsPartial;
-            }
-            updateJobs.remove(fJobTrace);
-            return Status.OK_STATUS;
-        }
-
-        /*
-         * Update statistics for a given trace
-         */
-        private void updateStats(Map<String, Long> eventsPerType) {
-
-            final TmfStatisticsTree statsData = TmfStatisticsTreeManager.getStatTree(getTreeID());
-            if (statsData == null) {
-                /* The stat tree has been disposed, abort mission. */
-                return;
-            }
-
-            Map<String, Long> map = eventsPerType;
-            String name = fJobTrace.getName();
-
-
-            /*
-             * "Global", "partial", "total", etc., it's all very confusing...
-             *
-             * The base view shows the total count for the trace and for
-             * each even types, organized in columns like this:
-             *
-             *                   |  Global  |  Time range |
-             * trace name        |    A     |      B      |
-             *    Event Type     |          |             |
-             *       <event 1>   |    C     |      D      |
-             *       <event 2>   |   ...    |     ...     |
-             *         ...       |          |             |
-             *
-             * Here, we called the cells like this:
-             *  A : GlobalTotal
-             *  B : TimeRangeTotal
-             *  C : GlobalTypeCount(s)
-             *  D : TimeRangeTypeCount(s)
-             */
-
-            /* Fill in an the event counts (either cells C or D) */
-            for (Map.Entry<String, Long> entry : map.entrySet()) {
-                statsData.setTypeCount(name, entry.getKey(), fIsGlobal, entry.getValue());
-            }
-
-            /*
-             * Calculate the totals (cell A or B, depending if isGlobal). We will
-             * use the results of the previous request instead of sending another
-             * one.
-             */
-            long globalTotal = 0;
-            for (long val : map.values()) {
-                globalTotal += val;
-            }
-            statsData.setTotal(name, fIsGlobal, globalTotal);
-
-            modelComplete(fIsGlobal);
         }
     }
 
@@ -853,6 +744,18 @@ public class TmfStatisticsViewer extends TmfViewer {
                     }
                 }
             });
+        }
+    }
+
+    /**
+     * @param isGlobal if the job to remove is global or partial
+     * @param jobTrace The trace
+     */
+    void removeFromJobs(boolean isGlobal, ITmfTrace jobTrace) {
+        Map<ITmfTrace, Job> updateJobs = isGlobal ? fUpdateJobsGlobal : fUpdateJobsPartial;
+        Job job = updateJobs.remove(jobTrace);
+        if (job != null) {
+            job.cancel();
         }
     }
 }
