@@ -56,6 +56,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.property.UstPro
 import org.eclipse.tracecompass.tmf.remote.core.proxy.TmfRemoteConnectionFactory;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.FrameworkUtil;
 
@@ -69,6 +70,7 @@ public class TraceControlPropertiesTest {
     // Constants
     // ------------------------------------------------------------------------
 
+    private TraceControlTestFacility fFacility;
     private static final String DIRECTORY   = "testfiles";
     private static final String TEST_STREAM = "ListInfoTest.cfg";
     private static final String SCEN_LIST_INFO_TEST = "ListInfoTest";
@@ -78,11 +80,20 @@ public class TraceControlPropertiesTest {
     // ------------------------------------------------------------------------
 
     /**
+     * Perform pre-test initialization.
+     */
+    @Before
+    public void setUp() {
+        fFacility = TraceControlTestFacility.getInstance();
+        fFacility.init();
+    }
+
+    /**
      * Perform post-test clean-up.
      */
     @After
     public void tearDown() {
-        TraceControlTestFacility.getInstance().waitForJobs();
+        fFacility.dispose();
     }
 
     /**
@@ -101,15 +112,15 @@ public class TraceControlPropertiesTest {
         proxy.setTestFile(testfile.getAbsolutePath());
         proxy.setScenario(SCEN_LIST_INFO_TEST);
 
-        ITraceControlComponent root = TraceControlTestFacility.getInstance().getControlView().getTraceControlRoot();
+        ITraceControlComponent root = fFacility.getControlView().getTraceControlRoot();
 
         TargetNodeComponent node = new TargetNodeComponent("myNode", root, proxy);
 
         root.addChild(node);
         node.connect();
 
-        TraceControlTestFacility.getInstance().waitForConnect(node);
-        TraceControlTestFacility.getInstance().waitForJobs();
+        fFacility.waitForConnect(node);
+        fFacility.waitForJobs();
 
         // ------------------------------------------------------------------------
         // Verify Node Properties (adapter)

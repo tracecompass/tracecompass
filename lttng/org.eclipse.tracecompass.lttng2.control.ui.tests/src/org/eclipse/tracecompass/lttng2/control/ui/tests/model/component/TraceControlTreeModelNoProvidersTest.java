@@ -61,7 +61,7 @@ public class TraceControlTreeModelNoProvidersTest {
     // ------------------------------------------------------------------------
     // Test data
     // ------------------------------------------------------------------------
-
+    private TraceControlTestFacility fFacility;
     private IRemoteConnection fHost = TmfRemoteConnectionFactory.getLocalConnection();
     private @NonNull TestRemoteSystemProxy fProxy = new TestRemoteSystemProxy(fHost);
     private String fTestFile;
@@ -78,6 +78,8 @@ public class TraceControlTreeModelNoProvidersTest {
      */
     @Before
     public void setUp() throws Exception {
+        fFacility = TraceControlTestFacility.getInstance();
+        fFacility.init();
         URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path(TraceControlTestFacility.DIRECTORY + File.separator + TEST_STREAM), null);
         File testfile = new File(FileLocator.toFileURL(location).toURI());
         fTestFile = testfile.getAbsolutePath();
@@ -88,7 +90,7 @@ public class TraceControlTreeModelNoProvidersTest {
      */
     @After
     public void tearDown()  {
-        TraceControlTestFacility.getInstance().waitForJobs();
+        fFacility.dispose();
     }
 
     /**
@@ -100,15 +102,15 @@ public class TraceControlTreeModelNoProvidersTest {
         fProxy.setTestFile(fTestFile);
         fProxy.setScenario(SCEN_LIST_INFO_TEST);
 
-        ITraceControlComponent root = TraceControlTestFacility.getInstance().getControlView().getTraceControlRoot();
+        ITraceControlComponent root = fFacility.getControlView().getTraceControlRoot();
 
         TargetNodeComponent node = new TargetNodeComponent(TARGET_NODE_NAME, root, fProxy);
 
         root.addChild(node);
         node.connect();
 
-        TraceControlTestFacility.getInstance().waitForConnect(node);
-        TraceControlTestFacility.getInstance().waitForJobs();
+        fFacility.waitForConnect(node);
+        fFacility.waitForJobs();
 
         // ------------------------------------------------------------------------
         // Verify Parameters of TargetNodeComponent

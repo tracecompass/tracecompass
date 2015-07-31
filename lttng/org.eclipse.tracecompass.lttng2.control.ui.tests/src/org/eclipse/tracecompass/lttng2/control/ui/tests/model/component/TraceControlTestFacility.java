@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.lttng2.control.ui.tests.model.component;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
@@ -53,7 +55,7 @@ public class TraceControlTestFacility {
     // ------------------------------------------------------------------------
     private static TraceControlTestFacility fInstance = null;
     private ControlView fControlView = null;
-    private boolean fIsInitialized = false;
+    private volatile boolean fIsInitialized = false;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -77,30 +79,13 @@ public class TraceControlTestFacility {
     public void init() {
 
         if (!fIsInitialized) {
-
             IViewPart view;
             try {
-
-                view = PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow()
-                        .getActivePage()
-                        .findView("org.eclipse.ui.internal.introview");
-
-                if (view != null) {
-                    PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow()
-                    .getActivePage().hideView(view);
-                }
-
-                view = PlatformUI.getWorkbench()
-                                 .getActiveWorkbenchWindow()
-                                 .getActivePage()
-                                 .showView(ControlView.ID);
-
+                hideView("org.eclipse.ui.internal.introview");
+                view = showView(ControlView.ID);
             } catch (PartInitException e) {
                 throw new RuntimeException(e);
             }
-
             fControlView = (ControlView) view;
 
             /*
@@ -117,11 +102,9 @@ public class TraceControlTestFacility {
              */
             fControlView.getTraceControlRoot().removeAllChildren();
 
-            delay(3000);
             fIsInitialized = true;
         }
     }
-
 
     /**
      * Disposes the facility (and GUI)
@@ -129,8 +112,8 @@ public class TraceControlTestFacility {
     public void dispose() {
         if (fIsInitialized) {
             waitForJobs();
-
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().hideView(fControlView);
+            hideView(ControlView.ID);
+            delay(200);
             fIsInitialized = false;
         }
     }
@@ -178,12 +161,61 @@ public class TraceControlTestFacility {
     }
 
     /**
+     * Waits for a view to be closed
+     */
+    public void waitForViewClosed(String viewId) {
+        for (int i = 1; i < 5000 && (getViewPart(viewId) != null); i *= 2) {
+            delay(i);
+        }
+    }
+
+    /**
+     * Waits for a view to be closed
+     */
+    public void waitForViewOpend(String viewId) {
+        for (int i = 1; i < 5000 && (getViewPart(viewId) == null); i *= 2) {
+            delay(i);
+        }
+    }
+
+    /**
      * Waits for all Eclipse jobs to finish
      */
     public void waitForJobs() {
         while (!Job.getJobManager().isIdle()) {
             delay(WAIT_FOR_JOBS_DELAY);
         }
+    }
+
+    private IViewPart showView(String viewId) throws PartInitException {
+        IViewPart view = getViewPart(viewId);
+
+        if (view == null) {
+            view = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow()
+            .getActivePage().showView(viewId);
+
+            waitForViewOpend(viewId);
+        }
+        assertNotNull(view);
+        return view;
+    }
+
+    private void hideView(String viewId) {
+        IViewPart view = getViewPart(viewId);
+        if (view != null) {
+            PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow()
+            .getActivePage().hideView(view);
+        }
+        waitForViewClosed(viewId);
+    }
+
+    private static IViewPart getViewPart(String viewId) {
+        return PlatformUI.getWorkbench()
+        .getActiveWorkbenchWindow()
+        .getActivePage()
+        .findView(viewId);
     }
 
     /**

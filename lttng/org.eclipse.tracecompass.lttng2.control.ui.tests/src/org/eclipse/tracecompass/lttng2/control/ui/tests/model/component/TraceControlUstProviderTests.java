@@ -97,7 +97,6 @@ public class TraceControlUstProviderTests {
      */
     @After
     public void tearDown() {
-        fFacility.waitForJobs();
         fFacility.dispose();
     }
 

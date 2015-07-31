@@ -102,7 +102,6 @@ public class TraceControlKernelSessionTests {
      */
     @After
     public void tearDown() {
-        fFacility.waitForJobs();
         fFacility.dispose();
     }
 

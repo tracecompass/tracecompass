@@ -92,7 +92,6 @@ public class TraceControlSnapshotSessionTests {
      */
     @After
     public void tearDown() {
-        fFacility.waitForJobs();
         fFacility.dispose();
     }
 
@@ -211,7 +210,5 @@ public class TraceControlSnapshotSessionTests {
         //-------------------------------------------------------------------------
 
         fFacility.executeCommand(node, "delete");
-
-        assertEquals(0,fFacility.getControlView().getTraceControlRoot().getChildren().length);
     }
 }

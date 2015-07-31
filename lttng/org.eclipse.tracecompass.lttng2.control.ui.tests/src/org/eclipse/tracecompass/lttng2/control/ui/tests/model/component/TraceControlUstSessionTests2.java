@@ -92,7 +92,6 @@ public class TraceControlUstSessionTests2 {
      */
     @After
     public void tearDown() {
-        fFacility.waitForJobs();
         fFacility.dispose();
     }
 
@@ -299,7 +298,6 @@ public class TraceControlUstSessionTests2 {
         //-------------------------------------------------------------------------
 
         fFacility.executeCommand(node, "delete");
-
         assertEquals(0,fFacility.getControlView().getTraceControlRoot().getChildren().length);
     }
 }

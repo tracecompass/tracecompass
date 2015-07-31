@@ -99,7 +99,7 @@ public class TraceControlCreateSessionTests {
      */
     @After
     public void tearDown() {
-        fFacility.waitForJobs();
+        fFacility.dispose();
     }
 
     /**
@@ -114,7 +114,7 @@ public class TraceControlCreateSessionTests {
         fProxy.setTestFile(fTestFile);
         fProxy.setScenario(TraceControlTestFacility.SCEN_INIT_TEST);
 
-        ITraceControlComponent root = TraceControlTestFacility.getInstance().getControlView().getTraceControlRoot();
+        ITraceControlComponent root = fFacility.getControlView().getTraceControlRoot();
 
         TargetNodeComponent node = new TargetNodeComponent("myNode", root, fProxy);
 
