@@ -67,11 +67,11 @@ public class CTFTraceWriterTest {
         private static final long STREAM1_FIRST_EVENT_TIME = 1332170682440133097L;
         private static final long STREAM1_FIFTH_PACKET_TIME = CLOCK_OFFSET + 4277970712221L;
         private static final long STREAM1_TENTH_PACKET_TIME = CLOCK_OFFSET + 4279440048309L;
-        private static final long STREAM1_FIFTH_PACKET_FIRST_EVENT_TIME = 1332170683212426208L;
+        private static final long STREAM1_FIFTH_PACKET_FIRST_EVENT_TIME = 1332170682702069762L;
         private static final long STREAM1_TENTH_PACKET_LAST_EVENT_TIME = 1332170685256508077L;
 
         // Miscellaneous
-        private static final int NB_EVENTS_SEVERAL_PACKETS = 138894;
+        private static final int NB_EVENTS_SEVERAL_PACKETS = 167585;
 
         // Test parameters
         private String fName;
@@ -99,13 +99,6 @@ public class CTFTraceWriterTest {
 
         addParams(params, "NO_EVENTS_USING_INVERTED_TIME",
                             Long.MAX_VALUE, Long.MIN_VALUE,
-                            0,
-                            -1,
-                            -1);
-
-        addParams(params, "NO_EVENTS_USING_FIRST_PACKET",
-                            STREAM0_FIRST_PACKET_TIME + 1,
-                            STREAM0_FIRST_PACKET_TIME + 1,
                             0,
                             -1,
                             -1);
@@ -218,7 +211,7 @@ public class CTFTraceWriterTest {
                 }
 
             } catch (CTFException e) {
-                fail();
+                fail(e.getMessage());
             }
     }
 

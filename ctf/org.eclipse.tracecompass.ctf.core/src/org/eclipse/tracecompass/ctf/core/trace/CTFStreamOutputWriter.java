@@ -85,7 +85,7 @@ public class CTFStreamOutputWriter {
      * corresponding output stream based on a given time range. The following
      * condition has to be met so that a packet is written to the output stream:
      *
-     * startTime <= packet.getTimestampBegin() <= endTime
+     * startTime <= packet.getTimestampEnd() && packet.getTimestampStart() <= endTime
      *
      * @param startTime
      *            the start time for packets to be written
@@ -107,7 +107,7 @@ public class CTFStreamOutputWriter {
             try (FileChannel source = FileChannel.open(streamInput.getFile().toPath(), StandardOpenOption.READ)) {
                 for (int i = 0; i < index.size(); i++) {
                     ICTFPacketDescriptor entry = index.getElement(i);
-                    if ((entry.getTimestampBegin() >= startTime) && (entry.getTimestampBegin() <= endTime)) {
+                    if ((entry.getTimestampEnd() >= startTime) && (entry.getTimestampBegin() <= endTime)) {
                         ByteBuffer buffer = SafeMappedByteBuffer.map(source, MapMode.READ_ONLY, entry.getOffsetBytes(), entry.getPacketSizeBits() / Byte.SIZE);
                         fStreamPacketOutputWriter.writePacket(buffer, fc);
                         count++;
