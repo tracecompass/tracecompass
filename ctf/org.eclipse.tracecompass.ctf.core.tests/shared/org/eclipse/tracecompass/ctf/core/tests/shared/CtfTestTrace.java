@@ -213,6 +213,19 @@ public enum CtfTestTrace {
      */
     FLIPPING_ENDIANNESS("../../ctf/org.eclipse.tracecompass.ctf.core.tests/traces/flipping-endianness", 14310, 41),
 
+    /**
+     * Example dynamic scope, timestamp in field, empty stream trace
+     *
+     * <pre>
+     * Trace Size: 3.5 MB
+     * Tracer: generated
+     * Event count: 101 003
+     * Kernel version: 4.0.6-1
+     * Trace length: 1 ms
+     * </pre>
+     */
+    DYNSCOPE("../../ctf/org.eclipse.tracecompass.ctf.core.tests/traces/ctfwriter_JF8nq3", 101003, 1),
+
     /** Set of many traces, do not call getTrace */
     TRACE_EXPERIMENT("../../ctf/org.eclipse.tracecompass.ctf.core.tests/traces/exp", -1, -1);
 
@@ -228,7 +241,9 @@ public enum CtfTestTrace {
         fDuration = time;
     }
 
-    /** @return The path to the test trace */
+    /**
+     * @return The path to the test trace
+     */
     public String getPath() {
         return fPath;
     }

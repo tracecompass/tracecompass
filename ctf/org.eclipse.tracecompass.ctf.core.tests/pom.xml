@@ -104,6 +104,7 @@
                 <fileset><directory>traces/trace2</directory></fileset>
                 <fileset><directory>traces/exp</directory></fileset>
                 <fileset><directory>traces/flipping-endianness</directory></fileset>
+                <fileset><directory>traces/bug470846</directory></fileset>
               </filesets>
             </configuration>
             <goals>
