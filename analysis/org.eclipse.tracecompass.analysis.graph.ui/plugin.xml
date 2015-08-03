@@ -1,4 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension
+            point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            category="org.eclipse.linuxtools.lttng2.ui.views.category"
+            class="org.eclipse.tracecompass.internal.analysis.graph.ui.criticalpath.view.CriticalPathView"
+            id="org.eclipse.linuxtools.tmf.analysis.graph.ui.criticalpath.view.criticalpathview"
+            name="%view.criticalpath"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.analysis">
+      <output
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="org.eclipse.linuxtools.tmf.analysis.graph.ui.criticalpath.view.criticalpathview">
+         <analysisModuleClass
+               class="org.eclipse.tracecompass.analysis.graph.core.criticalpath.CriticalPathModule">
+         </analysisModuleClass>
+      </output>
+   </extension>
 </plugin>

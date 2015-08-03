@@ -15,5 +15,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.tracecompass.common.core,
  org.eclipse.tracecompass.statesystem.core,
  org.eclipse.tracecompass.tmf.core,
- org.eclipse.tracecompass.tmf.ui
-Export-Package: org.eclipse.tracecompass.internal.analysis.graph.ui;x-internal:=true
+ org.eclipse.tracecompass.tmf.ui,
+ org.eclipse.core.resources;bundle-version="3.10.1"
+Export-Package: org.eclipse.tracecompass.internal.analysis.graph.ui;x-internal:=true,
+ org.eclipse.tracecompass.internal.analysis.graph.ui.criticalpath.view;x-friends:="org.eclipse.tracecompass.lttng2.kernel.ui"
