@@ -107,7 +107,7 @@ public class EventDeclaration implements IEventDeclaration {
         ICompositeDefinition packetContext = streamInputReader.getPacketReader().getCurrentPacketEventHeader();
         StructDefinition eventContext = fContext != null ? fContext.createFieldDefinition(eventHeaderDef, fStream.getTrace(), ILexicalScope.CONTEXT, input) : null;
         StructDefinition eventPayload = fFields != null ? fFields.createFieldDefinition(eventHeaderDef, fStream.getTrace(), ILexicalScope.FIELDS, input) : null;
-        long timestamp = calculateTimestamp(eventHeaderDef, prevTimestamp, eventPayload);
+        long timestamp = calculateTimestamp(eventHeaderDef, prevTimestamp, eventPayload, eventContext);
 
         return new EventDefinition(
                 this,
@@ -120,7 +120,7 @@ public class EventDeclaration implements IEventDeclaration {
                 eventPayload);
     }
 
-    private static long calculateTimestamp(@Nullable ICompositeDefinition eventHeaderDef, long prevTimestamp, StructDefinition eventPayload) throws CTFIOException {
+    private static long calculateTimestamp(@Nullable ICompositeDefinition eventHeaderDef, long prevTimestamp, StructDefinition eventPayload, StructDefinition eventContext) throws CTFIOException {
         long timestamp = 0;
         Definition def = null;
         if (eventHeaderDef instanceof EventHeaderDefinition) {
@@ -134,6 +134,9 @@ public class EventDeclaration implements IEventDeclaration {
         }
         if (def == null && eventPayload != null) {
             def = eventPayload.lookupDefinition(CTFStrings.TIMESTAMP);
+        }
+        if (def == null && eventContext != null) {
+            def = eventContext.lookupDefinition(CTFStrings.TIMESTAMP);
         }
         if (def instanceof IntegerDefinition) {
             IntegerDefinition timestampDef = (IntegerDefinition) def;
