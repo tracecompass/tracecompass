@@ -1292,6 +1292,12 @@
             id="org.eclipse.linuxtools.internal.lttng2.ui.views.control.preferences"
             name="%preference.page.control.name">
       </page>
+      <page
+            category="org.eclipse.linuxtools.tmf.ui.TmfTracingPreferences"
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.preferences.ControlRemoteProfilesPreferencePage"
+            id="org.eclipse.tracecompass.internal.lttng2.control.ui.views.preferences.ControlRemoteProfilesPreferencePage"
+            name="%preferences.page.remote.profiles.name">
+      </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

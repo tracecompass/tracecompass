@@ -43,4 +43,13 @@ public class LttngProfileManager {
     public static File[] getProfiles() {
         return SAVED_PROFILE_PATH.toFile().listFiles();
     }
+
+    /**
+     * Gets the path where the profiles are located in the workspace.
+     *
+     * @return the profile path
+     */
+    public static IPath getProfilePath() {
+        return SAVED_PROFILE_PATH;
+    }
 }
