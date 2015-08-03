@@ -16,12 +16,15 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * A CTF enum declaration.
@@ -34,6 +37,35 @@ import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
  * @author Simon Marchi
  */
 public final class EnumDeclaration extends Declaration implements ISimpleDatatypeDeclaration {
+
+    /**
+     * A pair of longs class
+     *
+     * @since 1.1
+     */
+    public static class Pair {
+        private final long fFirst;
+        private final long fSecond;
+
+        private Pair(long first, long second) {
+            fFirst = first;
+            fSecond = second;
+        }
+
+        /**
+         * @return the first element
+         */
+        public long getFirst() {
+            return fFirst;
+        }
+
+        /**
+         * @return the second element
+         */
+        public long getSecond() {
+            return fSecond;
+        }
+    }
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -122,6 +154,21 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
      */
     public @Nullable String query(long value) {
         return fTable.query(value);
+    }
+
+    /**
+     * Get the lookup table
+     *
+     * @return the lookup table
+     * @since 1.1
+     */
+    public Map<String, Pair> getEnumTable() {
+        ImmutableMap.Builder<String, Pair> builder = new ImmutableMap.Builder<>();
+        for (LabelAndRange range : fTable.ranges) {
+            builder.put(range.getLabel(), new Pair(range.low, range.high));
+        }
+        return builder.build();
+
     }
 
     /**
