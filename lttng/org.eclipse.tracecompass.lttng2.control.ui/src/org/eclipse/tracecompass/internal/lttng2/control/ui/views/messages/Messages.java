@@ -321,13 +321,26 @@ public final class Messages extends NLS {
 
     public static String TraceControl_LoadDialogTitle;
 
+    public static String TraceControl_ForceButtonText;
+    public static String TraceControl_ManageButtonText;
     public static String TraceControl_UnknownNode;
 
     public static String TraceControl_SelectProfileText;
     public static String TraceControl_LocalButtonText;
     public static String TraceControl_RemoteButtonText;
 
-    public static String TraceControl_ForceButtonText;
+    public static String TraceControl_DeleteButtonText;
+    public static String TraceControl_ImportButtonText;
+    public static String TraceControl_ExportButtonText;
+
+    public static String TraceControl_ImportProfileTitle;
+    public static String TraceControl_ExportProfileTitle;
+
+    public static String TraceControl_ProfileAlreadyExists;
+    public static String TraceControl_OverwriteQuery;
+
+    public static String TraceControl_DeleteProfileTitle;
+    public static String TraceControl_DeleteQuery;
 
     static {
         // initialize resource bundle
