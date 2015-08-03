@@ -37,6 +37,7 @@ import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.CTFCallsite;
 import org.eclipse.tracecompass.ctf.core.event.CTFClock;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
+import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
 import org.eclipse.tracecompass.ctf.core.trace.Metadata;
@@ -177,17 +178,19 @@ public class CtfTmfTrace extends TmfTrace
                     if (ctfTmfEventType == null) {
                         List<ITmfEventField> content = new ArrayList<>();
                         /* Should only return null the first time */
-                        for (String fieldName : ied.getFields().getFieldsList()) {
-                            content.add(new TmfEventField(fieldName, null, null));
-                        }
-                        ITmfEventField contentTree = new TmfEventField(
-                                ITmfEventField.ROOT_FIELD_ID,
-                                null,
-                                content.toArray(new ITmfEventField[content.size()])
-                                );
+                        final StructDeclaration fields = ied.getFields();
+                        if (fields != null) {
+                            for (String fieldName : ied.getFields().getFieldsList()) {
+                                content.add(new TmfEventField(fieldName, null, null));
+                            }
+                            ITmfEventField contentTree = new TmfEventField(
+                                    ITmfEventField.ROOT_FIELD_ID,
+                                    null,
+                                    content.toArray(new ITmfEventField[content.size()]));
 
-                        ctfTmfEventType = new CtfTmfEventType(ied.getName(), contentTree);
-                        fContainedEventTypes.put(ctfTmfEventType.getName(), ctfTmfEventType);
+                            ctfTmfEventType = new CtfTmfEventType(ied.getName(), contentTree);
+                            fContainedEventTypes.put(ctfTmfEventType.getName(), ctfTmfEventType);
+                        }
                     }
                 }
             }

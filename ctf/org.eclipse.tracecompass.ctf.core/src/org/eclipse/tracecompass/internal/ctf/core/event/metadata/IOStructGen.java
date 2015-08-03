@@ -18,9 +18,12 @@ import java.math.BigInteger;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
@@ -34,6 +37,7 @@ import org.eclipse.tracecompass.ctf.core.event.CTFClock;
 import org.eclipse.tracecompass.ctf.core.event.metadata.DeclarationScope;
 import org.eclipse.tracecompass.ctf.core.event.types.Encoding;
 import org.eclipse.tracecompass.ctf.core.event.types.EnumDeclaration;
+import org.eclipse.tracecompass.ctf.core.event.types.EnumDeclaration.Pair;
 import org.eclipse.tracecompass.ctf.core.event.types.FloatDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IEventHeaderDeclaration;
@@ -448,6 +452,10 @@ public class IOStructGen {
                     IDeclaration d = currentScope.lookupType(type);
                     if (d instanceof IntegerDeclaration) {
                         addByteOrder(byteOrder, currentScope, type, (IntegerDeclaration) d);
+                    } else if (d instanceof FloatDeclaration) {
+                        addByteOrder(byteOrder, currentScope, type, (FloatDeclaration) d);
+                    } else if (d instanceof EnumDeclaration) {
+                        addByteOrder(byteOrder, currentScope, type, (EnumDeclaration) d);
                     } else if (d instanceof StructDeclaration) {
                         setAlign(currentScope, (StructDeclaration) d, byteOrder);
                     }
@@ -486,6 +494,27 @@ public class IOStructGen {
                     decl.getBase(), byteOrder, decl.getEncoding(),
                     decl.getClock(), decl.getAlignment());
             parentScope.replaceType(name, newI);
+        }
+    }
+
+    private static void addByteOrder(ByteOrder byteOrder, DeclarationScope parentScope, String name, EnumDeclaration decl) throws ParseException {
+        final IntegerDeclaration containerType = decl.getContainerType();
+        if (containerType.getByteOrder() != byteOrder) {
+            EnumDeclaration newEnum = new EnumDeclaration(IntegerDeclaration.createDeclaration(containerType.getLength(), containerType.isSigned(),
+                    containerType.getBase(), byteOrder, containerType.getEncoding(),
+                    containerType.getClock(), containerType.getAlignment()));
+            for( Entry<String, Pair> entry : decl.getEnumTable().entrySet()){
+               newEnum.add(entry.getValue().getFirst(), entry.getValue().getSecond(), entry.getKey());
+            }
+
+            parentScope.replaceType(name, newEnum);
+        }
+    }
+
+    private static void addByteOrder(ByteOrder byteOrder, DeclarationScope parentScope, String name, FloatDeclaration decl) throws ParseException {
+        if (decl.getByteOrder() != byteOrder) {
+            FloatDeclaration newFloat = new FloatDeclaration(decl.getExponent(), decl.getMantissa(), byteOrder, decl.getAlignment());
+            parentScope.replaceType(name, newFloat);
         }
     }
 
@@ -1064,16 +1093,19 @@ public class IOStructGen {
      *
      * @param typedef
      *            A TYPEDEF node.
+     * @return map of type name to type declaration
      * @throws ParseException
      *             If there is an error creating the declaration.
      */
-    private void parseTypedef(CommonTree typedef) throws ParseException {
+    private Map<String, IDeclaration> parseTypedef(CommonTree typedef) throws ParseException {
 
         CommonTree typeDeclaratorListNode = (CommonTree) typedef.getFirstChildWithType(CTFParser.TYPE_DECLARATOR_LIST);
 
         CommonTree typeSpecifierListNode = (CommonTree) typedef.getFirstChildWithType(CTFParser.TYPE_SPECIFIER_LIST);
 
         List<CommonTree> typeDeclaratorList = typeDeclaratorListNode.getChildren();
+
+        Map<String, IDeclaration> declarations = new HashMap<>();
 
         for (CommonTree typeDeclaratorNode : typeDeclaratorList) {
             StringBuilder identifierSB = new StringBuilder();
@@ -1082,13 +1114,16 @@ public class IOStructGen {
                     typeDeclaratorNode, typeSpecifierListNode, identifierSB);
 
             if ((typeDeclaration instanceof VariantDeclaration)
-                    && ((VariantDeclaration) typeDeclaration).isTagged()) {
+                    && !((VariantDeclaration) typeDeclaration).isTagged()) {
                 throw new ParseException("Typealias of untagged variant is not permitted"); //$NON-NLS-1$
             }
 
             getCurrentScope().registerType(identifierSB.toString(),
                     typeDeclaration);
+
+            declarations.put(identifierSB.toString(), typeDeclaration);
         }
+        return declarations;
     }
 
     /**
@@ -1235,7 +1270,9 @@ public class IOStructGen {
     private void registerType(IDeclaration declaration, String identifier) throws ParseException {
         final DeclarationScope currentScope = getCurrentScope();
         if (declaration instanceof EnumDeclaration) {
-            currentScope.registerEnum(identifier, (EnumDeclaration) declaration);
+            if (currentScope.lookupEnum(identifier) == null) {
+                currentScope.registerEnum(identifier, (EnumDeclaration) declaration);
+            }
         } else if (declaration instanceof VariantDeclaration) {
             currentScope.registerVariant(identifier, (VariantDeclaration) declaration);
         }
@@ -2227,7 +2264,10 @@ public class IOStructGen {
                 parseTypealias(declarationNode);
                 break;
             case CTFParser.TYPEDEF:
-                parseTypedef(declarationNode);
+                Map<String, IDeclaration> decs = parseTypedef(declarationNode);
+                for (Entry<String, IDeclaration> declarationEntry : decs.entrySet()) {
+                    variantDeclaration.addField(declarationEntry.getKey(), declarationEntry.getValue());
+                }
                 break;
             case CTFParser.SV_DECLARATION:
                 parseVariantDeclaration(declarationNode, variantDeclaration);

@@ -220,7 +220,11 @@ public class DeclarationScope {
     public void registerVariant(String name, VariantDeclaration declaration)
             throws ParseException {
         /* Check if the variant has been defined in the current scope. */
-        if (lookupVariant(name) != null) {
+        final VariantDeclaration lookupVariant = lookupVariant(name);
+        if (declaration.equals(lookupVariant)) {
+            return;
+        }
+        if (lookupVariant != null) {
             throw new ParseException("Variant has already been defined:" + name); //$NON-NLS-1$
         }
 

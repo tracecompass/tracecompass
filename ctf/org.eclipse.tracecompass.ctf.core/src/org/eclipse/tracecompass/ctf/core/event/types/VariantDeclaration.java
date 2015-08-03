@@ -125,6 +125,10 @@ public class VariantDeclaration extends Declaration {
             throw new CTFException("Tag is not defined " + fTag); //$NON-NLS-1$
         }
         String varFieldName = tagDef.getStringValue();
+        if (varFieldName == null) {
+            throw new CTFException("Undefined enum selector for variant " + //$NON-NLS-1$
+                    definitionScope.getScopePath().getPath());
+        }
         fDeclarationToPopulate = fFields.get(varFieldName);
         if (fDeclarationToPopulate == null) {
             throw new CTFException("Unknown enum selector for variant " + //$NON-NLS-1$
