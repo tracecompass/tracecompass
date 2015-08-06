@@ -40,22 +40,22 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
     // Constants
     // ------------------------------------------------------------------------
 
-    private static final String sfInfoCategory = "Info"; //$NON-NLS-1$
-    private static final String sfName = "name"; //$NON-NLS-1$
-    private static final String sfPath = "path"; //$NON-NLS-1$
-    private static final String sfLocation = "location"; //$NON-NLS-1$
+    private static final String INFO_CATEGORY = "Info"; //$NON-NLS-1$
+    private static final String NAME = "name"; //$NON-NLS-1$
+    private static final String PATH = "path"; //$NON-NLS-1$
+    private static final String LOCATION = "location"; //$NON-NLS-1$
 
-    private static final ReadOnlyTextPropertyDescriptor sfNameDescriptor = new ReadOnlyTextPropertyDescriptor(sfName, sfName);
-    private static final ReadOnlyTextPropertyDescriptor sfPathDescriptor = new ReadOnlyTextPropertyDescriptor(sfPath, sfPath);
-    private static final ReadOnlyTextPropertyDescriptor sfLocationDescriptor = new ReadOnlyTextPropertyDescriptor(sfLocation, sfLocation);
+    private static final ReadOnlyTextPropertyDescriptor NAME_DESCRIPTOR = new ReadOnlyTextPropertyDescriptor(NAME, NAME);
+    private static final ReadOnlyTextPropertyDescriptor PATH_DESCRIPTOR = new ReadOnlyTextPropertyDescriptor(PATH, PATH);
+    private static final ReadOnlyTextPropertyDescriptor LOCATION_DESCRIPTOR = new ReadOnlyTextPropertyDescriptor(LOCATION, LOCATION);
 
-    private static final IPropertyDescriptor[] sfDescriptors = { sfNameDescriptor, sfPathDescriptor,
-            sfLocationDescriptor };
+    private static final IPropertyDescriptor[] DESCRIPTORS = { NAME_DESCRIPTOR, PATH_DESCRIPTOR,
+            LOCATION_DESCRIPTOR };
 
     static {
-        sfNameDescriptor.setCategory(sfInfoCategory);
-        sfPathDescriptor.setCategory(sfInfoCategory);
-        sfLocationDescriptor.setCategory(sfInfoCategory);
+        NAME_DESCRIPTOR.setCategory(INFO_CATEGORY);
+        PATH_DESCRIPTOR.setCategory(INFO_CATEGORY);
+        LOCATION_DESCRIPTOR.setCategory(INFO_CATEGORY);
     }
 
     // ------------------------------------------------------------------------
@@ -166,21 +166,21 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IPropertyS
 
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        return Arrays.copyOf(sfDescriptors, sfDescriptors.length);
+        return Arrays.copyOf(DESCRIPTORS, DESCRIPTORS.length);
     }
 
     @Override
     public Object getPropertyValue(Object id) {
 
-        if (sfName.equals(id)) {
+        if (NAME.equals(id)) {
             return getName();
         }
 
-        if (sfPath.equals(id)) {
+        if (PATH.equals(id)) {
             return getPath().toString();
         }
 
-        if (sfLocation.equals(id)) {
+        if (LOCATION.equals(id)) {
             return getLocation().toString();
         }
 

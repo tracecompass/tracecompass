@@ -46,18 +46,15 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider, IStyledL
     // Constants
     // ------------------------------------------------------------------------
 
-    private static final Image fFolderIcon = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
-    private static final String fTraceIconFile = "icons/elcl16/trace.gif"; //$NON-NLS-1$
-    private static final String fExperimentIconFile = "icons/elcl16/experiment.gif"; //$NON-NLS-1$
-    private static final String fAnalysisIconFile = "icons/ovr16/experiment_folder_ovr.png"; //$NON-NLS-1$
-    private static final String fViewIconFile = "icons/obj16/node_obj.gif"; //$NON-NLS-1$
+    private static final Image FOLDER_ICON = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
+    private static final String TRACE_ICON_FILE = "icons/elcl16/trace.gif"; //$NON-NLS-1$
+    private static final String EXPERIMENT_ICON_FILE = "icons/elcl16/experiment.gif"; //$NON-NLS-1$
+    private static final String ANALYSIS_ICON_FILE = "icons/ovr16/experiment_folder_ovr.png"; //$NON-NLS-1$
+    private static final String VIEW_ICON_FILE = "icons/obj16/node_obj.gif"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-
-    private final Image fTraceFolderIcon = fFolderIcon;
-    private final Image fExperimentFolderIcon = fFolderIcon;
 
     private final Image fDefaultTraceIcon;
     private final Image fExperimentIcon;
@@ -77,10 +74,10 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider, IStyledL
      */
     public TmfNavigatorLabelProvider() {
         Bundle bundle = Activator.getDefault().getBundle();
-        fDefaultTraceIcon = loadIcon(bundle, fTraceIconFile);
-        fExperimentIcon = loadIcon(bundle, fExperimentIconFile);
-        fDefaultAnalysisIcon = loadIcon(bundle, fAnalysisIconFile);
-        fDefaultViewIcon = loadIcon(bundle, fViewIconFile);
+        fDefaultTraceIcon = loadIcon(bundle, TRACE_ICON_FILE);
+        fExperimentIcon = loadIcon(bundle, EXPERIMENT_ICON_FILE);
+        fDefaultAnalysisIcon = loadIcon(bundle, ANALYSIS_ICON_FILE);
+        fDefaultViewIcon = loadIcon(bundle, VIEW_ICON_FILE);
     }
 
     private static Image loadIcon(Bundle bundle, String url) {
@@ -137,11 +134,11 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider, IStyledL
         }
 
         if (element instanceof TmfExperimentFolder) {
-            return fExperimentFolderIcon;
+            return FOLDER_ICON;
         }
 
         if (element instanceof TmfTraceFolder) {
-            return fTraceFolderIcon;
+            return FOLDER_ICON;
         }
 
         if (element instanceof TmfAnalysisOutputElement) {
