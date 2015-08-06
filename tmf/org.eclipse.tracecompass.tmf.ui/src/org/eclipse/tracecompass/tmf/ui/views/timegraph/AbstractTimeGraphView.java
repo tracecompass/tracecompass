@@ -462,7 +462,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     /**
      * Zoom thread
-     * @since 1.1
+     * @since 2.0
      */
     protected abstract class ZoomThread extends Thread {
         private final long fZoomStartTime;
@@ -1337,7 +1337,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @param restart
      *            true if restarting zoom for the same time range
      * @return a zoom thread
-     * @since 1.1
+     * @since 2.0
      */
     protected @Nullable ZoomThread createZoomThread(long startTime, long endTime, long resolution, boolean restart) {
         final List<TimeGraphEntry> entryList = fEntryList;

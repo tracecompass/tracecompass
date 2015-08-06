@@ -44,7 +44,7 @@ import com.google.common.collect.Multimap;
  * order before creating the time event lists as this is optimal for state
  * system queries.
  *
- * @since 1.1
+ * @since 2.0
  */
 public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraphView {
 
@@ -367,7 +367,6 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
      * @param monitor
      *            A progress monitor
      * @return The list of time graph events
-     * @since 1.1
      */
     protected abstract @Nullable List<ITimeEvent> getEventList(@NonNull TimeGraphEntry tgentry, ITmfStateSystem ss,
             @NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState, @NonNull IProgressMonitor monitor);
