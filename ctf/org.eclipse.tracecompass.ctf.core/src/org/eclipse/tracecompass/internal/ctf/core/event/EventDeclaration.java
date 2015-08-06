@@ -111,7 +111,7 @@ public class EventDeclaration implements IEventDeclaration {
 
         return new EventDefinition(
                 this,
-                streamInputReader,
+                streamInputReader.getCPU(),
                 timestamp,
                 eventHeaderDef,
                 streamEventContext,
@@ -159,8 +159,9 @@ public class EventDeclaration implements IEventDeclaration {
         // but it's passed to us
         return new EventDefinition(
                 this,
-                streamInputReader,
+                streamInputReader.getCPU(),
                 timestamp,
+                null,
                 streamEventContext,
                 eventContext,
                 packetContext,

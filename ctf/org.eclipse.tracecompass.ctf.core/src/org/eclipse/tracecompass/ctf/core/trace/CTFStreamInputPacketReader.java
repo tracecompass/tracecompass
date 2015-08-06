@@ -342,8 +342,9 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
             IntegerDefinition[] fields = new IntegerDefinition[] { lostCountDef, lostDurationDef };
             return new EventDefinition(
                     lostEventDeclaration,
-                    fStreamInputReader,
+                    fStreamInputReader.getCPU(),
                     lostEventsTimestamp,
+                    null,
                     null,
                     null,
                     null,

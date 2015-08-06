@@ -62,7 +62,7 @@ public class CTFStreamInputReaderTest {
         fixture = getStreamInputReader();
         fixture.setName(1);
         fixture.setCurrentEvent(new EventDefinition(new EventDeclaration(),
-                getStreamInputReader(), 0, null, null,
+                getStreamInputReader().getCPU(), 0, null, null, null,
                 new StructDefinition(
                         new StructDeclaration(0),
                         null,
@@ -217,7 +217,7 @@ public class CTFStreamInputReaderTest {
     @Test
     public void testSeek_eventDefinition() throws CTFException {
         EventDefinition eventDefinition = new EventDefinition(
-                new EventDeclaration(), getStreamInputReader(), 1L, null, null, null, null);
+                new EventDeclaration(), getStreamInputReader().getCPU(), 1L, null, null, null, null, null);
         fixture.setCurrentEvent(eventDefinition);
     }
 }

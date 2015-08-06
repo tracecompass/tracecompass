@@ -331,7 +331,6 @@ public class EventDeclarationTest {
         assertNull(ed.getContext());
         assertNotNull(ed.getPacketContext());
         assertNotNull(ed.getCPU());
-        assertNotNull(ed.getStreamInputReader());
         assertNull(ed.lookupDefinition("context"));
         assertNotNull(ed.lookupDefinition("fields"));
         assertNull(ed.lookupDefinition("other"));
