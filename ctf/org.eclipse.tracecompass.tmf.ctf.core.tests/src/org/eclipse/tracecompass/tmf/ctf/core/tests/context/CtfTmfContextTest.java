@@ -26,6 +26,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.context.CtfTmfContext;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -68,6 +69,16 @@ public class CtfTmfContextTest {
     }
 
     /**
+     * Post-test clean-up.
+     */
+    @After
+    public void tearDown() {
+        if (trace != null) {
+            trace.dispose();
+        }
+    }
+
+    /**
      * Index all the events in the test trace.
      */
     @Test
@@ -95,9 +106,9 @@ public class CtfTmfContextTest {
         double increment = (end - begin) / lwcCount;
         final ArrayList<Long> vals = new ArrayList<>();
         final ArrayList<Thread> threads = new ArrayList<>();
-        final ArrayList<CtfTmfContext> tooManyContexts = new ArrayList<>();
 
-        for (double i = begin; i < end; i += increment) {
+        double time = begin;
+        for (int i = 0; i < lwcCount; i++) {
             SeekerThread thread = new SeekerThread() {
                 @Override
                 public void run() {
@@ -108,19 +119,19 @@ public class CtfTmfContextTest {
                         if (lwc.getCurrentEvent() != null) {
                             vals.add(lwc.getCurrentEvent().getTimestamp().getValue());
                         }
-                        tooManyContexts.add(lwc);
                     }
                 }
             };
-            thread.setVal((long) i);
+            thread.setVal((long) time);
             threads.add(thread);
             thread.start();
+            time += increment;
         }
 
         for (Thread t : threads) {
             t.join();
         }
-        assertEquals("seeks done ", lwcCount + 1, vals.size());
+        assertEquals("seeks done ", lwcCount, vals.size());
         for (long val : vals) {
             assertTrue("val >= begin, " + val + " " + begin, val >= begin);
             assertTrue("val >= end, " + val + " " + end, val <= end);
