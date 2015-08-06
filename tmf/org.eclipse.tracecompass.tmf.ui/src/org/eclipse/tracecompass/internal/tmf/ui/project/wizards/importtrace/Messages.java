@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -19,7 +19,6 @@ import org.eclipse.osgi.util.NLS;
  * The messages for import trace wizards.
  * @author Matthew Khouzam
  */
-@SuppressWarnings("javadoc")
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.messages"; //$NON-NLS-1$
 
@@ -164,47 +163,6 @@ public class Messages extends NLS {
      * The label to indicate that trace type auto detection shall be used.
      */
     public static String ImportTraceWizard_AutoDetection;
-
-
-    // Batch Import Wizard
-    public static String ImportTraceWizardImportProblem ;
-    public static String ImportTraceWizardImportCaption;
-    public static String ImportTraceWizardTraceDisplayName;
-    public static String ImportTraceWizardLinkTraces;
-    public static String ImportTraceWizardCopyTraces;
-    public static String ImportTraceWizardOverwriteTraces;
-    public static String ImportTraceWizardAddFile;
-    public static String ImportTraceWizardAddDirectory;
-    public static String ImportTraceWizardRemove;
-    public static String ImportTraceWizardDirectoryTitle;
-    public static String ImportTraceWizardDirectoryHint;
-    public static String ImportTraceWizardScanPagebyte;
-
-    public static String ImportTraceWizardScanPageGigabyte;
-
-    public static String ImportTraceWizardScanPageKilobyte;
-
-    public static String ImportTraceWizardScanPageMegabyte;
-
-    public static String ImportTraceWizardScanPageRenameError;
-    public static String ImportTraceWizardScanPageSelectAtleastOne;
-
-    public static String ImportTraceWizardScanPageSize;
-    public static String ImportTraceWizardSelectAll;
-    public static String ImportTraceWizardScanPageTerabyte;
-
-    public static String ImportTraceWizardScanPageTitle;
-    public static String ImportTraceWizardSelectTraceTypePageTitle;
-    public static String ImportTraceWizardPageOptionsTitle;
-    public static String ImportTraceWizardPageScanDone;
-    public static String ImportTraceWizardPageScanScanning;
-    public static String ImportTraceWizardPageSelectNone;
-    public static String ImportTraceWizardPageSelectHint;
-    public static String BatchImportTraceWizardRemove;
-    public static String BatchImportTraceWizardAdd;
-    public static String BatchImportTraceWizardErrorImportingTraceResource;
-
-    public static String SharedSelectProject;
 
     static {
         // initialize resource bundle

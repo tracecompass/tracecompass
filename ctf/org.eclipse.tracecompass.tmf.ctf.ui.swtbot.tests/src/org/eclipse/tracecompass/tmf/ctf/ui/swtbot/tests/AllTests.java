@@ -22,7 +22,6 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        ImportAndReadSmokeTest.class,
         StandardImportAndReadSmokeTest.class,
         TestInvalidCtfTrace.class
 })
