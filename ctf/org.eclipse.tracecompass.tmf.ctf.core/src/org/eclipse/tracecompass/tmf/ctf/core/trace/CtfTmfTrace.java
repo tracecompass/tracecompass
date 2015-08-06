@@ -194,6 +194,7 @@ public class CtfTmfTrace extends TmfTrace
                     }
                 }
             }
+            ctx.dispose();
         } catch (final CTFException e) {
             /*
              * If it failed at the init(), we can assume it's because the file
