@@ -67,6 +67,8 @@ public class CopyToClipboardTest {
     private static final String TRACE_NAME = "syslog_collapse";
     private static final String TRACE_PATH = "testfiles/" + TRACE_NAME;
     private static final String TRACE_TYPE = "org.eclipse.linuxtools.tmf.tests.stubs.trace.text.testsyslog";
+    private static final String COPY_TO_CLIPBOARD = "Copy to Clipboard";
+    private static final int TIMEOUT = 2000; /* 20 second timeout */
 
     private static File fTestFile = null;
 
@@ -96,7 +98,7 @@ public class CopyToClipboardTest {
         assumeTrue(fTestFile.exists());
 
         /* Set up for swtbot */
-        SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
+        SWTBotPreferences.TIMEOUT = TIMEOUT;
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
         fLogger.removeAllAppenders();
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
@@ -148,7 +150,7 @@ public class CopyToClipboardTest {
         final SWTBotTable tableBot = fEditorBot.bot().table();
         tableBot.getTableItem(1).click();
 
-        tableBot.contextMenu("Copy to Clipboard").click();
+        tableBot.contextMenu(COPY_TO_CLIPBOARD).click();
         assertClipboardContentsEquals(HEADER_TEXT + EVENT1_TEXT);
     }
 
@@ -162,25 +164,43 @@ public class CopyToClipboardTest {
         KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.DOWN);
         KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.DOWN);
 
-        tableBot.contextMenu("Copy to Clipboard").click();
+        tableBot.contextMenu(COPY_TO_CLIPBOARD).click();
         assertClipboardContentsEquals(HEADER_TEXT + EVENT1_TEXT + EVENT2_TEXT + EVENT3_TEXT);
     }
 
     /**
      * Test copy to clipboard not enabled when selection includes search row
      */
-    @Test(expected = TimeoutException.class)
+    @Test
     public void testNoCopySearchRow() {
         final SWTBotTable tableBot = fEditorBot.bot().table();
         tableBot.getTableItem(1).click();
         KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.UP);
 
-        try {
-            SWTBotPreferences.TIMEOUT = 1000; /* 1 second timeout */
-            tableBot.contextMenu("Copy to Clipboard");
-        } finally {
-            SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
-        }
+        assertContextMenuAbsent(tableBot, COPY_TO_CLIPBOARD);
+    }
+
+    private static void assertContextMenuAbsent(final SWTBotTable tableBot, final String text) {
+        fBot.waitUntil(new DefaultCondition() {
+            @Override
+            public boolean test() throws Exception {
+                try {
+                    SWTBotPreferences.TIMEOUT = 0;
+                    tableBot.contextMenu(text);
+                } catch (TimeoutException e) {
+                    return true;
+                } catch (IndexOutOfBoundsException e) {
+                    /* remove when Bug 474063 is fixed */
+                } finally {
+                    SWTBotPreferences.TIMEOUT = TIMEOUT;
+                }
+                return false;
+            }
+            @Override
+            public String getFailureMessage() {
+                return text + " context menu present, absent expected.";
+            }
+        });
     }
 
     private static void assertClipboardContentsEquals(final String expected) {
