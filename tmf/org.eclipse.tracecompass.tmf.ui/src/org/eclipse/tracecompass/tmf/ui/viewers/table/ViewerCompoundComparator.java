@@ -76,7 +76,7 @@ public class ViewerCompoundComparator extends ViewerComparator {
     }
 
     @Override
-    public Comparator getComparator() {
+    public Comparator<Object> getComparator() {
         return super.getComparator();
     }
 
