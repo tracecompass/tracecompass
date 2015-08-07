@@ -28,6 +28,15 @@
             automatic="false"
             id="org.eclipse.tracecompass.analysis.os.linux.latency.syscall"
             name="%analysis.latency">
+            <tracetype
+               applies="true"
+               class="org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace">
+         </tracetype>
+            </module>
+      <module
+            analysis_module="org.eclipse.tracecompass.analysis.os.linux.core.contextswitch.KernelContextSwitchAnalysis"
+            id="org.eclipse.tracecompass.analysis.os.linux.contextswitch"
+            name="%analysis.contextswitch">
          <tracetype
                applies="true"
                class="org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace">
