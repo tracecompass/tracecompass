@@ -9,7 +9,10 @@
  * Contributors:
  *   Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.tracecompass.tmf.ui.viewers.table;
+
+import java.util.Comparator;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -22,22 +25,32 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
  * @since 2.0
  *
  */
-public abstract class ViewerCompoundComparator extends ViewerComparator {
+public class ViewerCompoundComparator extends ViewerComparator {
 
     /**
      * String comparator, compares two objects by their toString values, if an
      * object is null, it is assigned to an empty string
      */
-    public static final ViewerCompoundComparator STRING_COMPARATOR = new ViewerCompoundComparator() {
+    public static final ViewerCompoundComparator STRING_COMPARATOR = new ViewerCompoundComparator(new Comparator<Object>() {
         @Override
         public int compare(Object e1, Object e2) {
             String left = NonNullUtils.nullToEmptyString(e1);
             String right = NonNullUtils.nullToEmptyString(e2);
             return left.compareTo(right);
         }
-    };
+    });
 
-    ViewerCompoundComparator fNext;
+    private ViewerCompoundComparator fNext;
+
+    /**
+     * Create a viewer compound comparator
+     *
+     * @param comparator
+     *            selected comparator
+     */
+    public ViewerCompoundComparator(Comparator<? extends Object> comparator) {
+        super(comparator);
+    }
 
     /**
      * Sets the next comparator
@@ -58,29 +71,18 @@ public abstract class ViewerCompoundComparator extends ViewerComparator {
         return fNext;
     }
 
-    private int getNextComparator(Object e1, Object e2) {
-        return (fNext != null) ? fNext.compare(e1, e2) : 0;
+    private int getNextCompare(Viewer viewer, Object e1, Object e2) {
+        return (fNext != null) ? fNext.compare(viewer, e1, e2) : 0;
+    }
+
+    @Override
+    public Comparator getComparator() {
+        return super.getComparator();
     }
 
     @Override
     public int compare(Viewer viewer, Object e1, Object e2) {
-        int retVal = compare(e1, e2);
-        return (retVal != 0) ? retVal : getNextComparator(e1, e2);
+        int retVal = getComparator().compare(e1, e2);
+        return (retVal != 0) ? retVal : getNextCompare(viewer, e1, e2);
     }
-
-    /**
-     * Returns a negative, zero, or positive number depending on whether the
-     * first element is less than, equal to, or greater than the second element.
-     * <p>
-     *
-     * @param e1
-     *            the first element
-     * @param e2
-     *            the second element
-     * @return a negative number if the first element is less than the second
-     *         element; the value <code>0</code> if the first element is equal
-     *         to the second element; and a positive number if the first element
-     *         is greater than the second element
-     */
-    public abstract int compare(Object e1, Object e2);
 }
