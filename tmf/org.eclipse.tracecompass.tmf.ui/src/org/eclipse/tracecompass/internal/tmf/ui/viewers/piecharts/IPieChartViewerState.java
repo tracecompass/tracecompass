@@ -11,7 +11,7 @@
  *
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.viewers.piecharts;
+package org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts;
 
 /**
  * Interface used to take control of a {@link TmfPieChartViewer} as part of the

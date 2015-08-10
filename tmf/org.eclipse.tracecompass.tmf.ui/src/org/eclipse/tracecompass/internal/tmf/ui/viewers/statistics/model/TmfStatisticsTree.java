@@ -12,7 +12,7 @@
  *                           Move the tree structure logic into the nodes
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.viewers.statistics.model;
+package org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model;
 
 
 /**

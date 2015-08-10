@@ -13,7 +13,7 @@
  *   Bernd Hufmann - Fix range selection updates
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.viewers.statistics;
+package org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
@@ -38,6 +38,15 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.TmfPieChartViewer;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.model.TmfPieChartStatisticsModel;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfBaseColumnData;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfBaseColumnDataProvider;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfStatisticsFormatter;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfStatisticsTree;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfStatisticsTreeManager;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfStatisticsTreeNode;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfTreeContentProvider;
 import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
@@ -52,15 +61,6 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
-import org.eclipse.tracecompass.tmf.ui.viewers.piecharts.TmfPieChartViewer;
-import org.eclipse.tracecompass.tmf.ui.viewers.piecharts.model.TmfPieChartStatisticsModel;
-import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfBaseColumnData;
-import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfBaseColumnDataProvider;
-import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfStatisticsFormatter;
-import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfStatisticsTree;
-import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfStatisticsTreeManager;
-import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfStatisticsTreeNode;
-import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfTreeContentProvider;
 
 /**
  * A basic viewer to display statistics in the statistics view.

@@ -11,7 +11,7 @@
  *   Alexis Cabana-Loriaux - Extract the class in a compilation unit
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.viewers.statistics;
+package org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics;
 
 import java.util.Map;
 
@@ -19,6 +19,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.model.TmfPieChartStatisticsModel;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfStatisticsTree;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfStatisticsTreeManager;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.statistics.ITmfStatistics;
 import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsEventTypesModule;
@@ -26,9 +29,6 @@ import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsModule;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ui.viewers.piecharts.model.TmfPieChartStatisticsModel;
-import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfStatisticsTree;
-import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfStatisticsTreeManager;
 
 /**
  * Class used to update the Statistics view. Normally, it should only be used by
@@ -128,6 +128,7 @@ class StatisticsUpdateJob extends Job {
             Map<String, Long> map = stats.getEventTypesInRange(start, end);
             updateStats(map);
         } while (!finished);
+
 
         /* Query one last time for the final values */
         Map<String, Long> map = stats.getEventTypesInRange(start, end);

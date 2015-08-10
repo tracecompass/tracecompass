@@ -11,7 +11,7 @@
  *
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.viewers.piecharts;
+package org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,8 +25,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.model.TmfPieChartStatisticsModel;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ui.viewers.piecharts.model.TmfPieChartStatisticsModel;
 
 /**
  * Creates a viewer containing 2 pie charts, one for showing information about

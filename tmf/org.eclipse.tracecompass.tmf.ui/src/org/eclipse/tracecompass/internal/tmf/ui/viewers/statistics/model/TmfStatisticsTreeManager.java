@@ -10,7 +10,7 @@
  *   Mathieu Denis <mathieu.denis@polymtl.ca> - Initial API
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.viewers.statistics.model;
+package org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model;
 
 import java.util.HashMap;
 import java.util.Map;

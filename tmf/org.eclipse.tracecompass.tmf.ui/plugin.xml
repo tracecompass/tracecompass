@@ -65,7 +65,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.tmf.ui.views.category"
-            class="org.eclipse.tracecompass.tmf.ui.views.statistics.TmfStatisticsView"
+            class="org.eclipse.tracecompass.internal.tmf.ui.views.statistics.TmfStatisticsViewImpl"
             icon="icons/eview16/statistics_view.gif"
             id="org.eclipse.linuxtools.tmf.ui.views.statistics"
             name="%statistics.view.name"

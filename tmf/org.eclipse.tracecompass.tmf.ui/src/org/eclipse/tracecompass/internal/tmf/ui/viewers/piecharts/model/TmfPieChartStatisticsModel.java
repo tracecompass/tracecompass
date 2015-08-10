@@ -11,13 +11,13 @@
  *
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.viewers.piecharts.model;
+package org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.model;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.TmfPieChartViewer;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ui.viewers.piecharts.TmfPieChartViewer;
 
 /**
  * This class contains the model shown by the {@link TmfPieChartViewer}.

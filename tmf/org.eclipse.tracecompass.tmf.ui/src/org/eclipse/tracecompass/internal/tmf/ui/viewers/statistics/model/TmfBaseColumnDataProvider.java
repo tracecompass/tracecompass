@@ -11,7 +11,7 @@
  *   Vincent Perot - Add percentages to the label provider
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.viewers.statistics.model;
+package org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model;
 
 import java.util.List;
 import java.util.Set;
@@ -21,7 +21,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfBaseColumnData.ITmfColumnPercentageProvider;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfBaseColumnData.ITmfColumnPercentageProvider;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 

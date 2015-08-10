@@ -10,12 +10,12 @@
  *   Vincent Perot - Add percentages to the label provider
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.viewers.statistics.model;
+package org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfBaseColumnDataProvider.StatsColumn;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfBaseColumnDataProvider.StatsColumn;
 
 /**
  * Class that format data for cells in the statistics view.

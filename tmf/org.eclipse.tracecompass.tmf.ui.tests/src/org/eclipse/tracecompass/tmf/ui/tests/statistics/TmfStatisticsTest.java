@@ -14,7 +14,7 @@ package org.eclipse.tracecompass.tmf.ui.tests.statistics;
 
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfStatisticsValues;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfStatisticsValues;
 import org.junit.Test;
 
 /**

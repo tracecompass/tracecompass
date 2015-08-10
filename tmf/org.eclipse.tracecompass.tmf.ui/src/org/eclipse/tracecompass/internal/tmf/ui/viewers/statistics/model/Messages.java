@@ -10,7 +10,7 @@
  *   Mathieu Denis <mathieu.denis@polymtl.ca> - Initial API and Implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.viewers.statistics.model;
+package org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model;
 
 import org.eclipse.osgi.util.NLS;
 
@@ -21,7 +21,7 @@ import org.eclipse.osgi.util.NLS;
  */
 public class Messages extends NLS {
 
-    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.messages"; //$NON-NLS-1$
 
     /**
      * CPU statistic name.
