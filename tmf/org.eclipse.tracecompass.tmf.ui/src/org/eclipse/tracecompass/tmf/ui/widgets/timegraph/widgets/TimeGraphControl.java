@@ -379,15 +379,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Get the on/off trace filters
-     *
-     * @return The array of filters
-     */
-    public boolean[] getTraceFilter() {
-        return fItemData.getEntryFilter();
-    }
-
-    /**
      * Refresh the data for the thing
      */
     public void refreshData() {
@@ -2467,13 +2458,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
         fBlendSubPixelEvents = blend;
     }
 
-    /**
-     * @return The entries that are currently filtered out
-     */
-    public List<ITimeGraphEntry> getFilteredOut() {
-        return fItemData.getFilteredOut();
-    }
-
     @Override
     public void addSelectionChangedListener(ISelectionChangedListener listener) {
         if (listener != null && !fSelectionChangedListeners.contains(listener)) {
@@ -2542,8 +2526,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
         private Item[] fItems = new Item[0];
         private ITimeGraphEntry fRootEntries[] = new ITimeGraphEntry[0];
         private List<ILinkEvent> fLinks = new ArrayList<>();
-        private boolean fEntryFilter[] = new boolean[0];
-        private final ArrayList<ITimeGraphEntry> fFilteredOut = new ArrayList<>();
 
         public ItemData() {
         }
@@ -2561,7 +2543,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
 
         public void refreshData() {
-            fFilteredOut.clear();
             ITimeGraphEntry selection = getSelectedTrace();
             Map<ITimeGraphEntry, Item> itemMap = new LinkedHashMap<>();
             for (int i = 0; i < fRootEntries.length; i++) {
@@ -2644,15 +2625,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
         public void refreshData(ITimeGraphEntry[] entries) {
             if (entries == null) {
-                fEntryFilter = null;
                 fRootEntries = null;
             } else {
-                if (entries.length == 0) {
-                    fEntryFilter = null;
-                } else if (fEntryFilter == null || entries.length != fEntryFilter.length) {
-                    fEntryFilter = new boolean[entries.length];
-                    java.util.Arrays.fill(fEntryFilter, true);
-                }
                 fRootEntries = Arrays.copyOf(entries, entries.length);
             }
 
@@ -2670,14 +2644,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
         public ITimeGraphEntry[] getEntries() {
             return fRootEntries;
-        }
-
-        public boolean[] getEntryFilter() {
-            return fEntryFilter;
-        }
-
-        public List<ITimeGraphEntry> getFilteredOut() {
-            return fFilteredOut;
         }
     }
 
@@ -2773,5 +2739,3 @@ public class TimeGraphControl extends TimeGraphBaseControl
         return new TmfTimeViewAlignmentInfo(getShell(), toDisplay(0, 0), fTimeProvider.getNameSpace());
     }
 }
-
-
