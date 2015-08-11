@@ -14,19 +14,13 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileInfo;
-import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -35,19 +29,17 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.remote.core.IRemoteConnection;
+import org.eclipse.remote.core.IRemoteConnectionHostService;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
@@ -55,16 +47,21 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.relayd.LttngRelaydCon
 import org.eclipse.tracecompass.internal.lttng2.control.ui.relayd.LttngRelaydConnectionManager;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.relayd.LttngRelaydConsumer;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.IImportDialog;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.ImportFileInfo;
-import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.TraceControlDialogFactory;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
+import org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch.RemoteFetchLogWizard;
+import org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch.RemoteFetchLogWizardRemotePage;
+import org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch.model.RemoteImportConnectionNodeElement;
+import org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch.model.RemoteImportProfileElement;
+import org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch.model.RemoteImportTraceGroupElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.ImportTraceWizard;
-import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
+import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageElement;
+import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageFilesElement;
+import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageTraceElement;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceImportException;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.tracecompass.tmf.ctf.core.CtfConstants;
+import org.eclipse.tracecompass.tmf.remote.core.proxy.RemoteSystemProxy;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
@@ -72,7 +69,6 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceTypeUIUtils;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
-import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -87,16 +83,9 @@ import org.eclipse.ui.PlatformUI;
  */
 public class ImportHandler extends BaseControlViewHandler {
 
-    private static final int BUFFER_IN_KB = 16;
-
-    private static final int BYTES_PER_KB = 1024;
-
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-    /** Name of default project to import traces to */
-    public static final String DEFAULT_REMOTE_PROJECT_NAME = "Remote"; //$NON-NLS-1$
-
     /** The preference key to remeber whether or not the user wants the notification shown next time **/
     private static final String NOTIFY_IMPORT_STREAMED_PREF_KEY = "NOTIFY_IMPORT_STREAMED"; //$NON-NLS-1$
 
@@ -122,99 +111,74 @@ public class ImportHandler extends BaseControlViewHandler {
             return false;
         }
 
+        CommandParameter param;
         fLock.lock();
         try {
-            final CommandParameter param = fParam.clone();
-
-            // create default project
-            IProject project = TmfProjectRegistry.createProject(DEFAULT_REMOTE_PROJECT_NAME, null, null);
-
-            if (param.getSession().isLiveTrace()) {
-                importLiveTrace(new LttngRelaydConnectionInfo(param.getSession().getLiveUrl(), param.getSession().getLivePort(), param.getSession().getName()), project);
-                return null;
-            } else if (param.getSession().isStreamedTrace()) {
-
-                IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-                String notify = store.getString(NOTIFY_IMPORT_STREAMED_PREF_KEY);
-                if (!MessageDialogWithToggle.ALWAYS.equals(notify)) {
-                    MessageDialogWithToggle.openInformation(window.getShell(), null, Messages.TraceControl_ImportDialogStreamedTraceNotification, Messages.TraceControl_ImportDialogStreamedTraceNotificationToggle, false, store, NOTIFY_IMPORT_STREAMED_PREF_KEY);
-                }
-
-                // Streamed trace
-                TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
-                TmfTraceFolder traceFolder = projectElement.getTracesFolder();
-
-                ImportTraceWizard wizard = new ImportTraceWizard();
-                wizard.init(PlatformUI.getWorkbench(), new StructuredSelection(traceFolder));
-                WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
-                dialog.open();
-                return null;
-            }
-
-            // Remote trace
-            final IImportDialog dialog = TraceControlDialogFactory.getInstance().getImportDialog();
-            dialog.setSession(param.getSession());
-            dialog.setDefaultProject(DEFAULT_REMOTE_PROJECT_NAME);
-
-            if (dialog.open() != Window.OK) {
-                return null;
-            }
-
-            Job job = new Job(Messages.TraceControl_ImportJob) {
-                @Override
-                protected IStatus run(IProgressMonitor monitor) {
-
-                    MultiStatus status = new MultiStatus(Activator.PLUGIN_ID, IStatus.OK, Messages.TraceControl_ImportFailure, null);
-                    List<ImportFileInfo> traces = dialog.getTracePathes();
-                    IProject selectedProject = dialog.getProject();
-                    for (Iterator<ImportFileInfo> iterator = traces.iterator(); iterator.hasNext();) {
-                        try {
-
-                            if (monitor.isCanceled()) {
-                                status.add(Status.CANCEL_STATUS);
-                                break;
-                            }
-
-                            ImportFileInfo remoteFile = iterator.next();
-
-                            downloadTrace(remoteFile, selectedProject, monitor);
-
-                            // Set trace type
-                            IFolder traceFolder = remoteFile.getDestinationFolder();
-
-                            IResource file = traceFolder.findMember(remoteFile.getLocalTraceName());
-
-                            if (file != null) {
-                                TraceTypeHelper helper = null;
-
-                                try {
-                                    helper = TmfTraceTypeUIUtils.selectTraceType(file.getLocation().toOSString(), null, null);
-                                } catch (TmfTraceImportException e) {
-                                    // the trace did not match any trace type
-                                }
-
-                                if (helper != null) {
-                                    status.add(TmfTraceTypeUIUtils.setTraceType(file, helper));
-                                }
-
-                                URI uri = remoteFile.getImportFile().toURI();
-                                String sourceLocation = URIUtil.toUnencodedString(uri);
-                                file.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
-                            }
-                        } catch (ExecutionException e) {
-                            status.add(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ImportFailure, e));
-                        } catch (CoreException e) {
-                            status.add(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ImportFailure, e));
-                        }
-                    }
-                    return status;
-                }
-            };
-            job.setUser(true);
-            job.schedule();
+            param = fParam.clone();
         } finally {
             fLock.unlock();
         }
+        // create default project
+        IProject project = TmfProjectRegistry.createProject(RemoteFetchLogWizardRemotePage.DEFAULT_REMOTE_PROJECT_NAME, null, null);
+
+        if (param.getSession().isLiveTrace()) {
+            importLiveTrace(new LttngRelaydConnectionInfo(param.getSession().getLiveUrl(), param.getSession().getLivePort(), param.getSession().getName()), project);
+            return null;
+        } else if (param.getSession().isStreamedTrace()) {
+
+            IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+            String notify = store.getString(NOTIFY_IMPORT_STREAMED_PREF_KEY);
+            if (!MessageDialogWithToggle.ALWAYS.equals(notify)) {
+                MessageDialogWithToggle.openInformation(window.getShell(), null, Messages.TraceControl_ImportDialogStreamedTraceNotification, Messages.TraceControl_ImportDialogStreamedTraceNotificationToggle, false, store, NOTIFY_IMPORT_STREAMED_PREF_KEY);
+            }
+
+            // Streamed trace
+            TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
+            TmfTraceFolder traceFolder = projectElement.getTracesFolder();
+
+            ImportTraceWizard wizard = new ImportTraceWizard();
+            wizard.init(PlatformUI.getWorkbench(), new StructuredSelection(traceFolder));
+            WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
+            dialog.open();
+            return null;
+        }
+
+        // Generate the profile
+        RemoteImportProfileElement profile = new RemoteImportProfileElement(null, "LTTng Remote Traces"); //$NON-NLS-1$
+        TraceSessionComponent session = param.getSession();
+        RemoteSystemProxy proxy = session.getTargetNode().getRemoteSystemProxy();
+        IRemoteConnection rc = proxy.getRemoteConnection();
+        String name = rc.getName();
+
+        if (!rc.hasService(IRemoteConnectionHostService.class)) {
+            return null;
+        }
+
+        String scheme = rc.getConnectionType().getScheme();
+        IRemoteConnectionHostService hostService = rc.getService(IRemoteConnectionHostService.class);
+        String address = hostService.getHostname();
+        String user = hostService.getUsername();
+        int port =  hostService.getPort();
+
+        URI remoteUri;
+        try {
+            remoteUri = new URI(scheme, user, address, port, null, null, null);
+        } catch (URISyntaxException e) {
+            return false;
+        }
+        RemoteImportConnectionNodeElement connection = new RemoteImportConnectionNodeElement(profile, name, remoteUri.toString());
+        String pathString = session.isSnapshotSession() ? session.getSnapshotInfo().getSnapshotPath() : session.getSessionPath();
+        IPath path = new Path(pathString);
+        RemoteImportTraceGroupElement group = new RemoteImportTraceGroupElement(connection, path.removeLastSegments(1).toString());
+        group.setRecursive(true);
+        TracePackageElement element = new TracePackageTraceElement(group, "", "");  //$NON-NLS-1$//$NON-NLS-2$
+        new TracePackageFilesElement(element, path.lastSegment() + "/.*"); //$NON-NLS-1$
+
+        RemoteFetchLogWizard wizard = new RemoteFetchLogWizard(profile);
+        wizard.init(PlatformUI.getWorkbench(), StructuredSelection.EMPTY);
+        WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
+        dialog.open();
+
         return null;
     }
 
@@ -261,84 +225,7 @@ public class ImportHandler extends BaseControlViewHandler {
     // Helper methods
     // ------------------------------------------------------------------------
 
-    /**
-     * Downloads a trace from the remote host to the given project.
-     *
-     * @param trace
-     *            - trace information of trace to import
-     * @param project
-     *            - project to import to
-     * @param monitor
-     *            - a progress monitor
-     * @throws ExecutionException
-     */
-    private static void downloadTrace(ImportFileInfo trace, IProject project, IProgressMonitor monitor)
-            throws ExecutionException {
-        try {
-            IFileStore importRoot = trace.getImportFile();
-
-            IFolder traceFolder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
-            if (!traceFolder.exists()) {
-                throw new ExecutionException(Messages.TraceControl_ImportDialogInvalidTracingProject + " (" + TmfTracesFolder.TRACES_FOLDER_NAME + ")"); //$NON-NLS-1$//$NON-NLS-2$
-            }
-
-            IFolder destinationFolder = trace.getDestinationFolder();
-            TraceUtils.createFolder(destinationFolder, monitor);
-
-            String traceName = trace.getLocalTraceName();
-            IFolder folder = destinationFolder.getFolder(traceName);
-            if (folder.exists()) {
-                if (!trace.isOverwrite()) {
-                    throw new ExecutionException(Messages.TraceControl_ImportDialogTraceAlreadyExistError + ": " + traceName); //$NON-NLS-1$
-                }
-            } else {
-                folder.create(true, true, null);
-            }
-
-            IFileStore[] sources = importRoot.childStores(EFS.NONE, new NullProgressMonitor());
-            SubMonitor subMonitor = SubMonitor.convert(monitor, sources.length);
-            subMonitor.beginTask(Messages.TraceControl_DownloadTask, sources.length);
-
-            for (IFileStore source : sources) {
-                if (subMonitor.isCanceled()) {
-                    monitor.setCanceled(true);
-                    return;
-                }
-                SubMonitor childMonitor = subMonitor.newChild(1);
-                IFileInfo info = source.fetchInfo();
-                if (!info.isDirectory()) {
-                    IPath destination = folder.getLocation().addTrailingSeparator().append(source.getName());
-                    subMonitor.setTaskName(Messages.TraceControl_DownloadTask + ' ' + traceName + '/' + source.getName());
-                    try (InputStream in = source.openInputStream(EFS.NONE, new NullProgressMonitor())) {
-                        copy(in, destination, childMonitor, info.getLength());
-                    }
-                }
-            }
-        } catch (IOException e) {
-            throw new ExecutionException(e.toString(), e);
-        } catch (CoreException e) {
-            throw new ExecutionException(e.toString(), e);
-        }
-    }
-
-    private static void copy(InputStream in, IPath destination, SubMonitor monitor, long length) throws IOException {
-        try (OutputStream out = new FileOutputStream(destination.toFile())) {
-            monitor.setWorkRemaining((int) (length / BYTES_PER_KB));
-            byte[] buf = new byte[BYTES_PER_KB * BUFFER_IN_KB];
-            int counter = 0;
-            for (;;) {
-                int n = in.read(buf);
-                if (n <= 0) {
-                    return;
-                }
-                out.write(buf, 0, n);
-                counter = (counter % BYTES_PER_KB) + n;
-                monitor.worked(counter / BYTES_PER_KB);
-            }
-        }
-    }
-
-    private static void importLiveTrace(final LttngRelaydConnectionInfo connectionInfo, final IProject project) {
+   private static void importLiveTrace(final LttngRelaydConnectionInfo connectionInfo, final IProject project) {
         Job job = new Job(Messages.TraceControl_ImportJob) {
 
             @Override

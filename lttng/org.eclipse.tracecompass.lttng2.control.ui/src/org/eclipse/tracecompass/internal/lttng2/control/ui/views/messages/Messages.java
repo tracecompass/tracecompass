@@ -238,25 +238,6 @@ public final class Messages extends NLS {
 
     public static String TraceControl_ImportDialogStreamedTraceNotification;
     public static String TraceControl_ImportDialogStreamedTraceNotificationToggle;
-    public static String TraceControl_ImportDialogTitle;
-    public static String TraceControl_ImportDialogTracesGroupName;
-    public static String TraceControl_ImportDialogTracesTooltip;
-    public static String TraceControl_ImportDialogProjectsGroupName;
-    public static String TraceControl_ImportDialogProjectsTooltip;
-    public static String TraceControl_ImportDialogOverwriteButtonText;
-    public static String TraceControl_ImportDialogCreationError;
-    public static String TraceControl_ImportDialogNoProjectSelectedError;
-    public static String TraceControl_ImportDialogInvalidTracingProject;
-    public static String TraceControl_ImportDialogNoTraceSelectedError;
-    public static String TraceControl_ImportDialog_SelectAll;
-    public static String TraceControl_ImportDialog_DeselectAll;
-
-    public static String TraceControl_ImportDialogConfirmationTitle;
-    public static String TraceControl_ImportDialogConfirmationOverwriteLabel;
-    public static String TraceControl_ImportDialogConfirmationRenameLabel;
-    public static String TraceControl_ImportDialogConfirmationNewNameLabel;
-    public static String TraceControl_InvalidTraceNameError;
-    public static String TraceControl_ImportDialogTraceAlreadyExistError;
 
     // Tree structure strings
     public static String TraceControl_KernelDomainDisplayName;

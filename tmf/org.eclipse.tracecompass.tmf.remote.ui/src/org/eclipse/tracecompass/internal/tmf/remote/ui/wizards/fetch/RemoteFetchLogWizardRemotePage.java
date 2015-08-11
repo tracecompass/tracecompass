@@ -16,25 +16,32 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.tracecompass.internal.tmf.remote.ui.Activator;
@@ -50,7 +57,12 @@ import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePa
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageLabelProvider;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageTraceElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.importexport.Messages;
+import org.eclipse.tracecompass.tmf.core.TmfProjectNature;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
+import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -72,6 +84,8 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
     private static final String ICON_PATH = "icons/elcl16/fetch_log_wiz.gif"; //$NON-NLS-1$
     private static final Image COLLAPSE_ALL_IMAGE = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ELCL_COLLAPSEALL);
     private static final Image EXPAND_ALL_IMAGE = Activator.getDefault().getImageFromPath("icons/elcl16/expandall.png"); //$NON-NLS-1$
+    /** Name of default project to import traces to */
+    public static final String DEFAULT_REMOTE_PROJECT_NAME = "Remote"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes(s)
@@ -82,6 +96,9 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
     private final Set<RemoteImportConnectionNodeElement> fRemoteHosts = new HashSet<>();
     private boolean fOverwriteAll;
     private boolean fIsVisible = false;
+    private String fDefaultProjectName = null;
+    private CCombo fCombo;
+    private List<IProject> fProjects;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -93,8 +110,10 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
      *          The Wizard title
      * @param selection
      *          The current selection (trace folder element)
+     * @param profile
+     *          A profile to use or null
      */
-    protected RemoteFetchLogWizardRemotePage(String title, IStructuredSelection selection) {
+    protected RemoteFetchLogWizardRemotePage(String title, IStructuredSelection selection, @Nullable RemoteImportProfileElement profile) {
         super(PAGE_NAME, title, null, selection);
         setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(Activator.PLUGIN_ID, ICON_PATH));
 
@@ -103,8 +122,12 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
         }
 
         if (fTmfTraceFolder == null) {
-            throw new IllegalArgumentException();
+            // create default project
+            TmfProjectRegistry.createProject(DEFAULT_REMOTE_PROJECT_NAME, null, null);
+            fDefaultProjectName = DEFAULT_REMOTE_PROJECT_NAME;
         }
+
+        fProfile = profile;
         setDescription(RemoteMessages.RemoteFetchLogWizardRemotePage_Description);
     }
 
@@ -125,6 +148,8 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
         createElementViewer(composite);
 
         createButtonsGroup(composite);
+
+        createProjectGroup(composite);
 
         restoreWidgetValues();
         updatePageCompletion();
@@ -220,6 +245,31 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
                 return 0;
             }
         });
+    }
+
+    private void createProjectGroup(Composite parent) {
+        if (fDefaultProjectName != null) {
+            Group projectGroup = new Group(parent, SWT.SHADOW_NONE);
+            projectGroup.setText(RemoteMessages.RemoteFetchLogWizardRemotePage_ImportDialogProjectsGroupName);
+            GridLayout layout = new GridLayout(1, true);
+            projectGroup.setLayout(layout);
+            projectGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+            fProjects = new ArrayList<>();
+            List<String> projectNames = new ArrayList<>();
+
+            for (IProject project : TraceUtils.getOpenedTmfProjects()) {
+                fProjects.add(project);
+                projectNames.add(project.getName());
+            }
+
+            fCombo = new CCombo(projectGroup, SWT.READ_ONLY);
+            fCombo.setToolTipText(RemoteMessages.RemoteFetchLogWizardRemotePage_ImportDialogProjectsGroupName);
+            fCombo.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, true, false, 1, 1));
+            fCombo.setItems(projectNames.toArray(new String[projectNames.size()]));
+            int select = projectNames.indexOf(fDefaultProjectName);
+            fCombo.select(select);
+        }
     }
 
     @Override
@@ -319,11 +369,17 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
      */
     public boolean finish() {
 
+        boolean result;
         if (!fIsVisible) {
-            boolean result = updateViewer();
+            result = updateViewer();
             if (!result) {
                 return false;
             }
+        }
+
+        result = validateProject();
+        if (!result) {
+            return false;
         }
 
         Object[] elements = getElementViewer().getCheckedElements();
@@ -385,6 +441,35 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
         setAllChecked(elementViewer, false, true);
         updatePageCompletion();
 
+        return true;
+    }
+
+    private boolean validateProject() {
+        if (fCombo != null) {
+            int fProjectIndex = fCombo.getSelectionIndex();
+            if (fProjectIndex < 0) {
+                handleError(RemoteMessages.RemoteFetchLogWizardRemotePage_NoProjectSelectedError, null);
+                return false;
+            }
+
+            IProject project = fProjects.get(fProjectIndex);
+            IFolder traceFolder = project.getFolder(TmfTracesFolder.TRACES_FOLDER_NAME);
+
+            if (!traceFolder.exists()) {
+                handleError(RemoteMessages.RemoteFetchLogWizardRemotePage_InvalidTracingProject, null);
+                return false;
+            }
+
+            try {
+                if (project.hasNature(TmfProjectNature.ID)) {
+                    TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
+                    fTmfTraceFolder = projectElement.getTracesFolder();
+                }
+            } catch (CoreException ex) {
+                handleError(RemoteMessages.RemoteFetchLogWizardRemotePage_InvalidTracingProject, ex);
+                return false;
+            }
+        }
         return true;
     }
 
