@@ -472,15 +472,16 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Sets the auto-expand level to be used when the entries are refreshed
-     * using {@link #refreshData()} or {@link #refreshData(ITimeGraphEntry[])}.
-     * The value 0 means that there is no auto-expand; 1 means that top-level
+     * Sets the auto-expand level to be used for new entries discovered when
+     * calling {@link #refreshData()} or {@link #refreshData(ITimeGraphEntry[])}
+     * . The value 0 means that there is no auto-expand; 1 means that top-level
      * entries are expanded, but not their children; 2 means that top-level
      * entries are expanded, and their children, but not grand-children; and so
      * on.
      * <p>
      * The value {@link #ALL_LEVELS} means that all subtrees should be expanded.
      * </p>
+     *
      * @param level
      *            non-negative level, or <code>ALL_LEVELS</code> to expand all
      *            levels of the tree
@@ -498,6 +499,19 @@ public class TimeGraphControl extends TimeGraphBaseControl
      */
     public int getAutoExpandLevel() {
         return fAutoExpandLevel;
+    }
+
+    /**
+     * Get the expanded state of a given entry.
+     *
+     * @param entry
+     *            The entry
+     * @return true if the entry is expanded, false if collapsed
+     * @since 2.0
+     */
+    public boolean getExpandedState(ITimeGraphEntry entry) {
+        Item item = fItemData.fItemMap.get(entry);
+        return (item != null ? item.fExpanded : false);
     }
 
     /**
@@ -1249,18 +1263,18 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Get the number of expanded items
+     * Get the number of expanded (visible) items
      *
-     * @return The count of expanded items
+     * @return The count of expanded (visible) items
      */
     public int getExpandedElementCount() {
         return fItemData.fExpandedItems.length;
     }
 
     /**
-     * Get an array of all expanded elements
+     * Get an array of all expanded (visible) elements
      *
-     * @return The expanded elements
+     * @return The expanded (visible) elements
      */
     public ITimeGraphEntry[] getExpandedElements() {
         ArrayList<ITimeGraphEntry> elements = new ArrayList<>();
@@ -2523,7 +2537,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     private class ItemData {
-        private final Map<ITimeGraphEntry, Item> fItemMap = new LinkedHashMap<>();
+        private Map<ITimeGraphEntry, Item> fItemMap = new LinkedHashMap<>();
         private Item[] fExpandedItems = new Item[0];
         private Item[] fItems = new Item[0];
         private ITimeGraphEntry fRootEntries[] = new ITimeGraphEntry[0];
@@ -2547,13 +2561,14 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
 
         public void refreshData() {
-            fItemMap.clear();
             fFilteredOut.clear();
             ITimeGraphEntry selection = getSelectedTrace();
+            Map<ITimeGraphEntry, Item> itemMap = new LinkedHashMap<>();
             for (int i = 0; i < fRootEntries.length; i++) {
                 ITimeGraphEntry entry = fRootEntries[i];
-                refreshData(fItemMap, null, 0, entry);
+                refreshData(itemMap, null, 0, entry);
             }
+            fItemMap = itemMap;
             fItems = fItemMap.values().toArray(new Item[0]);
             updateExpandedItems();
             if (selection != null) {
@@ -2578,7 +2593,14 @@ public class TimeGraphControl extends TimeGraphBaseControl
             }
             itemMap.put(entry, item);
             if (entry.hasChildren()) {
-                item.fExpanded = fAutoExpandLevel == ALL_LEVELS || level < fAutoExpandLevel;
+                Item oldItem = fItemMap.get(entry);
+                if (oldItem != null && oldItem.fHasChildren && level == oldItem.fLevel && entry.getParent() == oldItem.fEntry.getParent()) {
+                    /* existing items keep their old expanded state */
+                    item.fExpanded = oldItem.fExpanded;
+                } else {
+                    /* new items set the expanded state according to auto-expand level */
+                    item.fExpanded = fAutoExpandLevel == ALL_LEVELS || level < fAutoExpandLevel;
+                }
                 item.fHasChildren = true;
                 for (ITimeGraphEntry child : entry.getChildren()) {
                     refreshData(itemMap, item, level + 1, child);
