@@ -13,12 +13,15 @@ package org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.tracecompass.internal.tmf.remote.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.remote.ui.messages.RemoteMessages;
+import org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch.model.RemoteImportProfileElement;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.ide.IDE;
@@ -43,6 +46,8 @@ public class RemoteFetchLogWizard extends Wizard implements IImportWizard {
     private RemoteFetchLogWizardPage fFetchLogWizardPage;
     private RemoteFetchLogWizardRemotePage fFetchLogRemotePage;
 
+    private @Nullable RemoteImportProfileElement fRemoteProfile = null;
+
     // ------------------------------------------------------------------------
     // Constructor(s)
     // ------------------------------------------------------------------------
@@ -57,6 +62,16 @@ public class RemoteFetchLogWizard extends Wizard implements IImportWizard {
             section = workbenchSettings.addNewSection(FETCH_LOG_WIZARD);
         }
         setDialogSettings(section);
+    }
+
+    /**
+     * Create wizard with pre-defined remote profile
+     * @param profile
+     *              a remote profile
+     */
+    public RemoteFetchLogWizard(@NonNull RemoteImportProfileElement profile) {
+        this();
+        fRemoteProfile = profile;
     }
 
     // ------------------------------------------------------------------------
@@ -79,9 +94,11 @@ public class RemoteFetchLogWizard extends Wizard implements IImportWizard {
     @Override
     public void addPages() {
         super.addPages();
-        fFetchLogWizardPage = new RemoteFetchLogWizardPage(RemoteMessages.RemoteFetchLogWizardPage_Title, fSelection);
-        addPage(fFetchLogWizardPage);
-        fFetchLogRemotePage = new RemoteFetchLogWizardRemotePage(RemoteMessages.RemoteFetchLogWizardRemotePage_Title, fSelection);
+        if (fRemoteProfile == null) {
+            fFetchLogWizardPage = new RemoteFetchLogWizardPage(RemoteMessages.RemoteFetchLogWizardPage_Title, fSelection);
+            addPage(fFetchLogWizardPage);
+        }
+        fFetchLogRemotePage = new RemoteFetchLogWizardRemotePage(RemoteMessages.RemoteFetchLogWizardRemotePage_Title, fSelection, fRemoteProfile);
         addPage(fFetchLogRemotePage);
     }
 
@@ -98,7 +115,9 @@ public class RemoteFetchLogWizard extends Wizard implements IImportWizard {
 
     @Override
     public boolean canFinish() {
-        return fFetchLogWizardPage.canFlipToNextPage();
+        if (fFetchLogWizardPage != null) {
+            return fFetchLogWizardPage.canFlipToNextPage();
+        }
+        return super.canFinish();
     }
-
 }

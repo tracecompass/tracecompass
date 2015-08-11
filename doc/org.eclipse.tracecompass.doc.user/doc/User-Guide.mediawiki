@@ -1449,17 +1449,14 @@ A new display will open for selecting the traces to import.
 
 [[Image:images/LTTng2ImportDialog.png]]
 
-By default all traces are selected. A default project with the name '''Remote''' is selected which will be created if necessary. Update the list of traces to be imported, if necessary, by selecting and deselecting the relevant traces in the tree viewer. Use buttons '''Select All''' or '''Deselect All''' to select or deselect all traces. Also if needed, change the tracing project from the '''Available Projects''' combo box. Select the Overwrite button ('''Overwrite existing trace without warning''') if required. Then press button '''Ok'''. Upon successful import operation the selected traces will be stored in the '''Traces''' directory of the specified tracing project. The session directory structure as well as the trace names will be preserved in the destination tracing project. For '''Kernel''' traces the trace type '''Linux Kernel Trace''' and for '''UST''' traces the trace type '''LTTng UST Trace''' will be set. From the '''Project Explorer''' view, the trace can be analyzed further.
+By default all traces are selected. A default project with the name '''Remote''' is selected which will be created if necessary. Update the list of traces to be imported, if necessary, by selecting and deselecting the relevant traces in the tree viewer. Use buttons '''Select All''' or '''Deselect All''' to select or deselect all traces. Also if needed, change the tracing project from the '''Available Projects''' combo box. Then press button '''Finish'''. Upon successful import operation the selected traces will be stored in the '''Traces''' directory of the specified tracing project. A directory with the connection name will be created under the '''Traces'''  directory. Underneath that, the session directory structure as well as the trace names will be preserved in the destination tracing project. For '''Kernel''' traces the trace type '''Linux Kernel Trace''' and for '''UST''' traces the trace type '''LTTng UST Trace''' will be set. From the '''Project Explorer''' view, the trace can be analyzed further.
 
-'''Note''': If the overwrite button ('''Overwrite existing trace without warning''') was not selected and a trace with the same name of a trace to be imported already exists in the destination directory of the project, then a new confirmation dialog box will open.
+'''Note''': If a trace already exists with the same name in the destination directory, the user can choose to rename the imported trace, overwrite the original trace or skip the trace. When rename is chosen, a number is appended to the trace name, for example kernel becomes kernel(2).
 
 [[Image:images/LTTng2ImportOverwriteConfirmationDialog.png]]
 
-To Overwrite select the '''Overwrite''' Button and press '''Ok'''.
+If one selects '''Rename All''', '''Overwrite All''' or '''Skip All''' the choice will be applied for all traces with a name conflict.
 
-If the existing trace should not be overwritten select, then select the '''Rename''' option of the confirmation dialog box above, enter a new name and then press '''Ok'''.
-
-[[Image:images/LTTng2ImportRenameDialog.png]]
 
 === Importing Network Traces to a Tracing Project ===
 

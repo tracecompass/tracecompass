@@ -23,6 +23,6 @@ Require-Bundle: org.eclipse.core.runtime,
 Export-Package: org.eclipse.tracecompass.internal.tmf.remote.ui;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.remote.ui.messages;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.remote.ui.preferences;x-internal:=true,
- org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch;x-internal:=true,
- org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch.model;x-friends:="org.eclipse.tracecompass.tmf.remote.ui.tests",
+ org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch;x-friends:="org.eclipse.tracecompass.lttng2.control.ui",
+ org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch.model;x-friends:="org.eclipse.tracecompass.tmf.remote.ui.tests,org.eclipse.tracecompass.lttng2.control.ui",
  org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch.preferences;x-internal:=true

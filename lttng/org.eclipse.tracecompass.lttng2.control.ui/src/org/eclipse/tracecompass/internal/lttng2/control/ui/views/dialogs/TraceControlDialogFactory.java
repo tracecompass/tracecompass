@@ -73,16 +73,6 @@ public final class TraceControlDialogFactory {
      */
     private IAddContextDialog fAddContextDialog;
 
-    /**
-     * The import dialog implementation.
-     */
-    private IImportDialog fImportDialog;
-
-    /**
-     * The import confirmation dialog.
-     */
-    private IImportConfirmationDialog fImportConfirmationDialog;
-
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -243,40 +233,5 @@ public final class TraceControlDialogFactory {
         fAddContextDialog = addContextDialog;
     }
 
-    /**
-     * @return the import dialog implementation
-     */
-    public IImportDialog getImportDialog() {
-        if (fImportDialog == null) {
-            fImportDialog = new ImportDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-        }
-        return fImportDialog;
-    }
-
-    /**
-     * Sets the import dialog implementation.
-     * @param importDialog - a import dialog implementation
-     */
-    public void setImportDialog(IImportDialog importDialog) {
-        fImportDialog = importDialog;
-    }
-
-    /**
-     * @return the import confirmation dialog implementation.
-     */
-    public IImportConfirmationDialog getImportConfirmationDialog() {
-        if (fImportConfirmationDialog == null) {
-            fImportConfirmationDialog = new ImportConfirmationDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-        }
-        return fImportConfirmationDialog;
-    }
-
-    /**
-     * Sets the import confirmation dialog implementation.
-     * @param confirmDialog - a import confirmation dialog implementation.
-     */
-    public void setImportConfirmationDialog(IImportConfirmationDialog confirmDialog) {
-        fImportConfirmationDialog = confirmDialog;
-    }
 }
 

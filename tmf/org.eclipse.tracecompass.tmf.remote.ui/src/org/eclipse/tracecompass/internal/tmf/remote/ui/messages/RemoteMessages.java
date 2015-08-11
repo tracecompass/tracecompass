@@ -44,6 +44,12 @@ public class RemoteMessages extends NLS {
     public static String RemoteFetchLogWizardRemotePage_OpeningConnectionTo;
     /** Title of remote fetch wizard remote page*/
     public static String RemoteFetchLogWizardRemotePage_Title;
+    /** Project group label */
+    public static String RemoteFetchLogWizardRemotePage_ImportDialogProjectsGroupName;
+    /** Error String for no project selected*/
+    public static String RemoteFetchLogWizardRemotePage_NoProjectSelectedError;
+    /** Error string for invalid tracing project */
+    public static String RemoteFetchLogWizardRemotePage_InvalidTracingProject;
 
     /** Label of add button in remote preference page */
     public static String RemoteProfilesPreferencePage_AddButton;
