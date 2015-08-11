@@ -13,22 +13,28 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.table;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
+import java.util.Collections;
+import java.util.Comparator;
+
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.viewers.deferred.DeferredContentProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Table;
@@ -36,28 +42,56 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 
 /**
- * Generic {@link TableViewer} wrapper with most standard features enabled
- *
- * <pre>
- * It provides the following features:
- *   - Sortable columns
- *   - Movable columns
- *   - Resizable columns
- *   - Tracking last clicked columns
- * </pre>
- *
- * The person extending this class must implement the {@link #createColumns()},
- * they must also supply a content provider of the {@link TableViewer} obtained
- * by {@link #getTableViewer()},
- * {@link TableViewer#setContentProvider(IContentProvider)} along with an input
- * to {@link TableViewer#setInput(Object)}. They can also add selection
- * listeners to the {@link Table} obtained from the {@link TableViewer} by
- * calling {@link TableViewer#getTable()} with
- * {@link Table#addSelectionListener(SelectionListener)}
+ * Generic {@link TableViewer} wrapper with most standard features enabled.
+ * <p>
+ * It provides the following features: <br>
+ * - Sortable columns <br>
+ * - Movable columns <br>
+ * - Resizable columns <br>
+ * - Tracking last clicked columns
+ * <p>
+ * The user of this class should add columns to the table by using the
+ * {@link #createColumn(String, ColumnLabelProvider, Comparator)} method, and
+ * set the content provider and input on the supplied {@link TableViewer}.
  *
  * @since 2.0
  */
 public class TmfSimpleTableViewer extends TmfViewer {
+
+    /**
+     * Viewer comparator that ignores the element label strings and uses the
+     * given comparator to compare the elements directly.
+     */
+    private static class ElementComparator extends ViewerComparator {
+
+        public ElementComparator(Comparator<?> comparator) {
+            super(comparator);
+        }
+
+        @Override
+        public int compare(Viewer viewer, Object e1, Object e2) {
+            return getComparator().compare(e1, e2);
+        }
+    }
+
+    /**
+     * Comparator that compares the text of a column given by the label
+     * provider, using the text's String ordering.
+     */
+    private static class ColumnLabelComparator implements Comparator<Object> {
+        private final ILabelProvider fLabelProvider;
+
+        public ColumnLabelComparator(ILabelProvider labelProvider) {
+            fLabelProvider = labelProvider;
+        }
+
+        @Override
+        public int compare(Object o1, Object o2) {
+            String s1 = nullToEmptyString(fLabelProvider.getText(o1));
+            String s2 = nullToEmptyString(fLabelProvider.getText(o2));
+            return s1.compareTo(s2);
+        }
+    }
 
     private final class MouseColumnListener extends MouseAdapter {
         @Override
@@ -68,10 +102,12 @@ public class TmfSimpleTableViewer extends TmfViewer {
     }
 
     private final class ColumnSorter extends SelectionAdapter {
-        private final TableColumn fColumn;
+        private final @NonNull TableColumn fColumn;
+        private final @NonNull Comparator<?> fComparator;
 
-        private ColumnSorter(TableColumn column) {
+        private ColumnSorter(@NonNull TableColumn column, @NonNull Comparator<?> comparator) {
             fColumn = column;
+            fComparator = comparator;
         }
 
         @Override
@@ -83,33 +119,24 @@ public class TmfSimpleTableViewer extends TmfViewer {
             }
             table.setSortDirection(fDirection);
             table.setSortColumn(fColumn);
-            ViewerCompoundComparator comparator = fComparators.get(fColumn.getText());
+            Comparator<?> comparator;
             if (fDirection == SWT.DOWN) {
-                fTableViewer.setComparator(comparator);
+                comparator = fComparator;
             } else {
-                fTableViewer.setComparator(new InvertSorter(comparator));
+                comparator = checkNotNull(Collections.reverseOrder(fComparator));
             }
-            sortOrderChanged();
+            IContentProvider contentProvider = fTableViewer.getContentProvider();
+            if (contentProvider instanceof DeferredContentProvider) {
+                DeferredContentProvider deferredContentProvider = (DeferredContentProvider) contentProvider;
+                deferredContentProvider.setSortOrder(comparator);
+            } else {
+                fTableViewer.setComparator(new ElementComparator(comparator));
+            }
         }
-    }
-
-    private class InvertSorter extends ViewerCompoundComparator {
-
-        public InvertSorter(final ViewerComparator vc) {
-            super(new Comparator<Object>() {
-                                @Override
-                public int compare(Object e1, Object e2) {
-                    return vc.compare(null, e2, e1);
-                }
-
-            });
-        }
-
     }
 
     private static final int DEFAULT_COL_WIDTH = 200;
     private final TableViewer fTableViewer;
-    private final Map<String, ViewerCompoundComparator> fComparators = new HashMap<>();
 
     private int fDirection;
     private int fSelectedColumn;
@@ -123,7 +150,6 @@ public class TmfSimpleTableViewer extends TmfViewer {
     public TmfSimpleTableViewer(TableViewer table) {
         super(table.getControl().getParent());
         fTableViewer = table;
-        createColumns();
 
         final Table tableControl = fTableViewer.getTable();
         tableControl.setHeaderVisible(true);
@@ -132,24 +158,22 @@ public class TmfSimpleTableViewer extends TmfViewer {
         fDirection = SWT.DOWN;
         fTableViewer.setUseHashlookup(true);
         fTableViewer.getControl().addMouseListener(new MouseColumnListener());
-        refresh();
     }
 
     /**
-     * Create a column for the table
+     * Create a column for the table. The column will have a default width set,
+     * and will be resizable, moveable and sortable.
      *
      * @param name
-     *            the name of the column (must be unique)
+     *            the name of the column
      * @param provider
-     *            the provider of the column
-     * @param viewerComparator
+     *            the label provider of the column
+     * @param comparator
      *            the comparator associated with clicking on the column, if it
-     *            is null, a string comparator will be used
+     *            is null, a string comparator on the label will be used
+     * @return the column that was created
      */
-    protected final void createColumn(String name, ColumnLabelProvider provider, ViewerCompoundComparator viewerComparator) {
-        if (fComparators.containsKey(name)) {
-            throw new IllegalArgumentException("Cannot have two columns with the same name"); //$NON-NLS-1$
-        }
+    public final TableColumn createColumn(String name, ColumnLabelProvider provider, @Nullable Comparator<?> comparator) {
         TableViewerColumn col = new TableViewerColumn(fTableViewer, SWT.NONE);
         col.setLabelProvider(provider);
         final TableColumn column = col.getColumn();
@@ -157,19 +181,12 @@ public class TmfSimpleTableViewer extends TmfViewer {
         column.setText(name);
         column.setResizable(true);
         column.setMoveable(true);
-        column.addSelectionListener(new ColumnSorter(column));
-        final ViewerCompoundComparator comparator = (viewerComparator == null) ? ViewerCompoundComparator.STRING_COMPARATOR : viewerComparator;
-        fComparators.put(name, comparator);
-    }
-
-    /**
-     * Column initializer, called in the constructor. This needs to be
-     * overridden. Use the
-     * {@link #createColumn(String, ColumnLabelProvider, ViewerCompoundComparator)}
-     * method to help create columns.
-     */
-    protected void createColumns() {
-        // override me!
+        if (comparator == null) {
+            column.addSelectionListener(new ColumnSorter(column, new ColumnLabelComparator(provider)));
+        } else {
+            column.addSelectionListener(new ColumnSorter(column, comparator));
+        }
+        return column;
     }
 
     /**
@@ -181,13 +198,6 @@ public class TmfSimpleTableViewer extends TmfViewer {
         } else {
             fDirection = SWT.DOWN;
         }
-    }
-
-    /**
-     * Called when the sort order has changed.
-     */
-    protected void sortOrderChanged() {
-        // Do nothing
     }
 
     @Override
