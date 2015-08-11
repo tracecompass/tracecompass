@@ -952,7 +952,6 @@ public class TimeGraphCombo extends Composite {
         try {
             tree.setRedraw(false);
             fTreeViewer.refresh();
-            fTreeViewer.expandToLevel(fTreeViewer.getAutoExpandLevel());
         } finally {
             tree.setRedraw(true);
         }
@@ -1003,14 +1002,15 @@ public class TimeGraphCombo extends Composite {
     }
 
     /**
-     * Sets the auto-expand level to be used when the input of the viewer is set
-     * using {@link #setInput(Object)}. The value 0 means that there is no
-     * auto-expand; 1 means that top-level elements are expanded, but not their
-     * children; 2 means that top-level elements are expanded, and their
-     * children, but not grand-children; and so on.
+     * Sets the auto-expand level to be used for new entries discovered when
+     * calling {@link #setInput(Object)} or {@link #refresh()}. The value 0
+     * means that there is no auto-expand; 1 means that top-level entries are
+     * expanded, but not their children; 2 means that top-level entries are
+     * expanded, and their children, but not grand-children; and so on.
      * <p>
      * The value {@link #ALL_LEVELS} means that all subtrees should be expanded.
      * </p>
+     *
      * @param level
      *            non-negative level, or <code>ALL_LEVELS</code> to expand all
      *            levels of the tree
@@ -1073,26 +1073,27 @@ public class TimeGraphCombo extends Composite {
 
     private List<TreeItem> getVisibleExpandedItems(Tree tree, boolean refresh) {
         if (fVisibleExpandedItems == null || refresh) {
-            ArrayList<TreeItem> items = new ArrayList<>();
-            for (TreeItem item : tree.getItems()) {
-                if (item.getData() == FILLER) {
-                    break;
-                }
-                items.add(item);
-                if (item.getExpanded()) {
-                    addVisibleExpandedItems(items, item);
-                }
-            }
-            fVisibleExpandedItems = items;
+            List<TreeItem> visibleExpandedItems = new ArrayList<>();
+            addVisibleExpandedItems(visibleExpandedItems, tree.getItems());
+            fVisibleExpandedItems = visibleExpandedItems;
         }
         return fVisibleExpandedItems;
     }
 
-    private void addVisibleExpandedItems(List<TreeItem> items, TreeItem treeItem) {
-        for (TreeItem item : treeItem.getItems()) {
-            items.add(item);
-            if (item.getExpanded()) {
-                addVisibleExpandedItems(items, item);
+    private void addVisibleExpandedItems(List<TreeItem> visibleExpandedItems, TreeItem[] items) {
+        for (TreeItem item : items) {
+            Object data = item.getData();
+            if (data == FILLER) {
+                break;
+            }
+            visibleExpandedItems.add(item);
+            boolean expandedState = fTimeGraphViewer.getExpandedState((ITimeGraphEntry) data);
+            if (item.getExpanded() != expandedState) {
+                /* synchronize the expanded state of both viewers */
+                fTreeViewer.setExpandedState(data, expandedState);
+            }
+            if (expandedState) {
+                addVisibleExpandedItems(visibleExpandedItems, item.getItems());
             }
         }
     }

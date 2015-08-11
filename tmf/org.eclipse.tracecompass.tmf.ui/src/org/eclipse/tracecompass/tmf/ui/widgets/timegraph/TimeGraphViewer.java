@@ -1427,14 +1427,15 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     }
 
     /**
-     * Sets the auto-expand level to be used when the input of the viewer is set
-     * using {@link #setInput(Object)}. The value 0 means that there is no
-     * auto-expand; 1 means that top-level elements are expanded, but not their
-     * children; 2 means that top-level elements are expanded, and their
-     * children, but not grand-children; and so on.
+     * Sets the auto-expand level to be used for new entries discovered when
+     * calling {@link #setInput(Object)} or {@link #refresh()}. The value 0
+     * means that there is no auto-expand; 1 means that top-level entries are
+     * expanded, but not their children; 2 means that top-level entries are
+     * expanded, and their children, but not grand-children; and so on.
      * <p>
      * The value {@link #ALL_LEVELS} means that all subtrees should be expanded.
      * </p>
+     *
      * @param level
      *            non-negative level, or <code>ALL_LEVELS</code> to expand all
      *            levels of the tree
@@ -1452,6 +1453,18 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      */
     public int getAutoExpandLevel() {
         return fTimeGraphCtrl.getAutoExpandLevel();
+    }
+
+    /**
+     * Get the expanded state of an entry.
+     *
+     * @param entry
+     *            The entry
+     * @return true if the entry is expanded, false if collapsed
+     * @since 1.1
+     */
+    public boolean getExpandedState(ITimeGraphEntry entry) {
+        return fTimeGraphCtrl.getExpandedState(entry);
     }
 
     /**
@@ -1476,7 +1489,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     }
 
     /**
-     * Expands all nodes of the viewer's tree, starting with the root.
+     * Expands all entries of the viewer's tree, starting with the root.
      */
     public void expandAll() {
         fTimeGraphCtrl.expandAll();
@@ -1484,18 +1497,20 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     }
 
     /**
-     * Get the number of sub-elements when expanded
+     * Get the number of expanded (visible) time graph entries. This includes
+     * leafs and does not include filtered-out entries.
      *
-     * @return The element count
+     * @return The number of expanded (visible) time graph entries
      */
     public int getExpandedElementCount() {
         return fTimeGraphCtrl.getExpandedElementCount();
     }
 
     /**
-     * Get the sub-elements
+     * Get the expanded (visible) time graph entries. This includes leafs and
+     * does not include filtered-out entries.
      *
-     * @return The array of entries that are below this one
+     * @return The array of expanded (visible) time graph entries
      */
     public ITimeGraphEntry[] getExpandedElements() {
         return fTimeGraphCtrl.getExpandedElements();
