@@ -17,6 +17,7 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -120,6 +121,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     private long fTime1bak;
     private boolean fIsInUpdate;
     private int fHeight;
+    private List<Integer> fTickList = new ArrayList<>();
 
     /**
      * Standard constructor
@@ -199,6 +201,16 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
             }
         }
         redraw();
+    }
+
+    /**
+     * Get the list of visible ticks of the time axis.
+     *
+     * @return the list of visible tick x-coordinates
+     * @since 2.0
+     */
+    public List<Integer> getTickList() {
+        return fTickList;
     }
 
     private long calcTimeDelta(int width, double pixelsPerNanoSec) {
@@ -334,6 +346,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         gc.fillRectangle(rect0);
 
         if (time1 <= time0 || timeSpace < 2) {
+            fTickList.clear();
             return;
         }
 
@@ -386,6 +399,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
             timeDraw.drawAbsHeader(gc, time, absHeaderRect);
         }
 
+        List<Integer> tickList = new ArrayList<>();
         while (true) {
             int x = rect.x + leftSpace + (int) (Math.floor((time - time0) * pixelsPerNanoSec));
             if (x >= rect.x + leftSpace + rect.width - rect0.width) {
@@ -397,6 +411,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
                 if (x + rect0.width <= rect.x + rect.width) {
                     timeDraw.draw(gc, time, rect0);
                 }
+                tickList.add(x);
             }
             if (pixelsPerNanoSec == 0 || time > Long.MAX_VALUE - timeDelta || timeDelta == 0) {
                 break;
@@ -427,6 +442,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
                 time += timeDelta;
             }
         }
+        fTickList = tickList;
     }
 
     private static void drawRangeDecorators(Rectangle rect, GC gc, int x1, int x2) {

@@ -153,6 +153,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private final Cursor fZoomCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_SIZEWE);
     private final List<ViewerFilter> fFilters = new ArrayList<>();
     private MenuDetectEvent fPendingMenuDetectEvent = null;
+    private boolean fGridLinesVisible = true;
+    private Color fGridLineColor = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
     private boolean fHideArrows = false;
     private int fAutoExpandLevel = ALL_LEVELS;
 
@@ -948,6 +950,48 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
+     * Set the grid lines visibility. The default is true.
+     *
+     * @param visible
+     *            true to show the grid lines, false otherwise
+     * @since 2.0
+     */
+    public void setGridLinesVisible(boolean visible) {
+        fGridLinesVisible = visible;
+    }
+
+    /**
+     * Get the grid lines visibility.
+     *
+     * @return true if the grid lines are visible, false otherwise
+     * @since 2.0
+     */
+    public boolean getGridLinesVisible() {
+        return fGridLinesVisible;
+    }
+
+    /**
+     * Set the grid line color. The default is SWT.COLOR_GRAY.
+     *
+     * @param color
+     *            the grid line color
+     * @since 2.0
+     */
+    public void setGridLineColor(Color color) {
+        fGridLineColor = color;
+    }
+
+    /**
+     * Get the grid line color.
+     *
+     * @return the grid line color
+     * @since 2.0
+     */
+    public Color getGridLineColor() {
+        return fGridLineColor;
+    }
+
+    /**
      * Hide arrows
      *
      * @param hideArrows true to hide arrows
@@ -1317,6 +1361,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
         drawBackground(bounds, nameSpace, gc);
 
+        // draw the grid lines
+        drawGridLines(bounds, gc);
+
         // draw items
         drawItems(bounds, fTimeProvider, fItemData.fExpandedItems, fTopIndex, nameSpace, gc);
         drawLinks(bounds, fTimeProvider, fItemData.fLinks, nameSpace, gc);
@@ -1428,6 +1475,25 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 gc.setBackground(getColorScheme().getBkColor(true, fIsInFocus, false));
                 gc.fillRectangle(nameSpace, itemRect.y, itemRect.width - nameSpace, itemRect.height);
             }
+        }
+    }
+
+    /**
+     * Draw the grid lines
+     *
+     * @param bounds
+     *            The rectangle of the area
+     * @param gc
+     *            Reference to the SWT GC object
+     * @since 2.0
+     */
+    public void drawGridLines(Rectangle bounds, GC gc) {
+        if (!fGridLinesVisible) {
+            return;
+        }
+        gc.setForeground(fGridLineColor);
+        for (int x : fTimeGraphScale.getTickList()) {
+            gc.drawLine(x, bounds.y, x, bounds.y + bounds.height);
         }
     }
 
