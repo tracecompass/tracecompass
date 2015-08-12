@@ -247,7 +247,7 @@ public class ImportHandler extends BaseControlViewHandler {
                     initializeTraceResource(connectionInfo, lttngRelaydConsumer.getTracePath(), project);
                     return Status.OK_STATUS;
                 } catch (CoreException | TmfTraceImportException e) {
-                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.ImportHandler_LiveTraceInitError, e);
+                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_LiveTraceInitError, e);
                 }
             }
 
@@ -283,7 +283,7 @@ public class ImportHandler extends BaseControlViewHandler {
         }
 
         if (found == null) {
-            throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.ImportHandler_LiveTraceElementError));
+            throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_LiveTraceElementError));
         }
 
         // Properties used to be able to reopen a trace in live mode

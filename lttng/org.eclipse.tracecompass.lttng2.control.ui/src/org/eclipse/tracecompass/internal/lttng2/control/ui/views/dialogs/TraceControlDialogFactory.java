@@ -54,6 +54,11 @@ public final class TraceControlDialogFactory {
     private ISelectCommandScriptDialog fCommandScriptDialog;
 
     /**
+     * The command script selection dialog.
+     */
+    private ILoadDialog fLoadDialog;
+
+    /**
      * The enable events dialog.
      */
     private IEnableEventsDialog fEnableEventsDialog;
@@ -151,6 +156,25 @@ public final class TraceControlDialogFactory {
             fCommandScriptDialog = new OpenCommandScriptDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
         }
         return fCommandScriptDialog;
+    }
+
+    /**
+     * @return command script selection dialog implementation
+     */
+    public ILoadDialog getLoadDialog() {
+        if (fLoadDialog == null) {
+            fLoadDialog = new LoadDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+        }
+        return fLoadDialog;
+    }
+
+    /**
+     * Sets a load dialog implementation
+     * @param loadDialog
+     *            a load dialog implementation
+     */
+    public void setLoadDialog(ILoadDialog loadDialog) {
+        fLoadDialog = loadDialog;
     }
 
     /**
