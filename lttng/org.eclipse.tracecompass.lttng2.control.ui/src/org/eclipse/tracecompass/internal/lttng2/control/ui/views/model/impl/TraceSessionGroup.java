@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISessionInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceControlComponent;
 
@@ -142,22 +143,6 @@ public class TraceSessionGroup extends TraceControlComponent {
     }
 
     /**
-     * Loads a session from a path
-     *
-     * @param sessionPath
-     *
-     * @param monitor
-     *            - a progress monitor
-     * @throws ExecutionException
-     *             If the command fails
-     */
-    public void loadSession(String sessionPath, IProgressMonitor monitor) throws ExecutionException {
-       getControlService().loadSession(sessionPath, monitor);
-
-
-    }
-
-    /**
      * Command to execute a list of commands
      * @param monitor
      *            - a progress monitor
@@ -186,5 +171,23 @@ public class TraceSessionGroup extends TraceControlComponent {
         getControlService().destroySession(session.getName(), monitor);
         session.removeAllChildren();
         removeChild(session);
+    }
+
+    /**
+     * Load all or a given session.
+     *
+     * @param inputPath
+     *            a input path to load session from or null for load all from default
+     * @param isForce
+     *            flag whether to overwrite existing or not
+     * @param monitor
+     *            a progress monitor
+     * @throws ExecutionException
+     *             If the command fails
+     */
+    public void loadSession(@Nullable String inputPath, boolean isForce, IProgressMonitor monitor)
+            throws ExecutionException {
+        getControlService().loadSession(inputPath, isForce, monitor);
+        getTargetNode().refresh();
     }
 }

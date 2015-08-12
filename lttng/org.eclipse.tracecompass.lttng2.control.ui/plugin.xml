@@ -204,11 +204,12 @@
             id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.snapshot"
             name="%commands.control.snapshot">
       </command>
+
       <command
-            defaultHandler="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.ProfileHandler"
-            description="%commands.control.wizard.description"
-            id="org.eclipse.tracecompass.lttng2.control.ui.wizard"
-            name="%commands.control.wizard">
+            categoryId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.category"
+            description="%commands.control.load.description"
+            id="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.load"
+            name="%commands.control.load">
       </command>
 
    </extension>
@@ -287,12 +288,6 @@
                commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.import"
                icon="icons/elcl16/import_trace.gif"
                label="%commands.control.import"
-               style="push">
-         </command>
-         <command
-               commandId="org.eclipse.tracecompass.lttng2.control.ui.wizard"
-               icon="icons/elcl16/add_button.gif"
-               label="%commands.control.record"
                style="push">
          </command>
          
@@ -378,7 +373,30 @@
                label="%commands.control.create.session"
                style="push">
             <visibleWhen
-                  checkEnabled="false">
+                  checkEnabled="true">
+               <with
+                     variable="activeMenuSelection">
+                  <and>
+                    <iterate
+                         operator="or">
+                         <instanceof
+                               value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionGroup">
+                         </instanceof>
+                      </iterate>
+                      <count
+                           value="1">
+                      </count>
+                  </and>   
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.load"
+               icon="icons/elcl16/import_button.png"
+               label="%commands.control.load"
+               style="push">
+            <visibleWhen
+                  checkEnabled="true">
             </visibleWhen>
          </command>
          <command
@@ -833,16 +851,6 @@
                </with>
             </visibleWhen>
          </command>
-         <command
-               commandId="org.eclipse.tracecompass.lttng2.control.ui.wizard"
-               icon="icons/obj16/channel_disabled.gif"
-               label="Record..."
-               style="push"
-               >
-            <visibleWhen
-                  checkEnabled="true">
-            </visibleWhen>
-         </command>
 
       </menuContribution>
       
@@ -935,6 +943,26 @@
                </iterate>
             </with>
          </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.LoadHandler"
+            commandId="org.eclipse.linuxtools.internal.lttng2.ui.commands.control.load">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <and>   
+                  <iterate
+                        operator="or">
+                     <instanceof
+                           value="org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionGroup">
+                     </instanceof>
+                  </iterate>
+                  <count
+                        value="1">
+                  </count>
+               </and>
+            </with>
+        </activeWhen>
       </handler>
       <handler
             class="org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers.ExecuteCommandScriptHandler"

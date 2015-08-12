@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISessionInfo;
@@ -144,7 +145,6 @@ class NullControlService implements ILttngControlService {
     }
 
     @Override
-    public void loadSession(String sessionName, IProgressMonitor monitor) throws ExecutionException {
-
+    public void loadSession(@Nullable String inputPath, boolean isForce, IProgressMonitor monitor) throws ExecutionException {
     }
 }

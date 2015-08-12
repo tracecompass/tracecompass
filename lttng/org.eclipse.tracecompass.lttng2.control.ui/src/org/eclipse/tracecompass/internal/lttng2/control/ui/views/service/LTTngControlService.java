@@ -669,16 +669,6 @@ public class LTTngControlService implements ILttngControlService {
     }
 
     @Override
-    public void loadSession(String sessionPath, IProgressMonitor monitor) throws ExecutionException {
-
-        ICommandInput command = createCommand(LTTngControlServiceConstants.COMMAND_LOAD_SESSION, "-i", sessionPath); //$NON-NLS-1$
-
-        executeCommand(command, monitor);
-
-        // Session <sessionName> loaded
-    }
-
-    @Override
     public void enableChannels(String sessionName, List<String> channelNames, boolean isKernel, IChannelInfo info, IProgressMonitor monitor) throws ExecutionException {
 
         // no channels to enable
@@ -1027,6 +1017,22 @@ public class LTTngControlService implements ILttngControlService {
         command.add(LTTngControlServiceConstants.OPTION_SESSION);
         command.add(newSessionName);
 
+        executeCommand(command, monitor);
+    }
+
+    @Override
+    public void loadSession(String inputPath, boolean isForce, IProgressMonitor monitor)
+            throws ExecutionException {
+        ICommandInput command = createCommand(LTTngControlServiceConstants.COMMAND_LOAD_SESSION);
+
+        if (inputPath != null) {
+            command.add(LTTngControlServiceConstants.OPTION_INPUT_PATH);
+            command.add(inputPath);
+        }
+
+        if (isForce) {
+            command.add(LTTngControlServiceConstants.OPTION_FORCE);
+        }
         executeCommand(command, monitor);
     }
 

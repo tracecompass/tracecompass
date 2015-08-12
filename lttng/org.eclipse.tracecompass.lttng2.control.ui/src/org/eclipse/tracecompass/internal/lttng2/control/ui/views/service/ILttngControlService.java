@@ -402,16 +402,17 @@ public interface ILttngControlService {
             throws ExecutionException;
 
     /**
-     * Load a session with given session name.
+     * Load all or a given session.
      *
-     * @param sessionName
-     *            - a session name to start
+     * @param inputPath
+     *            a input path to load session from or null for load all from default
+     * @param isForce
+     *            flag whether to overwrite existing or not
      * @param monitor
-     *            - a progress monitor
+     *            a progress monitor
      * @throws ExecutionException
      *             If the command fails
      */
-    void loadSession(String sessionName, IProgressMonitor monitor)
+    void loadSession(@Nullable String inputPath, boolean isForce, IProgressMonitor monitor)
             throws ExecutionException;
-
 }

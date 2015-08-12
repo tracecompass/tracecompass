@@ -17,7 +17,6 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.Map;
 
-import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.window.Window;
@@ -33,8 +32,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.ICommandService;
-import org.eclipse.ui.services.IServiceLocator;
 
 /**
  * <p>
@@ -101,28 +98,6 @@ public class NewConnectionHandler extends BaseControlViewHandler {
                 fLock.unlock();
             }
         }
-
-        // Obtain IServiceLocator implementer, e.g. from PlatformUI.getWorkbench():
-        IServiceLocator serviceLocator = PlatformUI.getWorkbench();
-        // or a site from within a editor or view:
-        // IServiceLocator serviceLocator = getSite();
-
-        ICommandService commandService = serviceLocator.getService(ICommandService.class);
-
-
-            // Lookup commmand with its ID
-            Command command = commandService.getCommand("org.eclipse.linuxtools.internal.lttng2.ui.commands.control.createSession"); //$NON-NLS-1$
-
-            // Optionally pass a ExecutionEvent instance, default no-param arg creates blank event
-            try {
-                // execute new connection command directly
-                command.executeWithChecks(new ExecutionEvent());
-              // FIX THIS OH GOD THE INHUMANITY
-            } catch (Exception e) {
-
-                e.printStackTrace();
-            }
-
         return null;
     }
 
