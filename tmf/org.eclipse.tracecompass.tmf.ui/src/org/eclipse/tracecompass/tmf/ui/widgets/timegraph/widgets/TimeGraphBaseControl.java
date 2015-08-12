@@ -82,6 +82,10 @@ public abstract class TimeGraphBaseControl extends Canvas implements PaintListen
         if (e.widget != this) {
             return;
         }
+
+        // we will use advanced graphics, set now for consistent output
+        e.gc.setAdvanced(true);
+
         fFontHeight = e.gc.getFontMetrics().getHeight();
         Rectangle bound = getClientArea();
         if (!bound.isEmpty()) {
