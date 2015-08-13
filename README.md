@@ -60,9 +60,17 @@ These commands will also build the p2 update site, which will be placed in
 Maven profiles and properties
 -----------------------------
 
-The following Maven profiles, and their corresponding properties, are defined in
+The following Maven profiles and properties are defined in
 the build system. You can set them by using `-P[profile name]` and
 `-D[property name]=[value]` in `mvn` commands.
+
+* `-Dtarget-platform=[target]`
+
+  Defines which target to use. This is used to build against various versions of
+  the Eclipse platform. Available ones are in
+  `releng/org.eclipse.tracecompass.target`. The default is usually the latest
+  stable platform. To use the staging target for example, use
+  `-Dtarget-platform=tracecompass-eStaging`.
 
 * `-Pctf-grammar`
 
