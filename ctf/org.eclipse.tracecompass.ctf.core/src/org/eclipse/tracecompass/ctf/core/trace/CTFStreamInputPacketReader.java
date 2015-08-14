@@ -235,6 +235,7 @@ public class CTFStreamInputPacketReader implements IDefinitionScope, AutoCloseab
      */
     public void setCurrentPacket(ICTFPacketDescriptor currentPacket) throws CTFException {
         fCurrentPacket = currentPacket;
+        fHasLost = false;
 
         if (fCurrentPacket != null) {
             /*
