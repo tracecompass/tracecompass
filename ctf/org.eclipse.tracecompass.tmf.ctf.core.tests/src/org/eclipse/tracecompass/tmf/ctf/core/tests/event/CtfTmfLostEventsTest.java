@@ -96,6 +96,34 @@ public class CtfTmfLostEventsTest {
     }
 
     /**
+     * Test that the number of events is reported correctly (a range of lost
+     * events is counted as one event). Events could be wrongly counted as lost
+     * events in certain situations.
+     */
+    @Test
+    public void testNbEventsBug475007() {
+        final CtfTmfTestTrace tmfTestTrace = CtfTmfTestTrace.DYNSCOPE;
+        assumeTrue(tmfTestTrace.exists());
+        try (CtfTmfTrace trace = tmfTestTrace.getTrace()) {
+            trace.indexTrace(true);
+
+            final long expectedReal = 100003;
+            final long expectedLost = 1;
+
+            EventCountRequest req = new EventCountRequest();
+            trace.sendRequest(req);
+            try {
+                req.waitForCompletion();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            assertEquals(expectedReal, req.getReal());
+            assertEquals(expectedLost, req.getLost());
+        }
+    }
+
+    /**
      * Test getting the first lost event from the trace.
      */
     @Test
