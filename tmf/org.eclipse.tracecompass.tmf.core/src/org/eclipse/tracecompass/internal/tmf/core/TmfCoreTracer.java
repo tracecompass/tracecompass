@@ -57,6 +57,7 @@ public final class TmfCoreTracer {
     private static final String SIGNAL_TRACE_KEY    = PLUGIN_ID + "/signal";
     private static final String EVENT_TRACE_KEY     = PLUGIN_ID + "/event";
     private static final String ANALYSIS_TRACE_KEY     = PLUGIN_ID + "/analysis";
+    private static final String INDEXER_TRACE_KEY   = PLUGIN_ID + "/indexer";
 
     private static final String TRACE_FILE_NAME = "TmfTrace.log";
 
@@ -70,6 +71,7 @@ public final class TmfCoreTracer {
     private static volatile boolean fSignalClassEnabled    = false;
     private static volatile boolean fEventClassEnabled     = false;
     private static volatile boolean fAnalysisClassEnabled  = false;
+    private static volatile boolean fIndexerClassEnabled   = false;
 
     // Trace log file
     private static BufferedWriter fTraceFile;
@@ -124,6 +126,12 @@ public final class TmfCoreTracer {
         if (traceKey != null) {
             fAnalysisClassEnabled = (Boolean.valueOf(traceKey)).booleanValue();
             isTracing |= fAnalysisClassEnabled;
+        }
+
+        traceKey = Platform.getDebugOption(INDEXER_TRACE_KEY);
+        if (traceKey != null) {
+            fIndexerClassEnabled = (Boolean.valueOf(traceKey)).booleanValue();
+            isTracing |= fIndexerClassEnabled;
         }
 
         // Create trace log file if any of the flags was set
@@ -200,6 +208,15 @@ public final class TmfCoreTracer {
         return fAnalysisClassEnabled;
     }
 
+    /**
+     * Is indexer tracing enabled? (useful to debug indexer issues)
+     *
+     * @return true if indexer is traced, false otherwise
+     */
+    public static boolean isIndexerTraced() {
+        return fAnalysisClassEnabled;
+    }
+
     // ------------------------------------------------------------------------
     // Tracing methods
     // ------------------------------------------------------------------------
@@ -273,6 +290,19 @@ public final class TmfCoreTracer {
     public static void traceRequest(int requestId, String msg) {
         if (fRequestClassEnabled) {
             String message = ("[REQ] Req=" + requestId + " " + msg);
+            trace(message);
+        }
+    }
+
+    /**
+     * Trace an event happening in an indexer.
+     *
+     * @param msg
+     *            The message to record for this indexer
+     */
+    public static void traceIndexer(String msg) {
+        if (fIndexerClassEnabled) {
+            String message = ("[INDEXER] " + msg);
             trace(message);
         }
     }

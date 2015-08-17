@@ -21,6 +21,7 @@ import java.nio.channels.FileChannel;
 import java.text.MessageFormat;
 
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
+import org.eclipse.tracecompass.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfPersistentlyIndexable;
@@ -248,6 +249,7 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
             fRandomAccessFile.setLength(header.getSize());
 
             fTimeRange = new TmfTimeRange(new TmfTimestamp(0), new TmfTimestamp(0));
+            TmfCoreTracer.traceIndexer(CheckpointCollectionFileHeader.class.getSimpleName() + " initialize " + "nbEvents: " + header.fNbEvents + " fTimeRangeOffset: " + header.fTimeRangeOffset + " fTimeRange: " + fTimeRange); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
         } catch (IOException e) {
             Activator.logError(MessageFormat.format(Messages.ErrorOpeningIndex, fFile), e);
             return null;
@@ -279,6 +281,7 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
                 return null;
             }
             serializeInTimeRange(header);
+            TmfCoreTracer.traceIndexer(CheckpointCollectionFileHeader.class.getSimpleName() + " read " + fFile + " nbEvents: " + header.fNbEvents + " fTimeRangeOffset: " + header.fTimeRangeOffset + " fTimeRange: " + fTimeRange); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
         } catch (IOException e) {
             Activator.logError(MessageFormat.format(Messages.IOErrorReadingHeader, fFile), e);
             return null;
@@ -471,6 +474,8 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
             }
             setCreatedFromScratch(true);
             fRandomAccessFile = null;
+            String headerTrace = fHeader == null ? "" : "nbEvents: " + fHeader.fNbEvents + " timerange:" + fTimeRange; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            TmfCoreTracer.traceIndexer(this.getClass().getSimpleName() + " disposed. " + headerTrace); //$NON-NLS-1$
         } catch (IOException e) {
             Activator.logError(MessageFormat.format(Messages.IOErrorClosingIndex, fFile), e);
         }

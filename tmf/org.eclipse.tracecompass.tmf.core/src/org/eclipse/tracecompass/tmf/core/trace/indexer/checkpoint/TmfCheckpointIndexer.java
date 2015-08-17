@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.Messages;
+import org.eclipse.tracecompass.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.tracecompass.internal.tmf.core.trace.indexer.TmfMemoryIndex;
 import org.eclipse.tracecompass.tmf.core.component.TmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -151,6 +152,7 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
         // No need to build the index, it has been restored
         if (!fTraceIndex.isCreatedFromScratch()) {
             // Set some trace attributes that depends on indexing
+            TmfCoreTracer.traceIndexer("Restoring index. nbEvents: " + fTraceIndex.getNbEvents() + " time range: " + fTraceIndex.getTimeRange()); //$NON-NLS-1$ //$NON-NLS-2$
             TmfTraceUpdatedSignal signal = new TmfTraceUpdatedSignal(this, fTrace, new TmfTimeRange(fTraceIndex.getTimeRange().getStartTime(), fTraceIndex.getTimeRange().getEndTime()), fTraceIndex.getNbEvents());
             if (waitForCompletion) {
                 fTrace.broadcast(signal);
@@ -160,6 +162,8 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
             fIsIndexing = false;
             return;
         }
+
+        TmfCoreTracer.traceIndexer("buildIndex. offset: " + offset + " time range: " + range); //$NON-NLS-1$ //$NON-NLS-2$
 
         // The monitoring job
         final Job job = new Job("Indexing " + fTrace.getName() + "...") { //$NON-NLS-1$ //$NON-NLS-2$
@@ -215,6 +219,7 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
                 job.cancel();
                 super.handleCompleted();
                 fIsIndexing = false;
+                TmfCoreTracer.traceIndexer("Build index request done. nbEvents: " + fTraceIndex.getNbEvents() + " time range: " + fTraceIndex.getTimeRange()); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             private void updateTraceStatus() {
@@ -255,7 +260,9 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
             final long position = context.getRank() / fCheckpointInterval;
             // Add new entry at proper location (if empty)
             if (fTraceIndex.size() == position) {
-                fTraceIndex.insert(new TmfCheckpoint(timestamp, context.getLocation(), position));
+                TmfCheckpoint checkpoint = new TmfCheckpoint(timestamp, context.getLocation(), position);
+                TmfCoreTracer.traceIndexer("Inserting checkpoint: " + checkpoint); //$NON-NLS-1$
+                fTraceIndex.insert(checkpoint);
             }
         }
     }
