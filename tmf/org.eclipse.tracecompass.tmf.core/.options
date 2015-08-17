@@ -3,3 +3,4 @@ org.eclipse.tracecompass.tmf.core/request=false
 org.eclipse.tracecompass.tmf.core/signal=false
 org.eclipse.tracecompass.tmf.core/event=false
 org.eclipse.tracecompass.tmf.core/analysis=false
+org.eclipse.tracecompass.tmf.core/indexer=false
