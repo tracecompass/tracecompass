@@ -250,6 +250,8 @@ public final class TmfCoreTracer {
         // Append the trace message
         message.append(msg);
 
+        System.out.println(message);
+
         // Write to file
         try {
             fTraceFile.write(message.toString());

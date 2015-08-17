@@ -167,6 +167,8 @@ public class TmfUiTracer {
         message.append("] ");
         message.append(msg);
 
+        System.out.println(message);
+
         try {
             fTraceLog.write(message.toString());
             fTraceLog.newLine();
