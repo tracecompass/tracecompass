@@ -31,6 +31,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
@@ -161,22 +162,22 @@ public class StandardImportGzipTraceTest {
          * This appears to be problematic due to the length of the file name and
          * the resolution in our CI.
          */
-        tree.expandNode(PROJECT_NAME, true);
-        SWTBotTreeItem treeItem = tree.getTreeItem(PROJECT_NAME);
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(tracesNode, treeItem));
-        treeItem = treeItem.getNode(tracesNode);
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(traceName, treeItem));
-        treeItem = treeItem.getNode(traceName);
+        SWTBotTreeItem treeItem = SWTBotUtils.getTreeItem(projectExplorer.bot(), tree, PROJECT_NAME, tracesNode, traceName);
         treeItem.doubleClick();
         SWTBotUtils.waitForJobs();
         /*
          * Check results
          */
-        SWTBotTable editor = fBot.activeEditor().bot().table();
-        String c22 = editor.cell(2, 2);
-        String c10 = editor.cell(1, 0);
-        assertEquals("Type-1", c22);
-        assertEquals("", c10);
+        SWTBot editorBot = fBot.activeEditor().bot();
+        SWTBotTable editorTable = editorBot.table();
+        final String expectedContent1 = "Type-1";
+        final String expectedContent2 = "";
+        editorBot.waitUntil(ConditionHelpers.isTableCellFilled(editorTable, expectedContent1, 2, 2));
+        editorBot.waitUntil(ConditionHelpers.isTableCellFilled(editorTable, expectedContent2, 1, 0));
+        String c22 = editorTable.cell(2, 2);
+        String c10 = editorTable.cell(1, 0);
+        assertEquals(expectedContent1, c22);
+        assertEquals(expectedContent2, c10);
     }
 
     private static void zipTrace() {
