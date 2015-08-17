@@ -99,20 +99,4 @@ public class BTreeTest extends AbstractCheckpointCollectionTest {
             assertEquals(checkpoint, treeVisitor.getCheckpoint());
         }
     }
-
-    /**
-     * Test setSize, size
-     */
-    @Override
-    @Test
-    public void testSetGetSize() {
-        assertEquals(0, fBTree.size());
-        int expected = CHECKPOINTS_INSERT_NUM;
-        for (int i = 0; i < expected; ++i) {
-            fBTree.insert(new TmfCheckpoint(new TmfTimestamp(0), new TmfLongLocation(0L), 0));
-            fBTree.setSize(fBTree.size() + 1);
-        }
-        assertEquals(expected, fBTree.size());
-    }
-
 }

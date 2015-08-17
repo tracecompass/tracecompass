@@ -102,10 +102,4 @@ public class TmfFlatArrayTraceIndex implements ITmfCheckpointIndex {
     public long getNbEvents() {
         return fCheckpoints.getNbEvents();
     }
-
-    @Override
-    public void setIndexComplete() {
-        fCheckpoints.setIndexComplete();
-    }
-
 }

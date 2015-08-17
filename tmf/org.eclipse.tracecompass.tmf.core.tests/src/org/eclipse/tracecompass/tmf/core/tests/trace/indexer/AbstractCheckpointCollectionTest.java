@@ -126,7 +126,6 @@ public abstract class AbstractCheckpointCollectionTest {
     public void testConstructorExistingFile() {
         if (isPersistableCollection()) {
             assertTrue(fFile.exists());
-            fCheckpointCollection.setIndexComplete();
             fCheckpointCollection.dispose();
 
             fCheckpointCollection = createCollection();
@@ -141,7 +140,6 @@ public abstract class AbstractCheckpointCollectionTest {
     @Test
     public void testIsCreatedFromScratch() {
         assertTrue(fCheckpointCollection.isCreatedFromScratch());
-        fCheckpointCollection.setIndexComplete();
 
         if (isPersistableCollection()) {
             fCheckpointCollection.dispose();
@@ -182,14 +180,14 @@ public abstract class AbstractCheckpointCollectionTest {
     }
 
     /**
-     * Test setSize, size
+     * Test get size
      */
     @Test
-    public void testSetGetSize() {
+    public void testGetSize() {
         assertEquals(0, fCheckpointCollection.size());
         int expected = CHECKPOINTS_INSERT_NUM;
         for (int i = 0; i < expected; ++i) {
-            fCheckpointCollection.insert(new TmfCheckpoint(new TmfTimestamp(0), new TmfLongLocation(0L), 0));
+            fCheckpointCollection.insert(new TmfCheckpoint(new TmfTimestamp(i), new TmfLongLocation(i), i));
         }
         assertEquals(expected, fCheckpointCollection.size());
     }
@@ -214,7 +212,6 @@ public abstract class AbstractCheckpointCollectionTest {
      */
     @Test
     public void testVersionChange() throws IOException {
-        fCheckpointCollection.setIndexComplete();
         fCheckpointCollection.dispose();
         try (RandomAccessFile f = new RandomAccessFile(fFile, "rw");) {
             f.writeInt(-1);
@@ -234,6 +231,7 @@ public abstract class AbstractCheckpointCollectionTest {
 
         long found = fCheckpointCollection.binarySearch(checkpoint);
         assertEquals(0, found);
+        assertEquals(1, fCheckpointCollection.size());
     }
 
     /**
@@ -247,7 +245,7 @@ public abstract class AbstractCheckpointCollectionTest {
             fCheckpointCollection.insert(checkpoint);
         }
 
-        fCheckpointCollection.setIndexComplete();
+        assertEquals(CHECKPOINTS_INSERT_NUM, fCheckpointCollection.size());
         if (isPersistableCollection()) {
             fCheckpointCollection.dispose();
         }
@@ -276,6 +274,7 @@ public abstract class AbstractCheckpointCollectionTest {
         if (isPersistableCollection()) {
             fCheckpointCollection = createCollection();
         }
+        assertEquals(CHECKPOINTS_INSERT_NUM, fCheckpointCollection.size());
 
         for (int i = 0; i < CHECKPOINTS_INSERT_NUM; i++) {
             Integer randomCheckpoint = list.get(i);
@@ -283,6 +282,8 @@ public abstract class AbstractCheckpointCollectionTest {
             long found = fCheckpointCollection.binarySearch(checkpoint);
             assertEquals(randomCheckpoint.intValue(), found);
         }
+
+        assertEquals(CHECKPOINTS_INSERT_NUM, fCheckpointCollection.size());
     }
 
     /**
@@ -295,8 +296,8 @@ public abstract class AbstractCheckpointCollectionTest {
             TmfCheckpoint checkpoint = new TmfCheckpoint(new TmfTimestamp(12345), new TmfLongLocation(123456L + i), i);
             fCheckpointCollection.insert(checkpoint);
         }
+        assertEquals(CHECKPOINTS_INSERT_NUM, fCheckpointCollection.size());
 
-        fCheckpointCollection.setIndexComplete();
         if (isPersistableCollection()) {
             fCheckpointCollection.dispose();
         }
@@ -315,6 +316,7 @@ public abstract class AbstractCheckpointCollectionTest {
         if (isPersistableCollection()) {
             fCheckpointCollection = createCollection();
         }
+        assertEquals(CHECKPOINTS_INSERT_NUM, fCheckpointCollection.size());
 
         for (int i = 0; i < CHECKPOINTS_INSERT_NUM; i++) {
             Integer randomCheckpoint = list.get(i);
@@ -334,6 +336,7 @@ public abstract class AbstractCheckpointCollectionTest {
             TmfCheckpoint checkpoint = new TmfCheckpoint(new TmfTimestamp(2 * i), new TmfLongLocation(2 * i), i);
             fCheckpointCollection.insert(checkpoint);
         }
+        assertEquals(CHECKPOINTS_INSERT_NUM, fCheckpointCollection.size());
 
         TmfCheckpoint searchedCheckpoint = new TmfCheckpoint(new TmfTimestamp(123), new TmfLongLocation(123L), 123);
         int expectedInsertionPoint = 61;
@@ -352,23 +355,53 @@ public abstract class AbstractCheckpointCollectionTest {
     @Test
     public void testBinarySearchInBetweenSameTimestamp() {
         int checkpointNum = 0;
-        for (; checkpointNum < 100; checkpointNum++) {
+        for (; checkpointNum < CHECKPOINTS_INSERT_NUM / 2; checkpointNum++) {
             TmfCheckpoint checkpoint = new TmfCheckpoint(new TmfTimestamp(0), new TmfLongLocation(checkpointNum), checkpointNum);
             fCheckpointCollection.insert(checkpoint);
         }
 
-        for (; checkpointNum < 200; checkpointNum++) {
+        for (; checkpointNum < CHECKPOINTS_INSERT_NUM; checkpointNum++) {
             TmfCheckpoint checkpoint = new TmfCheckpoint(new TmfTimestamp(1), new TmfLongLocation(checkpointNum), checkpointNum);
             fCheckpointCollection.insert(checkpoint);
         }
+        assertEquals(CHECKPOINTS_INSERT_NUM, fCheckpointCollection.size());
 
         final TmfCheckpoint searchedCheckpoint = new TmfCheckpoint(new TmfTimestamp(1), null, 0);
 
         long found = fCheckpointCollection.binarySearch(searchedCheckpoint);
 
-        int expectedInsertionPoint = 99;
+        int expectedInsertionPoint = CHECKPOINTS_INSERT_NUM / 2 - 1;
         int expectedRank = -(expectedInsertionPoint + 2);
 
         assertEquals(expectedRank, found);
+    }
+
+    /**
+     * Test checkpoint insertions after reopening the file.
+     */
+    @Test
+    public void testInsertAfterReopen() {
+        if (!isPersistableCollection()) {
+            return;
+        }
+
+        fCheckpointCollection.insert(new TmfCheckpoint(new TmfTimestamp(12345), new TmfLongLocation(123456L), 0));
+
+        assertEquals(1, fCheckpointCollection.size());
+
+        fCheckpointCollection.dispose();
+        fCheckpointCollection = createCollection();
+        assertEquals(1, fCheckpointCollection.size());
+
+        TmfCheckpoint checkpoint = new TmfCheckpoint(new TmfTimestamp(12345), new TmfLongLocation(123456L), 0);
+        long found = fCheckpointCollection.binarySearch(checkpoint);
+        assertEquals(0, found);
+
+        fCheckpointCollection.insert(new TmfCheckpoint(new TmfTimestamp(12345 + 1), new TmfLongLocation(123456L + 1), 1));
+        assertEquals(2, fCheckpointCollection.size());
+
+        fCheckpointCollection.dispose();
+        fCheckpointCollection = createCollection();
+        assertEquals(2, fCheckpointCollection.size());
     }
 }

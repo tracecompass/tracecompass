@@ -109,9 +109,4 @@ public interface ITmfCheckpointIndex {
      * @return the total number of events
      */
     long getNbEvents();
-
-    /**
-     * Set the index as complete. No more checkpoints will be inserted.
-     */
-    void setIndexComplete();
 }

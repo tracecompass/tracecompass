@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.checkpoint.ITmfCheckpoint;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.checkpoint.ITmfCheckpointIndex;
@@ -29,6 +30,8 @@ import org.eclipse.tracecompass.tmf.core.trace.indexer.checkpoint.ITmfCheckpoint
 public class TmfMemoryIndex implements ITmfCheckpointIndex, ICheckpointCollection {
 
     private final List<ITmfCheckpoint> fCheckpoints;
+    private TmfTimeRange fTimeRange;
+    private long fNbEvents;
 
     /**
      * Creates an index for the given trace
@@ -37,6 +40,8 @@ public class TmfMemoryIndex implements ITmfCheckpointIndex, ICheckpointCollectio
      */
     public TmfMemoryIndex(ITmfTrace trace) {
         fCheckpoints = new ArrayList<>();
+        fTimeRange = new TmfTimeRange(TmfTimestamp.ZERO, TmfTimestamp.ZERO);
+        fNbEvents = 0;
     }
 
     @Override
@@ -76,24 +81,22 @@ public class TmfMemoryIndex implements ITmfCheckpointIndex, ICheckpointCollectio
 
     @Override
     public void setTimeRange(TmfTimeRange timeRange) {
+        fTimeRange = timeRange;
     }
 
     @Override
     public void setNbEvents(long nbEvents) {
+        fNbEvents = nbEvents;
     }
 
     @Override
     public TmfTimeRange getTimeRange() {
-        return null;
+        return fTimeRange;
     }
 
     @Override
     public long getNbEvents() {
-        return 0;
-    }
-
-    @Override
-    public void setIndexComplete() {
+        return fNbEvents;
     }
 
     @Override
