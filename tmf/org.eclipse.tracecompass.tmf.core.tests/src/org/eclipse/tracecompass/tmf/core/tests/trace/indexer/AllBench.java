@@ -157,7 +157,6 @@ public class AllBench {
             }
 
             time += (System.currentTimeMillis() - old);
-            bTree.setIndexComplete();
             bTree.dispose();
             if (j != REPEAT - 1) {
                 file.delete();
@@ -183,7 +182,6 @@ public class AllBench {
             }
 
             time += (System.currentTimeMillis() - old);
-            array.setIndexComplete();
             array.dispose();
             if (j != REPEAT - 1) {
                 file.delete();

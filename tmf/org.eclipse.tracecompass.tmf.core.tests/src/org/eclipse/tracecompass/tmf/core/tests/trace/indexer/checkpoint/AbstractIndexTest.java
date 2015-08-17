@@ -28,6 +28,8 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -58,7 +60,16 @@ public abstract class AbstractIndexTest {
      *
      */
     protected static final int BLOCK_SIZE = 100;
-    private static final int NB_EVENTS = 10000;
+    /**
+     * The expected number of events in the test trace.
+     */
+    protected static final int NB_EVENTS = 10000;
+    /**
+     * Used to dispose the trace once the desired number of events has been
+     * reached in the trace. This has the wanted side effect of stopping the
+     * indexing once a number of events has been reached.
+     */
+    protected long fNbEventsLimit;
     /**
      * The trace being tested
      */
@@ -74,6 +85,7 @@ public abstract class AbstractIndexTest {
      */
     @Before
     public void setUp() {
+        fNbEventsLimit = Long.MAX_VALUE;
         setupTrace(getTracePath());
     }
 
@@ -161,6 +173,20 @@ public abstract class AbstractIndexTest {
         @Override
         public ITestIndexer getIndexer() {
             return (ITestIndexer) super.getIndexer();
+        }
+
+        /**
+         * Track the number of events in the trace in order to stop when the
+         * limit has been reached (fNbEventsLimit).
+         *
+         * @param signal
+         *            the TmfTraceUpdatedSignal
+         */
+        @TmfSignalHandler
+        public void testTraceUpdated(final TmfTraceUpdatedSignal signal) {
+            if (getNbEvents() >= fNbEventsLimit) {
+                dispose();
+            }
         }
     }
 
@@ -254,6 +280,7 @@ public abstract class AbstractIndexTest {
         ITmfCheckpointIndex checkpoints = fTrace.getIndexer().getCheckpoints();
         int pageSize = fTrace.getCacheSize();
         assertTrue(checkpoints != null);
+        assertEquals(NB_EVENTS, checkpoints.getNbEvents());
         assertEquals(NB_EVENTS / BLOCK_SIZE, checkpoints.size());
 
         // Validate that each checkpoint points to the right event

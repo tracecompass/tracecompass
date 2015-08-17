@@ -83,11 +83,6 @@ public interface ICheckpointCollection {
     long getNbEvents();
 
     /**
-     * Set the index as complete. No more checkpoints will be inserted.
-     */
-    void setIndexComplete();
-
-    /**
      * Dispose the collection and delete persistent data (file)
      */
     void delete();

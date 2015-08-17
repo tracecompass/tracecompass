@@ -81,7 +81,6 @@ public class TmfBTreeTraceIndex implements ITmfCheckpointIndex {
     public void insert(ITmfCheckpoint checkpoint) {
         fCheckpoints.insert(checkpoint);
         fCheckpointRanks.insert(checkpoint);
-        fCheckpoints.setSize(fCheckpoints.size() + 1);
     }
 
     @Override
@@ -131,8 +130,6 @@ public class TmfBTreeTraceIndex implements ITmfCheckpointIndex {
 
     @Override
     public void setIndexComplete() {
-        fCheckpoints.setIndexComplete();
-        fCheckpointRanks.setIndexComplete();
     }
 
 }

@@ -112,6 +112,7 @@ public interface ITmfCheckpointIndex {
 
     /**
      * Set the index as complete. No more checkpoints will be inserted.
+     * @Deprecated To be removed in 2.0. The index can always be considered incomplete.
      */
     void setIndexComplete();
 }

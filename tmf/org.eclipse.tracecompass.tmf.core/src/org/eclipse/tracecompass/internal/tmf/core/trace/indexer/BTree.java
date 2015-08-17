@@ -243,6 +243,8 @@ public class BTree extends AbstractFileCheckpointCollection {
                 }
             }
             node.setEntry(i, checkpoint);
+            CheckpointCollectionFileHeader header = getHeader();
+            ++header.fSize;
             return;
         }
     }
@@ -340,32 +342,12 @@ public class BTree extends AbstractFileCheckpointCollection {
     }
 
     /**
-     * Set the index as complete. No more checkpoints will be inserted.
-     */
-    @Override
-    public void setIndexComplete() {
-        super.setIndexComplete();
-
-        fNodeCache.serialize();
-    }
-
-    /**
      * Get the maximum number of entries in a node
      *
      * @return the maximum number of entries in a node
      */
     int getMaxNumEntries() {
         return fMaxNumEntries;
-    }
-
-    /**
-     * Set the size of the BTree, expressed as a number of checkpoints
-     *
-     * @param size
-     *            the size of the BTree
-     */
-    public void setSize(int size) {
-        fBTreeHeader.fSize = size;
     }
 
     /**
@@ -379,5 +361,14 @@ public class BTree extends AbstractFileCheckpointCollection {
 
     ByteBuffer getNodeByteBuffer() {
         return fNodeByteBuffer;
+    }
+
+    @Override
+    public void dispose() {
+        if (fNodeCache != null) {
+            fNodeCache.serialize();
+        }
+
+        super.dispose();
     }
 }

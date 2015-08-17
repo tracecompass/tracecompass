@@ -33,7 +33,8 @@ import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfPersistentlyIndexable
  */
 public abstract class AbstractFileCheckpointCollection implements ICheckpointCollection {
 
-    private static final int VERSION = 2;
+    private static final int INVALID_VERSION = -1;
+    private static final int VERSION = 3;
     private static final int SUB_VERSION_NONE = -1;
 
     /**
@@ -43,7 +44,8 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
         private static final int SIZE = INT_SIZE +
                 INT_SIZE +
                 LONG_SIZE +
-                LONG_SIZE;
+                LONG_SIZE +
+                MAX_TIME_RANGE_SERIALIZE_SIZE;
 
         /**
          * Get the size of the header in bytes. This should be overridden if the
@@ -76,7 +78,11 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
             fVersion = randomAccessFile.readInt();
             fSize = randomAccessFile.readInt();
             fNbEvents = randomAccessFile.readLong();
-            fTimeRangeOffset = randomAccessFile.readLong();
+            ByteBuffer b = ByteBuffer.allocate(MAX_TIME_RANGE_SERIALIZE_SIZE);
+            b.clear();
+            fFileChannel.read(b);
+            b.flip();
+            fTimeRange = new TmfTimeRange(new TmfTimestamp(b), new TmfTimestamp(b));
         }
 
         /**
@@ -99,10 +105,17 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
          */
         public void serialize(RandomAccessFile randomAccessFile) throws IOException {
             randomAccessFile.seek(0);
-            randomAccessFile.writeInt(getVersion());
+            // Version is written at the very last on dispose
+            randomAccessFile.writeInt(INVALID_VERSION);
             randomAccessFile.writeInt(fSize);
             randomAccessFile.writeLong(fNbEvents);
-            randomAccessFile.writeLong(fTimeRangeOffset);
+
+            ByteBuffer b = ByteBuffer.allocate(MAX_TIME_RANGE_SERIALIZE_SIZE);
+            b.clear();
+            new TmfTimestamp(fTimeRange.getStartTime()).serialize(b);
+            new TmfTimestamp(fTimeRange.getEndTime()).serialize(b);
+            b.rewind();
+            fFileChannel.write(b);
         }
 
         /**
@@ -115,13 +128,14 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
          */
         protected int fSize = 0;
         /**
-         * Offset in bytes where the time range is store
-         */
-        protected long fTimeRangeOffset;
-        /**
          * The total number of events in the trace
          */
         protected long fNbEvents;
+
+        /**
+         * The time range of the trace.
+         */
+        protected TmfTimeRange fTimeRange = new TmfTimeRange(TmfTimestamp.ZERO, TmfTimestamp.ZERO);
     }
 
     /**
@@ -136,7 +150,7 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
     /**
      * The maximum size of the serialize buffer when writing the time range
      */
-    protected static final int MAX_TIME_RANGE_SERIALIZE_SIZE = 1024;
+    protected static final int MAX_TIME_RANGE_SERIALIZE_SIZE = 128;
 
     /**
      * The originating trace
@@ -162,7 +176,6 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
 
     // Cached values
     private FileChannel fFileChannel;
-    private TmfTimeRange fTimeRange;
 
     /**
      * Constructs a checkpoint collection for a given trace from scratch or from
@@ -247,9 +260,7 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
 
             // Reserve space for header
             fRandomAccessFile.setLength(header.getSize());
-
-            fTimeRange = new TmfTimeRange(new TmfTimestamp(0), new TmfTimestamp(0));
-            TmfCoreTracer.traceIndexer(CheckpointCollectionFileHeader.class.getSimpleName() + " initialize " + "nbEvents: " + header.fNbEvents + " fTimeRangeOffset: " + header.fTimeRangeOffset + " fTimeRange: " + fTimeRange); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+            TmfCoreTracer.traceIndexer(CheckpointCollectionFileHeader.class.getSimpleName() + " initialize " + "nbEvents: " + header.fNbEvents + " fTimeRange: " + header.fTimeRange); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         } catch (IOException e) {
             Activator.logError(MessageFormat.format(Messages.ErrorOpeningIndex, fFile), e);
             return null;
@@ -268,7 +279,7 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
         CheckpointCollectionFileHeader header = null;
 
         try {
-            fRandomAccessFile = new RandomAccessFile(fFile, "r"); //$NON-NLS-1$
+            fRandomAccessFile = new RandomAccessFile(fFile, "rw"); //$NON-NLS-1$
             fFileChannel = fRandomAccessFile.getChannel();
         } catch (FileNotFoundException e) {
             Activator.logError(MessageFormat.format(Messages.ErrorOpeningIndex, fFile), e);
@@ -280,46 +291,18 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
             if (header.fVersion != VERSION || header.getSubVersion() != getSubVersion()) {
                 return null;
             }
-            serializeInTimeRange(header);
-            TmfCoreTracer.traceIndexer(CheckpointCollectionFileHeader.class.getSimpleName() + " read " + fFile + " nbEvents: " + header.fNbEvents + " fTimeRangeOffset: " + header.fTimeRangeOffset + " fTimeRange: " + fTimeRange); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+            TmfCoreTracer.traceIndexer(CheckpointCollectionFileHeader.class.getSimpleName() + " read " + fFile + " nbEvents: " + header.fNbEvents + " fTimeRange: " + header.fTimeRange); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+            // Write an invalid version until the very last moment when dispose
+            // the index. This is how we know if it's corrupted or not.
+            fRandomAccessFile.seek(0);
+            fRandomAccessFile.writeInt(INVALID_VERSION);
         } catch (IOException e) {
             Activator.logError(MessageFormat.format(Messages.IOErrorReadingHeader, fFile), e);
             return null;
         }
 
         return header;
-    }
-
-    private void serializeInTimeRange(CheckpointCollectionFileHeader header) throws IOException {
-        ByteBuffer b = ByteBuffer.allocate(MAX_TIME_RANGE_SERIALIZE_SIZE);
-        b.clear();
-        fFileChannel.read(b, header.fTimeRangeOffset);
-        b.flip();
-        fTimeRange = new TmfTimeRange(new TmfTimestamp(b), new TmfTimestamp(b));
-    }
-
-    private void serializeOutTimeRange() throws IOException {
-        fHeader.fTimeRangeOffset = fRandomAccessFile.length();
-        ByteBuffer b = ByteBuffer.allocate(MAX_TIME_RANGE_SERIALIZE_SIZE);
-        b.clear();
-        new TmfTimestamp(fTimeRange.getStartTime()).serialize(b);
-        new TmfTimestamp(fTimeRange.getEndTime()).serialize(b);
-        b.flip();
-        fFileChannel.write(b, fHeader.fTimeRangeOffset);
-    }
-
-    /**
-     * Set the index as complete. No more checkpoints will be inserted.
-     */
-    @Override
-    public void setIndexComplete() {
-        try {
-            serializeOutTimeRange();
-
-            fHeader.serialize(fRandomAccessFile);
-        } catch (IOException e) {
-            Activator.logError(MessageFormat.format(Messages.IOErrorWritingHeader, fFile), e);
-        }
     }
 
     /**
@@ -375,7 +358,7 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
      */
     @Override
     public void setTimeRange(TmfTimeRange timeRange) {
-        fTimeRange = timeRange;
+        fHeader.fTimeRange = timeRange;
     }
 
     /**
@@ -385,7 +368,7 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
      */
     @Override
     public TmfTimeRange getTimeRange() {
-        return fTimeRange;
+        return fHeader.fTimeRange;
     }
 
     /**
@@ -452,7 +435,9 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
      */
     public CheckpointCollectionFileHeader getHeader() {
         return fHeader;
-    }/**
+    }
+
+    /**
      * Dispose and delete the checkpoint collection
      */
     @Override
@@ -470,11 +455,18 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
     public void dispose() {
         try {
             if (fRandomAccessFile != null) {
+                if (fHeader != null) {
+                    fHeader.serialize(fRandomAccessFile);
+                }
+
+                fRandomAccessFile.seek(0);
+                fRandomAccessFile.writeInt(getVersion());
+
                 fRandomAccessFile.close();
             }
             setCreatedFromScratch(true);
             fRandomAccessFile = null;
-            String headerTrace = fHeader == null ? "" : "nbEvents: " + fHeader.fNbEvents + " timerange:" + fTimeRange; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            String headerTrace = fHeader == null ? "" : "nbEvents: " + fHeader.fNbEvents + " timerange:" + fHeader.fTimeRange; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             TmfCoreTracer.traceIndexer(this.getClass().getSimpleName() + " disposed. " + headerTrace); //$NON-NLS-1$
         } catch (IOException e) {
             Activator.logError(MessageFormat.format(Messages.IOErrorClosingIndex, fFile), e);

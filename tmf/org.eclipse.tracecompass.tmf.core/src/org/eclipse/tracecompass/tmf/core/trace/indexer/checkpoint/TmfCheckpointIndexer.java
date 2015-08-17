@@ -28,9 +28,9 @@ import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceCompleteness;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 
@@ -77,6 +77,9 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
      * The indexing request
      */
     private ITmfEventRequest fIndexingRequest = null;
+
+    /** Whether or not the index was built once */
+    private boolean fBuiltOnce;
 
     // ------------------------------------------------------------------------
     // Construction
@@ -141,6 +144,9 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
     @Override
     public void buildIndex(final long offset, final TmfTimeRange range, final boolean waitForCompletion) {
 
+        long indexingOffset = offset;
+        TmfTimeRange indexingTimeRange = range;
+
         // Don't do anything if we are already indexing
         synchronized (fTraceIndex) {
             if (fIsIndexing) {
@@ -149,21 +155,17 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
             fIsIndexing = true;
         }
 
-        // No need to build the index, it has been restored
-        if (!fTraceIndex.isCreatedFromScratch()) {
+        // Restore previously built index values
+        if (!fTraceIndex.isCreatedFromScratch() && !fBuiltOnce && fTraceIndex.getNbEvents() > 0) {
+            indexingOffset = fTraceIndex.getNbEvents();
+            indexingTimeRange = new TmfTimeRange(fTraceIndex.getTimeRange().getStartTime(), TmfTimestamp.BIG_CRUNCH);
+            TmfCoreTracer.traceIndexer("restoring index. nbEvents: " + fTraceIndex.getNbEvents() + " time range: " + fTraceIndex.getTimeRange()); //$NON-NLS-1$ //$NON-NLS-2$
             // Set some trace attributes that depends on indexing
-            TmfCoreTracer.traceIndexer("Restoring index. nbEvents: " + fTraceIndex.getNbEvents() + " time range: " + fTraceIndex.getTimeRange()); //$NON-NLS-1$ //$NON-NLS-2$
-            TmfTraceUpdatedSignal signal = new TmfTraceUpdatedSignal(this, fTrace, new TmfTimeRange(fTraceIndex.getTimeRange().getStartTime(), fTraceIndex.getTimeRange().getEndTime()), fTraceIndex.getNbEvents());
-            if (waitForCompletion) {
-                fTrace.broadcast(signal);
-            } else {
-                fTrace.broadcastAsync(signal);
-            }
-            fIsIndexing = false;
-            return;
+            TmfTraceUpdatedSignal signal = new TmfTraceUpdatedSignal(this, fTrace, new TmfTimeRange(fTraceIndex.getTimeRange().getStartTime(), fTraceIndex.getTimeRange().getEndTime()), indexingOffset);
+            fTrace.broadcast(signal);
         }
 
-        TmfCoreTracer.traceIndexer("buildIndex. offset: " + offset + " time range: " + range); //$NON-NLS-1$ //$NON-NLS-2$
+        TmfCoreTracer.traceIndexer("buildIndex. offset: " + indexingOffset + " (requested " + offset + ")" + " time range: " + range); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
         // The monitoring job
         final Job job = new Job("Indexing " + fTrace.getName() + "...") { //$NON-NLS-1$ //$NON-NLS-2$
@@ -187,13 +189,14 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
                 return Status.OK_STATUS;
             }
         };
-        job.setSystem(!isCompleteTrace(fTrace));
+        job.setSystem(fBuiltOnce);
+        fBuiltOnce = true;
         job.schedule();
 
         // Build a background request for all the trace data. The index is
         // updated as we go by readNextEvent().
         fIndexingRequest = new TmfEventRequest(ITmfEvent.class,
-                range, offset, ITmfEventRequest.ALL_DATA,
+                indexingTimeRange, indexingOffset, ITmfEventRequest.ALL_DATA,
                 ITmfEventRequest.ExecutionType.BACKGROUND) {
             @Override
             public void handleData(final ITmfEvent event) {
@@ -206,20 +209,17 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
 
             @Override
             public void handleSuccess() {
-                fTraceIndex.setTimeRange(fTrace.getTimeRange());
-                fTraceIndex.setNbEvents(fTrace.getNbEvents());
-                if (isCompleteTrace(fTrace)) {
-                    fTraceIndex.setIndexComplete();
-                }
                 updateTraceStatus();
             }
 
             @Override
             public void handleCompleted() {
                 job.cancel();
+                fTraceIndex.setTimeRange(fTrace.getTimeRange());
+                fTraceIndex.setNbEvents(fTrace.getNbEvents());
                 super.handleCompleted();
                 fIsIndexing = false;
-                TmfCoreTracer.traceIndexer("Build index request done. nbEvents: " + fTraceIndex.getNbEvents() + " time range: " + fTraceIndex.getTimeRange()); //$NON-NLS-1$ //$NON-NLS-2$
+                TmfCoreTracer.traceIndexer("Build index request completed. nbEvents: " + fTraceIndex.getNbEvents() + " time range: " + fTraceIndex.getTimeRange()); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             private void updateTraceStatus() {
@@ -343,9 +343,5 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
      */
     protected ITmfCheckpointIndex getTraceIndex() {
         return fTraceIndex;
-    }
-
-    private static boolean isCompleteTrace(ITmfTrace trace) {
-        return !(trace instanceof ITmfTraceCompleteness) || ((ITmfTraceCompleteness)trace).isComplete();
     }
 }

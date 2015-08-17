@@ -105,7 +105,6 @@ public class TmfFlatArrayTraceIndex implements ITmfCheckpointIndex {
 
     @Override
     public void setIndexComplete() {
-        fCheckpoints.setIndexComplete();
     }
 
 }
