@@ -175,10 +175,10 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
                         long prevNbEvents = fTrace.getNbEvents();
                         Thread.sleep(250);
                         long nbEvents = fTrace.getNbEvents();
-                        setName(Messages.TmfCheckpointIndexer_Indexing + ' ' + fTrace.getName() + " (" + nbEvents + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+                        setName(Messages.TmfCheckpointIndexer_Indexing + ' ' + fTrace.getName() + " (" + String.format("%,d", nbEvents) + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                         // setName doesn't refresh the UI, setTaskName does
                         long rate = (nbEvents - prevNbEvents) * 4;
-                        monitor.setTaskName(rate + " " + Messages.TmfCheckpointIndexer_EventsPerSecond); //$NON-NLS-1$
+                        monitor.setTaskName(String.format("%,d", rate) + " " + Messages.TmfCheckpointIndexer_EventsPerSecond); //$NON-NLS-1$ //$NON-NLS-2$
                     } catch (final InterruptedException e) {
                         return Status.OK_STATUS;
                     }
