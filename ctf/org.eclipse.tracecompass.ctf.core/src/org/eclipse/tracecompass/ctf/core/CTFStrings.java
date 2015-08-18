@@ -96,31 +96,31 @@ public interface CTFStrings {
     /**
      * Magic number
      *
-     * @since 1.1
+     * @since 2.0
      */
     String MAGIC = "magic";
     /**
      * Header
      *
-     * @since 1.1
+     * @since 2.0
      */
     String HEADER = "header";
     /**
      * Context
      *
-     * @since 1.1
+     * @since 2.0
      */
     String CONTEXT = "context";
     /**
      * Packet
      *
-     * @since 1.1
+     * @since 2.0
      */
     String PACKET = "packet";
     /**
      * Timestamp
      *
-     * @since 1.1
+     * @since 2.0
      */
     String TIMESTAMP = "timestamp";
 }

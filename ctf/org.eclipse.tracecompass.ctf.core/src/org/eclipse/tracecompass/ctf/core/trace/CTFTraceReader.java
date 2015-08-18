@@ -228,7 +228,7 @@ public class CTFTraceReader implements AutoCloseable {
      * Returns whether or not this CTFTraceReader has been closed
      *
      * @return true if it has been closed, false else
-     * @since 1.1
+     * @since 2.0
      */
     public boolean isClosed() {
         return fClosed;

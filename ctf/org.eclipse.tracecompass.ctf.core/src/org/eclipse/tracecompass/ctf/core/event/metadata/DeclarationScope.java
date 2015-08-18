@@ -36,7 +36,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.exceptions.Pars
  *
  * @author Matthew Khouzam
  * @author Simon Marchi
- * @since 1.1
+ * @since 2.0
  *
  */
 public class DeclarationScope {

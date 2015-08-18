@@ -41,7 +41,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
     /**
      * A pair of longs class
      *
-     * @since 1.1
+     * @since 2.0
      */
     public static class Pair {
         private final long fFirst;
@@ -160,7 +160,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
      * Get the lookup table
      *
      * @return the lookup table
-     * @since 1.1
+     * @since 2.0
      */
     public Map<String, Pair> getEnumTable() {
         ImmutableMap.Builder<String, Pair> builder = new ImmutableMap.Builder<>();

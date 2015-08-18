@@ -126,7 +126,7 @@ public final class EventDefinition implements IDefinitionScope {
      *            the stream context
      * @param fields
      *            The event fields
-     * @since 1.1
+     * @since 2.0
      */
     public EventDefinition(IEventDeclaration declaration,
             CTFStreamInputReader streamInputReader,
@@ -179,7 +179,7 @@ public final class EventDefinition implements IDefinitionScope {
      * Get the event header
      *
      * @return the event header
-     * @since 1.1
+     * @since 2.0
      */
     public ICompositeDefinition getEventHeader() {
         return fEventHeaderDefinition;
