@@ -100,37 +100,37 @@ public final class TmfCoreTracer {
 
         traceKey = Platform.getDebugOption(COMPONENT_TRACE_KEY);
         if (traceKey != null) {
-            fComponentClassEnabled = (Boolean.valueOf(traceKey)).booleanValue();
+            fComponentClassEnabled = Boolean.parseBoolean(traceKey);
             isTracing |= fComponentClassEnabled;
         }
 
         traceKey = Platform.getDebugOption(REQUEST_TRACE_KEY);
         if (traceKey != null) {
-            fRequestClassEnabled = (Boolean.valueOf(traceKey)).booleanValue();
+            fRequestClassEnabled = Boolean.parseBoolean(traceKey);
             isTracing |= fRequestClassEnabled;
         }
 
         traceKey = Platform.getDebugOption(SIGNAL_TRACE_KEY);
         if (traceKey != null) {
-            fSignalClassEnabled = (Boolean.valueOf(traceKey)).booleanValue();
+            fSignalClassEnabled = Boolean.parseBoolean(traceKey);
             isTracing |= fSignalClassEnabled;
         }
 
         traceKey = Platform.getDebugOption(EVENT_TRACE_KEY);
         if (traceKey != null) {
-            fEventClassEnabled = (Boolean.valueOf(traceKey)).booleanValue();
+            fEventClassEnabled = Boolean.parseBoolean(traceKey);
             isTracing |= fEventClassEnabled;
         }
 
         traceKey = Platform.getDebugOption(ANALYSIS_TRACE_KEY);
         if (traceKey != null) {
-            fAnalysisClassEnabled = (Boolean.valueOf(traceKey)).booleanValue();
+            fAnalysisClassEnabled = Boolean.parseBoolean(traceKey);
             isTracing |= fAnalysisClassEnabled;
         }
 
         traceKey = Platform.getDebugOption(INDEXER_TRACE_KEY);
         if (traceKey != null) {
-            fIndexerClassEnabled = (Boolean.valueOf(traceKey)).booleanValue();
+            fIndexerClassEnabled = Boolean.parseBoolean(traceKey);
             isTracing |= fIndexerClassEnabled;
         }
 
