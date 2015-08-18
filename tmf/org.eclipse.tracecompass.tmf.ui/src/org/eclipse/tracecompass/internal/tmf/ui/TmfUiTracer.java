@@ -54,37 +54,37 @@ public class TmfUiTracer {
 
         traceKey = Platform.getDebugOption(pluginID + "/error");
         if (traceKey != null) {
-            fError = (Boolean.valueOf(traceKey)).booleanValue();
+            fError = Boolean.parseBoolean(traceKey);
             isTracing |= fError;
         }
 
         traceKey = Platform.getDebugOption(pluginID + "/warning");
         if (traceKey != null) {
-            fWarning = (Boolean.valueOf(traceKey)).booleanValue();
+            fWarning = Boolean.parseBoolean(traceKey);
             isTracing |= fWarning;
         }
 
         traceKey = Platform.getDebugOption(pluginID + "/info");
         if (traceKey != null) {
-            fInfo = (Boolean.valueOf(traceKey)).booleanValue();
+            fInfo = Boolean.parseBoolean(traceKey);
             isTracing |= fInfo;
         }
 
         traceKey = Platform.getDebugOption(pluginID + "/updateindex");
         if (traceKey != null) {
-            fIndex = (Boolean.valueOf(traceKey)).booleanValue();
+            fIndex = Boolean.parseBoolean(traceKey);
             isTracing |= fIndex;
         }
 
         traceKey = Platform.getDebugOption(pluginID + "/display");
         if (traceKey != null) {
-            fDisplay = (Boolean.valueOf(traceKey)).booleanValue();
+            fDisplay = Boolean.parseBoolean(traceKey);
             isTracing |= fDisplay;
         }
 
         traceKey = Platform.getDebugOption(pluginID + "/sorting");
         if (traceKey != null) {
-            fSorting = (Boolean.valueOf(traceKey)).booleanValue();
+            fSorting = Boolean.parseBoolean(traceKey);
             isTracing |= fSorting;
         }
 
