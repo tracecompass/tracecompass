@@ -140,7 +140,7 @@ public class TmfAlignTimeAxisTest {
     @After
     public void after() {
         SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        bot.activeEditor().close();
+        SWTBotUtils.activeEventsEditor(bot).close();
     }
 
     /**

@@ -307,7 +307,7 @@ public class FilterViewerTest {
 
     private static String applyFilter(SWTWorkbenchBot bot, final String filterName) {
         SWTBotUtils.waitForJobs();
-        final SWTBotTable eventsEditor = bot.activeEditor().bot().table();
+        final SWTBotTable eventsEditor = SWTBotUtils.activeEventsEditor(bot).bot().table();
         SWTBotTableItem tableItem = eventsEditor.getTableItem(2);
         tableItem.contextMenu(filterName).click();
         fBot.waitUntil(ConditionHelpers.isTableCellFilled(eventsEditor, "/100", 1, 1));
