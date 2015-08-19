@@ -16,3 +16,4 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.tracecompass.statesystem.core,
  org.eclipse.tracecompass.tmf.core,
  org.eclipse.tracecompass.tmf.ui
+Export-Package: org.eclipse.tracecompass.internal.analysis.graph.ui;x-internal:=true
