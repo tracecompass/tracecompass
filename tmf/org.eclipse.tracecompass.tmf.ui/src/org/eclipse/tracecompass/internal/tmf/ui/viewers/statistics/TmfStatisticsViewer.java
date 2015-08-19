@@ -60,6 +60,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
+import org.eclipse.tracecompass.tmf.ui.TmfUiRefreshHandler;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 
 /**
@@ -387,7 +388,8 @@ public class TmfStatisticsViewer extends TmfViewer {
 
         fTreeViewer = new TreeViewer(fSash, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         fPieChartViewer = new TmfPieChartViewer(fSash);
-        fSash.setWeights(new int[]{100,100});
+        fPieChartViewer.setVisible(false);
+        fSash.setWeights(new int[] { 1, 1 });
 
         fTreeViewer.setContentProvider(new TmfTreeContentProvider());
         fTreeViewer.getTree().setHeaderVisible(true);
@@ -661,6 +663,7 @@ public class TmfStatisticsViewer extends TmfViewer {
             updateJobs = fUpdateJobsPartial;
         }
 
+        setPieChartsVisible(true);
         for (ITmfTrace aTrace : TmfTraceManager.getTraceSet(trace)) {
             aTrace = checkNotNull(aTrace);
             if (!isListeningTo(aTrace)) {
@@ -682,6 +685,21 @@ public class TmfStatisticsViewer extends TmfViewer {
                 job.schedule();
             }
         }
+    }
+
+    private void setPieChartsVisible(final boolean visible) {
+        if (fPieChartViewer.isDisposed()) {
+            return;
+        }
+        TmfUiRefreshHandler.getInstance().queueUpdate(fPieChartViewer, new Runnable() {
+            @Override
+            public void run() {
+                if (!fPieChartViewer.isDisposed()) {
+                    fPieChartViewer.setVisible(visible);
+                    fPieChartViewer.getParent().layout();
+                }
+            }
+        });
     }
 
     /**
