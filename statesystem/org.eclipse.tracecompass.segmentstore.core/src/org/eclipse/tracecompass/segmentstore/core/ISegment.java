@@ -20,7 +20,7 @@ import java.io.Serializable;
  *
  * @author Alexandre Montplaisir
  */
-public interface ISegment extends Serializable {
+public interface ISegment extends Serializable, Comparable<ISegment> {
 
     /**
      * The start position/time of the segment.

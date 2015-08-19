@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 EfficiOS Inc., Alexandre Montplaisir
+ * Copyright (c) 2015 EfficiOS Inc., Alexandre Montplaisir and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -14,17 +14,15 @@ package org.eclipse.tracecompass.segmentstore.core.treemap;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.TreeMap;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
+import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.google.common.collect.TreeMultimap;
 
@@ -33,8 +31,17 @@ import com.google.common.collect.TreeMultimap;
  * This relatively simple implementation holds everything in memory, and as such
  * cannot contain too much data.
  *
+ * The TreeMapStore itself is Iterable, and its iteration order will be by
+ * ascending order of start times. For segments with identical start times, the
+ * secondary comparator will be the end time. If even those are equal, it will
+ * defer to the segments' natural ordering ({@link ISegment#compareTo}).
+ *
+ * The store's tree maps will not accept duplicate key-value pairs, which means
+ * that if you want several segments with the same start and end times, make
+ * sure their compareTo() differentiates them.
+ *
  * @param <T>
- *            The time of time range held
+ *            The type of segment held in this store
  *
  * @author Alexandre Montplaisir
  */
@@ -43,17 +50,32 @@ public class TreeMapStore<T extends ISegment> implements ISegmentStore<T> {
     private final TreeMultimap<Long, T> fStartTimesIndex;
     private final TreeMultimap<Long, T> fEndTimesIndex;
 
-    private final Map<Long, T> fPositionMap;
-
     private volatile long fSize;
 
     /**
-     *Constructor
+     * Constructor
      */
     public TreeMapStore() {
-        fStartTimesIndex = checkNotNull(TreeMultimap.<Long, T> create(LONG_COMPARATOR, INTERVAL_START_COMPARATOR));
-        fEndTimesIndex = checkNotNull(TreeMultimap.<Long, T> create(LONG_COMPARATOR, INTERVAL_END_COMPARATOR));
-        fPositionMap = new HashMap<>();
+        /*
+         * For the start times index, the "key comparator" will compare the
+         * start times as longs directly. This is the primary comparator for its
+         * tree map.
+         *
+         * The secondary "value" comparator will check the end times first, and
+         * in the event of a tie, defer to the ISegment's Comparable
+         * implementation, a.k.a. its natural ordering.
+         *
+         * The same is done for the end times index, but swapping the first two
+         * comparators instead.
+         */
+        fStartTimesIndex = checkNotNull(TreeMultimap.<Long, T> create(
+                SegmentComparators.LONG_COMPARATOR,
+                Ordering.from(SegmentComparators.INTERVAL_END_COMPARATOR).compound(Ordering.natural())));
+
+        fEndTimesIndex = checkNotNull(TreeMultimap.<Long, T> create(
+                SegmentComparators.LONG_COMPARATOR,
+                Ordering.from(SegmentComparators.INTERVAL_START_COMPARATOR).compound(Ordering.natural())));
+
         fSize = 0;
     }
 
@@ -64,20 +86,15 @@ public class TreeMapStore<T extends ISegment> implements ISegmentStore<T> {
 
     @Override
     public synchronized void addElement(T val) {
-        fStartTimesIndex.put(Long.valueOf(val.getStart()), val);
-        fEndTimesIndex.put(Long.valueOf(val.getEnd()), val);
-        fPositionMap.put(fSize, val);
-        fSize++;
+        if (fStartTimesIndex.put(Long.valueOf(val.getStart()), val)) {
+            fEndTimesIndex.put(Long.valueOf(val.getEnd()), val);
+            fSize++;
+        }
     }
 
     @Override
     public long getNbElements() {
         return fSize;
-    }
-
-    @Override
-    public T getElementAtIndex(long index) {
-        return checkNotNull(fPositionMap.get(Long.valueOf(index)));
     }
 
     @Override
@@ -104,43 +121,6 @@ public class TreeMapStore<T extends ISegment> implements ISegmentStore<T> {
     public synchronized void dispose() {
         fStartTimesIndex.clear();
         fEndTimesIndex.clear();
-        fPositionMap.clear();
         fSize = 0;
     }
-
-    // ------------------------------------------------------------------------
-    // Comparators, used for the tree maps
-    // ------------------------------------------------------------------------
-
-    private static final Comparator<Long> LONG_COMPARATOR = new Comparator<Long>() {
-        @Override
-        public int compare(@Nullable Long o1, @Nullable Long o2) {
-            if (o1 == null || o2 == null) {
-                throw new IllegalArgumentException();
-            }
-            return o1.compareTo(o2);
-        }
-    };
-
-    private static final Comparator<ISegment> INTERVAL_START_COMPARATOR = new Comparator<ISegment>() {
-        @Override
-        public int compare(@Nullable ISegment o1, @Nullable ISegment o2) {
-            if (o1 == null || o2 == null) {
-                throw new IllegalArgumentException();
-            }
-            return Long.compare(o1.getStart(), o2.getStart());
-        }
-    };
-
-    private static final Comparator<ISegment> INTERVAL_END_COMPARATOR = new Comparator<ISegment>() {
-        @Override
-        public int compare(@Nullable ISegment o1, @Nullable ISegment o2) {
-            if (o1 == null || o2 == null) {
-                throw new IllegalArgumentException();
-            }
-            return Long.compare(o1.getEnd(), o2.getEnd());
-        }
-    };
-
-
 }

@@ -38,19 +38,6 @@ public interface ISegmentStore<T extends ISegment> extends Iterable<T> {
     long getNbElements();
 
     /**
-     * To seek rapidly among all elements, the elements should be indexed by
-     * their ascending order of start times.
-     *
-     * This method returns an individual element, given a position in this
-     * index.
-     *
-     * @param index
-     *            Retrieve the element at this index
-     * @return The element at this index
-     */
-    T getElementAtIndex(long index);
-
-    /**
      * Retrieve all elements that inclusively cross the given position.
      *
      * @param position
