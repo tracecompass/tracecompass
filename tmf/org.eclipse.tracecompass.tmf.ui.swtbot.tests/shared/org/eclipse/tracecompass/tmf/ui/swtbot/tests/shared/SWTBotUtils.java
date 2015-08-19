@@ -42,6 +42,7 @@ import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
@@ -520,5 +521,36 @@ public final class SWTBotUtils {
         }
 
         return currentNode;
+    }
+
+    /**
+     * Get the active events editor. Note that this will wait until such editor
+     * is available.
+     *
+     * @param workbenchBot
+     *            a given workbench bot
+     * @return the active events editor
+     */
+    public static SWTBotEditor activeEventsEditor(final SWTWorkbenchBot workbenchBot) {
+        final SWTBotEditor editor[] = new SWTBotEditor[1];
+        workbenchBot.waitUntil(new DefaultCondition() {
+            @Override
+            public boolean test() throws Exception {
+                List<SWTBotEditor> editors = workbenchBot.editors(WidgetMatcherFactory.withPartId(TmfEventsEditor.ID));
+                for (SWTBotEditor e : editors) {
+                    if (e.isActive() && !e.getWidget().isDisposed()) {
+                        editor[0] = e;
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return "Active events editor not found";
+            }
+        });
+        return editor[0];
     }
 }

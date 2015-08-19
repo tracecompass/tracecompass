@@ -168,7 +168,7 @@ public class StandardImportGzipTraceTest {
         /*
          * Check results
          */
-        SWTBot editorBot = fBot.activeEditor().bot();
+        SWTBot editorBot = SWTBotUtils.activeEventsEditor(fBot).bot();
         SWTBotTable editorTable = editorBot.table();
         final String expectedContent1 = "Type-1";
         final String expectedContent2 = "";

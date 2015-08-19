@@ -248,7 +248,7 @@ public class ColorsViewTest {
                 ColorSettingsManager.setColorSettings(cs);
             }
         });
-        final SWTBotTable eventsEditor = fBot.activeEditor().bot().table();
+        final SWTBotTable eventsEditor = SWTBotUtils.activeEventsEditor(fBot).bot().table();
         // should fix race condition of loading the trace
         SWTBotUtils.waitForJobs();
         eventsEditor.select(2);
