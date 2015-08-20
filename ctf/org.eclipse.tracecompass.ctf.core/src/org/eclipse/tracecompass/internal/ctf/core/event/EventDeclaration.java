@@ -126,6 +126,7 @@ public class EventDeclaration implements IEventDeclaration {
         if (eventHeaderDef instanceof EventHeaderDefinition) {
             EventHeaderDefinition eventHeaderDefinition = (EventHeaderDefinition) eventHeaderDef;
             timestamp = calculateTimestamp(eventHeaderDefinition.getTimestamp(), eventHeaderDefinition.getTimestampLength(), prevTimestamp);
+            def = eventHeaderDefinition;
         } else if (eventHeaderDef instanceof StructDefinition) {
             StructDefinition structDefinition = (StructDefinition) eventHeaderDef;
             def = structDefinition.lookupDefinition(CTFStrings.TIMESTAMP);
