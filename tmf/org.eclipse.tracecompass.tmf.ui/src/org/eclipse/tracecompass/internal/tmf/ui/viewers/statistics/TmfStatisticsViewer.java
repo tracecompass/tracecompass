@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -265,11 +266,11 @@ public class TmfStatisticsViewer extends TmfViewer {
      * @return the model of the piecharts in this viewer
      * @since 2.0
      */
-    public TmfPieChartStatisticsModel getPieChartModel(){
+    public TmfPieChartStatisticsModel getPieChartModel() {
         if (fPieChartModel == null) {
             fPieChartModel = new TmfPieChartStatisticsModel();
-         }
-         return fPieChartModel;
+        }
+        return fPieChartModel;
     }
 
     /**
@@ -296,7 +297,7 @@ public class TmfStatisticsViewer extends TmfViewer {
     /**
      * Only refreshes the Tree viewer
      */
-    private void refreshTree(){
+    private void refreshTree() {
         final Control viewerControl = getControl();
         // Ignore update if disposed
         if (viewerControl.isDisposed()) {
@@ -315,8 +316,11 @@ public class TmfStatisticsViewer extends TmfViewer {
 
     /**
      * Only refreshes the piecharts depending on the parameters
-     * @param refreshGlobal if we have to refresh the global piechart
-     * @param refreshSelection if we have to refresh the selection piechart
+     *
+     * @param refreshGlobal
+     *            if we have to refresh the global piechart
+     * @param refreshSelection
+     *            if we have to refresh the selection piechart
      * @since 2.0
      */
     protected void refreshPieCharts(final boolean refreshGlobal, final boolean refreshSelection) {
@@ -324,6 +328,25 @@ public class TmfStatisticsViewer extends TmfViewer {
         // Ignore update if disposed
         if (viewerControl.isDisposed()) {
             return;
+        }
+
+        TmfPieChartStatisticsModel pieChartModel = getPieChartModel();
+        if (pieChartModel == null || pieChartModel.getPieChartGlobalModel() == null) {
+            return;
+        }
+        /* If there's only one event type, don't show any piechart */
+        boolean moreThanOne = false;
+        for (Entry<ITmfTrace, Map<String, Long>> entry : pieChartModel.getPieChartGlobalModel().entrySet()) {
+            if(entry.getValue() != null && entry.getValue().size() > 1) {
+                moreThanOne = true;
+                break;
+            }
+        }
+
+        if (!moreThanOne) {
+            setPieChartsVisible(false);
+        } else {
+            setPieChartsVisible(true);
         }
 
         Display.getDefault().asyncExec(new Runnable() {
@@ -384,7 +407,7 @@ public class TmfStatisticsViewer extends TmfViewer {
 
         final List<TmfBaseColumnData> columnDataList = getColumnDataProvider().getColumnData();
 
-        fSash = new SashForm(parent, SWT.HORIZONTAL );
+        fSash = new SashForm(parent, SWT.HORIZONTAL);
 
         fTreeViewer = new TreeViewer(fSash, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         fPieChartViewer = new TmfPieChartViewer(fSash);
@@ -462,12 +485,14 @@ public class TmfStatisticsViewer extends TmfViewer {
                         return;
                     }
 
-                    // Otherwise, get percentage and draw bar and text if applicable.
+                    // Otherwise, get percentage and draw bar and text if
+                    // applicable.
                     double percentage = columnDataList.get(event.index).getPercentageProvider().getPercentage(node);
 
                     // The item is selected.
                     if ((event.detail & SWT.SELECTED) > 0) {
-                        // Draws our own background to avoid overwriting the bar.
+                        // Draws our own background to avoid overwriting the
+                        // bar.
                         event.gc.fillRectangle(event.x, event.y, event.width, event.height);
                         event.detail &= ~SWT.SELECTED;
                     }
@@ -663,7 +688,6 @@ public class TmfStatisticsViewer extends TmfViewer {
             updateJobs = fUpdateJobsPartial;
         }
 
-        setPieChartsVisible(true);
         for (ITmfTrace aTrace : TmfTraceManager.getTraceSet(trace)) {
             aTrace = checkNotNull(aTrace);
             if (!isListeningTo(aTrace)) {
@@ -766,8 +790,10 @@ public class TmfStatisticsViewer extends TmfViewer {
     }
 
     /**
-     * @param isGlobal if the job to remove is global or partial
-     * @param jobTrace The trace
+     * @param isGlobal
+     *            if the job to remove is global or partial
+     * @param jobTrace
+     *            The trace
      */
     void removeFromJobs(boolean isGlobal, ITmfTrace jobTrace) {
         Map<ITmfTrace, Job> updateJobs = isGlobal ? fUpdateJobsGlobal : fUpdateJobsPartial;
