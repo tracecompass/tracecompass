@@ -129,6 +129,9 @@ public class TmfSimpleTableViewer extends TmfViewer {
             if (contentProvider instanceof DeferredContentProvider) {
                 DeferredContentProvider deferredContentProvider = (DeferredContentProvider) contentProvider;
                 deferredContentProvider.setSortOrder(comparator);
+            } else if (contentProvider instanceof ISortingLazyContentProvider) {
+                ISortingLazyContentProvider sortingLazyContentProvider = (ISortingLazyContentProvider) contentProvider;
+                sortingLazyContentProvider.setSortOrder(comparator);
             } else {
                 fTableViewer.setComparator(new ElementComparator(comparator));
             }
