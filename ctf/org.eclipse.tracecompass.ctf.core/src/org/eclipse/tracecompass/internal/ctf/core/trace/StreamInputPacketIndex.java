@@ -96,7 +96,7 @@ public class StreamInputPacketIndex {
      * @throws CTFException
      *             If there was a problem reading the entry
      */
-    public boolean append(@NonNull ICTFPacketDescriptor entry)
+    public synchronized boolean append(@NonNull ICTFPacketDescriptor entry)
             throws CTFException {
 
         /* Validate consistent entry. */
@@ -109,7 +109,7 @@ public class StreamInputPacketIndex {
          * order.
          */
         if (!fEntries.isEmpty() && (entry.getTimestampBegin() < lastElement().getTimestampBegin())) {
-            throw new CTFException("Packets begin timestamp decreasing"); //$NON-NLS-1$
+            return false;
         }
 
         fEntries.add(entry);
