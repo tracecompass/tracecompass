@@ -23,5 +23,15 @@
                class="org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace">
          </tracetype>
       </module>
+      <module
+            analysis_module="org.eclipse.tracecompass.analysis.os.linux.core.latency.LatencyAnalysis"
+            automatic="false"
+            id="org.eclipse.tracecompass.analysis.os.linux.latency"
+            name="%analysis.latency">
+         <tracetype
+               applies="true"
+               class="org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace">
+         </tracetype>
+      </module>
    </extension>
 </plugin>
