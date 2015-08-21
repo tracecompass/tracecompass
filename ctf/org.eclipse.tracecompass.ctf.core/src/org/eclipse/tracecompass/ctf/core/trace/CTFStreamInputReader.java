@@ -348,7 +348,7 @@ public class CTFStreamInputReader implements AutoCloseable {
      *             if an error occurs
      */
     private void gotoPacket(long timestamp) throws CTFException {
-        fPacketIndex = fStreamInput.getIndex().search(timestamp).previousIndex();
+        fPacketIndex = fStreamInput.getIndex().search(timestamp) - 1;
         /*
          * Switch to this packet.
          */
