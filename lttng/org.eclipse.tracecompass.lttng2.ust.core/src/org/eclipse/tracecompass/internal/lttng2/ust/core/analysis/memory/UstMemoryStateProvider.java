@@ -19,8 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.lttng2.ust.core.LttngUstEventStrings;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
+import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
@@ -31,6 +31,8 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * State provider to track the memory of the threads using the UST libc wrapper
@@ -44,12 +46,22 @@ public class UstMemoryStateProvider extends AbstractTmfStateProvider {
     /* Version of this state provider */
     private static final int VERSION = 1;
 
-    /* Maps a pointer to a memory zone to the size of the memory */
-    private final Map<Long, Long> fMemory = new HashMap<>();
-
     private static final Long MINUS_ONE = Long.valueOf(-1);
     private static final Long ZERO = Long.valueOf(0);
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
+
+    private static final int MALLOC_INDEX = 1;
+    private static final int FREE_INDEX = 2;
+    private static final int CALLOC_INDEX = 3;
+    private static final int REALLOC_INDEX = 4;
+    private static final int MEMALIGN_INDEX = 5;
+    private static final int POSIX_MEMALIGN_INDEX = 6;
+
+    /** Map of a pointer to a memory zone to the size of the memory */
+    private final Map<Long, Long> fMemory = new HashMap<>();
+
+    private final @NonNull ILttngUstEventLayout fLayout;
+    private final @NonNull Map<String, Integer> fEventNames;
 
     /**
      * Constructor
@@ -59,69 +71,86 @@ public class UstMemoryStateProvider extends AbstractTmfStateProvider {
      */
     public UstMemoryStateProvider(@NonNull LttngUstTrace trace) {
         super(trace, "Ust:Memory"); //$NON-NLS-1$
+        fLayout = trace.getEventLayout();
+        fEventNames = buildEventNames(fLayout);
+    }
+
+    private static @NonNull Map<String, Integer> buildEventNames(ILttngUstEventLayout layout) {
+        ImmutableMap.Builder<String, Integer> builder = ImmutableMap.builder();
+        builder.put(layout.eventLibcMalloc(), MALLOC_INDEX);
+        builder.put(layout.eventLibcFree(), FREE_INDEX);
+        builder.put(layout.eventLibcCalloc(), CALLOC_INDEX);
+        builder.put(layout.eventLibcRealloc(), REALLOC_INDEX);
+        builder.put(layout.eventLibcMemalign(), MEMALIGN_INDEX);
+        builder.put(layout.eventLibcPosixMemalign(), POSIX_MEMALIGN_INDEX);
+        return checkNotNull(builder.build());
     }
 
     @Override
     protected void eventHandle(ITmfEvent event) {
         String name = event.getName();
-        switch (name) {
-        case LttngUstEventStrings.MALLOC: {
-            Long ptr = (Long) event.getContent().getField(LttngUstEventStrings.FIELD_PTR).getValue();
+        Integer index = fEventNames.get(name);
+        int intIndex = (index == null ? -1 : index.intValue());
+
+        switch (intIndex) {
+        case MALLOC_INDEX: {
+            Long ptr = (Long) event.getContent().getField(fLayout.fieldPtr()).getValue();
             if (ZERO.equals(ptr)) {
                 return;
             }
-            Long size = (Long) event.getContent().getField(LttngUstEventStrings.FIELD_SIZE).getValue();
+            Long size = (Long) event.getContent().getField(fLayout.fieldSize()).getValue();
             setMem(event, ptr, size);
         }
             break;
-        case LttngUstEventStrings.FREE: {
-            Long ptr = (Long) event.getContent().getField(LttngUstEventStrings.FIELD_PTR).getValue();
+        case FREE_INDEX: {
+            Long ptr = (Long) event.getContent().getField(fLayout.fieldPtr()).getValue();
             if (ZERO.equals(ptr)) {
                 return;
             }
             setMem(event, ptr, ZERO);
         }
             break;
-        case LttngUstEventStrings.CALLOC: {
-            Long ptr = (Long) event.getContent().getField(LttngUstEventStrings.FIELD_PTR).getValue();
+        case CALLOC_INDEX: {
+            Long ptr = (Long) event.getContent().getField(fLayout.fieldPtr()).getValue();
             if (ZERO.equals(ptr)) {
                 return;
             }
-            Long nmemb = (Long) event.getContent().getField(LttngUstEventStrings.FIELD_NMEMB).getValue();
-            Long size = (Long) event.getContent().getField(LttngUstEventStrings.FIELD_SIZE).getValue();
+            Long nmemb = (Long) event.getContent().getField(fLayout.fieldNmemb()).getValue();
+            Long size = (Long) event.getContent().getField(fLayout.fieldSize()).getValue();
             setMem(event, ptr, size * nmemb);
         }
             break;
-        case LttngUstEventStrings.REALLOC: {
-            Long ptr = (Long) event.getContent().getField(LttngUstEventStrings.FIELD_PTR).getValue();
+        case REALLOC_INDEX: {
+            Long ptr = (Long) event.getContent().getField(fLayout.fieldPtr()).getValue();
             if (ZERO.equals(ptr)) {
                 return;
             }
-            Long newPtr = (Long) event.getContent().getField(LttngUstEventStrings.FIELD_INPTR).getValue();
-            Long size = (Long) event.getContent().getField(LttngUstEventStrings.FIELD_SIZE).getValue();
+            Long newPtr = (Long) event.getContent().getField(fLayout.fieldInPtr()).getValue();
+            Long size = (Long) event.getContent().getField(fLayout.fieldSize()).getValue();
             setMem(event, ptr, ZERO);
             setMem(event, newPtr, size);
         }
             break;
-        case LttngUstEventStrings.MEMALIGN: {
-            Long ptr = (Long) event.getContent().getField(LttngUstEventStrings.FIELD_PTR).getValue();
+        case MEMALIGN_INDEX: {
+            Long ptr = (Long) event.getContent().getField(fLayout.fieldPtr()).getValue();
             if (ZERO.equals(ptr)) {
                 return;
             }
-            Long size = (Long) event.getContent().getField(LttngUstEventStrings.FIELD_SIZE).getValue();
+            Long size = (Long) event.getContent().getField(fLayout.fieldSize()).getValue();
             setMem(event, ptr, size);
         }
             break;
-        case LttngUstEventStrings.POSIX_MEMALIGN: {
-            Long ptr = (Long) event.getContent().getField(LttngUstEventStrings.FIELD_OUTPTR).getValue();
+        case POSIX_MEMALIGN_INDEX: {
+            Long ptr = (Long) event.getContent().getField(fLayout.fieldOutPtr()).getValue();
             if (ZERO.equals(ptr)) {
                 return;
             }
-            Long size = (Long) event.getContent().getField(LttngUstEventStrings.FIELD_SIZE).getValue();
+            Long size = (Long) event.getContent().getField(fLayout.fieldSize()).getValue();
             setMem(event, ptr, size);
         }
             break;
         default:
+            /* Ignore other event types */
             break;
         }
 
@@ -142,16 +171,16 @@ public class UstMemoryStateProvider extends AbstractTmfStateProvider {
         return VERSION;
     }
 
-    private static Long getVtid(ITmfEvent event) {
-        ITmfEventField field = event.getContent().getField(LttngUstEventStrings.CONTEXT_VTID);
+    private Long getVtid(ITmfEvent event) {
+        ITmfEventField field = event.getContent().getField(fLayout.contextVtid());
         if (field == null) {
             return MINUS_ONE;
         }
         return (Long) field.getValue();
     }
 
-    private static String getProcname(ITmfEvent event) {
-        ITmfEventField field = event.getContent().getField(LttngUstEventStrings.CONTEXT_PROCNAME);
+    private String getProcname(ITmfEvent event) {
+        ITmfEventField field = event.getContent().getField(fLayout.contextProcname());
         if (field == null) {
             return EMPTY_STRING;
         }

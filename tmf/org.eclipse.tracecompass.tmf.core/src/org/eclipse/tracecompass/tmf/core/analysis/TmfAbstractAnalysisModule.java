@@ -123,11 +123,12 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
         TmfCoreTracer.traceAnalysis(getId(), trace, "setting trace for analysis"); //$NON-NLS-1$
 
         /* Check that analysis can be executed */
+        fTrace = trace;
         if (!canExecute(trace)) {
+            fTrace = null;
             return false;
         }
 
-        fTrace = trace;
         /* Get the parameter providers for this trace */
         fParameterProviders = TmfAnalysisManager.getParameterProviders(this, trace);
         for (IAnalysisParameterProvider provider : fParameterProviders) {
