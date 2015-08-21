@@ -21,9 +21,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -39,15 +39,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.TmfPieChartViewer;
-import org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.model.TmfPieChartStatisticsModel;
-import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfBaseColumnData;
-import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfBaseColumnDataProvider;
-import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfStatisticsFormatter;
-import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfStatisticsTree;
-import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfStatisticsTreeManager;
-import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfStatisticsTreeNode;
-import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfTreeContentProvider;
 import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
@@ -61,8 +52,16 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
-import org.eclipse.tracecompass.tmf.ui.TmfUiRefreshHandler;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.TmfPieChartViewer;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.model.TmfPieChartStatisticsModel;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfBaseColumnData;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfBaseColumnDataProvider;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfStatisticsFormatter;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfStatisticsTree;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfStatisticsTreeManager;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfStatisticsTreeNode;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfTreeContentProvider;
 
 /**
  * A basic viewer to display statistics in the statistics view.
@@ -330,25 +329,6 @@ public class TmfStatisticsViewer extends TmfViewer {
             return;
         }
 
-        TmfPieChartStatisticsModel pieChartModel = getPieChartModel();
-        if (pieChartModel == null || pieChartModel.getPieChartGlobalModel() == null) {
-            return;
-        }
-        /* If there's only one event type, don't show any piechart */
-        boolean moreThanOne = false;
-        for (Entry<ITmfTrace, Map<String, Long>> entry : pieChartModel.getPieChartGlobalModel().entrySet()) {
-            if(entry.getValue() != null && entry.getValue().size() > 1) {
-                moreThanOne = true;
-                break;
-            }
-        }
-
-        if (!moreThanOne) {
-            setPieChartsVisible(false);
-        } else {
-            setPieChartsVisible(true);
-        }
-
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -411,8 +391,29 @@ public class TmfStatisticsViewer extends TmfViewer {
 
         fTreeViewer = new TreeViewer(fSash, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         fPieChartViewer = new TmfPieChartViewer(fSash);
-        fPieChartViewer.setVisible(false);
-        fSash.setWeights(new int[] { 1, 1 });
+        fPieChartViewer.addEventTypeSelectionListener(new Listener() {
+
+            @Override
+            public void handleEvent(Event event) {
+                String eventTypeName = event.text;
+                if (getStatisticData().getRootNode() == null ||
+                        fTreeViewer == null ||
+                        fTreeViewer.getTree() == null) {
+                    return;
+                }
+                /* Get all the nodes corresponding to the event name */
+                List<TmfStatisticsTreeNode> nodes = (List<TmfStatisticsTreeNode>) getStatisticData().getRootNode().findChildren(eventTypeName, true);
+                if (nodes.isEmpty()) {
+                    /* Shouldn't happen, except for when selecting "Others" */
+                    return;
+                }
+                /* Only select the first in the collection */
+                fTreeViewer.setSelection(new StructuredSelection(nodes.get(0)), true);
+            }
+        });
+
+        /* Make sure the sash is split in 2 equal parts */
+        fSash.setWeights(new int[] { 100, 100 });
 
         fTreeViewer.setContentProvider(new TmfTreeContentProvider());
         fTreeViewer.getTree().setHeaderVisible(true);
@@ -709,21 +710,6 @@ public class TmfStatisticsViewer extends TmfViewer {
                 job.schedule();
             }
         }
-    }
-
-    private void setPieChartsVisible(final boolean visible) {
-        if (fPieChartViewer.isDisposed()) {
-            return;
-        }
-        TmfUiRefreshHandler.getInstance().queueUpdate(fPieChartViewer, new Runnable() {
-            @Override
-            public void run() {
-                if (!fPieChartViewer.isDisposed()) {
-                    fPieChartViewer.setVisible(visible);
-                    fPieChartViewer.getParent().layout();
-                }
-            }
-        });
     }
 
     /**

@@ -20,21 +20,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.linuxtools.dataviewers.piechart.PieChart;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.model.TmfPieChartStatisticsModel;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.model.TmfPieChartStatisticsModel;
 
 /**
  * Creates a viewer containing 2 pie charts, one for showing information about
  * the current selection, and the second one for showing information about the
  * current time-range selection. It follows the MVC pattern, being a view.
  *
- * This class is closely related with the IPieChartViewerState interface
- * that acts as a state machine for the general layout of the charts.
+ * This class is closely related with the IPieChartViewerState interface that
+ * acts as a state machine for the general layout of the charts.
  *
  * @author Alexis Cabana-Loriaux
  * @since 2.0
@@ -65,9 +69,19 @@ public class TmfPieChartViewer extends Composite {
     private String fTimeRangePCname;
 
     /**
-     * The listener added to the charts every time they are created
+     * The listener for the mouse movement event.
      */
-    private Listener fMouseListener;
+    private Listener fMouseMoveListener;
+
+    /**
+     * The listener for the mouse right click event.
+     */
+    private MouseListener fMouseClickListener;
+
+    /**
+     * The list of listener to notify when an event type is selected
+     */
+    private ListenerList fEventTypeSelectedListeners = new ListenerList(ListenerList.IDENTITY);
 
     /**
      * The name of the slice containing the too little slices
@@ -125,11 +139,12 @@ public class TmfPieChartViewer extends Composite {
         fTimeRangePC = null;
 
         // Setup listeners for the tooltips
-        fMouseListener = new Listener() {
+        fMouseMoveListener = new Listener() {
             @Override
             public void handleEvent(org.eclipse.swt.widgets.Event event) {
                 PieChart pc = (PieChart) event.widget;
                 switch (event.type) {
+                /* Get tooltip information on the slice */
                 case SWT.MouseMove:
                     int sliceIndex = pc.getSliceIndexFromPosition(0, event.x, event.y);
                     if (sliceIndex < 0) {
@@ -141,17 +156,42 @@ public class TmfPieChartViewer extends Composite {
                     String percent = String.format("%.1f", percOfSlice); //$NON-NLS-1$
                     Long nbEvents = Long.valueOf((long) pc.getSeriesSet().getSeries()[sliceIndex].getXSeries()[0]);
 
-                    String text =   Messages.TmfStatisticsView_PieChartToolTipTextName + " = " + //$NON-NLS-1$
-                                    pc.getSeriesSet().getSeries()[sliceIndex].getId() + "\n"; //$NON-NLS-1$
+                    String text = Messages.TmfStatisticsView_PieChartToolTipTextName + " = " + //$NON-NLS-1$
+                            pc.getSeriesSet().getSeries()[sliceIndex].getId() + "\n"; //$NON-NLS-1$
 
-                    text +=         Messages.TmfStatisticsView_PieChartToolTipTextEventCount + " = "//$NON-NLS-1$
-                                    + nbEvents.toString() + " (" + percent + "%)"; //$NON-NLS-1$ //$NON-NLS-2$
+                    text += Messages.TmfStatisticsView_PieChartToolTipTextEventCount + " = "//$NON-NLS-1$
+                            + nbEvents.toString() + " (" + percent + "%)"; //$NON-NLS-1$ //$NON-NLS-2$
                     pc.setToolTipText(text);
                     return;
                 default:
                 }
             }
         };
+
+        fMouseClickListener = new MouseListener() {
+
+            @Override
+            public void mouseUp(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseDown(MouseEvent e) {
+                PieChart pc = (PieChart) e.widget;
+                int slicenb = pc.getSliceIndexFromPosition(0, e.x, e.y);
+                if (slicenb < 0 || slicenb >= pc.getSeriesSet().getSeries().length) {
+                    // mouse is outside the chart
+                    return;
+                }
+                Event selectionEvent = new Event();
+                selectionEvent.text = pc.getSeriesSet().getSeries()[slicenb].getId();
+                notifyEventTypeSelectionListener(selectionEvent);
+            }
+
+            @Override
+            public void mouseDoubleClick(MouseEvent e) {
+            }
+        };
+
         // at creation no content is selected
         setCurrentState(new PieChartViewerStateNoContentSelected(this));
     }
@@ -178,14 +218,15 @@ public class TmfPieChartViewer extends Composite {
             getGlobalPC().getAxisSet().getXAxis(0).getTitle().setText(""); //Hide the title over the legend //$NON-NLS-1$
             getGlobalPC().getLegend().setVisible(true);
             getGlobalPC().getLegend().setPosition(SWT.RIGHT);
-            getGlobalPC().addListener(SWT.MouseMove, fMouseListener);
+            getGlobalPC().addListener(SWT.MouseMove, fMouseMoveListener);
+            getGlobalPC().addMouseListener(fMouseClickListener);
         } else if (getGlobalPC().isDisposed() || fModel == null || fModel.getPieChartGlobalModel() == null) {
             return;
         }
 
         Map<String, Long> totalEventCountForChart = getTotalEventCountForChart(true);
 
-        if(totalEventCountForChart == null){
+        if (totalEventCountForChart == null) {
             return;
         }
 
@@ -203,7 +244,8 @@ public class TmfPieChartViewer extends Composite {
             getTimeRangePC().getAxisSet().getXAxis(0).getTitle().setText(""); //Hide the title over the legend //$NON-NLS-1$
             getTimeRangePC().getLegend().setPosition(SWT.BOTTOM);
             getTimeRangePC().getLegend().setVisible(true);
-            getTimeRangePC().addListener(SWT.MouseMove, fMouseListener);
+            getTimeRangePC().addListener(SWT.MouseMove, fMouseMoveListener);
+            getTimeRangePC().addMouseListener(fMouseClickListener);
         }
         else if (getTimeRangePC().isDisposed()) {
             return;
@@ -211,7 +253,7 @@ public class TmfPieChartViewer extends Composite {
 
         Map<String, Long> totalEventCountForChart = getTotalEventCountForChart(false);
 
-        if(totalEventCountForChart == null){
+        if (totalEventCountForChart == null) {
             return;
         }
 
@@ -219,28 +261,28 @@ public class TmfPieChartViewer extends Composite {
     }
 
     /* return the chart-friendly map given by the TmfPieChartStatisticsModel */
-    private Map<String,Long> getTotalEventCountForChart(boolean isGlobal){
-        if(fModel == null){
+    private Map<String, Long> getTotalEventCountForChart(boolean isGlobal) {
+        if (fModel == null) {
             return null;
         }
         Map<ITmfTrace, Map<String, Long>> chartModel;
-        if(isGlobal){
+        if (isGlobal) {
             chartModel = fModel.getPieChartGlobalModel();
         } else {
             chartModel = fModel.getPieChartSelectionModel();
         }
-        if(chartModel == null){
+        if (chartModel == null) {
             return null;
         }
 
         Map<String, Long> totalEventCountForChart = new HashMap<>();
-        for(Entry<ITmfTrace, Map<String, Long>> entry : chartModel.entrySet()){
+        for (Entry<ITmfTrace, Map<String, Long>> entry : chartModel.entrySet()) {
             Map<String, Long> traceEventCount = entry.getValue();
-            if(traceEventCount == null){
+            if (traceEventCount == null) {
                 continue;
             }
-            for(Entry<String, Long> event : traceEventCount.entrySet()){
-                if(totalEventCountForChart.containsKey(event.getKey())){
+            for (Entry<String, Long> event : traceEventCount.entrySet()) {
+                if (totalEventCountForChart.containsKey(event.getKey())) {
                     totalEventCountForChart.put(event.getKey(), totalEventCountForChart.get(event.getKey()) + event.getValue());
                 } else {
                     totalEventCountForChart.put(event.getKey(), event.getValue());
@@ -255,7 +297,7 @@ public class TmfPieChartViewer extends Composite {
      * Reinitializes the charts to their initial state, without any data
      */
     synchronized public void reinitializeCharts() {
-        if(isDisposed()){
+        if (isDisposed()) {
             return;
         }
 
@@ -336,24 +378,27 @@ public class TmfPieChartViewer extends Composite {
 
     /**
      * Refresh this viewer
-     * @param refreshGlobal if we have to refresh the global piechart
-     * @param refreshSelection if we have to refresh the selection piechart
+     *
+     * @param refreshGlobal
+     *            if we have to refresh the global piechart
+     * @param refreshSelection
+     *            if we have to refresh the selection piechart
      */
     public synchronized void refresh(boolean refreshGlobal, boolean refreshSelection) {
-        if(fModel == null){
+        if (fModel == null) {
             reinitializeCharts();
         } else {
-            if(refreshGlobal){
+            if (refreshGlobal) {
                 /* will update the global pc */
                 getCurrentState().newGlobalEntries(this);
             }
 
-            if(refreshSelection){
+            if (refreshSelection) {
                 // Check if the selection is empty
                 int nbEventsType = 0;
                 Map<String, Long> selectionModel = getTotalEventCountForChart(false);
                 for (Long l : selectionModel.values()) {
-                    if(l != 0){
+                    if (l != 0) {
                         nbEventsType++;
                     }
                 }
@@ -366,6 +411,29 @@ public class TmfPieChartViewer extends Composite {
                     getCurrentState().newSelection(this);
                 }
             }
+        }
+    }
+
+    /**
+     * @param l
+     *            the listener to add
+     */
+    public void addEventTypeSelectionListener(Listener l) {
+        fEventTypeSelectedListeners.add(l);
+    }
+
+    /**
+     * @param l
+     *            the listener to remove
+     */
+    public void removeEventTypeSelectionListener(Listener l) {
+        fEventTypeSelectedListeners.remove(l);
+    }
+
+    /* Notify all listeners that an event type has been selected */
+    private void notifyEventTypeSelectionListener(Event e) {
+        for (Object o : fEventTypeSelectedListeners.getListeners()) {
+            ((Listener) o).handleEvent(e);
         }
     }
 
@@ -406,7 +474,8 @@ public class TmfPieChartViewer extends Composite {
     }
 
     /**
-     * @param model the model to set
+     * @param model
+     *            the model to set
      */
     public void setInput(TmfPieChartStatisticsModel model) {
         fModel = model;

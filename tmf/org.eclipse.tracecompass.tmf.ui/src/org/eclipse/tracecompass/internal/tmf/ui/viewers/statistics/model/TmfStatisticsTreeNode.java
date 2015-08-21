@@ -17,6 +17,9 @@ package org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -130,6 +133,38 @@ public class TmfStatisticsTreeNode {
      */
     public Collection<TmfStatisticsTreeNode> getChildren() {
         return fChildren.values();
+    }
+
+    /**
+     * @param childrenName
+     *            the name to search for
+     * @param recursive
+     *            if the search should be recursive
+     * @return a Collection of children node (could be empty) with the same name
+     *         as childrenName
+     */
+    public Collection<TmfStatisticsTreeNode> findChildren(String childrenName, boolean recursive) {
+
+        if(childrenName.equals(getName())){
+            return Collections.singletonList(this);
+        }
+
+        if (fChildren.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        if (!recursive) {
+            if (!fChildren.containsKey(childrenName)) {
+                return Collections.emptyList();
+            }
+            return Collections.singletonList(fChildren.get(childrenName));
+        }
+
+        List<TmfStatisticsTreeNode> returnList = new LinkedList<>();
+        for (TmfStatisticsTreeNode node : fChildren.values()) {
+            returnList.addAll(node.findChildren(childrenName, true));
+        }
+        return returnList;
     }
 
     /**
