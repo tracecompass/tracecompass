@@ -292,7 +292,11 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
                 /* Set the status of the process that got scheduled out. */
                 quark = ss.getQuarkRelativeAndAdd(formerThreadNode, Attributes.STATUS);
                 if (prevState != 0) {
-                    value = StateValues.PROCESS_STATUS_WAIT_BLOCKED_VALUE;
+                    if (prevState == LinuxValues.TASK_STATE_DEAD) {
+                        value = TmfStateValue.nullValue();
+                    } else {
+                        value = StateValues.PROCESS_STATUS_WAIT_BLOCKED_VALUE;
+                    }
                 } else {
                     value = StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE;
                 }
