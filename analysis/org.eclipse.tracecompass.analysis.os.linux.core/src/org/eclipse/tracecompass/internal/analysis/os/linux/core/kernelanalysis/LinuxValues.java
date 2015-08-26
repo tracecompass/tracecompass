@@ -42,7 +42,17 @@ public interface LinuxValues {
      * #define TASK_PARKED 512
      * #define TASK_STATE_MAX 1024
      */
+    /**
+     * The task is running normally, can be interrupted, in a syscall or user mode.
+     */
     int TASK_STATE_RUNNING = 0;
+    /**
+     * The task is dead, that means the PID can be re-used.
+     */
+    int TASK_STATE_DEAD = 64;
+    /**
+     * this is the maximum value + 1 that the task state can be. TASK_STATE_MAX - 1 is useful to mask the task state.
+     */
     int TASK_STATE_MAX = 1024;
 
     /*
