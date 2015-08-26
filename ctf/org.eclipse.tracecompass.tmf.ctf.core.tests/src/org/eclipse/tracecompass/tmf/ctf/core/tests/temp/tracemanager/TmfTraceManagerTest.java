@@ -21,6 +21,7 @@ import static org.junit.Assume.assumeTrue;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -42,7 +43,10 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
+import org.junit.rules.Timeout;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -52,6 +56,10 @@ import com.google.common.collect.ImmutableSet;
  * @author Alexandre Montplaisir
  */
 public class TmfTraceManagerTest {
+
+    /** Time-out tests after 20 seconds */
+    @Rule
+    public TestRule globalTimeout= new Timeout(20, TimeUnit.SECONDS);
 
     private static final int SCALE = ITmfTimestamp.NANOSECOND_SCALE;
 
