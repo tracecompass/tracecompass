@@ -32,6 +32,7 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Matthew Khouzam
  * @author Simon Marchi
+ * @since 2.0
  */
 public class CTFStreamInputReader implements AutoCloseable {
 
@@ -65,8 +66,6 @@ public class CTFStreamInputReader implements AutoCloseable {
     private EventDefinition fCurrentEvent = null;
 
     private int fId;
-
-    private CTFTraceReader fParent;
 
     /**
      * Live trace reading
@@ -429,21 +428,6 @@ public class CTFStreamInputReader implements AutoCloseable {
          * Go back to the previous event
          */
         this.setCurrentEvent(prevEvent);
-    }
-
-    /**
-     * @return the parent
-     */
-    public CTFTraceReader getParent() {
-        return fParent;
-    }
-
-    /**
-     * @param parent
-     *            the parent to set
-     */
-    public void setParent(CTFTraceReader parent) {
-        fParent = parent;
     }
 
     /**

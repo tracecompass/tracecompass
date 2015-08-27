@@ -313,7 +313,6 @@ public class CTFTraceReader implements AutoCloseable {
              * Add each trace file reader in the priority queue, if we are able
              * to read an event from it.
              */
-            reader.setParent(this);
             CTFResponse readNextEvent = reader.readNextEvent();
             if (readNextEvent == CTFResponse.OK || readNextEvent == CTFResponse.WAIT) {
                 fPrio.add(reader);
