@@ -844,7 +844,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         fSelectionBegin = time;
         fSelectionEnd = time;
 
-        if (doNotify && ((time0 != fTime0) || (time1 != fTime1))) {
+        if ((time0 != fTime0) || (time1 != fTime1)) {
             notifyRangeListeners();
         }
 
