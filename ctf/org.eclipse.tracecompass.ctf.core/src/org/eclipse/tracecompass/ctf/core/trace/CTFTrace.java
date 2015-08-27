@@ -477,13 +477,14 @@ public class CTFTrace implements IDefinitionScope {
             /* Shouldn't happen at this stage if every other check passed */
             throw new CTFException(e);
         }
-        if (fPacketHeaderDef != null) {
-            validateMagicNumber(fPacketHeaderDef);
+        final StructDefinition packetHeaderDef = getPacketHeaderDef();
+        if (packetHeaderDef != null) {
+            validateMagicNumber(packetHeaderDef);
 
-            validateUUID(fPacketHeaderDef);
+            validateUUID(packetHeaderDef);
 
             /* Read the stream ID */
-            IDefinition streamIDDef = fPacketHeaderDef.lookupDefinition("stream_id"); //$NON-NLS-1$
+            IDefinition streamIDDef = packetHeaderDef.lookupDefinition(MetadataStrings.STREAM_ID);
 
             if (streamIDDef instanceof IntegerDefinition) {
                 /* This doubles as a null check */
@@ -556,7 +557,7 @@ public class CTFTrace implements IDefinitionScope {
     @Override
     public Definition lookupDefinition(String lookupPath) {
         if (lookupPath.equals(ILexicalScope.TRACE_PACKET_HEADER.getPath())) {
-            return fPacketHeaderDef;
+            return getPacketHeaderDef();
         }
         return null;
     }
@@ -823,6 +824,17 @@ public class CTFTrace implements IDefinitionScope {
      */
     public DeclarationScope getScope() {
         return fScope;
+    }
+
+    /**
+     * Gets the packet header definition (UUID, magic number and such)
+     *
+     * @return the packet header definition
+     *
+     * @since 2.0
+     */
+    public StructDefinition getPacketHeaderDef() {
+        return fPacketHeaderDef;
     }
 }
 

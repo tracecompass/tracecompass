@@ -367,7 +367,7 @@ public class CTFStreamInput implements IDefinitionScope {
             BitBuffer bitBuffer) throws CTFException {
         ICTFPacketDescriptor packetIndex;
         StructDefinition streamPacketContextDef = fStreamPacketContextDecl.createDefinition(this, ILexicalScope.STREAM_PACKET_CONTEXT, bitBuffer);
-        packetIndex = new StreamInputPacketIndexEntry(dataOffsetBits, streamPacketContextDef, fileSizeBytes, fLostSoFar);
+        packetIndex = new StreamInputPacketIndexEntry(dataOffsetBits, streamPacketContextDef, fileSizeBytes, fLostSoFar, bitBuffer.position());
         fLostSoFar = packetIndex.getLostEvents() + fLostSoFar;
         setTimestampEnd(packetIndex.getTimestampEnd());
         return packetIndex;

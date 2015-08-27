@@ -132,7 +132,7 @@ public class TmfPieChartViewer extends Composite {
      * Called by this class' constructor. Constructs the basic viewer containing
      * the charts, as well as their listeners
      */
-    private void initContent() {
+    private synchronized void initContent() {
         setLayout(new FillLayout());
 
         fGlobalPC = null;

@@ -40,8 +40,8 @@ public class StreamInputReaderTimestampComparator implements
 
     /**
      * @throws NullPointerException
-     *             If any {@link CTFStreamInputReader} parameter is null, of if any
-     *             of them does not contain a current event.
+     *             If any {@link CTFStreamInputReader} parameter is null, of if
+     *             any of them does not contain a current event.
      */
     @Override
     public int compare(CTFStreamInputReader a, CTFStreamInputReader b) {

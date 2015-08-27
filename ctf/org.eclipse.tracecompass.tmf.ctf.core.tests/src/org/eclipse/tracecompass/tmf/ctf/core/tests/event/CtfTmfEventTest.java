@@ -43,7 +43,17 @@ import org.junit.Test;
  */
 public class CtfTmfEventTest {
 
+    private static final String VALID_FIELD = "ret";
+
     private static final @NonNull CtfTestTrace testTrace = CtfTestTrace.KERNEL;
+
+    /**
+     * <pre>
+     * babeltrace output :
+     * [11:24:42.440133097] (+?.?????????) sys_socketcall: { cpu_id = 1 }, { call = 17, args = 0xB7555F30 }
+     * [11:24:42.440137077] (+0.000003980) exit_syscall: { cpu_id = 1 }, { ret = 4132 }
+     * </pre>
+     */
 
     private static CtfTmfEvent nullEvent;
     private CtfTmfEvent fixture;
@@ -102,8 +112,7 @@ public class CtfTmfEventTest {
      */
     @Test
     public void testGetFieldValue() {
-        String fieldName = "pid";
-        ITmfEventField result = fixture.getContent().getField(fieldName);
+        ITmfEventField result = fixture.getContent().getField(VALID_FIELD);
 
         assertNotNull(result);
         assertNotNull(result.getValue());
@@ -124,11 +133,11 @@ public class CtfTmfEventTest {
     @Test
     public void testGetSubFieldValue() {
         /* Field exists */
-        String[] names = { "pid" };
+        String[] names = { VALID_FIELD };
         assertNotNull(fixture.getContent().getField(names));
 
         /* First field exists, not the second */
-        String[] names2 = { "pid", "abcd" };
+        String[] names2 = { VALID_FIELD, "abcd" };
         assertNull(fixture.getContent().getField(names2));
 
         /* Both field do not exist */
@@ -163,7 +172,7 @@ public class CtfTmfEventTest {
 
         assertEquals("channel0_1", reference);
         assertEquals(1, cpu);
-        assertEquals("lttng_statedump_vm_map", type.toString());
+        assertEquals("exit_syscall", type.toString());
     }
 
     /**
@@ -185,7 +194,7 @@ public class CtfTmfEventTest {
     @Test
     public void testToString() {
         String s = fixture.getContent().toString();
-        assertEquals("pid=1922, start=0xb73ea000, end=0xb73ec000, flags=0x8000075, inode=917738, pgoff=0", s);
+        assertEquals("ret=4132", s);
     }
 
     /**

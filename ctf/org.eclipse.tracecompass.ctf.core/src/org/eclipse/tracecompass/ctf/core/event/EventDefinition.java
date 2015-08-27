@@ -74,7 +74,7 @@ public final class EventDefinition implements IDefinitionScope {
     private final ICompositeDefinition fFields;
 
     /**
-     * The cpu number of the event, can be UNKNOWN
+     * The current cpu, could be @link {@link IPacketHeader#UNKNOWN_CPU}
      */
     private final int fCpu;
 
@@ -98,7 +98,7 @@ public final class EventDefinition implements IDefinitionScope {
      * @param eventContext
      *            The event context
      * @param packetContext
-     *            the packet context
+     *            the packet context (the one with content size, not magic number)
      * @param streamContext
      *            the stream context
      * @param fields

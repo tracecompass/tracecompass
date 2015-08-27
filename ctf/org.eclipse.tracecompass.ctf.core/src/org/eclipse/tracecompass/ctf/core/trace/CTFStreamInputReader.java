@@ -16,8 +16,11 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileChannel.MapMode;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -25,10 +28,14 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
+import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
+import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
+import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
 import org.eclipse.tracecompass.internal.ctf.core.Activator;
-
-import com.google.common.collect.ImmutableList;
+import org.eclipse.tracecompass.internal.ctf.core.SafeMappedByteBuffer;
+import org.eclipse.tracecompass.internal.ctf.core.trace.CTFPacketReader;
+import org.eclipse.tracecompass.internal.ctf.core.trace.NullPacketReader;
 
 /**
  * A CTF trace event reader. Reads the events of a trace file.
@@ -39,6 +46,8 @@ import com.google.common.collect.ImmutableList;
  */
 @NonNullByDefault
 public class CTFStreamInputReader implements AutoCloseable {
+
+    private static final int BITS_PER_BYTE = Byte.SIZE;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -56,7 +65,7 @@ public class CTFStreamInputReader implements AutoCloseable {
     /**
      * The packet reader used to read packets from this trace file.
      */
-    private final CTFStreamInputPacketReader fPacketReader;
+    private IPacketReader fPacketReader;
 
     /**
      * Iterator on the packet index
@@ -96,7 +105,6 @@ public class CTFStreamInputReader implements AutoCloseable {
             throw new CTFIOException(e);
         }
         try {
-            fPacketReader = new CTFStreamInputPacketReader(this);
             /*
              * Get the iterator on the packet index.
              */
@@ -104,7 +112,16 @@ public class CTFStreamInputReader implements AutoCloseable {
             /*
              * Make first packet the current one.
              */
-            goToNextPacket();
+            // did we already index the packet?
+            if (getPacketSize() < (fPacketIndex + 1)) {
+                // go to the next packet if there is one, index it at the same
+                // time
+                if (fStreamInput.addPacketHeaderIndex()) {
+                    fPacketIndex = getPacketSize() - 1;
+                }
+            }
+            ICTFPacketDescriptor packet = getPacket();
+            fPacketReader = getCurrentPacketReader(packet);
         } catch (Exception e) {
             try {
                 close();
@@ -113,6 +130,49 @@ public class CTFStreamInputReader implements AutoCloseable {
             }
             throw e;
         }
+    }
+
+    private IPacketReader getCurrentPacketReader(@Nullable ICTFPacketDescriptor packet) throws CTFException {
+        IPacketReader ctfPacketReader = NullPacketReader.INSTANCE;
+        if (packet != null) {
+            long size = packet.getContentSizeBits();
+            if (size < 0) {
+                throw new CTFIOException("Cannot have negative sized buffers."); //$NON-NLS-1$
+            }
+            BitBuffer bitBuffer = new BitBuffer(getByteBufferAt(packet.getOffsetBits(), size));
+            bitBuffer.position(packet.getPayloadStartBits());
+            IDeclaration eventHeaderDeclaration = getStreamInput().getStream().getEventHeaderDeclaration();
+            CTFTrace trace = getStreamInput().getStream().getTrace();
+            StructDefinition packetHeaderDef = checkNotNull(trace.getPacketHeaderDef());
+            ctfPacketReader = new CTFPacketReader(bitBuffer, packet, getEventDeclarations(), eventHeaderDeclaration, getStreamEventContextDecl(), packetHeaderDef, trace);
+        }
+        return ctfPacketReader;
+    }
+
+    /**
+     * Get a bytebuffer map of the file
+     *
+     * @param position
+     *            start offset in bits
+     * @param size
+     *            size of the map in bits, use caution
+     * @return a byte buffer
+     * @throws CTFException
+     *             if the map failed in its allocation
+     *
+     * @since 2.0
+     */
+    public ByteBuffer getByteBufferAt(long position, long size) throws CTFException {
+        ByteBuffer map;
+        try {
+            map = SafeMappedByteBuffer.map(fFileChannel, MapMode.READ_ONLY, position / BITS_PER_BYTE, (size + BITS_PER_BYTE - 1) / BITS_PER_BYTE);
+        } catch (IOException e) {
+            throw new CTFIOException(e.getMessage(), e);
+        }
+        if (map == null) {
+            throw new CTFIOException("Failed to allocate mapped byte buffer"); //$NON-NLS-1$
+        }
+        return map;
     }
 
     /**
@@ -127,7 +187,7 @@ public class CTFStreamInputReader implements AutoCloseable {
         if (fFileChannel != null) {
             fFileChannel.close();
         }
-        fPacketReader.close();
+        fPacketReader = NullPacketReader.INSTANCE;
     }
 
     // ------------------------------------------------------------------------
@@ -193,9 +253,10 @@ public class CTFStreamInputReader implements AutoCloseable {
      * Gets the event definition set for this StreamInput
      *
      * @return Unmodifiable set with the event definitions
+     * @since 2.0
      */
-    public Iterable<IEventDeclaration> getEventDeclarations() {
-        return checkNotNull(ImmutableList.copyOf(fStreamInput.getStream().getEventDeclarations()));
+    public List<IEventDeclaration> getEventDeclarations() {
+        return fStreamInput.getStream().getEventDeclarations();
     }
 
     /**
@@ -269,18 +330,19 @@ public class CTFStreamInputReader implements AutoCloseable {
     private void goToNextPacket() throws CTFException {
         fPacketIndex++;
         // did we already index the packet?
-        if (getPacketSize() >= (fPacketIndex + 1)) {
-            fPacketReader.setCurrentPacket(getPacket());
-        } else {
+        while (getPacketSize() < (fPacketIndex + 1)) {
             // go to the next packet if there is one, index it at the same time
             if (fStreamInput.addPacketHeaderIndex()) {
                 fPacketIndex = getPacketSize() - 1;
-                fPacketReader.setCurrentPacket(getPacket());
             } else {
-                // out of packets
-                fPacketReader.setCurrentPacket(null);
+                fPacketReader = NullPacketReader.INSTANCE;
+                return;
             }
+
         }
+        ICTFPacketDescriptor packet = getPacket();
+        fPacketReader = getCurrentPacketReader(packet);
+
     }
 
     /**
@@ -382,7 +444,7 @@ public class CTFStreamInputReader implements AutoCloseable {
         /*
          * Go to last indexed packet
          */
-        fPacketReader.setCurrentPacket(getPacket());
+        fPacketReader = getCurrentPacketReader(getPacket());
 
         /*
          * Keep going until you cannot
@@ -397,7 +459,7 @@ public class CTFStreamInputReader implements AutoCloseable {
          */
         for (int pos = lastPacketIndex; pos > 0; pos--) {
             fPacketIndex = pos;
-            fPacketReader.setCurrentPacket(getPacket());
+            fPacketReader = getCurrentPacketReader(getPacket());
 
             if (fPacketReader.hasMoreEvents()) {
                 break;
@@ -443,19 +505,12 @@ public class CTFStreamInputReader implements AutoCloseable {
     }
 
     /**
-     * Get the file channel wrapped by this reader
+     * Get the current packet reader
      *
-     * @return the file channel
-     */
-    @Nullable
-    FileChannel getFc() {
-        return fFileChannel;
-    }
-
-    /**
      * @return the packetReader
+     * @since 2.0
      */
-    public CTFStreamInputPacketReader getPacketReader() {
+    public IPacketReader getCurrentPacketReader() {
         return fPacketReader;
     }
 

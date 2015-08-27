@@ -129,23 +129,13 @@ public class CtfTmfLostEventsTest {
      */
     @Test
     public void testFirstLostEvent() {
-        final long rank = 190;
-        final ITmfTimestamp start = new TmfNanoTimestamp(1376592664828900165L);
-        final ITmfTimestamp end   = new TmfNanoTimestamp(1376592664829403076L);
+        final long rank = 152;
+        final long startTime = 1376592664828848222L;
+        final ITmfTimestamp start = new TmfNanoTimestamp(startTime);
+        final ITmfTimestamp end = new TmfNanoTimestamp(startTime + 554854L);
         final long nbLost = 859;
 
-        final CtfTmfEvent ev = getOneEventTime(start);
-        /* Make sure seeking by rank yields the same event */
-        final CtfTmfEvent ev2 = getOneEventRank(rank);
-        assertEquals(ev, ev2);
-
-        assertTrue(ev instanceof ITmfLostEvent);
-        ITmfLostEvent event = (ITmfLostEvent) ev;
-
-        assertEquals(start, event.getTimestamp());
-        assertEquals(start, event.getTimeRange().getStartTime());
-        assertEquals(end, event.getTimeRange().getEndTime());
-        assertEquals(nbLost, event.getNbLostEvents());
+        validateLostEvent(rank, start, end, nbLost);
     }
 
     /**
@@ -153,11 +143,16 @@ public class CtfTmfLostEventsTest {
      */
     @Test
     public void testSecondLostEvent() {
-        final long rank = 229;
-        final ITmfTimestamp start = new TmfNanoTimestamp(1376592664829477058L);
-        final ITmfTimestamp end   = new TmfNanoTimestamp(1376592664829824514L);
+        final long rank = 191;
+        final long startTime = 1376592664829402521L;
+        final ITmfTimestamp start = new TmfNanoTimestamp(startTime);
+        final ITmfTimestamp end = new TmfNanoTimestamp(startTime + 421993L);
         final long nbLost = 488;
 
+        validateLostEvent(rank, start, end, nbLost);
+    }
+
+    private void validateLostEvent(final long rank, final @NonNull ITmfTimestamp start, final ITmfTimestamp end, final long nbLost) {
         final CtfTmfEvent ev = getOneEventTime(start);
         /* Make sure seeking by rank yields the same event */
         final CtfTmfEvent ev2 = getOneEventRank(rank);
@@ -178,8 +173,8 @@ public class CtfTmfLostEventsTest {
      */
     @Test
     public void testNormalEvent() {
-        final long rank = 200;
-        final ITmfTimestamp ts = new TmfNanoTimestamp(1376592664829425780L);
+        final long rank = 193;
+        final ITmfTimestamp ts = new TmfNanoTimestamp(1376592664829411423L);
 
         final CtfTmfEvent event = getOneEventTime(ts);
         /* Make sure seeking by rank yields the same event */
@@ -200,9 +195,9 @@ public class CtfTmfLostEventsTest {
         trace.setTimestampTransform(TimestampTransformFactory.createWithOffset(offset));
         trace.indexTrace(true);
 
-        final long rank = 190;
-        final ITmfTimestamp start = new TmfNanoTimestamp(1376592664828900165L + offset);
-        final ITmfTimestamp end   = new TmfNanoTimestamp(1376592664829403076L + offset);
+        final long rank = 152;
+        final ITmfTimestamp start = new TmfNanoTimestamp(1376592664828848222L + offset);
+        final ITmfTimestamp end = new TmfNanoTimestamp(1376592664828848222L + 554854L + offset);
         final long nbLost = 859;
 
         ITmfContext context = trace.seekEvent(rank);
@@ -273,7 +268,7 @@ public class CtfTmfLostEventsTest {
         public OneEventRequestPerTs(@NonNull ITmfTimestamp ts) {
             super(CtfTmfEvent.class,
                     new TmfTimeRange(ts, ts),
-                    0, ITmfEventRequest.ALL_DATA, ExecutionType.FOREGROUND);
+                    0, 1, ExecutionType.FOREGROUND);
         }
 
         @Override

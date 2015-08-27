@@ -26,6 +26,7 @@ import org.eclipse.tracecompass.ctf.core.event.types.SimpleDatatypeDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StringDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
 import org.eclipse.tracecompass.ctf.core.trace.ICTFPacketDescriptor;
+import org.eclipse.tracecompass.ctf.core.trace.IPacketReader;
 
 /**
  * <b><u>StreamInputPacketIndexEntry</u></b>
@@ -35,8 +36,6 @@ import org.eclipse.tracecompass.ctf.core.trace.ICTFPacketDescriptor;
 public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
 
     private static final Pattern NUMBER_PATTERN = Pattern.compile("\\D*(\\d+)"); //$NON-NLS-1$
-
-    private static final int UNKNOWN = -1;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -88,6 +87,8 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
      */
     private final Map<String, Object> fAttributes = new HashMap<>();
 
+    private final long fEndPacketHeaderBits;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -99,6 +100,8 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
      *            offset in the file for the start of data in bits
      * @param fileSizeBytes
      *            number of bytes in a file
+     *
+     * TODO: Remove
      */
 
     public StreamInputPacketIndexEntry(long dataOffsetBits, long fileSizeBytes) {
@@ -111,6 +114,7 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
         fTargetID = 0;
         fTimestampBegin = 0;
         fTimestampEnd = Long.MAX_VALUE;
+        fEndPacketHeaderBits = dataOffsetBits;
     }
 
     /**
@@ -124,8 +128,29 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
      *            number of bytes in a file
      * @param lostSoFar
      *            number of lost events so far
+     *
+     * TODO: Remove
      */
     public StreamInputPacketIndexEntry(long dataOffsetBits, StructDefinition streamPacketContextDef, long fileSizeBytes, long lostSoFar) {
+        this(dataOffsetBits, streamPacketContextDef, fileSizeBytes, lostSoFar, dataOffsetBits);
+    }
+
+    /**
+     * full Constructor
+     *
+     * @param dataOffsetBits
+     *            offset in the file for the start of data in bits
+     * @param streamPacketContextDef
+     *            packet context
+     * @param fileSizeBytes
+     *            number of bytes in a file
+     * @param lostSoFar
+     *            number of lost events so far
+     * @param endPacketHeaderBits
+     *            end of packet headers
+     */
+    public StreamInputPacketIndexEntry(long dataOffsetBits, StructDefinition streamPacketContextDef, long fileSizeBytes, long lostSoFar, long endPacketHeaderBits) {
+        fEndPacketHeaderBits = endPacketHeaderBits;
         for (String field : streamPacketContextDef.getDeclaration().getFieldsList()) {
             IDefinition id = streamPacketContextDef.lookupDefinition(field);
             if (id instanceof IntegerDefinition) {
@@ -204,7 +229,7 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
 
         public Target() {
             string = null;
-            number = UNKNOWN;
+            number = IPacketReader.UNKNOWN_CPU;
         }
     }
 
@@ -312,5 +337,10 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
     @Override
     public long getOffsetBytes() {
         return fOffsetBytes;
+    }
+
+    @Override
+    public long getPayloadStartBits() {
+        return fEndPacketHeaderBits;
     }
 }

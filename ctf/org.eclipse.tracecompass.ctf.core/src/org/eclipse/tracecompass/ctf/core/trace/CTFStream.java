@@ -14,12 +14,14 @@ package org.eclipse.tracecompass.ctf.core.trace;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
@@ -224,15 +226,10 @@ public class CTFStream {
      * Get all the event declarations in this stream.
      *
      * @return The event declarations for this stream
+     * @since 2.0
      */
-    public @NonNull Collection<@NonNull IEventDeclaration> getEventDeclarations() {
-        List<@NonNull IEventDeclaration> retVal = new ArrayList<>();
-        for (IEventDeclaration eventDeclaration : fEvents) {
-            if (eventDeclaration != null) {
-                retVal.add(eventDeclaration);
-            }
-        }
-        return retVal;
+    public @NonNull List<IEventDeclaration> getEventDeclarations() {
+        return NonNullUtils.checkNotNull(Collections.unmodifiableList(fEvents));
     }
 
     /**

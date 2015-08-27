@@ -104,4 +104,12 @@ public interface ICTFPacketDescriptor {
      */
     long getOffsetBytes();
 
+    /**
+     * Get the offset where the events start and the packet header ends
+     *
+     * @return the offset in the file of the end of the packet header
+     * @since 2.0
+     */
+    long getPayloadStartBits();
+
 }

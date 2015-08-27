@@ -29,9 +29,6 @@ import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.internal.ctf.core.Activator;
 import org.eclipse.tracecompass.internal.ctf.core.trace.StreamInputReaderTimestampComparator;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
-
 /**
  * A CTF trace reader. Reads the events of a trace.
  *
@@ -116,11 +113,8 @@ public class CTFTraceReader implements AutoCloseable {
          */
         fStartTime = 0;
         if (hasMoreEvents()) {
-            EventDefinition currentEvent = getTopStream().getCurrentEvent();
-            if (currentEvent != null) {
-                fStartTime = currentEvent.getTimestamp();
-                setEndTime(fStartTime);
-            }
+            fStartTime = checkNotNull(getTopStream().getCurrentEvent()).getTimestamp();
+            setEndTime(fStartTime);
         }
     }
 
@@ -254,6 +248,7 @@ public class CTFTraceReader implements AutoCloseable {
                  */
                 CTFStreamInputReader streamInputReader = new CTFStreamInputReader(checkNotNull(streamInput));
 
+
                 /*
                  * Add it to the group.
                  */
@@ -280,11 +275,12 @@ public class CTFTraceReader implements AutoCloseable {
      * @return the iterable of the stream input readers
      */
     public Iterable<IEventDeclaration> getEventDeclarations() {
-        ImmutableSet.Builder<IEventDeclaration> builder = new Builder<>();
+        Set<IEventDeclaration> retSet = new HashSet<>();
         for (CTFStreamInputReader sir : fStreamInputReaders) {
-            builder.addAll(sir.getEventDeclarations());
+            retSet.addAll(sir.getEventDeclarations());
         }
-        return builder.build();
+        retSet.remove(null);
+        return retSet;
     }
 
     /**
