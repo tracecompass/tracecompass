@@ -138,7 +138,9 @@ public class CTFStreamInputReaderTest {
      */
     @Test
     public void testGetCurrentPacketContext() {
-        ICompositeDefinition result = fixture.getCurrentEvent().getPacketContext();
+        EventDefinition currentEvent = fixture.getCurrentEvent();
+        assertNotNull(currentEvent);
+        ICompositeDefinition result = currentEvent.getPacketContext();
         assertNotNull(result);
     }
 
@@ -174,7 +176,9 @@ public class CTFStreamInputReaderTest {
     public void testGoToLastEvent2() throws CTFException {
         long timestamp = -1;
         while (fixture.readNextEvent().equals(CTFResponse.OK)) {
-            timestamp = fixture.getCurrentEvent().getTimestamp();
+            EventDefinition currentEvent = fixture.getCurrentEvent();
+            assertNotNull(currentEvent);
+            timestamp = currentEvent.getTimestamp();
         }
         long endTimestamp = goToEnd();
         assertEquals(0, timestamp - endTimestamp);
@@ -182,7 +186,9 @@ public class CTFStreamInputReaderTest {
 
     private long goToEnd() throws CTFException {
         fixture.goToLastEvent();
-        return fixture.getCurrentEvent().getTimestamp();
+        EventDefinition currentEvent = fixture.getCurrentEvent();
+        assertNotNull(currentEvent);
+        return currentEvent.getTimestamp();
     }
 
     /**

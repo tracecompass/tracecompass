@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.equalsNullable;
 
 import org.eclipse.tracecompass.ctf.core.CTFException;
+import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInputReader;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
@@ -162,8 +163,11 @@ public class CtfIterator extends CTFTraceReader
     public synchronized long getCurrentTimestamp() {
         final CTFStreamInputReader top = super.getPrio().peek();
         if (top != null) {
-            long ts = top.getCurrentEvent().getTimestamp();
-            return fTrace.timestampCyclesToNanos(ts);
+            EventDefinition currentEvent = top.getCurrentEvent();
+            if (currentEvent != null) {
+                long ts = currentEvent.getTimestamp();
+                return fTrace.timestampCyclesToNanos(ts);
+            }
         }
         return 0;
     }

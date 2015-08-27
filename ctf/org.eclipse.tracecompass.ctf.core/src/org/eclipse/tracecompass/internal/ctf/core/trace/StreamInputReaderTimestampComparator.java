@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson, Ecole Polytechnique de Montreal and others
+ * Copyright (c) 2011, 2015 Ericsson, Ecole Polytechnique de Montreal and others
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -11,6 +11,8 @@
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.ctf.core.trace;
+
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -43,11 +45,11 @@ public class StreamInputReaderTimestampComparator implements
      */
     @Override
     public int compare(CTFStreamInputReader a, CTFStreamInputReader b) {
-        EventDefinition event_a = a.getCurrentEvent();
-        EventDefinition event_b = b.getCurrentEvent();
+        EventDefinition eventA = checkNotNull(a.getCurrentEvent());
+        EventDefinition eventB = checkNotNull(b.getCurrentEvent());
 
-        long ta = event_a.getTimestamp();
-        long tb = event_b.getTimestamp();
+        long ta = eventA.getTimestamp();
+        long tb = eventB.getTimestamp();
         return Utils.unsignedCompare(ta, tb);
     }
 

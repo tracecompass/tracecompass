@@ -12,13 +12,16 @@
 
 package org.eclipse.tracecompass.ctf.core.trace;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
 
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
@@ -34,6 +37,7 @@ import com.google.common.collect.ImmutableList;
  * @author Simon Marchi
  * @since 2.0
  */
+@NonNullByDefault
 public class CTFStreamInputReader implements AutoCloseable {
 
     // ------------------------------------------------------------------------
@@ -43,11 +47,11 @@ public class CTFStreamInputReader implements AutoCloseable {
     /**
      * The StreamInput we are reading.
      */
-    private final @NonNull File fFile;
+    private final File fFile;
 
-    private final @NonNull CTFStreamInput fStreamInput;
+    private final CTFStreamInput fStreamInput;
 
-    private final FileChannel fFileChannel;
+    private final @Nullable FileChannel fFileChannel;
 
     /**
      * The packet reader used to read packets from this trace file.
@@ -63,7 +67,7 @@ public class CTFStreamInputReader implements AutoCloseable {
      * Reference to the current event of this trace file (iow, the last on that
      * was read, the next one to be returned)
      */
-    private EventDefinition fCurrentEvent = null;
+    private @Nullable EventDefinition fCurrentEvent = null;
 
     private int fId;
 
@@ -84,9 +88,6 @@ public class CTFStreamInputReader implements AutoCloseable {
      *             If the file cannot be opened
      */
     public CTFStreamInputReader(CTFStreamInput streamInput) throws CTFException {
-        if (streamInput == null) {
-            throw new IllegalArgumentException("stream cannot be null"); //$NON-NLS-1$
-        }
         fStreamInput = streamInput;
         fFile = fStreamInput.getFile();
         try {
@@ -126,9 +127,7 @@ public class CTFStreamInputReader implements AutoCloseable {
         if (fFileChannel != null) {
             fFileChannel.close();
         }
-        if (fPacketReader != null) {
-            fPacketReader.close();
-        }
+        fPacketReader.close();
     }
 
     // ------------------------------------------------------------------------
@@ -141,17 +140,8 @@ public class CTFStreamInputReader implements AutoCloseable {
      * @return the current event in the stream, null if the stream is
      *         finished/empty/malformed
      */
-    public EventDefinition getCurrentEvent() {
+    public @Nullable EventDefinition getCurrentEvent() {
         return fCurrentEvent;
-    }
-
-    /**
-     * Gets the byte order for a trace
-     *
-     * @return the trace byte order
-     */
-    public ByteOrder getByteOrder() {
-        return fStreamInput.getStream().getTrace().getByteOrder();
     }
 
     /**
@@ -205,7 +195,7 @@ public class CTFStreamInputReader implements AutoCloseable {
      * @return Unmodifiable set with the event definitions
      */
     public Iterable<IEventDeclaration> getEventDeclarations() {
-        return ImmutableList.copyOf(fStreamInput.getStream().getEventDeclarations());
+        return checkNotNull(ImmutableList.copyOf(fStreamInput.getStream().getEventDeclarations()));
     }
 
     /**
@@ -232,7 +222,7 @@ public class CTFStreamInputReader implements AutoCloseable {
      *
      * @return the event context declaration of the stream
      */
-    public StructDeclaration getStreamEventContextDecl() {
+    public @Nullable StructDeclaration getStreamEventContextDecl() {
         return getStreamInput().getStream().getEventContextDecl();
     }
 
@@ -252,8 +242,7 @@ public class CTFStreamInputReader implements AutoCloseable {
          * Change packet if needed
          */
         if (!fPacketReader.hasMoreEvents()) {
-            final ICTFPacketDescriptor prevPacket = fPacketReader
-                    .getCurrentPacket();
+            final ICTFPacketDescriptor prevPacket = fPacketReader.getCurrentPacket();
             if (prevPacket != null || fLive) {
                 goToNextPacket();
             }
@@ -343,10 +332,10 @@ public class CTFStreamInputReader implements AutoCloseable {
          * timestamp.
          */
         readNextEvent();
-        boolean done = (this.getCurrentEvent() == null);
-        while (!done && (this.getCurrentEvent().getTimestamp() < timestamp)) {
+        EventDefinition currentEvent = getCurrentEvent();
+        while (currentEvent != null && (currentEvent.getTimestamp() < timestamp)) {
             readNextEvent();
-            done = (this.getCurrentEvent() == null);
+            currentEvent = getCurrentEvent();
             offset++;
         }
         return offset;
@@ -359,8 +348,7 @@ public class CTFStreamInputReader implements AutoCloseable {
      *             if an error occurs
      */
     private void gotoPacket(long timestamp) throws CTFException {
-        fPacketIndex = fStreamInput.getIndex().search(timestamp)
-                .previousIndex();
+        fPacketIndex = fStreamInput.getIndex().search(timestamp).previousIndex();
         /*
          * Switch to this packet.
          */
@@ -436,7 +424,7 @@ public class CTFStreamInputReader implements AutoCloseable {
      * @param currentEvent
      *            the event to set
      */
-    public void setCurrentEvent(EventDefinition currentEvent) {
+    public void setCurrentEvent(@Nullable EventDefinition currentEvent) {
         fCurrentEvent = currentEvent;
     }
 
@@ -447,7 +435,10 @@ public class CTFStreamInputReader implements AutoCloseable {
         return fPacketIndex;
     }
 
-    private ICTFPacketDescriptor getPacket() {
+    private @Nullable ICTFPacketDescriptor getPacket() {
+        if (getPacketIndex() >= fStreamInput.getIndex().size()) {
+            return null;
+        }
         return fStreamInput.getIndex().getElement(getPacketIndex());
     }
 
@@ -456,6 +447,7 @@ public class CTFStreamInputReader implements AutoCloseable {
      *
      * @return the file channel
      */
+    @Nullable
     FileChannel getFc() {
         return fFileChannel;
     }
@@ -478,7 +470,7 @@ public class CTFStreamInputReader implements AutoCloseable {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (this == obj) {
             return true;
         }
@@ -498,7 +490,7 @@ public class CTFStreamInputReader implements AutoCloseable {
     @Override
     public String toString() {
         // this helps debugging
-        return fId + ' ' + fCurrentEvent.toString();
+        return fId + ' ' + NonNullUtils.nullToEmptyString(fCurrentEvent);
     }
 
 }
