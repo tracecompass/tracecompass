@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.remote.core.IRemoteFileService;
@@ -41,6 +42,8 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.LttngProfileManager
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
+import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.ISaveDialog;
+import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.TraceControlDialogFactory;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.service.LTTngControlServiceConstants;
@@ -83,12 +86,18 @@ public class SaveHandler extends BaseControlViewHandler {
             final List<TraceSessionComponent> sessions = new ArrayList<>();
             sessions.addAll(fSessions);
 
+            // Open dialog box for the save dialog path
+            final ISaveDialog dialog = TraceControlDialogFactory.getInstance().getSaveDialog();
+            if (dialog.open() != Window.OK) {
+                return null;
+            }
+
             Job job = new Job(Messages.TraceControl_SaveJob) {
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
                     try {
                         for (TraceSessionComponent session : sessions) {
-                            session.saveSession(null, null, true, monitor);
+                            session.saveSession(null, null, dialog.isForce(), monitor);
 
                             final IRemoteConnection connection = session.getTargetNode().getRemoteSystemProxy().getRemoteConnection();
                             SubMonitor subMonitor = SubMonitor.convert(monitor, 3);
@@ -126,9 +135,9 @@ public class SaveHandler extends BaseControlViewHandler {
                                         overwrite[0] = MessageDialog.openConfirm(Display.getDefault().getActiveShell(),
                                                 Messages.TraceControl_ProfileAlreadyExists,
                                                 NLS.bind(Messages.TraceControl_OverwriteQuery, destPath.getFileName()));
-
                                     }
                                 });
+
                                 if (!overwrite[0]) {
                                     continue;
                                 }

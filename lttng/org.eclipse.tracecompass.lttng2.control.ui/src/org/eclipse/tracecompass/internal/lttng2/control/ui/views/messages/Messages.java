@@ -323,6 +323,7 @@ public final class Messages extends NLS {
     public static String TraceControl_ExecuteScriptSelectLabel;
 
     public static String TraceControl_LoadDialogTitle;
+    public static String TraceControl_SaveDialogTitle;
 
     public static String TraceControl_ForceButtonText;
     public static String TraceControl_ManageButtonText;
