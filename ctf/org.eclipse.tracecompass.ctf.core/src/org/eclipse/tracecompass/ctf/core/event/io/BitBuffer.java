@@ -220,7 +220,7 @@ public final class BitBuffer {
         if (!canRead(length)) {
             throw new CTFException("Cannot read the integer, " + //$NON-NLS-1$
                     "the buffer does not have enough remaining space. " + //$NON-NLS-1$
-                    "Requested:" + length); //$NON-NLS-1$
+                    "Requested:" + length + " Available:" + (fBitCapacity - fPosition)); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         /* Get the value from the byte buffer. */
