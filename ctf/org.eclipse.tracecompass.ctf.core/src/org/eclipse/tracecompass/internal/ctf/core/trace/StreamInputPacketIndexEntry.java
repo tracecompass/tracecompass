@@ -109,7 +109,7 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
         fLostEvents = 0;
         fTarget = ""; //$NON-NLS-1$
         fTargetID = 0;
-        fTimestampBegin = Long.MIN_VALUE;
+        fTimestampBegin = 0;
         fTimestampEnd = Long.MAX_VALUE;
     }
 
@@ -170,7 +170,7 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
         if (tsBegin != null) {
             fTimestampBegin = (tsBegin.longValue());
         } else {
-            fTimestampBegin = Long.MIN_VALUE;
+            fTimestampBegin = 0;
         }
 
         /* Read the end timestamp */
