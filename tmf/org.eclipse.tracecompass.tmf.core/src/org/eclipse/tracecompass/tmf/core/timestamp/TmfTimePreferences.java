@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -21,6 +21,7 @@ import java.util.TimeZone;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 
@@ -95,7 +96,12 @@ public final class TmfTimePreferences {
      * @return the time zone
      */
     public static TimeZone getTimeZone() {
-        return TimeZone.getTimeZone(Platform.getPreferencesService().getString(Activator.PLUGIN_ID, ITmfTimePreferencesConstants.TIME_ZONE, TimeZone.getDefault().getID(), null));
+        String defaultId = TimeZone.getDefault().getID();
+        IPreferencesService preferencesService = Platform.getPreferencesService();
+        if (preferencesService == null) {
+            return TimeZone.getTimeZone(defaultId);
+        }
+        return TimeZone.getTimeZone(preferencesService.getString(Activator.PLUGIN_ID, ITmfTimePreferencesConstants.TIME_ZONE, defaultId, null));
     }
 
     /**
@@ -104,7 +110,12 @@ public final class TmfTimePreferences {
      * @return the locale
      */
     public static Locale getLocale() {
-        return Locale.forLanguageTag(Platform.getPreferencesService().getString(Activator.PLUGIN_ID, ITmfTimePreferencesConstants.LOCALE, Locale.getDefault().toLanguageTag(), null));
+        String defaultLanguageTag = Locale.getDefault().toLanguageTag();
+        IPreferencesService preferencesService = Platform.getPreferencesService();
+        if (preferencesService == null) {
+            return Locale.forLanguageTag(defaultLanguageTag);
+        }
+        return Locale.forLanguageTag(preferencesService.getString(Activator.PLUGIN_ID, ITmfTimePreferencesConstants.LOCALE, defaultLanguageTag, null));
     }
 
     /**
