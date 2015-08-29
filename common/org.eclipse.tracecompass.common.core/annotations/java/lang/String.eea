@@ -20,6 +20,9 @@ split
 split
  (Ljava/lang/String;I)[Ljava/lang/String;
  (L1java/lang/String;I)[1L1java/lang/String;
+substring
+ (II)Ljava/lang/String;
+ (II)L1java/lang/String;
 toString
  ()Ljava/lang/String;
  ()L1java/lang/String;

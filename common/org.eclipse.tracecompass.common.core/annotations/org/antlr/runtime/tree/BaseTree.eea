@@ -1,0 +1,4 @@
+class org/antlr/runtime/tree/BaseTree
+getFirstChildWithType
+ (I)Lorg/antlr/runtime/tree/Tree;
+ (I)L0org/antlr/runtime/tree/Tree;

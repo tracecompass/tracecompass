@@ -80,10 +80,10 @@ public class TestInvalidCtfTrace {
         ERRORS.put("integer-encoding-invalid", "Invalid value for encoding");
         ERRORS.put("integer-negative-bit-size", "Invalid value for size");
         ERRORS.put("integer-range", "Invalid integer format: 23452397856348975623897562893746589237465289374658923764598237645897234658723648579236");
-        ERRORS.put("integer-signed-as-string", "org.eclipse.tracecompass.internal.ctf.core.event.metadata.exceptions.ParseException");
+        ERRORS.put("integer-signed-as-string", "Invalid boolean value");
         ERRORS.put("integer-signed-invalid", "Invalid boolean value svp");
         ERRORS.put("integer-size-as-string", "Invalid value for size");
-        ERRORS.put("integer-size-missing", "org.eclipse.tracecompass.internal.ctf.core.event.metadata.exceptions.ParseException");
+        ERRORS.put("integer-size-missing", "Invalid boolean value");
         ERRORS.put("struct-align-enum", "Invalid value for alignment");
         ERRORS.put("struct-align-huge", "Invalid integer format: 0xFFFFFFFFU");
         ERRORS.put("struct-align-negative", "Invalid value for alignment : -8");

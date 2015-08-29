@@ -1,0 +1,7 @@
+class org/antlr/runtime/tree/CommonTree
+dupNode
+ ()Lorg/antlr/runtime/tree/Tree;
+ ()L1org/antlr/runtime/tree/Tree;
+getText
+ ()Ljava/lang/String;
+ ()L0java/lang/String;

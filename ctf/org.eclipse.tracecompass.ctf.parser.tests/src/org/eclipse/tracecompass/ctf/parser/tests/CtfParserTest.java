@@ -28,9 +28,9 @@ import org.junit.Test;
 /**
  * This test validates the CTF-Parser implementation.
  *
- * The goal of these tests is to validate syntactic rules and not the
- * CTF semantic. Each test parses a string with a given rule of the
- * compiled parser and validates the resulting tree by using match rules.
+ * The goal of these tests is to validate syntactic rules and not the CTF
+ * semantic. Each test parses a string with a given rule of the compiled parser
+ * and validates the resulting tree by using match rules.
  *
  * @author Etienne Bergeron
  */
@@ -63,12 +63,12 @@ public class CtfParserTest {
             }
             if (tree.getType() != fType) {
                 fail("Type mismatch!" +
-                     " expected:" + fType +
-                     " actual:" + tree.getType());
+                        " expected:" + fType +
+                        " actual:" + tree.getType());
             }
 
             if (fText != null) {
-                if (tree.getText().compareTo(fText) != 0) {
+                if (!fText.equals(tree.getText())) {
                     fail("Text mismatch!" +
                             " expected:" + fText +
                             " actual:" + tree.getText());
@@ -85,8 +85,8 @@ public class CtfParserTest {
                 } else {
                     if (tree.getChildren().size() != size) {
                         fail("Invalid number of childs!"
-                             + " expected:" + size
-                             + " actual:" + tree.getChildren().size());
+                                + " expected:" + size
+                                + " actual:" + tree.getChildren().size());
                     }
 
                     for (int i = 0; i < size; ++i) {
@@ -162,7 +162,6 @@ public class CtfParserTest {
     // Test cases
     // ------------------------------------------------------------------------
 
-
     /**
      * Validate that parsing of an empty expression is invalid.
      */
@@ -178,44 +177,44 @@ public class CtfParserTest {
     @Test
     public void testIntegerLiteralPrimaryExpression() {
         Matches(Node(CTFParser.UNARY_EXPRESSION_DEC,
-                     Node(CTFParser.DECIMAL_LITERAL, "123")),
+                Node(CTFParser.DECIMAL_LITERAL, "123")),
                 primaryExpression("123"));
 
         Matches(Node(CTFParser.UNARY_EXPRESSION_HEX,
-                     Node(CTFParser.HEX_LITERAL, "0x123")),
+                Node(CTFParser.HEX_LITERAL, "0x123")),
                 primaryExpression("0x123"));
 
         Matches(Node(CTFParser.UNARY_EXPRESSION_OCT,
-                     Node(CTFParser.OCTAL_LITERAL, "0123")),
+                Node(CTFParser.OCTAL_LITERAL, "0123")),
                 primaryExpression("0123"));
 
         Matches(Node(CTFParser.UNARY_EXPRESSION_DEC,
-                     Node(CTFParser.DECIMAL_LITERAL, "123"),
-                     Node(CTFParser.SIGN, "-")),
+                Node(CTFParser.DECIMAL_LITERAL, "123"),
+                Node(CTFParser.SIGN, "-")),
                 primaryExpression("-123"));
 
         Matches(Node(CTFParser.UNARY_EXPRESSION_DEC,
-                     Node(CTFParser.DECIMAL_LITERAL, "123"),
-                     Node(CTFParser.SIGN, "-")),
+                Node(CTFParser.DECIMAL_LITERAL, "123"),
+                Node(CTFParser.SIGN, "-")),
                 primaryExpression("  -  123"));
 
         Matches(Node(CTFParser.UNARY_EXPRESSION_DEC,
-                     Node(CTFParser.DECIMAL_LITERAL, "123"),
-                     Node(CTFParser.SIGN, "-"),
-                     Node(CTFParser.SIGN, "-"),
-                     Node(CTFParser.SIGN, "+")),
+                Node(CTFParser.DECIMAL_LITERAL, "123"),
+                Node(CTFParser.SIGN, "-"),
+                Node(CTFParser.SIGN, "-"),
+                Node(CTFParser.SIGN, "+")),
                 primaryExpression(" - -  + 123"));
 
         Matches(Node(CTFParser.UNARY_EXPRESSION_HEX,
-                     Node(CTFParser.HEX_LITERAL, "0x123"),
-                     Node(CTFParser.SIGN, "+"),
-                     Node(CTFParser.SIGN, "-")),
+                Node(CTFParser.HEX_LITERAL, "0x123"),
+                Node(CTFParser.SIGN, "+"),
+                Node(CTFParser.SIGN, "-")),
                 primaryExpression("+ - 0x123"));
 
         Matches(Node(CTFParser.UNARY_EXPRESSION_OCT,
-                     Node(CTFParser.OCTAL_LITERAL, "0123"),
-                     Node(CTFParser.SIGN, "+"),
-                     Node(CTFParser.SIGN, "-")),
+                Node(CTFParser.OCTAL_LITERAL, "0123"),
+                Node(CTFParser.SIGN, "+"),
+                Node(CTFParser.SIGN, "-")),
                 primaryExpression("+ - 0123"));
     }
 
@@ -237,15 +236,15 @@ public class CtfParserTest {
     @Test
     public void testStringLiteralPrimaryExpression() {
         Matches(Node(CTFParser.UNARY_EXPRESSION_STRING_QUOTES,
-                     Node(CTFParser.STRING_LITERAL, "\"aaa\"")),
+                Node(CTFParser.STRING_LITERAL, "\"aaa\"")),
                 primaryExpression("\"aaa\""));
 
         Matches(Node(CTFParser.UNARY_EXPRESSION_STRING_QUOTES,
-                     Node(CTFParser.STRING_LITERAL, "L\"aaa\"")),
+                Node(CTFParser.STRING_LITERAL, "L\"aaa\"")),
                 primaryExpression("L\"aaa\""));
 
         Matches(Node(CTFParser.UNARY_EXPRESSION_STRING_QUOTES,
-                     Node(CTFParser.STRING_LITERAL, "\"aaa\\n\"")),
+                Node(CTFParser.STRING_LITERAL, "\"aaa\\n\"")),
                 primaryExpression("\"aaa\\n\""));
     }
 
@@ -255,10 +254,10 @@ public class CtfParserTest {
     @Test
     public void testKeywordPrimaryExpression() {
         Matches(Node(CTFParser.UNARY_EXPRESSION_STRING,
-                     Node(CTFParser.SIGNEDTOK, "signed")),
+                Node(CTFParser.SIGNEDTOK, "signed")),
                 primaryExpression("signed"));
         Matches(Node(CTFParser.UNARY_EXPRESSION_STRING,
-                     Node(CTFParser.ALIGNTOK, "align")),
+                Node(CTFParser.ALIGNTOK, "align")),
                 primaryExpression("align"));
     }
 
@@ -268,10 +267,10 @@ public class CtfParserTest {
     @Test
     public void testIdentifierPrimaryExpression() {
         Matches(Node(CTFParser.UNARY_EXPRESSION_STRING,
-                     Node(CTFParser.IDENTIFIER, "x")),
+                Node(CTFParser.IDENTIFIER, "x")),
                 primaryExpression("x"));
         Matches(Node(CTFParser.UNARY_EXPRESSION_STRING,
-                     Node(CTFParser.IDENTIFIER, "_123")),
+                Node(CTFParser.IDENTIFIER, "_123")),
                 primaryExpression("_123"));
     }
 
@@ -290,11 +289,11 @@ public class CtfParserTest {
     @Test
     public void testSimpleUnaryExpression() {
         Matches(Node(CTFParser.UNARY_EXPRESSION_DEC,
-                     Node(CTFParser.DECIMAL_LITERAL, "123")),
+                Node(CTFParser.DECIMAL_LITERAL, "123")),
                 unaryExpression("123"));
 
         Matches(Node(CTFParser.UNARY_EXPRESSION_STRING,
-                     Node(CTFParser.IDENTIFIER, "x")),
+                Node(CTFParser.IDENTIFIER, "x")),
                 unaryExpression("x"));
     }
 
@@ -304,38 +303,38 @@ public class CtfParserTest {
     @Test
     public void testArrayUnaryExpression() {
         Matches(List(Node(CTFParser.UNARY_EXPRESSION_STRING,
-                          Node(CTFParser.IDENTIFIER, "x")),
-                     Node(CTFParser.OPENBRAC),
-                     Node(CTFParser.UNARY_EXPRESSION_DEC,
-                          Node(CTFParser.DECIMAL_LITERAL, "1"))),
+                Node(CTFParser.IDENTIFIER, "x")),
+                Node(CTFParser.OPENBRAC),
+                Node(CTFParser.UNARY_EXPRESSION_DEC,
+                        Node(CTFParser.DECIMAL_LITERAL, "1"))),
                 unaryExpression("x[1]"));
 
         Matches(List(Node(CTFParser.UNARY_EXPRESSION_STRING,
-                          Node(CTFParser.IDENTIFIER, "x")),
-                     Node(CTFParser.OPENBRAC),
-                     Node(CTFParser.UNARY_EXPRESSION_STRING,
-                          Node(CTFParser.IDENTIFIER, "n"))),
+                Node(CTFParser.IDENTIFIER, "x")),
+                Node(CTFParser.OPENBRAC),
+                Node(CTFParser.UNARY_EXPRESSION_STRING,
+                        Node(CTFParser.IDENTIFIER, "n"))),
                 unaryExpression("x[n]"));
 
         Matches(List(Node(CTFParser.UNARY_EXPRESSION_STRING,
-                          Node(CTFParser.IDENTIFIER, "x")),
-                     Node(CTFParser.OPENBRAC),
-                     Node(CTFParser.UNARY_EXPRESSION_STRING,
-                          Node(CTFParser.IDENTIFIER, "n")),
-                     Node(CTFParser.OPENBRAC),
-                     Node(CTFParser.UNARY_EXPRESSION_DEC,
-                          Node(CTFParser.DECIMAL_LITERAL, "1"))),
+                Node(CTFParser.IDENTIFIER, "x")),
+                Node(CTFParser.OPENBRAC),
+                Node(CTFParser.UNARY_EXPRESSION_STRING,
+                        Node(CTFParser.IDENTIFIER, "n")),
+                Node(CTFParser.OPENBRAC),
+                Node(CTFParser.UNARY_EXPRESSION_DEC,
+                        Node(CTFParser.DECIMAL_LITERAL, "1"))),
                 unaryExpression("x[n][1]"));
 
         Matches(List(Node(CTFParser.UNARY_EXPRESSION_STRING,
-                          Node(CTFParser.IDENTIFIER, "x")),
-                     Node(CTFParser.OPENBRAC),
-                     Node(CTFParser.UNARY_EXPRESSION_STRING,
-                          Node(CTFParser.IDENTIFIER, "n")),
-                     Node(CTFParser.OPENBRAC),
-                     Node(CTFParser.UNARY_EXPRESSION_DEC,
-                          Node(CTFParser.DECIMAL_LITERAL, "1"),
-                          Node(CTFParser.SIGN, "+"))),
+                Node(CTFParser.IDENTIFIER, "x")),
+                Node(CTFParser.OPENBRAC),
+                Node(CTFParser.UNARY_EXPRESSION_STRING,
+                        Node(CTFParser.IDENTIFIER, "n")),
+                Node(CTFParser.OPENBRAC),
+                Node(CTFParser.UNARY_EXPRESSION_DEC,
+                        Node(CTFParser.DECIMAL_LITERAL, "1"),
+                        Node(CTFParser.SIGN, "+"))),
                 unaryExpression("x[n][+1]"));
     }
 
@@ -346,18 +345,18 @@ public class CtfParserTest {
     public void testSpecialArrayUnaryExpression() {
         // Added for CTF-v1.8
         Matches(List(Node(CTFParser.TRACE),
-                     Node(CTFParser.OPENBRAC),
-                     Node(CTFParser.UNARY_EXPRESSION_STRING,
-                          Node(CTFParser.IDENTIFIER, "n"))),
+                Node(CTFParser.OPENBRAC),
+                Node(CTFParser.UNARY_EXPRESSION_STRING,
+                        Node(CTFParser.IDENTIFIER, "n"))),
                 unaryExpression("trace[n]"));
 
         Matches(List(Node(CTFParser.CLOCK),
-                     Node(CTFParser.OPENBRAC),
-                     Node(CTFParser.UNARY_EXPRESSION_STRING,
-                          Node(CTFParser.IDENTIFIER, "n")),
-                     Node(CTFParser.OPENBRAC),
-                     Node(CTFParser.UNARY_EXPRESSION_DEC,
-                          Node(CTFParser.DECIMAL_LITERAL, "1"))),
+                Node(CTFParser.OPENBRAC),
+                Node(CTFParser.UNARY_EXPRESSION_STRING,
+                        Node(CTFParser.IDENTIFIER, "n")),
+                Node(CTFParser.OPENBRAC),
+                Node(CTFParser.UNARY_EXPRESSION_DEC,
+                        Node(CTFParser.DECIMAL_LITERAL, "1"))),
                 unaryExpression("clock[n][1]"));
     }
 
@@ -367,20 +366,20 @@ public class CtfParserTest {
     @Test
     public void testMemberUnaryExpression() {
         Matches(List(Node(CTFParser.UNARY_EXPRESSION_STRING,
-                          Node(CTFParser.IDENTIFIER, "x")),
-                     Node(CTFParser.DOT,
-                          Node(CTFParser.UNARY_EXPRESSION_STRING,
-                               Node(CTFParser.IDENTIFIER, "y")))),
+                Node(CTFParser.IDENTIFIER, "x")),
+                Node(CTFParser.DOT,
+                        Node(CTFParser.UNARY_EXPRESSION_STRING,
+                                Node(CTFParser.IDENTIFIER, "y")))),
                 unaryExpression("x.y"));
 
         Matches(List(Node(CTFParser.UNARY_EXPRESSION_STRING,
-                         Node(CTFParser.IDENTIFIER, "x")),
-                     Node(CTFParser.DOT,
-                          Node(CTFParser.UNARY_EXPRESSION_STRING,
-                               Node(CTFParser.IDENTIFIER, "y"))),
-                     Node(CTFParser.DOT,
-                          Node(CTFParser.UNARY_EXPRESSION_STRING,
-                               Node(CTFParser.IDENTIFIER, "z")))),
+                Node(CTFParser.IDENTIFIER, "x")),
+                Node(CTFParser.DOT,
+                        Node(CTFParser.UNARY_EXPRESSION_STRING,
+                                Node(CTFParser.IDENTIFIER, "y"))),
+                Node(CTFParser.DOT,
+                        Node(CTFParser.UNARY_EXPRESSION_STRING,
+                                Node(CTFParser.IDENTIFIER, "z")))),
                 unaryExpression("x.y.z"));
     }
 
@@ -390,20 +389,20 @@ public class CtfParserTest {
     @Test
     public void testPointerUnaryExpression() {
         Matches(List(Node(CTFParser.UNARY_EXPRESSION_STRING,
-                          Node(CTFParser.IDENTIFIER, "x")),
-                     Node(CTFParser.ARROW,
-                          Node(CTFParser.UNARY_EXPRESSION_STRING,
-                               Node(CTFParser.IDENTIFIER, "y")))),
+                Node(CTFParser.IDENTIFIER, "x")),
+                Node(CTFParser.ARROW,
+                        Node(CTFParser.UNARY_EXPRESSION_STRING,
+                                Node(CTFParser.IDENTIFIER, "y")))),
                 unaryExpression("x->y"));
 
         Matches(List(Node(CTFParser.UNARY_EXPRESSION_STRING,
-                          Node(CTFParser.IDENTIFIER, "x")),
-                     Node(CTFParser.ARROW,
-                          Node(CTFParser.UNARY_EXPRESSION_STRING,
-                               Node(CTFParser.IDENTIFIER, "y"))),
-                     Node(CTFParser.ARROW,
-                          Node(CTFParser.UNARY_EXPRESSION_STRING,
-                               Node(CTFParser.IDENTIFIER, "z")))),
+                Node(CTFParser.IDENTIFIER, "x")),
+                Node(CTFParser.ARROW,
+                        Node(CTFParser.UNARY_EXPRESSION_STRING,
+                                Node(CTFParser.IDENTIFIER, "y"))),
+                Node(CTFParser.ARROW,
+                        Node(CTFParser.UNARY_EXPRESSION_STRING,
+                                Node(CTFParser.IDENTIFIER, "z")))),
                 unaryExpression("x->y->z"));
     }
 
@@ -413,19 +412,19 @@ public class CtfParserTest {
     @Test
     public void testMixedUnaryExpression() {
         Matches(List(Node(CTFParser.UNARY_EXPRESSION_STRING,
-                          Node(CTFParser.IDENTIFIER, "x")),
-                     Node(CTFParser.OPENBRAC),
-                          Node(CTFParser.UNARY_EXPRESSION_DEC,
-                               Node(CTFParser.DECIMAL_LITERAL, "2")),
-                     Node(CTFParser.ARROW,
-                          Node(CTFParser.UNARY_EXPRESSION_STRING,
-                               Node(CTFParser.IDENTIFIER, "y"))),
-                     Node(CTFParser.DOT,
-                          Node(CTFParser.UNARY_EXPRESSION_STRING,
-                               Node(CTFParser.IDENTIFIER, "z"))),
-                     Node(CTFParser.OPENBRAC),
-                     Node(CTFParser.UNARY_EXPRESSION_DEC,
-                          Node(CTFParser.DECIMAL_LITERAL, "1"))),
+                Node(CTFParser.IDENTIFIER, "x")),
+                Node(CTFParser.OPENBRAC),
+                Node(CTFParser.UNARY_EXPRESSION_DEC,
+                        Node(CTFParser.DECIMAL_LITERAL, "2")),
+                Node(CTFParser.ARROW,
+                        Node(CTFParser.UNARY_EXPRESSION_STRING,
+                                Node(CTFParser.IDENTIFIER, "y"))),
+                Node(CTFParser.DOT,
+                        Node(CTFParser.UNARY_EXPRESSION_STRING,
+                                Node(CTFParser.IDENTIFIER, "z"))),
+                Node(CTFParser.OPENBRAC),
+                Node(CTFParser.UNARY_EXPRESSION_DEC,
+                        Node(CTFParser.DECIMAL_LITERAL, "1"))),
                 unaryExpression("x[2]->y.z[1]"));
     }
 
@@ -481,39 +480,39 @@ public class CtfParserTest {
     @Test
     public void testEnumDeclaration() {
         Matches(Node(CTFParser.DECLARATION,
-                     Node(CTFParser.TYPE_SPECIFIER_LIST,
-                          Node(CTFParser.ENUM,
-                               Node(CTFParser.ENUM_NAME,
-                                    Node(CTFParser.IDENTIFIER, "name")),
-                               Node(CTFParser.ENUM_BODY,
-                                    Node(CTFParser.ENUM_ENUMERATOR,
-                                         Node(CTFParser.UNARY_EXPRESSION_STRING,
-                                              Node(CTFParser.IDENTIFIER, "A"))))))),
+                Node(CTFParser.TYPE_SPECIFIER_LIST,
+                        Node(CTFParser.ENUM,
+                                Node(CTFParser.ENUM_NAME,
+                                        Node(CTFParser.IDENTIFIER, "name")),
+                                Node(CTFParser.ENUM_BODY,
+                                        Node(CTFParser.ENUM_ENUMERATOR,
+                                                Node(CTFParser.UNARY_EXPRESSION_STRING,
+                                                        Node(CTFParser.IDENTIFIER, "A"))))))),
                 declaration("enum name { A };"));
 
         Matches(Node(CTFParser.DECLARATION,
-                     Node(CTFParser.TYPE_SPECIFIER_LIST,
-                          Node(CTFParser.ENUM,
-                               Node(CTFParser.ENUM_NAME, All()),
-                               Node(CTFParser.ENUM_CONTAINER_TYPE,
-                                    Node(CTFParser.TYPE_SPECIFIER_LIST,
-                                         Node(CTFParser.INTTOK))),
-                               Node(CTFParser.ENUM_BODY, All())))),
+                Node(CTFParser.TYPE_SPECIFIER_LIST,
+                        Node(CTFParser.ENUM,
+                                Node(CTFParser.ENUM_NAME, All()),
+                                Node(CTFParser.ENUM_CONTAINER_TYPE,
+                                        Node(CTFParser.TYPE_SPECIFIER_LIST,
+                                                Node(CTFParser.INTTOK))),
+                                Node(CTFParser.ENUM_BODY, All())))),
                 declaration("enum name : int { A };"));
 
         Matches(Node(CTFParser.DECLARATION,
                 Node(CTFParser.TYPE_SPECIFIER_LIST,
                         Node(CTFParser.ENUM,
-                             Node(CTFParser.ENUM_BODY, All())))),
+                                Node(CTFParser.ENUM_BODY, All())))),
                 declaration("enum { A };"));
 
         Matches(Node(CTFParser.DECLARATION,
                 Node(CTFParser.TYPE_SPECIFIER_LIST,
-                     Node(CTFParser.ENUM,
-                          Node(CTFParser.ENUM_CONTAINER_TYPE,
-                               Node(CTFParser.TYPE_SPECIFIER_LIST,
-                                    Node(CTFParser.INTTOK))),
-                          Node(CTFParser.ENUM_BODY, All())))),
+                        Node(CTFParser.ENUM,
+                                Node(CTFParser.ENUM_CONTAINER_TYPE,
+                                        Node(CTFParser.TYPE_SPECIFIER_LIST,
+                                                Node(CTFParser.INTTOK))),
+                                Node(CTFParser.ENUM_BODY, All())))),
                 declaration("enum : int { A };"));
     }
 
@@ -528,39 +527,39 @@ public class CtfParserTest {
                 declaration("enum { };"));
 
         Matches(Node(CTFParser.DECLARATION,
-                     Node(CTFParser.TYPE_SPECIFIER_LIST,
-                          Node(CTFParser.ENUM,
-                               Node(CTFParser.ENUM_BODY,
-                                    Node(CTFParser.ENUM_ENUMERATOR,
-                                         Node(CTFParser.UNARY_EXPRESSION_STRING,
-                                              Node(CTFParser.IDENTIFIER, "A"))),
-                                    Node(CTFParser.ENUM_ENUMERATOR,
-                                         Node(CTFParser.UNARY_EXPRESSION_STRING,
-                                              Node(CTFParser.IDENTIFIER, "B")),
-                                         Node(CTFParser.ENUM_VALUE,
-                                              Node(CTFParser.UNARY_EXPRESSION_DEC,
-                                                   Node(CTFParser.DECIMAL_LITERAL, "2")))),
-                                    Node(CTFParser.ENUM_ENUMERATOR,
-                                         Node(CTFParser.UNARY_EXPRESSION_STRING,
-                                              Node(CTFParser.IDENTIFIER, "C")),
-                                         Node(CTFParser.ENUM_VALUE_RANGE,
-                                              Node(CTFParser.UNARY_EXPRESSION_DEC,
-                                                   Node(CTFParser.DECIMAL_LITERAL, "3")),
-                                              Node(CTFParser.UNARY_EXPRESSION_DEC,
-                                                   Node(CTFParser.DECIMAL_LITERAL, "5")))))))),
+                Node(CTFParser.TYPE_SPECIFIER_LIST,
+                        Node(CTFParser.ENUM,
+                                Node(CTFParser.ENUM_BODY,
+                                        Node(CTFParser.ENUM_ENUMERATOR,
+                                                Node(CTFParser.UNARY_EXPRESSION_STRING,
+                                                        Node(CTFParser.IDENTIFIER, "A"))),
+                                        Node(CTFParser.ENUM_ENUMERATOR,
+                                                Node(CTFParser.UNARY_EXPRESSION_STRING,
+                                                        Node(CTFParser.IDENTIFIER, "B")),
+                                                Node(CTFParser.ENUM_VALUE,
+                                                        Node(CTFParser.UNARY_EXPRESSION_DEC,
+                                                                Node(CTFParser.DECIMAL_LITERAL, "2")))),
+                                        Node(CTFParser.ENUM_ENUMERATOR,
+                                                Node(CTFParser.UNARY_EXPRESSION_STRING,
+                                                        Node(CTFParser.IDENTIFIER, "C")),
+                                                Node(CTFParser.ENUM_VALUE_RANGE,
+                                                        Node(CTFParser.UNARY_EXPRESSION_DEC,
+                                                                Node(CTFParser.DECIMAL_LITERAL, "3")),
+                                                        Node(CTFParser.UNARY_EXPRESSION_DEC,
+                                                                Node(CTFParser.DECIMAL_LITERAL, "5")))))))),
                 declaration("enum { A, B=2, C=3...5 };"));
 
         Matches(Node(CTFParser.DECLARATION,
-                     Node(CTFParser.TYPE_SPECIFIER_LIST,
-                          Node(CTFParser.ENUM,
-                               Node(CTFParser.ENUM_BODY,
-                                    Node(CTFParser.ENUM_ENUMERATOR,
-                                         Node(CTFParser.UNARY_EXPRESSION_STRING_QUOTES,
-                                              Node(CTFParser.STRING_LITERAL, "\"A\""))),
-                                    Node(CTFParser.ENUM_ENUMERATOR,
-                                         Node(CTFParser.UNARY_EXPRESSION_STRING_QUOTES,
-                                              Node(CTFParser.STRING_LITERAL, "\"B\"")),
-                                         All()))))),
+                Node(CTFParser.TYPE_SPECIFIER_LIST,
+                        Node(CTFParser.ENUM,
+                                Node(CTFParser.ENUM_BODY,
+                                        Node(CTFParser.ENUM_ENUMERATOR,
+                                                Node(CTFParser.UNARY_EXPRESSION_STRING_QUOTES,
+                                                        Node(CTFParser.STRING_LITERAL, "\"A\""))),
+                                        Node(CTFParser.ENUM_ENUMERATOR,
+                                                Node(CTFParser.UNARY_EXPRESSION_STRING_QUOTES,
+                                                        Node(CTFParser.STRING_LITERAL, "\"B\"")),
+                                                All()))))),
                 declaration("enum { \"A\", \"B\"=2 };"));
     }
 
@@ -570,8 +569,9 @@ public class CtfParserTest {
     @Ignore("The grammar need to be fixed to support empty ctf-body.")
     @Test
     public void testEmptyDeclaration() {
-        /* TODO: An exception is throw when building an common tree without
-         *       assignments in the ctf-body.
+        /*
+         * TODO: An exception is throw when building an common tree without
+         * assignments in the ctf-body.
          */
         Matches(All(),
                 declaration("env { };"));
@@ -589,19 +589,19 @@ public class CtfParserTest {
     @Test
     public void testEnvDeclaration() {
         Matches(Node(CTFParser.ENV,
-                     Node(CTFParser.CTF_EXPRESSION_VAL,
-                          Node(CTFParser.CTF_LEFT,
-                               Node(CTFParser.UNARY_EXPRESSION_STRING,
-                                    Node(CTFParser.IDENTIFIER, "pid"))),
-                          Node(CTFParser.CTF_RIGHT,
-                               Node(CTFParser.UNARY_EXPRESSION_STRING,
-                                    Node(CTFParser.IDENTIFIER, "value"))))),
+                Node(CTFParser.CTF_EXPRESSION_VAL,
+                        Node(CTFParser.CTF_LEFT,
+                                Node(CTFParser.UNARY_EXPRESSION_STRING,
+                                        Node(CTFParser.IDENTIFIER, "pid"))),
+                        Node(CTFParser.CTF_RIGHT,
+                                Node(CTFParser.UNARY_EXPRESSION_STRING,
+                                        Node(CTFParser.IDENTIFIER, "value"))))),
                 declaration("env { pid = value; };"));
 
         Matches(Node(CTFParser.ENV,
-                     Node(CTFParser.CTF_EXPRESSION_VAL, All(), All()),
-                     Node(CTFParser.CTF_EXPRESSION_VAL, All(), All()),
-                     Node(CTFParser.CTF_EXPRESSION_VAL, All(), All())),
+                Node(CTFParser.CTF_EXPRESSION_VAL, All(), All()),
+                Node(CTFParser.CTF_EXPRESSION_VAL, All(), All()),
+                Node(CTFParser.CTF_EXPRESSION_VAL, All(), All())),
                 declaration("env { pid = value; proc_name = \"name\"; x = y;};"));
     }
 
@@ -612,41 +612,41 @@ public class CtfParserTest {
     @Test
     public void testTraceDeclaration() {
         Matches(Node(CTFParser.TRACE,
-                     Node(CTFParser.CTF_EXPRESSION_VAL,
-                          Node(CTFParser.CTF_LEFT,
-                               Node(CTFParser.UNARY_EXPRESSION_STRING,
-                                    Node(CTFParser.IDENTIFIER, "major"))),
-                          Node(CTFParser.CTF_RIGHT,
-                               Node(CTFParser.UNARY_EXPRESSION_DEC,
-                                    Node(CTFParser.DECIMAL_LITERAL, "1"))))),
+                Node(CTFParser.CTF_EXPRESSION_VAL,
+                        Node(CTFParser.CTF_LEFT,
+                                Node(CTFParser.UNARY_EXPRESSION_STRING,
+                                        Node(CTFParser.IDENTIFIER, "major"))),
+                        Node(CTFParser.CTF_RIGHT,
+                                Node(CTFParser.UNARY_EXPRESSION_DEC,
+                                        Node(CTFParser.DECIMAL_LITERAL, "1"))))),
                 declaration("trace { major = 1; };"));
 
         Matches(Node(CTFParser.TRACE,
-                     Node(CTFParser.CTF_EXPRESSION_TYPE,
-                          Node(CTFParser.CTF_LEFT,
-                               Node(CTFParser.UNARY_EXPRESSION_STRING,
-                                    Node(CTFParser.IDENTIFIER, "packet")),
-                               Node(CTFParser.DOT,
-                                    Node(CTFParser.UNARY_EXPRESSION_STRING,
-                                         Node(CTFParser.IDENTIFIER, "header")))),
-                          Node(CTFParser.CTF_RIGHT,
-                               Node(CTFParser.TYPE_SPECIFIER_LIST,
-                                    Node(CTFParser.STRUCT,
-                                         Node(CTFParser.STRUCT_NAME,
-                                              Node(CTFParser.IDENTIFIER, "dummy"))))))),
+                Node(CTFParser.CTF_EXPRESSION_TYPE,
+                        Node(CTFParser.CTF_LEFT,
+                                Node(CTFParser.UNARY_EXPRESSION_STRING,
+                                        Node(CTFParser.IDENTIFIER, "packet")),
+                                Node(CTFParser.DOT,
+                                        Node(CTFParser.UNARY_EXPRESSION_STRING,
+                                                Node(CTFParser.IDENTIFIER, "header")))),
+                        Node(CTFParser.CTF_RIGHT,
+                                Node(CTFParser.TYPE_SPECIFIER_LIST,
+                                        Node(CTFParser.STRUCT,
+                                                Node(CTFParser.STRUCT_NAME,
+                                                        Node(CTFParser.IDENTIFIER, "dummy"))))))),
                 declaration("trace { packet.header := struct dummy; };"));
 
         /* TODO: This test crash the parser. */
         Matches(Node(CTFParser.TRACE,
-                     All()),
+                All()),
                 declaration("trace { typedef x y; };"));
 
         Matches(Node(CTFParser.TRACE,
-                     Node(CTFParser.CTF_EXPRESSION_VAL, All(), All()),
-                     Node(CTFParser.CTF_EXPRESSION_VAL, All(), All()),
-                     Node(CTFParser.CTF_EXPRESSION_TYPE, All(), All())),
+                Node(CTFParser.CTF_EXPRESSION_VAL, All(), All()),
+                Node(CTFParser.CTF_EXPRESSION_VAL, All(), All()),
+                Node(CTFParser.CTF_EXPRESSION_TYPE, All(), All())),
                 declaration("trace { major = 1; minor = 1;"
-                            + "packet.header := struct dummy; };"));
+                        + "packet.header := struct dummy; };"));
     }
 
 }

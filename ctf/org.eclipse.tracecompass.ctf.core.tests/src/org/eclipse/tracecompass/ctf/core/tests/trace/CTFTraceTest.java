@@ -31,11 +31,13 @@ import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTraceUtils;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.ICTFStream;
-import org.eclipse.tracecompass.internal.ctf.core.event.metadata.exceptions.ParseException;
+import org.eclipse.tracecompass.internal.ctf.core.event.metadata.ParseException;
 import org.eclipse.tracecompass.internal.ctf.core.trace.CTFStream;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * The class <code>CTFTraceTest</code> contains tests for the class
@@ -370,10 +372,10 @@ public class CTFTraceTest {
     @Test
     public void testLookupEnvironment_3() {
         String key = "test";
-        fixture.addEnvironmentVar(key, key);
+        fixture.setEnvironment(ImmutableMap.<String, String> of(key, key));
         String result = fixture.getEnvironment().get(key);
         assertNotNull(result);
-        assertTrue(result.equals(key));
+        assertEquals(key, result);
     }
 
     /**
@@ -382,8 +384,7 @@ public class CTFTraceTest {
     @Test
     public void testLookupEnvironment_4() {
         String key = "test";
-        fixture.addEnvironmentVar(key, "bozo");
-        fixture.addEnvironmentVar(key, "the clown");
+        fixture.setEnvironment(ImmutableMap.<String, String> of(key, "bozo"));
         String result = fixture.getEnvironment().get(key);
         assertNotNull(result);
     }

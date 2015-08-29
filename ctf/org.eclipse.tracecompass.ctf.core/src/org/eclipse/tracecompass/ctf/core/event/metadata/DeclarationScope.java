@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.ctf.core.event.types.EnumDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.VariantDeclaration;
-import org.eclipse.tracecompass.internal.ctf.core.event.metadata.exceptions.ParseException;
+import org.eclipse.tracecompass.internal.ctf.core.event.metadata.ParseException;
 
 /**
  * <b><u>DeclarationScope</u></b>
@@ -542,5 +542,10 @@ public class DeclarationScope {
         }
         fChildren.put(scope.fName, scope);
         scope.fParentScope = this;
+    }
+
+    @Override
+    public String toString() {
+        return "Scope : " + fName + " children: " + fChildren.size() + (fParentScope == null ? "" : (" parent " + fParentScope.fName)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
 }
