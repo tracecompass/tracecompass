@@ -466,7 +466,7 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
             }
             setCreatedFromScratch(true);
             fRandomAccessFile = null;
-            String headerTrace = fHeader == null ? "" : "nbEvents: " + fHeader.fNbEvents + " timerange:" + fHeader.fTimeRange; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            String headerTrace = fHeader == null ? "No header" : "nbEvents: " + fHeader.fNbEvents + " timerange:" + fHeader.fTimeRange; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             TmfCoreTracer.traceIndexer(this.getClass().getSimpleName() + " disposed. " + headerTrace); //$NON-NLS-1$
         } catch (IOException e) {
             Activator.logError(MessageFormat.format(Messages.IOErrorClosingIndex, fFile), e);

@@ -404,4 +404,15 @@ public abstract class AbstractCheckpointCollectionTest {
         fCheckpointCollection = createCollection();
         assertEquals(2, fCheckpointCollection.size());
     }
+
+    /**
+     * Test that a checkpoint can be inserted after reopening an empty index.
+     */
+    @Test
+    public void testInsertAfterEmptyReopen() {
+        fCheckpointCollection.dispose();
+        fCheckpointCollection = createCollection();
+        fCheckpointCollection.insert(new TmfCheckpoint(new TmfTimestamp(12345), new TmfLongLocation(123456L), 0));
+        assertEquals(1, fCheckpointCollection.size());
+    }
 }
