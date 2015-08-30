@@ -28,7 +28,7 @@ public class CtfCpuAspect extends TmfCpuAspect {
         if (!(event instanceof CtfTmfEvent)) {
             return null;
         }
-        int cpu = ((CtfTmfEvent) event).getCpu();
+        int cpu = ((CtfTmfEvent) event).getCPU();
         return cpu;
     }
 }

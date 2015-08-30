@@ -160,9 +160,8 @@ public class CtfTmfEvent extends TmfEvent
      * Gets the cpu core the event was recorded on.
      *
      * @return The cpu id for a given source. In lttng it's from CPUINFO
-     * @since 2.0
      */
-    public int getCpu() {
+    public int getCPU() {
         return fSourceCpu;
     }
 
@@ -174,6 +173,17 @@ public class CtfTmfEvent extends TmfEvent
      */
     public String getChannel() {
         return fChannel;
+    }
+
+    /**
+     * Return this event's reference.
+     *
+     * @return The event's reference
+     * @deprecated This method was replaced by {@link #getChannel()}.
+     */
+    @Deprecated
+    public String getReference() {
+        return getChannel();
     }
 
     // ------------------------------------------------------------------------
@@ -314,7 +324,7 @@ public class CtfTmfEvent extends TmfEvent
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + getCpu();
+        result = prime * result + getCPU();
         result = prime * result + getChannel().hashCode();
         return result;
     }
@@ -326,7 +336,7 @@ public class CtfTmfEvent extends TmfEvent
         }
         /* super.equals() checks that the classes are the same */
         CtfTmfEvent other = checkNotNull((CtfTmfEvent) obj);
-        if (getCpu() != other.getCpu()) {
+        if (getCPU() != other.getCPU()) {
             return false;
         }
         if (!getChannel().equals(other.getChannel())) {

@@ -75,7 +75,7 @@ public class CtfTmfEventTest {
      */
     @Test
     public void testGetCPU() {
-        int result = nullEvent.getCpu();
+        int result = nullEvent.getCPU();
         assertEquals(-1, result);
     }
 
@@ -157,7 +157,7 @@ public class CtfTmfEventTest {
             assertEquals("kernel", trace.getName());
         }
         String reference = fixture.getChannel();
-        int cpu = fixture.getCpu();
+        int cpu = fixture.getCPU();
         ITmfEventType type = fixture.getType();
         assertEquals(ITmfContext.UNKNOWN_RANK, rank);
 
@@ -197,7 +197,7 @@ public class CtfTmfEventTest {
         CtfTmfEvent nullEvent2 = CtfTmfEventFactory.getNullEvent(fixture.getTrace());
         assertSame(nullEvent2, nullEvent);
         assertNotNull(nullEvent);
-        assertEquals(-1, nullEvent.getCpu());
+        assertEquals(-1, nullEvent.getCPU());
         assertEquals("Empty CTF event", nullEvent.getType().getName());
         assertEquals("", nullEvent.getChannel());
         assertEquals(0, nullEvent.getContent().getFields().size());

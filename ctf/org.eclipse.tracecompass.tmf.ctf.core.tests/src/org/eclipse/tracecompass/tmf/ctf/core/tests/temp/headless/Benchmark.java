@@ -64,7 +64,7 @@ public class Benchmark {
 
                             System.out.println("Event " + nbEvent + " Time "
                                     + current.getTimestamp().toString() + " type " + current.getType().getName()
-                                    + " on CPU " + current.getCpu() + " " + current.getContent().toString());
+                                    + " on CPU " + current.getCPU() + " " + current.getContent().toString());
                         }
                         // advance the trace to the next event.
                         boolean hasMore = traceReader.advance();
