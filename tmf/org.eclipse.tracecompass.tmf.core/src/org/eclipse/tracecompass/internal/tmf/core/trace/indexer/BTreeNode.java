@@ -59,7 +59,7 @@ class BTreeNode {
     private final BTree fTree;
 
     private int fNumEntries = 0;
-    private boolean fIsDirty = false;
+    private boolean fIsDirty = true;
 
     /**
      * Construct a node for the specified tree for the specified file offset
@@ -70,6 +70,9 @@ class BTreeNode {
      *            the file offset
      */
     BTreeNode(BTree tree, long offset) {
+        if (offset < 0) {
+            throw new IllegalStateException("Invalid node offset: " + offset); //$NON-NLS-1$
+        }
         fTree = tree;
         fFileOffset = offset;
         fEntries = new ITmfCheckpoint[fTree.getMaxNumEntries()];
@@ -99,7 +102,11 @@ class BTreeNode {
             fTree.getRandomAccessFile().read(bb.array());
 
             for (int i = 0; i < fTree.getMaxNumChildren(); ++i) {
-                fChildrenFileOffsets[i] = bb.getLong();
+                long offset = bb.getLong();
+                if (offset < 0 && offset != NULL_CHILD) {
+                    throw new IllegalStateException("Invalid node offset: " + offset); //$NON-NLS-1$
+                }
+                fChildrenFileOffsets[i] = offset;
             }
             fNumEntries = bb.getInt();
 
@@ -110,6 +117,7 @@ class BTreeNode {
                 TmfCheckpoint c = new TmfCheckpoint(timeStamp, location, bb);
                 fEntries[i] = c;
             }
+            fIsDirty = false;
 
         } catch (IOException e) {
             Activator.logError(MessageFormat.format(Messages.BTreeNode_IOErrorLoading, fFileOffset, fTree.getRandomAccessFile()), e);
@@ -156,7 +164,11 @@ class BTreeNode {
     }
 
     long getChild(int index) {
-        return fChildrenFileOffsets[index];
+        long childOffset = fChildrenFileOffsets[index];
+        if (childOffset < 0 && childOffset != NULL_CHILD) {
+            throw new IllegalStateException("Invalid node offset: " + childOffset); //$NON-NLS-1$
+        }
+        return childOffset;
     }
 
     /**
