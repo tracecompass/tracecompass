@@ -352,6 +352,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
     private Menu fRawTablePopup;
 
+    private Point fLastMenuCursorLocation;
     private MenuManager fRawViewerPopupMenuManager;
     private MenuManager fTablePopupMenuManager;
     private MenuManager fHeaderPopupMenuManager;
@@ -591,7 +592,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         fTable.addListener(SWT.MenuDetect, new Listener() {
             @Override
             public void handleEvent(Event event) {
-                Point pt = fTable.getDisplay().map(null, fTable, new Point(event.x, event.y));
+                fLastMenuCursorLocation = new Point(event.x, event.y);
+                Point pt = fTable.getDisplay().map(null, fTable, fLastMenuCursorLocation);
                 Rectangle clientArea = fTable.getClientArea();
                 boolean header = clientArea.y <= pt.y && pt.y < (clientArea.y + fTable.getHeaderHeight());
                 fTable.setMenu(header ? fHeaderMenu : fTablePopup);
@@ -1225,7 +1227,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     }
                     return;
                 }
-                final Point point = fTable.toControl(Display.getDefault().getCursorLocation());
+                final Point point = fTable.toControl(fLastMenuCursorLocation);
                 final TableItem item = fTable.getSelection().length > 0 ? fTable.getSelection()[0] : null;
                 if (item != null) {
                     final Rectangle imageBounds = item.getImageBounds(0);
