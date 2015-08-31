@@ -20,19 +20,13 @@ import java.io.IOException;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
-import org.eclipse.swtbot.swt.finder.finders.ContextMenuFinder;
-import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
-import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -40,8 +34,6 @@ import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.filter.FilterView;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -61,13 +53,14 @@ public class FilterViewerTest {
     private static final String AND = "AND";
     private static final String WITH_TRACETYPE = "WITH TRACETYPE " + TRACETYPE;
     private static final String FILTER_TEST = "FILTER ";
+    private static final String TIMESTAMP = "Timestamp";
+    private static final String CONTENTS = "Contents";
 
     private static final String TRACE_START = "<trace>";
     private static final String EVENT_BEGIN = "<event timestamp=\"";
     private static final String EVENT_MIDDLE = " \" name=\"event\"><field name=\"field\" value=\"";
     private static final String EVENT_END = "\" type=\"int\" />" + "</event>";
     private static final String TRACE_END = "</trace>";
-
 
     private static final String PROJECT_NAME = "TestForFiltering";
 
@@ -181,8 +174,8 @@ public class FilterViewerTest {
 
         filterNodeBot.getNode(WITH_TRACETYPE).getNode(AND).contextMenu(CONTAINS).click();
         filterNodeBot.getNode(WITH_TRACETYPE).getNode(AND).expand();
-        comboBot = filterBot.comboBox();
-        comboBot.setSelection(comboBot.itemCount() - 3);
+        comboBot = filterBot.comboBox(1); // aspect
+        comboBot.setSelection(TIMESTAMP);
         textBot = filterBot.text();
         textBot.setFocus();
         textBot.setText("100");
@@ -233,9 +226,8 @@ public class FilterViewerTest {
         orNode.contextMenu("EQUALS").click();
         orNode.expand();
         orNode.getNode(0).select();
-        comboBot = filterBot.comboBox();
-        //timestamp
-        comboBot.setSelection(comboBot.itemCount() - 3);
+        comboBot = filterBot.comboBox(1); // aspect
+        comboBot.setSelection(TIMESTAMP);
         textBot = filterBot.text();
         textBot.setFocus();
         textBot.setText("19:00:00.000 000 300");
@@ -246,13 +238,12 @@ public class FilterViewerTest {
         orNode.contextMenu("MATCHES").click();
         orNode.expand();
         orNode.getNode(1).select();
-        // contents
-        comboBot = filterBot.comboBox();
-        comboBot.setSelection(comboBot.itemCount() - 1);
-        textBot = filterBot.text(0);
+        comboBot = filterBot.comboBox(1); // aspect
+        comboBot.setSelection(CONTENTS);
+        textBot = filterBot.text(0); // field
         textBot.setFocus();
         textBot.setText("field");
-        textBot = filterBot.text(1);
+        textBot = filterBot.text(1); // value
         textBot.setFocus();
         textBot.setText("1");
 
@@ -293,16 +284,16 @@ public class FilterViewerTest {
         filterNodeBot.getNode(WITH_TRACETYPE).contextMenu(COMPARE).click();
         SWTBotTreeItem contentNode = filterNodeBot.getNode(WITH_TRACETYPE).getNode("<select aspect> " + "=" + " <value>");
         contentNode.expand();
-        comboBot = filterBot.comboBox();
-        comboBot.setSelection(comboBot.itemCount() - 1);
-        textBot = filterBot.text(0);
+        comboBot = filterBot.comboBox(1); // aspect
+        comboBot.setSelection(CONTENTS);
+        textBot = filterBot.text(0); // field
         textBot.setFocus();
         textBot.setText(filterName);
 
-        textBot = filterBot.text(1);
+        textBot = filterBot.text(1); // value
         textBot.setFocus();
         textBot.setText("1.5");
-        filterBot.radio(2).click();
+        filterBot.radio(">").click();
 
         // --------------------------------------------------------------------
         // apply
@@ -315,56 +306,10 @@ public class FilterViewerTest {
 
     private static String applyFilter(SWTWorkbenchBot bot, final String filterName) {
         SWTBotUtils.waitForJobs();
-        final SWTBotTable eventsEditor = bot.activeEditor().bot().table();
-        eventsEditor.select(2);
-        UIThreadRunnable.syncExec(new VoidResult() {
-
-            @Override
-            public void run() {
-                ContextMenuFinder cmf = new ContextMenuFinder(eventsEditor.widget);
-                ContextMenuListeners matcher = new ContextMenuListeners(filterName);
-                cmf.findMenus(matcher);
-            }
-        });
-        fBot.waitUntil(ConditionHelpers.isTableCellFilled(eventsEditor, "/100", 1, 1));
-        return eventsEditor.cell(1, 1);
-    }
-
-    /**
-     * FIXME: This is a big hack until SWTBot supports context menus better (bug 458975)
-     */
-    private static final class ContextMenuListeners extends BaseMatcher<MenuItem> {
-        private final String filterName;
-
-        private boolean found = false;
-
-        private ContextMenuListeners(String filterName) {
-            this.filterName = filterName;
-        }
-
-        @Override
-        public void describeTo(Description description) {
-        }
-
-        @Override
-        public boolean matches(Object item) {
-            if (item instanceof MenuItem) {
-                MenuItem menuItem = (MenuItem) item;
-                if (menuItem.getText().equals(filterName)) {
-                    for (Listener listener : menuItem.getListeners(SWT.Selection)) {
-                        if (!found) {
-                            Event event = new Event();
-                            event.type = SWT.Selection;
-                            event.widget = menuItem;
-                            event.button = 1;
-                            listener.handleEvent(event);
-                            found = true;
-                        }
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
+        final SWTBotTable eventsTable = bot.activeEditor().bot().table();
+        SWTBotTableItem tableItem = eventsTable.getTableItem(2);
+        tableItem.contextMenu(filterName).click();
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(eventsTable, "/100", 1, 1));
+        return eventsTable.cell(1, 1);
     }
 }
