@@ -34,7 +34,7 @@ wiki page:
 Compiling manually
 ------------------
 
-To build the plugins manually using Maven, simply run the following command from
+To build the project manually using Maven, simply run the following command from
 the top-level directory:
 
     mvn clean install
@@ -45,16 +45,11 @@ take some time, to skip them you can append `-Dmaven.test.skip=true` to the
 
     mvn clean install -Dmaven.test.skip=true
 
-The RCP is not built by default, to build it you need to add `-Pbuild-rcp` to
-the `mvn` command:
+Stand-alone application (RCP) packages will be placed in
+`rcp/org.eclipse.tracecompass.rcp.product/target/products`.
 
-    mvn clean install -Pbuild-rcp -Dmaven.test.skip=true
-
-This will build the RCP for all supported architectures. The resulting archives
-will be placed in `rcp/org.eclipse.tracecompass.rcp.product/target/products`.
-
-These commands will also build the p2 update site, which will be placed in
-`releng/org.eclipse.tracecompass.releng-site/target/repository`.
+The p2 update site, used for installation as plugins inside Eclipse, will be
+placed in `releng/org.eclipse.tracecompass.releng-site/target/repository`.
 
 
 Maven profiles and properties
@@ -69,9 +64,9 @@ the build system. You can set them by using `-P[profile name]` and
   Re-compiles the CTF grammar files. This should be enabled if you modify the
   `.g` files in the `ctf.parser` plugin.
 
-* `-Pbuild-rcp`
+* `-P -build-rcp`
 
-  Builds the RCP archives. Refer to the previous section for details.
+  Disables the "build-rcp" profile to skip building the RCP archives.
 
 * `-Pdeploy-rcp`
 
