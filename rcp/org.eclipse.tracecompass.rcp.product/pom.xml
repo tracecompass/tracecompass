@@ -60,6 +60,7 @@
                             </rootFolders>
                         </product>
                     </products>
+                    <source>repository</source>
                 </configuration>
             </plugin>
         </plugins>
