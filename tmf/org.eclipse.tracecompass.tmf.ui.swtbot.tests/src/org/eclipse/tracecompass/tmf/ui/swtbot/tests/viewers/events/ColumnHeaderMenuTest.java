@@ -193,7 +193,7 @@ public class ColumnHeaderMenuTest {
         headerBot.contextMenu("Message").click();
         assertVisibleColumns(tableBot.widget, new String[] { });
 
-        tableBot.contextMenu("Show All").click();
+        headerBot.contextMenu("Show All").click();
         assertVisibleColumns(tableBot.widget, new String[] { "Timestamp", "Host", "Logger", "File", "Line", "Message" });
     }
 
