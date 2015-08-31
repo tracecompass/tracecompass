@@ -36,6 +36,7 @@ import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimePreferencesConstants;
@@ -157,10 +158,10 @@ public class CallsiteEventsInTableTest {
 
         // Maximize editor area
         SWTBotUtils.maximizeTable(tableBot);
-        tableBot.click(1, 0);
+        SWTBotTableItem tableItem = tableBot.getTableItem(1);
 
         // Open source code location
-        SWTBotMenu menuBot = tableBot.contextMenu("Open Source Code");
+        SWTBotMenu menuBot = tableItem.contextMenu("Open Source Code");
         menuBot.click();
 
         // Verify that source code was actually opened

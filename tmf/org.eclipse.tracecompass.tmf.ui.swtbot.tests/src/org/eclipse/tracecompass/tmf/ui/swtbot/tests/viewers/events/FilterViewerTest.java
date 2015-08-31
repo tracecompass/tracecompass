@@ -20,19 +20,13 @@ import java.io.IOException;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
-import org.eclipse.swtbot.swt.finder.finders.ContextMenuFinder;
-import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
-import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -40,8 +34,6 @@ import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.filter.FilterView;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -316,55 +308,9 @@ public class FilterViewerTest {
     private static String applyFilter(SWTWorkbenchBot bot, final String filterName) {
         SWTBotUtils.waitForJobs();
         final SWTBotTable eventsEditor = bot.activeEditor().bot().table();
-        eventsEditor.select(2);
-        UIThreadRunnable.syncExec(new VoidResult() {
-
-            @Override
-            public void run() {
-                ContextMenuFinder cmf = new ContextMenuFinder(eventsEditor.widget);
-                ContextMenuListeners matcher = new ContextMenuListeners(filterName);
-                cmf.findMenus(matcher);
-            }
-        });
+        SWTBotTableItem tableItem = eventsEditor.getTableItem(2);
+        tableItem.contextMenu(filterName).click();
         fBot.waitUntil(ConditionHelpers.isTableCellFilled(eventsEditor, "/100", 1, 1));
         return eventsEditor.cell(1, 1);
-    }
-
-    /**
-     * FIXME: This is a big hack until SWTBot supports context menus better (bug 458975)
-     */
-    private static final class ContextMenuListeners extends BaseMatcher<MenuItem> {
-        private final String filterName;
-
-        private boolean found = false;
-
-        private ContextMenuListeners(String filterName) {
-            this.filterName = filterName;
-        }
-
-        @Override
-        public void describeTo(Description description) {
-        }
-
-        @Override
-        public boolean matches(Object item) {
-            if (item instanceof MenuItem) {
-                MenuItem menuItem = (MenuItem) item;
-                if (menuItem.getText().equals(filterName)) {
-                    for (Listener listener : menuItem.getListeners(SWT.Selection)) {
-                        if (!found) {
-                            Event event = new Event();
-                            event.type = SWT.Selection;
-                            event.widget = menuItem;
-                            event.button = 1;
-                            listener.handleEvent(event);
-                            found = true;
-                        }
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
     }
 }
