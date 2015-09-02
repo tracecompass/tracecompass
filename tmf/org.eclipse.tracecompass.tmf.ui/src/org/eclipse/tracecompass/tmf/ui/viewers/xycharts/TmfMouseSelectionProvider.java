@@ -37,6 +37,8 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
     private long fEndTime;
     /** Flag indicating that an update is ongoing */
     private boolean fIsInternalUpdate;
+    /** Flag indicating that the begin marker is dragged */
+    private boolean fDragBeginMarker;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -81,9 +83,25 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
     @Override
     public void mouseDown(MouseEvent e) {
         if ((getChartViewer().getWindowDuration() != 0) && (e.button == 1)) {
-            IAxis xAxis = getChart().getAxisSet().getXAxis(0);
-            fBeginTime = limitXDataCoordinate(xAxis.getDataCoordinate(e.x));
-            fEndTime = fBeginTime;
+            fDragBeginMarker = false;
+            if (((e.stateMask & SWT.SHIFT) != SWT.SHIFT) || (fEndTime == fBeginTime)) {
+                IAxis xAxis = getChart().getAxisSet().getXAxis(0);
+                fBeginTime = limitXDataCoordinate(xAxis.getDataCoordinate(e.x));
+                fEndTime = fBeginTime;
+            } else {
+                long selectionBegin = fBeginTime;
+                long selectionEnd = fEndTime;
+                IAxis xAxis = getChart().getAxisSet().getXAxis(0);
+                long time = limitXDataCoordinate(xAxis.getDataCoordinate(e.x));
+                if (Math.abs(time - selectionBegin) < Math.abs(time - selectionEnd)) {
+                    fDragBeginMarker = true;
+                    fBeginTime = time;
+                    fEndTime = selectionEnd;
+                } else {
+                    fBeginTime = selectionBegin;
+                    fEndTime = time;
+                }
+            }
             fIsInternalUpdate = true;
         }
     }
@@ -111,7 +129,11 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
     public void mouseMove(MouseEvent e) {
         if (fIsInternalUpdate) {
             IAxis xAxis = getChart().getAxisSet().getXAxis(0);
-            fEndTime = limitXDataCoordinate(xAxis.getDataCoordinate(e.x));
+            if (fDragBeginMarker) {
+                fBeginTime = limitXDataCoordinate(xAxis.getDataCoordinate(e.x));
+            } else {
+                fEndTime = limitXDataCoordinate(xAxis.getDataCoordinate(e.x));
+            }
             getChart().redraw();
         }
     }
