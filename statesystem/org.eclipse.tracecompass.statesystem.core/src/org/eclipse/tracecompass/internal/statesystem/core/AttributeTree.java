@@ -28,7 +28,6 @@ import java.io.PrintWriter;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -59,7 +58,7 @@ public final class AttributeTree {
      */
     public AttributeTree(StateSystem ss) {
         this.ss = ss;
-        this.attributeList = Collections.synchronizedList(new ArrayList<Attribute>());
+        this.attributeList = new ArrayList<>();
         this.attributeTreeRoot = new Attribute(null, "root", -1); //$NON-NLS-1$
     }
 
@@ -112,7 +111,7 @@ public final class AttributeTree {
      * @param pos
      *            The position (in bytes) in the file where to write
      */
-    public void writeSelf(File file, long pos) {
+    public synchronized void writeSelf(File file, long pos) {
         try (FileOutputStream fos = new FileOutputStream(file, true);
                 FileChannel fc = fos.getChannel();) {
             fc.position(pos);
@@ -141,7 +140,7 @@ public final class AttributeTree {
      *
      * @return The current number of attributes in the tree
      */
-    public int getNbAttributes() {
+    public synchronized int getNbAttributes() {
         return attributeList.size();
     }
 
@@ -158,7 +157,7 @@ public final class AttributeTree {
      * @throws AttributeNotFoundException
      *             If the specified path was not found
      */
-    public int getQuarkDontAdd(int startingNodeQuark, String... subPath)
+    public synchronized int getQuarkDontAdd(int startingNodeQuark, String... subPath)
             throws AttributeNotFoundException {
         assert (startingNodeQuark >= -1);
 
@@ -259,7 +258,7 @@ public final class AttributeTree {
      *             If 'attributeQuark' is invalid, or if there is no attrbiute
      *             associated to it.
      */
-    public @NonNull List<Integer> getSubAttributes(int attributeQuark, boolean recursive)
+    public synchronized @NonNull List<Integer> getSubAttributes(int attributeQuark, boolean recursive)
             throws AttributeNotFoundException {
         List<Integer> listOfChildren = new ArrayList<>();
         Attribute startingAttribute;
@@ -291,7 +290,7 @@ public final class AttributeTree {
      * @return Quark of the parent attribute or <code>-1</code> for the root
      *         attribute
      */
-    public int getParentAttributeQuark(int quark) {
+    public synchronized int getParentAttributeQuark(int quark) {
         if (quark == -1) {
             return quark;
         }
@@ -315,7 +314,7 @@ public final class AttributeTree {
      *            The quark of the attribute
      * @return The (base) name of the attribute
      */
-    public @NonNull String getAttributeName(int quark) {
+    public synchronized @NonNull String getAttributeName(int quark) {
         return attributeList.get(quark).getName();
     }
 
@@ -326,7 +325,7 @@ public final class AttributeTree {
      *            The quark of the attribute
      * @return The full path name of the attribute
      */
-    public @NonNull String getFullAttributeName(int quark) {
+    public synchronized @NonNull String getFullAttributeName(int quark) {
         return attributeList.get(quark).getFullAttributeName();
     }
 
@@ -338,7 +337,7 @@ public final class AttributeTree {
      *            The quark of the attribute
      * @return The path elements of the full path
      */
-    public @NonNull String[] getFullAttributePathArray(int quark) {
+    public synchronized @NonNull String[] getFullAttributePathArray(int quark) {
         return attributeList.get(quark).getFullAttribute();
     }
 
@@ -348,7 +347,7 @@ public final class AttributeTree {
      * @param writer
      *            The writer where to print the output
      */
-    public void debugPrint(PrintWriter writer) {
+    public synchronized void debugPrint(PrintWriter writer) {
         attributeTreeRoot.debugPrint(writer);
     }
 
