@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -554,6 +556,7 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
 
         IPath tracePath = getInitialDestinationPath(fileSystemElement);
         String newName = fConflictHandler.checkAndHandleNameClash(tracePath, monitor);
+
         if (newName == null) {
             return null;
         }
@@ -576,6 +579,14 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
             parentFolder = fileSystemElement;
 
         } else {
+            if (!fileSystemElement.isDirectory()) {
+                // File traces
+                IFileInfo info = EFS.getStore(new File(fileSystemElement.getFileSystemObject().getAbsolutePath()).toURI()).fetchInfo();
+                if (info.getLength() == 0) {
+                    // Don't import empty traces
+                    return null;
+                }
+            }
             subList.add(fileSystemElement);
         }
 

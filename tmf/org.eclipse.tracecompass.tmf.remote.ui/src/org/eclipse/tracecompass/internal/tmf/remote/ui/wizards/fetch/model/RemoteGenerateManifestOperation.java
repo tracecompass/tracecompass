@@ -188,12 +188,17 @@ public class RemoteGenerateManifestOperation extends AbstractGenerateManifestOpe
                         // Don't consider file traces on level 2 if it's not recursive
                         continue;
                     }
-                    String traceName = fullArchivePath.lastSegment();
-                    String fileName = fileStore.getName();
-                    // create new elements to decouple from input elements
-                    TracePackageTraceElement traceElement = new TracePackageTraceElement(parent, traceName, traceType);
-                    RemoteImportTraceFilesElement tracePackageFilesElement = new RemoteImportTraceFilesElement(traceElement, fileName, fileStore);
-                    tracePackageFilesElement.setVisible(false);
+
+                    IFileInfo info = fileStore.fetchInfo();
+                    if (info.getLength() > 0) {
+                        // Only add non-empty files
+                        String traceName = fullArchivePath.lastSegment();
+                        String fileName = fileStore.getName();
+                        // create new elements to decouple from input elements
+                        TracePackageTraceElement traceElement = new TracePackageTraceElement(parent, traceName, traceType);
+                        RemoteImportTraceFilesElement tracePackageFilesElement = new RemoteImportTraceFilesElement(traceElement, fileName, fileStore);
+                        tracePackageFilesElement.setVisible(false);
+                    }
                 }
             } else {
                 if (traceGroup.isRecursive() || localRecursionLevel < 2) {

@@ -215,6 +215,37 @@ public class FetchRemoteTracesTest {
     }
 
     /**
+     * Test to verify that empty files are omitted.
+     */
+    @Test
+    public void testEmptyFile() {
+        testImport(new Runnable() {
+            @Override
+            public void run() {
+                SWTBotTree tree = fBot.tree();
+                fBot.button("Deselect All").click();
+                int length = tree.getAllItems().length;
+                assertTrue(length > 0);
+
+                SWTBotTreeItem groupNode = getTreeItem(fBot, tree, new String[] { CONNECTION_NODE_TEXT, TRACE_GROUP_NODE_TEXT });
+                /*
+                 *  Currently there are 3 items at the location where 1 file has 0 bytes.
+                 *  Verify that empty file is not shown.
+                 */
+                assertEquals(2, groupNode.getItems().length);
+            }
+        }, new Runnable() {
+            @Override
+            public void run() {
+                TmfProjectElement project = TmfProjectRegistry.getProject(ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME), true);
+                List<TmfTraceElement> traces = project.getTracesFolder().getTraces();
+                assertEquals(0, traces.size());
+            }
+        });
+    }
+
+
+    /**
      * Test editing a profile
      */
     @Test
