@@ -18,6 +18,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -79,6 +80,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
     private static final String TRACE_FOLDER_PARENT_PATH = fTrace.getPath() + File.separator + ".." + File.separator + ".." + File.separator;
     private static final String ARCHIVE_FILE_NAME = "synctraces.tar.gz";
     private static final String EMPTY_ARCHIVE_FOLDER = "emptyArchiveFolder";
+    private static final String EMPTY_FILE_NAME = "emptyFile";
     private static final String TRACE_ARCHIVE_PATH = TRACE_FOLDER_PARENT_PATH + ARCHIVE_FILE_NAME;
     private static final String TRACE_FOLDER_PARENT_NAME = "traces";
     private static final String TRACE_PROJECT_NAME = "Tracing";
@@ -276,6 +278,29 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
     }
 
     /**
+     * Test import from an directory with an empty file. This should not import anything.
+     *
+     * @throws Exception
+     *             on error
+     */
+    @Test
+    public void testEmptyFile() throws Exception {
+        createProject();
+        IFolder folder = createEmptyDirectory();
+        createEmptyFile(folder);
+        String testDirectoryPath = folder.getLocation().toOSString();
+        openImportWizard();
+        selectImportFromDirectory(testDirectoryPath);
+        selectFile(EMPTY_FILE_NAME, EMPTY_ARCHIVE_FOLDER);
+        setOptions(ImportTraceWizardPage.OPTION_IMPORT_UNRECOGNIZED_TRACES, ImportTraceWizardPage.TRACE_TYPE_AUTO_DETECT);
+        importFinish();
+
+        assertNoTraces();
+
+        SWTBotUtils.deleteProject(getProjectName(), fBot);
+    }
+
+    /**
      * Test import from a directory containing an empty archive. This should not import anything.
      *
      * @throws Exception
@@ -443,6 +468,12 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         IFolder folder = project.getFolder(EMPTY_ARCHIVE_FOLDER);
         folder.create(true, true, null);
         return folder;
+    }
+
+    private static void createEmptyFile(IFolder folder) throws CoreException {
+        // Create empty file
+        IFile file = folder.getFile(EMPTY_FILE_NAME);
+        file.create(new ByteArrayInputStream(new byte[0]), true, null);
     }
 
     /**
