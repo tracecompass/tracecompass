@@ -20,6 +20,7 @@ import java.util.Random;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.eclipse.tracecompass.internal.tmf.ctf.core.Activator;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfLocationInfo;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfTmfContext;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
@@ -184,8 +185,11 @@ public class CtfIteratorManager {
             if (elem.isClosed()) {
                 /*
                  * In case the iterator streams have been closed, we need to
-                 * replace it by a fresh new one to access the trace.
+                 * replace it by a fresh new one to access the trace. We also
+                 * report that as an error as it should not happen.
                  */
+                Activator.getDefault().logError("Found closed iterator in iterator manager for trace " + victim.getTrace()); //$NON-NLS-1$
+
                 elem.dispose();
                 elem = (CtfIterator) fTrace.createIterator();
             }
