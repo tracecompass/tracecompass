@@ -174,6 +174,10 @@ public class TimeGraphEntry implements ITimeGraphEntry {
         } else {
             fEventList.add(event);
         }
+        if (event instanceof NullTimeEvent) {
+            /* A NullTimeEvent should not affect the entry bounds */
+            return;
+        }
         if (fStartTime == SWT.DEFAULT || start < fStartTime) {
             fStartTime = start;
         }
@@ -232,6 +236,10 @@ public class TimeGraphEntry implements ITimeGraphEntry {
             fZoomedEventList.add(event);
         } else if (start == lastStart) {
             fZoomedEventList.set(lastIndex, event);
+        }
+        if (event instanceof NullTimeEvent) {
+            /* A NullTimeEvent should not affect the entry bounds */
+            return;
         }
         if (fStartTime == SWT.DEFAULT || start < fStartTime) {
             fStartTime = start;
