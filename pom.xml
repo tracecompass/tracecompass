@@ -129,7 +129,7 @@
       </os>
     </activation>
     <properties>
-      <base.ui.test.vmargs>${base.test.vmargs} -XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</base.ui.test.vmargs>
+      <base.ui.test.vmargs>${base.test.vmargs} -XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts -Djava.awt.headless=false</base.ui.test.vmargs>
     </properties>
   </profile>
   <profile>
