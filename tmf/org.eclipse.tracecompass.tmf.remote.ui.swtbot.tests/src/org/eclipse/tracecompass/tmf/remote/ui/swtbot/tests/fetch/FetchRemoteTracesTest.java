@@ -159,8 +159,8 @@ public class FetchRemoteTracesTest {
                 fBot.waitUntil(new TraceCountCondition(project, 2));
                 List<TmfTraceElement> traces = project.getTracesFolder().getTraces();
                 assertEquals(2, traces.size());
-                testTrace(traces.get(0), CONNECTION_NODE_NAME + "/generated/synthetic-trace", TRACE_TYPE_LTTNG);
-                testTrace(traces.get(1), CONNECTION_NODE_NAME + "/syslog", TRACE_TYPE_SYSLOG);
+                testTrace(traces.get(0), CONNECTION_NODE_NAME + "/resources/generated/synthetic-trace", TRACE_TYPE_LTTNG);
+                testTrace(traces.get(1), CONNECTION_NODE_NAME + "/resources/syslog", TRACE_TYPE_SYSLOG);
             }
         });
     }
@@ -189,7 +189,7 @@ public class FetchRemoteTracesTest {
                 fBot.waitUntil(new TraceCountCondition(project, 1));
                 List<TmfTraceElement> traces = project.getTracesFolder().getTraces();
                 assertEquals(1, traces.size());
-                testTrace(traces.get(0), CONNECTION_NODE_NAME + "/syslog", TRACE_TYPE_SYSLOG);
+                testTrace(traces.get(0), CONNECTION_NODE_NAME + "/resources/syslog", TRACE_TYPE_SYSLOG);
             }
         });
     }

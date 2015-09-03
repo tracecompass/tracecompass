@@ -173,7 +173,7 @@ public class RemoteImportTracesOperation extends TmfWorkspaceModifyOperation {
                     IFileStore remoteFile = traceFilesElement.getRemoteFile();
 
                     // Preserve folder structure
-                    IPath sessionParentPath = TmfTraceCoreUtils.newSafePath(rootPath);
+                    IPath sessionParentPath = TmfTraceCoreUtils.newSafePath(rootPath).removeLastSegments(1);
                     IPath traceParentPath = TmfTraceCoreUtils.newSafePath(remoteFile.getParent().toURI().getPath());
                     IPath relativeTracePath = Path.EMPTY;
                     if (sessionParentPath.isPrefixOf(traceParentPath)) {

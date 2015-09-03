@@ -169,10 +169,10 @@ public class ImportHandler extends BaseControlViewHandler {
         RemoteImportConnectionNodeElement connection = new RemoteImportConnectionNodeElement(profile, name, remoteUri.toString());
         String pathString = session.isSnapshotSession() ? session.getSnapshotInfo().getSnapshotPath() : session.getSessionPath();
         IPath path = new Path(pathString);
-        RemoteImportTraceGroupElement group = new RemoteImportTraceGroupElement(connection, path.removeLastSegments(1).toString());
+        RemoteImportTraceGroupElement group = new RemoteImportTraceGroupElement(connection, path.toString());
         group.setRecursive(true);
         TracePackageElement element = new TracePackageTraceElement(group, "", "");  //$NON-NLS-1$//$NON-NLS-2$
-        new TracePackageFilesElement(element, path.lastSegment() + "/.*"); //$NON-NLS-1$
+        new TracePackageFilesElement(element, ".*"); //$NON-NLS-1$
 
         RemoteFetchLogWizard wizard = new RemoteFetchLogWizard(profile);
         wizard.init(PlatformUI.getWorkbench(), StructuredSelection.EMPTY);
