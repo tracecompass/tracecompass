@@ -11,8 +11,11 @@ package org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
+import java.io.File;
+
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.debuginfo.UstDebugInfoBinaryFile;
+import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.debuginfo.FileOffsetMapper;
+import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.debuginfo.UstDebugInfoLoadedBinaryFile;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -20,6 +23,8 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
+
+import com.google.common.collect.Iterables;
 
 /**
  * Event aspect of UST traces to generate a {@link TmfCallsite} using the debug
@@ -47,7 +52,7 @@ public class UstDebugInfoAspect implements ITmfEventAspect {
 
     // TODO Will return a TmfCallsite eventually
     @Override
-    public @Nullable String resolve(ITmfEvent event) {
+    public @Nullable TmfCallsite resolve(ITmfEvent event) {
         /* This aspect only supports UST traces */
         if (!(event.getTrace() instanceof LttngUstTrace)) {
             return null;
@@ -79,9 +84,46 @@ public class UstDebugInfoAspect implements ITmfEventAspect {
             return null;
         }
         long ts = event.getTimestamp().getValue();
-        UstDebugInfoBinaryFile file = module.getMatchingFile(ts, vpid, ip);
+        UstDebugInfoLoadedBinaryFile file = module.getMatchingFile(ts, vpid, ip);
+        if (file == null) {
+            return null;
+        }
 
-        return (file == null ? null : file.toString());
+        long offset;
+        if (isMainBinary(file)) {
+            /*
+             * In the case of the object being the main binary (loaded at a very
+             * low address), we must pass the actual ip address to addr2line.
+             */
+            offset = ip.longValue();
+        } else {
+            offset = (ip.longValue() - file.getBaseAddress());
+        }
+
+        if (offset < 0) {
+            throw new IllegalStateException();
+        }
+
+        Iterable<TmfCallsite> callsites = FileOffsetMapper.getCallsiteFromOffset(new File(file.getFilePath()), offset);
+
+        if (callsites == null || Iterables.isEmpty(callsites)) {
+            return null;
+        }
+        /*
+         * TMF only supports the notion of one callsite per event at the moment.
+         * We will take the "deepest" one in the stack, which should refer to
+         * the initial, non-inlined location.
+         */
+        return Iterables.getLast(callsites);
+    }
+
+    private static boolean isMainBinary(UstDebugInfoLoadedBinaryFile file) {
+        /*
+         * Ghetto binary/library identification for now. It would be possible to
+         * parse the ELF binary to check if it is position-independent
+         * (-fPIC/-fPIE) or not.
+         */
+        return (!file.getFilePath().endsWith(".so")); //$NON-NLS-1$
     }
 
 }

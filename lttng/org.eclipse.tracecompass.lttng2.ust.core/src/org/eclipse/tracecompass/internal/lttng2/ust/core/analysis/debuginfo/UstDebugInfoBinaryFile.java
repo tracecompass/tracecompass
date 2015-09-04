@@ -16,7 +16,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * executable or library. It contains both the complete file path (at the
  * time the trace was taken) and the build ID of the binary.
  */
-public final class UstDebugInfoBinaryFile implements Comparable<UstDebugInfoBinaryFile> {
+public class UstDebugInfoBinaryFile implements Comparable<UstDebugInfoBinaryFile> {
 
     private final String filePath;
     private final String buildId;

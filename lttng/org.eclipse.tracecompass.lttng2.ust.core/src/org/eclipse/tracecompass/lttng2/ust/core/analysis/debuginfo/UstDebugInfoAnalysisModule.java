@@ -20,6 +20,7 @@ import java.util.TreeSet;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.debuginfo.UstDebugInfoBinaryFile;
+import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.debuginfo.UstDebugInfoLoadedBinaryFile;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.debuginfo.UstDebugInfoStateProvider;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -177,7 +178,7 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
      * @return The {@link UstDebugInfoBinaryFile} object, containing both the binary's path
      *         and its build ID.
      */
-    @Nullable UstDebugInfoBinaryFile getMatchingFile(long ts, long vpid, long ip) {
+    @Nullable UstDebugInfoLoadedBinaryFile getMatchingFile(long ts, long vpid, long ip) {
         waitForCompletion();
         final ITmfStateSystem ss = checkNotNull(getStateSystem());
 
@@ -229,10 +230,12 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
             }
 
             /* Ok, we have everything we need! Return the information. */
+            long baddr = Long.parseLong(ss.getAttributeName(baddrQuark));
+
             int buildIdQuark = potentialBuildIdQuark.get().intValue();
             String buildId = ss.getAttributeName(buildIdQuark);
             String filePath = fullState.get(buildIdQuark).getStateValue().unboxStr();
-            return new UstDebugInfoBinaryFile(filePath, buildId);
+            return new UstDebugInfoLoadedBinaryFile(baddr, filePath, buildId);
 
         } catch (AttributeNotFoundException e) {
             /* We're only using quarks we've checked for. */
@@ -242,5 +245,4 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
         }
 
     }
-
 }
