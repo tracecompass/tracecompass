@@ -50,6 +50,14 @@ public interface ITmfEventProvider extends ITmfComponent {
     void notifyPendingRequest(boolean isIncrement);
 
     /**
+     * Get the event type this provider handles
+     *
+     * @return The type of ITmfEvent
+     * @since 2.0
+     */
+    Class<? extends ITmfEvent> getEventType();
+
+    /**
      * Return the next event based on the context supplied. The context
      * will be updated for the subsequent read.
      *

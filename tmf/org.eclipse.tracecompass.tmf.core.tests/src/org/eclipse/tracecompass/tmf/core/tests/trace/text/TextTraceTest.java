@@ -122,7 +122,7 @@ public class TextTraceTest {
     @Test
     public void testEmptyConstructor() {
         SyslogTrace trace = new SyslogTrace();
-        assertEquals("getType",      null, trace.getType());
+        assertEquals("getEventType",      null, trace.getEventType());
         assertEquals("getPath",      null, trace.getPath());
         assertEquals("getName",      "", trace.getName());
         assertEquals("getCacheSize", 100, trace.getCacheSize());
@@ -162,7 +162,7 @@ public class TextTraceTest {
         SyslogTrace trace = new SyslogTrace();
         IResource resource = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(PATH));
         trace.initTrace(resource, path, SyslogEvent.class);
-        assertEquals("getType",      SyslogEvent.class, trace.getType());
+        assertEquals("getEventType",      SyslogEvent.class, trace.getEventType());
         assertEquals("getPath",      fTestFile.toURI().getPath(), trace.getPath());
         assertEquals("getName",      NAME, trace.getName());
         assertEquals("getCacheSize", 100, trace.getCacheSize());

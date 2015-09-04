@@ -203,11 +203,6 @@ public interface ITmfTrace extends ITmfEventProvider {
     // ------------------------------------------------------------------------
 
     /**
-     * @return the trace event type
-     */
-    Class<? extends ITmfEvent> getEventType();
-
-    /**
      * @return the associated trace resource
      */
     IResource getResource();

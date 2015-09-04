@@ -119,7 +119,7 @@ public class TmfTraceTest {
             TmfTraceStub trace = new TmfTraceStub(testfile.toURI().getPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null);
             trace.indexTrace(true);
 
-            assertEquals("getType", ITmfEvent.class, trace.getType());
+            assertEquals("getEventType", ITmfEvent.class, trace.getEventType());
             assertNull("getResource", trace.getResource());
             assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
             assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
@@ -148,7 +148,7 @@ public class TmfTraceTest {
             TmfTraceStub trace = new TmfTraceStub(testfile.toURI().getPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, interval);
             trace.indexTrace(true);
 
-            assertEquals("getType", ITmfEvent.class, trace.getType());
+            assertEquals("getEventType", ITmfEvent.class, trace.getEventType());
             assertNull("getResource", trace.getResource());
             assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
             assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
@@ -177,7 +177,7 @@ public class TmfTraceTest {
             TmfTraceStub trace = new TmfTraceStub(original);
             trace.indexTrace(true);
 
-            assertEquals("getType", ITmfEvent.class, trace.getType());
+            assertEquals("getEventType", ITmfEvent.class, trace.getEventType());
             assertNull("getResource", trace.getResource());
             assertEquals("getPath", testfile.toURI().getPath(), trace.getPath());
             assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
@@ -239,7 +239,7 @@ public class TmfTraceTest {
             fail("TmfTrace.initialize() - Exception thrown");
         }
 
-        assertEquals("getType", ITmfEvent.class, trace.getType());
+        assertEquals("getEventType", ITmfEvent.class, trace.getEventType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getPath", path, trace.getPath());
         assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
@@ -267,7 +267,7 @@ public class TmfTraceTest {
             fail("TmfTrace.initialize() - Exception thrown");
         }
 
-        assertEquals("getType", ITmfEvent.class, trace.getType());
+        assertEquals("getEventType", ITmfEvent.class, trace.getEventType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getPath", path, trace.getPath());
         assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
@@ -286,7 +286,7 @@ public class TmfTraceTest {
         // Instantiate an "empty" trace
         final TmfTraceStub trace = new TmfTraceStub();
 
-        assertNull  ("getType",  trace.getType());
+        assertNull  ("getEventType",  trace.getEventType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
         assertEquals("getStreamingInterval", 0, trace.getStreamingInterval());
@@ -315,7 +315,7 @@ public class TmfTraceTest {
             fail("indexing");
         }
 
-        assertEquals("getType", ITmfEvent.class, trace.getType());
+        assertEquals("getEventType", ITmfEvent.class, trace.getEventType());
         assertNull  ("getResource", trace.getResource());
         assertEquals("getCacheSize", ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, trace.getCacheSize());
         assertEquals("getStreamingInterval", 0, trace.getStreamingInterval());
@@ -1338,7 +1338,7 @@ public class TmfTraceTest {
     @Test
     public void testDefaultTmfTraceStub() {
         assertFalse ("Open trace", fTrace == null);
-        assertEquals("getType",  ITmfEvent.class, fTrace.getType());
+        assertEquals("getEventType",  ITmfEvent.class, fTrace.getEventType());
         assertNull  ("getResource", fTrace.getResource());
         assertEquals("getStreamingInterval", 0, fTrace.getStreamingInterval());
         assertEquals("getName", TEST_TRACE.getPath(), fTrace.getName());

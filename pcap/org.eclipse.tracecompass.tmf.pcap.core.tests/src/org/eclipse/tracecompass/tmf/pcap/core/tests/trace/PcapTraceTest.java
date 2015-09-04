@@ -81,7 +81,7 @@ public class PcapTraceTest {
         assertEquals(0L, result.getNbEvents());
         assertEquals(0L, result.getStreamingInterval());
         assertNull(result.getResource());
-        assertNull(result.getType());
+        assertNull(result.getEventType());
 
         result.dispose();
     }

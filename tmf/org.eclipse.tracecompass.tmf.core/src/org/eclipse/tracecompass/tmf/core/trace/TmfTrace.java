@@ -351,11 +351,6 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
     // ------------------------------------------------------------------------
 
     @Override
-    public Class<? extends ITmfEvent> getEventType() {
-        return super.getType();
-    }
-
-    @Override
     public IResource getResource() {
         return fResource;
     }
