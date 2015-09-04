@@ -26,7 +26,6 @@ import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfLocation;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfLocationInfo;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
-import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEventFactory;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 
 /**
@@ -146,8 +145,7 @@ public class CtfIterator extends CTFTraceReader
         if (top != null) {
             if (!fCurLocation.equals(fPreviousLocation)) {
                 fPreviousLocation = fCurLocation;
-                fPreviousEvent = CtfTmfEventFactory.createEvent(top.getCurrentEvent(),
-                        top.getFilename(), fTrace);
+                fPreviousEvent = fTrace.getEventFactory().createEvent(fTrace, top.getCurrentEvent(), top.getFilename());
             }
             return fPreviousEvent;
         }

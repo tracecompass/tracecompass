@@ -84,10 +84,35 @@ public class CtfTmfEvent extends TmfEvent
     // ------------------------------------------------------------------------
 
     /**
-     * Constructor used by {@link CtfTmfEventFactory#createEvent}
+     * Constructor, used by {@link CtfTmfEventFactory#createEvent}.
+     *
+     * Only subclasses should call this. It is imperative that the subclass also
+     * has a constructor with the EXACT same parameter signature, because the
+     * factory will look for a constructor with the same arguments.
+     *
+     * @param trace
+     *            The trace to which this event belongs
+     * @param rank
+     *            The rank of the event
+     * @param timestamp
+     *            The timestamp
+     * @param channel
+     *            The CTF channel of this event
+     * @param cpu
+     *            The event's CPU
+     * @param declaration
+     *            The event declaration
+     * @param eventDefinition
+     *            The event definition
+     * @since 2.0
      */
-    CtfTmfEvent(CtfTmfTrace trace, long rank, TmfNanoTimestamp timestamp,
-            String channel, int cpu, IEventDeclaration declaration, EventDefinition eventDefinition) {
+    protected CtfTmfEvent(CtfTmfTrace trace,
+            long rank,
+            TmfNanoTimestamp timestamp,
+            String channel,
+            int cpu,
+            IEventDeclaration declaration,
+            EventDefinition eventDefinition) {
         super(trace,
                 rank,
                 timestamp,

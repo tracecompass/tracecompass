@@ -17,7 +17,6 @@ package org.eclipse.tracecompass.tmf.ctf.core.tests.event;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 
 import java.util.Collection;
 import java.util.Set;
@@ -190,13 +189,13 @@ public class CtfTmfEventTest {
     }
 
     /**
-     * Test the {@link CtfTmfEventFactory#getNullEvent(CtfTmfTrace)} method, and
+     * Test the {@link CtfTmfEventFactory#getNullEvent()} method, and
      * the nullEvent's values.
      */
     @Test
     public void testNullEvent() {
         CtfTmfEvent nullEvent2 = CtfTmfEventFactory.getNullEvent(fixture.getTrace());
-        assertSame(nullEvent2, nullEvent);
+        assertEquals(nullEvent2, nullEvent);
         assertNotNull(nullEvent);
         assertEquals(-1, nullEvent.getCPU());
         assertEquals("Empty CTF event", nullEvent.getType().getName());

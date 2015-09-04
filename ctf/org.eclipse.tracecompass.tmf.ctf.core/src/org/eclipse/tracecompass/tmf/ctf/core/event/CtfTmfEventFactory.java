@@ -31,34 +31,55 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
  *
  * @author Alexandre Montplaisir
  */
-public final class CtfTmfEventFactory {
+public class CtfTmfEventFactory {
 
-    private static final @NonNull String NO_STREAM = "No stream"; //$NON-NLS-1$
-
-    /**
-     * Don't let anyone instantiate this class.
-     */
-    private CtfTmfEventFactory() {}
+    private static final @NonNull CtfTmfEventFactory INSTANCE = new CtfTmfEventFactory();
 
     /**
-     * Factory method to instantiate new {@link CtfTmfEvent}'s.
+     * The file name to use when none is specified.
      *
+     * FIXME Externalize?
+     *
+     * @since 2.0
+     */
+    protected static final @NonNull String NO_STREAM = "No stream"; //$NON-NLS-1$
+
+    /**
+     * Protected constructor, only for use by sub-classes. Users should call
+     * the {@link #instance()} method instead.
+     *
+     * @since 2.0
+     */
+    protected CtfTmfEventFactory() {}
+
+    /**
+     * Get the singleton factory instance
+     *
+     * @return The instance
+     * @since 2.0
+     */
+    public static @NonNull CtfTmfEventFactory instance() {
+        return INSTANCE;
+    }
+
+    /**
+     * Factory method to instantiate new CTF events.
+     *
+     * @param trace
+     *            The trace to which the new event will belong
      * @param eventDef
      *            CTF EventDefinition object corresponding to this trace event
      * @param fileName
      *            The path to the trace file
-     * @param originTrace
-     *            The trace from which this event originates
      * @return The newly-built CtfTmfEvent
+     * @since 2.0
      */
-    public static CtfTmfEvent createEvent(EventDefinition eventDef,
-            String fileName, CtfTmfTrace originTrace) {
+    public CtfTmfEvent createEvent(CtfTmfTrace trace, EventDefinition eventDef, String fileName) {
 
         /* Prepare what to pass to CtfTmfEvent's constructor */
         final IEventDeclaration eventDecl = eventDef.getDeclaration();
         final long ts = eventDef.getTimestamp();
-        final TmfNanoTimestamp timestamp = originTrace.createTimestamp(
-                originTrace.timestampCyclesToNanos(ts));
+        final TmfNanoTimestamp timestamp = trace.createTimestamp(trace.timestampCyclesToNanos(ts));
 
         int sourceCPU = eventDef.getCPU();
 
@@ -66,59 +87,83 @@ public final class CtfTmfEventFactory {
 
         /* Handle the special case of lost events */
         if (eventDecl.getName().equals(CTFStrings.LOST_EVENT_NAME)) {
-            IDefinition nbLostEventsDef = eventDef.getFields().getDefinition(CTFStrings.LOST_EVENTS_FIELD);
-            IDefinition durationDef = eventDef.getFields().getDefinition(CTFStrings.LOST_EVENTS_DURATION);
-            if (!(nbLostEventsDef instanceof IntegerDefinition) || !(durationDef instanceof IntegerDefinition)) {
-                /*
-                 * One or both of these fields doesn't exist, or is not of the
-                 * right type. The event claims to be a "lost event", but is
-                 * malformed. Log it and return a null event instead.
-                 */
-                return getNullEvent(originTrace);
-            }
-            long nbLostEvents = ((IntegerDefinition) nbLostEventsDef).getValue();
-            long duration = ((IntegerDefinition) durationDef).getValue();
-            TmfNanoTimestamp timestampEnd = new TmfNanoTimestamp(
-                    originTrace.timestampCyclesToNanos(ts) + duration);
-
-            CtfTmfLostEvent lostEvent = new CtfTmfLostEvent(originTrace,
-                    ITmfContext.UNKNOWN_RANK,
-                    reference, // filename
-                    sourceCPU,
-                    eventDecl,
-                    new TmfTimeRange(timestamp, timestampEnd),
-                    nbLostEvents,
-                    eventDef);
-            return lostEvent;
+            return createLostEvent(trace, eventDef, eventDecl, ts, timestamp, sourceCPU, reference);
         }
 
         /* Handle standard event types */
-        CtfTmfEvent event = new CtfTmfEvent(
-                originTrace,
+        return new CtfTmfEvent(trace,
                 ITmfContext.UNKNOWN_RANK,
                 timestamp,
                 reference, // filename
                 sourceCPU,
                 eventDecl,
                 eventDef);
-        return event;
     }
 
-    /* Singleton instance of a null event */
-    private static CtfTmfEvent nullEvent = null;
+    /**
+     * Create a new CTF lost event.
+     *
+     * @param trace
+     *            The trace to which the new event will belong
+     * @param eventDef
+     *            The CTF event definition
+     * @param eventDecl
+     *            The CTF event declaration
+     * @param ts
+     *            The event's timestamp
+     * @param timestamp
+     *            The event's timestamp (FIXME again??)
+     * @param sourceCPU
+     *            The source CPU
+     * @param fileName
+     *            The file name
+     * @return The new lost event
+     * @since 2.0
+     */
+    protected static CtfTmfEvent createLostEvent(CtfTmfTrace trace,
+            EventDefinition eventDef,
+            final IEventDeclaration eventDecl,
+            final long ts,
+            final TmfNanoTimestamp timestamp,
+            int sourceCPU,
+            String fileName) {
+
+        IDefinition nbLostEventsDef = eventDef.getFields().getDefinition(CTFStrings.LOST_EVENTS_FIELD);
+        IDefinition durationDef = eventDef.getFields().getDefinition(CTFStrings.LOST_EVENTS_DURATION);
+        if (!(nbLostEventsDef instanceof IntegerDefinition) || !(durationDef instanceof IntegerDefinition)) {
+            /*
+             * One or both of these fields doesn't exist, or is not of the right
+             * type. The event claims to be a "lost event", but is malformed.
+             * Log it and return a null event instead.
+             */
+            return getNullEvent(trace);
+        }
+        long nbLostEvents = ((IntegerDefinition) nbLostEventsDef).getValue();
+        long duration = ((IntegerDefinition) durationDef).getValue();
+        TmfNanoTimestamp timestampEnd = new TmfNanoTimestamp(
+                trace.timestampCyclesToNanos(ts) + duration);
+
+        CtfTmfLostEvent lostEvent = new CtfTmfLostEvent(trace,
+                ITmfContext.UNKNOWN_RANK,
+                fileName,
+                sourceCPU,
+                eventDecl,
+                new TmfTimeRange(timestamp, timestampEnd),
+                nbLostEvents,
+                eventDef);
+        return lostEvent;
+    }
 
     /**
      * Get an instance of a null event.
      *
      * @param trace
-     *            A trace to associate with this null event
+     *            The trace to which the new null event will belong
      * @return An empty event
+     * @since 2.0
      */
-    public static CtfTmfEvent getNullEvent(@NonNull CtfTmfTrace trace) {
-        if (nullEvent == null) {
-            nullEvent = new CtfTmfEvent(trace);
-        }
-        return nullEvent;
+    public static CtfTmfEvent getNullEvent(CtfTmfTrace trace) {
+        return new CtfTmfEvent(trace);
     }
 
 

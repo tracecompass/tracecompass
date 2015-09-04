@@ -66,6 +66,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.context.CtfLocation;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfLocationInfo;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfTmfContext;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
+import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEventFactory;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEventType;
 import org.eclipse.tracecompass.tmf.ctf.core.event.aspect.CtfChannelAspect;
 import org.eclipse.tracecompass.tmf.ctf.core.event.aspect.CtfCpuAspect;
@@ -122,8 +123,36 @@ public class CtfTmfTrace extends TmfTrace
     private final CtfIteratorManager fIteratorManager =
             new CtfIteratorManager(this);
 
-    /* Reference to the CTF Trace */
+    private final @NonNull CtfTmfEventFactory fEventFactory;
+
+    /** Reference to the CTF Trace */
     private CTFTrace fTrace;
+
+    // -------------------------------------------
+    // Constructor
+    // -------------------------------------------
+
+    /**
+     * Default constructor
+     */
+    public CtfTmfTrace() {
+        super();
+
+        /* Use default event factory */
+        fEventFactory = CtfTmfEventFactory.instance();
+    }
+
+    /**
+     * Constructor for sub-classes to specify their own event factory.
+     *
+     * @param eventFactory
+     *            The event factory to use to generate trace events
+     * @since 2.0
+     */
+    protected CtfTmfTrace(@NonNull CtfTmfEventFactory eventFactory) {
+        super();
+        fEventFactory = eventFactory;
+    }
 
     // -------------------------------------------
     // TmfTrace Overrides
@@ -494,6 +523,16 @@ public class CtfTmfTrace extends TmfTrace
     // -------------------------------------------
     // CtfIterator factory methods
     // -------------------------------------------
+
+    /**
+     * Get the event factory for this trace to generate new events for it.
+     *
+     * @return The event factory
+     * @since 2.0
+     */
+    public @NonNull CtfTmfEventFactory getEventFactory() {
+        return fEventFactory;
+    }
 
     /**
      * Get an iterator to the trace
