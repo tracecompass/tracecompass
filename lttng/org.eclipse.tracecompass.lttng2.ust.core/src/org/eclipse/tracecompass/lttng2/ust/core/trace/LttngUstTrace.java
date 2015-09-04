@@ -72,7 +72,7 @@ public class LttngUstTrace extends CtfTmfTrace {
      * Default constructor
      */
     public LttngUstTrace() {
-        super();
+        super(LttngUstEventFactory.instance());
     }
 
     /**
