@@ -766,19 +766,19 @@ The Filters view allows the user to define preset filters that can be applied to
 
 The filters can be more complex than what can be achieved with the filter header row in the events table. The filter is defined in a tree node structure, where the node types can be any of '''TRACETYPE''', '''AND''', '''OR''', '''CONTAINS''', '''EQUALS''', '''MATCHES''' or '''COMPARE'''. Some nodes types have restrictions on their possible children in the tree.
 
-The '''TRACETYPE''' node filters against the trace type of the trace as defined in a plug-in extension or in a custom parser. When used, any child node will have its aspect combo box restricted to the possible aspects of that trace type.
+The '''TRACETYPE''' node filters against the trace type of the trace as defined in a plug-in extension or in a custom parser. When used, any child node will have its ''type'' combo box fixed and its ''aspect'' combo box restricted to the possible aspects of that trace type.
 
 The '''AND''' node applies the logical ''and'' condition on all of its children. All children conditions must be true for the filter to match. A ''not'' operator can be applied to invert the condition.
 
 The '''OR''' node applies the logical ''or'' condition on all of its children. At least one children condition must be true for the filter to match. A ''not'' operator can be applied to invert the condition.
 
-The '''CONTAINS''' node matches when the specified event ''aspect'' value contains the specified ''value'' string. A ''not'' operator can be applied to invert the condition. The condition can be case sensitive or insensitive.
+The '''CONTAINS''' node matches when the specified event ''aspect'' value contains the specified ''value'' string. A ''not'' operator can be applied to invert the condition. The condition can be case sensitive or insensitive. The ''type'' combo box restricts the possible aspects to those of the specified trace type.
 
-The '''EQUALS''' node matches when the specified event ''aspect'' value equals exactly the specified ''value'' string. A ''not'' operator can be applied to invert the condition. The condition can be case sensitive or insensitive.
+The '''EQUALS''' node matches when the specified event ''aspect'' value equals exactly the specified ''value'' string. A ''not'' operator can be applied to invert the condition. The condition can be case sensitive or insensitive. The ''type'' combo box restricts the possible aspects to those of the specified trace type.
 
-The '''MATCHES''' node matches when the specified event ''aspect'' value matches against the specified ''regular expression''. A ''not'' operator can be applied to invert the condition.
+The '''MATCHES''' node matches when the specified event ''aspect'' value matches against the specified ''regular expression''. A ''not'' operator can be applied to invert the condition. The ''type'' combo box restricts the possible aspects to those of the specified trace type.
 
-The '''COMPARE''' node matches when the specified event ''aspect'' value compared with the specified ''value'' gives the specified ''result''. The result can be set to ''smaller than'', ''equal'' or ''greater than''. The type of comparison can be numerical, alphanumerical or based on time stamp. A ''not'' operator can be applied to invert the condition.
+The '''COMPARE''' node matches when the specified event ''aspect'' value compared with the specified ''value'' gives the specified ''result''. The result can be set to ''smaller than'', ''equal'' or ''greater than''. The type of comparison can be numerical, alphanumerical or based on time stamp. A ''not'' operator can be applied to invert the condition. The ''type'' combo box restricts the possible aspects to those of the specified trace type.
 
 For numerical comparisons, strings prefixed by "0x", "0X" or "#" are treated as hexadecimal numbers and strings prefixed by "0" are treated as octal numbers.
 
