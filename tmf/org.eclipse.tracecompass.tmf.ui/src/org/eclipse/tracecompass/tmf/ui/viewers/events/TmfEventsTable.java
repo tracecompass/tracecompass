@@ -20,6 +20,7 @@ package org.eclipse.tracecompass.tmf.ui.viewers.events;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -39,6 +40,8 @@ import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.expressions.IEvaluationContext;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -69,6 +72,9 @@ import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -164,6 +170,7 @@ import org.eclipse.tracecompass.tmf.ui.views.filter.FilterManager;
 import org.eclipse.tracecompass.tmf.ui.widgets.rawviewer.TmfRawEventViewer;
 import org.eclipse.tracecompass.tmf.ui.widgets.virtualtable.TmfVirtualTable;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
@@ -172,6 +179,7 @@ import org.eclipse.ui.dialogs.ListDialog;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.ide.IGotoMarker;
+import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.themes.ColorUtil;
 import org.eclipse.ui.themes.IThemeManager;
 
@@ -1033,19 +1041,50 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 final TableItem item = items[0];
 
                 final Object data = item.getData();
-                if (data instanceof ITmfSourceLookup) {
-                    ITmfSourceLookup event = (ITmfSourceLookup) data;
-                    ITmfCallsite cs = event.getCallsite();
-                    if (cs == null) {
-                        return;
-                    }
-                    IMarker marker = null;
-                    try {
-                        String fileName = cs.getFileName();
-                        final String trimmedPath = fileName.replaceAll("\\.\\./", EMPTY_STRING); //$NON-NLS-1$
-                        if (trimmedPath.isEmpty()) {
-                            return;
+                if (!(data instanceof ITmfSourceLookup)) {
+                    return;
+                }
+                ITmfSourceLookup event = (ITmfSourceLookup) data;
+                ITmfCallsite cs = event.getCallsite();
+                if (cs == null) {
+                    return;
+                }
+
+                String fileName = cs.getFileName();
+                final String trimmedPath = fileName.replaceAll("\\.\\./", EMPTY_STRING); //$NON-NLS-1$
+                File fileToOpen = new File(trimmedPath);
+
+                try {
+                    if (fileToOpen.exists() && fileToOpen.isFile()) {
+                        /*
+                         * The path points to a "real" file, attempt to open
+                         * that
+                         */
+                        IFileStore fileStore = EFS.getLocalFileSystem().getStore(fileToOpen.toURI());
+                        IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+
+                        IEditorPart editor = IDE.openEditorOnFileStore(page, fileStore);
+                        if (editor instanceof ITextEditor) {
+                            /*
+                             * Calculate the "document offset" corresponding to
+                             * the line number, then seek there.
+                             */
+                            ITextEditor textEditor = (ITextEditor) editor;
+                            int lineNumber = Long.valueOf(cs.getLineNumber()).intValue();
+                            IDocument document = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput());
+
+                            IRegion region = document.getLineInformation(lineNumber - 1);
+                            if (region != null) {
+                                textEditor.selectAndReveal(region.getOffset(), region.getLength());
+                            }
                         }
+
+                    } else {
+                        /*
+                         * The file was not found on disk, attempt to find it in
+                         * the workspace instead.
+                         */
+                        IMarker marker = null;
                         final ArrayList<IFile> files = new ArrayList<>();
                         ResourcesPlugin.getWorkspace().getRoot().accept(new IResourceVisitor() {
                             @Override
@@ -1082,12 +1121,12 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                             marker.setAttribute(IMarker.LINE_NUMBER, Long.valueOf(cs.getLineNumber()).intValue());
                             IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), marker);
                             marker.delete();
-                        } else if (files.size() == 0) {
+                        } else if (files.isEmpty()) {
                             displayException(new FileNotFoundException('\'' + cs.toString() + '\'' + '\n' + Messages.TmfEventsTable_OpenSourceCodeNotFound));
                         }
-                    } catch (CoreException e) {
-                        displayException(e);
                     }
+                } catch (BadLocationException | CoreException e) {
+                    displayException(e);
                 }
             }
         };
