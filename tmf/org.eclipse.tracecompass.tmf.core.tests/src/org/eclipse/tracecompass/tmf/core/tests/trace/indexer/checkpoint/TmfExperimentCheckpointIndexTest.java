@@ -56,6 +56,9 @@ public class TmfExperimentCheckpointIndexTest {
     private static final TmfTestTrace TEST_TRACE2   = TmfTestTrace.E_TEST_10K;
     private static int          NB_EVENTS    = 20000;
     private static int          BLOCK_SIZE   = 1000;
+    private static int          LAST_EVENT_RANK    = NB_EVENTS - 1;
+    private static int          LAST_CHECKPOINT_RANK = LAST_EVENT_RANK / BLOCK_SIZE;
+    private static int          NB_CHECKPOINTS    =  LAST_CHECKPOINT_RANK + 1;
 
     private static ITmfTrace[] fTestTraces;
     private static TmfExperimentStub fExperiment;
@@ -118,7 +121,7 @@ public class TmfExperimentCheckpointIndexTest {
         ITmfCheckpointIndex checkpoints = fExperiment.getIndexer().getCheckpoints();
         int pageSize = fExperiment.getCacheSize();
         assertTrue("Checkpoints exist",  checkpoints != null);
-        assertEquals("Checkpoints size", NB_EVENTS / BLOCK_SIZE, checkpoints.size());
+        assertEquals("Checkpoints size", NB_CHECKPOINTS, checkpoints.size());
 
         // Validate that each checkpoint points to the right event
         for (int i = 0; i < checkpoints.size(); i++) {
@@ -165,13 +168,13 @@ public class TmfExperimentCheckpointIndexTest {
         // Validate that each checkpoint points to the right event
         ITmfCheckpointIndex checkpoints = experiment.getIndexer().getCheckpoints();
         assertTrue("Checkpoints exist",  checkpoints != null);
-        assertEquals("Checkpoints size", NB_EVENTS / BLOCK_SIZE / 2, checkpoints.size());
+        assertEquals("Checkpoints size", NB_CHECKPOINTS / 2, checkpoints.size());
 
         // Build the second half of the index
         experiment.getIndexer().buildIndex(NB_EVENTS / 2, TmfTimeRange.ETERNITY, true);
 
         // Validate that each checkpoint points to the right event
-        assertEquals("Checkpoints size", NB_EVENTS / BLOCK_SIZE, checkpoints.size());
+        assertEquals("Checkpoints size", NB_CHECKPOINTS, checkpoints.size());
         for (int i = 0; i < checkpoints.size(); i++) {
             ITmfCheckpoint checkpoint = checkpoints.get(i);
             ITmfLocation location = checkpoint.getLocation();

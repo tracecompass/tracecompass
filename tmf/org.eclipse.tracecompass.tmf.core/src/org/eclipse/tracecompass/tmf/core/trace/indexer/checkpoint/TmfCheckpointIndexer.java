@@ -314,19 +314,21 @@ public class TmfCheckpointIndexer implements ITmfTraceIndexer {
     /**
      * Position the trace at the given checkpoint
      *
-     * @param checkpoint the checkpoint index
+     * @param checkpointIndex the checkpoint index
      * @return the corresponding context
      */
-    private ITmfContext restoreCheckpoint(final long checkpoint) {
+    private ITmfContext restoreCheckpoint(final long checkpointIndex) {
         ITmfLocation location = null;
         long index = 0;
         synchronized (fTraceIndex) {
             if (!fTraceIndex.isEmpty()) {
-                index = checkpoint;
+                index = checkpointIndex;
                 if (index >= fTraceIndex.size()) {
                     index = fTraceIndex.size() - 1;
                 }
-                location = fTraceIndex.get(index).getLocation();
+                ITmfCheckpoint checkpoint = fTraceIndex.get(index);
+                TmfCoreTracer.traceIndexer("Restored checkpoint: " + checkpoint); //$NON-NLS-1$
+                location = checkpoint.getLocation();
             }
         }
         final ITmfContext context = fTrace.seekEvent(location);

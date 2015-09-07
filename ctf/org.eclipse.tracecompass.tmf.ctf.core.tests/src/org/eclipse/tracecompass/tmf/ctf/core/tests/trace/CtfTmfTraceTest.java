@@ -384,6 +384,26 @@ public class CtfTmfTraceTest {
     }
 
     /**
+     * Run the ITmfContext seekEvent(ITmfLocation<?>) method test with invalid location.
+     */
+    @Test
+    public void testSeekEventInvalidLocation() {
+        CtfLocation ctfLocation = new CtfLocation(CtfLocation.INVALID_LOCATION);
+        ITmfContext result = fixture.seekEvent(ctfLocation);
+        assertNull(fixture.getNext(result));
+        assertEquals(CtfLocation.INVALID_LOCATION, result.getLocation().getLocationInfo());
+        result.dispose();
+
+        // Not using CtfLocation.INVALID_LOCATION directly on purpose, to make sure CtfLocationInfo.equals is properly used
+        CtfLocationInfo invalidLocation = new CtfLocationInfo(CtfLocation.INVALID_LOCATION.getTimestamp(), CtfLocation.INVALID_LOCATION.getIndex());
+        ctfLocation = new CtfLocation(invalidLocation);
+        result = fixture.seekEvent(ctfLocation);
+        assertNull(fixture.getNext(result));
+        assertEquals(CtfLocation.INVALID_LOCATION, result.getLocation().getLocationInfo());
+        result.dispose();
+    }
+
+    /**
      * Run the boolean validate(IProject,String) method test.
      */
     @Test
