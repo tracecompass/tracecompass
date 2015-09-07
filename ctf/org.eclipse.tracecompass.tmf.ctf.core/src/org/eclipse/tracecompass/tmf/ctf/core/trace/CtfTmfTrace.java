@@ -321,9 +321,6 @@ public class CtfTmfTrace extends TmfTrace
             context.setRank(0);
         } else {
             context.setRank(ITmfContext.UNKNOWN_RANK);
-            if (currentLocation.getLocationInfo() == CtfLocation.INVALID_LOCATION) {
-                currentLocation = new CtfLocation(fTrace.getCurrentEndTime() + 1, 0L);
-            }
         }
         /* This will seek and update the location after the seek */
         context.setLocation(currentLocation);

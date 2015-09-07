@@ -178,6 +178,10 @@ public class CtfIterator extends CTFTraceReader
      */
     public synchronized boolean seek(CtfLocationInfo ctfLocationData) {
         boolean ret = false;
+        if (ctfLocationData.equals(CtfLocation.INVALID_LOCATION)) {
+            fCurLocation = NULL_LOCATION;
+            return false;
+        }
 
         /* Avoid the cost of seeking at the current location. */
         if (fCurLocation.getLocationInfo().equals(ctfLocationData)) {
