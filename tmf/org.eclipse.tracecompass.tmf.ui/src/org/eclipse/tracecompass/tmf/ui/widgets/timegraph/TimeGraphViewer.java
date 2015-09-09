@@ -755,6 +755,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             return;
         }
         setStartFinishTimeInt(time0, time1);
+        updateExtSynchValues();
     }
 
     private void setStartFinishTimeInt(long time0, long time1) {
@@ -1072,8 +1073,8 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
                 listener.timeRangeUpdated(event);
             }
 
-            // update external synch timers
-            updateExtSynchTimers();
+            // update external synch values
+            updateExtSynchValues();
         }
     }
 
@@ -1151,14 +1152,14 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
         // update notification time values since we are now in synch with the
         // external application
-        updateExtSynchTimers();
+        updateExtSynchValues();
     }
 
     /**
-     * update the cache timers used to identify the need to send a time window
+     * update the cache values used to identify the need to send a time window
      * update to external registered listeners
      */
-    private void updateExtSynchTimers() {
+    private void updateExtSynchValues() {
         // last time notification cache
         fTime0ExtSynch = fTime0;
         fTime1ExtSynch = fTime1;
