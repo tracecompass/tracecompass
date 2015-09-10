@@ -1134,9 +1134,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 } else {
                     fTimeGraphWrapper.getTimeGraphViewer().setSelectionRange(beginTime, endTime);
                 }
-                startZoomThread(fTimeGraphWrapper.getTimeGraphViewer().getTime0(), fTimeGraphWrapper.getTimeGraphViewer().getTime1());
-
-                synchingToTime(beginTime);
+                synchingToTime(fTimeGraphWrapper.getTimeGraphViewer().getSelectionBegin());
             }
         });
     }
