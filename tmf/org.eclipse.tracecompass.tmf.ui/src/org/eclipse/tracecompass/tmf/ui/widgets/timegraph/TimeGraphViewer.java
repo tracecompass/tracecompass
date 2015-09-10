@@ -806,9 +806,11 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     public void setSelectionRangeNotify(long beginTime, long endTime) {
         long time0 = fTime0;
         long time1 = fTime1;
-        boolean changed = (beginTime != fSelectionBegin || endTime != fSelectionEnd);
+        long selectionBegin = fSelectionBegin;
+        long selectionEnd = fSelectionEnd;
         fSelectionBegin = Math.max(fTime0Bound, Math.min(fTime1Bound, beginTime));
         fSelectionEnd = Math.max(fTime0Bound, Math.min(fTime1Bound, endTime));
+        boolean changed = (selectionBegin != fSelectionBegin || selectionEnd != fSelectionEnd);
         ensureVisible(fSelectionEnd);
         fTimeGraphCtrl.redraw();
         fTimeScaleCtrl.redraw();
@@ -833,17 +835,18 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     }
 
     private void setSelectedTimeInt(long time, boolean ensureVisible, boolean doNotify) {
+        long selection = Math.max(fTime0Bound, Math.min(fTime1Bound, time));
         long time0 = fTime0;
         long time1 = fTime1;
         if (ensureVisible) {
-            ensureVisible(time);
+            ensureVisible(selection);
         }
         fTimeGraphCtrl.redraw();
         fTimeScaleCtrl.redraw();
 
-        boolean notifySelectedTime = (time != fSelectionBegin || time != fSelectionEnd);
-        fSelectionBegin = time;
-        fSelectionEnd = time;
+        boolean notifySelectedTime = (selection != fSelectionBegin || selection != fSelectionEnd);
+        fSelectionBegin = selection;
+        fSelectionEnd = selection;
 
         if ((time0 != fTime0) || (time1 != fTime1)) {
             notifyRangeListeners();
