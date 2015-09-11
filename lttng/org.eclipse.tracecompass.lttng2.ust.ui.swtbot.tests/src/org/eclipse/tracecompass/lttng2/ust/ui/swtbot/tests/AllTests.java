@@ -20,7 +20,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-
+    CallStackViewTest.class
 })
 public class AllTests {
 
