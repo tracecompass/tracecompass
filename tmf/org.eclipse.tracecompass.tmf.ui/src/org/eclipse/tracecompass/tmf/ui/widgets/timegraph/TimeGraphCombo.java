@@ -93,8 +93,6 @@ public class TimeGraphCombo extends Composite {
 
     private static final Object FILLER = new Object();
 
-    private static final String ITEM_HEIGHT = "$height$"; //$NON-NLS-1$
-
     // ------------------------------------------------------------------------
     // Fields
     // ------------------------------------------------------------------------
@@ -891,8 +889,8 @@ public class TimeGraphCombo extends Composite {
         fInhibitTreeSelection = false;
         fTreeViewer.getTree().getVerticalBar().setEnabled(false);
         fTreeViewer.getTree().getVerticalBar().setVisible(false);
-        fTimeGraphViewer.setItemHeight(getItemHeight(fTreeViewer.getTree()));
         fTimeGraphViewer.setInput(input);
+        fTimeGraphViewer.setItemHeight(getItemHeight(fTreeViewer.getTree()));
         // queue the alignment update because in Linux the item bounds are not
         // set properly until the tree has been painted at least once
         fVisibleExpandedItems = null; // invalidate the cache
@@ -1179,11 +1177,9 @@ public class TimeGraphCombo extends Composite {
             TreeItem nextItem = treeItems.get(index + 1);
             Rectangle nextBounds = nextItem.getBounds();
             Integer itemHeight = nextBounds.y - bounds.y;
-            if (itemHeight > 0 && !itemHeight.equals(item.getData(ITEM_HEIGHT))) {
+            if (itemHeight > 0) {
                 ITimeGraphEntry entry = (ITimeGraphEntry) item.getData();
-                if (fTimeGraphViewer.getTimeGraphControl().setItemHeight(entry, itemHeight)) {
-                    item.setData(ITEM_HEIGHT, itemHeight);
-                }
+                fTimeGraphViewer.getTimeGraphControl().setItemHeight(entry, itemHeight);
             }
             index++;
             item = nextItem;
