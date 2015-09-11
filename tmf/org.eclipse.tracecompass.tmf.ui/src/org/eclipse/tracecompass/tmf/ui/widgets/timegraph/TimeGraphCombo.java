@@ -76,6 +76,8 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TimeGraphFilter
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 
+import com.google.common.collect.Iterables;
+
 /**
  * Time graph "combo" view (with the list/tree on the left and the gantt chart
  * on the right)
@@ -106,7 +108,7 @@ public class TimeGraphCombo extends Composite {
     /** The selection listener map */
     private final Map<ITimeGraphSelectionListener, SelectionListenerWrapper> fSelectionListenerMap = new HashMap<>();
 
-    /** The map of viewer filters */
+    /** The map of viewer filters to viewer filter wrappers */
     private final Map<ViewerFilter, ViewerFilter> fViewerFilterMap = new HashMap<>();
 
     /**
@@ -126,9 +128,6 @@ public class TimeGraphCombo extends Composite {
 
     /** The filter dialog */
     private TimeGraphFilterDialog fFilterDialog;
-
-    /** The filter generated from the filter dialog */
-    private RawViewerFilter fFilter;
 
     /** Default weight of each part of the sash */
     private static final int[] DEFAULT_WEIGHTS = { 1, 1 };
@@ -385,9 +384,6 @@ public class TimeGraphCombo extends Composite {
         fTimeGraphViewer.setHeaderHeight(tree.getHeaderHeight());
         fTimeGraphViewer.setBorderWidth(tree.getBorderWidth());
         fTimeGraphViewer.setNameWidthPref(0);
-
-        fFilter = new RawViewerFilter();
-        addFilter(fFilter);
 
         fFilterDialog = new TimeGraphFilterDialog(getShell());
 
@@ -704,9 +700,15 @@ public class TimeGraphCombo extends Composite {
             fFilterDialog.setTitle(Messages.TmfTimeFilterDialog_WINDOW_TITLE);
             fFilterDialog.setMessage(Messages.TmfTimeFilterDialog_MESSAGE);
             fFilterDialog.setExpandedElements(allElements.toArray());
-            if (fFilter.getFiltered() != null) {
+            RawViewerFilter rawViewerFilter = null;
+            for (ViewerFilter filter : fTimeGraphViewer.getFilters()) {
+                if (filter instanceof RawViewerFilter) {
+                    rawViewerFilter = (RawViewerFilter) filter;
+                }
+            }
+            if (rawViewerFilter != null && rawViewerFilter.getFiltered() != null) {
                 ArrayList<? extends ITimeGraphEntry> nonFilteredElements = new ArrayList<>(allElements);
-                nonFilteredElements.removeAll(fFilter.getFiltered());
+                nonFilteredElements.removeAll(rawViewerFilter.getFiltered());
                 fFilterDialog.setInitialElementSelections(nonFilteredElements);
             } else {
                 fFilterDialog.setInitialElementSelections(allElements);
@@ -719,9 +721,13 @@ public class TimeGraphCombo extends Composite {
                 if (fFilterDialog.getResult().length != allElements.size()) {
                     ArrayList<Object> filteredElements = new ArrayList<Object>(allElements);
                     filteredElements.removeAll(Arrays.asList(fFilterDialog.getResult()));
-                    fFilter.setFiltered(filteredElements);
-                } else {
-                    fFilter.setFiltered(null);
+                    if (rawViewerFilter == null) {
+                        rawViewerFilter = new RawViewerFilter();
+                        addFilter(rawViewerFilter);
+                    }
+                    rawViewerFilter.setFiltered(filteredElements);
+                } else if (rawViewerFilter != null) {
+                    removeFilter(rawViewerFilter);
                 }
                 fTreeViewer.refresh();
                 fTreeViewer.expandAll();
@@ -880,7 +886,6 @@ public class TimeGraphCombo extends Composite {
      * @param input the input of this time graph combo, or <code>null</code> if none
      */
     public void setInput(Object input) {
-        fFilter.setFiltered(null);
         fInhibitTreeSelection = true;
         fTreeViewer.setInput(input);
         for (SelectionListenerWrapper listenerWrapper : fSelectionListenerMap.values()) {
@@ -925,7 +930,7 @@ public class TimeGraphCombo extends Composite {
     public void addFilter(ViewerFilter filter) {
         ViewerFilter wrapper = new ViewerFilterWrapper(filter);
         fTreeViewer.addFilter(wrapper);
-        fTimeGraphViewer.addFilter(wrapper);
+        fTimeGraphViewer.addFilter(filter);
         fViewerFilterMap.put(filter, wrapper);
         alignTreeItems(true);
     }
@@ -936,8 +941,42 @@ public class TimeGraphCombo extends Composite {
     public void removeFilter(ViewerFilter filter) {
         ViewerFilter wrapper = fViewerFilterMap.get(filter);
         fTreeViewer.removeFilter(wrapper);
-        fTimeGraphViewer.removeFilter(wrapper);
+        fTimeGraphViewer.removeFilter(filter);
         fViewerFilterMap.remove(filter);
+        alignTreeItems(true);
+    }
+
+    /**
+     * Returns this viewer's filters.
+     *
+     * @return an array of viewer filters
+     * @since 2.0
+     */
+    public ViewerFilter[] getFilters() {
+        return fTimeGraphViewer.getFilters();
+    }
+
+    /**
+     * Sets the filters, replacing any previous filters, and triggers
+     * refiltering of the elements.
+     *
+     * @param filters
+     *            an array of viewer filters, or null
+     * @since 2.0
+     */
+    public void setFilters(ViewerFilter[] filters) {
+        fViewerFilterMap.clear();
+        if (filters == null) {
+            fTreeViewer.resetFilters();
+        } else {
+            for (ViewerFilter filter : filters) {
+                ViewerFilter wrapper = new ViewerFilterWrapper(filter);
+                fViewerFilterMap.put(filter, wrapper);
+            }
+            ViewerFilter[] wrappers = Iterables.toArray(fViewerFilterMap.values(), ViewerFilter.class);
+            fTreeViewer.setFilters(wrappers);
+        }
+        fTimeGraphViewer.setFilters(filters);
         alignTreeItems(true);
     }
 

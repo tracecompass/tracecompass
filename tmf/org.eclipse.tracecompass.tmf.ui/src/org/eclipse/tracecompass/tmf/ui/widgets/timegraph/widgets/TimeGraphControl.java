@@ -82,6 +82,8 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 
+import com.google.common.collect.Iterables;
+
 /**
  * Time graph control implementation
  *
@@ -2587,6 +2589,30 @@ public class TimeGraphControl extends TimeGraphBaseControl
      */
     public void removeFilter(ViewerFilter filter) {
         fFilters.remove(filter);
+    }
+
+    /**
+     * Returns this control's filters.
+     *
+     * @return an array of viewer filters
+     * @since 2.0
+     */
+    public ViewerFilter[] getFilters() {
+        return Iterables.toArray(fFilters, ViewerFilter.class);
+    }
+
+    /**
+     * Sets the filters, replacing any previous filters.
+     *
+     * @param filters
+     *            an array of viewer filters, or null
+     * @since 2.0
+     */
+    public void setFilters(ViewerFilter[] filters) {
+        fFilters.clear();
+        if (filters != null) {
+            fFilters.addAll(Arrays.asList(filters));
+        }
     }
 
     @Override
