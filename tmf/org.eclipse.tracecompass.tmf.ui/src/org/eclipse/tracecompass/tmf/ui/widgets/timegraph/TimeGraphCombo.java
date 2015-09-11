@@ -1123,13 +1123,18 @@ public class TimeGraphCombo extends Composite {
             if (fLinuxItemHeight != 0) {
                 return fLinuxItemHeight;
             }
-            List<TreeItem> treeItems = getVisibleExpandedItems(tree, true);
-            if (treeItems.size() > 1) {
-                final TreeItem treeItem0 = treeItems.get(0);
-                final TreeItem treeItem1 = treeItems.get(1);
+
+            if (getVisibleExpandedItems(tree, true).size() > 1) {
                 PaintListener paintListener = new PaintListener() {
                     @Override
                     public void paintControl(PaintEvent e) {
+                        // get the treeItems here to have all items
+                        List<TreeItem> treeItems = getVisibleExpandedItems(tree, true);
+                        if (treeItems.size() < 2) {
+                            return;
+                        }
+                        final TreeItem treeItem0 = treeItems.get(0);
+                        final TreeItem treeItem1 = treeItems.get(1);
                         tree.removePaintListener(this);
                         int y0 = treeItem0.getBounds().y;
                         int y1 = treeItem1.getBounds().y;
