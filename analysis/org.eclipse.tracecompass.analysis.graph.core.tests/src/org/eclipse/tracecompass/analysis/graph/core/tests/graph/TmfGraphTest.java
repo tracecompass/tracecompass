@@ -400,7 +400,7 @@ public class TmfGraphTest {
     public void testGraphStatistics() {
         TmfGraph graph = buildFullGraph();
         TmfGraphStatistics stats = new TmfGraphStatistics();
-        stats.getGraphStatistics(graph, WORKER1);
+        stats.computeGraphStatistics(graph, WORKER1);
         assertEquals(12, stats.getSum(WORKER1).longValue());
         assertEquals(11, stats.getSum(WORKER2).longValue());
         assertEquals(23, stats.getSum().longValue());

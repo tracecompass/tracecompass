@@ -13,16 +13,15 @@
 
 package org.eclipse.tracecompass.internal.analysis.graph.core.base;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.graph.core.base.IGraphWorker;
 import org.eclipse.tracecompass.analysis.graph.core.base.ITmfGraphVisitor;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfEdge;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfGraph;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
-
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 
 /**
  * Class that computes statistics on time spent in the elements (objects) of a
@@ -30,19 +29,20 @@ import com.google.common.collect.Multimap;
  *
  * @author Francis Giraldeau
  * @author Geneviève Bastien
+ * @author Matthew Khouzam
  */
 public class TmfGraphStatistics implements ITmfGraphVisitor {
 
-    private static final String STATS_TOTAL = "total"; //$NON-NLS-1$
-
-    private final Multimap<Object, Long> fWorkerStats;
+    private final Map<IGraphWorker, Long> fWorkerStats;
+    private Long fTotal;
     private @Nullable TmfGraph fGraph;
 
     /**
      * Constructor
      */
     public TmfGraphStatistics() {
-        fWorkerStats = NonNullUtils.checkNotNull(ArrayListMultimap.<Object, Long> create());
+        fWorkerStats = new HashMap<>();
+        fTotal = 0L;
     }
 
     /**
@@ -53,10 +53,11 @@ public class TmfGraphStatistics implements ITmfGraphVisitor {
      * @param current
      *            The element from which to start calculations
      */
-    public void getGraphStatistics(TmfGraph graph, @Nullable IGraphWorker current) {
+    public void computeGraphStatistics(TmfGraph graph, @Nullable IGraphWorker current) {
         if (current == null) {
             return;
         }
+        clear();
         fGraph = graph;
         fGraph.scanLineTraverse(fGraph.getHead(current), this);
     }
@@ -77,10 +78,14 @@ public class TmfGraphStatistics implements ITmfGraphVisitor {
         TmfGraph graph = fGraph;
         synchronized (fWorkerStats) {
             if (horizontal && graph != null) {
-                fWorkerStats.put(graph.getParentOf(edge.getVertexFrom()),
-                        edge.getVertexTo().getTs() - edge.getVertexFrom().getTs());
-                fWorkerStats.put(STATS_TOTAL,
-                        edge.getVertexTo().getTs() - edge.getVertexFrom().getTs());
+                IGraphWorker worker = graph.getParentOf(edge.getVertexFrom());
+                Long duration = edge.getDuration();
+                Long currentTotal = fWorkerStats.get(worker);
+                if (currentTotal != null) {
+                    duration += currentTotal;
+                }
+                fWorkerStats.put(worker, duration);
+                fTotal += edge.getDuration();
             }
         }
     }
@@ -92,11 +97,12 @@ public class TmfGraphStatistics implements ITmfGraphVisitor {
      *            The object to get the time spent for
      * @return The sum of all durations
      */
-    public Long getSum(@Nullable Object worker) {
-        long sum = 0L;
+    public Long getSum(@Nullable IGraphWorker worker) {
+        Long sum = 0L;
         synchronized (fWorkerStats) {
-            for (long duration : fWorkerStats.get(worker)) {
-                sum += duration;
+            Long elapsed = fWorkerStats.get(worker);
+            if (elapsed != null) {
+                sum += elapsed;
             }
         }
         return sum;
@@ -108,7 +114,9 @@ public class TmfGraphStatistics implements ITmfGraphVisitor {
      * @return The sum of all durations
      */
     public Long getSum() {
-        return getSum(STATS_TOTAL);
+        synchronized (fWorkerStats) {
+            return fTotal;
+        }
     }
 
     /**
@@ -118,11 +126,24 @@ public class TmfGraphStatistics implements ITmfGraphVisitor {
      *            The object to get the percentage for
      * @return The percentage time spent in this element
      */
-    public Double getPercent(@Nullable Object worker) {
-        if (getSum() == 0) {
-            return 0D;
+    public Double getPercent(@Nullable IGraphWorker worker) {
+        synchronized (fWorkerStats) {
+            if (getSum() == 0) {
+                return 0D;
+            }
+            return (double) getSum(worker) / (double) getSum();
         }
-        return (double) getSum(worker) / (double) getSum();
+    }
+
+    /**
+     * Clear statistics
+     */
+
+    public void clear() {
+        synchronized (fWorkerStats) {
+            fTotal = 0L;
+            fWorkerStats.clear();
+        }
     }
 
 }
