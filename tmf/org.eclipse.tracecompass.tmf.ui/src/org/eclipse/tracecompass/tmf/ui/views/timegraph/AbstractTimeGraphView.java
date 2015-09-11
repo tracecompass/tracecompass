@@ -39,6 +39,7 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
@@ -112,6 +113,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     /** The trace to entry list hash map */
     private final Map<ITmfTrace, List<TimeGraphEntry>> fEntryListMap = new HashMap<>();
+
+    /** The trace to filters hash map */
+    private final Map<ITmfTrace, ViewerFilter[]> fFiltersMap = new HashMap<>();
 
     /** The trace to build thread hash map */
     private final Map<ITmfTrace, BuildThread> fBuildThreadMap = new HashMap<>();
@@ -193,6 +197,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         Object getInput();
 
+        void setFilters(ViewerFilter[] filters);
+
+        ViewerFilter[] getFilters();
+
         void redraw();
 
         void update();
@@ -251,6 +259,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         @Override
         public Object getInput() {
             return viewer.getInput();
+        }
+
+        @Override
+        public void setFilters(ViewerFilter[] filters) {
+            viewer.setFilters(filters);
+        }
+
+        @Override
+        public ViewerFilter[] getFilters() {
+            return viewer.getFilters();
         }
 
         @Override
@@ -334,6 +352,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         @Override
         public Object getInput() {
             return combo.getInput();
+        }
+
+        @Override
+        public void setFilters(ViewerFilter[] filters) {
+            combo.setFilters(filters);
+        }
+
+        @Override
+        public ViewerFilter[] getFilters() {
+            return combo.getFilters();
         }
 
         @Override
@@ -976,8 +1004,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      */
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
-        fTrace = signal.getTrace();
-        loadTrace();
+        loadTrace(signal.getTrace());
     }
 
     /**
@@ -991,8 +1018,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         if (signal.getTrace() == fTrace) {
             return;
         }
-        fTrace = signal.getTrace();
-        loadTrace();
+        loadTrace(signal.getTrace());
     }
 
     /**
@@ -1014,6 +1040,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         synchronized (fEntryListMap) {
             fEntryListMap.remove(signal.getTrace());
         }
+        fFiltersMap.remove(signal.getTrace());
         if (signal.getTrace() == fTrace) {
             fTrace = null;
             fStartTime = SWT.DEFAULT;
@@ -1100,11 +1127,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     // Internal
     // ------------------------------------------------------------------------
 
-    private void loadTrace() {
+    private void loadTrace(final ITmfTrace trace) {
         if (fZoomThread != null) {
             fZoomThread.cancel();
             fZoomThread = null;
         }
+        if (fTrace != null) {
+            /* save the filters of the previous trace */
+            fFiltersMap.put(fTrace, fTimeGraphWrapper.getFilters());
+        }
+        fTrace = trace;
         synchronized (fEntryListMap) {
             fEntryList = fEntryListMap.get(fTrace);
             if (fEntryList == null) {
@@ -1246,6 +1278,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 }
                 if (fEntryList != fTimeGraphWrapper.getInput()) {
                     fTimeGraphWrapper.setInput(fEntryList);
+                    /* restore the previously saved filters, if any */
+                    fTimeGraphWrapper.setFilters(fFiltersMap.get(fTrace));
                     fTimeGraphWrapper.getTimeGraphViewer().setLinks(null);
                 } else {
                     fTimeGraphWrapper.refresh();

@@ -1892,6 +1892,29 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     }
 
     /**
+     * Returns this viewer's filters.
+     *
+     * @return an array of viewer filters
+     * @since 1.1
+     */
+    public ViewerFilter[] getFilters() {
+        return fTimeGraphCtrl.getFilters();
+    }
+
+    /**
+     * Sets the filters, replacing any previous filters, and triggers
+     * refiltering of the elements.
+     *
+     * @param filters
+     *            an array of viewer filters, or null
+     * @since 1.1
+     */
+    public void setFilters(ViewerFilter[] filters) {
+        fTimeGraphCtrl.setFilters(filters);
+        refresh();
+    }
+
+    /**
      * Return the time alignment information
      *
      * @return the time alignment information
