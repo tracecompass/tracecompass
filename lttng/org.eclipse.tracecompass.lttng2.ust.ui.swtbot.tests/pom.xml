@@ -34,7 +34,6 @@
         <configuration>
           <testSuite>org.eclipse.tracecompass.lttng2.ust.ui.swtbot.tests</testSuite>
           <testClass>org.eclipse.tracecompass.lttng2.ust.ui.swtbot.tests.AllTests</testClass>
-          <failIfNoTests>false</failIfNoTests>
           <useUIHarness>true</useUIHarness>
           <useUIThread>false</useUIThread>
           <argLine>${tycho.testArgLine} ${base.ui.test.vmargs}</argLine>
