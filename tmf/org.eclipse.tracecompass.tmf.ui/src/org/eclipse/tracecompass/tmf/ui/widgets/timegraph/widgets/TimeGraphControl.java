@@ -2417,6 +2417,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
      */
     public void setItemHeight(int rowHeight) {
         this.fGlobalItemHeight = rowHeight;
+        for (Item item : fItemData.fItems) {
+            item.fItemHeight = rowHeight;
+        }
     }
 
     /**
