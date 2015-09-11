@@ -55,7 +55,7 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
      * Version number of this state provider. Please bump this if you modify the
      * contents of the generated state history in some way.
      */
-    private static final int VERSION = 8;
+    private static final int VERSION = 9;
 
     private static final int IRQ_HANDLER_ENTRY_INDEX = 1;
     private static final int IRQ_HANDLER_EXIT_INDEX = 2;
@@ -298,16 +298,23 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
                 prevState = prevState & ~(LinuxValues.TASK_STATE_MAX);
 
                 /* Set the status of the process that got scheduled out. */
-                quark = ss.getQuarkRelativeAndAdd(formerThreadNode, Attributes.STATUS);
-                if (prevState != LinuxValues.TASK_STATE_RUNNING) {
-                    if (prevState == LinuxValues.TASK_STATE_DEAD) {
-                        value = TmfStateValue.nullValue();
-                    } else {
-                        value = StateValues.PROCESS_STATUS_WAIT_BLOCKED_VALUE;
-                    }
-                } else {
+                switch (prevState.intValue()) {
+                case LinuxValues.TASK_STATE_RUNNING:
                     value = StateValues.PROCESS_STATUS_WAIT_FOR_CPU_VALUE;
+                    break;
+                case LinuxValues.TASK_INTERRUPTIBLE:
+                case LinuxValues.TASK_UNINTERRUPTIBLE:
+                    value = StateValues.PROCESS_STATUS_WAIT_BLOCKED_VALUE;
+                    break;
+                case LinuxValues.TASK_DEAD:
+                    value = TmfStateValue.nullValue();
+                    break;
+                default:
+                    value = StateValues.PROCESS_STATUS_WAIT_UNKNOWN_VALUE;
+                    break;
                 }
+
+                quark = ss.getQuarkRelativeAndAdd(formerThreadNode, Attributes.STATUS);
                 ss.modifyAttribute(ts, value, quark);
 
                 /* Set the status of the new scheduled process */
