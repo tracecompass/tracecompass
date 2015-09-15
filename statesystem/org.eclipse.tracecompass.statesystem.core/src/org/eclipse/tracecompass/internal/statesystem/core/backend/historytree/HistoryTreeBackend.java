@@ -23,6 +23,7 @@ import java.nio.channels.ClosedChannelException;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.statesystem.core.Activator;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.CoreNode;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTConfig;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTInterval;
@@ -43,12 +44,12 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
  */
 public class HistoryTreeBackend implements IStateHistoryBackend {
 
-    private final @NonNull String ssid;
+    private final @NonNull String fSsid;
 
     /**
      * The history tree that sits underneath.
      */
-    private final HistoryTree sht;
+    private final HistoryTree fSht;
 
     /** Indicates if the history tree construction is done */
     private volatile boolean fFinishedBuilding = false;
@@ -69,7 +70,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      *            is the history tree finished building
      */
     protected void setFinishedBuilding(boolean isFinishedBuilding) {
-        this.fFinishedBuilding = isFinishedBuilding;
+        fFinishedBuilding = isFinishedBuilding;
     }
 
     /**
@@ -101,10 +102,10 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
             long startTime,
             int blockSize,
             int maxChildren) throws IOException {
-        this.ssid = ssid;
+        fSsid = ssid;
         final HTConfig conf = new HTConfig(newStateFile, blockSize, maxChildren,
                 providerVersion, startTime);
-        sht = new HistoryTree(conf);
+        fSht = new HistoryTree(conf);
     }
 
     /**
@@ -148,8 +149,8 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      */
     public HistoryTreeBackend(@NonNull String ssid, File existingStateFile, int providerVersion)
             throws IOException {
-        this.ssid = ssid;
-        sht = new HistoryTree(existingStateFile, providerVersion);
+        fSsid = ssid;
+        fSht = new HistoryTree(existingStateFile, providerVersion);
         fFinishedBuilding = true;
     }
 
@@ -159,22 +160,22 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      * @return The history tree
      */
     protected HistoryTree getSHT() {
-        return sht;
+        return fSht;
     }
 
     @Override
     public String getSSID() {
-        return ssid;
+        return fSsid;
     }
 
     @Override
     public long getStartTime() {
-        return sht.getTreeStart();
+        return fSht.getTreeStart();
     }
 
     @Override
     public long getEndTime() {
-        return sht.getTreeEnd();
+        return fSht.getTreeEnd();
     }
 
     @Override
@@ -184,46 +185,46 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
                 quark, (TmfStateValue) value);
 
         /* Start insertions at the "latest leaf" */
-        sht.insertInterval(interval);
+        fSht.insertInterval(interval);
     }
 
     @Override
     public void finishedBuilding(long endTime) {
-        sht.closeTree(endTime);
+        fSht.closeTree(endTime);
         fFinishedBuilding = true;
     }
 
     @Override
     public FileInputStream supplyAttributeTreeReader() {
-        return sht.supplyATReader();
+        return fSht.supplyATReader();
     }
 
     @Override
     public File supplyAttributeTreeWriterFile() {
-        return sht.supplyATWriterFile();
+        return fSht.supplyATWriterFile();
     }
 
     @Override
     public long supplyAttributeTreeWriterFilePosition() {
-        return sht.supplyATWriterFilePos();
+        return fSht.supplyATWriterFilePos();
     }
 
     @Override
     public void removeFiles() {
-        sht.deleteFile();
+        fSht.deleteFile();
     }
 
     @Override
     public void dispose() {
         if (fFinishedBuilding) {
-            sht.closeFile();
+            fSht.closeFile();
         } else {
             /*
              * The build is being interrupted, delete the file we partially
              * built since it won't be complete, so shouldn't be re-used in the
              * future (.deleteFile() will close the file first)
              */
-            sht.deleteFile();
+            fSht.deleteFile();
         }
     }
 
@@ -233,13 +234,13 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         checkValidTime(t);
 
         /* We start by reading the information in the root node */
-        HTNode currentNode = sht.getRootNode();
+        HTNode currentNode = fSht.getRootNode();
         currentNode.writeInfoFromNode(stateInfo, t);
 
         /* Then we follow the branch down in the relevant children */
         try {
             while (currentNode.getNodeType() == HTNode.NodeType.CORE) {
-                currentNode = sht.selectNextChild((CoreNode) currentNode, t);
+                currentNode = fSht.selectNextChild((CoreNode) currentNode, t);
                 currentNode.writeInfoFromNode(stateInfo, t);
             }
         } catch (ClosedChannelException e) {
@@ -250,7 +251,6 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
          * The stateInfo should now be filled with everything needed, we pass
          * the control back to the State System.
          */
-        return;
     }
 
     @Override
@@ -260,10 +260,10 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     }
 
     private void checkValidTime(long t) {
-        long treeStart = sht.getTreeStart();
-        long treeEnd = sht.getTreeEnd();
+        long treeStart = fSht.getTreeStart();
+        long treeEnd = fSht.getTreeEnd();
         if (t < treeStart || t > treeEnd) {
-            throw new TimeRangeException(ssid + " Time:" + t + ", Start:" + treeStart + ", End:" + treeEnd); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            throw new TimeRangeException(fSsid + " Time:" + t + ", Start:" + treeStart + ", End:" + treeEnd); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
     }
 
@@ -279,12 +279,12 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
             throws TimeRangeException, StateSystemDisposedException {
         checkValidTime(t);
 
-        HTNode currentNode = sht.getRootNode();
+        HTNode currentNode = fSht.getRootNode();
         HTInterval interval = currentNode.getRelevantInterval(key, t);
 
         try {
             while (interval == null && currentNode.getNodeType() == HTNode.NodeType.CORE) {
-                currentNode = sht.selectNextChild((CoreNode) currentNode, t);
+                currentNode = fSht.selectNextChild((CoreNode) currentNode, t);
                 interval = currentNode.getRelevantInterval(key, t);
             }
         } catch (ClosedChannelException e) {
@@ -299,7 +299,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
      * @return The current size of the history file in bytes
      */
     public long getFileSize() {
-        return sht.getFileSize();
+        return fSht.getFileSize();
     }
 
     /**
@@ -313,15 +313,15 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         long ret;
 
         try {
-            for (int seq = 0; seq < sht.getNodeCount(); seq++) {
-                node = sht.readNode(seq);
+            for (int seq = 0; seq < fSht.getNodeCount(); seq++) {
+                node = fSht.readNode(seq);
                 total += node.getNodeUsagePercent();
             }
         } catch (ClosedChannelException e) {
-            e.printStackTrace();
+            Activator.getDefault().logError(e.getMessage(), e);
         }
 
-        ret = total / sht.getNodeCount();
+        ret = total / fSht.getNodeCount();
         assert (ret >= 0 && ret <= 100);
         return (int) ret;
     }
@@ -329,7 +329,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     @Override
     public void debugPrint(PrintWriter writer) {
         /* By default don't print out all the intervals */
-        this.debugPrint(writer, false);
+        debugPrint(writer, false);
     }
 
     /**
@@ -347,11 +347,11 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         /* Only used for debugging, shouldn't be externalized */
         writer.println("------------------------------"); //$NON-NLS-1$
         writer.println("State History Tree:\n"); //$NON-NLS-1$
-        writer.println(sht.toString());
+        writer.println(fSht.toString());
         writer.println("Average node utilization: " //$NON-NLS-1$
-                + this.getAverageNodeUsage());
+                + getAverageNodeUsage());
         writer.println(""); //$NON-NLS-1$
 
-        sht.debugPrintFullTree(writer, printIntervals);
+        fSht.debugPrintFullTree(writer, printIntervals);
     }
 }

@@ -92,35 +92,46 @@ public abstract class HTNode {
         }
     }
 
+    /**
+     * <pre>
+     *  1 - byte (type)
+     * 16 - 2x long (start time, end time)
+     * 16 - 4x int (seq number, parent seq number, intervalcount,
+     *              strings section pos.)
+     *  1 - byte (done or not)
+     * </pre>
+     */
+    private static final int COMMON_HEADER_SIZE = 34;
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
 
     /* Configuration of the History Tree to which belongs this node */
-    private final HTConfig config;
+    private final HTConfig fConfig;
 
     /* Time range of this node */
-    private final long nodeStart;
-    private long nodeEnd;
+    private final long fNodeStart;
+    private long fNodeEnd;
 
     /* Sequence number = position in the node section of the file */
-    private final int sequenceNumber;
-    private int parentSequenceNumber; /* = -1 if this node is the root node */
+    private final int fSequenceNumber;
+    private int fParentSequenceNumber; /* = -1 if this node is the root node */
 
     /* Where the Strings section begins (from the start of the node */
-    private int stringSectionOffset;
+    private int fStringSectionOffset;
 
     /* Sum of bytes of all intervals in the node */
-    private int sizeOfIntervalSection;
+    private int fSizeOfIntervalSection;
 
     /* True if this node was read from disk (meaning its end time is now fixed) */
-    private volatile boolean isOnDisk;
+    private volatile boolean fIsOnDisk;
 
     /* Vector containing all the intervals contained in this node */
-    private final List<HTInterval> intervals;
+    private final List<HTInterval> fIntervals;
 
     /* Lock used to protect the accesses to intervals, nodeEnd and such */
-    private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock(false);
+    private final ReentrantReadWriteLock fRwl = new ReentrantReadWriteLock(false);
 
     /**
      * Constructor
@@ -135,15 +146,15 @@ public abstract class HTNode {
      *            The earliest timestamp stored in this node
      */
     protected HTNode(HTConfig config, int seqNumber, int parentSeqNumber, long start) {
-        this.config = config;
-        this.nodeStart = start;
-        this.sequenceNumber = seqNumber;
-        this.parentSequenceNumber = parentSeqNumber;
+        fConfig = config;
+        fNodeStart = start;
+        fSequenceNumber = seqNumber;
+        fParentSequenceNumber = parentSeqNumber;
 
-        this.stringSectionOffset = config.getBlockSize();
-        this.sizeOfIntervalSection = 0;
-        this.isOnDisk = false;
-        this.intervals = new ArrayList<>();
+        fStringSectionOffset = config.getBlockSize();
+        fSizeOfIntervalSection = 0;
+        fIsOnDisk = false;
+        fIntervals = new ArrayList<>();
     }
 
     /**
@@ -207,14 +218,14 @@ public abstract class HTNode {
          */
         for (i = 0; i < intervalCount; i++) {
             HTInterval interval = HTInterval.readFrom(buffer);
-            newNode.intervals.add(interval);
-            newNode.sizeOfIntervalSection += interval.getIntervalSize();
+            newNode.fIntervals.add(interval);
+            newNode.fSizeOfIntervalSection += interval.getIntervalSize();
         }
 
         /* Assign the node's other information we have read previously */
-        newNode.nodeEnd = end;
-        newNode.stringSectionOffset = stringSectionOffset;
-        newNode.isOnDisk = true;
+        newNode.fNodeEnd = end;
+        newNode.fStringSectionOffset = stringSectionOffset;
+        newNode.fIsOnDisk = true;
 
         return newNode;
     }
@@ -233,9 +244,9 @@ public abstract class HTNode {
          * Yes, we are taking the *read* lock here, because we are reading the
          * information in the node to write it to disk.
          */
-        rwl.readLock().lock();
+        fRwl.readLock().lock();
         try {
-            final int blockSize = config.getBlockSize();
+            final int blockSize = fConfig.getBlockSize();
             int curStringsEntryEndPos = blockSize;
 
             ByteBuffer buffer = ByteBuffer.allocate(blockSize);
@@ -243,20 +254,20 @@ public abstract class HTNode {
             buffer.clear();
 
             /* Write the common header part */
-            buffer.put(this.getNodeType().toByte());
-            buffer.putLong(nodeStart);
-            buffer.putLong(nodeEnd);
-            buffer.putInt(sequenceNumber);
-            buffer.putInt(parentSequenceNumber);
-            buffer.putInt(intervals.size());
-            buffer.putInt(stringSectionOffset);
+            buffer.put(getNodeType().toByte());
+            buffer.putLong(fNodeStart);
+            buffer.putLong(fNodeEnd);
+            buffer.putInt(fSequenceNumber);
+            buffer.putInt(fParentSequenceNumber);
+            buffer.putInt(fIntervals.size());
+            buffer.putInt(fStringSectionOffset);
             buffer.put((byte) 1); // TODO Used to be "isDone", to be removed from header
 
             /* Now call the inner method to write the specific header part */
-            this.writeSpecificHeader(buffer);
+            writeSpecificHeader(buffer);
 
             /* Back to us, we write the intervals */
-            for (HTInterval interval : intervals) {
+            for (HTInterval interval : fIntervals) {
                 int size = interval.writeInterval(buffer, curStringsEntryEndPos);
                 curStringsEntryEndPos -= size;
             }
@@ -266,7 +277,7 @@ public abstract class HTNode {
              * of the Strings section (needed to fill the node in case there is
              * no Strings section)
              */
-            while (buffer.position() < stringSectionOffset) {
+            while (buffer.position() < fStringSectionOffset) {
                 buffer.put((byte) 0);
             }
 
@@ -274,7 +285,7 @@ public abstract class HTNode {
              * If the offsets were right, the size of the Strings section should
              * be == to the expected size
              */
-            assert (curStringsEntryEndPos == stringSectionOffset);
+            assert (curStringsEntryEndPos == fStringSectionOffset);
 
             /* Finally, write everything in the Buffer to disk */
 
@@ -286,9 +297,9 @@ public abstract class HTNode {
             assert (res == blockSize);
 
         } finally {
-            rwl.readLock().unlock();
+            fRwl.readLock().unlock();
         }
-        isOnDisk = true;
+        fIsOnDisk = true;
     }
 
     // ------------------------------------------------------------------------
@@ -301,7 +312,7 @@ public abstract class HTNode {
      * @return The history tree config
      */
     protected HTConfig getConfig() {
-        return config;
+        return fConfig;
     }
 
     /**
@@ -310,7 +321,7 @@ public abstract class HTNode {
      * @return The start time of this node
      */
     public long getNodeStart() {
-        return nodeStart;
+        return fNodeStart;
     }
 
     /**
@@ -319,8 +330,8 @@ public abstract class HTNode {
      * @return The end time of this node
      */
     public long getNodeEnd() {
-        if (this.isOnDisk) {
-            return nodeEnd;
+        if (fIsOnDisk) {
+            return fNodeEnd;
         }
         return 0;
     }
@@ -331,7 +342,7 @@ public abstract class HTNode {
      * @return The sequence number of this node
      */
     public int getSequenceNumber() {
-        return sequenceNumber;
+        return fSequenceNumber;
     }
 
     /**
@@ -340,7 +351,7 @@ public abstract class HTNode {
      * @return The parent sequence number
      */
     public int getParentSequenceNumber() {
-        return parentSequenceNumber;
+        return fParentSequenceNumber;
     }
 
     /**
@@ -351,7 +362,7 @@ public abstract class HTNode {
      *            The sequence number of the node that is the new parent
      */
     public void setParentSequenceNumber(int newParent) {
-        parentSequenceNumber = newParent;
+        fParentSequenceNumber = newParent;
     }
 
     /**
@@ -360,7 +371,7 @@ public abstract class HTNode {
      * @return If this node is done or not
      */
     public boolean isOnDisk() {
-        return isOnDisk;
+        return fIsOnDisk;
     }
 
     /**
@@ -370,24 +381,24 @@ public abstract class HTNode {
      *            Interval to add to this node
      */
     public void addInterval(HTInterval newInterval) {
-        rwl.writeLock().lock();
+        fRwl.writeLock().lock();
         try {
             /* Just in case, should be checked before even calling this function */
-            assert (newInterval.getIntervalSize() <= this.getNodeFreeSpace());
+            assert (newInterval.getIntervalSize() <= getNodeFreeSpace());
 
             /* Find the insert position to keep the list sorted */
-            int index = intervals.size();
-            while (index > 0 && newInterval.compareTo(intervals.get(index - 1)) < 0) {
+            int index = fIntervals.size();
+            while (index > 0 && newInterval.compareTo(fIntervals.get(index - 1)) < 0) {
                 index--;
             }
 
-            intervals.add(index, newInterval);
-            sizeOfIntervalSection += newInterval.getIntervalSize();
+            fIntervals.add(index, newInterval);
+            fSizeOfIntervalSection += newInterval.getIntervalSize();
 
             /* Update the in-node offset "pointer" */
-            stringSectionOffset -= (newInterval.getStringsEntrySize());
+            fStringSectionOffset -= (newInterval.getStringsEntrySize());
         } finally {
-            rwl.writeLock().unlock();
+            fRwl.writeLock().unlock();
         }
     }
 
@@ -399,22 +410,22 @@ public abstract class HTNode {
      *            The nodeEnd time that the node will have
      */
     public void closeThisNode(long endtime) {
-        rwl.writeLock().lock();
+        fRwl.writeLock().lock();
         try {
-            assert (endtime >= this.nodeStart);
+            assert (endtime >= fNodeStart);
 
-            if (!intervals.isEmpty()) {
+            if (!fIntervals.isEmpty()) {
                 /*
                  * Make sure there are no intervals in this node with their
                  * EndTime > the one requested. Only need to check the last one
                  * since they are sorted
                  */
-                assert (endtime >= intervals.get(intervals.size() - 1).getEndTime());
+                assert (endtime >= fIntervals.get(fIntervals.size() - 1).getEndTime());
             }
 
-            this.nodeEnd = endtime;
+            fNodeEnd = endtime;
         } finally {
-            rwl.writeLock().unlock();
+            fRwl.writeLock().unlock();
         }
     }
 
@@ -434,9 +445,9 @@ public abstract class HTNode {
     public void writeInfoFromNode(List<ITmfStateInterval> stateInfo, long t)
             throws TimeRangeException {
         /* This is from a state system query, we are "reading" this node */
-        rwl.readLock().lock();
+        fRwl.readLock().lock();
         try {
-            for (int i = getStartIndexFor(t); i < intervals.size(); i++) {
+            for (int i = getStartIndexFor(t); i < fIntervals.size(); i++) {
                 /*
                  * Now we only have to compare the Start times, since we now the
                  * End times necessarily fit.
@@ -445,14 +456,14 @@ public abstract class HTNode {
                  * been created after stateInfo was instantiated (they would be
                  * null anyway).
                  */
-                ITmfStateInterval interval = intervals.get(i);
+                ITmfStateInterval interval = fIntervals.get(i);
                 if (interval.getStartTime() <= t &&
                         interval.getAttribute() < stateInfo.size()) {
                     stateInfo.set(interval.getAttribute(), interval);
                 }
             }
         } finally {
-            rwl.readLock().unlock();
+            fRwl.readLock().unlock();
         }
     }
 
@@ -470,10 +481,10 @@ public abstract class HTNode {
      *             If 't' is invalid
      */
     public HTInterval getRelevantInterval(int key, long t) throws TimeRangeException {
-        rwl.readLock().lock();
+        fRwl.readLock().lock();
         try {
-            for (int i = getStartIndexFor(t); i < intervals.size(); i++) {
-                HTInterval curInterval = intervals.get(i);
+            for (int i = getStartIndexFor(t); i < fIntervals.size(); i++) {
+                HTInterval curInterval = fIntervals.get(i);
                 if (curInterval.getAttribute() == key
                         && curInterval.getStartTime() <= t
                         && curInterval.getEndTime() >= t) {
@@ -485,14 +496,14 @@ public abstract class HTNode {
             return null;
 
         } finally {
-            rwl.readLock().unlock();
+            fRwl.readLock().unlock();
         }
     }
 
     private int getStartIndexFor(long t) throws TimeRangeException {
         /* Should only be called by methods with the readLock taken */
 
-        if (intervals.isEmpty()) {
+        if (fIntervals.isEmpty()) {
             return 0;
         }
         /*
@@ -501,7 +512,7 @@ public abstract class HTNode {
          * provides a .binarySearch method, but its API is quite weird...
          */
         HTInterval dummy = new HTInterval(0, t, 0, TmfStateValue.nullValue());
-        int index = Collections.binarySearch(intervals, dummy);
+        int index = Collections.binarySearch(fIntervals, dummy);
 
         if (index < 0) {
             /*
@@ -517,8 +528,8 @@ public abstract class HTNode {
         if (index < 0) {
             index = 0;
         }
-        if (index >= intervals.size()) {
-            index = intervals.size() - 1;
+        if (index >= fIntervals.size()) {
+            index = fIntervals.size() - 1;
         }
 
         /*
@@ -528,23 +539,12 @@ public abstract class HTNode {
          * again.
          */
         while (index > 0
-                && intervals.get(index - 1).compareTo(intervals.get(index)) == 0) {
+                && fIntervals.get(index - 1).compareTo(fIntervals.get(index)) == 0) {
             index--;
         }
 
         return index;
     }
-
-    /**
-     * <pre>
-     *  1 - byte (type)
-     * 16 - 2x long (start time, end time)
-     * 16 - 4x int (seq number, parent seq number, intervalcount,
-     *              strings section pos.)
-     *  1 - byte (done or not)
-     * </pre>
-     */
-    private static final int COMMON_HEADER_SIZE = 34;
 
     /**
      * Return the total header size of this node (will depend on the node type).
@@ -559,7 +559,7 @@ public abstract class HTNode {
      * @return The offset, within the node, where the Data section ends
      */
     private int getDataSectionEndOffset() {
-        return this.getTotalHeaderSize() + sizeOfIntervalSection;
+        return getTotalHeaderSize() + fSizeOfIntervalSection;
     }
 
     /**
@@ -569,9 +569,9 @@ public abstract class HTNode {
      * @return The amount of free space in the node (in bytes)
      */
     public int getNodeFreeSpace() {
-        rwl.readLock().lock();
-        int ret = stringSectionOffset - this.getDataSectionEndOffset();
-        rwl.readLock().unlock();
+        fRwl.readLock().lock();
+        int ret = fStringSectionOffset - getDataSectionEndOffset();
+        fRwl.readLock().unlock();
 
         return ret;
     }
@@ -584,16 +584,16 @@ public abstract class HTNode {
      *         in this node.
      */
     public long getNodeUsagePercent() {
-        rwl.readLock().lock();
+        fRwl.readLock().lock();
         try {
-            final int blockSize = config.getBlockSize();
-            float freePercent = (float) this.getNodeFreeSpace()
-                    / (float) (blockSize - this.getTotalHeaderSize())
+            final int blockSize = fConfig.getBlockSize();
+            float freePercent = (float) getNodeFreeSpace()
+                    / (float) (blockSize - getTotalHeaderSize())
                     * 100F;
             return (long) (100L - freePercent);
 
         } finally {
-            rwl.readLock().unlock();
+            fRwl.readLock().unlock();
         }
     }
 
@@ -605,14 +605,14 @@ public abstract class HTNode {
     @Override
     public String toString() {
         /* Only used for debugging, shouldn't be externalized */
-        StringBuffer buf = new StringBuffer("Node #" + sequenceNumber + ", ");
-        buf.append(this.toStringSpecific());
-        buf.append(intervals.size() + " intervals (" + this.getNodeUsagePercent()
+        StringBuffer buf = new StringBuffer("Node #" + fSequenceNumber + ", ");
+        buf.append(toStringSpecific());
+        buf.append(fIntervals.size() + " intervals (" + getNodeUsagePercent()
                 + "% used), ");
 
-        buf.append("[" + this.nodeStart + " - ");
-        if (this.isOnDisk) {
-            buf = buf.append("" + this.nodeEnd + "]");
+        buf.append("[" + fNodeStart + " - ");
+        if (fIsOnDisk) {
+            buf = buf.append("" + fNodeEnd + "]");
         } else {
             buf = buf.append("...]");
         }
@@ -628,10 +628,10 @@ public abstract class HTNode {
     @SuppressWarnings("nls")
     public void debugPrintIntervals(PrintWriter writer) {
         /* Only used for debugging, shouldn't be externalized */
-        writer.println("Node #" + sequenceNumber + ":");
+        writer.println("Node #" + fSequenceNumber + ":");
 
         /* Array of children */
-        if (this.getNodeType() == NodeType.CORE) { /* Only Core Nodes can have children */
+        if (getNodeType() == NodeType.CORE) { /* Only Core Nodes can have children */
             CoreNode thisNode = (CoreNode) this;
             writer.print("  " + thisNode.getNbChildren() + " children");
             if (thisNode.getNbChildren() >= 1) {
@@ -646,8 +646,8 @@ public abstract class HTNode {
 
         /* List of intervals in the node */
         writer.println("  Intervals contained:");
-        for (int i = 0; i < intervals.size(); i++) {
-            writer.println(intervals.get(i).toString());
+        for (int i = 0; i < fIntervals.size(); i++) {
+            writer.println(fIntervals.get(i).toString());
         }
         writer.println('\n');
     }
