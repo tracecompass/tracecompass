@@ -94,6 +94,9 @@ public class FilteredCheckboxTree extends FilteredTree implements ICheckable {
         job.addJobChangeListener(new JobChangeAdapter() {
             @Override
             public void done(IJobChangeEvent event) {
+                if (fCheckboxTreeViewer.getTree().isDisposed()) {
+                    return;
+                }
                 fCheckboxTreeViewer.expandAll();
                 fCheckboxTreeViewer.setCheckedElements(getCheckedElements());
             }
