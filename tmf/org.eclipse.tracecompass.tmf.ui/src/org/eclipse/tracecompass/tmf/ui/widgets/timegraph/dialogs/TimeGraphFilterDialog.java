@@ -302,6 +302,9 @@ public class TimeGraphFilterDialog extends SelectionStatusDialog {
                 if (fExpandedElements != null) {
                     fTree.getViewer().setExpandedElements(fExpandedElements);
                 }
+                for (TreeColumn column : fTree.getViewer().getTree().getColumns()) {
+                    column.pack();
+                }
                 updateOKStatus();
             }
         });
@@ -344,7 +347,6 @@ public class TimeGraphFilterDialog extends SelectionStatusDialog {
         for (String columnName : fColumnNames) {
             TreeColumn column = new TreeColumn(tree, SWT.LEFT);
             column.setText(columnName);
-            column.pack();
         }
 
         fTree.getViewer().setContentProvider(fContentProvider);
@@ -357,11 +359,6 @@ public class TimeGraphFilterDialog extends SelectionStatusDialog {
             }
         }
         fTree.getViewer().setInput(fInput);
-
-        // pack the columns again for a nice view...
-        for (TreeColumn column : tree.getColumns()) {
-            column.pack();
-        }
         return (CheckboxTreeViewer) fTree.getViewer();
     }
 
