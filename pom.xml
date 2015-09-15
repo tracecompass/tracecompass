@@ -435,6 +435,11 @@
           <version>0.22.0</version>
         </plugin>
         <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>sonar-maven-plugin</artifactId>
+          <version>2.6</version>
+        </plugin>
+        <plugin>
                 <groupId>org.eclipse.tycho.extras</groupId>
                 <artifactId>tycho-eclipserun-plugin</artifactId>
                 <version>${tycho-extras-version}</version>
