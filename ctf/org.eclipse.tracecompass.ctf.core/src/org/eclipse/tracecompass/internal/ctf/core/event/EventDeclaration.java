@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
@@ -407,35 +408,19 @@ public class EventDeclaration implements IEventDeclaration {
             return false;
         }
         EventDeclaration other = (EventDeclaration) obj;
-        if (fContext == null) {
-            if (other.fContext != null) {
-                return false;
-            }
-        } else if (!fContext.equals(other.fContext)) {
-            return false;
-        }
-        if (fFields == null) {
-            if (other.fFields != null) {
-                return false;
-            }
-        } else if (!fFields.equals(other.fFields)) {
-            return false;
-        }
         if (fId != (other.fId)) {
             return false;
         }
-        if (fName == null) {
-            if (other.fName != null) {
-                return false;
-            }
-        } else if (!fName.equals(other.fName)) {
+        if (!NonNullUtils.equalsNullable(fContext, other.fContext)) {
             return false;
         }
-        if (fStream == null) {
-            if (other.fStream != null) {
-                return false;
-            }
-        } else if (!fStream.equals(other.fStream)) {
+        if (!NonNullUtils.equalsNullable(fFields, other.fFields)) {
+            return false;
+        }
+        if (!NonNullUtils.equalsNullable(fName, other.fName)) {
+            return false;
+        }
+        if (!NonNullUtils.equalsNullable(fStream, other.fStream)) {
             return false;
         }
         if (!fCustomAttributes.equals(other.fCustomAttributes)) {
