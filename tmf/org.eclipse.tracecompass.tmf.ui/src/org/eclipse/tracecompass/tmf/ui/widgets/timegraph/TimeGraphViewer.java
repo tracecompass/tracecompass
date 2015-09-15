@@ -24,6 +24,8 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -51,6 +53,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.ShowFilterDialogAction;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TimeGraphLegend;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -134,6 +137,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     private Action fHideArrowsAction;
     private Action fFollowArrowFwdAction;
     private Action fFollowArrowBwdAction;
+    private ShowFilterDialogAction fShowFilterDialogAction;
 
     private ListenerNotifier fListenerNotifier;
 
@@ -252,6 +256,36 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         fTimeGraphCtrl.setTimeGraphProvider(timeGraphProvider);
         fToolTipHandler = new TimeGraphTooltipHandler(fTimeGraphProvider, fTimeDataProvider);
         fToolTipHandler.activateHoverHelp(fTimeGraphCtrl);
+    }
+
+    /**
+     * Sets the tree columns for this time graph combo's filter dialog.
+     *
+     * @param columnNames the tree column names
+     * @since 2.0
+     */
+    public void setFilterColumns(String[] columnNames) {
+        getShowFilterDialogAction().getFilterDialog().setColumnNames(columnNames);
+    }
+
+    /**
+     * Sets the tree content provider used by the filter dialog
+     *
+     * @param contentProvider the tree content provider
+     * @since 2.0
+     */
+    public void setFilterContentProvider(ITreeContentProvider contentProvider) {
+        getShowFilterDialogAction().getFilterDialog().setContentProvider(contentProvider);
+    }
+
+    /**
+     * Sets the tree label provider used by the filter dialog
+     *
+     * @param labelProvider the tree label provider
+     * @since 2.0
+     */
+    public void setFilterLabelProvider(ITableLabelProvider labelProvider) {
+        getShowFilterDialogAction().getFilterDialog().setLabelProvider(labelProvider);
     }
 
     /**
@@ -1804,6 +1838,19 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             }
         }
         return fFollowArrowBwdAction;
+    }
+
+    /**
+     * Get the show filter dialog action.
+     *
+     * @return The Action object
+     * @since 2.0
+     */
+    public ShowFilterDialogAction getShowFilterDialogAction() {
+        if (fShowFilterDialogAction == null) {
+            fShowFilterDialogAction = new ShowFilterDialogAction(this);
+        }
+        return fShowFilterDialogAction;
     }
 
     private void adjustHorizontalScrollBar() {

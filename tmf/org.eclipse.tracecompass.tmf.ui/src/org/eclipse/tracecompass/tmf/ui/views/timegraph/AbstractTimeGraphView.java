@@ -38,6 +38,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
@@ -179,11 +180,13 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     private interface ITimeGraphWrapper {
 
-        void setTimeGraphProvider(TimeGraphPresentationProvider fPresentation);
+        void setTimeGraphContentProvider(ITimeGraphContentProvider timeGraphContentProvider);
+
+        void setTimeGraphPresentationProvider(TimeGraphPresentationProvider timeGraphPresentationProvider);
 
         TimeGraphViewer getTimeGraphViewer();
 
-        void addSelectionListener(ITimeGraphSelectionListener iTimeGraphSelectionListener);
+        void addSelectionListener(ITimeGraphSelectionListener listener);
 
         ISelectionProvider getSelectionProvider();
 
@@ -207,6 +210,14 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         void setAutoExpandLevel(int level);
 
+        void setFilterColumns(String[] columnNames);
+
+        void setFilterContentProvider(ITreeContentProvider contentProvider);
+
+        void setFilterLabelProvider(ITableLabelProvider labelProvider);
+
+        IAction getShowFilterDialogAction();
+
         void performAlign(int offset, int width);
 
         TmfTimeViewAlignmentInfo getTimeViewAlignmentInfo();
@@ -222,8 +233,13 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
 
         @Override
-        public void setTimeGraphProvider(TimeGraphPresentationProvider timeGraphProvider) {
-            viewer.setTimeGraphProvider(timeGraphProvider);
+        public void setTimeGraphContentProvider(ITimeGraphContentProvider timeGraphContentProvider) {
+            viewer.setTimeGraphContentProvider(timeGraphContentProvider);
+        }
+
+        @Override
+        public void setTimeGraphPresentationProvider(TimeGraphPresentationProvider timeGraphPresentationProvider) {
+            viewer.setTimeGraphProvider(timeGraphPresentationProvider);
         }
 
         @Override
@@ -262,6 +278,21 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
 
         @Override
+        public void setFilterColumns(String[] columnNames) {
+            viewer.setFilterColumns(columnNames);
+        }
+
+        @Override
+        public void setFilterContentProvider(ITreeContentProvider contentProvider) {
+            viewer.setFilterContentProvider(contentProvider);
+        }
+
+        @Override
+        public void setFilterLabelProvider(ITableLabelProvider labelProvider) {
+            viewer.setFilterLabelProvider(labelProvider);
+        }
+
+        @Override
         public void setFilters(ViewerFilter[] filters) {
             viewer.setFilters(filters);
         }
@@ -269,6 +300,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         @Override
         public ViewerFilter[] getFilters() {
             return viewer.getFilters();
+        }
+
+        @Override
+        public IAction getShowFilterDialogAction() {
+            return viewer.getShowFilterDialogAction();
         }
 
         @Override
@@ -315,8 +351,13 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
 
         @Override
-        public void setTimeGraphProvider(TimeGraphPresentationProvider timeGraphProvider) {
-            combo.setTimeGraphProvider(timeGraphProvider);
+        public void setTimeGraphContentProvider(ITimeGraphContentProvider timeGraphContentProvider) {
+            combo.setTimeGraphContentProvider(timeGraphContentProvider);
+        }
+
+        @Override
+        public void setTimeGraphPresentationProvider(TimeGraphPresentationProvider timeGraphPresentationProvider) {
+            combo.setTimeGraphProvider(timeGraphPresentationProvider);
         }
 
         @Override
@@ -355,6 +396,21 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
 
         @Override
+        public void setFilterColumns(String[] columnNames) {
+            combo.setFilterColumns(columnNames);
+        }
+
+        @Override
+        public void setFilterContentProvider(ITreeContentProvider contentProvider) {
+            combo.setFilterContentProvider(contentProvider);
+        }
+
+        @Override
+        public void setFilterLabelProvider(ITableLabelProvider labelProvider) {
+            combo.setFilterLabelProvider(labelProvider);
+        }
+
+        @Override
         public void setFilters(ViewerFilter[] filters) {
             combo.setFilters(filters);
         }
@@ -362,6 +418,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         @Override
         public ViewerFilter[] getFilters() {
             return combo.getFilters();
+        }
+
+        @Override
+        public IAction getShowFilterDialogAction() {
+            return combo.getShowFilterDialogAction();
         }
 
         @Override
@@ -390,10 +451,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         TreeViewer getTreeViewer() {
             return combo.getTreeViewer();
-        }
-
-        IAction getShowFilterAction() {
-            return combo.getShowFilterAction();
         }
 
         @Override
@@ -931,8 +988,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         super.createPartControl(parent);
         if (fColumns == null || fLabelProvider == null) {
             fTimeGraphWrapper = new TimeGraphViewerWrapper(parent, SWT.NONE);
-            TimeGraphViewer viewer = fTimeGraphWrapper.getTimeGraphViewer();
-            viewer.setTimeGraphContentProvider(fTimeGraphContentProvider);
         } else {
             TimeGraphComboWrapper wrapper = new TimeGraphComboWrapper(parent, SWT.NONE);
             fTimeGraphWrapper = wrapper;
@@ -940,13 +995,13 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             combo.setTreeContentProvider(fTimeGraphContentProvider);
             combo.setTreeLabelProvider(fLabelProvider);
             combo.setTreeColumns(fColumns);
-            combo.setFilterContentProvider(fTimeGraphContentProvider);
-            combo.setFilterLabelProvider(fFilterLabelProvider);
-            combo.setFilterColumns(fFilterColumns);
-            combo.setTimeGraphContentProvider(fTimeGraphContentProvider);
         }
+        fTimeGraphWrapper.setTimeGraphContentProvider(fTimeGraphContentProvider);
+        fTimeGraphWrapper.setFilterContentProvider(fTimeGraphContentProvider);
+        fTimeGraphWrapper.setFilterLabelProvider(fFilterLabelProvider);
+        fTimeGraphWrapper.setFilterColumns(fFilterColumns);
 
-        fTimeGraphWrapper.setTimeGraphProvider(fPresentation);
+        fTimeGraphWrapper.setTimeGraphPresentationProvider(fPresentation);
         fTimeGraphWrapper.setAutoExpandLevel(fAutoExpandLevel);
 
         fTimeGraphWrapper.getTimeGraphViewer().addRangeListener(new ITimeGraphRangeListener() {
@@ -1401,10 +1456,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @param manager the tool bar manager
      */
     protected void fillLocalToolBar(IToolBarManager manager) {
-        if (fTimeGraphWrapper instanceof TimeGraphComboWrapper) {
-            if (fFilterColumns != null && fFilterLabelProvider != null && fFilterColumns.length > 0) {
-                manager.add(((TimeGraphComboWrapper) fTimeGraphWrapper).getShowFilterAction());
-            }
+        if (fFilterColumns != null && fFilterLabelProvider != null && fFilterColumns.length > 0) {
+            manager.add(fTimeGraphWrapper.getShowFilterDialogAction());
         }
         manager.add(fTimeGraphWrapper.getTimeGraphViewer().getShowLegendAction());
         manager.add(new Separator());

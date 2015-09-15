@@ -98,8 +98,8 @@ public class Messages extends NLS {
     public static String TmfTimeTipHandler_TRACE_STATE;
     public static String TmfTimeTipHandler_TRACE_STOP_TIME;
 
-    public static String TmfTimeGraphCombo_FilterActionNameText;
-    public static String TmfTimeGraphCombo_FilterActionToolTipText;
+    public static String ShowFilterDialogAction_FilterActionNameText;
+    public static String ShowFilterDialogAction_FilterActionToolTipText;
 
     public static String TmfTimeGraphViewer_ResetScaleActionNameText;
     public static String TmfTimeGraphViewer_ResetScaleActionToolTipText;
