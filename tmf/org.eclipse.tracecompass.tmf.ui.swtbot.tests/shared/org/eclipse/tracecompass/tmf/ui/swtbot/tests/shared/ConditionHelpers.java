@@ -17,6 +17,8 @@ package org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared;
 
 import static org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory.withPartName;
 
+import java.util.Arrays;
+
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
@@ -87,6 +89,12 @@ public final class ConditionHelpers {
                 }
                 return false;
             }
+
+            @Override
+            public String getFailureMessage() {
+                return NLS.bind("No child of tree {0} found with text '{1}'. Child items: {2}",
+                        new String[] { tree.toString(), name, Arrays.toString(tree.getAllItems()) });
+            }
         };
     }
 
@@ -109,6 +117,11 @@ public final class ConditionHelpers {
                 }
                 return false;
             }
+
+            @Override
+            public String getFailureMessage() {
+                return NLS.bind("No child of table {0} found with text '{1}'.", table, name);
+            }
         };
     }
 
@@ -130,6 +143,12 @@ public final class ConditionHelpers {
                 } catch (Exception e) {
                 }
                 return false;
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return NLS.bind("No child of tree item {0} found with text '{1}'. Child items: {2}",
+                        new String[] { treeItem.toString(), name, Arrays.toString(treeItem.getItems()) });
             }
         };
     }
