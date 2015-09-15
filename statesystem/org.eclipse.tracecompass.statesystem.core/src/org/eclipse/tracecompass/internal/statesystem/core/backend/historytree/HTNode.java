@@ -28,6 +28,8 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 
+import com.google.common.collect.Iterables;
+
 /**
  * The base class for all the types of nodes that go in the History Tree.
  *
@@ -285,7 +287,9 @@ public abstract class HTNode {
              * If the offsets were right, the size of the Strings section should
              * be == to the expected size
              */
-            assert (curStringsEntryEndPos == fStringSectionOffset);
+            if (curStringsEntryEndPos != fStringSectionOffset) {
+                throw new IllegalStateException("Wrong size of Strings section: Actual: " + curStringsEntryEndPos + ", Expected: " + fStringSectionOffset); //$NON-NLS-1$ //$NON-NLS-2$
+            }
 
             /* Finally, write everything in the Buffer to disk */
 
@@ -294,7 +298,9 @@ public abstract class HTNode {
 
             buffer.flip();
             int res = fc.write(buffer);
-            assert (res == blockSize);
+            if (res != blockSize) {
+                throw new IllegalStateException("Wrong size of block written: Actual: " + res + ", Expected: " + blockSize); //$NON-NLS-1$ //$NON-NLS-2$
+            }
 
         } finally {
             fRwl.readLock().unlock();
@@ -412,7 +418,13 @@ public abstract class HTNode {
     public void closeThisNode(long endtime) {
         fRwl.writeLock().lock();
         try {
-            assert (endtime >= fNodeStart);
+            /**
+             * FIXME: was assert (endtime >= fNodeStart); but that exception
+             * is reached with an empty node that has start time endtime + 1
+             */
+//            if (endtime < fNodeStart) {
+//                throw new IllegalArgumentException("Endtime " + endtime + " cannot be lower than start time " + fNodeStart);
+//            }
 
             if (!fIntervals.isEmpty()) {
                 /*
@@ -420,7 +432,9 @@ public abstract class HTNode {
                  * EndTime > the one requested. Only need to check the last one
                  * since they are sorted
                  */
-                assert (endtime >= fIntervals.get(fIntervals.size() - 1).getEndTime());
+                if (endtime < Iterables.getLast(fIntervals).getEndTime()) {
+                    throw new IllegalArgumentException("Closing end time should be greater than or equal to the end time of the intervals of this node"); //$NON-NLS-1$
+                }
             }
 
             fNodeEnd = endtime;

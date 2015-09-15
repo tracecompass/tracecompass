@@ -322,7 +322,10 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         }
 
         ret = total / fSht.getNodeCount();
-        assert (ret >= 0 && ret <= 100);
+        /* The return value should be a percentage */
+        if (ret >= 0 && ret <= 100) {
+            throw new IllegalStateException("Average node usage is not a percentage: " + ret); //$NON-NLS-1$
+        }
         return (int) ret;
     }
 

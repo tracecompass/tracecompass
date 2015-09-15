@@ -474,7 +474,6 @@ public class HistoryTree {
              * No, this interval starts before the startTime of this node. We
              * need to check recursively in parents if it can fit.
              */
-            assert (indexOfNode >= 1);
             tryInsertAtNode(interval, indexOfNode - 1);
             return;
         }
@@ -663,7 +662,9 @@ public class HistoryTree {
          * Once we exit this loop, we should have found a children to follow. If
          * we didn't, there's a problem.
          */
-        assert (potentialNextSeqNb != currentNode.getSequenceNumber());
+        if (potentialNextSeqNb == currentNode.getSequenceNumber()) {
+            throw new IllegalStateException("No next child node found"); //$NON-NLS-1$
+        }
 
         /*
          * Since this code path is quite performance-critical, avoid iterating
