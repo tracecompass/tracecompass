@@ -64,15 +64,12 @@ import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.tracecompass.internal.tmf.ui.Activator;
-import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
-import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
 import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.ITimeGraphEntryActiveProvider;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TimeGraphFilterDialog;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.ShowFilterDialogAction;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 
@@ -123,11 +120,8 @@ public class TimeGraphCombo extends Composite {
     /** Calculated item height for Linux workaround */
     private int fLinuxItemHeight = 0;
 
-    /** The button that opens the filter dialog */
-    private Action showFilterAction;
-
-    /** The filter dialog */
-    private TimeGraphFilterDialog fFilterDialog;
+    /** The action that opens the filter dialog */
+    private ShowFilterDialogAction fShowFilterDialogAction;
 
     /** Default weight of each part of the sash */
     private static final int[] DEFAULT_WEIGHTS = { 1, 1 };
@@ -314,32 +308,6 @@ public class TimeGraphCombo extends Composite {
 
     }
 
-    /**
-     * This filter simply keeps a list of elements that should be filtered out.
-     * All the other elements will be shown.
-     * By default and when the list is set to null, all elements are shown.
-     */
-    private class RawViewerFilter extends ViewerFilter {
-
-        private List<Object> fFiltered = null;
-
-        public void setFiltered(List<Object> objects) {
-            fFiltered = objects;
-        }
-
-        public List<Object> getFiltered() {
-            return fFiltered;
-        }
-
-        @Override
-        public boolean select(Viewer viewer, Object parentElement, Object element) {
-            if (fFiltered == null) {
-                return true;
-            }
-            return !fFiltered.contains(element);
-        }
-    }
-
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -384,8 +352,6 @@ public class TimeGraphCombo extends Composite {
         fTimeGraphViewer.setHeaderHeight(tree.getHeaderHeight());
         fTimeGraphViewer.setBorderWidth(tree.getBorderWidth());
         fTimeGraphViewer.setNameWidthPref(0);
-
-        fFilterDialog = new TimeGraphFilterDialog(getShell());
 
         // Feature in Windows. The tree vertical bar reappears when
         // the control is resized so we need to hide it again.
@@ -691,79 +657,53 @@ public class TimeGraphCombo extends Composite {
 
     /**
      * Callback for the show filter action
+     * @deprecated Use {@link ShowFilterDialogAction#run()}
      */
+    @Deprecated
     public void showFilterDialog() {
-        ITimeGraphEntry[] topInput = fTimeGraphViewer.getTimeGraphContentProvider().getElements(fTimeGraphViewer.getInput());
-        if (topInput != null) {
-            List<? extends ITimeGraphEntry> allElements = listAllInputs(Arrays.asList(topInput));
-            fFilterDialog.setInput(fTimeGraphViewer.getInput());
-            fFilterDialog.setTitle(Messages.TmfTimeFilterDialog_WINDOW_TITLE);
-            fFilterDialog.setMessage(Messages.TmfTimeFilterDialog_MESSAGE);
-            fFilterDialog.setExpandedElements(allElements.toArray());
-            RawViewerFilter rawViewerFilter = null;
-            for (ViewerFilter filter : fTimeGraphViewer.getFilters()) {
-                if (filter instanceof RawViewerFilter) {
-                    rawViewerFilter = (RawViewerFilter) filter;
-                }
-            }
-            if (rawViewerFilter != null && rawViewerFilter.getFiltered() != null) {
-                ArrayList<? extends ITimeGraphEntry> nonFilteredElements = new ArrayList<>(allElements);
-                nonFilteredElements.removeAll(rawViewerFilter.getFiltered());
-                fFilterDialog.setInitialElementSelections(nonFilteredElements);
-            } else {
-                fFilterDialog.setInitialElementSelections(allElements);
-            }
-            fFilterDialog.create();
-            fFilterDialog.open();
-            // Process selected elements
-            if (fFilterDialog.getResult() != null) {
-                fInhibitTreeSelection = true;
-                if (fFilterDialog.getResult().length != allElements.size()) {
-                    ArrayList<Object> filteredElements = new ArrayList<Object>(allElements);
-                    filteredElements.removeAll(Arrays.asList(fFilterDialog.getResult()));
-                    if (rawViewerFilter == null) {
-                        rawViewerFilter = new RawViewerFilter();
-                        addFilter(rawViewerFilter);
-                    }
-                    rawViewerFilter.setFiltered(filteredElements);
-                } else if (rawViewerFilter != null) {
-                    removeFilter(rawViewerFilter);
-                }
-                fTreeViewer.refresh();
-                fTreeViewer.expandAll();
-                fTimeGraphViewer.refresh();
-                fTimeGraphViewer.expandAll();
-                fInhibitTreeSelection = false;
-                alignTreeItems(true);
-                // Reset selection
-                if (fFilterDialog.getResult().length > 0) {
-                    setSelection(null);
-                }
-            }
-        }
+        getShowFilterDialogAction().run();
     }
 
     /**
      * Get the show filter action.
      *
      * @return The Action object
+     * @deprecated Use {@link #getShowFilterDialogAction()}
      */
+    @Deprecated
     public Action getShowFilterAction() {
-        if (showFilterAction == null) {
-            // showFilter
-            showFilterAction = new Action() {
+        return getShowFilterDialogAction();
+    }
+
+    /**
+     * Get the show filter dialog action.
+     *
+     * @return The Action object
+     * @since 1.1
+     */
+    public ShowFilterDialogAction getShowFilterDialogAction() {
+        if (fShowFilterDialogAction == null) {
+            fShowFilterDialogAction = new ShowFilterDialogAction(fTimeGraphViewer) {
                 @Override
-                public void run() {
-                    showFilterDialog();
+                protected void addFilter(ViewerFilter filter) {
+                    /* add filter to the combo instead of the viewer */
+                    TimeGraphCombo.this.addFilter(filter);
+                }
+
+                @Override
+                protected void removeFilter(ViewerFilter filter) {
+                    /* remove filter from the combo instead of the viewer */
+                    TimeGraphCombo.this.removeFilter(filter);
+                }
+
+                @Override
+                protected void refresh() {
+                    /* refresh the combo instead of the viewer */
+                    TimeGraphCombo.this.refresh();
                 }
             };
-            showFilterAction.setText(Messages.TmfTimeGraphCombo_FilterActionNameText);
-            showFilterAction.setToolTipText(Messages.TmfTimeGraphCombo_FilterActionToolTipText);
-            // TODO find a nice, distinctive icon
-            showFilterAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_FILTERS));
         }
-
-        return showFilterAction;
+        return fShowFilterDialogAction;
     }
 
     // ------------------------------------------------------------------------
@@ -804,7 +744,7 @@ public class TimeGraphCombo extends Composite {
      * @param contentProvider the tree content provider
      */
     public void setFilterContentProvider(ITreeContentProvider contentProvider) {
-        fFilterDialog.setContentProvider(contentProvider);
+        getShowFilterDialogAction().getFilterDialog().setContentProvider(contentProvider);
     }
 
     /**
@@ -813,7 +753,7 @@ public class TimeGraphCombo extends Composite {
      * @param labelProvider the tree label provider
      */
     public void setFilterLabelProvider(ITableLabelProvider labelProvider) {
-        fFilterDialog.setLabelProvider(labelProvider);
+        getShowFilterDialogAction().getFilterDialog().setLabelProvider(labelProvider);
     }
 
     /**
@@ -824,7 +764,7 @@ public class TimeGraphCombo extends Composite {
      * @since 1.0
      */
     public void addTimeGraphFilterCheckActiveButton(ITimeGraphEntryActiveProvider activeProvider) {
-        fFilterDialog.addTimeGraphFilterCheckActiveButton(activeProvider);
+        getShowFilterDialogAction().getFilterDialog().addTimeGraphFilterCheckActiveButton(activeProvider);
     }
 
     /**
@@ -835,7 +775,7 @@ public class TimeGraphCombo extends Composite {
      * @since 1.0
      */
     public void addTimeGraphFilterUncheckInactiveButton(ITimeGraphEntryActiveProvider inactiveProvider) {
-        fFilterDialog.addTimeGraphFilterUncheckInactiveButton(inactiveProvider);
+        getShowFilterDialogAction().getFilterDialog().addTimeGraphFilterUncheckInactiveButton(inactiveProvider);
     }
 
     /**
@@ -858,7 +798,7 @@ public class TimeGraphCombo extends Composite {
      * @param columnNames the tree column names
      */
     public void setFilterColumns(String[] columnNames) {
-        fFilterDialog.setColumnNames(columnNames);
+        getShowFilterDialogAction().getFilterDialog().setColumnNames(columnNames);
     }
 
     /**
@@ -928,22 +868,26 @@ public class TimeGraphCombo extends Composite {
      * @param filter The filter object to be attached to the view
      */
     public void addFilter(ViewerFilter filter) {
+        fInhibitTreeSelection = true;
         ViewerFilter wrapper = new ViewerFilterWrapper(filter);
         fTreeViewer.addFilter(wrapper);
         fTimeGraphViewer.addFilter(filter);
         fViewerFilterMap.put(filter, wrapper);
         alignTreeItems(true);
+        fInhibitTreeSelection = false;
     }
 
     /**
      * @param filter The filter object to be removed from the view
      */
     public void removeFilter(ViewerFilter filter) {
+        fInhibitTreeSelection = true;
         ViewerFilter wrapper = fViewerFilterMap.get(filter);
         fTreeViewer.removeFilter(wrapper);
         fTimeGraphViewer.removeFilter(filter);
         fViewerFilterMap.remove(filter);
         alignTreeItems(true);
+        fInhibitTreeSelection = false;
     }
 
     /**
@@ -965,6 +909,7 @@ public class TimeGraphCombo extends Composite {
      * @since 1.1
      */
     public void setFilters(ViewerFilter[] filters) {
+        fInhibitTreeSelection = true;
         fViewerFilterMap.clear();
         if (filters == null) {
             fTreeViewer.resetFilters();
@@ -978,6 +923,7 @@ public class TimeGraphCombo extends Composite {
         }
         fTimeGraphViewer.setFilters(filters);
         alignTreeItems(true);
+        fInhibitTreeSelection = false;
     }
 
     /**
@@ -1133,23 +1079,6 @@ public class TimeGraphCombo extends Composite {
                 addVisibleExpandedItems(visibleExpandedItems, item.getItems());
             }
         }
-    }
-
-    /**
-     * Explores the list of top-level inputs and returns all the inputs
-     *
-     * @param inputs The top-level inputs
-     * @return All the inputs
-     */
-    private List<? extends ITimeGraphEntry> listAllInputs(List<? extends ITimeGraphEntry> inputs) {
-        ArrayList<ITimeGraphEntry> items = new ArrayList<>();
-        for (ITimeGraphEntry entry : inputs) {
-            items.add(entry);
-            if (entry.hasChildren()) {
-                items.addAll(listAllInputs(entry.getChildren()));
-            }
-        }
-        return items;
     }
 
     private int getItemHeight(final Tree tree) {
