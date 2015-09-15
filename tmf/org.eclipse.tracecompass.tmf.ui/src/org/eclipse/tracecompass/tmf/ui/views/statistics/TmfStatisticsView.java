@@ -52,11 +52,13 @@ public class TmfStatisticsView extends TmfView {
     /**
      * The view name.
      */
+    @Deprecated
     public static final String TMF_STATISTICS_VIEW = "StatisticsView"; //$NON-NLS-1$
 
     /**
      * The viewer that builds the columns to show the statistics.
      */
+    @Deprecated
     protected final TmfViewerFolder fStatsViewers;
 
     /**
@@ -69,6 +71,7 @@ public class TmfStatisticsView extends TmfView {
      *
      * @param viewName The name to give to the view.
      */
+    @Deprecated
     public TmfStatisticsView(String viewName) {
         super(viewName);
         /*
@@ -82,11 +85,13 @@ public class TmfStatisticsView extends TmfView {
     /**
      * Default constructor.
      */
+    @Deprecated
     public TmfStatisticsView() {
         this(TMF_STATISTICS_VIEW);
     }
 
     @Override
+    @Deprecated
     public void createPartControl(Composite parent) {
         fStatsViewers.setParent(parent);
         createStatisticsViewers();
@@ -98,6 +103,7 @@ public class TmfStatisticsView extends TmfView {
     }
 
     @Override
+    @Deprecated
     public void dispose() {
         super.dispose();
         fStatsViewers.dispose();
@@ -110,6 +116,7 @@ public class TmfStatisticsView extends TmfView {
      *            Contains the information about the selection.
      */
     @TmfSignalHandler
+    @Deprecated
     public void traceOpened(TmfTraceOpenedSignal signal) {
         /*
          * Dispose the current viewer and adapt the new one to the trace
@@ -131,6 +138,7 @@ public class TmfStatisticsView extends TmfView {
      *            Contains the information about the selection.
      */
     @TmfSignalHandler
+    @Deprecated
     public void traceSelected(TmfTraceSelectedSignal signal) {
         // Does not reload the same trace if already opened
         if (signal.getTrace() != fTrace) {
@@ -169,6 +177,7 @@ public class TmfStatisticsView extends TmfView {
      * @param signal the incoming signal
      */
     @TmfSignalHandler
+    @Deprecated
     public void traceClosed(TmfTraceClosedSignal signal) {
         if (signal.getTrace() != fTrace) {
             return;
@@ -184,6 +193,7 @@ public class TmfStatisticsView extends TmfView {
     }
 
     @Override
+    @Deprecated
     public void setFocus() {
         fStatsViewers.setFocus();
     }
@@ -199,6 +209,7 @@ public class TmfStatisticsView extends TmfView {
      * statistics. If there is no trace selected, a global statistics viewer will
      * still be created.
      */
+    @Deprecated
     protected void createStatisticsViewers() {
         // Default style for the tabs that will be created
         int defaultStyle = SWT.NONE;

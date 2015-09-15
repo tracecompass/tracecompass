@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Mathieu Denis
  */
+@Deprecated
 public class TmfStatisticsTreeNode {
 
     /** Tree to which this node belongs */

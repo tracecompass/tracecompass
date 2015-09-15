@@ -21,6 +21,7 @@ import org.eclipse.jface.viewers.Viewer;
  * @author Mathieu Denis
  * @see org.eclipse.jface.viewers.ITreeContentProvider
  */
+@Deprecated
 public class TmfTreeContentProvider implements ITreeContentProvider {
 
     @Override

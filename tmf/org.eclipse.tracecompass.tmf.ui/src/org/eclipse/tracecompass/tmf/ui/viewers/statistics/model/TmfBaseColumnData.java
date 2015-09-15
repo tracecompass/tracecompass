@@ -22,6 +22,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
  *
  * @author Mathieu Denis
  */
+@Deprecated
 public class TmfBaseColumnData {
 
     /**

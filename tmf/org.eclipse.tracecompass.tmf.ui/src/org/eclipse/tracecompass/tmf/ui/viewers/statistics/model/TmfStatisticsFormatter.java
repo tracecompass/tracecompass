@@ -22,6 +22,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfBaseColumnDat
  *
  * @author Vincent Perot
  */
+@Deprecated
 public final class TmfStatisticsFormatter {
 
     /**

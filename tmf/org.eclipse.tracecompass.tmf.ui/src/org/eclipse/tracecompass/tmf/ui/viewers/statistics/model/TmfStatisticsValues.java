@@ -24,6 +24,7 @@ package org.eclipse.tracecompass.tmf.ui.viewers.statistics.model;
  *
  * @author Mathieu Denis
  */
+@Deprecated
 public class TmfStatisticsValues {
 
     /**

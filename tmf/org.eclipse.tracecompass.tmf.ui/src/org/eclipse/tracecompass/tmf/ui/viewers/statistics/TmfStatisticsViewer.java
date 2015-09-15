@@ -73,6 +73,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.statistics.model.TmfTreeContentPr
  *
  * @author Mathieu Denis
  */
+@Deprecated
 public class TmfStatisticsViewer extends TmfViewer {
 
     /** Timestamp scale used for all statistics (nanosecond) */

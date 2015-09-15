@@ -22,6 +22,7 @@ package org.eclipse.tracecompass.tmf.ui.viewers.statistics.model;
  *
  * @author Mathieu Denis
  */
+@Deprecated
 public class TmfStatisticsTree {
 
     /** Header for the event type categories. */

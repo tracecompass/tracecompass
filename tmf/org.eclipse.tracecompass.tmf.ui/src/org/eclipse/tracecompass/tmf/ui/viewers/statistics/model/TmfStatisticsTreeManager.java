@@ -24,6 +24,7 @@ import java.util.Map;
  *
  * @author Mathieu Denis
  */
+@Deprecated
 public class TmfStatisticsTreeManager {
 
     /**
