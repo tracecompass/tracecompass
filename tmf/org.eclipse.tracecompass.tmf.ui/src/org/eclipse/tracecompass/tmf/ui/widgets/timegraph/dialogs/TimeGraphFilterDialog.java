@@ -113,7 +113,6 @@ public class TimeGraphFilterDialog extends SelectionStatusDialog {
      */
     public TimeGraphFilterDialog(Shell parent) {
         super(parent);
-        setResult(new ArrayList<>(0));
         setStatusLineAboveButtons(true);
         setHelpAvailable(false);
         fExpandedElements = null;
@@ -282,14 +281,9 @@ public class TimeGraphFilterDialog extends SelectionStatusDialog {
     @Override
     public int open() {
         fIsEmpty = evaluateIfTreeEmpty(fInput);
+        setResult(null);
         super.open();
         return getReturnCode();
-    }
-
-    @Override
-    protected void cancelPressed() {
-        setResult(null);
-        super.cancelPressed();
     }
 
     @Override
