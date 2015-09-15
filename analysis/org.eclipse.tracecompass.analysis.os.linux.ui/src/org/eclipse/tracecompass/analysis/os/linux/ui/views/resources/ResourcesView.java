@@ -66,6 +66,19 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
     public ResourcesView() {
         super(ID, new ResourcesPresentationProvider());
         setFilterColumns(FILTER_COLUMN_NAMES);
+        setFilterLabelProvider(new ResourcesFilterLabelProvider());
+    }
+
+    private static class ResourcesFilterLabelProvider extends TreeLabelProvider {
+        @Override
+        public String getColumnText(Object element, int columnIndex) {
+            ResourcesEntry entry = (ResourcesEntry) element;
+            if (columnIndex == 0) {
+                return entry.getName();
+            }
+            return ""; //$NON-NLS-1$
+        }
+
     }
 
     // ------------------------------------------------------------------------
