@@ -116,6 +116,8 @@ import org.eclipse.ui.ide.IDE;
 @SuppressWarnings("restriction")
 public class DsfGdbAdaptor {
 
+    private static final Object SESSION_LOCK = new Object();
+
     private GdbTrace fGdbTrace;
 
     private int fNumberOfFrames = 0;
@@ -203,13 +205,13 @@ public class DsfGdbAdaptor {
                         IDMContext context = (IDMContext) contextObject;
                         if (context != null) {
                             String sessionId;
-                            synchronized(fCurrentSessionId) {
+                            synchronized(SESSION_LOCK) {
                                 sessionId = context.getSessionId();
                                 if (sessionId.equals(fCurrentSessionId)) {
                                     return;
                                 }
+                                fCurrentSessionId = sessionId;
                             }
-                            fCurrentSessionId = sessionId;
                             // Get the current trace record
                             final DsfExecutor executor = DsfSession.getSession(sessionId).getExecutor();
                             final DsfServicesTracker tracker = new DsfServicesTracker(GdbTraceCorePlugin.getBundleContext(), sessionId);
