@@ -43,6 +43,7 @@
       <configuration>
         <removeDefaultCategory>true</removeDefaultCategory>
         <skipWebContentGeneration>true</skipWebContentGeneration>
+        <skipBuildInfo>true</skipBuildInfo>
       </configuration>
     </plugin>
   </plugins>
