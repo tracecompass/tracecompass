@@ -12,54 +12,65 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.osgi.util.NLS;
 
 /**
  * @author France Lapointe Nguyen
  */
+@NonNullByDefault(false)
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.messages"; //$NON-NLS-1$
 
     /**
+     * Legend
+     */
+    public static String LatencyScatterGraphViewer_legend;
+
+    /**
+     * Time vs Duration
+     */
+    public static String LatencyScatterView_title;
+
+    /**
+     * Time
+     */
+    public static String LatencyScatterView_xAxis;
+
+    /**
+     * Duration
+     */
+    public static String LatencyScatterView_yAxis;
+
+    /**
+     * Name of the compacting job
+     */
+    public static String LatencyScatterGraphViewer_compactTitle;
+
+    /**
      * Name of the duration column
      */
-    public static @Nullable String LatencyTableViewer_duration;
+    public static String LatencyTableViewer_duration;
 
     /**
      * Name of the end time column
      */
-    public static @Nullable String LatencyTableViewer_endTime;
+    public static String LatencyTableViewer_endTime;
 
     /**
      * Name of the start time column
      */
-    public static @Nullable String LatencyTableViewer_startTime;
-
-    /**
-     * Title of the scatter graph
-     */
-    public static @Nullable String LatencyView_title;
-
-    /**
-     * Title of the x axis of the scatter graph
-     */
-    public static @Nullable String LatencyView_xAxis;
-
-    /**
-     * Title of the y axis of the scatter graph
-     */
-    public static @Nullable String LatencyView_yAxis;
+    public static String LatencyTableViewer_startTime;
 
     /**
      * Title of action to goto start time time
      */
-    public static @Nullable String LatencyView_goToStartEvent;
+    public static String LatencyView_goToStartEvent;
 
     /**
      * Title of action to goto end event
      */
-    public static @Nullable String LatencyView_goToEndEvent;
+    public static String LatencyView_goToEndEvent;
 
     static {
         // initialize resource bundle

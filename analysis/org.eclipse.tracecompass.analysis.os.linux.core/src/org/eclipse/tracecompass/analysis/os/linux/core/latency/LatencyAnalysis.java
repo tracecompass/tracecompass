@@ -124,7 +124,7 @@ public class LatencyAnalysis extends TmfAbstractAnalysisModule {
         req = new LatencyAnalysisRequest(layout, syscalls);
         fOngoingRequest = req;
         trace.sendRequest(req);
-
+        /* The request will fill 'syscalls' */
         try {
             req.waitForCompletion();
         } catch (InterruptedException e) {

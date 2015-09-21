@@ -39,6 +39,15 @@
             name="%latency.view.name"
             restorable="true">
       </view>
+      <view
+            allowMultiple="false"
+            category="org.eclipse.linuxtools.lttng2.ui.views.category"
+            class="org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.LatencyScatterView"
+            icon="icons/eview16/scatter.png"
+            id="org.eclipse.tracecompass.analysis.os.linux.views.latency.scatter"
+            name="%latency.scatter.view.name"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
@@ -66,6 +75,13 @@
       <output
             class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
             id="org.eclipse.tracecompass.analysis.os.linux.views.latency">
+         <analysisModuleClass
+               class="org.eclipse.tracecompass.analysis.os.linux.core.latency.LatencyAnalysis">
+         </analysisModuleClass>
+      </output>
+      <output
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="org.eclipse.tracecompass.analysis.os.linux.views.latency.scatter">
          <analysisModuleClass
                class="org.eclipse.tracecompass.analysis.os.linux.core.latency.LatencyAnalysis">
          </analysisModuleClass>

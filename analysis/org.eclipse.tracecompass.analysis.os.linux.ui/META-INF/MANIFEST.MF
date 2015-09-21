@@ -18,7 +18,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.tracecompass.tmf.ui,
  org.eclipse.tracecompass.tmf.ctf.core,
  org.eclipse.tracecompass.segmentstore.core
-Import-Package: com.google.common.collect
+Import-Package: com.google.common.collect,
+ org.swtchart
 Export-Package: org.eclipse.tracecompass.analysis.os.linux.ui.views.controlflow,
  org.eclipse.tracecompass.analysis.os.linux.ui.views.cpuusage,
  org.eclipse.tracecompass.analysis.os.linux.ui.views.resources,

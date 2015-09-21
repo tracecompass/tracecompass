@@ -54,6 +54,7 @@ public class LatencyTableViewer extends TmfSimpleTableViewer {
     // Attributes
     // ------------------------------------------------------------------------
 
+
     /**
      * Abstract class for the column label provider for the latency analysis
      * table viewer
