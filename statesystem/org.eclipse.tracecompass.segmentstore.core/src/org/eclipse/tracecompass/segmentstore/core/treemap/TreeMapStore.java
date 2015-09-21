@@ -16,6 +16,8 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.Iterator;
 import java.util.TreeMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
@@ -47,10 +49,12 @@ import com.google.common.collect.TreeMultimap;
  */
 public class TreeMapStore<T extends ISegment> implements ISegmentStore<T> {
 
+    private final ReadWriteLock fLock = new ReentrantReadWriteLock(false);
+
     private final TreeMultimap<Long, T> fStartTimesIndex;
     private final TreeMultimap<Long, T> fEndTimesIndex;
 
-    private volatile long fSize;
+    private long fSize;
 
     /**
      * Constructor
@@ -79,22 +83,36 @@ public class TreeMapStore<T extends ISegment> implements ISegmentStore<T> {
         fSize = 0;
     }
 
+    /**
+     * Warning, this is not thread safe, and can cause concurrent modification
+     * exceptions
+     */
     @Override
     public Iterator<T> iterator() {
         return checkNotNull(fStartTimesIndex.values().iterator());
     }
 
     @Override
-    public synchronized void addElement(T val) {
-        if (fStartTimesIndex.put(Long.valueOf(val.getStart()), val)) {
-            fEndTimesIndex.put(Long.valueOf(val.getEnd()), val);
-            fSize++;
+    public void addElement(T val) {
+        fLock.writeLock().lock();
+        try {
+            if (fStartTimesIndex.put(Long.valueOf(val.getStart()), val)) {
+                fEndTimesIndex.put(Long.valueOf(val.getEnd()), val);
+                fSize++;
+            }
+        } finally {
+            fLock.writeLock().unlock();
         }
     }
 
     @Override
     public long getNbElements() {
-        return fSize;
+        fLock.readLock().lock();
+        try {
+            return fSize;
+        } finally {
+            fLock.readLock().unlock();
+        }
     }
 
     @Override
@@ -103,24 +121,37 @@ public class TreeMapStore<T extends ISegment> implements ISegmentStore<T> {
          * The intervals intersecting 't' are those whose 1) start time is
          * *lower* than 't' AND 2) end time is *higher* than 't'.
          */
-        Iterable<T> matchStarts = Iterables.concat(fStartTimesIndex.asMap().headMap(position, true).values());
-        Iterable<T> matchEnds = Iterables.concat(fEndTimesIndex.asMap().tailMap(position, true).values());
-
-        return checkNotNull(Sets.intersection(Sets.newHashSet(matchStarts), Sets.newHashSet(matchEnds)));
+        fLock.readLock().lock();
+        try {
+            Iterable<T> matchStarts = Iterables.concat(fStartTimesIndex.asMap().headMap(position, true).values());
+            Iterable<T> matchEnds = Iterables.concat(fEndTimesIndex.asMap().tailMap(position, true).values());
+            return checkNotNull(Sets.intersection(Sets.newHashSet(matchStarts), Sets.newHashSet(matchEnds)));
+        } finally {
+            fLock.readLock().unlock();
+        }
     }
 
     @Override
     public Iterable<T> getIntersectingElements(long start, long end) {
-        Iterable<T> matchStarts = Iterables.concat(fStartTimesIndex.asMap().headMap(end, true).values());
-        Iterable<T> matchEnds = Iterables.concat(fEndTimesIndex.asMap().tailMap(start, true).values());
-
-        return checkNotNull(Sets.intersection(Sets.newHashSet(matchStarts), Sets.newHashSet(matchEnds)));
+        fLock.readLock().lock();
+        try {
+            Iterable<T> matchStarts = Iterables.concat(fStartTimesIndex.asMap().headMap(end, true).values());
+            Iterable<T> matchEnds = Iterables.concat(fEndTimesIndex.asMap().tailMap(start, true).values());
+            return checkNotNull(Sets.intersection(Sets.newHashSet(matchStarts), Sets.newHashSet(matchEnds)));
+        } finally {
+            fLock.readLock().unlock();
+        }
     }
 
     @Override
-    public synchronized void dispose() {
-        fStartTimesIndex.clear();
-        fEndTimesIndex.clear();
-        fSize = 0;
+    public void dispose() {
+        fLock.writeLock().lock();
+        try {
+            fStartTimesIndex.clear();
+            fEndTimesIndex.clear();
+            fSize = 0;
+        } finally {
+            fLock.writeLock().unlock();
+        }
     }
 }
