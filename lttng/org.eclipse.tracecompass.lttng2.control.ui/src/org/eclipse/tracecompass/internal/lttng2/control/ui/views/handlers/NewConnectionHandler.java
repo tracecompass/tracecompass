@@ -80,6 +80,9 @@ public class NewConnectionHandler extends BaseControlViewHandler {
         IRemoteConnection connection = getConnection(event.getParameters());
         if (connection != null) {
             fLock.lock();
+            if (fRoot == null) {
+                return null;
+            }
             try {
                 // successful creation of host
                 TargetNodeComponent node = null;

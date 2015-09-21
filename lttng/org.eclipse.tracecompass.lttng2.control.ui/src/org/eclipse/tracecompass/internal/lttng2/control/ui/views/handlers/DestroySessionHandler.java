@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
@@ -50,7 +51,7 @@ public class DestroySessionHandler extends BaseControlViewHandler {
     /**
      * The list of session components the command is to be executed on.
      */
-    private final List<TraceSessionComponent> fSessions = new ArrayList<>();
+    @NonNull private final List<TraceSessionComponent> fSessions = new ArrayList<>();
 
     // ------------------------------------------------------------------------
     // Operations

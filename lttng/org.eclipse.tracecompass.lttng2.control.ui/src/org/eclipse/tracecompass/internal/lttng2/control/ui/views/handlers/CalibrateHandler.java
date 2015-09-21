@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,6 +10,8 @@
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers;
+
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.Iterator;
 
@@ -61,8 +63,14 @@ public class CalibrateHandler extends BaseControlViewHandler {
         }
         fLock.lock();
         try {
+
+            DomainCommandParameter tmpParam = fParam;
+            if (tmpParam == null) {
+                return null;
+            }
+
             // Make a copy for thread safety
-            final DomainCommandParameter param = fParam.clone();
+            final DomainCommandParameter param = new DomainCommandParameter(tmpParam);
 
             Job addJob = new Job(Messages.TraceControl_AddCalibrateJob) {
                 @Override
@@ -121,7 +129,7 @@ public class CalibrateHandler extends BaseControlViewHandler {
         try {
             fParam = null;
             if (isEnabled) {
-                fParam = new DomainCommandParameter(session, domain);
+                fParam = new DomainCommandParameter(checkNotNull(session), checkNotNull(domain));
             }
         } finally {
             fLock.unlock();

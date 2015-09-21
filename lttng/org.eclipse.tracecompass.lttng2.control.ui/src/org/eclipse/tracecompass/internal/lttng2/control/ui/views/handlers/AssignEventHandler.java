@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -23,9 +23,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.IGetEventInfoDialog;
@@ -66,61 +68,69 @@ public class AssignEventHandler extends BaseControlViewHandler {
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
 
+        // Make a copy for thread safety
+        Parameter tmpParam = null;
         fLock.lock();
         try {
-            // Make a copy for thread safety
-            final Parameter param = new Parameter(fParam);
-
-            // Open dialog box to retrieve the session and channel where the events should be enabled in.
-            final IGetEventInfoDialog dialog = TraceControlDialogFactory.getInstance().getGetEventInfoDialog();
-            dialog.setIsKernel(param.isKernel());
-            dialog.setSessions(param.getSessions());
-
-            if (dialog.open() != Window.OK) {
+            tmpParam = fParam;
+            if (tmpParam == null)  {
                 return null;
             }
-
-            Job job = new Job(Messages.TraceControl_EnableEventsJob) {
-                @Override
-                protected IStatus run(IProgressMonitor monitor) {
-
-                    Exception error = null;
-
-                    try {
-                        List<String> eventNames = new ArrayList<>();
-                        List<BaseEventComponent> events = param.getEvents();
-                        // Create list of event names
-                        for (Iterator<BaseEventComponent> iterator = events.iterator(); iterator.hasNext();) {
-                            BaseEventComponent baseEvent = iterator.next();
-                            eventNames.add(baseEvent.getName());
-                        }
-
-                        TraceChannelComponent channel = dialog.getChannel();
-                        if (channel == null) {
-                            // enable events on default channel (which will be created by lttng-tools)
-                            dialog.getSession().enableEvents(eventNames, param.isKernel(), dialog.getFilterExpression(), monitor);
-                        } else {
-                            channel.enableEvents(eventNames, dialog.getFilterExpression(), monitor);
-                        }
-
-                    } catch (ExecutionException e) {
-                        error = e;
-                    }
-
-                    // refresh in all cases
-                    refresh(new CommandParameter(dialog.getSession()));
-
-                    if (error != null) {
-                        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_EnableEventsFailure, error);
-                    }
-                    return Status.OK_STATUS;
-                }
-            };
-            job.setUser(true);
-            job.schedule();
+            tmpParam = new Parameter(tmpParam);
         } finally {
             fLock.unlock();
         }
+        final Parameter param = tmpParam;
+
+        // Open dialog box to retrieve the session and channel where the events should be enabled in.
+        final IGetEventInfoDialog dialog = TraceControlDialogFactory.getInstance().getGetEventInfoDialog();
+        dialog.setIsKernel(param.isKernel());
+        dialog.setSessions(param.getSessions());
+
+        if (dialog.open() != Window.OK) {
+            return null;
+        }
+
+        Job job = new Job(Messages.TraceControl_EnableEventsJob) {
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+
+                Exception error = null;
+                TraceSessionComponent session = dialog.getSession();
+                try {
+                    List<String> eventNames = new ArrayList<>();
+                    List<BaseEventComponent> events = param.getEvents();
+                    // Create list of event names
+                    for (Iterator<BaseEventComponent> iterator = events.iterator(); iterator.hasNext();) {
+                        BaseEventComponent baseEvent = iterator.next();
+                        eventNames.add(baseEvent.getName());
+                    }
+
+                    TraceChannelComponent channel = dialog.getChannel();
+                    if (channel == null) {
+                        // enable events on default channel (which will be created by lttng-tools)
+                        session.enableEvents(eventNames, param.isKernel(), dialog.getFilterExpression(), monitor);
+                    } else {
+                        channel.enableEvents(eventNames, dialog.getFilterExpression(), monitor);
+                    }
+
+                } catch (ExecutionException e) {
+                    error = e;
+                }
+
+                // refresh in all cases
+                if (session != null) {
+                    refresh(new CommandParameter(session));
+                }
+
+                if (error != null) {
+                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_EnableEventsFailure, error);
+                }
+                return Status.OK_STATUS;
+            }
+        };
+        job.setUser(true);
+        job.schedule();
 
         return null;
     }
@@ -188,7 +198,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
         try {
             fParam = null;
             if(isEnabled) {
-                fParam = new Parameter(sessions, events, isKernel);
+                fParam = new Parameter(NonNullUtils.checkNotNull(sessions), events, isKernel);
             }
         } finally {
             fLock.unlock();
@@ -199,6 +209,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
     /**
      *  Class containing parameter for the command execution.
      */
+    @NonNullByDefault
     private static final class Parameter {
 
         /**
@@ -224,7 +235,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
          * @param isKernel - domain (true for kernel or UST)
          */
         public Parameter(TraceSessionComponent[] sessions, List<BaseEventComponent> events, boolean isKernel) {
-            fSessions = Arrays.copyOf(sessions, sessions.length);
+            fSessions = NonNullUtils.checkNotNull(Arrays.copyOf(sessions, sessions.length));
             fEvents = new ArrayList<>();
             fEvents.addAll(events);
             fIsKernel = isKernel;

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -77,47 +77,55 @@ abstract class BaseEnableChannelHandler extends BaseControlViewHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
+        CommandParameter tmpParam = null;
+
         fLock.lock();
         try {
-            final CommandParameter param = fParam.clone();
-
-            final IEnableChannelDialog dialog =  TraceControlDialogFactory.getInstance().getEnableChannelDialog();
-            dialog.setTargetNodeComponent(param.getSession().getTargetNode());
-            dialog.setDomainComponent(getDomain(param));
-            dialog.setHasKernel(param.getSession().hasKernelProvider());
-
-            if (dialog.open() != Window.OK) {
+            tmpParam = fParam;
+            if (tmpParam == null) {
                 return null;
             }
-
-            Job job = new Job(Messages.TraceControl_CreateChannelStateJob) {
-                @Override
-                protected IStatus run(IProgressMonitor monitor) {
-                    Exception error = null;
-
-                    List<String> channelNames = new ArrayList<>();
-                    channelNames.add(dialog.getChannelInfo().getName());
-
-                    try {
-                        enableChannel(param, channelNames, dialog.getChannelInfo(), dialog.isKernel(), monitor);
-                    } catch (ExecutionException e) {
-                        error = e;
-                    }
-
-                    // refresh in all cases
-                    refresh(param);
-
-                    if (error != null) {
-                        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_CreateChannelStateFailure, error);
-                    }
-                    return Status.OK_STATUS;
-                }
-            };
-            job.setUser(true);
-            job.schedule();
+            tmpParam = new CommandParameter(tmpParam);
         } finally {
             fLock.unlock();
         }
+        final CommandParameter param = tmpParam;
+
+        final IEnableChannelDialog dialog =  TraceControlDialogFactory.getInstance().getEnableChannelDialog();
+        dialog.setTargetNodeComponent(param.getSession().getTargetNode());
+        dialog.setDomainComponent(getDomain(param));
+        dialog.setHasKernel(param.getSession().hasKernelProvider());
+
+        if (dialog.open() != Window.OK) {
+            return null;
+        }
+
+        Job job = new Job(Messages.TraceControl_CreateChannelStateJob) {
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+                Exception error = null;
+
+                List<String> channelNames = new ArrayList<>();
+                channelNames.add(dialog.getChannelInfo().getName());
+
+                try {
+                    enableChannel(param, channelNames, dialog.getChannelInfo(), dialog.isKernel(), monitor);
+                } catch (ExecutionException e) {
+                    error = e;
+                }
+
+                // refresh in all cases
+                refresh(param);
+
+                if (error != null) {
+                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_CreateChannelStateFailure, error);
+                }
+                return Status.OK_STATUS;
+            }
+        };
+        job.setUser(true);
+        job.schedule();
+
         return null;
     }
 

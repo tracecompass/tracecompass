@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,6 +10,8 @@
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers;
+
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.Iterator;
 import java.util.List;
@@ -80,7 +82,7 @@ public class AddContextOnChannelHandler extends BaseAddContextHandler {
         try {
             fParam = null;
             if(isEnabled) {
-                fParam = new ChannelCommandParameter(session, channel);
+                fParam = new ChannelCommandParameter(checkNotNull(session), checkNotNull(channel));
             }
         } finally {
             fLock.unlock();

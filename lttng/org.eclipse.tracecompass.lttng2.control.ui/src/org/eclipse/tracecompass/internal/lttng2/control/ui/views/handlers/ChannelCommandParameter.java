@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -11,6 +11,7 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceChannelComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
 
@@ -19,6 +20,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.Trac
  *
  * @author Bernd Hufmann
  */
+@NonNullByDefault
 public class ChannelCommandParameter extends CommandParameter {
 
     // ------------------------------------------------------------------------
@@ -42,6 +44,17 @@ public class ChannelCommandParameter extends CommandParameter {
         fChannel = channel;
     }
 
+    /**
+     * Copy constructor
+     *
+     * @param param
+     *            a channel command parameter to copy
+     */
+    public ChannelCommandParameter(ChannelCommandParameter param) {
+        super(param);
+        fChannel = param.fChannel;
+    }
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -53,14 +66,4 @@ public class ChannelCommandParameter extends CommandParameter {
         return fChannel;
     }
 
-    // ------------------------------------------------------------------------
-    // Operations
-    // ------------------------------------------------------------------------
-
-    @Override
-    public ChannelCommandParameter clone() {
-        ChannelCommandParameter clone = (ChannelCommandParameter) super.clone();
-        clone.fChannel = fChannel;
-        return clone;
-    }
 }

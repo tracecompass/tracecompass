@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -11,6 +11,7 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceEventComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
 
@@ -19,6 +20,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.Trac
  *
  * @author Bernd Hufmann
  */
+@NonNullByDefault
 public class EventCommandParameter extends CommandParameter {
 
     // ------------------------------------------------------------------------
@@ -41,6 +43,17 @@ public class EventCommandParameter extends CommandParameter {
         fEvent = event;
     }
 
+    /**
+     * Copy constructor
+     *
+     * @param param
+     *            a event command parameter to copy
+     */
+    public EventCommandParameter(EventCommandParameter param) {
+        super(param);
+        fEvent = param.fEvent;
+    }
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -50,16 +63,5 @@ public class EventCommandParameter extends CommandParameter {
      */
     public TraceEventComponent getEvent() {
         return fEvent;
-    }
-
-    // ------------------------------------------------------------------------
-    // Operations
-    // ------------------------------------------------------------------------
-
-    @Override
-    public EventCommandParameter clone() {
-        EventCommandParameter clone = (EventCommandParameter) super.clone();
-        clone.fEvent = fEvent;
-        return clone;
     }
 }

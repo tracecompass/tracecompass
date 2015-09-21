@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -53,35 +53,41 @@ public class CreateSessionHandler extends BaseControlViewHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-
+        // Make a copy for thread safety
+        TraceSessionGroup tmpSessionGroup = null;
         fLock.lock();
         try {
-            final TraceSessionGroup sessionGroup = fSessionGroup;
-
-            // Open dialog box for the node name and address
-            final ICreateSessionDialog dialog = TraceControlDialogFactory.getInstance().getCreateSessionDialog();
-            dialog.initialize(sessionGroup);
-
-            if (dialog.open() != Window.OK) {
-                return null;
-            }
-
-            Job job = new Job(Messages.TraceControl_CreateSessionJob) {
-                @Override
-                protected IStatus run(IProgressMonitor monitor) {
-                    try {
-                        sessionGroup.createSession(dialog.getParameters(), monitor);
-                    } catch (ExecutionException e) {
-                        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_CreateSessionFailure, e);
-                    }
-                    return Status.OK_STATUS;
-                }
-            };
-            job.setUser(true);
-            job.schedule();
+             tmpSessionGroup = fSessionGroup;
         } finally {
             fLock.unlock();
         }
+        final TraceSessionGroup sessionGroup = tmpSessionGroup;
+
+        if (sessionGroup == null) {
+            return null;
+        }
+
+        // Open dialog box for the node name and address
+        final ICreateSessionDialog dialog = TraceControlDialogFactory.getInstance().getCreateSessionDialog();
+        dialog.initialize(sessionGroup);
+
+        if (dialog.open() != Window.OK) {
+            return null;
+        }
+
+        Job job = new Job(Messages.TraceControl_CreateSessionJob) {
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+                try {
+                    sessionGroup.createSession(dialog.getParameters(), monitor);
+                } catch (ExecutionException e) {
+                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_CreateSessionFailure, e);
+                }
+                return Status.OK_STATUS;
+            }
+        };
+        job.setUser(true);
+        job.schedule();
         return null;
     }
 

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -74,8 +74,14 @@ public abstract class BaseAddContextHandler extends BaseControlViewHandler {
         }
         fLock.lock();
         try {
+
+            CommandParameter tmpParam = fParam;
+            if (tmpParam == null) {
+                return null;
+            }
+
             // Make a copy for thread safety
-            final CommandParameter param = fParam.clone();
+            final CommandParameter param = new CommandParameter(tmpParam);
 
             UIJob getJob = new UIJob(Messages.TraceControl_GetContextJob) {
                 @Override

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.window.Window;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
@@ -49,7 +50,7 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
     /**
      * The command execution parameter.
      */
-    protected CommandParameter fParam = null;
+    @Nullable protected CommandParameter fParam = null;
 
     // ------------------------------------------------------------------------
     // Operations
@@ -138,90 +139,97 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
         if (window == null) {
             return false;
         }
+
+        // Make a copy for thread safety
+        CommandParameter tmpParam = null;
         fLock.lock();
         try {
-            // Make a copy for thread safety
-            final CommandParameter param = fParam.clone();
-
-            TargetNodeComponent node = param.getSession().getTargetNode();
-            List<ITraceControlComponent> providers = node.getChildren(TraceProviderGroup.class);
-
-            final IEnableEventsDialog dialog = TraceControlDialogFactory.getInstance().getEnableEventsDialog();
-            dialog.setTraceProviderGroup((TraceProviderGroup)providers.get(0));
-            dialog.setTraceDomainComponent(getDomain(param));
-
-            if (dialog.open() != Window.OK) {
+            tmpParam = fParam;
+            if (tmpParam == null) {
                 return null;
             }
+            tmpParam = new CommandParameter(tmpParam);
+        } finally {
+            fLock.unlock();
+        }
+        final CommandParameter param = tmpParam;
 
-            Job job = new Job(Messages.TraceControl_ChangeEventStateJob) {
-                @Override
-                protected IStatus run(IProgressMonitor monitor) {
-                    Exception error = null;
+        TargetNodeComponent node = param.getSession().getTargetNode();
+        List<ITraceControlComponent> providers = node.getChildren(TraceProviderGroup.class);
 
-                    try {
-                        String filter = dialog.getFilterExpression();
+        final IEnableEventsDialog dialog = TraceControlDialogFactory.getInstance().getEnableEventsDialog();
+        dialog.setTraceProviderGroup((TraceProviderGroup)providers.get(0));
+        dialog.setTraceDomainComponent(getDomain(param));
 
-                        // Enable tracepoint events
-                        if (dialog.isTracepoints()) {
-                            if (dialog.isAllTracePoints()) {
-                                enableEvents(param, null, dialog.isKernel(), filter, monitor);
-                            } else {
-                                List<String> eventNames = dialog.getEventNames();
-                                if (!eventNames.isEmpty()) {
-                                    enableEvents(param, eventNames, dialog.isKernel(), filter, monitor);
-                                }
-                            }
-                        }
+        if (dialog.open() != Window.OK) {
+            return null;
+        }
 
-                        // Enable syscall events
-                        if (dialog.isAllSysCalls()) {
-                            enableSyscalls(param, monitor);
-                        }
+        Job job = new Job(Messages.TraceControl_ChangeEventStateJob) {
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+                Exception error = null;
 
-                        // Enable dynamic probe
-                        if (dialog.isDynamicProbe() && (dialog.getProbeEventName() != null) && (dialog.getProbeName() != null)) {
-                            enableProbe(param, dialog.getProbeEventName(), false, dialog.getProbeName(), monitor);
-                        }
+                try {
+                    String filter = dialog.getFilterExpression();
 
-                        // Enable dynamic function probe
-                        if (dialog.isDynamicFunctionProbe() && (dialog.getFunctionEventName() != null) && (dialog.getFunction() != null)) {
-                            enableProbe(param, dialog.getFunctionEventName(), true, dialog.getFunction(), monitor);
-                        }
-
-                        // Enable event using a wildcard
-                        if (dialog.isWildcard()) {
+                    // Enable tracepoint events
+                    if (dialog.isTracepoints()) {
+                        if (dialog.isAllTracePoints()) {
+                            enableEvents(param, null, dialog.isKernel(), filter, monitor);
+                        } else {
                             List<String> eventNames = dialog.getEventNames();
-                            eventNames.add(dialog.getWildcard());
-
                             if (!eventNames.isEmpty()) {
                                 enableEvents(param, eventNames, dialog.isKernel(), filter, monitor);
                             }
                         }
+                    }
 
-                        // Enable events using log level
-                        if (dialog.isLogLevel()) {
-                            enableLogLevel(param, dialog.getLogLevelEventName(), dialog.getLogLevelType(), dialog.getLogLevel(), filter, monitor);
+                    // Enable syscall events
+                    if (dialog.isAllSysCalls()) {
+                        enableSyscalls(param, monitor);
+                    }
+
+                    // Enable dynamic probe
+                    if (dialog.isDynamicProbe() && (dialog.getProbeEventName() != null) && (dialog.getProbeName() != null)) {
+                        enableProbe(param, dialog.getProbeEventName(), false, dialog.getProbeName(), monitor);
+                    }
+
+                    // Enable dynamic function probe
+                    if (dialog.isDynamicFunctionProbe() && (dialog.getFunctionEventName() != null) && (dialog.getFunction() != null)) {
+                        enableProbe(param, dialog.getFunctionEventName(), true, dialog.getFunction(), monitor);
+                    }
+
+                    // Enable event using a wildcard
+                    if (dialog.isWildcard()) {
+                        List<String> eventNames = dialog.getEventNames();
+                        eventNames.add(dialog.getWildcard());
+
+                        if (!eventNames.isEmpty()) {
+                            enableEvents(param, eventNames, dialog.isKernel(), filter, monitor);
                         }
-
-                    } catch (ExecutionException e) {
-                        error = e;
                     }
 
-                    // refresh in all cases
-                    refresh(param);
-
-                    if (error != null) {
-                        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ChangeEventStateFailure, error);
+                    // Enable events using log level
+                    if (dialog.isLogLevel()) {
+                        enableLogLevel(param, dialog.getLogLevelEventName(), dialog.getLogLevelType(), dialog.getLogLevel(), filter, monitor);
                     }
-                    return Status.OK_STATUS;
+
+                } catch (ExecutionException e) {
+                    error = e;
                 }
-            };
-            job.setUser(true);
-            job.schedule();
-        } finally {
-            fLock.unlock();
-        }
+
+                // refresh in all cases
+                refresh(param);
+
+                if (error != null) {
+                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_ChangeEventStateFailure, error);
+                }
+                return Status.OK_STATUS;
+            }
+        };
+        job.setUser(true);
+        job.schedule();
         return null;
     }
 }

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -11,6 +11,7 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
 
 /**
@@ -18,7 +19,8 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.Trac
  *
  * @author Bernd Hufmann
  */
-public class CommandParameter implements Cloneable {
+@NonNullByDefault
+public class CommandParameter {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -41,6 +43,16 @@ public class CommandParameter implements Cloneable {
         fSession = session;
     }
 
+    /**
+     * Copy constructor
+     *
+     * @param param
+     *            a command parameter to copy
+     */
+    public CommandParameter(CommandParameter param) {
+        fSession = param.fSession;
+    }
+
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -50,20 +62,5 @@ public class CommandParameter implements Cloneable {
      */
     public TraceSessionComponent getSession() {
         return fSession;
-    }
-
-    // ------------------------------------------------------------------------
-    // Operations
-    // ------------------------------------------------------------------------
-
-    @Override
-    public CommandParameter clone() {
-        CommandParameter clone = null;
-        try {
-            clone = (CommandParameter) super.clone();
-            clone.fSession = fSession;
-        } catch (CloneNotSupportedException e) {
-        }
-        return clone;
     }
 }

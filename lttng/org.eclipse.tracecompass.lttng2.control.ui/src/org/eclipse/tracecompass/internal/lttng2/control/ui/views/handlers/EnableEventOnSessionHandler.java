@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -19,6 +19,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
@@ -99,7 +100,7 @@ public class EnableEventOnSessionHandler extends BaseEnableEventHandler {
         try {
             fParam = null;
             if(isEnabled) {
-                fParam = new CommandParameter(session);
+                fParam = new CommandParameter(NonNullUtils.checkNotNull(session));
             }
         } finally {
             fLock.unlock();
