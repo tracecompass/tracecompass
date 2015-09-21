@@ -22,13 +22,14 @@ import java.util.Set;
 import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
-import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfExperimentStub;
 import org.junit.Test;
@@ -43,7 +44,7 @@ public class ExperimentBenchmark {
     private static final String TEST_ID = "org.eclipse.linuxtools#Experiment benchmark#";
     private static final int MAX_TRACES = 160;
     private static final int BLOCK_SIZE = 100;
-    private static final String TRACES_ROOT_PATH = CtfTestTrace.TRACE_EXPERIMENT.getPath();
+    private static final String TRACES_ROOT_PATH = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.TRACE_EXPERIMENT).getPath();
     private static final int SAMPLE_SIZE_SLOW = 20;
     private static final int SAMPLE_SIZE = 100;
 

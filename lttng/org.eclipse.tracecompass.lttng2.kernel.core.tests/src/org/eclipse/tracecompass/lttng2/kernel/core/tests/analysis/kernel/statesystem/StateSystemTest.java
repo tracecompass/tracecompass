@@ -15,11 +15,11 @@ package org.eclipse.tracecompass.lttng2.kernel.core.tests.analysis.kernel.states
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
@@ -29,7 +29,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeExcept
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,7 +50,7 @@ public abstract class StateSystemTest {
     public TestRule timeoutRule = new Timeout(2, TimeUnit.MINUTES);
 
     /** Test trace used for these tests */
-    protected static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.TRACE2;
+    protected static final @NonNull CtfTestTrace testTrace = CtfTestTrace.TRACE2;
 
     /** Expected start time of the test trace/state history */
     protected static final long startTime = 1331668247314038062L;
@@ -65,14 +65,12 @@ public abstract class StateSystemTest {
     private static final long NANOSECS_PER_SEC = 1000000000L;
 
     protected static ITmfStateSystem fixture;
-    protected static boolean traceIsPresent = false;
 
     /**
      * Test set-up
      */
     @Before
     public void setUp() {
-        assumeTrue(traceIsPresent);
         /* Subclasses should set-up 'fixture' */
         assertNotNull(fixture);
     }

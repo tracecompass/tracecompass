@@ -16,7 +16,6 @@ package org.eclipse.tracecompass.tmf.ctf.core.tests.temp.tracemanager;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.util.Collection;
@@ -24,13 +23,14 @@ import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -38,7 +38,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -81,10 +81,8 @@ public class TmfTraceManagerTest {
      */
     @BeforeClass
     public static void setUpClass() {
-        assumeTrue(CtfTmfTestTrace.TRACE2.exists());
-        assumeTrue(CtfTmfTestTrace.KERNEL.exists());
-        trace1 = CtfTmfTestTrace.TRACE2.getTrace();
-        trace2 = CtfTmfTestTrace.KERNEL.getTrace();
+        trace1 = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.TRACE2);
+        trace2 = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.KERNEL);
 
         trace1.indexTrace(true);
         trace2.indexTrace(true);
@@ -118,8 +116,8 @@ public class TmfTraceManagerTest {
      */
     @AfterClass
     public static void tearDownClass() {
-        CtfTmfTestTrace.TRACE2.dispose();
-        CtfTmfTestTrace.KERNEL.dispose();
+        CtfTmfTestTraceUtils.dispose(CtfTestTrace.TRACE2);
+        CtfTmfTestTraceUtils.dispose(CtfTestTrace.KERNEL);
     }
 
     // ------------------------------------------------------------------------

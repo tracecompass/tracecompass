@@ -19,7 +19,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -28,8 +27,9 @@ import java.util.Set;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
-import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEndSynchSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
@@ -41,7 +41,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfEventTypeCollectionHelper;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfLocation;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfLocationInfo;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.After;
 import org.junit.Before;
@@ -56,21 +56,16 @@ import org.junit.Test;
  */
 public class CtfTmfTraceTest {
 
-    private static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.KERNEL;
+    private static final @NonNull CtfTestTrace testTrace = CtfTestTrace.KERNEL;
 
     private CtfTmfTrace fixture;
 
     /**
      * Perform pre-test initialization.
-     *
-     * @throws TmfTraceException
-     *             If the test trace is not found
      */
     @Before
-    public void setUp() throws TmfTraceException {
-        assumeTrue(testTrace.exists());
-        fixture = new CtfTmfTrace();
-        fixture.initTrace((IResource) null, testTrace.getPath(), CtfTmfEvent.class);
+    public void setUp() {
+        fixture = CtfTmfTestTraceUtils.getTrace(testTrace);
     }
 
     /**
@@ -409,7 +404,7 @@ public class CtfTmfTraceTest {
     @Test
     public void testValidate() {
         IProject project = null;
-        IStatus result = fixture.validate(project, testTrace.getPath());
+        IStatus result = fixture.validate(project, fixture.getPath());
         assertTrue(result.isOK());
     }
 

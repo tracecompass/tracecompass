@@ -16,23 +16,23 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.statistics.ITmfStatistics;
 import org.eclipse.tracecompass.tmf.core.statistics.TmfStateStatistics;
 import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsEventTypesModule;
 import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsTotalsModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -50,7 +50,7 @@ public class CtfTmfLostEventStatisticsTest {
     public TestRule globalTimeout= new Timeout(30, TimeUnit.SECONDS);
 
     /**Test trace with lost events */
-    private static final CtfTmfTestTrace lostEventsTrace = CtfTmfTestTrace.HELLO_LOST;
+    private static final @NonNull CtfTestTrace lostEventsTrace = CtfTestTrace.HELLO_LOST;
 
     private ITmfTrace fTrace;
 
@@ -66,19 +66,11 @@ public class CtfTmfLostEventStatisticsTest {
     // ------------------------------------------------------------------------
 
     /**
-     * Class setup
-     */
-    @BeforeClass
-    public static void setUpClass() {
-        assumeTrue(lostEventsTrace.exists());
-    }
-
-    /**
      * Test setup
      */
     @Before
     public void setUp() {
-        ITmfTrace trace = lostEventsTrace.getTrace();
+        ITmfTrace trace = CtfTmfTestTraceUtils.getTrace(lostEventsTrace);
         fTrace = trace;
 
         /* Prepare the two analysis-backed state systems */

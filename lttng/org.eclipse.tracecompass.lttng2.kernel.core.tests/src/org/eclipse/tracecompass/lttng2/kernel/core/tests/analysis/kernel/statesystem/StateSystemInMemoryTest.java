@@ -19,6 +19,7 @@ import static org.junit.Assert.fail;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -30,6 +31,7 @@ import org.junit.BeforeClass;
  */
 public class StateSystemInMemoryTest extends StateSystemTest {
 
+    private static CtfTmfTrace trace;
     private static TestLttngKernelAnalysisModule module;
 
     /**
@@ -37,15 +39,12 @@ public class StateSystemInMemoryTest extends StateSystemTest {
      */
     @BeforeClass
     public static void initialize() {
-        if (!testTrace.exists()) {
-            traceIsPresent = false;
-            return;
-        }
-        traceIsPresent = true;
+        CtfTmfTrace thetrace = CtfTmfTestTraceUtils.getTrace(testTrace);
+        trace = thetrace;
 
         module = new TestLttngKernelAnalysisModule();
         try {
-            assertTrue(module.setTrace(testTrace.getTrace()));
+            assertTrue(module.setTrace(thetrace));
         } catch (TmfAnalysisException e) {
             fail();
         }
@@ -66,8 +65,12 @@ public class StateSystemInMemoryTest extends StateSystemTest {
         if (fixture != null) {
             fixture.dispose();
         }
+        if (trace != null) {
+            trace.dispose();
+        }
         module = null;
         fixture = null;
+        trace = null;
     }
 
     private static class TestLttngKernelAnalysisModule extends KernelAnalysisModule {

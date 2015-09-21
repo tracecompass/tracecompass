@@ -15,7 +15,6 @@ package org.eclipse.tracecompass.lttng2.kernel.core.tests.event.matchandsync;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -24,10 +23,11 @@ import java.util.List;
 
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpEventMatching;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpLttngEventMatching;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.event.matching.IMatchProcessingUnit;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.Test;
 
@@ -44,10 +44,8 @@ public class MatchAndSyncTest {
      */
     @Test
     public void testMatching() {
-        assumeTrue(CtfTmfTestTrace.SYNC_SRC.exists());
-        assumeTrue(CtfTmfTestTrace.SYNC_DEST.exists());
-        CtfTmfTrace trace1 = CtfTmfTestTrace.SYNC_SRC.getTrace();
-        CtfTmfTrace trace2 = CtfTmfTestTrace.SYNC_DEST.getTrace();
+        CtfTmfTrace trace1 = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.SYNC_SRC);
+        CtfTmfTrace trace2 = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.SYNC_DEST);
 
         List<ITmfTrace> tracearr = new LinkedList<>();
         tracearr.add(trace1);

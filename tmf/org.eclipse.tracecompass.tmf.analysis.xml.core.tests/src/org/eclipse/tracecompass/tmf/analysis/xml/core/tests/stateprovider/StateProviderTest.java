@@ -16,19 +16,19 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.List;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,8 +55,7 @@ public class StateProviderTest {
     @Before
     public void setupTest() {
         /* Initialize the trace */
-        assumeTrue(CtfTmfTestTrace.KERNEL.exists());
-        ITmfTrace trace = CtfTmfTestTrace.KERNEL.getTrace();
+        ITmfTrace trace = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.KERNEL);
         fTrace = trace;
 
         /* Initialize the state provider module */

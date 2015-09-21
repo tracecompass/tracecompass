@@ -14,22 +14,23 @@
 package org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.analysis;
 
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestHelper;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.junit.Test;
 
 /**
@@ -47,17 +48,15 @@ public class AnalysisBenchmark {
      */
     @Test
     public void testTrace2() {
-        runTest(CtfTmfTestTrace.TRACE2, "Trace2");
+        runTest(CtfTestTrace.TRACE2, "Trace2");
     }
 
-    private static void runTest(CtfTmfTestTrace testTrace, String testName) {
-        assumeTrue(testTrace.exists());
-
+    private static void runTest(@NonNull CtfTestTrace testTrace, String testName) {
         Performance perf = Performance.getDefault();
         PerformanceMeter pm = perf.createPerformanceMeter(TEST_ID + '#' + testName);
         perf.tagAsSummary(pm, "LTTng Kernel Analysis: " + testName, Dimension.CPU_TIME);
 
-        if (testTrace == CtfTmfTestTrace.TRACE2) {
+        if (testTrace == CtfTestTrace.TRACE2) {
             /* Do not show all traces in the global summary */
             perf.tagAsGlobalSummary(pm, "LTTng Kernel Analysis: " + testName, Dimension.CPU_TIME);
         }
@@ -65,11 +64,15 @@ public class AnalysisBenchmark {
         for (int i = 0; i < LOOP_COUNT; i++) {
             LttngKernelTrace trace = null;
             IAnalysisModule module = null;
+            // TODO Allow the utility method to instantiate trace sub-types
+            // directly.
+            String path = CtfTmfTestTraceUtils.getTrace(testTrace).getPath();
+
             try {
                 trace = new LttngKernelTrace();
                 module = new KernelAnalysisModule();
                 module.setId("test");
-                trace.initTrace(null, testTrace.getPath(), CtfTmfEvent.class);
+                trace.initTrace(null, path, CtfTmfEvent.class);
                 module.setTrace(trace);
 
                 pm.start();
@@ -97,6 +100,6 @@ public class AnalysisBenchmark {
             }
         }
         pm.commit();
-        testTrace.dispose();
+        CtfTmfTestTraceUtils.dispose(testTrace);
     }
 }

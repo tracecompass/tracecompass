@@ -14,16 +14,16 @@
 package org.eclipse.tracecompass.ctf.core.tests.perf.trace;
 
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
-import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
+import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTraceUtils;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.junit.Test;
 
 /**
@@ -55,8 +55,6 @@ public class TraceReadBenchmark {
     }
 
     private static void readTrace(CtfTestTrace testTrace, String testName, boolean inGlobalSummary) {
-        assumeTrue(testTrace.exists());
-
         Performance perf = Performance.getDefault();
         PerformanceMeter pm = perf.createPerformanceMeter(TEST_ID + '#' + testName);
         perf.tagAsSummary(pm, TEST_SUITE_NAME + ':' + testName, Dimension.CPU_TIME);
@@ -68,7 +66,7 @@ public class TraceReadBenchmark {
         for (int loop = 0; loop < LOOP_COUNT; loop++) {
             pm.start();
             try {
-                CTFTrace trace = testTrace.getTrace();
+                CTFTrace trace = CtfTestTraceUtils.getTrace(testTrace);
                 try (CTFTraceReader traceReader = new CTFTraceReader(trace);) {
 
                     while (traceReader.hasMoreEvents()) {

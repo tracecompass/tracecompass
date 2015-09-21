@@ -46,7 +46,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.tracecompass.ctf.core.tests.synthetictraces.LttngKernelTraceGenerator;
+import org.eclipse.tracecompass.ctf.core.tests.shared.LttngKernelTraceGenerator;
 import org.eclipse.tracecompass.tmf.remote.ui.swtbot.tests.TmfRemoteUISWTBotTestPlugin;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;

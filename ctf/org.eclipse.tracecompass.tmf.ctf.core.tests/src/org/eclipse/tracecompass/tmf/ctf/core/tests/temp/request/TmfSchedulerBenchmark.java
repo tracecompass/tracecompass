@@ -14,11 +14,12 @@ package org.eclipse.tracecompass.tmf.ctf.core.tests.temp.request;
 
 import java.io.PrintWriter;
 
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 
 /**
@@ -43,7 +44,7 @@ public class TmfSchedulerBenchmark {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private static CtfTmfTrace trace = CtfTmfTestTrace.KERNEL.getTrace();
+    private static CtfTmfTrace trace = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.KERNEL);
     private static ForegroundRequest lastForegroundRequest = null;
     private static BackgroundRequest lastBackgroundRequest = null;
 

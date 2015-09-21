@@ -18,8 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.statistics.ITmfStatistics;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -37,7 +38,7 @@ public abstract class TmfStatisticsTest {
     @Rule public TestRule globalTimeout= new Timeout(30, TimeUnit.SECONDS);
 
     /** Test trace used for these tests */
-    protected static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.KERNEL;
+    protected static final @NonNull CtfTestTrace testTrace = CtfTestTrace.KERNEL;
 
     /** The statistics back-end object */
     protected static ITmfStatistics backend;

@@ -17,12 +17,14 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnalysisModule;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 
 /**
@@ -36,7 +38,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
  */
 public class GenerateTestValues {
 
-    private static CtfTmfTestTrace testTrace = CtfTmfTestTrace.TRACE2;
+    private static @NonNull CtfTestTrace testTrace = CtfTestTrace.TRACE2;
     private static final long targetTimestamp = 18670067372290L + 1331649577946812237L;
     private static final String INDENT = "    ";
 
@@ -49,17 +51,12 @@ public class GenerateTestValues {
      *             I'm messing with Exception. Come at me bro!
      */
     public static void main(String[] args) throws Exception {
-        if (!testTrace.exists()) {
-            System.err.println("Trace files not present.");
-            return;
-        }
-
         /* Prepare the files */
         File logFile = File.createTempFile("TestValues", ".java");
         try (PrintWriter writer = new PrintWriter(new FileWriter(logFile), true);) {
 
             /* Build and query the state system */
-            final CtfTmfTrace trace = testTrace.getTrace();
+            final CtfTmfTrace trace = CtfTmfTestTraceUtils.getTrace(testTrace);
             TmfStateSystemAnalysisModule module = new KernelAnalysisModule() {
                 @Override
                 protected String getSsFileName() {

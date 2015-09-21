@@ -14,12 +14,12 @@
 package org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.varia.NullAppender;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -37,10 +37,11 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.internal.tmf.ui.views.statistics.TmfStatisticsViewImpl;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
@@ -70,7 +71,7 @@ public abstract class AbstractImportAndReadSmokeTest {
     /** Trace type name for generic CTF traces */
     protected static final String TRACE_TYPE_NAME = "Generic CTF Trace";
     /** A Generic CTF Trace */
-    protected static final CtfTmfTestTrace fTrace = CtfTmfTestTrace.SYNC_DEST;
+    protected static final @NonNull CtfTestTrace fTrace = CtfTestTrace.SYNC_DEST;
     /** SWT BOT workbench reference */
     protected static SWTWorkbenchBot fBot;
     /** Wizard to use */
@@ -82,7 +83,6 @@ public abstract class AbstractImportAndReadSmokeTest {
     /** Test Class setup */
     @BeforeClass
     public static void init() {
-        assumeTrue(fTrace.exists());
         SWTBotUtils.failIfUIThread();
 
         /* set up for swtbot */
@@ -245,7 +245,7 @@ public abstract class AbstractImportAndReadSmokeTest {
      * @return the event at given rank
      */
     protected CtfTmfEvent getEvent(int rank) {
-        CtfTmfTrace trace = fTrace.getTrace();
+        CtfTmfTrace trace = CtfTmfTestTraceUtils.getTrace(fTrace);
         ITmfContext ctx = trace.seekEvent(rank);
         CtfTmfEvent ret = trace.getNext(ctx);
         ctx.dispose();

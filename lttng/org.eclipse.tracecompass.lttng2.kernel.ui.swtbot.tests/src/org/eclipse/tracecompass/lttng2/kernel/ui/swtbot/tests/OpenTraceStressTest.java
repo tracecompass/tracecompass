@@ -27,12 +27,14 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.analysis.Messages;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -48,7 +50,7 @@ public class OpenTraceStressTest {
 
     private static final String TRACE_TYPE = "org.eclipse.linuxtools.lttng2.kernel.tracetype";
     private static final String KERNEL_PERSPECTIVE_ID = "org.eclipse.linuxtools.lttng2.kernel.ui.perspective";
-    private static final CtfTmfTestTrace CTF_TRACE = CtfTmfTestTrace.SYNC_DEST;
+    private static final @NonNull CtfTestTrace CTF_TRACE = CtfTestTrace.SYNC_DEST;
     private static final String TRACE_PROJECT_NAME = "test";
 
     private static SWTWorkbenchBot workbenchbot;
@@ -82,7 +84,7 @@ public class OpenTraceStressTest {
     public void testOpenAndCloseConcurrency() {
         SWTBotUtils.createProject(TRACE_PROJECT_NAME);
 
-        File fTestFile = new File(CTF_TRACE.getPath());
+        File fTestFile = new File(CtfTmfTestTraceUtils.getTrace(CTF_TRACE).getPath());
 
         String path = fTestFile.getAbsolutePath();
 

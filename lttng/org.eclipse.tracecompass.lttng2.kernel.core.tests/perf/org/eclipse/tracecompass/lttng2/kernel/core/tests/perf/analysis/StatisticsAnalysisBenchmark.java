@@ -15,17 +15,18 @@ package org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.analysis;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
 import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.statistics.ITmfStatistics;
@@ -33,7 +34,8 @@ import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsModule;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestHelper;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
+import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -42,6 +44,7 @@ import org.junit.Test;
  *
  * @author Alexis Cabana-Loriaux
  */
+@NonNullByDefault
 public class StatisticsAnalysisBenchmark {
 
     private static final String TEST_ID = "org.eclipse.linuxtools#Statistics analysis";
@@ -80,7 +83,7 @@ public class StatisticsAnalysisBenchmark {
      */
     @Test
     public void testDjangoClient() {
-        runTest(CtfTmfTestTrace.DJANGO_CLIENT, "Django-client trace", fDjangoClientEntriesToTest);
+        runTest(CtfTestTrace.DJANGO_CLIENT, "Django-client trace", fDjangoClientEntriesToTest);
     }
 
     /**
@@ -88,17 +91,15 @@ public class StatisticsAnalysisBenchmark {
      */
     @Test
     public void testDjangoHttpd() {
-        runTest(CtfTmfTestTrace.DJANGO_HTTPD, "Django-Httpd trace", fDjangoHttpdEntriesToTest);
+        runTest(CtfTestTrace.DJANGO_HTTPD, "Django-Httpd trace", fDjangoHttpdEntriesToTest);
     }
 
-    private static void runTest(CtfTmfTestTrace testTrace, String testName, Map<String, Long> testCases) {
-        assumeTrue(testTrace.exists());
-
+    private static void runTest(CtfTestTrace testTrace, String testName, Map<String, Long> testCases) {
         Performance perf = Performance.getDefault();
         PerformanceMeter pm = perf.createPerformanceMeter(TEST_ID + '#' + testName);
         perf.tagAsSummary(pm, "Statistics Analysis: " + testName, Dimension.CPU_TIME);
 
-        if (testTrace == CtfTmfTestTrace.DJANGO_CLIENT || testTrace == CtfTmfTestTrace.DJANGO_HTTPD) {
+        if (testTrace == CtfTestTrace.DJANGO_CLIENT || testTrace == CtfTestTrace.DJANGO_HTTPD) {
             /* Do not show all traces in the global summary */
             perf.tagAsGlobalSummary(pm, "Statistics Analysis: " + testName, Dimension.CPU_TIME);
         }
@@ -110,7 +111,10 @@ public class StatisticsAnalysisBenchmark {
                 trace = new LttngKernelTrace();
                 module = new TmfStatisticsModule();
                 module.setId("test");
-                trace.initTrace(null, testTrace.getPath(), CtfTmfEvent.class);
+
+                // TODO Allow the utility method to return a LttngKernelTrace directly
+                CtfTmfTrace ctfTmfTrace = CtfTmfTestTraceUtils.getTrace(testTrace);
+                trace.initTrace(null, ctfTmfTrace.getPath(), CtfTmfEvent.class);
                 module.setTrace(trace);
 
                 pm.start();
@@ -154,6 +158,6 @@ public class StatisticsAnalysisBenchmark {
             }
         }
         pm.commit();
-        testTrace.dispose();
+        CtfTmfTestTraceUtils.dispose(testTrace);
     }
 }

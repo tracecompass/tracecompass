@@ -18,18 +18,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.Collection;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator.CtfIterator;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEventFactory;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,7 +44,7 @@ import org.junit.Test;
  */
 public class CtfTmfEventTest {
 
-    private static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.KERNEL;
+    private static final @NonNull CtfTestTrace testTrace = CtfTestTrace.KERNEL;
 
     private static CtfTmfEvent nullEvent;
     private CtfTmfEvent fixture;
@@ -53,8 +54,7 @@ public class CtfTmfEventTest {
      */
     @Before
     public void setUp() {
-        assumeTrue(testTrace.exists());
-        CtfTmfTrace trace = testTrace.getTrace();
+        CtfTmfTrace trace = CtfTmfTestTraceUtils.getTrace(testTrace);
         try (CtfIterator tr = (CtfIterator) trace.createIterator();) {
             tr.advance();
             fixture = tr.getCurrentEvent();

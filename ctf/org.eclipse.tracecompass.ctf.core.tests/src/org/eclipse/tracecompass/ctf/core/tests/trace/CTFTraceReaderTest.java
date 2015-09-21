@@ -15,13 +15,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
-import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
+import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTraceUtils;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,8 +46,7 @@ public class CTFTraceReaderTest {
      */
     @Before
     public void setUp() throws CTFException {
-        assumeTrue(testTrace.exists());
-        fixture = new CTFTraceReader(testTrace.getTrace());
+        fixture = new CTFTraceReader(CtfTestTraceUtils.getTrace(testTrace));
     }
 
     /**
@@ -58,7 +57,7 @@ public class CTFTraceReaderTest {
      */
     @Test
     public void testOpen_existing() throws CTFException {
-        CTFTrace trace = testTrace.getTrace();
+        CTFTrace trace = CtfTestTraceUtils.getTrace(testTrace);
         try (CTFTraceReader result = new CTFTraceReader(trace);) {
             assertNotNull(result);
         }
@@ -142,31 +141,6 @@ public class CTFTraceReaderTest {
     public void testCopyFrom() throws CTFException {
         try (CTFTraceReader result = fixture.copyFrom();) {
             assertNotNull(result);
-        }
-    }
-
-    /**
-     * Test the hashCode method.
-     */
-    @Test
-    public void testHash() {
-        int result = fixture.hashCode();
-        assertTrue(0 != result);
-    }
-
-    /**
-     * Test the equals method. Uses the class-wide 'fixture' and another
-     * method-local 'fixture2', which both point to the same trace.
-     *
-     * Both trace reader are different objects, so they shouldn't "equals" each
-     * other.
-     *
-     * @throws CTFException
-     */
-    @Test
-    public void testEquals() throws CTFException {
-        try (CTFTraceReader fixture2 = new CTFTraceReader(testTrace.getTrace());) {
-            assertEquals(fixture, fixture2);
         }
     }
 

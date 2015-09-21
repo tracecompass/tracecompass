@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.callstack.LttngUstCallStackProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
@@ -30,12 +31,13 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundExc
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.After;
 import org.junit.Before;
@@ -58,7 +60,7 @@ public abstract class AbstractProviderTest {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private static final CtfTmfTestTrace otherUstTrace = CtfTmfTestTrace.HELLO_LOST;
+    private static final @NonNull CtfTestTrace otherUstTrace = CtfTestTrace.HELLO_LOST;
 
     private CtfTmfTrace fTrace = null;
     private ITmfStateSystem fSS = null;
@@ -72,7 +74,7 @@ public abstract class AbstractProviderTest {
     /**
      * @return The test trace to use for this test
      */
-    protected abstract CtfTmfTestTrace getTestTrace();
+    protected abstract @NonNull CtfTestTrace getTestTrace();
 
     /**
      * @return The name of the executable process in that particular trace
@@ -97,9 +99,9 @@ public abstract class AbstractProviderTest {
      */
     @Before
     public void setUp() {
-        CtfTmfTestTrace testTrace = getTestTrace();
+        CtfTestTrace testTrace = getTestTrace();
 
-        CtfTmfTrace trace = testTrace.getTrace();
+        CtfTmfTrace trace = CtfTmfTestTraceUtils.getTrace(testTrace);
         fTrace = trace;
         fModule = new TestLttngCallStackModule();
         try {
@@ -139,7 +141,7 @@ public abstract class AbstractProviderTest {
     public void testOtherUstTrace() {
         /* Initialize the trace and analysis module */
         File suppDir;
-        CtfTmfTrace ustTrace = otherUstTrace.getTrace();
+        CtfTmfTrace ustTrace = CtfTmfTestTraceUtils.getTrace(otherUstTrace);
         TestLttngCallStackModule module = null;
         try {
             module = new TestLttngCallStackModule();

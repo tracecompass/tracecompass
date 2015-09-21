@@ -11,23 +11,21 @@
  *   Marc-Andre Laperle - Move generation to traces folder
  *******************************************************************************/
 
-package org.eclipse.tracecompass.ctf.core.tests.synthetictraces;
+package org.eclipse.tracecompass.ctf.core.tests.shared;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.tracecompass.ctf.core.tests.CtfCoreTestPlugin;
 
 /**
@@ -203,15 +201,9 @@ public class LttngKernelTraceGenerator {
         if (plugin == null) {
             return null;
         }
-        URL location = FileLocator.find(plugin.getBundle(), new Path(TRACES_DIRECTORY), null);
-        File file = null;
-        try {
-            IPath path = new Path(FileLocator.toFileURL(location).getPath()).append(TRACE_NAME);
-            file = path.toFile();
-        } catch (IOException e) {
-            // Shouldn't happen but at least throw something to get the test to fail early
-            throw new IllegalStateException();
-        }
+        Path tracePath = Paths.get("..", "..", "ctf", "org.eclipse.tracecompass.ctf.core.tests", TRACES_DIRECTORY, TRACE_NAME);
+        tracePath = tracePath.toAbsolutePath();
+        File file = tracePath.toFile();
 
         if (!file.exists()) {
             generateLttngKernelTrace(file);

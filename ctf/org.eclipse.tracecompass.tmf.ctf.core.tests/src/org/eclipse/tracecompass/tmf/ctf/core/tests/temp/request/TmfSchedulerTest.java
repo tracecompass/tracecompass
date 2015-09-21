@@ -16,24 +16,22 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.core.resources.IResource;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
-import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.After;
 import org.junit.Before;
@@ -56,7 +54,7 @@ public class TmfSchedulerTest {
     // Constants
     // ------------------------------------------------------------------------
 
-    private static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.KERNEL;
+    private static final @NonNull CtfTestTrace testTrace = CtfTestTrace.KERNEL;
     private static final int NB_EVENTS_TRACE = 695319;
     private static final int NB_EVENTS_TIME_RANGE = 155133;
 
@@ -76,15 +74,10 @@ public class TmfSchedulerTest {
 
     /**
      * Perform pre-test initialization.
-     *
-     * @throws TmfTraceException
-     *             If the test trace is not found
      */
     @Before
-    public void setUp() throws TmfTraceException {
-        assumeTrue(testTrace.exists());
-        fixture = new CtfTmfTrace();
-        fixture.initTrace((IResource) null, testTrace.getPath(), CtfTmfEvent.class);
+    public void setUp() {
+        fixture = CtfTmfTestTraceUtils.getTrace(testTrace);
         fixture.indexTrace(true);
         fStartTime = fixture.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
         fEndTime = fixture.getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();

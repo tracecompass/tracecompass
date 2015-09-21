@@ -77,7 +77,7 @@ import org.junit.runner.RunWith;
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTest {
 
-    private static final String TRACE_FOLDER_PARENT_PATH = fTrace.getPath() + File.separator + ".." + File.separator + ".." + File.separator;
+    private static final String TRACE_FOLDER_PARENT_PATH = "../../ctf/org.eclipse.tracecompass.ctf.core.tests/traces/";
     private static final String ARCHIVE_FILE_NAME = "synctraces.tar.gz";
     private static final String EMPTY_ARCHIVE_FOLDER = "emptyArchiveFolder";
     private static final String EMPTY_FILE_NAME = "emptyFile";

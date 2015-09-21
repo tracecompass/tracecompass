@@ -15,7 +15,6 @@ package org.eclipse.tracecompass.tmf.ctf.core.tests.temp.statistics;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
@@ -23,9 +22,9 @@ import org.eclipse.tracecompass.tmf.core.statistics.TmfStateStatistics;
 import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsEventTypesModule;
 import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsTotalsModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 
 /**
  * Unit tests for the {@link TmfStateStatistics}
@@ -40,19 +39,11 @@ public class TmfStateStatisticsTest extends TmfStatisticsTest {
     private TmfStatisticsEventTypesModule fEventTypesMod;
 
     /**
-     * Class setup
-     */
-    @BeforeClass
-    public static void setUpClass() {
-        assumeTrue(testTrace.exists());
-    }
-
-    /**
      * Test setup
      */
     @Before
     public void setUp() {
-        ITmfTrace trace = testTrace.getTrace();
+        ITmfTrace trace = CtfTmfTestTraceUtils.getTrace(testTrace);
         fTrace = trace;
 
         /* Prepare the two analysis-backed state systems */

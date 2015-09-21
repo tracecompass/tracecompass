@@ -18,7 +18,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.List;
 import java.util.Set;
@@ -27,17 +26,17 @@ import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelAnal
 import org.eclipse.tracecompass.lttng2.control.core.session.SessionConfigStrings;
 import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestHelper;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -54,22 +53,17 @@ public class LttngKernelAnalysisTest {
     private KernelAnalysisModule fKernelAnalysisModule;
 
     /**
-     * Class setup
-     */
-    @BeforeClass
-    public static void setUpClass() {
-        assumeTrue(CtfTmfTestTrace.KERNEL.exists());
-    }
-
-    /**
      * Set-up the test
      */
     @Before
     public void setUp() {
         fKernelAnalysisModule = new KernelAnalysisModule();
+        // Rework the utils to allow creating a sub-type directly.
+        String path = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.KERNEL).getPath();
+
         fTrace = new LttngKernelTrace();
         try {
-            fTrace.initTrace(null, CtfTmfTestTrace.KERNEL.getPath(), CtfTmfEvent.class);
+            fTrace.initTrace(null, path, CtfTmfEvent.class);
         } catch (TmfTraceException e) {
             /* Should not happen if tracesExist() passed */
             throw new RuntimeException(e);
@@ -123,8 +117,7 @@ public class LttngKernelAnalysisTest {
         assertTrue(fKernelAnalysisModule.canExecute(fTrace));
 
         /* Test with a CTF trace that does not have required events */
-        assumeTrue(CtfTmfTestTrace.CYG_PROFILE.exists());
-        CtfTmfTrace trace = CtfTmfTestTrace.CYG_PROFILE.getTrace();
+        CtfTmfTrace trace = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.CYG_PROFILE);
         /*
          * TODO: This should be false, but for now there is no mandatory events
          * in the kernel analysis so it will return true.

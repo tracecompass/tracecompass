@@ -13,19 +13,19 @@
 package org.eclipse.tracecompass.lttng2.kernel.core.tests.event.matchandsync;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpEventMatching;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpLttngEventMatching;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.tracecompass.tmf.core.synchronization.SynchronizationAlgorithm;
 import org.eclipse.tracecompass.tmf.core.synchronization.TimestampTransformFactory;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -62,10 +62,8 @@ public class ExperimentSyncTest {
      */
     @Test
     public void testExperimentSync() {
-        assumeTrue(CtfTmfTestTrace.SYNC_SRC.exists());
-        assumeTrue(CtfTmfTestTrace.SYNC_DEST.exists());
-        CtfTmfTrace trace1 = CtfTmfTestTrace.SYNC_SRC.getTrace();
-        CtfTmfTrace trace2 = CtfTmfTestTrace.SYNC_DEST.getTrace();
+        CtfTmfTrace trace1 = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.SYNC_SRC);
+        CtfTmfTrace trace2 = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.SYNC_DEST);
 
         ITmfTrace[] traces = { trace1, trace2 };
         TmfExperiment experiment = new TmfExperiment(traces[0].getEventType(), EXPERIMENT, traces, BLOCK_SIZE, null);
@@ -94,13 +92,9 @@ public class ExperimentSyncTest {
      */
     @Test
     public void testDjangoExperimentSync() {
-        assumeTrue(CtfTmfTestTrace.DJANGO_CLIENT.exists());
-        assumeTrue(CtfTmfTestTrace.DJANGO_DB.exists());
-        assumeTrue(CtfTmfTestTrace.DJANGO_HTTPD.exists());
-
-        CtfTmfTrace trace1 = CtfTmfTestTrace.DJANGO_CLIENT.getTrace();
-        CtfTmfTrace trace2 = CtfTmfTestTrace.DJANGO_DB.getTrace();
-        CtfTmfTrace trace3 = CtfTmfTestTrace.DJANGO_HTTPD.getTrace();
+        CtfTmfTrace trace1 = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.DJANGO_CLIENT);
+        CtfTmfTrace trace2 = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.DJANGO_DB);
+        CtfTmfTrace trace3 = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.DJANGO_HTTPD);
 
         ITmfTrace[] traces = { trace1, trace2, trace3 };
         TmfExperiment experiment = new TmfExperiment(traces[0].getEventType(), EXPERIMENT, traces, BLOCK_SIZE, null);

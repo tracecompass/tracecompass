@@ -33,7 +33,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
@@ -55,8 +55,6 @@ import org.junit.runner.RunWith;
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class ImportAndReadKernelSmokeTest extends KernelTest {
 
-    private static final CtfTmfTestTrace CTT = CtfTmfTestTrace.SYNTHETIC_TRACE;
-
     private ITmfEvent fDesired1;
     private ITmfEvent fDesired2;
 
@@ -65,10 +63,11 @@ public class ImportAndReadKernelSmokeTest extends KernelTest {
      */
     @Test
     public void test() {
-        Matcher<IEditorReference> matcher = WidgetMatcherFactory.withPartName(CTT.getTrace().getName());
+        CtfTmfTrace trace = CtfTmfTestTraceUtils.getSyntheticTrace();
+        Matcher<IEditorReference> matcher = WidgetMatcherFactory.withPartName(trace.getName());
         IEditorPart iep = fBot.editor(matcher).getReference().getEditor(true);
         final TmfEventsEditor tmfEd = (TmfEventsEditor) iep;
-        CtfTmfTrace trace = CtfTmfTestTrace.SYNTHETIC_TRACE.getTrace();
+
         fDesired1 = getEvent(trace, 100);
         fDesired2 = getEvent(trace, 10000);
 

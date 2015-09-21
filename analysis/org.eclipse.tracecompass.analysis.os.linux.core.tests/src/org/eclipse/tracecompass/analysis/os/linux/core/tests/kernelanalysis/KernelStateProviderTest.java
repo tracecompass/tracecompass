@@ -13,12 +13,15 @@
 package org.eclipse.tracecompass.analysis.os.linux.core.tests.kernelanalysis;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assume.assumeTrue;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelanalysis.KernelStateProvider;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
+import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -29,8 +32,9 @@ import org.junit.Test;
  */
 public class KernelStateProviderTest {
 
-    private static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.TRACE2;
+    private static final @NonNull CtfTestTrace testTrace = CtfTestTrace.TRACE2;
 
+    private static CtfTmfTrace trace;
     private static ITmfStateProvider input;
 
     /**
@@ -38,8 +42,19 @@ public class KernelStateProviderTest {
      */
     @BeforeClass
     public static void initialize() {
-        assumeTrue(testTrace.exists());
-        input = new KernelStateProvider(testTrace.getTrace(), IKernelAnalysisEventLayout.DEFAULT_LAYOUT);
+        CtfTmfTrace thetrace = CtfTmfTestTraceUtils.getTrace(testTrace);
+        trace = thetrace;
+        input = new KernelStateProvider(thetrace, IKernelAnalysisEventLayout.DEFAULT_LAYOUT);
+    }
+
+    /**
+     * Class teardown
+     */
+    @AfterClass
+    public static void classTeardown() {
+        if (trace != null) {
+            trace.dispose();
+        }
     }
 
     /**

@@ -16,7 +16,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -24,9 +23,10 @@ import java.io.FilenameFilter;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
-import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
+import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTraceUtils;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStream;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInput;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -51,14 +51,12 @@ public class CTFStreamInputTest {
      */
     @Before
     public void setUp() throws CTFException {
-        assumeTrue(testTrace.exists());
-        fixture = new CTFStreamInput(new CTFStream(testTrace.getTrace()), createFile());
+        fixture = new CTFStreamInput(new CTFStream(CtfTestTraceUtils.getTrace(testTrace)), createFile());
         fixture.setTimestampEnd(1L);
     }
 
-    @NonNull
-    private static File createFile() {
-        File path = new File(testTrace.getPath());
+    private static @NonNull File createFile() throws CTFException {
+        File path = new File(CtfTestTraceUtils.getTrace(testTrace).getPath());
         final File[] listFiles = path.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
@@ -141,14 +139,14 @@ public class CTFStreamInputTest {
 
     @Test
     public void testEquals1() throws CTFException {
-        s1 = new CTFStreamInput(new CTFStream(testTrace.getTrace()),
+        s1 = new CTFStreamInput(new CTFStream(CtfTestTraceUtils.getTrace(testTrace)),
                 createFile());
         assertFalse(s1.equals(null));
     }
 
     @Test
     public void testEquals2() throws CTFException {
-        s1 = new CTFStreamInput(new CTFStream(testTrace.getTrace()),
+        s1 = new CTFStreamInput(new CTFStream(CtfTestTraceUtils.getTrace(testTrace)),
                 createFile());
         assertFalse(s1.equals(new Long(23L)));
 
@@ -156,7 +154,7 @@ public class CTFStreamInputTest {
 
     @Test
     public void testEquals3() throws CTFException {
-        s1 = new CTFStreamInput(new CTFStream(testTrace.getTrace()),
+        s1 = new CTFStreamInput(new CTFStream(CtfTestTraceUtils.getTrace(testTrace)),
                 createFile());
         assertEquals(s1, s1);
 
@@ -164,9 +162,9 @@ public class CTFStreamInputTest {
 
     @Test
     public void testEquals4() throws CTFException {
-        s1 = new CTFStreamInput(new CTFStream(testTrace.getTrace()),
+        s1 = new CTFStreamInput(new CTFStream(CtfTestTraceUtils.getTrace(testTrace)),
                 createFile());
-        s2 = new CTFStreamInput(new CTFStream(testTrace.getTrace()),
+        s2 = new CTFStreamInput(new CTFStream(CtfTestTraceUtils.getTrace(testTrace)),
                 createFile());
         assertEquals(s1, s2);
     }

@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.ctf.core.tests.types;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assume.assumeTrue;
 
 import java.nio.ByteBuffer;
 
@@ -34,7 +33,8 @@ import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.VariantDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.VariantDefinition;
-import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
+import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTraceUtils;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -60,7 +60,6 @@ public class VariantDeclarationTest {
     }
 
     private static IDefinitionScope createDefinitionScope() throws CTFException {
-        assumeTrue(testTrace.exists());
         StructDeclaration declaration = new StructDeclaration(8);
         VariantDeclaration variantDeclaration = new VariantDeclaration();
         variantDeclaration.addField("a", IntegerDeclaration.INT_32B_DECL);
@@ -84,7 +83,7 @@ public class VariantDeclarationTest {
                 );
         VariantDefinition variantDefinition = new VariantDefinition(
                 variantDeclaration,
-                testTrace.getTrace(),
+                CtfTestTraceUtils.getTrace(testTrace),
                 "tag",
                 "tag",
                 new StringDefinition(

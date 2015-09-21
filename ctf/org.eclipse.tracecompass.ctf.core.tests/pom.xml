@@ -25,10 +25,6 @@
   <version>1.0.0-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
 
-  <properties>
-    <ctfTestSuiteCommit>0f8beba86ae551f42adeb81d1bfddd5645f31013</ctfTestSuiteCommit>
-  </properties>
-
   <!-- Do not download the test traces if "maven.test.skip" is set -->
   <profiles>
     <profile>
@@ -51,7 +47,6 @@
                 <phase>pre-integration-test</phase>
                 <configuration>
                   <target>
-                    <property name="ctf-test-suite-commit" value="${ctfTestSuiteCommit}"/>
                     <ant antfile="get-traces.xml" dir="traces" />
                   </target>
                 </configuration>
@@ -92,19 +87,7 @@
             <phase>clean</phase>
             <configuration>
               <filesets>
-                <fileset><directory>traces/ctf-testsuite</directory></fileset>
-                <fileset><directory>traces/cyg-profile</directory></fileset>
-                <fileset><directory>traces/django-benchmark</directory></fileset>
-                <fileset><directory>traces/funky_trace</directory></fileset>
-                <fileset><directory>traces/hello-lost</directory></fileset>
-                <fileset><directory>traces/kernel</directory></fileset>
-                <fileset><directory>traces/kernel_vm</directory></fileset>
                 <fileset><directory>traces/synctraces</directory></fileset>
-                <fileset><directory>traces/synthetic-trace</directory></fileset>
-                <fileset><directory>traces/trace2</directory></fileset>
-                <fileset><directory>traces/exp</directory></fileset>
-                <fileset><directory>traces/flipping-endianness</directory></fileset>
-                <fileset><directory>traces/bug470846</directory></fileset>
               </filesets>
             </configuration>
             <goals>

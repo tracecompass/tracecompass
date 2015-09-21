@@ -25,7 +25,7 @@ import java.io.InputStreamReader;
 
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
-import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
+import org.eclipse.tracecompass.ctf.core.tests.shared.LttngKernelTraceGenerator;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
 import org.eclipse.tracecompass.ctf.core.trace.Metadata;
@@ -39,9 +39,9 @@ import org.junit.Test;
  *
  */
 public class CTFTraceGrowingTest {
-    final private String fPathName = CtfTestTrace.SYNTHETIC_TRACE.getPath();
 
-    final private CTFTrace fixture = new CTFTrace();
+    private final String fPathName = LttngKernelTraceGenerator.getPath();
+    private final CTFTrace fixture = new CTFTrace();
 
     /**
      * Init

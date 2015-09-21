@@ -28,6 +28,7 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -44,6 +45,7 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
     private static final @NonNull String TEST_FILE_NAME = "test.ht";
     private static final @NonNull String BENCHMARK_FILE_NAME = "test.benchmark.ht";
 
+    private static CtfTmfTrace trace;
     private static File stateFile;
     private static File stateFileBenchmark;
     private static TestLttngKernelAnalysisModule module;
@@ -53,18 +55,14 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
      */
     @BeforeClass
     public static void initialize() {
-        if (!testTrace.exists()) {
-            traceIsPresent = false;
-            return;
-        }
-        traceIsPresent = true;
+        trace = CtfTmfTestTraceUtils.getTrace(testTrace);
 
         stateFile = createStateFile(TEST_FILE_NAME);
         stateFileBenchmark = createStateFile(BENCHMARK_FILE_NAME);
 
         module = new TestLttngKernelAnalysisModule(TEST_FILE_NAME);
         try {
-            assertTrue(module.setTrace(testTrace.getTrace()));
+            assertTrue(module.setTrace(trace));
         } catch (TmfAnalysisException e) {
             fail();
         }
@@ -91,8 +89,12 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
         if (fixture != null) {
             fixture.dispose();
         }
+        if (trace != null) {
+            trace.dispose();
+        }
         module = null;
         fixture = null;
+        trace = null;
     }
 
     // ------------------------------------------------------------------------
@@ -107,7 +109,7 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
     public void testBuild() {
         TestLttngKernelAnalysisModule module2 = new TestLttngKernelAnalysisModule(BENCHMARK_FILE_NAME);
         try {
-            assertTrue(module2.setTrace(testTrace.getTrace()));
+            assertTrue(module2.setTrace(trace));
         } catch (TmfAnalysisException e) {
             module2.dispose();
             fail();
@@ -131,7 +133,7 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
         /* 'newStateFile' should have already been created */
         TestLttngKernelAnalysisModule module2 = new TestLttngKernelAnalysisModule(TEST_FILE_NAME);
         try {
-            assertTrue(module2.setTrace(testTrace.getTrace()));
+            assertTrue(module2.setTrace(trace));
         } catch (TmfAnalysisException e) {
             module2.dispose();
             fail();
@@ -182,7 +184,7 @@ public class StateSystemFullHistoryTest extends StateSystemTest {
     }
 
     private static File createStateFile(String name) {
-        File file = new File(TmfTraceManager.getSupplementaryFileDir(testTrace.getTrace()) + name);
+        File file = new File(TmfTraceManager.getSupplementaryFileDir(trace) + name);
         if (file.exists()) {
             file.delete();
         }

@@ -17,13 +17,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator.CtfIterator;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfLocation;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfLocationInfo;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.After;
 import org.junit.Before;
@@ -38,7 +39,7 @@ import org.junit.Test;
  */
 public class CtfIteratorTest {
 
-    private static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.KERNEL;
+    private static final @NonNull CtfTestTrace testTrace = CtfTestTrace.KERNEL;
 
     private CtfTmfTrace trace;
     private CtfIterator iterator;
@@ -48,8 +49,7 @@ public class CtfIteratorTest {
      */
     @Before
     public void setUp() {
-        assumeTrue(testTrace.exists());
-        trace = testTrace.getTrace();
+        trace = CtfTmfTestTraceUtils.getTrace(testTrace);
         iterator = (CtfIterator) trace.createIterator();
         CtfLocation ctfLocation = new CtfLocation(new CtfLocationInfo(1, 0));
         iterator.setLocation(ctfLocation);

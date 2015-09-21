@@ -25,6 +25,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -41,6 +42,7 @@ public class PartialStateSystemTest extends StateSystemTest {
 
     private static final @NonNull String TEST_FILE_NAME = "test-partial";
 
+    private static CtfTmfTrace trace;
     private static File stateFile;
     private static TestLttngKernelAnalysisModule module;
 
@@ -49,20 +51,16 @@ public class PartialStateSystemTest extends StateSystemTest {
      */
     @BeforeClass
     public static void initialize() {
-        if (!testTrace.exists()) {
-            traceIsPresent = false;
-            return;
-        }
-        traceIsPresent = true;
+        trace = CtfTmfTestTraceUtils.getTrace(testTrace);
 
-        stateFile = new File(TmfTraceManager.getSupplementaryFileDir(testTrace.getTrace()) + TEST_FILE_NAME);
+        stateFile = new File(TmfTraceManager.getSupplementaryFileDir(trace) + TEST_FILE_NAME);
         if (stateFile.exists()) {
             stateFile.delete();
         }
 
         module = new TestLttngKernelAnalysisModule(TEST_FILE_NAME);
         try {
-            assertTrue(module.setTrace(testTrace.getTrace()));
+            assertTrue(module.setTrace(trace));
         } catch (TmfAnalysisException e) {
             fail();
         }
@@ -86,8 +84,12 @@ public class PartialStateSystemTest extends StateSystemTest {
         if (fixture != null) {
             fixture.dispose();
         }
+        if (trace != null) {
+            trace.dispose();
+        }
         module = null;
         fixture = null;
+        trace = null;
     }
 
     /**

@@ -15,9 +15,9 @@ package org.eclipse.tracecompass.tmf.ctf.core.tests.event;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfLostEvent;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
@@ -26,7 +26,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.After;
 import org.junit.Before;
@@ -46,7 +46,7 @@ import org.junit.Test;
  */
 public class CtfTmfLostEventsTest {
 
-    private static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.HELLO_LOST;
+    private static final @NonNull CtfTestTrace testTrace = CtfTestTrace.HELLO_LOST;
 
     private CtfTmfTrace fixture = null;
 
@@ -55,8 +55,7 @@ public class CtfTmfLostEventsTest {
      */
     @Before
     public void setUp() {
-        assumeTrue(testTrace.exists());
-        fixture = testTrace.getTrace();
+        fixture = CtfTmfTestTraceUtils.getTrace(testTrace);
         fixture.indexTrace(true);
     }
 
@@ -102,9 +101,8 @@ public class CtfTmfLostEventsTest {
      */
     @Test
     public void testNbEventsBug475007() {
-        final CtfTmfTestTrace tmfTestTrace = CtfTmfTestTrace.DYNSCOPE;
-        assumeTrue(tmfTestTrace.exists());
-        CtfTmfTrace trace = tmfTestTrace.getTrace();
+        final CtfTestTrace tmfTestTrace = CtfTestTrace.DYNSCOPE;
+        CtfTmfTrace trace = CtfTmfTestTraceUtils.getTrace(tmfTestTrace);
         trace.indexTrace(true);
 
         final long expectedReal = 100003;

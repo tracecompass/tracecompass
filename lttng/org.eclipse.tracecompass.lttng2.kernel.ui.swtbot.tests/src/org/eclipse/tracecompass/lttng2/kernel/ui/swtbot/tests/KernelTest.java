@@ -27,7 +27,7 @@ import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.results.BoolResult;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.ctf.core.tests.shared.LttngKernelTraceGenerator;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.ui.PlatformUI;
@@ -49,7 +49,6 @@ public class KernelTest {
     private static final String TRACE_TYPE = "org.eclipse.linuxtools.lttng2.kernel.tracetype";
     private static final String KERNEL_PERSPECTIVE_ID = "org.eclipse.linuxtools.lttng2.kernel.ui.perspective";
     private static final String TRACE_PROJECT_NAME = "test";
-    private static final CtfTmfTestTrace CTT = CtfTmfTestTrace.SYNTHETIC_TRACE;
 
     /** The workbench bot */
     protected static SWTWorkbenchBot fBot;
@@ -82,7 +81,6 @@ public class KernelTest {
         switchKernelPerspective();
         /* Finish waiting for eclipse to load */
         SWTBotUtils.waitForJobs();
-        SWTBotUtils.createProject(TRACE_PROJECT_NAME);
     }
 
     /**
@@ -90,7 +88,6 @@ public class KernelTest {
      */
     @AfterClass
     public static void afterClass() {
-        SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
         fLogger.removeAllAppenders();
     }
 
@@ -119,8 +116,9 @@ public class KernelTest {
      */
     @Before
     public void before() {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, CTT.getPath(), TRACE_TYPE);
-        SWTBotUtils.activateEditor(fBot, CTT.getTrace().getName());
+        SWTBotUtils.createProject(TRACE_PROJECT_NAME);
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, LttngKernelTraceGenerator.getPath(), TRACE_TYPE);
+        SWTBotUtils.activateEditor(fBot, LttngKernelTraceGenerator.getName());
     }
 
     /**
@@ -129,5 +127,6 @@ public class KernelTest {
     @After
     public void after() {
         fBot.closeAllEditors();
+        SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
     }
 }

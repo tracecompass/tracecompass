@@ -12,11 +12,11 @@ package org.eclipse.tracecompass.tmf.ctf.core.tests.trace.indexer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 
-import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -27,10 +27,9 @@ import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.TmfBTreeTraceIndexer;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.checkpoint.ITmfCheckpoint;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.checkpoint.ITmfCheckpointIndex;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -39,8 +38,8 @@ import org.junit.Test;
 public class CtfExperimentCheckpointIndexTest {
 
     private static final String EXPERIMENT = "MyExperiment";
-    private static final CtfTmfTestTrace TEST_TRACE1 = CtfTmfTestTrace.TRACE2;
-    private static final CtfTmfTestTrace TEST_TRACE2 = CtfTmfTestTrace.KERNEL_VM;
+    private static final @NonNull CtfTestTrace TEST_TRACE1 = CtfTestTrace.TRACE2;
+    private static final @NonNull CtfTestTrace TEST_TRACE2 = CtfTestTrace.KERNEL_VM;
     private static final int NB_EVENTS = CtfTestTrace.TRACE2.getNbEvents() + CtfTestTrace.KERNEL_VM.getNbEvents();
 
     private static final long START_TIME = 1331668247314038062L;
@@ -55,15 +54,6 @@ public class CtfExperimentCheckpointIndexTest {
     private static TestIndexer fIndexer;
 
     /**
-     * Setup the test class
-     */
-    @BeforeClass
-    public static void setUpClass() {
-        assumeTrue(TEST_TRACE1.exists());
-        assumeTrue(TEST_TRACE2.exists());
-    }
-
-    /**
      * Setup the test
      */
     @Before
@@ -74,8 +64,8 @@ public class CtfExperimentCheckpointIndexTest {
 
     private static void setUpTraces() {
         fTestTraces = new ITmfTrace[2];
-        fTestTraces[0] = TEST_TRACE1.getTrace();
-        fTestTraces[1] = TEST_TRACE2.getTrace();
+        fTestTraces[0] = CtfTmfTestTraceUtils.getTrace(TEST_TRACE1);
+        fTestTraces[1] = CtfTmfTestTraceUtils.getTrace(TEST_TRACE2);
         fExperiment = new TmfExperiment(ITmfEvent.class, EXPERIMENT, fTestTraces, BLOCK_SIZE, null) {
             @Override
             protected ITmfTraceIndexer createIndexer(int interval) {

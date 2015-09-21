@@ -16,14 +16,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -74,8 +74,6 @@ public class StateProviderModuleTest {
      */
     @Test
     public void testModuleExecution() {
-        assumeTrue(CtfTmfTestTrace.KERNEL.exists());
-
         Document doc = TmfXmlTestFiles.VALID_FILE.getXmlDocument();
         assertNotNull(doc);
 
@@ -90,7 +88,7 @@ public class StateProviderModuleTest {
 
         fModule.setXmlFile(TmfXmlTestFiles.VALID_FILE.getPath());
 
-        CtfTmfTrace trace = CtfTmfTestTrace.KERNEL.getTrace();
+        CtfTmfTrace trace = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.KERNEL);
         try {
             fModule.setTrace(trace);
             fModule.schedule();

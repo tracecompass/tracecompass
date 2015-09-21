@@ -16,29 +16,9 @@
     <target name="deleteFailedCheckSumTraces"/>
   </antcall>
   <antcall target="downloadTraceFiles"/>
-  <exec executable = "git" failifexecutionfails="false" timeout="20000">
-    <arg value = "clone"/>
-    <arg value = "https://github.com/efficios/ctf-testsuite.git"/>
-  </exec>
-  <condition property="testSuiteExists">
-    <and>
-      <available file="ctf-testsuite" type="dir"/>
-    </and>
-  </condition>
-  <antcall target="pullTestSuite"/>
   <condition property="tracesExist">
     <and>
-      <available file="sample-ctf-trace-20120412.tar.bz2"/>
-      <available file="trace2.tar.bz2"/>
-      <available file="kernel_vm.tar.bz2" />
       <available file="synctraces.tar.gz" />
-      <available file="django-benchmark.tar.gz" />
-      <available file="hello-lost.tar.bz2" />
-      <available file="cyg-profile.tar.bz2" />
-      <available file="funky_trace.tar.bz2" />
-      <available file="bug446190.tar.bz2" />
-      <available file="flipping-endianness.tar.bz2" />
-      <available file="bug470846.tar.bz2" />
     </and>
   </condition>
   <antcall target="extractTraces"/>
@@ -47,9 +27,7 @@
 <target name="checkAnyTraceExists">
   <pathconvert property="anyTraceExists" setonempty="false" pathsep=" ">
     <path>
-      <fileset dir="." includes="*.tar.bz2" />
       <fileset dir="." includes="*.tar.gz" />
-      <fileset dir="." includes="*.zip" />
     </path>
   </pathconvert>
 </target>
@@ -62,9 +40,7 @@
       <not>
         <and>
           <checksum>
-            <fileset dir="." includes="*.tar.bz2" />
             <fileset dir="." includes="*.tar.gz" />
-            <fileset dir="." includes="*.zip" />
           </checksum>
         </and>
       </not>
@@ -76,9 +52,7 @@
 <target name="deleteFailedCheckSumTraces" if="failedCheckSum">
   <echo message="Some traces have failed the checksum tests. Deleting traces."/>
   <delete verbose="true">
-    <fileset dir="." includes="*.tar.bz2" />
     <fileset dir="." includes="*.tar.gz" />
-    <fileset dir="." includes="*.zip" />
   </delete>
 </target>
 
@@ -88,35 +62,7 @@
 
 <target name="downloadTraceFiles">
   <echo message="Attempting to download test traces"/>
-  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="sample-ctf-trace-20120412.tar.bz2" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/sample-ctf-trace-20120412.tar.bz2"/>
-  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="trace2.tar.bz2" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/trace2.tar.bz2"/>
-  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="kernel_vm.tar.bz2" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/kernel_vm.tar.bz2" />
   <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="synctraces.tar.gz" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/synctraces.tar.gz" />
-  <get ignoreerrors="true" maxtime="200" skipexisting="true" dest="django-benchmark.tar.gz" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/django-benchmark.tar.gz" />
-  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="hello-lost.tar.bz2" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/hello-lost.tar.bz2" />
-  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="cyg-profile.tar.bz2" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/cyg-profile.tar.bz2" />
-  <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="funky_trace.tar.bz2" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/funky_trace.tar.bz2" />
-  <get ignoreerrors="true" maxtime="200" skipexisting="true" dest="testtraceExp.zip" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/testtraceExp.zip" />
-  <get ignoreerrors="true" maxtime="200" skipexisting="true" dest="bug446190.tar.bz2" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/bug446190.tar.bz2" />
-  <get ignoreerrors="true" maxtime="200" skipexisting="true" dest="flipping-endianness.tar.bz2" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/flipping-endianness.tar.bz2" />
-  <get ignoreerrors="true" maxtime="200" skipexisting="true" dest="bug470846.tar.bz2" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/bug470846.tar.bz2" />
-</target>
-
-<target name="pullTestSuite" if="testSuiteExists">
-  <!-- Update the local 'master' branch -->
-  <exec executable = "git" failifexecutionfails="false" dir="ctf-testsuite" timeout="20000">
-    <arg value = "checkout"/>
-    <arg value = "master"/>
-  </exec>
-  <exec executable = "git" failifexecutionfails="false" dir="ctf-testsuite" timeout="20000">
-    <arg value = "pull"/>
-  </exec>
-
-  <!-- Checkout the commit requested by the current build -->
-  <exec executable = "git" failifexecutionfails="false" dir="ctf-testsuite" timeout="20000">
-    <arg value = "checkout"/>
-    <arg value = "${ctf-test-suite-commit}"/>
-  </exec>
 </target>
 
 <target name="extractTraces" if="tracesExist">
@@ -125,30 +71,8 @@
       <target name="verifyChecksum"/>
       <target name="warnFailedCheckSum"/>
     </antcall>
-    <bunzip2 src="sample-ctf-trace-20120412.tar.bz2"/>
-    <bunzip2 src="trace2.tar.bz2"/>
-    <bunzip2 src="kernel_vm.tar.bz2" />
     <gunzip src="synctraces.tar.gz" />
-    <gunzip src="django-benchmark.tar.gz" />
-    <bunzip2 src="hello-lost.tar.bz2" />
-    <bunzip2 src="cyg-profile.tar.bz2" />
-    <bunzip2 src="funky_trace.tar.bz2" />
-    <bunzip2 src="bug446190.tar.bz2"/>
-    <bunzip2 src="flipping-endianness.tar.bz2"/>
-    <bunzip2 src="bug470846.tar.bz2"/>
-    <unzip src="testtraceExp.zip" dest="./exp" />
-
-    <untar src="sample-ctf-trace-20120412.tar" dest="." />
-    <untar src="trace2.tar" dest="." />
-    <untar src="kernel_vm.tar" dest="." />
     <untar src="synctraces.tar" dest="." />
-    <untar src="django-benchmark.tar" dest="." />
-    <untar src="hello-lost.tar" dest="." />
-    <untar src="cyg-profile.tar" dest="." />
-    <untar src="funky_trace.tar" dest="." />
-    <untar src="bug446190.tar" dest="." />
-    <untar src="flipping-endianness.tar" dest="." />
-    <untar src="bug470846.tar" dest="." />
 
     <echo message="Traces extracted successfully"/>
 </target>

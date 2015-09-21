@@ -24,9 +24,9 @@ import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDefinition;
-import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
-import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
+import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTraceUtils;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -84,7 +84,7 @@ public class TraceReadAllTracesTest {
     @Test
     public void readTraces() {
         if (fTraceEnum.getNbEvents() != -1) {
-            try (CTFTraceReader reader = new CTFTraceReader(new CTFTrace(fTraceEnum.getPath()))) {
+            try (CTFTraceReader reader = new CTFTraceReader(CtfTestTraceUtils.getTrace(fTraceEnum))) {
                 EventDefinition currentEventDef = reader.getCurrentEventDef();
                 double start = currentEventDef.getTimestamp();
                 long count = 0;
@@ -103,7 +103,7 @@ public class TraceReadAllTracesTest {
                 assertEquals("Event count", fTraceEnum.getNbEvents(), count);
                 assertEquals("Trace duration", fTraceEnum.getDuration(), (end - start) / 1000000000.0, 1.0);
             } catch (CTFException e) {
-                fail(fTraceEnum.getPath() + " " + e.getMessage());
+                fail(fTraceEnum.name() + " " + e.getMessage());
             }
         } else {
             assumeTrue("Trace did not specify events count", false);

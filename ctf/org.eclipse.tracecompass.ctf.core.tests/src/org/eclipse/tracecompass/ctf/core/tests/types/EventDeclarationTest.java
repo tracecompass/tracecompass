@@ -16,18 +16,18 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.LostEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
-import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
+import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTraceUtils;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStream;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
 import org.eclipse.tracecompass.internal.ctf.core.event.EventDeclaration;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -52,12 +52,11 @@ public class EventDeclarationTest {
      */
     @Before
     public void setUp() throws CTFException {
-        assumeTrue(testTrace.exists());
         fixture = new EventDeclaration();
         fixture.setContext(new StructDeclaration(1L));
         fixture.setId(1L);
         fixture.setFields(new StructDeclaration(1L));
-        fixture.setStream(new CTFStream(testTrace.getTrace()));
+        fixture.setStream(new CTFStream(CtfTestTraceUtils.getTrace(testTrace)));
         fixture.setName("");
     }
 
@@ -101,7 +100,7 @@ public class EventDeclarationTest {
         obj.setContext(new StructDeclaration(1L));
         obj.setId(1L);
         obj.setFields(new StructDeclaration(1L));
-        obj.setStream(new CTFStream(testTrace.getTrace()));
+        obj.setStream(new CTFStream(CtfTestTraceUtils.getTrace(testTrace)));
         obj.setName("");
 
         assertTrue(fixture.equals(fixture));
@@ -317,7 +316,7 @@ public class EventDeclarationTest {
      */
     @Test
     public void testEventDefinition() throws CTFException {
-        CTFTrace trace = testTrace.getTrace();
+        CTFTrace trace = CtfTestTraceUtils.getTrace(testTrace);
         EventDefinition ed = null;
         try (CTFTraceReader tr = new CTFTraceReader(trace);) {
             tr.advance();

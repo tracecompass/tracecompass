@@ -15,7 +15,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -24,10 +23,11 @@ import java.util.UUID;
 
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
-import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
+import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTraceUtils;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStream;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.Metadata;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -171,8 +171,7 @@ public class MetadataTest {
      */
     @Before
     public void setUp() throws CTFException {
-        assumeTrue(testTrace.exists());
-        fixture = new Metadata(testTrace.getTrace());
+        fixture = new Metadata(CtfTestTraceUtils.getTrace(testTrace));
     }
 
     /**
@@ -246,8 +245,8 @@ public class MetadataTest {
     @Test
     public void testParse() throws CTFException {
         setUp();
-        assertEquals(new UUID(0xd18e637435a1cd42L, 0x8e70a9cffa712793L), testTrace.getTrace().getUUID());
-        assertEquals(1332166405241713920.0, testTrace.getTrace().getClock().getClockOffset(), 200.0);
-        assertEquals(8, testTrace.getTrace().getEnvironment().size());
+        assertEquals(new UUID(0xd18e637435a1cd42L, 0x8e70a9cffa712793L), CtfTestTraceUtils.getTrace(testTrace).getUUID());
+        assertEquals(1332166405241713920.0, CtfTestTraceUtils.getTrace(testTrace).getClock().getClockOffset(), 200.0);
+        assertEquals(8, CtfTestTraceUtils.getTrace(testTrace).getEnvironment().size());
     }
 }

@@ -19,7 +19,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.nio.ByteOrder;
@@ -29,10 +28,11 @@ import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.CTFClock;
 import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
-import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
+import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTraceUtils;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStream;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.exceptions.ParseException;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,9 +53,8 @@ public class CTFTraceTest {
      */
     @Before
     public void setUp() {
-        assumeTrue(testTrace.exists());
         try {
-            fixture = testTrace.getTraceFromFile();
+            fixture = CtfTestTraceUtils.getTrace(testTrace);
         } catch (CTFException e) {
             /* If the assumeTrue() call passed, this should not happen. */
             fail();
@@ -73,7 +72,7 @@ public class CTFTraceTest {
     @Test
     public void testOpen_existing() {
         try {
-            CTFTrace result = testTrace.getTraceFromFile();
+            CTFTrace result = CtfTestTraceUtils.getTrace(testTrace);
             assertNotNull(result.getUUID());
         } catch (CTFException e) {
             fail();
@@ -113,7 +112,7 @@ public class CTFTraceTest {
 
         // Add a stream
         try {
-            CTFStream stream = new CTFStream(testTrace.getTrace());
+            CTFStream stream = new CTFStream(CtfTestTraceUtils.getTrace(testTrace));
             stream.setId(1234);
             fixture.addStream(stream);
         } catch (CTFException e) {
@@ -253,7 +252,7 @@ public class CTFTraceTest {
     @Test
     public void testPacketHeaderIsSet_invalid() {
         try {
-            CTFTrace fixture2 = testTrace.getTraceFromFile();
+            CTFTrace fixture2 = CtfTestTraceUtils.getTrace(testTrace);
             fixture2.setMinor(1L);
             fixture2.setUUID(UUID.randomUUID());
             /*

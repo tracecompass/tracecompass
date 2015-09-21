@@ -13,18 +13,17 @@
 package org.eclipse.tracecompass.tmf.ctf.core.tests.event;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assume.assumeTrue;
 
-import org.eclipse.core.resources.IResource;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.After;
 import org.junit.Before;
@@ -42,7 +41,7 @@ public class EventContextTest {
     // ------------------------------------------------------------------------
 
     /* We use test trace #2, kernel_vm, which has event contexts */
-    private static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.KERNEL_VM;
+    private static final @NonNull CtfTestTrace testTrace = CtfTestTrace.KERNEL_VM;
 
     private CtfTmfTrace fixture;
     private long startTime;
@@ -54,15 +53,10 @@ public class EventContextTest {
 
     /**
      * Perform pre-class initialization.
-     *
-     * @throws TmfTraceException
-     *             If the test trace is not found
      */
     @Before
-    public void setUp() throws TmfTraceException {
-        assumeTrue(testTrace.exists());
-        fixture = new CtfTmfTrace();
-        fixture.initTrace((IResource) null, testTrace.getPath(), CtfTmfEvent.class);
+    public void setUp() {
+        fixture = CtfTmfTestTraceUtils.getTrace(testTrace);
         fixture.indexTrace(true);
 
         startTime = fixture.getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();

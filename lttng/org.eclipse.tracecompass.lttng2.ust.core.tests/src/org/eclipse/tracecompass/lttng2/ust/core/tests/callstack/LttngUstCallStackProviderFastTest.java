@@ -12,10 +12,7 @@
 
 package org.eclipse.tracecompass.lttng2.ust.core.tests.callstack;
 
-import static org.junit.Assume.assumeTrue;
-
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
-import org.junit.BeforeClass;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 
 /**
  * Test suite for the UST callstack state provider, using the trace of a program
@@ -30,17 +27,9 @@ public class LttngUstCallStackProviderFastTest extends AbstractProviderTest {
                                                1379361250498400000L,
                                                1379361250499759000L };
 
-    /**
-     * Class setup
-     */
-    @BeforeClass
-    public static void setUpClass() {
-        assumeTrue(CtfTmfTestTrace.CYG_PROFILE_FAST.exists());
-    }
-
     @Override
-    protected CtfTmfTestTrace getTestTrace() {
-        return CtfTmfTestTrace.CYG_PROFILE_FAST;
+    protected CtfTestTrace getTestTrace() {
+        return CtfTestTrace.CYG_PROFILE_FAST;
     }
 
     @Override

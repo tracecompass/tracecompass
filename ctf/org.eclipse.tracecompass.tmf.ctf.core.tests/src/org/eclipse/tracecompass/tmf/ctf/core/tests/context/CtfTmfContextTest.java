@@ -16,15 +16,13 @@ package org.eclipse.tracecompass.tmf.ctf.core.tests.context;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 
-import org.eclipse.core.resources.IResource;
-import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfTmfContext;
-import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.After;
 import org.junit.Before;
@@ -38,7 +36,7 @@ import org.junit.Test;
  */
 public class CtfTmfContextTest {
 
-    private static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.KERNEL;
+    private static final @NonNull CtfTestTrace testTrace = CtfTestTrace.KERNEL;
     private static final long begin = 1332170682440133097L; /*
                                                              * Trace start time
                                                              */
@@ -56,16 +54,10 @@ public class CtfTmfContextTest {
 
     /**
      * Pre-test initialization
-     *
-     * @throws TmfTraceException
-     *             If the trace couldn't be init'ed, which shouldn't happen.
      */
     @Before
-    public void setUp() throws TmfTraceException {
-        assumeTrue(testTrace.exists());
-        trace = new CtfTmfTrace();
-        String path = testTrace.getPath();
-        trace.initTrace((IResource) null, path, CtfTmfEvent.class);
+    public void setUp() {
+        trace = CtfTmfTestTraceUtils.getTrace(testTrace);
     }
 
     /**

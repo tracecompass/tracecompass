@@ -17,7 +17,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -27,11 +26,12 @@ import java.util.List;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
-import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTrace;
+import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTraceUtils;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceWriter;
 import org.eclipse.tracecompass.internal.ctf.core.trace.Utils;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -170,9 +170,8 @@ public class CTFTraceWriterTest {
      */
     @Test
     public void testKernelTrace() {
-        assumeTrue(CtfTestTrace.KERNEL.exists());
             try {
-                CTFTrace trace = CtfTestTrace.KERNEL.getTrace();
+                CTFTrace trace = CtfTestTraceUtils.getTrace(CtfTestTrace.KERNEL);
                 CTFTraceWriter ctfWriter = new CTFTraceWriter(checkNotNull(trace));
                 String traceName = createTraceName(fName);
                 ctfWriter.copyPackets(fStartTime, fEndTime, traceName);

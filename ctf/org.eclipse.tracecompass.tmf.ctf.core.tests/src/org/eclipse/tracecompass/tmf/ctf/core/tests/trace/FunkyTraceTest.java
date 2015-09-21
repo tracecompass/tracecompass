@@ -14,17 +14,18 @@ package org.eclipse.tracecompass.tmf.ctf.core.tests.trace;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.ctf.core.CtfEnumPair;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
-import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
+import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.junit.After;
 import org.junit.Before;
@@ -50,7 +51,7 @@ public class FunkyTraceTest {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private static final CtfTmfTestTrace testTrace = CtfTmfTestTrace.FUNKY_TRACE;
+    private static final @NonNull CtfTestTrace testTrace = CtfTestTrace.FUNKY_TRACE;
     private static final double DELTA = 0.0000001;
 
     private CtfTmfTrace fTrace;
@@ -64,8 +65,7 @@ public class FunkyTraceTest {
      */
     @Before
     public void setup() {
-        assumeTrue(testTrace.exists());
-        fTrace = testTrace.getTrace();
+        fTrace = CtfTmfTestTraceUtils.getTrace(testTrace);
         fTrace.indexTrace(true);
     }
 
