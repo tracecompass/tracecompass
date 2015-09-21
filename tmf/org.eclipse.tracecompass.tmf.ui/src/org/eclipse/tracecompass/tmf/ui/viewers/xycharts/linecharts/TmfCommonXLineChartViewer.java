@@ -114,15 +114,15 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                 initializeDataSource();
                 TmfUiRefreshHandler.getInstance().queueUpdate(TmfCommonXLineChartViewer.this,
                         new Runnable() {
-                            @Override
-                            public void run() {
-                                if (!getSwtChart().isDisposed()) {
-                                    /* Delete the old series */
-                                    clearContent();
-                                    createSeries();
-                                }
-                            }
-                        });
+                    @Override
+                    public void run() {
+                        if (!getSwtChart().isDisposed()) {
+                            /* Delete the old series */
+                            clearContent();
+                            createSeries();
+                        }
+                    }
+                });
             }
         };
         thread.start();
@@ -149,7 +149,12 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
         @Override
         public void run() {
-            updateData(getWindowStartTime(), getWindowEndTime(), fNumRequests, fMonitor);
+            Display.getDefault().syncExec(new Runnable() {
+                @Override
+                public void run() {
+                    updateData(getWindowStartTime(), getWindowEndTime(), fNumRequests, fMonitor);
+                }
+            });
             updateThreadFinished(this);
         }
 
@@ -364,8 +369,8 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                     getSwtChart().redraw();
 
                     if (isSendTimeAlignSignals()) {
-                        // The width of the chart might have changed and its time
-                        // axis might be misaligned with the other views
+                        // The width of the chart might have changed and its
+                        // time axis might be misaligned with the other views
                         Point viewPos = TmfCommonXLineChartViewer.this.getParent().getParent().toDisplay(0, 0);
                         int axisPos = getSwtChart().toDisplay(0, 0).x + getPointAreaOffset();
                         int timeAxisOffset = axisPos - viewPos.x;
