@@ -1361,14 +1361,18 @@ public class TimeGraphControl extends TimeGraphBaseControl
         fIdealNameSpace = 0;
         int nameSpace = fTimeProvider.getNameSpace();
 
+        // draw the background layer
         drawBackground(bounds, nameSpace, gc);
 
         // draw the grid lines
         drawGridLines(bounds, gc);
 
-        // draw items
+        // draw the items
         drawItems(bounds, fTimeProvider, fItemData.fExpandedItems, fTopIndex, nameSpace, gc);
+
+        // draw the links (arrows)
         drawLinks(bounds, fTimeProvider, fItemData.fLinks, nameSpace, gc);
+
         fTimeGraphProvider.postDrawControl(bounds, gc);
 
         int alpha = gc.getAlpha();
@@ -1442,14 +1446,16 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Draw the background
+     * Draw the background layer. Fills the background of the control's name
+     * space and states space, updates the background of items if necessary,
+     * and draws the item's name text and middle line.
      *
      * @param bounds
-     *            The rectangle of the area
+     *            The bounds of the control
      * @param nameSpace
-     *            The width reserved for the names
+     *            The name space width
      * @param gc
-     *            Reference to the SWT GC object
+     *            Graphics context
      * @since 2.0
      */
     protected void drawBackground(Rectangle bounds, int nameSpace, GC gc) {
@@ -1461,13 +1467,13 @@ public class TimeGraphControl extends TimeGraphBaseControl
         gc.setBackground(getColorScheme().getColor(TimeGraphColorScheme.BACKGROUND));
         drawBackground(gc, bounds.x + nameSpace, bounds.y, bounds.width - nameSpace, bounds.height);
 
-        // draw the background of selected item and items with no time events
         for (int i = fTopIndex; i < fItemData.fExpandedItems.length; i++) {
             Rectangle itemRect = getItemRect(bounds, i);
             if (itemRect.y >= bounds.y + bounds.height) {
                 break;
             }
             Item item = fItemData.fExpandedItems[i];
+            // draw the background of selected item and items with no time events
             if (! item.fEntry.hasTimeEvents()) {
                 gc.setBackground(getColorScheme().getBkColorGroup(item.fSelected, fIsInFocus));
                 gc.fillRectangle(itemRect);
@@ -1477,6 +1483,15 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 gc.setBackground(getColorScheme().getBkColor(true, fIsInFocus, false));
                 gc.fillRectangle(nameSpace, itemRect.y, itemRect.width - nameSpace, itemRect.height);
             }
+            // draw the name and middle line
+            if (! item.fEntry.hasTimeEvents()) {
+                drawName(item, itemRect, gc);
+            } else {
+                Rectangle nameRect = new Rectangle(itemRect.x, itemRect.y, nameSpace, itemRect.height);
+                drawName(item, nameRect, gc);
+                Rectangle rect = new Rectangle(nameSpace, itemRect.y, itemRect.width - nameSpace, itemRect.height);
+                drawMidLine(rect, gc);
+            }
         }
     }
 
@@ -1484,9 +1499,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * Draw the grid lines
      *
      * @param bounds
-     *            The rectangle of the area
+     *            The bounds of the control
      * @param gc
-     *            Reference to the SWT GC object
+     *            Graphics context
      * @since 2.0
      */
     public void drawGridLines(Rectangle bounds, GC gc) {
@@ -1503,7 +1518,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * Draw many items at once
      *
      * @param bounds
-     *            The rectangle of the area
+     *            The bounds of the control
      * @param timeProvider
      *            The time provider
      * @param items
@@ -1511,9 +1526,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @param topIndex
      *            The index of the first element to draw
      * @param nameSpace
-     *            The width reserved for the names
+     *            The name space width
      * @param gc
-     *            Reference to the SWT GC object
+     *            Graphics context
      */
     public void drawItems(Rectangle bounds, ITimeDataProvider timeProvider,
             Item[] items, int topIndex, int nameSpace, GC gc) {
@@ -1526,12 +1541,18 @@ public class TimeGraphControl extends TimeGraphBaseControl
     /**
      * Draws the item
      *
-     * @param item the item to draw
-     * @param bounds the container rectangle
-     * @param timeProvider Time provider
-     * @param i the item index
-     * @param nameSpace the name space
-     * @param gc Graphics context
+     * @param item
+     *            The item to draw
+     * @param bounds
+     *            The bounds of the control
+     * @param timeProvider
+     *            The time provider
+     * @param i
+     *            The expanded item index
+     * @param nameSpace
+     *            The name space width
+     * @param gc
+     *            Graphics context
      */
     protected void drawItem(Item item, Rectangle bounds, ITimeDataProvider timeProvider, int i, int nameSpace, GC gc) {
         Rectangle itemRect = getItemRect(bounds, i);
@@ -1544,20 +1565,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
         long time1 = timeProvider.getTime1();
         long selectedTime = fTimeProvider.getSelectionEnd();
 
-        if (! item.fEntry.hasTimeEvents()) {
-            drawName(item, itemRect, gc);
-        } else {
-            Rectangle nameRect = new Rectangle(itemRect.x, itemRect.y, nameSpace, itemRect.height);
-            drawName(item, nameRect, gc);
-        }
         Rectangle rect = new Rectangle(nameSpace, itemRect.y, itemRect.width - nameSpace, itemRect.height);
-        if (rect.isEmpty()) {
-            fTimeGraphProvider.postDrawEntry(entry, rect, gc);
-            return;
-        }
-        if (time1 <= time0) {
-            gc.setBackground(getColorScheme().getBkColor(false, false, false));
-            gc.fillRectangle(rect);
+        if (rect.isEmpty() || (time1 <= time0)) {
             fTimeGraphProvider.postDrawEntry(entry, rect, gc);
             return;
         }
@@ -1615,15 +1624,15 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * Draw the links
      *
      * @param bounds
-     *            The rectangle of the area
+     *            The bounds of the control
      * @param timeProvider
      *            The time provider
      * @param links
      *            The list of link events
      * @param nameSpace
-     *            The width reserved for the names
+     *            The name space width
      * @param gc
-     *            Reference to the SWT GC object
+     *            Graphics context
      */
     public void drawLinks(Rectangle bounds, ITimeDataProvider timeProvider,
             List<ILinkEvent> links, int nameSpace, GC gc) {
@@ -1639,16 +1648,16 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Draws the link type events of this item
+     * Draws a link type event
      *
      * @param event
-     *            the item to draw
+     *            The link event to draw
      * @param bounds
-     *            the container rectangle
+     *            The bounds of the control
      * @param timeProvider
-     *            Time provider
+     *            The time provider
      * @param nameSpace
-     *            the name space
+     *            The name space width
      * @param gc
      *            Graphics context
      */
@@ -1682,17 +1691,17 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Draw the state (color fill)
+     * Draw an arrow
      *
      * @param colors
      *            Color scheme
      * @param event
-     *            Time event for which we're drawing the state
+     *            Time event for which we're drawing the arrow
      * @param rect
-     *            Where to draw
+     *            The arrow rectangle
      * @param gc
      *            Graphics context
-     * @return true if the state was drawn
+     * @return true if the arrow was drawn
      */
     protected boolean drawArrow(TimeGraphColorScheme colors, ITimeEvent event,
             Rectangle rect, GC gc) {
@@ -1759,7 +1768,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @param item
      *            Item object
      * @param bounds
-     *            Where to draw the name
+     *            The bounds of the item's name space
      * @param gc
      *            Graphics context
      */
@@ -1828,15 +1837,13 @@ public class TimeGraphControl extends TimeGraphBaseControl
             gc.setForeground(getColorScheme().getFgColor(item.fSelected, fIsInFocus));
             int textWidth = Utils.drawText(gc, name, rect, true);
             leftMargin += textWidth + MARGIN;
-            rect.y -= 2;
 
             if (hasTimeEvents) {
                 // draw middle line
-                int x = bounds.x + leftMargin;
-                int width = bounds.width - x;
-                int midy = bounds.y + bounds.height / 2;
-                gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.MID_LINE));
-                gc.drawLine(x, midy, x + width, midy);
+                rect.x = bounds.x + leftMargin;
+                rect.y = bounds.y;
+                rect.width = bounds.width - rect.x;
+                drawMidLine(rect, gc);
             }
         }
     }
@@ -1849,7 +1856,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @param event
      *            Time event for which we're drawing the state
      * @param rect
-     *            Where to draw
+     *            The state rectangle
      * @param gc
      *            Graphics context
      * @param selected
@@ -1916,14 +1923,25 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * Fill an item's states rectangle
      *
      * @param rect
-     *            Rectangle to fill
+     *            The states rectangle
      * @param gc
      *            Graphics context
      * @param selected
      *            true if the item is selected
      */
     protected void fillSpace(Rectangle rect, GC gc, boolean selected) {
-        // draw middle line
+        /* Nothing to draw */
+    }
+
+    /**
+     * Draw a line at the middle height of a rectangle
+     *
+     * @param rect
+     *            The rectangle
+     * @param gc
+     *            Graphics context
+     */
+    private void drawMidLine(Rectangle rect, GC gc) {
         gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.MID_LINE));
         int midy = rect.y + rect.height / 2;
         gc.drawLine(rect.x, midy, rect.x + rect.width, midy);
