@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -64,6 +64,20 @@ public class DestroySessionHandler extends BaseControlViewHandler {
         if (window == null) {
             return false;
         }
+
+        List<TraceSessionComponent> tmpSessions = new ArrayList<>();
+
+        // Make a copy of the session list to avoid concurrent modification
+        // of the list of sessions
+        fLock.lock();
+        try {
+            tmpSessions = new ArrayList<>();
+            tmpSessions.addAll(fSessions);
+        } finally {
+            fLock.unlock();
+        }
+        final List<TraceSessionComponent> sessions = tmpSessions;
+
         // Get user confirmation
         IConfirmDialog dialog = TraceControlDialogFactory.getInstance().getConfirmDialog();
         if (!dialog.openConfirm(window.getShell(),
@@ -77,14 +91,8 @@ public class DestroySessionHandler extends BaseControlViewHandler {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
-                    // Make a copy of the list of sessions to avoid ConcurrentModificationException when iterating
-                    // over fSessions, since fSessions is modified in another thread triggered by the tree viewer refresh
-                    // after removing a session.
-                    TraceSessionComponent[] sessions = fSessions.toArray(new TraceSessionComponent[fSessions.size()]);
-
-                    for (int i = 0; i < sessions.length; i++) {
+                    for (TraceSessionComponent session : sessions) {
                         // Destroy all selected sessions
-                        TraceSessionComponent session = sessions[i];
                         TraceSessionGroup sessionGroup = (TraceSessionGroup)session.getParent();
                         sessionGroup.destroySession(session, monitor);
                     }
@@ -107,7 +115,8 @@ public class DestroySessionHandler extends BaseControlViewHandler {
         if (page == null) {
             return false;
         }
-        fSessions.clear();
+
+        List<TraceSessionComponent> sessions = new ArrayList<>(0);
 
         // Check if one or more session are selected
         ISelection selection = page.getSelection(ControlView.ID);
@@ -119,11 +128,21 @@ public class DestroySessionHandler extends BaseControlViewHandler {
                     // Add only TraceSessionComponents that are inactive and not destroyed
                     TraceSessionComponent session = (TraceSessionComponent) element;
                     if ((session.getSessionState() == TraceSessionState.INACTIVE) && (!session.isDestroyed())) {
-                        fSessions.add((TraceSessionComponent)element);
+                        sessions.add((TraceSessionComponent)element);
                     }
                 }
             }
         }
-        return !fSessions.isEmpty();
+        boolean isEnabled = !sessions.isEmpty();
+        fLock.lock();
+        try {
+            fSessions.clear();
+            if (isEnabled) {
+                fSessions.addAll(sessions);
+            }
+        } finally {
+            fLock.unlock();
+        }
+        return isEnabled;
     }
 }
