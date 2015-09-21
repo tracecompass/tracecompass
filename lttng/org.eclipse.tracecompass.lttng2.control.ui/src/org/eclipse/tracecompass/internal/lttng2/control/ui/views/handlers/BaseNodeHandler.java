@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -11,6 +11,7 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
@@ -32,7 +33,7 @@ public abstract class BaseNodeHandler extends BaseControlViewHandler {
     /**
      * The target node component the command is to be executed on.
      */
-    protected TargetNodeComponent fTargetNode = null;
+    @Nullable protected TargetNodeComponent fTargetNode = null;
 
     // ------------------------------------------------------------------------
     // Operations
@@ -57,6 +58,7 @@ public abstract class BaseNodeHandler extends BaseControlViewHandler {
         boolean isEnabled = node != null;
         fLock.lock();
         try {
+            fTargetNode = null;
             if (isEnabled) {
                 fTargetNode = node;
             }

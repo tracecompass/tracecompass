@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.ControlView;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
@@ -74,7 +75,7 @@ public abstract class BaseControlViewHandler extends AbstractHandler {
      * Refreshes the session information based on given session (in CommandParameter)
      * @param param - command parameter containing the session to refresh
      */
-    protected void refresh(final CommandParameter param) {
+    protected void refresh(final @NonNull CommandParameter param) {
         Job job = new Job(Messages.TraceControl_RetrieveNodeConfigurationJob) {
 
             @Override

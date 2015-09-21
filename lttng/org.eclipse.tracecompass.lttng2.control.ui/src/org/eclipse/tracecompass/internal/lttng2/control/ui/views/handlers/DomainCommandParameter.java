@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -11,6 +11,7 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceDomainComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
 
@@ -19,6 +20,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.Trac
  *
  *  @author Bernd Hufmann
  */
+@NonNullByDefault
 public class DomainCommandParameter extends CommandParameter {
 
     // ------------------------------------------------------------------------
@@ -53,14 +55,15 @@ public class DomainCommandParameter extends CommandParameter {
         return fDomain;
     }
 
-    // ------------------------------------------------------------------------
-    // Operations
-    // ------------------------------------------------------------------------
-
-    @Override
-    public DomainCommandParameter clone() {
-        DomainCommandParameter clone = (DomainCommandParameter) super.clone();
-        clone.fDomain = fDomain;
-        return clone;
+    /**
+     * Copy constructor
+     *
+     * @param param
+     *            a domain command parameter to copy
+     */
+    public DomainCommandParameter(DomainCommandParameter param) {
+        super(param);
+        fDomain = param.fDomain;
     }
+
 }

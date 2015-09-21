@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -44,7 +45,7 @@ public class ExecuteCommandScriptHandler extends BaseControlViewHandler {
     /**
      * The trace session group the command is to be executed on.
      */
-    private TraceSessionGroup fSessionGroup = null;
+    @Nullable private TraceSessionGroup fSessionGroup = null;
 
     // ------------------------------------------------------------------------
     // Operations
@@ -53,33 +54,40 @@ public class ExecuteCommandScriptHandler extends BaseControlViewHandler {
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
 
+        TraceSessionGroup tmpGroup = null;
+
         fLock.lock();
         try {
-            final TraceSessionGroup sessionGroup = fSessionGroup;
-
-            // Open dialog box for the node name and address
-            final ISelectCommandScriptDialog dialog = TraceControlDialogFactory.getInstance().getCommandScriptDialog();
-
-            if (dialog.open() != Window.OK) {
-                return null;
-            }
-
-            Job job = new Job(Messages.TraceControl_ExecuteScriptJob) {
-                @Override
-                protected IStatus run(IProgressMonitor monitor) {
-                    try {
-                        sessionGroup.executeCommands(monitor, dialog.getCommands());
-                    } catch (ExecutionException e) {
-                        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_CreateSessionFailure, e);
-                    }
-                    return Status.OK_STATUS;
-                }
-            };
-            job.setUser(true);
-            job.schedule();
+            tmpGroup = fSessionGroup;
         } finally {
             fLock.unlock();
         }
+
+        final TraceSessionGroup sessionGroup = tmpGroup;
+        if (sessionGroup == null) {
+            return null;
+        }
+
+        // Open dialog box for the node name and address
+        final ISelectCommandScriptDialog dialog = TraceControlDialogFactory.getInstance().getCommandScriptDialog();
+
+        if (dialog.open() != Window.OK) {
+            return null;
+        }
+
+        Job job = new Job(Messages.TraceControl_ExecuteScriptJob) {
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+                try {
+                    sessionGroup.executeCommands(monitor, dialog.getCommands());
+                } catch (ExecutionException e) {
+                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TraceControl_CreateSessionFailure, e);
+                }
+                return Status.OK_STATUS;
+            }
+        };
+        job.setUser(true);
+        job.schedule();
         return null;
     }
 

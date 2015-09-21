@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
@@ -46,7 +47,7 @@ public class SnaphshotHandler extends BaseControlViewHandler {
     /**
      * The list of session components the command is to be executed on.
      */
-    protected List<TraceSessionComponent> fSessions = new ArrayList<>();
+    @NonNull protected List<TraceSessionComponent> fSessions = new ArrayList<>();
 
     // ------------------------------------------------------------------------
     // Operations
@@ -118,9 +119,9 @@ public class SnaphshotHandler extends BaseControlViewHandler {
         boolean isEnabled = !sessions.isEmpty();
         fLock.lock();
         try {
-            fSessions = null;
+            fSessions.clear();
             if (isEnabled) {
-                fSessions = sessions;
+                fSessions.addAll(sessions);
             }
         } finally {
             fLock.unlock();

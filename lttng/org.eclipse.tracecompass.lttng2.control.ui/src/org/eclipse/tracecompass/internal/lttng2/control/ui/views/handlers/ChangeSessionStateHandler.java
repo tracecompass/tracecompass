@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -93,10 +93,9 @@ public abstract class ChangeSessionStateHandler extends BaseControlViewHandler {
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
                     try {
-                        for (Iterator<TraceSessionComponent> iterator = sessions.iterator(); iterator.hasNext();) {
+                        for (TraceSessionComponent session : sessions) {
 
-                            // Start all selected sessions
-                            TraceSessionComponent session = iterator.next();
+                            // Change state of selected sessions
                             changeState(session, monitor);
 
                             // Set Session state
@@ -145,7 +144,7 @@ public abstract class ChangeSessionStateHandler extends BaseControlViewHandler {
         boolean isEnabled = !sessions.isEmpty();
         fLock.lock();
         try {
-            fSessions = null;
+            fSessions.clear();
             if (isEnabled) {
                 fSessions = sessions;
             }

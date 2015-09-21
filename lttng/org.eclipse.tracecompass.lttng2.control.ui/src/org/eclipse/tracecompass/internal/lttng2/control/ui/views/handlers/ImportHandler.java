@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -41,6 +41,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.remote.core.IRemoteConnectionHostService;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.relayd.LttngRelaydConnectionInfo;
@@ -114,10 +115,15 @@ public class ImportHandler extends BaseControlViewHandler {
         CommandParameter param;
         fLock.lock();
         try {
-            param = fParam.clone();
+            param = fParam;
+            if (param == null) {
+                return null;
+            }
+            param = new CommandParameter(param);
         } finally {
             fLock.unlock();
         }
+
         // create default project
         IProject project = TmfProjectRegistry.createProject(RemoteFetchLogWizardRemotePage.DEFAULT_REMOTE_PROJECT_NAME, null, null);
 
@@ -213,7 +219,7 @@ public class ImportHandler extends BaseControlViewHandler {
         try {
             fParam = null;
             if (isEnabled) {
-                fParam = new CommandParameter(session);
+                fParam = new CommandParameter(NonNullUtils.checkNotNull(session));
             }
         } finally {
             fLock.unlock();
