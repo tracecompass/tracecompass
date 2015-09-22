@@ -38,6 +38,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimePreferences;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 
@@ -122,6 +123,8 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     private boolean fIsInUpdate;
     private int fHeight;
     private List<Integer> fTickList = new ArrayList<>();
+    private List<IMarkerEvent> fMarkers = null;
+    private boolean fMarkersVisible = true;
 
     /**
      * Standard constructor
@@ -211,6 +214,28 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
      */
     public List<Integer> getTickList() {
         return fTickList;
+    }
+
+    /**
+     * Set the markers list.
+     *
+     * @param markers
+     *            The markers list, or null
+     * @since 2.0
+     */
+    public void setMarkers(List<IMarkerEvent> markers) {
+        fMarkers = markers;
+    }
+
+    /**
+     * Set the markers visibility. The default is true.
+     *
+     * @param visible
+     *            true to show the markers, false otherwise
+     * @since 2.0
+     */
+    public void setMarkersVisible(boolean visible) {
+        fMarkersVisible = visible;
     }
 
     private long calcTimeDelta(int width, double pixelsPerNanoSec) {
@@ -443,6 +468,19 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
             }
         }
         fTickList = tickList;
+
+        // draw marker labels
+        if (fMarkersVisible && fMarkers != null) {
+            for (IMarkerEvent marker : fMarkers) {
+                String label = marker.getLabel();
+                if (label != null && marker.getEntry() == null) {
+                    int x = rect.x + leftSpace + (int) (Math.floor((marker.getTime() - time0) * pixelsPerNanoSec));
+                    y = rect.y + rect.height - gc.stringExtent(label).y + 1;
+                    gc.setForeground(marker.getColor());
+                    Utils.drawText(gc, label, x, y, true);
+                }
+            }
+        }
     }
 
     private static void drawRangeDecorators(Rectangle rect, GC gc, int x1, int x2) {

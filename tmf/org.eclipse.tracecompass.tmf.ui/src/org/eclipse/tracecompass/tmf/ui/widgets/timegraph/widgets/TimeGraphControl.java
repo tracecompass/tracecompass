@@ -77,6 +77,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphTreeExpansionEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
@@ -143,6 +144,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private long fTime1bak;
     private ITimeGraphPresentationProvider fTimeGraphProvider = null;
     private ItemData fItemData = null;
+    private List<IMarkerEvent> fMarkers = null;
+    private boolean fMarkersVisible = true;
     private List<SelectionListener> fSelectionListeners;
     private List<ITimeGraphTimeListener> fDragSelectionListeners;
     private final List<ISelectionChangedListener> fSelectionChangedListeners = new ArrayList<>();
@@ -994,6 +997,50 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
+     * Set the markers list.
+     *
+     * @param markers
+     *            The markers list, or null
+     * @since 2.0
+     */
+    public void setMarkers(List<IMarkerEvent> markers) {
+        fMarkers = markers;
+        fTimeGraphScale.setMarkers(markers);
+    }
+
+    /**
+     * Get the markers list.
+     *
+     * @return The markers list, or null
+     * @since 2.0
+     */
+    public List<IMarkerEvent> getMarkers() {
+        return fMarkers;
+    }
+
+    /**
+     * Set the markers visibility. The default is true.
+     *
+     * @param visible
+     *            true to show the markers, false otherwise
+     * @since 2.0
+     */
+    public void setMarkersVisible(boolean visible) {
+        fMarkersVisible = visible;
+        fTimeGraphScale.setMarkersVisible(visible);
+    }
+
+    /**
+     * Get the markers visibility.
+     *
+     * @return true if the markers are visible, false otherwise
+     * @since 2.0
+     */
+    public boolean getMarkersVisible() {
+        return fMarkersVisible;
+    }
+
+    /**
      * Hide arrows
      *
      * @param hideArrows true to hide arrows
@@ -1367,8 +1414,14 @@ public class TimeGraphControl extends TimeGraphBaseControl
         // draw the grid lines
         drawGridLines(bounds, gc);
 
+        // draw the background markers
+        drawMarkers(bounds, fTimeProvider, fMarkers, false, nameSpace, gc);
+
         // draw the items
         drawItems(bounds, fTimeProvider, fItemData.fExpandedItems, fTopIndex, nameSpace, gc);
+
+        // draw the foreground markers
+        drawMarkers(bounds, fTimeProvider, fMarkers, true, nameSpace, gc);
 
         // draw the links (arrows)
         drawLinks(bounds, fTimeProvider, fItemData.fLinks, nameSpace, gc);
@@ -1509,8 +1562,88 @@ public class TimeGraphControl extends TimeGraphBaseControl
             return;
         }
         gc.setForeground(fGridLineColor);
+        gc.setAlpha(fGridLineColor.getAlpha());
         for (int x : fTimeGraphScale.getTickList()) {
             gc.drawLine(x, bounds.y, x, bounds.y + bounds.height);
+        }
+        gc.setAlpha(255);
+    }
+
+    /**
+     * Draw the markers
+     *
+     * @param bounds
+     *            The rectangle of the area
+     * @param timeProvider
+     *            The time provider
+     * @param markers
+     *            The list of markers
+     * @param foreground
+     *            true to draw the foreground markers, false otherwise
+     * @param nameSpace
+     *            The width reserved for the names
+     * @param gc
+     *            Reference to the SWT GC object
+     * @since 2.0
+     */
+    protected void drawMarkers(Rectangle bounds, ITimeDataProvider timeProvider, List<IMarkerEvent> markers, boolean foreground, int nameSpace, GC gc) {
+        if (!fMarkersVisible || markers == null || markers.isEmpty()) {
+            return;
+        }
+        gc.setClipping(new Rectangle(nameSpace, 0, bounds.width - nameSpace, bounds.height));
+        /* the list can grow concurrently but cannot shrink */
+        for (int i = 0; i < markers.size(); i++) {
+            IMarkerEvent marker = markers.get(i);
+            if (marker.isForeground() == foreground) {
+                drawMarker(marker, bounds, timeProvider, nameSpace, gc);
+            }
+        }
+        gc.setClipping((Rectangle) null);
+    }
+
+    /**
+     * Draw a single marker
+     *
+     * @param marker
+     *            The marker event
+     * @param bounds
+     *            The bounds of the control
+     * @param timeProvider
+     *            The time provider
+     * @param nameSpace
+     *            The width reserved for the name
+     * @param gc
+     *            Reference to the SWT GC object
+     * @since 2.0
+     */
+    protected void drawMarker(IMarkerEvent marker, Rectangle bounds, ITimeDataProvider timeProvider, int nameSpace, GC gc) {
+        Rectangle rect = Utils.clone(bounds);
+        if (marker.getEntry() != null) {
+            int index = fItemData.findItemIndex(marker.getEntry());
+            if (index == -1) {
+                return;
+            }
+            rect = getStatesRect(bounds, index, nameSpace);
+            if (rect.y < 0 || rect.y > bounds.height) {
+                return;
+            }
+        }
+        int x0 = getXForTime(marker.getTime());
+        int x1 = getXForTime(marker.getTime() + marker.getDuration());
+        if (x0 > bounds.width || x1 < nameSpace) {
+            return;
+        }
+        rect.x = Math.max(nameSpace, Math.min(bounds.width, x0));
+        rect.width = Math.max(1, Math.min(bounds.width, x1) - rect.x);
+
+        gc.setBackground(marker.getColor());
+        gc.setAlpha(marker.getColor().getAlpha());
+        gc.fillRectangle(rect);
+        gc.setAlpha(255);
+        String label = marker.getLabel();
+        if (label != null && marker.getEntry() != null) {
+            gc.setForeground(marker.getColor());
+            Utils.drawText(gc, label, rect.x - gc.stringExtent(label).x, rect.y, true);
         }
     }
 
