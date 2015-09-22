@@ -72,7 +72,6 @@ public class DestroySessionHandler extends BaseControlViewHandler {
         // of the list of sessions
         fLock.lock();
         try {
-            tmpSessions = new ArrayList<>();
             tmpSessions.addAll(fSessions);
         } finally {
             fLock.unlock();
