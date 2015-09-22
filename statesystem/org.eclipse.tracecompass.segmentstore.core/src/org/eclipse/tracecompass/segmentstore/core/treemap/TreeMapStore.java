@@ -19,10 +19,12 @@ import java.util.TreeMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
@@ -56,6 +58,8 @@ public class TreeMapStore<T extends ISegment> implements ISegmentStore<T> {
 
     private long fSize;
 
+    private @Nullable transient Iterable<T> fLastSnapshot = null;
+
     /**
      * Constructor
      */
@@ -83,13 +87,19 @@ public class TreeMapStore<T extends ISegment> implements ISegmentStore<T> {
         fSize = 0;
     }
 
-    /**
-     * Warning, this is not thread safe, and can cause concurrent modification
-     * exceptions
-     */
     @Override
     public Iterator<T> iterator() {
-        return checkNotNull(fStartTimesIndex.values().iterator());
+        fLock.readLock().lock();
+        try {
+            Iterable<T> lastSnapshot = fLastSnapshot;
+            if (lastSnapshot == null) {
+                lastSnapshot = checkNotNull(ImmutableList.copyOf(fStartTimesIndex.values()));
+                fLastSnapshot = lastSnapshot;
+            }
+            return checkNotNull(lastSnapshot.iterator());
+        } finally {
+            fLock.readLock().unlock();
+        }
     }
 
     @Override
@@ -99,6 +109,7 @@ public class TreeMapStore<T extends ISegment> implements ISegmentStore<T> {
             if (fStartTimesIndex.put(Long.valueOf(val.getStart()), val)) {
                 fEndTimesIndex.put(Long.valueOf(val.getEnd()), val);
                 fSize++;
+                fLastSnapshot = null;
             }
         } finally {
             fLock.writeLock().unlock();
