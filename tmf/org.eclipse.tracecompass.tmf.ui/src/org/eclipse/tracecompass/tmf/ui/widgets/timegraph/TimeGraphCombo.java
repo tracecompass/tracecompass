@@ -131,6 +131,8 @@ public class TimeGraphCombo extends Composite {
     private Listener fSashDragListener;
     private SashForm fSashForm;
 
+    private final boolean fScrollBarsInTreeWorkaround;
+
     // ------------------------------------------------------------------------
     // Classes
     // ------------------------------------------------------------------------
@@ -340,7 +342,17 @@ public class TimeGraphCombo extends Composite {
 
         fSashForm = new SashForm(this, SWT.NONE);
 
-        fTreeViewer = new TreeViewer(fSashForm, SWT.FULL_SELECTION | SWT.H_SCROLL);
+        /*
+         * In Windows, SWT.H_SCROLL | SWT.NO_SCROLL is not properly supported,
+         * both scroll bars are always created. See Tree.checkStyle: "Even when
+         * WS_HSCROLL or WS_VSCROLL is not specified, Windows creates trees and
+         * tables with scroll bars."
+         */
+        fScrollBarsInTreeWorkaround = "win32".equals(SWT.getPlatform()); //$NON-NLS-1$
+
+        int scrollBarStyle = fScrollBarsInTreeWorkaround ? SWT.H_SCROLL : SWT.H_SCROLL | SWT.NO_SCROLL;
+
+        fTreeViewer = new TreeViewer(fSashForm, SWT.FULL_SELECTION | scrollBarStyle);
         fTreeViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
         final Tree tree = fTreeViewer.getTree();
         tree.setHeaderVisible(true);
@@ -352,21 +364,24 @@ public class TimeGraphCombo extends Composite {
         fTimeGraphViewer.setBorderWidth(tree.getBorderWidth());
         fTimeGraphViewer.setNameWidthPref(0);
 
-        // Feature in Windows. The tree vertical bar reappears when
-        // the control is resized so we need to hide it again.
-        tree.addControlListener(new ControlAdapter() {
-            private int depth = 0;
-            @Override
-            public void controlResized(ControlEvent e) {
-                if (depth == 0) {
-                    depth++;
-                    tree.getVerticalBar().setEnabled(false);
-                    // this can trigger controlResized recursively
-                    tree.getVerticalBar().setVisible(false);
-                    depth--;
+        if (fScrollBarsInTreeWorkaround) {
+            // Feature in Windows. The tree vertical bar reappears when
+            // the control is resized so we need to hide it again.
+            tree.addControlListener(new ControlAdapter() {
+                private int depth = 0;
+
+                @Override
+                public void controlResized(ControlEvent e) {
+                    if (depth == 0) {
+                        depth++;
+                        tree.getVerticalBar().setEnabled(false);
+                        // this can trigger controlResized recursively
+                        tree.getVerticalBar().setVisible(false);
+                        depth--;
+                    }
                 }
-            }
-        });
+            });
+        }
         // Bug in Linux. The tree header height is 0 in constructor,
         // so we need to reset it later when the control is painted.
         // This work around used to be done on control resized but the header
@@ -811,8 +826,10 @@ public class TimeGraphCombo extends Composite {
             listenerWrapper.selection = null;
         }
         fInhibitTreeSelection = false;
-        fTreeViewer.getTree().getVerticalBar().setEnabled(false);
-        fTreeViewer.getTree().getVerticalBar().setVisible(false);
+        if (fScrollBarsInTreeWorkaround) {
+            fTreeViewer.getTree().getVerticalBar().setEnabled(false);
+            fTreeViewer.getTree().getVerticalBar().setVisible(false);
+        }
         fTimeGraphViewer.setInput(input);
         fTimeGraphViewer.setItemHeight(getItemHeight(fTreeViewer.getTree()));
         // queue the alignment update because in Linux the item bounds are not
