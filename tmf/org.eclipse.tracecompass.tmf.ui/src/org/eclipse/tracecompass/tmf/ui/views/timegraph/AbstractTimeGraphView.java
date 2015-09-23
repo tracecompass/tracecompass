@@ -104,6 +104,12 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     /** The timegraph wrapper */
     private ITimeGraphWrapper fTimeGraphWrapper;
 
+    private int fDirty;
+
+    public boolean isDirty() {
+        return fDirty > 0;
+    }
+
     /** The selected trace */
     private ITmfTrace fTrace;
 
@@ -459,6 +465,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             fMonitor.setCanceled(true);
         }
     }
+    private static int fZoomThreadCount = 0;
 
     private class ZoomThread extends Thread {
         private final @NonNull List<TimeGraphEntry> fZoomEntryList;
@@ -466,9 +473,15 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         private final long fZoomEndTime;
         private final long fResolution;
         private final @NonNull  IProgressMonitor fMonitor;
+        private int fZoomThreadId = 0;
+        private boolean fStarted = false;
 
         public ZoomThread(@NonNull List<TimeGraphEntry> entryList, long startTime, long endTime, String name) {
             super(name + " zoom"); //$NON-NLS-1$
+            synchronized (ZoomThread.class) {
+                fZoomThreadCount++;
+                fZoomThreadId = fZoomThreadCount;
+            }
             fZoomEntryList = entryList;
             fZoomStartTime = startTime;
             fZoomEndTime = endTime;
@@ -478,20 +491,37 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         @Override
         public void run() {
-            for (TimeGraphEntry entry : fZoomEntryList) {
-                if (fMonitor.isCanceled()) {
-                    return;
+            if (!fStarted) {
+                fStarted = true;
+                synchronized (ZoomThread.class) {
+                    fDirty++;
+                    System.out.println("zoom thread start " + fZoomThreadId + "(" + fDirty + " dirty)");
                 }
-                if (entry == null) {
-                    break;
-                }
-                zoom(entry, fMonitor);
+            } else {
+                System.out.println();
             }
-            /* Refresh the arrows when zooming */
-            List<ILinkEvent> events = getLinkList(fZoomStartTime, fZoomEndTime, fResolution, fMonitor);
-            if (events != null) {
-                fTimeGraphWrapper.getTimeGraphViewer().setLinks(events);
-                redraw();
+            try {
+                for (TimeGraphEntry entry : fZoomEntryList) {
+                    if (fMonitor.isCanceled()) {
+                        return;
+                    }
+                    if (entry == null) {
+                        break;
+                    }
+                    zoom(entry, fMonitor);
+                }
+                /* Refresh the arrows when zooming */
+                List<ILinkEvent> events = getLinkList(fZoomStartTime, fZoomEndTime, fResolution, fMonitor);
+                if (events != null) {
+                    fTimeGraphWrapper.getTimeGraphViewer().setLinks(events);
+                    redraw();
+                }
+                synchronized (ZoomThread.class) {
+                    fDirty--;
+                    System.out.println("zoom thread end " + fZoomThreadId + "(" + fDirty + " dirty)");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 
@@ -516,6 +546,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
 
         public void cancel() {
+            System.out.println("cancel " + fZoomThreadId);
             fMonitor.setCanceled(true);
         }
     }
@@ -539,6 +570,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      */
     public AbstractTimeGraphView(String id, TimeGraphPresentationProvider pres) {
         super(id);
+        fDirty = 0;
         fPresentation = pres;
         fDisplayWidth = Display.getDefault().getBounds().width;
     }
@@ -847,6 +879,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     @Override
     public void createPartControl(Composite parent) {
+        fDirty = 0;
         super.createPartControl(parent);
         if (fColumns == null || fLabelProvider == null) {
             fTimeGraphWrapper = new TimeGraphViewerWrapper(parent, SWT.NONE);
@@ -1188,6 +1221,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 }
                 if (fEntryList != fTimeGraphWrapper.getInput()) {
                     fTimeGraphWrapper.setInput(fEntryList);
+//                    fTimeGraphWrapper.getTimeGraphViewer().setLinks(null);
                 } else {
                     fTimeGraphWrapper.refresh();
                 }

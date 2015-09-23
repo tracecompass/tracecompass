@@ -76,6 +76,7 @@ public class CallsiteEventsInTableTest {
      */
     @BeforeClass
     public static void init() {
+        SWTBotUtils.delay(30000);
         SWTBotUtils.failIfUIThread();
 
         /* set up test trace*/

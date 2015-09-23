@@ -1872,7 +1872,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
             selectPrevEvent(extend);
         } else if (SWT.ARROW_RIGHT == e.keyCode && fDragState == DRAG_NONE) {
             boolean extend = (e.stateMask & SWT.SHIFT) != 0;
+            System.out.println("ARROW_RIGHT before ("+extend+") "+fTimeProvider.getSelectionBegin()+"-"+fTimeProvider.getSelectionEnd()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             selectNextEvent(extend);
+            System.out.println("ARROW_RIGHT after  ("+extend+") "+fTimeProvider.getSelectionBegin()+"-"+fTimeProvider.getSelectionEnd()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         } else if (SWT.PAGE_DOWN == e.keyCode) {
             int page = countPerPage();
             idx = getSelectedIndex();

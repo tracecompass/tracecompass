@@ -901,7 +901,9 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * @since 1.0
      */
     public void selectNextEvent(boolean extend) {
+        System.out.println("selectNextEvent before ("+extend+") "+getSelectionBegin()+"-"+getSelectionEnd()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         fTimeGraphCtrl.selectNextEvent(extend);
+        System.out.println("selectNextEvent after  ("+extend+") "+getSelectionBegin()+"-"+getSelectionEnd()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         adjustVerticalScrollBar();
     }
 

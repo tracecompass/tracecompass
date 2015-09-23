@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -35,8 +36,11 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
+import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
+import org.eclipse.ui.IWorkbenchPart;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -79,13 +83,19 @@ public class ControlFlowViewTest extends KernelTest {
 
     @Test
     public void testBug() {
-        testToolBarFollowCPUForwardBackward();
-        after();
-        before();
-        testKeyboardLeftRight();
-        after();
-        before();
-        testToolBarSelectNextPreviousEvent();
+        for (int i = 0; i < 30; i++) {
+            before();
+            testToolBarFollowCPUForwardBackward();
+            after();
+            before();
+            testKeyboardLeftRight();
+            after();
+            before();
+            testToolBarSelectNextPreviousEvent();
+            after();
+            System.out.println("testBug " + i);
+        }
+
     }
 
     /**
@@ -115,54 +125,94 @@ public class ControlFlowViewTest extends KernelTest {
             }
         });
 
+//        fBot.waitUntil(new ZoomCondition(timegraph));
+
         /* press ARROW_RIGHT 3 times */
         KEYBOARD.pressShortcut(Keystrokes.RIGHT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME1.getValue(), TID1_TIME2.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         KEYBOARD.pressShortcut(Keystrokes.RIGHT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME2.getValue(), TID1_TIME3.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         KEYBOARD.pressShortcut(Keystrokes.RIGHT);
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME3, TID1_TIME3)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME3));
 
         /* press Shift-ARROW_RIGHT 3 times */
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME3.getValue(), TID1_TIME4.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.RIGHT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME4.getValue(), TID1_TIME5.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.RIGHT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME5.getValue(), TID1_TIME6.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.RIGHT);
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME3, TID1_TIME6)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME6));
 
         /* press Shift-ARROW_LEFT 4 times */
         KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.LEFT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME4.getValue(), TID1_TIME5.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.LEFT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME3.getValue(), TID1_TIME4.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.LEFT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME2.getValue(), TID1_TIME3.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.LEFT);
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME3, TID1_TIME2)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME2));
 
         /* press ARROW_RIGHT 2 times */
         KEYBOARD.pressShortcut(Keystrokes.RIGHT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME3.getValue(), TID1_TIME4.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         KEYBOARD.pressShortcut(Keystrokes.RIGHT);
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME4, TID1_TIME4)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME4));
 
         /* press Shift-ARROW_LEFT 3 times */
         KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.LEFT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME2.getValue(), TID1_TIME3.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.LEFT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME1.getValue(), TID1_TIME2.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.LEFT);
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME4, TID1_TIME1)));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME1));
 
         /* press Shift-ARROW_RIGHT 4 times */
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME1.getValue(), TID1_TIME2.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.RIGHT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME2.getValue(), TID1_TIME3.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.RIGHT);
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME3.getValue(), TID1_TIME4.getValue()));
         KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.RIGHT);
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME4.getValue(), TID1_TIME5.getValue()));
         KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.RIGHT);
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME4, TID1_TIME5)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME5));
 
         /* press ARROW_LEFT 5 times */
         KEYBOARD.pressShortcut(Keystrokes.LEFT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME3.getValue(), TID1_TIME4.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         KEYBOARD.pressShortcut(Keystrokes.LEFT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME2.getValue(), TID1_TIME3.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         KEYBOARD.pressShortcut(Keystrokes.LEFT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME1.getValue(), TID1_TIME2.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         KEYBOARD.pressShortcut(Keystrokes.LEFT);
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         KEYBOARD.pressShortcut(Keystrokes.LEFT);
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(START_TIME, START_TIME)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(START_TIME));
@@ -195,54 +245,91 @@ public class ControlFlowViewTest extends KernelTest {
             }
         });
 
+//        fBot.waitUntil(new ZoomCondition(timegraph));
+
         /* click "Select Next Event" 3 times */
         fViewBot.toolbarButton(SELECT_NEXT_EVENT).click();
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME1.getValue(), TID1_TIME2.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         fViewBot.toolbarButton(SELECT_NEXT_EVENT).click();
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME2.getValue(), TID1_TIME3.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         fViewBot.toolbarButton(SELECT_NEXT_EVENT).click();
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME3, TID1_TIME3)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME3));
 
         /* shift-click "Select Next Event" 3 times */
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME3.getValue(), TID1_TIME4.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME4.getValue(), TID1_TIME5.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME5.getValue(), TID1_TIME6.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME3, TID1_TIME6)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME6));
 
         /* shift-click "Select Previous Event" 4 times */
         fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME4.getValue(), TID1_TIME5.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME3.getValue(), TID1_TIME4.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME2.getValue(), TID1_TIME3.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME3, TID1_TIME2)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME2));
 
         /* click "Select Next Event" 2 times */
         fViewBot.toolbarButton(SELECT_NEXT_EVENT).click();
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME3.getValue(), TID1_TIME4.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         fViewBot.toolbarButton(SELECT_NEXT_EVENT).click();
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME4, TID1_TIME4)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME4));
 
         /* shift-click "Select Previous Event" 3 times */
         fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME2.getValue(), TID1_TIME3.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME1.getValue(), TID1_TIME2.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME4, TID1_TIME1)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME1));
 
         /* shift-click "Select Next Event" 4 times */
         fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME2.getValue(), TID1_TIME3.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME3.getValue(), TID1_TIME4.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME4.getValue(), TID1_TIME5.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME4, TID1_TIME5)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME5));
 
         /* click "Select Previous Event" 5 times */
         fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click();
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME3.getValue(), TID1_TIME4.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click();
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME2.getValue(), TID1_TIME3.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click();
+        fBot.waitUntil(new TimeEventCondition(timegraph, TID1_TIME1.getValue(), TID1_TIME2.getValue()));
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click();
+        fBot.waitUntil(new ViewDirtyCondition(), 30000000);
         fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click();
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(START_TIME, START_TIME)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(START_TIME));
@@ -348,5 +435,83 @@ public class ControlFlowViewTest extends KernelTest {
         fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(START_TIME, START_TIME)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(START_TIME));
+    }
+
+//    private static class ZoomCondition extends DefaultCondition  {
+//
+//        private TimeGraphControl timegraph;
+//
+//        public ZoomCondition(TimeGraphControl timegraph) {
+//            super();
+//            this.timegraph = timegraph;
+//        }
+//
+//        @Override
+//        public boolean test() throws Exception {
+//            Iterator<ITimeEvent> iter = timegraph.getSelectedTrace().getTimeEventsIterator();
+//            int count = 0;
+//            ITimeEvent event = null;
+//            while (iter.hasNext() && count++ < 6) {
+//                event = iter.next();
+//                System.out.println(count+":"+event.getTime());
+//            }
+//            if (count == 6 && event != null && event.getTime() == TID1_TIME5.getValue()) {
+//                return true;
+//            }
+//            return false;
+//        }
+//
+//        @Override
+//        public String getFailureMessage() {
+//            return "Time Event not found";
+//        }
+//    }
+
+    private static class TimeEventCondition extends DefaultCondition  {
+
+        private TimeGraphControl timegraph;
+        private long fEventEnd;
+        private long fEventStart;
+
+        public TimeEventCondition(TimeGraphControl timegraph, long eventStart, long eventEnd) {
+            super();
+            this.timegraph = timegraph;
+            fEventStart = eventStart;
+            fEventEnd = eventEnd;
+        }
+
+        @Override
+        public boolean test() throws Exception {
+            Iterator<ITimeEvent> iter = timegraph.getSelectedTrace().getTimeEventsIterator();
+            ITimeEvent event = null;
+            while (iter.hasNext()) {
+                event = iter.next();
+                if (event != null && event.getTime() == fEventStart && event.getTime() + event.getDuration() == fEventEnd) {
+                    System.out.println("found " + fEventStart  + "-" + fEventEnd);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public String getFailureMessage() {
+            return "Time Event not found";
+        }
+    }
+
+    private class ViewDirtyCondition extends DefaultCondition  {
+
+        @Override
+        public boolean test() throws Exception {
+            IWorkbenchPart part = fViewBot.getViewReference().getPart(false);
+            AbstractTimeGraphView view = (AbstractTimeGraphView) part;
+            return !view.isDirty();
+        }
+
+        @Override
+        public String getFailureMessage() {
+            return "View is dirty";
+        }
     }
 }

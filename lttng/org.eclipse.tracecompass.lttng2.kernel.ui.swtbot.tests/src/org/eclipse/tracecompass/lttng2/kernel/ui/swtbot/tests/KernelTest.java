@@ -18,9 +18,6 @@ import static org.junit.Assert.fail;
 
 import java.util.List;
 
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
@@ -55,7 +52,7 @@ public class KernelTest {
     protected static SWTWorkbenchBot fBot;
 
     /** The Log4j logger instance. */
-    private static final Logger fLogger = Logger.getRootLogger();
+//    private static final Logger fLogger = Logger.getRootLogger();
 
     /**
      * Before Class
@@ -67,9 +64,9 @@ public class KernelTest {
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
-        SWTBotPreferences.PLAYBACK_DELAY = 200;
-        fLogger.removeAllAppenders();
-        fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
+//        SWTBotPreferences.PLAYBACK_DELAY = 200;
+//        fLogger.removeAllAppenders();
+//        fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
         fBot = new SWTWorkbenchBot();
 
         final List<SWTBotView> openViews = fBot.views();
@@ -92,7 +89,7 @@ public class KernelTest {
     @AfterClass
     public static void afterClass() {
         SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
-        fLogger.removeAllAppenders();
+//        fLogger.removeAllAppenders();
     }
 
     private static void switchKernelPerspective() {
