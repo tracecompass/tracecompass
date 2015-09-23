@@ -745,8 +745,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                             if (styleRange.data.equals(event.index)) {
                                 int startIndex = styleRange.start;
                                 int endIndex = startIndex + styleRange.length;
-                                int startX = gc.stringExtent(text.substring(0, startIndex)).x;
-                                int endX = gc.stringExtent(text.substring(0, endIndex)).x;
+                                int startX = gc.textExtent(text.substring(0, startIndex)).x;
+                                int endX = gc.textExtent(text.substring(0, endIndex)).x;
                                 gc.setBackground(styleRange.background);
                                 gc.fillRectangle(textBounds.x + startX, textBounds.y, (endX - startX), textBounds.height);
                             }
