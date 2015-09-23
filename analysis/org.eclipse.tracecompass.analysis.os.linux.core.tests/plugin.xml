@@ -23,6 +23,15 @@
                class="org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub">
          </tracetype>
       </module>
+      <module
+            analysis_module="org.eclipse.tracecompass.analysis.os.linux.core.contextswitch.KernelContextSwitchAnalysis"
+            automatic="false"
+            id="org.eclipse.tracecompass.analysis.os.linux.contextswitch"
+            name="Context switch test">
+         <tracetype
+               class="org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub">
+         </tracetype>
+      </module>
    </extension>
 
 </plugin>
