@@ -202,7 +202,7 @@ public class LatencyAnalysis extends TmfAbstractAnalysisModule {
                 long endTime = event.getTimestamp().getValue();
                 int ret = ((Long) event.getContent().getField("ret").getValue()).intValue(); //$NON-NLS-1$
                 ISegment syscall = new SystemCall(info, endTime, ret);
-                fFullSyscalls.addElement(syscall);
+                fFullSyscalls.add(syscall);
             }
         }
 

@@ -11,7 +11,10 @@ package org.eclipse.tracecompass.segmentstore.core.tests.treemap;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
@@ -50,7 +53,7 @@ public class TreeMapStoreTest {
     public void setup() {
         fSegmentStore = new TreeMapStore<>();
         for (ISegment segment : SEGMENTS) {
-            fSegmentStore.addElement(checkNotNull(segment));
+            fSegmentStore.add(checkNotNull(segment));
         }
     }
 
@@ -63,11 +66,61 @@ public class TreeMapStoreTest {
     }
 
     /**
-     * Testing method getNbElements
+     * Testing method size()
      */
     @Test
-    public void testGetNbElements() {
-        assertEquals(SEGMENTS.size(), fSegmentStore.getNbElements());
+    public void testSize() {
+        assertEquals(SEGMENTS.size(), fSegmentStore.size());
+    }
+
+    /**
+     * Test the contains() method.
+     */
+    @Test
+    public void testContains() {
+        ISegment otherSegment = new BasicSegment(0, 20);
+
+        assertTrue(fSegmentStore.contains(SEGMENT_2_6));
+        assertTrue(fSegmentStore.contains(SEGMENT_4_8));
+        assertFalse(fSegmentStore.contains(otherSegment));
+    }
+
+    /**
+     * Test the toArray() method.
+     */
+    @Test
+    public void testToObjectArray() {
+        Object[] array = fSegmentStore.toArray();
+
+        assertEquals(SEGMENTS.size(), array.length);
+        assertTrue(Arrays.asList(array).containsAll(SEGMENTS));
+    }
+
+    /**
+     * Test the toArray(T[]) method.
+     */
+    @Test
+    public void testToSpecificArray() {
+        ISegment[] array = fSegmentStore.toArray(new ISegment[0]);
+
+        assertEquals(SEGMENTS.size(), array.length);
+        assertTrue(Arrays.asList(array).containsAll(SEGMENTS));
+    }
+
+    /**
+     * Test the toArray(T[]) method with a subtype of ISegment.
+     */
+    @Test
+    public void testToSpecifyArraySubtype() {
+        TreeMapStore<BasicSegment> tms2 = new TreeMapStore<>();
+        BasicSegment otherSegment = new BasicSegment(2, 6);
+        tms2.add(otherSegment);
+        BasicSegment[] array = tms2.toArray(new BasicSegment[0]);
+
+        assertEquals(1, array.length);
+        assertTrue(Arrays.asList(array).contains(otherSegment));
+
+        tms2.dispose();
     }
 
     /**
@@ -76,9 +129,9 @@ public class TreeMapStoreTest {
     @Test
     public void testNoDuplicateElements() {
         for (ISegment segment : SEGMENTS) {
-            fSegmentStore.addElement(new BasicSegment(segment.getStart(), segment.getEnd()));
+            fSegmentStore.add(new BasicSegment(segment.getStart(), segment.getEnd()));
         }
-        assertEquals(SEGMENTS.size(), fSegmentStore.getNbElements());
+        assertEquals(SEGMENTS.size(), fSegmentStore.size());
     }
 
     /**
@@ -101,7 +154,7 @@ public class TreeMapStoreTest {
         /* Prepare the segment store, we don't use the 'fixture' in this test */
         TreeMapStore<ISegment> store = new TreeMapStore<>();
         for (ISegment segment : REVERSE_SEGMENTS) {
-            store.addElement(checkNotNull(segment));
+            store.add(checkNotNull(segment));
         }
 
         /*
@@ -238,8 +291,8 @@ public class TreeMapStoreTest {
     @Test
     public void testDispose() {
         TreeMapStore<ISegment> store = new TreeMapStore<>();
-        store.addElement(checkNotNull(SEGMENT_2_6));
+        store.add(SEGMENT_2_6);
         store.dispose();
-        assertEquals(0, store.getNbElements());
+        assertEquals(0, store.size());
     }
 }
