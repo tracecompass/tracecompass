@@ -33,6 +33,7 @@ import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfPersistentlyIndexable;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
@@ -86,6 +87,14 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
         }
         if (!file.isFile()) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Not a file. It's a directory: " + path); //$NON-NLS-1$
+        }
+        try {
+            if (!TmfTraceUtils.isText(file)) {
+                return new TraceValidationStatus(0, Activator.PLUGIN_ID);
+            }
+        } catch (IOException e) {
+            Activator.logError("Error validating file: " + path, e); //$NON-NLS-1$
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, "IOException validating file: " + path, e); //$NON-NLS-1$
         }
         int confidence = 0;
         try (BufferedRandomAccessFile rafile = new BufferedRandomAccessFile(path, "r")) { //$NON-NLS-1$

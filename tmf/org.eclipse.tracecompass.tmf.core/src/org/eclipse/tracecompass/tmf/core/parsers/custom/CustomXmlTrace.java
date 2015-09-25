@@ -38,6 +38,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfPersistentlyIndexable;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
@@ -545,6 +546,14 @@ public class CustomXmlTrace extends TmfTrace implements ITmfPersistentlyIndexabl
         File file = new File(path);
         if (!file.exists() || !file.isFile() || !file.canRead()) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CustomTrace_FileNotFound + ": " + path); //$NON-NLS-1$
+        }
+        try {
+            if (!TmfTraceUtils.isText(file)) {
+                return new TraceValidationStatus(0, Activator.PLUGIN_ID);
+            }
+        } catch (IOException e) {
+            Activator.logError("Error validating file: " + path, e); //$NON-NLS-1$
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, "IOException validating file: " + path, e); //$NON-NLS-1$
         }
         try (BufferedRandomAccessFile rafile = new BufferedRandomAccessFile(path, "r")) { //$NON-NLS-1$
             int lineCount = 0;

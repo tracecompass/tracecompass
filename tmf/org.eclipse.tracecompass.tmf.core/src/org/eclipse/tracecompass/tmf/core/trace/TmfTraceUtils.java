@@ -12,6 +12,10 @@
 
 package org.eclipse.tracecompass.tmf.core.trace;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,6 +32,8 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
  */
 @NonNullByDefault
 public final class TmfTraceUtils {
+
+    private static final int MAX_NB_BINARY_BYTES = 2048;
 
     private TmfTraceUtils() {
     }
@@ -104,5 +110,33 @@ public final class TmfTraceUtils {
             }
         }
         return null;
+    }
+
+    /**
+     * Checks for text file.
+     *
+     * Note that it checks for binary value 0 in the first MAX_NB_BINARY_BYTES
+     * bytes to determine if the file is text.
+     *
+     * @param file
+     *            the file to check. Caller has to make sure that file exists.
+     * @return true if it is binary else false
+     * @throws IOException
+     *             if IOException occurs
+     * @since 2.0
+     */
+    public static boolean isText(File file) throws IOException {
+        try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file))) {
+            int count = 0;
+            int val = bufferedInputStream.read();
+            while ((count < MAX_NB_BINARY_BYTES) && (val >= 0)) {
+                if (val == 0) {
+                    return false;
+                }
+                count++;
+                val = bufferedInputStream.read();
+            }
+        }
+        return true;
     }
 }
