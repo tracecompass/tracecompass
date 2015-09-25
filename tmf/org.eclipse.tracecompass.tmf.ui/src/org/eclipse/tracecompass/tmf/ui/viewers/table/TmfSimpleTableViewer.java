@@ -21,9 +21,14 @@ import java.util.Comparator;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -37,6 +42,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
@@ -144,6 +150,8 @@ public class TmfSimpleTableViewer extends TmfViewer {
     private int fDirection;
     private int fSelectedColumn;
 
+    private MenuManager fTablePopupMenuManager;
+
     /**
      * Constructor that initializes the parent of the viewer
      *
@@ -161,6 +169,44 @@ public class TmfSimpleTableViewer extends TmfViewer {
         fDirection = SWT.DOWN;
         fTableViewer.setUseHashlookup(true);
         fTableViewer.getControl().addMouseListener(new MouseColumnListener());
+
+        fTablePopupMenuManager = new MenuManager();
+        fTablePopupMenuManager.setRemoveAllWhenShown(true);
+
+        fTablePopupMenuManager.addMenuListener(new IMenuListener() {
+            @Override
+            public void menuAboutToShow(final @Nullable IMenuManager manager) {
+                TableViewer viewer = getTableViewer();
+                ISelection selection = viewer.getSelection();
+                if (selection instanceof IStructuredSelection) {
+                    IStructuredSelection sel = (IStructuredSelection) selection;
+                    if (manager != null) {
+                        appendToTablePopupMenu(manager, sel);
+                    }
+                }
+            }
+        });
+
+        Menu tablePopup = fTablePopupMenuManager.createContextMenu(getTableViewer().getTable());
+        getTableViewer().getTable().setMenu(tablePopup);
+    }
+
+    @Override
+    public void dispose() {
+        if (fTablePopupMenuManager != null) {
+            fTablePopupMenuManager.dispose();
+        }
+        super.dispose();
+    }
+
+    /**
+     * Method to add commands to the context sensitive menu.
+     * @param manager
+     *          the menu manager
+     * @param sel
+     *          the current selection
+     */
+    protected void appendToTablePopupMenu(@NonNull IMenuManager manager, @NonNull IStructuredSelection sel) {
     }
 
     /**
