@@ -961,6 +961,39 @@
                </with>
             </visibleWhen>
          </command>
+         <command
+              commandId="org.eclipse.ui.file.refresh"
+              label="%commands.sync.refresh.tracecontent"
+              style="push">
+           <visibleWhen
+                 checkEnabled="false">
+               <or>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <or>
+                        <and>
+                           <instanceof
+                                 value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
+                           </instanceof>
+                           <not>
+                              <test
+                                    forcePluginActivation="true"
+                                    property="org.eclipse.linuxtools.tmf.ui.isExperimentTrace">
+                              </test>
+                           </not>
+                        </and>
+                     </or>
+                  </iterate>
+                  <with
+                      variable="activePart">
+                     <instanceof
+                           value="org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor">
+                     </instanceof>
+                  </with>
+               </or>
+           </visibleWhen>
+        </command>
       </menuContribution>
       <menuContribution
             allPopups="false"
@@ -1674,6 +1707,37 @@
                   </or>
                </iterate>
             </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.RefreshTraceContentHandler"
+            commandId="org.eclipse.ui.file.refresh">
+         <activeWhen>
+            <or>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <or>
+                     <and>
+                        <instanceof
+                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
+                        </instanceof>
+                        <not>
+                           <test
+                                 forcePluginActivation="true"
+                                 property="org.eclipse.linuxtools.tmf.ui.isExperimentTrace">
+                           </test>
+                        </not>
+                     </and>
+                  </or>
+               </iterate>
+               <with
+                   variable="activePart">
+                  <instanceof
+                        value="org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor">
+                  </instanceof>
+               </with>
+            </or>
          </activeWhen>
       </handler>
    </extension>

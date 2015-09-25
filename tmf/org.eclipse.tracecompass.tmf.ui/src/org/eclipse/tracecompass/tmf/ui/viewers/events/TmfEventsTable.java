@@ -160,7 +160,9 @@ import org.eclipse.tracecompass.tmf.ui.views.colors.IColorSettingsListener;
 import org.eclipse.tracecompass.tmf.ui.views.filter.FilterManager;
 import org.eclipse.tracecompass.tmf.ui.widgets.rawviewer.TmfRawEventViewer;
 import org.eclipse.tracecompass.tmf.ui.widgets.virtualtable.TmfVirtualTable;
+import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.dialogs.ListDialog;
@@ -2525,6 +2527,24 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      */
     public void setFocus() {
         fTable.setFocus();
+    }
+
+    /**
+     * Registers context menus with a site for extension. This method can be
+     * called for part sites so that context menu contributions can be added.
+     *
+     * @param site
+     *            the site that the context menus will be registered for
+     *
+     * @since 2.0
+     */
+    public void registerContextMenus(IWorkbenchPartSite site) {
+        if (site instanceof IEditorSite) {
+            IEditorSite editorSite = (IEditorSite) site;
+            // Don't use the editor input when adding contributions, otherwise
+            // we get too many unwanted things.
+            editorSite.registerContextMenu(fTablePopupMenuManager, this, false);
+        }
     }
 
     /**
