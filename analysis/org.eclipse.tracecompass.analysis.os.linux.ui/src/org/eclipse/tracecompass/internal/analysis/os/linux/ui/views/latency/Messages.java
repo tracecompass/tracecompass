@@ -50,6 +50,17 @@ public class Messages extends NLS {
      * Title of the y axis of the scatter graph
      */
     public static @Nullable String LatencyView_yAxis;
+
+    /**
+     * Title of action to goto start time time
+     */
+    public static @Nullable String LatencyView_goToStartEvent;
+
+    /**
+     * Title of action to goto end event
+     */
+    public static @Nullable String LatencyView_goToEndEvent;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

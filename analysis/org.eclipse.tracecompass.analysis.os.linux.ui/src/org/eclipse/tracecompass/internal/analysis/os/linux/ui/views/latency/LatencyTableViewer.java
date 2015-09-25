@@ -13,7 +13,11 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -214,6 +218,28 @@ public class LatencyTableViewer extends TmfSimpleTableViewer {
         updateModel(null);
         analysis.addListener(fListener);
         analysis.schedule();
+    }
+
+    @Override
+    protected void appendToTablePopupMenu(IMenuManager manager, IStructuredSelection sel) {
+        final ISegment segment = (ISegment) sel.getFirstElement();
+
+        IAction gotoStartTime = new Action(Messages.LatencyView_goToStartEvent) {
+            @Override
+            public void run() {
+                broadcast(new TmfSelectionRangeUpdatedSignal(LatencyTableViewer.this, new TmfNanoTimestamp(segment.getStart())));
+            }
+        };
+
+        IAction gotoEndTime = new Action(Messages.LatencyView_goToEndEvent) {
+            @Override
+            public void run() {
+                broadcast(new TmfSelectionRangeUpdatedSignal(LatencyTableViewer.this, new TmfNanoTimestamp(segment.getEnd())));
+            }
+        };
+
+       manager.add(gotoStartTime);
+       manager.add(gotoEndTime);
     }
 
     // ------------------------------------------------------------------------
