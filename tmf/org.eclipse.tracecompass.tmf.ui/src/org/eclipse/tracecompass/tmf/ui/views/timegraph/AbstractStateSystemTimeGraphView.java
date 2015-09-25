@@ -31,6 +31,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
@@ -99,6 +100,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
         @Override
         public void run() {
             final List<ILinkEvent> links = new ArrayList<>();
+            final List<IMarkerEvent> markers = new ArrayList<>();
             if (fClearZoomedLists) {
                 clearZoomedLists();
             }
@@ -108,11 +110,12 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
                     entryList = fSSEntryListMap.get(ss);
                 }
                 if (entryList != null) {
-                    zoomByTime(ss, entryList, links, getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
+                    zoomByTime(ss, entryList, links, markers, getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
                 }
             }
             if (!getMonitor().isCanceled()) {
                 getTimeGraphViewer().setLinks(links);
+                getTimeGraphViewer().getTimeGraphControl().setMarkers(markers);
             }
         }
 
@@ -124,7 +127,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
             }
         }
 
-        private void zoomByTime(final ITmfStateSystem ss, final List<TimeGraphEntry> entryList, final List<ILinkEvent> links,
+        private void zoomByTime(final ITmfStateSystem ss, final List<TimeGraphEntry> entryList, final List<ILinkEvent> links, final List<IMarkerEvent> markers,
                 long startTime, long endTime, long resolution, final @NonNull IProgressMonitor monitor) {
             final long start = Math.max(startTime, ss.getStartTime());
             final long end = Math.min(endTime, ss.getCurrentEndTime());
@@ -145,6 +148,8 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
                     }
                     /* Refresh the arrows when zooming */
                     links.addAll(getLinkList(ss, fullStates, monitor));
+                    /* Refresh the markers when zooming */
+                    markers.addAll(getMarkerList(ss, fullStates, monitor));
                 }
             });
             refresh();
@@ -389,6 +394,23 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     }
 
     /**
+     * Gets the list of markers for a given list of full
+     * states. The default implementation returns an empty list.
+     *
+     * @param ss
+     *            The state system
+     * @param fullStates
+     *            A list of full states
+     * @param monitor
+     *            A progress monitor
+     * @return The list of marker events
+     */
+    protected @NonNull List<IMarkerEvent> getMarkerList(ITmfStateSystem ss,
+            @NonNull List<List<ITmfStateInterval>> fullStates, @NonNull IProgressMonitor monitor) {
+        return new ArrayList<>();
+    }
+
+    /**
      * @deprecated The subclass should call {@link #getEntryList(ITmfStateSystem)} instead.
      */
     @Deprecated
@@ -439,6 +461,15 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     @Deprecated
     @Override
     protected final List<ILinkEvent> getLinkList(long startTime, long endTime, long resolution, IProgressMonitor monitor) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * @deprecated The subclass should implement {@link #getMarkerList(ITmfStateSystem, List, IProgressMonitor)} instead.
+     */
+    @Deprecated
+    @Override
+    protected final List<IMarkerEvent> getMarkerList(long startTime, long endTime, long resolution, IProgressMonitor monitor) {
         throw new UnsupportedOperationException();
     }
 

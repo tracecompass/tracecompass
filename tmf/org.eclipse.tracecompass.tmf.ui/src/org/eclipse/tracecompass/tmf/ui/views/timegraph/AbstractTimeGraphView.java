@@ -75,6 +75,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphRangeUpdateEve
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphViewer;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
@@ -632,6 +633,12 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             List<ILinkEvent> events = getLinkList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
             if (events != null) {
                 fTimeGraphWrapper.getTimeGraphViewer().setLinks(events);
+                redraw();
+            }
+            /* Refresh the markers when zooming */
+            List<IMarkerEvent> markers = getMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
+            if (markers != null) {
+                fTimeGraphWrapper.getTimeGraphViewer().getTimeGraphControl().setMarkers(markers);
                 redraw();
             }
         }
@@ -1304,6 +1311,25 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         return new ArrayList<>();
     }
 
+    /**
+     * Gets the list of markers for a trace in a given time range. Default
+     * implementation returns an empty list.
+     *
+     * @param startTime
+     *            Start of the time range
+     * @param endTime
+     *            End of the time range
+     * @param resolution
+     *            The resolution
+     * @param monitor
+     *            The progress monitor object
+     * @return The list of marker events
+     * @since 2.0
+     */
+    protected @Nullable List<IMarkerEvent> getMarkerList(long startTime, long endTime,
+            long resolution, @NonNull IProgressMonitor monitor) {
+        return new ArrayList<>();
+    }
 
     /**
      * Refresh the display
