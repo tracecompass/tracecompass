@@ -217,7 +217,10 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
                     /* Get the event's CPU */
                     Object cpuObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
                     if (cpuObj == null) {
-                        /* We couldn't find any CPU information, ignore this event */
+                        /*
+                         * We couldn't find any CPU information, ignore this
+                         * event
+                         */
                         break;
                     }
                     Integer cpu = (Integer) cpuObj;
@@ -253,9 +256,11 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
 
                     /* Add the preempted flag to the status */
                     value = ss.queryOngoingState(curStatusQuark);
-                    int newVal = Math.max(VcpuStateValues.VCPU_UNKNOWN, value.unboxInt());
-                    value = TmfStateValue.newValueInt(newVal | VcpuStateValues.VCPU_PREEMPT);
-                    ss.modifyAttribute(ts, value, curStatusQuark);
+                    if ((value.unboxInt() & VcpuStateValues.VCPU_IDLE) == 0) {
+                        int newVal = Math.max(VcpuStateValues.VCPU_UNKNOWN, value.unboxInt());
+                        value = TmfStateValue.newValueInt(newVal | VcpuStateValues.VCPU_PREEMPT);
+                        ss.modifyAttribute(ts, value, curStatusQuark);
+                    }
                 }
 
                 /* Verify if the next thread corresponds to a virtual CPU */
@@ -301,9 +306,11 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
                     int curStatusQuark = ss.getQuarkRelativeAndAdd(getNodeVirtualMachines(), vm.getHostId(),
                             Long.toString(virtualCpu.getCpuId()), VmAttributes.STATUS);
                     value = ss.queryOngoingState(curStatusQuark);
-                    int newVal = Math.max(VcpuStateValues.VCPU_UNKNOWN, value.unboxInt());
-                    value = TmfStateValue.newValueInt(newVal | VcpuStateValues.VCPU_VMM);
-                    ss.modifyAttribute(ts, value, curStatusQuark);
+                    if ((value.unboxInt() & VcpuStateValues.VCPU_IDLE) == 0) {
+                        int newVal = Math.max(VcpuStateValues.VCPU_UNKNOWN, value.unboxInt());
+                        value = TmfStateValue.newValueInt(newVal | VcpuStateValues.VCPU_VMM);
+                        ss.modifyAttribute(ts, value, curStatusQuark);
+                    }
                 }
 
                 /*
