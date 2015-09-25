@@ -38,6 +38,8 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceContext;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceProperties;
@@ -216,6 +218,26 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
             throw new TmfTraceException(e.getMessage(), e);
         }
 
+    }
+
+    private void initFile() throws TmfTraceException {
+        closeFile();
+        try {
+            fFileInput = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
+        } catch (IOException e) {
+            throw new TmfTraceException(e.getMessage(), e);
+        }
+    }
+
+    private void closeFile() {
+        if (fFileInput != null) {
+            try {
+                fFileInput.close();
+            } catch (IOException e) {
+            } finally {
+                fFileInput = null;
+            }
+        }
     }
 
     @Override
@@ -465,4 +487,21 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
         }
     }
 
+    @TmfSignalHandler
+    @Override
+    public void traceRangeUpdated(TmfTraceRangeUpdatedSignal signal) {
+        if (signal.getTrace() == this) {
+            try {
+                synchronized (this) {
+                    // Reset the file handle in case it has reached the end of the
+                    // file already. Otherwise, it will not be able to read new data
+                    // pass the previous end.
+                    initFile();
+                }
+            } catch (TmfTraceException e) {
+                Activator.logError(e.getLocalizedMessage(), e);
+            }
+        }
+        super.traceRangeUpdated(signal);
+    }
 }

@@ -35,6 +35,8 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition.InputLine;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
@@ -109,6 +111,11 @@ public class CustomTxtTrace extends TmfTrace implements ITmfPersistentlyIndexabl
     @Override
     public void initTrace(final IResource resource, final String path, final Class<? extends ITmfEvent> eventType) throws TmfTraceException {
         super.initTrace(resource, path, eventType);
+        initFile();
+    }
+
+    private void initFile() throws TmfTraceException {
+        closeFile();
         try {
             fFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
         } catch (IOException e) {
@@ -119,6 +126,10 @@ public class CustomTxtTrace extends TmfTrace implements ITmfPersistentlyIndexabl
     @Override
     public synchronized void dispose() {
         super.dispose();
+        closeFile();
+    }
+
+    private void closeFile() {
         if (fFile != null) {
             try {
                 fFile.close();
@@ -548,5 +559,23 @@ public class CustomTxtTrace extends TmfTrace implements ITmfPersistentlyIndexabl
             return CUSTOM_TXT_TRACE_TYPE_PREFIX + traceTypeId.substring(LINUX_TOOLS_CUSTOM_TXT_TRACE_TYPE_PREFIX.length());
         }
         return traceTypeId;
+    }
+
+    @TmfSignalHandler
+    @Override
+    public void traceRangeUpdated(TmfTraceRangeUpdatedSignal signal) {
+        if (signal.getTrace() == this) {
+            try {
+                synchronized (this) {
+                    // Reset the file handle in case it has reached the end of the
+                    // file already. Otherwise, it will not be able to read new data
+                    // pass the previous end.
+                    initFile();
+                }
+            } catch (TmfTraceException e) {
+                Activator.logError(e.getLocalizedMessage(), e);
+            }
+        }
+        super.traceRangeUpdated(signal);
     }
 }

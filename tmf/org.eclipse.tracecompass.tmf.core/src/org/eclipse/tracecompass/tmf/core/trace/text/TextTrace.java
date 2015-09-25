@@ -30,6 +30,8 @@ import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
@@ -125,6 +127,11 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
     @Override
     public void initTrace(IResource resource, String path, Class<? extends ITmfEvent> type) throws TmfTraceException {
         super.initTrace(resource, path, type);
+        initFile();
+    }
+
+    private void initFile() throws TmfTraceException {
+        closeFile();
         try {
             fFile = new BufferedRandomAccessFile(getPath(), "r"); //$NON-NLS-1$
         } catch (IOException e) {
@@ -135,6 +142,10 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
     @Override
     public synchronized void dispose() {
         super.dispose();
+        closeFile();
+    }
+
+    private void closeFile() {
         if (fFile != null) {
             try {
                 fFile.close();
@@ -400,5 +411,23 @@ public abstract class TextTrace<T extends TextTraceEvent> extends TmfTrace imple
     @Override
     public ITmfLocation restoreLocation(ByteBuffer bufferIn) {
         return new TmfLongLocation(bufferIn);
+    }
+
+    @TmfSignalHandler
+    @Override
+    public void traceRangeUpdated(TmfTraceRangeUpdatedSignal signal) {
+        if (signal.getTrace() == this) {
+            try {
+                synchronized (this) {
+                    // Reset the file handle in case it has reached the end of the
+                    // file already. Otherwise, it will not be able to read new data
+                    // pass the previous end.
+                    initFile();
+                }
+            } catch (TmfTraceException e) {
+                Activator.logError(e.getLocalizedMessage(), e);
+            }
+        }
+        super.traceRangeUpdated(signal);
     }
 }

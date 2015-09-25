@@ -69,6 +69,7 @@ import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IReusableEditor;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IGotoMarker;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.properties.IPropertySheetPage;
@@ -207,6 +208,12 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             /* change the input to a FileEditorInput to allow open handlers to find this editor */
             super.setInput(new FileEditorInput(fFile));
             createAndInitializeTable();
+            // The table was swapped for a new one, make sure it gets focus if
+            // the editor is active. Otherwise, the new table will not get focus
+            // because the editor already had focus.
+            if (!PlatformUI.getWorkbench().isClosing() && PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart() == getSite().getPart()) {
+                fEventsTable.setFocus();
+            }
             fParent.layout();
         }
     }
@@ -228,6 +235,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         if (fTrace != null) {
             setPartName(fTrace.getName());
             fEventsTable = createEventsTable(fParent, fTrace.getCacheSize());
+            fEventsTable.registerContextMenus(getSite());
             fEventsTable.setColumnOrder(TmfTraceColumnManager.loadColumnOrder(fTrace.getTraceTypeId()));
             fEventsTable.addSelectionChangedListener(this);
             fEventsTable.setTrace(fTrace, true);
