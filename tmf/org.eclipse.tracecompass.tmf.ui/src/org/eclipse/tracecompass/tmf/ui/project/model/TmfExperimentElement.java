@@ -57,6 +57,7 @@ import org.eclipse.ui.views.properties.IPropertySource2;
 /**
  * Implementation of TMF Experiment Model Element.
  * <p>
+ *
  * @version 1.0
  * @author Francois Chouinard
  *
@@ -137,9 +138,13 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
     // ------------------------------------------------------------------------
     /**
      * Constructor
-     * @param name The name of the experiment
-     * @param folder The folder reference
-     * @param parent The experiment folder reference.
+     *
+     * @param name
+     *            The name of the experiment
+     * @param folder
+     *            The folder reference
+     * @param parent
+     *            The experiment folder reference.
      */
     public TmfExperimentElement(String name, IFolder folder, TmfExperimentFolder parent) {
         super(name, folder, parent);
@@ -261,6 +266,7 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
 
     /**
      * Returns a list of TmfTraceElements contained in this experiment.
+     *
      * @return a list of TmfTraceElements
      */
     @Override
@@ -278,7 +284,8 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
     /**
      * Adds a trace to the experiment
      *
-     * @param trace The trace element to add
+     * @param trace
+     *            The trace element to add
      */
     public void addTrace(TmfTraceElement trace) {
         addTrace(trace, true);
@@ -287,8 +294,10 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
     /**
      * Adds a trace to the experiment
      *
-     * @param trace The trace element to add
-     * @param refresh Flag for refreshing the project
+     * @param trace
+     *            The trace element to add
+     * @param refresh
+     *            Flag for refreshing the project
      */
     public void addTrace(TmfTraceElement trace, boolean refresh) {
         /**
@@ -337,8 +346,10 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
     /**
      * Removes a trace from an experiment
      *
-     * @param trace The trace to remove
-     * @throws CoreException exception
+     * @param trace
+     *            The trace to remove
+     * @throws CoreException
+     *             exception
      */
     public void removeTrace(TmfTraceElement trace) throws CoreException {
 
@@ -350,7 +361,7 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
             }
         });
 
-        /* Finally, remove the trace from experiment*/
+        /* Finally, remove the trace from experiment */
         removeChild(trace);
         deleteTraceResource(trace.getResource());
         deleteSupplementaryResources();
@@ -502,6 +513,7 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
 
     /**
      * Return the suffix for resource names
+     *
      * @return The folder suffix
      */
     @Override

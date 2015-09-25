@@ -36,7 +36,7 @@ public class Messages extends NLS {
      */
     public static String NewProjectWizard_DialogMessage;
     /**
-     *  The title of the select traces wizard.
+     * The title of the select traces wizard.
      */
     public static String SelectTracesWizard_WindowTitle;
     /**
@@ -72,7 +72,8 @@ public class Messages extends NLS {
      */
     public static String SelectTracesWizardPage_InternalErrorTitle;
     /**
-     * The error message when no name was entered in a dialog box (new trace or experiment dialog)
+     * The error message when no name was entered in a dialog box (new trace or
+     * experiment dialog)
      */
     public static String Dialog_EmptyNameError;
     /**
@@ -155,6 +156,37 @@ public class Messages extends NLS {
      * The label of the field for entering the new folder name.
      */
     public static String RenameFolderDialog_FolderNewName;
+    /**
+     * The title of the select root node wizard.
+     *
+     * The title of the select root node wizard.
+     *
+     * @since 2.0
+     *
+     */
+    public static String SelectRootNodeWizard_WindowTitle;
+
+    /**
+     * The title of the select root node wizard page.
+     *
+     * @since 2.0
+     *
+     */
+    public static String SelectRootNodeWizardPage_WindowTitle;
+
+    /**
+     * The description of the select root node wizard page.
+     *
+     * @since 2.0
+     *
+     */
+    public static String SelectRootNodeWizardPage_Description;
+    /**
+     * The column header for the traces (select root node wizard page).
+     *
+     * @since 2.0
+     */
+    public static String SelectRootNodeWizardPage_TraceColumnHeader;
 
     static {
         // initialize resource bundle

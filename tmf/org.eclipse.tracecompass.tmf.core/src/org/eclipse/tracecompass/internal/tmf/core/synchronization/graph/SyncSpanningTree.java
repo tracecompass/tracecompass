@@ -41,12 +41,24 @@ public class SyncSpanningTree {
      * reference node, is predictable, mostly for unit tests.
      */
     private SortedSet<String> fHosts = new TreeSet<>();
+    private final String fRootNode;
 
     /**
      * Default constructor
      */
     public SyncSpanningTree() {
+        this(null);
+    }
+
+    /**
+     * Constructor with a root node.
+     *
+     * @param rootNode
+     *            Root node that will be used.
+     */
+    public SyncSpanningTree(String rootNode) {
         fSyncGraph = new SyncGraph<>();
+        fRootNode = rootNode;
     }
 
     /**
@@ -106,12 +118,16 @@ public class SyncSpanningTree {
     private String getRootNode() {
         /**
          * Get the root node from which all other paths will be calculated. For
-         * now, we take the first node alphabetically.
+         * now, we take the first node alphabetically if the rootNode was not
+         * set.
          */
         if (fHosts.size() == 0) {
             return null;
         }
-        return fHosts.first();
+        if (fRootNode == null) {
+            return fHosts.first();
+        }
+        return fRootNode;
     }
 
     /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 École Polytechnique de Montréal
+ * Copyright (c) 2013, 2015 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Geneviève Bastien - Initial implementation and API
+ *   Cédric Biancheri - Added a wizard to select the root node
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.tmf.ui.project.handlers;
@@ -24,9 +25,11 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.jface.window.Window;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
@@ -37,10 +40,10 @@ import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.tracecompass.tmf.ui.project.wizards.SelectRootNodeWizard;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
  * Handles the synchronization of an experiment, when the user selects this
@@ -54,15 +57,9 @@ public class SynchronizeTracesHandler extends AbstractHandler {
 
     private TreeSelection fSelection = null;
     private static final String CR = System.getProperty("line.separator"); //$NON-NLS-1$
-
-    // ------------------------------------------------------------------------
-    // Validation
-    // ------------------------------------------------------------------------
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+    private TmfExperimentElement fExperiment = null;
+    private TmfTraceElement fRootNode = null;
+    private String fRootNodeId = null;
 
     // ------------------------------------------------------------------------
     // Execution
@@ -78,16 +75,7 @@ public class SynchronizeTracesHandler extends AbstractHandler {
         }
 
         // Get the selection
-        IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-        IWorkbenchPart part = page.getActivePart();
-        if (part == null) {
-            return Boolean.FALSE;
-        }
-        ISelectionProvider selectionProvider = part.getSite().getSelectionProvider();
-        if (selectionProvider == null) {
-            return Boolean.FALSE;
-        }
-        ISelection selection = selectionProvider.getSelection();
+        ISelection selection = HandlerUtil.getCurrentSelectionChecked(event);
 
         // Make sure selection contains only traces
         fSelection = null;
@@ -98,9 +86,7 @@ public class SynchronizeTracesHandler extends AbstractHandler {
             Iterator<Object> iterator = fSelection.iterator();
             while (iterator.hasNext()) {
                 Object element = iterator.next();
-                if (element instanceof TmfTraceElement) {
-                    tl.add((TmfTraceElement) element);
-                } else if (element instanceof TmfExperimentElement) {
+                if (element instanceof TmfExperimentElement) {
                     TmfExperimentElement exp = (TmfExperimentElement) element;
                     uiexperiment.add(exp);
                     for (TmfTraceElement trace : exp.getTraces()) {
@@ -114,6 +100,20 @@ public class SynchronizeTracesHandler extends AbstractHandler {
             TraceUtils.displayErrorMsg(Messages.SynchronizeTracesHandler_Title, Messages.SynchronizeTracesHandler_WrongTraceNumber);
             return null;
         }
+        fExperiment = uiexperiment.get(0);
+        fRootNode = null;
+        fRootNodeId = null;
+
+        // Fire the Select Root Node Wizard
+        IWorkbenchWindow workbenchWindow = HandlerUtil.getActiveWorkbenchWindowChecked(event);
+        Shell shell = workbenchWindow.getShell();
+        SelectRootNodeWizard wizard = new SelectRootNodeWizard(fExperiment);
+        WizardDialog dialog = new WizardDialog(shell, wizard);
+        int returnValue = dialog.open();
+        if (returnValue == Window.CANCEL) {
+            return null;
+        }
+        fRootNode = wizard.getRootNode();
 
         Thread thread = new Thread() {
             @Override
@@ -143,19 +143,24 @@ public class SynchronizeTracesHandler extends AbstractHandler {
                         }
                         return;
                     }
+                    if (tl.get(i).getElementPath().equals(fRootNode.getElementPath())) {
+                        fRootNodeId = trace.getHostId();
+                    }
                     traces[i] = trace;
                 }
 
                 /*
-                 * FIXME Unlike traces, there is no instanceExperiment, so
-                 * we call this function here alone. Maybe it would be
-                 * better to do this on experiment's element constructor?
+                 * FIXME Unlike traces, there is no instanceExperiment, so we
+                 * call this function here alone. Maybe it would be better to do
+                 * this on experiment's element constructor?
                  */
                 exp.refreshSupplementaryFolder();
                 final TmfExperiment experiment = new TmfExperiment(ITmfEvent.class,
                         exp.getName(), traces, TmfExperiment.DEFAULT_INDEX_PAGE_SIZE, exp.getResource());
 
                 final SynchronizationAlgorithm syncAlgo = experiment.synchronizeTraces(true);
+                syncAlgo.setRootNode(fRootNodeId);
+
                 TmfTraceManager.refreshSupplementaryFiles(experiment);
 
                 Display.getDefault().asyncExec(new Runnable() {
@@ -164,15 +169,14 @@ public class SynchronizeTracesHandler extends AbstractHandler {
                         List<TmfTraceElement> tracesToAdd = new ArrayList<>();
                         List<TmfTraceElement> tracesToRemove = new ArrayList<>();
                         /*
-                         * For each trace in the experiment, if there is
-                         * a transform equation, copy the original
-                         * trace, so that a new state system will be
-                         * generated with sync time.
+                         * For each trace in the experiment, if there is a
+                         * transform equation, copy the original trace, so that
+                         * a new state system will be generated with sync time.
                          */
                         for (TmfTraceElement traceel : tl) {
                             /*
-                             * Find the trace corresponding to this
-                             * element in the experiment
+                             * Find the trace corresponding to this element in
+                             * the experiment
                              */
                             ITmfTrace expTrace = null;
                             for (ITmfTrace t : experiment.getTraces()) {
@@ -182,13 +186,12 @@ public class SynchronizeTracesHandler extends AbstractHandler {
                                 }
                             }
                             if ((expTrace != null) && syncAlgo.isTraceSynced(expTrace.getHostId())) {
-
                                 /* Find the original trace */
                                 TmfTraceElement origtrace = traceel.getElementUnderTraceFolder();
 
                                 /*
-                                 * Make sure a trace with the
-                                 * new name does not exist
+                                 * Make sure a trace with the new name does not
+                                 * exist
                                  */
                                 String newname = traceel.getName();
                                 IContainer parentFolder = origtrace.getResource().getParent();
@@ -210,8 +213,8 @@ public class SynchronizeTracesHandler extends AbstractHandler {
                                 }
 
                                 /*
-                                 * Instantiate the new trace
-                                 * and set its sync formula
+                                 * Instantiate the new trace and set its sync
+                                 * formula
                                  */
                                 ITmfTrace trace = newtrace.instantiateTrace();
                                 ITmfEvent traceEvent = newtrace.instantiateEvent();

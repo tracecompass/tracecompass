@@ -153,7 +153,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
      */
     private SyncSpanningTree getSyncTree() {
         if (fTree == null) {
-            fTree = new SyncSpanningTree();
+            fTree = new SyncSpanningTree(getRootNode());
             for (ConvexHull traceSync : fSyncs) {
                 SyncQuality q = traceSync.getQuality();
                 if (q == SyncQuality.ACCURATE || q == SyncQuality.APPROXIMATE) {

@@ -28,6 +28,8 @@ public abstract class SynchronizationAlgorithm extends TmfEventMatches implement
 
     private static final long serialVersionUID = -3083906749528872196L;
 
+    private String fRootNode;
+
     /**
      * Quality of the result obtained by the synchronization algorithm
      */
@@ -117,5 +119,26 @@ public abstract class SynchronizationAlgorithm extends TmfEventMatches implement
      * @return true if trace has formula
      */
     public abstract boolean isTraceSynced(String hostId);
+
+    /**
+     * Sets the root node.
+     *
+     * @param rootNode
+     *            The root node
+     * @since 2.0
+     */
+    public void setRootNode(String rootNode) {
+        fRootNode = rootNode;
+    }
+
+    /**
+     * Returns the root node.
+     *
+     * @return The root node.
+     * @since 2.0
+     */
+    public String getRootNode() {
+        return fRootNode;
+    }
 
 }
