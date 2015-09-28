@@ -56,6 +56,8 @@ public class LatencyAnalysis extends TmfAbstractAnalysisModule {
 
     private @Nullable ISegmentStore<ISegment> fSystemCalls;
 
+    private @Nullable ITmfEventRequest fOngoingRequest = null;
+
     private final Set<LatencyAnalysisListener> fListeners = new HashSet<>();
 
     @Override
@@ -102,12 +104,28 @@ public class LatencyAnalysis extends TmfAbstractAnalysisModule {
         }
 
         ISegmentStore<ISegment> syscalls = new TreeMapStore<>();
-        ITmfEventRequest req = new LatencyAnalysisRequest(layout, syscalls);
+
+        /* Cancel an ongoing request */
+        ITmfEventRequest req = fOngoingRequest;
+        if ((req != null) && (!req.isCompleted())) {
+            req.cancel();
+        }
+
+        /* Create a new request */
+        req = new LatencyAnalysisRequest(layout, syscalls);
+        fOngoingRequest = req;
         trace.sendRequest(req);
+
         try {
             req.waitForCompletion();
         } catch (InterruptedException e) {
         }
+
+        /* Do not process the results if the request was cancelled */
+        if (req.isCancelled() || req.isFailed()) {
+            return false;
+        }
+
         /* The request will fill 'syscalls' */
         fSystemCalls = syscalls;
 
@@ -127,7 +145,10 @@ public class LatencyAnalysis extends TmfAbstractAnalysisModule {
 
     @Override
     protected void canceling() {
-
+        ITmfEventRequest req = fOngoingRequest;
+        if ((req != null) && (!req.isCompleted())) {
+            req.cancel();
+        }
     }
 
     /**
