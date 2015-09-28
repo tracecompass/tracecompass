@@ -129,7 +129,8 @@ public class TreeMapStoreTest {
     @Test
     public void testNoDuplicateElements() {
         for (ISegment segment : SEGMENTS) {
-            fSegmentStore.add(new BasicSegment(segment.getStart(), segment.getEnd()));
+            boolean ret = fSegmentStore.add(new BasicSegment(segment.getStart(), segment.getEnd()));
+            assertFalse(ret);
         }
         assertEquals(SEGMENTS.size(), fSegmentStore.size());
     }

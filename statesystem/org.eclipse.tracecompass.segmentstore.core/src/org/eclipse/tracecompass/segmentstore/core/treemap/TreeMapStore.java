@@ -117,20 +117,16 @@ public class TreeMapStore<E extends ISegment> implements ISegmentStore<E> {
 
         fLock.writeLock().lock();
         try {
-            /* We can take a read lock while holding the write lock. */
-            if (contains(val)) {
-                return false;
-            }
-
             if (fStartTimesIndex.put(Long.valueOf(val.getStart()), val)) {
                 fEndTimesIndex.put(Long.valueOf(val.getEnd()), val);
                 fSize++;
                 fLastSnapshot = null;
+                return true;
             }
+            return false;
         } finally {
             fLock.writeLock().unlock();
         }
-        return true;
     }
 
     @Override
