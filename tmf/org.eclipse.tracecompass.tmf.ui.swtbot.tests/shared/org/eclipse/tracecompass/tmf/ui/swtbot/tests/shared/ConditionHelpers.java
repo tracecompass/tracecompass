@@ -14,26 +14,31 @@
 
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared;
 
-
 import static org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory.withPartName;
 
 import java.util.Arrays;
 
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
+import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.TableCollection;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.ui.IEditorReference;
 import org.hamcrest.Matcher;
 
@@ -393,5 +398,56 @@ public final class ConditionHelpers {
                         new Object[] { column, tree.selection().get(0, column), text});
             }
         };
+    }
+
+    private static class EventsTableSelectionCondition extends DefaultCondition {
+        private long fSelectionTime;
+        private SWTWorkbenchBot fBot;
+
+        private EventsTableSelectionCondition(SWTWorkbenchBot bot, long selectionTime) {
+            fBot = bot;
+            fSelectionTime = selectionTime;
+        }
+
+        @Override
+        public boolean test() throws Exception {
+            StructuredSelection eventsTableSelection = getEventsTableSelection();
+            if (eventsTableSelection.isEmpty()) {
+                return false;
+            }
+            return ((ITmfEvent) eventsTableSelection.getFirstElement()).getTimestamp().getValue() == fSelectionTime;
+        }
+
+        @Override
+        public String getFailureMessage() {
+            return "The selection in the table was not an event with timestamp " + fSelectionTime;
+        }
+
+        private StructuredSelection getEventsTableSelection() {
+            return UIThreadRunnable.syncExec(new Result<StructuredSelection>() {
+
+                @Override
+                public StructuredSelection run() {
+                    SWTBotEditor eventsEditor = SWTBotUtils.activeEventsEditor(fBot);
+                    TmfEventsEditor part = (TmfEventsEditor) eventsEditor.getReference().getPart(false);
+                    StructuredSelection selection = (StructuredSelection) part.getSelection();
+                    return selection;
+                }
+            });
+        }
+    }
+
+    /**
+     * Wait until the events table selection matches the specified time stamp.
+     *
+     * @param bot
+     *            a workbench bot
+     *
+     * @param selectionTime
+     *            the selection time
+     * @return ICondition for verification
+     */
+    public static ICondition selectionInEventsTable(final SWTWorkbenchBot bot, long selectionTime) {
+        return new EventsTableSelectionCondition(bot, selectionTime);
     }
 }

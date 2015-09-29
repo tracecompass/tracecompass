@@ -31,8 +31,9 @@ import org.junit.runners.Suite;
         MovableColumnEventsEditorTest.class,
         SDViewTest.class,
         TestTraceOffsetting.class,
-        TmfAlignTimeAxisTest.class
-
+        TmfAlignTimeAxisTest.class,
+        TestRefreshTextTrace.class,
+        TestRefreshCustomTextTrace.class,
 })
 public class AllTests {
 }

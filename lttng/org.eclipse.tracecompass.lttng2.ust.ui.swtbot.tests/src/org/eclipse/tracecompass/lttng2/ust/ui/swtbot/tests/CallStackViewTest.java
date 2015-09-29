@@ -24,25 +24,19 @@ import java.util.List;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
-import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
-import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTrace;
-import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.callstack.CallStackView;
 import org.junit.After;
@@ -222,7 +216,7 @@ public class CallStackViewTest {
         for (int i = 0; i < 10; i++) {
             viewBot.toolbarPushButton(SELECT_NEXT_EVENT).click();
             currentEventOffset++;
-            fBot.waitUntil(new EventsTableSelectionCondition(TIMESTAMPS[currentEventOffset]));
+            fBot.waitUntil(ConditionHelpers.selectionInEventsTable(fBot, TIMESTAMPS[currentEventOffset]));
             SWTBotUtils.waitForJobs();
             assertArrayEquals(STACK_FRAMES[currentEventOffset], getVisibleStackFrames(viewBot).toArray());
 
@@ -231,7 +225,7 @@ public class CallStackViewTest {
         for (int i = 0; i < 2; i++) {
             viewBot.toolbarPushButton(SELECT_PREVIOUS_EVENT).click();
             currentEventOffset--;
-            fBot.waitUntil(new EventsTableSelectionCondition(TIMESTAMPS[currentEventOffset]));
+            fBot.waitUntil(ConditionHelpers.selectionInEventsTable(fBot, TIMESTAMPS[currentEventOffset]));
             SWTBotUtils.waitForJobs();
             assertArrayEquals(STACK_FRAMES[currentEventOffset], getVisibleStackFrames(viewBot).toArray());
         }
@@ -283,45 +277,7 @@ public class CallStackViewTest {
         SWTBotTable table = fBot.activeEditor().bot().table();
         table.setFocus();
         TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(table.widget, new TmfNanoTimestamp(timestamp)));
-        fBot.waitUntil(new EventsTableSelectionCondition(timestamp));
-    }
-
-    /**
-     * Wait until the events table selection matches the specified time stamp.
-     */
-    private static class EventsTableSelectionCondition extends DefaultCondition {
-        private long fSelectionTime;
-
-        private EventsTableSelectionCondition(long selectionTime) {
-            fSelectionTime = selectionTime;
-        }
-
-        @Override
-        public boolean test() throws Exception {
-            StructuredSelection eventsTableSelection = getEventsTableSelection();
-            if (eventsTableSelection.isEmpty()) {
-                return false;
-            }
-            return ((ITmfEvent) eventsTableSelection.getFirstElement()).getTimestamp().getValue() == fSelectionTime;
-        }
-
-        @Override
-        public String getFailureMessage() {
-            return "failed";
-        }
-
-        private static StructuredSelection getEventsTableSelection() {
-            return UIThreadRunnable.syncExec(new Result<StructuredSelection>() {
-
-                @Override
-                public StructuredSelection run() {
-                    SWTBotEditor eventsEditor = SWTBotUtils.activeEventsEditor(fBot);
-                    TmfEventsEditor part = (TmfEventsEditor) eventsEditor.getReference().getPart(false);
-                    StructuredSelection selection = (StructuredSelection) part.getSelection();
-                    return selection;
-                }
-            });
-        }
+        fBot.waitUntil(ConditionHelpers.selectionInEventsTable(fBot, timestamp));
     }
 
     /**
