@@ -24,7 +24,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ui.TmfUiRefreshHandler;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfChartTimeStampFormat;
@@ -109,20 +108,22 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
     protected void reinitialize() {
         fSeriesValues.clear();
         Thread thread = new Thread() {
+            // Don't use TmfUiRefreshHandler (bug 467751)
             @Override
             public void run() {
                 initializeDataSource();
-                TmfUiRefreshHandler.getInstance().queueUpdate(TmfCommonXLineChartViewer.this,
-                        new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!getSwtChart().isDisposed()) {
-                            /* Delete the old series */
-                            clearContent();
-                            createSeries();
+                if (!getSwtChart().isDisposed()) {
+                    getDisplay().asyncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!getSwtChart().isDisposed()) {
+                                /* Delete the old series */
+                                clearContent();
+                                createSeries();
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
         };
         thread.start();
