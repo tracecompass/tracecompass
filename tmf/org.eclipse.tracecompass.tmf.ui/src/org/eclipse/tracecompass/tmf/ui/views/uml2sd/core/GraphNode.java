@@ -371,12 +371,10 @@ public abstract class GraphNode {
             return null;
         }
 
-        Iterator<String> it = fNodes.keySet().iterator();
         GraphNode node = null;
-        while (it.hasNext()) {
-            Object nodeType = it.next();
-            List<GraphNode> list = fNodes.get(nodeType);
-            int index = fIndexes.get(nodeType).intValue();
+        for (Map.Entry<String, List<GraphNode>> entry : fNodes.entrySet()) {
+            List<GraphNode> list = entry.getValue();
+            int index = fIndexes.get(entry.getKey()).intValue();
             node = getNodeFromListAt(x, y, list, index);
             if (toReturn == null) {
                 toReturn = node;
@@ -426,10 +424,8 @@ public abstract class GraphNode {
             return result;
         }
 
-        Iterator<String> it = fNodes.keySet().iterator();
-        while (it.hasNext()) {
-            Object nodeType = it.next();
-            List<GraphNode> nodesList = fNodes.get(nodeType);
+        for (Map.Entry<String, List<GraphNode>> entry : fNodes.entrySet()) {
+            List<GraphNode> nodesList = entry.getValue();
             if (nodesList == null || nodesList.isEmpty()) {
                 return null;
             }
@@ -512,16 +508,15 @@ public abstract class GraphNode {
             TmfUiTracer.traceIndex("Visible area position in virtual screen (x,y)= " + x + " " + y + "\n\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
 
-        Iterator<String> it = fNodes.keySet().iterator();
-        while (it.hasNext()) {
-            String nodeType = it.next();
+        for (Map.Entry<String, List<GraphNode>> entry : fNodes.entrySet()) {
+            String nodeType = entry.getKey();
             int direction = 1;
             int drawIndex = fIndexes.get(nodeType).intValue();
             /*
              * if (x==0) { drawIndex = 0; indexes.put(nodeType,new Integer(drawIndex)); }
              */
-            if ((fNodes.get(nodeType) != null) && (fNodes.get(nodeType).size() > 1)) {
-                if (fNodes.get(nodeType).get(drawIndex).positiveDistanceToPoint(x, y)) {
+            if ((entry.getValue() != null) && (entry.getValue().size() > 1)) {
+                if (entry.getValue().get(drawIndex).positiveDistanceToPoint(x, y)) {
                     direction = -1;
                 }
 
@@ -530,24 +525,24 @@ public abstract class GraphNode {
                 }
 
                 if ((direction == -1) && (fBackwardNodes.get(nodeType) != null)) {
-                    GraphNode currentNode = fNodes.get(nodeType).get(drawIndex);
+                    GraphNode currentNode = entry.getValue().get(drawIndex);
                     drawIndex = Arrays.binarySearch(fBackwardNodes.get(nodeType).toArray(new GraphNode[fBackwardNodes.get(nodeType).size()]),
-                            fNodes.get(nodeType).get(drawIndex), currentNode.getBackComparator());
-                    fNodes.put(nodeType, fBackwardNodes.get(nodeType));
+                            entry.getValue().get(drawIndex), currentNode.getBackComparator());
+                    entry.setValue(fBackwardNodes.get(nodeType));
                     if (drawIndex < 0) {
                         drawIndex = 0;
                         direction = 1;
                     } else {
-                        fNodes.put(nodeType, fBackwardNodes.get(nodeType));
+                        entry.setValue(fBackwardNodes.get(nodeType));
                     }
                 }
                 GraphNode prev = null;
 
-                for (int i = drawIndex; i < fNodes.get(nodeType).size() && i >= 0; i = i + direction) {
+                for (int i = drawIndex; i < entry.getValue().size() && i >= 0; i = i + direction) {
                     drawIndex = i;
                     fIndexes.put(nodeType, Integer.valueOf(i));
 
-                    GraphNode currentNode = fNodes.get(nodeType).get(i);
+                    GraphNode currentNode = entry.getValue().get(i);
 
                     if (prev == null) {
                         prev = currentNode;
@@ -561,15 +556,15 @@ public abstract class GraphNode {
                         sort = fBackwardSort;
                     }
 
-                    if (i < fNodes.get(nodeType).size() - 1) {
-                        GraphNode next = fNodes.get(nodeType).get(i + 1);
+                    if (i < entry.getValue().size() - 1) {
+                        GraphNode next = entry.getValue().get(i + 1);
 
                         if ((comp != null) && (comp.compare(currentNode, next) > 0)) {
                             sort.put(nodeType, Boolean.TRUE);
                         }
                     }
                     if (direction == 1) {
-                        if (fNodes.get(nodeType).get(i).positiveDistanceToPoint(x, y)) {
+                        if (entry.getValue().get(i).positiveDistanceToPoint(x, y)) {
                             break;
                         }
                     } else {
@@ -590,11 +585,11 @@ public abstract class GraphNode {
                     }
                 }
 
-                fNodes.put(nodeType, fForwardNodes.get(nodeType));
+                entry.setValue(fForwardNodes.get(nodeType));
                 if ((fBackwardNodes.get(nodeType) != null) && (direction == -1)) {
                     // nodes.put(nodeType,fnodes.get(nodeType));
                     int index = fIndexes.get(nodeType).intValue();
-                    List<GraphNode> list = fNodes.get(nodeType);
+                    List<GraphNode> list = entry.getValue();
                     List<GraphNode> backList = fBackwardNodes.get(nodeType);
                     GraphNode currentNode = (backList.get(index));
                     if (index > 0) {
@@ -606,8 +601,8 @@ public abstract class GraphNode {
                     }
                 }
 
-                for (int i = drawIndex; i < fNodes.get(nodeType).size() && i >= 0; i++) {
-                    GraphNode toDraw = fNodes.get(nodeType).get(i);
+                for (int i = drawIndex; i < entry.getValue().size() && i >= 0; i++) {
+                    GraphNode toDraw = entry.getValue().get(i);
                     toDraw.updateIndex(x, y, width, height);
                     if (!toDraw.isVisible(x, y, width, height)) {
                         break;
@@ -639,15 +634,14 @@ public abstract class GraphNode {
             return;
         }
         // If the nodes have not been added ordered, the array is ordered
-        Iterator<String> it = fForwardSort.keySet().iterator();
-        while (it.hasNext()) {
-            String nodeType = it.next();
-            boolean sort = fForwardSort.get(nodeType).booleanValue();
+        for (Map.Entry<String, Boolean> entry : fForwardSort.entrySet()) {
+            String nodeType = entry.getKey();
+            boolean sort = entry.getValue().booleanValue();
             if (sort) {
                 GraphNode[] temp = fForwardNodes.get(nodeType).toArray(new GraphNode[fForwardNodes.get(nodeType).size()]);
                 GraphNode node = fNodes.get(nodeType).get(0);
                 Arrays.sort(temp, node.getComparator());
-                fForwardSort.put(nodeType, Boolean.FALSE);
+                entry.setValue(Boolean.FALSE);
                 fNodes.put(nodeType, Arrays.asList(temp));
                 fForwardNodes.put(nodeType, Arrays.asList(temp));
                 if (TmfUiTracer.isSortingTraced()) {
@@ -656,15 +650,14 @@ public abstract class GraphNode {
             }
         }
 
-        Iterator<String> it2 = fBackwardSort.keySet().iterator();
-        while (it2.hasNext()) {
-            String nodeType = it2.next();
-            boolean sort = fBackwardSort.get(nodeType).booleanValue();
+        for (Map.Entry<String, Boolean> entry : fBackwardSort.entrySet()) {
+            String nodeType = entry.getKey();
+            boolean sort = entry.getValue().booleanValue();
             if (sort) {
                 GraphNode[] temp = fBackwardNodes.get(nodeType).toArray(new GraphNode[fBackwardNodes.get(nodeType).size()]);
                 GraphNode node = fNodes.get(nodeType).get(0);
                 Arrays.sort(temp, node.getBackComparator());
-                fBackwardSort.put(nodeType, Boolean.FALSE);
+                entry.setValue(Boolean.FALSE);
                 fBackwardNodes.put(nodeType, Arrays.asList(temp));
                 if (TmfUiTracer.isSortingTraced()) {
                     TmfUiTracer.traceSorting(nodeType + " back array sorted\n"); //$NON-NLS-1$
