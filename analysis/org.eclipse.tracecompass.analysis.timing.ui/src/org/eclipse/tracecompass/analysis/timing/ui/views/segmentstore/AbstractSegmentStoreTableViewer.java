@@ -345,6 +345,11 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
                 getTableViewer().setInput(null);
                 refresh();
             }
+
+            AbstractSegmentStoreAnalysisModule analysis = getAnalysisModule();
+            if ((analysis != null)) {
+                analysis.removeListener(fListener);
+            }
         }
     }
 }

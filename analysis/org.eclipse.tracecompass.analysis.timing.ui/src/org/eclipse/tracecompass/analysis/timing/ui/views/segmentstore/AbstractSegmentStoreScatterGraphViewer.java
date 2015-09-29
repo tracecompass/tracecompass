@@ -493,7 +493,7 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
             if (TmfTraceManager.getInstance().getActiveTrace() == null) {
                 AbstractSegmentStoreAnalysisModule analysis = getAnalysisModule();
                 if (analysis != null) {
-                    // TODO remove listener analysis.
+                    analysis.removeListener(fListener);
                 }
                 clearContent();
             }

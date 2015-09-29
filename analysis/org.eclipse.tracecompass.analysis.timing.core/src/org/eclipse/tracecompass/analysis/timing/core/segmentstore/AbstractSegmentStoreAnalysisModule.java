@@ -16,11 +16,12 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
@@ -47,7 +48,7 @@ import com.google.common.collect.ImmutableList;
  */
 public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnalysisModule {
 
-    private final Set<IAnalysisProgressListener> fListeners = new HashSet<>();
+    private final ListenerList fListeners = new ListenerList(ListenerList.IDENTITY);
 
     private @Nullable ISegmentStore<ISegment> fSegmentStore;
 
@@ -64,11 +65,25 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
     }
 
     /**
+     * Removes a listener for the viewers
+     *
+     * @param listener
+     *            listener for each type of viewer to remove
+     */
+    public void removeListener(IAnalysisProgressListener listener) {
+        fListeners.remove(listener);
+    }
+
+    /**
      * Returns all the listeners
-     * @return latency listners
+     * @return latency listeners
      */
     protected Iterable<IAnalysisProgressListener> getListeners() {
-        return fListeners;
+        List<IAnalysisProgressListener> listeners = new ArrayList<>();
+        for (Object listener : fListeners.getListeners()) {
+            listeners.add((IAnalysisProgressListener) listener);
+        }
+        return listeners;
     }
 
     /**

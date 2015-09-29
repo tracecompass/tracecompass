@@ -49,7 +49,6 @@ public class LatencyAnalysis extends AbstractSegmentStoreAnalysisModule {
     private static final Collection<ISegmentAspect> BASE_ASPECTS =
             checkNotNull(ImmutableList.of(SyscallNameAspect.INSTANCE));
 
-
     @Override
     public String getId() {
         return ID;
