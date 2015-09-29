@@ -99,11 +99,12 @@ public class OffsetTraceHandler extends AbstractHandler {
         TmfWorkspaceModifyOperation operation = new TmfWorkspaceModifyOperation() {
             @Override
             public void execute(IProgressMonitor monitor) throws CoreException {
-                for (final TmfTraceElement trace : offsets.keySet()) {
+                for (final Map.Entry<TmfTraceElement, Long> entry : offsets.entrySet()) {
                     if (monitor.isCanceled()) {
                         throw new OperationCanceledException();
                     }
-                    Long offset = offsets.get(trace);
+                    final TmfTraceElement trace = entry.getKey();
+                    Long offset = entry.getValue();
                     if (offset != 0 && trace.getResource().exists()) {
                         Display.getDefault().syncExec(new Runnable() {
                             @Override
