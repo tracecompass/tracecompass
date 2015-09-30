@@ -33,6 +33,7 @@ import org.eclipse.tracecompass.tmf.ui.views.uml2sd.preferences.SDViewPref;
  */
 public abstract class GraphNode {
 
+    private static final String UI_DELIMITER = "*****************************\n"; //$NON-NLS-1$
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -504,7 +505,7 @@ public abstract class GraphNode {
             return;
         }
         if(TmfUiTracer.isIndexTraced()) {
-            TmfUiTracer.traceIndex("*****************************\n"); //$NON-NLS-1$
+            TmfUiTracer.traceIndex(UI_DELIMITER);
             TmfUiTracer.traceIndex("Visible area position in virtual screen (x,y)= " + x + " " + y + "\n\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
 
@@ -616,7 +617,7 @@ public abstract class GraphNode {
         }
 
         if (TmfUiTracer.isIndexTraced()) {
-            TmfUiTracer.traceIndex("*****************************\n"); //$NON-NLS-1$
+            TmfUiTracer.traceIndex(UI_DELIMITER);
         }
     }
 
@@ -666,7 +667,7 @@ public abstract class GraphNode {
         }
 
         if (TmfUiTracer.isDisplayTraced()) {
-            TmfUiTracer.traceDisplay("*****************************\n"); //$NON-NLS-1$
+            TmfUiTracer.traceDisplay(UI_DELIMITER);
         }
 
         int arrayStep = 1;
@@ -688,7 +689,7 @@ public abstract class GraphNode {
             }
         }
         if (TmfUiTracer.isDisplayTraced()) {
-            TmfUiTracer.traceDisplay("*****************************\n"); //$NON-NLS-1$
+            TmfUiTracer.traceDisplay(UI_DELIMITER);
         }
 
     }
