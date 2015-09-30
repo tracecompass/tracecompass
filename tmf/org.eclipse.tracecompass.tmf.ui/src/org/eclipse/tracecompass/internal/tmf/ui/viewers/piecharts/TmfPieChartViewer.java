@@ -297,7 +297,7 @@ public class TmfPieChartViewer extends Composite {
     /**
      * Reinitializes the charts to their initial state, without any data
      */
-    synchronized public void reinitializeCharts() {
+    public synchronized void reinitializeCharts() {
         if (isDisposed()) {
             return;
         }
