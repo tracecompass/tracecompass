@@ -513,9 +513,7 @@ public abstract class GraphNode {
             String nodeType = entry.getKey();
             int direction = 1;
             int drawIndex = fIndexes.get(nodeType).intValue();
-            /*
-             * if (x==0) { drawIndex = 0; indexes.put(nodeType,new Integer(drawIndex)); }
-             */
+
             if ((entry.getValue() != null) && (entry.getValue().size() > 1)) {
                 if (entry.getValue().get(drawIndex).positiveDistanceToPoint(x, y)) {
                     direction = -1;
@@ -570,8 +568,7 @@ public abstract class GraphNode {
                         }
                     } else {
                         if (currentNode.getBackComparator() == null) {
-                            if // (currentNode.isVisible(x,y,width,height)
-                            (!currentNode.positiveDistanceToPoint(x, y)) {
+                            if (!currentNode.positiveDistanceToPoint(x, y)) {
                                 break;
                             }
                         } else {
@@ -588,7 +585,6 @@ public abstract class GraphNode {
 
                 entry.setValue(fForwardNodes.get(nodeType));
                 if ((fBackwardNodes.get(nodeType) != null) && (direction == -1)) {
-                    // nodes.put(nodeType,fnodes.get(nodeType));
                     int index = fIndexes.get(nodeType).intValue();
                     List<GraphNode> list = entry.getValue();
                     List<GraphNode> backList = fBackwardNodes.get(nodeType);
