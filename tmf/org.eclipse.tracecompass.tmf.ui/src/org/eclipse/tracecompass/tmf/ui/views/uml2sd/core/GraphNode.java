@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -104,10 +103,8 @@ public abstract class GraphNode {
             return;
         }
 
-        Iterator<String> it = fIndexes.keySet().iterator();
-        while (it.hasNext()) {
-            String nodeType = it.next();
-            fIndexes.put(nodeType, Integer.valueOf(0));
+        for (Map.Entry<String, Integer> entry : fIndexes.entrySet()) {
+            entry.setValue(Integer.valueOf(0));
         }
     }
 
@@ -634,35 +631,16 @@ public abstract class GraphNode {
         }
         // If the nodes have not been added ordered, the array is ordered
         for (Map.Entry<String, Boolean> entry : fForwardSort.entrySet()) {
-            String nodeType = entry.getKey();
             boolean sort = entry.getValue().booleanValue();
             if (sort) {
-                List<GraphNode> forwardNodes = checkNotNull(fForwardNodes.get(nodeType));
-                GraphNode[] temp = forwardNodes.toArray(new GraphNode[forwardNodes.size()]);
-                GraphNode node = checkNotNull(fNodes.get(nodeType)).get(0);
-                Arrays.sort(temp, node.getComparator());
-                entry.setValue(Boolean.FALSE);
-                fNodes.put(nodeType, Arrays.asList(temp));
-                fForwardNodes.put(nodeType, Arrays.asList(temp));
-                if (TmfUiTracer.isSortingTraced()) {
-                    TmfUiTracer.traceSorting(nodeType + " array sorted\n"); //$NON-NLS-1$
-                }
+                sortNodes(fForwardNodes, entry, true);
             }
         }
 
         for (Map.Entry<String, Boolean> entry : fBackwardSort.entrySet()) {
-            String nodeType = entry.getKey();
             boolean sort = entry.getValue().booleanValue();
             if (sort) {
-                List<GraphNode> backwardNodes = checkNotNull(fBackwardNodes.get(nodeType));
-                GraphNode[] temp = backwardNodes.toArray(new GraphNode[backwardNodes.size()]);
-                GraphNode node = checkNotNull(fNodes.get(nodeType)).get(0);
-                Arrays.sort(temp, node.getBackComparator());
-                entry.setValue(Boolean.FALSE);
-                fBackwardNodes.put(nodeType, Arrays.asList(temp));
-                if (TmfUiTracer.isSortingTraced()) {
-                    TmfUiTracer.traceSorting(nodeType + " back array sorted\n"); //$NON-NLS-1$
-                }
+                sortNodes(fBackwardNodes, entry, false);
             }
         }
 
@@ -676,10 +654,9 @@ public abstract class GraphNode {
         }
 
         int count = 0;
-        Iterator<String> it3 = fForwardSort.keySet().iterator();
-        while (it3.hasNext()) {
+        for (Map.Entry<String, Boolean> entry : fForwardSort.entrySet()) {
             count = 0;
-            Object nodeType = it3.next();
+            String nodeType = entry.getKey();
             GraphNode node = checkNotNull(fNodes.get(nodeType)).get(0);
             context.setFont(SDViewPref.getInstance().getFont(node.fPrefId));
             int index = checkNotNull(fIndexes.get(nodeType)).intValue();
@@ -692,6 +669,23 @@ public abstract class GraphNode {
             TmfUiTracer.traceDisplay(UI_DELIMITER);
         }
 
+    }
+
+    private void sortNodes(Map<String, List<GraphNode>> nodesToSort, Map.Entry<String, Boolean> sortMapEntry, boolean forward) {
+        String nodeType = sortMapEntry.getKey();
+        GraphNode[] temp = nodesToSort.get(nodeType).toArray(new GraphNode[nodesToSort.get(nodeType).size()]);
+        GraphNode node = fNodes.get(nodeType).get(0);
+        if (forward) {
+            Arrays.sort(temp, node.getComparator());
+            fNodes.put(nodeType, Arrays.asList(temp));
+        } else {
+            Arrays.sort(temp, node.getBackComparator());
+        }
+        nodesToSort.put(nodeType, Arrays.asList(temp));
+        sortMapEntry.setValue(Boolean.FALSE);
+        if (TmfUiTracer.isSortingTraced()) {
+            TmfUiTracer.traceSorting(nodeType + " array sorted\n"); //$NON-NLS-1$
+        }
     }
 
     /**
