@@ -522,7 +522,7 @@ public class TmfPieChartViewer extends Composite {
         @Override
         public int compareTo(EventOccurrenceObject other) {
             // descending order
-            return -Long.compare(this.getNbOccurence(), other.getNbOccurence());
+            return Long.compare(other.getNbOccurence(), this.getNbOccurence());
         }
 
         public String getName() {
