@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson and others.
+ * Copyright (c) 2011, 2015 Ericsson and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,8 +37,10 @@ public interface ITmfImageConstants {
     String IMG_UI_SHOW_LEGEND = ICONS_PATH + "elcl16/show_legend.gif";
     String IMG_UI_NEXT_EVENT = ICONS_PATH + "elcl16/next_event.gif";
     String IMG_UI_PREV_EVENT = ICONS_PATH + "elcl16/prev_event.gif";
-//    String IMG_UI_NEXT_ITEM = ICONS_PATH + "elcl16/next_item.gif";
-//    String IMG_UI_PREV_ITEM = ICONS_PATH + "elcl16/prev_item.gif";
+    String IMG_UI_ADD_BOOKMARK = ICONS_PATH + "elcl16/add_bookmark.gif";
+    String IMG_UI_NEXT_BOOKMARK = ICONS_PATH + "elcl16/next_bookmark.gif";
+    String IMG_UI_PREVIOUS_BOOKMARK = ICONS_PATH + "elcl16/prev_bookmark.gif";
+    String IMG_UI_REMOVE_BOOKMARK = ICONS_PATH + "elcl16/remove_bookmark.gif";
     String IMG_UI_NEXT_ITEM = IMG_UI_NEXT_PAGE;
     String IMG_UI_PREV_ITEM = IMG_UI_PREV_PAGE;
     String IMG_UI_PIN_VIEW = ICONS_PATH + "elcl16/pin_view.gif";

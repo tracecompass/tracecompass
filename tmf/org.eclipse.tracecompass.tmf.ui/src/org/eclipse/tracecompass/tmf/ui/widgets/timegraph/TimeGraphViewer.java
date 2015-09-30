@@ -17,19 +17,25 @@
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MenuDetectListener;
@@ -38,6 +44,8 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -51,13 +59,16 @@ import org.eclipse.swt.widgets.Slider;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
+import org.eclipse.tracecompass.internal.tmf.ui.dialogs.AddBookmarkDialog;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.ShowFilterDialogAction;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TimeGraphLegend;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.MarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITimeDataProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeDataProviderCyclesConverter;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
@@ -66,6 +77,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphScale;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphTooltipHandler;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Generic time graph viewer implementation
@@ -84,6 +96,11 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     private static final String HIDE_ARROWS_KEY = "hide.arrows"; //$NON-NLS-1$
     private static final long DEFAULT_FREQUENCY = 1000000000L;
     private static final int H_SCROLLBAR_MAX = Integer.MAX_VALUE - 1;
+
+    private static ImageDescriptor ADD_BOOKMARK = Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_ADD_BOOKMARK);
+    private static ImageDescriptor NEXT_BOOKMARK = Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_NEXT_BOOKMARK);
+    private static ImageDescriptor PREVIOUS_BOOKMARK = Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_PREVIOUS_BOOKMARK);
+    private static ImageDescriptor REMOVE_BOOKMARK = Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_REMOVE_BOOKMARK);
 
     private long fMinTimeInterval;
     private ITimeGraphEntry fSelectedEntry;
@@ -117,6 +134,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     private List<ITimeGraphSelectionListener> fSelectionListeners = new ArrayList<>();
     private List<ITimeGraphTimeListener> fTimeListeners = new ArrayList<>();
     private List<ITimeGraphRangeListener> fRangeListeners = new ArrayList<>();
+    private List<ITimeGraphBookmarkListener> fBookmarkListeners = new ArrayList<>();
 
     // Time format, using Epoch reference, Relative time format(default),
     // Number, or Cycles
@@ -138,6 +156,15 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     private Action fFollowArrowFwdAction;
     private Action fFollowArrowBwdAction;
     private ShowFilterDialogAction fShowFilterDialogAction;
+    private Action fToggleBookmarkAction;
+    private Action fNextBookmarkAction;
+    private Action fPreviousBookmarkAction;
+
+    /** The list of bookmarks */
+    private final List<IMarkerEvent> fBookmarks = new ArrayList<>();
+
+    /** The list of color resources created by this viewer */
+    private final List<Color> fColors = new ArrayList<>();
 
     private ListenerNotifier fListenerNotifier;
 
@@ -208,6 +235,17 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
         public boolean hasTimeSelected() {
             return fTimeSelected;
+        }
+    }
+
+    private final static class BookmarkComparator implements Comparator<IMarkerEvent> {
+        @Override
+        public int compare(IMarkerEvent o1, IMarkerEvent o2) {
+            int res = Long.compare(o1.getTime(), o2.getTime());
+            if (res != 0) {
+                return res;
+            }
+            return Long.compare(o1.getDuration(), o2.getDuration());
         }
     }
 
@@ -304,6 +342,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             setTopIndex(0);
             fSelectionBegin = SWT.DEFAULT;
             fSelectionEnd = SWT.DEFAULT;
+            updateBookmarkActions();
             fSelectedEntry = null;
             refreshAllData(input);
         }
@@ -405,6 +444,14 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
                 super.redraw();
             }
         };
+        fDataViewer.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(DisposeEvent e) {
+                for (Color color : fColors) {
+                    color.dispose();
+                }
+            }
+        });
         GridLayout gl = new GridLayout(2, false);
         gl.marginHeight = fBorderWidth;
         gl.marginWidth = 0;
@@ -662,6 +709,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         }
         fTimeGraphCtrl.refreshData(traces);
         fTimeScaleCtrl.redraw();
+        updateBookmarkActions();
         adjustVerticalScrollBar();
     }
 
@@ -848,6 +896,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         ensureVisible(fSelectionEnd);
         fTimeGraphCtrl.redraw();
         fTimeScaleCtrl.redraw();
+        updateBookmarkActions();
         if ((time0 != fTime0) || (time1 != fTime1)) {
             notifyRangeListeners();
         }
@@ -866,6 +915,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         fSelectionEnd = Math.max(fTime0Bound, Math.min(fTime1Bound, endTime));
         fTimeGraphCtrl.redraw();
         fTimeScaleCtrl.redraw();
+        updateBookmarkActions();
     }
 
     private void setSelectedTimeInt(long time, boolean ensureVisible, boolean doNotify) {
@@ -881,6 +931,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         boolean notifySelectedTime = (selection != fSelectionBegin || selection != fSelectionEnd);
         fSelectionBegin = selection;
         fSelectionEnd = selection;
+        updateBookmarkActions();
 
         if ((time0 != fTime0) || (time1 != fTime1)) {
             notifyRangeListeners();
@@ -1112,6 +1163,91 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
             // update external synch values
             updateExtSynchValues();
+        }
+    }
+
+    /**
+     * Add a bookmark listener
+     *
+     * @param listener
+     *            The listener to add
+     * @since 2.0
+     */
+    public void addBookmarkListener(ITimeGraphBookmarkListener listener) {
+        fBookmarkListeners.add(listener);
+    }
+
+    /**
+     * Remove a bookmark listener
+     *
+     * @param listener
+     *            The listener to remove
+     * @since 2.0
+     */
+    public void removeBookmarkListener(ITimeGraphBookmarkListener listener) {
+        fBookmarkListeners.remove(listener);
+    }
+
+    private void fireBookmarkAdded(IMarkerEvent bookmark) {
+        TimeGraphBookmarkEvent event = new TimeGraphBookmarkEvent(this, bookmark);
+
+        for (ITimeGraphBookmarkListener listener : fBookmarkListeners) {
+            listener.bookmarkAdded(event);
+        }
+    }
+
+    private void fireBookmarkRemoved(IMarkerEvent bookmark) {
+        TimeGraphBookmarkEvent event = new TimeGraphBookmarkEvent(this, bookmark);
+
+        for (ITimeGraphBookmarkListener listener : fBookmarkListeners) {
+            listener.bookmarkRemoved(event);
+        }
+    }
+
+    /**
+     * Set the bookmarks list.
+     *
+     * @param bookmarks
+     *            The bookmarks list, or null
+     * @since 2.0
+     */
+    public void setBookmarks(List<IMarkerEvent> bookmarks) {
+        for (IMarkerEvent bookmark : fBookmarks) {
+            checkDisposeColor(bookmark.getColor());
+        }
+        fBookmarks.clear();
+        if (bookmarks != null) {
+            fBookmarks.addAll(bookmarks);
+            Collections.sort(fBookmarks, new BookmarkComparator());
+        }
+        updateBookmarkActions();
+        getTimeGraphControl().setBookmarks(bookmarks);
+    }
+
+    /**
+     * Get the bookmarks list.
+     *
+     * @return The bookmarks list
+     * @since 2.0
+     */
+    public List<IMarkerEvent> getBookmarks() {
+        return Collections.unmodifiableList(fBookmarks);
+    }
+
+    /**
+     * Dispose the color resource if and only if it was created by this viewer.
+     *
+     * @param color
+     *            the color
+     */
+    private void checkDisposeColor(Color color) {
+        for (int i = 0; i < fColors.size(); i++) {
+            /* check for identity, not equality */
+            if (fColors.get(i) == color) {
+                color.dispose();
+                fColors.remove(i);
+                break;
+            }
         }
     }
 
@@ -1851,6 +1987,146 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             fShowFilterDialogAction = new ShowFilterDialogAction(this);
         }
         return fShowFilterDialogAction;
+    }
+
+    /**
+     * Get the toggle bookmark action.
+     *
+     * @return The Action object
+     * @since 2.0
+     */
+    public Action getToggleBookmarkAction() {
+        if (fToggleBookmarkAction == null) {
+            fToggleBookmarkAction = new Action() {
+                @Override
+                public void runWithEvent(Event event) {
+                    IMarkerEvent selectedBookmark = getBookmarkAtSelection();
+                    if (selectedBookmark == null) {
+                        final long time = Math.min(fSelectionBegin, fSelectionEnd);
+                        final long duration = Math.max(fSelectionBegin, fSelectionEnd) - time;
+                        final AddBookmarkDialog dialog = new AddBookmarkDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+                        if (dialog.open() == Window.OK) {
+                            final String label = dialog.getValue();
+                            final RGBA rgba = dialog.getColorValue();
+                            Color color = new Color(Display.getDefault(), rgba.rgb.red, rgba.rgb.green, rgba.rgb.blue, rgba.alpha);
+                            fColors.add(color);
+                            IMarkerEvent bookmark = new MarkerEvent(null, time, duration, color, label, true);
+                            fBookmarks.add(bookmark);
+                            Collections.sort(fBookmarks, new BookmarkComparator());
+                            getTimeGraphControl().setBookmarks(fBookmarks);
+                            getControl().redraw();
+                            fireBookmarkAdded(bookmark);
+                        }
+                    } else {
+                        checkDisposeColor(selectedBookmark.getColor());
+                        fBookmarks.remove(selectedBookmark);
+                        getTimeGraphControl().setBookmarks(fBookmarks);
+                        getControl().redraw();
+                        fireBookmarkRemoved(selectedBookmark);
+                    }
+                    updateBookmarkActions();
+                }
+            };
+            fToggleBookmarkAction.setText(Messages.TmfTimeGraphViewer_BookmarkActionAddText);
+            fToggleBookmarkAction.setToolTipText(Messages.TmfTimeGraphViewer_BookmarkActionAddText);
+            fToggleBookmarkAction.setImageDescriptor(ADD_BOOKMARK);
+        }
+        return fToggleBookmarkAction;
+    }
+
+    /**
+     * Get the next bookmark action.
+     *
+     * @return The Action object
+     * @since 2.0
+     */
+    public Action getNextBookmarkAction() {
+        if (fNextBookmarkAction == null) {
+            fNextBookmarkAction = new Action() {
+                @Override
+                public void runWithEvent(Event event) {
+                    final long time = Math.min(fSelectionBegin, fSelectionEnd);
+                    final long duration = Math.max(fSelectionBegin, fSelectionEnd) - time;
+                    for (IMarkerEvent bookmark : fBookmarks) {
+                        if (bookmark.getTime() > time ||
+                                (bookmark.getTime() == time && bookmark.getDuration() > duration)) {
+                            setSelectionRangeNotify(bookmark.getTime(), bookmark.getTime() + bookmark.getDuration());
+                            return;
+                        }
+                    }
+                }
+            };
+            fNextBookmarkAction.setText(Messages.TmfTimeGraphViewer_NextBookmarkActionText);
+            fNextBookmarkAction.setToolTipText(Messages.TmfTimeGraphViewer_NextBookmarkActionText);
+            fNextBookmarkAction.setImageDescriptor(NEXT_BOOKMARK);
+        }
+        return fNextBookmarkAction;
+    }
+
+    /**
+     * Get the previous bookmark action.
+     *
+     * @return The Action object
+     * @since 2.0
+     */
+    public Action getPreviousBookmarkAction() {
+        if (fPreviousBookmarkAction == null) {
+            fPreviousBookmarkAction = new Action() {
+                @Override
+                public void runWithEvent(Event event) {
+                    final long time = Math.min(fSelectionBegin, fSelectionEnd);
+                    final long duration = Math.max(fSelectionBegin, fSelectionEnd) - time;
+                    for (int i = fBookmarks.size() - 1; i >= 0; i--) {
+                        IMarkerEvent bookmark = fBookmarks.get(i);
+                        if (bookmark.getTime() < time ||
+                                (bookmark.getTime() == time && bookmark.getDuration() < duration)) {
+                            setSelectionRangeNotify(bookmark.getTime(), bookmark.getTime() + bookmark.getDuration());
+                            return;
+                        }
+                    }
+                }
+            };
+            fPreviousBookmarkAction.setText(Messages.TmfTimeGraphViewer_PreviousBookmarkActionText);
+            fPreviousBookmarkAction.setToolTipText(Messages.TmfTimeGraphViewer_PreviousBookmarkActionText);
+            fPreviousBookmarkAction.setImageDescriptor(PREVIOUS_BOOKMARK);
+        }
+        return fPreviousBookmarkAction;
+    }
+
+    private IMarkerEvent getBookmarkAtSelection() {
+        final long time = Math.min(fSelectionBegin, fSelectionEnd);
+        final long duration = Math.max(fSelectionBegin, fSelectionEnd) - time;
+        for (IMarkerEvent bookmark : fBookmarks) {
+            if (bookmark.getTime() == time && bookmark.getDuration() == duration) {
+                return bookmark;
+            }
+        }
+        return null;
+    }
+
+    private void updateBookmarkActions() {
+        if (fToggleBookmarkAction != null) {
+            if (getBookmarkAtSelection() != null) {
+                fToggleBookmarkAction.setText(Messages.TmfTimeGraphViewer_BookmarkActionRemoveText);
+                fToggleBookmarkAction.setToolTipText(Messages.TmfTimeGraphViewer_BookmarkActionRemoveText);
+                fToggleBookmarkAction.setImageDescriptor(REMOVE_BOOKMARK);
+            } else {
+                fToggleBookmarkAction.setText(Messages.TmfTimeGraphViewer_BookmarkActionAddText);
+                fToggleBookmarkAction.setToolTipText(Messages.TmfTimeGraphViewer_BookmarkActionAddText);
+                fToggleBookmarkAction.setImageDescriptor(ADD_BOOKMARK);
+            }
+        }
+        final long time = Math.min(fSelectionBegin, fSelectionEnd);
+        final long duration = Math.max(fSelectionBegin, fSelectionEnd) - time;
+        if (fPreviousBookmarkAction != null) {
+            fPreviousBookmarkAction.setEnabled(!fBookmarks.isEmpty() &&
+                    (time > fBookmarks.get(0).getTime() || (time == fBookmarks.get(0).getTime() && duration > fBookmarks.get(0).getDuration())));
+        }
+        if (fNextBookmarkAction != null) {
+            int last = fBookmarks.size() - 1;
+            fNextBookmarkAction.setEnabled(!fBookmarks.isEmpty() &&
+                    (time < fBookmarks.get(last).getTime() || (time == fBookmarks.get(last).getTime() && duration < fBookmarks.get(last).getDuration())));
+        }
     }
 
     private void adjustHorizontalScrollBar() {

@@ -1490,6 +1490,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         manager.add(fTimeGraphWrapper.getTimeGraphViewer().getResetScaleAction());
         manager.add(fTimeGraphWrapper.getTimeGraphViewer().getPreviousEventAction());
         manager.add(fTimeGraphWrapper.getTimeGraphViewer().getNextEventAction());
+        manager.add(fTimeGraphWrapper.getTimeGraphViewer().getToggleBookmarkAction());
+        manager.add(fTimeGraphWrapper.getTimeGraphViewer().getPreviousBookmarkAction());
+        manager.add(fTimeGraphWrapper.getTimeGraphViewer().getNextBookmarkAction());
         manager.add(fPreviousResourceAction);
         manager.add(fNextResourceAction);
         manager.add(fTimeGraphWrapper.getTimeGraphViewer().getZoomInAction());
