@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
@@ -43,12 +44,14 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import com.google.common.collect.ImmutableList;
 
 /**
  * Test for the Call Stack view in trace compass
  */
+@RunWith(SWTBotJunit4ClassRunner.class)
 public class CallStackViewTest {
 
     private static final String UST_ID = "org.eclipse.linuxtools.lttng2.ust.tracetype";
