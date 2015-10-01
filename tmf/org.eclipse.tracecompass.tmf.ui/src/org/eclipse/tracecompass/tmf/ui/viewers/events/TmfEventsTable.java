@@ -1018,13 +1018,16 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 if (data instanceof ITmfSourceLookup) {
                     ITmfSourceLookup event = (ITmfSourceLookup) data;
                     ITmfCallsite cs = event.getCallsite();
-                    if (cs == null || cs.getFileName() == null) {
+                    if (cs == null) {
                         return;
                     }
                     IMarker marker = null;
                     try {
                         String fileName = cs.getFileName();
                         final String trimmedPath = fileName.replaceAll("\\.\\./", EMPTY_STRING); //$NON-NLS-1$
+                        if (trimmedPath.isEmpty()) {
+                            return;
+                        }
                         final ArrayList<IFile> files = new ArrayList<>();
                         ResourcesPlugin.getWorkspace().getRoot().accept(new IResourceVisitor() {
                             @Override

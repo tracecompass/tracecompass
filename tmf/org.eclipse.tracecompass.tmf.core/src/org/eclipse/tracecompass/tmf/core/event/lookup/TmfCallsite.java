@@ -14,6 +14,8 @@ package org.eclipse.tracecompass.tmf.core.event.lookup;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.equalsNullable;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 /**
  * TMF call site information for source code lookup.
  *
@@ -26,7 +28,7 @@ public class TmfCallsite implements ITmfCallsite {
     // ------------------------------------------------------------------------
 
     /** The file name string. */
-    private final String fFileName;
+    private final @NonNull String fFileName;
 
     /** The function name. */
     private final String fFunctionName;
@@ -64,7 +66,7 @@ public class TmfCallsite implements ITmfCallsite {
      *            - An other call site implementation
      */
     public TmfCallsite(ITmfCallsite other) {
-        if ((other == null) || (other.getFileName() == null)) {
+        if (other == null) {
             throw new IllegalArgumentException();
         }
         fFileName = other.getFileName();
@@ -77,7 +79,7 @@ public class TmfCallsite implements ITmfCallsite {
     // ------------------------------------------------------------------------
 
     @Override
-    public String getFileName() {
+    public @NonNull String getFileName() {
         return fFileName;
     }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -41,9 +41,14 @@ public class TmfCallsiteTest {
     private final static String fFunctionName3 = null;
     private final static long fLine3 = 123;
 
+    private final static String fFileName4 = "filename1";
+    private final static String fFunctionName4 = "func1";
+    private final static long fLine4 = 11;
+
     private final static ITmfCallsite fCallsite1 = new TmfCallsite(fFileName1, fFunctionName1, fLine1);
     private final static ITmfCallsite fCallsite2 = new TmfCallsite(fFileName2, fFunctionName2, fLine2);
     private final static ITmfCallsite fCallsite3 = new TmfCallsite(fFileName3, fFunctionName3, fLine3);
+    private final static ITmfCallsite fCallsite4 = new TmfCallsite(fFileName4, fFunctionName4, fLine4);
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -58,39 +63,19 @@ public class TmfCallsiteTest {
 
     @Test
     public void testCallsiteCopy() {
-        TmfCallsite copy =  new TmfCallsite(fCallsite1);
+        TmfCallsite copy = new TmfCallsite(fCallsite1);
 
         assertEquals(fFileName1, copy.getFileName());
         assertEquals(fFunctionName1, copy.getFunctionName());
         assertEquals(fLine1, copy.getLineNumber());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testCallsiteCopy2() {
         new TmfCallsite(null);
     }
 
-    @Test(expected=IllegalArgumentException.class)
-    public void testCallsiteCopy3() {
-        new TmfCallsite(new ITmfCallsite() {
-            @Override
-            public long getLineNumber() {
-                return 0;
-            }
-
-            @Override
-            public String getFunctionName() {
-                return null;
-            }
-
-            @Override
-            public String getFileName() {
-                return null;
-            }
-        });
-    }
-
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testCallsiteFileNull() {
         new TmfCallsite(null, fFunctionName1, fLine1);
     }
@@ -103,12 +88,11 @@ public class TmfCallsiteTest {
     public void testHashCode() {
         final ITmfCallsite callsite1b = new TmfCallsite(fCallsite1);
         final ITmfCallsite callsite2b = new TmfCallsite(fCallsite2);
+        final ITmfCallsite callsite3b = new TmfCallsite(fCallsite3);
 
-        assertTrue("hashCode", fCallsite1.hashCode() == callsite1b.hashCode());
-        assertTrue("hashCode", fCallsite2.hashCode() == callsite2b.hashCode());
-
-        assertTrue("hashCode", fCallsite1.hashCode() != fCallsite2.hashCode());
-        assertTrue("hashCode", fCallsite2.hashCode() != fCallsite1.hashCode());
+        assertEquals("hashCode", fCallsite1.hashCode(), callsite1b.hashCode());
+        assertEquals("hashCode", fCallsite2.hashCode(), callsite2b.hashCode());
+        assertEquals("hashCode", fCallsite3.hashCode(), callsite3b.hashCode());
     }
 
     // ------------------------------------------------------------------------
@@ -122,6 +106,8 @@ public class TmfCallsiteTest {
 
         assertFalse("equals", fCallsite1.equals(fCallsite2));
         assertFalse("equals", fCallsite2.equals(fCallsite1));
+        assertFalse("equals", fCallsite1.equals(fCallsite4));
+        assertFalse("equals", fCallsite4.equals(fCallsite1));
     }
 
     @Test
