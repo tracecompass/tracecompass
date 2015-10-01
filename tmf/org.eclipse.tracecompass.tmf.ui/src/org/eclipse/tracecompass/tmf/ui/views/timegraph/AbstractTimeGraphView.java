@@ -23,7 +23,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IMarkerDelta;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IWorkspaceRunnable;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -42,10 +53,12 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
@@ -63,11 +76,13 @@ import org.eclipse.tracecompass.tmf.ui.TmfUiRefreshHandler;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphBookmarkListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphContentProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider2;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphRangeListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphSelectionListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphBookmarkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphCombo;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphContentProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
@@ -78,6 +93,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.MarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 import org.eclipse.ui.IActionBars;
@@ -88,10 +104,21 @@ import org.eclipse.ui.IActionBars;
  * This view contains either a time graph viewer, or a time graph combo which is
  * divided between a tree viewer on the left and a time graph viewer on the right.
  */
-public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeAligned {
+public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeAligned, IResourceChangeListener {
 
     /** Constant indicating that all levels of the time graph should be expanded */
     protected static final int ALL_LEVELS = AbstractTreeViewer.ALL_LEVELS;
+
+    /** Color marker attribute. The format is the output of RGBA.toString(). */
+    private static final String MARKER_COLOR = "color"; //$NON-NLS-1$
+
+    /** Time marker attribute. The format is the output of Long.toString(). */
+    private static final String MARKER_TIME = "time"; //$NON-NLS-1$
+
+    /** Duration marker attribute. The format is the output of Long.toString(). */
+    private static final String MARKER_DURATION = "duration"; //$NON-NLS-1$
+
+    private static final Pattern RGBA_PATTERN = Pattern.compile("RGBA \\{(\\d+), (\\d+), (\\d+), (\\d+)\\}"); //$NON-NLS-1$
 
     /**
      * Redraw state enum
@@ -109,6 +136,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     /** The selected trace */
     private ITmfTrace fTrace;
+
+    /** The selected trace editor file*/
+    private IFile fEditorFile;
 
     /** The timegraph entry list */
     private List<TimeGraphEntry> fEntryList;
@@ -174,6 +204,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private TreeLabelProvider fFilterLabelProvider;
 
     private int fAutoExpandLevel = ALL_LEVELS;
+
+    /** The list of color resources created by this view */
+    private final List<Color> fColors = new ArrayList<>();
 
     // ------------------------------------------------------------------------
     // Classes
@@ -1031,6 +1064,53 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             }
         });
 
+        fTimeGraphWrapper.getTimeGraphViewer().addBookmarkListener(new ITimeGraphBookmarkListener() {
+            @Override
+            public void bookmarkAdded(final TimeGraphBookmarkEvent event) {
+                try {
+                    ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
+                        @Override
+                        public void run(IProgressMonitor monitor) throws CoreException {
+                            IMarkerEvent bookmark = event.getBookmark();
+                            IMarker marker = fEditorFile.createMarker(IMarker.BOOKMARK);
+                            marker.setAttribute(IMarker.MESSAGE, bookmark.getLabel());
+                            marker.setAttribute(MARKER_TIME, Long.toString(bookmark.getTime()));
+                            if (bookmark.getDuration() > 0) {
+                                marker.setAttribute(MARKER_DURATION, Long.toString(bookmark.getDuration()));
+                                marker.setAttribute(IMarker.LOCATION,
+                                        String.format("[%d, %d]", bookmark.getTime(), bookmark.getTime() + bookmark.getDuration())); //$NON-NLS-1$
+                            } else {
+                                marker.setAttribute(IMarker.LOCATION,
+                                        String.format("[%d]", bookmark.getTime())); //$NON-NLS-1$
+                            }
+                            marker.setAttribute(MARKER_COLOR, bookmark.getColor().getRGBA().toString());
+                        }
+                    }, null);
+                } catch (CoreException e) {
+                    Activator.getDefault().logError(e.getMessage());
+                }
+            }
+
+            @Override
+            public void bookmarkRemoved(TimeGraphBookmarkEvent event) {
+                try {
+                    IMarkerEvent bookmark = event.getBookmark();
+                    IMarker[] markers = fEditorFile.findMarkers(IMarker.BOOKMARK, false, IResource.DEPTH_ZERO);
+                    for (IMarker marker : markers) {
+                        if (bookmark.getLabel().equals(marker.getAttribute(IMarker.MESSAGE)) &&
+                                Long.toString(bookmark.getTime()).equals(marker.getAttribute(MARKER_TIME, (String) null)) &&
+                                Long.toString(bookmark.getDuration()).equals(marker.getAttribute(MARKER_DURATION, Long.toString(0))) &&
+                                bookmark.getColor().getRGBA().toString().equals(marker.getAttribute(MARKER_COLOR))) {
+                            marker.delete();
+                            break;
+                        }
+                    }
+                } catch (CoreException e) {
+                    Activator.getDefault().logError(e.getMessage());
+                }
+            }
+        });
+
         fTimeGraphWrapper.getTimeGraphViewer().setTimeFormat(TimeFormat.CALENDAR);
 
         IStatusLineManager statusLineManager = getViewSite().getActionBars().getStatusLineManager();
@@ -1047,11 +1127,69 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         // make selection available to other views
         getSite().setSelectionProvider(fTimeGraphWrapper.getSelectionProvider());
+
+        ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
     }
 
     @Override
     public void setFocus() {
         fTimeGraphWrapper.setFocus();
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public void resourceChanged(final IResourceChangeEvent event) {
+        for (final IMarkerDelta delta : event.findMarkerDeltas(IMarker.BOOKMARK, false)) {
+            if (delta.getResource().equals(fEditorFile)) {
+                fTimeGraphWrapper.getTimeGraphViewer().setBookmarks(refreshBookmarks(fEditorFile));
+                redraw();
+                return;
+            }
+        }
+    }
+
+    private List<IMarkerEvent> refreshBookmarks(final IFile editorFile) {
+        List<IMarkerEvent> bookmarks = new ArrayList<>();
+        try {
+            for (Color color : fColors) {
+                color.dispose();
+            }
+            fColors.clear();
+            IMarker[] markers = editorFile.findMarkers(IMarker.BOOKMARK, false, IResource.DEPTH_ZERO);
+            for (IMarker marker : markers) {
+                String label = marker.getAttribute(IMarker.MESSAGE, (String) null);
+                String time = marker.getAttribute(MARKER_TIME, (String) null);
+                String duration = marker.getAttribute(MARKER_DURATION, Long.toString(0));
+                String rgba = marker.getAttribute(MARKER_COLOR, (String) null);
+                if (label != null && time != null && rgba != null) {
+                    Matcher matcher = RGBA_PATTERN.matcher(rgba);
+                    if (matcher.matches()) {
+                        try {
+                            int red = Integer.valueOf(matcher.group(1));
+                            int green = Integer.valueOf(matcher.group(2));
+                            int blue = Integer.valueOf(matcher.group(3));
+                            int alpha = Integer.valueOf(matcher.group(4));
+                            Color color = new Color(Display.getDefault(), red, green, blue, alpha);
+                            fColors.add(color);
+                            bookmarks.add(new MarkerEvent(null, Long.valueOf(time), Long.valueOf(duration), color, label, true));
+                        } catch (NumberFormatException e) {
+                            Activator.getDefault().logError(e.getMessage());
+                        }
+                    }
+                }
+            }
+        } catch (CoreException e) {
+            Activator.getDefault().logError(e.getMessage());
+        }
+        return bookmarks;
     }
 
     // ------------------------------------------------------------------------
@@ -1197,6 +1335,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             fFiltersMap.put(fTrace, fTimeGraphWrapper.getFilters());
         }
         fTrace = trace;
+        fEditorFile = TmfTraceManager.getInstance().getTraceEditorFile(trace);
         synchronized (fEntryListMap) {
             fEntryList = fEntryListMap.get(fTrace);
             if (fEntryList == null) {
@@ -1360,6 +1499,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     /* restore the previously saved filters, if any */
                     fTimeGraphWrapper.setFilters(fFiltersMap.get(fTrace));
                     fTimeGraphWrapper.getTimeGraphViewer().setLinks(null);
+                    fTimeGraphWrapper.getTimeGraphViewer().setBookmarks(refreshBookmarks(fEditorFile));
                 } else {
                     fTimeGraphWrapper.refresh();
                 }
