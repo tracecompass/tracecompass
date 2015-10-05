@@ -33,12 +33,12 @@ import com.google.common.collect.Iterables;
  * @author Alexandre Montplaisir
  * @since 2.0
  */
-public class UstDebugInfoAspect implements ITmfEventAspect {
+public class UstDebugInfoSourceAspect implements ITmfEventAspect {
 
     /** Singleton instance */
-    public static final UstDebugInfoAspect INSTANCE = new UstDebugInfoAspect();
+    public static final UstDebugInfoSourceAspect INSTANCE = new UstDebugInfoSourceAspect();
 
-    private UstDebugInfoAspect() {}
+    private UstDebugInfoSourceAspect() {}
 
     @Override
     public String getName() {

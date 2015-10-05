@@ -28,7 +28,7 @@ import org.eclipse.tracecompass.internal.lttng2.ust.core.Activator;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.LttngUst20EventLayout;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.LttngUst27EventLayout;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.LttngUst28EventLayout;
-import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.UstDebugInfoAspect;
+import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.UstDebugInfoSourceAspect;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
@@ -62,7 +62,7 @@ public class LttngUstTrace extends CtfTmfTrace {
     static {
         ImmutableSet.Builder<ITmfEventAspect> builder = ImmutableSet.builder();
         builder.addAll(CtfTmfTrace.CTF_ASPECTS);
-        builder.add(UstDebugInfoAspect.INSTANCE);
+        builder.add(UstDebugInfoSourceAspect.INSTANCE);
         LTTNG_UST_ASPECTS = NonNullUtils.checkNotNull(builder.build());
     }
 
