@@ -123,7 +123,7 @@ public final class TmfTraceUtils {
      * @return true if it is binary else false
      * @throws IOException
      *             if IOException occurs
-     * @since 1.1
+     * @since 1.2
      */
     public static boolean isText(File file) throws IOException {
         try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file))) {

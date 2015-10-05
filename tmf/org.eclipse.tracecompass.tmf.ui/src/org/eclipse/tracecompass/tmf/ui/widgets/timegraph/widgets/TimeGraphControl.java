@@ -2526,7 +2526,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * Returns this control's filters.
      *
      * @return an array of viewer filters
-     * @since 1.1
+     * @since 1.2
      */
     public ViewerFilter[] getFilters() {
         return Iterables.toArray(fFilters, ViewerFilter.class);
@@ -2537,7 +2537,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *
      * @param filters
      *            an array of viewer filters, or null
-     * @since 1.1
+     * @since 1.2
      */
     public void setFilters(ViewerFilter[] filters) {
         fFilters.clear();
