@@ -225,7 +225,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      *
      * @param event
      *            The time event to add
-     * @since 2.0
+     * @since 1.1
      */
     public void addZoomedEvent(ITimeEvent event) {
         long start = event.getTime();

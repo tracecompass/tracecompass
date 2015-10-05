@@ -45,7 +45,7 @@ import com.google.common.collect.Multimap;
  * order before creating the time event lists as this is optimal for state
  * system queries.
  *
- * @since 2.0
+ * @since 1.1
  */
 public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraphView {
 

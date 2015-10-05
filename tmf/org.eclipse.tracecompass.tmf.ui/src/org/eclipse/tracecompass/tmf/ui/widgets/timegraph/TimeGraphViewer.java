@@ -1635,7 +1635,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * @param entry
      *            The entry
      * @return true if the entry is expanded, false if collapsed
-     * @since 2.0
+     * @since 1.1
      */
     public boolean getExpandedState(ITimeGraphEntry entry) {
         return fTimeGraphCtrl.getExpandedState(entry);

@@ -421,7 +421,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *
      * @return The unmodifiable link event list
      *
-     * @since 2.0
+     * @since 1.1
      */
     public List<ILinkEvent> getArrows() {
         return Collections.unmodifiableList(fItemData.fLinks);
@@ -508,7 +508,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @param entry
      *            The entry
      * @return true if the entry is expanded, false if collapsed
-     * @since 2.0
+     * @since 1.1
      */
     public boolean getExpandedState(ITimeGraphEntry entry) {
         Item item = fItemData.fItemMap.get(entry);
@@ -2715,7 +2715,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *
      * @param blend
      *            true if sub-pixel events should be blended, false otherwise.
-     * @since 2.0
+     * @since 1.1
      */
     public void setBlendSubPixelEvents(boolean blend) {
         fBlendSubPixelEvents = blend;

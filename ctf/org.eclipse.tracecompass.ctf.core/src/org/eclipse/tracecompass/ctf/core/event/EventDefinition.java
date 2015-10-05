@@ -156,7 +156,7 @@ public final class EventDefinition implements IDefinitionScope {
      * Get the event header
      *
      * @return the event header
-     * @since 2.0
+     * @since 1.1
      */
     public ICompositeDefinition getEventHeader() {
         return fEventHeaderDefinition;

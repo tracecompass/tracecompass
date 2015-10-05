@@ -175,7 +175,7 @@ public final class StructDefinition extends ScopedDefinition implements IComposi
      * @param defintionToExclude
      *            the definition to exclude, can be null
      * @return the definition or null
-     * @since 2.0
+     * @since 1.1
      */
     public Definition lookupDefinition(String lookupPath, ScopedDefinition defintionToExclude) {
         /*

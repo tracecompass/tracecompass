@@ -222,7 +222,7 @@ public class StructDeclaration extends Declaration {
      * @return the fields definition
      * @throws CTFException
      *             something went wrong
-     * @since 2.0
+     * @since 1.1
      */
     public StructDefinition createFieldDefinition(ICompositeDefinition eventHeaderDef, IDefinitionScope definitionScope, ILexicalScope fields, @NonNull BitBuffer input) throws CTFException {
         alignRead(input);

@@ -262,7 +262,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         /**
          * The width of a table item
          *
-         * @since 2.0
+         * @since 1.1
          */
         String WIDTH = "$width"; //$NON-NLS-1$
     }

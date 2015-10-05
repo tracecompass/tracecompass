@@ -60,7 +60,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
  * {@link #createColumn(String, ColumnLabelProvider, Comparator)} method, and
  * set the content provider and input on the supplied {@link TableViewer}.
  *
- * @since 2.0
+ * @since 1.1
  */
 public class TmfSimpleTableViewer extends TmfViewer {
 

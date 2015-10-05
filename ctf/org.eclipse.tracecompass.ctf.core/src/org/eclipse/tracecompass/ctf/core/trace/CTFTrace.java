@@ -817,7 +817,7 @@ public class CTFTrace implements IDefinitionScope {
      *
      * @return the current declaration scope
      *
-     * @since 2.0
+     * @since 1.1
      */
     public DeclarationScope getScope() {
         return fScope;
