@@ -205,6 +205,7 @@ public class TmfSimpleTableViewer extends TmfViewer {
      *          the menu manager
      * @param sel
      *          the current selection
+     * @since 2.0
      */
     protected void appendToTablePopupMenu(@NonNull IMenuManager manager, @NonNull IStructuredSelection sel) {
     }
@@ -221,6 +222,7 @@ public class TmfSimpleTableViewer extends TmfViewer {
      *            the comparator associated with clicking on the column, if it
      *            is null, a string comparator on the label will be used
      * @return the column that was created
+     * @since 2.0
      */
     public final TableColumn createColumn(String name, ColumnLabelProvider provider, @Nullable Comparator<?> comparator) {
         TableViewerColumn col = new TableViewerColumn(fTableViewer, SWT.NONE);

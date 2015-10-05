@@ -27,6 +27,6 @@
    <feature url="features/org.eclipse.tracecompass.tmf.remote.source_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.tmf.remote.source" version="0.0.0"/>
    <feature url="features/org.eclipse.tracecompass.tmf.pcap.source_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.tmf.pcap.source" version="0.0.0"/>
    <feature url="features/org.eclipse.tracecompass.testing.source_0.0.0.qualifier.jar" id="org.eclipse.tracecompass.testing.source" version="0.0.0"/>
-   <bundle id="org.eclipse.tracecompass.common.core" version="1.1.0.qualifier"/>
+   <bundle id="org.eclipse.tracecompass.common.core"/>
    <category-def name="Trace Compass" label="Trace Compass Main Features"/>
 </site>

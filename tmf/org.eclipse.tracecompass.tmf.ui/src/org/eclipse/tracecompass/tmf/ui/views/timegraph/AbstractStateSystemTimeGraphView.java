@@ -404,6 +404,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
      * @param monitor
      *            A progress monitor
      * @return The list of marker events
+     * @since 2.0
      */
     protected @NonNull List<IMarkerEvent> getMarkerList(ITmfStateSystem ss,
             @NonNull List<List<ITmfStateInterval>> fullStates, @NonNull IProgressMonitor monitor) {
