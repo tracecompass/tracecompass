@@ -161,6 +161,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
+import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventsCache.CachedEvent;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.TmfEventTableColumn;
 import org.eclipse.tracecompass.tmf.ui.views.colors.ColorSetting;
@@ -169,8 +170,8 @@ import org.eclipse.tracecompass.tmf.ui.views.colors.IColorSettingsListener;
 import org.eclipse.tracecompass.tmf.ui.views.filter.FilterManager;
 import org.eclipse.tracecompass.tmf.ui.widgets.rawviewer.TmfRawEventViewer;
 import org.eclipse.tracecompass.tmf.ui.widgets.virtualtable.TmfVirtualTable;
-import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
@@ -3076,11 +3077,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     TmfTimeRange.ETERNITY, 0, 1, ExecutionType.FOREGROUND) {
 
                 TmfTimestamp ts = new TmfTimestamp(signal.getBeginTime());
-
-                @Override
-                public void handleData(final ITmfEvent event) {
-                    super.handleData(event);
-                }
+                TmfTimestamp tf = new TmfTimestamp(signal.getEndTime());
 
                 @Override
                 public void handleSuccess() {
@@ -3089,23 +3086,82 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         return;
                     }
 
-                    /*
-                     * Verify if the event is within the trace range and adjust
-                     * if necessary
-                     */
-                    ITmfTimestamp timestamp = ts;
-                    if (timestamp.compareTo(fTrace.getStartTime()) == -1) {
-                        timestamp = fTrace.getStartTime();
+                    final Pair<Long, Long> selection = getSelectedRanks();
+                    updateDisplayWithSelection(selection.getFirst().longValue(), selection.getSecond().longValue());
+                }
+
+                /**
+                 * Verify if the event is within the trace range and adjust if
+                 * necessary.
+                 *
+                 * @return A pair of rank representing the selected area
+                 **/
+                private Pair<Long, Long> getSelectedRanks() {
+
+                    /* Clamp the timestamp value to fit inside of the trace */
+                    ITmfTimestamp timestampBegin = ts;
+                    if (timestampBegin.compareTo(fTrace.getStartTime()) < 0) {
+                        timestampBegin = fTrace.getStartTime();
                     }
-                    if (timestamp.compareTo(fTrace.getEndTime()) == 1) {
-                        timestamp = fTrace.getEndTime();
+                    if (timestampBegin.compareTo(fTrace.getEndTime()) > 0) {
+                        timestampBegin = fTrace.getEndTime();
                     }
 
-                    // Get the rank of the selected event in the table
-                    final ITmfContext context = fTrace.seekEvent(timestamp);
-                    final long rank = context.getRank();
-                    context.dispose();
+                    ITmfTimestamp timestampEnd = tf;
+                    if (timestampEnd.compareTo(fTrace.getStartTime()) < 0) {
+                        timestampEnd = fTrace.getStartTime();
+                    }
+                    if (timestampEnd.compareTo(fTrace.getEndTime()) > 0) {
+                        timestampEnd = fTrace.getEndTime();
+                    }
 
+                    ITmfTimestamp tb;
+                    ITmfTimestamp te;
+                    long rankBegin;
+                    long rankEnd;
+                    ITmfContext contextBegin;
+                    ITmfContext contextEnd;
+
+                    /* Adjust the rank of the selection to the right range */
+                    if (timestampBegin.compareTo(timestampEnd) > 0) {
+                        te = timestampEnd;
+                        contextEnd = fTrace.seekEvent(te);
+                        rankEnd = contextEnd.getRank();
+                        contextEnd.dispose();
+                        /* To include all events at the begin time, seek at the next nanosecond and then use the previous rank */
+                        tb = timestampBegin.normalize(1, ITmfTimestamp.NANOSECOND_SCALE);
+                        if (tb.compareTo(fTrace.getEndTime()) <= 0) {
+                            contextBegin = fTrace.seekEvent(tb);
+                            rankBegin = contextBegin.getRank();
+                            contextBegin.dispose();
+                        } else {
+                            rankBegin = ITmfContext.UNKNOWN_RANK;
+                        }
+                        rankBegin = (rankBegin == ITmfContext.UNKNOWN_RANK ? fTrace.getNbEvents() : rankBegin) - 1;
+                        /* If no events in selection range, select only the next event */
+                        rankBegin = rankBegin >= rankEnd ? rankBegin : rankEnd;
+                    } else {
+                        tb = timestampBegin;
+                        contextBegin = fTrace.seekEvent(tb);
+                        rankBegin = contextBegin.getRank();
+                        contextBegin.dispose();
+                        /* To include all events at the end time, seek at the next nanosecond and then use the previous rank */
+                        te = timestampEnd.normalize(1, ITmfTimestamp.NANOSECOND_SCALE);
+                        if (te.compareTo(fTrace.getEndTime()) <= 0) {
+                            contextEnd = fTrace.seekEvent(te);
+                            rankEnd = contextEnd.getRank();
+                            contextEnd.dispose();
+                        } else {
+                            rankEnd = ITmfContext.UNKNOWN_RANK;
+                        }
+                        rankEnd = (rankEnd == ITmfContext.UNKNOWN_RANK ? fTrace.getNbEvents() : rankEnd) - 1;
+                        /* If no events in selection range, select only the next event */
+                        rankEnd = rankEnd >= rankBegin ? rankEnd : rankBegin;
+                    }
+                    return new Pair<>(Long.valueOf(rankBegin), Long.valueOf(rankEnd));
+                }
+
+                private void updateDisplayWithSelection(final long rankBegin, final long rankEnd) {
                     PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
                         @Override
                         public void run() {
@@ -3114,16 +3170,20 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                                 return;
                             }
 
-                            fSelectedRank = rank;
-                            fSelectedBeginRank = fSelectedRank;
-                            int index = (int) rank;
+                            fSelectedRank = rankEnd;
+                            long toReveal = fSelectedBeginRank != rankBegin ? rankBegin : rankEnd;
+                            fSelectedBeginRank = rankBegin;
+                            int indexBegin = (int) rankBegin;
+                            int indexEnd = (int) rankEnd;
+
                             if (fTable.getData(Key.FILTER_OBJ) != null) {
                                 /* +1 for top filter status row */
-                                index = fCache.getFilteredEventIndex(rank) + 1;
+                                indexBegin = fCache.getFilteredEventIndex(rankBegin) + 1;
+                                indexEnd = rankEnd == rankBegin ? indexBegin : fCache.getFilteredEventIndex(rankEnd) + 1;
                             }
                             /* +1 for header row */
-                            fTable.setSelection(index + 1);
-                            fRawViewer.selectAndReveal(rank);
+                            fTable.setSelectionRange(indexBegin + 1, indexEnd + 1);
+                            fRawViewer.selectAndReveal(toReveal);
                             updateStatusLine(null);
                         }
                     });

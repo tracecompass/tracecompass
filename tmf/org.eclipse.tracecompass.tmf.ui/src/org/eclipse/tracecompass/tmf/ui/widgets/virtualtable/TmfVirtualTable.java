@@ -1097,21 +1097,45 @@ public class TmfVirtualTable extends Composite {
      * </ul>
      */
     public void setSelection(int index) {
-        if (fTableItemCount > 0) {
-            int i = Math.min(index, fTableItemCount - 1);
-            i = Math.max(i, 0);
+        setSelectionRange(index, index);
+    }
 
-            fSelectedEventRank = i;
-            fSelectedBeginRank = fSelectedEventRank;
-            if ((i < fTableTopEventRank + fFrozenRowCount && i >= fFrozenRowCount) ||
-                    (i >= fTableTopEventRank + fFullyVisibleRows)) {
+    /**
+     * Selects a range of items starting at the given zero-relative index in the
+     * receiver. The current selection is first cleared, then the new items are
+     * selected, and if necessary the receiver is scrolled to make the new
+     * selection visible.
+     *
+     * @param beginIndex
+     *            The index of the first item in the selection range
+     * @param endIndex
+     *            The index of the last item in the selection range
+     *
+     * @exception SWTException
+     *                <ul>
+     *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been
+     *                disposed</li>
+     *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the
+     *                thread that created the receiver</li>
+     *                </ul>
+     * @since 2.0
+     */
+    public void setSelectionRange(int beginIndex, int endIndex) {
+        if (fTableItemCount > 0) {
+            int begin = Math.max(Math.min(beginIndex, fTableItemCount - 1), 0);
+            int end =   Math.max(Math.min(endIndex, fTableItemCount - 1), 0);
+            int selection = fSelectedBeginRank != begin ? begin : end;
+
+            fSelectedBeginRank = begin;
+            fSelectedEventRank = end;
+            if ((selection < fTableTopEventRank + fFrozenRowCount && selection >= fFrozenRowCount) ||
+                    (selection >= fTableTopEventRank + fFullyVisibleRows)) {
                 int lastPageTopEntryRank = Math.max(0, fTableItemCount - fFullyVisibleRows);
-                fTableTopEventRank = Math.max(0, Math.min(lastPageTopEntryRank, i - fFrozenRowCount - fFullyVisibleRows / 2));
+                fTableTopEventRank = Math.max(0, Math.min(lastPageTopEntryRank, selection - fFrozenRowCount - fFullyVisibleRows / 2));
             }
             if (fFullyVisibleRows < fTableItemCount) {
                 fSlider.setSelection(fTableTopEventRank);
             }
-
             refreshTable();
         }
     }
