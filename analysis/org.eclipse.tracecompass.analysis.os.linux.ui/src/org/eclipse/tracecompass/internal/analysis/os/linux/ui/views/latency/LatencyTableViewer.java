@@ -30,6 +30,7 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
+import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
@@ -68,17 +69,17 @@ public class LatencyTableViewer extends TmfSimpleTableViewer {
                 /* Doubles as a null check */
                 return ""; //$NON-NLS-1$
             }
-            return getTextFoITimeRange((ISegment) input);
+            return getTextForSegment((ISegment) input);
         }
 
-        public abstract String getTextFoITimeRange(ISegment input);
+        public abstract String getTextForSegment(ISegment input);
     }
 
     /**
      * Listener to update the model with the latency analysis results once the
      * latency analysis is fully completed
      */
-    private final class LatencyListener implements IAnalysisProgressListener {
+    private final class AnalysisProgressListener implements IAnalysisProgressListener {
         @Override
         public void onComplete(AbstractSegmentStoreAnalysisModule activeAnalysis, ISegmentStore<ISegment> data) {
             // Check if the active trace was changed while the analysis was
@@ -111,7 +112,12 @@ public class LatencyTableViewer extends TmfSimpleTableViewer {
     /**
      * Latency analysis completion listener
      */
-    private LatencyListener fListener;
+    private AnalysisProgressListener fListener;
+
+    /**
+     * Flag to create columns once
+     */
+    boolean fColumnsCreated = false;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -133,7 +139,7 @@ public class LatencyTableViewer extends TmfSimpleTableViewer {
         }
         createColumns();
         getTableViewer().getTable().addSelectionListener(new LatencyTableSelectionListener());
-        fListener = new LatencyListener();
+        fListener = new AnalysisProgressListener();
     }
 
     // ------------------------------------------------------------------------
@@ -141,29 +147,50 @@ public class LatencyTableViewer extends TmfSimpleTableViewer {
     // ------------------------------------------------------------------------
 
     /**
-     * Create columns for start time, end time and duration
+     * Create default columns for start time, end time and duration
      */
     private void createColumns() {
         createColumn(Messages.LatencyTableViewer_startTime, new LatencyTableColumnLabelProvider() {
             @Override
-            public String getTextFoITimeRange(ISegment input) {
+            public String getTextForSegment(ISegment input) {
                 return NonNullUtils.nullToEmptyString(TmfTimestampFormat.getDefaulTimeFormat().format(input.getStart()));
             }
         }, SegmentComparators.INTERVAL_START_COMPARATOR);
 
         createColumn(Messages.LatencyTableViewer_endTime, new LatencyTableColumnLabelProvider() {
             @Override
-            public String getTextFoITimeRange(ISegment input) {
+            public String getTextForSegment(ISegment input) {
                 return NonNullUtils.nullToEmptyString(TmfTimestampFormat.getDefaulTimeFormat().format(input.getEnd()));
             }
         }, SegmentComparators.INTERVAL_END_COMPARATOR);
 
         createColumn(Messages.LatencyTableViewer_duration, new LatencyTableColumnLabelProvider() {
             @Override
-            public String getTextFoITimeRange(ISegment input) {
+            public String getTextForSegment(ISegment input) {
                 return NonNullUtils.nullToEmptyString(Long.toString(input.getLength()));
             }
         }, SegmentComparators.INTERVAL_LENGTH_COMPARATOR);
+    }
+
+    /**
+     * Create columns specific to the analysis
+     */
+    private void createAnalysisColumns() {
+        if (!fColumnsCreated) {
+            AbstractSegmentStoreAnalysisModule analysis = getAnalysisModule();
+            if (analysis != null) {
+                for (final ISegmentAspect aspect : analysis.getSegmentAspects()) {
+                    createColumn(aspect.getName(), new LatencyTableColumnLabelProvider() {
+                        @Override
+                        public String getTextForSegment(ISegment input) {
+                            return NonNullUtils.nullToEmptyString(aspect.resolve(input));
+                        }
+                    },
+                    null);
+                }
+            }
+            fColumnsCreated = true;
+        }
     }
 
     /**
@@ -209,6 +236,9 @@ public class LatencyTableViewer extends TmfSimpleTableViewer {
             updateModel(null);
             return;
         }
+
+        createAnalysisColumns();
+
         ISegmentStore<ISegment> results = analysis.getResults();
         // If results are not null, then analysis is completed and model can be
         // updated

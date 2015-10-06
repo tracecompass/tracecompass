@@ -16,6 +16,7 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,8 +30,11 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
+import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Abstract analysis module to generate a segment store. It is a base class that
@@ -65,6 +69,17 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
      */
     public Iterable<IAnalysisProgressListener> getListeners() {
         return fListeners;
+    }
+
+    /**
+     * Return the pre-defined set of segment aspects exposed by this analysis.
+     *
+     * It should not be null, but could be empty.
+     * @return The segment aspects for this analysis
+     */
+    public Iterable<ISegmentAspect> getSegmentAspects() {
+        Collection<ISegmentAspect> coll = ImmutableList.of();
+        return checkNotNull(coll);
     }
 
     /**

@@ -13,6 +13,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,9 +26,11 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 
 /**
  * @author Alexandre Montplaisir
@@ -42,9 +45,18 @@ public class LatencyAnalysis extends AbstractSegmentStoreAnalysisModule {
 
     private static final String DATA_FILENAME = "latency-analysis.dat"; //$NON-NLS-1$
 
+    private static final Collection<ISegmentAspect> BASE_ASPECTS =
+            checkNotNull(ImmutableList.of(SyscallNameAspect.INSTANCE));
+
+
     @Override
     public String getId() {
         return ID;
+    }
+
+    @Override
+    public Iterable<ISegmentAspect> getSegmentAspects() {
+        return BASE_ASPECTS;
     }
 
     @Override
@@ -133,6 +145,28 @@ public class LatencyAnalysis extends AbstractSegmentStoreAnalysisModule {
         @Override
         public void handleCompleted() {
             fOngoingSystemCalls.clear();
+        }
+    }
+
+    private static class SyscallNameAspect implements ISegmentAspect {
+        public static final ISegmentAspect INSTANCE = new SyscallNameAspect();
+
+        private SyscallNameAspect() { }
+
+        @Override
+        public String getHelpText() {
+            return checkNotNull(Messages.SegmentAspectHelpText_SystemCall);
+        }
+        @Override
+        public String getName() {
+            return checkNotNull(Messages.SegmentAspectName_SystemCall);
+        }
+        @Override
+        public @Nullable String resolve(ISegment segment) {
+            if (segment instanceof SystemCall) {
+                return ((SystemCall) segment).getName();
+            }
+            return EMPTY_STRING;
         }
     }
 
