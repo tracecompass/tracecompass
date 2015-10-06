@@ -971,26 +971,26 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <or>
-                        <and>
-                           <instanceof
-                                 value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
-                           </instanceof>
-                           <not>
-                              <test
-                                    forcePluginActivation="true"
-                                    property="org.eclipse.linuxtools.tmf.ui.isExperimentTrace">
-                              </test>
-                           </not>
-                        </and>
-                     </or>
-                  </iterate>
-                  <with
-                      variable="activePart">
                      <instanceof
-                           value="org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
                      </instanceof>
-                  </with>
+                  </iterate>
+                  <and>
+                     <with
+                         variable="activePart">
+                        <instanceof
+                              value="org.eclipse.tracecompass.tmf.ui.editors.ITmfTraceEditor">
+                        </instanceof>
+                     </with>
+                     <not>
+                        <with
+                            variable="activeEditorInput">
+                           <test
+                                 property="org.eclipse.tracecompass.tmf.ui.isExperimentEditorInput">
+                           </test>
+                        </with>
+                     </not>
+                  </and>
                </or>
            </visibleWhen>
         </command>
@@ -1717,26 +1717,26 @@
                <iterate
                      ifEmpty="false"
                      operator="and">
-                  <or>
-                     <and>
-                        <instanceof
-                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
-                        </instanceof>
-                        <not>
-                           <test
-                                 forcePluginActivation="true"
-                                 property="org.eclipse.linuxtools.tmf.ui.isExperimentTrace">
-                           </test>
-                        </not>
-                     </and>
-                  </or>
-               </iterate>
-               <with
-                   variable="activePart">
                   <instanceof
-                        value="org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor">
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
                   </instanceof>
-               </with>
+               </iterate>
+               <and>
+                  <with
+                      variable="activePart">
+                     <instanceof
+                           value="org.eclipse.tracecompass.tmf.ui.editors.ITmfTraceEditor">
+                     </instanceof>
+                  </with>
+                  <not>
+                     <with
+                         variable="activeEditorInput">
+                        <test
+                              property="org.eclipse.tracecompass.tmf.ui.isExperimentEditorInput">
+                        </test>
+                     </with>
+                  </not>
+               </and>
             </or>
          </activeWhen>
       </handler>
@@ -1848,6 +1848,13 @@
             namespace="org.eclipse.linuxtools.tmf.ui"
             properties="isExperimentTrace,hasSupplementaryFiles,traceType"
             type="org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectModelElement">
+      </propertyTester>
+      <propertyTester
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.EditorInputPropertyTester"
+            id="org.eclipse.tracecompass.tmf.ui.editorInputPropertyTester"
+            namespace="org.eclipse.tracecompass.tmf.ui"
+            properties="isExperimentEditorInput"
+            type="org.eclipse.ui.IEditorInput">
       </propertyTester>
    </extension>
    <extension
