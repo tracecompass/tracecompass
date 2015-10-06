@@ -63,14 +63,14 @@ public class TestRefreshCustomTextTrace extends TestRefreshTextTrace {
     }
 
     @Override
-    protected void appendToTrace(long nbEVents) throws IOException {
-        writeToTrace(nbEVents, true);
+    protected void appendToTrace(long nbEvents) throws IOException {
+        writeToTrace(nbEvents, true);
     }
 
-    private void writeToTrace(long nbEVents, boolean append) throws IOException {
+    private void writeToTrace(long nbEvents, boolean append) throws IOException {
         final File file = new File(TRACE_LOCATION);
         try (FileWriter writer = new FileWriter(file, append)) {
-            for (int i = 0; i < nbEVents; ++i) {
+            for (int i = 0; i < nbEvents; ++i) {
                 SimpleDateFormat f = new SimpleDateFormat(TIMESTAMP_FORMAT);
                 String eventStr = f.format(new Date(fNbWrittenEvents * SECOND_TO_MILLISECOND)) + " hello world\n";
                 writer.write(eventStr);
