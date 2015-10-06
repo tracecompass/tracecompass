@@ -6,29 +6,28 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-
-package org.eclipse.tracecompass.analysis.os.linux.core.latency;
+package org.eclipse.tracecompass.analysis.timing.core.segmentstore;
 
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 
 /**
- * End of latency analysis listener for latency viewers
+ * Analysis progress listener for segment store viewers
  *
  * @author France Lapointe Nguyen
  * @since 2.0
  */
-public interface LatencyAnalysisListener {
+public interface IAnalysisProgressListener {
 
     /**
-     * Called at the end of the latency analysis
+     * Called at the end of the analysis
      *
      * @param activeAnalysis
-     *            latency analysis that is running
+     *            analysis that is running
      *
      * @param data
-     *            results of the latency analysis
+     *            segment store of the latency analysis
      */
-    void onComplete(LatencyAnalysis activeAnalysis, ISegmentStore<ISegment> data);
+    void onComplete(AbstractSegmentStoreAnalysisModule activeAnalysis, ISegmentStore<ISegment> data);
 
 }

@@ -27,7 +27,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.analysis.os.linux.core.latency.LatencyAnalysis;
-import org.eclipse.tracecompass.analysis.os.linux.core.latency.LatencyAnalysisListener;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmentStoreAnalysisModule;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
@@ -191,10 +192,10 @@ public class LatencyScatterGraphViewer extends TmfCommonXLineChartViewer {
      * Listener to update the model with the latency analysis results once the
      * latency analysis is fully completed
      */
-    private final class LatencyListener implements LatencyAnalysisListener {
+    private final class LatencyListener implements IAnalysisProgressListener {
 
         @Override
-        public void onComplete(LatencyAnalysis activeAnalysis, ISegmentStore<ISegment> results) {
+        public void onComplete(AbstractSegmentStoreAnalysisModule activeAnalysis, ISegmentStore<ISegment> results) {
             // Only update the model if trace that was analyzed is active trace
             if (activeAnalysis.equals(getAnalysisModule())) {
                 updateModel(results);

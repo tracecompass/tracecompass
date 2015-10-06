@@ -13,30 +13,18 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelTidAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmentStoreAnalysisModule;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
-import org.eclipse.tracecompass.segmentstore.core.treemap.TreeMapStore;
-import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
-import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
-import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
@@ -45,7 +33,7 @@ import com.google.common.collect.FluentIterable;
  * @author Alexandre Montplaisir
  * @since 2.0
  */
-public class LatencyAnalysis extends TmfAbstractAnalysisModule {
+public class LatencyAnalysis extends AbstractSegmentStoreAnalysisModule {
 
     /**
      * The ID of this analysis
@@ -54,142 +42,48 @@ public class LatencyAnalysis extends TmfAbstractAnalysisModule {
 
     private static final String DATA_FILENAME = "latency-analysis.dat"; //$NON-NLS-1$
 
-    private @Nullable ISegmentStore<ISegment> fSystemCalls;
-
-    private @Nullable ITmfEventRequest fOngoingRequest = null;
-
-    private final Set<LatencyAnalysisListener> fListeners = new HashSet<>();
-
     @Override
     public String getId() {
         return ID;
     }
 
-    /**
-     * Listener for the viewers
-     *
-     * @param listener
-     *            listener for each type of viewer
-     */
-    public void addListener(LatencyAnalysisListener listener) {
-        fListeners.add(listener);
+    @Override
+    public String getDataFileName() {
+        return DATA_FILENAME;
     }
 
     @Override
-    protected boolean executeAnalysis(IProgressMonitor monitor) throws TmfAnalysisException {
-        IKernelTrace trace = checkNotNull((IKernelTrace) getTrace());
-        IKernelAnalysisEventLayout layout = trace.getKernelEventLayout();
-
-        /* See if the data file already exists on disk */
-        String dir = TmfTraceManager.getSupplementaryFileDir(trace);
-        final Path file = Paths.get(dir, DATA_FILENAME);
-
-        if (Files.exists(file)) {
-            /* Attempt to read the existing file */
-            try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(file))) {
-                Object[] syscallsArray = (Object[]) ois.readObject();
-                final ISegmentStore<ISegment> systemCalls = new TreeMapStore<>();
-                for (Object element : syscallsArray) {
-                    if (element instanceof ISegment) {
-                        ISegment segment = (ISegment) element;
-                        systemCalls.add(segment);
-                    }
-                }
-                fSystemCalls = systemCalls;
-                for (LatencyAnalysisListener listener : fListeners) {
-                    listener.onComplete(this, systemCalls);
-                }
-                return true;
-            } catch (IOException | ClassNotFoundException | ClassCastException e) {
-                /*
-                 * We did not manage to read the file successfully, we will just
-                 * fall-through to rebuild a new one.
-                 */
-                try {
-                    Files.delete(file);
-                } catch (IOException e1) {
-                }
-            }
-        }
-
-        ISegmentStore<ISegment> syscalls = new TreeMapStore<>();
-
-        /* Cancel an ongoing request */
-        ITmfEventRequest req = fOngoingRequest;
-        if ((req != null) && (!req.isCompleted())) {
-            req.cancel();
-        }
-
-        /* Create a new request */
-        req = new LatencyAnalysisRequest(layout, syscalls);
-        fOngoingRequest = req;
-        trace.sendRequest(req);
-        /* The request will fill 'syscalls' */
-        try {
-            req.waitForCompletion();
-        } catch (InterruptedException e) {
-        }
-
-        /* Do not process the results if the request was cancelled */
-        if (req.isCancelled() || req.isFailed()) {
-            return false;
-        }
-
-        /* The request will fill 'syscalls' */
-        fSystemCalls = syscalls;
-
-        /* Serialize the collections to disk for future usage */
-        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(file))) {
-            oos.writeObject(syscalls.toArray());
-        } catch (IOException e) {
-            /* Didn't work, oh well. We will just re-read the trace next time */
-        }
-
-        for (LatencyAnalysisListener listener : fListeners) {
-            listener.onComplete(this, syscalls);
-        }
-
-        return true;
+    public AbstractSegmentStoreAnalysisRequest createAnalysisRequest(ISegmentStore<ISegment> syscalls) {
+        return new SyscallLatencyAnalysisRequest(syscalls);
     }
 
     @Override
-    protected void canceling() {
-        ITmfEventRequest req = fOngoingRequest;
-        if ((req != null) && (!req.isCompleted())) {
-            req.cancel();
-        }
+    protected Object[] readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+        return checkNotNull((Object[]) ois.readObject());
     }
 
-    /**
-     * @return Results from the analysis in a ISegmentStore
-     */
-    public @Nullable ISegmentStore<ISegment> getResults() {
-        return fSystemCalls;
-    }
+    private static class SyscallLatencyAnalysisRequest extends AbstractSegmentStoreAnalysisRequest {
 
-    private static class LatencyAnalysisRequest extends TmfEventRequest {
-
-        private final IKernelAnalysisEventLayout fLayout;
-        private final ISegmentStore<ISegment> fFullSyscalls;
         private final Map<Integer, SystemCall.InitialInfo> fOngoingSystemCalls = new HashMap<>();
+        private @Nullable IKernelAnalysisEventLayout fLayout;
 
-        public LatencyAnalysisRequest(IKernelAnalysisEventLayout layout, ISegmentStore<ISegment> syscalls) {
-            super(ITmfEvent.class, 0, ITmfEventRequest.ALL_DATA, ExecutionType.BACKGROUND);
-            fLayout = layout;
-            /*
-             * We do NOT make a copy here! We want to modify the list that was
-             * passed in parameter.
-             */
-            fFullSyscalls = syscalls;
+        public SyscallLatencyAnalysisRequest(ISegmentStore<ISegment> syscalls) {
+            super(syscalls);
         }
 
         @Override
         public void handleData(final ITmfEvent event) {
             super.handleData(event);
+            IKernelAnalysisEventLayout layout = fLayout;
+            if (layout == null) {
+                IKernelTrace trace = checkNotNull((IKernelTrace) event.getTrace());
+                layout = trace.getKernelEventLayout();
+                fLayout = layout;
+            }
             final String eventName = event.getType().getName();
 
-            if (eventName.startsWith(fLayout.eventSyscallEntryPrefix()) ||
-                    eventName.startsWith(fLayout.eventCompatSyscallEntryPrefix())) {
+            if (eventName.startsWith(layout.eventSyscallEntryPrefix()) ||
+                    eventName.startsWith(layout.eventCompatSyscallEntryPrefix())) {
                 /* This is a system call entry event */
 
                 Integer tid = KernelTidAspect.INSTANCE.resolve(event);
@@ -201,7 +95,7 @@ public class LatencyAnalysis extends TmfAbstractAnalysisModule {
                 /* Record the event's data into the intial system call info */
                 // String syscallName = fLayout.getSyscallNameFromEvent(event);
                 long startTime = event.getTimestamp().getValue();
-                String syscallName = eventName.substring(fLayout.eventSyscallEntryPrefix().length());
+                String syscallName = eventName.substring(layout.eventSyscallEntryPrefix().length());
                 FluentIterable<String> argNames = FluentIterable.from(event.getContent().getFieldNames());
                 Map<String, String> args = argNames.toMap(new Function<String, String>() {
                     @Override
@@ -212,7 +106,7 @@ public class LatencyAnalysis extends TmfAbstractAnalysisModule {
                 SystemCall.InitialInfo newSysCall = new SystemCall.InitialInfo(startTime, NonNullUtils.checkNotNull(syscallName), NonNullUtils.checkNotNull(args));
                 fOngoingSystemCalls.put(tid, newSysCall);
 
-            } else if (eventName.startsWith(fLayout.eventSyscallExitPrefix())) {
+            } else if (eventName.startsWith(layout.eventSyscallExitPrefix())) {
                 /* This is a system call exit event */
 
                 Integer tid = KernelTidAspect.INSTANCE.resolve(event);
@@ -232,7 +126,7 @@ public class LatencyAnalysis extends TmfAbstractAnalysisModule {
                 long endTime = event.getTimestamp().getValue();
                 int ret = ((Long) event.getContent().getField("ret").getValue()).intValue(); //$NON-NLS-1$
                 ISegment syscall = new SystemCall(info, endTime, ret);
-                fFullSyscalls.add(syscall);
+                getSegmentStore().add(syscall);
             }
         }
 

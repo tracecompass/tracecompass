@@ -24,7 +24,8 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.analysis.os.linux.core.latency.LatencyAnalysis;
-import org.eclipse.tracecompass.analysis.os.linux.core.latency.LatencyAnalysisListener;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmentStoreAnalysisModule;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
@@ -77,9 +78,9 @@ public class LatencyTableViewer extends TmfSimpleTableViewer {
      * Listener to update the model with the latency analysis results once the
      * latency analysis is fully completed
      */
-    private final class LatencyListener implements LatencyAnalysisListener {
+    private final class LatencyListener implements IAnalysisProgressListener {
         @Override
-        public void onComplete(LatencyAnalysis activeAnalysis, ISegmentStore<ISegment> data) {
+        public void onComplete(AbstractSegmentStoreAnalysisModule activeAnalysis, ISegmentStore<ISegment> data) {
             // Check if the active trace was changed while the analysis was
             // running
             if (activeAnalysis.equals(fAnalysisModule)) {
@@ -105,7 +106,7 @@ public class LatencyTableViewer extends TmfSimpleTableViewer {
     /**
      * Current latency analysis module
      */
-    private @Nullable LatencyAnalysis fAnalysisModule = null;
+    private @Nullable AbstractSegmentStoreAnalysisModule fAnalysisModule = null;
 
     /**
      * Latency analysis completion listener
@@ -201,7 +202,7 @@ public class LatencyTableViewer extends TmfSimpleTableViewer {
      * @param analysis
      *            Latency analysis module
      */
-    public void setData(@Nullable LatencyAnalysis analysis) {
+    public void setData(@Nullable AbstractSegmentStoreAnalysisModule analysis) {
         // Set the current latency analysis module
         fAnalysisModule = analysis;
         if (analysis == null) {
@@ -252,7 +253,7 @@ public class LatencyTableViewer extends TmfSimpleTableViewer {
      *
      * @return current latency analysis module
      */
-    public @Nullable LatencyAnalysis getAnalysisModule() {
+    public @Nullable AbstractSegmentStoreAnalysisModule getAnalysisModule() {
         return fAnalysisModule;
     }
 

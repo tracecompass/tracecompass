@@ -12,7 +12,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.tracecompass.common.core,
  org.eclipse.tracecompass.tmf.core,
- org.eclipse.tracecompass.segmentstore.core
+ org.eclipse.tracecompass.segmentstore.core,
+ org.eclipse.tracecompass.analysis.timing.core
 Import-Package: com.google.common.base,
  com.google.common.collect,
  com.google.common.hash
