@@ -264,23 +264,24 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
     @Override
     protected void appendToTablePopupMenu(IMenuManager manager, IStructuredSelection sel) {
         final ISegment segment = (ISegment) sel.getFirstElement();
+        if (segment != null) {
+            IAction gotoStartTime = new Action(Messages.SegmentStoreTableViewer_goToStartEvent) {
+                @Override
+                public void run() {
+                    broadcast(new TmfSelectionRangeUpdatedSignal(AbstractSegmentStoreTableViewer.this, new TmfNanoTimestamp(segment.getStart())));
+                }
+            };
 
-        IAction gotoStartTime = new Action(Messages.SegmentStoreTableViewer_goToStartEvent) {
-            @Override
-            public void run() {
-                broadcast(new TmfSelectionRangeUpdatedSignal(AbstractSegmentStoreTableViewer.this, new TmfNanoTimestamp(segment.getStart())));
-            }
-        };
+            IAction gotoEndTime = new Action(Messages.SegmentStoreTableViewer_goToEndEvent) {
+                @Override
+                public void run() {
+                    broadcast(new TmfSelectionRangeUpdatedSignal(AbstractSegmentStoreTableViewer.this, new TmfNanoTimestamp(segment.getEnd())));
+                }
+            };
 
-        IAction gotoEndTime = new Action(Messages.SegmentStoreTableViewer_goToEndEvent) {
-            @Override
-            public void run() {
-                broadcast(new TmfSelectionRangeUpdatedSignal(AbstractSegmentStoreTableViewer.this, new TmfNanoTimestamp(segment.getEnd())));
-            }
-        };
-
-       manager.add(gotoStartTime);
-       manager.add(gotoEndTime);
+            manager.add(gotoStartTime);
+            manager.add(gotoEndTime);
+        }
     }
 
     // ------------------------------------------------------------------------
