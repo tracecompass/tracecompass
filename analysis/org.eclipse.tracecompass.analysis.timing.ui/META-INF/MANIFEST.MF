@@ -16,4 +16,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.tracecompass.segmentstore.core,
  org.eclipse.tracecompass.tmf.core,
  org.eclipse.tracecompass.tmf.ui
-Export-Package: org.eclipse.tracecompass.internal.analysis.timing.ui
+Export-Package: org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore,
+ org.eclipse.tracecompass.internal.analysis.timing.ui,
+ org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore

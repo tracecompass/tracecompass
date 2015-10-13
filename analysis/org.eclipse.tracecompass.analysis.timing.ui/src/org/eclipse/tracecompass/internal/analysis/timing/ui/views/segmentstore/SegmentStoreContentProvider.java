@@ -8,9 +8,10 @@
  *
  * Contributors:
  *   France Lapointe Nguyen - Initial API and implementation
+ *   Bernd Hufmann - MOve abstract class to TMF
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency;
+package org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -28,8 +29,9 @@ import com.google.common.collect.Iterables;
  * Content provider for the latency table viewers.
  *
  * @author France Lapointe Nguyen
+ * @since 2.0
  */
-public class LatencyContentProvider implements ISortingLazyContentProvider {
+public class SegmentStoreContentProvider implements ISortingLazyContentProvider {
 
     /**
      * Array of all the segments in the segment store of the current trace
