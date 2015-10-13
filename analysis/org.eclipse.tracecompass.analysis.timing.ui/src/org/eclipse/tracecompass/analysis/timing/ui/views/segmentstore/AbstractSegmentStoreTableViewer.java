@@ -21,9 +21,13 @@ import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmentStoreAnalysisModule;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
@@ -140,6 +144,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         }
         createColumns();
         getTableViewer().getTable().addSelectionListener(new TableSelectionListener());
+        addPackListener();
         fListener = new AnalysisProgressListener();
     }
 
@@ -215,6 +220,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
                         tableViewer.setItemCount(0);
                         return;
                     }
+                    addPackListener();
                     tableViewer.setInput(dataInput);
                     SegmentStoreContentProvider contentProvider = (SegmentStoreContentProvider) getTableViewer().getContentProvider();
                     tableViewer.setItemCount(contentProvider.getSegmentCount());
@@ -351,5 +357,28 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
                 analysis.removeListener(fListener);
             }
         }
+    }
+
+    // ------------------------------------------------------------------------
+    // Helper methods
+    // ------------------------------------------------------------------------
+    /*
+     * Add the listener for SetData on the table
+     */
+    private void addPackListener() {
+        getControl().addListener(SWT.SetData, new Listener() {
+            @Override
+            public void handleEvent(@Nullable Event event) {
+                // Pack the column the first time data is set
+                TableViewer tableViewer = getTableViewer();
+                if (tableViewer != null) {
+                    for (TableColumn col : tableViewer.getTable().getColumns()) {
+                        col.pack();
+                    }
+                    // Remove the listener after the pack
+                    getControl().removeListener(SWT.SetData, this);
+                }
+            }
+        });
     }
 }
