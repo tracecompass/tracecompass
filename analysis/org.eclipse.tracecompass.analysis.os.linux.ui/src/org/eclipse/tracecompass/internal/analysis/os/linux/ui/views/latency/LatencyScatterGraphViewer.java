@@ -274,12 +274,14 @@ public class LatencyScatterGraphViewer extends TmfCommonXLineChartViewer {
         long currentStart = getTimeInNanos(currentRange.getStartTime());
         long currentEnd = getTimeInNanos(currentRange.getEndTime());
         if (dataInput == null) {
-            Display.getDefault().syncExec(new Runnable() {
-                @Override
-                public void run() {
-                    clearContent();
-                }
-            });
+            if (!getDisplay().isDisposed()) {
+                Display.getDefault().syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        clearContent();
+                    }
+                });
+            }
             fDisplayData = NonNullUtils.checkNotNull(Collections.EMPTY_LIST);
         } else {
             Collection<ISegment> elements = (Collection<ISegment>) dataInput.getIntersectingElements(currentStart, currentEnd);
@@ -348,7 +350,6 @@ public class LatencyScatterGraphViewer extends TmfCommonXLineChartViewer {
         IAxisTick xTick = xAxis.getTick();
         xTick.setFormat(tmfChartTimeStampFormat);
         xAxis.setRange(new Range(0.0, end - start));
-        xAxis.adjustRange();
         if (maxY > 0.0) {
             swtChart.getAxisSet().getYAxis(0).setRange(new Range(0.0, maxY));
         }

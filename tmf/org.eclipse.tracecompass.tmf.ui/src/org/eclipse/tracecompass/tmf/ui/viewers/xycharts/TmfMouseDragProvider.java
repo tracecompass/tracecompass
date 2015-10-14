@@ -91,11 +91,6 @@ public class TmfMouseDragProvider extends TmfBaseProvider implements MouseListen
     @Override
     public void mouseUp(MouseEvent e) {
         if ((fIsUpdate) && (fStartTime != fEndTime)) {
-            // Adjust range to the full range here so that it shows
-            // the original range (important for time alignment)
-            IAxis xAxis = getChart().getAxisSet().getXAxis(0);
-            xAxis.adjustRange();
-
             ITmfChartTimeProvider viewer = getChartViewer();
             viewer.updateWindow(fStartTime, fEndTime);
         }

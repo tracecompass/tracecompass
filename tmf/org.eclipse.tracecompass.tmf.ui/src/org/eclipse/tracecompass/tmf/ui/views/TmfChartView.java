@@ -208,8 +208,6 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
         if (pointAreaWidth <= 0) {
             pointAreaWidth = fSashForm.getBounds().width - curTimeAxisOffset;
         }
-
-        // TODO this is just an approximation that assumes that the end will be at the same position but that can change for a different data range/scaling
         int endOffset = curTimeAxisOffset + pointAreaWidth;
         GridLayout layout = (GridLayout) fXYViewerContainer.getLayout();
         int endOffsetWithoutMargin = endOffset + layout.marginRight;

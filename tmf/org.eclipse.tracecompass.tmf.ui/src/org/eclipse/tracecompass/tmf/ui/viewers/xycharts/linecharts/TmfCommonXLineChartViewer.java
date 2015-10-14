@@ -363,7 +363,6 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
                     int lastX = xValues.length - 1;
                     double end = (start == xValues[lastX]) ? start + 1 : xValues[lastX];
                     getSwtChart().getAxisSet().getXAxis(0).setRange(new Range(start, end));
-                    getSwtChart().getAxisSet().getXAxis(0).adjustRange();
                     if (maxy > miny) {
                         getSwtChart().getAxisSet().getYAxis(0).setRange(new Range(miny, maxy));
                     }

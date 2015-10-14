@@ -393,20 +393,9 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
 
         int pixelCoordinate = 0;
         IAxis[] xAxes = getSwtChart().getAxisSet().getXAxes();
-        ISeries[] series = fSwtChart.getSeriesSet().getSeries();
-        if ((xAxes.length > 0) && (series.length > 0) &&
-                (series[0].getXSeries() != null) && (series[0].getXSeries().length > 0)) {
+        if (xAxes.length > 0) {
             IAxis axis = xAxes[0];
-            // All series have the same X series
-            double[] xSeries = series[0].getXSeries();
-            double minX = Double.MAX_VALUE;
-            for (double x : xSeries) {
-                if (minX > x) {
-                    minX = x;
-                }
-            }
-
-            pixelCoordinate = axis.getPixelCoordinate(minX);
+            pixelCoordinate = axis.getPixelCoordinate(axis.getRange().lower);
         }
         return getSwtChart().toControl(getSwtChart().getPlotArea().toDisplay(pixelCoordinate, 0)).x;
     }
@@ -424,21 +413,10 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
      */
     public int getPointAreaWidth() {
         IAxis[] xAxes = getSwtChart().getAxisSet().getXAxes();
-        ISeries[] series = fSwtChart.getSeriesSet().getSeries();
-        if ((xAxes.length > 0) && (series.length > 0) &&
-                (series[0].getXSeries() != null) && (series[0].getXSeries().length > 0)) {
+        if (xAxes.length > 0) {
             IAxis axis = xAxes[0];
-            // All series have the same X series
-            double[] xSeries = series[0].getXSeries();
-            double maxX = Double.MIN_VALUE;
-            for (double x : xSeries) {
-                if (maxX < x) {
-                    maxX = x;
-                }
-            }
-
             int x1 = getPointAreaOffset();
-            int x2 = axis.getPixelCoordinate(maxX);
+            int x2 = axis.getPixelCoordinate(axis.getRange().upper);
             x2 = getSwtChart().toControl(getSwtChart().getPlotArea().toDisplay(x2, 0)).x;
             int width = x2 - x1;
             return width;

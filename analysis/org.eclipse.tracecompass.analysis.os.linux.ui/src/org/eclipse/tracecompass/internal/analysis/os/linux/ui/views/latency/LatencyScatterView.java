@@ -8,20 +8,21 @@
  ********************************************************************************/
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency;
+
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.tmf.ui.views.TmfView;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
+import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 
 /**
  * Some stuff
  *
  * @author Matthew Khouzam
  */
-public class LatencyScatterView extends TmfView {
+public class LatencyScatterView extends TmfChartView {
     // Attributes
     // ------------------------------------------------------------------------
 
@@ -46,28 +47,10 @@ public class LatencyScatterView extends TmfView {
     // ------------------------------------------------------------------------
 
     @Override
-    public void createPartControl(@Nullable Composite parent) {
-        SashForm sf = new SashForm(parent, SWT.NONE);
-        fScatterViewer = new LatencyScatterGraphViewer(sf, nullToEmptyString(Messages.LatencyScatterView_title), nullToEmptyString(Messages.LatencyScatterView_xAxis), nullToEmptyString(Messages.LatencyScatterView_yAxis));
-    }
-
-    // ------------------------------------------------------------------------
-    // Operations
-    // ------------------------------------------------------------------------
-
-    @Override
-    public void setFocus() {
-        if (fScatterViewer != null) {
-            fScatterViewer.getControl().setFocus();
-        }
-    }
-
-    @Override
-    public void dispose() {
-        super.dispose();
-        if (fScatterViewer != null) {
-            fScatterViewer.dispose();
-        }
+    protected TmfXYChartViewer createChartViewer(@Nullable Composite parent) {
+        fScatterViewer = new LatencyScatterGraphViewer(NonNullUtils.checkNotNull(parent), nullToEmptyString(Messages.LatencyScatterView_title), nullToEmptyString(Messages.LatencyScatterView_xAxis),
+                nullToEmptyString(Messages.LatencyScatterView_yAxis));
+        return fScatterViewer;
     }
 
 }
