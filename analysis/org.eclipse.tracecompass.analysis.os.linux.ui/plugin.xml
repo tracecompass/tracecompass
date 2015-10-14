@@ -25,6 +25,7 @@
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
             class="org.eclipse.tracecompass.analysis.os.linux.ui.views.cpuusage.CpuUsageView"
+            icon="icons/eview16/cpu-usage.png"
             id="org.eclipse.tracecompass.analysis.os.linux.views.cpuusage"
             name="%cpuusage.view.name"
             restorable="true">
