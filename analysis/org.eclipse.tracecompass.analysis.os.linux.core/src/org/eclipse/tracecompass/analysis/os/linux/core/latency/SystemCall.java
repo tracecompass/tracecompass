@@ -71,7 +71,6 @@ public class SystemCall implements ISegment {
     private final InitialInfo fInfo;
     private final long fEndTime;
     private final int fRet;
-    private final transient long fDuration;
 
     /**
      * @param info
@@ -88,7 +87,6 @@ public class SystemCall implements ISegment {
         fInfo = info;
         fEndTime = endTime;
         fRet = ret;
-        fDuration = fEndTime - fInfo.fStartTime;
     }
 
     @Override
@@ -103,7 +101,7 @@ public class SystemCall implements ISegment {
 
     @Override
     public long getLength() {
-        return fDuration;
+        return fEndTime - fInfo.fStartTime;
     }
 
     /**
@@ -132,7 +130,6 @@ public class SystemCall implements ISegment {
     public int getReturnValue() {
         return fRet;
     }
-
 
     @Override
     public int compareTo(@Nullable ISegment o) {

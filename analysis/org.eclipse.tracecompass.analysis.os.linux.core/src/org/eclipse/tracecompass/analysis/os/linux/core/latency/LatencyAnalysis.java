@@ -87,9 +87,18 @@ public class LatencyAnalysis extends TmfAbstractAnalysisModule {
         if (Files.exists(file)) {
             /* Attempt to read the existing file */
             try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(file))) {
-                @SuppressWarnings("unchecked")
-                ISegmentStore<ISegment> syscalls = (ISegmentStore<ISegment>) ois.readObject();
-                fSystemCalls = syscalls;
+                Object[] syscallsArray = (Object[]) ois.readObject();
+                final ISegmentStore<ISegment> systemCalls = new TreeMapStore<>();
+                for (Object element : syscallsArray) {
+                    if (element instanceof ISegment) {
+                        ISegment segment = (ISegment) element;
+                        systemCalls.add(segment);
+                    }
+                }
+                fSystemCalls = systemCalls;
+                for (LatencyAnalysisListener listener : fListeners) {
+                    listener.onComplete(this, systemCalls);
+                }
                 return true;
             } catch (IOException | ClassNotFoundException | ClassCastException e) {
                 /*
@@ -131,7 +140,7 @@ public class LatencyAnalysis extends TmfAbstractAnalysisModule {
 
         /* Serialize the collections to disk for future usage */
         try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(file))) {
-            oos.writeObject(syscalls);
+            oos.writeObject(syscalls.toArray());
         } catch (IOException e) {
             /* Didn't work, oh well. We will just re-read the trace next time */
         }
