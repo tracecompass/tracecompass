@@ -187,7 +187,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
                             return NonNullUtils.nullToEmptyString(aspect.resolve(input));
                         }
                     },
-                    null);
+                    aspect.getComparator());
                 }
             }
             fColumnsCreated = true;

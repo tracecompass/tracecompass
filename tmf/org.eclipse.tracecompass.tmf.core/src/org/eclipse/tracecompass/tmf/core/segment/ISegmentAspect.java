@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.tmf.core.segment;
 
+import java.util.Comparator;
+
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 
@@ -49,6 +51,12 @@ public interface ISegmentAspect {
     String getHelpText();
 
     /**
+     * Gets the comparator to be used when comparing to segments.
+     * @return the comparator to be used when comparing to segments
+     */
+    @Nullable Comparator<?> getComparator();
+
+    /**
      * The "functor" representing this aspect. Basically, what to do for an
      * segment that is passed in parameter.
      *
@@ -60,4 +68,5 @@ public interface ISegmentAspect {
      * @return The resulting information for this segment.
      */
     @Nullable Object resolve(ISegment segment);
+
 }

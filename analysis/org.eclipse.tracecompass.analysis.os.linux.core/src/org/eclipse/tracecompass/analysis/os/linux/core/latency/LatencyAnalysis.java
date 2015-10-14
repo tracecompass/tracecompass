@@ -14,6 +14,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -160,6 +161,10 @@ public class LatencyAnalysis extends AbstractSegmentStoreAnalysisModule {
         @Override
         public String getName() {
             return checkNotNull(Messages.SegmentAspectName_SystemCall);
+        }
+        @Override
+        public @Nullable Comparator<?> getComparator() {
+            return null;
         }
         @Override
         public @Nullable String resolve(ISegment segment) {
