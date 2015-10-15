@@ -5,9 +5,6 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *    Alexandre Montplaisir - Initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelanalysis;
@@ -23,11 +20,12 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelanalysis;
 @SuppressWarnings("javadoc")
 public interface LinuxValues {
 
-    /*
+    /**
      * Process states found in scheduler events.
      *
      * From include/linux/sched.h
      *
+     * <pre>
      * #define TASK_RUNNING 0
      * #define TASK_INTERRUPTIBLE 1
      * #define TASK_UNINTERRUPTIBLE 2
@@ -41,6 +39,7 @@ public interface LinuxValues {
      * #define TASK_WAKING 256
      * #define TASK_PARKED 512
      * #define TASK_STATE_MAX 1024
+     * </pre>
      */
     /**
      * The task is running normally, can be interrupted, in a syscall or user
@@ -63,7 +62,7 @@ public interface LinuxValues {
      */
     int TASK_STATE_MAX = 1024;
 
-    /*
+    /**
      * Process statuses, used in LTTng statedump events.
      *
      * This is LTTng-specific, but the statedump are handled at this level, so
@@ -71,6 +70,7 @@ public interface LinuxValues {
      *
      * Taken from lttng-module's lttng-statedump-impl.c:
      *
+     * <pre>
      * enum lttng_process_status {
      *     LTTNG_UNNAMED = 0,
      *     LTTNG_WAIT_FORK = 1,
@@ -81,7 +81,12 @@ public interface LinuxValues {
      *     LTTNG_RUN = 6,
      *     LTTNG_DEAD = 7,
      * };
+     * </pre>
      */
+
+    /** Task is initially preempted */
     int STATEDUMP_PROCESS_STATUS_WAIT_CPU = 2;
+
+    /** Task is initially blocked */
     int STATEDUMP_PROCESS_STATUS_WAIT = 5;
 }
