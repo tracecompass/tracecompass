@@ -89,4 +89,57 @@ public interface LinuxValues {
 
     /** Task is initially blocked */
     int STATEDUMP_PROCESS_STATUS_WAIT = 5;
+
+    /**
+     * SoftIRQ definitions
+     *
+     * From linux/interrupt.h
+     * <pre>
+     * enum
+     * {
+     *     HI_SOFTIRQ=0,
+     *     TIMER_SOFTIRQ,
+     *     NET_TX_SOFTIRQ,
+     *     NET_RX_SOFTIRQ,
+     *     BLOCK_SOFTIRQ,
+     *     BLOCK_IOPOLL_SOFTIRQ,
+     *     TASKLET_SOFTIRQ,
+     *     SCHED_SOFTIRQ,
+     *     HRTIMER_SOFTIRQ,
+     *     RCU_SOFTIRQ,
+     *     NR_SOFTIRQS // not used as this is the NUMBER of softirqs
+     * };
+     * </pre>
+     */
+
+    /** High-priority tasklet */
+    int SOFTIRQ_HI = 0;
+
+    /** Interrupted because of timer */
+    int SOFTIRQ_TIMER = 1;
+
+    /** Interrupted because of network transmission */
+    int SOFTIRQ_NET_TX = 2;
+
+    /** Interrupted because of network reception */
+    int SOFTIRQ_NET_RX = 3;
+
+    /** Interrupted because of block operation */
+    int SOFTIRQ_BLOCK = 4;
+
+    /** Interrupted because of block IO */
+    int SOFTIRQ_BLOCK_IOPOLL = 5;
+
+    /** Tasklet (differed device interrupt) */
+    int SOFTIRQ_TASKLET = 6;
+
+    /** Interrupted because of the scheduler */
+    int SOFTIRQ_SCHED = 7;
+
+    /** Interrupted because of HR timer */
+    int SOFTIRQ_HRTIMER = 8;
+
+    /** Interrupted because of RCU */
+    int SOFTIRQ_RCU = 9;
+
 }
