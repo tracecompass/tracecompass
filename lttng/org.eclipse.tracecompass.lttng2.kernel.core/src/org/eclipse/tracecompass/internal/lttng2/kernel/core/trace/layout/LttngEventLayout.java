@@ -40,15 +40,21 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     private static final String SOFTIRQ_ENTRY = "softirq_entry";
     private static final String SOFTIRQ_EXIT = "softirq_exit";
     private static final String SOFTIRQ_RAISE = "softirq_raise";
+    private static final String HRTIMER_EXPIRE_ENTRY = "hrtimer_expire_entry";
+    private static final String HRTIMER_EXPIRE_EXIT = "hrtimer_expire_exit";
     private static final String SCHED_SWITCH = "sched_switch";
     private static final String SCHED_PI_SETPRIO = "sched_pi_setprio";
 
+    private static final String SCHED_TTWU = "sched_ttwu";
+    private static final String SCHED_WAKEUP = "sched_wakeup";
+    private static final String SCHED_WAKEUP_NEW = "sched_wakeup_new";
     private static final Collection<String> SCHED_WAKEUP_EVENTS =
-            checkNotNull(ImmutableList.of("sched_wakeup", "sched_wakeup_new"));
+            checkNotNull(ImmutableList.of(SCHED_WAKEUP, SCHED_WAKEUP_NEW));
 
     private static final String SCHED_PROCESS_FORK = "sched_process_fork";
     private static final String SCHED_PROCESS_EXIT = "sched_process_exit";
     private static final String SCHED_PROCESS_FREE = "sched_process_free";
+    private static final String SCHED_PROCESS_EXEC = "sched_process_exec";
     private static final String STATEDUMP_PROCESS_STATE = "lttng_statedump_process_state";
 
     private static final String SYSCALL_ENTRY_PREFIX = "sys_";
@@ -69,6 +75,11 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     private static final String PRIO = "prio";
     private static final String NEXT_PRIO = "next_prio";
     private static final String NEW_PRIO = "newprio";
+    private static final String COMM = "comm";
+    private static final String NAME = "name";
+    private static final String STATUS = "status";
+    private static final String PREV_COMM = "prev_comm";
+    private static final String FILENAME = "filename";
 
     /** All instances are the same. Only provide a static instance getter */
     protected LttngEventLayout() {
@@ -236,4 +247,63 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
         return NEXT_PRIO;
     }
 
+    @Override
+    public String fieldComm() {
+        return COMM;
+    }
+
+    @Override
+    public String fieldName() {
+        return NAME;
+    }
+
+    @Override
+    public String fieldStatus() {
+        return STATUS;
+    }
+
+    @Override
+    public String fieldPrevComm() {
+        return PREV_COMM;
+    }
+
+    @Override
+    public String fieldFilename() {
+        return FILENAME;
+    }
+
+    @Override
+    public String eventSchedProcessExec() {
+        return SCHED_PROCESS_EXEC;
+    }
+
+    @Override
+    public String eventSchedProcessWakeup() {
+        return SCHED_WAKEUP;
+    }
+
+    @Override
+    public String eventSchedProcessWakeupNew() {
+        return SCHED_WAKEUP_NEW;
+    }
+
+    @Override
+    public String eventHRTimerExpireEntry() {
+        return HRTIMER_EXPIRE_ENTRY;
+    }
+
+    @Override
+    public String eventHRTimerExpireExit() {
+        return HRTIMER_EXPIRE_EXIT;
+    }
+
+    /**
+     * Event indicating the source of the wakeup signal.
+     *
+     * @return The name of the event
+     * @since 2.0
+     */
+    public String eventSchedProcessTTWU() {
+        return SCHED_TTWU;
+    }
 }

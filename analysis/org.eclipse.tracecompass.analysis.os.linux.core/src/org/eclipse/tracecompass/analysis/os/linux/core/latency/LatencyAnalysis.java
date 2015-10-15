@@ -43,7 +43,7 @@ import com.google.common.collect.FluentIterable;
 
 /**
  * @author Alexandre Montplaisir
- * @since 1.1
+ * @since 2.0
  */
 public class LatencyAnalysis extends TmfAbstractAnalysisModule {
 

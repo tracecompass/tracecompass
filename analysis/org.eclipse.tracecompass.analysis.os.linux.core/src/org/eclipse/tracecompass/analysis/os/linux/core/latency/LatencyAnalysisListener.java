@@ -16,7 +16,7 @@ import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
  * End of latency analysis listener for latency viewers
  *
  * @author France Lapointe Nguyen
- * @since 1.1
+ * @since 2.0
  */
 public interface LatencyAnalysisListener {
 

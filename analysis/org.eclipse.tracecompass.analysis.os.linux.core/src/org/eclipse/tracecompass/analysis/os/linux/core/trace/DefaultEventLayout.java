@@ -38,15 +38,21 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout{
     private static final String SOFTIRQ_ENTRY = "softirq_entry"; //$NON-NLS-1$
     private static final String SOFTIRQ_EXIT = "softirq_exit"; //$NON-NLS-1$
     private static final String SOFTIRQ_RAISE = "softirq_raise"; //$NON-NLS-1$
+    private static final String HRTIMER_EXPIRE_ENTRY = "hrtimer_expire_entry"; //$NON-NLS-1$
+    private static final String HRTIMER_EXPIRE_EXIT = "hrtimer_expire_exit"; //$NON-NLS-1$
     private static final String SCHED_SWITCH = "sched_switch"; //$NON-NLS-1$
     private static final String SCHED_PI_SETPRIO = "sched_pi_setprio"; //$NON-NLS-1$
 
+    private static final String SCHED_TTWU = "sched_ttwu"; //$NON-NLS-1$
+    private static final String SCHED_WAKEUP = "sched_wakeup"; //$NON-NLS-1$
+    private static final String SCHED_WAKEUP_NEW = "sched_wakeup_new"; //$NON-NLS-1$
     private static final Collection<String> SCHED_WAKEUP_EVENTS =
-            checkNotNull(ImmutableList.of("sched_wakeup", "sched_wakeup_new")); //$NON-NLS-1$ //$NON-NLS-2$
+            checkNotNull(ImmutableList.of(SCHED_WAKEUP, SCHED_WAKEUP_NEW)); //$NON-NLS-1$ //$NON-NLS-2$
 
     private static final String SCHED_PROCESS_FORK = "sched_process_fork"; //$NON-NLS-1$
     private static final String SCHED_PROCESS_EXIT = "sched_process_exit"; //$NON-NLS-1$
     private static final String SCHED_PROCESS_FREE = "sched_process_free"; //$NON-NLS-1$
+    private static final String SCHED_PROCESS_EXEC = "sched_process_exec"; //$NON-NLS-1$
     private static final String STATEDUMP_PROCESS_STATE = "lttng_statedump_process_state"; //$NON-NLS-1$
 
     private static final String SYSCALL_ENTRY_PREFIX = "sys_"; //$NON-NLS-1$
@@ -67,6 +73,11 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout{
     private static final String PRIO = "prio"; //$NON-NLS-1$
     private static final String NEW_PRIO = "newprio"; //$NON-NLS-1$
     private static final String NEXT_PRIO = "next_prio"; //$NON-NLS-1$
+    private static final String COMM = "comm"; //$NON-NLS-1$
+    private static final String NAME = "name"; //$NON-NLS-1$
+    private static final String STATUS = "status"; //$NON-NLS-1$
+    private static final String PREV_COMM = "prev_comm"; //$NON-NLS-1$
+    private static final String FILENAME = "filename"; //$NON-NLS-1$
 
     /** All instances are the same. Only provide a static instance getter */
     private DefaultEventLayout() {
@@ -216,28 +227,92 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout{
         return CHILD_TID;
     }
 
-    /**
-     * @since 1.0
-     */
+    /** @since 1.0 */
     @Override
     public String fieldPrio() {
         return PRIO;
     }
 
-    /**
-     * @since 1.0
-     */
+    /** @since 1.0 */
     @Override
     public String fieldNewPrio() {
         return NEW_PRIO;
     }
 
-    /**
-     * @since 1.0
-     */
+    /** @since 1.0 */
     @Override
     public String fieldNextPrio() {
         return NEXT_PRIO;
+    }
+
+    /** @since 2.0 */
+    @Override
+    public String fieldComm() {
+        return COMM;
+    }
+
+    /** @since 2.0 */
+    @Override
+    public String fieldName() {
+        return NAME;
+    }
+
+    /** @since 2.0 */
+    @Override
+    public String fieldStatus() {
+        return STATUS;
+    }
+
+    /** @since 2.0 */
+    @Override
+    public String fieldPrevComm() {
+        return PREV_COMM;
+    }
+
+    /** @since 2.0 */
+    @Override
+    public String fieldFilename() {
+        return FILENAME;
+    }
+
+    /** @since 2.0 */
+    @Override
+    public String eventSchedProcessExec() {
+        return SCHED_PROCESS_EXEC;
+    }
+
+    /** @since 2.0 */
+    @Override
+    public String eventSchedProcessWakeup() {
+        return SCHED_WAKEUP;
+    }
+
+    /** @since 2.0 */
+    @Override
+    public String eventSchedProcessWakeupNew() {
+        return SCHED_WAKEUP_NEW;
+    }
+
+    /** @since 2.0 */
+    @Override
+    public String eventHRTimerExpireEntry() {
+        return HRTIMER_EXPIRE_ENTRY;
+    }
+
+    /** @since 2.0 */
+    @Override
+    public String eventHRTimerExpireExit() {
+        return HRTIMER_EXPIRE_EXIT;
+    }
+
+    /**
+     * Event indicating the source of the wakeup signal.
+     *
+     * @return The name of the event
+     * @since 2.0
+     */
+    public String eventSchedProcessTTWU() {
+        return SCHED_TTWU;
     }
 
 }

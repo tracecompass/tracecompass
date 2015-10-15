@@ -124,6 +124,31 @@ public class PerfEventLayout implements IKernelAnalysisEventLayout {
         return "raw_syscalls:sys_exit"; //$NON-NLS-1$
     }
 
+    @Override
+    public String eventSchedProcessExec() {
+        return "sched:sched_process_exec"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String eventSchedProcessWakeup() {
+        return "sched:sched_process_wakeup"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String eventSchedProcessWakeupNew() {
+        return "sched:process_wakeup_new";  //$NON-NLS-1$
+    }
+
+    @Override
+    public String eventHRTimerExpireEntry() {
+        return "timer:hrtimer_expire_entry"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String eventHRTimerExpireExit() {
+        return "timer:hrtimer_expire_exit"; //$NON-NLS-1$
+    }
+
     // ------------------------------------------------------------------------
     // Field names
     // ------------------------------------------------------------------------
@@ -191,6 +216,31 @@ public class PerfEventLayout implements IKernelAnalysisEventLayout {
     @Override
     public String fieldNextPrio() {
         return "next_prio"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String fieldComm() {
+        return "comm"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String fieldName() {
+        return "name"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String fieldStatus() {
+        return "status"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String fieldPrevComm() {
+        return "prev_comm"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String fieldFilename() {
+        return "filename"; //$NON-NLS-1$
     }
 
 }

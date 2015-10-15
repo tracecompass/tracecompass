@@ -65,6 +65,20 @@ public interface IKernelAnalysisEventLayout {
     String eventCompatSyscallEntryPrefix();
     String eventSyscallExitPrefix();
 
+    /** @since 2.0 */
+    String eventSchedProcessExec();
+
+    /** @since 2.0 */
+    String eventSchedProcessWakeup();
+
+    /** @since 2.0 */
+    String eventSchedProcessWakeupNew();
+
+    /** @since 2.0 */
+    String eventHRTimerExpireEntry();
+
+    /** @since 2.0 */
+    String eventHRTimerExpireExit();
     // ------------------------------------------------------------------------
     // Event field names
     // ------------------------------------------------------------------------
@@ -79,6 +93,21 @@ public interface IKernelAnalysisEventLayout {
     String fieldChildComm();
     String fieldParentTid();
     String fieldChildTid();
+
+    /** @since 2.0 */
+    String fieldComm();
+
+    /** @since 2.0 */
+    String fieldName();
+
+    /** @since 2.0 */
+    String fieldStatus();
+
+    /** @since 2.0 */
+    String fieldPrevComm();
+
+    /** @since 2.0 */
+    String fieldFilename();
 
     /** @since 1.0 */
     String fieldPrio();

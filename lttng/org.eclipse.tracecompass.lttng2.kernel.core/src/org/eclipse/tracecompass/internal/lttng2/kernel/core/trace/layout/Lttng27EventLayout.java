@@ -60,7 +60,4 @@ public class Lttng27EventLayout extends Lttng26EventLayout {
         return "ns_level"; //$NON-NLS-1$
     }
 
-    public String fieldStatus() {
-        return "status"; //$NON-NLS-1$
-    }
 }
