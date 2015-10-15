@@ -72,6 +72,11 @@ public class Messages extends NLS {
      */
     public static String LatencyView_goToEndEvent;
 
+    /**
+     * Name of show statistics action
+     */
+    public static String LatencyTable_ShowStatisticsActionName;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
