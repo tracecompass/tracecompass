@@ -202,7 +202,6 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
                 TmfTraceColumnManager.saveColumnOrder(fTrace.getTraceTypeId(), fEventsTable.getColumnOrder());
             }
             fEventsTable.dispose();
-            fTraceSelected = false;
             fFile = ((TmfEditorInput) getEditorInput()).getFile();
             fTrace = ((TmfEditorInput) getEditorInput()).getTrace();
             /* change the input to a FileEditorInput to allow open handlers to find this editor */
@@ -251,6 +250,9 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             context.dispose();
 
             broadcast(new TmfTraceOpenedSignal(this, fTrace, fFile));
+            if (fTraceSelected) {
+                broadcast(new TmfTraceSelectedSignal(this, fTrace));
+            }
         } else {
             fEventsTable = new TmfEventsTable(fParent, 0);
             fEventsTable.addSelectionChangedListener(this);
@@ -527,22 +529,22 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
 
     @Override
     public void partActivated(IWorkbenchPart part) {
-        if (part == this && fTrace != null) {
-            if (fTraceSelected) {
+        if (part == this && !fTraceSelected) {
+            fTraceSelected = true;
+            if (fTrace == null) {
                 return;
             }
-            fTraceSelected = true;
             broadcast(new TmfTraceSelectedSignal(this, fTrace));
         }
     }
 
     @Override
     public void partBroughtToTop(IWorkbenchPart part) {
-        if (part == this && fTrace != null) {
-            if (fTraceSelected) {
+        if (part == this && !fTraceSelected) {
+            fTraceSelected = true;
+            if (fTrace == null) {
                 return;
             }
-            fTraceSelected = true;
             broadcast(new TmfTraceSelectedSignal(this, fTrace));
         }
     }
