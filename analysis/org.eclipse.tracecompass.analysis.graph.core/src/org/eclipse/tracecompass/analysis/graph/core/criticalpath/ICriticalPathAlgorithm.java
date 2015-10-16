@@ -32,7 +32,7 @@ public interface ICriticalPathAlgorithm {
     public TmfGraph compute(TmfVertex start, @Nullable TmfVertex end);
 
     /**
-     * Unique ID of this analysis
+     * Unique ID of this algorithm
      *
      * @return the ID string
      */
