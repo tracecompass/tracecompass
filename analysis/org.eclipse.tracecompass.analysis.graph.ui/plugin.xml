@@ -7,6 +7,7 @@
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
             class="org.eclipse.tracecompass.internal.analysis.graph.ui.criticalpath.view.CriticalPathView"
+            icon="icons/eview16/critical-path.png"
             id="org.eclipse.linuxtools.tmf.analysis.graph.ui.criticalpath.view.criticalpathview"
             name="%view.criticalpath"
             restorable="true">
