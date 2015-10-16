@@ -9,26 +9,35 @@
 
 package org.eclipse.tracecompass.internal.analysis.graph.core.criticalpath;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.graph.core.criticalpath.ICriticalPathAlgorithm;
 
 /**
- * Register algorithm
+ * A manager to provide a selection of critical path algorithms
  *
- * FIXME: is there already a facility in Eclipse to replace this class?
+ * TODO: Investigate if there is already a facility in Eclipse to replace this
+ * class?
+ *
  * @author Francis Giraldeau
  *
  */
 public final class AlgorithmManager {
 
-    private static @Nullable AlgorithmManager INSTANCE;
-    private final Map<String, Class<? extends ICriticalPathAlgorithm>> map;
+    private static final AlgorithmManager INSTANCE = new AlgorithmManager();
+    private final Map<String, Class<? extends ICriticalPathAlgorithm>> fMap;
+    private final Map<String, Class<? extends ICriticalPathAlgorithm>> fPublicMap;
+
+
+    static {
+        INSTANCE.register(CriticalPathAlgorithmBounded.class);
+    }
 
     private AlgorithmManager() {
-        map = new HashMap<>();
+        fMap = new HashMap<>();
+        fPublicMap = Collections.unmodifiableMap(fMap);
     }
 
     /**
@@ -37,30 +46,26 @@ public final class AlgorithmManager {
      * @return the instance
      */
     public static AlgorithmManager getInstance() {
-        AlgorithmManager manager = INSTANCE;
-        if (manager == null) {
-            manager = new AlgorithmManager();
-            manager.register(CriticalPathAlgorithmBounded.class);
-            INSTANCE = manager;
-        }
-        return manager;
+        return INSTANCE;
     }
 
     /**
-     * Register a type in the manager
+     * Register an algorithm in the manager
      *
-     * @param type the class to register
+     * @param type
+     *            the class of the algorithm to register
      */
     public void register(Class<? extends ICriticalPathAlgorithm> type) {
-        map.put(type.getSimpleName(), type);
+        fMap.put(type.getSimpleName(), type);
     }
 
     /**
-     * Return registered types
-     * @return the types
+     * Return registered algorithms
+     *
+     * @return an unmodifiable map of the algorithms.
      */
     public Map<String, Class<? extends ICriticalPathAlgorithm>> registeredTypes() {
-        return map;
+        return fPublicMap;
     }
 
 }
