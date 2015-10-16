@@ -241,6 +241,7 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
      */
     public AbstractSegmentStoreScatterGraphViewer(Composite parent, String title, String xLabel, String yLabel) {
         super(parent, title, xLabel, yLabel);
+        setTooltipProvider(new SegmentStoreScatterGraphTooltipProvider(this));
         fListener = new AnalysisProgressListener();
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
         initializeModule(trace);
