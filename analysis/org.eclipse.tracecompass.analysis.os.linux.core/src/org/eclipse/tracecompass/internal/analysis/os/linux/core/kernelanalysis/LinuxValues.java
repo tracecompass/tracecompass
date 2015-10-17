@@ -17,7 +17,6 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelanalysis;
  *
  * @author Alexandre Montplaisir
  */
-@SuppressWarnings("javadoc")
 public interface LinuxValues {
 
     /**
@@ -47,14 +46,58 @@ public interface LinuxValues {
      */
     int TASK_STATE_RUNNING = 0;
 
+    /**
+     * The process is in an interruptible sleep, (waiting for an event to
+     * complete)
+     */
     int TASK_INTERRUPTIBLE = 1;
 
+    /**
+     * The process is in an uninteruptible sleep, (usually waiting on IO)
+     */
     int TASK_UNINTERRUPTIBLE = 2;
+
+    /**
+     * The process is stopped, it is waiting for a SIGCONT
+     */
+    int TASK_STOPPED__ = 4;
+
+    /**
+     * The process is being monitored by other processes like a debugger
+     */
+    int TASK_TRACED__ = 8;
+
+    /**
+     * The task is terminated. It is lingering waiting for a parent to reap it.
+     */
+    int EXIT_ZOMBIE = 16;
+
+    /**
+     * The final state, the process reaches this state when being reaped. This
+     * state should not be seen.
+     */
+    int EXIT_DEAD = 32;
 
     /**
      * The task is dead, that means the PID can be re-used.
      */
     int TASK_DEAD = 64;
+
+    /**
+     * The task will wake up only on kill signals
+     */
+    int TASK_WAKEKILL = 128;
+
+    /**
+     * A task is being woken up, should not appear in sched switch, but if we
+     * poll.
+     */
+    int TASK_WAKING = 256;
+
+    /**
+     * A very deep sleep that can only be woken by an unpark wakeup
+     */
+    int TASK_PARK = 512;
 
     /**
      * This is the maximum value + 1 that the task state can be. TASK_STATE_MAX
@@ -94,6 +137,7 @@ public interface LinuxValues {
      * SoftIRQ definitions
      *
      * From linux/interrupt.h
+     *
      * <pre>
      * enum
      * {
@@ -141,5 +185,4 @@ public interface LinuxValues {
 
     /** Interrupted because of RCU */
     int SOFTIRQ_RCU = 9;
-
 }
