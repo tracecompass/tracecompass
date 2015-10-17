@@ -47,7 +47,7 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout{
     private static final String SCHED_WAKEUP = "sched_wakeup"; //$NON-NLS-1$
     private static final String SCHED_WAKEUP_NEW = "sched_wakeup_new"; //$NON-NLS-1$
     private static final Collection<String> SCHED_WAKEUP_EVENTS =
-            checkNotNull(ImmutableList.of(SCHED_WAKEUP, SCHED_WAKEUP_NEW)); //$NON-NLS-1$ //$NON-NLS-2$
+            checkNotNull(ImmutableList.of(SCHED_WAKEUP, SCHED_WAKEUP_NEW));
 
     private static final String SCHED_PROCESS_FORK = "sched_process_fork"; //$NON-NLS-1$
     private static final String SCHED_PROCESS_EXIT = "sched_process_exit"; //$NON-NLS-1$
