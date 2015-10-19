@@ -39,21 +39,6 @@ public class Messages extends NLS {
     public static String SegmentStoreTableViewer_startTime;
 
     /**
-     * Title of the scatter graph
-     */
-    public static String LatencyView_title;
-
-    /**
-     * Title of the x axis of the scatter graph
-     */
-    public static String LatencyView_xAxis;
-
-    /**
-     * Title of the y axis of the scatter graph
-     */
-    public static String LatencyView_yAxis;
-
-    /**
      * Title of action to goto start time time
      */
     public static String SegmentStoreTableViewer_goToStartEvent;
@@ -62,6 +47,30 @@ public class Messages extends NLS {
      * Title of action to goto end event
      */
     public static String SegmentStoreTableViewer_goToEndEvent;
+    /**
+     * Title of the scatter graph
+     */
+    public static String SegmentStoreScatterGraphViewer_title;
+
+    /**
+     * Title of the x axis of the scatter graph
+     */
+    public static String SegmentStoreScatterGraphViewer_xAxis;
+
+    /**
+     * Title of the y axis of the scatter graph
+     */
+    public static String SegmentStoreScatterGraphViewer_yAxis;
+
+    /**
+     * Legend
+     */
+    public static String SegmentStoreScatterGraphViewer_legend;
+
+    /**
+     * Name of the compacting job
+     */
+    public static String SegmentStoreScatterGraphViewer_compactTitle;
 
     static {
         // initialize resource bundle

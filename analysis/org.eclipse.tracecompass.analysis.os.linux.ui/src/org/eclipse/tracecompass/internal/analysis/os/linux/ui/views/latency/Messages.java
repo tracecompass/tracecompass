@@ -23,11 +23,6 @@ public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.messages"; //$NON-NLS-1$
 
     /**
-     * Legend
-     */
-    public static String LatencyScatterGraphViewer_legend;
-
-    /**
      * Time vs Duration
      */
     public static String LatencyScatterView_title;
@@ -41,11 +36,6 @@ public class Messages extends NLS {
      * Duration
      */
     public static String LatencyScatterView_yAxis;
-
-    /**
-     * Name of the compacting job
-     */
-    public static String LatencyScatterGraphViewer_compactTitle;
 
     /**
      * Name of the duration column
