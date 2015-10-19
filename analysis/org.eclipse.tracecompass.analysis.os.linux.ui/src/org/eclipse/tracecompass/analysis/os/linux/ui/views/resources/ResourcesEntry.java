@@ -14,6 +14,7 @@
 package org.eclipse.tracecompass.analysis.os.linux.ui.views.resources;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources.SoftIrqLabelProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
@@ -106,7 +107,14 @@ public class ResourcesEntry extends TimeGraphEntry implements Comparable<ITimeGr
      */
     public ResourcesEntry(int quark, @NonNull ITmfTrace trace,
             long startTime, long endTime, Type type, int id) {
-        this(quark, trace, type.toString() + " " + id, startTime, endTime, type, id); //$NON-NLS-1$
+        this(quark, trace, computeEntryName(type, id), startTime, endTime, type, id);
+    }
+
+    private static String computeEntryName(Type type, int id) {
+        if (Type.SOFT_IRQ.equals(type)) {
+            return type.toString() + ' ' + id + ' ' + SoftIrqLabelProvider.getSoftIrq(id);
+        }
+        return type.toString() + ' ' + id;
     }
 
     /**
@@ -156,7 +164,9 @@ public class ResourcesEntry extends TimeGraphEntry implements Comparable<ITimeGr
     @Override
     public int compareTo(ITimeGraphEntry other) {
         if (!(other instanceof ResourcesEntry)) {
-            /* Should not happen, but if it does, put those entries at the end */
+            /*
+             * Should not happen, but if it does, put those entries at the end
+             */
             return -1;
         }
         ResourcesEntry o = (ResourcesEntry) other;
