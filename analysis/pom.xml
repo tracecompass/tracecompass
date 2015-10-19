@@ -36,6 +36,8 @@
     <module>org.eclipse.tracecompass.analysis.os.linux.core</module>
     <module>org.eclipse.tracecompass.analysis.os.linux.core.tests</module>
     <module>org.eclipse.tracecompass.analysis.os.linux.ui</module>
+    <module>org.eclipse.tracecompass.analysis.timing.core</module>
+    <module>org.eclipse.tracecompass.analysis.timing.ui</module>
   </modules>
 
 </project>
