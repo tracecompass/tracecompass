@@ -43,9 +43,11 @@ public class AddBookmarkDialog extends MultiLineInputDialog {
      *
      * @param parentShell
      *            the parent shell
+     * @param initialValue
+     *            the initial input value, or <code>null</code> if none (equivalent to the empty string)
      */
-    public AddBookmarkDialog(Shell parentShell) {
-        super(parentShell, Messages.AddBookmarkDialog_Title, Messages.AddBookmarkDialog_Message, ""); //$NON-NLS-1$
+    public AddBookmarkDialog(Shell parentShell, String initialValue) {
+        super(parentShell, Messages.AddBookmarkDialog_Title, Messages.AddBookmarkDialog_Message, initialValue);
     }
 
     @Override

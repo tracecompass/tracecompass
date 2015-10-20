@@ -52,6 +52,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
@@ -59,6 +60,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.tmf.core.resources.ITmfMarker;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
@@ -108,15 +110,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     /** Constant indicating that all levels of the time graph should be expanded */
     protected static final int ALL_LEVELS = AbstractTreeViewer.ALL_LEVELS;
-
-    /** Color marker attribute. The format is the output of RGBA.toString(). */
-    private static final String MARKER_COLOR = "color"; //$NON-NLS-1$
-
-    /** Time marker attribute. The format is the output of Long.toString(). */
-    private static final String MARKER_TIME = "time"; //$NON-NLS-1$
-
-    /** Duration marker attribute. The format is the output of Long.toString(). */
-    private static final String MARKER_DURATION = "duration"; //$NON-NLS-1$
 
     private static final Pattern RGBA_PATTERN = Pattern.compile("RGBA \\{(\\d+), (\\d+), (\\d+), (\\d+)\\}"); //$NON-NLS-1$
 
@@ -1074,16 +1067,19 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                             IMarkerEvent bookmark = event.getBookmark();
                             IMarker marker = fEditorFile.createMarker(IMarker.BOOKMARK);
                             marker.setAttribute(IMarker.MESSAGE, bookmark.getLabel());
-                            marker.setAttribute(MARKER_TIME, Long.toString(bookmark.getTime()));
+                            marker.setAttribute(ITmfMarker.MARKER_TIME, Long.toString(bookmark.getTime()));
                             if (bookmark.getDuration() > 0) {
-                                marker.setAttribute(MARKER_DURATION, Long.toString(bookmark.getDuration()));
+                                marker.setAttribute(ITmfMarker.MARKER_DURATION, Long.toString(bookmark.getDuration()));
                                 marker.setAttribute(IMarker.LOCATION,
-                                        String.format("[%d, %d]", bookmark.getTime(), bookmark.getTime() + bookmark.getDuration())); //$NON-NLS-1$
+                                        NLS.bind(org.eclipse.tracecompass.internal.tmf.ui.Messages.TmfMarker_LocationTimeRange,
+                                                new TmfNanoTimestamp(bookmark.getTime()),
+                                                new TmfNanoTimestamp(bookmark.getTime() + bookmark.getDuration())));
                             } else {
                                 marker.setAttribute(IMarker.LOCATION,
-                                        String.format("[%d]", bookmark.getTime())); //$NON-NLS-1$
+                                        NLS.bind(org.eclipse.tracecompass.internal.tmf.ui.Messages.TmfMarker_LocationTime,
+                                                new TmfNanoTimestamp(bookmark.getTime())));
                             }
-                            marker.setAttribute(MARKER_COLOR, bookmark.getColor().getRGBA().toString());
+                            marker.setAttribute(ITmfMarker.MARKER_COLOR, bookmark.getColor().getRGBA().toString());
                         }
                     }, null);
                 } catch (CoreException e) {
@@ -1098,9 +1094,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     IMarker[] markers = fEditorFile.findMarkers(IMarker.BOOKMARK, false, IResource.DEPTH_ZERO);
                     for (IMarker marker : markers) {
                         if (bookmark.getLabel().equals(marker.getAttribute(IMarker.MESSAGE)) &&
-                                Long.toString(bookmark.getTime()).equals(marker.getAttribute(MARKER_TIME, (String) null)) &&
-                                Long.toString(bookmark.getDuration()).equals(marker.getAttribute(MARKER_DURATION, Long.toString(0))) &&
-                                bookmark.getColor().getRGBA().toString().equals(marker.getAttribute(MARKER_COLOR))) {
+                                Long.toString(bookmark.getTime()).equals(marker.getAttribute(ITmfMarker.MARKER_TIME, (String) null)) &&
+                                Long.toString(bookmark.getDuration()).equals(marker.getAttribute(ITmfMarker.MARKER_DURATION, Long.toString(0))) &&
+                                bookmark.getColor().getRGBA().toString().equals(marker.getAttribute(ITmfMarker.MARKER_COLOR))) {
                             marker.delete();
                             break;
                         }
@@ -1158,17 +1154,20 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     private List<IMarkerEvent> refreshBookmarks(final IFile editorFile) {
         List<IMarkerEvent> bookmarks = new ArrayList<>();
+        for (Color color : fColors) {
+            color.dispose();
+        }
+        fColors.clear();
+        if (editorFile == null || !editorFile.exists()) {
+            return bookmarks;
+        }
         try {
-            for (Color color : fColors) {
-                color.dispose();
-            }
-            fColors.clear();
             IMarker[] markers = editorFile.findMarkers(IMarker.BOOKMARK, false, IResource.DEPTH_ZERO);
             for (IMarker marker : markers) {
                 String label = marker.getAttribute(IMarker.MESSAGE, (String) null);
-                String time = marker.getAttribute(MARKER_TIME, (String) null);
-                String duration = marker.getAttribute(MARKER_DURATION, Long.toString(0));
-                String rgba = marker.getAttribute(MARKER_COLOR, (String) null);
+                String time = marker.getAttribute(ITmfMarker.MARKER_TIME, (String) null);
+                String duration = marker.getAttribute(ITmfMarker.MARKER_DURATION, Long.toString(0));
+                String rgba = marker.getAttribute(ITmfMarker.MARKER_COLOR, (String) null);
                 if (label != null && time != null && rgba != null) {
                     Matcher matcher = RGBA_PATTERN.matcher(rgba);
                     if (matcher.matches()) {
@@ -1243,6 +1242,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         fFiltersMap.remove(signal.getTrace());
         if (signal.getTrace() == fTrace) {
             fTrace = null;
+            fEditorFile = null;
             fStartTime = SWT.DEFAULT;
             fEndTime = SWT.DEFAULT;
             if (fZoomThread != null) {

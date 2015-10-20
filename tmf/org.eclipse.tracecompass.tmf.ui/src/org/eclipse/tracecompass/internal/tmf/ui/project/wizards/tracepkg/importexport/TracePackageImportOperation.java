@@ -317,7 +317,12 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
                                 String key = entry.getKey();
                                 String value = entry.getValue();
                                 if (key.equals(IMarker.LOCATION)) {
-                                    createMarker.setAttribute(IMarker.LOCATION, Integer.valueOf(value).intValue());
+                                    try {
+                                        /* try location as an integer for backward compatibility */
+                                        createMarker.setAttribute(IMarker.LOCATION, Integer.parseInt(value));
+                                    } catch (NumberFormatException e) {
+                                        createMarker.setAttribute(IMarker.LOCATION, value);
+                                    }
                                 } else {
                                     createMarker.setAttribute(key, value);
                                 }

@@ -2004,7 +2004,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
                     if (selectedBookmark == null) {
                         final long time = Math.min(fSelectionBegin, fSelectionEnd);
                         final long duration = Math.max(fSelectionBegin, fSelectionEnd) - time;
-                        final AddBookmarkDialog dialog = new AddBookmarkDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+                        final AddBookmarkDialog dialog = new AddBookmarkDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), null);
                         if (dialog.open() == Window.OK) {
                             final String label = dialog.getValue();
                             final RGBA rgba = dialog.getColorValue();

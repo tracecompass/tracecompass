@@ -39,8 +39,6 @@ public class Messages extends NLS {
     public static String ManageCustomParsersDialog_TextButtonLabel;
 
     public static String TmfEventsTable_AddBookmarkActionText;
-    public static String TmfEventsTable_AddBookmarkDialogMessage;
-    public static String TmfEventsTable_AddBookmarkDialogTitle;
     public static String TmfEventsTable_ApplyPresetFilterMenuName;
     public static String TmfEventsTable_ClearFiltersActionText;
     public static String TmfEventsTable_CollapseFilterMenuName;
@@ -60,7 +58,6 @@ public class Messages extends NLS {
     public static String TmfEventsTable_RemoveBookmarkActionText;
     public static String TmfEventsTable_SearchHint;
     public static String TmfEventsTable_SearchingJobName;
-
     public static String TmfEventsTable_ShowAll;
     public static String TmfEventsTable_ShowFilterBarActionText;
     public static String TmfEventsTable_ShowRawActionText;
@@ -69,6 +66,10 @@ public class Messages extends NLS {
     public static String TmfEventsTable_SourceColumnHeader;
     public static String TmfEventsTable_TimestampColumnHeader;
     public static String TmfEventsTable_TypeColumnHeader;
+
+    public static String TmfMarker_LocationRank;
+    public static String TmfMarker_LocationTime;
+    public static String TmfMarker_LocationTimeRange;
 
     public static String TmfTimeFilterDialog_EDIT_PROFILING_OPTIONS;
     public static String TmfTimeFilterDialog_TRACE_FILTER;

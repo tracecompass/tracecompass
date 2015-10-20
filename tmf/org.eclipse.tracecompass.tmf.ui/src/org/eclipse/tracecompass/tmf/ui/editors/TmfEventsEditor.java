@@ -15,7 +15,9 @@ package org.eclipse.tracecompass.tmf.ui.editors;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -239,10 +241,6 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             fEventsTable.addSelectionChangedListener(this);
             fEventsTable.setTrace(fTrace, true);
             fEventsTable.refreshBookmarks(fFile);
-            if (fPendingGotoMarker != null) {
-                fEventsTable.gotoMarker(fPendingGotoMarker);
-                fPendingGotoMarker = null;
-            }
 
             /* ensure start time is set */
             final ITmfContext context = fTrace.seekEvent(0);
@@ -252,6 +250,12 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
             broadcast(new TmfTraceOpenedSignal(this, fTrace, fFile));
             if (fTraceSelected) {
                 broadcast(new TmfTraceSelectedSignal(this, fTrace));
+            }
+
+            /* go to marker after trace opened */
+            if (fPendingGotoMarker != null) {
+                fEventsTable.gotoMarker(fPendingGotoMarker);
+                fPendingGotoMarker = null;
             }
         } else {
             fEventsTable = new TmfEventsTable(fParent, 0);
@@ -444,26 +448,38 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
 
     @Override
     public void resourceChanged(final IResourceChangeEvent event) {
+        final Set<IMarker> added = new HashSet<>();
+        final Set<IMarker> removed = new HashSet<>();
+        boolean deltaFound = false;
         for (final IMarkerDelta delta : event.findMarkerDeltas(IMarker.BOOKMARK, false)) {
             if (delta.getResource().equals(fFile)) {
                 if (delta.getKind() == IResourceDelta.REMOVED) {
-                    final IMarker bookmark = delta.getMarker();
-                    Display.getDefault().asyncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            fEventsTable.removeBookmark(bookmark);
-                        }
-                    });
-                } else if (delta.getKind() == IResourceDelta.CHANGED) {
-                    Display.getDefault().asyncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            fEventsTable.getTable().refresh();
-                        }
-                    });
+                    removed.add(delta.getMarker());
+                } else if (delta.getKind() == IResourceDelta.ADDED) {
+                    added.add(delta.getMarker());
                 }
+                /* this also covers IResourceDelta.CHANGED */
+                deltaFound = true;
             }
         }
+        if (!deltaFound) {
+            return;
+        }
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                if (removed.isEmpty() && added.isEmpty()) {
+                    fEventsTable.getTable().refresh();
+                } else {
+                    if (!removed.isEmpty()) {
+                        fEventsTable.removeBookmark(Iterables.toArray(removed, IMarker.class));
+                    }
+                    if (!added.isEmpty()) {
+                        fEventsTable.addBookmark(Iterables.toArray(added, IMarker.class));
+                    }
+                }
+            }
+        });
     }
 
     // ------------------------------------------------------------------------
