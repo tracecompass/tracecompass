@@ -193,6 +193,9 @@ public class TmfSimpleTableViewer extends TmfViewer {
 
     @Override
     public void dispose() {
+        if (fTableViewer != null) {
+            fTableViewer.getControl().dispose();
+        }
         if (fTablePopupMenuManager != null) {
             fTablePopupMenuManager.dispose();
         }
