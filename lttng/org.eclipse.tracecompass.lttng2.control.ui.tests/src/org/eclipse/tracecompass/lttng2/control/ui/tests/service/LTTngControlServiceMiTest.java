@@ -26,6 +26,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IDomainInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISessionInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.LogLevelType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceChannelOutputType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEventType;
@@ -46,6 +47,7 @@ public class LTTngControlServiceMiTest extends LTTngControlServiceTest {
     private static final String MI_TEST_STREAM = "LTTngServiceMiTest.cfg";
 
     private static final String SCEN_SESSION_WITH_SYSCALLS = "GetSessionWithSyscalls";
+    private static final String SCEN_LIST_SESSION_2_7_COMPAT = "ListSession2.7Compat";
 
     @Override
     protected ILttngControlService getControlService() {
@@ -204,6 +206,100 @@ public class LTTngControlServiceMiTest extends LTTngControlServiceTest {
             assertEquals("write", channel0Events[1].getName());
             assertEquals(TraceEventType.SYSCALL, channel0Events[1].getEventType());
             assertEquals(TraceEnablement.ENABLED, channel0Events[1].getState());
+        } catch (ExecutionException e) {
+            fail(e.toString());
+        }
+    }
+
+    /**
+     * Test List session for lttng 2.7.
+     *
+     * This is to make sure that it is possible to parse the output of a session
+     * create on a target with LTTng 2.7 installed.
+     *
+     *
+     */
+    @Test
+    public void testListSessionCompatibility_2_7() {
+
+        /*
+           Note the session was created with basic commands:
+           lttng create mysession
+           lttng enable-event  -a  -k  -s mysession
+           lttng enable-channel channel0 -u  -s mysession --buffers-pid
+           lttng enable-event  -a  -u  -s mysession -c channel0 --tracepoint
+           lttng add-context -u -t vtid -t procname
+        */
+
+        try {
+            fShell.setScenario(SCEN_LIST_SESSION_2_7_COMPAT);
+            ISessionInfo session = fService.getSession("mysession", new NullProgressMonitor());
+
+            // Verify Session
+            assertNotNull(session);
+            assertEquals("mysession", session.getName());
+            assertEquals("/home/user/lttng-traces/mysession-20151020-085614", session.getSessionPath());
+            assertEquals(TraceSessionState.INACTIVE, session.getSessionState());
+
+            IDomainInfo[] domains = session.getDomains();
+            assertNotNull(domains);
+            assertEquals(2, domains.length);
+
+            // Verify Kernel domain
+            assertEquals("Kernel", domains[0].getName());
+            IChannelInfo[] channels =  domains[0].getChannels();
+            assertNotNull(channels);
+            assertEquals(1, channels.length);
+
+            // Verify Kernel's channel0
+            assertEquals("channel0", channels[0].getName());
+            assertEquals(4, channels[0].getNumberOfSubBuffers());
+            assertEquals("splice()", channels[0].getOutputType().getInName());
+            assertEquals(TraceChannelOutputType.SPLICE, channels[0].getOutputType());
+            assertEquals(false, channels[0].isOverwriteMode());
+            assertEquals(200000, channels[0].getReadTimer());
+            assertEquals(TraceEnablement.ENABLED, channels[0].getState());
+            assertEquals(262144, channels[0].getSubBufferSize());
+            assertEquals(0, channels[0].getSwitchTimer());
+
+            // Verify event info
+            IEventInfo[] channel0Events = channels[0].getEvents();
+            assertNotNull(channel0Events);
+            assertEquals(2, channel0Events.length);
+            assertEquals("*", channel0Events[0].getName());
+            assertEquals(TraceEventType.SYSCALL, channel0Events[0].getEventType());
+            assertEquals(TraceEnablement.ENABLED, channel0Events[0].getState());
+
+            assertEquals("*", channel0Events[1].getName());
+            assertEquals(TraceLogLevel.TRACE_EMERG, channel0Events[1].getLogLevel());
+            assertEquals(LogLevelType.LOGLEVEL_ALL, channel0Events[1].getLogLevelType());
+            assertEquals(TraceEventType.TRACEPOINT, channel0Events[1].getEventType());
+            assertEquals(TraceEnablement.ENABLED, channel0Events[1].getState());
+
+            // Verify domain UST global
+            assertEquals("UST global", domains[1].getName());
+
+            IChannelInfo[] ustChannels =  domains[1].getChannels();
+
+            // Verify UST global's channel0
+            assertEquals("channel0", ustChannels[0].getName());
+            assertEquals(4, ustChannels[0].getNumberOfSubBuffers());
+            assertEquals("mmap()", ustChannels[0].getOutputType().getInName());
+            assertEquals(TraceChannelOutputType.MMAP, ustChannels[0].getOutputType());
+            assertEquals(false, ustChannels[0].isOverwriteMode());
+            assertEquals(0, ustChannels[0].getReadTimer());
+            assertEquals(TraceEnablement.ENABLED, ustChannels[0].getState());
+            assertEquals(4096, ustChannels[0].getSubBufferSize());
+            assertEquals(0, ustChannels[0].getSwitchTimer());
+
+            // Verify event info
+            IEventInfo[] ustEvents = ustChannels[0].getEvents();
+            assertEquals(1, ustEvents.length);
+
+            assertEquals("*", ustEvents[0].getName());
+            assertEquals(TraceEventType.TRACEPOINT, ustEvents[0].getEventType());
+            assertEquals(TraceEnablement.ENABLED, ustEvents[0].getState());
+
         } catch (ExecutionException e) {
             fail(e.toString());
         }
