@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	elementFormDefault="qualified" version="2.5">
+	elementFormDefault="qualified" version="2.7">
 
 	<!-- Maps to the uint32_t type -->
 	<xs:simpleType name="uint32_type">
@@ -140,6 +140,12 @@ THE SOFTWARE.
 			<xs:enumeration value="LOG4J_DEBUG" />
 			<xs:enumeration value="LOG4J_TRACE" />
 			<xs:enumeration value="LOG4J_ALL" />
+			<xs:enumeration value="PYTHON_CRITICAL" />
+			<xs:enumeration value="PYTHON_ERROR" />
+			<xs:enumeration value="PYTHON_WARNING" />
+			<xs:enumeration value="PYTHON_INFO" />
+			<xs:enumeration value="PYTHON_DEBUG" />
+			<xs:enumeration value="PYTHON_NOTSET" />
 			<xs:enumeration value="UNKNOWN" />
 		</xs:restriction>
 	</xs:simpleType>
@@ -228,6 +234,7 @@ THE SOFTWARE.
 			<xs:enumeration value="UST"/>
 			<xs:enumeration value="JUL"/>
 			<xs:enumeration value="LOG4J"/>
+			<xs:enumeration value="PYTHON"/>
 		</xs:restriction>
 	</xs:simpleType>
 
@@ -272,6 +279,53 @@ THE SOFTWARE.
 		</xs:sequence>
 	</xs:complexType>
 
+	<xs:simpleType name="pidbyint">
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="0"/>
+			<xs:maxInclusive value="4294967295" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="pidwildcard">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="*"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="pid_target_type">
+		<xs:all>
+			<xs:element name="pid">
+				<xs:simpleType>
+					<xs:union memberTypes="pidbyint pidwildcard" />
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="success" type="xs:boolean" default="false" minOccurs="0" />
+		</xs:all>
+	</xs:complexType>
+
+	<!-- Maps to a list of pid_targets-->
+	<xs:complexType name="targets_type">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="pid_target" type="pid_target_type" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- Maps to a pid_tracker-->
+	<xs:complexType name="pid_tracker_type">
+		<xs:all>
+			<xs:element name="targets" type="targets_type" />
+		</xs:all>
+	</xs:complexType>
+
+	<!-- Maps to a list of trackers-->
+	<xs:complexType name="trackers_type">
+		<xs:sequence minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="pid_tracker" type="pid_tracker_type" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
 	<!-- Maps to struct lttng_domain and contains channels -->
 	<xs:complexType name="domain_type">
 		<xs:all>
@@ -280,6 +334,7 @@ THE SOFTWARE.
 			<xs:element name="pids" type="pids_type" minOccurs="0" />
 			<xs:element name="channels" type="channels_type" minOccurs="0" />
 			<xs:element name="events" type="event_list_type" minOccurs="0" />
+			<xs:element name="trackers" type="trackers_type" minOccurs="0" />
 		</xs:all>
 	</xs:complexType>
 
@@ -356,7 +411,7 @@ THE SOFTWARE.
 		</xs:all>
 	</xs:complexType>
 
-	<!-- Map to the save command -->
+	<!-- Maps to the save command -->
 	<xs:complexType name="save_type">
 		<xs:all>
 			<xs:element name="session" type="session_type" />
@@ -364,7 +419,7 @@ THE SOFTWARE.
 		</xs:all>
 	</xs:complexType>
 
-	<!-- Map to the load command -->
+	<!-- Maps to the load command -->
 	<xs:complexType name="load_type">
 		<xs:all>
 			<xs:element name="session" type="session_type" />
@@ -379,7 +434,7 @@ THE SOFTWARE.
 		</xs:all>
 	</xs:complexType>
 
-	<!-- Map to lttng_event_perf_counter_ctx -->
+	<!-- Maps to lttng_event_perf_counter_ctx -->
 	<xs:complexType name="perf_counter_context_type">
 		<xs:all>
 			<xs:element name="type" type="uint32_type" />
@@ -388,7 +443,7 @@ THE SOFTWARE.
 		</xs:all>
 	</xs:complexType>
 
-	<!-- Map to lttng_event_context -->
+	<!-- Maps to lttng_event_context -->
 	<xs:complexType name="context_type">
 		<xs:all>
 			<xs:element name="type" type="context_type_type" />
@@ -458,6 +513,7 @@ THE SOFTWARE.
 			<xs:element name="channels" type="channels_type" minOccurs="0" />
 			<xs:element name="events" type="event_list_type" minOccurs="0" />
 			<xs:element name="channel" type="channel_type" minOccurs="0" />
+			<xs:element name="targets" type="targets_type" minOccurs="0" />
 		</xs:choice>
 	</xs:complexType>
 
@@ -480,6 +536,8 @@ THE SOFTWARE.
 			<xs:enumeration value="set-session" />
 			<xs:enumeration value="disable-event" />
 			<xs:enumeration value="disable-channel" />
+			<xs:enumeration value="track" />
+			<xs:enumeration value="untrack" />
 		</xs:restriction>
 	</xs:simpleType>
 
