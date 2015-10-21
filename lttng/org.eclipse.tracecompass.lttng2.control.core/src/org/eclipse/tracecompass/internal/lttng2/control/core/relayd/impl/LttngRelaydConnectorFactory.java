@@ -10,19 +10,18 @@
  *   Matthew Khouzam - Initial implementation
  **********************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.control.core.relayd;
+package org.eclipse.tracecompass.internal.lttng2.control.core.relayd.impl;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
+import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.ILttngRelaydConnector;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.Command;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.ConnectResponse;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.ConnectionType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.ViewerCommand;
-import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.impl.LttngRelaydConnector_2_4;
-import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.impl.LttngRelaydConnector_Unsupported;
 
 /**
  * LTTng RelayD connector factory

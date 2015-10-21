@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.ILttngRelaydConnector;
-import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.LttngRelaydConnectorFactory;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.AttachReturnCode;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.AttachSessionResponse;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.CreateSessionResponse;
@@ -34,6 +33,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.Ind
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.NextIndexReturnCode;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.SessionResponse;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.StreamResponse;
+import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.impl.LttngRelaydConnectorFactory;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;

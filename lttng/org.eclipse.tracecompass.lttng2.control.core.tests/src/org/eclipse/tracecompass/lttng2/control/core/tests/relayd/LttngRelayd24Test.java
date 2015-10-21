@@ -24,7 +24,6 @@ import java.net.Socket;
 import java.util.List;
 
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.ILttngRelaydConnector;
-import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.LttngRelaydConnectorFactory;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.AttachSessionResponse;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.Command;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.ConnectResponse;
@@ -36,6 +35,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.Nex
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.SessionResponse;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.StreamResponse;
 import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.commands.ViewerCommand;
+import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.impl.LttngRelaydConnectorFactory;
 import org.junit.Test;
 
 /**
