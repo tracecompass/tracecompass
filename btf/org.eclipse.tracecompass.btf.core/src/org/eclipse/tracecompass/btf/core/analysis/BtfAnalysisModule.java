@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.btf.core.analysis;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import org.eclipse.tracecompass.btf.core.trace.BtfTrace;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
@@ -40,6 +42,6 @@ public class BtfAnalysisModule extends TmfStateSystemAnalysisModule {
 
     @Override
     protected ITmfStateProvider createStateProvider() {
-        return new BtfStateProvider(getTrace());
+        return new BtfStateProvider(checkNotNull(getTrace()));
     }
 }
