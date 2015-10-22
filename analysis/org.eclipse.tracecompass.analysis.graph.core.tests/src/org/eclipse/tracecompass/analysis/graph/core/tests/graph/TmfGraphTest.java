@@ -18,9 +18,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.analysis.graph.core.base.CycleDetectedException;
 import org.eclipse.tracecompass.analysis.graph.core.base.IGraphWorker;
 import org.eclipse.tracecompass.analysis.graph.core.base.ITmfGraphVisitor;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfEdge;
@@ -45,6 +48,7 @@ public class TmfGraphTest {
 
     private static final @NonNull IGraphWorker WORKER1 = new TestGraphWorker(1);
     private static final @NonNull IGraphWorker WORKER2 = new TestGraphWorker(2);
+    private static final @NonNull IGraphWorker WORKER3 = new TestGraphWorker(3);
 
     private final @NonNull TmfGraph fGraph = new TmfGraph();
     private final @NonNull TmfVertex fV0 = new TmfVertex(0);
@@ -404,6 +408,93 @@ public class TmfGraphTest {
         assertEquals(12, stats.getSum(WORKER1).longValue());
         assertEquals(11, stats.getSum(WORKER2).longValue());
         assertEquals(23, stats.getSum().longValue());
+    }
+
+    /**
+     * This visitor throws an exception if it visits twice the same vertex
+     *
+     * @author Francis Giraldeau
+     *
+     */
+    private class DuplicateDetectorVisitor implements ITmfGraphVisitor {
+        private final Set<TmfVertex> set = new HashSet<>();
+        @Override
+        public void visitHead(TmfVertex vertex) {
+        }
+        @Override
+        public void visit(TmfEdge edge, boolean horizontal) {
+        }
+        @Override
+        public void visit(TmfVertex vertex) {
+            if (set.contains(vertex)) {
+                throw new RuntimeException("node already visited");
+            }
+            set.add(vertex);
+        }
+    }
+
+    /**
+     * Test that exception is thrown if a node is linked horizontally to itself
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testHorizontalSelfLink() {
+        TmfVertex n0 = new TmfVertex(0);
+        n0.linkHorizontal(n0);
+    }
+
+    /**
+     * Test that exception is thrown if a node is linked vertically to itself.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testVerticalSelfLink() {
+        TmfVertex n0 = new TmfVertex(0);
+        n0.linkVertical(n0);
+    }
+
+    /**
+     * Test that the visitor detect a cycle in horizontal links. A cycle may
+     * exists only between vertices with equal timetstamps.
+     */
+    @Test(expected = CycleDetectedException.class)
+    public void testHorizontalCycle() {
+        TmfVertex n0 = new TmfVertex(0);
+        TmfVertex n1 = new TmfVertex(0);
+        n0.linkHorizontal(n1);
+        n1.linkHorizontal(n0);
+        TmfGraph graph = new TmfGraph();
+        graph.add(WORKER1, n0);
+        graph.add(WORKER1, n1);
+        graph.scanLineTraverse(n0, new DuplicateDetectorVisitor());
+    }
+
+    /**
+     * Test that scanLineTraverse terminates with the following graph:
+     *
+     * <pre>
+     *          ^
+     *          |
+     *    +----->
+     *    ^
+     *    |
+     *    +
+     *
+     * </pre>
+     */
+    @Test
+    public void testScanLineTerminates() {
+        TmfVertex n10 = new TmfVertex(0);
+        TmfVertex n20 = new TmfVertex(0);
+        TmfVertex n21 = new TmfVertex(1);
+        TmfVertex n30 = new TmfVertex(1);
+        TmfGraph graph = new TmfGraph();
+        n10.linkVertical(n20);
+        n20.linkHorizontal(n21);
+        n21.linkVertical(n30);
+        graph.add(WORKER1, n10);
+        graph.add(WORKER2, n20);
+        graph.add(WORKER2, n21);
+        graph.add(WORKER3, n30);
+        graph.scanLineTraverse(n20, new DuplicateDetectorVisitor());
     }
 
 }

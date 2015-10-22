@@ -26,6 +26,8 @@ public class Messages extends NLS {
     public static @Nullable String TmfGraph_FromNotInGraph;
 
     public static @Nullable String TmfVertex_ArgumentTimestampLower;
+
+    public static @Nullable String TmfVertex_CannotLinkToSelf;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

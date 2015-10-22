@@ -169,6 +169,7 @@ public class TmfVertex implements Comparable<TmfVertex> {
      */
     public TmfEdge linkHorizontal(TmfVertex to) {
         checkTimestamps(to);
+        checkNotSelf(to);
         return linkHorizontalRaw(to);
     }
 
@@ -188,6 +189,7 @@ public class TmfVertex implements Comparable<TmfVertex> {
      */
     public TmfEdge linkVertical(TmfVertex to) {
         checkTimestamps(to);
+        checkNotSelf(to);
         return linkVerticalRaw(to);
     }
 
@@ -204,6 +206,13 @@ public class TmfVertex implements Comparable<TmfVertex> {
                     String.format(": (curr=%d,next=%d,elapsed=%d)", fTimestamp, to.fTimestamp, to.fTimestamp - fTimestamp)); //$NON-NLS-1$
         }
     }
+
+    private void checkNotSelf(TmfVertex to) {
+        if (this == to) {
+            throw new IllegalArgumentException(Messages.TmfVertex_CannotLinkToSelf);
+        }
+    }
+
 
     /**
      * Get an edge to or from this vertex in the appropriate direction

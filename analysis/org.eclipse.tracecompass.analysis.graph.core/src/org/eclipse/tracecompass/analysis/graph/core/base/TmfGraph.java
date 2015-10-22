@@ -243,6 +243,9 @@ public class TmfGraph {
         TmfEdge edge = headNode.getEdge(EdgeDirection.INCOMING_HORIZONTAL_EDGE);
         while (edge != null) {
             headNode = edge.getVertexFrom();
+            if (headNode == vertex) {
+                throw new CycleDetectedException();
+            }
             edge = headNode.getEdge(EdgeDirection.INCOMING_HORIZONTAL_EDGE);
         }
         return headNode;
@@ -343,8 +346,10 @@ public class TmfGraph {
             // process one line
             TmfVertex n = getHead(curr);
             visitor.visitHead(n);
-            while (n != null) {
+            while (true) {
                 visitor.visit(n);
+                visited.add(n);
+
                 // Only visit links up-right, guarantee to visit once only
                 TmfEdge edge = n.getEdge(EdgeDirection.OUTGOING_VERTICAL_EDGE);
                 if (edge != null) {
@@ -360,9 +365,9 @@ public class TmfGraph {
                     visitor.visit(edge, true);
                     n = edge.getVertexTo();
                 } else {
-                    n = null;
+                    // end of the horizontal list
+                    break;
                 }
-                visited.add(n);
             }
         }
     }
