@@ -28,6 +28,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.pcap.PcapPacket;
@@ -68,7 +69,7 @@ public class PcapTrace extends TmfTrace implements ITmfTraceProperties {
     /** pcap trace type id as defined in plugin.xml */
     public static final String TRACE_TYPE_ID = "org.eclipse.linuxtools.tmf.pcap.core.pcaptrace"; //$NON-NLS-1$
 
-    private static final Collection<ITmfEventAspect> PCAP_ASPECTS =
+    private @NonNull static final Collection<ITmfEventAspect> PCAP_ASPECTS =
             checkNotNull(ImmutableList.of(
                     ITmfEventAspect.BaseAspects.TIMESTAMP,
                     PcapSourceAspect.INSTANCE,
@@ -78,7 +79,7 @@ public class PcapTrace extends TmfTrace implements ITmfTraceProperties {
                     ITmfEventAspect.BaseAspects.CONTENTS
                     ));
 
-    private static final String EMPTY_STRING = ""; //$NON-NLS-1$
+    private @NonNull static final String EMPTY_STRING = ""; //$NON-NLS-1$
     private static final int CONFIDENCE = 50;
     private @Nullable PcapFile fPcapFile;
     private @Nullable Map<String, String> fTraceProperties = null;
