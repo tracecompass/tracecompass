@@ -30,6 +30,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
@@ -40,8 +41,6 @@ import org.junit.Test;
 import org.junit.rules.TestRule;
 import org.junit.rules.Timeout;
 
-import com.google.common.base.Functions;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
@@ -353,11 +352,11 @@ public class BufferedBlockingQueueTest {
 
         /*
          * Convert the test's testBuffer into an array of String, one for each
-         * character. There are probably simpler ways of doing this, but it
-         * would not look as impressive.
+         * character.
          */
-        FluentIterable<Character> fi = FluentIterable.from(Chars.asList(testString.toCharArray()));
-        List<String> strings = fi.transform(Functions.toStringFunction()).toList();
+        List<String> strings = Chars.asList(testString.toCharArray()).stream()
+            .map(Object::toString)
+            .collect(Collectors.toList());
 
         Iterable<Iterable<String>> results =
                 runConcurrencyTest(queue, strings, poisonPill, 1, 1, 1);

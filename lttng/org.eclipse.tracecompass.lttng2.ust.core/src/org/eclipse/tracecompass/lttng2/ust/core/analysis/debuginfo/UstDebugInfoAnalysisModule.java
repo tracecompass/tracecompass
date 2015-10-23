@@ -15,8 +15,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.NavigableSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.debuginfo.UstDebugInfoBinaryFile;
@@ -36,12 +38,7 @@ import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModul
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfUtils;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Ordering;
 
 /**
  * Analysis to provide TMF Callsite information by mapping IP (instruction
@@ -185,14 +182,13 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
         List<Integer> possibleBaddrQuarks = ss.getQuarks(String.valueOf(vpid), "*"); //$NON-NLS-1$
 
         /* Get the most probable base address from all the known ones */
-        NavigableSet<Long> possibleBaddrs = FluentIterable.from(possibleBaddrQuarks)
-                .transform(new Function<Integer, Long>(){
-                    @Override
-                    public Long apply(@Nullable Integer quark) {
-                        String baddrStr = ss.getAttributeName(checkNotNull(quark).intValue());
-                        return checkNotNull(Long.valueOf(baddrStr));
-                    }
-                }).toSortedSet(Ordering.natural());
+        NavigableSet<Long> possibleBaddrs = possibleBaddrQuarks.stream()
+            .map(quark -> {
+                String baddrStr = ss.getAttributeName(checkNotNull(quark).intValue());
+                return checkNotNull(Long.valueOf(baddrStr));
+            })
+            .collect(Collectors.toCollection(TreeSet::new));
+
         final Long potentialBaddr = possibleBaddrs.floor(ip);
 
         /* Make sure the 'ip' fits in the expected memory range */
@@ -215,14 +211,13 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
              * library was loaded there at that time.
              */
             List<Integer> buildIds = ss.getSubAttributes(baddrQuark, false);
-            Optional<Integer> potentialBuildIdQuark = FluentIterable.from(buildIds).firstMatch(new Predicate<Integer>() {
-                @Override
-                public boolean apply(@Nullable Integer input) {
-                    int quark = checkNotNull(input).intValue();
+            Optional<Integer> potentialBuildIdQuark = buildIds.stream()
+                .filter(id -> {
+                    int quark = checkNotNull(id).intValue();
                     ITmfStateValue value = fullState.get(quark).getStateValue();
                     return (!value.isNull());
-                }
-            });
+                })
+                .findFirst();
 
             if (!potentialBuildIdQuark.isPresent()) {
                 /* We didn't have the information after all. */

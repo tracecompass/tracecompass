@@ -29,9 +29,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 
-import com.google.common.base.Function;
-import com.google.common.collect.FluentIterable;
-
 /**
  * Histogram-independent data model.
  *
@@ -283,14 +280,9 @@ public class HistogramDataModel implements IHistogramDataModel {
      * @return an array of trace names
      */
     public String[] getTraceNames() {
-        FluentIterable<ITmfTrace> traces = FluentIterable.from(TmfTraceManager.getTraceSet(fTrace));
-        FluentIterable<String> traceNames = traces.transform(new Function<ITmfTrace, String>() {
-            @Override
-            public String apply(ITmfTrace input) {
-                return input.getName();
-            }
-        });
-        return traceNames.toArray(String.class);
+        return TmfTraceManager.getTraceSet(fTrace).stream()
+            .map(trace -> trace.getName())
+            .toArray(String[]::new);
     }
 
     /**

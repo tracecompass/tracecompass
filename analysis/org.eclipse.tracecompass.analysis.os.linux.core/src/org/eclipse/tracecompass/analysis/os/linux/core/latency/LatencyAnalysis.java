@@ -17,20 +17,19 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.KernelTidAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmentStoreAnalysisModule;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 
-import com.google.common.base.Function;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 
 /**
@@ -108,14 +107,12 @@ public class LatencyAnalysis extends AbstractSegmentStoreAnalysisModule {
                 // String syscallName = fLayout.getSyscallNameFromEvent(event);
                 long startTime = event.getTimestamp().getValue();
                 String syscallName = eventName.substring(layout.eventSyscallEntryPrefix().length());
-                FluentIterable<String> argNames = FluentIterable.from(event.getContent().getFieldNames());
-                Map<String, String> args = argNames.toMap(new Function<String, String>() {
-                    @Override
-                    public String apply(@Nullable String input) {
-                        return checkNotNull(event.getContent().getField(input).getValue().toString());
-                    }
-                });
-                SystemCall.InitialInfo newSysCall = new SystemCall.InitialInfo(startTime, NonNullUtils.checkNotNull(syscallName), NonNullUtils.checkNotNull(args));
+
+                Map<String, String> args = event.getContent().getFieldNames().stream()
+                    .collect(Collectors.toMap(Function.identity(),
+                            input -> checkNotNull(event.getContent().getField(input).getValue().toString())));
+
+                SystemCall.InitialInfo newSysCall = new SystemCall.InitialInfo(startTime, checkNotNull(syscallName), checkNotNull(args));
                 fOngoingSystemCalls.put(tid, newSysCall);
 
             } else if (eventName.startsWith(layout.eventSyscallExitPrefix())) {

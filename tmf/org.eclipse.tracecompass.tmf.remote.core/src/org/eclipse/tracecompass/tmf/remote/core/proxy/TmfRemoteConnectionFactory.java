@@ -28,10 +28,6 @@ import org.eclipse.remote.core.exception.RemoteConnectionException;
 import org.eclipse.tracecompass.internal.tmf.remote.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.remote.core.messages.Messages;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
-
 /**
  * Factory for creation of remote connections programmatically.
  *
@@ -224,14 +220,13 @@ public class TmfRemoteConnectionFactory {
         if (manager == null) {
             return null;
         }
-        FluentIterable<IRemoteConnection> connections = FluentIterable.from(manager.getAllRemoteConnections());
-        Optional<IRemoteConnection> ret = connections.firstMatch(new Predicate<IRemoteConnection>() {
-            @Override
-            public boolean apply(@Nullable IRemoteConnection input) {
-                return ((input != null) && input.getConnectionType().getId().equals(remoteServicesId.toString()) && input.getName().equals(name.toString()));
-            }
-        });
-        return ret.orNull();
+        return manager.getAllRemoteConnections().stream()
+            .filter(connection ->
+                (connection != null) &&
+                connection.getConnectionType().getId().equals(remoteServicesId.toString()) &&
+                connection.getName().equals(name.toString()))
+            .findFirst()
+            .orElse(null);
     }
 
     /**
