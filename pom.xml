@@ -39,8 +39,8 @@
 
 <properties>
   <base.test.vmargs>-Xms256m -Xmx1024m -XX:MaxPermSize=256m</base.test.vmargs>
-  <tycho-version>0.23.1</tycho-version>
-  <tycho-extras-version>0.23.1</tycho-extras-version>
+  <tycho-version>0.24.0</tycho-version>
+  <tycho-extras-version>0.24.0</tycho-extras-version>
   <tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/tracecompass/org.eclipse.tracecompass.git</tycho.scmUrl>
   <target-platform>tracecompass-e4.5</target-platform>
   <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
