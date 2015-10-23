@@ -115,6 +115,8 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
             }
             if (!getMonitor().isCanceled()) {
                 getTimeGraphViewer().setLinks(links);
+                /* Refresh the trace-specific markers when zooming */
+                markers.addAll(getTraceMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
                 getTimeGraphViewer().getTimeGraphControl().setMarkers(markers);
             }
         }
@@ -148,8 +150,8 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
                     }
                     /* Refresh the arrows when zooming */
                     links.addAll(getLinkList(ss, fullStates, prevFullState, monitor));
-                    /* Refresh the markers when zooming */
-                    markers.addAll(getMarkerList(ss, fullStates, prevFullState, monitor));
+                    /* Refresh the view-specific markers when zooming */
+                    markers.addAll(getViewMarkerList(ss, fullStates, prevFullState, monitor));
                 }
             });
             refresh();
@@ -411,7 +413,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
      * @return The list of marker events
      * @since 2.0
      */
-    protected @NonNull List<IMarkerEvent> getMarkerList(ITmfStateSystem ss,
+    protected @NonNull List<IMarkerEvent> getViewMarkerList(ITmfStateSystem ss,
             @NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState, @NonNull IProgressMonitor monitor) {
         return new ArrayList<>();
     }
@@ -471,11 +473,11 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     }
 
     /**
-     * @deprecated The subclass should implement {@link #getMarkerList(ITmfStateSystem, List, List, IProgressMonitor)} instead.
+     * @deprecated The subclass should implement {@link #getViewMarkerList(ITmfStateSystem, List, List, IProgressMonitor)} instead.
      */
     @Deprecated
     @Override
-    protected final List<IMarkerEvent> getMarkerList(long startTime, long endTime, long resolution, IProgressMonitor monitor) {
+    protected final List<IMarkerEvent> getViewMarkerList(long startTime, long endTime, long resolution, IProgressMonitor monitor) {
         throw new UnsupportedOperationException();
     }
 

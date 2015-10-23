@@ -16,6 +16,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.timegraph;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -72,6 +74,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceAdapterManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.TmfUiRefreshHandler;
@@ -93,6 +96,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphViewer;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEventSource;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.MarkerEvent;
@@ -141,6 +145,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     /** The trace to filters hash map */
     private final Map<ITmfTrace, ViewerFilter[]> fFiltersMap = new HashMap<>();
+
+    /** The trace to marker event sources hash map */
+    private final Map<ITmfTrace, List<IMarkerEventSource>> fMarkerEventSourcesMap = new HashMap<>();
 
     /** The trace to build thread hash map */
     private final Map<ITmfTrace, BuildThread> fBuildThreadMap = new HashMap<>();
@@ -661,12 +668,12 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 fTimeGraphWrapper.getTimeGraphViewer().setLinks(events);
                 redraw();
             }
-            /* Refresh the markers when zooming */
-            List<IMarkerEvent> markers = getMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
-            if (markers != null) {
-                fTimeGraphWrapper.getTimeGraphViewer().getTimeGraphControl().setMarkers(markers);
-                redraw();
-            }
+            /* Refresh the view-specific markers when zooming */
+            List<IMarkerEvent> markers = new ArrayList<>(getViewMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
+            /* Refresh the trace-specific markers when zooming */
+            markers.addAll(getTraceMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
+            fTimeGraphWrapper.getTimeGraphViewer().getTimeGraphControl().setMarkers(markers);
+            redraw();
         }
 
         private void zoom(@NonNull TimeGraphEntry entry, @NonNull IProgressMonitor monitor) {
@@ -1234,6 +1241,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 if (buildThread != null) {
                     buildThread.cancel();
                 }
+                fMarkerEventSourcesMap.remove(trace);
             }
         }
         synchronized (fEntryListMap) {
@@ -1364,6 +1372,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 if (trace == null) {
                     break;
                 }
+                fMarkerEventSourcesMap.put(trace, TmfTraceAdapterManager.getAdapters(trace, IMarkerEventSource.class));
                 BuildThread buildThread = new BuildThread(trace, viewTrace, getName());
                 fBuildThreadMap.put(trace, buildThread);
                 buildThread.start();
@@ -1451,8 +1460,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     }
 
     /**
-     * Gets the list of markers for a trace in a given time range. Default
-     * implementation returns an empty list.
+     * Gets the list of view-specific markers for a trace in a given time range.
+     * Default implementation returns an empty list.
      *
      * @param startTime
      *            Start of the time range
@@ -1465,9 +1474,51 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @return The list of marker events
      * @since 2.0
      */
-    protected @Nullable List<IMarkerEvent> getMarkerList(long startTime, long endTime,
+    protected @NonNull List<IMarkerEvent> getViewMarkerList(long startTime, long endTime,
             long resolution, @NonNull IProgressMonitor monitor) {
         return new ArrayList<>();
+    }
+
+    /**
+     * Gets the list of trace-specific markers for a trace in a given time range.
+     *
+     * @param startTime
+     *            Start of the time range
+     * @param endTime
+     *            End of the time range
+     * @param resolution
+     *            The resolution
+     * @param monitor
+     *            The progress monitor object
+     * @return The list of marker events
+     * @since 2.0
+     */
+    protected @NonNull List<IMarkerEvent> getTraceMarkerList(long startTime, long endTime,
+            long resolution, @NonNull IProgressMonitor monitor) {
+        List<IMarkerEvent> markers = new ArrayList<>();
+        for (IMarkerEventSource markerEventSource : getMarkerEventSources(getTrace())) {
+            if (monitor.isCanceled()) {
+                break;
+            }
+            markers.addAll(markerEventSource.getMarkerList(startTime, endTime, resolution, monitor));
+        }
+        return markers;
+    }
+
+    /**
+     * Gets the list of marker event sources for a given trace.
+     *
+     * @param trace
+     *            The trace
+     * @return The list of marker event sources
+     * @since 2.0
+     */
+    protected @NonNull List<IMarkerEventSource> getMarkerEventSources(ITmfTrace trace) {
+        List<IMarkerEventSource> markerEventSources = fMarkerEventSourcesMap.get(trace);
+        if (markerEventSources == null) {
+            markerEventSources = checkNotNull(Collections.<IMarkerEventSource>emptyList());
+        }
+        return markerEventSources;
     }
 
     /**
