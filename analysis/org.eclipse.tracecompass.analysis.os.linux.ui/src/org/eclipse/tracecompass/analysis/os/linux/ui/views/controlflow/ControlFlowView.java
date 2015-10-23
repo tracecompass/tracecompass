@@ -551,7 +551,7 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
 
     @Override
     protected @NonNull List<ILinkEvent> getLinkList(ITmfStateSystem ss,
-            @NonNull List<List<ITmfStateInterval>> fullStates, @NonNull IProgressMonitor monitor) {
+            @NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState, @NonNull IProgressMonitor monitor) {
         List<ILinkEvent> list = new ArrayList<>();
         List<TimeGraphEntry> entryList = getEntryList(ss);
         if (entryList == null) {
@@ -569,14 +569,28 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                 }
                 List<ITmfStateInterval> currentThreadIntervals = new ArrayList<>(fullStates.size() + 2);
                 try {
-                    // add the previous and following intervals
-                    long start = Math.max(fullStates.get(0).get(currentThreadQuark).getStartTime() - 1, ss.getStartTime());
-                    currentThreadIntervals.add(ss.querySingleState(start, currentThreadQuark));
+                    /*
+                     * Add the previous interval if it is the first query
+                     * iteration and the first interval has currentThread=0. Add
+                     * the following interval if the last interval has
+                     * currentThread=0. These are diagonal arrows crossing the
+                     * query iteration range.
+                     */
+                    if (prevFullState == null) {
+                        ITmfStateInterval currentThreadInterval = fullStates.get(0).get(currentThreadQuark);
+                        if (currentThreadInterval.getStateValue().unboxInt() == 0) {
+                            long start = Math.max(currentThreadInterval.getStartTime() - 1, ss.getStartTime());
+                            currentThreadIntervals.add(ss.querySingleState(start, currentThreadQuark));
+                        }
+                    }
                     for (List<ITmfStateInterval> fullState : fullStates) {
                         currentThreadIntervals.add(fullState.get(currentThreadQuark));
                     }
-                    long end = Math.min(fullStates.get(fullStates.size() - 1).get(currentThreadQuark).getEndTime() + 1, ss.getCurrentEndTime());
-                    currentThreadIntervals.add(ss.querySingleState(end, currentThreadQuark));
+                    ITmfStateInterval currentThreadInterval = fullStates.get(fullStates.size() - 1).get(currentThreadQuark);
+                    if (currentThreadInterval.getStateValue().unboxInt() == 0) {
+                        long end = Math.min(currentThreadInterval.getEndTime() + 1, ss.getCurrentEndTime());
+                        currentThreadIntervals.add(ss.querySingleState(end, currentThreadQuark));
+                    }
                 } catch (AttributeNotFoundException e) {
                     Activator.getDefault().logError(e.getMessage());
                     return list;

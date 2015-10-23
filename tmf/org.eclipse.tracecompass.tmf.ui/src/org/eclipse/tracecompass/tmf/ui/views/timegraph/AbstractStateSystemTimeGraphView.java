@@ -147,9 +147,9 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
                         }
                     }
                     /* Refresh the arrows when zooming */
-                    links.addAll(getLinkList(ss, fullStates, monitor));
+                    links.addAll(getLinkList(ss, fullStates, prevFullState, monitor));
                     /* Refresh the markers when zooming */
-                    markers.addAll(getMarkerList(ss, fullStates, monitor));
+                    markers.addAll(getMarkerList(ss, fullStates, prevFullState, monitor));
                 }
             });
             refresh();
@@ -384,12 +384,15 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
      *            The state system
      * @param fullStates
      *            A list of full states
+     * @param prevFullState
+     *            The previous full state, or null
      * @param monitor
      *            A progress monitor
      * @return The list of link events
+     * @since 2.0
      */
     protected @NonNull List<ILinkEvent> getLinkList(ITmfStateSystem ss,
-            @NonNull List<List<ITmfStateInterval>> fullStates, @NonNull IProgressMonitor monitor) {
+            @NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState, @NonNull IProgressMonitor monitor) {
         return new ArrayList<>();
     }
 
@@ -401,13 +404,15 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
      *            The state system
      * @param fullStates
      *            A list of full states
+     * @param prevFullState
+     *            The previous full state, or null
      * @param monitor
      *            A progress monitor
      * @return The list of marker events
      * @since 2.0
      */
     protected @NonNull List<IMarkerEvent> getMarkerList(ITmfStateSystem ss,
-            @NonNull List<List<ITmfStateInterval>> fullStates, @NonNull IProgressMonitor monitor) {
+            @NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState, @NonNull IProgressMonitor monitor) {
         return new ArrayList<>();
     }
 
@@ -457,7 +462,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     }
 
     /**
-     * @deprecated The subclass should implement {@link #getLinkList(ITmfStateSystem, List, IProgressMonitor)} instead.
+     * @deprecated The subclass should implement {@link #getLinkList(ITmfStateSystem, List, List, IProgressMonitor)} instead.
      */
     @Deprecated
     @Override
@@ -466,7 +471,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     }
 
     /**
-     * @deprecated The subclass should implement {@link #getMarkerList(ITmfStateSystem, List, IProgressMonitor)} instead.
+     * @deprecated The subclass should implement {@link #getMarkerList(ITmfStateSystem, List, List, IProgressMonitor)} instead.
      */
     @Deprecated
     @Override
