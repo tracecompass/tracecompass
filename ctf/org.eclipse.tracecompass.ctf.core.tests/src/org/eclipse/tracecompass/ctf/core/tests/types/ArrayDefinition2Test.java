@@ -125,7 +125,6 @@ public class ArrayDefinition2Test {
         CompoundDeclaration declaration = (CompoundDeclaration) charArrayFixture.getDeclaration();
         String fieldName = "";
 
-        @SuppressWarnings("null")
         ArrayDefinition result = new ArrayDefinition(declaration, this.trace, fieldName, Arrays.asList(new Definition[0]));
         assertNotNull(result);
     }
@@ -141,7 +140,6 @@ public class ArrayDefinition2Test {
         IDefinitionScope definitionScope = getDefinitionScope();
 
         String fieldName = "";
-        @SuppressWarnings("null")
         ArrayDefinition result = new ArrayDefinition(declaration, definitionScope, fieldName, Arrays.asList(new Definition[0]));
         assertNotNull(result);
     }

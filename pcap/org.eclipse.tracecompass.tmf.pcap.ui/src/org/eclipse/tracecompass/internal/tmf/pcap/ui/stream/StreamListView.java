@@ -338,7 +338,10 @@ public class StreamListView extends TmfView {
                     return;
                 }
                 TmfPcapProtocol protocol = (TmfPcapProtocol) e.item.getData(KEY_PROTOCOL);
-                tables.get(protocol).deselectAll();
+                final Table table = tables.get(protocol);
+                if (table != null) {
+                    table.deselectAll();
+                }
                 fCurrentStream = null;
             }
 

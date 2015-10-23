@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.internal.analysis.graph.ui.criticalpath.view;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -135,7 +137,7 @@ public class CriticalPathView extends AbstractTimeGraphView {
                 if (!fHostEntries.containsKey(host)) {
                     fHostEntries.put(host, new CriticalPathEntry(host, fTrace, getStartTime(), getEndTime(), owner));
                 }
-                parent = fHostEntries.get(host);
+                parent = checkNotNull(fHostEntries.get(host));
                 CriticalPathEntry entry = new CriticalPathEntry(NonNullUtils.nullToEmptyString(owner), fTrace, getStartTime(), getEndTime(), owner);
                 parent.addChild(entry);
 
@@ -152,7 +154,7 @@ public class CriticalPathView extends AbstractTimeGraphView {
             public void visit(TmfEdge link, boolean horizontal) {
                 if (horizontal) {
                     Object parent = fGraph.getParentOf(link.getVertexFrom());
-                    CriticalPathEntry entry = fRootList.get(parent);
+                    CriticalPathEntry entry = checkNotNull(fRootList.get(parent));
                     TimeEvent ev = new TimeEvent(entry, link.getVertexFrom().getTs(), link.getDuration(),
                             getMatchingState(link.getType()).ordinal());
                     entry.addEvent(ev);

@@ -673,8 +673,8 @@ public abstract class GraphNode {
 
     private void sortNodes(Map<String, List<GraphNode>> nodesToSort, Map.Entry<String, Boolean> sortMapEntry, boolean forward) {
         String nodeType = sortMapEntry.getKey();
-        GraphNode[] temp = nodesToSort.get(nodeType).toArray(new GraphNode[nodesToSort.get(nodeType).size()]);
-        GraphNode node = fNodes.get(nodeType).get(0);
+        GraphNode[] temp = checkNotNull(nodesToSort.get(nodeType)).stream().toArray(GraphNode[]::new);
+        GraphNode node = checkNotNull(fNodes.get(nodeType)).get(0);
         if (forward) {
             Arrays.sort(temp, node.getComparator());
             fNodes.put(nodeType, Arrays.asList(temp));

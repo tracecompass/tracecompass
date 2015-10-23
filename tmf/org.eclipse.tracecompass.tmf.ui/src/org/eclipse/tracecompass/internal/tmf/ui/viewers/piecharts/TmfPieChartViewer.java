@@ -29,8 +29,8 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.model.TmfPieChartStatisticsModel;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
  * Creates a viewer containing 2 pie charts, one for showing information about
@@ -282,8 +282,9 @@ public class TmfPieChartViewer extends Composite {
                 continue;
             }
             for (Entry<String, Long> event : traceEventCount.entrySet()) {
-                if (totalEventCountForChart.containsKey(event.getKey())) {
-                    totalEventCountForChart.put(event.getKey(), totalEventCountForChart.get(event.getKey()) + event.getValue());
+                final Long value = totalEventCountForChart.get(event.getKey());
+                if (value != null) {
+                    totalEventCountForChart.put(event.getKey(), value + event.getValue());
                 } else {
                     totalEventCountForChart.put(event.getKey(), event.getValue());
                 }

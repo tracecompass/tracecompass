@@ -210,8 +210,12 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
              * prev_state, string next_comm, int32 next_tid, int32 next_prio
              */
             {
-                int prevTid = ((Long) content.getField(fLayouts.get(event.getTrace()).fieldPrevTid()).getValue()).intValue();
-                int nextTid = ((Long) content.getField(fLayouts.get(event.getTrace()).fieldNextTid()).getValue()).intValue();
+                final IKernelAnalysisEventLayout eventLayout = fLayouts.get(event.getTrace());
+                if (eventLayout == null) {
+                    return;
+                }
+                int prevTid = ((Long) content.getField(eventLayout.fieldPrevTid()).getValue()).intValue();
+                int nextTid = ((Long) content.getField(eventLayout.fieldNextTid()).getValue()).intValue();
 
                 if (host.isGuest()) {
                     /* Get the event's CPU */
