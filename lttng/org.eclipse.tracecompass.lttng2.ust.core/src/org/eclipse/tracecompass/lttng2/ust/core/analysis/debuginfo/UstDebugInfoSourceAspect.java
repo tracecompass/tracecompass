@@ -50,7 +50,6 @@ public class UstDebugInfoSourceAspect implements ITmfEventAspect {
         return nullToEmptyString(Messages.UstDebugInfoAnalysis_AspectHelpText);
     }
 
-    // TODO Will return a TmfCallsite eventually
     @Override
     public @Nullable TmfCallsite resolve(ITmfEvent event) {
         /* This aspect only supports UST traces */
