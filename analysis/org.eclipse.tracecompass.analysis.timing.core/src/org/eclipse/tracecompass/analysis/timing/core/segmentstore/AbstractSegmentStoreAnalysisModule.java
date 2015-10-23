@@ -126,6 +126,15 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
     }
 
     @Override
+    public void dispose() {
+        super.dispose();
+        ISegmentStore<ISegment> store = fSegmentStore;
+        if (store != null) {
+            store.dispose();
+        }
+    }
+
+    @Override
     protected boolean executeAnalysis(IProgressMonitor monitor) throws TmfAnalysisException {
         ITmfTrace trace = checkNotNull(getTrace());
 
