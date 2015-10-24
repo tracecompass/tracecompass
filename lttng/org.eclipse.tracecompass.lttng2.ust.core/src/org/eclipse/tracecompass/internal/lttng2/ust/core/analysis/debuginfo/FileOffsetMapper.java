@@ -52,7 +52,7 @@ public final class FileOffsetMapper {
      */
     public static @Nullable Iterable<TmfCallsite> getCallsiteFromOffset(File file, long offset) {
         if (!Files.exists((file.toPath()))) {
-            throw new IllegalArgumentException();
+            return null;
         }
         return getCallsiteFromOffsetWithAddr2line(file, offset);
     }
