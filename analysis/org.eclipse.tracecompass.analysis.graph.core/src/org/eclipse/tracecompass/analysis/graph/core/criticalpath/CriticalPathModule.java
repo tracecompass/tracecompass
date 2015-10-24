@@ -106,9 +106,13 @@ public class CriticalPathModule extends TmfAbstractAnalysisModule {
             return true;
         }
         ICriticalPathAlgorithm cp = getAlgorithm(graph);
-        fCriticalPath = cp.compute(start, null);
-
-        return true;
+        try {
+            fCriticalPath = cp.compute(start, null);
+            return true;
+        } catch (CriticalPathAlgorithmException e) {
+            Activator.getInstance().logError(NonNullUtils.nullToEmptyString(e.getMessage()), e);
+        }
+        return false;
     }
 
     @Override

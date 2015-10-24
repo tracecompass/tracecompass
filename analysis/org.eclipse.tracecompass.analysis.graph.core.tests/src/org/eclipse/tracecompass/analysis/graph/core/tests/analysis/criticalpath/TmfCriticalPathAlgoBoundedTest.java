@@ -10,9 +10,11 @@
 package org.eclipse.tracecompass.analysis.graph.core.tests.analysis.criticalpath;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfGraph;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex;
+import org.eclipse.tracecompass.analysis.graph.core.criticalpath.CriticalPathAlgorithmException;
 import org.eclipse.tracecompass.analysis.graph.core.criticalpath.ICriticalPathAlgorithm;
 import org.eclipse.tracecompass.analysis.graph.core.tests.stubs.GraphBuilder;
 import org.eclipse.tracecompass.internal.analysis.graph.core.criticalpath.CriticalPathAlgorithmBounded;
@@ -29,8 +31,12 @@ public class TmfCriticalPathAlgoBoundedTest extends TmfCriticalPathAlgorithmTest
     protected TmfGraph computeCriticalPath(TmfGraph graph, TmfVertex start) {
         assertNotNull(graph);
         ICriticalPathAlgorithm cp = new CriticalPathAlgorithmBounded(graph);
-        TmfGraph bounded = cp.compute(start, null);
-        return bounded;
+        try {
+            return cp.compute(start, null);
+        } catch (CriticalPathAlgorithmException e) {
+            fail(e.getMessage());
+        }
+        return null;
     }
 
     @Override

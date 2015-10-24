@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.internal.analysis.graph.core.criticalpath;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,6 +22,7 @@ import org.eclipse.tracecompass.analysis.graph.core.base.TmfEdge;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfGraph;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex.EdgeDirection;
+import org.eclipse.tracecompass.analysis.graph.core.criticalpath.CriticalPathAlgorithmException;
 
 /**
  * Critical path bounded algorithm: backward resolution of blocking limited to
@@ -45,7 +48,7 @@ public class CriticalPathAlgorithmBounded extends AbstractCriticalPathAlgorithm 
     }
 
     @Override
-    public TmfGraph compute(TmfVertex start, @Nullable TmfVertex end) {
+    public TmfGraph compute(TmfVertex start, @Nullable TmfVertex end) throws CriticalPathAlgorithmException {
         /* Create new graph for the critical path result */
         TmfGraph criticalPath = new TmfGraph();
 
@@ -55,10 +58,7 @@ public class CriticalPathAlgorithmBounded extends AbstractCriticalPathAlgorithm 
         /*
          * Calculate path starting from the object the start vertex belongs to
          */
-        IGraphWorker parent = graph.getParentOf(start);
-        if (parent == null) {
-            throw new NullPointerException();
-        }
+        IGraphWorker parent = checkNotNull(graph.getParentOf(start));
         criticalPath.add(parent, new TmfVertex(start));
         TmfVertex currentVertex = start;
         TmfEdge nextEdge = currentVertex.getEdge(EdgeDirection.OUTGOING_HORIZONTAL_EDGE);
@@ -92,12 +92,9 @@ public class CriticalPathAlgorithmBounded extends AbstractCriticalPathAlgorithm 
                  * TODO: Normally, the parent of the link's vertex to should be
                  * the object itself, verify if that is true
                  */
-                IGraphWorker parentTo = graph.getParentOf(nextEdge.getVertexTo());
-                if (parentTo == null) {
-                    throw new NullPointerException();
-                }
+                IGraphWorker parentTo = checkNotNull(graph.getParentOf(nextEdge.getVertexTo()));
                 if (parentTo != parent) {
-                    System.err.println("no, the parents of horizontal edges are not always identical... shouldn't they be?"); //$NON-NLS-1$
+                    throw new CriticalPathAlgorithmException("no, the parents of horizontal edges are not always identical... shouldn't they be?"); //$NON-NLS-1$
                 }
                 criticalPath.append(parentTo, new TmfVertex(nextEdge.getVertexTo()), nextEdge.getType());
                 break;
@@ -109,11 +106,11 @@ public class CriticalPathAlgorithmBounded extends AbstractCriticalPathAlgorithm 
                 break;
             case EPS:
                 if (nextEdge.getDuration() != 0) {
-                    throw new RuntimeException("epsilon duration is not zero " + nextEdge); //$NON-NLS-1$
+                    throw new CriticalPathAlgorithmException("epsilon duration is not zero " + nextEdge); //$NON-NLS-1$
                 }
                 break;
             case DEFAULT:
-                throw new RuntimeException("Illegal link type " + nextEdge.getType()); //$NON-NLS-1$
+                throw new CriticalPathAlgorithmException("Illegal link type " + nextEdge.getType()); //$NON-NLS-1$
             case UNKNOWN:
             default:
                 break;
@@ -126,10 +123,7 @@ public class CriticalPathAlgorithmBounded extends AbstractCriticalPathAlgorithm 
 
     /** Add the links to the critical path, with currentVertex to glue to */
     private void appendPathComponent(TmfGraph criticalPath, TmfGraph graph, TmfVertex currentVertex, List<TmfEdge> links) {
-        IGraphWorker currentActor = graph.getParentOf(currentVertex);
-        if (currentActor == null) {
-            throw new NullPointerException();
-        }
+        IGraphWorker currentActor = checkNotNull(graph.getParentOf(currentVertex));
         if (links.isEmpty()) {
             /*
              * The next vertex should not be null, since we glue only after
@@ -144,21 +138,14 @@ public class CriticalPathAlgorithmBounded extends AbstractCriticalPathAlgorithm 
         }
         // FIXME: assert last link.to actor == currentActor
 
-        // attach subpath to b1 and b2
-        TmfVertex b1 = criticalPath.getTail(currentActor);
-        if (b1 == null) {
-            throw new NullPointerException();
-        }
-        // TmfVertex b2 = new TmfVertex(curr.neighbor(TmfVertex.OUTH));
+        // attach subpath to b1
+        TmfVertex b1 = checkNotNull(criticalPath.getTail(currentActor));
 
         // glue head
         TmfEdge lnk = links.get(0);
         TmfVertex anchor = null;
-        IGraphWorker objSrc = graph.getParentOf(lnk.getVertexFrom());
-        if (objSrc == null) {
-            throw new NullPointerException();
-        }
-        if (objSrc == currentActor) {
+        IGraphWorker objSrc = checkNotNull(graph.getParentOf(lnk.getVertexFrom()));
+        if (objSrc.equals( currentActor)) {
             anchor = b1;
         } else {
             anchor = new TmfVertex(currentVertex);
@@ -167,10 +154,7 @@ public class CriticalPathAlgorithmBounded extends AbstractCriticalPathAlgorithm 
             /* fill any gap with UNKNOWN */
             if (lnk.getVertexFrom().compareTo(anchor) > 0) {
                 anchor = new TmfVertex(lnk.getVertexFrom());
-                TmfEdge edge = criticalPath.append(objSrc, anchor);
-                if (edge == null) {
-                    throw new NullPointerException();
-                }
+                TmfEdge edge = checkNotNull(criticalPath.append(objSrc, anchor));
                 edge.setType(TmfEdge.EdgeType.UNKNOWN);
             }
         }
@@ -212,10 +196,7 @@ public class CriticalPathAlgorithmBounded extends AbstractCriticalPathAlgorithm 
             return subPath;
         }
 
-        TmfEdge down = junction.getEdge(EdgeDirection.INCOMING_VERTICAL_EDGE);
-        if (down == null) {
-            throw new NullPointerException();
-        }
+        TmfEdge down = checkNotNull(junction.getEdge(EdgeDirection.INCOMING_VERTICAL_EDGE));
         subPath.add(down);
         TmfVertex vertexFrom = down.getVertexFrom();
 

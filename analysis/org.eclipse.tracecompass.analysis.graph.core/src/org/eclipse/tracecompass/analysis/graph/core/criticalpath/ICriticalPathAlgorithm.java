@@ -28,8 +28,10 @@ public interface ICriticalPathAlgorithm {
      * @param end
      *            The end vertex
      * @return The graph of the critical path
+     * @throws CriticalPathAlgorithmException
+     *             an exception in the calculation occurred
      */
-    public TmfGraph compute(TmfVertex start, @Nullable TmfVertex end);
+    public TmfGraph compute(TmfVertex start, @Nullable TmfVertex end) throws CriticalPathAlgorithmException;
 
     /**
      * Unique ID of this algorithm
