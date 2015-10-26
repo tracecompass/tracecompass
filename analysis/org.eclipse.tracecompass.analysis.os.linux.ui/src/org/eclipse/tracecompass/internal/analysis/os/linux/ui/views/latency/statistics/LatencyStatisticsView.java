@@ -9,7 +9,6 @@
  * Contributors:
  *     Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.statistics;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
@@ -22,14 +21,14 @@ import org.eclipse.swt.widgets.Composite;
  * @author Bernd Hufmann
  *
  */
-public class LatencyStatisticsView extends AbstractLatencyStatisticsView {
+public class LatencyStatisticsView extends AbstractSegmentStoreStatisticsView {
 
     /** The view ID*/
     public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.ui.views.latency.statsview"; //$NON-NLS-1$
 
     @Override
-    protected AbstractLatencyStatisticsViewer createLatencyStatisticsViewer(Composite parent) {
-        return checkNotNull((AbstractLatencyStatisticsViewer) new LatencyStatisticsViewer(checkNotNull(parent)));
+    protected AbstractSegmentStoreStatisticsViewer createSegmentStoreStatisticsViewer(Composite parent) {
+        return checkNotNull((AbstractSegmentStoreStatisticsViewer) new LatencyStatisticsViewer(checkNotNull(parent)));
     }
 
 }

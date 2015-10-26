@@ -38,7 +38,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
  * @author Bernd Hufmann
  *
  */
-public abstract class AbstractLatencyStatisticsViewer extends AbstractTmfTreeViewer {
+public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTreeViewer {
 
     private static final NumberFormat FORMATTER = checkNotNull(NumberFormat.getNumberInstance(Locale.getDefault()));
 
@@ -57,7 +57,7 @@ public abstract class AbstractLatencyStatisticsViewer extends AbstractTmfTreeVie
      * @param parent
      *            the parent composite
      */
-    public AbstractLatencyStatisticsViewer(Composite parent) {
+    public AbstractSegmentStoreStatisticsViewer(Composite parent) {
         super(parent, false);
         setLabelProvider(new LatencyLabelProvider());
     }
@@ -218,7 +218,8 @@ public abstract class AbstractLatencyStatisticsViewer extends AbstractTmfTreeVie
     /**
      * Class for defining an entry in the statistics tree.
      */
-    protected class LatencyTreeViewerEntry extends TmfTreeViewerEntry  {
+    protected class LatencyTreeViewerEntry extends TmfTreeViewerEntry {
+
         private LatencyStatistics fEntry;
 
         /**
@@ -241,7 +242,7 @@ public abstract class AbstractLatencyStatisticsViewer extends AbstractTmfTreeVie
          * @return statistics object
          */
         public LatencyStatistics getEntry() {
-            return fEntry;
+            return checkNotNull(fEntry);
         }
 
     }

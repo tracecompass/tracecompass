@@ -32,7 +32,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
  * @author Bernd Hufmann
  *
  */
-public class LatencyStatisticsViewer extends AbstractLatencyStatisticsViewer {
+public class LatencyStatisticsViewer extends AbstractSegmentStoreStatisticsViewer {
 
     private static final String SYSCALL_LEVEL = checkNotNull(Messages.LatencyStatistics_SyscallLevelName);
 
@@ -81,15 +81,16 @@ public class LatencyStatisticsViewer extends AbstractLatencyStatisticsViewer {
         TmfTreeViewerEntry child = new LatencyTreeViewerEntry(checkNotNull(Messages.LatencyStatistics_TotalLabel), checkNotNull(entry));
         entryList.add(child);
 
-        HiddenTreeViewerEntry syscalls = new HiddenTreeViewerEntry(SYSCALL_LEVEL);
+        HiddenTreeViewerEntry syscalls = new HiddenTreeViewerEntry(checkNotNull(SYSCALL_LEVEL));
         child.addChild(syscalls);
 
         Map<String, LatencyStatistics> perSyscallStats = module.getPerSyscallStats();
-
-        Iterator<Entry<String, LatencyStatistics>> stats = perSyscallStats.entrySet().iterator();
-        while (stats.hasNext()) {
-            Entry<String, LatencyStatistics> statsEntry = stats.next();
-            syscalls.addChild(new LatencyTreeViewerEntry(checkNotNull(statsEntry.getKey()), checkNotNull(statsEntry.getValue())));
+        if (perSyscallStats != null) {
+            Iterator<Entry<String, LatencyStatistics>> stats = perSyscallStats.entrySet().iterator();
+            while (stats.hasNext()) {
+                Entry<String, LatencyStatistics> statsEntry = stats.next();
+                syscalls.addChild(new LatencyTreeViewerEntry(checkNotNull(statsEntry.getKey()), checkNotNull(statsEntry.getValue())));
+            }
         }
         return root;
     }

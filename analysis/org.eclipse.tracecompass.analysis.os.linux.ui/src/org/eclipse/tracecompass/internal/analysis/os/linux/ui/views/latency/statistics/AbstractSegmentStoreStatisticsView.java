@@ -9,7 +9,6 @@
  * Contributors:
  *     Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.statistics;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -20,26 +19,26 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 
 /**
- * Abstract view to to be extended to display latency statistics.
+ * Abstract view to to be extended to display segment store statistics.
  *
  * @author Bernd Hufmann
  *
  */
-public abstract class AbstractLatencyStatisticsView extends TmfView {
+public abstract class AbstractSegmentStoreStatisticsView extends TmfView {
 
-    @Nullable private AbstractLatencyStatisticsViewer fStatsViewer = null;
+    @Nullable private AbstractSegmentStoreStatisticsViewer fStatsViewer = null;
 
     /**
      * Constructor
      */
-    public AbstractLatencyStatisticsView() {
+    public AbstractSegmentStoreStatisticsView() {
         super("StatisticsView"); //$NON-NLS-1$
     }
 
     @Override
     public void createPartControl(@Nullable Composite parent) {
         super.createPartControl(parent);
-        AbstractLatencyStatisticsViewer statsViewer = createLatencyStatisticsViewer(NonNullUtils.checkNotNull(parent));
+        AbstractSegmentStoreStatisticsViewer statsViewer = createSegmentStoreStatisticsViewer(NonNullUtils.checkNotNull(parent));
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
         if (trace != null) {
             statsViewer.loadTrace(trace);
@@ -49,7 +48,7 @@ public abstract class AbstractLatencyStatisticsView extends TmfView {
 
     @Override
     public void setFocus() {
-        AbstractLatencyStatisticsViewer statsViewer = fStatsViewer;
+        AbstractSegmentStoreStatisticsViewer statsViewer = fStatsViewer;
         if (statsViewer != null) {
             statsViewer.getControl().setFocus();
         }
@@ -58,19 +57,19 @@ public abstract class AbstractLatencyStatisticsView extends TmfView {
     @Override
     public void dispose() {
         super.dispose();
-        AbstractLatencyStatisticsViewer statsViewer = fStatsViewer;
+        AbstractSegmentStoreStatisticsViewer statsViewer = fStatsViewer;
         if (statsViewer != null) {
             statsViewer.dispose();
         }
     }
 
     /**
-     * Creates a latency statistics viewer instance.
+     * Creates a segment store statistics viewer instance.
      *
      * @param parent
      *            the parent composite to create the viewer in.
      * @return the latency statistics viewer implementation
      */
-    protected abstract AbstractLatencyStatisticsViewer createLatencyStatisticsViewer(Composite parent);
+    protected abstract AbstractSegmentStoreStatisticsViewer createSegmentStoreStatisticsViewer(Composite parent);
 
 }

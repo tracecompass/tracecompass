@@ -9,7 +9,6 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.statistics;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;

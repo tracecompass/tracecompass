@@ -45,13 +45,13 @@ public class LatencyStatisticsAnalysisModule extends TmfAbstractAnalysisModule {
 
     private @Nullable LatencyStatistics fTotalStats;
 
-    private Map<String, LatencyStatistics> fPerSyscallStats = new HashMap<>();
+    private @Nullable Map<String, LatencyStatistics> fPerSyscallStats;
 
     @Override
     protected Iterable<IAnalysisModule> getDependentAnalyses() {
         ITmfTrace trace = getTrace();
         if (trace != null) {
-            LatencyAnalysis module = TmfTraceUtils.getAnalysisModuleOfClass(trace, LatencyAnalysis.class, LatencyAnalysis.ID);
+            LatencyAnalysis module = TmfTraceUtils.getAnalysisModuleOfClass(trace, LatencyAnalysis.class, checkNotNull(LatencyAnalysis.ID));
             fLatencyModule = module;
             return checkNotNull(ImmutableList.of((IAnalysisModule) module));
         }
@@ -95,13 +95,12 @@ public class LatencyStatisticsAnalysisModule extends TmfAbstractAnalysisModule {
             ISegment segment = iter.next();
             total.update(checkNotNull(segment));
         }
-
         fTotalStats = total;
         return true;
     }
 
     private boolean calculateTotalPerSyscall(ISegmentStore<ISegment> store, IProgressMonitor monitor) {
-        fPerSyscallStats = new HashMap<>();
+        Map<String, LatencyStatistics> perSyscallStats = new HashMap<>();
 
         Iterator<ISegment> iter = store.iterator();
         while (iter.hasNext()) {
@@ -111,15 +110,15 @@ public class LatencyStatisticsAnalysisModule extends TmfAbstractAnalysisModule {
             ISegment segment = iter.next();
             if (segment instanceof SystemCall) {
                 SystemCall syscall = (SystemCall) segment;
-                LatencyStatistics values = fPerSyscallStats.get(syscall.getName());
+                LatencyStatistics values = perSyscallStats.get(syscall.getName());
                 if (values == null) {
                     values = new LatencyStatistics();
                 }
                 values.update(segment);
-                fPerSyscallStats.put(syscall.getName(), values);
+                perSyscallStats.put(syscall.getName(), values);
             }
         }
-
+        fPerSyscallStats = perSyscallStats;
         return true;
     }
 
@@ -141,7 +140,7 @@ public class LatencyStatisticsAnalysisModule extends TmfAbstractAnalysisModule {
      *
      * @return the per syscall statistics
      */
-    public Map<String, LatencyStatistics> getPerSyscallStats() {
+    public @Nullable Map<String, LatencyStatistics> getPerSyscallStats() {
         return fPerSyscallStats;
     }
 
