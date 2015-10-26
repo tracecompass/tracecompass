@@ -24,9 +24,9 @@
          </tracetype>
       </module>
       <module
-            analysis_module="org.eclipse.tracecompass.analysis.os.linux.core.latency.LatencyAnalysis"
+            analysis_module="org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCallLatencyAnalysis"
             automatic="true"
-            id="org.eclipse.tracecompass.analysis.os.linux.latency"
+            id="org.eclipse.tracecompass.analysis.os.linux.latency.syscall"
             name="%analysis.latency">
          <tracetype
                applies="true"

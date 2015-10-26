@@ -36,12 +36,12 @@ import com.google.common.collect.ImmutableList;
  * @author Alexandre Montplaisir
  * @since 2.0
  */
-public class LatencyAnalysis extends AbstractSegmentStoreAnalysisModule {
+public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisModule {
 
     /**
      * The ID of this analysis
      */
-    public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.latency"; //$NON-NLS-1$
+    public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.latency.syscall"; //$NON-NLS-1$
 
     private static final String DATA_FILENAME = "latency-analysis.dat"; //$NON-NLS-1$
 

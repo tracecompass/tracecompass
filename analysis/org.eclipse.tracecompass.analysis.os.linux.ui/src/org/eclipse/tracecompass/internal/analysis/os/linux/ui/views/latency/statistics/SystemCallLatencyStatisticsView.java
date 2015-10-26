@@ -21,14 +21,14 @@ import org.eclipse.swt.widgets.Composite;
  * @author Bernd Hufmann
  *
  */
-public class LatencyStatisticsView extends AbstractSegmentStoreStatisticsView {
+public class SystemCallLatencyStatisticsView extends AbstractSegmentStoreStatisticsView {
 
     /** The view ID*/
     public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.ui.views.latency.statsview"; //$NON-NLS-1$
 
     @Override
     protected AbstractSegmentStoreStatisticsViewer createSegmentStoreStatisticsViewer(Composite parent) {
-        return checkNotNull((AbstractSegmentStoreStatisticsViewer) new LatencyStatisticsViewer(checkNotNull(parent)));
+        return checkNotNull((AbstractSegmentStoreStatisticsViewer) new SystemCallLatencyStatisticsViewer(checkNotNull(parent)));
     }
 
 }

@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
  *
  * @author Matthew Khouzam
  */
-public class LatencyScatterView extends TmfChartView {
+public class SystemCallLatencyScatterView extends TmfChartView {
     // Attributes
     // ------------------------------------------------------------------------
 
@@ -39,7 +39,7 @@ public class LatencyScatterView extends TmfChartView {
     /**
      * Constructor
      */
-    public LatencyScatterView() {
+    public SystemCallLatencyScatterView() {
         super(ID);
     }
 
@@ -49,8 +49,8 @@ public class LatencyScatterView extends TmfChartView {
 
     @Override
     protected TmfXYChartViewer createChartViewer(@Nullable Composite parent) {
-        fScatterViewer = new LatencyScatterGraphViewer(NonNullUtils.checkNotNull(parent), nullToEmptyString(Messages.LatencyScatterView_title), nullToEmptyString(Messages.LatencyScatterView_xAxis),
-                nullToEmptyString(Messages.LatencyScatterView_yAxis));
+        fScatterViewer = new SystemCallLatencyScatterGraphViewer(NonNullUtils.checkNotNull(parent), nullToEmptyString(Messages.SystemCallLatencyScatterView_title), nullToEmptyString(Messages.SystemCallLatencyScatterView_xAxis),
+                nullToEmptyString(Messages.SystemCallLatencyScatterView_yAxis));
         return fScatterViewer;
     }
 

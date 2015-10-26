@@ -15,7 +15,7 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.os.linux.core.latency.LatencyAnalysis;
+import org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCallLatencyAnalysis;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmentStoreAnalysisModule;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.AbstractSegmentStoreScatterGraphViewer;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -28,7 +28,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
  * @author Matthew Khouzam - reduced memory usage
  * @since 1.0
  */
-public class LatencyScatterGraphViewer extends AbstractSegmentStoreScatterGraphViewer {
+public class SystemCallLatencyScatterGraphViewer extends AbstractSegmentStoreScatterGraphViewer {
 
     /**
      * Constructor
@@ -42,12 +42,12 @@ public class LatencyScatterGraphViewer extends AbstractSegmentStoreScatterGraphV
      * @param yLabel
      *            name of the y axis
      */
-    public LatencyScatterGraphViewer(Composite parent, String title, String xLabel, String yLabel) {
+    public SystemCallLatencyScatterGraphViewer(Composite parent, String title, String xLabel, String yLabel) {
         super(parent, title, xLabel, yLabel);
     }
 
     @Override
     protected @Nullable AbstractSegmentStoreAnalysisModule getSegmentStoreAnalysisModule(ITmfTrace trace) {
-        return TmfTraceUtils.getAnalysisModuleOfClass(trace, LatencyAnalysis.class, LatencyAnalysis.ID);
+        return TmfTraceUtils.getAnalysisModuleOfClass(trace, SystemCallLatencyAnalysis.class, SystemCallLatencyAnalysis.ID);
     }
 }

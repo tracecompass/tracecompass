@@ -12,30 +12,41 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.AbstractSegmentStoreTableView;
+import org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCallLatencyAnalysis;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmentStoreAnalysisModule;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.AbstractSegmentStoreTableViewer;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 /**
- * View for the latency analysis
+ * Displays the latency analysis data in a column table
  *
  * @author France Lapointe Nguyen
  */
-public class LatencyView extends AbstractSegmentStoreTableView {
-
-    // ------------------------------------------------------------------------
-    // Attributes
-    // ------------------------------------------------------------------------
-
-    /** The view's ID */
-    public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.views.latency"; //$NON-NLS-1$
+public class SystemCallLatencyTableViewer extends AbstractSegmentStoreTableViewer {
 
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
 
+    /**
+     * Constructor
+     *
+     * @param tableViewer
+     *            The table viewer
+     */
+    public SystemCallLatencyTableViewer(TableViewer tableViewer) {
+        super(tableViewer);
+    }
+
+    // ------------------------------------------------------------------------
+    // Operations
+    // ------------------------------------------------------------------------
+
     @Override
-    protected AbstractSegmentStoreTableViewer getSegmentStoreViewer(TableViewer tableViewer) {
-        return new LatencyTableViewer(tableViewer);
+    protected @Nullable AbstractSegmentStoreAnalysisModule getSegmentStoreAnalysisModule(ITmfTrace trace) {
+          return TmfTraceUtils.getAnalysisModuleOfClass(trace, SystemCallLatencyAnalysis.class, SystemCallLatencyAnalysis.ID);
     }
 }

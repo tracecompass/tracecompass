@@ -33,7 +33,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
-            class="org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.LatencyView"
+            class="org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.SystemCallLatencyView"
             icon="icons/eview16/latency.png"
             id="org.eclipse.tracecompass.analysis.os.linux.views.latency"
             name="%latency.view.name"
@@ -42,7 +42,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
-            class="org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.LatencyScatterView"
+            class="org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.SystemCallLatencyScatterView"
             icon="icons/eview16/scatter.png"
             id="org.eclipse.tracecompass.analysis.os.linux.views.latency.scatter"
             name="%latency.scatter.view.name"
@@ -51,7 +51,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
-            class="org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.statistics.LatencyStatisticsView"
+            class="org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.statistics.SystemCallLatencyStatisticsView"
             icon="icons/eview16/statistics_view.gif"
             id="org.eclipse.tracecompass.analysis.os.linux.ui.views.latency.statsview"
             name="%latency.stats.view.name"
@@ -85,21 +85,21 @@
             class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
             id="org.eclipse.tracecompass.analysis.os.linux.views.latency">
          <analysisModuleClass
-               class="org.eclipse.tracecompass.analysis.os.linux.core.latency.LatencyAnalysis">
+               class="org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCallLatencyAnalysis">
          </analysisModuleClass>
       </output>
       <output
             class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
             id="org.eclipse.tracecompass.analysis.os.linux.views.latency.scatter">
          <analysisModuleClass
-               class="org.eclipse.tracecompass.analysis.os.linux.core.latency.LatencyAnalysis">
+               class="org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCallLatencyAnalysis">
          </analysisModuleClass>
       </output>
       <output
             class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
             id="org.eclipse.tracecompass.analysis.os.linux.ui.views.latency.statsview">
          <analysisModuleClass
-               class="org.eclipse.tracecompass.analysis.os.linux.core.latency.LatencyAnalysis">
+               class="org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCallLatencyAnalysis">
          </analysisModuleClass>
       </output>
       

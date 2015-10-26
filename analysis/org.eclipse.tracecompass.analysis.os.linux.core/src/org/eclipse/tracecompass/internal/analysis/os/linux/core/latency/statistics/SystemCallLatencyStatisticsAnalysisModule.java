@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.analysis.os.linux.core.latency.LatencyAnalysis;
+import org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCallLatencyAnalysis;
 import org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCall;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
@@ -36,12 +36,12 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Bernd Hufmann
  */
-public class LatencyStatisticsAnalysisModule extends TmfAbstractAnalysisModule {
+public class SystemCallLatencyStatisticsAnalysisModule extends TmfAbstractAnalysisModule {
 
     /** The analysis module ID */
-    public static String ID = "org.eclipse.tracecompass.analysis.os.linux.core.latency.statistics"; //$NON-NLS-1$
+    public static String ID = "org.eclipse.tracecompass.analysis.os.linux.core.latency.statistics.syscall"; //$NON-NLS-1$
 
-    private @Nullable LatencyAnalysis fLatencyModule;
+    private @Nullable SystemCallLatencyAnalysis fLatencyModule;
 
     private @Nullable LatencyStatistics fTotalStats;
 
@@ -51,7 +51,7 @@ public class LatencyStatisticsAnalysisModule extends TmfAbstractAnalysisModule {
     protected Iterable<IAnalysisModule> getDependentAnalyses() {
         ITmfTrace trace = getTrace();
         if (trace != null) {
-            LatencyAnalysis module = TmfTraceUtils.getAnalysisModuleOfClass(trace, LatencyAnalysis.class, checkNotNull(LatencyAnalysis.ID));
+            SystemCallLatencyAnalysis module = TmfTraceUtils.getAnalysisModuleOfClass(trace, SystemCallLatencyAnalysis.class, checkNotNull(SystemCallLatencyAnalysis.ID));
             fLatencyModule = module;
             return checkNotNull(ImmutableList.of((IAnalysisModule) module));
         }
@@ -60,7 +60,7 @@ public class LatencyStatisticsAnalysisModule extends TmfAbstractAnalysisModule {
 
     @Override
     protected boolean executeAnalysis(IProgressMonitor monitor) throws TmfAnalysisException {
-        LatencyAnalysis latency = fLatencyModule;
+        SystemCallLatencyAnalysis latency = fLatencyModule;
         ITmfTrace trace = getTrace();
         if ((latency == null) || (trace == null)) {
             return false;

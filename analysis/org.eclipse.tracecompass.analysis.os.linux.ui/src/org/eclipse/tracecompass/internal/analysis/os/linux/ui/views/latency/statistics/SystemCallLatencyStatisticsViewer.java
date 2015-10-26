@@ -21,7 +21,7 @@ import java.util.Map.Entry;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.statistics.LatencyStatistics;
-import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.statistics.LatencyStatisticsAnalysisModule;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.statistics.SystemCallLatencyStatisticsAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
@@ -32,7 +32,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
  * @author Bernd Hufmann
  *
  */
-public class LatencyStatisticsViewer extends AbstractSegmentStoreStatisticsViewer {
+public class SystemCallLatencyStatisticsViewer extends AbstractSegmentStoreStatisticsViewer {
 
     private static final String SYSCALL_LEVEL = checkNotNull(Messages.LatencyStatistics_SyscallLevelName);
 
@@ -42,7 +42,7 @@ public class LatencyStatisticsViewer extends AbstractSegmentStoreStatisticsViewe
      * @param parent
      *            the parent composite
      */
-    public LatencyStatisticsViewer(Composite parent) {
+    public SystemCallLatencyStatisticsViewer(Composite parent) {
         super(parent);
     }
 
@@ -53,7 +53,7 @@ public class LatencyStatisticsViewer extends AbstractSegmentStoreStatisticsViewe
      */
     @Override
     @Nullable protected TmfAbstractAnalysisModule createStatisticsAnalysiModule() {
-        LatencyStatisticsAnalysisModule module = new LatencyStatisticsAnalysisModule();
+        SystemCallLatencyStatisticsAnalysisModule module = new SystemCallLatencyStatisticsAnalysisModule();
         return module;
     }
 
@@ -65,11 +65,11 @@ public class LatencyStatisticsViewer extends AbstractSegmentStoreStatisticsViewe
 
         TmfAbstractAnalysisModule analysisModule = getStatisticsAnalysisModule();
 
-        if (getTrace() == null || !(analysisModule instanceof LatencyStatisticsAnalysisModule)) {
+        if (getTrace() == null || !(analysisModule instanceof SystemCallLatencyStatisticsAnalysisModule)) {
             return null;
         }
 
-        LatencyStatisticsAnalysisModule module = (LatencyStatisticsAnalysisModule) analysisModule;
+        SystemCallLatencyStatisticsAnalysisModule module = (SystemCallLatencyStatisticsAnalysisModule) analysisModule;
 
         module.waitForCompletion();
 

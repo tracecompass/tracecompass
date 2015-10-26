@@ -25,47 +25,17 @@ public class Messages extends NLS {
     /**
      * Time vs Duration
      */
-    public static String LatencyScatterView_title;
+    public static String SystemCallLatencyScatterView_title;
 
     /**
-     * Time
+     * Time axis
      */
-    public static String LatencyScatterView_xAxis;
+    public static String SystemCallLatencyScatterView_xAxis;
 
     /**
-     * Duration
+     * Duration axis
      */
-    public static String LatencyScatterView_yAxis;
-
-    /**
-     * Name of the duration column
-     */
-    public static String LatencyTableViewer_duration;
-
-    /**
-     * Name of the end time column
-     */
-    public static String LatencyTableViewer_endTime;
-
-    /**
-     * Name of the start time column
-     */
-    public static String LatencyTableViewer_startTime;
-
-    /**
-     * Title of action to goto start time time
-     */
-    public static String LatencyView_goToStartEvent;
-
-    /**
-     * Title of action to goto end event
-     */
-    public static String LatencyView_goToEndEvent;
-
-    /**
-     * Name of show statistics action
-     */
-    public static String LatencyTable_ShowStatisticsActionName;
+    public static String SystemCallLatencyScatterView_yAxis;
 
     static {
         // initialize resource bundle
