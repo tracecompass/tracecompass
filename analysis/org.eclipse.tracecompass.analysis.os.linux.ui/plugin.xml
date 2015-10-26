@@ -95,5 +95,13 @@
                class="org.eclipse.tracecompass.analysis.os.linux.core.latency.LatencyAnalysis">
          </analysisModuleClass>
       </output>
+      <output
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="org.eclipse.tracecompass.analysis.os.linux.ui.views.latency.statsview">
+         <analysisModuleClass
+               class="org.eclipse.tracecompass.analysis.os.linux.core.latency.LatencyAnalysis">
+         </analysisModuleClass>
+      </output>
+      
    </extension>
 </plugin>
