@@ -67,7 +67,7 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
      * Returns all the listeners
      * @return latency listners
      */
-    public Iterable<IAnalysisProgressListener> getListeners() {
+    protected Iterable<IAnalysisProgressListener> getListeners() {
         return fListeners;
     }
 
@@ -86,7 +86,7 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
      * Returns the file name for storing segment store
      * @return segment store fine name
      */
-    public abstract String getDataFileName();
+    protected abstract String getDataFileName();
 
     /**
      * Returns the analysis request for creating the segment store
@@ -94,7 +94,7 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
      *                a segment store to fill
      * @return the segment store analysis request implementation
      */
-    public abstract AbstractSegmentStoreAnalysisRequest createAnalysisRequest(ISegmentStore<ISegment> segmentStore);
+    protected abstract AbstractSegmentStoreAnalysisRequest createAnalysisRequest(ISegmentStore<ISegment> segmentStore);
 
     /**
      * Read an object from the ObjectInputStream.
@@ -213,7 +213,7 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
     /**
      * Abstract event request to fill a a segment store
      */
-    public static abstract class AbstractSegmentStoreAnalysisRequest extends TmfEventRequest {
+    protected static abstract class AbstractSegmentStoreAnalysisRequest extends TmfEventRequest {
 
         private final ISegmentStore<ISegment> fFullLatencyStore;
 
