@@ -21,6 +21,7 @@ import org.eclipse.swt.graphics.Color;
  */
 public class MarkerEvent extends TimeEvent implements IMarkerEvent {
 
+    private final String fCategory;
     private final Color fColor;
     private final String fLabel;
     private final boolean fForeground;
@@ -34,6 +35,8 @@ public class MarkerEvent extends TimeEvent implements IMarkerEvent {
      *            The timestamp of this marker
      * @param duration
      *            The duration of the marker
+     * @param category
+     *            The category of the marker
      * @param color
      *            The marker color
      * @param label
@@ -41,8 +44,9 @@ public class MarkerEvent extends TimeEvent implements IMarkerEvent {
      * @param foreground
      *            true if the marker is drawn in foreground, and false otherwise
      */
-    public MarkerEvent(ITimeGraphEntry entry, long time, long duration, Color color, String label, boolean foreground) {
+    public MarkerEvent(ITimeGraphEntry entry, long time, long duration, String category, Color color, String label, boolean foreground) {
         super(entry, time, duration);
+        fCategory = category;
         fColor = color;
         fLabel = label;
         fForeground = foreground;
@@ -57,6 +61,8 @@ public class MarkerEvent extends TimeEvent implements IMarkerEvent {
      *            The timestamp of this marker
      * @param duration
      *            The duration of the marker
+     * @param category
+     *            The category of the marker
      * @param color
      *            The marker color
      * @param label
@@ -66,11 +72,17 @@ public class MarkerEvent extends TimeEvent implements IMarkerEvent {
      * @param value
      *            The value of the marker
      */
-    public MarkerEvent(ITimeGraphEntry entry, long time, long duration, Color color, String label, boolean foreground, int value) {
+    public MarkerEvent(ITimeGraphEntry entry, long time, long duration, String category, Color color, String label, boolean foreground, int value) {
         super(entry, time, duration, value);
+        fCategory = category;
         fColor = color;
         fLabel = label;
         fForeground = foreground;
+    }
+
+    @Override
+    public String getCategory() {
+        return fCategory;
     }
 
     @Override

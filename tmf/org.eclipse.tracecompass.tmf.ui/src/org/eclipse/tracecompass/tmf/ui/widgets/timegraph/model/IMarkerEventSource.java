@@ -25,8 +25,18 @@ import org.eclipse.jdt.annotation.NonNull;
 public interface IMarkerEventSource {
 
     /**
-     * Gets the list of marker events in a given time range.
+     * Gets the list of marker categories that this object provides.
      *
+     * @return The list of marker categories
+     */
+    @NonNull List<String> getMarkerCategories();
+
+    /**
+     * Gets the list of marker events of a specific category in a given time
+     * range.
+     *
+     * @param category
+     *            The marker category
      * @param startTime
      *            Start of the time range
      * @param endTime
@@ -36,8 +46,7 @@ public interface IMarkerEventSource {
      * @param monitor
      *            The progress monitor object
      * @return The list of marker events
-     * @since 2.0
      */
-    @NonNull List<IMarkerEvent> getMarkerList(long startTime, long endTime, long resolution, @NonNull IProgressMonitor monitor);
+    @NonNull List<IMarkerEvent> getMarkerList(@NonNull String category, long startTime, long endTime, long resolution, @NonNull IProgressMonitor monitor);
 
 }

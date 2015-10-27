@@ -2010,7 +2010,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
                             final RGBA rgba = dialog.getColorValue();
                             Color color = new Color(Display.getDefault(), rgba.rgb.red, rgba.rgb.green, rgba.rgb.blue, rgba.alpha);
                             fColors.add(color);
-                            IMarkerEvent bookmark = new MarkerEvent(null, time, duration, color, label, true);
+                            IMarkerEvent bookmark = new MarkerEvent(null, time, duration, IMarkerEvent.BOOKMARK, color, label, true);
                             fBookmarks.add(bookmark);
                             Collections.sort(fBookmarks, new BookmarkComparator());
                             getTimeGraphControl().setBookmarks(fBookmarks);

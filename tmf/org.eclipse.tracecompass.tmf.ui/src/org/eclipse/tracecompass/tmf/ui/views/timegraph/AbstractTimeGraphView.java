@@ -1185,7 +1185,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                             int alpha = Integer.valueOf(matcher.group(4));
                             Color color = new Color(Display.getDefault(), red, green, blue, alpha);
                             fColors.add(color);
-                            bookmarks.add(new MarkerEvent(null, Long.valueOf(time), Long.valueOf(duration), color, label, true));
+                            bookmarks.add(new MarkerEvent(null, Long.valueOf(time), Long.valueOf(duration), IMarkerEvent.BOOKMARK, color, label, true));
                         } catch (NumberFormatException e) {
                             Activator.getDefault().logError(e.getMessage());
                         }
@@ -1497,10 +1497,12 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             long resolution, @NonNull IProgressMonitor monitor) {
         List<IMarkerEvent> markers = new ArrayList<>();
         for (IMarkerEventSource markerEventSource : getMarkerEventSources(getTrace())) {
-            if (monitor.isCanceled()) {
-                break;
+            for (String category : markerEventSource.getMarkerCategories()) {
+                if (monitor.isCanceled()) {
+                    break;
+                }
+                markers.addAll(markerEventSource.getMarkerList(checkNotNull(category), startTime, endTime, resolution, monitor));
             }
-            markers.addAll(markerEventSource.getMarkerList(startTime, endTime, resolution, monitor));
         }
         return markers;
     }

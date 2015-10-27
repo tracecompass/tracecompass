@@ -12,14 +12,29 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 
 /**
- * Interface for a marker time event that includes a color and optional label.
+ * Interface for a marker time event that includes a category, a color and
+ * an optional label.
  *
  * @since 2.0
  */
 public interface IMarkerEvent extends ITimeEvent {
+
+    /** Bookmark marker category */
+    @NonNull String BOOKMARK = checkNotNull(Messages.MarkerEvent_Bookmark);
+
+    /**
+     * Get this marker's category.
+     *
+     * @return The category
+     */
+    String getCategory();
 
     /**
      * Get this marker's label.
