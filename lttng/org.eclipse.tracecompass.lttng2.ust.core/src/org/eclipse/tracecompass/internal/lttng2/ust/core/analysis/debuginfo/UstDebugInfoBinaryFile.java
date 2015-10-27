@@ -18,9 +18,9 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 public class UstDebugInfoBinaryFile implements Comparable<UstDebugInfoBinaryFile> {
 
-    private final String filePath;
-    private final String buildId;
-    private final String toString;
+    private final String fFilePath;
+    private final String fBuildId;
+    private final String fToString;
 
     /**
      * Constructor
@@ -31,9 +31,9 @@ public class UstDebugInfoBinaryFile implements Comparable<UstDebugInfoBinaryFile
      *            The binary's unique buildID (in base16 form).
      */
     public UstDebugInfoBinaryFile(String filePath, String buildId) {
-        this.filePath = filePath;
-        this.buildId = buildId;
-        this.toString = new String(filePath + " (" + buildId + ')'); //$NON-NLS-1$
+        fFilePath = filePath;
+        fBuildId = buildId;
+        fToString = new String(filePath + " (" + buildId + ')'); //$NON-NLS-1$
     }
 
     /**
@@ -42,7 +42,7 @@ public class UstDebugInfoBinaryFile implements Comparable<UstDebugInfoBinaryFile
      * @return The file path
      */
     public String getFilePath() {
-        return filePath;
+        return fFilePath;
     }
 
     /**
@@ -54,12 +54,12 @@ public class UstDebugInfoBinaryFile implements Comparable<UstDebugInfoBinaryFile
      * @return The file's build ID.
      */
     public String getBuildId() {
-        return buildId;
+        return fBuildId;
     }
 
     @Override
     public String toString() {
-        return toString;
+        return fToString;
     }
 
     @Override
@@ -68,19 +68,16 @@ public class UstDebugInfoBinaryFile implements Comparable<UstDebugInfoBinaryFile
             return false;
         }
         UstDebugInfoBinaryFile other = (UstDebugInfoBinaryFile) obj;
-        if (this.filePath == other.filePath &&
-                this.buildId == other.buildId) {
-            return true;
-        }
-        return false;
+        return (fFilePath == other.fFilePath &&
+                fBuildId == other.fBuildId);
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + buildId.hashCode();
-        result = prime * result +  filePath.hashCode();
+        result = prime * result + fBuildId.hashCode();
+        result = prime * result +  fFilePath.hashCode();
         return result;
     }
 
@@ -93,6 +90,6 @@ public class UstDebugInfoBinaryFile implements Comparable<UstDebugInfoBinaryFile
         if (o == null) {
             return 1;
         }
-        return this.filePath.compareTo(o.filePath);
+        return fFilePath.compareTo(o.fFilePath);
     }
 }
