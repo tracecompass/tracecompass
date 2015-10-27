@@ -93,12 +93,12 @@ public final class FileOffsetMapper {
             builder.redirectErrorStream(true);
 
             Process p = builder.start();
-            BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            int ret = p.waitFor();
-            List<String> lines = br.lines().collect(Collectors.toList());
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));) {
+                int ret = p.waitFor();
+                List<String> lines = br.lines().collect(Collectors.toList());
 
-            return (ret == 0 ? lines : null);
-
+                return (ret == 0 ? lines : null);
+            }
         } catch (IOException | InterruptedException e) {
             return null;
         }
