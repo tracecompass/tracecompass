@@ -216,6 +216,39 @@ public interface IKernelAnalysisEventLayout {
      */
     String eventSchedProcessWakeupNew();
 
+
+    /**
+     * Starting the high resolution timer
+     * <p>
+     * In Linux, High resolution timers are used in the following:
+     * <ul>
+     * <li>nanosleep</li>
+     * <li>itimers</li>
+     * <li>posix timers</li>
+     * </ul>
+     *
+     * @return the event name
+     *
+     * @since 2.0
+     */
+    String eventHRTimerStart();
+
+    /**
+     * Canceling the high resolution timer
+     * <p>
+     * In Linux, High resolution timers are used in the following:
+     * <ul>
+     * <li>nanosleep</li>
+     * <li>itimers</li>
+     * <li>posix timers</li>
+     * </ul>
+     *
+     * @return the event name
+     *
+     * @since 2.0
+     */
+    String eventHRTimerCancel();
+
     /**
      * Entering the high resolution timer expired handler.
      * <p>
@@ -440,4 +473,48 @@ public interface IKernelAnalysisEventLayout {
      * @since 1.0
      */
     String fieldNextPrio();
+
+    /**
+     * The field with the hrtimer. The hrtimer holds the timer instance.
+     *
+     * @return the name of the hrTimer field
+     * @since 2.0
+     */
+    String fieldHRtimer();
+
+    /**
+     * The field with the expires value. The expires field holds the expiry time.
+     * of the hrtimer.
+     *
+     * @return the name of the expires field
+     * @since 2.0
+     */
+    String fieldHRtimerExpires();
+
+    /**
+     * Gets the field name with the softexpires value. The softexpire value is the
+     * absolute earliest expiry time of the hrtimer.
+     *
+     * @return the name of the softexpires field
+     * @since 2.0
+     */
+    String fieldHRtimerSoftexpires();
+
+    /**
+     * The field of the function address value. The function field holds timer
+     * expiry callback function.
+     *
+     * @return the name of the function field
+     * @since 2.0
+     */
+    String fieldHRtimerFunction();
+
+    /**
+     * The field of the now value. The now field holds the current time.
+     *
+     * @return the name of the now field (hrtimer)
+     * @since 2.0
+     */
+    String fieldHRtimerNow();
+
 }

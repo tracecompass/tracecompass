@@ -29,7 +29,31 @@ public class Lttng27EventLayout extends Lttng26EventLayout {
     public static final Lttng27EventLayout INSTANCE = new Lttng27EventLayout();
 
     // ------------------------------------------------------------------------
-    // New definitions in LTTng 2.7
+    // New event definition in LTTng 2.7
+    // ------------------------------------------------------------------------
+
+    @Override
+    public String eventHRTimerStart() {
+        return "timer_hrtimer_start";
+    }
+
+    @Override
+    public String eventHRTimerCancel() {
+        return "timer_hrtimer_cancel";
+    }
+
+    @Override
+    public String eventHRTimerExpireEntry() {
+        return "timer_hrtimer_expire_entry";
+    }
+
+    @Override
+    public String eventHRTimerExpireExit() {
+        return "timer_hrtimer_expire_exit";
+    }
+
+    // ------------------------------------------------------------------------
+    // New field definitions in LTTng 2.7
     // ------------------------------------------------------------------------
 
     public String fieldParentNSInum() {

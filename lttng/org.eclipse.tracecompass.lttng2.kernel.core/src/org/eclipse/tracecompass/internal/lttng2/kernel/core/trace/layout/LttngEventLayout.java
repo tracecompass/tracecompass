@@ -40,6 +40,8 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     private static final String SOFTIRQ_ENTRY = "softirq_entry";
     private static final String SOFTIRQ_EXIT = "softirq_exit";
     private static final String SOFTIRQ_RAISE = "softirq_raise";
+    private static final String HRTIMER_START = "hrtimer_start";
+    private static final String HRTIMER_CANCEL = "hrtimer_cancel";
     private static final String HRTIMER_EXPIRE_ENTRY = "hrtimer_expire_entry";
     private static final String HRTIMER_EXPIRE_EXIT = "hrtimer_expire_exit";
     private static final String SCHED_SWITCH = "sched_switch";
@@ -80,6 +82,11 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     private static final String STATUS = "status";
     private static final String PREV_COMM = "prev_comm";
     private static final String FILENAME = "filename";
+    private static final String HRTIMER = "hrtimer";
+    private static final String HRTIMER_FUNCTION = "function";
+    private static final String HRTIMER_EXPIRES = "expires";
+    private static final String HRTIMER_NOW = "now";
+    private static final String HRTIMER_SOFT_EXPIRES = "softexpires";
 
     /** All instances are the same. Only provide a static instance getter */
     protected LttngEventLayout() {
@@ -288,6 +295,16 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     }
 
     @Override
+    public String eventHRTimerStart() {
+        return HRTIMER_START;
+    }
+
+    @Override
+    public String eventHRTimerCancel() {
+        return HRTIMER_CANCEL;
+    }
+
+    @Override
     public String eventHRTimerExpireEntry() {
         return HRTIMER_EXPIRE_ENTRY;
     }
@@ -306,4 +323,28 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     public String eventSchedProcessTTWU() {
         return SCHED_TTWU;
     }
+
+    @Override
+    public String fieldHRtimer() {
+        return HRTIMER;
+    }
+    @Override
+    public String fieldHRtimerFunction() {
+        return HRTIMER_FUNCTION;
+    }
+
+    @Override
+    public String fieldHRtimerExpires() {
+        return HRTIMER_EXPIRES;
+    }
+
+    @Override
+    public String fieldHRtimerSoftexpires() {
+        return HRTIMER_SOFT_EXPIRES;
+    }
+    @Override
+    public String fieldHRtimerNow() {
+        return HRTIMER_NOW;
+    }
+
 }

@@ -38,6 +38,8 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout{
     private static final String SOFTIRQ_ENTRY = "softirq_entry"; //$NON-NLS-1$
     private static final String SOFTIRQ_EXIT = "softirq_exit"; //$NON-NLS-1$
     private static final String SOFTIRQ_RAISE = "softirq_raise"; //$NON-NLS-1$
+    private static final String HRTIMER_START = "hrtimer_start"; //$NON-NLS-1$
+    private static final String HRTIMER_CANCEL = "hrtimer_cancel"; //$NON-NLS-1$
     private static final String HRTIMER_EXPIRE_ENTRY = "hrtimer_expire_entry"; //$NON-NLS-1$
     private static final String HRTIMER_EXPIRE_EXIT = "hrtimer_expire_exit"; //$NON-NLS-1$
     private static final String SCHED_SWITCH = "sched_switch"; //$NON-NLS-1$
@@ -78,6 +80,11 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout{
     private static final String STATUS = "status"; //$NON-NLS-1$
     private static final String PREV_COMM = "prev_comm"; //$NON-NLS-1$
     private static final String FILENAME = "filename"; //$NON-NLS-1$
+    private static final String HRTIMER = "hrtimer"; //$NON-NLS-1$
+    private static final String FUNCTION = "function"; //$NON-NLS-1$
+    private static final String EXPIRES = "expires"; //$NON-NLS-1$
+    private static final String NOW = "now"; //$NON-NLS-1$
+    private static final String SOFT_EXPIRES = "softexpires"; //$NON-NLS-1$
 
     /** All instances are the same. Only provide a static instance getter */
     private DefaultEventLayout() {
@@ -295,6 +302,18 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout{
 
     /** @since 2.0 */
     @Override
+    public String eventHRTimerStart() {
+        return HRTIMER_START;
+    }
+
+    /** @since 2.0 */
+    @Override
+    public String eventHRTimerCancel() {
+        return HRTIMER_CANCEL;
+    }
+
+    /** @since 2.0 */
+    @Override
     public String eventHRTimerExpireEntry() {
         return HRTIMER_EXPIRE_ENTRY;
     }
@@ -313,6 +332,36 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout{
      */
     public String eventSchedProcessTTWU() {
         return SCHED_TTWU;
+    }
+
+    /** @since 2.0 */
+    @Override
+    public String fieldHRtimer() {
+        return HRTIMER;
+    }
+
+    /** @since 2.0 */
+    @Override
+    public String fieldHRtimerFunction() {
+        return FUNCTION;
+    }
+
+    /** @since 2.0 */
+    @Override
+    public String fieldHRtimerExpires() {
+        return EXPIRES;
+    }
+
+    /** @since 2.0 */
+    @Override
+    public String fieldHRtimerSoftexpires() {
+        return SOFT_EXPIRES;
+    }
+
+    /** @since 2.0 */
+    @Override
+    public String fieldHRtimerNow() {
+        return NOW;
     }
 
 }

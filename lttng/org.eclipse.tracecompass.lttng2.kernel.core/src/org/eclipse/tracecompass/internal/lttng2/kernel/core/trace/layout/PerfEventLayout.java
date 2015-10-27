@@ -140,6 +140,16 @@ public class PerfEventLayout implements IKernelAnalysisEventLayout {
     }
 
     @Override
+    public String eventHRTimerStart() {
+        return "timer:hrtimer_start";  //$NON-NLS-1$
+    }
+
+    @Override
+    public String eventHRTimerCancel() {
+        return "timer:hrtimer_cancel"; //$NON-NLS-1$
+    }
+
+    @Override
     public String eventHRTimerExpireEntry() {
         return "timer:hrtimer_expire_entry"; //$NON-NLS-1$
     }
@@ -241,6 +251,31 @@ public class PerfEventLayout implements IKernelAnalysisEventLayout {
     @Override
     public String fieldFilename() {
         return "filename"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String fieldHRtimer() {
+        return "hrtimer"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String fieldHRtimerFunction() {
+        return "function"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String fieldHRtimerExpires() {
+        return "expires"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String fieldHRtimerSoftexpires() {
+        return "softexpires"; //$NON-NLS-1$
+    }
+
+    @Override
+    public String fieldHRtimerNow() {
+        return "now"; //$NON-NLS-1$
     }
 
 }
