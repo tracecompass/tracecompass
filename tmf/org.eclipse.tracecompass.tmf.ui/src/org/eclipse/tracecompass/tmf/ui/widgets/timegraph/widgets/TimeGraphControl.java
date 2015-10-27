@@ -146,7 +146,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private long fTime1bak;
     private ITimeGraphPresentationProvider fTimeGraphProvider = null;
     private ItemData fItemData = null;
-    private List<IMarkerEvent> fBookmarks = null;
     private List<IMarkerEvent> fMarkers = null;
     private boolean fMarkersVisible = true;
     private List<SelectionListener> fSelectionListeners;
@@ -1000,18 +999,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Set the bookmarks list.
-     *
-     * @param bookmarks
-     *            The bookmarks list, or null
-     * @since 2.0
-     */
-    public void setBookmarks(List<IMarkerEvent> bookmarks) {
-        fBookmarks = bookmarks;
-        fTimeGraphScale.setBookmarks(bookmarks);
-    }
-
-    /**
      * Set the markers list.
      *
      * @param markers
@@ -1432,17 +1419,11 @@ public class TimeGraphControl extends TimeGraphBaseControl
         // draw the background markers
         drawMarkers(bounds, fTimeProvider, fMarkers, false, nameSpace, gc);
 
-        // draw the background bookmarks
-        drawMarkers(bounds, fTimeProvider, fBookmarks, false, nameSpace, gc);
-
         // draw the items
         drawItems(bounds, fTimeProvider, fItemData.fExpandedItems, fTopIndex, nameSpace, gc);
 
         // draw the foreground markers
         drawMarkers(bounds, fTimeProvider, fMarkers, true, nameSpace, gc);
-
-        // draw the foreground bookmarks
-        drawMarkers(bounds, fTimeProvider, fBookmarks, true, nameSpace, gc);
 
         // draw the links (arrows)
         drawLinks(bounds, fTimeProvider, fItemData.fLinks, nameSpace, gc);

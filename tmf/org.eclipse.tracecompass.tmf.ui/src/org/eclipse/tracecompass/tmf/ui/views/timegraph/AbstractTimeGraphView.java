@@ -672,7 +672,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             List<IMarkerEvent> markers = new ArrayList<>(getViewMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
             /* Refresh the trace-specific markers when zooming */
             markers.addAll(getTraceMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
-            fTimeGraphWrapper.getTimeGraphViewer().getTimeGraphControl().setMarkers(markers);
+            fTimeGraphWrapper.getTimeGraphViewer().setMarkers(markers);
             redraw();
         }
 
@@ -1684,8 +1684,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         manager.add(fTimeGraphWrapper.getTimeGraphViewer().getPreviousEventAction());
         manager.add(fTimeGraphWrapper.getTimeGraphViewer().getNextEventAction());
         manager.add(fTimeGraphWrapper.getTimeGraphViewer().getToggleBookmarkAction());
-        manager.add(fTimeGraphWrapper.getTimeGraphViewer().getPreviousBookmarkAction());
-        manager.add(fTimeGraphWrapper.getTimeGraphViewer().getNextBookmarkAction());
+        manager.add(fTimeGraphWrapper.getTimeGraphViewer().getPreviousMarkerAction());
+        manager.add(fTimeGraphWrapper.getTimeGraphViewer().getNextMarkerAction());
         manager.add(fPreviousResourceAction);
         manager.add(fNextResourceAction);
         manager.add(fTimeGraphWrapper.getTimeGraphViewer().getZoomInAction());

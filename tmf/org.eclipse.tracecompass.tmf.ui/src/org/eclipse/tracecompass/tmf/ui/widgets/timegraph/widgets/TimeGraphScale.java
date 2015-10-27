@@ -125,7 +125,6 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     private boolean fIsInUpdate;
     private int fHeight;
     private List<Integer> fTickList = new ArrayList<>();
-    private List<IMarkerEvent> fBookmarks = null;
     private List<IMarkerEvent> fMarkers = null;
     private boolean fMarkersVisible = true;
 
@@ -217,17 +216,6 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
      */
     public List<Integer> getTickList() {
         return fTickList;
-    }
-
-    /**
-     * Set the bookmarks list.
-     *
-     * @param bookmarks
-     *            The bookmarks list, or null
-     * @since 2.0
-     */
-    public void setBookmarks(List<IMarkerEvent> bookmarks) {
-        fBookmarks = bookmarks;
     }
 
     /**
@@ -487,9 +475,6 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         if (fMarkersVisible) {
             drawMarkerLabels(fMarkers, rect, gc, time0, leftSpace, pixelsPerNanoSec);
         }
-
-        // draw bookmark labels
-        drawMarkerLabels(fBookmarks, rect, gc, time0, leftSpace, pixelsPerNanoSec);
     }
 
     private static void drawMarkerLabels(List<IMarkerEvent> markerEvents, Rectangle rect, GC gc, long time0, int leftSpace, double pixelsPerNanoSec) {

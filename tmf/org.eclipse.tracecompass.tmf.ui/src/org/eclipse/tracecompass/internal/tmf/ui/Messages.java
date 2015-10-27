@@ -132,8 +132,8 @@ public class Messages extends NLS {
     public static String TmfTimeGraphViewer_FollowArrowBackwardActionToolTipText;
     public static String TmfTimeGraphViewer_BookmarkActionAddText;
     public static String TmfTimeGraphViewer_BookmarkActionRemoveText;
-    public static String TmfTimeGraphViewer_NextBookmarkActionText;
-    public static String TmfTimeGraphViewer_PreviousBookmarkActionText;
+    public static String TmfTimeGraphViewer_NextMarkerActionText;
+    public static String TmfTimeGraphViewer_PreviousMarkerActionText;
 
     public static String Utils_ClockCyclesUnit;
 
