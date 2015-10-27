@@ -26,8 +26,8 @@ import org.eclipse.tracecompass.internal.tmf.ui.Messages;
  */
 public interface IMarkerEvent extends ITimeEvent {
 
-    /** Bookmark marker category */
-    @NonNull String BOOKMARK = checkNotNull(Messages.MarkerEvent_Bookmark);
+    /** Bookmarks marker category */
+    @NonNull String BOOKMARKS = checkNotNull(Messages.MarkerEvent_Bookmarks);
 
     /**
      * Get this marker's category.

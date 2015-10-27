@@ -22,8 +22,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,6 +45,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
@@ -1185,7 +1188,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                             int alpha = Integer.valueOf(matcher.group(4));
                             Color color = new Color(Display.getDefault(), red, green, blue, alpha);
                             fColors.add(color);
-                            bookmarks.add(new MarkerEvent(null, Long.valueOf(time), Long.valueOf(duration), IMarkerEvent.BOOKMARK, color, label, true));
+                            bookmarks.add(new MarkerEvent(null, Long.valueOf(time), Long.valueOf(duration), IMarkerEvent.BOOKMARKS, color, label, true));
                         } catch (NumberFormatException e) {
                             Activator.getDefault().logError(e.getMessage());
                         }
@@ -1460,6 +1463,17 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     }
 
     /**
+     * Gets the list of view-specific marker categories. Default implementation
+     * returns an empty list.
+     *
+     * @return The list of marker categories
+     * @since 2.0
+     */
+    protected @NonNull List<String> getViewMarkerCategories() {
+        return new ArrayList<>();
+    }
+
+    /**
      * Gets the list of view-specific markers for a trace in a given time range.
      * Default implementation returns an empty list.
      *
@@ -1508,6 +1522,20 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     }
 
     /**
+     * Get the list of current marker categories.
+     *
+     * @return The list of marker categories
+     * @since 2.0
+     */
+    private @NonNull List<String> getMarkerCategories() {
+        Set<String> categories = new HashSet<>(getViewMarkerCategories());
+        for (IMarkerEventSource markerEventSource : getMarkerEventSources(fTrace)) {
+            categories.addAll(markerEventSource.getMarkerCategories());
+        }
+        return new ArrayList<>(categories);
+    }
+
+    /**
      * Gets the list of marker event sources for a given trace.
      *
      * @param trace
@@ -1515,7 +1543,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @return The list of marker event sources
      * @since 2.0
      */
-    protected @NonNull List<IMarkerEventSource> getMarkerEventSources(ITmfTrace trace) {
+    private @NonNull List<IMarkerEventSource> getMarkerEventSources(ITmfTrace trace) {
         List<IMarkerEventSource> markerEventSources = fMarkerEventSourcesMap.get(trace);
         if (markerEventSources == null) {
             markerEventSources = checkNotNull(Collections.<IMarkerEventSource>emptyList());
@@ -1553,6 +1581,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     fTimeGraphWrapper.setFilters(fFiltersMap.get(fTrace));
                     fTimeGraphWrapper.getTimeGraphViewer().setLinks(null);
                     fTimeGraphWrapper.getTimeGraphViewer().setBookmarks(refreshBookmarks(fEditorFile));
+                    fTimeGraphWrapper.getTimeGraphViewer().setMarkerCategories(getMarkerCategories());
                 } else {
                     fTimeGraphWrapper.refresh();
                 }
@@ -1667,6 +1696,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private void contributeToActionBars() {
         IActionBars bars = getViewSite().getActionBars();
         fillLocalToolBar(bars.getToolBarManager());
+        fillLocalMenu(bars.getMenuManager());
     }
 
     /**
@@ -1683,14 +1713,26 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         manager.add(fTimeGraphWrapper.getTimeGraphViewer().getResetScaleAction());
         manager.add(fTimeGraphWrapper.getTimeGraphViewer().getPreviousEventAction());
         manager.add(fTimeGraphWrapper.getTimeGraphViewer().getNextEventAction());
+        manager.add(new Separator());
         manager.add(fTimeGraphWrapper.getTimeGraphViewer().getToggleBookmarkAction());
         manager.add(fTimeGraphWrapper.getTimeGraphViewer().getPreviousMarkerAction());
         manager.add(fTimeGraphWrapper.getTimeGraphViewer().getNextMarkerAction());
+        manager.add(new Separator());
         manager.add(fPreviousResourceAction);
         manager.add(fNextResourceAction);
         manager.add(fTimeGraphWrapper.getTimeGraphViewer().getZoomInAction());
         manager.add(fTimeGraphWrapper.getTimeGraphViewer().getZoomOutAction());
         manager.add(new Separator());
+    }
+
+    /**
+     * Add actions to local menu manager
+     *
+     * @param manager the tool bar manager
+     * @since 2.0
+     */
+    protected void fillLocalMenu(IMenuManager manager) {
+        manager.add(fTimeGraphWrapper.getTimeGraphViewer().getMarkersMenu());
     }
 
     /**

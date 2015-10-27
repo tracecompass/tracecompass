@@ -19,10 +19,15 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
@@ -159,9 +164,16 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     private Action fToggleBookmarkAction;
     private Action fNextMarkerAction;
     private Action fPreviousMarkerAction;
+    private MenuManager fMarkersMenu;
 
     /** The list of bookmarks */
     private final List<IMarkerEvent> fBookmarks = new ArrayList<>();
+
+    /** The list of marker categories */
+    private final List<String> fMarkerCategories = new ArrayList<>();
+
+    /** The set of hidden marker categories */
+    private final Set<String> fHiddenMarkerCategories = new HashSet<>();
 
     /** The list of markers */
     private final List<IMarkerEvent> fMarkers = new ArrayList<>();
@@ -452,6 +464,9 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             public void widgetDisposed(DisposeEvent e) {
                 for (Color color : fColors) {
                     color.dispose();
+                }
+                if (fMarkersMenu != null) {
+                    fMarkersMenu.dispose();
                 }
             }
         });
@@ -1234,6 +1249,22 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      */
     public List<IMarkerEvent> getBookmarks() {
         return Collections.unmodifiableList(fBookmarks);
+    }
+
+    /**
+     * Set the list of marker categories.
+     *
+     * @param categories
+     *            The list of marker categories, or null
+     * @since 2.0
+     */
+    public void setMarkerCategories(List<String> categories) {
+        fMarkerCategories.clear();
+        fMarkerCategories.add(IMarkerEvent.BOOKMARKS);
+        if (categories != null) {
+            fMarkerCategories.addAll(categories);
+        }
+        Collections.sort(fMarkerCategories);
     }
 
     /**
@@ -2038,9 +2069,10 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
                             final RGBA rgba = dialog.getColorValue();
                             Color color = new Color(Display.getDefault(), rgba.rgb.red, rgba.rgb.green, rgba.rgb.blue, rgba.alpha);
                             fColors.add(color);
-                            IMarkerEvent bookmark = new MarkerEvent(null, time, duration, IMarkerEvent.BOOKMARK, color, label, true);
+                            IMarkerEvent bookmark = new MarkerEvent(null, time, duration, IMarkerEvent.BOOKMARKS, color, label, true);
                             fBookmarks.add(bookmark);
                             updateMarkerList();
+                            updateMarkerActions();
                             getControl().redraw();
                             fireBookmarkAdded(bookmark);
                         }
@@ -2048,10 +2080,10 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
                         checkDisposeColor(selectedBookmark.getColor());
                         fBookmarks.remove(selectedBookmark);
                         updateMarkerList();
+                        updateMarkerActions();
                         getControl().redraw();
                         fireBookmarkRemoved(selectedBookmark);
                     }
-                    updateMarkerActions();
                 }
             };
             fToggleBookmarkAction.setText(Messages.TmfTimeGraphViewer_BookmarkActionAddText);
@@ -2128,6 +2160,42 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         return fPreviousMarkerAction;
     }
 
+    /**
+     * Get the show markers menu.
+     *
+     * @return The menu manager object
+     * @since 2.0
+     */
+    public MenuManager getMarkersMenu() {
+        if (fMarkersMenu == null) {
+            fMarkersMenu = new MenuManager(Messages.TmfTimeGraphViewer_ShowMarkersMenuText);
+            fMarkersMenu.setRemoveAllWhenShown(true);
+            fMarkersMenu.addMenuListener(new IMenuListener() {
+                @Override
+                public void menuAboutToShow(IMenuManager manager) {
+                    for (String category : fMarkerCategories) {
+                        final Action action = new Action(category, IAction.AS_CHECK_BOX) {
+                            @Override
+                            public void runWithEvent(Event event) {
+                                if (isChecked()) {
+                                    fHiddenMarkerCategories.remove(getText());
+                                } else {
+                                    fHiddenMarkerCategories.add(getText());
+                                }
+                                updateMarkerList();
+                                updateMarkerActions();
+                                getControl().redraw();
+                            }
+                        };
+                        action.setChecked(!fHiddenMarkerCategories.contains(category));
+                        manager.add(action);
+                    }
+                }
+            });
+        }
+        return fMarkersMenu;
+    }
+
     private IMarkerEvent getBookmarkAtSelection() {
         final long time = Math.min(fSelectionBegin, fSelectionEnd);
         final long duration = Math.max(fSelectionBegin, fSelectionEnd) - time;
@@ -2169,8 +2237,15 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     }
 
     private void updateMarkerList() {
-        List<IMarkerEvent> markers = new ArrayList<>(fMarkers);
-        markers.addAll(fBookmarks);
+        List<IMarkerEvent> markers = new ArrayList<>();
+        for (IMarkerEvent marker : fMarkers) {
+            if (!fHiddenMarkerCategories.contains(marker.getCategory())) {
+                markers.add(marker);
+            }
+        }
+        if (!fHiddenMarkerCategories.contains(IMarkerEvent.BOOKMARKS)) {
+            markers.addAll(fBookmarks);
+        }
         Collections.sort(markers, new MarkerComparator());
         getTimeGraphControl().setMarkers(markers);
     }

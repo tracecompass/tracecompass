@@ -38,7 +38,7 @@ public class Messages extends NLS {
     public static String ManageCustomParsersDialog_NewButtonLabel;
     public static String ManageCustomParsersDialog_TextButtonLabel;
 
-    public static String MarkerEvent_Bookmark;
+    public static String MarkerEvent_Bookmarks;
 
     public static String TmfEventsTable_AddBookmarkActionText;
     public static String TmfEventsTable_ApplyPresetFilterMenuName;
@@ -134,6 +134,7 @@ public class Messages extends NLS {
     public static String TmfTimeGraphViewer_BookmarkActionRemoveText;
     public static String TmfTimeGraphViewer_NextMarkerActionText;
     public static String TmfTimeGraphViewer_PreviousMarkerActionText;
+    public static String TmfTimeGraphViewer_ShowMarkersMenuText;
 
     public static String Utils_ClockCyclesUnit;
 
