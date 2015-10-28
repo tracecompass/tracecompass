@@ -27,13 +27,13 @@ public class Messages extends NLS {
     /** Name of the system call level in statistics tree */
     public static String LatencyStatistics_SyscallLevelName;
     /** Name of level column */
-    public static String LatencyStatistics_LevelLabel;
+    public static String SegmentStoreStatistics_LevelLabel;
     /** Name of the minimum column */
-    public static String LatencyStatistics_MinLabel;
+    public static String SegmentStoreStatistics_Statistics_MinLabel;
     /** Name of maximum column */
-    public static String LatencyStatistics_MaxLabel;
+    public static String SegmentStoreStatistics_MaxLabel;
     /** Name of average column */
-    public static String LatencyStatistics_AverageLabel;
+    public static String SegmentStoreStatistics_AverageLabel;
     /** Name of Total statistics */
     public static String LatencyStatistics_TotalLabel;
 

@@ -14,11 +14,11 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.statist
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 
 /**
- * Class to calculate simple latency statistics (min, max, average)
+ * Class to calculate simple segment store statistics (min, max, average)
  *
  * @author Bernd Hufmann
  */
-public class LatencyStatistics {
+public class SegmentStoreStatistics {
     private long fMin;
     private long fMax;
     private long fSum;
@@ -27,7 +27,7 @@ public class LatencyStatistics {
     /**
      * Constructor
      */
-    public LatencyStatistics() {
+    public SegmentStoreStatistics() {
         this.fMin = Long.MAX_VALUE;
         this.fMax = Long.MIN_VALUE;
         this.fSum = 0;

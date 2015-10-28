@@ -22,7 +22,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.statistics.LatencyStatistics;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.statistics.SegmentStoreStatistics;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
@@ -33,7 +33,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeColumnData;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
 
 /**
- * An abstract tree viewer implementation for displaying latency statistics
+ * An abstract tree viewer implementation for displaying segment store statistics
  *
  * @author Bernd Hufmann
  *
@@ -45,10 +45,10 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
     @Nullable private TmfAbstractAnalysisModule fModule;
 
     private static final String[] COLUMN_NAMES = new String[] {
-            checkNotNull(Messages.LatencyStatistics_LevelLabel),
-            checkNotNull(Messages.LatencyStatistics_MinLabel),
-            checkNotNull(Messages.LatencyStatistics_MaxLabel),
-            checkNotNull(Messages.LatencyStatistics_AverageLabel)
+            checkNotNull(Messages.SegmentStoreStatistics_LevelLabel),
+            checkNotNull(Messages.SegmentStoreStatistics_Statistics_MinLabel),
+            checkNotNull(Messages.SegmentStoreStatistics_MaxLabel),
+            checkNotNull(Messages.SegmentStoreStatistics_AverageLabel)
     };
 
     /**
@@ -59,11 +59,11 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
      */
     public AbstractSegmentStoreStatisticsViewer(Composite parent) {
         super(parent, false);
-        setLabelProvider(new LatencyLabelProvider());
+        setLabelProvider(new SegmentStoreStatisticsLabelProvider());
     }
 
-    /** Provides label for the Latency tree viewer cells */
-    protected static class LatencyLabelProvider extends TreeLabelProvider {
+    /** Provides label for the Segment Store tree viewer cells */
+    protected static class SegmentStoreStatisticsLabelProvider extends TreeLabelProvider {
 
         @Override
         public String getColumnText(@Nullable Object element, int columnIndex) {
@@ -72,8 +72,8 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
                 if (columnIndex == 0) {
                     value = ((HiddenTreeViewerEntry) element).getName();
                 }
-            } else if (element instanceof LatencyTreeViewerEntry) {
-                LatencyTreeViewerEntry entry = (LatencyTreeViewerEntry) element;
+            } else if (element instanceof SegmentStoreStatisticsEntry) {
+                SegmentStoreStatisticsEntry entry = (SegmentStoreStatisticsEntry) element;
                 if (columnIndex == 0) {
                     return checkNotNull(String.valueOf(entry.getName()));
                 }
@@ -122,8 +122,8 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
                             return 0;
                         }
 
-                        LatencyTreeViewerEntry n1 = (LatencyTreeViewerEntry) e1;
-                        LatencyTreeViewerEntry n2 = (LatencyTreeViewerEntry) e2;
+                        SegmentStoreStatisticsEntry n1 = (SegmentStoreStatisticsEntry) e1;
+                        SegmentStoreStatisticsEntry n2 = (SegmentStoreStatisticsEntry) e2;
 
                         return n1.getName().compareTo(n2.getName());
 
@@ -138,8 +138,8 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
                             return 0;
                         }
 
-                        LatencyTreeViewerEntry n1 = (LatencyTreeViewerEntry) e1;
-                        LatencyTreeViewerEntry n2 = (LatencyTreeViewerEntry) e2;
+                        SegmentStoreStatisticsEntry n1 = (SegmentStoreStatisticsEntry) e1;
+                        SegmentStoreStatisticsEntry n2 = (SegmentStoreStatisticsEntry) e2;
 
                         return Long.compare(n1.getEntry().getMin(), n2.getEntry().getMin());
 
@@ -154,8 +154,8 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
                             return 0;
                         }
 
-                        LatencyTreeViewerEntry n1 = (LatencyTreeViewerEntry) e1;
-                        LatencyTreeViewerEntry n2 = (LatencyTreeViewerEntry) e2;
+                        SegmentStoreStatisticsEntry n1 = (SegmentStoreStatisticsEntry) e1;
+                        SegmentStoreStatisticsEntry n2 = (SegmentStoreStatisticsEntry) e2;
 
                         return Long.compare(n1.getEntry().getMax(), n2.getEntry().getMax());
 
@@ -170,8 +170,8 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
                             return 0;
                         }
 
-                        LatencyTreeViewerEntry n1 = (LatencyTreeViewerEntry) e1;
-                        LatencyTreeViewerEntry n2 = (LatencyTreeViewerEntry) e2;
+                        SegmentStoreStatisticsEntry n1 = (SegmentStoreStatisticsEntry) e1;
+                        SegmentStoreStatisticsEntry n2 = (SegmentStoreStatisticsEntry) e2;
 
                         return Double.compare(n1.getEntry().getAverage(), n2.getEntry().getAverage());
 
@@ -219,9 +219,9 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
     /**
      * Class for defining an entry in the statistics tree.
      */
-    protected class LatencyTreeViewerEntry extends TmfTreeViewerEntry {
+    protected class SegmentStoreStatisticsEntry extends TmfTreeViewerEntry {
 
-        private LatencyStatistics fEntry;
+        private SegmentStoreStatistics fEntry;
 
         /**
          * Constructor
@@ -230,9 +230,9 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
          *            name of entry
          *
          * @param entry
-         *            latency statistics object
+         *            segment store statistics object
          */
-        public LatencyTreeViewerEntry(String name, LatencyStatistics entry) {
+        public SegmentStoreStatisticsEntry(String name, SegmentStoreStatistics entry) {
             super(name);
             fEntry = entry;
         }
@@ -242,7 +242,7 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
          *
          * @return statistics object
          */
-        public LatencyStatistics getEntry() {
+        public SegmentStoreStatistics getEntry() {
             return checkNotNull(fEntry);
         }
 
@@ -251,7 +251,7 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
     /**
      * Class to define a level in the tree that doesn't have any values.
      */
-    protected class HiddenTreeViewerEntry extends LatencyTreeViewerEntry {
+    protected class HiddenTreeViewerEntry extends SegmentStoreStatisticsEntry {
         /**
          * Constructor
          *
@@ -259,7 +259,7 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
          *            the name of the level
          */
         public HiddenTreeViewerEntry(String name) {
-            super(name, new LatencyStatistics());
+            super(name, new SegmentStoreStatistics());
         }
     }
 

@@ -19,8 +19,8 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCallLatencyAnalysis;
 import org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCall;
+import org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCallLatencyAnalysis;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
@@ -43,9 +43,9 @@ public class SystemCallLatencyStatisticsAnalysisModule extends TmfAbstractAnalys
 
     private @Nullable SystemCallLatencyAnalysis fLatencyModule;
 
-    private @Nullable LatencyStatistics fTotalStats;
+    private @Nullable SegmentStoreStatistics fTotalStats;
 
-    private @Nullable Map<String, LatencyStatistics> fPerSyscallStats;
+    private @Nullable Map<String, SegmentStoreStatistics> fPerSyscallStats;
 
     @Override
     protected Iterable<IAnalysisModule> getDependentAnalyses() {
@@ -88,7 +88,7 @@ public class SystemCallLatencyStatisticsAnalysisModule extends TmfAbstractAnalys
     }
 
     private boolean calculateTotalManual(ISegmentStore<ISegment> store, IProgressMonitor monitor) {
-        LatencyStatistics total = new LatencyStatistics();
+        SegmentStoreStatistics total = new SegmentStoreStatistics();
         Iterator<ISegment> iter = store.iterator();
         while (iter.hasNext()) {
             if (monitor.isCanceled()) {
@@ -102,7 +102,7 @@ public class SystemCallLatencyStatisticsAnalysisModule extends TmfAbstractAnalys
     }
 
     private boolean calculateTotalPerSyscall(ISegmentStore<ISegment> store, IProgressMonitor monitor) {
-        Map<String, LatencyStatistics> perSyscallStats = new HashMap<>();
+        Map<String, SegmentStoreStatistics> perSyscallStats = new HashMap<>();
 
         Iterator<ISegment> iter = store.iterator();
         while (iter.hasNext()) {
@@ -112,9 +112,9 @@ public class SystemCallLatencyStatisticsAnalysisModule extends TmfAbstractAnalys
             ISegment segment = iter.next();
             if (segment instanceof SystemCall) {
                 SystemCall syscall = (SystemCall) segment;
-                LatencyStatistics values = perSyscallStats.get(syscall.getName());
+                SegmentStoreStatistics values = perSyscallStats.get(syscall.getName());
                 if (values == null) {
-                    values = new LatencyStatistics();
+                    values = new SegmentStoreStatistics();
                 }
                 values.update(segment);
                 perSyscallStats.put(syscall.getName(), values);
@@ -133,7 +133,7 @@ public class SystemCallLatencyStatisticsAnalysisModule extends TmfAbstractAnalys
      *
      * @return the total statistics
      */
-    public @Nullable LatencyStatistics getTotalStats() {
+    public @Nullable SegmentStoreStatistics getTotalStats() {
         return fTotalStats;
     }
 
@@ -142,7 +142,7 @@ public class SystemCallLatencyStatisticsAnalysisModule extends TmfAbstractAnalys
      *
      * @return the per syscall statistics
      */
-    public @Nullable Map<String, LatencyStatistics> getPerSyscallStats() {
+    public @Nullable Map<String, SegmentStoreStatistics> getPerSyscallStats() {
         return fPerSyscallStats;
     }
 

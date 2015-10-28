@@ -20,7 +20,7 @@ import java.util.Map.Entry;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.statistics.LatencyStatistics;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.statistics.SegmentStoreStatistics;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.statistics.SystemCallLatencyStatisticsAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
@@ -73,23 +73,23 @@ public class SystemCallLatencyStatisticsViewer extends AbstractSegmentStoreStati
 
         module.waitForCompletion();
 
-        LatencyStatistics entry = module.getTotalStats();
+        SegmentStoreStatistics entry = module.getTotalStats();
 
         TmfTreeViewerEntry root = new TmfTreeViewerEntry(""); //$NON-NLS-1$
         List<ITmfTreeViewerEntry> entryList = root.getChildren();
 
-        TmfTreeViewerEntry child = new LatencyTreeViewerEntry(checkNotNull(Messages.LatencyStatistics_TotalLabel), checkNotNull(entry));
+        TmfTreeViewerEntry child = new SegmentStoreStatisticsEntry(checkNotNull(Messages.LatencyStatistics_TotalLabel), checkNotNull(entry));
         entryList.add(child);
 
         HiddenTreeViewerEntry syscalls = new HiddenTreeViewerEntry(checkNotNull(SYSCALL_LEVEL));
         child.addChild(syscalls);
 
-        Map<String, LatencyStatistics> perSyscallStats = module.getPerSyscallStats();
+        Map<String, SegmentStoreStatistics> perSyscallStats = module.getPerSyscallStats();
         if (perSyscallStats != null) {
-            Iterator<Entry<String, LatencyStatistics>> stats = perSyscallStats.entrySet().iterator();
+            Iterator<Entry<String, SegmentStoreStatistics>> stats = perSyscallStats.entrySet().iterator();
             while (stats.hasNext()) {
-                Entry<String, LatencyStatistics> statsEntry = stats.next();
-                syscalls.addChild(new LatencyTreeViewerEntry(checkNotNull(statsEntry.getKey()), checkNotNull(statsEntry.getValue())));
+                Entry<String, SegmentStoreStatistics> statsEntry = stats.next();
+                syscalls.addChild(new SegmentStoreStatisticsEntry(checkNotNull(statsEntry.getKey()), checkNotNull(statsEntry.getValue())));
             }
         }
         return root;
