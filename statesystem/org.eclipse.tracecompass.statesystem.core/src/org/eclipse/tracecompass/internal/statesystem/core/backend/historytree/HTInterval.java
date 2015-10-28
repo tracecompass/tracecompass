@@ -44,7 +44,7 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
      * +  4  int (valueOffset)
      * </pre>
      */
-    private static final int DATA_ENTRY_SIZE = 25;
+    public static final int DATA_ENTRY_SIZE = 25;
 
     /* 'Byte' equivalent for state values types */
     private static final byte TYPE_NULL = -1;

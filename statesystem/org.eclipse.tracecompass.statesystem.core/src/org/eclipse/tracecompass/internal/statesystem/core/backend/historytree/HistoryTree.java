@@ -30,6 +30,8 @@ import org.eclipse.tracecompass.internal.statesystem.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 
+import com.google.common.collect.ImmutableList;
+
 /**
  * Meta-container for the History Tree. This structure contains all the
  * high-level data relevant to the tree.
@@ -333,6 +335,16 @@ public class HistoryTree {
      */
     public HTNode getRootNode() {
         return fLatestBranch.get(0);
+    }
+
+    /**
+     * Return the latest branch of the tree. That branch is immutable. Used for
+     * unit testing and debugging.
+     *
+     * @return The immutable latest branch
+     */
+    protected List<HTNode> getLatestBranch() {
+        return ImmutableList.copyOf(fLatestBranch);
     }
 
     // ------------------------------------------------------------------------

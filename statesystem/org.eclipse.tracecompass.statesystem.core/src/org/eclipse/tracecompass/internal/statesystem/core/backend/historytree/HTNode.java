@@ -219,7 +219,7 @@ public abstract class HTNode {
         for (i = 0; i < intervalCount; i++) {
             HTInterval interval = HTInterval.readFrom(buffer);
             newNode.fIntervals.add(interval);
-            newNode.fSizeOfIntervalSection += interval.getIntervalSize();
+            newNode.fSizeOfIntervalSection += HTInterval.DATA_ENTRY_SIZE;
         }
 
         /* Assign the node's other information we have read previously */
@@ -393,7 +393,7 @@ public abstract class HTNode {
             }
 
             fIntervals.add(index, newInterval);
-            fSizeOfIntervalSection += newInterval.getIntervalSize();
+            fSizeOfIntervalSection += HTInterval.DATA_ENTRY_SIZE;
 
             /* Update the in-node offset "pointer" */
             fStringSectionOffset -= (newInterval.getStringsEntrySize());
