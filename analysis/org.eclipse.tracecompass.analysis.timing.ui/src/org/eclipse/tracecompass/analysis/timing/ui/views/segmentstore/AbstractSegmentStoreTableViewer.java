@@ -200,7 +200,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
      * @param dataInput
      *            New data input
      */
-    public void updateModel(final @Nullable ISegmentStore<ISegment> dataInput) {
+    public void updateModel(final @Nullable Object dataInput) {
         final TableViewer tableViewer = getTableViewer();
         Display.getDefault().asyncExec(new Runnable() {
             @Override

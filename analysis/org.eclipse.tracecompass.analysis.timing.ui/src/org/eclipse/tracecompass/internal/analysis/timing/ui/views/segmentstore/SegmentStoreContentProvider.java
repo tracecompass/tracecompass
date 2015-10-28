@@ -73,6 +73,11 @@ public class SegmentStoreContentProvider implements ISortingLazyContentProvider 
             if (fComparator != null) {
                 Arrays.sort(fSegmentArray, fComparator);
             }
+        } else if (newInput instanceof ISegment[]) {
+            fSegmentArray = ((ISegment[]) newInput).clone();
+            if (fComparator != null) {
+                Arrays.sort(fSegmentArray, fComparator);
+            }
         } else {
             fSegmentArray = null;
         }
