@@ -11,6 +11,8 @@ package org.eclipse.tracecompass.internal.analysis.timing.ui;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -41,6 +43,44 @@ public class Activator extends AbstractUIPlugin {
     public void stop(BundleContext context) throws Exception {
         plugin = null;
         super.stop(context);
+    }
+
+    /**
+     * Get the image object from a given path
+     *
+     * @param path
+     *            The path to the image file
+     * @return The Image object
+     */
+    public Image getImageFromPath(String path) {
+        return getImageDescripterFromPath(path).createImage();
+    }
+
+    /**
+     * Get the ImageDescriptor from a given path
+     *
+     * @param path
+     *            The path to the image file
+     * @return The ImageDescriptor object
+     */
+    public ImageDescriptor getImageDescripterFromPath(String path) {
+        return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
+    }
+
+    /**
+     * Get the Image from a registry
+     *
+     * @param path
+     *            The path to the image registry
+     * @return The Image object
+     */
+    public Image getImageFromImageRegistry(String path) {
+        Image icon = getImageRegistry().get(path);
+        if (icon == null) {
+            icon = getImageDescripterFromPath(path).createImage();
+            plugin.getImageRegistry().put(path, icon);
+        }
+        return icon;
     }
 
     /**

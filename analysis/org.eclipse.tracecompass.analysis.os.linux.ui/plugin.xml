@@ -57,6 +57,14 @@
             name="%latency.stats.view.name"
             restorable="true">
       </view>
+      <view
+            category="org.eclipse.linuxtools.lttng2.ui.views.category"
+            class="org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.SystemCallLatencyDensityView"
+            icon="icons/eview16/density.png"
+            id="org.eclipse.tracecompass.analysis.os.linux.views.latency.density"
+            name="%latency.density.view.name"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
@@ -102,6 +110,12 @@
                class="org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCallLatencyAnalysis">
          </analysisModuleClass>
       </output>
-      
+      <output
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="org.eclipse.tracecompass.analysis.os.linux.views.latency.density">
+         <analysisModuleClass
+               class="org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCallLatencyAnalysis">
+         </analysisModuleClass>
+      </output>
    </extension>
 </plugin>
