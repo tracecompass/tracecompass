@@ -1582,6 +1582,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     fTimeGraphWrapper.getTimeGraphViewer().setLinks(null);
                     fTimeGraphWrapper.getTimeGraphViewer().setBookmarks(refreshBookmarks(fEditorFile));
                     fTimeGraphWrapper.getTimeGraphViewer().setMarkerCategories(getMarkerCategories());
+                    fTimeGraphWrapper.getTimeGraphViewer().setMarkers(null);
                 } else {
                     fTimeGraphWrapper.refresh();
                 }

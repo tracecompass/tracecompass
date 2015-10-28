@@ -24,7 +24,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -60,6 +62,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Slider;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
@@ -174,6 +177,9 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
 
     /** The set of hidden marker categories */
     private final Set<String> fHiddenMarkerCategories = new HashSet<>();
+
+    /** The set of skipped marker categories */
+    private final Set<String> fSkippedMarkerCategories = new HashSet<>();
 
     /** The list of markers */
     private final List<IMarkerEvent> fMarkers = new ArrayList<>();
@@ -2101,7 +2107,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      */
     public Action getNextMarkerAction() {
         if (fNextMarkerAction == null) {
-            fNextMarkerAction = new Action() {
+            fNextMarkerAction = new Action(Messages.TmfTimeGraphViewer_NextMarkerActionText, IAction.AS_DROP_DOWN_MENU) {
                 @Override
                 public void runWithEvent(Event event) {
                     final long time = Math.min(fSelectionBegin, fSelectionEnd);
@@ -2111,17 +2117,57 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
                         return;
                     }
                     for (IMarkerEvent marker : markers) {
-                        if (marker.getTime() > time ||
-                                (marker.getTime() == time && marker.getDuration() > duration)) {
+                        if ((marker.getTime() > time ||
+                                (marker.getTime() == time && marker.getDuration() > duration))
+                                && !fSkippedMarkerCategories.contains(marker.getCategory())) {
                             setSelectionRangeNotify(marker.getTime(), marker.getTime() + marker.getDuration());
                             return;
                         }
                     }
                 }
             };
-            fNextMarkerAction.setText(Messages.TmfTimeGraphViewer_NextMarkerActionText);
             fNextMarkerAction.setToolTipText(Messages.TmfTimeGraphViewer_NextMarkerActionText);
             fNextMarkerAction.setImageDescriptor(NEXT_BOOKMARK);
+            fNextMarkerAction.setMenuCreator(new IMenuCreator () {
+                Menu menu = null;
+                @Override
+                public void dispose() {
+                    if (menu != null) {
+                        menu.dispose();
+                        menu = null;
+                    }
+                }
+
+                @Override
+                public Menu getMenu(Control parent) {
+                    if (menu != null) {
+                        menu.dispose();
+                    }
+                    menu = new Menu(parent);
+                    for (String category : fMarkerCategories) {
+                        final Action action = new Action(category, IAction.AS_CHECK_BOX) {
+                            @Override
+                            public void runWithEvent(Event event) {
+                                if (isChecked()) {
+                                    fSkippedMarkerCategories.remove(getText());
+                                } else {
+                                    fSkippedMarkerCategories.add(getText());
+                                }
+                                updateMarkerActions();
+                            }
+                        };
+                        action.setEnabled(!fHiddenMarkerCategories.contains(category));
+                        action.setChecked(action.isEnabled() && !fSkippedMarkerCategories.contains(category));
+                        new ActionContributionItem(action).fill(menu, -1);
+                    }
+                    return menu;
+                }
+
+                @Override
+                public Menu getMenu(Menu parent) {
+                    return null;
+                }
+            });
         }
         return fNextMarkerAction;
     }
@@ -2145,8 +2191,9 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
                     }
                     for (int i = markers.size() - 1; i >= 0; i--) {
                         IMarkerEvent marker = markers.get(i);
-                        if (marker.getTime() < time ||
-                                (marker.getTime() == time && marker.getDuration() < duration)) {
+                        if ((marker.getTime() < time ||
+                                (marker.getTime() == time && marker.getDuration() < duration))
+                                && !fSkippedMarkerCategories.contains(marker.getCategory())) {
                             setSelectionRangeNotify(marker.getTime(), marker.getTime() + marker.getDuration());
                             return;
                         }
@@ -2208,6 +2255,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     }
 
     private void updateMarkerActions() {
+        boolean enabled = fTime0Bound != SWT.DEFAULT || fTime1Bound != SWT.DEFAULT;
         if (fToggleBookmarkAction != null) {
             if (getBookmarkAtSelection() != null) {
                 fToggleBookmarkAction.setText(Messages.TmfTimeGraphViewer_BookmarkActionRemoveText);
@@ -2218,21 +2266,17 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
                 fToggleBookmarkAction.setToolTipText(Messages.TmfTimeGraphViewer_BookmarkActionAddText);
                 fToggleBookmarkAction.setImageDescriptor(ADD_BOOKMARK);
             }
+            fToggleBookmarkAction.setEnabled(enabled);
         }
-        final long time = Math.min(fSelectionBegin, fSelectionEnd);
-        final long duration = Math.max(fSelectionBegin, fSelectionEnd) - time;
         List<IMarkerEvent> markers = getTimeGraphControl().getMarkers();
         if (markers == null) {
             markers = Collections.emptyList();
         }
         if (fPreviousMarkerAction != null) {
-            fPreviousMarkerAction.setEnabled(!markers.isEmpty() &&
-                    (time > markers.get(0).getTime() || (time == markers.get(0).getTime() && duration > markers.get(0).getDuration())));
+            fPreviousMarkerAction.setEnabled(enabled && !markers.isEmpty());
         }
         if (fNextMarkerAction != null) {
-            int last = markers.size() - 1;
-            fNextMarkerAction.setEnabled(!markers.isEmpty() &&
-                    (time < markers.get(last).getTime() || (time == markers.get(last).getTime() && duration < markers.get(last).getDuration())));
+            fNextMarkerAction.setEnabled(enabled && !markers.isEmpty());
         }
     }
 
