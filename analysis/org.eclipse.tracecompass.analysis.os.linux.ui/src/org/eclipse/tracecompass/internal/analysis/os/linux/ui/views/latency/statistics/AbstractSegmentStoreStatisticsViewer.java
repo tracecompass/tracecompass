@@ -72,17 +72,18 @@ public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTr
                 if (columnIndex == 0) {
                     value = ((HiddenTreeViewerEntry) element).getName();
                 }
-            } else {
-                LatencyTreeViewerEntry obj = (LatencyTreeViewerEntry) element;
-                if (obj != null) {
-                    if (columnIndex == 0) {
-                        value = String.valueOf(obj.getName());
-                    } else if (columnIndex == 1) {
-                        value = toFormattedString(obj.getEntry().getMin());
+            } else if (element instanceof LatencyTreeViewerEntry) {
+                LatencyTreeViewerEntry entry = (LatencyTreeViewerEntry) element;
+                if (columnIndex == 0) {
+                    return checkNotNull(String.valueOf(entry.getName()));
+                }
+                if (entry.getEntry().getNbSegments() > 0) {
+                    if (columnIndex == 1) {
+                        value = toFormattedString(entry.getEntry().getMin());
                     } else if (columnIndex == 2) {
-                        value = String.valueOf(toFormattedString(obj.getEntry().getMax()));
+                        value = String.valueOf(toFormattedString(entry.getEntry().getMax()));
                     } else if (columnIndex == 3) {
-                        value = String.valueOf(toFormattedString(obj.getEntry().getAverage()));
+                        value = String.valueOf(toFormattedString(entry.getEntry().getAverage()));
                     }
                 }
             }
