@@ -1,4 +1,7 @@
 class java/util/Map
+entrySet
+ ()Ljava/util/Set<Ljava/util/Map$Entry<TK;TV;>;>;
+ ()L1java/util/Set<Ljava/util/Map$Entry<TK;TV;>;>;
 get
  (Ljava/lang/Object;)TV;
  (Ljava/lang/Object;)T0V;
