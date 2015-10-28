@@ -1,0 +1,43 @@
+class java/lang/String
+copyValueOf
+ ([C)Ljava/lang/String;
+ ([C)L1java/lang/String;
+copyValueOf
+ ([CII)Ljava/lang/String;
+ ([CII)L1java/lang/String;
+format
+ (Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
+ (Ljava/lang/String;[Ljava/lang/Object;)L1java/lang/String;
+format
+ (Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
+ (Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)L1java/lang/String;
+intern
+ ()Ljava/lang/String;
+ ()L1java/lang/String;
+toString
+ ()Ljava/lang/String;
+ ()L1java/lang/String;
+valueOf
+ (C)Ljava/lang/String;
+ (C)L1java/lang/String;
+valueOf
+ (D)Ljava/lang/String;
+ (D)L1java/lang/String;
+valueOf
+ (F)Ljava/lang/String;
+ (F)L1java/lang/String;
+valueOf
+ (I)Ljava/lang/String;
+ (I)L1java/lang/String;
+valueOf
+ (J)Ljava/lang/String;
+ (J)L1java/lang/String;
+valueOf
+ (Ljava/lang/Object;)Ljava/lang/String;
+ (Ljava/lang/Object;)L1java/lang/String;
+valueOf
+ (Z)Ljava/lang/String;
+ (Z)L1java/lang/String;
+valueOf
+ ([C)Ljava/lang/String;
+ ([C)L1java/lang/String;
