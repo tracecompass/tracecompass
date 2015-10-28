@@ -577,7 +577,7 @@ public class HistoryTree {
         fLatestBranch.add(newRootNode);
 
         // Create new coreNode
-        for (int i = 1; i < depth + 1; i++) {
+        for (int i = 1; i < depth; i++) {
             CoreNode prevNode = (CoreNode) fLatestBranch.get(i - 1);
             CoreNode newNode = initNewCoreNode(prevNode.getParentSequenceNumber(),
                     splitTime + 1);
@@ -586,7 +586,7 @@ public class HistoryTree {
         }
 
         // Create the new leafNode
-        CoreNode prevNode = (CoreNode) fLatestBranch.get(depth);
+        CoreNode prevNode = (CoreNode) fLatestBranch.get(depth - 1);
         LeafNode newNode = initNewLeafNode(prevNode.getParentSequenceNumber(), splitTime + 1);
         prevNode.linkNewChild(newNode);
         fLatestBranch.add(newNode);

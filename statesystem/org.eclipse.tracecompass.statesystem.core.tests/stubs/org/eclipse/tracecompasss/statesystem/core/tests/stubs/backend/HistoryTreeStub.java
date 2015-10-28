@@ -67,4 +67,13 @@ public class HistoryTreeStub extends HistoryTree {
         return checkNotNull(latest.get(pos));
     }
 
+    /**
+     * Get the depth of the tree
+     *
+     * @return The depth of the tree
+     */
+    public int getDepth() {
+        return getLatestBranch().size();
+    }
+
 }

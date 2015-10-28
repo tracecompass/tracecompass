@@ -134,4 +134,49 @@ public class HistoryTreeTest {
 
     }
 
+    /**
+     * Test the addition of new nodes to the tree and make sure the tree is
+     * built with the right structure
+     */
+    @Test
+    public void testDepth() {
+        HistoryTreeStub ht = setupSmallTree();
+
+        /* Fill a first node */
+        HTNode node = ht.getLatestLeaf();
+        int nodeFreeSpace = node.getNodeFreeSpace();
+        int nbIntervals = nodeFreeSpace / (HTInterval.DATA_ENTRY_SIZE + TEST_STRING.length() + STRING_PADDING);
+        long start = fillValues(ht, STRING_VALUE, nbIntervals, 1);
+
+        /* Add intervals that should add a sibling to the node */
+        assertEquals(1, ht.getNodeCount());
+        assertEquals(1, ht.getDepth());
+        start = fillValues(ht, STRING_VALUE, 1, start);
+        assertEquals(3, ht.getNodeCount());
+        assertEquals(2, ht.getDepth());
+
+        /* Fill the latest leaf node (2nd child) */
+        node = ht.getLatestLeaf();
+        nodeFreeSpace = node.getNodeFreeSpace();
+        nbIntervals = nodeFreeSpace / (HTInterval.DATA_ENTRY_SIZE + TEST_STRING.length() + STRING_PADDING);
+        start = fillValues(ht, STRING_VALUE, nbIntervals, start);
+
+        /*
+         * Add an interval that should add another sibling to the previous nodes
+         */
+        start = fillValues(ht, STRING_VALUE, 1, start);
+        assertEquals(4, ht.getNodeCount());
+        assertEquals(2, ht.getDepth());
+
+        /* Fill the latest leaf node (3rd and last child) */
+        node = ht.getLatestLeaf();
+        nodeFreeSpace = node.getNodeFreeSpace();
+        nbIntervals = nodeFreeSpace / (HTInterval.DATA_ENTRY_SIZE + TEST_STRING.length() + STRING_PADDING);
+        start = fillValues(ht, STRING_VALUE, nbIntervals, start);
+
+        /* The new node created here should generate a new branch */
+        start = fillValues(ht, STRING_VALUE, 1, start);
+        assertEquals(7, ht.getNodeCount());
+        assertEquals(3, ht.getDepth());
+    }
 }
