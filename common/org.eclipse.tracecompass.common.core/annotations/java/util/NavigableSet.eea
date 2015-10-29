@@ -1,0 +1,13 @@
+class java/util/NavigableSet
+ceiling
+ (TE;)TE;
+ (TE;)T0E;
+floor
+ (TE;)TE;
+ (TE;)T0E;
+higher
+ (TE;)TE;
+ (TE;)T0E;
+lower
+ (TE;)TE;
+ (TE;)T0E;
