@@ -30,6 +30,7 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Activator;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.Lttng26EventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.Lttng27EventLayout;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.Lttng28EventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.PerfEventLayout;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -57,7 +58,8 @@ public class LttngKernelTrace extends CtfTmfTrace implements IKernelTrace {
     private enum OriginTracer {
         LTTNG(LttngEventLayout.getInstance()),
         LTTNG26(Lttng26EventLayout.getInstance()),
-        LTTNG27(Lttng27EventLayout.INSTANCE),
+        LTTNG27(Lttng27EventLayout.getInstance()),
+        LTTNG28(Lttng28EventLayout.getInstance()),
         PERF(PerfEventLayout.getInstance());
 
         private final @NonNull IKernelAnalysisEventLayout fLayout;
@@ -126,7 +128,9 @@ public class LttngKernelTrace extends CtfTmfTrace implements IKernelTrace {
         } else if ("lttng-modules".equals(tracerName)) { //$NON-NLS-1$
             /* Look for specific versions of LTTng */
             if (tracerMajor >= 2) {
-                if (tracerMinor >= 7) {
+                if (tracerMinor >= 8) {
+                    return OriginTracer.LTTNG28;
+                } else if (tracerMinor >= 7) {
                     return OriginTracer.LTTNG27;
                 } else if (tracerMinor >= 6) {
                     return OriginTracer.LTTNG26;

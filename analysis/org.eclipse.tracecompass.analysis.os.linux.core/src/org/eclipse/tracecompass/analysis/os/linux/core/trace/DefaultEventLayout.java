@@ -46,6 +46,7 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout{
     private static final String SCHED_PI_SETPRIO = "sched_pi_setprio"; //$NON-NLS-1$
 
     private static final String SCHED_TTWU = "sched_ttwu"; //$NON-NLS-1$
+    private static final String SCHED_WAKING = "sched_waking"; //$NON-NLS-1$
     private static final String SCHED_WAKEUP = "sched_wakeup"; //$NON-NLS-1$
     private static final String SCHED_WAKEUP_NEW = "sched_wakeup_new"; //$NON-NLS-1$
     private static final Collection<String> SCHED_WAKEUP_EVENTS =
@@ -362,6 +363,16 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout{
     @Override
     public String fieldHRtimerNow() {
         return NOW;
+    }
+
+    /**
+     * Event indicating the source of the wakeup signal.
+     *
+     * @return The name of the event
+     * @since 2.0
+     */
+    public String eventSchedProcessWaking() {
+        return SCHED_WAKING;
     }
 
 }
