@@ -190,6 +190,9 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
             .collect(Collectors.toCollection(TreeSet::new));
 
         final Long potentialBaddr = possibleBaddrs.floor(ip);
+        if (potentialBaddr == null) {
+            return null;
+        }
 
         /* Make sure the 'ip' fits in the expected memory range */
         try {
