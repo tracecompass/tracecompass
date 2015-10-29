@@ -40,7 +40,7 @@ public class EventContextHandler extends BaseHandler {
     @Override
     public void handleEvent(ITmfEvent event) {
         String eventName = event.getName();
-        IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout();
+        IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
         if (eventName.equals(eventLayout.eventSoftIrqEntry())) {
             handleSoftirqEntry(event);
         } else if (eventName.equals(eventLayout.eventSoftIrqExit())) {
@@ -53,6 +53,10 @@ public class EventContextHandler extends BaseHandler {
             handleIrqHandlerEntry(event);
         } else if (eventName.equals(eventLayout.eventIrqHandlerExit())) {
             handleIrqHandlerExit(event);
+        } else if (isIpiEntry(event)) {
+            handleIpiEntry(event);
+        } else if (isIpiExit(event)) {
+            handleIpiExit(event);
         }
     }
 
@@ -98,6 +102,14 @@ public class EventContextHandler extends BaseHandler {
 
     private void handleHrtimerExpireExit(ITmfEvent event) {
         popInterruptContext(event, Context.HRTIMER);
+    }
+
+    private void handleIpiEntry(ITmfEvent event) {
+        pushInterruptContext(event, Context.IPI);
+    }
+
+    private void handleIpiExit(ITmfEvent event) {
+        popInterruptContext(event, Context.IPI);
     }
 
 }

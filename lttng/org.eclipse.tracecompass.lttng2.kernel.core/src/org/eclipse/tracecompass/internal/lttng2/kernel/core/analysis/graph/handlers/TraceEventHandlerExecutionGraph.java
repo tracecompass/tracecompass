@@ -23,6 +23,7 @@ import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex.EdgeDirection;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernelanalysis.LinuxValues;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.TcpEventStrings;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecGraphProvider;
@@ -32,7 +33,6 @@ import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.LttngInterruptContext;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.LttngSystemModel;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.LttngWorker;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEventLayout;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.event.matching.IMatchProcessingUnit;
@@ -128,22 +128,10 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
     @Override
     public void handleEvent(ITmfEvent ev) {
         String eventName = ev.getName();
-        LttngEventLayout eventLayout = getProvider().getEventLayout();
+        IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(ev.getTrace());
 
         if (eventName.equals(eventLayout.eventSchedSwitch())) {
             handleSchedSwitch(ev);
-        } else if (eventName.equals(eventLayout.eventSchedProcessTTWU())) {
-            if (traceHasEventSchedTTWU(ev.getTrace())) {
-                handleSchedWakeup(ev);
-            }
-        } else if (eventName.equals(eventLayout.eventSchedProcessWakeup())) {
-            if (!traceHasEventSchedTTWU(ev.getTrace())) {
-                handleSchedWakeup(ev);
-            }
-        } else if (eventName.equals(eventLayout.eventSchedProcessWakeupNew())) {
-            if (!traceHasEventSchedTTWU(ev.getTrace())) {
-                handleSchedWakeup(ev);
-            }
         } else if (eventName.equals(eventLayout.eventSoftIrqEntry())) {
             handleSoftirqEntry(ev);
         } else if (eventName.equals(TcpEventStrings.INET_SOCK_LOCAL_IN) ||
@@ -152,6 +140,8 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
         } else if (eventName.equals(TcpEventStrings.INET_SOCK_LOCAL_OUT) ||
                 eventName.equals(TcpEventStrings.NET_DEV_QUEUE)) {
             handleInetSockLocalOut(ev);
+        } else if (isWakeupEvent(ev)) {
+            handleSchedWakeup(ev);
         }
     }
 
@@ -202,7 +192,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
     private void handleSchedSwitch(ITmfEvent event) {
         String host = event.getTrace().getHostId();
         long ts = event.getTimestamp().getValue();
-        LttngEventLayout eventLayout = getProvider().getEventLayout();
+        IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
         LttngSystemModel system = getProvider().getSystem();
 
         Integer next = EventField.getInt(event, eventLayout.fieldNextTid());
@@ -222,7 +212,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
         TmfGraph graph = NonNullUtils.checkNotNull(getProvider().getAssignedGraph());
         String host = event.getTrace().getHostId();
         Integer cpu = NonNullUtils.checkNotNull(TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event));
-        LttngEventLayout eventLayout = getProvider().getEventLayout();
+        IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
         LttngSystemModel system = getProvider().getSystem();
 
         long ts = event.getTimestamp().getValue();
@@ -254,7 +244,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
         }
     }
 
-    private void waitBlocked(ITmfEvent event, TmfGraph graph, String host, Integer cpu, LttngEventLayout eventLayout, LttngSystemModel system, long ts, LttngWorker target, @Nullable LttngWorker current) {
+    private void waitBlocked(ITmfEvent event, TmfGraph graph, String host, Integer cpu, IKernelAnalysisEventLayout eventLayout, LttngSystemModel system, long ts, LttngWorker target, @Nullable LttngWorker current) {
         LttngInterruptContext context = system.peekContextStack(host, cpu);
         switch (context.getContext()) {
         case HRTIMER:
@@ -267,6 +257,9 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
         case SOFTIRQ:
             softIrq(event, graph, cpu, eventLayout, ts, target, context);
             break;
+        case IPI:
+            graph.append(target, new TmfVertex(ts), EdgeType.IPI);
+            break;
         case NONE:
             none(ts, target, current);
             break;
@@ -275,7 +268,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
         }
     }
 
-    private void softIrq(ITmfEvent event, TmfGraph graph, Integer cpu, LttngEventLayout eventLayout, long ts, LttngWorker target, LttngInterruptContext context) {
+    private void softIrq(ITmfEvent event, TmfGraph graph, Integer cpu, IKernelAnalysisEventLayout eventLayout, long ts, LttngWorker target, LttngInterruptContext context) {
         TmfVertex wup = new TmfVertex(ts);
         TmfEdge l2 = graph.append(target, wup);
         if (l2 != null) {
@@ -306,7 +299,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
         }
     }
 
-    private static void irq(TmfGraph graph, LttngEventLayout eventLayout, long ts, LttngWorker target, LttngInterruptContext context) {
+    private static void irq(TmfGraph graph, IKernelAnalysisEventLayout eventLayout, long ts, LttngWorker target, LttngInterruptContext context) {
         TmfEdge link = graph.append(target, new TmfVertex(ts));
         if (link != null) {
             int vec = EventField.getLong(context.getEvent(), eventLayout.fieldIrq()).intValue();
@@ -402,7 +395,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
     }
 
     private void handleSoftirqEntry(ITmfEvent event) {
-        LttngEventLayout eventLayout = getProvider().getEventLayout();
+        IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
         TmfGraph graph = NonNullUtils.checkNotNull(getProvider().getAssignedGraph());
         Long vec = EventField.getLong(event, eventLayout.fieldVec());
         if (vec == LinuxValues.SOFTIRQ_NET_RX || vec == LinuxValues.SOFTIRQ_NET_TX) {

@@ -19,6 +19,7 @@ import org.eclipse.tracecompass.analysis.graph.core.base.TmfGraph;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex.EdgeDirection;
 import org.eclipse.tracecompass.analysis.graph.core.building.AbstractTmfGraphProvider;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.handlers.EventContextHandler;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.handlers.TraceEventHandlerExecutionGraph;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.handlers.TraceEventHandlerSched;
@@ -51,7 +52,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  */
 public class LttngKernelExecGraphProvider extends AbstractTmfGraphProvider {
 
-    private final LttngEventLayout fEventLayout;
     private final LttngSystemModel fSystem;
 
     /**
@@ -65,7 +65,9 @@ public class LttngKernelExecGraphProvider extends AbstractTmfGraphProvider {
         /** The interrupt is an IRQ */
         IRQ,
         /** The interrupt is a timer */
-        HRTIMER
+        HRTIMER,
+        /** The inter-processor interrupt */
+        IPI,
     }
 
     /**
@@ -125,18 +127,6 @@ public class LttngKernelExecGraphProvider extends AbstractTmfGraphProvider {
         super(trace, "LTTng Kernel"); //$NON-NLS-1$
         fSystem = new LttngSystemModel();
 
-        /*
-         * TODO: factorize this code because it is duplicated everywhere to
-         * access layout
-         */
-        if (trace instanceof LttngKernelTrace) {
-
-            fEventLayout = (LttngEventLayout) ((LttngKernelTrace) trace).getKernelEventLayout();
-        } else {
-            /* Fall-back to the base LttngEventLayout */
-            fEventLayout = (LttngEventLayout) LttngEventLayout.getInstance();
-        }
-
         registerHandler(new TraceEventHandlerStatedump(this));
         registerHandler(new TraceEventHandlerSched(this));
         registerHandler(new EventContextHandler(this));
@@ -193,12 +183,18 @@ public class LttngKernelExecGraphProvider extends AbstractTmfGraphProvider {
     }
 
     /**
-     * Returns the event layout for the current trace
+     * Returns the event layout for the given trace
+     *
+     * @param trace
+     *            the trace
      *
      * @return the eventLayout
      */
-    public LttngEventLayout getEventLayout() {
-        return fEventLayout;
+    public IKernelAnalysisEventLayout getEventLayout(ITmfTrace trace) {
+        if (trace instanceof LttngKernelTrace) {
+            return ((LttngKernelTrace) trace).getKernelEventLayout();
+        }
+        return LttngEventLayout.getInstance();
     }
 
     /**

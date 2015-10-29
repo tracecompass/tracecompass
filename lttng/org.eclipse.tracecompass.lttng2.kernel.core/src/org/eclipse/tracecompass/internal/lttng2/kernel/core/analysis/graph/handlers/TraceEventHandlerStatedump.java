@@ -10,12 +10,12 @@
 package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.handlers;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecGraphProvider;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecGraphProvider.ProcessStatus;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.EventField;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.LttngSystemModel;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.LttngWorker;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.LttngEventLayout;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 
 /**
@@ -38,7 +38,7 @@ public class TraceEventHandlerStatedump extends BaseHandler {
 
     @Override
     public void handleEvent(ITmfEvent event) {
-        LttngEventLayout eventLayout = getProvider().getEventLayout();
+        IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
         LttngSystemModel system = getProvider().getSystem();
         String eventName = event.getName();
         if (!eventName.equals(eventLayout.eventStatedumpProcessState())) {

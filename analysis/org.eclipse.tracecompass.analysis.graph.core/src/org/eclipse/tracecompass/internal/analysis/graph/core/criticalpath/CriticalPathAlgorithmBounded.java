@@ -78,6 +78,7 @@ public class CriticalPathAlgorithmBounded extends AbstractCriticalPathAlgorithm 
                 break;
             }
             switch (nextEdge.getType()) {
+            case IPI:
             case USER_INPUT:
             case BLOCK_DEVICE:
             case TIMER:

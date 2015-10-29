@@ -79,8 +79,9 @@ public class TmfEdge {
         /** Worker is waiting for user input */
         USER_INPUT,
         /** Block device */
-        BLOCK_DEVICE
-
+        BLOCK_DEVICE,
+        /** inter-processor interrupt */
+        IPI,
     }
 
     private EdgeType fType;

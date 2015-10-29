@@ -42,6 +42,8 @@ public class CriticalPathPresentationProvider extends TimeGraphPresentationProvi
         USER_INPUT      (new RGB(0x5a, 0x01, 0x01)),
         /** Worker is waiting on network */
         NETWORK         (new RGB(0xff, 0x9b, 0xff)),
+        /** Worker is waiting for an IPI */
+        IPI             (new RGB(0x66, 0x66, 0xcc)),
         /** Any other reason */
         UNKNOWN         (new RGB(0x40, 0x3b, 0x33));
 
@@ -92,6 +94,8 @@ public class CriticalPathPresentationProvider extends TimeGraphPresentationProvi
             return State.USER_INPUT;
         case 6:
             return State.NETWORK;
+        case 7:
+            return State.IPI;
         default:
             return State.UNKNOWN;
         }

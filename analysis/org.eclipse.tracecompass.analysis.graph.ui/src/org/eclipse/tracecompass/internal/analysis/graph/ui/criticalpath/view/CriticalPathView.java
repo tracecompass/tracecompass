@@ -458,6 +458,9 @@ public class CriticalPathView extends AbstractTimeGraphView {
         case USER_INPUT:
             state = State.USER_INPUT;
             break;
+        case IPI:
+            state = State.IPI;
+            break;
         case EPS:
         case UNKNOWN:
         case DEFAULT:
