@@ -32,6 +32,7 @@ import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
  */
 public final class FileOffsetMapper {
 
+    private static final String DISCRIMINATOR = "\\(discriminator.*\\)";
     private static final String ADDR2LINE_EXECUTABLE = "addr2line"; //$NON-NLS-1$
 
     private FileOffsetMapper() {}
@@ -70,6 +71,9 @@ public final class FileOffsetMapper {
         }
 
         for (String outputLine : output) {
+            // Remove discriminator part, for example: /build/buildd/glibc-2.21/elf/dl-object.c:78 (discriminator 8)
+            outputLine = outputLine.replaceFirst(DISCRIMINATOR, "").trim(); //$NON-NLS-1$
+
             String[] elems = outputLine.split(":"); //$NON-NLS-1$
             String fileName = elems[0];
             if (fileName.equals("??")) { //$NON-NLS-1$
