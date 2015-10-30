@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.statesystem.core.interval;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 
 /**
@@ -51,7 +52,7 @@ public interface ITmfStateInterval {
      *
      * @return the state value represented by this interval
      */
-    ITmfStateValue getStateValue();
+    @NonNull ITmfStateValue getStateValue();
 
     /**
      * Test if this interval intersects another timestamp, inclusively.

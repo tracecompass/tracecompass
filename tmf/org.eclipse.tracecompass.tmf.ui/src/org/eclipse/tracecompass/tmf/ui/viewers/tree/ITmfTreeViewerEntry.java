@@ -43,8 +43,7 @@ public interface ITmfTreeViewerEntry {
      *
      * @return an array of child elements
      */
-    @NonNull
-    List<? extends ITmfTreeViewerEntry> getChildren();
+    @NonNull List<@NonNull ? extends ITmfTreeViewerEntry> getChildren();
 
     /**
      * Returns the name of this entry.

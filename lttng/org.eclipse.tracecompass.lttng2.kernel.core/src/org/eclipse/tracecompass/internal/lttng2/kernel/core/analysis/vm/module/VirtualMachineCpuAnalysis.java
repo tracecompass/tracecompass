@@ -58,7 +58,7 @@ import com.google.common.collect.TreeMultimap;
 public class VirtualMachineCpuAnalysis extends TmfStateSystemAnalysisModule {
 
     // TODO: Update with event layout when requirements are back */
-    static final Set<String> REQUIRED_EVENTS = NonNullUtils.checkNotNull(ImmutableSet.<String> of(
+    static final Set<String> REQUIRED_EVENTS = NonNullUtils.checkNotNull(ImmutableSet.of(
             // LttngStrings.SCHED_SWITCH
             ));
 

@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 
@@ -29,7 +30,7 @@ public class TraceImpl implements ITimeGraphEntry {
     private long startTime = 0;
     private long stopTime = 1;
     private String className = "defaultClassName";
-    private Vector<ITimeEvent> traceEvents = new Vector<>();
+    private Vector<@NonNull ITimeEvent> traceEvents = new Vector<>();
 
     // ========================================================================
     // Constructor
@@ -87,21 +88,21 @@ public class TraceImpl implements ITimeGraphEntry {
     }
 
     @Override
-    public Iterator<ITimeEvent> getTimeEventsIterator() {
+    public Iterator<@NonNull ITimeEvent> getTimeEventsIterator() {
         return traceEvents.iterator();
     }
 
     @Override
-    public Iterator<ITimeEvent> getTimeEventsIterator(long aStartTime, long aStopTime, long maxDuration) {
+    public Iterator<@NonNull ITimeEvent> getTimeEventsIterator(long aStartTime, long aStopTime, long maxDuration) {
         return traceEvents.iterator();
     }
 
-    public void addTraceEvent(ITimeEvent event) {
+    public void addTraceEvent(@NonNull ITimeEvent event) {
         traceEvents.add(event);
     }
 
     @Override
-    public List<ITimeGraphEntry> getChildren() {
+    public List<@NonNull ITimeGraphEntry> getChildren() {
         return null;
     }
 

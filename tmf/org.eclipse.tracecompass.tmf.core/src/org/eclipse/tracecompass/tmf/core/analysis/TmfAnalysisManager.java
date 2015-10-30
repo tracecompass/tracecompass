@@ -42,7 +42,7 @@ import com.google.common.collect.Multimap;
 @NonNullByDefault
 public class TmfAnalysisManager {
 
-    private static final Multimap<String, IAnalysisModuleHelper> fAnalysisModules = NonNullUtils.checkNotNull(HashMultimap.<String, IAnalysisModuleHelper> create());
+    private static final Multimap<String, IAnalysisModuleHelper> fAnalysisModules = NonNullUtils.checkNotNull(HashMultimap.create());
     private static final Map<String, List<Class<? extends IAnalysisParameterProvider>>> fParameterProviders = new HashMap<>();
     private static final Map<Class<? extends IAnalysisParameterProvider>, IAnalysisParameterProvider> fParamProviderInstances = new HashMap<>();
     private static final List<IAnalysisModuleSource> fSources = new ArrayList<>();

@@ -15,6 +15,7 @@
 package org.eclipse.tracecompass.internal.tmf.pcap.core.trace;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
@@ -28,9 +29,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.pcap.PcapPacket;
 import org.eclipse.tracecompass.internal.pcap.core.trace.BadPcapFileException;
@@ -70,7 +69,7 @@ public class PcapTrace extends TmfTrace implements ITmfTraceProperties {
     /** pcap trace type id as defined in plugin.xml */
     public static final String TRACE_TYPE_ID = "org.eclipse.linuxtools.tmf.pcap.core.pcaptrace"; //$NON-NLS-1$
 
-    private @NonNull static final Collection<ITmfEventAspect> PCAP_ASPECTS =
+    private static final Collection<ITmfEventAspect> PCAP_ASPECTS =
             checkNotNull(ImmutableList.of(
                     ITmfEventAspect.BaseAspects.TIMESTAMP,
                     PcapSourceAspect.INSTANCE,
@@ -80,7 +79,7 @@ public class PcapTrace extends TmfTrace implements ITmfTraceProperties {
                     ITmfEventAspect.BaseAspects.CONTENTS
                     ));
 
-    private @NonNull static final String EMPTY_STRING = ""; //$NON-NLS-1$
+    private static final String EMPTY_STRING = ""; //$NON-NLS-1$
     private static final int CONFIDENCE = 50;
     private @Nullable PcapFile fPcapFile;
     private @Nullable Map<String, String> fTraceProperties = null;
@@ -248,18 +247,18 @@ public class PcapTrace extends TmfTrace implements ITmfTraceProperties {
     public synchronized Map<String, String> getTraceProperties() {
         PcapFile pcap = fPcapFile;
         if (pcap == null) {
-            return checkNotNull(Collections.<String, String> emptyMap());
+            return Collections.emptyMap();
         }
 
         Map<String, String> properties = fTraceProperties;
         if (properties == null) {
             ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-            builder.put(NonNullUtils.nullToEmptyString(Messages.PcapTrace_Version), String.format("%d%c%d", pcap.getMajorVersion(), '.', pcap.getMinorVersion())); //$NON-NLS-1$
-            builder.put(NonNullUtils.nullToEmptyString(Messages.PcapTrace_TimeZoneCorrection), pcap.getTimeZoneCorrection() + " s"); //$NON-NLS-1$
-            builder.put(NonNullUtils.nullToEmptyString(Messages.PcapTrace_TimestampAccuracy), String.valueOf(pcap.getTimeAccuracy()));
-            builder.put(NonNullUtils.nullToEmptyString(Messages.PcapTrace_MaxSnapLength), pcap.getSnapLength() + " bytes"); //$NON-NLS-1$
-            builder.put(NonNullUtils.nullToEmptyString(Messages.PcapTrace_LinkLayerHeaderType), LinkTypeHelper.toString((int) pcap.getDataLinkType()) + " (" + pcap.getDataLinkType() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
-            builder.put(NonNullUtils.nullToEmptyString(Messages.PcapTrace_FileEndianness), pcap.getByteOrder().toString());
+            builder.put(nullToEmptyString(Messages.PcapTrace_Version), String.format("%d%c%d", pcap.getMajorVersion(), '.', pcap.getMinorVersion())); //$NON-NLS-1$
+            builder.put(nullToEmptyString(Messages.PcapTrace_TimeZoneCorrection), pcap.getTimeZoneCorrection() + " s"); //$NON-NLS-1$
+            builder.put(nullToEmptyString(Messages.PcapTrace_TimestampAccuracy), String.valueOf(pcap.getTimeAccuracy()));
+            builder.put(nullToEmptyString(Messages.PcapTrace_MaxSnapLength), pcap.getSnapLength() + " bytes"); //$NON-NLS-1$
+            builder.put(nullToEmptyString(Messages.PcapTrace_LinkLayerHeaderType), LinkTypeHelper.toString((int) pcap.getDataLinkType()) + " (" + pcap.getDataLinkType() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+            builder.put(nullToEmptyString(Messages.PcapTrace_FileEndianness), nullToEmptyString(pcap.getByteOrder().toString()));
 
             return checkNotNull(builder.build());
 

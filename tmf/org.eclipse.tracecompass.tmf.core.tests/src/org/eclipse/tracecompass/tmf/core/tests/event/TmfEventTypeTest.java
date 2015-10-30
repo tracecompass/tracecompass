@@ -19,10 +19,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.Collection;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
@@ -38,21 +38,21 @@ public class TmfEventTypeTest {
     // Variables
     // ------------------------------------------------------------------------
 
-    private final String fTypeId1 = "Some type";
-    private final String fTypeId2 = "Some other type";
+    private final @NonNull String fTypeId1 = "Some type";
+    private final @NonNull String fTypeId2 = "Some other type";
 
-    private final String fLabel0 = "label1";
-    private final String fLabel1 = "label2";
-    private final String fLabel2 = "label3";
+    private final @NonNull String fLabel0 = "label1";
+    private final @NonNull String fLabel1 = "label2";
+    private final @NonNull String fLabel2 = "label3";
 
     private final String[] fLabels0 = new String[] { };
     private final String[] fLabels1 = new String[] { fLabel0, fLabel1 };
     private final String[] fLabels2 = new String[] { fLabel1, fLabel0, fLabel2 };
 
-    private final ITmfEventType fType0 = new TmfEventType(fTypeId1, TmfEventField.makeRoot(fLabels0));
-    private final ITmfEventType fType1 = new TmfEventType(fTypeId2, TmfEventField.makeRoot(fLabels1));
-    private final ITmfEventType fType2 = new TmfEventType(fTypeId1, TmfEventField.makeRoot(fLabels2));
-    private final ITmfEventType fType3 = new TmfEventType(fTypeId2, TmfEventField.makeRoot(fLabels1));
+    private final @NonNull ITmfEventType fType0 = new TmfEventType(fTypeId1, TmfEventField.makeRoot(fLabels0));
+    private final @NonNull ITmfEventType fType1 = new TmfEventType(fTypeId2, TmfEventField.makeRoot(fLabels1));
+    private final @NonNull ITmfEventType fType2 = new TmfEventType(fTypeId1, TmfEventField.makeRoot(fLabels2));
+    private final @NonNull ITmfEventType fType3 = new TmfEventType(fTypeId2, TmfEventField.makeRoot(fLabels1));
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -90,11 +90,6 @@ public class TmfEventTypeTest {
         assertArrayEquals(fLabels2, labels2.toArray(new String[labels2.size()]));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testConstructorCornerCases() {
-        new TmfEventType(null, null);
-    }
-
     @Test
     public void testCopyConstructor() {
         final TmfEventType original = new TmfEventType(fTypeId1, TmfEventField.makeRoot(fLabels1));
@@ -105,15 +100,6 @@ public class TmfEventTypeTest {
         final Collection<String> labels1 = copy.getFieldNames();
         assertEquals("getFieldNames length", fLabels1.length, labels1.size());
         assertArrayEquals(fLabels1, labels1.toArray(new String[labels1.size()]));
-    }
-
-    @Test
-    public void testCopyConstructorCornerCases() {
-        try {
-            new TmfEventType(null);
-            fail("TmfEventType: null argument");
-        } catch (final IllegalArgumentException e) {
-        }
     }
 
     // ------------------------------------------------------------------------

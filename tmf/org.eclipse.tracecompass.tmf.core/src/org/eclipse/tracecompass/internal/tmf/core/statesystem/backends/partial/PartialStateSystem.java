@@ -16,6 +16,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.statesystem.core.AttributeTree;
 import org.eclipse.tracecompass.internal.statesystem.core.StateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -77,7 +78,7 @@ public class PartialStateSystem extends StateSystem {
     // ------------------------------------------------------------------------
 
     @Override
-    public void replaceOngoingState(List<ITmfStateInterval> ongoingIntervals) {
+    public void replaceOngoingState(List<@NonNull ITmfStateInterval> ongoingIntervals) {
         super.replaceOngoingState(ongoingIntervals);
     }
 

@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.lttng2.ust.core.trace;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
@@ -42,7 +43,7 @@ public class LttngUstEventFactory extends CtfTmfEventFactory {
     }
 
     @Override
-    public CtfTmfEvent createEvent(CtfTmfTrace trace, EventDefinition eventDef, String fileName) {
+    public CtfTmfEvent createEvent(CtfTmfTrace trace, EventDefinition eventDef, @Nullable String fileName) {
         /* Prepare what to pass to CtfTmfEvent's constructor */
         final IEventDeclaration eventDecl = eventDef.getDeclaration();
         final long ts = eventDef.getTimestamp();

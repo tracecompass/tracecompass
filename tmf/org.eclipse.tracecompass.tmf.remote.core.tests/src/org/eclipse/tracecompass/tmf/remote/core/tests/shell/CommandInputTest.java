@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.remote.core.shell.CommandInput;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandInput;
 import org.junit.Test;
@@ -30,7 +29,7 @@ import org.junit.Test;
 public class CommandInputTest {
 
     private static final @NonNull String COMMAND = "my-command";
-    private static final String @NonNull [] CMD_INPUT = { "This", "are", "the", "params" };
+    private static final @NonNull String @NonNull [] CMD_INPUT = { "This", "are", "the", "params" };
 
     /**
      * Test suite for the {@link CommandInput#add(String)} and {@link CommandInput#addAll(List)}
@@ -39,8 +38,8 @@ public class CommandInputTest {
     public void testConstructorAndAdd() {
         ICommandInput iunput = new CommandInput();
         iunput.add(COMMAND);
-        List<String> params = Arrays.asList(CMD_INPUT);
-        iunput.addAll(NonNullUtils.checkNotNull(params));
+        @NonNull List<@NonNull String> params = Arrays.asList(CMD_INPUT);
+        iunput.addAll(params);
 
         List<String> expectedList = new ArrayList<>();
         expectedList.add(COMMAND);

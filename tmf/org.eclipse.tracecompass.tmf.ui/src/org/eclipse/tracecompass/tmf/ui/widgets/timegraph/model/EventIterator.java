@@ -12,9 +12,13 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import org.eclipse.jdt.annotation.NonNull;
 
 
 /**
@@ -31,7 +35,7 @@ import java.util.NoSuchElementException;
  * iterator    [A][D][E][F]       [G][B][C]
  * </pre>
  */
-public class EventIterator implements Iterator<ITimeEvent> {
+public class EventIterator implements Iterator<@NonNull ITimeEvent> {
 
     private final long fStartTime;
     private final long fEndTime;
@@ -139,11 +143,11 @@ public class EventIterator implements Iterator<ITimeEvent> {
     public ITimeEvent next() {
         if (hasNext()) {
             if (fZoomedNext != null && (fNext == null || fZoomedNext.getTime() <= fNext.getTime())) {
-                ITimeEvent event = fZoomedNext;
+                ITimeEvent event = checkNotNull(fZoomedNext);
                 fZoomedNext = null;
                 return event;
             }
-            ITimeEvent event = fNext;
+            ITimeEvent event = checkNotNull(fNext);
             fNext = fSplitNext;
             fSplitNext = null;
             return event;

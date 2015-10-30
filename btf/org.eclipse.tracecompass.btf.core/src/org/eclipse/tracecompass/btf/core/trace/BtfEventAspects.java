@@ -14,7 +14,8 @@
 
 package org.eclipse.tracecompass.btf.core.trace;
 
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.btf.core.event.BtfEvent;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -28,11 +29,12 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Alexandre Montplaisir
  */
+@NonNullByDefault
 public final class BtfEventAspects {
 
     private BtfEventAspects() {}
 
-    private static final @NonNull Iterable<ITmfEventAspect> BTF_ASPECTS =
+    private static final Iterable<ITmfEventAspect> BTF_ASPECTS =
             NonNullUtils.checkNotNull(ImmutableList.of(
                     ITmfEventAspect.BaseAspects.TIMESTAMP,
                     new BtfSourceAspect(),
@@ -60,7 +62,7 @@ public final class BtfEventAspects {
         }
 
         @Override
-        public String resolve(ITmfEvent event) {
+        public @Nullable String resolve(ITmfEvent event) {
             if (!(event instanceof BtfEvent)) {
                 return EMPTY_STRING;
             }
@@ -86,7 +88,7 @@ public final class BtfEventAspects {
         }
 
         @Override
-        public String resolve(ITmfEvent event) {
+        public @Nullable String resolve(ITmfEvent event) {
             if (!(event instanceof BtfEvent)) {
                 return EMPTY_STRING;
             }
@@ -100,7 +102,7 @@ public final class BtfEventAspects {
      *
      * @return The aspects
      */
-    public static @NonNull Iterable<ITmfEventAspect> getAspects() {
+    public static Iterable<ITmfEventAspect> getAspects() {
         return BTF_ASPECTS;
     }
 }

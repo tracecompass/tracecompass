@@ -524,7 +524,7 @@ public class Utils {
         if (null == entry || ! entry.hasTimeEvents()) {
             return null;
         }
-        Iterator<ITimeEvent> iterator = entry.getTimeEventsIterator();
+        Iterator<? extends ITimeEvent> iterator = entry.getTimeEventsIterator();
         if (iterator != null && iterator.hasNext()) {
             return iterator.next();
         }
@@ -550,7 +550,7 @@ public class Utils {
         if (null == entry || ! entry.hasTimeEvents()) {
             return null;
         }
-        Iterator<ITimeEvent> iterator = entry.getTimeEventsIterator();
+        Iterator<? extends ITimeEvent> iterator = entry.getTimeEventsIterator();
         if (iterator == null) {
             return null;
         }

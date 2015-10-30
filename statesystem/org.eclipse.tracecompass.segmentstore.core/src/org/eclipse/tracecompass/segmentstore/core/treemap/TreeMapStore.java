@@ -79,11 +79,11 @@ public class TreeMapStore<E extends ISegment> implements ISegmentStore<E> {
          * The same is done for the end times index, but swapping the first two
          * comparators instead.
          */
-        fStartTimesIndex = checkNotNull(TreeMultimap.<Long, E> create(
+        fStartTimesIndex = checkNotNull(TreeMultimap.create(
                 SegmentComparators.LONG_COMPARATOR,
                 Ordering.from(SegmentComparators.INTERVAL_END_COMPARATOR).compound(Ordering.natural())));
 
-        fEndTimesIndex = checkNotNull(TreeMultimap.<Long, E> create(
+        fEndTimesIndex = checkNotNull(TreeMultimap.create(
                 SegmentComparators.LONG_COMPARATOR,
                 Ordering.from(SegmentComparators.INTERVAL_START_COMPARATOR).compound(Ordering.natural())));
 
@@ -164,7 +164,7 @@ public class TreeMapStore<E extends ISegment> implements ISegmentStore<E> {
     public Object[] toArray() {
         fLock.readLock().lock();
         try {
-            return checkNotNull(fStartTimesIndex.values().toArray());
+            return fStartTimesIndex.values().toArray();
         } finally {
             fLock.readLock().unlock();
         }
@@ -174,7 +174,7 @@ public class TreeMapStore<E extends ISegment> implements ISegmentStore<E> {
     public <T> T[] toArray(T @Nullable[] a) {
         fLock.readLock().lock();
         try {
-            return checkNotNull(fStartTimesIndex.values().toArray(a));
+            return fStartTimesIndex.values().toArray(a);
         } finally {
             fLock.readLock().unlock();
         }

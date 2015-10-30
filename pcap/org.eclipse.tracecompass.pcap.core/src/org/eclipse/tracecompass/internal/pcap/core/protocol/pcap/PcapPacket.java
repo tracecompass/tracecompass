@@ -236,7 +236,7 @@ public class PcapPacket extends Packet {
 
     @Override
     public PcapEndpoint getSourceEndpoint() {
-        @Nullable PcapEndpoint endpoint = fSourceEndpoint;
+        PcapEndpoint endpoint = fSourceEndpoint;
         if (endpoint == null) {
             endpoint = new PcapEndpoint(this, true);
         }
@@ -246,7 +246,6 @@ public class PcapPacket extends Packet {
 
     @Override
     public PcapEndpoint getDestinationEndpoint() {
-        @Nullable
         PcapEndpoint endpoint = fDestinationEndpoint;
 
         if (endpoint == null) {
@@ -262,7 +261,7 @@ public class PcapPacket extends Packet {
     public Map<String, String> getFields() {
         Map<String, String> map = fFields;
         if (map == null) {
-            ImmutableMap.Builder<String, String> builder = ImmutableMap.<String, String> builder();
+            ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
             builder.put("Frame", String.valueOf(fPacketIndex)); //$NON-NLS-1$
             builder.put("Frame Length", String.valueOf(fOriginalLength) + " bytes"); //$NON-NLS-1$ //$NON-NLS-2$
             builder.put("Capture Length", String.valueOf(fIncludedLength) + " bytes"); //$NON-NLS-1$ //$NON-NLS-2$

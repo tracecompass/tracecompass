@@ -258,9 +258,9 @@ public final class AttributeTree {
      *             If 'attributeQuark' is invalid, or if there is no attrbiute
      *             associated to it.
      */
-    public synchronized @NonNull List<Integer> getSubAttributes(int attributeQuark, boolean recursive)
+    public synchronized @NonNull List<@NonNull Integer> getSubAttributes(int attributeQuark, boolean recursive)
             throws AttributeNotFoundException {
-        List<Integer> listOfChildren = new ArrayList<>();
+        List<@NonNull Integer> listOfChildren = new ArrayList<>();
         Attribute startingAttribute;
 
         /* Check if the quark is valid */

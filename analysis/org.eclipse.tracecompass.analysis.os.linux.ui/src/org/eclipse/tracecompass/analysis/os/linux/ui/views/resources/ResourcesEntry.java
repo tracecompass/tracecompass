@@ -13,9 +13,12 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.ui.views.resources;
 
+import java.util.Iterator;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources.SoftIrqLabelProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 
@@ -182,6 +185,11 @@ public class ResourcesEntry extends TimeGraphEntry implements Comparable<ITimeGr
             return ret;
         }
         return Integer.compare(this.getId(), o.getId());
+    }
+
+    @Override
+    public Iterator<@NonNull ITimeEvent> getTimeEventsIterator() {
+        return super.getTimeEventsIterator();
     }
 
 }

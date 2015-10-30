@@ -67,35 +67,34 @@ public class ArrayDefinition2Test {
 
     private ArrayDefinition createLongArray() {
         IntegerDeclaration decl = IntegerDeclaration.createDeclaration(32, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "none", 8);
-        List<Definition> defs = createIntDefs(10, 32);
+        List<@NonNull Definition> defs = createIntDefs(10, 32);
         ArrayDefinition temp = setUpDeclaration(decl, defs);
         return temp;
     }
 
     private ArrayDefinition createCharArray() {
         IntegerDeclaration decl = IntegerDeclaration.createDeclaration(8, false, 10, ByteOrder.BIG_ENDIAN, Encoding.UTF8, "none", 8);
-        List<Definition> defs = createIntDefs(4, 8);
+        List<@NonNull Definition> defs = createIntDefs(4, 8);
         ArrayDefinition temp = setUpDeclaration(decl, defs);
         return temp;
     }
 
     private ArrayDefinition createStringArray() {
         StringDeclaration strDecl = StringDeclaration.getStringDeclaration(Encoding.UTF8);
-        List<Definition> defs = createDefs();
+        List<@NonNull Definition> defs = createDefs();
         ArrayDefinition temp = setUpDeclaration(strDecl, defs);
         return temp;
     }
 
     private ArrayDefinition setUpDeclaration(@NonNull IDeclaration decl,
-            @NonNull List<Definition> defs) {
+            @NonNull List<@NonNull Definition> defs) {
         CompoundDeclaration ad = new ArrayDeclaration(0, decl);
         ArrayDefinition temp = new ArrayDefinition(ad, this.trace, "Testx", defs);
         return temp;
     }
 
-    @NonNull
-    private static List<Definition> createIntDefs(int size, int bits) {
-        List<Definition> defs = new ArrayList<>(size);
+    private static @NonNull List<@NonNull Definition> createIntDefs(int size, int bits) {
+        List<@NonNull Definition> defs = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             String content = "test" + i;
             defs.add(new IntegerDefinition(IntegerDeclaration.createDeclaration(bits, false,
@@ -104,10 +103,9 @@ public class ArrayDefinition2Test {
         return defs;
     }
 
-    @NonNull
-    private static List<Definition> createDefs() {
+    private static @NonNull List<@NonNull Definition> createDefs() {
         int size = 4;
-        List<Definition> defs = new ArrayList<>();
+        List<@NonNull Definition> defs = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             String content = "test" + i;
             defs.add(new StringDefinition(
@@ -125,7 +123,7 @@ public class ArrayDefinition2Test {
         CompoundDeclaration declaration = (CompoundDeclaration) charArrayFixture.getDeclaration();
         String fieldName = "";
 
-        ArrayDefinition result = new ArrayDefinition(declaration, this.trace, fieldName, Arrays.asList(new Definition[0]));
+        ArrayDefinition result = new ArrayDefinition(declaration, this.trace, fieldName, Arrays.asList(new @NonNull Definition[0]));
         assertNotNull(result);
     }
 
@@ -140,7 +138,7 @@ public class ArrayDefinition2Test {
         IDefinitionScope definitionScope = getDefinitionScope();
 
         String fieldName = "";
-        ArrayDefinition result = new ArrayDefinition(declaration, definitionScope, fieldName, Arrays.asList(new Definition[0]));
+        ArrayDefinition result = new ArrayDefinition(declaration, definitionScope, fieldName, Arrays.asList(new @NonNull Definition[0]));
         assertNotNull(result);
     }
 
@@ -170,7 +168,7 @@ public class ArrayDefinition2Test {
      */
     @Test
     public void testgetElem_withDefs() {
-        List<Definition> defs = createDefs();
+        List<@NonNull Definition> defs = createDefs();
         IDefinitionScope definitionScope = getDefinitionScope();
         ArrayDefinition ad = new ArrayDefinition((CompoundDeclaration) charArrayFixture.getDeclaration(), definitionScope, "test", defs);
         int j = 1;

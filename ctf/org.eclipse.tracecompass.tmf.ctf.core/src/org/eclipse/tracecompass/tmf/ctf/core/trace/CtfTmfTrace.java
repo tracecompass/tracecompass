@@ -97,7 +97,7 @@ public class CtfTmfTrace extends TmfTrace
      * Event aspects available for all CTF traces
      * @since 1.0
      */
-    protected static final @NonNull Collection<ITmfEventAspect> CTF_ASPECTS =
+    protected static final @NonNull Collection<@NonNull ITmfEventAspect> CTF_ASPECTS =
             checkNotNull(ImmutableList.of(
                     ITmfEventAspect.BaseAspects.TIMESTAMP,
                     new CtfChannelAspect(),
@@ -117,11 +117,10 @@ public class CtfTmfTrace extends TmfTrace
     // Fields
     // -------------------------------------------
 
-    private final Map<String, CtfTmfEventType> fContainedEventTypes =
-            Collections.synchronizedMap(new HashMap<String, CtfTmfEventType>());
+    private final Map<@NonNull String, @NonNull CtfTmfEventType> fContainedEventTypes =
+            Collections.synchronizedMap(new HashMap<>());
 
-    private final CtfIteratorManager fIteratorManager =
-            new CtfIteratorManager(this);
+    private final CtfIteratorManager fIteratorManager = new CtfIteratorManager(this);
 
     private final @NonNull CtfTmfEventFactory fEventFactory;
 
@@ -481,7 +480,7 @@ public class CtfTmfTrace extends TmfTrace
      * Gets the list of declared events
      */
     @Override
-    public Set<CtfTmfEventType> getContainedEventTypes() {
+    public Set<@NonNull CtfTmfEventType> getContainedEventTypes() {
         return ImmutableSet.copyOf(fContainedEventTypes.values());
     }
 

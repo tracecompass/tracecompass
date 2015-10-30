@@ -64,7 +64,7 @@ public interface ITmfEventField {
      *
      * @return The subfield names (empty Collection if none)
      */
-    @NonNull Collection<String> getFieldNames();
+    @NonNull Collection<@NonNull String> getFieldNames();
 
     /**
      * Return the subfields. The iteration order is the same as

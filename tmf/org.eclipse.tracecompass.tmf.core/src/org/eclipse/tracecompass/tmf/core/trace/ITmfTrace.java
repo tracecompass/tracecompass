@@ -253,7 +253,7 @@ public interface ITmfTrace extends ITmfEventProvider {
      *
      * @return An iterable view of the analysis modules
      */
-    @NonNull Iterable<IAnalysisModule> getAnalysisModules();
+    @NonNull Iterable<@NonNull IAnalysisModule> getAnalysisModules();
 
     // ------------------------------------------------------------------------
     // Aspect getters
@@ -267,7 +267,7 @@ public interface ITmfTrace extends ITmfEventProvider {
      *
      * @return The event aspects for this trace
      */
-    @NonNull Iterable<ITmfEventAspect> getEventAspects();
+    @NonNull Iterable<@NonNull ITmfEventAspect> getEventAspects();
 
     // ------------------------------------------------------------------------
     // Trace characteristics getters

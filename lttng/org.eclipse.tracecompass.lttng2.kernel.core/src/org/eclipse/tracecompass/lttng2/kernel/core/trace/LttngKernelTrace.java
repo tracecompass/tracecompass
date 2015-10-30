@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.lttng2.kernel.core.trace;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -35,6 +36,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
+import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEventType;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTraceValidationStatus;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfUtils;
@@ -160,6 +162,15 @@ public class LttngKernelTrace extends CtfTmfTrace implements IKernelTrace {
     @Override
     public Iterable<ITmfEventAspect> getEventAspects() {
          return LTTNG_KERNEL_ASPECTS;
+    }
+
+    /*
+     * Needs explicit @NonNull generic type annotation. Can be removed once this
+     * class becomes @NonNullByDefault.
+     */
+    @Override
+    public @NonNull Set<@NonNull CtfTmfEventType> getContainedEventTypes() {
+        return super.getContainedEventTypes();
     }
 
 }

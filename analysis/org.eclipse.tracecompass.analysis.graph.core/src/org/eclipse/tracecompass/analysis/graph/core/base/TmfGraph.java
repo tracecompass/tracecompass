@@ -54,7 +54,7 @@ public class TmfGraph {
      * Constructor
      */
     public TmfGraph() {
-        fNodeMap = NonNullUtils.checkNotNull(ArrayListMultimap.<IGraphWorker, TmfVertex> create());
+        fNodeMap = NonNullUtils.checkNotNull(ArrayListMultimap.create());
         fReverse = new HashMap<>();
     }
 

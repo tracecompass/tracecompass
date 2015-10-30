@@ -25,6 +25,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -279,8 +280,8 @@ public class StateSystem implements ITmfStateSystemBuilder {
     }
 
     @Override
-    public List<Integer> getQuarks(String... pattern) {
-        List<Integer> quarks = new LinkedList<>();
+    public List<@NonNull Integer> getQuarks(String... pattern) {
+        List<@NonNull Integer> quarks = new LinkedList<>();
         List<String> prefix = new LinkedList<>();
         List<String> suffix = new LinkedList<>();
         boolean split = false;
@@ -544,7 +545,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
      * @param newStateIntervals
      *            The new List of state values to use as ongoing state info
      */
-    protected void replaceOngoingState(@NonNull List<ITmfStateInterval> newStateIntervals) {
+    protected void replaceOngoingState(@NonNull List<@NonNull ITmfStateInterval> newStateIntervals) {
         transState.replaceOngoingState(newStateIntervals);
     }
 
@@ -560,7 +561,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
         }
 
         final int nbAttr = getNbAttributes();
-        List<ITmfStateInterval> stateInfo = new ArrayList<>(nbAttr);
+        List<@Nullable ITmfStateInterval> stateInfo = new ArrayList<>(nbAttr);
 
         /* Bring the size of the array to the current number of attributes */
         for (int i = 0; i < nbAttr; i++) {

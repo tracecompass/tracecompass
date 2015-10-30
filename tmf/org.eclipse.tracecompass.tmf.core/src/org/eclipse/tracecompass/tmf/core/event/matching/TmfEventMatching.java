@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.core.event.matching;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -50,7 +52,7 @@ public class TmfEventMatching implements ITmfEventMatching {
     /**
      * The array of traces to match
      */
-    private final Collection<ITmfTrace> fTraces;
+    private final @NonNull Collection<@NonNull ITmfTrace> fTraces;
 
     /**
      * The class to call once a match is found
@@ -91,7 +93,7 @@ public class TmfEventMatching implements ITmfEventMatching {
      *            The set of traces for which to match events
      * @since 1.0
      */
-    public TmfEventMatching(Collection<ITmfTrace> traces) {
+    public TmfEventMatching(Collection<@NonNull ITmfTrace> traces) {
         this(traces, new TmfEventMatches());
     }
 
@@ -103,7 +105,7 @@ public class TmfEventMatching implements ITmfEventMatching {
      * @param tmfEventMatches
      *            The match processing class
      */
-    public TmfEventMatching(Collection<ITmfTrace> traces, IMatchProcessingUnit tmfEventMatches) {
+    public TmfEventMatching(Collection<@NonNull ITmfTrace> traces, IMatchProcessingUnit tmfEventMatches) {
         if (tmfEventMatches == null) {
             throw new IllegalArgumentException();
         }
@@ -287,7 +289,7 @@ public class TmfEventMatching implements ITmfEventMatching {
          * lists
          */
         if (found) {
-            getProcessingUnit().addMatch(dep);
+            getProcessingUnit().addMatch(checkNotNull(dep));
             monitor.subTask(NLS.bind(Messages.TmfEventMatching_MatchesFound, getProcessingUnit().countMatches()));
         } else {
             /*

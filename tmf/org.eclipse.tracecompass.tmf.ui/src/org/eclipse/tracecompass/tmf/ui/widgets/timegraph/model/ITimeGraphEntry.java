@@ -16,6 +16,8 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 /**
  * Interface for an entry (row) in the time graph view
  *
@@ -44,7 +46,7 @@ public interface ITimeGraphEntry {
      *
      * @return an array of child elements
      */
-    List<? extends ITimeGraphEntry> getChildren();
+    List<@NonNull ? extends ITimeGraphEntry> getChildren();
 
     /**
      * Returns the name of this entry.
@@ -83,18 +85,22 @@ public interface ITimeGraphEntry {
      *
      * @return the iterator
      */
-    <T extends ITimeEvent> Iterator<T> getTimeEventsIterator();
+    Iterator<@NonNull ? extends ITimeEvent> getTimeEventsIterator();
 
     /**
-     * Get an iterator which only returns events that fall within the start time and the stop time.
-     * The visible duration is the event duration below which further detail is not discernible.
-     * If no such iterator is implemented, provide a basic iterator which returns all events.
+     * Get an iterator which only returns events that fall within the start time
+     * and the stop time. The visible duration is the event duration below which
+     * further detail is not discernible. If no such iterator is implemented,
+     * provide a basic iterator which returns all events.
      *
-     * @param startTime start time in nanoseconds
-     * @param stopTime stop time in nanoseconds
-     * @param visibleDuration duration of one pixel in nanoseconds
+     * @param startTime
+     *            start time in nanoseconds
+     * @param stopTime
+     *            stop time in nanoseconds
+     * @param visibleDuration
+     *            duration of one pixel in nanoseconds
      *
      * @return the iterator
      */
-    <T extends ITimeEvent> Iterator<T> getTimeEventsIterator(long startTime, long stopTime, long visibleDuration);
+    <T extends ITimeEvent> Iterator<@NonNull T> getTimeEventsIterator(long startTime, long stopTime, long visibleDuration);
 }

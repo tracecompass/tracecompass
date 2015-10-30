@@ -113,7 +113,7 @@ public final class ArrayDeclaration extends CompoundDeclaration {
 
             return new ByteArrayDefinition(this, definitionScope, fieldName, data);
         }
-        @NonNull List<Definition> definitions = read(input, definitionScope, fieldName);
+        @NonNull List<@NonNull Definition> definitions = read(input, definitionScope, fieldName);
         return new ArrayDefinition(this, definitionScope, fieldName, definitions);
     }
 

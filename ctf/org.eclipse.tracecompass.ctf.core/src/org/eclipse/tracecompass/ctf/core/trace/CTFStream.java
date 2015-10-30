@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.ctf.core.trace;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -226,9 +225,13 @@ public class CTFStream {
      *
      * @return The event declarations for this stream
      */
-    public @NonNull Collection<IEventDeclaration> getEventDeclarations() {
-        List<IEventDeclaration> retVal = new ArrayList<>(fEvents);
-        retVal.removeAll(Collections.<IEventDeclaration> singletonList(null));
+    public @NonNull Collection<@NonNull IEventDeclaration> getEventDeclarations() {
+        List<@NonNull IEventDeclaration> retVal = new ArrayList<>();
+        for (IEventDeclaration eventDeclaration : fEvents) {
+            if (eventDeclaration != null) {
+                retVal.add(eventDeclaration);
+            }
+        }
         return retVal;
     }
 

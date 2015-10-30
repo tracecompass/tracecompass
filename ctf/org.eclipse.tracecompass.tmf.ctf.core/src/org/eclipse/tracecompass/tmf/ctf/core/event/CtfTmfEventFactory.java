@@ -12,7 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.ctf.core.event;
 
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
@@ -31,9 +32,10 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
  *
  * @author Alexandre Montplaisir
  */
+@NonNullByDefault
 public class CtfTmfEventFactory {
 
-    private static final @NonNull CtfTmfEventFactory INSTANCE = new CtfTmfEventFactory();
+    private static final CtfTmfEventFactory INSTANCE = new CtfTmfEventFactory();
 
     /**
      * The file name to use when none is specified.
@@ -42,7 +44,7 @@ public class CtfTmfEventFactory {
      *
      * @since 2.0
      */
-    protected static final @NonNull String NO_STREAM = "No stream"; //$NON-NLS-1$
+    protected static final String NO_STREAM = "No stream"; //$NON-NLS-1$
 
     /**
      * Protected constructor, only for use by sub-classes. Users should call
@@ -58,7 +60,7 @@ public class CtfTmfEventFactory {
      * @return The instance
      * @since 2.0
      */
-    public static @NonNull CtfTmfEventFactory instance() {
+    public static CtfTmfEventFactory instance() {
         return INSTANCE;
     }
 
@@ -74,7 +76,7 @@ public class CtfTmfEventFactory {
      * @return The newly-built CtfTmfEvent
      * @since 2.0
      */
-    public CtfTmfEvent createEvent(CtfTmfTrace trace, EventDefinition eventDef, String fileName) {
+    public CtfTmfEvent createEvent(CtfTmfTrace trace, EventDefinition eventDef, @Nullable String fileName) {
 
         /* Prepare what to pass to CtfTmfEvent's constructor */
         final IEventDeclaration eventDecl = eventDef.getDeclaration();
@@ -83,7 +85,7 @@ public class CtfTmfEventFactory {
 
         int sourceCPU = eventDef.getCPU();
 
-        String reference = fileName == null ? NO_STREAM : fileName;
+        String reference = (fileName == null ? NO_STREAM : fileName);
 
         /* Handle the special case of lost events */
         if (eventDecl.getName().equals(CTFStrings.LOST_EVENT_NAME)) {

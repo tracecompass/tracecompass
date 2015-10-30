@@ -67,7 +67,6 @@ import org.swtchart.Range;
  * @since 2.0
  */
 public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXLineChartViewer {
-    private static final List<ISegment> EMPTY_LIST = NonNullUtils.checkNotNull(Collections.<ISegment> emptyList());
 
     private final class CompactingSegmentStoreQuery extends Job {
         private static final long MAX_POINTS = 1000;
@@ -90,14 +89,14 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
             final long endTimeInNanos = getTimeInNanos(fCurrentRange.getEndTime());
             if (module == null) {
                 setWindowRange(startTimeInNanos, endTimeInNanos);
-                redraw(statusMonitor, startTimeInNanos, startTimeInNanos, EMPTY_LIST);
+                redraw(statusMonitor, startTimeInNanos, startTimeInNanos, Collections.EMPTY_LIST);
                 return new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Analysis module not available"); //$NON-NLS-1$
             }
 
             final ISegmentStore<ISegment> results = module.getResults();
             if (results == null) {
                 setWindowRange(startTimeInNanos, endTimeInNanos);
-                redraw(statusMonitor, startTimeInNanos, startTimeInNanos, EMPTY_LIST);
+                redraw(statusMonitor, startTimeInNanos, startTimeInNanos, Collections.EMPTY_LIST);
                 return new Status(IStatus.INFO, Activator.PLUGIN_ID, "Analysis module does not have results"); //$NON-NLS-1$
             }
 
@@ -142,7 +141,7 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
                     continue;
                 }
                 if (statusMonitor.isCanceled()) {
-                    return NonNullUtils.checkNotNull(Collections.<ISegment> emptyList());
+                    return Collections.EMPTY_LIST;
                 }
                 if (!overlaps(last, next)) {
                     displayData.add(next);
@@ -156,7 +155,7 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
             final List<ISegment> list = new ArrayList<>();
             for (ISegment seg : iterable) {
                 if (statusMonitor.isCanceled()) {
-                    return NonNullUtils.checkNotNull(Collections.<ISegment> emptyList());
+                    return Collections.EMPTY_LIST;
                 }
                 list.add(seg);
             }
@@ -209,7 +208,7 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
     /**
      * Data to display
      */
-    private Collection<ISegment> fDisplayData = NonNullUtils.checkNotNull(Collections.<ISegment> emptyList());
+    private Collection<ISegment> fDisplayData = Collections.EMPTY_LIST;
 
     /**
      * Analysis completion listener
@@ -283,7 +282,7 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
                     }
                 });
             }
-            fDisplayData = NonNullUtils.checkNotNull(Collections.EMPTY_LIST);
+            fDisplayData = Collections.EMPTY_LIST;
         } else {
             Collection<ISegment> elements = (Collection<ISegment>) dataInput.getIntersectingElements(currentStart, currentEnd);
             // getIntersectingElements can return an unsorted iterable, make
@@ -411,12 +410,12 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
 
     /**
      * Returns the segment store analysis module
+     *
      * @param trace
      *            The trace to consider
      * @return the analysis module
      */
     protected @Nullable abstract AbstractSegmentStoreAnalysisModule getSegmentStoreAnalysisModule(ITmfTrace trace);
-
 
     // ------------------------------------------------------------------------
     // Signal handlers

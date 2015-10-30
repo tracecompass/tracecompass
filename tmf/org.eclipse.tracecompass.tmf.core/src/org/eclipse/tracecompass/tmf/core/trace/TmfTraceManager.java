@@ -177,11 +177,11 @@ public final class TmfTraceManager {
      *            The trace or experiment
      * @return The corresponding trace set.
      */
-    public static @NonNull Collection<ITmfTrace> getTraceSet(ITmfTrace trace) {
+    public static @NonNull Collection<@NonNull ITmfTrace> getTraceSet(ITmfTrace trace) {
         if (trace == null) {
-            return NonNullUtils.checkNotNull(ImmutableSet.<ITmfTrace> of());
+            return NonNullUtils.checkNotNull(ImmutableSet.of());
         }
-        List<ITmfTrace> traces = trace.getChildren(ITmfTrace.class);
+        List<@NonNull ITmfTrace> traces = trace.getChildren(ITmfTrace.class);
         if (traces.size() > 0) {
             return NonNullUtils.checkNotNull(ImmutableSet.copyOf(traces));
         }

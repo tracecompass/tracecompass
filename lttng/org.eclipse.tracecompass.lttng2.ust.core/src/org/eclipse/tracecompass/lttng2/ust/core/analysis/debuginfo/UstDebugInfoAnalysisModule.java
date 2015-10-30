@@ -76,7 +76,7 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
     public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
         // TODO specify actual requirements once the requirement-checking is
         // implemented. This analysis needs "ip" and "vpid" contexts.
-        return checkNotNull(Collections.EMPTY_SET);
+        return Collections.EMPTY_SET;
     }
 
     @Override

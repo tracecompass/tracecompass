@@ -501,9 +501,6 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
             if (thread > 0) {
                 break;
             }
-            if (trace == null) {
-                continue;
-            }
             ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
             if (ssq == null) {
                 continue;
@@ -558,9 +555,6 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
             return list;
         }
         for (ITmfTrace trace : TmfTraceManager.getTraceSet(getTrace())) {
-            if (trace == null) {
-                continue;
-            }
             List<Integer> currentThreadQuarks = ss.getQuarks(Attributes.CPUS, "*", Attributes.CURRENT_THREAD); //$NON-NLS-1$
             for (int currentThreadQuark : currentThreadQuarks) {
                 if (currentThreadQuark >= fullStates.get(0).size()) {

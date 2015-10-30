@@ -82,9 +82,9 @@ public class CriticalPathView extends AbstractTimeGraphView {
             COLUMN_PROCESS
     };
 
-    private final Table<ITmfTrace, Object, List<ILinkEvent>> fLinks = NonNullUtils.checkNotNull(HashBasedTable.<ITmfTrace, Object, List<ILinkEvent>> create());
+    private final Table<ITmfTrace, Object, List<ILinkEvent>> fLinks = NonNullUtils.checkNotNull(HashBasedTable.create());
     /** The trace to entry list hash map */
-    private final Table<ITmfTrace, Object, TmfGraphStatistics> fObjectStatistics = NonNullUtils.checkNotNull(HashBasedTable.<ITmfTrace, Object, TmfGraphStatistics> create());
+    private final Table<ITmfTrace, Object, TmfGraphStatistics> fObjectStatistics = NonNullUtils.checkNotNull(HashBasedTable.create());
 
     private final CriticalPathContentProvider fContentProvider = new CriticalPathContentProvider();
 
@@ -203,7 +203,7 @@ public class CriticalPathView extends AbstractTimeGraphView {
         private @Nullable Object fCurrentObject;
 
         @Override
-        public @Nullable ITimeGraphEntry[] getElements(@Nullable Object inputElement) {
+        public ITimeGraphEntry[] getElements(@Nullable Object inputElement) {
             ITimeGraphEntry[] ret = new ITimeGraphEntry[0];
             if (inputElement instanceof List) {
                 List<?> list = (List<?>) inputElement;
@@ -225,6 +225,7 @@ public class CriticalPathView extends AbstractTimeGraphView {
                 buildEntryList(worker);
                 entries = workerEntries.get(worker);
             }
+
             return (entries == null) ?
                 new ITimeGraphEntry[0] :
                 NonNullUtils.checkNotNull(entries.toArray(new ITimeGraphEntry[entries.size()]));
@@ -275,10 +276,13 @@ public class CriticalPathView extends AbstractTimeGraphView {
         }
 
         private @Nullable TmfGraph getGraph(final ITmfTrace trace) {
-            CriticalPathModule module = Iterables.getFirst(TmfTraceUtils.getAnalysisModulesOfClass(trace, CriticalPathModule.class), null);
+            CriticalPathModule module = Iterables.<@Nullable CriticalPathModule> getFirst(
+                    TmfTraceUtils.getAnalysisModulesOfClass(trace, CriticalPathModule.class),
+                    null);
             if (module == null) {
-                return null;
+                throw new IllegalStateException();
             }
+
             module.schedule();
             if (!module.waitForCompletion()) {
                 return null;
@@ -304,10 +308,12 @@ public class CriticalPathView extends AbstractTimeGraphView {
             if (trace == null) {
                 return null;
             }
-            CriticalPathModule module = Iterables.getFirst(TmfTraceUtils.getAnalysisModulesOfClass(trace, CriticalPathModule.class), null);
+            CriticalPathModule module = Iterables.<@Nullable CriticalPathModule> getFirst(
+                    TmfTraceUtils.getAnalysisModulesOfClass(trace, CriticalPathModule.class), null);
             if (module == null) {
-                return null;
+                throw new IllegalStateException();
             }
+
             final TmfGraph graph = module.getCriticalPath();
             if (graph == null) {
                 return null;
@@ -475,9 +481,6 @@ public class CriticalPathView extends AbstractTimeGraphView {
         redraw();
 
         for (ITimeGraphEntry child : entry.getChildren()) {
-            if (child == null) {
-                throw new NullPointerException();
-            }
             buildStatusEvents(trace, (CriticalPathEntry) child);
         }
     }

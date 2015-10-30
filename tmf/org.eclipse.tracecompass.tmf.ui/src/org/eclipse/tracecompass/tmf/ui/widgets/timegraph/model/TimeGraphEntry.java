@@ -32,7 +32,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
     private ITimeGraphEntry fParent = null;
 
     /** List of child entries */
-    private final List<ITimeGraphEntry> fChildren = new CopyOnWriteArrayList<>();
+    private final List<@NonNull ITimeGraphEntry> fChildren = new CopyOnWriteArrayList<>();
 
     /** Name of this entry (text to show) */
     private String fName;
@@ -97,7 +97,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
     }
 
     @Override
-    public synchronized List<? extends ITimeGraphEntry> getChildren() {
+    public synchronized List<@NonNull ? extends ITimeGraphEntry> getChildren() {
         return fChildren;
     }
 
@@ -142,7 +142,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
     }
 
     @Override
-    public Iterator<ITimeEvent> getTimeEventsIterator() {
+    public Iterator<@NonNull ITimeEvent> getTimeEventsIterator() {
         if (hasTimeEvents()) {
             return new EventIterator(fEventList, fZoomedEventList);
         }
@@ -150,7 +150,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
     }
 
     @Override
-    public Iterator<ITimeEvent> getTimeEventsIterator(long startTime, long stopTime, long visibleDuration) {
+    public Iterator<@NonNull ITimeEvent> getTimeEventsIterator(long startTime, long stopTime, long visibleDuration) {
         if (!hasTimeEvents()) {
             return null;
         }
@@ -258,7 +258,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
     /*
      * TODO: This method can be removed in the next major API version.
      */
-    public synchronized void addChild(TimeGraphEntry child) {
+    public synchronized void addChild(@NonNull TimeGraphEntry child) {
         addChild((ITimeGraphEntry) child);
     }
 
@@ -270,7 +270,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      * @param child
      *            The child entry
      */
-    public synchronized void addChild(ITimeGraphEntry child) {
+    public synchronized void addChild(@NonNull ITimeGraphEntry child) {
         /*
          * TODO: Use setParent() once it is added to the interface.
          */
@@ -299,7 +299,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      * @param child
      *            The child entry
      */
-    public synchronized void addChild(int index, ITimeGraphEntry child) {
+    public synchronized void addChild(int index, @NonNull ITimeGraphEntry child) {
         /*
          * TODO: Use setParent() once it is added to the interface.
          */
@@ -322,7 +322,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
         if (comparator == null) {
             return;
         }
-        ITimeGraphEntry[] array = fChildren.toArray(new ITimeGraphEntry[0]);
+        @NonNull ITimeGraphEntry[] array = fChildren.toArray(new @NonNull ITimeGraphEntry[0]);
         Arrays.sort(array, comparator);
         fChildren.clear();
         fChildren.addAll(Arrays.asList(array));

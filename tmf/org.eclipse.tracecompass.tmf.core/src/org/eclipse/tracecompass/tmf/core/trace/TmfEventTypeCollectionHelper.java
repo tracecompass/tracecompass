@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.core.trace;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 
 /**
@@ -37,8 +38,8 @@ public final class TmfEventTypeCollectionHelper {
      * @return a set of the names of these events, if some names are clashing
      *         they will only appear once
      */
-    public static Set<String> getEventNames(Iterable<? extends ITmfEventType> eventTypes) {
-        Set<String> retSet = new HashSet<>();
+    public static Set<@NonNull String> getEventNames(Iterable<@NonNull ? extends ITmfEventType> eventTypes) {
+        Set<@NonNull String> retSet = new HashSet<>();
         for (ITmfEventType eventType : eventTypes) {
             retSet.add(eventType.getName());
         }

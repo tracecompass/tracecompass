@@ -16,6 +16,8 @@ package org.eclipse.tracecompass.tmf.core.event;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 /**
  * A basic implementation of ITmfEventType.
  *
@@ -31,7 +33,7 @@ public class TmfEventType implements ITmfEventType {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final String fTypeId;
+    private final @NonNull String fTypeId;
     private final ITmfEventField fRootField;
 
     // ------------------------------------------------------------------------
@@ -51,10 +53,7 @@ public class TmfEventType implements ITmfEventType {
      * @param typeId the type name
      * @param root the root field
      */
-    public TmfEventType(final String typeId, final ITmfEventField root) {
-        if (typeId == null) {
-            throw new IllegalArgumentException();
-        }
+    public TmfEventType(final @NonNull String typeId, final ITmfEventField root) {
         fTypeId = typeId;
         fRootField = root;
     }
@@ -64,10 +63,7 @@ public class TmfEventType implements ITmfEventType {
      *
      * @param type the other type
      */
-    public TmfEventType(final ITmfEventType type) {
-        if (type == null) {
-            throw new IllegalArgumentException();
-        }
+    public TmfEventType(@NonNull ITmfEventType type) {
         fTypeId  = type.getName();
         fRootField = type.getRootField();
     }

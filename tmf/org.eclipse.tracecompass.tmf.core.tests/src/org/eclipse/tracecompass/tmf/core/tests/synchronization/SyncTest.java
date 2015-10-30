@@ -24,8 +24,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.synchronization.SyncAlgorithmFullyIncremental;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventDependency;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
@@ -49,7 +51,7 @@ import org.junit.Test;
 public class SyncTest {
 
     private TmfTraceStub t1, t2;
-    private Collection<ITmfTrace> fTraces;
+    private @NonNull Collection<ITmfTrace> fTraces = Collections.EMPTY_LIST;
 
     /**
      * Initializing the traces

@@ -13,6 +13,7 @@
 
 package org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.equalsNullable;
 
 import org.eclipse.tracecompass.ctf.core.CTFException;
@@ -145,7 +146,7 @@ public class CtfIterator extends CTFTraceReader
         if (top != null) {
             if (!fCurLocation.equals(fPreviousLocation)) {
                 fPreviousLocation = fCurLocation;
-                fPreviousEvent = fTrace.getEventFactory().createEvent(fTrace, top.getCurrentEvent(), top.getFilename());
+                fPreviousEvent = fTrace.getEventFactory().createEvent(fTrace, checkNotNull(top.getCurrentEvent()), top.getFilename());
             }
             return fPreviousEvent;
         }

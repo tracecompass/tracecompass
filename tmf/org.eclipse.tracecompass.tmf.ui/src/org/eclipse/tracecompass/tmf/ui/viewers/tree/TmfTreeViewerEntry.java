@@ -28,8 +28,7 @@ public class TmfTreeViewerEntry implements ITmfTreeViewerEntry {
     private ITmfTreeViewerEntry fParent = null;
 
     /** List of child entries */
-    @NonNull
-    private final List<ITmfTreeViewerEntry> fChildren = new CopyOnWriteArrayList<>();
+    private final @NonNull List<@NonNull ITmfTreeViewerEntry> fChildren = new CopyOnWriteArrayList<>();
 
     /** Name of this entry (default text to show in first column) */
     private String fName;
@@ -68,7 +67,7 @@ public class TmfTreeViewerEntry implements ITmfTreeViewerEntry {
     }
 
     @Override
-    public List<ITmfTreeViewerEntry> getChildren() {
+    public List<@NonNull ITmfTreeViewerEntry> getChildren() {
         return fChildren;
     }
 

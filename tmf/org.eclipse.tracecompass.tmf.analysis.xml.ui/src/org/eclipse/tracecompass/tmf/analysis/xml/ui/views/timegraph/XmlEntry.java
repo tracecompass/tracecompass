@@ -14,6 +14,7 @@
 package org.eclipse.tracecompass.tmf.analysis.xml.ui.views.timegraph;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -28,6 +29,7 @@ import org.eclipse.tracecompass.tmf.analysis.xml.core.model.readonly.TmfXmlReadO
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.w3c.dom.Element;
 
@@ -263,6 +265,11 @@ public class XmlEntry extends TimeGraphEntry implements IXmlStateSystemContainer
     @Override
     public Iterable<TmfXmlLocation> getLocations() {
         return Collections.EMPTY_SET;
+    }
+
+    @Override
+    public Iterator<@NonNull ITimeEvent> getTimeEventsIterator() {
+        return super.getTimeEventsIterator();
     }
 
 }

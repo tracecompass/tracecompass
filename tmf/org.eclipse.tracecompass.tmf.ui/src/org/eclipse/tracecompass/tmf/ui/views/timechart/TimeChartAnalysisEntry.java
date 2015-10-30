@@ -12,11 +12,14 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.timechart;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
@@ -43,7 +46,7 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
     }
 
     @Override
-    public List<ITimeGraphEntry> getChildren() {
+    public List<@NonNull ITimeGraphEntry> getChildren() {
         return null;
     }
 
@@ -78,16 +81,16 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
     }
 
     @Override
-    public Iterator<ITimeEvent> getTimeEventsIterator() {
+    public Iterator<@NonNull ITimeEvent> getTimeEventsIterator() {
         return new EntryIterator(0, Long.MAX_VALUE, 0);
     }
 
     @Override
-    public Iterator<ITimeEvent> getTimeEventsIterator(long startTime, long stopTime, long maxDuration) {
+    public Iterator<@NonNull ITimeEvent> getTimeEventsIterator(long startTime, long stopTime, long maxDuration) {
         return new EntryIterator(startTime, stopTime, maxDuration);
     }
 
-    private class EntryIterator implements Iterator<ITimeEvent> {
+    private class EntryIterator implements Iterator<@NonNull ITimeEvent> {
         private final long fIteratorStartTime;
         private final long fIteratorStopTime;
         private final long fIteratorMaxDuration;
@@ -142,7 +145,7 @@ public class TimeChartAnalysisEntry implements ITimeGraphEntry {
                     return event;
                 }
                 if (hasNext()) {
-                    TimeChartEvent event = next;
+                    TimeChartEvent event = checkNotNull(next);
                     next = null;
                     return event;
                 }

@@ -89,7 +89,7 @@ public class SystemCallLatencyStatisticsViewer extends AbstractSegmentStoreStati
             Iterator<Entry<String, SegmentStoreStatistics>> stats = perSyscallStats.entrySet().iterator();
             while (stats.hasNext()) {
                 Entry<String, SegmentStoreStatistics> statsEntry = stats.next();
-                syscalls.addChild(new SegmentStoreStatisticsEntry(checkNotNull(statsEntry.getKey()), checkNotNull(statsEntry.getValue())));
+                syscalls.addChild(new SegmentStoreStatisticsEntry(statsEntry.getKey(), statsEntry.getValue()));
             }
         }
         return root;

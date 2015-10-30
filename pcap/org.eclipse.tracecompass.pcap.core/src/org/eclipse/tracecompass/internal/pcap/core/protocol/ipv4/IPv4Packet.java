@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.internal.pcap.core.protocol.ipv4;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -22,6 +23,7 @@ import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.pcap.core.packet.BadPacketException;
@@ -435,7 +437,7 @@ public class IPv4Packet extends Packet {
     public Map<String, String> getFields() {
         Map<String, String> map = fFields;
         if (map == null) {
-            Builder<String, String> builder = ImmutableMap.<String, String> builder()
+            Builder<@NonNull String, @NonNull String> builder = ImmutableMap.<@NonNull String, @NonNull String> builder()
                     .put("Version", String.valueOf(fVersion)) //$NON-NLS-1$
                     .put("Header Length", String.valueOf(getHeaderLength()) + " bytes") //$NON-NLS-1$ //$NON-NLS-2$
                     .put("Differentiated Services Field", String.format("%s%02x", "0x", fDSCP)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -448,8 +450,8 @@ public class IPv4Packet extends Packet {
                     .put("Time to live", String.valueOf(fTimeToLive)) //$NON-NLS-1$
                     .put("Protocol", IPProtocolNumberHelper.toString(fIpDatagramProtocol) + " (" + String.valueOf(fIpDatagramProtocol) + ")") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     .put("Checksum", String.format("%s%04x", "0x", fHeaderChecksum)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    .put("Source IP Address", fSourceIpAddress.getHostAddress()) //$NON-NLS-1$
-                    .put("Destination IP Address", fDestinationIpAddress.getHostAddress()); //$NON-NLS-1$
+                    .put("Source IP Address", nullToEmptyString(fSourceIpAddress.getHostAddress())) //$NON-NLS-1$
+                    .put("Destination IP Address", nullToEmptyString(fDestinationIpAddress.getHostAddress())); //$NON-NLS-1$
             byte[] options = fOptions;
             if (options == null) {
                 builder.put("Options", EMPTY_STRING); //$NON-NLS-1$

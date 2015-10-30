@@ -26,7 +26,7 @@ import com.google.common.collect.Table;
  */
 public class VirtualCPU {
 
-    private static final Table<VirtualMachine, Long, @Nullable VirtualCPU> VIRTUAL_CPU_TABLE = NonNullUtils.checkNotNull(HashBasedTable.<VirtualMachine, Long, VirtualCPU> create());
+    private static final Table<VirtualMachine, Long, @Nullable VirtualCPU> VIRTUAL_CPU_TABLE = NonNullUtils.checkNotNull(HashBasedTable.create());
 
     private final VirtualMachine fVm;
     private final Long fCpuId;

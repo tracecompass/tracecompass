@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
@@ -72,9 +73,9 @@ public final class TmfTraceUtils {
      *            Returned modules must extend this class
      * @return List of modules of class moduleClass
      */
-    public static <T> Iterable<T> getAnalysisModulesOfClass(ITmfTrace trace, Class<T> moduleClass) {
+    public static <T> Iterable<@NonNull T> getAnalysisModulesOfClass(ITmfTrace trace, Class<T> moduleClass) {
         Iterable<IAnalysisModule> analysisModules = trace.getAnalysisModules();
-        Set<T> modules = new HashSet<>();
+        Set<@NonNull T> modules = new HashSet<>();
         for (IAnalysisModule module : analysisModules) {
             if (moduleClass.isAssignableFrom(module.getClass())) {
                 modules.add(moduleClass.cast(module));

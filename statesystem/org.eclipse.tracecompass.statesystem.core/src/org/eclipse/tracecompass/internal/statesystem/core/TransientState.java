@@ -343,7 +343,7 @@ public class TransientState {
      * @param t
      *            The requested timestamp
      */
-    public void doQuery(List<ITmfStateInterval> stateInfo, long t) {
+    public void doQuery(List<@Nullable ITmfStateInterval> stateInfo, long t) {
         fRWLock.readLock().lock();
         try {
             if (!this.fIsActive) {

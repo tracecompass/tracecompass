@@ -172,7 +172,7 @@ public interface ITmfStateSystem {
      * @throws AttributeNotFoundException
      *             If the quark was not existing or invalid.
      */
-    @NonNull List<Integer> getSubAttributes(int quark, boolean recursive)
+    @NonNull List<@NonNull Integer> getSubAttributes(int quark, boolean recursive)
             throws AttributeNotFoundException;
 
     /**
@@ -195,7 +195,7 @@ public interface ITmfStateSystem {
      * @throws AttributeNotFoundException
      *             If the 'quark' was not existing or invalid.
      */
-    List<Integer> getSubAttributes(int quark, boolean recursive, String pattern)
+    @NonNull List<@NonNull Integer> getSubAttributes(int quark, boolean recursive, String pattern)
             throws AttributeNotFoundException;
 
     /**
@@ -222,7 +222,7 @@ public interface ITmfStateSystem {
      *         the pattern. If no attribute matched, the list will be empty (but
      *         not null).
      */
-    List<Integer> getQuarks(String... pattern);
+    @NonNull List<@NonNull Integer> getQuarks(String... pattern);
 
     /**
      * Return the name assigned to this quark. This returns only the "basename",
@@ -327,7 +327,7 @@ public interface ITmfStateSystem {
      * @throws StateSystemDisposedException
      *             If the query is sent after the state system has been disposed
      */
-    @NonNull List<ITmfStateInterval> queryFullState(long t)
+    @NonNull List<@NonNull ITmfStateInterval> queryFullState(long t)
             throws StateSystemDisposedException;
 
     /**
