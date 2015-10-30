@@ -102,7 +102,7 @@ public final class NonNullUtils {
      *             If the reference was actually null
      * @since 2.0
      */
-    public static <@Nullable T> T[] checkNotNull(T @Nullable [] array) {
+    public static <T> T[] checkNotNull(T @Nullable [] array) {
         if (array == null) {
             throw new NullPointerException();
         }
@@ -123,7 +123,7 @@ public final class NonNullUtils {
      *             If the reference was actually null
      * @since 2.0
      */
-    public static <@Nullable T, C extends Iterable<T>> C checkNotNull(@Nullable C container) {
+    public static <T, C extends Iterable<T>> C checkNotNull(@Nullable C container) {
         if (container == null) {
             throw new NullPointerException();
         }
@@ -144,7 +144,7 @@ public final class NonNullUtils {
      *             If the reference was actually null
      * @since 2.0
      */
-    public static <@Nullable K, @Nullable V, M extends Map<K, V>> M checkNotNull(@Nullable M map) {
+    public static <K, V, M extends Map<K, V>> M checkNotNull(@Nullable M map) {
         if (map == null) {
             throw new NullPointerException();
         }
