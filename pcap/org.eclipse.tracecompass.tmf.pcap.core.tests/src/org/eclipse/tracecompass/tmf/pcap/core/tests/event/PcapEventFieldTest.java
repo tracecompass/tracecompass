@@ -233,11 +233,7 @@ public class PcapEventFieldTest {
             localPacket = localPacket.getChildPacket();
         }
 
-        ITmfEventField[] fieldArray = fieldList.toArray(new ITmfEventField[fieldList.size()]);
-        if (fieldArray == null) {
-            return new ITmfEventField[0];
-        }
-        return fieldArray;
+        return fieldList.toArray(new ITmfEventField[fieldList.size()]);
     }
 
 }

@@ -171,7 +171,7 @@ public class TreeMapStore<E extends ISegment> implements ISegmentStore<E> {
     }
 
     @Override
-    public <T> T[] toArray(T @Nullable[] a) {
+    public <T> T[] toArray(T[] a) {
         fLock.readLock().lock();
         try {
             return fStartTimesIndex.values().toArray(a);

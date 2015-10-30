@@ -46,7 +46,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
  */
 public class PcapEventFactory {
 
-    private static final ITmfEventField[] EMPTY_FIELD_ARRAY = new ITmfEventField[0];
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
     private static final Map<PcapProtocol, TmfEventType> fEventTypes = new HashMap<>();
@@ -121,10 +120,6 @@ public class PcapEventFactory {
             localPacket = localPacket.getChildPacket();
         }
 
-        ITmfEventField[] fieldArray = fieldList.toArray(new ITmfEventField[fieldList.size()]);
-        if (fieldArray == null) {
-            return EMPTY_FIELD_ARRAY;
-        }
-        return fieldArray;
+        return fieldList.toArray(new ITmfEventField[fieldList.size()]);
     }
 }
