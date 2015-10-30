@@ -331,10 +331,7 @@ public class TmfXmlTraceStub extends TmfTrace {
 
         /* Add the big content aspect */
         builder.add(ITmfEventAspect.BaseAspects.CONTENTS);
-
-        @SuppressWarnings("null")
-        @NonNull Collection<ITmfEventAspect> aspectList = builder.build();
-        fAspects = aspectList;
+        fAspects = builder.build();
     }
 
     @Override

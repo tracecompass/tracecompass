@@ -73,9 +73,7 @@ public class TmfTraceUtilsTest {
                 }
             });
             builder.addAll(TmfTrace.BASE_ASPECTS);
-            @SuppressWarnings("null")
-            @NonNull Collection<ITmfEventAspect> ret = builder.build();
-            EVENT_ASPECTS = ret;
+            EVENT_ASPECTS = builder.build();
         }
 
         public TmfTraceStubWithAspects(String path) throws TmfTraceException {
