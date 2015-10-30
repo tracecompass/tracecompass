@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.common.core;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -151,5 +152,23 @@ public final class NonNullUtils {
         return map;
     }
 
-
+    /**
+     * Ensures a {@link Stream} does not contain any null values.
+     *
+     * This also "upcasts" the reference from a Stream<@Nullable T> to a
+     * Stream<@NonNull T>.
+     *
+     * @param stream
+     *            The stream to check for
+     * @return A stream with the same elements
+     * @throws NullPointerException
+     *             If the stream itself or any of its values are null
+     * @since 2.0
+     */
+    public static <T> Stream<@NonNull T> checkNotNullContents(@Nullable Stream<@Nullable T> stream) {
+        if (stream == null) {
+            throw new NullPointerException();
+        }
+        return checkNotNull(stream.map(t -> checkNotNull(t)));
+    }
 }

@@ -20,6 +20,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    NonNullUtilsTest.class,
     org.eclipse.tracecompass.common.core.tests.ObjectUtilsTest.class,
     org.eclipse.tracecompass.common.core.tests.collect.AllTests.class
 })
