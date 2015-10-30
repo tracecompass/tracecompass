@@ -189,7 +189,7 @@ public class CtfTmfEventTest {
     }
 
     /**
-     * Test the {@link CtfTmfEventFactory#getNullEvent()} method, and
+     * Test the {@link CtfTmfEventFactory#getNullEvent} method, and
      * the nullEvent's values.
      */
     @Test
