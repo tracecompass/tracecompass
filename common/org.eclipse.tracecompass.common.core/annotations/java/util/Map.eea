@@ -5,6 +5,12 @@ entrySet
 get
  (Ljava/lang/Object;)TV;
  (Ljava/lang/Object;)T0V;
+keySet
+ ()Ljava/util/Set<TK;>;
+ ()L1java/util/Set<TK;>;
 remove
  (Ljava/lang/Object;)TV;
  (Ljava/lang/Object;)T0V;
+values
+ ()Ljava/util/Collection<TV;>;
+ ()L1java/util/Collection<TV;>;

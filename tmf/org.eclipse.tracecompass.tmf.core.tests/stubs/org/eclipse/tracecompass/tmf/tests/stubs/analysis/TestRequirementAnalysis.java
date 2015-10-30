@@ -12,12 +12,10 @@
 
 package org.eclipse.tracecompass.tmf.tests.stubs.analysis;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement.ValuePriorityLevel;
@@ -81,8 +79,6 @@ public class TestRequirementAnalysis extends TmfAbstractAnalysisModule {
         fieldReqs.addValue(TID, ValuePriorityLevel.MANDATORY);
         requirements.put(FIELD_TYPE, fieldReqs);
 
-        @SuppressWarnings("null")
-        @NonNull Collection<TmfAnalysisRequirement> values = requirements.values();
-        return values;
+        return requirements.values();
     }
 }
