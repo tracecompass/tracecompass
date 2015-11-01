@@ -39,11 +39,12 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.relayd.impl.LttngRe
 import org.junit.Test;
 
 /**
- * Unit tests for lttng-relayd. It actually allows us to test the API.
+ * Test application for lttng-relayd. It actually allows us to test the API.
+ * Written as a Junit test for convenience.
  *
  * @author Matthew Khouzam
  */
-public class LttngRelayd24Test {
+public class LttngRelayd24TestApplication {
 
     private static final int PACKETS_TO_READ = 100;
     private static final String ADDRESS = "127.0.0.1"; // change me //$NON-NLS-1$
