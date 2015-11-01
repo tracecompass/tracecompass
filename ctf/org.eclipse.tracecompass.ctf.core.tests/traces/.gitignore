@@ -1,4 +1,5 @@
 *.gz
 *.tar
+ctf-testsuite/
 synctraces/
 synthetic-trace/

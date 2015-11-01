@@ -16,6 +16,16 @@
     <target name="deleteFailedCheckSumTraces"/>
   </antcall>
   <antcall target="downloadTraceFiles"/>
+  <exec executable = "git" failifexecutionfails="false" timeout="20000">
+    <arg value = "clone"/>
+    <arg value = "https://github.com/efficios/ctf-testsuite.git"/>
+  </exec>
+  <condition property="testSuiteExists">
+    <and>
+      <available file="ctf-testsuite" type="dir"/>
+    </and>
+  </condition>
+  <antcall target="pullTestSuite"/>
   <condition property="tracesExist">
     <and>
       <available file="synctraces.tar.gz" />
@@ -63,6 +73,23 @@
 <target name="downloadTraceFiles">
   <echo message="Attempting to download test traces"/>
   <get ignoreerrors="true" maxtime="60" skipexisting="true" dest="synctraces.tar.gz" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/synctraces.tar.gz" />
+</target>
+
+<target name="pullTestSuite" if="testSuiteExists">
+  <!-- Update the local 'master' branch -->
+  <exec executable = "git" failifexecutionfails="false" dir="ctf-testsuite" timeout="20000">
+    <arg value = "checkout"/>
+    <arg value = "master"/>
+  </exec>
+  <exec executable = "git" failifexecutionfails="false" dir="ctf-testsuite" timeout="20000">
+    <arg value = "pull"/>
+  </exec>
+
+  <!-- Checkout the commit requested by the current build -->
+  <exec executable = "git" failifexecutionfails="false" dir="ctf-testsuite" timeout="20000">
+    <arg value = "checkout"/>
+    <arg value = "${ctf-test-suite-commit}"/>
+  </exec>
 </target>
 
 <target name="extractTraces" if="tracesExist">
