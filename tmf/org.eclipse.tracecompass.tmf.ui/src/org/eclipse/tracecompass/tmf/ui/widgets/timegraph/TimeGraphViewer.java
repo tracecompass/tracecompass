@@ -528,6 +528,20 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
                     zoomIn();
                 } else if (e.character == '-') {
                     zoomOut();
+                } else if (e.keyCode == '.') {
+                    boolean extend = (e.stateMask & SWT.SHIFT) != 0;
+                    if (extend) {
+                        extendToNextMarker();
+                    } else {
+                        selectNextMarker();
+                    }
+                } else if (e.keyCode == ',') {
+                    boolean extend = (e.stateMask & SWT.SHIFT) != 0;
+                    if (extend) {
+                        extendToPrevMarker();
+                    } else {
+                        selectPrevMarker();
+                    }
                 }
                 adjustVerticalScrollBar();
             }
@@ -2110,19 +2124,11 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             fNextMarkerAction = new Action(Messages.TmfTimeGraphViewer_NextMarkerActionText, IAction.AS_DROP_DOWN_MENU) {
                 @Override
                 public void runWithEvent(Event event) {
-                    final long time = Math.min(fSelectionBegin, fSelectionEnd);
-                    final long duration = Math.max(fSelectionBegin, fSelectionEnd) - time;
-                    List<IMarkerEvent> markers = getTimeGraphControl().getMarkers();
-                    if (markers == null) {
-                        return;
-                    }
-                    for (IMarkerEvent marker : markers) {
-                        if ((marker.getTime() > time ||
-                                (marker.getTime() == time && marker.getDuration() > duration))
-                                && !fSkippedMarkerCategories.contains(marker.getCategory())) {
-                            setSelectionRangeNotify(marker.getTime(), marker.getTime() + marker.getDuration());
-                            return;
-                        }
+                    boolean extend = (event.stateMask & SWT.SHIFT) != 0;
+                    if (extend) {
+                        extendToNextMarker();
+                    } else {
+                        selectNextMarker();
                     }
                 }
             };
@@ -2183,20 +2189,11 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             fPreviousMarkerAction = new Action() {
                 @Override
                 public void runWithEvent(Event event) {
-                    final long time = Math.min(fSelectionBegin, fSelectionEnd);
-                    final long duration = Math.max(fSelectionBegin, fSelectionEnd) - time;
-                    List<IMarkerEvent> markers = getTimeGraphControl().getMarkers();
-                    if (markers == null) {
-                        return;
-                    }
-                    for (int i = markers.size() - 1; i >= 0; i--) {
-                        IMarkerEvent marker = markers.get(i);
-                        if ((marker.getTime() < time ||
-                                (marker.getTime() == time && marker.getDuration() < duration))
-                                && !fSkippedMarkerCategories.contains(marker.getCategory())) {
-                            setSelectionRangeNotify(marker.getTime(), marker.getTime() + marker.getDuration());
-                            return;
-                        }
+                    boolean extend = (event.stateMask & SWT.SHIFT) != 0;
+                    if (extend) {
+                        extendToPrevMarker();
+                    } else {
+                        selectPrevMarker();
                     }
                 }
             };
@@ -2241,6 +2238,92 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             });
         }
         return fMarkersMenu;
+    }
+
+    /**
+     * Select the next marker that begins at or after the current selection
+     * begin time. Markers that begin at the same time are ordered by end time.
+     */
+    private void selectNextMarker() {
+        List<IMarkerEvent> markers = getTimeGraphControl().getMarkers();
+        if (markers == null) {
+            return;
+        }
+        for (IMarkerEvent marker : markers) {
+            final long time = Math.min(fSelectionBegin, fSelectionEnd);
+            final long duration = Math.max(fSelectionBegin, fSelectionEnd) - time;
+            if ((marker.getTime() > time ||
+                    (marker.getTime() == time && marker.getDuration() > duration))
+                    && !fSkippedMarkerCategories.contains(marker.getCategory())) {
+                setSelectionRangeNotify(marker.getTime(), marker.getTime() + marker.getDuration());
+                fTimeGraphCtrl.updateStatusLine();
+                return;
+            }
+        }
+    }
+
+    /**
+     * Select the previous marker that begins at or before the current selection
+     * begin time. Markers that begin at the same time are ordered by end time.
+     */
+    private void selectPrevMarker() {
+        List<IMarkerEvent> markers = getTimeGraphControl().getMarkers();
+        if (markers == null) {
+            return;
+        }
+        final long time = Math.min(fSelectionBegin, fSelectionEnd);
+        final long duration = Math.max(fSelectionBegin, fSelectionEnd) - time;
+        for (int i = markers.size() - 1; i >= 0; i--) {
+            IMarkerEvent marker = markers.get(i);
+            if ((marker.getTime() < time ||
+                    (marker.getTime() == time && marker.getDuration() < duration))
+                    && !fSkippedMarkerCategories.contains(marker.getCategory())) {
+                setSelectionRangeNotify(marker.getTime(), marker.getTime() + marker.getDuration());
+                fTimeGraphCtrl.updateStatusLine();
+                return;
+            }
+        }
+    }
+
+    /**
+     * Extend the selection to the closest next marker end time.
+     */
+    private void extendToNextMarker() {
+        List<IMarkerEvent> markers = getTimeGraphControl().getMarkers();
+        if (markers == null) {
+            return;
+        }
+        IMarkerEvent nextMarker = null;
+        for (IMarkerEvent marker : markers) {
+            if (marker.getTime() + marker.getDuration() > fSelectionEnd
+                    && !fSkippedMarkerCategories.contains(marker.getCategory())
+                    && (nextMarker == null || marker.getTime() + marker.getDuration() < nextMarker.getTime() + nextMarker.getDuration())) {
+                nextMarker = marker;
+            }
+        }
+        if (nextMarker != null) {
+            setSelectionRangeNotify(fSelectionBegin, nextMarker.getTime() + nextMarker.getDuration());
+            fTimeGraphCtrl.updateStatusLine();
+        }
+    }
+
+    /**
+     * Extend the selection to the closest previous marker start time.
+     */
+    private void extendToPrevMarker() {
+        List<IMarkerEvent> markers = getTimeGraphControl().getMarkers();
+        if (markers == null) {
+            return;
+        }
+        for (int i = markers.size() - 1; i >= 0; i--) {
+            IMarkerEvent marker = markers.get(i);
+            if (marker.getTime() < fSelectionEnd
+                    && !fSkippedMarkerCategories.contains(marker.getCategory())) {
+                setSelectionRangeNotify(fSelectionBegin, marker.getTime());
+                fTimeGraphCtrl.updateStatusLine();
+                return;
+            }
+        }
     }
 
     private IMarkerEvent getBookmarkAtSelection() {

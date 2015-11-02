@@ -32,8 +32,12 @@ public interface IMarkerEventSource {
     @NonNull List<String> getMarkerCategories();
 
     /**
-     * Gets the list of marker events of a specific category in a given time
-     * range.
+     * Gets the list of marker events of a specific category that intersect the
+     * given time range (inclusively).
+     * <p>
+     * The list should include the nearest previous marker that starts before
+     * the time range (it might already be included if it intersects the time
+     * range), and the nearest next marker that starts after the time range.
      *
      * @param category
      *            The marker category

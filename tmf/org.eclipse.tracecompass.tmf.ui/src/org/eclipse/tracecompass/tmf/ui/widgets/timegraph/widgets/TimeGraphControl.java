@@ -2236,6 +2236,15 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
     }
 
+    /**
+     * Update the status line following a change of selection.
+     *
+     * @since 2.0
+     */
+    public void updateStatusLine() {
+        updateStatusLine(STATUS_WITHOUT_CURSOR_TIME);
+    }
+
     private void updateStatusLine(int x) {
         // use the time provider of the time graph scale for the status line
         ITimeDataProvider tdp = fTimeGraphScale.getTimeProvider();
