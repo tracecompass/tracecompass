@@ -244,7 +244,7 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
                     return null;
                 }
                 if (statusQuark >= fullState.size()) {
-                    /* No information on this cpu (yet?), skip it for now */
+                    /* No information on this CPU (yet?), skip it for now */
                     continue;
                 }
                 ITmfStateInterval statusInterval = fullState.get(statusQuark);
@@ -267,13 +267,17 @@ public class ResourcesView extends AbstractStateSystemTimeGraphView {
             }
         } else if (resourcesEntry.getType().equals(Type.IRQ) || resourcesEntry.getType().equals(Type.SOFT_IRQ)) {
             eventList = new ArrayList<>(fullStates.size());
-            ITmfStateInterval lastInterval = prevFullState == null ? null : prevFullState.get(quark);
+            ITmfStateInterval lastInterval = prevFullState == null || quark >= prevFullState.size() ? null : prevFullState.get(quark);
             long lastStartTime = lastInterval == null ? -1 : lastInterval.getStartTime();
             long lastEndTime = lastInterval == null ? -1 : lastInterval.getEndTime() + 1;
             boolean lastIsNull = lastInterval == null ? false : lastInterval.getStateValue().isNull();
             for (List<ITmfStateInterval> fullState : fullStates) {
                 if (monitor.isCanceled()) {
                     return null;
+                }
+                if (quark >= fullState.size()) {
+                    /* No information on this IRQ (yet?), skip it for now */
+                    continue;
                 }
                 ITmfStateInterval irqInterval = fullState.get(quark);
                 long time = irqInterval.getStartTime();
