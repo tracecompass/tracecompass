@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -67,14 +67,20 @@ public class TimeDataProviderCyclesConverter implements ITimeDataProviderConvert
         return toCycles(time);
     }
 
+    /**
+     * @since 2.0
+     */
     @Override
-    public void setSelectionRangeNotify(long beginTime, long endTime) {
-        fProvider.setSelectionRangeNotify(toNanos(beginTime), toNanos(endTime));
+    public void setSelectionRangeNotify(long beginTime, long endTime, boolean ensureVisible) {
+        fProvider.setSelectionRangeNotify(toNanos(beginTime), toNanos(endTime), ensureVisible);
     }
 
+    /**
+     * @since 2.0
+     */
     @Override
-    public void setSelectionRange(long beginTime, long endTime) {
-        fProvider.setSelectionRange(toNanos(beginTime), toNanos(endTime));
+    public void setSelectionRange(long beginTime, long endTime, boolean ensureVisible) {
+        fProvider.setSelectionRange(toNanos(beginTime), toNanos(endTime), ensureVisible);
     }
 
     @Override

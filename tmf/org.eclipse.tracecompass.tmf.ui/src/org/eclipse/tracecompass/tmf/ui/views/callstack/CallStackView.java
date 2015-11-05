@@ -699,7 +699,7 @@ public class CallStackView extends TmfView implements ITmfTimeAligned {
                 if (beginTime == endTime) {
                     fTimeGraphCombo.getTimeGraphViewer().setSelectedTime(beginTime, true);
                 } else {
-                    fTimeGraphCombo.getTimeGraphViewer().setSelectionRange(beginTime, endTime);
+                    fTimeGraphCombo.getTimeGraphViewer().setSelectionRange(beginTime, endTime, true);
                 }
                 synchingToTime(beginTime);
                 startZoomThread(fTimeGraphCombo.getTimeGraphViewer().getTime0(), fTimeGraphCombo.getTimeGraphViewer().getTime1());
@@ -1069,7 +1069,7 @@ public class CallStackView extends TmfView implements ITmfTimeAligned {
                 long endTime = fTrace == null ? SWT.DEFAULT : ctx.getWindowRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
                 startTime = (fStartTime == SWT.DEFAULT ? SWT.DEFAULT : Math.max(startTime, fStartTime));
                 endTime = (fEndTime == SWT.DEFAULT ? SWT.DEFAULT : Math.min(endTime, fEndTime));
-                fTimeGraphCombo.getTimeGraphViewer().setSelectionRange(selectionBeginTime, selectionEndTime);
+                fTimeGraphCombo.getTimeGraphViewer().setSelectionRange(selectionBeginTime, selectionEndTime, false);
                 synchingToTime(selectionBeginTime);
                 fTimeGraphCombo.getTimeGraphViewer().setStartFinishTime(startTime, endTime);
                 startZoomThread(startTime, endTime);

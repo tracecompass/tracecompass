@@ -922,8 +922,31 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         setSelectedTimeInt(time, ensureVisible, false);
     }
 
+    private void setSelectedTimeInt(long time, boolean ensureVisible, boolean doNotify) {
+        setSelectionRangeInt(time, time, ensureVisible, doNotify);
+    }
+
+    /**
+     * @since 2.0
+     */
     @Override
-    public void setSelectionRangeNotify(long beginTime, long endTime) {
+    public void setSelectionRangeNotify(long beginTime, long endTime, boolean ensureVisible) {
+        setSelectionRangeInt(beginTime, endTime, ensureVisible, true);
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public void setSelectionRange(long beginTime, long endTime, boolean ensureVisible) {
+        /* if there is a pending time selection, ignore this one */
+        if (fListenerNotifier != null && fListenerNotifier.hasTimeSelected()) {
+            return;
+        }
+        setSelectionRangeInt(beginTime, endTime, ensureVisible, false);
+    }
+
+    private void setSelectionRangeInt(long beginTime, long endTime, boolean ensureVisible, boolean doNotify) {
         long time0 = fTime0;
         long time1 = fTime1;
         long selectionBegin = fSelectionBegin;
@@ -931,51 +954,20 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         fSelectionBegin = Math.max(fTime0Bound, Math.min(fTime1Bound, beginTime));
         fSelectionEnd = Math.max(fTime0Bound, Math.min(fTime1Bound, endTime));
         boolean changed = (selectionBegin != fSelectionBegin || selectionEnd != fSelectionEnd);
-        ensureVisible(fSelectionEnd);
-        fTimeGraphCtrl.redraw();
-        fTimeScaleCtrl.redraw();
-        updateMarkerActions();
-        if ((time0 != fTime0) || (time1 != fTime1)) {
-            notifyRangeListeners();
-        }
-        if (changed) {
-            notifyTimeListeners();
-        }
-    }
 
-    @Override
-    public void setSelectionRange(long beginTime, long endTime) {
-        /* if there is a pending time selection, ignore this one */
-        if (fListenerNotifier != null && fListenerNotifier.hasTimeSelected()) {
-            return;
-        }
-        fSelectionBegin = Math.max(fTime0Bound, Math.min(fTime1Bound, beginTime));
-        fSelectionEnd = Math.max(fTime0Bound, Math.min(fTime1Bound, endTime));
-        fTimeGraphCtrl.redraw();
-        fTimeScaleCtrl.redraw();
-        updateMarkerActions();
-    }
-
-    private void setSelectedTimeInt(long time, boolean ensureVisible, boolean doNotify) {
-        long selection = Math.max(fTime0Bound, Math.min(fTime1Bound, time));
-        long time0 = fTime0;
-        long time1 = fTime1;
         if (ensureVisible) {
-            ensureVisible(selection);
+            ensureVisible(selectionBegin != fSelectionBegin ? fSelectionBegin : fSelectionEnd);
         }
+
         fTimeGraphCtrl.redraw();
         fTimeScaleCtrl.redraw();
-
-        boolean notifySelectedTime = (selection != fSelectionBegin || selection != fSelectionEnd);
-        fSelectionBegin = selection;
-        fSelectionEnd = selection;
         updateMarkerActions();
 
         if ((time0 != fTime0) || (time1 != fTime1)) {
             notifyRangeListeners();
         }
 
-        if (doNotify && notifySelectedTime) {
+        if (doNotify && changed) {
             notifyTimeListeners();
         }
     }
@@ -2255,7 +2247,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             if ((marker.getTime() > time ||
                     (marker.getTime() == time && marker.getDuration() > duration))
                     && !fSkippedMarkerCategories.contains(marker.getCategory())) {
-                setSelectionRangeNotify(marker.getTime(), marker.getTime() + marker.getDuration());
+                setSelectionRangeNotify(marker.getTime(), marker.getTime() + marker.getDuration(), true);
                 fTimeGraphCtrl.updateStatusLine();
                 return;
             }
@@ -2278,7 +2270,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             if ((marker.getTime() < time ||
                     (marker.getTime() == time && marker.getDuration() < duration))
                     && !fSkippedMarkerCategories.contains(marker.getCategory())) {
-                setSelectionRangeNotify(marker.getTime(), marker.getTime() + marker.getDuration());
+                setSelectionRangeNotify(marker.getTime(), marker.getTime() + marker.getDuration(), true);
                 fTimeGraphCtrl.updateStatusLine();
                 return;
             }
@@ -2302,7 +2294,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             }
         }
         if (nextMarker != null) {
-            setSelectionRangeNotify(fSelectionBegin, nextMarker.getTime() + nextMarker.getDuration());
+            setSelectionRangeNotify(fSelectionBegin, nextMarker.getTime() + nextMarker.getDuration(), true);
             fTimeGraphCtrl.updateStatusLine();
         }
     }
@@ -2319,7 +2311,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
             IMarkerEvent marker = markers.get(i);
             if (marker.getTime() < fSelectionEnd
                     && !fSkippedMarkerCategories.contains(marker.getCategory())) {
-                setSelectionRangeNotify(fSelectionBegin, marker.getTime());
+                setSelectionRangeNotify(fSelectionBegin, marker.getTime(), true);
                 fTimeGraphCtrl.updateStatusLine();
                 return;
             }
