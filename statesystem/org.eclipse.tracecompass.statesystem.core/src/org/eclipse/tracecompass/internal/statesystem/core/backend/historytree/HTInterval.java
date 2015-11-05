@@ -349,11 +349,6 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
     }
 
     @Override
-    public long getViewerEndTime() {
-        return end + 1;
-    }
-
-    @Override
     public int getAttribute() {
         return attribute;
     }

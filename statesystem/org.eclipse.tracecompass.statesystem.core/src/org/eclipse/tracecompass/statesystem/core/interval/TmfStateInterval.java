@@ -59,11 +59,6 @@ public final class TmfStateInterval implements ITmfStateInterval {
     }
 
     @Override
-    public long getViewerEndTime() {
-        return end + 1;
-    }
-
-    @Override
     public int getAttribute() {
         return attribute;
     }
