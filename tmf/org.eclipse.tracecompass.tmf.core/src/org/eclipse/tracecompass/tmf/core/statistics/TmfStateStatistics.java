@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -314,6 +314,10 @@ public class TmfStateStatistics implements ITmfStatistics {
         public static final String TOTAL = "total"; //$NON-NLS-1$
 
         /** event_types */
-        public static final String EVENT_TYPES = "event_types"; //$NON-NLS-1$<
+        public static final String EVENT_TYPES = "event_types"; //$NON-NLS-1$
+
+        /** lost_events
+         * @since 2.0*/
+        public static final String LOST_EVENTS = "lost_events"; //$NON-NLS-1$
     }
 }

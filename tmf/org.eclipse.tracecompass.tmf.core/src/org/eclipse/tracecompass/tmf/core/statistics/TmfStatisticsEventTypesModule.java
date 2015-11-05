@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Alexandre Montplaisir - Initial API and implementation
+ *   Patrick Tasse - Added lost events attribute
  ******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.core.statistics;
@@ -19,6 +20,7 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
+import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfLostEvent;
@@ -70,20 +72,26 @@ public class TmfStatisticsEventTypesModule extends TmfStateSystemAnalysisModule 
      * The state provider for traces statistics that use TmfStateStatistics. It
      * should work with any trace type for which we can use the state system.
      *
-     * It will store number of events seen, per event types. The resulting attribute
-     * tree will look like this:
+     * It will store number of events seen, per event types. The resulting
+     * attribute tree will look like this:
      *
      * <pre>
      * (root)
-     *   \-- event_types
-     *        |-- (event name 1)
-     *        |-- (event name 2)
-     *        |-- (event name 3)
-     *       ...
+     *   |-- event_types
+     *   |    |-- (event name 1)
+     *   |    |-- (event name 2)
+     *   |    |-- (event name 3)
+     *   |   ...
+     *   \-- lost_events
      * </pre>
      *
-     * And each (event name)'s value will be an integer, representing how many times
+     * Each (event name)'s value will be an integer, representing how many times
      * this particular event type has been seen in the trace so far.
+     *
+     * The value of the lost_events attribute will be a long, representing the
+     * latest end time of any current or previous lost event time range, in
+     * nanoseconds. If the value at a specific time 't' is greater than 't',
+     * then there is at least one lost event time range that overlaps time 't'.
      *
      * @author Alexandre Montplaisir
      * @version 1.0
@@ -94,7 +102,7 @@ public class TmfStatisticsEventTypesModule extends TmfStateSystemAnalysisModule 
          * Version number of this input handler. Please bump this if you modify the
          * contents of the generated state history in some way.
          */
-        private static final int VERSION = 2;
+        private static final int VERSION = 3;
 
         /**
          * Constructor
@@ -138,8 +146,18 @@ public class TmfStatisticsEventTypesModule extends TmfStateSystemAnalysisModule 
                         curVal = 0;
                     }
 
-                    TmfStateValue value = TmfStateValue.newValueInt((int) (curVal + le.getNbLostEvents()));
-                    ss.modifyAttribute(ts, value, quark);
+                    ITmfStateValue value1 = TmfStateValue.newValueInt((int) (curVal + le.getNbLostEvents()));
+                    ss.modifyAttribute(ts, value1, quark);
+
+                    long lostEventsStartTime = le.getTimeRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                    long lostEventsEndTime = le.getTimeRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                    int lostEventsQuark = ss.getQuarkAbsoluteAndAdd(Attributes.LOST_EVENTS);
+                    ITmfStateValue currentLostEventsEndTime = ss.queryOngoingState(lostEventsQuark);
+                    if (currentLostEventsEndTime.isNull() || currentLostEventsEndTime.unboxLong() < lostEventsStartTime) {
+                        ss.modifyAttribute(lostEventsStartTime, TmfStateValue.newValueLong(lostEventsEndTime), lostEventsQuark);
+                    } else if (currentLostEventsEndTime.unboxLong() < lostEventsEndTime) {
+                        ss.updateOngoingState(TmfStateValue.newValueLong(lostEventsEndTime), lostEventsQuark);
+                    }
                     return;
                 }
 

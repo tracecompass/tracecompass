@@ -39,6 +39,7 @@ public class Messages extends NLS {
     public static String ManageCustomParsersDialog_TextButtonLabel;
 
     public static String MarkerEvent_Bookmarks;
+    public static String MarkerEvent_LostEvents;
 
     public static String TmfEventsTable_AddBookmarkActionText;
     public static String TmfEventsTable_ApplyPresetFilterMenuName;
