@@ -349,6 +349,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         if (TmfTraceManager.getInstance().getActiveTrace() == null) {
             if (!getTableViewer().getTable().isDisposed()) {
                 getTableViewer().setInput(null);
+                getTableViewer().setItemCount(0);
                 refresh();
             }
 
