@@ -28,20 +28,32 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeForma
 public interface ITimeDataProvider {
 
     /**
-     * Updates the selection begin and end time and notifies any registered
-     * listeners about the new time range (if necessary)
+     * Updates the selection begin and end time and notifies the selection
+     * listeners about the new selection range (if it has changed).
      *
-     * @param beginTime the selection begin time
-     * @param endTime the selection end time
+     * @param beginTime
+     *            the selection begin time
+     * @param endTime
+     *            the selection end time
+     * @deprecated Use
+     *             {@link ITimeDataProvider2#setSelectionRangeNotify(long, long, boolean)}
+     *             instead.
      */
+    @Deprecated
     void setSelectionRangeNotify(long beginTime, long endTime);
 
     /**
-     * Updates the selection begin and end time
+     * Updates the selection begin and end time.
      *
-     * @param beginTime the selection begin time
-     * @param endTime the selection end time
+     * @param beginTime
+     *            the selection begin time
+     * @param endTime
+     *            the selection end time
+     * @deprecated Use
+     *             {@link ITimeDataProvider2#setSelectionRange(long, long, boolean)}
+     *             instead.
      */
+    @Deprecated
     void setSelectionRange(long beginTime, long endTime);
 
     /**
@@ -96,48 +108,58 @@ public interface ITimeDataProvider {
     long getMinTimeInterval();
 
     /**
-     * Updates the time range and notify registered listeners
+     * Updates the window range and notify the range listeners.
      *
      * @param time0
+     *            the window start time
      * @param time1
+     *            the window end time
      */
     void setStartFinishTimeNotify(long time0, long time1);
 
     /**
-     * Update the time range but do not trigger event notification
+     * Update the window range but do not notify the range listeners.
      *
      * @param time0
+     *            the window start time
      * @param time1
+     *            the window end time
      */
     void setStartFinishTime(long time0, long time1);
 
     /**
-     * Notify registered listeners without updating the time range
+     * Notify the range listeners without updating the time range.
      */
     void notifyStartFinishTime();
 
     /**
-     * Updates the selected time, adjusts the time range if necessary and
-     * notifies any registered listeners about the new selected time and new
-     * range (if necessary)
+     * Updates the selection time and notifies the selection listeners about the
+     * new selection time (if it has changed).
+     * <p>
+     * If ensureVisible is true, the window range will be centered on the
+     * selection time, if and only if that time is outside of the current
+     * window. If the window range is modified, the range listeners will be
+     * notified.
      *
      * @param time
-     *            A Time to set
+     *            the selection time
      * @param ensureVisible
-     *            Ensure visibility of new time (will adjust time range if
-     *            necessary)
+     *            if true, ensure visibility of the new selection time
      */
     void setSelectedTimeNotify(long time, boolean ensureVisible);
 
     /**
-     * Updates the selected time and adjusts the time range if necessary without
-     * notifying registered listeners.
+     * Updates the selection time.
+     * <p>
+     * If ensureVisible is true, the window range will be centered on the
+     * selection time, if and only if that time is outside of the current
+     * window. If the window range is modified, the range listeners will be
+     * notified.
      *
      * @param time
-     *            A Time to set
+     *            the selection time
      * @param ensureVisible
-     *            Ensure visibility of new time (will adjust time range if
-     *            necessary)
+     *            if true, ensure visibility of the new selection time
      */
     void setSelectedTime(long time, boolean ensureVisible);
 
@@ -169,6 +191,7 @@ public interface ITimeDataProvider {
      *   <li>{@link TimeFormat#CALENDAR} absolute time, displayed as year/month/day/hours/minutes/seconds/ms/us/ns
      *   <li>{@link TimeFormat#RELATIVE} relative time, displayed as seconds/ms/us/ns
      *   <li>{@link TimeFormat#NUMBER}   number, displayed as long values.
+     *   <li>{@link TimeFormat#CYCLES}   cycles, displayed as long values.
      * </ul>
      */
     TimeFormat getTimeFormat();

@@ -1132,7 +1132,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 if (beginTime == endTime) {
                     fTimeGraphWrapper.getTimeGraphViewer().setSelectedTime(beginTime, true);
                 } else {
-                    fTimeGraphWrapper.getTimeGraphViewer().setSelectionRange(beginTime, endTime);
+                    fTimeGraphWrapper.getTimeGraphViewer().setSelectionRange(beginTime, endTime, true);
                 }
                 synchingToTime(fTimeGraphWrapper.getTimeGraphViewer().getSelectionBegin());
             }
@@ -1348,7 +1348,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 long endTime = fTrace == null ? SWT.DEFAULT : ctx.getWindowRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
                 startTime = (fStartTime == Long.MAX_VALUE ? SWT.DEFAULT : Math.max(startTime, fStartTime));
                 endTime = (fEndTime == Long.MIN_VALUE ? SWT.DEFAULT : Math.min(endTime, fEndTime));
-                fTimeGraphWrapper.getTimeGraphViewer().setSelectionRange(selectionBeginTime, selectionEndTime);
+                fTimeGraphWrapper.getTimeGraphViewer().setSelectionRange(selectionBeginTime, selectionEndTime, false);
                 fTimeGraphWrapper.getTimeGraphViewer().setStartFinishTime(startTime, endTime);
 
                 if (fTimeGraphWrapper instanceof TimeGraphComboWrapper && !fPackDone) {

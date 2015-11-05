@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -20,11 +20,11 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeForma
  *
  * The user of the wrapper uses cycles, the wrapped provider uses nanoseconds.
  */
-public class TimeDataProviderCyclesConverter implements ITimeDataProviderConverter {
+public class TimeDataProviderCyclesConverter implements ITimeDataProviderConverter2 {
 
     private static final long GIGAHERTZ = 1000000000L;
 
-    private final @NonNull ITimeDataProvider fProvider;
+    private final @NonNull ITimeDataProvider2 fProvider;
     private final long fFreq;
 
     /**
@@ -36,7 +36,7 @@ public class TimeDataProviderCyclesConverter implements ITimeDataProviderConvert
      *            the clock frequency in Hz
      */
     public TimeDataProviderCyclesConverter(@NonNull ITimeDataProvider provider, long clockFrequency) {
-        fProvider = provider;
+        fProvider = (ITimeDataProvider2) provider;
         fFreq = clockFrequency;
     }
 
@@ -67,14 +67,32 @@ public class TimeDataProviderCyclesConverter implements ITimeDataProviderConvert
         return toCycles(time);
     }
 
+    @Deprecated
     @Override
     public void setSelectionRangeNotify(long beginTime, long endTime) {
         fProvider.setSelectionRangeNotify(toNanos(beginTime), toNanos(endTime));
     }
 
+    @Deprecated
     @Override
     public void setSelectionRange(long beginTime, long endTime) {
         fProvider.setSelectionRange(toNanos(beginTime), toNanos(endTime));
+    }
+
+    /**
+     * @since 1.2
+     */
+    @Override
+    public void setSelectionRangeNotify(long beginTime, long endTime, boolean ensureVisible) {
+        fProvider.setSelectionRangeNotify(toNanos(beginTime), toNanos(endTime), ensureVisible);
+    }
+
+    /**
+     * @since 1.2
+     */
+    @Override
+    public void setSelectionRange(long beginTime, long endTime, boolean ensureVisible) {
+        fProvider.setSelectionRange(toNanos(beginTime), toNanos(endTime), ensureVisible);
     }
 
     @Override

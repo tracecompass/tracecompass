@@ -122,7 +122,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     /** Color map for event types */
     private Color[] fEventColorMap = null;
 
-    private ITimeDataProvider fTimeProvider;
+    private ITimeDataProvider2 fTimeProvider;
     private IStatusLineManager fStatusLineManager = null;
     private TimeGraphScale fTimeGraphScale = null;
 
@@ -234,7 +234,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *            The time provider
      */
     public void setTimeProvider(ITimeDataProvider timeProvider) {
-        fTimeProvider = timeProvider;
+        fTimeProvider = (ITimeDataProvider2) timeProvider;
         redraw();
     }
 
@@ -790,14 +790,14 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 nextTime = nextEvent.getTime() + nextEvent.getDuration();
             }
             if (extend) {
-                fTimeProvider.setSelectionRangeNotify(fTimeProvider.getSelectionBegin(), nextTime);
+                fTimeProvider.setSelectionRangeNotify(fTimeProvider.getSelectionBegin(), nextTime, true);
             } else {
                 fTimeProvider.setSelectedTimeNotify(nextTime, true);
             }
             fireSelectionChanged();
         } else if (n == 1) {
             if (extend) {
-                fTimeProvider.setSelectionRangeNotify(fTimeProvider.getSelectionBegin(), endTime);
+                fTimeProvider.setSelectionRangeNotify(fTimeProvider.getSelectionBegin(), endTime, true);
             } else {
                 fTimeProvider.setSelectedTimeNotify(endTime, true);
             }
@@ -985,7 +985,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 selectItem(link.getDestinationEntry(), false);
                 if (link.getDuration() != 0) {
                     if (extend) {
-                        fTimeProvider.setSelectionRangeNotify(fTimeProvider.getSelectionBegin(), link.getTime() + link.getDuration());
+                        fTimeProvider.setSelectionRangeNotify(fTimeProvider.getSelectionBegin(), link.getTime() + link.getDuration(), true);
                     } else {
                         fTimeProvider.setSelectedTimeNotify(link.getTime() + link.getDuration(), true);
                     }
@@ -1018,7 +1018,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 selectItem(link.getEntry(), false);
                 if (link.getDuration() != 0) {
                     if (extend) {
-                        fTimeProvider.setSelectionRangeNotify(fTimeProvider.getSelectionBegin(), link.getTime());
+                        fTimeProvider.setSelectionRangeNotify(fTimeProvider.getSelectionBegin(), link.getTime(), true);
                     } else {
                         fTimeProvider.setSelectedTimeNotify(link.getTime(), true);
                     }
@@ -2267,7 +2267,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 } else {
                     long time0 = fDragBeginMarker ? getTimeAtX(fDragX0) : fDragTime0;
                     long time1 = fDragBeginMarker ? fDragTime0 : getTimeAtX(fDragX);
-                    fTimeProvider.setSelectionRangeNotify(time0, time1);
+                    fTimeProvider.setSelectionRangeNotify(time0, time1, false);
                 }
                 fDragState = DRAG_NONE;
                 redraw();

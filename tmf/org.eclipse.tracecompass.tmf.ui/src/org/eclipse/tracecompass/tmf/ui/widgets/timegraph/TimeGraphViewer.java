@@ -59,6 +59,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITimeDataProvider;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITimeDataProvider2;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeDataProviderCyclesConverter;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
@@ -72,7 +73,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeForma
  *
  * @author Patrick Tasse, and others
  */
-public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
+public class TimeGraphViewer implements ITimeDataProvider2, SelectionListener {
 
     /** Constant indicating that all levels of the time graph should be expanded */
     public static final int ALL_LEVELS = AbstractTreeViewer.ALL_LEVELS;
@@ -836,54 +837,63 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
         setSelectedTimeInt(time, ensureVisible, false);
     }
 
-    @Override
-    public void setSelectionRangeNotify(long beginTime, long endTime) {
-        long time0 = fTime0;
-        long time1 = fTime1;
-        boolean changed = (beginTime != fSelectionBegin || endTime != fSelectionEnd);
-        fSelectionBegin = Math.max(fTime0Bound, Math.min(fTime1Bound, beginTime));
-        fSelectionEnd = Math.max(fTime0Bound, Math.min(fTime1Bound, endTime));
-        ensureVisible(fSelectionEnd);
-        fTimeGraphCtrl.redraw();
-        fTimeScaleCtrl.redraw();
-        if ((time0 != fTime0) || (time1 != fTime1)) {
-            notifyRangeListeners();
-        }
-        if (changed) {
-            notifyTimeListeners();
-        }
+    private void setSelectedTimeInt(long time, boolean ensureVisible, boolean doNotify) {
+        setSelectionRangeInt(time, time, ensureVisible, doNotify);
     }
 
+    @Deprecated
+    @Override
+    public void setSelectionRangeNotify(long beginTime, long endTime) {
+        setSelectionRangeInt(beginTime, endTime, true, true);
+    }
+
+    /**
+     * @since 1.2
+     */
+    @Override
+    public void setSelectionRangeNotify(long beginTime, long endTime, boolean ensureVisible) {
+        setSelectionRangeInt(beginTime, endTime, ensureVisible, true);
+    }
+
+    @Deprecated
     @Override
     public void setSelectionRange(long beginTime, long endTime) {
+        setSelectionRange(beginTime, endTime, false);
+    }
+
+    /**
+     * @since 1.2
+     */
+    @Override
+    public void setSelectionRange(long beginTime, long endTime, boolean ensureVisible) {
         /* if there is a pending time selection, ignore this one */
         if (fListenerNotifier != null && fListenerNotifier.hasTimeSelected()) {
             return;
         }
-        fSelectionBegin = Math.max(fTime0Bound, Math.min(fTime1Bound, beginTime));
-        fSelectionEnd = Math.max(fTime0Bound, Math.min(fTime1Bound, endTime));
-        fTimeGraphCtrl.redraw();
-        fTimeScaleCtrl.redraw();
+        setSelectionRangeInt(beginTime, endTime, ensureVisible, false);
     }
 
-    private void setSelectedTimeInt(long time, boolean ensureVisible, boolean doNotify) {
+    private void setSelectionRangeInt(long beginTime, long endTime, boolean ensureVisible, boolean doNotify) {
         long time0 = fTime0;
         long time1 = fTime1;
+        long selectionBegin = fSelectionBegin;
+        long selectionEnd = fSelectionEnd;
+        fSelectionBegin = Math.max(fTime0Bound, Math.min(fTime1Bound, beginTime));
+        fSelectionEnd = Math.max(fTime0Bound, Math.min(fTime1Bound, endTime));
+        boolean changed = (selectionBegin != fSelectionBegin || selectionEnd != fSelectionEnd);
+
         if (ensureVisible) {
-            ensureVisible(time);
+            ensureVisible(selectionBegin != fSelectionBegin ? fSelectionBegin : fSelectionEnd);
         }
+
         fTimeGraphCtrl.redraw();
         fTimeScaleCtrl.redraw();
-
-        boolean notifySelectedTime = (time != fSelectionBegin || time != fSelectionEnd);
-        fSelectionBegin = time;
-        fSelectionEnd = time;
 
         if ((time0 != fTime0) || (time1 != fTime1)) {
             notifyRangeListeners();
         }
 
-        if (doNotify && notifySelectedTime) {
+        if (doNotify && changed) {
             notifyTimeListeners();
         }
     }
