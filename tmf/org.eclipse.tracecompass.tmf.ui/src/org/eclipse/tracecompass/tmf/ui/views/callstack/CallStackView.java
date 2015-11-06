@@ -73,12 +73,12 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
-import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
@@ -203,10 +203,10 @@ public class CallStackView extends TmfView implements ITmfTimeAligned {
     private Map<String, String> fNameMapping;
 
     // The start time
-    private long fStartTime;
+    private long fStartTime = SWT.DEFAULT;
 
     // The end time
-    private long fEndTime;
+    private long fEndTime = SWT.DEFAULT;
 
     // The display width
     private int fDisplayWidth;
@@ -667,8 +667,8 @@ public class CallStackView extends TmfView implements ITmfTimeAligned {
         fSelectedThreadMap.remove(signal.getTrace());
         if (signal.getTrace() == fTrace) {
             fTrace = null;
-            fStartTime = 0;
-            fEndTime = 0;
+            fStartTime = SWT.DEFAULT;
+            fEndTime = SWT.DEFAULT;
             refresh();
         }
     }
@@ -778,8 +778,8 @@ public class CallStackView extends TmfView implements ITmfTimeAligned {
         synchronized (fEntryListMap) {
             fEntryList = fEntryListMap.get(fTrace);
             if (fEntryList == null) {
-                fStartTime = Long.MAX_VALUE;
-                fEndTime = Long.MIN_VALUE;
+                fStartTime = SWT.DEFAULT;
+                fEndTime = SWT.DEFAULT;
                 refresh();
                 synchronized (fBuildThreadMap) {
                     for (ITmfTrace trace : TmfTraceManager.getTraceSet(fTrace)) {
@@ -885,8 +885,8 @@ public class CallStackView extends TmfView implements ITmfTimeAligned {
             }
             if (parentTrace == fTrace) {
                 synchronized (fEntryListMap) {
-                    fStartTime = Math.min(fStartTime, start);
-                    fEndTime = Math.max(fEndTime, end + 1);
+                    fStartTime = fStartTime == SWT.DEFAULT ? start : Math.min(fStartTime, start);
+                    fEndTime = fEndTime == SWT.DEFAULT ? end + 1 : Math.max(fEndTime, end + 1);
                 }
                 refresh();
             }
@@ -1063,12 +1063,12 @@ public class CallStackView extends TmfView implements ITmfTimeAligned {
                 fTimeGraphCombo.getTimeGraphViewer().setTimeBounds(fStartTime, fEndTime);
 
                 TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
-                long selectionBeginTime = fTrace == null ? 0 : ctx.getSelectionRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-                long selectionEndTime = fTrace == null ? 0 : ctx.getSelectionRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-                long startTime = fTrace == null ? 0 : ctx.getWindowRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-                long endTime = fTrace == null ? 0 : ctx.getWindowRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
-                startTime = Math.max(startTime, fStartTime);
-                endTime = Math.min(endTime, fEndTime);
+                long selectionBeginTime = fTrace == null ? SWT.DEFAULT : ctx.getSelectionRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                long selectionEndTime = fTrace == null ? SWT.DEFAULT : ctx.getSelectionRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                long startTime = fTrace == null ? SWT.DEFAULT : ctx.getWindowRange().getStartTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                long endTime = fTrace == null ? SWT.DEFAULT : ctx.getWindowRange().getEndTime().normalize(0, ITmfTimestamp.NANOSECOND_SCALE).getValue();
+                startTime = (fStartTime == SWT.DEFAULT ? SWT.DEFAULT : Math.max(startTime, fStartTime));
+                endTime = (fEndTime == SWT.DEFAULT ? SWT.DEFAULT : Math.min(endTime, fEndTime));
                 fTimeGraphCombo.getTimeGraphViewer().setSelectionRange(selectionBeginTime, selectionEndTime);
                 synchingToTime(selectionBeginTime);
                 fTimeGraphCombo.getTimeGraphViewer().setStartFinishTime(startTime, endTime);
