@@ -78,7 +78,7 @@ public final class CtfTmfEventFactory {
             }
             long nbLostEvents = ((IntegerDefinition) nbLostEventsDef).getValue();
             long duration = ((IntegerDefinition) durationDef).getValue();
-            TmfNanoTimestamp timestampEnd = new TmfNanoTimestamp(
+            TmfNanoTimestamp timestampEnd = originTrace.createTimestamp(
                     originTrace.timestampCyclesToNanos(ts) + duration);
 
             CtfTmfLostEvent lostEvent = new CtfTmfLostEvent(originTrace,
