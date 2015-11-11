@@ -1244,9 +1244,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 if (buildThread != null) {
                     buildThread.cancel();
                 }
-                fMarkerEventSourcesMap.remove(trace);
             }
         }
+        fMarkerEventSourcesMap.remove(signal.getTrace());
         synchronized (fEntryListMap) {
             fEntryListMap.remove(signal.getTrace());
         }
@@ -1370,17 +1370,19 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         if (viewTrace == null) {
             return;
         }
+        List<IMarkerEventSource> markerEventSources = new ArrayList<>();
         synchronized (fBuildThreadMap) {
             for (ITmfTrace trace : getTracesToBuild(viewTrace)) {
                 if (trace == null) {
                     break;
                 }
-                fMarkerEventSourcesMap.put(trace, TmfTraceAdapterManager.getAdapters(trace, IMarkerEventSource.class));
+                markerEventSources.addAll(TmfTraceAdapterManager.getAdapters(trace, IMarkerEventSource.class));
                 BuildThread buildThread = new BuildThread(trace, viewTrace, getName());
                 fBuildThreadMap.put(trace, buildThread);
                 buildThread.start();
             }
         }
+        fMarkerEventSourcesMap.put(viewTrace, markerEventSources);
     }
 
     /**
@@ -1510,7 +1512,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     protected @NonNull List<IMarkerEvent> getTraceMarkerList(long startTime, long endTime,
             long resolution, @NonNull IProgressMonitor monitor) {
         List<IMarkerEvent> markers = new ArrayList<>();
-        for (IMarkerEventSource markerEventSource : getMarkerEventSources(getTrace())) {
+        for (IMarkerEventSource markerEventSource : getMarkerEventSources(fTrace)) {
             for (String category : markerEventSource.getMarkerCategories()) {
                 if (monitor.isCanceled()) {
                     break;
