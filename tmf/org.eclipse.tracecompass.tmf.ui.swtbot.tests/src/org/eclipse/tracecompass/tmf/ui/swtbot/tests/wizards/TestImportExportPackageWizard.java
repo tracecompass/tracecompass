@@ -114,7 +114,7 @@ public class TestImportExportPackageWizard {
      */
     @Test
     public void test() throws IOException {
-        File f = File.createTempFile("temp", ".xml");
+        File f = File.createTempFile("temp", ".xml").getCanonicalFile();
         try (FileWriter fw = new FileWriter(f)) {
             fw.write(TRACE_CONTENT);
         }
