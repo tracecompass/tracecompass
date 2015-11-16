@@ -647,9 +647,9 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 
     private void updateTextArea() {
         if (fTopLineIndex < fLastTopLineIndex) {
-            StringBuffer insertedText = new StringBuffer();
+            StringBuilder insertedText = new StringBuilder();
             for (int i = fTopLineIndex; i < fLastTopLineIndex; i++) {
-                insertedText.append(fLines.get(i).string + LF);
+                insertedText.append(fLines.get(i).string).append(LF);
             }
             fStyledText.replaceTextRange(0, 0, insertedText.toString());
             for (int i = 0; i < fLastTopLineIndex - fTopLineIndex; i++) {
