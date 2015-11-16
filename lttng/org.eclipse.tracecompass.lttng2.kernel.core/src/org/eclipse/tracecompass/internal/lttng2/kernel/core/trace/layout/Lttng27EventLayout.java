@@ -34,22 +34,22 @@ public class Lttng27EventLayout extends Lttng26EventLayout {
 
     @Override
     public String eventHRTimerStart() {
-        return "timer_hrtimer_start";
+        return "timer_hrtimer_start"; //$NON-NLS-1$
     }
 
     @Override
     public String eventHRTimerCancel() {
-        return "timer_hrtimer_cancel";
+        return "timer_hrtimer_cancel"; //$NON-NLS-1$
     }
 
     @Override
     public String eventHRTimerExpireEntry() {
-        return "timer_hrtimer_expire_entry";
+        return "timer_hrtimer_expire_entry"; //$NON-NLS-1$
     }
 
     @Override
     public String eventHRTimerExpireExit() {
-        return "timer_hrtimer_expire_exit";
+        return "timer_hrtimer_expire_exit"; //$NON-NLS-1$
     }
 
     // ------------------------------------------------------------------------
