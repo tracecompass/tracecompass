@@ -193,19 +193,19 @@ public class SynchronizeTracesHandler extends AbstractHandler {
                                  * Make sure a trace with the new name does not
                                  * exist
                                  */
-                                String newname = traceel.getName();
+                                StringBuilder newname = new StringBuilder(traceel.getName());
                                 IContainer parentFolder = origtrace.getResource().getParent();
                                 boolean traceexists;
                                 do {
                                     traceexists = false;
-                                    newname += "_"; //$NON-NLS-1$
-                                    if (parentFolder.findMember(newname) != null) {
+                                    newname.append('_');
+                                    if (parentFolder.findMember(newname.toString()) != null) {
                                         traceexists = true;
                                     }
                                 } while (traceexists);
 
                                 /* Copy the original trace */
-                                TmfTraceElement newtrace = origtrace.copy(newname);
+                                TmfTraceElement newtrace = origtrace.copy(newname.toString());
                                 if (newtrace == null) {
                                     TraceUtils.displayErrorMsg(Messages.SynchronizeTracesHandler_Title,
                                             Messages.SynchronizeTracesHandler_Error + CR + CR + String.format(Messages.SynchronizeTracesHandler_CopyProblem, origtrace.getName()));
