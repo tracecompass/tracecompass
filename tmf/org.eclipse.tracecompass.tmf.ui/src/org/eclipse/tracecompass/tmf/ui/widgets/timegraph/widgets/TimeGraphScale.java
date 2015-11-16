@@ -767,6 +767,18 @@ abstract class TimeDraw {
      */
     public void drawAbsHeader(GC gc, long nanosec, Rectangle absHeaderRect) {
     }
+
+    protected void drawAbsHeader(GC gc, long nanosec, Rectangle rect, SimpleDateFormat dateFormat) {
+        String header;
+        synchronized (dateFormat) {
+            header = dateFormat.format(new Date(nanosec / MILLISEC_IN_NS));
+        }
+        int headerwidth = gc.stringExtent(header).x + 4;
+        if (headerwidth <= rect.width) {
+            rect.x += (rect.width - headerwidth);
+            Utils.drawText(gc, header, rect, true);
+        }
+    }
 }
 
 class TimeDrawSec extends TimeDraw {
@@ -846,15 +858,7 @@ class TimeDrawAbsDay extends TimeDraw {
 
     @Override
     public void drawAbsHeader(GC gc, long nanosec, Rectangle rect) {
-        String header;
-        synchronized (DAY_FORMAT_HEADER) {
-            header = DAY_FORMAT_HEADER.format(new Date(nanosec / MILLISEC_IN_NS));
-        }
-        int headerwidth = gc.stringExtent(header).x + 4;
-        if (headerwidth <= rect.width) {
-            rect.x += (rect.width - headerwidth);
-            Utils.drawText(gc, header, rect, true);
-        }
+        drawAbsHeader(gc, nanosec, rect, DAY_FORMAT_HEADER);
     }
 }
 
@@ -870,15 +874,7 @@ class TimeDrawAbsHrs extends TimeDraw {
 
     @Override
     public void drawAbsHeader(GC gc, long nanosec, Rectangle rect) {
-        String header;
-        synchronized (HOURS_FORMAT_HEADER) {
-            header = HOURS_FORMAT_HEADER.format(new Date(nanosec / MILLISEC_IN_NS));
-        }
-        int headerwidth = gc.stringExtent(header).x + 4;
-        if (headerwidth <= rect.width) {
-            rect.x += (rect.width - headerwidth);
-            Utils.drawText(gc, header, rect, true);
-        }
+        drawAbsHeader(gc, nanosec, rect, HOURS_FORMAT_HEADER);
     }
 }
 
@@ -894,15 +890,7 @@ class TimeDrawAbsMin extends TimeDraw {
 
     @Override
     public void drawAbsHeader(GC gc, long nanosec, Rectangle rect) {
-        String header;
-        synchronized (MIN_FORMAT_HEADER) {
-            header = MIN_FORMAT_HEADER.format(new Date(nanosec / MILLISEC_IN_NS));
-        }
-        int headerwidth = gc.stringExtent(header).x + 4;
-        if (headerwidth <= rect.width) {
-            rect.x += (rect.width - headerwidth);
-            Utils.drawText(gc, header, rect, true);
-        }
+        drawAbsHeader(gc, nanosec, rect, MIN_FORMAT_HEADER);
     }
 }
 
@@ -918,15 +906,7 @@ class TimeDrawAbsSec extends TimeDraw {
 
     @Override
     public void drawAbsHeader(GC gc, long nanosec, Rectangle rect) {
-        String header;
-        synchronized (SEC_FORMAT_HEADER) {
-            header = SEC_FORMAT_HEADER.format(new Date(nanosec / MILLISEC_IN_NS));
-        }
-        int headerwidth = gc.stringExtent(header).x + 4;
-        if (headerwidth <= rect.width) {
-            rect.x += (rect.width - headerwidth);
-            Utils.drawText(gc, header, rect, true);
-        }
+        drawAbsHeader(gc, nanosec, rect, SEC_FORMAT_HEADER);
     }
 }
 
@@ -943,15 +923,7 @@ class TimeDrawAbsMillisec extends TimeDraw {
 
     @Override
     public void drawAbsHeader(GC gc, long nanosec, Rectangle rect) {
-        String header;
-        synchronized (SEC_FORMAT_HEADER) {
-            header = SEC_FORMAT_HEADER.format(new Date(nanosec / MILLISEC_IN_NS));
-        }
-        int headerwidth = gc.stringExtent(header).x + 4;
-        if (headerwidth <= rect.width) {
-            rect.x += (rect.width - headerwidth);
-            Utils.drawText(gc, header, rect, true);
-        }
+        drawAbsHeader(gc, nanosec, rect, SEC_FORMAT_HEADER);
     }
 }
 
@@ -968,15 +940,7 @@ class TimeDrawAbsMicroSec extends TimeDraw {
 
     @Override
     public void drawAbsHeader(GC gc, long nanosec, Rectangle rect) {
-        String header;
-        synchronized (SEC_FORMAT_HEADER) {
-            header = SEC_FORMAT_HEADER.format(new Date(nanosec / MILLISEC_IN_NS));
-        }
-        int headerwidth = gc.stringExtent(header).x + 4;
-        if (headerwidth <= rect.width) {
-            rect.x += (rect.width - headerwidth);
-            Utils.drawText(gc, header, rect, true);
-        }
+        drawAbsHeader(gc, nanosec, rect, SEC_FORMAT_HEADER);
     }
 }
 
@@ -993,15 +957,7 @@ class TimeDrawAbsNanoSec extends TimeDraw {
 
     @Override
     public void drawAbsHeader(GC gc, long nanosec, Rectangle rect) {
-        String header;
-        synchronized (SEC_FORMAT_HEADER) {
-            header = SEC_FORMAT_HEADER.format(new Date(nanosec / MILLISEC_IN_NS));
-        }
-        int headerwidth = gc.stringExtent(header).x + 4;
-        if (headerwidth <= rect.width) {
-            rect.x += (rect.width - headerwidth);
-            Utils.drawText(gc, header, rect, true);
-        }
+        drawAbsHeader(gc, nanosec, rect, SEC_FORMAT_HEADER);
     }
 }
 
