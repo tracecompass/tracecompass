@@ -1399,7 +1399,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         });
     }
 
-    private void startZoomThread(long startTime, long endTime) {
+    /**
+     * Start or restart the zoom thread.
+     *
+     * @param startTime
+     *            the zoom start time
+     * @param endTime
+     *            the zoom end time
+     * @since 1.2
+     */
+    protected void startZoomThread(long startTime, long endTime) {
         boolean restart = false;
         if (fZoomThread != null) {
             fZoomThread.cancel();
