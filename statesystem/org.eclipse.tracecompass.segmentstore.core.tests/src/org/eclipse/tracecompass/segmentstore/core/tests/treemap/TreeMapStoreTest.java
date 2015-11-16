@@ -38,11 +38,11 @@ public class TreeMapStoreTest {
 
     private TreeMapStore<@NonNull ISegment> fSegmentStore;
 
-    private static final ISegment SEGMENT_2_6 = new BasicSegment(2, 6);
-    private static final ISegment SEGMENT_4_6 = new BasicSegment(4, 6);
-    private static final ISegment SEGMENT_4_8 = new BasicSegment(4, 8);
-    private static final ISegment SEGMENT_6_8 = new BasicSegment(6, 8);
-    private static final ISegment SEGMENT_10_14 = new BasicSegment(10, 14);
+    private static final @NonNull ISegment SEGMENT_2_6 = new BasicSegment(2, 6);
+    private static final @NonNull ISegment SEGMENT_4_6 = new BasicSegment(4, 6);
+    private static final @NonNull ISegment SEGMENT_4_8 = new BasicSegment(4, 8);
+    private static final @NonNull ISegment SEGMENT_6_8 = new BasicSegment(6, 8);
+    private static final @NonNull ISegment SEGMENT_10_14 = new BasicSegment(10, 14);
 
     private static final List<ISegment> SEGMENTS = ImmutableList.of(SEGMENT_2_6, SEGMENT_4_6, SEGMENT_4_8, SEGMENT_6_8, SEGMENT_10_14);
     private static final List<ISegment> REVERSE_SEGMENTS = Lists.reverse(SEGMENTS);

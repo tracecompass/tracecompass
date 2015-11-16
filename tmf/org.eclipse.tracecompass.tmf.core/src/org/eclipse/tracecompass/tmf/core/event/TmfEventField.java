@@ -143,7 +143,7 @@ public class TmfEventField implements ITmfEventField {
      * @param labels the list of labels
      * @return the (flat) root list
      */
-    public static final ITmfEventField makeRoot(final String[] labels) {
+    public static final @NonNull ITmfEventField makeRoot(final String[] labels) {
         final ITmfEventField[] fields = new ITmfEventField[labels.length];
         for (int i = 0; i < labels.length; i++) {
             String label = checkNotNull(labels[i]);

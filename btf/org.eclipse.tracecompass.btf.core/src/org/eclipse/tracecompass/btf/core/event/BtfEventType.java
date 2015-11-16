@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.btf.core.event;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.btf.core.Messages;
 import org.eclipse.tracecompass.btf.core.trace.BtfColumnNames;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
@@ -31,18 +32,18 @@ import com.google.common.collect.ImmutableList;
  */
 public class BtfEventType extends TmfEventType {
 
-    private static final String[] FIELD_WITH_NOTES_COLUMNS = new String[] {
+    private static final String @NonNull [] FIELD_WITH_NOTES_COLUMNS = new String[] {
             BtfColumnNames.EVENT.toString(),
             BtfColumnNames.SOURCE_INSTANCE.toString(),
             BtfColumnNames.TARGET_INSTANCE.toString() };
 
-    private static final String[] FIELDS_WITHOUT_NOTES_COLUMNS = new String[] {
+    private static final String @NonNull [] FIELDS_WITHOUT_NOTES_COLUMNS = new String[] {
             BtfColumnNames.EVENT.toString(),
             BtfColumnNames.SOURCE_INSTANCE.toString(),
             BtfColumnNames.TARGET_INSTANCE.toString(),
             BtfColumnNames.NOTES.toString() };
-    private static final ITmfEventField FIELDS_WITHOUT_NOTES = TmfEventField.makeRoot(FIELD_WITH_NOTES_COLUMNS);
-    private static final ITmfEventField FIELDS_WITH_NOTES = TmfEventField.makeRoot(FIELDS_WITHOUT_NOTES_COLUMNS);
+    private static final @NonNull ITmfEventField FIELDS_WITHOUT_NOTES = TmfEventField.makeRoot(FIELD_WITH_NOTES_COLUMNS);
+    private static final @NonNull ITmfEventField FIELDS_WITH_NOTES = TmfEventField.makeRoot(FIELDS_WITHOUT_NOTES_COLUMNS);
     private final String fName;
     private final String fDescription;
     private final boolean fHasNotes;

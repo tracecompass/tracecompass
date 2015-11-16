@@ -29,6 +29,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.btf.core.Activator;
 import org.eclipse.tracecompass.btf.core.event.BtfEvent;
 import org.eclipse.tracecompass.btf.core.event.BtfEventType;
@@ -93,11 +94,11 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
 
     private static int fCheckpointSize = -1;
 
-    private final Map<String, String> fProperties = new HashMap<>();
+    private final @NonNull Map<String, String> fProperties = new HashMap<>();
 
-    private final Map<Integer, String> fEntityTable = new TreeMap<>();
-    private final Map<BtfEventType, String> fEntityTypeTable = new HashMap<>();
-    private final Map<Integer, BtfEventType> fEntityTypes = new TreeMap<>();
+    private final @NonNull Map<Integer, String> fEntityTable = new TreeMap<>();
+    private final @NonNull Map<BtfEventType, String> fEntityTypeTable = new HashMap<>();
+    private final @NonNull Map<Integer, BtfEventType> fEntityTypes = new TreeMap<>();
 
     private String fVersion;
     private String fCreator;

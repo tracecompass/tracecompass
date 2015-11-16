@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.lttng2.kernel.core;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpEventMatching;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpLttngEventMatching;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching;
@@ -25,6 +26,7 @@ import org.osgi.framework.BundleContext;
  * <p>
  * The activator class controls the plug-in life cycle
  */
+@NonNullByDefault({})
 public class Activator extends Plugin {
 
     // ------------------------------------------------------------------------

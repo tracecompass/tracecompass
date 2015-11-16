@@ -23,6 +23,7 @@ import java.util.List;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
@@ -98,21 +99,21 @@ public class CallStackViewTest {
 
     /** Tooltips of the toolbar buttons */
 
-    private static final String ALIGN_VIEWS = "Align Views";
-    private static final String IMPORT_BINARY = "Import a binary file containing debugging symbols";
-    private static final String IMPORT_TEXT = "Import a text file containing the mapping between addresses and function names";
+    private static final @NonNull String ALIGN_VIEWS = "Align Views";
+    private static final @NonNull String IMPORT_BINARY = "Import a binary file containing debugging symbols";
+    private static final @NonNull String IMPORT_TEXT = "Import a text file containing the mapping between addresses and function names";
     // Separator
-    private static final String SORT_BY_NAME = "Sort threads by thread name";
-    private static final String SORT_BY_ID = "Sort threads by thread id";
-    private static final String SORT_BY_START = "Sort threads by start time";
+    private static final @NonNull String SORT_BY_NAME = "Sort threads by thread name";
+    private static final @NonNull String SORT_BY_ID = "Sort threads by thread id";
+    private static final @NonNull String SORT_BY_START = "Sort threads by start time";
     // Separator
-    private static final String RESET_TIME_SCALE = "Reset the Time Scale to Default";
-    private static final String SELECT_PREVIOUS_EVENT = "Select Previous Event";
-    private static final String SELECT_NEXT_EVENT = "Select Next Event";
-    private static final String SELECT_PREVIOUS_ITEM = "Select Previous Item";
-    private static final String SELECT_NEXT_ITEM = "Select Next Item";
-    private static final String ZOOM_IN = "Zoom In";
-    private static final String ZOOM_OUT = "Zoom Out";
+    private static final @NonNull String RESET_TIME_SCALE = "Reset the Time Scale to Default";
+    private static final @NonNull String SELECT_PREVIOUS_EVENT = "Select Previous Event";
+    private static final @NonNull String SELECT_NEXT_EVENT = "Select Next Event";
+    private static final @NonNull String SELECT_PREVIOUS_ITEM = "Select Previous Item";
+    private static final @NonNull String SELECT_NEXT_ITEM = "Select Next Item";
+    private static final @NonNull String ZOOM_IN = "Zoom In";
+    private static final @NonNull String ZOOM_OUT = "Zoom Out";
     // Separator
     private static final String PIN_VIEW = "Pin View";
     private static final List<String> TOOLBAR_BUTTONS_TOOLTIPS = ImmutableList.of(

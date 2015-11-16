@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.tmf.tests.stubs.analysis;
 
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement.ValuePriorityLevel;
 
@@ -23,6 +24,7 @@ import com.google.common.collect.ImmutableSet;
  * Factory class to facilitate requirement usage across test case
  */
 @SuppressWarnings("javadoc")
+@NonNullByDefault
 public final class AnalysisRequirementFactory {
 
     private AnalysisRequirementFactory() {}

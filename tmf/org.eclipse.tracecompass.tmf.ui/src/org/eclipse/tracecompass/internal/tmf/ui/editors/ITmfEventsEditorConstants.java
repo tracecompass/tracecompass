@@ -11,6 +11,8 @@
 
 package org.eclipse.tracecompass.internal.tmf.ui.editors;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 import com.google.common.collect.ImmutableSet;
 
 
@@ -19,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
  *
  * @noimplement
  */
+@NonNullByDefault
 public interface ITmfEventsEditorConstants {
 
     /**
