@@ -35,6 +35,11 @@ import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterTraceTypeNode;
  */
 public class FilterTreeLabelProvider implements ILabelProvider {
 
+    private static final String EMPTY_STRING = ""; //$NON-NLS-1$
+    private static final String QUOTE = "\""; //$NON-NLS-1$
+    private static final String SPACE_QUOTE = " \""; //$NON-NLS-1$
+    private static final String NOT = "NOT "; //$NON-NLS-1$
+
     @Override
     public void addListener(ILabelProviderListener listener) {
         // TODO Auto-generated method stub
@@ -80,46 +85,46 @@ public class FilterTreeLabelProvider implements ILabelProvider {
         } else if (element instanceof TmfFilterAndNode) {
 
             TmfFilterAndNode node = (TmfFilterAndNode) element;
-            label = (node.isNot() ? "NOT " : "") + node.getNodeName(); //$NON-NLS-1$ //$NON-NLS-2$
+            label = (node.isNot() ? NOT : EMPTY_STRING) + node.getNodeName();
 
         } else if (element instanceof TmfFilterOrNode) {
 
             TmfFilterOrNode node = (TmfFilterOrNode) element;
-            label = (node.isNot() ? "NOT " : "") + node.getNodeName(); //$NON-NLS-1$ //$NON-NLS-2$
+            label = (node.isNot() ? NOT : EMPTY_STRING) + node.getNodeName();
 
         } else if (element instanceof TmfFilterContainsNode) {
 
             TmfFilterContainsNode node = (TmfFilterContainsNode) element;
-            label = (node.isNot() ? "NOT " : "") + //$NON-NLS-1$ //$NON-NLS-2$
+            label = (node.isNot() ? NOT : EMPTY_STRING) +
                     (node.getEventAspect() != null ? node.getAspectLabel(false) : Messages.FilterTreeLabelProvider_AspectHint) +
                     ' ' + node.getNodeName() +
-                    (node.getValue() != null ? " \"" + node.getValue() + "\"" : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    (node.getValue() != null ? SPACE_QUOTE + node.getValue() + QUOTE : EMPTY_STRING);
 
         } else if (element instanceof TmfFilterEqualsNode) {
 
             TmfFilterEqualsNode node = (TmfFilterEqualsNode) element;
-            label = (node.isNot() ? "NOT " : "") + //$NON-NLS-1$ //$NON-NLS-2$
+            label = (node.isNot() ? NOT : EMPTY_STRING) +
                     (node.getEventAspect() != null ? node.getAspectLabel(false) : Messages.FilterTreeLabelProvider_AspectHint) +
                     ' ' + node.getNodeName() +
-                    (node.getValue() != null ? " \"" + node.getValue() + "\"" : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    (node.getValue() != null ? SPACE_QUOTE + node.getValue() + QUOTE : EMPTY_STRING);
 
         } else if (element instanceof TmfFilterMatchesNode) {
 
             TmfFilterMatchesNode node = (TmfFilterMatchesNode) element;
-            label = (node.isNot() ? "NOT " : "") + //$NON-NLS-1$ //$NON-NLS-2$
+            label = (node.isNot() ? NOT : EMPTY_STRING) +
                     (node.getEventAspect() != null ? node.getAspectLabel(false) : Messages.FilterTreeLabelProvider_AspectHint) +
                     ' ' + node.getNodeName() +
-                    (node.getRegex() != null ? " \"" + node.getRegex() + "\"" : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    (node.getRegex() != null ? SPACE_QUOTE + node.getRegex() + QUOTE : EMPTY_STRING);
 
         } else if (element instanceof TmfFilterCompareNode) {
 
             TmfFilterCompareNode node = (TmfFilterCompareNode) element;
-            label = (node.isNot() ? "NOT " : "") + //$NON-NLS-1$ //$NON-NLS-2$
+            label = (node.isNot() ? NOT : EMPTY_STRING) +
                     (node.getEventAspect() != null ? node.getAspectLabel(false) : Messages.FilterTreeLabelProvider_AspectHint) +
                     (node.getResult() < 0 ? " <" : (node.getResult() > 0 ? " >" : " =")) + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    (node.getType() == Type.ALPHA ? " \"" : node.getType() == Type.TIMESTAMP ? " [" : ' ') + //$NON-NLS-1$ //$NON-NLS-2$
+                    (node.getType() == Type.ALPHA ? SPACE_QUOTE : node.getType() == Type.TIMESTAMP ? " [" : ' ') + //$NON-NLS-1$
                     (node.hasValidValue() ? node.getValue() : Messages.FilterTreeLabelProvider_ValueHint) +
-                    (node.getType() == Type.ALPHA ? '\"' : node.getType() == Type.TIMESTAMP ? ']' : ""); //$NON-NLS-1$
+                    (node.getType() == Type.ALPHA ? '\"' : node.getType() == Type.TIMESTAMP ? ']' : EMPTY_STRING);
 
         }
         return label;
