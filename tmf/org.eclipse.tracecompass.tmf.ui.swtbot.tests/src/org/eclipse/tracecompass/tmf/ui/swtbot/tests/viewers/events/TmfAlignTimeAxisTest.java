@@ -71,6 +71,11 @@ public class TmfAlignTimeAxisTest {
 
     private static final String PROJET_NAME = "TestAxisAlignment";
     private static final int NUM_EVENTS = 100;
+    /**
+     * Using a small ratio for the editor so that other views have enough space
+     * to be drawn, even when a low screen resolution is used.
+     */
+    private static final float EDITOR_AREA_RATIO = 0.10f;
 
     /** The Log4j logger instance. */
     private static final Logger fLogger = Logger.getRootLogger();
@@ -351,7 +356,7 @@ public class TmfAlignTimeAxisTest {
             topLeftFolder.addView(IPageLayout.ID_PROJECT_EXPLORER);
 
             // Create the top right folder
-            IFolderLayout topRightFolder = layout.createFolder("topRightFolder", IPageLayout.BOTTOM, 0.30f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
+            IFolderLayout topRightFolder = layout.createFolder("topRightFolder", IPageLayout.BOTTOM, EDITOR_AREA_RATIO, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
             topRightFolder.addView(HistogramView.ID);
 
             // Create the middle right folder
@@ -394,7 +399,7 @@ public class TmfAlignTimeAxisTest {
             topLeftFolder.addView(IPageLayout.ID_PROJECT_EXPLORER);
 
             // Create the middle right folder
-            IFolderLayout middleRightFolder = layout.createFolder("middleRightFolder", IPageLayout.BOTTOM, 0.40f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
+            IFolderLayout middleRightFolder = layout.createFolder("middleRightFolder", IPageLayout.BOTTOM, EDITOR_AREA_RATIO, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
             middleRightFolder.addView(HistogramView.ID);
             middleRightFolder.addView(TimeChartView.ID);
 
@@ -437,7 +442,7 @@ public class TmfAlignTimeAxisTest {
             bottomLeftFolder.addView(CallStackView.ID);
 
             // Create the middle right folder
-            IFolderLayout middleRightFolder = layout.createFolder("middleRightFolder", IPageLayout.BOTTOM, 0.40f, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
+            IFolderLayout middleRightFolder = layout.createFolder("middleRightFolder", IPageLayout.BOTTOM, EDITOR_AREA_RATIO, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$
             middleRightFolder.addView(HistogramView.ID);
 
             // Create the bottom right folder
