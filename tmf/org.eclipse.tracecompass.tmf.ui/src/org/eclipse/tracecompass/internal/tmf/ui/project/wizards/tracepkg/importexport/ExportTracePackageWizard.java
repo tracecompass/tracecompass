@@ -63,7 +63,7 @@ public class ExportTracePackageWizard extends Wizard implements IExportWizard {
     @Override
     public void init(IWorkbench workbench, IStructuredSelection selection) {
         fSelection = selection;
-
+        setWindowTitle(Messages.ExportTracePackageWizardPage_Title);
         setNeedsProgressMonitor(true);
     }
 
