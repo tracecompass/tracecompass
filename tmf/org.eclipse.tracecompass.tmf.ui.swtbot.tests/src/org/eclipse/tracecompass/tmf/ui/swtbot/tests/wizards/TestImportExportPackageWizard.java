@@ -27,6 +27,7 @@ import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
@@ -50,7 +51,9 @@ public class TestImportExportPackageWizard {
     // private static final int PACKAGE_SIZE = 213732;
     private static final String EXPORT_LOCATION = TmfTraceManager.getTemporaryDirPath() + File.separator + "test.zip";
     private static final String IMPORT_TRACE_PACKAGE = "Import Trace Package...";
+    private static final String IMPORT_TRACE_PACKAGE_TITLE = "Import trace package";
     private static final String EXPORT_TRACE_PACKAGE = "Export Trace Package...";
+    private static final String EXPORT_TRACE_PACKAGE_TITLE = "Export trace package";
     private static final String PROJECT_EXPLORER = "Project Explorer";
     private static final String FINISH = "Finish";
     private static final String COMPRESS_THE_CONTENTS_OF_THE_FILE = "Compress the contents of the file";
@@ -134,24 +137,25 @@ public class TestImportExportPackageWizard {
         SWTBotTreeItem treeItem = SWTBotUtils.selectTracesFolder(fBot, PROJECT_NAME);
 
         treeItem.contextMenu(EXPORT_TRACE_PACKAGE).click();
-        fBot = new SWTWorkbenchBot();
-        fBot.button(DESELECT_ALL).click();
+        fBot.waitUntil(Conditions.shellIsActive(EXPORT_TRACE_PACKAGE_TITLE));
+        SWTBot shellBot = fBot.activeShell().bot();
+        shellBot.button(DESELECT_ALL).click();
         SWTBotTreeItem[] items = fBot.tree().getAllItems();
         for (SWTBotTreeItem item : items) {
             assertEquals(item.isChecked(), false);
         }
-        fBot.button(SELECT_ALL).click();
+        shellBot.button(SELECT_ALL).click();
         for (SWTBotTreeItem item : items) {
             assertEquals(item.isChecked(), true);
         }
-        fBot.radio(SAVE_IN_TAR_FORMAT).click();
-        fBot.radio(SAVE_IN_ZIP_FORMAT).click();
+        shellBot.radio(SAVE_IN_TAR_FORMAT).click();
+        shellBot.radio(SAVE_IN_ZIP_FORMAT).click();
 
-        fBot.checkBox(COMPRESS_THE_CONTENTS_OF_THE_FILE).click();
-        fBot.checkBox(COMPRESS_THE_CONTENTS_OF_THE_FILE).click();
-        fBot.comboBox().setText(EXPORT_LOCATION);
+        shellBot.checkBox(COMPRESS_THE_CONTENTS_OF_THE_FILE).click();
+        shellBot.checkBox(COMPRESS_THE_CONTENTS_OF_THE_FILE).click();
+        shellBot.comboBox().setText(EXPORT_LOCATION);
         SWTBotShell shell = fBot.activeShell();
-        fBot.button(FINISH).click();
+        shellBot.button(FINISH).click();
         // finished exporting
         SWTBotUtils.waitForJobs();
         fBot.waitUntil(Conditions.shellCloses(shell));
@@ -164,13 +168,14 @@ public class TestImportExportPackageWizard {
         // import
         treeItem = SWTBotUtils.selectTracesFolder(fBot, PROJECT_NAME);
         treeItem.contextMenu(IMPORT_TRACE_PACKAGE).click();
-        fBot = new SWTWorkbenchBot();
-        fBot.comboBox().setText(EXPORT_LOCATION);
-        fBot.comboBox().typeText("\n");
+        fBot.waitUntil(Conditions.shellIsActive(IMPORT_TRACE_PACKAGE_TITLE));
+        shellBot = fBot.activeShell().bot();
+        shellBot.comboBox().setText(EXPORT_LOCATION);
+        shellBot.comboBox().typeText("\n");
 
-        fBot.button(SELECT_ALL).click();
+        shellBot.button(SELECT_ALL).click();
         shell = fBot.activeShell();
-        fBot.button(FINISH).click();
+        shellBot.button(FINISH).click();
         fBot.button("Yes To All").click();
         fBot.waitUntil(Conditions.shellCloses(shell));
         fBot = new SWTWorkbenchBot();

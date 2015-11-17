@@ -46,6 +46,7 @@ public class ImportTracePackageWizard extends Wizard implements IImportWizard {
     @Override
     public void init(IWorkbench workbench, IStructuredSelection selection) {
         fSelection = selection;
+        setWindowTitle(Messages.ImportTracePackageWizardPage_Title);
         setNeedsProgressMonitor(true);
     }
 
