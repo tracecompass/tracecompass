@@ -801,7 +801,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     }
 
     /**
-     * Sets the comparator class for the entries
+     * Sets the comparator class for the entries.
+     * <p>
+     * This comparator will apply recursively to entries that implement
+     * {@link TimeGraphEntry#sortChildren(Comparator)}.
      *
      * @param comparator
      *            A comparator object
@@ -1324,6 +1327,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     } else if (fEntryComparator != null) {
                         List<TimeGraphEntry> list = new ArrayList<>(fEntryList);
                         Collections.sort(list, fEntryComparator);
+                        for (ITimeGraphEntry entry : list) {
+                            sortChildren(entry, fEntryComparator);
+                        }
                         fEntryList.clear();
                         fEntryList.addAll(list);
                     }
@@ -1397,6 +1403,15 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 }
             }
         });
+    }
+
+    private static void sortChildren(ITimeGraphEntry entry, Comparator<ITimeGraphEntry> comparator) {
+        if (entry instanceof TimeGraphEntry) {
+            ((TimeGraphEntry) entry).sortChildren(comparator);
+        }
+        for (ITimeGraphEntry child : entry.getChildren()) {
+            sortChildren(child, comparator);
+        }
     }
 
     /**
