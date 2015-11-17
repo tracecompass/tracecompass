@@ -203,6 +203,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     /** The pack done flag */
     private boolean fPackDone = false;
 
+    /** The filter content provider, or null if filter is not used */
+    private ITreeContentProvider fFilterContentProvider;
+
     /** The filter label provider, or null if filter is not used */
     private TreeLabelProvider fFilterLabelProvider;
 
@@ -815,6 +818,18 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     }
 
     /**
+     * Sets the filter content provider.
+     * This should be called from the constructor.
+     *
+     * @param contentProvider
+     *            The filter content provider
+     * @since 2.0
+     */
+    protected void setFilterContentProvider(final ITreeContentProvider contentProvider) {
+        fFilterContentProvider = contentProvider;
+    }
+
+    /**
      * Sets the filter label provider.
      * This should be called from the constructor.
      *
@@ -1043,7 +1058,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             combo.setTreeColumns(fColumns);
         }
         fTimeGraphWrapper.setTimeGraphContentProvider(fTimeGraphContentProvider);
-        fTimeGraphWrapper.setFilterContentProvider(fTimeGraphContentProvider);
+        fTimeGraphWrapper.setFilterContentProvider(fFilterContentProvider != null ? fFilterContentProvider : fTimeGraphContentProvider);
         fTimeGraphWrapper.setFilterLabelProvider(fFilterLabelProvider);
         fTimeGraphWrapper.setFilterColumns(fFilterColumns);
 
