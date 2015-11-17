@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.tmf.ui.parsers.wizards;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.internal.tmf.ui.parsers.CustomParserUtils;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTrace;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition;
@@ -39,7 +40,7 @@ public class CustomTxtParserWizard extends Wizard implements INewWizard {
      * Default constructor
      */
     public CustomTxtParserWizard() {
-        super();
+        this(null);
     }
 
     /**
@@ -55,6 +56,7 @@ public class CustomTxtParserWizard extends Wizard implements INewWizard {
             initialCategoryName = definition.categoryName;
             initialDefinitionName = definition.definitionName;
         }
+        setWindowTitle(Messages.CustomTxtParserInputWizardPage_windowTitle);
     }
 
     @Override

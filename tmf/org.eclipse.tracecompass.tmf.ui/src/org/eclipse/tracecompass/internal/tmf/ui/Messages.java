@@ -197,8 +197,9 @@ public class Messages extends NLS {
     public static String CustomTxtParserInputWizardPage_timestampFormatHelp;
     public static String CustomTxtParserInputWizardPage_uncapturedText;
     public static String CustomTxtParserInputWizardPage_unidentifiedCaptureGroup;
-    public static String CustomTxtParserInputWizardPage_windowTitleEdit;
-    public static String CustomTxtParserInputWizardPage_windowTitleNew;
+    public static String CustomTxtParserInputWizardPage_windowTitle;
+    public static String CustomTxtParserInputWizardPage_titleEdit;
+    public static String CustomTxtParserInputWizardPage_titleNew;
     public static String CustomTxtParserOutputWizardPage_description;
     public static String CustomTxtParserOutputWizardPage_moveAfter;
     public static String CustomTxtParserOutputWizardPage_moveBefore;
@@ -254,6 +255,7 @@ public class Messages extends NLS {
     public static String CustomXmlParserInputWizardPage_tagName;
     public static String CustomXmlParserInputWizardPage_timestampFormat;
     public static String CustomXmlParserInputWizardPage_timestampFormatHelp;
+    public static String CustomXmlParserInputWizardPage_windowTitle;
     public static String CustomXmlParserInputWizardPage_titleEdit;
     public static String CustomXmlParserInputWizardPage_titleNew;
     public static String CustomXmlParserOutputWizardPage_description;

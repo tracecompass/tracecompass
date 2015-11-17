@@ -157,10 +157,10 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             CustomTxtTraceDefinition definition) {
         super("CustomParserWizardPage"); //$NON-NLS-1$
         if (definition == null) {
-            setTitle(Messages.CustomTxtParserInputWizardPage_windowTitleNew);
+            setTitle(Messages.CustomTxtParserInputWizardPage_titleNew);
             defaultDescription = Messages.CustomTxtParserInputWizardPage_descriptionNew;
         } else {
-            setTitle(Messages.CustomTxtParserInputWizardPage_windowTitleEdit);
+            setTitle(Messages.CustomTxtParserInputWizardPage_titleEdit);
             defaultDescription = Messages.CustomTxtParserInputWizardPage_desccriptionEdit;
         }
         setDescription(defaultDescription);

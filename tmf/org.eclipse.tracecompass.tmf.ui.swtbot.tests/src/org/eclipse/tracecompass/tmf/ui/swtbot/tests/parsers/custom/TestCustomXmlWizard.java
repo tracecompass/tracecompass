@@ -22,6 +22,7 @@ import java.io.IOException;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.junit.Test;
@@ -41,6 +42,7 @@ public class TestCustomXmlWizard extends AbstractCustomParserWizard {
     private static final String TRACE = "trace";
     private static final String XML_TRACE1 = "<trace>\n\t<event time=\"100\" msg=\"hello\"/>\n\t<event time=\"200\" msg=\"world\"/></trace>";
     private static final String MANAGE_CUSTOM_PARSERS_SHELL_TITLE = "Manage Custom Parsers";
+    private static final String CUSTOM_XML_PARSER_SHELL_TITLE = "Custom XML Parser";
     private static final String PROJECT_NAME = "TestXML";
     private static final String CATEGORY_NAME = "Test Category";
     private static final String TRACETYPE_NAME = "Test Trace";
@@ -87,9 +89,11 @@ public class TestCustomXmlWizard extends AbstractCustomParserWizard {
         }
         assertNotNull(treeNode);
         treeNode.contextMenu("Manage Custom Parsers...").click();
+        fBot.waitUntil(Conditions.shellIsActive(MANAGE_CUSTOM_PARSERS_SHELL_TITLE));
         fBot.shell(MANAGE_CUSTOM_PARSERS_SHELL_TITLE).setFocus();
         fBot.radio("XML").click();
         fBot.button("New...").click();
+        fBot.waitUntil(Conditions.shellIsActive(CUSTOM_XML_PARSER_SHELL_TITLE));
         fBot.textWithLabel("Category:").setText(CATEGORY_NAME);
         fBot.textWithLabel("Trace type:").setText(TRACETYPE_NAME);
         fBot.textWithLabel("Time Stamp format:").setText("ss");

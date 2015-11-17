@@ -23,6 +23,7 @@ import java.io.IOException;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.junit.Test;
@@ -65,6 +66,7 @@ import org.junit.runner.RunWith;
 public class TestCustomTxtWizard extends AbstractCustomParserWizard {
 
     private static final String MANAGE_CUSTOM_PARSERS_SHELL_TITLE = "Manage Custom Parsers";
+    private static final String CUSTOM_TEXT_PARSER_SHELL_TITLE = "Custom Text Parser";
     private static final String PROJECT_NAME = "TestText";
     private static final String CATEGORY_NAME = "Test Category";
     private static final String TRACETYPE_NAME = "Test Trace";
@@ -111,9 +113,11 @@ public class TestCustomTxtWizard extends AbstractCustomParserWizard {
         }
         assertNotNull(treeNode);
         treeNode.contextMenu("Manage Custom Parsers...").click();
+        fBot.waitUntil(Conditions.shellIsActive(MANAGE_CUSTOM_PARSERS_SHELL_TITLE));
         fBot.shell(MANAGE_CUSTOM_PARSERS_SHELL_TITLE).setFocus();
 
         fBot.button("New...").click();
+        fBot.waitUntil(Conditions.shellIsActive(CUSTOM_TEXT_PARSER_SHELL_TITLE));
 
         fBot.textWithLabel("Category:").setText(CATEGORY_NAME);
         fBot.textWithLabel("Trace type:").setText(TRACETYPE_NAME);
@@ -216,9 +220,11 @@ public class TestCustomTxtWizard extends AbstractCustomParserWizard {
         }
         assertNotNull(treeNode);
         treeNode.contextMenu("Manage Custom Parsers...").click();
+        fBot.waitUntil(Conditions.shellIsActive(MANAGE_CUSTOM_PARSERS_SHELL_TITLE));
         fBot.shell(MANAGE_CUSTOM_PARSERS_SHELL_TITLE).setFocus();
         fBot.list().select("Demo Category : Demo trace");
         fBot.button("Edit...").click();
+        fBot.waitUntil(Conditions.shellIsActive(CUSTOM_TEXT_PARSER_SHELL_TITLE));
 
         fBot.textWithLabel("Category:").setText(CATEGORY_NAME);
         fBot.textWithLabel("Trace type:").setText(TRACETYPE_NAME);
