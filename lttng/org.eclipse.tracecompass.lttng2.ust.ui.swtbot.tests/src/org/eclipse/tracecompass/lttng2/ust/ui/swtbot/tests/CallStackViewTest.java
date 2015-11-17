@@ -106,6 +106,8 @@ public class CallStackViewTest {
     private static final String SORT_BY_ID = "Sort threads by thread id";
     private static final String SORT_BY_START = "Sort threads by start time";
     // Separator
+    private static final String SHOW_VIEW_FILTERS = "Show View Filters";
+    // Separator
     private static final String RESET_TIME_SCALE = "Reset the Time Scale to Default";
     private static final String SELECT_PREVIOUS_EVENT = "Select Previous Event";
     private static final String SELECT_NEXT_EVENT = "Select Next Event";
@@ -119,6 +121,8 @@ public class CallStackViewTest {
             ALIGN_VIEWS, IMPORT_BINARY, IMPORT_TEXT,
             "",
             SORT_BY_NAME, SORT_BY_ID, SORT_BY_START,
+            "",
+            SHOW_VIEW_FILTERS,
             "",
             RESET_TIME_SCALE, SELECT_PREVIOUS_EVENT, SELECT_NEXT_EVENT,
             SELECT_PREVIOUS_ITEM, SELECT_NEXT_ITEM, ZOOM_IN, ZOOM_OUT,
