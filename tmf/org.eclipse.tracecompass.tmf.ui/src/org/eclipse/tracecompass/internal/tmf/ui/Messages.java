@@ -307,6 +307,7 @@ public class Messages extends NLS {
     public static String CallStackView_EntryTimeColumn;
     public static String CallStackView_ExitTimeColumn;
     public static String CallStackView_DurationColumn;
+    public static String CallStackView_ThreadColumn;
     public static String CallStackView_StackInfoNotAvailable;
     public static String CallStackView_SortByThreadName;
     public static String CallStackView_SortByThreadId;

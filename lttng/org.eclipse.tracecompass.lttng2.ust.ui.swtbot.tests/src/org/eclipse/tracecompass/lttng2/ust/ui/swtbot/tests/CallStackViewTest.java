@@ -107,9 +107,16 @@ public class CallStackViewTest {
     private static final @NonNull String SORT_BY_ID = "Sort threads by thread id";
     private static final @NonNull String SORT_BY_START = "Sort threads by start time";
     // Separator
+    private static final @NonNull String SHOW_VIEW_FILTERS = "Show View Filters";
+    // Separator
     private static final @NonNull String RESET_TIME_SCALE = "Reset the Time Scale to Default";
     private static final @NonNull String SELECT_PREVIOUS_EVENT = "Select Previous Event";
     private static final @NonNull String SELECT_NEXT_EVENT = "Select Next Event";
+    // Separator
+    private static final @NonNull String ADD_BOOKMARK = "Add Bookmark...";
+    private static final @NonNull String PREVIOUS_MARKER = "Previous Marker";
+    private static final @NonNull String NEXT_MARKER = "Next Marker";
+    // Separator
     private static final @NonNull String SELECT_PREVIOUS_ITEM = "Select Previous Item";
     private static final @NonNull String SELECT_NEXT_ITEM = "Select Next Item";
     private static final @NonNull String ZOOM_IN = "Zoom In";
@@ -121,7 +128,12 @@ public class CallStackViewTest {
             "",
             SORT_BY_NAME, SORT_BY_ID, SORT_BY_START,
             "",
+            SHOW_VIEW_FILTERS,
+            "",
             RESET_TIME_SCALE, SELECT_PREVIOUS_EVENT, SELECT_NEXT_EVENT,
+            "",
+            ADD_BOOKMARK, PREVIOUS_MARKER, NEXT_MARKER,
+            "",
             SELECT_PREVIOUS_ITEM, SELECT_NEXT_ITEM, ZOOM_IN, ZOOM_OUT,
             "",
             PIN_VIEW);

@@ -41,7 +41,7 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
     /** Number of colors used for call stack events */
     public static final int NUM_COLORS = 360;
 
-    private final CallStackView fView;
+    private CallStackView fView;
 
     private Integer fAverageCharWidth;
 
@@ -59,10 +59,19 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
     /**
      * Constructor
      *
-     * @param view
-     *            The callstack view that will contain the time events
+     * @since 2.0
      */
-    public CallStackPresentationProvider(CallStackView view) {
+    public CallStackPresentationProvider() {
+    }
+
+    /**
+     * Sets the call stack view
+     *
+     * @param view
+     *            The call stack view that will contain the time events
+     * @since 2.0
+     */
+    public void setCallStackView(CallStackView view) {
         fView = view;
     }
 
