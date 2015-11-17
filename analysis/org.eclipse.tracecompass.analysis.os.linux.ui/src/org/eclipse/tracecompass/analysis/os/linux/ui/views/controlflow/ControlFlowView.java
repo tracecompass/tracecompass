@@ -165,9 +165,18 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
         @Override
         public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
 
+            if (o1.getParent() != null || o2.getParent() != null) {
+                /* Sort all child processes according to birth time. */
+                return Long.compare(o1.getStartTime(), o2.getStartTime());
+            }
+
             int result = 0;
 
             if ((o1 instanceof ControlFlowEntry) && (o2 instanceof ControlFlowEntry)) {
+                /*
+                 * Sort root processes according to their trace's start time,
+                 * then by trace name, then by the process thread id.
+                 */
                 ControlFlowEntry entry1 = (ControlFlowEntry) o1;
                 ControlFlowEntry entry2 = (ControlFlowEntry) o2;
                 result = entry1.getTrace().getStartTime().compareTo(entry2.getTrace().getStartTime());
@@ -175,12 +184,13 @@ public class ControlFlowView extends AbstractStateSystemTimeGraphView {
                     result = entry1.getTrace().getName().compareTo(entry2.getTrace().getName());
                 }
                 if (result == 0) {
-                    result = entry1.getThreadId() < entry2.getThreadId() ? -1 : entry1.getThreadId() > entry2.getThreadId() ? 1 : 0;
+                    result = Integer.compare(entry1.getThreadId(), entry2.getThreadId());
                 }
             }
 
             if (result == 0) {
-                result = o1.getStartTime() < o2.getStartTime() ? -1 : o1.getStartTime() > o2.getStartTime() ? 1 : 0;
+                /* Sort root processes with reused thread id by birth time. */
+                result = Long.compare(o1.getStartTime(), o2.getStartTime());
             }
 
             return result;
