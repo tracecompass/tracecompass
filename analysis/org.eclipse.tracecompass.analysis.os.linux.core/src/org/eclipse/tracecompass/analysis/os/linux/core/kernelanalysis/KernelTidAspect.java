@@ -36,12 +36,11 @@ public final class KernelTidAspect extends LinuxTidAspect {
     @Override
     public @Nullable Integer resolve(ITmfEvent event) {
         /* Find the CPU this event is run on */
-        Object cpuObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(event.getTrace(),
+        Integer cpu = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(),
                 TmfCpuAspect.class, event);
-        if (cpuObj == null) {
+        if (cpu == null) {
             return null;
         }
-        Integer cpu = (Integer) cpuObj;
 
         /* Find the analysis module for the trace */
         KernelAnalysisModule analysis = TmfTraceUtils.getAnalysisModuleOfClass(event.getTrace(),

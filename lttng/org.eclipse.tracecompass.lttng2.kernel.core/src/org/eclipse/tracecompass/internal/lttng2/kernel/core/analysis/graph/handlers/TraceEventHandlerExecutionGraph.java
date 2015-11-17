@@ -221,11 +221,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
     private void handleSchedWakeup(ITmfEvent event) {
         TmfGraph graph = NonNullUtils.checkNotNull(getProvider().getAssignedGraph());
         String host = event.getTrace().getHostId();
-        Object cpuObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
-        if (cpuObj == null) {
-            throw new NullPointerException();
-        }
-        Integer cpu = (Integer) cpuObj;
+        Integer cpu = NonNullUtils.checkNotNull(TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event));
         LttngEventLayout eventLayout = getProvider().getEventLayout();
         LttngSystemModel system = getProvider().getSystem();
 
@@ -367,11 +363,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
     }
 
     private void handleInetSockLocalIn(ITmfEvent event) {
-        Object cpuObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
-        if (cpuObj == null) {
-            throw new NullPointerException();
-        }
-        Integer cpu = (Integer) cpuObj;
+        Integer cpu = NonNullUtils.checkNotNull(TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event));
         String host = event.getTrace().getHostId();
         LttngSystemModel system = getProvider().getSystem();
 
@@ -387,8 +379,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
     }
 
     private void handleInetSockLocalOut(ITmfEvent event) {
-        Object cpuObj = NonNullUtils.checkNotNull(TmfTraceUtils.resolveEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event));
-        Integer cpu = (Integer) cpuObj;
+        Integer cpu = NonNullUtils.checkNotNull(TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event));
         String host = event.getTrace().getHostId();
         LttngSystemModel system = getProvider().getSystem();
 
@@ -415,8 +406,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
         TmfGraph graph = NonNullUtils.checkNotNull(getProvider().getAssignedGraph());
         Long vec = EventField.getLong(event, eventLayout.fieldVec());
         if (vec == LinuxValues.SOFTIRQ_NET_RX || vec == LinuxValues.SOFTIRQ_NET_TX) {
-            Object cpuObj = NonNullUtils.checkNotNull(TmfTraceUtils.resolveEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event));
-            Integer cpu = (Integer) cpuObj;
+            Integer cpu = NonNullUtils.checkNotNull(TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event));
             LttngWorker k = getOrCreateKernelWorker(event, cpu);
             graph.add(k, new TmfVertex(event.getTimestamp().getValue()));
         }

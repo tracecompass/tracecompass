@@ -114,6 +114,31 @@ public final class TmfTraceUtils {
     }
 
     /**
+     * Return the first result of the first aspect that resolves as non null for
+     * the event received in parameter. The result is cast to an Integer if
+     * possible, otherwise null is returned.
+     *
+     * @param trace
+     *            The trace for which you want the event aspects
+     * @param aspectClass
+     *            The class of the aspect(s) to resolve
+     * @param event
+     *            The event for which to get the aspect
+     * @return Integer of the first result of the
+     *         {@link ITmfEventAspect#resolve(ITmfEvent)} that returns non null
+     *         for the event or {@code null} otherwise
+     * @since 2.0
+     */
+    public static @Nullable <T extends ITmfEventAspect> Integer resolveIntEventAspectOfClassForEvent(
+            ITmfTrace trace, Class<T> aspectClass, ITmfEvent event) {
+        Object result = resolveEventAspectOfClassForEvent(trace, aspectClass, event);
+        if (result instanceof Integer) {
+            return (Integer) result;
+        }
+        return null;
+    }
+
+    /**
      * Checks for text file.
      *
      * Note that it checks for binary value 0 in the first MAX_NB_BINARY_BYTES

@@ -209,12 +209,11 @@ public class QemuKvmVmModel implements IVirtualMachineModel {
         final long ts = event.getTimestamp().getValue();
         final String hostId = event.getTrace().getHostId();
 
-        Object cpuObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
-        if (cpuObj == null) {
+        final Integer cpu = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
+        if (cpu == null) {
             /* We couldn't find any CPU information, ignore this event */
             return;
         }
-        Integer cpu = (Integer) cpuObj;
 
         /* Find a virtual machine with the vm uid payload value */
         ITmfEventField data = content.getField(QemuKvmStrings.VM_UID_PAYLOAD);

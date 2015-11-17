@@ -69,11 +69,7 @@ public class TraceEventHandlerSched extends BaseHandler {
     }
 
     private void handleSchedSwitch(ITmfEvent event) {
-        Object cpuObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
-        if (cpuObj == null) {
-            throw new NullPointerException();
-        }
-        Integer cpu = (Integer) cpuObj;
+        Integer cpu = NonNullUtils.checkNotNull(TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event));
         LttngEventLayout eventLayout = getProvider().getEventLayout();
         LttngSystemModel system = getProvider().getSystem();
 
@@ -132,11 +128,7 @@ public class TraceEventHandlerSched extends BaseHandler {
 
     private void handleSchedWakeup(ITmfEvent event) {
         String host = event.getTrace().getHostId();
-        Object cpuObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
-        if (cpuObj == null) {
-            throw new NullPointerException();
-        }
-        Integer cpu = (Integer) cpuObj;
+        Integer cpu = NonNullUtils.checkNotNull(TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event));
         LttngEventLayout eventLayout = getProvider().getEventLayout();
         LttngSystemModel system = getProvider().getSystem();
 
@@ -180,11 +172,7 @@ public class TraceEventHandlerSched extends BaseHandler {
 
     private void handleSchedProcessExec(ITmfEvent event) {
         String host = event.getTrace().getHostId();
-        Object cpuObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
-        if (cpuObj == null) {
-            throw new NullPointerException();
-        }
-        Integer cpu = (Integer) cpuObj;
+        Integer cpu = NonNullUtils.checkNotNull(TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event));
         LttngEventLayout eventLayout = getProvider().getEventLayout();
         LttngSystemModel system = getProvider().getSystem();
 

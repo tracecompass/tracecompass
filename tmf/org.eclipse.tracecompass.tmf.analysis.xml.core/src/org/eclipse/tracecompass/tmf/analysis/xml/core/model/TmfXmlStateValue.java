@@ -263,9 +263,8 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
         /* Exception for "CPU", returns the source of this event */
         /* FIXME : Nameclash if a eventfield have "cpu" for name. */
         if (fieldName.equals(TmfXmlStrings.CPU)) {
-            Object cpuObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
-            if (cpuObj != null) {
-                Integer cpu = (Integer) cpuObj;
+            Integer cpu = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
+            if (cpu != null) {
                 return TmfStateValue.newValueInt(cpu.intValue());
             }
         }

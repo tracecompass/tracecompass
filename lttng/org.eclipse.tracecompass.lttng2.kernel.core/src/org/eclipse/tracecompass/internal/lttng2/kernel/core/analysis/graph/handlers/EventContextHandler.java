@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.handlers;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecGraphProvider;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecGraphProvider.Context;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.LttngInterruptContext;
@@ -56,11 +57,7 @@ public class EventContextHandler extends BaseHandler {
     }
 
     private void pushInterruptContext(ITmfEvent event, Context ctx) {
-        Object cpuObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
-        if (cpuObj == null) {
-            throw new NullPointerException();
-        }
-        Integer cpu = (Integer) cpuObj;
+        Integer cpu = NonNullUtils.checkNotNull(TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event));
         LttngSystemModel system = getProvider().getSystem();
 
         LttngInterruptContext interruptCtx = new LttngInterruptContext(event, ctx);
@@ -69,11 +66,7 @@ public class EventContextHandler extends BaseHandler {
     }
 
     private void popInterruptContext(ITmfEvent event, Context ctx) {
-        Object cpuObj = TmfTraceUtils.resolveEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
-        if (cpuObj == null) {
-            throw new NullPointerException();
-        }
-        Integer cpu = (Integer) cpuObj;
+        Integer cpu = NonNullUtils.checkNotNull(TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event));
         LttngSystemModel system = getProvider().getSystem();
 
         /* TODO: add a warning bookmark if the interrupt context is not coherent */
