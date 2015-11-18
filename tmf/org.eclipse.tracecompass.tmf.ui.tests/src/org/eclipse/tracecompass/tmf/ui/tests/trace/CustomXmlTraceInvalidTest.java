@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -67,9 +68,15 @@ public class CustomXmlTraceInvalidTest extends CustomXmlTraceTest{
     @Test
     public void testInvalid() {
         IStatus invalid = getTrace().validate(null, getPath());
-        if (IStatus.ERROR != invalid.getSeverity()) {
-            fail(getPath());
+
+        // Validation doesn't check for syntax errors. It returns a confidence
+        // of  0 and status OK if it is a text file for invalid xml files.
+        if ((IStatus.ERROR == invalid.getSeverity() ||
+                ((IStatus.OK == invalid.getSeverity() && (invalid instanceof TraceValidationStatus) && ((TraceValidationStatus) invalid).getConfidence() == 0)))) {
+            return;
         }
+
+        fail(getPath());
     }
 
 }

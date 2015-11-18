@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011-2014 Ericsson
+ * Copyright (c) 2011, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -26,6 +26,7 @@ import org.junit.runner.RunWith;
         org.eclipse.tracecompass.tmf.ui.tests.histogram.AllTests.class,
         org.eclipse.tracecompass.tmf.ui.tests.project.model.AllTests.class,
         org.eclipse.tracecompass.tmf.ui.tests.statistics.AllTests.class,
+        org.eclipse.tracecompass.tmf.ui.tests.trace.AllTests.class,
         org.eclipse.tracecompass.tmf.ui.tests.views.uml2sd.dialogs.AllTests.class,
         org.eclipse.tracecompass.tmf.ui.tests.views.uml2sd.load.AllTests.class,
         org.eclipse.tracecompass.tmf.ui.tests.views.uml2sd.loader.AllTests.class
