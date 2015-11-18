@@ -22,7 +22,6 @@ import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlCondition;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlEventHandler;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlLocation;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.model.TmfXmlStateChange;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.model.readwrite.TmfXmlReadWriteModelFactory;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.w3c.dom.Element;
 
@@ -38,7 +37,7 @@ public class TmfXmlReadOnlyModelFactory implements ITmfXmlModelFactory {
     /**
      * Get the instance of this model creator
      *
-     * @return The {@link TmfXmlReadWriteModelFactory} instance
+     * @return The {@link TmfXmlReadOnlyModelFactory} instance
      */
     public static synchronized ITmfXmlModelFactory getInstance() {
         ITmfXmlModelFactory instance = fInstance;
