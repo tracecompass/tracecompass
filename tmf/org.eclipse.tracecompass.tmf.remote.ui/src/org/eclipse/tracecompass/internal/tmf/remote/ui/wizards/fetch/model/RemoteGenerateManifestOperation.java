@@ -181,6 +181,7 @@ public class RemoteGenerateManifestOperation extends AbstractGenerateManifestOpe
                         fullArchivePath = fullArchivePath.removeLastSegments(1);
                         fDirectoryTraces.add(fullArchivePath);
                         fileStore = fileStore.getParent();
+                        sourceInfo = fileStore.fetchInfo();
                         parent = parentElement.getParent();
                         // Let the auto-detection choose the best trace type
                         traceType = null;
@@ -189,8 +190,7 @@ public class RemoteGenerateManifestOperation extends AbstractGenerateManifestOpe
                         continue;
                     }
 
-                    IFileInfo info = fileStore.fetchInfo();
-                    if (info.getLength() > 0) {
+                    if (sourceInfo.getLength() > 0 || sourceInfo.isDirectory()) {
                         // Only add non-empty files
                         String traceName = fullArchivePath.lastSegment();
                         String fileName = fileStore.getName();
