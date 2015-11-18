@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -49,6 +49,7 @@ public abstract class AbstractCustomTraceIndexTest {
      * The total number of events in the generated trace
      */
     protected static final int NB_EVENTS = 10000;
+    private static final long MILLISECOND_TO_NANOSECOND = 1000000;
     private TestTrace fTrace = null;
 
     /**
@@ -152,12 +153,13 @@ public abstract class AbstractCustomTraceIndexTest {
     }
 
     private void verifyIndexContent() {
+        long endTime = (NB_EVENTS - 1) * MILLISECOND_TO_NANOSECOND;
         assertEquals("getCacheSize", BLOCK_SIZE, fTrace.getCacheSize());
         assertEquals("getTraceSize", NB_EVENTS, fTrace.getNbEvents());
         assertEquals("getRange-start", 0, fTrace.getTimeRange().getStartTime().getValue());
-        assertEquals("getRange-end", NB_EVENTS - 1, fTrace.getTimeRange().getEndTime().getValue());
+        assertEquals("getRange-end", endTime, fTrace.getTimeRange().getEndTime().getValue());
         assertEquals("getStartTime", 0, fTrace.getStartTime().getValue());
-        assertEquals("getEndTime", NB_EVENTS - 1, fTrace.getEndTime().getValue());
+        assertEquals("getEndTime", endTime, fTrace.getEndTime().getValue());
 
         ITmfCheckpointIndex checkpoints = fTrace.getIndexer().getCheckpoints();
         int pageSize = fTrace.getCacheSize();

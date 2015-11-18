@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,10 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.tests.trace;
 
-import java.util.ArrayList;
+import java.io.File;
 
-import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
-import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlInputElement;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTrace;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTraceDefinition;
 import org.junit.Before;
@@ -27,6 +25,9 @@ import org.junit.Before;
  *
  */
 public abstract class CustomXmlTraceTest {
+
+    private static final String DEFINITION_PATH = "tracesets" + File.separator + "xml" + File.separator + "testDefinition.xml";
+
     private CustomXmlTraceDefinition cxtd;
     /**
      * The trace to use to "validate" the xml files
@@ -43,7 +44,7 @@ public abstract class CustomXmlTraceTest {
      */
     @Before
     public void init() {
-        cxtd = new CustomXmlTraceDefinition(CustomXmlTraceDefinition.CUSTOM_XML_CATEGORY, "test", new CustomXmlInputElement(), new ArrayList<OutputColumn>(), "s");
+        cxtd = createDefinition();
         t = new CustomXmlTrace(cxtd);
     }
 
@@ -71,4 +72,8 @@ public abstract class CustomXmlTraceTest {
         this.path = path;
     }
 
+    private static CustomXmlTraceDefinition createDefinition() {
+        CustomXmlTraceDefinition[] definitions = CustomXmlTraceDefinition.loadAll(new File(DEFINITION_PATH).toString());
+        return definitions[0];
+    }
 }
