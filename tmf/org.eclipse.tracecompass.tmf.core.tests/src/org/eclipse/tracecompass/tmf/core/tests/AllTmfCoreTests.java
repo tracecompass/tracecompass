@@ -29,6 +29,7 @@ import org.junit.runner.RunWith;
     org.eclipse.tracecompass.tmf.core.tests.event.lookup.AllTests.class,
     org.eclipse.tracecompass.tmf.core.tests.filter.AllTests.class,
     org.eclipse.tracecompass.tmf.core.tests.model.AllTests.class,
+    org.eclipse.tracecompass.tmf.core.tests.parsers.custom.AllTests.class,
     org.eclipse.tracecompass.tmf.core.tests.request.AllTests.class,
     org.eclipse.tracecompass.tmf.core.tests.signal.AllTests.class,
     org.eclipse.tracecompass.tmf.core.tests.statesystem.AllTests.class,

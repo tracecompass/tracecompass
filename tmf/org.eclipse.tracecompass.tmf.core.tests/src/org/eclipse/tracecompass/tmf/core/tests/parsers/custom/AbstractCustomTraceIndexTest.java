@@ -10,7 +10,7 @@
  *   Marc-Andre Laperle - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.tests.trace;
+package org.eclipse.tracecompass.tmf.core.tests.parsers.custom;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

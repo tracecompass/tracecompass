@@ -10,7 +10,7 @@
  *   Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.tests.trace;
+package org.eclipse.tracecompass.tmf.core.tests.parsers.custom;
 
 import static org.junit.Assert.fail;
 
@@ -26,15 +26,14 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * Invalid Xml files, random errors
- *
+ * Malformed xml test, dangerous errors
  * @author Matthew Khouzam
  *
  */
 @RunWith(Parameterized.class)
-public class CustomXmlTraceInvalidTest extends CustomXmlTraceTest{
+public class CustomXmlTraceBadlyFormedTest extends CustomXmlTraceTest {
 
-    private final static String pathname = "tracesets/xml/invalid";
+    private final static String pathname = "testfiles/xml/malformed";
 
     /**
      * This should create the parameters to launch the project
@@ -43,13 +42,28 @@ public class CustomXmlTraceInvalidTest extends CustomXmlTraceTest{
      */
     @Parameters(name = "{index}: path {0}")
     public static Collection<Object[]> getFiles() {
-        File[] invalidFiles = (new File(pathname)).listFiles();
+        File[] malformedFiles = (new File(pathname)).listFiles();
         Collection<Object[]> params = new ArrayList<>();
-        for (File f : invalidFiles) {
+        for (File f : malformedFiles) {
             Object[] arr = new Object[] { f.getAbsolutePath() };
             params.add(arr);
         }
         return params;
+    }
+
+    /**
+     * Test all the invalid xml files
+     */
+    @Test
+    public void testBadlyFormed() {
+        IStatus invalid = getTrace().validate(null, getPath());
+        // Validation doesn't check for syntax errors. It returns a confidence
+        // of  0 and status OK if it is a text file for malformed xml files.
+        if ((IStatus.ERROR == invalid.getSeverity() ||
+                ((IStatus.OK == invalid.getSeverity() && (invalid instanceof TraceValidationStatus) && ((TraceValidationStatus) invalid).getConfidence() == 0)))) {
+            return;
+        }
+        fail(getPath());
     }
 
     /**
@@ -58,25 +72,8 @@ public class CustomXmlTraceInvalidTest extends CustomXmlTraceTest{
      * @param filePath
      *            the path
      */
-    public CustomXmlTraceInvalidTest(String filePath) {
-        setPath(filePath);
-    }
-
-    /**
-     * Test all the invalid xml files
-     */
-    @Test
-    public void testInvalid() {
-        IStatus invalid = getTrace().validate(null, getPath());
-
-        // Validation doesn't check for syntax errors. It returns a confidence
-        // of  0 and status OK if it is a text file for invalid xml files.
-        if ((IStatus.ERROR == invalid.getSeverity() ||
-                ((IStatus.OK == invalid.getSeverity() && (invalid instanceof TraceValidationStatus) && ((TraceValidationStatus) invalid).getConfidence() == 0)))) {
-            return;
-        }
-
-        fail(getPath());
+    public CustomXmlTraceBadlyFormedTest(String filePath) {
+        this.setPath(filePath);
     }
 
 }

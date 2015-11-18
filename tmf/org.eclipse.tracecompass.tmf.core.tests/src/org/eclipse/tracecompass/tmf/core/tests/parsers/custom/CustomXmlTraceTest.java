@@ -10,7 +10,7 @@
  *   Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.tests.trace;
+package org.eclipse.tracecompass.tmf.core.tests.parsers.custom;
 
 import java.io.File;
 
@@ -26,7 +26,7 @@ import org.junit.Before;
  */
 public abstract class CustomXmlTraceTest {
 
-    private static final String DEFINITION_PATH = "tracesets" + File.separator + "xml" + File.separator + "testDefinition.xml";
+    private static final String DEFINITION_PATH = "testfiles" + File.separator + "xml" + File.separator + "testDefinition.xml";
 
     private CustomXmlTraceDefinition cxtd;
     /**

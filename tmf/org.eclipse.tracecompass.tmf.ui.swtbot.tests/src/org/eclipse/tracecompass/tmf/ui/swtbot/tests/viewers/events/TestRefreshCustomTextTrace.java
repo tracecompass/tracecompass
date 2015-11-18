@@ -21,8 +21,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition;
+import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.ui.tests.TmfUITestPlugin;
 import org.junit.runner.RunWith;
 import org.osgi.framework.Bundle;
 
@@ -33,7 +33,7 @@ import org.osgi.framework.Bundle;
 public class TestRefreshCustomTextTrace extends TestRefreshTextTrace {
 
     private static final String TRACE_LOCATION = TmfTraceManager.getTemporaryDirPath() + File.separator + "test.txt";
-    private static final String DEFINITION_PATH = "tracesets" + File.separator + "txt" + File.separator + "testTxtDefinition.xml";
+    private static final String DEFINITION_PATH = "testfiles" + File.separator + "txt" + File.separator + "testTxtDefinition.xml";
     private static final String TRACE_TYPE_CUSTOM_TEXT = "custom.txt.trace:Custom Text:testtxt";
     private static final String TIMESTAMP_FORMAT = "dd/MM/yyyy HH:mm:ss:SSS";
 
@@ -51,7 +51,7 @@ public class TestRefreshCustomTextTrace extends TestRefreshTextTrace {
     }
 
     private static void createDefinition() throws URISyntaxException, IOException {
-        File file = getBundleFile(TmfUITestPlugin.getDefault().getBundle(), new Path(DEFINITION_PATH));
+        File file = getBundleFile(TmfCoreTestPlugin.getDefault().getBundle(), new Path(DEFINITION_PATH));
         CustomTxtTraceDefinition[] definitions = CustomTxtTraceDefinition.loadAll(file.toString());
         for (CustomTxtTraceDefinition text : definitions) {
             text.save();

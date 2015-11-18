@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,7 +10,7 @@
  *   Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.tests.trace;
+package org.eclipse.tracecompass.tmf.core.tests.parsers.custom;
 
 import static org.junit.Assert.fail;
 
@@ -32,7 +32,7 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class CustomXmlTraceValidTest extends CustomXmlTraceTest {
 
-    private final static String pathname = "tracesets/xml/valid";
+    private final static String pathname = "testfiles/xml/valid";
 
 
     /**

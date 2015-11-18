@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson
+ * Copyright (c) 2009, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,10 +10,10 @@
  *   Francois Chouinard - Initial API and implementation
  *   Francois Chouinard - Adapted for TMF Trace Model 1.0
  *   Alexandre Montplaisir - Port to JUnit4
- *   Marc-Andre Laperle - Adapted to CustomXmlTrace
+ *   Marc-Andre Laperle - Adapted to CustomTxtTrace
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.tests.trace;
+package org.eclipse.tracecompass.tmf.core.tests.parsers.custom;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -22,24 +22,24 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
-import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTrace;
-import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomXmlTraceDefinition;
+import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTrace;
+import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
 
 /**
- * Test suite for indexing using a CustomXmlTrace.
+ * Test suite for indexing using a CustomTxtTrace.
  *
  * @author Marc-Andre Laperle
  */
-public class CustomXmlIndexTest extends AbstractCustomTraceIndexTest {
+public class CustomTxtIndexTest extends AbstractCustomTraceIndexTest {
 
-    private static final String TRACE_DIRECTORY = TmfTraceManager.getTemporaryDirPath() + File.separator + "dummyXmlTrace";
-    private static final String TRACE_PATH = TRACE_DIRECTORY + File.separator + "test.xml";
-    private static final String DEFINITION_PATH = "tracesets" + File.separator + "xml" + File.separator + "testDefinition.xml";
+    private static final String TRACE_DIRECTORY = TmfTraceManager.getTemporaryDirPath() + File.separator + "dummyTxtTrace";
+    private static final String TRACE_PATH = TRACE_DIRECTORY + File.separator + "test.txt";
+    private static final String DEFINITION_PATH = "testfiles" + File.separator + "txt" + File.separator + "testTxtDefinition.xml";
 
-    private static CustomXmlTraceDefinition createDefinition() {
-        CustomXmlTraceDefinition[] definitions = CustomXmlTraceDefinition.loadAll(new File(DEFINITION_PATH).toString());
+    private static CustomTxtTraceDefinition createDefinition() {
+        CustomTxtTraceDefinition[] definitions = CustomTxtTraceDefinition.loadAll(new File(DEFINITION_PATH).toString());
         return definitions[0];
     }
 
@@ -50,23 +50,21 @@ public class CustomXmlIndexTest extends AbstractCustomTraceIndexTest {
 
     @Override
     protected TestTrace createTrace() throws Exception {
-        CustomXmlTraceDefinition definition = createDefinition();
+        CustomTxtTraceDefinition definition = createDefinition();
         final File file = new File(TRACE_PATH);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file));) {
-            writer.write("<trace>");
             for (int i = 0; i < NB_EVENTS; ++i) {
                 SimpleDateFormat f = new SimpleDateFormat(TIMESTAMP_FORMAT);
-                String eventStr = "<element time=\"" + f.format(new Date(i)) + "\">message</element>\n";
+                String eventStr = f.format(new Date(i)) + " hello world\n";
                 writer.write(eventStr);
             }
-            writer.write("</trace>");
         }
 
-        return new TestXmlTrace(file.toString(), definition, BLOCK_SIZE);
+        return new TestTxtTrace(file.toString(), definition, BLOCK_SIZE);
     }
 
-    private class TestXmlTrace extends CustomXmlTrace implements TestTrace {
-        public TestXmlTrace(String path, CustomXmlTraceDefinition createDefinition, int blockSize) throws TmfTraceException {
+    private class TestTxtTrace extends CustomTxtTrace implements TestTrace {
+        public TestTxtTrace(String path, CustomTxtTraceDefinition createDefinition, int blockSize) throws TmfTraceException {
             super(null, createDefinition, path, blockSize);
         }
 
