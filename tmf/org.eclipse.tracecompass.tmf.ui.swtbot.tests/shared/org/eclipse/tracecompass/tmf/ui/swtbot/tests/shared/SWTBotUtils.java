@@ -52,6 +52,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
@@ -562,7 +563,15 @@ public final class SWTBotUtils {
             currentNode.expand();
 
             String nodeName = nodeNames[i];
-            bot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(nodeName, currentNode));
+            try {
+                bot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(nodeName, currentNode));
+            } catch (TimeoutException e) {
+                //FIXME: Sometimes in a JFace TreeViewer, it expands to nothing. Need to find out why.
+                currentNode.collapse();
+                currentNode.expand();
+                bot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(nodeName, currentNode));
+            }
+
             SWTBotTreeItem newNode = currentNode.getNode(nodeName);
             currentNode = newNode;
         }
