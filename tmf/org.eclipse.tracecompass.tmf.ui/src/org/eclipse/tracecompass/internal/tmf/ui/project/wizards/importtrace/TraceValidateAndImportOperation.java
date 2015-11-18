@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -668,12 +669,7 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
         @Override
         public List getChildren(Object element) {
             TraceFileSystemElement resource = (TraceFileSystemElement) element;
-            Object[] array = resource.getFiles().getChildren();
-            List<Object> list = new ArrayList<>();
-            for (int i = 0; i < array.length; i++) {
-                list.add(array[i]);
-            }
-            return list;
+            return Arrays.asList(resource.getFiles().getChildren());
         }
 
         @Override
