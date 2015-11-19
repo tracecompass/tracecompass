@@ -42,6 +42,7 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
+import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
@@ -72,6 +73,9 @@ import org.hamcrest.Matcher;
  * @author Matthew Khouzam
  */
 public final class SWTBotUtils {
+
+    private static final String WINDOW_MENU = "Window";
+    private static final String PREFERENCES_MENU_ITEM = "Preferences";
 
     private SWTBotUtils() {
     }
@@ -590,5 +594,30 @@ public final class SWTBotUtils {
             }
         });
         return editor[0];
+    }
+
+    /**
+     * Open the preferences dialog and return the corresponding shell.
+     *
+     * @param bot
+     *            a given workbench bot
+     * @return the preferences shell
+     */
+    public static SWTBotShell openPreferences(SWTBot bot) {
+        if (SWTUtils.isMac()) {
+            // On Mac, the Preferences menu item is under the application name.
+            // For some reason, we can't access the application menu anymore so
+            // we use the keyboard shortcut.
+            try {
+                bot.activeShell().pressShortcut(KeyStroke.getInstance(IKeyLookup.COMMAND_NAME + "+"), KeyStroke.getInstance(","));
+            } catch (ParseException e) {
+                fail();
+            }
+        } else {
+            bot.menu(WINDOW_MENU).menu(PREFERENCES_MENU_ITEM).click();
+        }
+
+        bot.waitUntil(Conditions.shellIsActive(PREFERENCES_MENU_ITEM));
+        return bot.activeShell();
     }
 }

@@ -15,7 +15,6 @@ package org.eclipse.tracecompass.tmf.remote.ui.swtbot.tests.fetch;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,16 +27,13 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.bindings.keys.IKeyLookup;
-import org.eclipse.jface.bindings.keys.KeyStroke;
-import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
-import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
@@ -453,27 +449,15 @@ public class FetchRemoteTracesTest {
     }
 
     private static void openRemoteProfilePreferences() {
-        if (SWTUtils.isMac()) {
-            // On Mac, the Preferences menu item is under the application name.
-            // For some reason, we can't access the application menu anymore so
-            // we use the keyboard shortcut.
-            try {
-                fBot.activeShell().pressShortcut(KeyStroke.getInstance(IKeyLookup.COMMAND_NAME + "+"), KeyStroke.getInstance(","));
-            } catch (ParseException e) {
-                fail();
-            }
-        } else {
-            fBot.menu("Window").menu("Preferences").click();
-        }
-
-        fBot.waitUntil(Conditions.shellIsActive("Preferences"));
+        SWTBotShell preferencesShell = SWTBotUtils.openPreferences(fBot);
 
         // The first tree is the preference "categories" on the left side
-        SWTBotTree tree = fBot.tree(0);
+        SWTBot bot = preferencesShell.bot();
+        SWTBotTree tree = bot.tree(0);
         SWTBotTreeItem treeNode = tree.getTreeItem("Tracing");
         treeNode.select();
         treeNode.expand();
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable("Remote Profiles", treeNode));
+        bot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable("Remote Profiles", treeNode));
         treeNode = treeNode.getNode("Remote Profiles");
         treeNode.select();
     }
