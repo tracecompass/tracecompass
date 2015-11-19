@@ -365,7 +365,7 @@ public class BTree extends AbstractFileCheckpointCollection {
 
     @Override
     public void dispose() {
-        if (fNodeCache != null) {
+        if (fNodeCache != null && getRandomAccessFile() != null) {
             fNodeCache.serialize();
         }
 

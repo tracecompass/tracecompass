@@ -222,6 +222,32 @@ public abstract class AbstractCheckpointCollectionTest {
     }
 
     /**
+     * Test version change
+     *
+     * @throws IOException
+     *             can throw this
+     */
+    @Test
+    public void testDeleteWhenInvalidBug479675() throws IOException {
+        insertAlot();
+        try (RandomAccessFile f = new RandomAccessFile(fFile, "rw");) {
+            f.writeInt(-1);
+        }
+
+        fCheckpointCollection = createCollection();
+        if (isPersistableCollection()) {
+            ICheckpointCollection old = fCheckpointCollection;
+            try {
+                fCheckpointCollection = createCollection();
+                assertEquals(0, fCheckpointCollection.size());
+            } finally {
+                old.dispose();
+            }
+        }
+        assertTrue(fCheckpointCollection.isCreatedFromScratch());
+    }
+
+    /**
      * Test a single insertion
      */
     @Test
