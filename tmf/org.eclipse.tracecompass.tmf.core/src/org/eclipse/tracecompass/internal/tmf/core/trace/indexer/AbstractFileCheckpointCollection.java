@@ -197,8 +197,7 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
         if (!isCreatedFromScratch()) {
             header = tryRestore();
             if (header == null) {
-                fFile.delete();
-                dispose();
+                delete();
             }
         }
 
@@ -442,7 +441,7 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
      */
     @Override
     public void delete() {
-        dispose();
+        dispose(true);
         if (fFile.exists()) {
             fFile.delete();
         }
@@ -453,14 +452,20 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
      */
     @Override
     public void dispose() {
+        dispose(false);
+    }
+
+    private void dispose(boolean deleting) {
         try {
             if (fRandomAccessFile != null) {
-                if (fHeader != null) {
-                    fHeader.serialize(fRandomAccessFile);
-                }
+                if (!deleting) {
+                    if (fHeader != null) {
+                        fHeader.serialize(fRandomAccessFile);
+                    }
 
-                fRandomAccessFile.seek(0);
-                fRandomAccessFile.writeInt(getVersion());
+                    fRandomAccessFile.seek(0);
+                    fRandomAccessFile.writeInt(getVersion());
+                }
 
                 fRandomAccessFile.close();
             }
