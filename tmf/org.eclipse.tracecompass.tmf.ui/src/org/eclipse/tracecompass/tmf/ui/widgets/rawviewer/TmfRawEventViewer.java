@@ -114,7 +114,8 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
             this.rank = rank;
             this.location = location;
             if (string.length() == 0) {
-                this.string = " "; // workaround for setLineBackground has no effect on empty line //$NON-NLS-1$
+                /* workaround for setLineBackground has no effect on empty line */
+                this.string = " "; //$NON-NLS-1$
             } else {
                 this.string = string;
             }
@@ -281,9 +282,13 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         fStyledText.addMouseMoveListener(this);
         fStyledText.addMouseTrackListener(this);
         fStyledText.addMouseWheelListener(this);
-        fStyledText.addListener(SWT.MouseWheel, new Listener() { // disable mouse scroll of horizontal scroll bar
+        /* disable mouse scroll of horizontal scroll bar */
+        fStyledText.addListener(SWT.MouseWheel, new Listener() {
             @Override
-            public void handleEvent(Event event) { event.doit = false; }});
+            public void handleEvent(Event event) {
+                event.doit = false;
+            }
+        });
         fStyledText.addKeyListener(this);
 
         fTextArea.setBackground(fStyledText.getBackground());
@@ -291,7 +296,8 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
             @Override
             public void mouseDown(MouseEvent e) {
                 fTextArea.setFocus();
-            }});
+            }
+        });
     }
 
     // ------------------------------------------------------------------------
@@ -362,7 +368,6 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 }
                 loadLineData();
                 fillTextArea();
-                //fSlider.setSelection((int) (SLIDER_MAX * ((double) fLines.get(fTopLineIndex).rank / fTrace.getNbEvents())));
                 fSlider.setSelection((int) (SLIDER_MAX * fTrace.getLocationRatio(fLines.get(fTopLineIndex).location)));
             }
         } else {
@@ -454,7 +459,6 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         if (fLines.size() == 0) {
             fSlider.setSelection(0);
         } else {
-            //fSlider.setSelection((int) (SLIDER_MAX * ((double) fLines.get(fTopLineIndex).rank / fTrace.getNbEvents())));
             fSlider.setSelection((int) (SLIDER_MAX * fTrace.getLocationRatio(fLines.get(fTopLineIndex).location)));
         }
     }
@@ -477,25 +481,6 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 
     private void loadLineData() {
         if (fTopLineIndex < 0) {
-            //if (fLines.size() > 0 && fLines.get(0).rank > 0) {
-                //long endRank = fLines.get(0).rank;
-                //long startRank = Math.max(0, endRank - fNumVisibleLines);
-                //TmfContext context = fTrace.seekEvent(startRank);
-                //int index = 0;
-                //while (context.getRank() < endRank) {
-                    //long rank = context.getRank();
-                    //ITmfLocation<?> location = context.getLocation();
-                    //TmfEvent event = fTrace.getNextEvent(context);
-                    //String[] lines = event.getRawText().split("\r?\n");
-                    //for (int i = 0; i < lines.length; i++) {
-                        //String line = lines[i];
-                        //LineData lineData = new LineData(rank, location, line);
-                        //fLines.add(index++, lineData);
-                        //fTopLineIndex++;
-                        //fLastTopLineIndex++;
-                    //}
-                //}
-            //}
             if (fLines.size() > 0 && fTrace.getLocationRatio(fLines.get(0).location) > 0) {
                 double lastRatio = fTrace.getLocationRatio(fLines.get(fLines.size() - 1).location);
                 double firstRatio = fTrace.getLocationRatio(fLines.get(0).location);
@@ -561,7 +546,6 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 if (fLines.size() == 0) {
                     fBottomContext = fTrace.seekEvent(0);
                 } else {
-                    //fBottomContext = fTrace.seekEvent(fLines.get(fLines.size() - 1).rank + 1);
                     fBottomContext = fTrace.seekEvent(fLines.get(fLines.size() - 1).location);
                     fTrace.getNext(fBottomContext);
                 }
@@ -805,8 +789,6 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 /*
                  * The selection event was sent by the viewer, refresh now.
                  */
-                //long rank = (long) (fTrace.getNbEvents() * ((double) fSlider.getSelection() / SLIDER_MAX));
-                //setTopRank(rank);
                 if (fSlider.getSelection() == 0 || fSlider.getThumb() == SLIDER_MAX) {
                     fLines.clear();
                     setTopPosition(0.0);
@@ -841,8 +823,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 break;
             }
             case SWT.ARROW_UP: {
-                //if (fLines.size() == 0 || (fTopLineIndex == 0 && fLines.get(0).rank == 0)) {
-                if (fLines.size() == 0) {// || (fTopLineIndex == 0 && fLines.get(0).rank == 0)) {
+                if (fLines.size() == 0) {
                     break;
                 }
                 fTopLineIndex--;
@@ -857,14 +838,10 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 break;
             }
             case SWT.HOME: {
-                //selectAndReveal(0);
                 setTopPosition(0.0);
                 break;
             }
             case SWT.END: {
-                //if (fTrace.getNbEvents() > 0) {
-                    //selectAndReveal(fTrace.getNbEvents() - 1);
-                //}
                 double ratio = 1.0;
                 double delta = Math.pow(10, -15);
                 fLines.clear();
@@ -881,7 +858,6 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
             default:
                 break;
         }
-        //fSlider.setSelection((int) (SLIDER_MAX * ((double) fLines.get(fTopLineIndex).rank / fTrace.getNbEvents())));
         if (e.detail != SWT.NONE) {
             fSlider.setSelection((int) (SLIDER_MAX * fTrace.getLocationRatio(fLines.get(fTopLineIndex).location)));
         }
@@ -999,7 +975,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 if (previousLineAtCaretPosition > 0) {
                     break;
                 }
-                if (fLines.size() == 0) {// || (fTopLineIndex == 0 && fLines.get(0).rank == 0)) {
+                if (fLines.size() == 0) {
                     break;
                 }
                 fHoldSelection++;
@@ -1038,7 +1014,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 if (previousCaretOffset > 0) {
                     break;
                 }
-                if (fLines.size() == 0) {// || (fTopLineIndex == 0 && fLines.get(0).rank == 0)) {
+                if (fLines.size() == 0) {
                     break;
                 }
                 long topRank = fLines.get(fTopLineIndex).rank;
@@ -1062,7 +1038,6 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 if ((e.stateMask & SWT.CTRL) == 0) {
                     break;
                 }
-                //selectAndReveal(0);
                 setTopPosition(0.0);
                 LineData lineData = fLines.get(fTopLineIndex);
                 if (!lineData.location.equals(fSelectedLocation)) {
@@ -1076,9 +1051,6 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 if ((e.stateMask & SWT.CTRL) == 0) {
                     break;
                 }
-                //if (fTrace.getNbEvents() > 0) {
-                    //selectAndReveal(fTrace.getNbEvents() - 1);
-                //}
                 double ratio = 1.0;
                 double delta = Math.pow(10, -15);
                 fLines.clear();
@@ -1101,7 +1073,6 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
             default:
                 break;
         }
-        //fSlider.setSelection((int) (SLIDER_MAX * ((double) fLines.get(fTopLineIndex).rank / fTrace.getNbEvents())));
         updateHighlightedRank();
         fSlider.setSelection((int) (SLIDER_MAX * fTrace.getLocationRatio(fLines.get(fTopLineIndex).location)));
     }
@@ -1206,7 +1177,6 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         loadLineData();
         updateTextArea();
         fHoldSelection = 0;
-        //fSlider.setSelection((int) (SLIDER_MAX * ((double) fLines.get(fTopLineIndex).rank / fTrace.getNbEvents())));
         updateHighlightedRank();
         fSlider.setSelection((int) (SLIDER_MAX * fTrace.getLocationRatio(fLines.get(fTopLineIndex).location)));
     }
