@@ -164,63 +164,78 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
             }
         }
 
-        Long contentSize = (Long) fAttributes.get(CTFStrings.CONTENT_SIZE);
-        Long packetSize = (Long) fAttributes.get(CTFStrings.PACKET_SIZE);
-        Long tsBegin = (Long) fAttributes.get(CTFStrings.TIMESTAMP_BEGIN);
-        Long tsEnd = (Long) fAttributes.get(CTFStrings.TIMESTAMP_END);
-        boolean hasDevice = fAttributes.containsKey(CTFStrings.DEVICE);
-        // LTTng Specific
-        Long cpuId = (Long) fAttributes.get(CTFStrings.CPU_ID);
-        Long lostEvents = (Long) fAttributes.get(CTFStrings.EVENTS_DISCARDED);
+        fContentSizeBits = computeContentSize(fileSizeBytes);
+        fPacketSizeBits = computePacketSize(fileSizeBytes);
+        fTimestampBegin = computeTsBegin();
+        fTimestampEnd = computeTsEnd();
+        fOffsetBits = dataOffsetBits;
+        fOffsetBytes = dataOffsetBits / Byte.SIZE;
 
+        // LTTng Specific
+        Target target = lookupTarget(streamPacketContextDef);
+        fTarget = target.string;
+        fTargetID = target.number;
+        fLostEvents = computeLostEvents(lostSoFar);
+    }
+
+    private Long getPacketSize() {
+        return (Long) fAttributes.get(CTFStrings.PACKET_SIZE);
+    }
+
+    private long computeContentSize(long fileSizeBytes) {
+        Long contentSize = (Long) fAttributes.get(CTFStrings.CONTENT_SIZE);
         /* Read the content size in bits */
         if (contentSize != null) {
-            fContentSizeBits = (contentSize.longValue());
-        } else if (packetSize != null) {
-            fContentSizeBits = (packetSize.longValue());
-        } else {
-            fContentSizeBits = (fileSizeBytes * Byte.SIZE);
+            return contentSize.longValue();
         }
+        Long packetSize = getPacketSize();
+        if (packetSize != null) {
+            return packetSize.longValue();
+        }
+        return fileSizeBytes * Byte.SIZE;
+    }
 
+    private long computePacketSize(long fileSizeBytes) {
+        Long packetSize = getPacketSize();
         /* Read the packet size in bits */
         if (packetSize != null) {
-            fPacketSizeBits = (packetSize.longValue());
-        } else if (this.getContentSizeBits() != 0) {
-            fPacketSizeBits = fContentSizeBits;
-        } else {
-            fPacketSizeBits = (fileSizeBytes * Byte.SIZE);
+            return packetSize.longValue();
         }
+        long contentSizeBits = computeContentSize(fileSizeBytes);
+        if (contentSizeBits != 0) {
+            return contentSizeBits;
+        }
+        return fileSizeBytes * Byte.SIZE;
+    }
 
+    private long computeTsBegin() {
+        Long tsBegin = (Long) fAttributes.get(CTFStrings.TIMESTAMP_BEGIN);
         /* Read the begin timestamp */
         if (tsBegin != null) {
-            fTimestampBegin = (tsBegin.longValue());
-        } else {
-            fTimestampBegin = 0;
+            return tsBegin.longValue();
         }
+        return 0;
+    }
 
+    private long computeTsEnd() {
+        Long tsEnd = (Long) fAttributes.get(CTFStrings.TIMESTAMP_END);
         /* Read the end timestamp */
         if (tsEnd != null) {
             // check if tsEnd == unsigned long max value
             if (tsEnd == -1) {
-                tsEnd = Long.MAX_VALUE;
+                return Long.MAX_VALUE;
             }
-            fTimestampEnd = (tsEnd.longValue());
-        } else {
-            fTimestampEnd = Long.MAX_VALUE;
+            return tsEnd.longValue();
         }
+        return Long.MAX_VALUE;
+    }
 
-        Target target = lookupTarget(streamPacketContextDef, hasDevice, cpuId);
-        fTarget = target.string;
-        fTargetID = target.number;
-
+    private long computeLostEvents(long lostSoFar) {
+        Long lostEvents = (Long) fAttributes.get(CTFStrings.EVENTS_DISCARDED);
         if (lostEvents != null) {
-            fLostEvents = (lostEvents - lostSoFar);
-        } else {
-            fLostEvents = 0;
+            return lostEvents - lostSoFar;
         }
-
-        fOffsetBits = dataOffsetBits;
-        fOffsetBytes = dataOffsetBits / Byte.SIZE;
+        return 0;
     }
 
     private static class Target {
@@ -233,8 +248,9 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
         }
     }
 
-    private static Target lookupTarget(StructDefinition streamPacketContextDef, boolean hasDevice, Long cpuId) {
+    private Target lookupTarget(StructDefinition streamPacketContextDef) {
         Target ret = new Target();
+        boolean hasDevice = fAttributes.containsKey(CTFStrings.DEVICE);
         if (hasDevice) {
             IDefinition def = streamPacketContextDef.lookupDefinition(CTFStrings.DEVICE);
             if (def instanceof SimpleDatatypeDefinition) {
@@ -250,9 +266,12 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
                     ret.number = Integer.parseInt(number);
                 }
             }
-        } else if (cpuId != null) {
-            ret.string = ("CPU" + cpuId.toString()); //$NON-NLS-1$
-            ret.number = cpuId;
+        } else {
+            Long cpuId = (Long) fAttributes.get(CTFStrings.CPU_ID);
+            if (cpuId != null) {
+                ret.string = ("CPU" + cpuId.toString()); //$NON-NLS-1$
+                ret.number = cpuId;
+            }
         }
         return ret;
     }
