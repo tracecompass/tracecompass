@@ -31,11 +31,12 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
-import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -132,11 +133,10 @@ public class FontEventEditorTest {
 
         FontData font = getFont(rawText);
 
-        fBot.menu("Window").menu("Preferences").click();
+        SWTBotShell preferencesShell = SWTBotUtils.openPreferences(fBot);
 
-        fBot.waitUntil(Conditions.shellIsActive("Preferences"));
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        bot.activeShell().activate();
+        SWTBot bot = preferencesShell.bot();
+        preferencesShell.activate();
         bot.text().setText("color");
 
         SWTBotTreeItem generalItem = bot.tree().getTreeItem("General");
