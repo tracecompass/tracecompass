@@ -44,6 +44,8 @@ import org.w3c.dom.Element;
  */
 public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
 
+    private static final String ILLEGAL_STATE_EXCEPTION_MESSAGE = "The state system hasn't been initialized yet"; //$NON-NLS-1$
+
     /**
      * Constructor where the path to the value is a list of state attributes
      *
@@ -175,7 +177,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         protected void processValue(int quark, long timestamp, ITmfStateValue value) throws AttributeNotFoundException, TimeRangeException, StateValueTypeException {
             ITmfStateSystemBuilder ss = getStateSystem();
             if (ss == null) {
-                throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
+                throw new IllegalStateException(ILLEGAL_STATE_EXCEPTION_MESSAGE);
             }
             switch (getStackType()) {
             case POP:
@@ -196,7 +198,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         protected void incrementValue(ITmfEvent event, int quark, long timestamp) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
             ITmfStateSystemBuilder ss = getStateSystem();
             if (ss == null) {
-                throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
+                throw new IllegalStateException(ILLEGAL_STATE_EXCEPTION_MESSAGE);
             }
             ss.incrementAttribute(timestamp, quark);
         }
@@ -245,7 +247,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         public void incrementValue(ITmfEvent event, int quark, long timestamp) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
             ITmfStateSystem ss = getStateSystem();
             if (ss == null) {
-                throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
+                throw new IllegalStateException(ILLEGAL_STATE_EXCEPTION_MESSAGE);
             }
             ITmfStateValue value = incrementByType(quark, ss, fValue);
             if (value != null) {
@@ -279,7 +281,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         public void incrementValue(ITmfEvent event, int quark, long timestamp) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
             ITmfStateSystem ss = getSsContainer().getStateSystem();
             if (ss == null) {
-                throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
+                throw new IllegalStateException(ILLEGAL_STATE_EXCEPTION_MESSAGE);
             }
             ITmfStateValue incrementValue = getValue(event);
             ITmfStateValue value = incrementByType(quark, ss, incrementValue);
@@ -341,7 +343,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
             int quarkQuery = IXmlStateSystemContainer.ROOT_QUARK;
             ITmfStateSystem ss = getStateSystem();
             if (ss == null) {
-                throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
+                throw new IllegalStateException(ILLEGAL_STATE_EXCEPTION_MESSAGE);
             }
 
             for (ITmfXmlStateAttribute attribute : fQueryValue) {
@@ -368,7 +370,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         public void incrementValue(ITmfEvent event, int quark, long timestamp) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
             ITmfStateSystem ss = getStateSystem();
             if (ss == null) {
-                throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
+                throw new IllegalStateException(ILLEGAL_STATE_EXCEPTION_MESSAGE);
             }
 
             ITmfStateValue incrementValue = getValue(event);
