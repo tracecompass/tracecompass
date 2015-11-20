@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -31,6 +30,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
+import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.tracecompass.tmf.ui.project.wizards.RenameFolderDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -119,7 +119,7 @@ public class RenameFolderHandler extends AbstractHandler {
         } catch (InterruptedException e) {
             return null;
         } catch (InvocationTargetException e) {
-            MessageDialog.openError(window.getShell(), e.toString(), e.getTargetException().toString());
+            TraceUtils.displayErrorMsg(e.toString(), e.getTargetException().toString());
             return null;
         }
 
@@ -154,7 +154,7 @@ public class RenameFolderHandler extends AbstractHandler {
         } catch (InterruptedException e) {
             return null;
         } catch (InvocationTargetException e) {
-            MessageDialog.openError(window.getShell(), e.toString(), e.getTargetException().toString());
+            TraceUtils.displayErrorMsg(e.toString(), e.getTargetException().toString());
             return null;
         }
 

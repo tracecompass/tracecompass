@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -34,6 +33,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
+import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.tracecompass.tmf.ui.project.wizards.RenameTraceDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -130,7 +130,7 @@ public class RenameTraceHandler extends AbstractHandler {
         } catch (InterruptedException e) {
             return null;
         } catch (InvocationTargetException e) {
-            MessageDialog.openError(window.getShell(), e.toString(), e.getTargetException().toString());
+            TraceUtils.displayErrorMsg(e.toString(), e.getTargetException().toString());
             return null;
         }
 
@@ -169,7 +169,7 @@ public class RenameTraceHandler extends AbstractHandler {
             PlatformUI.getWorkbench().getProgressService().busyCursorWhile(operation);
         } catch (InterruptedException e) {
         } catch (InvocationTargetException e) {
-            MessageDialog.openError(window.getShell(), e.toString(), e.getTargetException().toString());
+            TraceUtils.displayErrorMsg(e.toString(), e.getTargetException().toString());
         }
 
         return null;

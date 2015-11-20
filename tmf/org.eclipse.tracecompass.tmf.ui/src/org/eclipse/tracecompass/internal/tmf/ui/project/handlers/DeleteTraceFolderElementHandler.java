@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -43,6 +42,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
+import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -340,7 +340,7 @@ public class DeleteTraceFolderElementHandler extends AbstractHandler {
         } catch (InterruptedException e) {
             return null;
         } catch (InvocationTargetException e) {
-            MessageDialog.openError(window.getShell(), e.toString(), e.getTargetException().toString());
+            TraceUtils.displayErrorMsg(e.toString(), e.getTargetException().toString());
             return null;
         }
         return null;

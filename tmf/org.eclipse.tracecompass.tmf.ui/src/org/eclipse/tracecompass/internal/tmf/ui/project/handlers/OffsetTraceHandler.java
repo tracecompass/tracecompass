@@ -26,7 +26,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -39,6 +38,7 @@ import org.eclipse.tracecompass.tmf.core.synchronization.TimestampTransformFacto
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
+import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 
@@ -128,7 +128,7 @@ public class OffsetTraceHandler extends AbstractHandler {
         } catch (InterruptedException e) {
             return null;
         } catch (InvocationTargetException e) {
-            MessageDialog.openError(shell, e.toString(), e.getTargetException().toString());
+            TraceUtils.displayErrorMsg(e.toString(), e.getTargetException().toString());
             return null;
         }
 

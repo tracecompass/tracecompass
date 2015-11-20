@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.tmf.ui.views.uml2sd.dialogs;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -27,6 +26,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.SDWidget;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.util.Messages;
 
@@ -159,7 +159,7 @@ public class MinMaxDialog extends Dialog {
 
             super.okPressed();
         } catch (Exception e) {
-            MessageDialog.openError(getShell(), Messages.SequenceDiagram_Error, Messages.SequenceDiagram_InvalidRange);
+            TraceUtils.displayErrorMsg(Messages.SequenceDiagram_Error, Messages.SequenceDiagram_InvalidRange);
         }
     }
 

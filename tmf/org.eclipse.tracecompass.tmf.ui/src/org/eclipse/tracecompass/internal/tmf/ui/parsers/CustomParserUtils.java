@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.project.operations.TmfWorkspaceModifyOperation;
 import org.eclipse.tracecompass.tmf.core.TmfProjectNature;
@@ -28,6 +27,7 @@ import org.eclipse.tracecompass.tmf.ui.editors.TmfTraceColumnManager;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -83,7 +83,7 @@ public class CustomParserUtils {
             PlatformUI.getWorkbench().getProgressService().run(true, true, operation);
         } catch (InterruptedException e) {
         } catch (InvocationTargetException e) {
-            MessageDialog.openError(Display.getDefault().getActiveShell(), e.toString(), e.getTargetException().toString());
+            TraceUtils.displayErrorMsg(e.toString(), e.getTargetException().toString());
         }
     }
 }

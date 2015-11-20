@@ -16,7 +16,6 @@ package org.eclipse.tracecompass.tmf.ui.views.uml2sd.dialogs;
 import java.text.MessageFormat;
 import java.util.Arrays;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
@@ -48,6 +47,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.DiagramToolTip;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.NGC;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.SDWidget;
@@ -1009,22 +1009,22 @@ public class SDPrintDialogUI {
                 fFrom = Integer.valueOf(fFromPage.getText()).intValue();
                 fTo = Integer.valueOf(fToPage.getText()).intValue();
                 if (fFrom > maxNumOfPages() || fTo > maxNumOfPages() || fFrom <= 0 || fTo <= 0) {
-                    MessageDialog.openError(getShell(), Messages.SequenceDiagram_Error, Messages.SequenceDiagram_InvalidRange);
+                    TraceUtils.displayErrorMsg(Messages.SequenceDiagram_Error, Messages.SequenceDiagram_InvalidRange);
                     return false;
                 }
             } else if (fSetHPagesNumber.getSelection() && fNbPages <= 0) {
-                MessageDialog.openError(getShell(), Messages.SequenceDiagram_Error, Messages.SequenceDiagram_InvalidNbHorizontal);
+                TraceUtils.displayErrorMsg(Messages.SequenceDiagram_Error, Messages.SequenceDiagram_InvalidNbHorizontal);
                 return false;
             } else if (fSetVPagesNumber.getSelection() && fNbPages <= 0) {
-                MessageDialog.openError(getShell(), Messages.SequenceDiagram_Error, Messages.SequenceDiagram_InvalidNbVertical);
+                TraceUtils.displayErrorMsg(Messages.SequenceDiagram_Error, Messages.SequenceDiagram_InvalidNbVertical);
                 return false;
             } else if (fPrintSelection && getPageList().length <= 0) {
-                MessageDialog.openError(getShell(), Messages.SequenceDiagram_Error, Messages.SequenceDiagram_NoPageSelected);
+                TraceUtils.displayErrorMsg(Messages.SequenceDiagram_Error, Messages.SequenceDiagram_NoPageSelected);
                 return false;
             }
 
         } catch (Exception e) {
-            MessageDialog.openError(getShell(), Messages.SequenceDiagram_Error, Messages.SequenceDiagram_InvalidRange);
+            TraceUtils.displayErrorMsg(Messages.SequenceDiagram_Error, Messages.SequenceDiagram_InvalidRange);
             fFrom = 0;
             fTo = 0;
             return false;

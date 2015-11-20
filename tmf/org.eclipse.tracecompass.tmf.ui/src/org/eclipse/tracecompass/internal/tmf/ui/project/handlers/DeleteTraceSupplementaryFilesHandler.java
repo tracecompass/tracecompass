@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -43,6 +42,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.project.operations.TmfWorkspaceM
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfCommonProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -183,7 +183,7 @@ public class DeleteTraceSupplementaryFilesHandler extends AbstractHandler {
         } catch (InterruptedException e) {
             return null;
         } catch (InvocationTargetException e) {
-            MessageDialog.openError(window.getShell(), e.toString(), e.getTargetException().toString());
+            TraceUtils.displayErrorMsg(e.toString(), e.getTargetException().toString());
             return null;
         }
         return null;
