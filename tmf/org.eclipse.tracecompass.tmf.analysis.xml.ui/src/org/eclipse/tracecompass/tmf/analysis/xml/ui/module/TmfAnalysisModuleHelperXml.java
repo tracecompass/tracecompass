@@ -112,7 +112,7 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper {
 
     @Override
     public String getHelpText() {
-        return new String();
+        return ""; //$NON-NLS-1$
     }
 
     @Override
