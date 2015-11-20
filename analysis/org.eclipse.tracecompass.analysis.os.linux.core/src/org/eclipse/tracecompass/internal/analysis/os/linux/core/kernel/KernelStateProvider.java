@@ -17,6 +17,7 @@ import java.util.Map;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.IrqEntryHandler;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.IrqExitHandler;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.KernelEventHandler;
@@ -134,12 +135,6 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
     }
 
     @Override
-    public void assignTargetStateSystem(ITmfStateSystemBuilder ssb) {
-        /* We can only set up the locations once the state system is assigned */
-        super.assignTargetStateSystem(ssb);
-    }
-
-    @Override
     public KernelStateProvider getNewInstance() {
         return new KernelStateProvider(this.getTrace(), fLayout);
     }
@@ -160,10 +155,9 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
              */
             KernelEventHandler handler = fEventNames.get(eventName);
             if (handler == null) {
-                if (eventName.startsWith(fLayout.eventSyscallExitPrefix())) {
+                if (isSyscallExit(eventName)) {
                     handler = fSysExitHandler;
-                } else if (eventName.startsWith(fLayout.eventSyscallEntryPrefix())
-                        || eventName.startsWith(fLayout.eventCompatSyscallEntryPrefix())) {
+                } else if (isSyscallEntry(eventName)) {
                     handler = fSysEntryHandler;
                 }
             }
@@ -176,24 +170,32 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
              * This would indicate a problem with the logic of the manager here,
              * so it shouldn't happen.
              */
-            ae.printStackTrace();
+            Activator.getDefault().logError("Attribute not found: " + ae.getMessage(), ae); //$NON-NLS-1$
 
         } catch (TimeRangeException tre) {
             /*
              * This would happen if the events in the trace aren't ordered
              * chronologically, which should never be the case ...
              */
-            System.err.println("TimeRangeExcpetion caught in the state system's event manager."); //$NON-NLS-1$
-            System.err.println("Are the events in the trace correctly ordered?"); //$NON-NLS-1$
-            tre.printStackTrace();
+            Activator.getDefault().logError("TimeRangeExcpetion caught in the state system's event manager.\n" + //$NON-NLS-1$
+                    "Are the events in the trace correctly ordered?\n" + tre.getMessage(), tre); //$NON-NLS-1$
 
         } catch (StateValueTypeException sve) {
             /*
              * This would happen if we were trying to push/pop attributes not of
              * type integer. Which, once again, should never happen.
              */
-            sve.printStackTrace();
+            Activator.getDefault().logError("State value error: " + sve.getMessage(), sve); //$NON-NLS-1$
         }
+    }
+
+    private boolean isSyscallEntry(@Nullable String eventName) {
+        return (eventName != null) && (eventName.startsWith(fLayout.eventSyscallEntryPrefix())
+                || eventName.startsWith(fLayout.eventCompatSyscallEntryPrefix()));
+    }
+
+    private boolean isSyscallExit(@Nullable String eventName) {
+        return (eventName != null) && (eventName.startsWith(fLayout.eventSyscallExitPrefix()));
     }
 
 }
