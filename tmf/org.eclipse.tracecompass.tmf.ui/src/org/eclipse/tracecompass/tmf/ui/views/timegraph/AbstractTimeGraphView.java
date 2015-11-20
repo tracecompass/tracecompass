@@ -763,62 +763,73 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     /**
      * Sets the tree column labels.
+     * <p>
      * This should be called from the constructor.
      *
      * @param columns
      *            The array of tree column labels
      */
     protected void setTreeColumns(final String[] columns) {
+        checkPartNotCreated();
         fColumns = columns;
     }
 
     /**
      * Sets the tree label provider.
+     * <p>
      * This should be called from the constructor.
      *
      * @param tlp
      *            The tree label provider
      */
     protected void setTreeLabelProvider(final TreeLabelProvider tlp) {
+        checkPartNotCreated();
         fLabelProvider = tlp;
     }
 
     /**
-     * Sets the time graph content provider. This should be called from the
-     * constructor.
+     * Sets the time graph content provider.
+     * <p>
+     * This should be called from the constructor.
      *
      * @param tgcp
      *            The time graph content provider
      * @since 1.0
      */
     protected void setTimeGraphContentProvider(final @NonNull ITimeGraphContentProvider tgcp) {
+        checkPartNotCreated();
         fTimeGraphContentProvider = tgcp;
     }
 
     /**
      * Sets the relative weight of each part of the time graph combo.
+     * <p>
      * This should be called from the constructor.
      *
      * @param weights
      *            The array (length 2) of relative weights of each part of the combo
      */
     protected void setWeight(final int[] weights) {
+        checkPartNotCreated();
         fWeight = weights;
     }
 
     /**
      * Sets the filter column labels.
+     * <p>
      * This should be called from the constructor.
      *
      * @param filterColumns
      *            The array of filter column labels
      */
     protected void setFilterColumns(final String[] filterColumns) {
+        checkPartNotCreated();
         fFilterColumns = filterColumns;
     }
 
     /**
      * Sets the filter content provider.
+     * <p>
      * This should be called from the constructor.
      *
      * @param contentProvider
@@ -826,18 +837,27 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @since 2.0
      */
     protected void setFilterContentProvider(final ITreeContentProvider contentProvider) {
+        checkPartNotCreated();
         fFilterContentProvider = contentProvider;
     }
 
     /**
      * Sets the filter label provider.
+     * <p>
      * This should be called from the constructor.
      *
      * @param labelProvider
      *            The filter label provider
      */
     protected void setFilterLabelProvider(final TreeLabelProvider labelProvider) {
+        checkPartNotCreated();
         fFilterLabelProvider = labelProvider;
+    }
+
+    private void checkPartNotCreated() {
+        if (getParentComposite() != null) {
+            throw new IllegalStateException("This method must be called before createPartControl."); //$NON-NLS-1$
+        }
     }
 
     /**
