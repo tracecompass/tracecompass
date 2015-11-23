@@ -50,7 +50,8 @@ public class TmfWindowRangeUpdatedSignal extends TmfSignal {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(getClass().getSimpleName() + " [source="); //$NON-NLS-1$
+        StringBuilder sb = new StringBuilder(getClass().getSimpleName());
+        sb.append(" [source="); //$NON-NLS-1$
 
         if (getSource() != null) {
             sb.append(getSource().toString());
