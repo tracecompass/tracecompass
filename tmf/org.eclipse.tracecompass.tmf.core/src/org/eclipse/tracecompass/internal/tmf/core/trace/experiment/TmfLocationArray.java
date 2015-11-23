@@ -190,14 +190,19 @@ public final class TmfLocationArray implements Comparable<TmfLocationArray> {
     @SuppressWarnings("nls")
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName() + " [");
+        sb.append(getClass().getSimpleName());
+        sb.append(" [");
         for (int i = 0; i < fLocations.length; i++) {
             if (i > 0) {
                 sb.append(", ");
             }
-            sb.append("[location=" + fLocations[i] + ",rank=" + fRanks[i] + "]");
+            sb.append("[location=");
+            sb.append(fLocations[i]);
+            sb.append(",rank=");
+            sb.append(fRanks[i]);
+            sb.append(']');
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 
