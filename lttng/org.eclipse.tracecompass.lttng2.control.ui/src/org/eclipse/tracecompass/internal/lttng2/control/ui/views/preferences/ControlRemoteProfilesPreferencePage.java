@@ -52,7 +52,7 @@ import org.eclipse.ui.dialogs.PatternFilter;
 public class ControlRemoteProfilesPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
     /** Preference page ID */
-    public static String ID = "org.eclipse.tracecompass.internal.lttng2.control.ui.views.preferences.ControlRemoteProfilesPreferencePage"; //$NON-NLS-1$
+    public static final String ID = "org.eclipse.tracecompass.internal.lttng2.control.ui.views.preferences.ControlRemoteProfilesPreferencePage"; //$NON-NLS-1$
 
     private CheckboxTreeViewer fFolderViewer;
 
