@@ -341,9 +341,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         partialProvider.assignTargetStateSystem(pss);
 
         /* 3 */
-        String partialId = new String(id + ".partial"); //$NON-NLS-1$
-        IStateHistoryBackend partialBackend =
-                new PartialHistoryBackend(partialId, partialProvider, pss, realBackend, granularity);
+        IStateHistoryBackend partialBackend = new PartialHistoryBackend(id + ".partial", partialProvider, pss, realBackend, granularity); //$NON-NLS-1$
 
         /* 4 */
         @SuppressWarnings("restriction")
