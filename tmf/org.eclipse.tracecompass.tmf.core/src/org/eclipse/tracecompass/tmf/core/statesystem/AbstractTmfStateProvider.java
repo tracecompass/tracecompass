@@ -17,6 +17,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.collect.BufferedBlockingQueue;
+import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -116,7 +117,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
     public final void processEvent(ITmfEvent event) {
         /* Make sure the target state system has been assigned */
         if (!fStateSystemAssigned) {
-            System.err.println("Cannot process event without a target state system"); //$NON-NLS-1$
+            Activator.logError("Cannot process event without a target state system"); //$NON-NLS-1$
             return;
         }
 
@@ -181,7 +182,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
         @Override
         public void run() {
             if (!fStateSystemAssigned) {
-                System.err.println("Cannot run event manager without assigning a target state system first!"); //$NON-NLS-1$
+                Activator.logError("Cannot run event manager without assigning a target state system first!"); //$NON-NLS-1$
                 return;
             }
 
