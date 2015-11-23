@@ -162,7 +162,7 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
             throw new IllegalStateException();
         }
 
-        return new String(procName + '-' + vtid.toString());
+        return procName + '-' + vtid.toString();
     }
 
     @Override
