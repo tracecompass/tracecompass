@@ -198,10 +198,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
 
     @Override
     public String toString() {
-        StringBuilder b = new StringBuilder();
-        b.append(getClass().getSimpleName() + " "); //$NON-NLS-1$
-        b.append(fSyncs);
-        return b.toString();
+        return getClass().getSimpleName() + ' ' + fSyncs.toString();
     }
 
     /**
