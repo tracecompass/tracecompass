@@ -39,7 +39,7 @@ import com.google.common.collect.ImmutableList;
 public class SystemCallLatencyStatisticsAnalysisModule extends TmfAbstractAnalysisModule {
 
     /** The analysis module ID */
-    public static String ID = "org.eclipse.tracecompass.analysis.os.linux.core.latency.statistics.syscall"; //$NON-NLS-1$
+    public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.core.latency.statistics.syscall"; //$NON-NLS-1$
 
     private @Nullable SystemCallLatencyAnalysis fLatencyModule;
 
