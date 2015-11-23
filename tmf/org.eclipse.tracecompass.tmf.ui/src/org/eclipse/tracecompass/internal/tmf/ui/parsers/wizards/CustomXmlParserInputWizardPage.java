@@ -725,7 +725,8 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 StringBuilder sb = new StringBuilder();
                 String line = null;
                 while ((line = reader.readLine()) != null) {
-                    sb.append(line + "\n"); //$NON-NLS-1$
+                    sb.append(line);
+                    sb.append('\n');
                 }
                 parseXmlInput(sb.toString());
                 return sb.toString();
