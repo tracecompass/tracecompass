@@ -33,7 +33,7 @@ public class UstDebugInfoBinaryFile implements Comparable<UstDebugInfoBinaryFile
     public UstDebugInfoBinaryFile(String filePath, String buildId) {
         fFilePath = filePath;
         fBuildId = buildId;
-        fToString = new String(filePath + " (" + buildId + ')'); //$NON-NLS-1$
+        fToString = filePath + " (" + buildId + ')'; //$NON-NLS-1$
     }
 
     /**
