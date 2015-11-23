@@ -126,8 +126,9 @@ public class TmfFilterTraceTypeNode extends TmfFilterTreeNode {
 
     @Override
     public String toString(boolean explicit) {
-        StringBuffer buf = new StringBuffer();
-        buf.append("TraceType is " + fName); //$NON-NLS-1$
+        StringBuilder buf = new StringBuilder();
+        buf.append("TraceType is "); //$NON-NLS-1$
+        buf.append(fName);
         if (explicit) {
             buf.append('[');
             buf.append(fTraceTypeId);
