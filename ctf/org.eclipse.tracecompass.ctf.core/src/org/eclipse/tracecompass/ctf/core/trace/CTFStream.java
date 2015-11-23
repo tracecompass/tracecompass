@@ -228,7 +228,7 @@ public class CTFStream {
      * @return The event declarations for this stream
      * @since 2.0
      */
-    public @NonNull List<IEventDeclaration> getEventDeclarations() {
+    public @NonNull List<@Nullable IEventDeclaration> getEventDeclarations() {
         return NonNullUtils.checkNotNull(Collections.unmodifiableList(fEvents));
     }
 

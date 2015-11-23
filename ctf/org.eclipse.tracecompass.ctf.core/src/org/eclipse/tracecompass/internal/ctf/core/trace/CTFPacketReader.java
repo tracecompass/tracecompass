@@ -62,7 +62,7 @@ public final class CTFPacketReader implements IPacketReader, IDefinitionScope {
 
     private final BitBuffer fInput;
     private final ICTFPacketDescriptor fPacketContext;
-    private final List<IEventDeclaration> fDeclarations;
+    private final List<@Nullable IEventDeclaration> fDeclarations;
     private boolean fHasLost;
     private long fLastTimestamp;
     private @Nullable final IDeclaration fStreamEventHeaderDecl;
@@ -94,7 +94,7 @@ public final class CTFPacketReader implements IPacketReader, IDefinitionScope {
      * @param packetScope
      *            the scope of the packetHeader
      */
-    public CTFPacketReader(BitBuffer input, ICTFPacketDescriptor packetContext, List<IEventDeclaration> declarations, @Nullable IDeclaration eventHeaderDeclaration, @Nullable StructDeclaration streamContext, ICompositeDefinition packetHeader,
+    public CTFPacketReader(BitBuffer input, ICTFPacketDescriptor packetContext, List<@Nullable IEventDeclaration> declarations, @Nullable IDeclaration eventHeaderDeclaration, @Nullable StructDeclaration streamContext, @Nullable ICompositeDefinition packetHeader,
             IDefinitionScope packetScope) {
         fInput = input;
         fPacketContext = packetContext;

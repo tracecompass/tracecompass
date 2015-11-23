@@ -24,6 +24,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    CTFPacketReaderTest.class,
     CTFTraceReaderTest.class,
     CTFTraceTest.class,
     CTFTraceGrowingTest.class,

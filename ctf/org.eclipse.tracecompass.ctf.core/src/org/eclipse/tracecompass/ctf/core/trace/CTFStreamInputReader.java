@@ -12,8 +12,6 @@
 
 package org.eclipse.tracecompass.ctf.core.trace;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -31,7 +29,6 @@ import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
-import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
 import org.eclipse.tracecompass.internal.ctf.core.Activator;
 import org.eclipse.tracecompass.internal.ctf.core.SafeMappedByteBuffer;
 import org.eclipse.tracecompass.internal.ctf.core.trace.CTFPacketReader;
@@ -143,8 +140,7 @@ public class CTFStreamInputReader implements AutoCloseable {
             bitBuffer.position(packet.getPayloadStartBits());
             IDeclaration eventHeaderDeclaration = getStreamInput().getStream().getEventHeaderDeclaration();
             CTFTrace trace = getStreamInput().getStream().getTrace();
-            StructDefinition packetHeaderDef = checkNotNull(trace.getPacketHeaderDef());
-            ctfPacketReader = new CTFPacketReader(bitBuffer, packet, getEventDeclarations(), eventHeaderDeclaration, getStreamEventContextDecl(), packetHeaderDef, trace);
+            ctfPacketReader = new CTFPacketReader(bitBuffer, packet, getEventDeclarations(), eventHeaderDeclaration, getStreamEventContextDecl(), trace.getPacketHeaderDef(), trace);
         }
         return ctfPacketReader;
     }
@@ -255,7 +251,7 @@ public class CTFStreamInputReader implements AutoCloseable {
      * @return Unmodifiable set with the event definitions
      * @since 2.0
      */
-    public List<IEventDeclaration> getEventDeclarations() {
+    public List<@Nullable IEventDeclaration> getEventDeclarations() {
         return fStreamInput.getStream().getEventDeclarations();
     }
 
