@@ -105,10 +105,10 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
     private static final long DEFAULT_FREQUENCY = 1000000000L;
     private static final int H_SCROLLBAR_MAX = Integer.MAX_VALUE - 1;
 
-    private static ImageDescriptor ADD_BOOKMARK = Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_ADD_BOOKMARK);
-    private static ImageDescriptor NEXT_BOOKMARK = Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_NEXT_BOOKMARK);
-    private static ImageDescriptor PREVIOUS_BOOKMARK = Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_PREVIOUS_BOOKMARK);
-    private static ImageDescriptor REMOVE_BOOKMARK = Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_REMOVE_BOOKMARK);
+    private static final ImageDescriptor ADD_BOOKMARK = Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_ADD_BOOKMARK);
+    private static final ImageDescriptor NEXT_BOOKMARK = Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_NEXT_BOOKMARK);
+    private static final ImageDescriptor PREVIOUS_BOOKMARK = Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_PREVIOUS_BOOKMARK);
+    private static final ImageDescriptor REMOVE_BOOKMARK = Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_REMOVE_BOOKMARK);
 
     private long fMinTimeInterval;
     private ITimeGraphEntry fSelectedEntry;
