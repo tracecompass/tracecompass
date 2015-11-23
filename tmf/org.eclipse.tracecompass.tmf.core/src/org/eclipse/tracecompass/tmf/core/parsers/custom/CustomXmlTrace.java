@@ -458,7 +458,9 @@ public class CustomXmlTrace extends TmfTrace implements ITmfPersistentlyIndexabl
                 if (!element.hasChildNodes()) {
                     buffer.append(element.getNodeName());
                 } else if (element.getChildNodes().getLength() == 1 && element.getFirstChild().getNodeType() == Node.TEXT_NODE) {
-                    buffer.append(element.getNodeName() + ":" + element.getFirstChild().getNodeValue().trim()); //$NON-NLS-1$
+                    buffer.append(element.getNodeName());
+                    buffer.append(':');
+                    buffer.append(element.getFirstChild().getNodeValue().trim());
                 } else {
                     buffer.append(element.getNodeName());
                     buffer.append(" [ "); //$NON-NLS-1$
