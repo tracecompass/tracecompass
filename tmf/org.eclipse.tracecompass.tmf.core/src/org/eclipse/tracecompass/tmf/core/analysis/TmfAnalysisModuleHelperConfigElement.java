@@ -93,7 +93,7 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
          * FIXME: No need to externalize this. A better solution will be found
          * soon and this string is just temporary
          */
-        return new String("The trace must be opened to get the help message"); //$NON-NLS-1$
+        return "The trace must be opened to get the help message"; //$NON-NLS-1$
     }
 
     @Override
