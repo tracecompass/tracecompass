@@ -33,6 +33,7 @@ import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
 import org.eclipse.tracecompass.ctf.core.trace.CTFIOException;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStream;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInputReader;
+import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.ICTFPacketDescriptor;
 import org.eclipse.tracecompass.internal.ctf.core.event.types.composite.EventHeaderDefinition;
 
@@ -64,7 +65,7 @@ public class EventDeclaration implements IEventDeclaration {
     /**
      * Stream to which belongs this event.
      */
-    private CTFStream fStream = null;
+    private @Nullable CTFStream fStream = null;
 
     /**
      * Loglevel of an event
@@ -109,9 +110,11 @@ public class EventDeclaration implements IEventDeclaration {
      */
     public EventDefinition createDefinition(StructDeclaration streamEventContextDecl, ICTFPacketDescriptor packetDescriptor, ICompositeDefinition packetContext, ICompositeDefinition eventHeaderDef, @NonNull BitBuffer input, long prevTimestamp)
             throws CTFException {
-        StructDefinition streamEventContext = streamEventContextDecl != null ? streamEventContextDecl.createDefinition(fStream.getTrace(), ILexicalScope.STREAM_EVENT_CONTEXT, input) : null;
-        StructDefinition eventContext = fContext != null ? fContext.createFieldDefinition(eventHeaderDef, fStream.getTrace(), ILexicalScope.CONTEXT, input) : null;
-        StructDefinition eventPayload = fFields != null ? fFields.createFieldDefinition(eventHeaderDef, fStream.getTrace(), ILexicalScope.FIELDS, input) : null;
+        final CTFStream stream = fStream;
+        final CTFTrace trace = stream == null ? null : stream.getTrace();
+        StructDefinition streamEventContext = streamEventContextDecl != null ? streamEventContextDecl.createDefinition(trace, ILexicalScope.STREAM_EVENT_CONTEXT, input) : null;
+        StructDefinition eventContext = fContext != null ? fContext.createFieldDefinition(eventHeaderDef, trace, ILexicalScope.CONTEXT, input) : null;
+        StructDefinition eventPayload = fFields != null ? fFields.createFieldDefinition(eventHeaderDef, trace, ILexicalScope.FIELDS, input) : null;
         long timestamp = calculateTimestamp(eventHeaderDef, prevTimestamp, eventPayload, eventContext);
 
         int cpu = (int) packetDescriptor.getTargetId();
@@ -155,10 +158,12 @@ public class EventDeclaration implements IEventDeclaration {
     @Override
     public EventDefinition createDefinition(CTFStreamInputReader streamInputReader, @NonNull BitBuffer input, long timestamp) throws CTFException {
         StructDeclaration streamEventContextDecl = streamInputReader.getStreamEventContextDecl();
-        StructDefinition streamEventContext = streamEventContextDecl != null ? streamEventContextDecl.createDefinition(fStream.getTrace(), ILexicalScope.STREAM_EVENT_CONTEXT, input) : null;
+        final @Nullable CTFStream stream = fStream;
+        final CTFTrace trace = stream == null ? null : stream.getTrace();
+        StructDefinition streamEventContext = streamEventContextDecl != null ? streamEventContextDecl.createDefinition(trace, ILexicalScope.STREAM_EVENT_CONTEXT, input) : null;
         ICompositeDefinition packetContext = streamInputReader.getCurrentPacketReader().getCurrentPacketEventHeader();
-        StructDefinition eventContext = fContext != null ? fContext.createDefinition(fStream.getTrace(), ILexicalScope.CONTEXT, input) : null;
-        StructDefinition eventPayload = fFields != null ? fFields.createDefinition(fStream.getTrace(), ILexicalScope.FIELDS, input) : null;
+        StructDefinition eventContext = fContext != null ? fContext.createDefinition(trace, ILexicalScope.CONTEXT, input) : null;
+        StructDefinition eventPayload = fFields != null ? fFields.createDefinition(trace, ILexicalScope.FIELDS, input) : null;
 
         // a bit lttng specific
         // CTF doesn't require a timestamp,
@@ -443,7 +448,8 @@ public class EventDeclaration implements IEventDeclaration {
         result = (prime * result) + ((fFields == null) ? 0 : fFields.hashCode());
         result = (prime * result) + fId;
         result = (prime * result) + ((fName == null) ? 0 : fName.hashCode());
-        result = (prime * result) + ((fStream == null) ? 0 : fStream.hashCode());
+        final CTFStream stream = fStream;
+        result = (prime * result) + ((stream == null) ? 0 : stream.hashCode());
         result = (prime * result) + fCustomAttributes.hashCode();
         return result;
     }
