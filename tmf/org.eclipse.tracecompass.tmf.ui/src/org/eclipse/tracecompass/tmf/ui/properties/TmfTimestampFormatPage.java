@@ -247,7 +247,7 @@ public class TmfTimestampFormatPage extends PreferencePage implements IWorkbench
                 timeZoneIntervals[i][0] = tz.getDisplayName();
                 timeZoneIntervals[i][1] = tz.getID();
             } catch (NullPointerException e) {
-                System.out.println("TimeZone " + timeZones[i] + " does not exist."); //$NON-NLS-1$ //$NON-NLS-2$
+                Activator.getDefault().logError("TimeZone " + timeZones[i] + " does not exist.", e); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
 
