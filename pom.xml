@@ -49,6 +49,21 @@
   <sonar.java.source>1.8</sonar.java.source>
   <sonar.exclusions>**/tests/**,**/test/**,**/stubs/**,**/Messages*,**/alltests/**</sonar.exclusions>
   <sonar.skippedModules>org.eclipse.tracecompass.ctf.parser,org.eclipse.tracecompass.examples</sonar.skippedModules>
+  <!-- Sonar rule exclusions -->
+  <sonar.issue.ignore.multicriteria>e1,e2,e3,e4,e5,e6</sonar.issue.ignore.multicriteria>
+  <sonar.issue.ignore.multicriteria.e1.ruleKey>findbugs:NP_STORE_INTO_NONNULL_FIELD</sonar.issue.ignore.multicriteria.e1.ruleKey>
+  <sonar.issue.ignore.multicriteria.e1.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e1.resourceKey>
+  <sonar.issue.ignore.multicriteria.e2.ruleKey>findbugs:RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE</sonar.issue.ignore.multicriteria.e2.ruleKey>
+  <sonar.issue.ignore.multicriteria.e2.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e2.resourceKey>
+  <sonar.issue.ignore.multicriteria.e3.ruleKey>findbugs:NP_NONNULL_PARAM_VIOLATION</sonar.issue.ignore.multicriteria.e3.ruleKey>
+  <sonar.issue.ignore.multicriteria.e3.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e3.resourceKey>
+  <sonar.issue.ignore.multicriteria.e4.ruleKey>findbugs:NP_NULL_PARAM_DEREF_NONVIRTUAL</sonar.issue.ignore.multicriteria.e4.ruleKey>
+  <sonar.issue.ignore.multicriteria.e4.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e4.resourceKey>
+  <sonar.issue.ignore.multicriteria.e5.ruleKey>findbugs:NP_NONNULL_RETURN_VIOLATION</sonar.issue.ignore.multicriteria.e5.ruleKey>
+  <sonar.issue.ignore.multicriteria.e5.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e5.resourceKey>
+  <sonar.issue.ignore.multicriteria.e6.ruleKey>findbugs:NP_NONNULL_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR</sonar.issue.ignore.multicriteria.e6.ruleKey>
+  <sonar.issue.ignore.multicriteria.e6.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e6.resourceKey>
+
   <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   <help-docs-eclipserun-repo>http://download.eclipse.org/eclipse/updates/4.5</help-docs-eclipserun-repo>
   <!-- Disable GTK3 because it's not quite usable yet and it can make the tests hang (bug in IcedTea http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=1736) -->
