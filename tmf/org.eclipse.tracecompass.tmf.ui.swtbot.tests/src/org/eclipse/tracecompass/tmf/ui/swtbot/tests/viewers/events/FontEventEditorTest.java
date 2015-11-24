@@ -70,7 +70,7 @@ public class FontEventEditorTest {
      */
     @BeforeClass
     public static void init() {
-        SWTBotUtils.failIfUIThread();
+        SWTBotUtils.initialize();
 
         /* set up test trace */
         URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(COLUMN_TRACE_PATH), null);

@@ -57,7 +57,7 @@ public abstract class AbstractPerspectiveChecker {
     /** Test Class setup */
     @BeforeClass
     public static void beforeInit() {
-        SWTBotUtils.failIfUIThread();
+        SWTBotUtils.initialize();
 
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 50000; /* 50 second timeout */

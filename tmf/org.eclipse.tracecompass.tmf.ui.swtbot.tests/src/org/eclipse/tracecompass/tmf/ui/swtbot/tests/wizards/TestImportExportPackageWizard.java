@@ -94,7 +94,7 @@ public class TestImportExportPackageWizard {
     @BeforeClass
     public static void init() {
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
-        SWTBotUtils.failIfUIThread();
+        SWTBotUtils.initialize();
         Thread.currentThread().setName(SWT_BOT_THREAD_NAME); // for the debugger
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */

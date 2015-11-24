@@ -83,7 +83,7 @@ public class StandardImportGzipTraceTest {
      */
     @BeforeClass
     public static void init() {
-        SWTBotUtils.failIfUIThread();
+        SWTBotUtils.initialize();
         zipTrace();
         fLogger.removeAllAppenders();
         fLogger.addAppender(new NullAppender());
