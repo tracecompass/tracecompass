@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.common.core;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -165,10 +166,30 @@ public final class NonNullUtils {
      *             If the stream itself or any of its values are null
      * @since 2.0
      */
-    public static <T> Stream<@NonNull T> checkNotNullContents(@Nullable Stream<@Nullable T> stream) {
+    public static <T> Stream<@NonNull T> checkNotNullContents(@Nullable Stream<T> stream) {
         if (stream == null) {
             throw new NullPointerException();
         }
         return checkNotNull(stream.map(t -> checkNotNull(t)));
+    }
+
+    /**
+     * Ensures an array does not contain any null elements.
+     *
+     * @param array
+     *            The array to check
+     * @return The same array, now with guaranteed @NonNull elements
+     * @throws NullPointerException
+     *             If the array reference or any contained element was null
+     * @since 2.0
+     */
+    public static <T> @NonNull T[] checkNotNullContents(T @Nullable [] array) {
+        if (array == null) {
+            throw new NullPointerException();
+        }
+        Arrays.stream(array).forEach(elem -> checkNotNull(elem));
+        @SuppressWarnings("null")
+        @NonNull T[] ret = (@NonNull T[]) array;
+        return ret;
     }
 }
