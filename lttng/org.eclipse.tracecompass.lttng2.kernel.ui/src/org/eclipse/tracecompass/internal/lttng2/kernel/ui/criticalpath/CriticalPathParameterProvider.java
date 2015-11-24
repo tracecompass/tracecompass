@@ -28,6 +28,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -174,9 +175,21 @@ public class CriticalPathParameterProvider extends TmfAbstractAnalysisParamProvi
     }
 
     private void registerListener() {
-        final IWorkbench wb = PlatformUI.getWorkbench();
-
-        final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
+        if (!PlatformUI.isWorkbenchRunning()) {
+            return;
+        }
+        IWorkbench wb = PlatformUI.getWorkbench();
+        if (wb == null) {
+            return;
+        }
+        IWorkbenchWindow wbw = wb.getActiveWorkbenchWindow();
+        if (wbw == null) {
+            return;
+        }
+        final IWorkbenchPage activePage = wbw.getActivePage();
+        if (activePage == null) {
+            return;
+        }
 
         /* Activate the update if critical path view visible */
         IViewPart view = activePage.findView(CriticalPathView.ID);
