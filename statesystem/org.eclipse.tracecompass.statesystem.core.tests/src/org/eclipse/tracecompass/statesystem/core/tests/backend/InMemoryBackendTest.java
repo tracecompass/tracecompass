@@ -17,6 +17,7 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -96,7 +97,7 @@ public class InMemoryBackendTest {
      */
     @Test
     public void testDoQuery() {
-        List<ITmfStateInterval> interval = new ArrayList<>(NUMBER_OF_ATTRIBUTES);
+        List<@Nullable ITmfStateInterval> interval = new ArrayList<>(NUMBER_OF_ATTRIBUTES);
         for (int i = 0; i < NUMBER_OF_ATTRIBUTES; i++) {
             interval.add(null);
         }
@@ -142,7 +143,7 @@ public class InMemoryBackendTest {
             testInterval(interval[8], 908, 998, 9);
             testInterval(interval[9], 909, 999, 9);
 
-            List<ITmfStateInterval> intervalQuery = new ArrayList<>(NUMBER_OF_ATTRIBUTES);
+            List<@Nullable ITmfStateInterval> intervalQuery = new ArrayList<>(NUMBER_OF_ATTRIBUTES);
             for (int i = 0; i < NUMBER_OF_ATTRIBUTES; i++) {
                 intervalQuery.add(null);
             }

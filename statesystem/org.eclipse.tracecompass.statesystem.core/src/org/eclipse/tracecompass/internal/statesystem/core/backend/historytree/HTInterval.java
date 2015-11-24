@@ -18,6 +18,7 @@ package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -62,7 +63,7 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
     private final long start;
     private final long end;
     private final int attribute;
-    private final TmfStateValue sv;
+    private final @NonNull TmfStateValue sv;
 
     /*
      * Size of the strings section entry used by this interval (= 0 if not used)
@@ -85,7 +86,7 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
      *             If the start time or end time are invalid
      */
     public HTInterval(long intervalStart, long intervalEnd, int attribute,
-            TmfStateValue value) throws TimeRangeException {
+            @NonNull TmfStateValue value) throws TimeRangeException {
         if (intervalStart > intervalEnd) {
             throw new TimeRangeException("Start:" + intervalStart + ", End:" + intervalEnd); //$NON-NLS-1$ //$NON-NLS-2$
         }
@@ -104,7 +105,7 @@ public final class HTInterval implements ITmfStateInterval, Comparable<HTInterva
      * {@link #computeStringsEntrySize()} and do an extra copy.
      */
     private HTInterval(long intervalStart, long intervalEnd, int attribute,
-            TmfStateValue value, int size) throws TimeRangeException {
+            @NonNull TmfStateValue value, int size) throws TimeRangeException {
         if (intervalStart > intervalEnd) {
             throw new TimeRangeException("Start:" + intervalStart + ", End:" + intervalEnd); //$NON-NLS-1$ //$NON-NLS-2$
         }

@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.Messages;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfStatisticsTree;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfStatisticsTreeNode;
@@ -48,8 +49,8 @@ public class TmfBaseStatisticsDataTest {
 
     private static final String fTestName = "StatisticsDataTest";
 
-    private final String fTypeId1 = "Some type1";
-    private final String fTypeId2 = "Some type2";
+    private final @NonNull String fTypeId1 = "Some type1";
+    private final @NonNull String fTypeId2 = "Some type2";
 
     private final String   fLabel0 = "label1";
     private final String   fLabel1 = "label2";

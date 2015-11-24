@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.common.core.collect;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -47,8 +49,9 @@ public class StreamFlattener<T> {
      *         recursively.
      */
     public Stream<T> flatten(T element) {
-        return Stream.concat(
+        Stream<T> ret = Stream.concat(
                 Stream.of(element),
                 fGetChildrenFunction.apply(element).flatMap(this::flatten));
+        return checkNotNull(ret);
     }
 }

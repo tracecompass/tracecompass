@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
 import org.eclipse.tracecompass.tmf.core.event.matching.ITmfEventMatching;
@@ -45,7 +46,8 @@ public abstract class SynchronizationManager extends TmfComponent {
      *            file
      * @return The synchronization object
      */
-    public static SynchronizationAlgorithm synchronizeTraces(final File syncFile, final Collection<ITmfTrace> traces, boolean doSync) {
+    public static SynchronizationAlgorithm synchronizeTraces(final File syncFile,
+            final Collection<@NonNull ITmfTrace> traces, boolean doSync) {
 
         SynchronizationAlgorithm syncAlgo;
         if (doSync) {
@@ -78,7 +80,8 @@ public abstract class SynchronizationManager extends TmfComponent {
      *            file
      * @return The synchronization object
      */
-    public static SynchronizationAlgorithm synchronizeTraces(final File syncFile, final Collection<ITmfTrace> traces, SynchronizationAlgorithm algo, boolean doSync) {
+    public static SynchronizationAlgorithm synchronizeTraces(final File syncFile,
+            final Collection<@NonNull ITmfTrace> traces, SynchronizationAlgorithm algo, boolean doSync) {
 
         SynchronizationAlgorithm syncAlgo;
         if (doSync) {
@@ -116,7 +119,8 @@ public abstract class SynchronizationManager extends TmfComponent {
         return null;
     }
 
-    private static SynchronizationAlgorithm synchronize(final File syncFile, final Collection<ITmfTrace> traces, SynchronizationAlgorithm syncAlgo) {
+    private static SynchronizationAlgorithm synchronize(final File syncFile,
+            final Collection<@NonNull ITmfTrace> traces, SynchronizationAlgorithm syncAlgo) {
         ITmfEventMatching matching = new TmfEventMatching(traces, syncAlgo);
         matching.matchEvents();
 

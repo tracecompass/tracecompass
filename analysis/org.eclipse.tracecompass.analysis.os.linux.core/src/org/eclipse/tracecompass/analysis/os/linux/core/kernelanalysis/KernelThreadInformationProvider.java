@@ -92,7 +92,7 @@ public final class KernelThreadInformationProvider {
     public static Collection<Integer> getThreadIds(KernelAnalysisModule module) {
         ITmfStateSystem ss = module.getStateSystem();
         if (ss == null) {
-            return NonNullUtils.checkNotNull(Collections.EMPTY_SET);
+            return Collections.EMPTY_SET;
         }
         int threadQuark;
         try {
@@ -104,7 +104,7 @@ public final class KernelThreadInformationProvider {
             return tids;
         } catch (AttributeNotFoundException e) {
         }
-        return NonNullUtils.checkNotNull(Collections.EMPTY_SET);
+        return Collections.EMPTY_SET;
     }
 
     /**
@@ -245,7 +245,7 @@ public final class KernelThreadInformationProvider {
     public static List<ITmfStateInterval> getStatusIntervalsForThread(KernelAnalysisModule module, Integer threadId, long start, long end, long resolution, IProgressMonitor monitor) {
         ITmfStateSystem ss = module.getStateSystem();
         if (ss == null) {
-            return NonNullUtils.checkNotNull(Collections.EMPTY_LIST);
+            return Collections.EMPTY_LIST;
         }
 
         try {
@@ -255,7 +255,7 @@ public final class KernelThreadInformationProvider {
             return statusIntervals;
         } catch (AttributeNotFoundException | StateSystemDisposedException | TimeRangeException e) {
         }
-        return NonNullUtils.checkNotNull(Collections.EMPTY_LIST);
+        return Collections.EMPTY_LIST;
     }
 
 }

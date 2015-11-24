@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.core.parsers.custom;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;
@@ -30,7 +32,7 @@ public abstract class CustomEventType extends TmfEventType {
      *            Trace definition
      */
     public CustomEventType(CustomTraceDefinition definition) {
-        super(definition.definitionName, getRootField(definition));
+        super(checkNotNull(definition.definitionName), getRootField(definition));
     }
 
     private static ITmfEventField getRootField(CustomTraceDefinition definition) {

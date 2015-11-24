@@ -22,6 +22,7 @@ import java.util.List;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -102,7 +103,7 @@ public class ColorsViewTest {
         }
 
         @Override
-        public ITmfFilterTreeNode[] getChildren() {
+        public @NonNull ITmfFilterTreeNode[] getChildren() {
             return null;
         }
 

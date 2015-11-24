@@ -11,8 +11,11 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.preferences;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.io.File;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.logging.ControlCommandLogger;
 
@@ -144,8 +147,8 @@ public class ControlPreferences {
     /**
      * @return value of tracing group preference
      */
-    public String getTracingGroup() {
-        return fPreferenceStore.getString(TRACE_CONTROL_TRACING_GROUP_PREF);
+    public @NonNull String getTracingGroup() {
+        return checkNotNull(fPreferenceStore.getString(TRACE_CONTROL_TRACING_GROUP_PREF));
     }
 
     /**

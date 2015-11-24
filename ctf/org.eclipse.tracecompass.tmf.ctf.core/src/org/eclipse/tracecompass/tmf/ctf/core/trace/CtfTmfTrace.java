@@ -213,7 +213,7 @@ public class CtfTmfTrace extends TmfTrace
                                     null,
                                     content.toArray(new ITmfEventField[content.size()]));
 
-                            ctfTmfEventType = new CtfTmfEventType(ied.getName(), contentTree);
+                            ctfTmfEventType = new CtfTmfEventType(checkNotNull(ied.getName()), contentTree);
                             fContainedEventTypes.put(ctfTmfEventType.getName(), ctfTmfEventType);
                         }
                     }

@@ -15,6 +15,8 @@
 
 package org.eclipse.tracecompass.tmf.core.component;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -529,11 +531,11 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
 
     @Override
     public <T extends ITmfEventProvider> List<T> getChildren(Class<T> clazz) {
-       List<T> list = new ArrayList<>();
+       List<@NonNull T> list = new ArrayList<>();
        synchronized (fChildren) {
            for (TmfEventProvider child : fChildren) {
                if (clazz.isAssignableFrom(child.getClass())) {
-                   list.add(clazz.cast(child));
+                   list.add(checkNotNull(clazz.cast(child)));
                }
            }
        }

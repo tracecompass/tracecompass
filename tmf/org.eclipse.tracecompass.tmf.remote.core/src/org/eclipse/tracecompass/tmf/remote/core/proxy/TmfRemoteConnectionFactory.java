@@ -53,7 +53,10 @@ public class TmfRemoteConnectionFactory {
         // Add local services
         IRemoteServicesManager manager = getService(IRemoteServicesManager.class);
         if (manager != null) {
-            CONNECTION_FACTORIES.put(manager.getLocalConnectionType().getId(), new LocalConnectionFactory());
+            IRemoteConnectionType type = manager.getLocalConnectionType();
+            if (type != null) {
+                CONNECTION_FACTORIES.put(checkNotNull(type.getId()), new LocalConnectionFactory());
+            }
         }
     }
 

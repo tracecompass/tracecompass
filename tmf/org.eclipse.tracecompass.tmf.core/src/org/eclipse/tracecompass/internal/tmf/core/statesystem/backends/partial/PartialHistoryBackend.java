@@ -12,6 +12,9 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.statesystem.backends.partial;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNullContents;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.PrintWriter;
@@ -19,8 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -204,7 +209,7 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
     }
 
     @Override
-    public void doQuery(List<ITmfStateInterval> currentStateInfo, long t)
+    public void doQuery(List<@Nullable ITmfStateInterval> currentStateInfo, long t)
             throws TimeRangeException, StateSystemDisposedException {
         /* Wait for required steps to be done */
         waitForCheckpoints();
@@ -222,8 +227,11 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
          * Set the initial contents of the partial state system (which is the
          * contents of the query at the checkpoint).
          */
+        List<@NonNull ITmfStateInterval> filledStateInfo =
+                checkNotNullContents(currentStateInfo.stream()).collect(Collectors.toList());
+
         fPartialSS.takeQueryLock();
-        fPartialSS.replaceOngoingState(currentStateInfo);
+        fPartialSS.replaceOngoingState(filledStateInfo);
 
         /* Send an event request to update the state system to the target time. */
         TmfTimeRange range = new TmfTimeRange(
@@ -251,11 +259,10 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
         try {
             for (int i = 0; i < currentStateInfo.size(); i++) {
                 long start = 0;
-                ITmfStateValue val = null;
                 start = ((ITmfStateSystem) fPartialSS).getOngoingStartTime(i);
-                val = ((ITmfStateSystem) fPartialSS).queryOngoingState(i);
+                ITmfStateValue val = ((ITmfStateSystem) fPartialSS).queryOngoingState(i);
 
-                ITmfStateInterval interval = new TmfStateInterval(start, t, i, val);
+                ITmfStateInterval interval = new TmfStateInterval(start, t, i, checkNotNull(val));
                 currentStateInfo.set(i, interval);
             }
         } catch (AttributeNotFoundException e) {

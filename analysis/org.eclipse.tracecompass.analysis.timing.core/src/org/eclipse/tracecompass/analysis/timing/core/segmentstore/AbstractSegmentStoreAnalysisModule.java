@@ -81,7 +81,9 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
     protected Iterable<IAnalysisProgressListener> getListeners() {
         List<IAnalysisProgressListener> listeners = new ArrayList<>();
         for (Object listener : fListeners.getListeners()) {
-            listeners.add((IAnalysisProgressListener) listener);
+            if (listener != null) {
+                listeners.add((IAnalysisProgressListener) listener);
+            }
         }
         return listeners;
     }

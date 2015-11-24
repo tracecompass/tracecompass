@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfLostEvent;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
@@ -104,12 +105,11 @@ public class TmfEventsStatistics implements ITmfStatistics {
     }
 
     @Override
-    public Map<String, Long> getEventTypesTotal() {
+    public Map<@NonNull String, @NonNull Long> getEventTypesTotal() {
         StatsPerTypeRequest request = new StatsPerTypeRequest(trace, TmfTimeRange.ETERNITY);
         sendAndWait(request);
 
-        Map<String, Long> stats =  request.getResults();
-        return stats;
+        return request.getResults();
     }
 
     @Override
@@ -182,7 +182,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
     private class StatsPerTypeRequest extends TmfEventRequest {
 
         /* Map in which the results are saved */
-        private final Map<String, Long> stats;
+        private final Map<@NonNull String, @NonNull Long> stats;
 
         public StatsPerTypeRequest(ITmfTrace trace, TmfTimeRange range) {
             super(trace.getEventType(), range, 0, ITmfEventRequest.ALL_DATA,
@@ -190,7 +190,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
             this.stats = new HashMap<>();
         }
 
-        public Map<String, Long> getResults() {
+        public Map<@NonNull String, @NonNull Long> getResults() {
             return stats;
         }
 
@@ -214,7 +214,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
             }
         }
 
-        private void incrementStats(String key, long count) {
+        private void incrementStats(@NonNull String key, long count) {
             if (stats.containsKey(key)) {
                 long curValue = checkNotNull(stats.get(key));
                 stats.put(key, curValue + count);

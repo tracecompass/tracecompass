@@ -30,6 +30,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.interval.TmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 
 /**
  * State history back-end that stores its intervals in RAM only. It cannot be
@@ -231,7 +232,7 @@ public class InMemoryBackend implements IStateHistoryBackend {
     }
 
     private static Iterator<ITmfStateInterval> serachforEndTime(TreeSet<ITmfStateInterval> tree, long time) {
-        ITmfStateInterval dummyInterval = new TmfStateInterval(-1, time, -1, null);
+        ITmfStateInterval dummyInterval = new TmfStateInterval(-1, time, -1, TmfStateValue.nullValue());
         ITmfStateInterval myInterval = tree.lower(dummyInterval);
         if (myInterval == null) {
             return tree.iterator();

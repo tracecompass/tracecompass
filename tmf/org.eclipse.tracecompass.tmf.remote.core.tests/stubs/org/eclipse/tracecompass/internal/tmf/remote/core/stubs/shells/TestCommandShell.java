@@ -14,7 +14,9 @@ package org.eclipse.tracecompass.internal.tmf.remote.core.stubs.shells;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.remote.core.shell.CommandInput;
 import org.eclipse.tracecompass.internal.tmf.remote.core.shell.CommandResult;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandInput;
@@ -25,6 +27,7 @@ import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandShell;
 /**
  * Command shell stub
  */
+@NonNullByDefault
 public class TestCommandShell implements ICommandShell {
 
     /** If the shell is connected */
@@ -36,16 +39,17 @@ public class TestCommandShell implements ICommandShell {
     }
 
     @Override
-    public ICommandResult executeCommand(ICommandInput command, IProgressMonitor monitor) throws ExecutionException {
+    public ICommandResult executeCommand(ICommandInput command, @Nullable IProgressMonitor monitor) throws ExecutionException {
         return executeCommand(command, monitor, null);
     }
 
     @Override
-    public ICommandResult executeCommand(ICommandInput command, IProgressMonitor monitor, ICommandOutputListener listener) throws ExecutionException {
+    public ICommandResult executeCommand(ICommandInput command, @Nullable IProgressMonitor monitor,
+            @Nullable ICommandOutputListener listener) throws ExecutionException {
         if (fIsConnected) {
-            return createCommandResult(0, new String[0], new String[0]);
+            return createCommandResult(0, new @NonNull String[0], new @NonNull String[0]);
         }
-        return createCommandResult(1, new String[0], new String[0]);
+        return createCommandResult(1, new @NonNull String[0], new @NonNull String[0]);
     }
 
     @Override
@@ -64,8 +68,7 @@ public class TestCommandShell implements ICommandShell {
      *            THe error output as an array of strings
      * @return {@link ICommandResult} instance
      */
-    @NonNullByDefault
-    protected ICommandResult createCommandResult(int result, String[] output, String[] errorOutput) {
+    protected ICommandResult createCommandResult(int result, @NonNull String[] output, @NonNull String[] errorOutput) {
         return new CommandResult(result, output, errorOutput);
     }
 }

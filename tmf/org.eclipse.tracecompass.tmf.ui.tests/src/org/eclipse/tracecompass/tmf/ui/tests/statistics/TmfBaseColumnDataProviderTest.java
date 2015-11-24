@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.Messages;
@@ -57,8 +58,8 @@ public class TmfBaseColumnDataProviderTest {
 
     private static final String fTestName = "ColumnDataProviderTest";
 
-    private final String fTypeId1 = "Some type1";
-    private final String fTypeId2 = "Some type2";
+    private final @NonNull String fTypeId1 = "Some type1";
+    private final @NonNull String fTypeId2 = "Some type2";
 
     private final String fLabel0 = "label1";
     private final String fLabel1 = "label2";

@@ -115,14 +115,15 @@ public class CommandShell implements ICommandShell {
                             }
                         } catch (OperationCanceledException e) {
                         } catch (InterruptedException e) {
-                            return new CommandResult(1, new String[0], new String[] {e.getMessage()});
+                            return new CommandResult(1, new @NonNull String[0],
+                                    new @NonNull String[] { checkNotNull(e.getMessage()) });
                         } finally {
                             stdout.stop();
                             stderr.stop();
                             process.destroy();
                         }
                     }
-                    return new CommandResult(1, new String[0], new String[] {"cancelled"}); //$NON-NLS-1$
+                    return new CommandResult(1, new @NonNull String[0], new @NonNull String[] { "cancelled" }); //$NON-NLS-1$
                 }
             });
 
@@ -154,12 +155,12 @@ public class CommandShell implements ICommandShell {
         result = origResult;
         stdout = origStdout;
         stderr = origStderr;
-        String[] output = splitLines(stdout);
-        String[] error = splitLines(stderr);
+        @NonNull String[] output = splitLines(stdout);
+        @NonNull String[] error = splitLines(stderr);
         return new CommandResult(result, output, error);
     }
 
-    private static String @NonNull [] splitLines(String output) {
-        return checkNotNull(output.split("\\r?\\n")); //$NON-NLS-1$
+    private static @NonNull String @NonNull [] splitLines(String output) {
+        return output.split("\\r?\\n"); //$NON-NLS-1$
     }
 }

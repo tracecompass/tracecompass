@@ -413,7 +413,7 @@ public class CtfTmfTraceTest {
      */
     @Test
     public void testEventLookup() {
-        Set<? extends ITmfEventType> eventTypes = fixture.getContainedEventTypes();
+        Set<@NonNull ? extends ITmfEventType> eventTypes = fixture.getContainedEventTypes();
         Set<String> eventNames = TmfEventTypeCollectionHelper.getEventNames(eventTypes);
         assertTrue(eventNames.contains("sched_switch"));
         assertFalse(eventNames.contains("Sched_switch"));

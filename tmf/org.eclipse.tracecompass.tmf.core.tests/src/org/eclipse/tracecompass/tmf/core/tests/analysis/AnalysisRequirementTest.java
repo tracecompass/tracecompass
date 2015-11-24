@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisRequirement.ValuePriorityLevel;
 
@@ -52,9 +53,9 @@ public class AnalysisRequirementTest {
     private static final String VALUE_F = "Test Value F";
 
     /* Requirement information strings */
-    private static final String INFO_A = "This is an information.";
-    private static final String INFO_B = "This is another information.";
-    private static final String INFO_C = "This is the last information.";
+    private static final @NonNull String INFO_A = "This is an information.";
+    private static final @NonNull String INFO_B = "This is another information.";
+    private static final @NonNull String INFO_C = "This is the last information.";
 
     /**
      * Test suite for the {@link TmfAnalysisRequirement#addInformation} and the

@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.core.filter.model;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
 
 
@@ -56,7 +57,7 @@ public interface ITmfFilterTreeNode extends ITmfFilter {
      *
      * @return The array (possibly empty) of children nodes.
      */
-    public ITmfFilterTreeNode[] getChildren();
+    public @NonNull ITmfFilterTreeNode[] getChildren();
 
     /**
      * <h4>Get the node by index</h4>

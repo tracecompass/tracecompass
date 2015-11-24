@@ -12,7 +12,6 @@
 
 package org.eclipse.tracecompass.internal.tmf.pcap.core.event;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.pcap.core.packet.Packet;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
@@ -41,7 +40,7 @@ public class PcapEventField extends TmfEventField {
      * @throws IllegalArgumentException
      *             If 'name' is null, or if 'fields' has duplicate field names.
      */
-    public PcapEventField(String name, Object value, @Nullable ITmfEventField[] fields, Packet packet) {
+    public PcapEventField(String name, Object value, ITmfEventField[] fields, Packet packet) {
         super(name, value, fields);
         fSummaryString = packet.getLocalSummaryString();
     }

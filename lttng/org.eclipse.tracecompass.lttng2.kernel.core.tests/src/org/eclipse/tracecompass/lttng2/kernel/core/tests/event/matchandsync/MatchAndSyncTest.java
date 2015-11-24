@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpEventMatching;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching.TcpLttngEventMatching;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
@@ -47,7 +48,7 @@ public class MatchAndSyncTest {
         CtfTmfTrace trace1 = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.SYNC_SRC);
         CtfTmfTrace trace2 = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.SYNC_DEST);
 
-        List<ITmfTrace> tracearr = new LinkedList<>();
+        List<@NonNull ITmfTrace> tracearr = new LinkedList<>();
         tracearr.add(trace1);
         tracearr.add(trace2);
 

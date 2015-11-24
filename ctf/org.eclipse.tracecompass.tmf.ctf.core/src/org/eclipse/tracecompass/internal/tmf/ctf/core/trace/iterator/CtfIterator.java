@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.equalsNullable;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInputReader;
@@ -43,7 +44,7 @@ public class CtfIterator extends CTFTraceReader
     /** An invalid location */
     public static final CtfLocation NULL_LOCATION = new CtfLocation(CtfLocation.INVALID_LOCATION);
 
-    private final CtfTmfTrace fTrace;
+    private final @NonNull CtfTmfTrace fTrace;
 
     private CtfLocation fCurLocation;
     private long fCurRank;
@@ -69,7 +70,7 @@ public class CtfIterator extends CTFTraceReader
      *             If the iterator couldn't not be instantiated, probably due to
      *             a read error.
      */
-    public CtfIterator(CTFTrace ctfTrace, CtfTmfTrace ctfTmfTrace) throws CTFException {
+    public CtfIterator(CTFTrace ctfTrace, @NonNull CtfTmfTrace ctfTmfTrace) throws CTFException {
         super(ctfTrace);
         fTrace = ctfTmfTrace;
         if (hasMoreEvents()) {
@@ -97,7 +98,7 @@ public class CtfIterator extends CTFTraceReader
      *             If the iterator couldn't not be instantiated, probably due to
      *             a read error.
      */
-    public CtfIterator(CTFTrace ctfTrace, CtfTmfTrace ctfTmfTrace, CtfLocationInfo ctfLocationData, long rank)
+    public CtfIterator(CTFTrace ctfTrace, @NonNull CtfTmfTrace ctfTmfTrace, CtfLocationInfo ctfLocationData, long rank)
             throws CTFException {
         super(ctfTrace);
 
@@ -330,8 +331,7 @@ public class CtfIterator extends CTFTraceReader
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = (prime * result)
-                + ((fTrace == null) ? 0 : fTrace.hashCode());
+        result = (prime * result) + fTrace.hashCode();
         result = (prime * result)
                 + ((fCurLocation == null) ? 0 : fCurLocation.hashCode());
         result = (prime * result) + (int) (fCurRank ^ (fCurRank >>> 32));

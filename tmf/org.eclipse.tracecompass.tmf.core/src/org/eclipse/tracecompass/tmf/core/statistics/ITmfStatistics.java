@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.core.statistics;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 
 /**
@@ -64,7 +65,7 @@ public interface ITmfStatistics {
      *
      * @return The map of <event_type, count>, for the whole trace
      */
-    Map<String, Long> getEventTypesTotal();
+    Map<@NonNull String, @NonNull Long> getEventTypesTotal();
 
     /**
      * Retrieve the number of events in the trace in a given time interval.

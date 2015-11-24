@@ -16,6 +16,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.Collections;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
@@ -89,14 +90,14 @@ public class TraceSynchronizationBenchmark {
         trace3.dispose();
     }
 
-    private static void runCpuTest(TmfExperiment experiment, String testName, int loop_count) {
+    private static void runCpuTest(@NonNull TmfExperiment experiment, String testName, int loop_count) {
         Performance perf = Performance.getDefault();
         PerformanceMeter pm = perf.createPerformanceMeter(TEST_ID + testName + TIME);
         perf.tagAsSummary(pm, TEST_SUMMARY + ':' + testName + TIME, Dimension.CPU_TIME);
 
         for (int i = 0; i < loop_count; i++) {
             pm.start();
-            SynchronizationManager.synchronizeTraces(null, Collections.<ITmfTrace> singleton(experiment), true);
+            SynchronizationManager.synchronizeTraces(null, Collections.singleton(experiment), true);
             pm.stop();
         }
         pm.commit();
@@ -104,7 +105,7 @@ public class TraceSynchronizationBenchmark {
     }
 
     /* Benchmark memory used by the algorithm */
-    private static void runMemoryTest(TmfExperiment experiment, String testName, int loop_count) {
+    private static void runMemoryTest(@NonNull TmfExperiment experiment, String testName, int loop_count) {
         Performance perf = Performance.getDefault();
         PerformanceMeter pm = perf.createPerformanceMeter(TEST_ID + testName + MEMORY);
         perf.tagAsSummary(pm, TEST_SUMMARY + ':' + testName + MEMORY, Dimension.USED_JAVA_HEAP);
@@ -113,7 +114,7 @@ public class TraceSynchronizationBenchmark {
 
             System.gc();
             pm.start();
-            SynchronizationAlgorithm algo = SynchronizationManager.synchronizeTraces(null, Collections.<ITmfTrace> singleton(experiment), true);
+            SynchronizationAlgorithm algo = SynchronizationManager.synchronizeTraces(null, Collections.singleton(experiment), true);
             assertNotNull(algo);
 
             System.gc();

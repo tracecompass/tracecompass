@@ -353,8 +353,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
         }
         sb.append("type:").append(fContainerType.toString()); //$NON-NLS-1$
         sb.append(']');
-        String string = sb.toString();
-        return string;
+        return sb.toString();
     }
 
     @Override

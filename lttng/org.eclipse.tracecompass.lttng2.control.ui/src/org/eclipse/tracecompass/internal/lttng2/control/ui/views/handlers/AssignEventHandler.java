@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -137,7 +138,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
 
     @Override
     public boolean isEnabled() {
-        ArrayList<BaseEventComponent> events = new ArrayList<>();
+        @NonNull ArrayList<@NonNull BaseEventComponent> events = new ArrayList<>();
         TraceSessionComponent[] sessions = null;
         Boolean isKernel = null;
 

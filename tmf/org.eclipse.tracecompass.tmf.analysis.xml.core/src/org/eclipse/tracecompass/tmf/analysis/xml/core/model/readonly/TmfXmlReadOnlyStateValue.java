@@ -12,8 +12,6 @@
 
 package org.eclipse.tracecompass.tmf.analysis.xml.core.model.readonly;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.Collections;
 import java.util.List;
 
@@ -65,7 +63,7 @@ public class TmfXmlReadOnlyStateValue extends TmfXmlStateValue {
      */
     public TmfXmlReadOnlyStateValue(TmfXmlReadOnlyModelFactory modelFactory, Element node,
             IXmlStateSystemContainer container, String eventField) {
-        super(modelFactory, node, container, checkNotNull(Collections.EMPTY_LIST), eventField);
+        super(modelFactory, node, container, Collections.EMPTY_LIST, eventField);
     }
 
 }

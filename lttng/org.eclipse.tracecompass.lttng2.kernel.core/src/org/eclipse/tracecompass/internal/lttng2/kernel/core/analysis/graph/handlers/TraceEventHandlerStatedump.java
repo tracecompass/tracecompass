@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.handlers;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
+
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecGraphProvider;
@@ -46,7 +48,7 @@ public class TraceEventHandlerStatedump extends BaseHandler {
         }
 
         Integer tid = EventField.getInt(event, eventLayout.fieldTid());
-        String name = EventField.getOrDefault(event, eventLayout.fieldName(), Messages.TraceEventHandlerSched_UnknownThreadName);
+        String name = EventField.getOrDefault(event, eventLayout.fieldName(), nullToEmptyString(Messages.TraceEventHandlerSched_UnknownThreadName));
         Integer status = EventField.getInt(event, eventLayout.fieldStatus());
 
         String host = event.getTrace().getHostId();

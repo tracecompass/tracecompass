@@ -18,6 +18,7 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -79,7 +80,7 @@ public interface IStateHistoryBackend {
      */
     // FIXME change to IStateInterval?
     void insertPastState(long stateStartTime, long stateEndTime,
-            int quark, ITmfStateValue value) throws TimeRangeException;
+            int quark, @NonNull ITmfStateValue value) throws TimeRangeException;
 
     /**
      * Indicate to the provider that we are done building the history (so it can
@@ -159,7 +160,7 @@ public interface IStateHistoryBackend {
      * @throws StateSystemDisposedException
      *             If the state system is disposed while a request is ongoing.
      */
-    void doQuery(@NonNull List<ITmfStateInterval> currentStateInfo, long t)
+    void doQuery(@NonNull List<@Nullable ITmfStateInterval> currentStateInfo, long t)
             throws TimeRangeException, StateSystemDisposedException;
 
     /**

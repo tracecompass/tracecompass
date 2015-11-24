@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 
 /**
@@ -71,8 +72,8 @@ public abstract class TmfFilterTreeNode implements ITmfFilterTreeNode, Cloneable
     }
 
     @Override
-    public ITmfFilterTreeNode[] getChildren() {
-        return children.toArray(new ITmfFilterTreeNode[0]);
+    public @NonNull ITmfFilterTreeNode[] getChildren() {
+        return children.toArray(new @NonNull ITmfFilterTreeNode[0]);
     }
 
     @Override

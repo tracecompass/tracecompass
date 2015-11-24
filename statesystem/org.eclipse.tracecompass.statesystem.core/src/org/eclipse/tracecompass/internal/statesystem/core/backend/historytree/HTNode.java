@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
@@ -172,7 +173,7 @@ public abstract class HTNode {
      * @throws IOException
      *             If there was an error reading from the file channel
      */
-    public static final HTNode readNode(HTConfig config, FileChannel fc)
+    public static final @NonNull HTNode readNode(HTConfig config, FileChannel fc)
             throws IOException {
         HTNode newNode = null;
         int res, i;

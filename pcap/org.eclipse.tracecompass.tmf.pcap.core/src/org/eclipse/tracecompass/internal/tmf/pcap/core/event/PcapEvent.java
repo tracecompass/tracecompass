@@ -210,7 +210,7 @@ public class PcapEvent extends TmfEvent {
         }
 
         if (packet == null) {
-            fProtocols = checkNotNull(Collections.EMPTY_LIST);
+            fProtocols = Collections.EMPTY_LIST;
             return fProtocols;
         }
         // Go through all the packets and add them to list.

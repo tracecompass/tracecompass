@@ -13,6 +13,7 @@ package org.eclipse.tracecompass.internal.tmf.core.filter;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.collapse.ITmfCollapsibleEvent;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
@@ -74,8 +75,8 @@ public class TmfCollapseFilter implements ITmfFilterTreeNode {
     }
 
     @Override
-    public ITmfFilterTreeNode[] getChildren() {
-        return new ITmfFilterTreeNode[0];
+    public @NonNull ITmfFilterTreeNode[] getChildren() {
+        return new @NonNull ITmfFilterTreeNode[0];
     }
 
     @Override

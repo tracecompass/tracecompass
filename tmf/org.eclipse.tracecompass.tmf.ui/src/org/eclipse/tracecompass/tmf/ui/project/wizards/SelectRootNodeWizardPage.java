@@ -186,9 +186,7 @@ public class SelectRootNodeWizardPage extends WizardPage {
                 traces.add((TmfTraceElement) sel);
             }
         }
-        TmfTraceElement[] result = new TmfTraceElement[traces.size()];
-        traces.toArray(result);
-        return result;
+        return traces.toArray(new @NonNull TmfTraceElement[0]);
     }
 
     /**

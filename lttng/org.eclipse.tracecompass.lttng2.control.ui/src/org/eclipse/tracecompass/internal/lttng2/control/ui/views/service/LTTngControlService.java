@@ -1067,7 +1067,7 @@ public class LTTngControlService implements ILttngControlService {
             }
             String[] args = commandLine.split("\\s+"); //$NON-NLS-1$
             ICommandInput command = fCommandShell.createCommand();
-            command.addAll(checkNotNull(Arrays.asList(args)));
+            command.addAll(Arrays.asList(args));
             ICommandResult result = executeCommand(command, monitor);
 
             if (isError(result)) {
@@ -1474,7 +1474,7 @@ public class LTTngControlService implements ILttngControlService {
     protected @NonNull ICommandInput createCommand(String... segments) {
         ICommandInput command = fCommandShell.createCommand();
         command.add(LTTngControlServiceConstants.CONTROL_COMMAND);
-        List<String> groupOption = getTracingGroupOption();
+        List<@NonNull String> groupOption = getTracingGroupOption();
         if (!groupOption.isEmpty()) {
             command.addAll(groupOption);
         }
@@ -1491,8 +1491,8 @@ public class LTTngControlService implements ILttngControlService {
     /**
      * @return the tracing group option if configured in the preferences
      */
-    protected @NonNull List<String> getTracingGroupOption() {
-        List<String> groupOption = new ArrayList<>();
+    protected @NonNull List<@NonNull String> getTracingGroupOption() {
+        List<@NonNull String> groupOption = new ArrayList<>();
         if (!ControlPreferences.getInstance().isDefaultTracingGroup() && !ControlPreferences.getInstance().getTracingGroup().equals("")) { //$NON-NLS-1$
             groupOption.add(LTTngControlServiceConstants.OPTION_TRACING_GROUP);
             groupOption.add(ControlPreferences.getInstance().getTracingGroup());

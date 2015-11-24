@@ -31,6 +31,7 @@ import javax.xml.validation.Validator;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.ITracePackageConstants;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageBookmarkElement;
@@ -55,7 +56,8 @@ public class ManifestReader {
 
     private static final String SCHEMA_FOLDER_NAME = "schema"; //$NON-NLS-1$
     private static final String EXPORT_MANIFEST_SCHEMA_FILE_NAME = "export-manifest.xsd"; //$NON-NLS-1$
-    private static final TracePackageElement [] EMPTY_ARRAY = new TracePackageElement[0];
+    private static final @NonNull TracePackageElement @NonNull [] EMPTY_ARRAY =
+            new @NonNull TracePackageElement[0];
 
     /**
      * Validate the content of a manifest from an input stream

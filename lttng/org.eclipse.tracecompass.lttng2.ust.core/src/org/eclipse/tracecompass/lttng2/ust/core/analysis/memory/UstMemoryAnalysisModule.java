@@ -14,6 +14,7 @@
 package org.eclipse.tracecompass.lttng2.ust.core.analysis.memory;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
 import java.util.Set;
 
@@ -100,8 +101,8 @@ public class UstMemoryAnalysisModule extends TmfStateSystemAnalysisModule {
          * In order to have these events, the libc wrapper with probes should be
          * loaded
          */
-        eventsReq.addInformation(Messages.UstMemoryAnalysisModule_EventsLoadingInformation);
-        eventsReq.addInformation(Messages.UstMemoryAnalysisModule_EventsLoadingExampleInformation);
+        eventsReq.addInformation(nullToEmptyString(Messages.UstMemoryAnalysisModule_EventsLoadingInformation));
+        eventsReq.addInformation(nullToEmptyString(Messages.UstMemoryAnalysisModule_EventsLoadingExampleInformation));
 
         /* The domain type of the analysis */
         TmfAnalysisRequirement domainReq = new TmfAnalysisRequirement(SessionConfigStrings.CONFIG_ELEMENT_DOMAIN);

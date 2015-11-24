@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.internal.tmf.core.statesystem.mipmap;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.List;
 
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
@@ -64,6 +66,6 @@ public class MaxMipmapFeature extends TmfMipmapFeature {
         } catch (StateValueTypeException e) {
             e.printStackTrace();
         }
-        return maxValue;
+        return checkNotNull(maxValue);
     }
 }

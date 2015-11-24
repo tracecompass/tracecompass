@@ -44,7 +44,7 @@ public class BtfEventType extends TmfEventType {
             BtfColumnNames.NOTES.toString() };
     private static final @NonNull ITmfEventField FIELDS_WITHOUT_NOTES = TmfEventField.makeRoot(FIELD_WITH_NOTES_COLUMNS);
     private static final @NonNull ITmfEventField FIELDS_WITH_NOTES = TmfEventField.makeRoot(FIELDS_WITHOUT_NOTES_COLUMNS);
-    private final String fName;
+    private final @NonNull String fName;
     private final String fDescription;
     private final boolean fHasNotes;
     private final List<String> fCols;
@@ -55,7 +55,7 @@ public class BtfEventType extends TmfEventType {
      * @param name the event name
      * @param description the event description
      */
-    public BtfEventType(String name, String description) {
+    public BtfEventType(@NonNull String name, String description) {
         super();
         fName = name;
         fDescription = description;

@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.Messages;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
@@ -70,7 +71,7 @@ public class XmlAnalysisModuleSource implements IAnalysisModuleSource {
             .append("org.eclipse.linuxtools.tmf.analysis.xml.core") //$NON-NLS-1$
             .append("xml_files"); //$NON-NLS-1$
 
-    private static List<IAnalysisModuleHelper> fModules = null;
+    private static List<@NonNull IAnalysisModuleHelper> fModules = null;
 
     /**
      * Constructor. It adds the new module listener to the analysis manager.
@@ -81,12 +82,14 @@ public class XmlAnalysisModuleSource implements IAnalysisModuleSource {
 
     @Override
     public synchronized Iterable<IAnalysisModuleHelper> getAnalysisModules() {
-        if (fModules == null) {
-            fModules = new ArrayList<>();
+        List<@NonNull IAnalysisModuleHelper> modules = fModules;
+        if (modules == null) {
+            modules = new ArrayList<>();
+            fModules = modules;
             populateBuiltinModules();
             populateAnalysisModules();
         }
-        return fModules;
+        return modules;
     }
 
     private static void processFile(File xmlFile) {

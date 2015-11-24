@@ -13,9 +13,12 @@
 
 package org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNullContents;
+
 import java.util.Arrays;
 import java.util.Comparator;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -51,7 +54,7 @@ public class SegmentStoreContentProvider implements ISortingLazyContentProvider 
     @Override
     public void updateElement(int index) {
         final TableViewer tableViewer = fTableViewer;
-        final ISegment[] segmentArray = fSegmentArray;
+        final ISegment @Nullable [] segmentArray = fSegmentArray;
         if (tableViewer != null && segmentArray != null) {
             tableViewer.replace(segmentArray[index], index);
         }
@@ -68,16 +71,24 @@ public class SegmentStoreContentProvider implements ISortingLazyContentProvider 
     public void inputChanged(@Nullable Viewer viewer, @Nullable Object oldInput, @Nullable Object newInput) {
         fTableViewer = (TableViewer) viewer;
         if (newInput instanceof ISegmentStore) {
+            @SuppressWarnings("unchecked")
             ISegmentStore<ISegment> segmentStore = (ISegmentStore<ISegment>) newInput;
-            fSegmentArray = Iterables.toArray(segmentStore, ISegment.class);
+            ISegment[] array = Iterables.toArray(segmentStore, ISegment.class);
+            @NonNull ISegment[] checkedArray = checkNotNullContents(array);
             if (fComparator != null) {
-                Arrays.sort(fSegmentArray, fComparator);
+                Arrays.sort(checkedArray, fComparator);
             }
+            fSegmentArray = checkedArray;
         } else if (newInput instanceof ISegment[]) {
-            fSegmentArray = ((ISegment[]) newInput).clone();
+            /*
+             * Ensure that there are no null elements in the array, so we can
+             * set it back to fSegmentArray, which does not allow nulls.
+             */
+            @NonNull ISegment[] checkedArray = checkNotNullContents((@Nullable ISegment[]) newInput);
             if (fComparator != null) {
-                Arrays.sort(fSegmentArray, fComparator);
+                Arrays.sort(checkedArray, fComparator);
             }
+            fSegmentArray = checkedArray;
         } else {
             fSegmentArray = null;
         }
@@ -85,18 +96,21 @@ public class SegmentStoreContentProvider implements ISortingLazyContentProvider 
 
     @Override
     public void setSortOrder(@Nullable Comparator<?> comparator) {
+        @NonNull ISegment @Nullable [] segmentArray = fSegmentArray;
         if (comparator == null) {
             return;
         }
-        if (fSegmentArray == null) {
+        if (segmentArray == null) {
             return;
         }
         final TableViewer tableViewer = fTableViewer;
         if (tableViewer == null) {
             return;
         }
-        fComparator = (Comparator<ISegment>) comparator;
-        Arrays.sort(fSegmentArray, fComparator);
+        @SuppressWarnings("unchecked")
+        Comparator<ISegment> comp = (Comparator<ISegment>) comparator;
+        fComparator = comp;
+        Arrays.sort(segmentArray, fComparator);
         tableViewer.refresh();
     }
 

@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfExperimentContext;
@@ -242,7 +243,7 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
      *
      * @return The array of contained traces
      */
-    public List<ITmfTrace> getTraces() {
+    public List<@NonNull ITmfTrace> getTraces() {
         return getChildren(ITmfTrace.class);
     }
 
@@ -525,7 +526,7 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
 
             final File syncFile = (syncDirectory != null) ? new File(syncDirectory + File.separator + SYNCHRONIZATION_FILE_NAME) : null;
 
-            final SynchronizationAlgorithm syncAlgo = SynchronizationManager.synchronizeTraces(syncFile, Collections.<ITmfTrace> singleton(this), doSync);
+            final SynchronizationAlgorithm syncAlgo = SynchronizationManager.synchronizeTraces(syncFile, Collections.singleton(this), doSync);
 
             final TmfTraceSynchronizedSignal signal = new TmfTraceSynchronizedSignal(this, syncAlgo);
 

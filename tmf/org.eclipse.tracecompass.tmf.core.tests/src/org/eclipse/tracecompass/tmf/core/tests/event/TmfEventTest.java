@@ -48,7 +48,7 @@ public class TmfEventTest {
 
     private final @NonNull ITmfTrace fTrace = STUB_TRACE.getTrace();
 
-    private final String fTypeId = "TestType";
+    private final @NonNull String fTypeId = "TestType";
     private final @NonNull String fLabel1 = "AString";
     private final @NonNull String fLabel2 = "AnInteger";
     private final String[] fLabels = new String[] { fLabel1, fLabel2 };

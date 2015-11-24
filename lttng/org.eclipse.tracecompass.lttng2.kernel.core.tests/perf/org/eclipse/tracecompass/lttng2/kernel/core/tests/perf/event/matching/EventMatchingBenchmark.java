@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.event.matching;
 
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
@@ -58,7 +59,7 @@ public class EventMatchingBenchmark {
         CtfTmfTrace trace1 = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.SYNC_SRC);
         CtfTmfTrace trace2 = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.SYNC_DEST);
 
-        Set<ITmfTrace> traces = ImmutableSet.of((ITmfTrace) trace1, trace2);
+        Set<@NonNull ITmfTrace> traces = ImmutableSet.of(trace1, trace2);
         runCpuTest(traces, "Match TCP events", 100);
 
         trace1.dispose();
@@ -75,7 +76,7 @@ public class EventMatchingBenchmark {
         CtfTmfTrace trace2 = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.DJANGO_DB);
         CtfTmfTrace trace3 = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.DJANGO_HTTPD);
 
-        Set<ITmfTrace> traces = ImmutableSet.of((ITmfTrace) trace1, trace2, trace3);
+        Set<@NonNull ITmfTrace> traces = ImmutableSet.of(trace1, trace2, trace3);
         runCpuTest(traces, "Django traces", 10);
         runMemoryTest(traces, "Django traces", 10);
 
@@ -84,7 +85,7 @@ public class EventMatchingBenchmark {
         trace3.dispose();
     }
 
-    private static void runCpuTest(Set<ITmfTrace> testTraces, String testName, int loop_count) {
+    private static void runCpuTest(Set<@NonNull ITmfTrace> testTraces, String testName, int loop_count) {
         Performance perf = Performance.getDefault();
         PerformanceMeter pm = perf.createPerformanceMeter(TEST_ID + testName + TIME);
         perf.tagAsSummary(pm, TEST_SUMMARY + ':' + testName + TIME, Dimension.CPU_TIME);
@@ -101,7 +102,7 @@ public class EventMatchingBenchmark {
     }
 
     /* Benchmark memory used by the algorithm */
-    private static void runMemoryTest(Set<ITmfTrace> testTraces, String testName, int loop_count) {
+    private static void runMemoryTest(Set<@NonNull ITmfTrace> testTraces, String testName, int loop_count) {
         Performance perf = Performance.getDefault();
         PerformanceMeter pm = perf.createPerformanceMeter(TEST_ID + testName + MEMORY);
         perf.tagAsSummary(pm, TEST_SUMMARY + ':' + testName + MEMORY, Dimension.USED_JAVA_HEAP);

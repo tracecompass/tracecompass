@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.tmf.core.statesystem.mipmap;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
@@ -34,7 +35,7 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 public abstract class TmfMipmapFeature implements ITmfMipmapFeature {
 
     /** The current state value */
-    protected ITmfStateValue currentValue = TmfStateValue.nullValue();
+    protected @NonNull ITmfStateValue currentValue = TmfStateValue.nullValue();
     /** The current start time for the state value */
     protected long currentStartTime;
     /** The list of ongoing state intervals per mipmap level */
@@ -167,7 +168,7 @@ public abstract class TmfMipmapFeature implements ITmfMipmapFeature {
      *            The end time of the mipmap interval
      * @return A state value to be stored in the mipmap level attribute
      */
-    protected abstract ITmfStateValue computeMipmapValue(List<ITmfStateInterval> lowerIntervals, long startTime, long endTime);
+    protected abstract @NonNull ITmfStateValue computeMipmapValue(List<ITmfStateInterval> lowerIntervals, long startTime, long endTime);
 
     /**
      * Get the mipmap resolution

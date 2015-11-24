@@ -29,6 +29,7 @@ import javax.xml.validation.Validator;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.remote.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.importexport.ManifestReader;
@@ -48,7 +49,8 @@ public class RemoteImportProfilesReader {
 
     private static final String SCHEMA_FOLDER_NAME = "schema"; //$NON-NLS-1$
     private static final String PROFILES_SCHEMA_FILE_NAME = "remote-profile.xsd"; //$NON-NLS-1$
-    private static final TracePackageElement[] EMPTY_ARRAY = new TracePackageElement[0];
+    private static final @NonNull TracePackageElement @NonNull [] EMPTY_ARRAY =
+            new @NonNull TracePackageElement[0];
 
     /**
      * Validate the content of the profiles file from an input stream

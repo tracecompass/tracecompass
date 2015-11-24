@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.lttng2.kernel.core.tests.Activator;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
@@ -69,7 +70,7 @@ public enum VmTraces {
      *
      * @return A TmfXmlTraceStub reference to this trace
      */
-    public ITmfTrace getTrace() {
+    public @Nullable ITmfTrace getTrace() {
         ITmfTrace trace = new TmfXmlTraceStub();
         IStatus status = trace.validate(null, fPath.toOSString());
         if (!status.isOK()) {

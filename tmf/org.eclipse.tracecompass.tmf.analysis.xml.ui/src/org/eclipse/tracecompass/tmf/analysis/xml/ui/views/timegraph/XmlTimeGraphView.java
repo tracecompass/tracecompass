@@ -254,7 +254,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
             return;
         }
 
-        Set<ITmfAnalysisModuleWithStateSystems> stateSystemModules = new HashSet<>();
+        Set<@NonNull ITmfAnalysisModuleWithStateSystems> stateSystemModules = new HashSet<>();
         if (analysisIds.isEmpty()) {
             /*
              * No analysis specified, take all state system analysis modules

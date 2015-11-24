@@ -79,6 +79,9 @@ public class TmfGraphStatistics implements ITmfGraphVisitor {
         synchronized (fWorkerStats) {
             if (horizontal && graph != null) {
                 IGraphWorker worker = graph.getParentOf(edge.getVertexFrom());
+                if (worker == null) {
+                    return;
+                }
                 Long duration = edge.getDuration();
                 Long currentTotal = fWorkerStats.get(worker);
                 if (currentTotal != null) {

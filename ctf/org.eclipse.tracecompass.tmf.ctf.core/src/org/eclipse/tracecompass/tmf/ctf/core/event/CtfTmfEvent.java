@@ -293,7 +293,7 @@ public class CtfTmfEvent extends TmfEvent
         if (declaration == null) {
             return new HashSet<>();
         }
-        return checkNotNull(declaration.getCustomAttributes());
+        return declaration.getCustomAttributes();
     }
 
     @Override

@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.statesystem.core.Activator;
 
 /**
@@ -99,7 +100,7 @@ class HT_IO {
      *             reading. Instead of using a big reader-writer lock, we'll
      *             just catch this exception.
      */
-    public synchronized HTNode readNode(int seqNumber) throws ClosedChannelException {
+    public synchronized @NonNull HTNode readNode(int seqNumber) throws ClosedChannelException {
         /* Do a cache lookup */
         int offset = seqNumber & (CACHE_SIZE - 1);
         HTNode readNode = fNodeCache[offset];
@@ -115,12 +116,13 @@ class HT_IO {
             /* Put the node in the cache. */
             fNodeCache[offset] = readNode;
             return readNode;
+
         } catch (ClosedChannelException e) {
             throw e;
         } catch (IOException e) {
             /* Other types of IOExceptions shouldn't happen at this point though */
             Activator.getDefault().logError(e.getMessage(), e);
-            return null;
+            throw new IllegalStateException();
         }
     }
 

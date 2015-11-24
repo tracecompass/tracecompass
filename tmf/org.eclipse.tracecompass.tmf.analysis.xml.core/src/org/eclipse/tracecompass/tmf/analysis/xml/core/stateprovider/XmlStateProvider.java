@@ -44,13 +44,13 @@ import org.w3c.dom.NodeList;
 public class XmlStateProvider extends AbstractTmfStateProvider implements IXmlStateSystemContainer {
 
     private final IPath fFilePath;
-    @NonNull private final String fStateId;
+    private final @NonNull String fStateId;
 
     /** List of all Event Handlers */
     private final List<TmfXmlEventHandler> fEventHandlers = new ArrayList<>();
 
     /** List of all Locations */
-    private final Set<TmfXmlLocation> fLocations;
+    private final @NonNull Set<@NonNull TmfXmlLocation> fLocations;
 
     /** Map for defined values */
     private final Map<String, String> fDefinedValues = new HashMap<>();
@@ -90,7 +90,7 @@ public class XmlStateProvider extends AbstractTmfStateProvider implements IXmlSt
 
         /* parser for the locations */
         List<Element> childElements = XmlUtils.getChildElements(doc, TmfXmlStrings.LOCATION);
-        Set<TmfXmlLocation> locations = new HashSet<>();
+        Set<@NonNull TmfXmlLocation> locations = new HashSet<>();
         for (Element element : childElements) {
             if (element == null) {
                 continue;

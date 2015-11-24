@@ -740,7 +740,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
     protected ICommandInput createCommand(String... strings) {
         ICommandInput command = getCommandShell().createCommand();
         command.add(LTTngControlServiceConstants.CONTROL_COMMAND);
-        List<String> groupOption = getTracingGroupOption();
+        List<@NonNull String> groupOption = getTracingGroupOption();
         if (!groupOption.isEmpty()) {
             command.addAll(groupOption);
         }

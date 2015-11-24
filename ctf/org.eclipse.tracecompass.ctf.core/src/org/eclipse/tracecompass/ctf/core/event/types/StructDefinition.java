@@ -46,7 +46,7 @@ public final class StructDefinition extends ScopedDefinition implements IComposi
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final ImmutableList<String> fFieldNames;
+    private final @NonNull List<String> fFieldNames;
     private final Definition[] fDefinitions;
     private Map<String, Definition> fDefinitionsMap = null;
 
@@ -128,7 +128,7 @@ public final class StructDefinition extends ScopedDefinition implements IComposi
     }
 
     @Override
-    public List<String> getFieldNames() {
+    public @NonNull List<String> getFieldNames() {
         return fFieldNames;
     }
 
@@ -152,15 +152,13 @@ public final class StructDefinition extends ScopedDefinition implements IComposi
 
         builder.append("{ "); //$NON-NLS-1$
 
-        if (fFieldNames != null) {
-            List<String> fields = new LinkedList<>();
-            for (String field : fFieldNames) {
-                String appendee = field + " = " + lookupDefinition(field).toString(); //$NON-NLS-1$
-                fields.add(appendee);
-            }
-            Joiner joiner = Joiner.on(", ").skipNulls(); //$NON-NLS-1$
-            builder.append(joiner.join(fields));
+        List<String> fields = new LinkedList<>();
+        for (String field : fFieldNames) {
+            String appendee = field + " = " + lookupDefinition(field).toString(); //$NON-NLS-1$
+            fields.add(appendee);
         }
+        Joiner joiner = Joiner.on(", ").skipNulls(); //$NON-NLS-1$
+        builder.append(joiner.join(fields));
 
         builder.append(" }"); //$NON-NLS-1$
 

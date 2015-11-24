@@ -58,7 +58,9 @@ public final class TmfAnalysisModuleSources {
             if (elementName.equals(SOURCE_ELEM)) {
                 try {
                     IAnalysisModuleSource source = (IAnalysisModuleSource) ce.createExecutableExtension(CLASS_ATTR);
-                    sources.add(source);
+                    if (source != null) {
+                        sources.add(source);
+                    }
                 } catch (InvalidRegistryObjectException e) {
                     Activator.logError("Error creating module source", e); //$NON-NLS-1$
                 } catch (CoreException e) {

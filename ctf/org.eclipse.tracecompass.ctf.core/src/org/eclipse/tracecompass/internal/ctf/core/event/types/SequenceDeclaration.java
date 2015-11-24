@@ -16,6 +16,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
@@ -128,13 +129,13 @@ public class SequenceDeclaration extends CompoundDeclaration {
             fPaths.put(fieldName, fieldName + '[' + collection.size() + ']');
         }
         List<String> paths = (List<String>) fPaths.get(fieldName);
-        Builder<Definition> definitions = new ImmutableList.Builder<>();
+        Builder<@NonNull Definition> definitions = new ImmutableList.Builder<>();
         for (int i = 0; i < length; i++) {
             /* We should not have inserted any null values */
             String elemName = checkNotNull(paths.get(i));
             definitions.add(fElemType.createDefinition(definitionScope, elemName, input));
         }
-        List<Definition> list = checkNotNull(definitions.build());
+        List<@NonNull Definition> list = checkNotNull(definitions.build());
         return new ArrayDefinition(this, definitionScope, fieldName, list);
     }
 

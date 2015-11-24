@@ -40,7 +40,7 @@ public class PcapRootEventField extends TmfEventField {
      * @throws IllegalArgumentException
      *             If 'name' is null, or if 'fields' has duplicate field names.
      */
-    public PcapRootEventField(@Nullable ITmfEventField[] fields, Packet packet) {
+    public PcapRootEventField(ITmfEventField[] fields, Packet packet) {
         super(ITmfEventField.ROOT_FIELD_ID, null, fields);
         fPacketSourceField = new TmfEventField(PcapEvent.EVENT_FIELD_PACKET_SOURCE,
                 packet.getMostEcapsulatedPacket().getSourceEndpoint().toString(), null);

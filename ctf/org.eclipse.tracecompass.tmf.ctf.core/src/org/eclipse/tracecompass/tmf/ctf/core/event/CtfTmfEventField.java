@@ -101,7 +101,7 @@ public abstract class CtfTmfEventField extends TmfEventField {
      *            String The name to assign to this field
      * @return The resulting CtfTmfEventField object
      */
-    public static CtfTmfEventField parseField(IDefinition fieldDef,
+    public static @NonNull CtfTmfEventField parseField(IDefinition fieldDef,
             @NonNull String fieldName) {
         CtfTmfEventField field = null;
 

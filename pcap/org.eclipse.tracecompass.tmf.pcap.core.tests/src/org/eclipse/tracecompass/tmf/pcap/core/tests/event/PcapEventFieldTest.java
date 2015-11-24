@@ -210,21 +210,15 @@ public class PcapEventFieldTest {
     }
 
     // Convenience method
-    private static ITmfEventField[] generatePacketFields(Packet packet) {
+    private static ITmfEventField @NonNull [] generatePacketFields(Packet packet) {
         List<ITmfEventField> fieldList = new ArrayList<>();
         List<ITmfEventField> subfieldList = new ArrayList<>();
         Packet localPacket = packet;
 
         while (localPacket != null) {
             subfieldList.clear();
-            for (Map.Entry<String, String> entry : localPacket.getFields().entrySet()) {
-
-                @SuppressWarnings("null")
-                @NonNull
+            for (Map.Entry<@NonNull String, @NonNull String> entry : localPacket.getFields().entrySet()) {
                 String key = entry.getKey();
-
-                @SuppressWarnings("null")
-                @NonNull
                 String value = entry.getValue();
                 subfieldList.add(new TmfEventField(key, value, null));
             }

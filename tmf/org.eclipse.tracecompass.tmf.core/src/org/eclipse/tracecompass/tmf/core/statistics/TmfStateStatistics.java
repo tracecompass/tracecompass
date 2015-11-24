@@ -151,8 +151,8 @@ public class TmfStateStatistics implements ITmfStatistics {
     }
 
     @Override
-    public Map<String, Long> getEventTypesTotal() {
-        final Map<String, Long> map = new HashMap<>();
+    public Map<@NonNull String, @NonNull Long> getEventTypesTotal() {
+        final Map<@NonNull String, @NonNull Long> map = new HashMap<>();
         long endTime = typesStats.getCurrentEndTime();
 
         try {

@@ -18,6 +18,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.pcap.core.packet.Packet;
@@ -134,7 +135,7 @@ public class UnknownPacket extends Packet {
         if (map == null) {
             byte[] array = checkNotNull(fPayload.array());
 
-            Builder<String, String> builder = ImmutableMap.<String, String> builder()
+            Builder<String, String> builder = ImmutableMap.<@NonNull String, @NonNull String> builder()
                     .put("Binary", ConversionHelper.bytesToHex(array, true)); //$NON-NLS-1$
             try {
                 String s = new String(array, "UTF-8"); //$NON-NLS-1$

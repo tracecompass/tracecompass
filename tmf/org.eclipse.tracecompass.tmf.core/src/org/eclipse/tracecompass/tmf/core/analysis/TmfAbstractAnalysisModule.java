@@ -285,7 +285,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
      * @return An iterable list of analysis this analyzes depends on.
      */
     protected Iterable<IAnalysisModule> getDependentAnalyses() {
-        return checkNotNull(Collections.EMPTY_LIST);
+        return Collections.EMPTY_LIST;
     }
 
     private void execute(final ITmfTrace trace) {
@@ -519,6 +519,6 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent implements 
 
     @Override
     public Iterable<TmfAnalysisRequirement> getAnalysisRequirements() {
-        return checkNotNull(Collections.EMPTY_SET);
+        return Collections.EMPTY_SET;
     }
 }

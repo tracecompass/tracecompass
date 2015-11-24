@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 
 /**
@@ -64,8 +65,8 @@ public class TmfAnalysisModuleOutputs {
      *
      * @return List of {@link ITmfNewAnalysisModuleListener}
      */
-    public static Iterable<ITmfNewAnalysisModuleListener> getOutputListeners() {
-        List<ITmfNewAnalysisModuleListener> newModuleListeners = new ArrayList<>();
+    public static Iterable<@NonNull ITmfNewAnalysisModuleListener> getOutputListeners() {
+        List<@NonNull ITmfNewAnalysisModuleListener> newModuleListeners = new ArrayList<>();
         // Get the sources element from the extension point
         IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(TMF_ANALYSIS_TYPE_ID);
         for (IConfigurationElement ce : config) {

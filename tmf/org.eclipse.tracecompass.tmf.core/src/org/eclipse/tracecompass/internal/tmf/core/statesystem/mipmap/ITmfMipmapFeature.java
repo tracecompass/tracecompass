@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.internal.tmf.core.statesystem.mipmap;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 
 /**
@@ -32,7 +33,7 @@ public interface ITmfMipmapFeature {
      * @param ts
      *            The timestamp of the event
      */
-    public void updateMipmap(ITmfStateValue value, long ts);
+    public void updateMipmap(@NonNull ITmfStateValue value, long ts);
 
     /**
      * Update the mipmap values at all levels before closing.

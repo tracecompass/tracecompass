@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.lttng2.lttng.kernel.core.tests.shared.vm;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
@@ -59,12 +61,14 @@ public enum VmTestExperiment {
      *         experiment
      */
     public synchronized TmfExperiment getExperiment(boolean deleteSuppFiles) {
-        Set<ITmfTrace> traces = new HashSet<>();
+        Set<@NonNull ITmfTrace> traces = new HashSet<>();
         for (VmTraces trace : fTraces) {
-            traces.add(trace.getTrace());
+            ITmfTrace tmfTrace = trace.getTrace();
+            if (tmfTrace != null) {
+                traces.add(tmfTrace);
+            }
         }
-        @SuppressWarnings("null")
-        @NonNull String expName = this.name();
+        String expName = checkNotNull(this.name());
         VirtualMachineExperiment experiment = new VirtualMachineExperiment(expName, traces);
         if (deleteSuppFiles) {
             /*

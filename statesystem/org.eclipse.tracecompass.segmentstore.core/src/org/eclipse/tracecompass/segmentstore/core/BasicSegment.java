@@ -26,9 +26,15 @@ public class BasicSegment implements ISegment {
 
     private static final long serialVersionUID = -3257452887960883177L;
 
-    private static final Comparator<ISegment> COMPARATOR = checkNotNull(Ordering
-            .from(SegmentComparators.INTERVAL_START_COMPARATOR)
-            .compound(SegmentComparators.INTERVAL_END_COMPARATOR));
+    private static final Comparator<ISegment> COMPARATOR;
+    static {
+        /* checkNotNull() has to be called separately, or else it breaks the
+         * type inference. */
+        Comparator<ISegment> comp = Ordering
+                .from(SegmentComparators.INTERVAL_START_COMPARATOR)
+                .compound(SegmentComparators.INTERVAL_END_COMPARATOR);
+        COMPARATOR = checkNotNull(comp);
+    }
 
     private final long fStart;
     private final long fEnd;

@@ -53,7 +53,7 @@ public class TmfAnalysisRequirement {
 
     private final String fType;
     private final Map<String, ValuePriorityLevel> fValues = new HashMap<>();
-    private final Set<String> fInformation = new HashSet<>();
+    private final Set<@NonNull String> fInformation = new HashSet<>();
 
     /**
      * The possible level for each value. They must be listed in ascending order
@@ -182,7 +182,7 @@ public class TmfAnalysisRequirement {
      * @param information
      *            The information to be added
      */
-    public void addInformation(String information) {
+    public void addInformation(@NonNull String information) {
         fInformation.add(information);
     }
 
@@ -244,7 +244,7 @@ public class TmfAnalysisRequirement {
      *
      * @return The set of all the information
      */
-    public Set<String> getInformation() {
+    public Set<@NonNull String> getInformation() {
         return fInformation;
     }
 

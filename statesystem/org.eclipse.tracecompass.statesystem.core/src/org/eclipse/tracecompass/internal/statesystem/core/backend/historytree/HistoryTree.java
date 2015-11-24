@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.statesystem.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -73,7 +74,7 @@ public class HistoryTree {
     private int fNodeCount;
 
     /** "Cache" to keep the active nodes in memory */
-    private final List<HTNode> fLatestBranch;
+    private final List<@NonNull HTNode> fLatestBranch;
 
     // ------------------------------------------------------------------------
     // Constructors/"Destructors"
@@ -101,7 +102,7 @@ public class HistoryTree {
         fConfig = conf;
         fTreeEnd = conf.getTreeStart();
         fNodeCount = 0;
-        fLatestBranch = Collections.synchronizedList(new ArrayList<HTNode>());
+        fLatestBranch = Collections.synchronizedList(new ArrayList<>());
 
         /* Prepare the IO object */
         fTreeIO = new HT_IO(fConfig, true);
@@ -216,8 +217,8 @@ public class HistoryTree {
      *            start
      * @throws ClosedChannelException
      */
-    private List<HTNode> buildLatestBranch(int rootNodeSeqNb) throws ClosedChannelException {
-        List<HTNode> list = new ArrayList<>();
+    private List<@NonNull HTNode> buildLatestBranch(int rootNodeSeqNb) throws ClosedChannelException {
+        List<@NonNull HTNode> list = new ArrayList<>();
 
         HTNode nextChildNode = fTreeIO.readNode(rootNodeSeqNb);
         list.add(nextChildNode);
@@ -343,7 +344,7 @@ public class HistoryTree {
      *
      * @return The immutable latest branch
      */
-    protected List<HTNode> getLatestBranch() {
+    protected List<@NonNull HTNode> getLatestBranch() {
         return ImmutableList.copyOf(fLatestBranch);
     }
 
@@ -600,7 +601,7 @@ public class HistoryTree {
      *            Start time of the new node
      * @return The newly created node
      */
-    private CoreNode initNewCoreNode(int parentSeqNumber, long startTime) {
+    private @NonNull CoreNode initNewCoreNode(int parentSeqNumber, long startTime) {
         CoreNode newNode = new CoreNode(fConfig, fNodeCount, parentSeqNumber,
                 startTime);
         fNodeCount++;
@@ -621,7 +622,7 @@ public class HistoryTree {
      *            Start time of the new node
      * @return The newly created node
      */
-    private LeafNode initNewLeafNode(int parentSeqNumber, long startTime) {
+    private @NonNull LeafNode initNewLeafNode(int parentSeqNumber, long startTime) {
         LeafNode newNode = new LeafNode(fConfig, fNodeCount, parentSeqNumber,
                 startTime);
         fNodeCount++;

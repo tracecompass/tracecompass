@@ -16,6 +16,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.pcap.core.packet.BadPacketException;
@@ -205,7 +206,7 @@ public class UDPPacket extends Packet {
     public Map<String, String> getFields() {
         Map<String, String> map = fFields;
         if (map == null) {
-            ImmutableMap.Builder<String, String> builder = ImmutableMap.<String, String> builder()
+            ImmutableMap.Builder<String, String> builder = ImmutableMap.<@NonNull String, @NonNull String> builder()
                     .put("Source Port", String.valueOf(fSourcePort)) //$NON-NLS-1$
                     .put("Destination Port", String.valueOf(fDestinationPort)) //$NON-NLS-1$
                     .put("Length", String.valueOf(fTotalLength) + " bytes") //$NON-NLS-1$ //$NON-NLS-2$

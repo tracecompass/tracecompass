@@ -129,7 +129,7 @@ public interface ITmfEventProvider extends ITmfComponent {
      *         an empty list if no children (return value cannot be null).
      */
     @NonNull
-    <T extends ITmfEventProvider> List<T> getChildren(Class<T> clazz);
+    <T extends ITmfEventProvider> List<@NonNull T> getChildren(Class<T> clazz);
 
     /**
      * Gets the number of children

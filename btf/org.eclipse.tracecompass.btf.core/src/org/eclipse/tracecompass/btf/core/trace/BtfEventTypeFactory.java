@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.btf.core.trace;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
+
 import java.util.Map;
 
 import org.eclipse.tracecompass.btf.core.Messages;
@@ -33,22 +35,22 @@ public final class BtfEventTypeFactory {
     static {
         ImmutableMap.Builder<String, BtfEventType> builder = new ImmutableMap.Builder<>();
         // Environment
-        builder.put("STI", new BtfEventType(Messages.BtfTypeId_STIName, Messages.BtfTypeId_STIDescr)); //$NON-NLS-1$
+        builder.put("STI", new BtfEventType(nullToEmptyString(Messages.BtfTypeId_STIName), Messages.BtfTypeId_STIDescr)); //$NON-NLS-1$
         // Software
-        builder.put("T", new BtfEventType(Messages.BtfTypeId_TName, Messages.BtfTypeId_TDescr)); //$NON-NLS-1$
-        builder.put("ISR", new BtfEventType(Messages.BtfTypeId_ISRName, Messages.BtfTypeId_ISRDescr)); //$NON-NLS-1$
-        builder.put("R", new BtfEventType(Messages.BtfTypeId_RName, Messages.BtfTypeId_RDescr)); //$NON-NLS-1$
-        builder.put("IB", new BtfEventType(Messages.BtfTypeId_IBName, Messages.BtfTypeId_IBDescr)); //$NON-NLS-1$
+        builder.put("T", new BtfEventType(nullToEmptyString(Messages.BtfTypeId_TName), Messages.BtfTypeId_TDescr)); //$NON-NLS-1$
+        builder.put("ISR", new BtfEventType(nullToEmptyString(Messages.BtfTypeId_ISRName), Messages.BtfTypeId_ISRDescr)); //$NON-NLS-1$
+        builder.put("R", new BtfEventType(nullToEmptyString(Messages.BtfTypeId_RName), Messages.BtfTypeId_RDescr)); //$NON-NLS-1$
+        builder.put("IB", new BtfEventType(nullToEmptyString(Messages.BtfTypeId_IBName), Messages.BtfTypeId_IBDescr)); //$NON-NLS-1$
         // Hardware
-        builder.put("ECU", new BtfEventType(Messages.BtfTypeId_ECUName, Messages.BtfTypeId_ECUDescr)); //$NON-NLS-1$
-        builder.put("P", new BtfEventType(Messages.BtfTypeId_PName, Messages.BtfTypeId_PDescr)); //$NON-NLS-1$
-        builder.put("C", new BtfEventType(Messages.BtfTypeId_CName, Messages.BtfTypeId_CDescr)); //$NON-NLS-1$
+        builder.put("ECU", new BtfEventType(nullToEmptyString(Messages.BtfTypeId_ECUName), Messages.BtfTypeId_ECUDescr)); //$NON-NLS-1$
+        builder.put("P", new BtfEventType(nullToEmptyString(Messages.BtfTypeId_PName), Messages.BtfTypeId_PDescr)); //$NON-NLS-1$
+        builder.put("C", new BtfEventType(nullToEmptyString(Messages.BtfTypeId_CName), Messages.BtfTypeId_CDescr)); //$NON-NLS-1$
         // Operating system
-        builder.put("SCHED", new BtfEventType(Messages.BtfTypeId_SCHEDName, Messages.BtfTypeId_SCHEDDescr)); //$NON-NLS-1$
-        builder.put("SIG", new BtfEventType(Messages.BtfTypeId_SIGName, Messages.BtfTypeId_SIGDescr)); //$NON-NLS-1$
-        builder.put("SEM", new BtfEventType(Messages.BtfTypeId_SEMName, Messages.BtfTypeId_SEMDescr)); //$NON-NLS-1$
+        builder.put("SCHED", new BtfEventType(nullToEmptyString(Messages.BtfTypeId_SCHEDName), Messages.BtfTypeId_SCHEDDescr)); //$NON-NLS-1$
+        builder.put("SIG", new BtfEventType(nullToEmptyString(Messages.BtfTypeId_SIGName), Messages.BtfTypeId_SIGDescr)); //$NON-NLS-1$
+        builder.put("SEM", new BtfEventType(nullToEmptyString(Messages.BtfTypeId_SEMName), Messages.BtfTypeId_SEMDescr)); //$NON-NLS-1$
         // Information
-        builder.put("SIM", new BtfEventType(Messages.BtfTypeId_SIMName, Messages.BtfTypeId_SIMDescr)); //$NON-NLS-1$
+        builder.put("SIM", new BtfEventType(nullToEmptyString(Messages.BtfTypeId_SIMName), Messages.BtfTypeId_SIMDescr)); //$NON-NLS-1$
         TYPES = builder.build();
     }
 

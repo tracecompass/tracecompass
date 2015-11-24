@@ -98,7 +98,7 @@ public interface IEventDeclaration {
      *
      * @return The set of custom attributes
      */
-    Set<String> getCustomAttributes();
+    @NonNull Set<@NonNull String> getCustomAttributes();
 
     /**
      * Get the value of a given CTF attribute.

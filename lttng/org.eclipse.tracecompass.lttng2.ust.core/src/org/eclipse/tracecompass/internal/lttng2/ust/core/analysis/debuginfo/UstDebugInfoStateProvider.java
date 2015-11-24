@@ -207,7 +207,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
          * Add this library to the pending entries, the matching
          * build_id/debug_link event will finish updating this attribute
          */
-        fPendingEntries.put(baddr, sopath);
+        fPendingEntries.put(baddr, checkNotNull(sopath));
     }
 
     /**

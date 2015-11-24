@@ -11,11 +11,11 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.tmf.remote.core.shell;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandResult;
 
@@ -55,10 +55,10 @@ public class CommandResult implements ICommandResult {
      * @param errorOutput
      *            THe error output as an array of strings
      */
-    public CommandResult(int result, String[] output, String[] errorOutput) {
+    public CommandResult(int result, @NonNull String[] output, @NonNull String[] errorOutput) {
         fResult = result;
-        fOutput = checkNotNull(ImmutableList.copyOf(output));
-        fErrorOutput = checkNotNull(ImmutableList.copyOf(errorOutput));
+        fOutput = ImmutableList.copyOf(output);
+        fErrorOutput = ImmutableList.copyOf(errorOutput);
     }
 
     // ------------------------------------------------------------------------

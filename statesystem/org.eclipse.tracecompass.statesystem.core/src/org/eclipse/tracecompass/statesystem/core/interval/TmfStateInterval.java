@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.statesystem.core.interval;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 
 import com.google.common.base.Objects;
@@ -28,7 +29,7 @@ public final class TmfStateInterval implements ITmfStateInterval {
     private final long start;
     private final long end;
     private final int attribute;
-    private final ITmfStateValue sv;
+    private final @NonNull ITmfStateValue sv;
 
     /**
      * Construct an interval from its given parameters
@@ -43,7 +44,7 @@ public final class TmfStateInterval implements ITmfStateInterval {
      *            State value this interval will contain
      */
     public TmfStateInterval(long start, long end, int attribute,
-            ITmfStateValue sv) {
+            @NonNull ITmfStateValue sv) {
         this.start = start;
         this.end = end;
         this.attribute = attribute;

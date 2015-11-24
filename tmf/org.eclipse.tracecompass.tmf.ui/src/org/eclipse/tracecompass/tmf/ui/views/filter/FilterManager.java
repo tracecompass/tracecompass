@@ -20,6 +20,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterRootNode;
@@ -89,7 +90,7 @@ public class FilterManager {
      *
      * @return The array of filters
      */
-    public static ITmfFilterTreeNode[] getSavedFilters() {
+    public static @NonNull ITmfFilterTreeNode[] getSavedFilters() {
         return fRoot.clone().getChildren();
     }
 

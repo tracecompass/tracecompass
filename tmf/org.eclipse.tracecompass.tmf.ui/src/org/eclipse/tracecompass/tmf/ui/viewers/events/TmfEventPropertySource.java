@@ -255,6 +255,9 @@ public class TmfEventPropertySource implements IPropertySource {
 
         @Override
         public Object getPropertyValue(Object id) {
+            if (!(id instanceof String)) {
+                return null;
+            }
             return event.getCustomAttribute((String) id);
         }
 
