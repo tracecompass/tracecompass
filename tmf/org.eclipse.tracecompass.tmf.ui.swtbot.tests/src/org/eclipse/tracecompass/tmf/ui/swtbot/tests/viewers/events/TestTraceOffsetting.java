@@ -14,9 +14,12 @@
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests.viewers.events;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
@@ -26,6 +29,7 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -109,6 +113,12 @@ public class TestTraceOffsetting {
      */
     @Test
     public void testOffsetting() {
+        // Skip this test on Mac OS X 10.11.1 because of bug 481611
+        // FIXME: Remove this work around once bug 481611 is fixed
+        MacOsVersion macOsVersion = MacOsVersion.getMacOsVersion();
+        boolean macBugPresent = macOsVersion != null && macOsVersion.compareTo(new MacOsVersion(10, 11, 1)) >= 0;
+        assumeTrue(!macBugPresent);
+
         SWTBotUtils.createProject(PROJET_NAME);
         SWTBotTreeItem traceFolderItem = SWTBotUtils.selectTracesFolder(fBot, PROJET_NAME);
         SWTBotUtils.openTrace(PROJET_NAME, fLocation.getAbsolutePath(), "org.eclipse.linuxtools.tmf.core.tests.xmlstub");
@@ -145,4 +155,76 @@ public class TestTraceOffsetting {
         SWTBotUtils.deleteProject(PROJET_NAME, fBot);
     }
 
+    /**
+     * Class to store the Mac OS version.
+     *
+     * This could be moved if other tests start using this.
+     */
+    private static class MacOsVersion implements Comparable<MacOsVersion> {
+        private static final Pattern MAC_OS_VERSION_PATTERN = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)");
+
+        private int fMajorVersion;
+        private int fMinorVersion;
+        private int fBugFixVersion;
+
+        private static MacOsVersion fRunningMacOsVersion;
+
+        private MacOsVersion(int version, int majorVersion, int patchVersion) {
+            this.fMajorVersion = version;
+            this.fMinorVersion = majorVersion;
+            this.fBugFixVersion = patchVersion;
+        }
+
+        private int getMajorVersion() {
+            return fMajorVersion;
+        }
+
+        private int getMinorVersion() {
+            return fMinorVersion;
+        }
+
+        private int getBugFixVersion() {
+            return fBugFixVersion;
+        }
+
+        private static MacOsVersion getMacOsVersion() {
+            if (fRunningMacOsVersion != null) {
+                return fRunningMacOsVersion;
+            }
+
+            if (!SWTUtils.isMac()) {
+                return null;
+            }
+
+            String osVersion = System.getProperty("os.version");
+            if (osVersion == null) {
+                return null;
+            }
+            Matcher matcher = MAC_OS_VERSION_PATTERN.matcher(osVersion);
+            if (matcher.matches()) {
+                try {
+                    fRunningMacOsVersion = new MacOsVersion(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)), Integer.parseInt(matcher.group(3)));
+                    return fRunningMacOsVersion;
+                } catch (NumberFormatException e) {
+                    // ignore
+                }
+            }
+            return null;
+        }
+
+        @Override
+        public int compareTo(MacOsVersion o) {
+            int compareTo = Integer.compare(fMajorVersion, o.getMajorVersion());
+            if (compareTo != 0) {
+                return compareTo;
+            }
+
+            compareTo = Integer.compare(fMinorVersion, o.getMinorVersion());
+            if (compareTo != 0) {
+                return compareTo;
+            }
+
+            return Integer.compare(fBugFixVersion, o.getBugFixVersion());
+        }
+    }
 }
