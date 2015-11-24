@@ -13,6 +13,7 @@
 
 package org.eclipse.tracecompass.tmf.tests.stubs.trace.xml;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,6 +55,8 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
+import org.eclipse.tracecompass.tmf.core.trace.indexer.checkpoint.TmfCheckpointIndexer;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 import org.xml.sax.SAXException;
 
@@ -88,14 +91,14 @@ public class TmfXmlTraceStub extends TmfTrace {
     private static final String VALUES_SEPARATOR = " \\| "; //$NON-NLS-1$
     private static final String TYPE_INTEGER = "int"; //$NON-NLS-1$
     private static final String TYPE_LONG = "long"; //$NON-NLS-1$
-    private static final String ASPECT_SPECIAL_EVENT = "set_aspects";
     private static final String ASPECT_CPU = "cpu";
 
     private static final Long SECONDS_TO_NS = 1000000000L;
 
-    private final CustomXmlTrace fTrace;
+    private final CustomXmlTraceDefinition fDefinition;
+    private CustomXmlTrace fTrace;
 
-    private Collection<ITmfEventAspect> fAspects;
+    private Collection<ITmfEventAspect> fAspects = TmfTrace.BASE_ASPECTS;
 
     /**
      * Constructor. Constructs the custom XML trace with the appropriate
@@ -106,15 +109,19 @@ public class TmfXmlTraceStub extends TmfTrace {
         /* Load custom XML definition */
         try (InputStream in = TmfXmlTraceStub.class.getResourceAsStream(DEVELOPMENT_TRACE_PARSER_PATH);) {
             CustomXmlTraceDefinition[] definitions = CustomXmlTraceDefinition.loadAll(in);
-            if (definitions.length == 0) {
+            if (definitions.length < 2) {
                 throw new IllegalStateException("The custom trace definition does not exist"); //$NON-NLS-1$
             }
-            fTrace = new CustomXmlTrace(definitions[0]);
-            /* Deregister the custom XML trace */
-            TmfSignalManager.deregister(fTrace);
-
-            Collection<ITmfEventAspect> aspects = TmfTrace.BASE_ASPECTS;
-            fAspects = aspects;
+            /* The first definition parses the 'set_aspects' event */
+            fTrace = new CustomXmlTrace(definitions[0]) {
+                @Override
+                protected ITmfTraceIndexer createIndexer(int interval) {
+                    /* Use the in-memory checkpoint indexer */
+                    return new TmfCheckpointIndexer(this, interval);
+                }
+            };
+            /* The second definition parses 'event' trace events */
+            fDefinition = checkNotNull(definitions[1]);
         } catch (IOException e) {
             throw new IllegalStateException("Cannot open the trace parser for development traces"); //$NON-NLS-1$
         }
@@ -124,8 +131,21 @@ public class TmfXmlTraceStub extends TmfTrace {
     @Override
     public void initTrace(@Nullable IResource resource, @Nullable String path, @Nullable Class<? extends ITmfEvent> type) throws TmfTraceException {
         super.initTrace(resource, path, type);
-        fTrace.initTrace(resource, path, type);
         ITmfContext ctx;
+
+        /* Initialize and read the trace with the 'set_aspects' definition */
+        TmfSignalManager.deregister(fTrace);
+        fTrace.initTrace(resource, path, type);
+        ctx = seekEvent(0L);
+        /* If a set_aspects event exists, getNext() will process it */
+        getNext(ctx);
+        ctx.dispose();
+        fTrace.dispose();
+
+        /* Initialize a new trace with the trace events definition */
+        fTrace = new CustomXmlTrace(fDefinition);
+        TmfSignalManager.deregister(fTrace);
+        fTrace.initTrace(resource, path, type);
         /* Set the start and (current) end times for this trace */
         ctx = seekEvent(0L);
         if (ctx == null) {
@@ -137,6 +157,7 @@ public class TmfXmlTraceStub extends TmfTrace {
             this.setStartTime(curTime);
             this.setEndTime(curTime);
         }
+        ctx.dispose();
     }
 
     @Override
@@ -275,15 +296,15 @@ public class TmfXmlTraceStub extends TmfTrace {
             fieldsArray[i] = new TmfEventField(fields[i], val, null);
         }
 
-        /* Generate the aspects for this trace if it is the aspects special event */
-        String eventName = getStringValue(content, EVENT_NAME_FIELD);
-        if (eventName.equals(ASPECT_SPECIAL_EVENT)) {
+        /* Generate the aspects for this trace if it is the 'set_aspects' definition */
+        if (fTrace.getDefinition() != fDefinition) {
             generateAspects(fieldsArray);
-            return getNext(context);
+            return null;
         }
 
         /* Create a new event with new fields and name */
         ITmfEventType customEventType = event.getType();
+        String eventName = getStringValue(content, EVENT_NAME_FIELD);
         TmfEventType eventType = new TmfEventType(eventName, customEventType.getRootField());
         ITmfEventField eventFields = new CustomEventContent(content.getName(), content.getValue(), fieldsArray);
         /*
@@ -295,8 +316,6 @@ public class TmfXmlTraceStub extends TmfTrace {
         ITmfTimestamp timestamp = new TmfNanoTimestamp(event.getTimestamp().getValue() / SECONDS_TO_NS);
         TmfEvent newEvent = new TmfEvent(this, ITmfContext.UNKNOWN_RANK, timestamp, eventType, eventFields);
         updateAttributes(savedContext, event);
-        context.increaseRank();
-
         return newEvent;
     }
 

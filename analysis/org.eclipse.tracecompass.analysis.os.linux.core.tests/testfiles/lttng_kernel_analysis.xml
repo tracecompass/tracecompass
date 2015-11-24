@@ -3,9 +3,9 @@
 * sched_switches and a process forking
 *************************************************************************** -->
 <trace>
-<event timestamp="0" name="set_aspects">
+<set_aspects>
 <field name="cpu" value="1" type="int" />
-</event>
+</set_aspects>
 <event timestamp="1" name="lttng_statedump_process_state">
 <field name="cpu" value="0" type="int" />
 <field name="tid" value="10" type="long" />

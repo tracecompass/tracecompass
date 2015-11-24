@@ -1,7 +1,7 @@
 <trace>
-<event timestamp="0" name="set_aspects">
+<set_aspects>
 <field name="cpu" value="1" type="int" />
-</event>
+</set_aspects>
 <event timestamp="1" name="sched_switch">
 <field name="cpu" value="0" type="int" />
 <field name="prev_comm" value="proc1" type="string" />
