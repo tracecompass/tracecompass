@@ -21,7 +21,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    BufferedBlockingQueueTest.class
+    BufferedBlockingQueueTest.class,
+    StreamFlattenerTest.class
 })
 public class AllTests {
 
