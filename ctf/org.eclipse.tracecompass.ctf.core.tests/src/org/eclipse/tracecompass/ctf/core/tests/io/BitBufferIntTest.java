@@ -42,9 +42,6 @@ public class BitBufferIntTest {
     @Before
     public void setUp() throws CTFException {
         ByteBuffer allocateDirect = ByteBuffer.allocateDirect(128);
-        if (allocateDirect == null) {
-            throw new IllegalStateException("Failed to allocate memory");
-        }
         fixture = new BitBuffer(allocateDirect);
         fixture.setByteOrder(ByteOrder.BIG_ENDIAN);
         fixture = createBuffer();
@@ -60,9 +57,6 @@ public class BitBufferIntTest {
             bytes[i] = (byte) (i % 0xff);
         }
         ByteBuffer wrap = ByteBuffer.wrap(bytes);
-        if (wrap == null) {
-            throw new IllegalStateException("Failed to allocate memory");
-        }
         BitBuffer fixture = new BitBuffer(wrap);
         fixture.position(1);
         return fixture;

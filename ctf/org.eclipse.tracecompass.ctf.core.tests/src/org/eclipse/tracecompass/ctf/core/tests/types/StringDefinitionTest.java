@@ -48,9 +48,6 @@ public class StringDefinitionTest {
         String name = "testString";
         StringDeclaration stringDec = StringDeclaration.getStringDeclaration(Encoding.UTF8);
         ByteBuffer byteBuffer = ByteBuffer.allocate(100);
-        if (byteBuffer == null) {
-            throw new IllegalStateException("Failed to allocate memory");
-        }
         BitBuffer bb = new BitBuffer(byteBuffer);
         byteBuffer.mark();
         testString = new String("testString");

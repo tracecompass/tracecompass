@@ -82,9 +82,6 @@ public class StructDeclarationTest {
     public void testCreateDefinition() throws CTFException {
         String fieldName = "";
         ByteBuffer allocate = ByteBuffer.allocate(100);
-        if (allocate == null) {
-            throw new IllegalStateException("Failed to allocate memory");
-        }
         BitBuffer bb = new BitBuffer(allocate);
         StructDefinition result = fixture.createDefinition(null, fieldName, bb);
         assertNotNull(result);

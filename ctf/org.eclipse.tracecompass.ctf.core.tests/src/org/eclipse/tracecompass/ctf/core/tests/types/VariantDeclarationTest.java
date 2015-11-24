@@ -139,9 +139,6 @@ public class VariantDeclarationTest {
         IDefinitionScope definitionScope = createDefinitionScope();
         String fieldName = "";
         ByteBuffer allocate = ByteBuffer.allocate(100);
-        if (allocate == null) {
-            throw new IllegalStateException("Failed to allocate memory");
-        }
         BitBuffer bb = new BitBuffer(allocate);
         VariantDefinition result = fixture.createDefinition(definitionScope, fieldName, bb);
 

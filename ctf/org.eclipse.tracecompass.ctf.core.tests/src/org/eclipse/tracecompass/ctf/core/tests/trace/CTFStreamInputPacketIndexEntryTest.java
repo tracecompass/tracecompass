@@ -85,7 +85,6 @@ public class CTFStreamInputPacketIndexEntryTest {
         sd.addField("load_factor", new FloatDeclaration(24, 8, ByteOrder.nativeOrder(), 8));
         sd.addField("target", StringDeclaration.getStringDeclaration(Encoding.ASCII));
         sd.addField("Enum", new EnumDeclaration(IntegerDeclaration.INT_8_DECL));
-        @SuppressWarnings("null")
         BitBuffer bb = new BitBuffer(ByteBuffer.allocate(128));
         bb.getByteBuffer().putInt(100);
         bb.getByteBuffer().putInt(200);
@@ -114,7 +113,6 @@ public class CTFStreamInputPacketIndexEntryTest {
         sd.addField("content_size", IntegerDeclaration.INT_32B_DECL);
         sd.addField("target", StringDeclaration.getStringDeclaration(Encoding.ASCII));
         sd.addField("Enum", new EnumDeclaration(IntegerDeclaration.INT_8_DECL));
-        @SuppressWarnings("null")
         BitBuffer bb = new BitBuffer(ByteBuffer.allocate(128));
         bb.getByteBuffer().putInt(100);
         bb.getByteBuffer().putInt(200);
@@ -144,7 +142,6 @@ public class CTFStreamInputPacketIndexEntryTest {
         sd.addField("target", StringDeclaration.getStringDeclaration(Encoding.ASCII));
         sd.addField("Enum", new EnumDeclaration(IntegerDeclaration.INT_8_DECL));
         sd.addField("intruder", new StructDeclaration(8));
-        @SuppressWarnings("null")
         BitBuffer bb = new BitBuffer(ByteBuffer.allocate(128));
         bb.getByteBuffer().putInt(100);
         bb.getByteBuffer().putInt(200);
@@ -174,7 +171,6 @@ public class CTFStreamInputPacketIndexEntryTest {
         sd.addField("content_size", IntegerDeclaration.INT_32B_DECL);
         sd.addField("target", StringDeclaration.getStringDeclaration(Encoding.ASCII));
         sd.addField("Enum", new EnumDeclaration(IntegerDeclaration.INT_8_DECL));
-        @SuppressWarnings("null")
         BitBuffer bb = new BitBuffer(ByteBuffer.allocate(128));
         bb.getByteBuffer().putInt(0);
         bb.getByteBuffer().put(("Test").getBytes());
@@ -200,7 +196,6 @@ public class CTFStreamInputPacketIndexEntryTest {
         sd.addField("content_size", IntegerDeclaration.INT_32B_DECL);
         sd.addField("device", StringDeclaration.getStringDeclaration(Encoding.ASCII));
         sd.addField("Enum", new EnumDeclaration(IntegerDeclaration.INT_8_DECL));
-        @SuppressWarnings("null")
         BitBuffer bb = new BitBuffer(ByteBuffer.allocate(128));
         bb.getByteBuffer().putInt(-1);
         bb.getByteBuffer().putInt(0);
@@ -228,7 +223,6 @@ public class CTFStreamInputPacketIndexEntryTest {
         sd.addField("content_size", IntegerDeclaration.INT_32B_DECL);
         sd.addField("cpu_id", IntegerDeclaration.INT_32B_DECL);
         sd.addField("events_discarded", IntegerDeclaration.INT_32B_DECL);
-        @SuppressWarnings("null")
         BitBuffer bb = new BitBuffer(ByteBuffer.allocate(128));
         bb.getByteBuffer().putInt(-1);
         bb.getByteBuffer().putInt(0);
@@ -259,7 +253,6 @@ public class CTFStreamInputPacketIndexEntryTest {
         final EnumDeclaration declaration = new EnumDeclaration(IntegerDeclaration.createDeclaration(16, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 8));
         declaration.add(313, 315, "CPU-PI");
         sd.addField("device", declaration);
-        @SuppressWarnings("null")
         BitBuffer bb = new BitBuffer(ByteBuffer.allocate(128));
         bb.getByteBuffer().putInt(-1);
         bb.getByteBuffer().putInt(0);
@@ -285,7 +278,6 @@ public class CTFStreamInputPacketIndexEntryTest {
         sd.addField("content_size", IntegerDeclaration.INT_32B_DECL);
         final IDeclaration declaration = IntegerDeclaration.createDeclaration(16, false, 10, ByteOrder.BIG_ENDIAN, Encoding.NONE, "", 8);
         sd.addField("device", declaration);
-        @SuppressWarnings("null")
         BitBuffer bb = new BitBuffer(ByteBuffer.allocate(128));
         bb.getByteBuffer().putInt(-1);
         bb.getByteBuffer().putInt(0);
@@ -311,7 +303,6 @@ public class CTFStreamInputPacketIndexEntryTest {
         StructDeclaration sd = new StructDeclaration(8);
         sd.addField("timestamp_begin", IntegerDeclaration.INT_32B_DECL);
         sd.addField("timestamp_end", IntegerDeclaration.INT_32B_DECL);
-        @SuppressWarnings("null")
         BitBuffer bb = new BitBuffer(ByteBuffer.allocate(128));
 
         StructDefinition sdef = sd.createDefinition(null, ILexicalScope.PACKET_HEADER, bb);

@@ -82,9 +82,6 @@ public class StringDeclarationTest {
         IDefinitionScope definitionScope = null;
         String fieldName = "id";
         ByteBuffer allocate = ByteBuffer.allocate(100);
-        if (allocate == null) {
-            throw new IllegalStateException("Failed to allocate memory");
-        }
         BitBuffer bb = new BitBuffer(allocate);
         StringDefinition result = fixture.createDefinition(definitionScope,
                 fieldName, bb);

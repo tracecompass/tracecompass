@@ -67,10 +67,7 @@ public class SequenceDefinition2Test {
         structDef = new StructDefinition(structDec, null, "x",  new Definition[] { new IntegerDefinition(id, null, lengthName, seqLen) });
 
         SequenceDeclaration sd = new SequenceDeclaration(lengthName, id);
-        ByteBuffer allocateDirect = java.nio.ByteBuffer.allocateDirect(seqLen * len);
-        if( allocateDirect == null){
-            throw new IllegalStateException("Failed to allocate memory");
-        }
+        ByteBuffer allocateDirect = ByteBuffer.allocateDirect(seqLen * len);
         BitBuffer input = new BitBuffer(allocateDirect);
         for (int i = 0; i < seqLen; i++) {
             input.putInt(i);

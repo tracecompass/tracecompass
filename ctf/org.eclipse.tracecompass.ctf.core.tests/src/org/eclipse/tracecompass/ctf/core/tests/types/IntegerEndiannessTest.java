@@ -49,9 +49,6 @@ public class IntegerEndiannessTest {
     public void setUp() {
         bb = java.nio.ByteBuffer.allocateDirect(8);
         final ByteBuffer byb = bb;
-        if (byb == null) {
-            throw new IllegalStateException("Failed to allocate memory");
-        }
         bb.put((byte) 0xab);
         bb.put((byte) 0xcd);
         bb.put((byte) 0xef);

@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
@@ -50,9 +49,7 @@ public class CTFPacketReaderTest {
     private static final StructDeclaration EMPTY_STRUCT = new StructDeclaration(8);
 
     private static @NonNull BitBuffer createBitBuffer(byte[] bytes) {
-        // TODO: annotate ByteBuffer.wrap
-        ByteBuffer bb = NonNullUtils.checkNotNull(ByteBuffer.wrap(bytes));
-        return new BitBuffer(bb);
+        return new BitBuffer(ByteBuffer.wrap(bytes));
     }
 
     /**

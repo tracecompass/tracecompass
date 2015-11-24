@@ -95,10 +95,8 @@ public class EthernetIIPacket extends Packet {
             byte[] array = new byte[packet.array().length - packet.position()];
             packet.get(array);
             ByteBuffer payload = ByteBuffer.wrap(array);
-            if (payload != null) {
-                payload.order(ByteOrder.BIG_ENDIAN);
-                payload.position(0);
-            }
+            payload.order(ByteOrder.BIG_ENDIAN);
+            payload.position(0);
             fPayload = payload;
 
         } else {
