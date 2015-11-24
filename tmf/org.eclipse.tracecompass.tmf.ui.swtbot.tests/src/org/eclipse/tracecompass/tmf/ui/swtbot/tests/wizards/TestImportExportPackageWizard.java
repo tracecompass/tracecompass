@@ -66,10 +66,6 @@ public class TestImportExportPackageWizard {
     private static final String PROJECT_NAME = "Test";
     private static final String XMLSTUB_ID = "org.eclipse.linuxtools.tmf.core.tests.xmlstub";
 
-    /*
-     * FIXME: bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=477508, we
-     * shouldn't need so many events.
-     */
     private static final String TRACE_CONTENT = "<trace>" +
             "<event timestamp=\"100\" name=\"event\"><field name=\"field\" value=\"1\" type=\"int\" /></event>" +
             "<event timestamp=\"200\" name=\"event1\"><field name=\"field\" value=\"2\" type=\"int\" /></event>" +

@@ -1,6 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <CustomXMLTraceDefinitionList>
-<Definition name="handmade">
+<Definition name="set_aspects">
+<InputElement name="trace">
+<InputElement logentry="true" name="set_aspects">
+<InputData action="0" format="" name="Ignore"/>
+<InputElement name="field">
+<InputData action="0" format="" name="Ignore"/>
+<Attribute name="name">
+<InputData action="2" format="" name="fields"/>
+</Attribute>
+<Attribute name="type">
+<InputData action="2" format="" name="type"/>
+</Attribute>
+<Attribute name="value">
+<InputData action="2" format="" name="values"/>
+</Attribute>
+</InputElement>
+</InputElement>
+</InputElement>
+<OutputColumn name="fields"/>
+<OutputColumn name="values"/>
+<OutputColumn name="type"/>
+</Definition>
+<Definition name="events">
 <TimeStampOutputFormat>T</TimeStampOutputFormat>
 <InputElement name="trace">
 <InputElement logentry="true" name="event">

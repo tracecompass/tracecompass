@@ -1,8 +1,8 @@
 <trace>
-<event timestamp="0" name="set_aspects">
+<set_aspects>
 <field name="cpu" value="1" type="int" />
 <field name="test" value="abc" type="string" />
-</event>
+</set_aspects>
 <event timestamp="1" name="A">
 <field name="cpu" value="1" type="int" />
 <field name="test" value="abc" type="string" />
