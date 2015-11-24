@@ -58,7 +58,7 @@ public class OpenTraceStressTest {
      */
     @BeforeClass
     public static void init() {
-        SWTBotUtils.failIfUIThread();
+        SWTBotUtils.initialize();
 
         /* Set up for swtbot */
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */

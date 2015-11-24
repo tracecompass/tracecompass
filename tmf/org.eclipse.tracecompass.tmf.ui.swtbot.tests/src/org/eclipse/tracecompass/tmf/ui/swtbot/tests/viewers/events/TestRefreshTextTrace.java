@@ -62,7 +62,7 @@ public class TestRefreshTextTrace {
     @BeforeClass
     public static void init() {
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
-        SWTBotUtils.failIfUIThread();
+        SWTBotUtils.initialize();
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
         Logger.getRootLogger().addAppender(new NullAppender());
         fBot = new SWTWorkbenchBot();

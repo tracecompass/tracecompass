@@ -62,7 +62,7 @@ public class KernelTest {
      */
     @BeforeClass
     public static void beforeClass() {
-        SWTBotUtils.failIfUIThread();
+        SWTBotUtils.initialize();
 
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */

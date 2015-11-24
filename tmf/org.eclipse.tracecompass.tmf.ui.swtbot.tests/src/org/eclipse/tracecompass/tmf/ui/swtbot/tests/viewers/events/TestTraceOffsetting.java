@@ -72,7 +72,7 @@ public class TestTraceOffsetting {
      */
     @Before
     public void init() throws IOException {
-        SWTBotUtils.failIfUIThread();
+        SWTBotUtils.initialize();
         Thread.currentThread().setName("SWTBot Thread"); // for the debugger
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */

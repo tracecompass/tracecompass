@@ -134,7 +134,7 @@ public class CallStackViewTest {
      */
     @BeforeClass
     public static void init() {
-        SWTBotUtils.failIfUIThread();
+        SWTBotUtils.initialize();
 
         Thread.currentThread().setName("SWTBot Thread"); // for the debugger
         /* set up for swtbot */

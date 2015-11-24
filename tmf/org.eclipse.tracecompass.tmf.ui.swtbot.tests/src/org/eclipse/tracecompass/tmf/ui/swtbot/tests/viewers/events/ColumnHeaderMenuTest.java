@@ -72,7 +72,7 @@ public class ColumnHeaderMenuTest {
      */
     @BeforeClass
     public static void beforeClass() {
-        SWTBotUtils.failIfUIThread();
+        SWTBotUtils.initialize();
 
         /* set up test trace */
         URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(COLUMN_TRACE_PATH), null);

@@ -83,7 +83,7 @@ public abstract class AbstractImportAndReadSmokeTest {
     @BeforeClass
     public static void init() {
         assumeTrue(fTrace.exists());
-        SWTBotUtils.failIfUIThread();
+        SWTBotUtils.initialize();
 
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 50000; /* 50 second timeout */

@@ -31,6 +31,7 @@ import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -250,14 +251,54 @@ public final class SWTBotUtils {
     }
 
     /**
+     * Initialize the environment for SWTBot
+     */
+    public static void initialize() {
+        failIfUIThread();
+
+        final SWTWorkbenchBot bot = new SWTWorkbenchBot();
+        UIThreadRunnable.syncExec(new VoidResult() {
+            @Override
+            public void run() {
+                Shell shell = bot.activeShell().widget;
+
+                // Only adjust shell if it appears to be the top-most
+                if (shell.getParent() == null) {
+                    makeShellFullyVisible(shell);
+                }
+            }
+        });
+    }
+
+    /**
      * If the test is running in the UI thread then fail
      */
-    public static void failIfUIThread() {
+    private static void failIfUIThread() {
         if (Display.getCurrent() != null && Display.getCurrent().getThread() == Thread.currentThread()) {
             fail("SWTBot test needs to run in a non-UI thread. Make sure that \"Run in UI thread\" is unchecked in your launch configuration or"
                     + " that useUIThread is set to false in the pom.xml");
         }
+    }
 
+    /**
+     * Try to make the shell fully visible in the display. If the shell cannot
+     * fit the display, it will be positioned so that top-left corner is at
+     * <code>(0, 0)</code> in display-relative coordinates.
+     *
+     * @param shell
+     *            the shell to make fully visible
+     */
+    private static void makeShellFullyVisible(Shell shell) {
+        Rectangle displayBounds = shell.getDisplay().getBounds();
+        Point absCoord = shell.toDisplay(0, 0);
+        Point shellSize = shell.getSize();
+
+        Point newLocation = new Point(absCoord.x, absCoord.y);
+        newLocation.x = Math.max(0, Math.min(absCoord.x, displayBounds.width - shellSize.x));
+        newLocation.y = Math.max(0, Math.min(absCoord.y, displayBounds.height - shellSize.y));
+        if (!newLocation.equals(absCoord)) {
+            shell.setLocation(newLocation);
+        }
     }
 
     /**

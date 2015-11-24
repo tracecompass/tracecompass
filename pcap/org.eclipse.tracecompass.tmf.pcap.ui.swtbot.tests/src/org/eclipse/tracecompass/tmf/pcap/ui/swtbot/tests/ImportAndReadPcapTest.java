@@ -86,7 +86,7 @@ public class ImportAndReadPcapTest {
     @BeforeClass
     public static void init() {
 
-        SWTBotUtils.failIfUIThread();
+        SWTBotUtils.initialize();
 
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 300000; /* 300 second timeout */
