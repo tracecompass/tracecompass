@@ -15,14 +15,10 @@ import java.io.File;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.debuginfo.FileOffsetMapper;
-import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.debuginfo.UstDebugInfoLoadedBinaryFile;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
-import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 import com.google.common.collect.Iterables;
 
@@ -42,12 +38,12 @@ public class UstDebugInfoSourceAspect implements ITmfEventAspect {
 
     @Override
     public String getName() {
-        return nullToEmptyString(Messages.UstDebugInfoAnalysis_AspectName);
+        return nullToEmptyString(Messages.UstDebugInfoAnalysis_SourceAspectName);
     }
 
     @Override
     public String getHelpText() {
-        return nullToEmptyString(Messages.UstDebugInfoAnalysis_AspectHelpText);
+        return nullToEmptyString(Messages.UstDebugInfoAnalysis_SourceAspectHelpText);
     }
 
     @Override
@@ -57,53 +53,16 @@ public class UstDebugInfoSourceAspect implements ITmfEventAspect {
             return null;
         }
 
-        ILttngUstEventLayout layout = ((LttngUstTrace) event.getTrace()).getEventLayout();
-
-        /* We need both the vpid and ip contexts */
-        ITmfEventField vpidField = event.getContent().getField(layout.contextVpid());
-        ITmfEventField ipField = event.getContent().getField(layout.contextIp());
-        if (vpidField == null || ipField == null) {
-            return null;
-        }
-        Long vpid = (Long) vpidField.getValue();
-        Long ip = (Long) ipField.getValue();
-
         /*
-         * First match the IP to the correct binary or library, by using the
-         * UstDebugInfoAnalysis.
+         * Resolve the binary callsite first, from there we can use the file's
+         * debug information if it is present.
          */
-        UstDebugInfoAnalysisModule module =
-                TmfTraceUtils.getAnalysisModuleOfClass(event.getTrace(),
-                        UstDebugInfoAnalysisModule.class, UstDebugInfoAnalysisModule.ID);
-        if (module == null) {
-            /*
-             * The analysis is not available for this trace, we won't be
-             * able to find the information.
-             */
-            return null;
-        }
-        long ts = event.getTimestamp().getValue();
-        UstDebugInfoLoadedBinaryFile file = module.getMatchingFile(ts, vpid, ip);
-        if (file == null) {
+        BinaryCallsite bc = UstDebugInfoBinaryAspect.INSTANCE.resolve(event);
+        if (bc == null) {
             return null;
         }
 
-        long offset;
-        if (isMainBinary(file)) {
-            /*
-             * In the case of the object being the main binary (loaded at a very
-             * low address), we must pass the actual ip address to addr2line.
-             */
-            offset = ip.longValue();
-        } else {
-            offset = (ip.longValue() - file.getBaseAddress());
-        }
-
-        if (offset < 0) {
-            throw new IllegalStateException();
-        }
-
-        Iterable<TmfCallsite> callsites = FileOffsetMapper.getCallsiteFromOffset(new File(file.getFilePath()), offset);
+        Iterable<TmfCallsite> callsites = FileOffsetMapper.getCallsiteFromOffset(new File(bc.getBinaryFilePath()), bc.getOffset());
 
         if (callsites == null || Iterables.isEmpty(callsites)) {
             return null;
@@ -115,14 +74,4 @@ public class UstDebugInfoSourceAspect implements ITmfEventAspect {
          */
         return Iterables.getLast(callsites);
     }
-
-    private static boolean isMainBinary(UstDebugInfoLoadedBinaryFile file) {
-        /*
-         * Ghetto binary/library identification for now. It would be possible to
-         * parse the ELF binary to check if it is position-independent
-         * (-fPIC/-fPIE) or not.
-         */
-        return (!file.getFilePath().endsWith(".so")); //$NON-NLS-1$
-    }
-
 }

@@ -18,15 +18,18 @@ import org.eclipse.osgi.util.NLS;
  * @author Alexandre Montplaisir
  * @since 2.0
  */
+@SuppressWarnings("javadoc")
 public class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.messages"; //$NON-NLS-1$
 
-    /** Name of the DebugInfo aspect */
-    public static @Nullable String UstDebugInfoAnalysis_AspectName;
+    public static @Nullable String UstDebugInfoAnalysis_SourceAspectName;
+    public static @Nullable String UstDebugInfoAnalysis_SourceAspectHelpText;
+    public static @Nullable String UstDebugInfoAnalysis_BinaryAspectName;
+    public static @Nullable String UstDebugInfoAnalysis_BinaryAspectHelpText;
 
-    /** Help text of the DebugInfo aspect */
-    public static @Nullable String UstDebugInfoAnalysis_AspectHelpText;
+    public static @Nullable String UstDebugInfoAnalysis_Offset;
+    public static @Nullable String UstDebugInfoAnalysis_Symbol;
 
     static {
         // initialize resource bundle
