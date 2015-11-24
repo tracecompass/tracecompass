@@ -170,17 +170,8 @@ public class XmlUtilsTest {
     @Test
     public void testGetElementInFile() {
         File testXmlFile = TmfXmlTestFiles.VALID_FILE.getFile();
-        if ((testXmlFile == null) || !testXmlFile.exists()) {
-            fail("XML test file does not exist");
-        }
-        /*
-         * This sounds useless, but I get a potential null pointer warning
-         * otherwise
-         */
-        if (testXmlFile == null) {
-            return;
-        }
-
+        assertNotNull("XML test file does not exist", testXmlFile);
+        assertTrue("XML test file does not exist", testXmlFile.exists());
         Element analysis = XmlUtils.getElementInFile(testXmlFile.getAbsolutePath(), TmfXmlStrings.STATE_PROVIDER, ANALYSIS_ID);
         assertNotNull(analysis);
     }

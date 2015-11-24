@@ -320,7 +320,8 @@ public class StreamListView extends TmfView {
     @Override
     public void createPartControl(@Nullable Composite parent) {
         // Initialize
-        fTableMap = new HashMap<>();
+        final Map<TmfPcapProtocol, Table> tables = new HashMap<>();
+        fTableMap = tables;
         fCurrentTrace = TmfTraceManager.getInstance().getActiveTrace();
         fCurrentStream = null;
 
@@ -330,8 +331,7 @@ public class StreamListView extends TmfView {
 
             @Override
             public void widgetSelected(@Nullable SelectionEvent e) {
-                Map<TmfPcapProtocol, Table> tables = fTableMap;
-                if (tables == null || e == null) {
+                if (e == null) {
                     return;
                 }
                 TmfPcapProtocol protocol = (TmfPcapProtocol) e.item.getData(KEY_PROTOCOL);
@@ -372,11 +372,6 @@ public class StreamListView extends TmfView {
                     }
 
                 });
-
-                Map<TmfPcapProtocol, Table> tables = fTableMap;
-                if (tables == null) {
-                    return;
-                }
 
                 tables.put(protocol, table);
 

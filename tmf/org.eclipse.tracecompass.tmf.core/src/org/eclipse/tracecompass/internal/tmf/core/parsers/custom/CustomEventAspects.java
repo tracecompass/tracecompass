@@ -18,6 +18,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomEvent;
@@ -74,8 +75,7 @@ public class CustomEventAspects {
         @Override
         public String resolve(ITmfEvent event) {
             if (event instanceof CustomEvent) {
-                String ret = ((CustomEvent) event).getEventString(fIndex);
-                return (ret == null ? EMPTY_STRING : ret);
+                return NonNullUtils.nullToEmptyString(((CustomEvent) event).getEventString(fIndex));
             }
             return EMPTY_STRING;
         }
