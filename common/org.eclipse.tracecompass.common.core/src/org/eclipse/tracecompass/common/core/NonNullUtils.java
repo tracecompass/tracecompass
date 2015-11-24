@@ -13,7 +13,6 @@
 package org.eclipse.tracecompass.common.core;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -89,68 +88,6 @@ public final class NonNullUtils {
             throw new NullPointerException();
         }
         return obj;
-    }
-
-    /**
-     * Convert a non-annotated [] array reference to a @NonNull one.
-     *
-     * Note that this method does not check the array contents itself, which can
-     * still contain null elements.
-     *
-     * @param array
-     *            The array whose reference should not be null
-     * @return A {@link NonNull} reference to the array
-     * @throws NullPointerException
-     *             If the reference was actually null
-     * @since 2.0
-     */
-    public static <T> T[] checkNotNull(T @Nullable [] array) {
-        if (array == null) {
-            throw new NullPointerException();
-        }
-        return array;
-    }
-
-    /**
-     * Convert a non-annotated {@link Iterable} to a NonNull one.
-     *
-     * Note that, unlike {{@link #checkNotNull(Object)}}, this method does not
-     * check the contents itself, which can still contain null elements.
-     *
-     * @param container
-     *            The iterable whose reference should not be null
-     * @return A {@link NonNull} reference to the Iterable. The original class
-     *         type is preserved.
-     * @throws NullPointerException
-     *             If the reference was actually null
-     * @since 2.0
-     */
-    public static <T, C extends Iterable<T>> C checkNotNull(@Nullable C container) {
-        if (container == null) {
-            throw new NullPointerException();
-        }
-        return container;
-    }
-
-    /**
-     * Convert a non-annotated {@link Map} to a NonNull one.
-     *
-     * Note that, unlike {{@link #checkNotNull(Object)}}, this method does not
-     * check the keys or values themselves, which can still contain null
-     * elements.
-     *
-     * @param map
-     *            The map whose reference should not be null
-     * @return A {@link NonNull} reference to the Map
-     * @throws NullPointerException
-     *             If the reference was actually null
-     * @since 2.0
-     */
-    public static <K, V, M extends Map<K, V>> M checkNotNull(@Nullable M map) {
-        if (map == null) {
-            throw new NullPointerException();
-        }
-        return map;
     }
 
     /**

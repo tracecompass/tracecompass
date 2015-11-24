@@ -20,6 +20,7 @@ import java.util.TreeMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
@@ -52,7 +53,7 @@ import com.google.common.collect.TreeMultimap;
  *
  * @author Alexandre Montplaisir
  */
-public class TreeMapStore<E extends ISegment> implements ISegmentStore<E> {
+public class TreeMapStore<@NonNull E extends ISegment> implements ISegmentStore<E> {
 
     private final ReadWriteLock fLock = new ReentrantReadWriteLock(false);
 
