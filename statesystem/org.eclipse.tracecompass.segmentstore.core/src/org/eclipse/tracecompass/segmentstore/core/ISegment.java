@@ -37,10 +37,11 @@ public interface ISegment extends Serializable, Comparable<ISegment> {
     long getEnd();
 
     /**
-     * The length/duration of the segment. Normally ({@link #getEnd()} -
-     * {@link #getStart()}).
+     * The length/duration of the segment.
      *
      * @return The duration
      */
-    long getLength();
+    default long getLength() {
+        return getEnd() - getStart();
+    }
 }

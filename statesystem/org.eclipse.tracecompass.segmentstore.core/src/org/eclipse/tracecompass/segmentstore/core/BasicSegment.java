@@ -62,11 +62,6 @@ public class BasicSegment implements ISegment {
     }
 
     @Override
-    public long getLength() {
-        return (fEnd - fStart);
-    }
-
-    @Override
     public int compareTo(@Nullable ISegment o) {
         if (o == null) {
             throw new IllegalArgumentException();

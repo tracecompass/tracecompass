@@ -99,11 +99,6 @@ public class SystemCall implements ISegment {
         return fEndTime;
     }
 
-    @Override
-    public long getLength() {
-        return fEndTime - fInfo.fStartTime;
-    }
-
     /**
      * Get the name of the system call
      *
