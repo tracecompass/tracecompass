@@ -41,7 +41,7 @@ import org.junit.Test;
  * @author Patrick Tasse
  */
 @SuppressWarnings("javadoc")
-public class TmfFilterNodeTest extends TmfFilterTreeNodeTest {
+public class TmfFilterNodeTest extends TmfFilterTreeNodeTestBase {
 
     // ------------------------------------------------------------------------
     // Variables

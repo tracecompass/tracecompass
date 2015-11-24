@@ -31,12 +31,8 @@
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-surefire-plugin</artifactId>
         <configuration>
-          <testSuite>org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests</testSuite>
-          <testClass>org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests.AllTests</testClass>
           <useUIHarness>true</useUIHarness>
           <useUIThread>false</useUIThread>
-          <argLine>${tycho.testArgLine} ${base.ui.test.vmargs}</argLine>
-          <product>org.eclipse.platform.ide</product>
           <environmentVariables>
             <SWT_GTK3>${SWT_GTK3}</SWT_GTK3>
             <LIBOVERLAY_SCROLLBAR>0</LIBOVERLAY_SCROLLBAR>

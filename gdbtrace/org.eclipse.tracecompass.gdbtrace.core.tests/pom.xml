@@ -23,20 +23,4 @@
 
   <name>Trace Compass GDB Tracepoint Analysis Core Tests Plug-in</name>
 
- <build>
-    <plugins>
-        <plugin>
-            <groupId>org.eclipse.tycho</groupId>
-            <artifactId>tycho-surefire-plugin</artifactId>
-            <configuration>
-                <testSuite>org.eclipse.tracecompass.gdbtrace.core.tests</testSuite>
-                <testClass>org.eclipse.tracecompass.gdbtrace.core.tests.AllGdbTraceCoreTests</testClass>
-                <useUIHarness>false</useUIHarness>
-                <useUIThread>false</useUIThread>
-                <product>org.eclipse.platform.ide</product>
-            </configuration>
-        </plugin>
-    </plugins>
-  </build>
-
 </project>

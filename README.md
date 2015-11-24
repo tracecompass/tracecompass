@@ -80,7 +80,7 @@ the build system. You can set them by using `-P[profile name]` and
 
   Runs a test suite present in `releng/org.eclipse.tracecompass.alltests`. The
   test suite to run has to be defined by `-DcustomTestSuite=[name]`, for example
-  `-DcustomTestSuite=RunAllCoreTests`.
+  `-DcustomTestSuite=RunAllPerfTests`.
 
 * `-Pdeploy-rcp`
 

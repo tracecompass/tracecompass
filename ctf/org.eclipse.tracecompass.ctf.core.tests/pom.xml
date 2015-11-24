@@ -66,19 +66,6 @@
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/AllCtfCoreTests.*</include>
-          </includes>
-          <useUIHarness>false</useUIHarness>
-          <useUIThread>false</useUIThread>
-          <product>org.eclipse.platform.ide</product>
-        </configuration>
-      </plugin>
-
       <!-- We don't use the ant file to clean because of http://jira.codehaus.org/browse/MANTRUN-78 -->
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>

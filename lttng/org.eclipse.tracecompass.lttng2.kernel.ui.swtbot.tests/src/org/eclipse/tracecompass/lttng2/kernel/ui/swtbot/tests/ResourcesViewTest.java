@@ -41,7 +41,7 @@ import org.junit.Test;
  *
  * @author Patrick Tasse
  */
-public class ResourcesViewTest extends KernelTest {
+public class ResourcesViewTest extends KernelTestBase {
 
     private static final String NEXT_MARKER = "Next Marker";
     private static final String PREVIOUS_MARKER = "Previous Marker";

@@ -52,7 +52,7 @@ import org.junit.Test;
  * @author Patrick Tasse
  */
 @SuppressWarnings("javadoc")
-public class TmfFilterTraceTypeNodeTest extends TmfFilterTreeNodeTest {
+public class TmfFilterTraceTypeNodeTest extends TmfFilterTreeNodeTestBase {
 
     // ------------------------------------------------------------------------
     // Variables

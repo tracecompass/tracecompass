@@ -25,20 +25,4 @@
 
   <name>Best Trace Format Tests Plug-in</name>
 
- <build>
-    <plugins>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-surefire-plugin</artifactId>
-        <configuration>
-          <testSuite>org.eclipse.tracecompass.btf.core.tests</testSuite>
-          <testClass>org.eclipse.tracecompass.btf.core.tests.AllTests</testClass>
-          <useUIHarness>false</useUIHarness>
-          <useUIThread>false</useUIThread>
-          <product>org.eclipse.platform.ide</product>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
 </project>

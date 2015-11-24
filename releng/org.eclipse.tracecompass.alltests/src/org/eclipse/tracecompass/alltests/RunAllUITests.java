@@ -20,12 +20,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    org.eclipse.tracecompass.gdbtrace.ui.tests.AllGdbTraceUITests.class,
-    org.eclipse.tracecompass.lttng2.control.ui.tests.AllTests.class,
-    org.eclipse.tracecompass.lttng2.ust.ui.tests.AllTests.class,
-    org.eclipse.tracecompass.tmf.analysis.xml.ui.tests.AllAnalysisXmlUiTests.class,
-    org.eclipse.tracecompass.tmf.remote.ui.tests.AllTmfRemoteUITests.class,
-    org.eclipse.tracecompass.tmf.ui.tests.AllTmfUITests.class,
+    // FIXME Link to all UI tests
 
 })
 public class RunAllUITests {

@@ -18,6 +18,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
+import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.keyboard.Keyboard;
 import org.eclipse.swtbot.swt.finder.keyboard.KeyboardFactory;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
@@ -37,13 +38,15 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphContro
 import org.eclipse.ui.IWorkbenchPart;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * SWTBot tests for Control Flow view
  *
  * @author Patrick Tasse
  */
-public class ControlFlowViewTest extends KernelTest {
+@RunWith(SWTBotJunit4ClassRunner.class)
+public class ControlFlowViewTest extends KernelTestBase {
 
     private static final String FOLLOW_CPU_BACKWARD = "Follow CPU Backward";
     private static final String FOLLOW_CPU_FORWARD = "Follow CPU Forward";
@@ -73,6 +76,8 @@ public class ControlFlowViewTest extends KernelTest {
     public void before() {
         super.before();
         fViewBot = fBot.viewByTitle("Control Flow");
+        fViewBot.show();
+        fViewBot.setFocus();
     }
 
     /**

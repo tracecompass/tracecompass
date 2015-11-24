@@ -53,7 +53,7 @@ import org.junit.runner.RunWith;
  * @author Matthew Khouzam
  */
 @RunWith(SWTBotJunit4ClassRunner.class)
-public class ImportAndReadKernelSmokeTest extends KernelTest {
+public class ImportAndReadKernelSmokeTest extends KernelTestBase {
 
     private ITmfEvent fDesired1;
     private ITmfEvent fDesired2;

@@ -23,12 +23,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    org.eclipse.tracecompass.tmf.ui.swtbot.tests.AllTmfUISWTBotTests.class,
-    org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests.AllTests.class,
-    org.eclipse.tracecompass.tmf.pcap.ui.swtbot.tests.AllTests.class,
-    org.eclipse.tracecompass.tmf.remote.ui.swtbot.tests.AllTmfRemoteUISWTBotTests.class,
-    org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests.AllTests.class,
-    org.eclipse.tracecompass.lttng2.ust.ui.swtbot.tests.AllTests.class
+    // FIXME Link to all swtbot tests
 })
 public class RunAllSWTBotTests {
 

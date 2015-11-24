@@ -32,7 +32,7 @@ import org.junit.Test;
  * @author Patrick Tasse
  */
 @SuppressWarnings("javadoc")
-public class TmfFilterContainsNodeTest extends TmfFilterTreeNodeTest {
+public class TmfFilterContainsNodeTest extends TmfFilterTreeNodeTestBase {
 
     // ------------------------------------------------------------------------
     // Variables

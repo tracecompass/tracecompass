@@ -25,18 +25,14 @@
 
   <name>Trace Compass TMF Remote UI Tests Plug-in</name>
 
- <build>
+  <build>
     <plugins>
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-surefire-plugin</artifactId>
         <configuration>
-          <testSuite>org.eclipse.tracecompass.tmf.remote.ui.tests</testSuite>
-          <testClass>org.eclipse.tracecompass.tmf.remote.ui.tests.AllTmfRemoteUITests</testClass>
           <useUIHarness>true</useUIHarness>
           <useUIThread>true</useUIThread>
-          <argLine>${tycho.testArgLine} ${base.ui.test.vmargs}</argLine>
-          <product>org.eclipse.platform.ide</product>
         </configuration>
       </plugin>
     </plugins>
