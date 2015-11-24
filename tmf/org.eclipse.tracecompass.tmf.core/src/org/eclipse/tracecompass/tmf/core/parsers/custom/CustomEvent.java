@@ -137,6 +137,9 @@ public class CustomEvent extends TmfEvent {
 
     @Override
     public ITmfEventField getContent() {
+        if (fData != null) {
+            processData();
+        }
         return customEventContent;
     }
 
@@ -230,8 +233,7 @@ public class CustomEvent extends TmfEvent {
                 fColumnData[i++] = new TmfEventField(outputColumn.name, (value != null ? value : ""), null); //$NON-NLS-1$
             }
         }
-        CustomEventContent curContent = (CustomEventContent) getContent();
-        setContent(new CustomEventContent(curContent.getName(), curContent.getValue(), fColumnData));
+        setContent(new CustomEventContent(customEventContent.getName(), customEventContent.getValue(), fColumnData));
         fData = null;
     }
 
