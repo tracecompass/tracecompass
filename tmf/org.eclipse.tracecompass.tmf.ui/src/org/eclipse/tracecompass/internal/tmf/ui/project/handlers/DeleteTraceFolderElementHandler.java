@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -259,7 +258,7 @@ public class DeleteTraceFolderElementHandler extends AbstractHandler {
                         throw new OperationCanceledException();
                     }
                     Object element = iterator.next();
-                    SubProgressMonitor elementSubMonitor = new SubProgressMonitor(subMonitor, 1);
+                    IProgressMonitor elementSubMonitor = subMonitor.newChild(1);
                     if (element instanceof TmfTraceElement) {
                         final TmfTraceElement trace = (TmfTraceElement) element;
                         if (!trace.getResource().exists()) {
@@ -294,14 +293,13 @@ public class DeleteTraceFolderElementHandler extends AbstractHandler {
                             // delete all traces under this folder
                             SubMonitor childrenSubMonitor = SubMonitor.convert(elementSubMonitor, folder.getTraces().size() + 1);
                             for (TmfTraceElement traceElement : folder.getTraces()) {
-                                SubProgressMonitor deleteSubMonitor = new SubProgressMonitor(childrenSubMonitor, 1);
-                                traceElement.delete(deleteSubMonitor);
+                                traceElement.delete(childrenSubMonitor.newChild(1));
                             }
 
                             // Finally, delete the folder. For the Traces
                             // folder, we only delete the children since the
                             // folder should always be there.
-                            final SubProgressMonitor deleteSubMonitor = new SubProgressMonitor(subMonitor, 1);
+                            final IProgressMonitor deleteSubMonitor = subMonitor.newChild(1);
                             if (folder instanceof TmfTracesFolder) {
                                 resource.accept(new IResourceVisitor() {
                                     @Override

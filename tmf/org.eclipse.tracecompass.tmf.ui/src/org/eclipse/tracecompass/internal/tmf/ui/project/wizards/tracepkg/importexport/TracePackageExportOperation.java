@@ -35,7 +35,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.AbstractTracePackageOperation;
@@ -134,7 +134,7 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
 
             setStatus(exportToArchive(progressMonitor, totalWork));
 
-            fExportFolder.delete(true, new SubProgressMonitor(progressMonitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
+            fExportFolder.delete(true, SubMonitor.convert(progressMonitor));
 
             progressMonitor.done();
 
@@ -150,7 +150,7 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
         if (folder.exists()) {
             folder.delete(true, null);
         }
-        folder.create(IResource.FORCE | IResource.HIDDEN, true, new SubProgressMonitor(monitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
+        folder.create(IResource.FORCE | IResource.HIDDEN, true, SubMonitor.convert(monitor));
         return folder;
     }
 
@@ -194,9 +194,9 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
 
                 // project/.traceExport/.tracing/A/B
                 IFolder folder = fExportFolder.getFolder(relativeToExportFolder.removeLastSegments(1));
-                TraceUtils.createFolder(folder, new SubProgressMonitor(monitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
+                TraceUtils.createFolder(folder, SubMonitor.convert(monitor));
 
-                res.refreshLocal(0, new SubProgressMonitor(monitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
+                res.refreshLocal(0, SubMonitor.convert(monitor));
                 createExportResource(folder, res);
                 Element suppFileElement = doc.createElement(ITracePackageConstants.SUPPLEMENTARY_FILE_ELEMENT);
 
@@ -220,7 +220,7 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
 
         // project/.traceExport/A/B
         IFolder folder = fExportFolder.getFolder(relativeToExportFolder.removeLastSegments(1));
-        TraceUtils.createFolder(folder, new SubProgressMonitor(monitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
+        TraceUtils.createFolder(folder, SubMonitor.convert(monitor));
 
         createExportResource(folder, resource);
         Element fileElement = doc.createElement(ITracePackageConstants.TRACE_FILE_ELEMENT);
@@ -295,7 +295,7 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
         op.setCreateLeadupStructure(false);
         op.setUseCompression(fUseCompression);
         op.setUseTarFormat(fUseTar);
-        op.run(new SubProgressMonitor(monitor, totalWork / 2, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
+        op.run(SubMonitor.convert(monitor).newChild(totalWork / 2));
 
         return op.getStatus();
     }

@@ -37,7 +37,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.ModalContext;
@@ -150,10 +149,10 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
             // Temporary directory to contain any extracted files
             IFolder destTempFolder = fTraceFolderElement.getProject().getResource().getFolder(TRACE_IMPORT_TEMP_FOLDER);
             if (destTempFolder.exists()) {
-                SubProgressMonitor monitor = new SubProgressMonitor(subMonitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
+                SubMonitor monitor = subMonitor.newChild(1);
                 destTempFolder.delete(true, monitor);
             }
-            SubProgressMonitor monitor = new SubProgressMonitor(subMonitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK);
+            SubMonitor monitor = subMonitor.newChild(1);
             destTempFolder.create(IResource.HIDDEN, true, monitor);
 
             subMonitor = SubMonitor.convert(progressMonitor, 2);
@@ -446,7 +445,7 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
         operation.setOverwriteResources(false);
         operation.setVirtualFolders(false);
 
-        operation.run(new SubProgressMonitor(progressMonitor, subList.size(), SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
+        operation.run(SubMonitor.convert(progressMonitor).newChild(subList.size()));
     }
 
     private static TraceFileSystemElement getRootElement(TraceFileSystemElement element) {
@@ -609,7 +608,7 @@ public class TraceValidateAndImportOperation implements IRunnableWithProgress {
         operation.setCreateLinks(createLinksInWorkspace);
         operation.setVirtualFolders(false);
 
-        operation.run(new SubProgressMonitor(monitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
+        operation.run(SubMonitor.convert(monitor).newChild(1));
         String sourceLocation = fileSystemElement.getSourceLocation();
         IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(tracePath);
         if (sourceLocation != null) {

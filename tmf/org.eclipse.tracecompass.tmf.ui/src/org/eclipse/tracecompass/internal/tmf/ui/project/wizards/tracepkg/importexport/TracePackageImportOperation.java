@@ -37,7 +37,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
@@ -263,7 +263,7 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
             TmfTraceElement existingTrace = getMatchingTraceElement(traceElement);
             if (existingTrace != null) {
                 try {
-                    existingTrace.delete(new SubProgressMonitor(progressMonitor, 1, SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
+                    existingTrace.delete(SubMonitor.convert(progressMonitor));
                 } catch (CoreException e) {
                     return new Status(IStatus.ERROR, Activator.PLUGIN_ID, org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.Messages.TracePackage_ErrorOperation, e);
                 }
@@ -473,7 +473,7 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
         operation.setOverwriteResources(true);
 
         try {
-            operation.run(new SubProgressMonitor(monitor, fileNameAndLabelPairs.size(), SubProgressMonitor.PREPEND_MAIN_LABEL_TO_SUBTASK));
+            operation.run(SubMonitor.convert(monitor));
             archiveFile.close();
         } catch (InvocationTargetException e) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.Messages.TracePackage_ErrorOperation, e);
