@@ -105,6 +105,7 @@ public class TmfTraceTest {
     public void tearDown() {
         fTrace.dispose();
         fTrace = null;
+        assertEquals(0, TmfProviderManager.getProviders(ITmfEvent.class).length);
     }
 
     // ------------------------------------------------------------------------
@@ -132,6 +133,7 @@ public class TmfTraceTest {
             assertEquals("getStartTime", 1, trace.getStartTime().getValue());
             assertEquals("getEndTime", NB_EVENTS, trace.getEndTime().getValue());
 
+            trace.dispose();
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
         } catch (final IOException e) {
@@ -161,6 +163,7 @@ public class TmfTraceTest {
             assertEquals("getStartTime", 1, trace.getStartTime().getValue());
             assertEquals("getEndTime", NB_EVENTS, trace.getEndTime().getValue());
 
+            trace.dispose();
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
         } catch (final IOException e) {
@@ -190,6 +193,8 @@ public class TmfTraceTest {
             assertEquals("getStartTime", 1, trace.getStartTime().getValue());
             assertEquals("getEndTime", NB_EVENTS, trace.getEndTime().getValue());
 
+            original.dispose();
+            trace.dispose();
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
         } catch (final IOException e) {
@@ -251,6 +256,8 @@ public class TmfTraceTest {
         assertEquals("getRange-end",   Long.MIN_VALUE, trace.getTimeRange().getEndTime().getValue());
         assertEquals("getStartTime",   Long.MIN_VALUE, trace.getStartTime().getValue());
         assertEquals("getEndTime",     Long.MIN_VALUE, trace.getEndTime().getValue());
+
+        trace.dispose();
     }
 
     @Test
@@ -279,6 +286,8 @@ public class TmfTraceTest {
         assertEquals("getRange-end",   Long.MIN_VALUE, trace.getTimeRange().getEndTime().getValue());
         assertEquals("getStartTime",   Long.MIN_VALUE, trace.getStartTime().getValue());
         assertEquals("getEndTime",     Long.MIN_VALUE, trace.getEndTime().getValue());
+
+        trace.dispose();
     }
 
     @Test
@@ -326,6 +335,8 @@ public class TmfTraceTest {
         assertEquals("getRange-end",   NB_EVENTS, trace.getTimeRange().getEndTime().getValue());
         assertEquals("getStartTime",   1,         trace.getStartTime().getValue());
         assertEquals("getEndTime",     NB_EVENTS, trace.getEndTime().getValue());
+
+        trace.dispose();
     }
 
     // ------------------------------------------------------------------------
@@ -1378,6 +1389,7 @@ public class TmfTraceTest {
             TmfTimestamp initRange = new TmfTimestamp(5, ITmfTimestamp.MILLISECOND_SCALE);
             assertEquals("getInitialRangeOffset", initRange, trace.getInitialRangeOffset());
 
+            trace.dispose();
         } catch (final URISyntaxException e) {
             fail("URISyntaxException");
         } catch (final IOException e) {
