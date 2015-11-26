@@ -15,6 +15,7 @@
 package org.eclipse.tracecompass.internal.tmf.remote.core.shell;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;
@@ -35,8 +36,9 @@ import org.eclipse.remote.core.IRemoteProcessService;
 import org.eclipse.tracecompass.internal.tmf.remote.core.messages.Messages;
 import org.eclipse.tracecompass.internal.tmf.remote.core.preferences.TmfRemotePreferences;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandInput;
+import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandOutputListener;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandResult;
-import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandShell;
+import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandShell2;
 
 /**
  * <p>
@@ -46,7 +48,7 @@ import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandShell;
  * @author Patrick Tasse
  * @author Bernd Hufmann
  */
-public class CommandShell implements ICommandShell {
+public class CommandShell implements ICommandShell2 {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -83,6 +85,11 @@ public class CommandShell implements ICommandShell {
 
     @Override
     public ICommandResult executeCommand(final ICommandInput command, final IProgressMonitor aMonitor) throws ExecutionException {
+        return executeCommand(command, aMonitor, null);
+    }
+
+    @Override
+    public ICommandResult executeCommand(final ICommandInput command, final IProgressMonitor aMonitor, final ICommandOutputListener listener) throws ExecutionException {
         if (fConnection.isOpen()) {
             FutureTask<CommandResult> future = new FutureTask<>(new Callable<CommandResult>() {
                 @Override
@@ -92,9 +99,13 @@ public class CommandShell implements ICommandShell {
                         monitor = new NullProgressMonitor();
                     }
                     if (!monitor.isCanceled()) {
-                        IRemoteProcess process = fConnection.getService(IRemoteProcessService.class).getProcessBuilder(command.getInput()).start();
-                        InputReader stdout = new InputReader(checkNotNull(process.getInputStream()));
-                        InputReader stderr = new InputReader(checkNotNull(process.getErrorStream()));
+                        IRemoteProcessService service = fConnection.getService(IRemoteProcessService.class);
+                        if (service == null) {
+                            return new CommandResult(1, new String[0], new  String[] { nullToEmptyString(Messages.RemoteConnection_ServiceNotDefined) });
+                        }
+                        IRemoteProcess process = service.getProcessBuilder(command.getInput()).start();
+                        InputReader stdout = new InputReader(checkNotNull(process.getInputStream()), listener, true);
+                        InputReader stderr = new InputReader(checkNotNull(process.getErrorStream()), listener, false);
 
                         try {
                             stdout.waitFor(monitor);
