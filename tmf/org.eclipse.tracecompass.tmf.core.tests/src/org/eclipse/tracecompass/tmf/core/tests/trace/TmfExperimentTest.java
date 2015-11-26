@@ -29,6 +29,7 @@ import java.util.Vector;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.tracecompass.internal.tmf.core.component.TmfProviderManager;
 import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfExperimentContext;
 import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfExperimentLocation;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
@@ -51,6 +52,7 @@ import org.eclipse.tracecompass.tmf.core.trace.location.TmfLongLocation;
 import org.eclipse.tracecompass.tmf.tests.stubs.analysis.TestExperimentAnalysis;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfExperimentStub;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -109,6 +111,14 @@ public class TmfExperimentTest {
     public void setUp() {
         setupTrace(TmfTestTrace.A_TEST_10K.getFullPath());
         setupExperiment();
+    }
+
+    @After
+    public void tearDown() {
+        if (fExperiment != null) {
+            fExperiment.dispose();
+        }
+        assertEquals(0, TmfProviderManager.getProviders(ITmfEvent.class).length);
     }
 
     // ------------------------------------------------------------------------
@@ -170,6 +180,8 @@ public class TmfExperimentTest {
         final TmfTimeRange timeRange = fExperiment.getTimeRange();
         assertEquals("getStartTime", 1, timeRange.getStartTime().getValue());
         assertEquals("getEndTime", NB_EVENTS, timeRange.getEndTime().getValue());
+
+        experiment.dispose();
     }
 
     // ------------------------------------------------------------------------
