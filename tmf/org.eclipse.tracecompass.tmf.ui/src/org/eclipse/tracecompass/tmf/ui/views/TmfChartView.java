@@ -225,8 +225,10 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
         int plotAreaOffset = fChartViewer.getPointAreaOffset();
         int width1 = Math.max(0, offset - plotAreaOffset - fSashForm.getSashWidth());
         int width2 = Math.max(0, total - width1 - fSashForm.getSashWidth());
-        fSashForm.setWeights(new int[] { width1, width2 });
-        fSashForm.layout();
+        if (width1 >= 0 && width2 > 0 || width1 > 0 && width2 >= 0) {
+            fSashForm.setWeights(new int[] { width1, width2 });
+            fSashForm.layout();
+        }
 
         Composite composite = fXYViewerContainer;
         GridLayout layout = (GridLayout) composite.getLayout();

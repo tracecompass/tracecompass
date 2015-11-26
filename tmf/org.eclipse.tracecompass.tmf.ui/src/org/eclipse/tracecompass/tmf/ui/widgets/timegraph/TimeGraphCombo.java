@@ -1200,8 +1200,10 @@ public class TimeGraphCombo extends Composite {
         int timeAxisOffset = Math.min(offset, total);
         int width1 = Math.max(0, timeAxisOffset - fSashForm.getSashWidth());
         int width2 = total - timeAxisOffset;
-        fSashForm.setWeights(new int[] { width1, width2 });
-        fSashForm.layout();
+        if (width1 >= 0 && width2 > 0 || width1 > 0 && width2 >= 0) {
+            fSashForm.setWeights(new int[] { width1, width2 });
+            fSashForm.layout();
+        }
 
         Composite composite = fTimeGraphViewer.getTimeAlignedComposite();
         GridLayout layout = (GridLayout) composite.getLayout();
