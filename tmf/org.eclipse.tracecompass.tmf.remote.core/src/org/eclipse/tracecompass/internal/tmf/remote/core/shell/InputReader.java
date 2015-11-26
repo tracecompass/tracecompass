@@ -19,6 +19,8 @@ import java.io.InputStreamReader;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandOutputListener;
 
 @NonNullByDefault
 class InputReader {
@@ -30,7 +32,7 @@ class InputReader {
     private final StringBuilder fResult;
     private volatile boolean fDone;
 
-    public InputReader(InputStream inputStream) {
+    public InputReader(InputStream inputStream, @Nullable final ICommandOutputListener listener, final boolean isStdOut) {
         fResult = new StringBuilder();
         fReader = new InputStreamReader(inputStream);
         fThread = new Thread() {
@@ -41,6 +43,13 @@ class InputReader {
                 try {
                     while (!fDone && (read = fReader.read(buffer)) > 0) {
                         fResult.append(buffer, 0, read);
+                        if (listener != null) {
+                            if (isStdOut) {
+                                listener.outputUpdated(String.valueOf(buffer, 0, read));
+                            } else {
+                                listener.errorOutputUpdated(String.valueOf(buffer, 0, read));
+                            }
+                        }
                     }
                 } catch (IOException e) {
                 }

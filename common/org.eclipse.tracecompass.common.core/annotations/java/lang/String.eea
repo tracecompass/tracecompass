@@ -41,3 +41,6 @@ valueOf
 valueOf
  ([C)Ljava/lang/String;
  ([C)L1java/lang/String;
+valueOf
+ ([CII)Ljava/lang/String;
+ ([CII)L1java/lang/String;

@@ -36,6 +36,7 @@ import org.eclipse.remote.core.IRemoteProcessService;
 import org.eclipse.tracecompass.internal.tmf.remote.core.messages.Messages;
 import org.eclipse.tracecompass.internal.tmf.remote.core.preferences.TmfRemotePreferences;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandInput;
+import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandOutputListener;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandResult;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandShell;
 
@@ -84,6 +85,11 @@ public class CommandShell implements ICommandShell {
 
     @Override
     public ICommandResult executeCommand(final ICommandInput command, final IProgressMonitor aMonitor) throws ExecutionException {
+        return executeCommand(command, aMonitor, null);
+    }
+
+    @Override
+    public ICommandResult executeCommand(final ICommandInput command, final IProgressMonitor aMonitor, ICommandOutputListener listener) throws ExecutionException {
         if (fConnection.isOpen()) {
             FutureTask<CommandResult> future = new FutureTask<>(new Callable<CommandResult>() {
                 @Override
@@ -98,8 +104,8 @@ public class CommandShell implements ICommandShell {
                             return new CommandResult(1, new @NonNull String[0], new @NonNull String[] { nullToEmptyString(Messages.RemoteConnection_ServiceNotDefined) });
                         }
                         IRemoteProcess process = service.getProcessBuilder(command.getInput()).start();
-                        InputReader stdout = new InputReader(checkNotNull(process.getInputStream()));
-                        InputReader stderr = new InputReader(checkNotNull(process.getErrorStream()));
+                        InputReader stdout = new InputReader(checkNotNull(process.getInputStream()), listener, true);
+                        InputReader stderr = new InputReader(checkNotNull(process.getErrorStream()), listener, false);
 
                         try {
                             stdout.waitFor(monitor);

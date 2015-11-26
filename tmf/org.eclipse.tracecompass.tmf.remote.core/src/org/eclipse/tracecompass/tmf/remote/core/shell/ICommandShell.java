@@ -42,6 +42,22 @@ public interface ICommandShell {
     ICommandResult executeCommand(ICommandInput command, @Nullable IProgressMonitor monitor) throws ExecutionException;
 
     /**
+     * Method to execute a command on the command shell.
+     *
+     * @param command
+     *            The command to executed
+     * @param monitor
+     *            A progress monitor
+     * @param listener
+     *            A command output listener (can be null if not used)
+     * @return a {@link ICommandResult} instance
+     * @throws ExecutionException
+     *             If the command fails
+     * @since 2.0
+     */
+    ICommandResult executeCommand(ICommandInput command, @Nullable IProgressMonitor monitor, @Nullable ICommandOutputListener listener) throws ExecutionException;
+
+    /**
      * Creates a command input instance
      *
      * @return {@link ICommandInput} instance

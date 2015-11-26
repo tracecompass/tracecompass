@@ -18,6 +18,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.internal.tmf.remote.core.shell.CommandInput;
 import org.eclipse.tracecompass.internal.tmf.remote.core.shell.CommandResult;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandInput;
+import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandOutputListener;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandResult;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandShell;
 
@@ -36,6 +37,11 @@ public class TestCommandShell implements ICommandShell {
 
     @Override
     public ICommandResult executeCommand(ICommandInput command, IProgressMonitor monitor) throws ExecutionException {
+        return executeCommand(command, monitor, null);
+    }
+
+    @Override
+    public ICommandResult executeCommand(ICommandInput command, IProgressMonitor monitor, ICommandOutputListener listener) throws ExecutionException {
         if (fIsConnected) {
             return createCommandResult(0, new String[0], new String[0]);
         }

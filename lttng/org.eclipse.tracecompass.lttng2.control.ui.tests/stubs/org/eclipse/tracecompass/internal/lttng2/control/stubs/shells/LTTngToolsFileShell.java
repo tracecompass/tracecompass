@@ -32,6 +32,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.tracecompass.internal.tmf.remote.core.stubs.shells.TestCommandShell;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandInput;
+import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandOutputListener;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandResult;
 
 @SuppressWarnings("javadoc")
@@ -246,6 +247,11 @@ public class LTTngToolsFileShell extends TestCommandShell {
 
     @Override
     public synchronized ICommandResult executeCommand(ICommandInput command, IProgressMonitor monitor) throws ExecutionException {
+        return executeCommand(command, monitor, null);
+    }
+
+    @Override
+    public synchronized ICommandResult executeCommand(ICommandInput command, IProgressMonitor monitor, ICommandOutputListener listener) throws ExecutionException {
         Map<String, ICommandResult> commands = checkNotNull(fScenarioMap.get(fScenario));
         String commandLine = command.toString();
         String fullCommand = commandLine;
