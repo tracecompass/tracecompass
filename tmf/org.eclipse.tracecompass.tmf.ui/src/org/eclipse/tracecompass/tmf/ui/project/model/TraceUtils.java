@@ -50,8 +50,8 @@ public class TraceUtils {
             @Override
             public void run() {
                 final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-                MessageDialog.openError(shell, boxTitle, errorMsg);
                 Activator.getDefault().logError(errorMsg);
+                MessageDialog.openError(shell, boxTitle, errorMsg);
             }
         });
     }
