@@ -44,17 +44,6 @@ public class ChannelCommandParameter extends CommandParameter {
         fChannel = channel;
     }
 
-    /**
-     * Copy constructor
-     *
-     * @param param
-     *            a channel command parameter to copy
-     */
-    public ChannelCommandParameter(ChannelCommandParameter param) {
-        super(param);
-        fChannel = param.fChannel;
-    }
-
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -66,4 +55,13 @@ public class ChannelCommandParameter extends CommandParameter {
         return fChannel;
     }
 
+    // ------------------------------------------------------------------------
+    // Cloneable interface
+    // ------------------------------------------------------------------------
+    @Override
+    public ChannelCommandParameter clone() {
+        ChannelCommandParameter clone = (ChannelCommandParameter) super.clone();
+        clone.fChannel = fChannel;
+        return clone;
+    }
 }

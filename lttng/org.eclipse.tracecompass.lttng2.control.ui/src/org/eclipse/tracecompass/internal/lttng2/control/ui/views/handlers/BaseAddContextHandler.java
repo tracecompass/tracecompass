@@ -81,7 +81,7 @@ public abstract class BaseAddContextHandler extends BaseControlViewHandler {
             }
 
             // Make a copy for thread safety
-            final CommandParameter param = new CommandParameter(tmpParam);
+            final CommandParameter param = tmpParam.clone();
 
             UIJob getJob = new UIJob(Messages.TraceControl_GetContextJob) {
                 @Override

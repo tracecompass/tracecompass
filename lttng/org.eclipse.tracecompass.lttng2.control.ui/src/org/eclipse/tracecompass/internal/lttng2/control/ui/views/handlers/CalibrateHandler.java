@@ -70,7 +70,7 @@ public class CalibrateHandler extends BaseControlViewHandler {
             }
 
             // Make a copy for thread safety
-            final DomainCommandParameter param = new DomainCommandParameter(tmpParam);
+            final DomainCommandParameter param = tmpParam.clone();
 
             Job addJob = new Job(Messages.TraceControl_AddCalibrateJob) {
                 @Override
