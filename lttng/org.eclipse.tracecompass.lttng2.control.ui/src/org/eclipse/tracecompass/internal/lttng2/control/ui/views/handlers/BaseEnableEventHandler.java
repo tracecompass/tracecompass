@@ -148,7 +148,7 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
             if (tmpParam == null) {
                 return null;
             }
-            tmpParam = new CommandParameter(tmpParam);
+            tmpParam = tmpParam.clone();
         } finally {
             fLock.unlock();
         }

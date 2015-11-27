@@ -55,15 +55,14 @@ public class DomainCommandParameter extends CommandParameter {
         return fDomain;
     }
 
-    /**
-     * Copy constructor
-     *
-     * @param param
-     *            a domain command parameter to copy
-     */
-    public DomainCommandParameter(DomainCommandParameter param) {
-        super(param);
-        fDomain = param.fDomain;
+    // ------------------------------------------------------------------------
+    // Cloneable interface
+    // ------------------------------------------------------------------------
+    @Override
+    public DomainCommandParameter clone() {
+        DomainCommandParameter clone = (DomainCommandParameter) super.clone();
+        clone.fDomain = fDomain;
+        return clone;
     }
 
 }

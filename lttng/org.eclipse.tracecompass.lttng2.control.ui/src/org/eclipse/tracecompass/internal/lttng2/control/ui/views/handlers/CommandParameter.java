@@ -20,7 +20,7 @@ import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.Trac
  * @author Bernd Hufmann
  */
 @NonNullByDefault
-public class CommandParameter {
+public class CommandParameter implements Cloneable {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -43,16 +43,6 @@ public class CommandParameter {
         fSession = session;
     }
 
-    /**
-     * Copy constructor
-     *
-     * @param param
-     *            a command parameter to copy
-     */
-    public CommandParameter(CommandParameter param) {
-        fSession = param.fSession;
-    }
-
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -62,5 +52,20 @@ public class CommandParameter {
      */
     public TraceSessionComponent getSession() {
         return fSession;
+    }
+
+    // ------------------------------------------------------------------------
+    // Cloneable interface
+    // ------------------------------------------------------------------------
+    @Override
+    protected CommandParameter clone() {
+        CommandParameter clone;
+        try {
+            clone = (CommandParameter) super.clone();
+            clone.fSession = fSession;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException();
+        }
+        return clone;
     }
 }

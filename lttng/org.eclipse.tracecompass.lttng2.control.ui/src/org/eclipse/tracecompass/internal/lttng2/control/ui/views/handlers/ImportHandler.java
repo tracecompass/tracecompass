@@ -119,7 +119,7 @@ public class ImportHandler extends BaseControlViewHandler {
             if (param == null) {
                 return null;
             }
-            param = new CommandParameter(param);
+            param = param.clone();
         } finally {
             fLock.unlock();
         }

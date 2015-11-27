@@ -43,17 +43,6 @@ public class EventCommandParameter extends CommandParameter {
         fEvent = event;
     }
 
-    /**
-     * Copy constructor
-     *
-     * @param param
-     *            a event command parameter to copy
-     */
-    public EventCommandParameter(EventCommandParameter param) {
-        super(param);
-        fEvent = param.fEvent;
-    }
-
     // ------------------------------------------------------------------------
     // Accessors
     // ------------------------------------------------------------------------
@@ -64,4 +53,15 @@ public class EventCommandParameter extends CommandParameter {
     public TraceEventComponent getEvent() {
         return fEvent;
     }
+
+    // ------------------------------------------------------------------------
+    // Cloneable interface
+    // ------------------------------------------------------------------------
+    @Override
+    public EventCommandParameter clone() {
+        EventCommandParameter clone = (EventCommandParameter) super.clone();
+        clone.fEvent = fEvent;
+        return clone;
+    }
+
 }
