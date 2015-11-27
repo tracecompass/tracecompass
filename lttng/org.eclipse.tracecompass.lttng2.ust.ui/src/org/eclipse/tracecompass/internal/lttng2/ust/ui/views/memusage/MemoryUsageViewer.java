@@ -117,7 +117,8 @@ public class MemoryUsageViewer extends TmfCommonXLineChartViewer {
                         if (!procnameValue.isNull()) {
                             procname = procnameValue.unboxStr();
                         }
-                        fSeriesName.put(quark, procname + ' ' + '(' + ss.getAttributeName(quark) + ')').trim();
+                        String seriesName = procname + ' ' + '(' + ss.getAttributeName(quark) + ')';
+                        fSeriesName.put(quark, seriesName.trim());
                     } catch (TimeRangeException e) {
                         fSeriesName.put(quark, '(' + ss.getAttributeName(quark) + ')');
                     }
