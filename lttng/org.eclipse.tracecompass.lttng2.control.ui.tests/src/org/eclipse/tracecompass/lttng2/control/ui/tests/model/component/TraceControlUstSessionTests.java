@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.lttng2.control.ui.tests.model.component;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -24,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.ILogListener;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.remote.core.IRemoteConnection;
@@ -36,12 +39,14 @@ import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.BufferType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.ChannelInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.stubs.dialogs.AddContextDialogStub;
 import org.eclipse.tracecompass.internal.lttng2.control.stubs.dialogs.CreateSessionDialogStub;
 import org.eclipse.tracecompass.internal.lttng2.control.stubs.dialogs.DestroyConfirmDialogStub;
 import org.eclipse.tracecompass.internal.lttng2.control.stubs.dialogs.EnableChannelDialogStub;
 import org.eclipse.tracecompass.internal.lttng2.control.stubs.dialogs.EnableEventsDialogStub;
 import org.eclipse.tracecompass.internal.lttng2.control.stubs.dialogs.GetEventInfoDialogStub;
 import org.eclipse.tracecompass.internal.lttng2.control.stubs.service.TestRemoteSystemProxy;
+import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs.TraceControlDialogFactory;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceControlComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent;
@@ -189,6 +194,54 @@ public class TraceControlUstSessionTests {
         assertEquals(TraceEnablement.ENABLED, channel.getState());
         assertEquals(16384, channel.getSubBufferSize());
         assertEquals(100, channel.getSwitchTimer());
+
+        // ------------------------------------------------------------------------
+        // Add context on channel
+        // ------------------------------------------------------------------------
+        AddContextDialogStub addContextStub = new AddContextDialogStub();
+        List<String> contexts = new ArrayList<>();
+        contexts.add("procname");
+        contexts.add("vtid");
+        addContextStub.setContexts(contexts);
+        TraceControlDialogFactory.getInstance().setAddContextDialog(addContextStub);
+
+        /*
+         * Currently there is nothing to verify because the list commands don't
+         * show any context information. However, the execution of the command
+         * makes sure that the correct service command line is built and
+         * executed.
+         *
+         * There was a bug in the control where the add context command was
+         * called with -k option instead of -u. Sending the -k option would
+         * cause that the command string is not found in the scenario. When a
+         * command string is not found then it is logged in the error log.
+         *
+         * Check the error log here to verify that the command was successful.
+         */
+        final IStatus[] statusToCheck = new IStatus[1];
+        ILogListener listener = new ILogListener() {
+            @Override
+            public void logging(IStatus status, String plugin) {
+                if (plugin.contentEquals(Activator.PLUGIN_ID)  && (!status.isOK())) {
+                    statusToCheck[0] = status;
+                }
+            }
+        };
+        Activator.getDefault().getLog().addLogListener(listener);
+
+        fFacility.executeCommand(channels[0], "addContextOnChannel");
+
+        // check that no error status was created
+        assertNull(statusToCheck[0]);
+
+        Activator.getDefault().getLog().removeLogListener(listener);
+
+        fFacility.delay(10000);
+
+        // Get Kernel domain component instance
+        domains = session.getChildren();
+        assertNotNull(domains);
+        assertEquals(1, domains.length);
 
         // ------------------------------------------------------------------------
         // Enable channel on domain
