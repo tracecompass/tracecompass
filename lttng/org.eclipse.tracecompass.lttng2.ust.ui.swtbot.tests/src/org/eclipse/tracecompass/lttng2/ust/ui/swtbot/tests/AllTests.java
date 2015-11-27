@@ -20,7 +20,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    CallStackViewTest.class
+    CallStackViewTest.class,
+    MemoryUsageViewTest.class
 })
 public class AllTests {
 
