@@ -1,0 +1,4 @@
+class org/eclipse/cdt/dsf/service/DsfServicesTracker
+getService
+ <V:Ljava/lang/Object;>(Ljava/lang/Class<TV;>;)TV;
+ <V:Ljava/lang/Object;>(Ljava/lang/Class<TV;>;)T0V;

@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.remote.core.IRemoteConnectionChangeListener;
@@ -181,7 +182,7 @@ public class TargetNodeComponent extends TraceControlComponent implements IRemot
     }
 
     @Override
-    public <T> T getAdapter(Class<T> adapter) {
+    public <T> @Nullable T getAdapter(Class<T> adapter) {
         if (adapter == IPropertySource.class) {
             return adapter.cast(new TargetNodePropertySource(this));
         }

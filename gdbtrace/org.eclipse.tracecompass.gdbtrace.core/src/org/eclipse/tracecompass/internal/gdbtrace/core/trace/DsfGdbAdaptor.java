@@ -442,7 +442,14 @@ public class DsfGdbAdaptor {
                                 IContainerDMContext containerDMC = (IContainerDMContext)(getData()[0]);
                                 IBreakpointsTargetDMContext bpTargetDMC = DMContexts.getAncestorOfType(containerDMC , IBreakpointsTargetDMContext.class);
 
-                                CommandFactory cmdFactory = tracker.getService(IMICommandControl.class).getCommandFactory();
+                                IMICommandControl commandService = tracker.getService(IMICommandControl.class);
+                                if (commandService == null) {
+                                    drm.setStatus(new Status(IStatus.ERROR, GdbPlugin.PLUGIN_ID, IDsfStatusConstants.INTERNAL_ERROR, "Could not find necessary services", null)); //$NON-NLS-1$
+                                    drm.done();
+                                    return;
+                                }
+
+                                CommandFactory cmdFactory = commandService.getCommandFactory();
                                 IBreakpoints bpService = tracker.getService(MIBreakpoints.class);
                                 if (cmdFactory == null || bpService == null) {
                                     drm.setStatus(new Status(IStatus.ERROR, GdbPlugin.PLUGIN_ID, IDsfStatusConstants.INTERNAL_ERROR, "Could not find necessary services", null)); //$NON-NLS-1$
@@ -520,8 +527,12 @@ public class DsfGdbAdaptor {
                 final IGDBTraceControl traceControl = tracker
                         .getService(IGDBTraceControl.class);
 
-                final ICommandControlService commandControl = tracker
-                        .getService(ICommandControlService.class);
+                final ICommandControlService commandControl = tracker.getService(ICommandControlService.class);
+                if (commandControl == null) {
+                    queryRm.setStatus(new Status(IStatus.ERROR, GdbPlugin.PLUGIN_ID, IDsfStatusConstants.INTERNAL_ERROR, "Could not find necessary services", null)); //$NON-NLS-1$
+                    queryRm.done();
+                    return;
+                }
                 final ITraceTargetDMContext dmc = (ITraceTargetDMContext) commandControl
                         .getContext();
 
@@ -606,6 +617,12 @@ public class DsfGdbAdaptor {
                 final IGDBTraceControl traceControl = tracker.getService(IGDBTraceControl.class);
 
                 final ICommandControlService commandControl = tracker.getService(ICommandControlService.class);
+                if (commandControl == null) {
+                    queryRm.setStatus(new Status(IStatus.ERROR, GdbPlugin.PLUGIN_ID, IDsfStatusConstants.INTERNAL_ERROR, "Could not find necessary services", null)); //$NON-NLS-1$
+                    queryRm.done();
+                    return;
+                }
+
                 final ITraceTargetDMContext dmc = (ITraceTargetDMContext) commandControl.getContext();
 
                 if (traceControl != null) {
@@ -670,6 +687,11 @@ public class DsfGdbAdaptor {
                 final IGDBTraceControl traceControl = tracker.getService(IGDBTraceControl.class);
 
                 final ICommandControlService commandControl = tracker.getService(ICommandControlService.class);
+                if (commandControl == null) {
+                    rm.setStatus(new Status(IStatus.ERROR, GdbPlugin.PLUGIN_ID, IDsfStatusConstants.INTERNAL_ERROR, "Could not find necessary services", null)); //$NON-NLS-1$
+                    rm.done();
+                    return;
+                }
                 final ITraceTargetDMContext dmc = (ITraceTargetDMContext) commandControl.getContext();
 
                 if (traceControl != null) {

@@ -15,6 +15,7 @@
 package org.eclipse.tracecompass.internal.tmf.remote.core.shell;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;
@@ -92,7 +93,11 @@ public class CommandShell implements ICommandShell {
                         monitor = new NullProgressMonitor();
                     }
                     if (!monitor.isCanceled()) {
-                        IRemoteProcess process = fConnection.getService(IRemoteProcessService.class).getProcessBuilder(command.getInput()).start();
+                        IRemoteProcessService service = fConnection.getService(IRemoteProcessService.class);
+                        if (service == null) {
+                            return new CommandResult(1, new @NonNull String[0], new @NonNull String[] { nullToEmptyString(Messages.RemoteConnection_ServiceNotDefined) });
+                        }
+                        IRemoteProcess process = service.getProcessBuilder(command.getInput()).start();
                         InputReader stdout = new InputReader(checkNotNull(process.getInputStream()));
                         InputReader stderr = new InputReader(checkNotNull(process.getErrorStream()));
 

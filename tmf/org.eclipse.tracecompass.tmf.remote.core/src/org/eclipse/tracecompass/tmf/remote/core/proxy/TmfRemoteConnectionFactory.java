@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.remote.core.proxy;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -135,7 +137,7 @@ public class TmfRemoteConnectionFactory {
                 }
 
                 if (wc.hasService(IRemoteConnectionHostService.class)) {
-                    IRemoteConnectionHostService hostService = wc.getService(IRemoteConnectionHostService.class);
+                    IRemoteConnectionHostService hostService = checkNotNull(wc.getService(IRemoteConnectionHostService.class));
                     hostService.setHostname(hostUri.getHost());
                     hostService.setPort(hostUri.getPort());
                     String user = hostUri.getUserInfo();

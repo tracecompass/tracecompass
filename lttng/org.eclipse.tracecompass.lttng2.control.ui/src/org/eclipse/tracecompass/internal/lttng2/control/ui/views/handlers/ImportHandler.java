@@ -14,6 +14,8 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.handlers;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Iterator;
@@ -161,7 +163,7 @@ public class ImportHandler extends BaseControlViewHandler {
         }
 
         String scheme = rc.getConnectionType().getScheme();
-        IRemoteConnectionHostService hostService = rc.getService(IRemoteConnectionHostService.class);
+        IRemoteConnectionHostService hostService = checkNotNull(rc.getService(IRemoteConnectionHostService.class));
         String address = hostService.getHostname();
         String user = hostService.getUsername();
         int port =  hostService.getPort();

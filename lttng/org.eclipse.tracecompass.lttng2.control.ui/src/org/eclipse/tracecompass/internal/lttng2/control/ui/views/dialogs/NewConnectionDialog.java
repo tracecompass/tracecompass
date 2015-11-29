@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.dialogs;
 
 import static java.text.MessageFormat.format;
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -392,7 +393,8 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         StringBuffer label = new StringBuffer();
         label.append(rc.getName());
         if (rc.hasService(IRemoteConnectionHostService.class)) {
-            label.append(format(" [{0}]", rc.getService(IRemoteConnectionHostService.class).getHostname())); //$NON-NLS-1$
+            IRemoteConnectionHostService service = checkNotNull(rc.getService(IRemoteConnectionHostService.class));
+            label.append(format(" [{0}]", service.getHostname())); //$NON-NLS-1$
         }
         return label.toString();
     }

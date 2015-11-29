@@ -1,0 +1,4 @@
+class org/eclipse/remote/core/IRemoteConnection
+getService
+ <T::Lorg/eclipse/remote/core/IRemoteConnection$Service;>(Ljava/lang/Class<TT;>;)TT;
+ <T::Lorg/eclipse/remote/core/IRemoteConnection$Service;>(Ljava/lang/Class<TT;>;)T0T;
