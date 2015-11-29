@@ -157,7 +157,7 @@ public class TraceTypeHelper {
      *
      * @return The trace class
      */
-    public Class<? extends ITmfTrace> getTraceClass() {
+    public Class<@NonNull ? extends ITmfTrace> getTraceClass() {
         return fTrace.getClass();
     }
 

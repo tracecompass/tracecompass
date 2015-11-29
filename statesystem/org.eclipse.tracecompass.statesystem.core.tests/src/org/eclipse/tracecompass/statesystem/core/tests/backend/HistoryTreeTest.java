@@ -16,6 +16,7 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.IOException;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTConfig;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTInterval;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTNode;
@@ -42,9 +43,9 @@ public class HistoryTreeTest {
 
     /* String with 23 characters, interval in file will be 25 bytes long */
     private static final String TEST_STRING = "abcdefghifklmnopqrstuvw";
-    private static final TmfStateValue STRING_VALUE = TmfStateValue.newValueString(TEST_STRING);
-    private static final TmfStateValue LONG_VALUE = TmfStateValue.newValueLong(10L);
-    private static final TmfStateValue INT_VALUE = TmfStateValue.newValueInt(1);
+    private static final @NonNull TmfStateValue STRING_VALUE = TmfStateValue.newValueString(TEST_STRING);
+    private static final @NonNull TmfStateValue LONG_VALUE = TmfStateValue.newValueLong(10L);
+    private static final @NonNull TmfStateValue INT_VALUE = TmfStateValue.newValueInt(1);
 
     private File fTempFile;
 
@@ -88,7 +89,7 @@ public class HistoryTreeTest {
         return ht;
     }
 
-    private static long fillValues(HistoryTree ht, TmfStateValue value, int nbValues, long start) {
+    private static long fillValues(HistoryTree ht, @NonNull TmfStateValue value, int nbValues, long start) {
         for (int i = 0; i < nbValues; i++) {
             ht.insertInterval(new HTInterval(start + i, start + i + 1, 1, value));
         }

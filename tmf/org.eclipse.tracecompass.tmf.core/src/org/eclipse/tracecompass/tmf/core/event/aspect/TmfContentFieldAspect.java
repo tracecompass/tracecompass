@@ -17,6 +17,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.Arrays;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
@@ -41,11 +42,11 @@ public class TmfContentFieldAspect implements ITmfEventAspect {
      *            The field name or absolute field path array to look for in the
      *            event content. Should *not* be localized!
      */
-    public TmfContentFieldAspect(String aspectName, String... fieldPath) {
+    public TmfContentFieldAspect(String aspectName, @NonNull String... fieldPath) {
         this(aspectName, EMPTY_STRING, fieldPath);
     }
 
-    private TmfContentFieldAspect(String aspectName, String helpText, String... fieldPath) {
+    private TmfContentFieldAspect(String aspectName, String helpText, @NonNull String... fieldPath) {
         fAspectName = aspectName;
         fFieldPath = checkNotNull(Arrays.copyOf(fieldPath, fieldPath.length));
         fHelpText = helpText;
@@ -65,7 +66,7 @@ public class TmfContentFieldAspect implements ITmfEventAspect {
      * @return the new aspect
      * @since 1.0
      */
-    public static TmfContentFieldAspect create(String aspectName, String helpText, String... fieldPath) {
+    public static TmfContentFieldAspect create(String aspectName, String helpText, @NonNull String... fieldPath) {
         return new TmfContentFieldAspect(aspectName, helpText, fieldPath);
     }
 

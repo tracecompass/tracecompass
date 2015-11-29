@@ -46,7 +46,7 @@ public final class StructDefinition extends ScopedDefinition implements IComposi
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final @NonNull List<String> fFieldNames;
+    private final @NonNull List<@NonNull String> fFieldNames;
     private final Definition[] fDefinitions;
     private Map<String, Definition> fDefinitionsMap = null;
 
@@ -98,8 +98,11 @@ public final class StructDefinition extends ScopedDefinition implements IComposi
      * @since 1.0
      */
     public StructDefinition(@NonNull StructDeclaration declaration,
-            IDefinitionScope definitionScope, @NonNull ILexicalScope scope,
-            @NonNull String structFieldName, @NonNull Iterable<String> fieldNames, Definition[] definitions) {
+            IDefinitionScope definitionScope,
+            @NonNull ILexicalScope scope,
+            @NonNull String structFieldName,
+            @NonNull Iterable<@NonNull String> fieldNames,
+            Definition[] definitions) {
         super(declaration, definitionScope, structFieldName, scope);
         fFieldNames = ImmutableList.copyOf(fieldNames);
         fDefinitions = definitions;
@@ -128,7 +131,7 @@ public final class StructDefinition extends ScopedDefinition implements IComposi
     }
 
     @Override
-    public @NonNull List<String> getFieldNames() {
+    public @NonNull List<@NonNull String> getFieldNames() {
         return fFieldNames;
     }
 

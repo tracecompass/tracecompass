@@ -208,7 +208,7 @@ public final class Attribute {
             curNode = curNode.parent;
         }
 
-        return checkNotNull(list.toArray(new String[0]));
+        return list.toArray(new String[0]);
     }
 
     /**

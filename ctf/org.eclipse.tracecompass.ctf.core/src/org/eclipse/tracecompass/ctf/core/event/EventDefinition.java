@@ -208,7 +208,7 @@ public final class EventDefinition implements IDefinitionScope {
         List<Definition> fieldValues = new ArrayList<>();
 
         /* Add fields from the stream */
-        List<String> fieldNames = fStreamContext.getFieldNames();
+        List<@NonNull String> fieldNames = fStreamContext.getFieldNames();
         for (String fieldName : fieldNames) {
             Definition definition = fStreamContext.getDefinition(fieldName);
             mergedDeclaration.addField(fieldName, definition.getDeclaration());

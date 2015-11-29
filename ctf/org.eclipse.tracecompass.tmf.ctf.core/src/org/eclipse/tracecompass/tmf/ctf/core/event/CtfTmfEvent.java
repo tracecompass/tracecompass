@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
@@ -280,7 +281,7 @@ public class CtfTmfEvent extends TmfEvent
             }
         }
 
-        return checkNotNull(fields.toArray(new CtfTmfEventField[fields.size()]));
+        return checkNotNull(fields.toArray(new @NonNull CtfTmfEventField[fields.size()]));
     }
 
     // ------------------------------------------------------------------------

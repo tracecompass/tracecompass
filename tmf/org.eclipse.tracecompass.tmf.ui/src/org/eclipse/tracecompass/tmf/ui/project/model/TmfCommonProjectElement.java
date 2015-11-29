@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstants;
@@ -106,7 +107,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
 
         TraceTypeHelper helper = TmfTraceType.getTraceType(getTraceType());
 
-        Class<? extends ITmfTrace> traceClass = null;
+        Class<@NonNull ? extends ITmfTrace> traceClass = null;
 
         if (helper != null) {
             traceClass = helper.getTraceClass();

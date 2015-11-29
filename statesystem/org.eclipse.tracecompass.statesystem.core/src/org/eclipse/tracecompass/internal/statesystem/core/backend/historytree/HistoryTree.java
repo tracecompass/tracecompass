@@ -74,7 +74,7 @@ public class HistoryTree {
     private int fNodeCount;
 
     /** "Cache" to keep the active nodes in memory */
-    private final List<@NonNull HTNode> fLatestBranch;
+    private final @NonNull List<@NonNull HTNode> fLatestBranch;
 
     // ------------------------------------------------------------------------
     // Constructors/"Destructors"
@@ -217,7 +217,7 @@ public class HistoryTree {
      *            start
      * @throws ClosedChannelException
      */
-    private List<@NonNull HTNode> buildLatestBranch(int rootNodeSeqNb) throws ClosedChannelException {
+    private @NonNull List<@NonNull HTNode> buildLatestBranch(int rootNodeSeqNb) throws ClosedChannelException {
         List<@NonNull HTNode> list = new ArrayList<>();
 
         HTNode nextChildNode = fTreeIO.readNode(rootNodeSeqNb);

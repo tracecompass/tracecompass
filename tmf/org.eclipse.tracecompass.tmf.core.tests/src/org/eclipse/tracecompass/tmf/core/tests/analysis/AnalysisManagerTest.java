@@ -95,7 +95,7 @@ public class AnalysisManagerTest {
     public void testListForTraces() {
         /* Generic TmfTrace */
         ITmfTrace trace = TmfTestTrace.A_TEST_10K.getTrace();
-        Class<? extends ITmfTrace> traceClass = trace.getClass();
+        Class<@NonNull ? extends ITmfTrace> traceClass = trace.getClass();
         assertNotNull(traceClass);
         Map<String, IAnalysisModuleHelper> map = TmfAnalysisManager.getAnalysisModules(traceClass);
 
@@ -121,14 +121,14 @@ public class AnalysisManagerTest {
         /* Make sure that modules in the new source are not in the list already */
         /* Generic TmfTrace */
         ITmfTrace trace = TmfTestTrace.A_TEST_10K.getTrace();
-        Class<? extends ITmfTrace> traceClass = trace.getClass();
+        Class<@NonNull ? extends ITmfTrace> traceClass = trace.getClass();
         assertNotNull(traceClass);
         Map<String, IAnalysisModuleHelper> map = TmfAnalysisManager.getAnalysisModules(traceClass);
 
         assertFalse(map.containsKey(AnalysisModuleTestHelper.moduleStubEnum.TEST.name()));
 
         /* TmfTraceStub2 class */
-        Class<? extends ITmfTrace> ftraceClass = fTrace.getClass();
+        Class<@NonNull ? extends ITmfTrace> ftraceClass = fTrace.getClass();
         assertNotNull(ftraceClass);
         map = TmfAnalysisManager.getAnalysisModules(ftraceClass);
 

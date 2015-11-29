@@ -49,24 +49,24 @@ import org.junit.Test;
 public class CtfTmfEventFieldTest {
 
     private static final @NonNull String ROOT = "root";
-    private static final String SEQ = "seq";
+    private static final @NonNull String SEQ = "seq";
     private static final @NonNull String ARRAY_STR = "array_str";
     private static final @NonNull String ARRAY_FLOAT = "array_float";
     private static final @NonNull String ARRAY_INT = "array_int";
     private static final @NonNull String ARRAY_STRUCT = "array_struct";
     private static final @NonNull String ARRAY_VARIANT = "array_variant";
     private static final @NonNull String ARRAY_ENUM = "array_enum";
-    private static final String STR = "str";
-    private static final String FLOAT = "float";
-    private static final String LEN = "len";
-    private static final String INT = "int";
+    private static final @NonNull String STR = "str";
+    private static final @NonNull String FLOAT = "float";
+    private static final @NonNull String LEN = "len";
+    private static final @NonNull String INT = "int";
     private static final @NonNull String NAME = "test";
-    private static final String STRUCT = "struct";
-    private static final String VARIANT = "variant";
-    private static final String ENUM = "enum";
+    private static final @NonNull String STRUCT = "struct";
+    private static final @NonNull String VARIANT = "variant";
+    private static final @NonNull String ENUM = "enum";
 
     private static final byte TEST_NUMBER = 2;
-    private static final String TEST_STRING = "two";
+    private static final @NonNull String TEST_STRING = "two";
 
     private static final int ARRAY_SIZE = 2;
 

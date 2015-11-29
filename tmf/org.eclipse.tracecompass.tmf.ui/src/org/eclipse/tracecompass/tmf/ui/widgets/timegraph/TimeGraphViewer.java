@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
@@ -2443,7 +2444,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * @param filter
      *            The filter object to be attached to the view
      */
-    public void addFilter(ViewerFilter filter) {
+    public void addFilter(@NonNull ViewerFilter filter) {
         fTimeGraphCtrl.addFilter(filter);
         refresh();
     }
@@ -2452,7 +2453,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * @param filter
      *            The filter object to be attached to the view
      */
-    public void removeFilter(ViewerFilter filter) {
+    public void removeFilter(@NonNull ViewerFilter filter) {
         fTimeGraphCtrl.removeFilter(filter);
         refresh();
     }
@@ -2463,7 +2464,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      * @return an array of viewer filters
      * @since 2.0
      */
-    public ViewerFilter[] getFilters() {
+    public @NonNull ViewerFilter[] getFilters() {
         return fTimeGraphCtrl.getFilters();
     }
 
@@ -2475,7 +2476,7 @@ public class TimeGraphViewer implements ITimeDataProvider, SelectionListener {
      *            an array of viewer filters, or null
      * @since 2.0
      */
-    public void setFilters(ViewerFilter[] filters) {
+    public void setFilters(@NonNull ViewerFilter[] filters) {
         fTimeGraphCtrl.setFilters(filters);
         refresh();
     }

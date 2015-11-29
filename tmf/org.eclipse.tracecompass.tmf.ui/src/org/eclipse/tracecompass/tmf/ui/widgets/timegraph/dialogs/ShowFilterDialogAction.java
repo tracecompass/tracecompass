@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -140,7 +141,7 @@ public class ShowFilterDialogAction extends Action {
      * @param filter
      *            The filter object to be added to the viewer
      */
-    protected void addFilter(ViewerFilter filter) {
+    protected void addFilter(@NonNull ViewerFilter filter) {
         fTimeGraphViewer.addFilter(filter);
     }
 
@@ -150,7 +151,7 @@ public class ShowFilterDialogAction extends Action {
      * @param filter
      *            The filter object to be removed from the viewer
      */
-    protected void removeFilter(ViewerFilter filter) {
+    protected void removeFilter(@NonNull ViewerFilter filter) {
         fTimeGraphViewer.removeFilter(filter);
     }
 

@@ -17,6 +17,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyStrin
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.remote.core.shell.ICommandInput;
 
@@ -32,8 +33,9 @@ public class CommandInput implements ICommandInput {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
+
     /** The input as list of Strings. */
-    private final List<String> fInput = new ArrayList<>();
+    private final @NonNull List<@NonNull String> fInput = new ArrayList<>();
 
     // ------------------------------------------------------------------------
     // Accessors
@@ -47,6 +49,7 @@ public class CommandInput implements ICommandInput {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+
     @Override
     public void add(@Nullable String segment) {
         if (segment != null) {

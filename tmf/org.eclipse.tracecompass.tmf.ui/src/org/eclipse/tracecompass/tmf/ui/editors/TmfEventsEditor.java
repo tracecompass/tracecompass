@@ -448,8 +448,8 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
 
     @Override
     public void resourceChanged(final IResourceChangeEvent event) {
-        final Set<IMarker> added = new HashSet<>();
-        final Set<IMarker> removed = new HashSet<>();
+        final Set<@NonNull IMarker> added = new HashSet<>();
+        final Set<@NonNull IMarker> removed = new HashSet<>();
         boolean deltaFound = false;
         for (final IMarkerDelta delta : event.findMarkerDeltas(IMarker.BOOKMARK, false)) {
             if (delta.getResource().equals(fFile)) {

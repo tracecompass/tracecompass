@@ -33,7 +33,7 @@ import com.google.common.collect.ImmutableList;
  */
 public final class EventHeaderDefinition extends Definition implements ICompositeDefinition {
 
-    private static final @NonNull List<String> FIELD_NAMES = ImmutableList.of(
+    private static final @NonNull List<@NonNull String> FIELD_NAMES = ImmutableList.of(
             IEventHeaderDeclaration.ID,
             IEventHeaderDeclaration.TIMESTAMP
             );
@@ -99,7 +99,7 @@ public final class EventHeaderDefinition extends Definition implements IComposit
     }
 
     @Override
-    public @NonNull List<String> getFieldNames() {
+    public @NonNull List<@NonNull String> getFieldNames() {
         return FIELD_NAMES;
     }
 }

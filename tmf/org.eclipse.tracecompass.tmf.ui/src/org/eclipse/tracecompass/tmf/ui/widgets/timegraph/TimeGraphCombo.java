@@ -105,7 +105,7 @@ public class TimeGraphCombo extends Composite {
     private final Map<ITimeGraphSelectionListener, SelectionListenerWrapper> fSelectionListenerMap = new HashMap<>();
 
     /** The map of viewer filters to viewer filter wrappers */
-    private final Map<ViewerFilter, ViewerFilter> fViewerFilterMap = new HashMap<>();
+    private final Map<@NonNull ViewerFilter, @NonNull ViewerFilter> fViewerFilterMap = new HashMap<>();
 
     /**
      * Flag to block the tree selection changed listener when triggered by the
@@ -863,7 +863,7 @@ public class TimeGraphCombo extends Composite {
     /**
      * @param filter The filter object to be attached to the view
      */
-    public void addFilter(ViewerFilter filter) {
+    public void addFilter(@NonNull ViewerFilter filter) {
         fInhibitTreeSelection = true;
         ViewerFilter wrapper = new ViewerFilterWrapper(filter);
         fTreeViewer.addFilter(wrapper);
@@ -876,7 +876,7 @@ public class TimeGraphCombo extends Composite {
     /**
      * @param filter The filter object to be removed from the view
      */
-    public void removeFilter(ViewerFilter filter) {
+    public void removeFilter(@NonNull ViewerFilter filter) {
         fInhibitTreeSelection = true;
         ViewerFilter wrapper = fViewerFilterMap.get(filter);
         fTreeViewer.removeFilter(wrapper);
@@ -892,7 +892,7 @@ public class TimeGraphCombo extends Composite {
      * @return an array of viewer filters
      * @since 2.0
      */
-    public ViewerFilter[] getFilters() {
+    public @NonNull ViewerFilter[] getFilters() {
         return fTimeGraphViewer.getFilters();
     }
 
@@ -904,7 +904,7 @@ public class TimeGraphCombo extends Composite {
      *            an array of viewer filters, or null
      * @since 2.0
      */
-    public void setFilters(ViewerFilter[] filters) {
+    public void setFilters(@NonNull ViewerFilter[] filters) {
         fInhibitTreeSelection = true;
         fViewerFilterMap.clear();
         if (filters == null) {

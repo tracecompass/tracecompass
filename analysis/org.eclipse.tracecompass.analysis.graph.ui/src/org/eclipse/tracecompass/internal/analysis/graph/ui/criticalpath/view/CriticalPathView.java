@@ -228,7 +228,7 @@ public class CriticalPathView extends AbstractTimeGraphView {
 
             return (entries == null) ?
                 new ITimeGraphEntry[0] :
-                NonNullUtils.checkNotNull(entries.toArray(new ITimeGraphEntry[entries.size()]));
+                entries.toArray(new @NonNull ITimeGraphEntry[entries.size()]);
         }
 
         private void buildEntryList(IGraphWorker worker) {

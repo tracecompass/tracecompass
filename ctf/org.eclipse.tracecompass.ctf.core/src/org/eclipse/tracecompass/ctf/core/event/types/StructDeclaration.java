@@ -47,7 +47,7 @@ public class StructDeclaration extends Declaration {
     // ------------------------------------------------------------------------
 
     /** linked list of field names. So fieldName->fieldValue */
-    private final @NonNull Map<String, IDeclaration> fFieldMap = new LinkedHashMap<>();
+    private final @NonNull Map<@NonNull String, IDeclaration> fFieldMap = new LinkedHashMap<>();
 
     /** maximum bit alignment */
     private long fMaxAlign;
@@ -119,7 +119,7 @@ public class StructDeclaration extends Declaration {
      *
      * @return the field list.
      */
-    public Iterable<String> getFieldsList() {
+    public @NonNull Iterable<@NonNull String> getFieldsList() {
         return fFieldMap.keySet();
     }
 
@@ -193,7 +193,7 @@ public class StructDeclaration extends Declaration {
      * @param declaration
      *            the declaration of the field
      */
-    public void addField(String name, IDeclaration declaration) {
+    public void addField(@NonNull String name, IDeclaration declaration) {
         fFieldMap.put(name, declaration);
         fMaxAlign = Math.max(fMaxAlign, declaration.getAlignment());
     }

@@ -85,7 +85,7 @@ public final class StructDeclarationFlattener {
         return flatStruct;
     }
 
-    private static void depthFirstAdd(String path, StructDeclaration flatStruct, IDeclaration dec) {
+    private static void depthFirstAdd(@NonNull String path, StructDeclaration flatStruct, IDeclaration dec) {
         if (dec instanceof ISimpleDatatypeDeclaration) {
             flatStruct.addField(path, dec);
         } else if (dec instanceof ArrayDeclaration) {

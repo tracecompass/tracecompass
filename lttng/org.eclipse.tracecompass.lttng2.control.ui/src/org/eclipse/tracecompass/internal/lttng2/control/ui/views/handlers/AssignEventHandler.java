@@ -139,7 +139,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
     @Override
     public boolean isEnabled() {
         @NonNull ArrayList<@NonNull BaseEventComponent> events = new ArrayList<>();
-        TraceSessionComponent[] sessions = null;
+        @NonNull TraceSessionComponent[] sessions = null;
         Boolean isKernel = null;
 
         // Get workbench page for the Control View
@@ -221,7 +221,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
         /**
          * The list of available sessions.
          */
-        private final TraceSessionComponent[] fSessions;
+        private final @NonNull TraceSessionComponent[] fSessions;
 
         /**
          * Flag for indicating Kernel or UST.
@@ -235,7 +235,7 @@ public class AssignEventHandler extends BaseControlViewHandler {
          * @param events - a lists of events to enable
          * @param isKernel - domain (true for kernel or UST)
          */
-        public Parameter(TraceSessionComponent[] sessions, List<BaseEventComponent> events, boolean isKernel) {
+        public Parameter(@NonNull TraceSessionComponent[] sessions, List<BaseEventComponent> events, boolean isKernel) {
             fSessions = NonNullUtils.checkNotNull(Arrays.copyOf(sessions, sessions.length));
             fEvents = new ArrayList<>();
             fEvents.addAll(events);

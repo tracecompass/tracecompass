@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -158,7 +159,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private final Cursor fResizeCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_IBEAM);
     private final Cursor fWaitCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_WAIT);
     private final Cursor fZoomCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_SIZEWE);
-    private final List<ViewerFilter> fFilters = new ArrayList<>();
+    private final List<@NonNull ViewerFilter> fFilters = new ArrayList<>();
     private MenuDetectEvent fPendingMenuDetectEvent = null;
     private boolean fGridLinesVisible = true;
     private Color fGridLineColor = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
@@ -2741,7 +2742,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     /**
      * @param filter The filter object to be attached to the view
      */
-    public void addFilter(ViewerFilter filter) {
+    public void addFilter(@NonNull ViewerFilter filter) {
         if (!fFilters.contains(filter)) {
             fFilters.add(filter);
         }
@@ -2750,7 +2751,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     /**
      * @param filter The filter object to be attached to the view
      */
-    public void removeFilter(ViewerFilter filter) {
+    public void removeFilter(@NonNull ViewerFilter filter) {
         fFilters.remove(filter);
     }
 
@@ -2760,7 +2761,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @return an array of viewer filters
      * @since 2.0
      */
-    public ViewerFilter[] getFilters() {
+    public @NonNull ViewerFilter[] getFilters() {
         return Iterables.toArray(fFilters, ViewerFilter.class);
     }
 
@@ -2771,7 +2772,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *            an array of viewer filters, or null
      * @since 2.0
      */
-    public void setFilters(ViewerFilter[] filters) {
+    public void setFilters(@NonNull ViewerFilter[] filters) {
         fFilters.clear();
         if (filters != null) {
             fFilters.addAll(Arrays.asList(filters));

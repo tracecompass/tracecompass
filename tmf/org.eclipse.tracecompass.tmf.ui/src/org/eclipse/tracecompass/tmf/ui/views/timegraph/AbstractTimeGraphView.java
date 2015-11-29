@@ -150,7 +150,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private final Map<ITmfTrace, List<TimeGraphEntry>> fEntryListMap = new HashMap<>();
 
     /** The trace to filters hash map */
-    private final Map<ITmfTrace, ViewerFilter[]> fFiltersMap = new HashMap<>();
+    private final Map<ITmfTrace, @NonNull ViewerFilter[]> fFiltersMap = new HashMap<>();
 
     /** The trace to marker event sources hash map */
     private final Map<ITmfTrace, List<IMarkerEventSource>> fMarkerEventSourcesMap = new HashMap<>();
@@ -243,9 +243,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         Object getInput();
 
-        void setFilters(ViewerFilter[] filters);
+        void setFilters(@NonNull ViewerFilter[] filters);
 
-        ViewerFilter[] getFilters();
+        @NonNull ViewerFilter[] getFilters();
 
         void redraw();
 
@@ -336,12 +336,12 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
 
         @Override
-        public void setFilters(ViewerFilter[] filters) {
+        public void setFilters(@NonNull ViewerFilter[] filters) {
             viewer.setFilters(filters);
         }
 
         @Override
-        public ViewerFilter[] getFilters() {
+        public @NonNull ViewerFilter[] getFilters() {
             return viewer.getFilters();
         }
 
@@ -454,12 +454,12 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
 
         @Override
-        public void setFilters(ViewerFilter[] filters) {
+        public void setFilters(@NonNull ViewerFilter[] filters) {
             combo.setFilters(filters);
         }
 
         @Override
-        public ViewerFilter[] getFilters() {
+        public @NonNull ViewerFilter[] getFilters() {
             return combo.getFilters();
         }
 

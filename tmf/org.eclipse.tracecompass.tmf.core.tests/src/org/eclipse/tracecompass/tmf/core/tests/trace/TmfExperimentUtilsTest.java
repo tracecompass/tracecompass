@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -116,8 +117,8 @@ public class TmfExperimentUtilsTest {
      */
     @Test
     public void testGetModuleByClass() {
-        Class<TestAnalysis> commonClass = TestAnalysis.class;
-        Class<TestAnalysis2> notCommonClass = TestAnalysis2.class;
+        Class<@NonNull TestAnalysis> commonClass = TestAnalysis.class;
+        Class<@NonNull TestAnalysis2> notCommonClass = TestAnalysis2.class;
         String host1 = TmfTestTrace.A_TEST_10K.getPath();
         String host2 = TmfTestTrace.A_TEST_10K2.getPath();
         TmfExperiment experiment = fExperiment;

@@ -199,12 +199,12 @@ public class TargetNodeComponent extends TraceControlComponent implements IRemot
     /**
      * @return all available sessions.
      */
-    public TraceSessionComponent[] getSessions() {
+    public @NonNull TraceSessionComponent[] getSessions() {
         List<ITraceControlComponent> compenents = getChildren(TraceSessionGroup.class);
         if (compenents.size() > 0) {
             TraceSessionGroup group = (TraceSessionGroup)compenents.get(0);
             List<ITraceControlComponent> sessions = group.getChildren(TraceSessionComponent.class);
-            return sessions.toArray(new TraceSessionComponent[sessions.size()]);
+            return sessions.toArray(new @NonNull TraceSessionComponent[sessions.size()]);
         }
         return new TraceSessionComponent[0];
     }
