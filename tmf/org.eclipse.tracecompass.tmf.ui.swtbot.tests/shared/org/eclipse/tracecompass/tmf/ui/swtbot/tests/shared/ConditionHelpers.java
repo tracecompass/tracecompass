@@ -57,7 +57,7 @@ public final class ConditionHelpers {
     /**
      * Provide default implementations for some {@link ICondition} methods.
      */
-    private abstract static class SWTBotTestCondition implements ICondition {
+    public abstract static class SWTBotTestCondition implements ICondition {
 
         @Override
         public abstract boolean test() throws Exception;
@@ -157,6 +157,34 @@ public final class ConditionHelpers {
             public String getFailureMessage() {
                 return NLS.bind("No child of tree item {0} found with text '{1}'. Child items: {2}",
                         new String[] { treeItem.toString(), name, Arrays.toString(treeItem.getItems()) });
+            }
+        };
+    }
+
+    /**
+     * Is the treeItem's node removed
+     *
+     * @param length
+     *            length of the node after removal
+     * @param treeItem
+     *            the treeItem
+     * @return true or false, it should swallow all exceptions
+     */
+    public static ICondition isTreeChildNodeRemoved(final int length, final SWTBotTreeItem treeItem) {
+        return new SWTBotTestCondition() {
+            @Override
+            public boolean test() throws Exception {
+                try {
+                    return treeItem.getNodes().size() == length;
+                } catch (Exception e) {
+                }
+                return false;
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return NLS.bind("Child of tree item {0} found with text '{1}' not removed. Child items: {2}",
+                        new String[] { treeItem.toString(), String.valueOf(length), Arrays.toString(treeItem.getItems()) });
             }
         };
     }

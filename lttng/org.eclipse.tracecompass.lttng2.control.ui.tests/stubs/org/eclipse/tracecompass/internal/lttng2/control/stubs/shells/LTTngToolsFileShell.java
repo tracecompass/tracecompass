@@ -56,6 +56,9 @@ public class LTTngToolsFileShell extends TestCommandShell {
     private final static Pattern LTTNG_LIST_SESSION_PATTERN = Pattern.compile("lttng\\s+list\\s+(.+)");
     private final static String LTTNG_LIST_PROVIDER_PATTERN = "lttng\\s+list\\s+(-u|-k)";
 
+    private final static Pattern LTTNG_LIST_SESSION_MI_PATTERN = Pattern.compile("lttng\\s+--mi xml\\s+list\\s+(.+)");
+    private final static String LTTNG_LIST_PROVIDER_MI_PATTERN = "lttng\\s+--mi xml\\s+list\\s+(-u|-k)";
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
@@ -175,16 +178,13 @@ public class LTTngToolsFileShell extends TestCommandShell {
                             // Handle instances of 'lttng list
                             // <session"-command
                             Matcher matcher = LTTNG_LIST_SESSION_PATTERN.matcher(strLine);
+                            Matcher miMatcher = LTTNG_LIST_SESSION_MI_PATTERN.matcher(strLine);
                             if (matcher.matches() && !input.matches(LTTNG_LIST_PROVIDER_PATTERN)) {
                                 String sessionName = matcher.group(1).trim();
-                                Integer i = tmpSessionNameMap.get(sessionName);
-                                if (i != null) {
-                                    i++;
-                                } else {
-                                    i = 0;
-                                }
-                                tmpSessionNameMap.put(sessionName, i);
-                                input += String.valueOf(i);
+                                input += updateSessionMap(tmpSessionNameMap, input, sessionName);
+                            } else if (miMatcher.matches() && !input.matches(LTTNG_LIST_PROVIDER_MI_PATTERN)) {
+                                String sessionName = miMatcher.group(1).trim();
+                                input += updateSessionMap(tmpSessionNameMap, input, sessionName);
                             }
                         } else if (INPUT_END_KEY.equals(strLine)) {
                             // Initialize output array
@@ -237,6 +237,17 @@ public class LTTngToolsFileShell extends TestCommandShell {
         }
     }
 
+    private static String updateSessionMap(Map<String, Integer> tmpSessionNameMap, String input, String sessionName) {
+        Integer i = tmpSessionNameMap.get(sessionName);
+        if (i != null) {
+            i++;
+        } else {
+            i = 0;
+        }
+        tmpSessionNameMap.put(sessionName, i);
+        return String.valueOf(i);
+    }
+
     // Set the scenario to consider in executeCommand()
     public synchronized void setScenario(String scenario) {
         fScenario = scenario;
@@ -258,16 +269,13 @@ public class LTTngToolsFileShell extends TestCommandShell {
         String fullCommand = commandLine;
 
         Matcher matcher = LTTNG_LIST_SESSION_PATTERN.matcher(commandLine);
+        Matcher miMatcher = LTTNG_LIST_SESSION_MI_PATTERN.matcher(commandLine);
         if (matcher.matches() && !commandLine.matches(LTTNG_LIST_PROVIDER_PATTERN)) {
             String sessionName = matcher.group(1).trim();
-            Integer i = fSessionNameMap.get(sessionName);
-            if (i != null) {
-                i++;
-            } else {
-                i = 0;
-            }
-            fSessionNameMap.put(sessionName, i);
-            fullCommand += String.valueOf(i);
+            fullCommand += updateSessionMap(fSessionNameMap, fullCommand, sessionName);
+        } else if (miMatcher.matches() && !commandLine.matches(LTTNG_LIST_PROVIDER_MI_PATTERN)) {
+            String sessionName = miMatcher.group(1).trim();
+            fullCommand += updateSessionMap(fSessionNameMap, fullCommand, sessionName);
         }
 
         if (commands.containsKey(fullCommand)) {
