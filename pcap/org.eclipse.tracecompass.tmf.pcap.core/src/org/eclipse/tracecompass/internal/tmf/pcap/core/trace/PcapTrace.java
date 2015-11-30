@@ -250,20 +250,20 @@ public class PcapTrace extends TmfTrace implements ITmfTraceProperties {
             return Collections.emptyMap();
         }
 
-        Map<String, String> properties = fTraceProperties;
-        if (properties == null) {
-            ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-            builder.put(nullToEmptyString(Messages.PcapTrace_Version), String.format("%d%c%d", pcap.getMajorVersion(), '.', pcap.getMinorVersion())); //$NON-NLS-1$
-            builder.put(nullToEmptyString(Messages.PcapTrace_TimeZoneCorrection), pcap.getTimeZoneCorrection() + " s"); //$NON-NLS-1$
-            builder.put(nullToEmptyString(Messages.PcapTrace_TimestampAccuracy), String.valueOf(pcap.getTimeAccuracy()));
-            builder.put(nullToEmptyString(Messages.PcapTrace_MaxSnapLength), pcap.getSnapLength() + " bytes"); //$NON-NLS-1$
-            builder.put(nullToEmptyString(Messages.PcapTrace_LinkLayerHeaderType), LinkTypeHelper.toString((int) pcap.getDataLinkType()) + " (" + pcap.getDataLinkType() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
-            builder.put(nullToEmptyString(Messages.PcapTrace_FileEndianness), nullToEmptyString(pcap.getByteOrder().toString()));
-
-            return checkNotNull(builder.build());
-
+        if (fTraceProperties != null) {
+            return fTraceProperties;
         }
 
-        return properties;
+        ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+        builder.put(nullToEmptyString(Messages.PcapTrace_Version), String.format("%d%c%d", pcap.getMajorVersion(), '.', pcap.getMinorVersion())); //$NON-NLS-1$
+        builder.put(nullToEmptyString(Messages.PcapTrace_TimeZoneCorrection), pcap.getTimeZoneCorrection() + " s"); //$NON-NLS-1$
+        builder.put(nullToEmptyString(Messages.PcapTrace_TimestampAccuracy), String.valueOf(pcap.getTimeAccuracy()));
+        builder.put(nullToEmptyString(Messages.PcapTrace_MaxSnapLength), pcap.getSnapLength() + " bytes"); //$NON-NLS-1$
+        builder.put(nullToEmptyString(Messages.PcapTrace_LinkLayerHeaderType), LinkTypeHelper.toString((int) pcap.getDataLinkType()) + " (" + pcap.getDataLinkType() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+        builder.put(nullToEmptyString(Messages.PcapTrace_FileEndianness), nullToEmptyString(pcap.getByteOrder().toString()));
+
+        fTraceProperties = builder.build();
+
+        return fTraceProperties;
     }
 }
