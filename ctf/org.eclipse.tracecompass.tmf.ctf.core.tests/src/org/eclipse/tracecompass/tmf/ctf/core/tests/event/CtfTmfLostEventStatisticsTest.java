@@ -157,6 +157,6 @@ public class CtfTmfLostEventStatisticsTest {
         Map<String, Long> eventsInRange = fStats.getEventTypesInRange(rangeStart, rangeEnd);
         Long lostEventsInRange = eventsInRange.get(CTFStrings.LOST_EVENT_NAME);
         assertNotNull(lostEventsInRange);
-        assertEquals(363494L, lostEventsInRange.longValue());
+        assertEquals(365752L, lostEventsInRange.longValue());
     }
 }

@@ -212,17 +212,17 @@ public class CTFPacketReaderTest {
         assertTrue(cpr.hasMoreEvents());
         EventDefinition event = cpr.readNextEvent();
         assertEquals(0L, event.getTimestamp());
-        assertEquals(event.getDeclaration().getName(), CTFStrings.LOST_EVENT_NAME);
-        assertEquals(512L, ((IntegerDefinition) event.getFields().getDefinition(CTFStrings.LOST_EVENTS_FIELD)).getValue());
-        assertTrue(cpr.hasMoreEvents());
-        event = cpr.readNextEvent();
-        assertEquals(0L, event.getTimestamp());
         assertEquals(1L, ((IntegerDefinition) event.getFields().getDefinition("field")).getValue());
         assertNotNull(cpr);
         assertTrue(cpr.hasMoreEvents());
         event = cpr.readNextEvent();
         assertEquals(256L, event.getTimestamp());
         assertEquals(0x5a, ((IntegerDefinition) event.getFields().getDefinition("field")).getValue());
+        assertTrue(cpr.hasMoreEvents());
+        event = cpr.readNextEvent();
+        assertEquals(256L, event.getTimestamp());
+        assertEquals(event.getDeclaration().getName(), CTFStrings.LOST_EVENT_NAME);
+        assertEquals(512L, ((IntegerDefinition) event.getFields().getDefinition(CTFStrings.LOST_EVENTS_FIELD)).getValue());
         assertFalse(cpr.hasMoreEvents());
     }
 

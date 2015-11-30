@@ -114,7 +114,7 @@ public final class CTFPacketReader implements IPacketReader, IDefinitionScope {
 
     @Override
     public boolean hasMoreEvents() {
-        return fInput.position() < fPacketContext.getContentSizeBits();
+        return fHasLost || (fInput.position() < fPacketContext.getContentSizeBits());
     }
 
     @Override
@@ -125,7 +125,7 @@ public final class CTFPacketReader implements IPacketReader, IDefinitionScope {
          * Return the Lost Event after all other events in this packet. We need
          * to check if the bytebuffer is at the beginning too.
          */
-        if (fHasLost && (posStart == fPacketContext.getPayloadStartBits())) {
+        if (fHasLost && (posStart >= fPacketContext.getContentSizeBits())) {
             fHasLost = false;
             return createLostEvent(fPacketContext);
         }
