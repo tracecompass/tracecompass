@@ -276,8 +276,10 @@ public class LttngKernelTraceGenerator {
         }
         // determine the number of events per channel
         long evPerChan = fNbEvents / fNbChans;
+        final int evPerPacket = PacketWriter.CONTENT_SIZE / EventWriter.SIZE;
         long delta = (int) (fDuration / evPerChan);
         long offsetTime = 0;
+        Random rndLost = new Random(1337);
         for (int chan = 0; chan < fNbChans; chan++) {
             int currentSpace = 0;
             ByteBuffer bb = ByteBuffer.allocate(65536);
@@ -291,7 +293,12 @@ public class LttngKernelTraceGenerator {
             }
             int prevPrio = 0;
             int prevPos = -1;
+            int discarded = 0;
+            int discardedTotal = 0;
             for (int eventNb = 0; eventNb < evPerChan; eventNb++) {
+                if (EventWriter.SIZE > currentSpace) {
+                    eventNb += discarded;
+                }
                 long ts = eventNb * delta + delta / (fNbChans + 1) * chan;
 
                 int pos = rnd.nextInt((int) (fProcesses.size() * 1.5));
@@ -319,8 +326,12 @@ public class LttngKernelTraceGenerator {
                     PacketWriter pw = new PacketWriter(bb);
                     long tsBegin = ts;
                     offsetTime = ts;
-                    long tsEnd = (eventNb + (PacketWriter.SIZE / EventWriter.SIZE)) * delta + 1;
-                    pw.writeNewHeader(tsBegin, tsEnd, chan);
+                    int eventCount = Math.min(evPerPacket, (int) evPerChan - eventNb);
+                    discarded = rndLost.nextInt(10 * fNbChans) == 0 ? rndLost.nextInt(evPerPacket) : 0;
+                    discarded = Math.min(discarded, (int) evPerChan - eventNb - eventCount);
+                    discardedTotal += discarded;
+                    long tsEnd = (eventNb + eventCount + discarded) * delta;
+                    pw.writeNewHeader(tsBegin, tsEnd, chan, eventCount, discardedTotal);
                     currentSpace = PacketWriter.CONTENT_SIZE;
                 }
                 EventWriter ew = new EventWriter(bb);
@@ -424,7 +435,7 @@ public class LttngKernelTraceGenerator {
             data = bb;
         }
 
-        public void writeNewHeader(long tsBegin, long tsEnd, int cpu) {
+        public void writeNewHeader(long tsBegin, long tsEnd, int cpu, int eventCount, int discarded) {
             final int magicLE = 0xC1FC1FC1;
             byte uuid[] = {
                     0x11, 0x11, 0x11, 0x11,
@@ -448,13 +459,13 @@ public class LttngKernelTraceGenerator {
             data.putLong(tsEnd);
 
             // content_size 8
-            data.putLong((CONTENT_SIZE / EventWriter.SIZE * EventWriter.SIZE + HEADER_SIZE) * 8);
+            data.putLong((eventCount * EventWriter.SIZE + HEADER_SIZE)* 8);
 
             // packet_size 8
             data.putLong((SIZE) * 8);
 
             // events_discarded 4
-            data.putInt(0);
+            data.putInt(discarded);
 
             // cpu_id 4
             data.putInt(cpu);
