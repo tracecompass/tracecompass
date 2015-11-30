@@ -17,10 +17,11 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.tracecompass.lttng2.control.core,
  org.eclipse.tracecompass.lttng2.control.ui,
  org.eclipse.tracecompass.tmf.remote.core,
- org.eclipse.tracecompass.tmf.remote.core.tests
-Export-Package: org.eclipse.tracecompass.internal.lttng2.control.stubs.dialogs;x-internal:=true,
- org.eclipse.tracecompass.internal.lttng2.control.stubs.service;x-internal:=true,
- org.eclipse.tracecompass.internal.lttng2.control.stubs.shells;x-internal:=true,
+ org.eclipse.tracecompass.tmf.remote.core.tests,
+ org.eclipse.tracecompass.tmf.remote.ui
+Export-Package: org.eclipse.tracecompass.internal.lttng2.control.stubs.dialogs;x-friends:="org.eclipse.tracecompass.lttng2.control.ui.swtbot.tests",
+ org.eclipse.tracecompass.internal.lttng2.control.stubs.service;x-friends:="org.eclipse.tracecompass.lttng2.control.ui.swtbot.tests",
+ org.eclipse.tracecompass.internal.lttng2.control.stubs.shells;x-friends:="org.eclipse.tracecompass.lttng2.control.ui.swtbot.tests",
  org.eclipse.tracecompass.lttng2.control.ui.tests;x-friends:="org.eclipse.tracecompass.alltests",
  org.eclipse.tracecompass.lttng2.control.ui.tests.model.component;x-internal:=true,
  org.eclipse.tracecompass.lttng2.control.ui.tests.service;x-internal:=true
