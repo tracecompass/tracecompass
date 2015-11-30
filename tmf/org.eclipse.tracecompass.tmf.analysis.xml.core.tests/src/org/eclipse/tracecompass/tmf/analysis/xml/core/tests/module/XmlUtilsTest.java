@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2015 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -27,13 +27,26 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
+import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
+import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
+import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.Activator;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
+import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
+import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub;
 import org.junit.After;
 import org.junit.Test;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * Tests for the {@link XmlUtils} class
@@ -206,6 +219,85 @@ public class XmlUtilsTest {
         values = XmlUtils.getChildElements(head);
         assertEquals(2, values.size());
 
+    }
+
+    /**
+     * Initialize a new trace based using the input file path
+     *
+     * @param traceFile
+     *            The trace file
+     * @return The trace
+     */
+    public static @NonNull ITmfTrace initializeTrace(String traceFile) {
+        /* Initialize the trace */
+        TmfXmlTraceStub trace = new TmfXmlTraceStub();
+        try {
+            trace.initTrace(null, Activator.getAbsolutePath(new Path(traceFile)).toOSString(), TmfEvent.class);
+        } catch (TmfTraceException e1) {
+            fail(e1.getMessage());
+        }
+        return trace;
+    }
+
+    /**
+     * Initialize a new module using the xml file
+     *
+     * @param xmlAnalysisFile
+     *            The xml file used to initialize the module
+     * @return The module
+     */
+    public static @NonNull XmlStateSystemModule initializeModule(TmfXmlTestFiles xmlAnalysisFile) {
+
+        /* Initialize the state provider module */
+        Document doc = xmlAnalysisFile.getXmlDocument();
+        assertNotNull(doc);
+
+        /* get State Providers modules */
+        NodeList stateproviderNodes = doc.getElementsByTagName(TmfXmlStrings.STATE_PROVIDER);
+        assertFalse(stateproviderNodes.getLength() == 0);
+
+        Element node = (Element) stateproviderNodes.item(0);
+        XmlStateSystemModule module = new XmlStateSystemModule();
+        String moduleId = node.getAttribute(TmfXmlStrings.ID);
+        assertNotNull(moduleId);
+        module.setId(moduleId);
+
+        module.setXmlFile(xmlAnalysisFile.getPath());
+
+        return module;
+    }
+
+    /**
+     * This function test the data provided by the state intervals queried
+     *
+     * @param testId
+     *            The id of the test
+     * @param ss
+     *            The state system associated to this test
+     * @param quark
+     *            The quark we want to query
+     * @param expectedStarts
+     *            The expected start timestamps for the intervals generated for
+     *            this quark
+     * @param expectedValues
+     *            The expected content values for this quark
+     * @throws AttributeNotFoundException
+     *             If the quark we want to query is invalid
+     * @throws StateSystemDisposedException
+     *             If the state system has been disposed before the end of the
+     *             queries
+     */
+    public static void verifyStateIntervals(String testId, @NonNull ITmfStateSystem ss, Integer quark, int[] expectedStarts, ITmfStateValue[] expectedValues) throws AttributeNotFoundException, StateSystemDisposedException {
+        int expectedCount = expectedStarts.length - 1;
+        List<ITmfStateInterval> intervals = StateSystemUtils.queryHistoryRange(ss, quark, expectedStarts[0], expectedStarts[expectedCount]);
+        assertEquals(testId + ": Interval count", expectedCount, intervals.size());
+        for (int i = 0; i < expectedCount; i++) {
+            ITmfStateInterval interval = intervals.get(i);
+            assertEquals(testId + ": Start time of interval " + i, expectedStarts[i], interval.getStartTime());
+            long actualEnd = (i == expectedCount - 1) ? (expectedStarts[i + 1]) : (expectedStarts[i + 1]) - 1;
+            assertEquals(testId + ": End time of interval " + i, actualEnd, interval.getEndTime());
+            assertEquals(testId + ": Expected value of interval " + i, expectedValues[i], interval.getStateValue());
+        }
     }
 
 }

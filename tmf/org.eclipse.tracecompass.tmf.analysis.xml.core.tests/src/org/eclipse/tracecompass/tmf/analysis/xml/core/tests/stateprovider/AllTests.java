@@ -23,7 +23,8 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
         StateProviderModelTest.class,
         StateProviderTest.class,
-        StateProviderModuleTest.class })
+        StateProviderModuleTest.class,
+        TmfXmlConditionTest.class})
 public class AllTests {
 
 }

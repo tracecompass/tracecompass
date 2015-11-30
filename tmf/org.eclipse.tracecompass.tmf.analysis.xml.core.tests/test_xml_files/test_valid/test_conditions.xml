@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ***************************************************************************
+* Copyright (c) 2015 Ericsson
+*
+* All rights reserved. This program and the accompanying materials are
+* made available under the terms of the Eclipse Public License v1.0 which
+* accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Jean-Christian Kouame - Initial API and implementation
+*************************************************************************** -->
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
+
+	<stateProvider id="test.xml.conditions" version="1">
+		<eventHandler eventName="test">
+			<stateChange>
+				<if>
+					<condition>
+						<field name="testField" />
+						<stateValue type="long" value="10" />
+					</condition>
+				</if>
+				<then>
+					<stateAttribute type="eventName" />
+					<stateValue type="long" value="1" />
+				</then>
+				<else>
+					<stateAttribute type="eventName" />
+					<stateValue type="long" value="0" />
+				</else>
+			</stateChange>
+		</eventHandler>
+		<eventHandler eventName="test1">
+			<stateChange>
+				<if>
+					<condition>
+						<field name="testField" />
+						<stateValue type="long" value="200" />
+					</condition>
+				</if>
+				<then>
+					<stateAttribute type="eventName" />
+					<stateValue type="long" value="1" />
+				</then>
+				<else>
+					<stateAttribute type="eventName" />
+					<stateValue type="long" value="0" />
+				</else>
+			</stateChange>
+		</eventHandler>
+		<eventHandler eventName="*">
+			<stateChange>
+				<if>
+					<condition>
+						<stateValue type="query">
+							<stateAttribute type="constant" value="test" />
+						</stateValue>
+						<stateValue type="query">
+							<stateAttribute type="constant" value="test1" />
+						</stateValue>
+					</condition>
+				</if>
+				<then>
+					<stateAttribute type="constant" value="checkpoint" />
+					<stateValue type="long" value="1" />
+				</then>
+				<else>
+					<stateAttribute type="constant" value="checkpoint" />
+					<stateValue type="long" value="0" />
+				</else>
+			</stateChange>
+		</eventHandler>
+	</stateProvider>
+</tmfxml>

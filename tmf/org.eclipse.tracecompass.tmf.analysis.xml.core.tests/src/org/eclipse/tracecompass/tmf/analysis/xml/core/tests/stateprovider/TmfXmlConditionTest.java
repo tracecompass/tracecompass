@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 École Polytechnique de Montréal
+ * Copyright (c) 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,9 +7,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   Geneviève Bastien - Initial API and implementation
+ *   Jean-Christian Kouame - Initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.tracecompass.tmf.analysis.xml.core.tests.stateprovider;
 
 import static org.junit.Assert.assertEquals;
@@ -32,23 +31,21 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.junit.Test;
 
 /**
- * Test the XML model for state providers
+ * Test suite for the XML conditions
  *
- * @author Geneviève Bastien
  */
-public class StateProviderModelTest {
+public class TmfXmlConditionTest {
 
-    private static final @NonNull String testTrace1 = "test_traces/testTrace1.xml";
+    private static final @NonNull String testTrace2 = "test_traces/testTrace2.xml";
 
     /**
-     * Test an increment of one, for an event name attribute
+     *
      */
     @Test
-    public void testEventName() {
-        ITmfTrace trace = XmlUtilsTest.initializeTrace(testTrace1);
-        XmlStateSystemModule module = XmlUtilsTest.initializeModule(TmfXmlTestFiles.ATTRIBUTE_FILE);
+    public void testConditionsValidation() {
+        ITmfTrace trace = XmlUtilsTest.initializeTrace(testTrace2);
+        XmlStateSystemModule module = XmlUtilsTest.initializeModule(TmfXmlTestFiles.CONDITION_FILE);
         try {
-
             module.setTrace(trace);
 
             module.schedule();
@@ -58,23 +55,27 @@ public class StateProviderModelTest {
             assertNotNull(ss);
 
             List<Integer> quarks = ss.getQuarks("*");
-            assertEquals(2, quarks.size());
+            assertEquals(3, quarks.size());
 
             for (Integer quark : quarks) {
                 String name = ss.getAttributeName(quark);
                 switch (name) {
-                case "test":
-                {
+                case "test": {
                     final int[] expectedStarts = { 1, 5, 7 };
-                    ITmfStateValue[] expectedValues = { TmfStateValue.newValueInt(1), TmfStateValue.newValueInt(2) };
+                    ITmfStateValue[] expectedValues = { TmfStateValue.newValueLong(1), TmfStateValue.newValueLong(0) };
                     XmlUtilsTest.verifyStateIntervals("test", ss, quark, expectedStarts, expectedValues);
                 }
                     break;
-                case "test1":
-                {
+                case "test1": {
                     final int[] expectedStarts = { 1, 3, 7, 7 };
-                    ITmfStateValue[] expectedValues = { TmfStateValue.nullValue(), TmfStateValue.newValueInt(1), TmfStateValue.newValueInt(2) };
+                    ITmfStateValue[] expectedValues = { TmfStateValue.nullValue(), TmfStateValue.newValueLong(0), TmfStateValue.newValueLong(1) };
                     XmlUtilsTest.verifyStateIntervals("test1", ss, quark, expectedStarts, expectedValues);
+                }
+                    break;
+                case "checkpoint": {
+                    final int[] expectedStarts = { 1, 5, 7, 7 };
+                    ITmfStateValue[] expectedValues = { TmfStateValue.newValueLong(0), TmfStateValue.newValueLong(1), TmfStateValue.newValueLong(0) };
+                    XmlUtilsTest.verifyStateIntervals("checkpoint", ss, quark, expectedStarts, expectedValues);
                 }
                     break;
                 default:
@@ -82,14 +83,11 @@ public class StateProviderModelTest {
                     break;
                 }
             }
-
         } catch (TmfAnalysisException | AttributeNotFoundException | StateSystemDisposedException e) {
             fail(e.getMessage());
         } finally {
             module.dispose();
             trace.dispose();
         }
-
     }
-
 }
