@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- ***************************************************************************
- * Copyright (c) 2014 École Polytechnique de Montréal
+ * Copyright (c) 2014 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -110,19 +110,24 @@
 	<xs:complexType name="condition">
 		<xs:annotation>
 			<xs:documentation>Define a conditional statement. Conditions may use values of the state system or from the event being handled. This element defines a statement in the form of "if (some_path == value)".</xs:documentation></xs:annotation>
-		<xs:sequence maxOccurs="1" minOccurs="1">
-			<xs:choice maxOccurs="1" minOccurs="1">
-				<xs:element maxOccurs="unbounded" minOccurs="1" name="stateAttribute" type="stateAttribute" >
+		<xs:choice>
+			<xs:sequence>
+				<xs:choice maxOccurs="1" minOccurs="1">
+					<xs:element maxOccurs="unbounded" minOccurs="1" name="stateAttribute" type="stateAttribute" >
+						<xs:annotation>
+							<xs:documentation>Compare the current value of an attribute of the state system.</xs:documentation></xs:annotation></xs:element>
+					<xs:element maxOccurs="1" minOccurs="1" name="field" type="eventField" >
+						<xs:annotation>
+							<xs:documentation>Compare the value of an event field.</xs:documentation></xs:annotation></xs:element>
+				</xs:choice>
+				<xs:element maxOccurs="1" minOccurs="1" name="stateValue" type="stateValue" >
 					<xs:annotation>
-						<xs:documentation>Compare the current value of an attribute of the state system.</xs:documentation></xs:annotation></xs:element>
-				<xs:element maxOccurs="1" minOccurs="1" name="field" type="eventField" >
-					<xs:annotation>
-						<xs:documentation>Compare the value of an event field.</xs:documentation></xs:annotation></xs:element>
-			</xs:choice>
-			<xs:element maxOccurs="1" minOccurs="1" name="stateValue" type="stateValue" >
-				<xs:annotation>
-					<xs:documentation>Define the value to compare to.</xs:documentation></xs:annotation></xs:element>
-		</xs:sequence>
+						<xs:documentation>Define the value to compare to.</xs:documentation></xs:annotation></xs:element>
+			</xs:sequence>
+			<xs:sequence>
+				<xs:element maxOccurs="2" minOccurs="2" name="stateValue" type="stateValue"/>
+			</xs:sequence>
+		</xs:choice>
 
 		<xs:attribute name="operator" default="eq">
 			<xs:annotation>
