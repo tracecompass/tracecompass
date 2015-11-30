@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,7 +47,7 @@ public class XmlStateProvider extends AbstractTmfStateProvider implements IXmlSt
     @NonNull private final String fStateId;
 
     /** List of all Event Handlers */
-    private final Set<TmfXmlEventHandler> fEventHandlers = new HashSet<>();
+    private final List<TmfXmlEventHandler> fEventHandlers = new ArrayList<>();
 
     /** List of all Locations */
     private final Set<TmfXmlLocation> fLocations;
