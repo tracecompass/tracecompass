@@ -114,6 +114,8 @@ public class LTTngControlServiceTest {
     private static final String SCEN_CREATE_SNAPSHOT_SESSION_ERRORS = "CreateSessionSnapshotErrors";
     protected static final String SCEN_CREATE_LIVE_SESSION = "CreateSessionLive";
     private static final String SCEN_CREATE_LIVE_SESSION_ERRORS = "CreateSessionLiveErrors";
+    private static final String SCEN_SESSION_PROFILES = "SessionProfile";
+
 
 
     // ------------------------------------------------------------------------
@@ -1577,6 +1579,48 @@ public class LTTngControlServiceTest {
             fail("createSession() didn't fail");
         } catch (ExecutionException e) {
             // successful
+        }
+    }
+
+    @Test
+    public void testSessionProfile() {
+        fShell.setScenario(SCEN_SESSION_PROFILES);
+        final String profile = "/home/user/.lttng/sessions/mysession.lttng";
+        try {
+            fService.loadSession(profile, false, new NullProgressMonitor());
+        } catch (ExecutionException e) {
+            fail("load session failed: " + e);
+        }
+
+        try {
+            fService.loadSession(profile, true, new NullProgressMonitor());
+        } catch (ExecutionException e) {
+            fail("load session failed: " + e);
+        }
+
+        try {
+            fService.saveSession(null, null, false, new NullProgressMonitor());
+        } catch (ExecutionException e) {
+            fail("save session failed: " + e);
+        }
+
+        final String sessionName = "mysession";
+        try {
+            fService.saveSession(sessionName, null, false, new NullProgressMonitor());
+        } catch (ExecutionException e) {
+            fail("save session failed: " + e);
+        }
+
+        try {
+            fService.saveSession(sessionName, null, true, new NullProgressMonitor());
+        } catch (ExecutionException e) {
+            fail("save session failed: " + e);
+        }
+
+        try {
+            fService.saveSession(sessionName, "/tmp/test", true, new NullProgressMonitor());
+        } catch (ExecutionException e) {
+            fail("save session failed: " + e);
         }
     }
 
