@@ -59,11 +59,7 @@ public final class FloatDeclaration extends Declaration implements ISimpleDataty
             long alignment) {
         fMantissa = mantissa;
         fExponent = exponent;
-        ByteOrder byteOrder2 = (byteOrder == null) ? ByteOrder.nativeOrder() : byteOrder;
-        if (byteOrder2 == null) {
-            throw new IllegalStateException("ByteOrder cannot be null"); //$NON-NLS-1$
-        }
-        fByteOrder = byteOrder2;
+        fByteOrder = (byteOrder == null) ? ByteOrder.nativeOrder() : byteOrder;
         fAlignement = Math.max(alignment, 1);
 
     }

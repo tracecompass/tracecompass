@@ -243,9 +243,7 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
         fLength = len;
         fSigned = signed;
         fBase = base;
-
-        fByteOrder = (byteOrder == null ? checkNotNull(ByteOrder.nativeOrder()) : byteOrder);
-
+        fByteOrder = (byteOrder == null) ? ByteOrder.nativeOrder() : byteOrder;
         fEncoding = encoding;
         fClock = clock;
         fAlignment = Math.max(alignment, 1);
