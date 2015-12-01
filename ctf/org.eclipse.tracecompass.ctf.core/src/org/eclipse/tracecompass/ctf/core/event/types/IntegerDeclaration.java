@@ -150,7 +150,7 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
      */
     public static IntegerDeclaration createDeclaration(int len, boolean signed, int base,
             @Nullable ByteOrder byteOrder, Encoding encoding, String clock, long alignment) {
-        if (encoding.equals(Encoding.NONE) && (clock.equals("")) && base == BASE_10) { //$NON-NLS-1$
+        if (encoding.equals(Encoding.NONE) && (clock.equals("")) && base == BASE_10 && byteOrder != null) { //$NON-NLS-1$
             if (alignment == BYTE_ALIGN) {
                 switch (len) {
                 case SIZE_8:
