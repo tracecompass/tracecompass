@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.ctf.core.event.types;
 
+import java.nio.ByteOrder;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -112,6 +113,22 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
     @Override
     public int getMaximumSize() {
         return fContainerType.getMaximumSize();
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public boolean isByteOrderSet() {
+        return fContainerType.isByteOrderSet();
+    }
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public ByteOrder getByteOrder() {
+        return fContainerType.getByteOrder();
     }
 
     // ------------------------------------------------------------------------

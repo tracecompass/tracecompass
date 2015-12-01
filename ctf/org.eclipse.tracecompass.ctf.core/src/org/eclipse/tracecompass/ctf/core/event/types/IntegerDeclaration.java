@@ -120,6 +120,7 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
     private final int fLength;
     private final boolean fSigned;
     private final int fBase;
+    private final boolean fIsByteOrderSet;
     private final ByteOrder fByteOrder;
     private final Encoding fEncoding;
     private final long fAlignment;
@@ -243,6 +244,7 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
         fLength = len;
         fSigned = signed;
         fBase = base;
+        fIsByteOrderSet = byteOrder != null;
         fByteOrder = (byteOrder == null) ? ByteOrder.nativeOrder() : byteOrder;
         fEncoding = encoding;
         fClock = clock;
@@ -276,10 +278,14 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
     }
 
     /**
-     * Get the byte order
-     *
-     * @return the byte order
+     * @since 2.0
      */
+    @Override
+    public boolean isByteOrderSet() {
+        return fIsByteOrderSet;
+    }
+
+    @Override
     public ByteOrder getByteOrder() {
         return fByteOrder;
     }

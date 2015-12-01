@@ -36,6 +36,7 @@ public final class FloatDeclaration extends Declaration implements ISimpleDataty
 
     private final int fMantissa;
     private final int fExponent;
+    private final boolean fIsByteOrderSet;
     private final ByteOrder fByteOrder;
     private final long fAlignement;
 
@@ -59,6 +60,7 @@ public final class FloatDeclaration extends Declaration implements ISimpleDataty
             long alignment) {
         fMantissa = mantissa;
         fExponent = exponent;
+        fIsByteOrderSet = byteOrder != null;
         fByteOrder = (byteOrder == null) ? ByteOrder.nativeOrder() : byteOrder;
         fAlignement = Math.max(alignment, 1);
 
@@ -69,22 +71,28 @@ public final class FloatDeclaration extends Declaration implements ISimpleDataty
     // ------------------------------------------------------------------------
 
     /**
-     * @return the mant
+     * @return the mantissa
      */
     public int getMantissa() {
         return fMantissa;
     }
 
     /**
-     * @return the exp
+     * @return the exponent
      */
     public int getExponent() {
         return fExponent;
     }
 
     /**
-     * @return the byteOrder
+     * @since 2.0
      */
+    @Override
+    public boolean isByteOrderSet() {
+        return fIsByteOrderSet;
+    }
+
+    @Override
     public ByteOrder getByteOrder() {
         return fByteOrder;
     }
@@ -177,7 +185,11 @@ public final class FloatDeclaration extends Declaration implements ISimpleDataty
         final int prime = 31;
         int result = 1;
         result = prime * result + (int) (fAlignement ^ (fAlignement >>> 32));
-        result = prime * result + fByteOrder.toString().hashCode(); // don't evaluate object but string
+        result = prime * result + fByteOrder.toString().hashCode(); // don't
+                                                                    // evaluate
+                                                                    // object
+                                                                    // but
+                                                                    // string
         result = prime * result + fExponent;
         result = prime * result + fMantissa;
         return result;

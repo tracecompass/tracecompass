@@ -21,8 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
+import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
+import org.eclipse.tracecompass.ctf.core.event.types.ISimpleDatatypeDeclaration;
 import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTraceUtils;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStream;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
@@ -30,6 +33,8 @@ import org.eclipse.tracecompass.ctf.core.trace.Metadata;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.collect.Iterables;
 
 /**
  * The class <code>MetadataTest</code> contains tests for the class
@@ -162,6 +167,62 @@ public class MetadataTest {
             "        };\n" +
             "    };";
 
+    private static final String ENDIAN_CHANGE_L_B =
+            "/* ctf 1.8 */"
+            + "typealias integer { size = 32; align = 16; byte_order = be; signed = true; base = dec; } := INT;"
+            + "trace { byte_order = le; };"
+            + "event { "
+            + " name = \"bob\"; "
+            + " fields := struct field { INT data ; };"
+            + "};";
+
+    private static final String ENDIAN_CHANGE_L_N =
+            "/* ctf 1.8 */"
+            + "typealias integer { size = 32; align = 16; signed = true; base = dec; } := INT;"
+            + "trace { byte_order = le; };"
+            + "event { "
+            + " name = \"bob\"; "
+            + " fields := struct field { INT data ; };"
+            + "};";
+
+    private static final String ENDIAN_CHANGE_L_L =
+            "/* ctf 1.8 */"
+            + "typealias integer { size = 32; align = 16; byte_order = le; signed = true; base = dec; } := INT;"
+            + "trace { byte_order = le; };"
+            + "event { "
+            + " name = \"bob\"; "
+            + " fields := struct field { INT data ; };"
+            + "};";
+
+
+    private static final String ENDIAN_CHANGE_B_L =
+            "/* ctf 1.8 */"
+            + "typealias integer { size = 32; align = 16;  byte_order = le; signed = true; base = dec; } := INT;"
+            + "trace { byte_order = be; };"
+            + "event { "
+            + " name = \"bob\"; "
+            + " fields := struct field { INT data ; };"
+            + "};";
+
+    private static final String ENDIAN_CHANGE_B_N =
+            "/* ctf 1.8 */"
+            + "typealias integer { size = 32; align = 16; signed = true; base = dec; } := INT;"
+            + "trace { byte_order = be; };"
+            + "event { "
+            + " name = \"bob\"; "
+            + " fields := struct field { INT data ; };"
+            + "};";
+
+    private static final String ENDIAN_CHANGE_B_B =
+            "/* ctf 1.8 */"
+            + "typealias integer { size = 32; align = 16; byte_order = be; signed = true; base = dec; } := INT;"
+            + "trace { byte_order = be; };"
+            + "event { "
+            + " name = \"bob\"; "
+            + " fields := struct field { INT data ; };"
+            + "};";
+
+
     private Metadata fixture;
 
     /**
@@ -235,6 +296,42 @@ public class MetadataTest {
         setUp();
         String result = fixture.toString();
         assertNotNull(result);
+    }
+
+    /**
+     * Test a changing endian event field
+     *
+     * @throws CTFException
+     *             won't happen
+     */
+    @Test
+    public void testEndian() throws CTFException {
+        testEndianess(ENDIAN_CHANGE_L_B, ByteOrder.LITTLE_ENDIAN, ByteOrder.BIG_ENDIAN);
+        testEndianess(ENDIAN_CHANGE_L_N, ByteOrder.LITTLE_ENDIAN, ByteOrder.LITTLE_ENDIAN);
+        testEndianess(ENDIAN_CHANGE_L_L, ByteOrder.LITTLE_ENDIAN, ByteOrder.LITTLE_ENDIAN);
+        testEndianess(ENDIAN_CHANGE_B_L, ByteOrder.BIG_ENDIAN, ByteOrder.LITTLE_ENDIAN);
+        testEndianess(ENDIAN_CHANGE_B_N, ByteOrder.BIG_ENDIAN, ByteOrder.BIG_ENDIAN);
+        testEndianess(ENDIAN_CHANGE_B_B, ByteOrder.BIG_ENDIAN, ByteOrder.BIG_ENDIAN);
+    }
+
+    private void testEndianess(String tsdl, ByteOrder traceEndian, ByteOrder fieldEndian) throws CTFException {
+        fixture = new Metadata();
+        CTFTrace trace = fixture.getTrace();
+        fixture.parseText(tsdl);
+        assertEquals(traceEndian, trace.getByteOrder());
+        final Iterable<IEventDeclaration> eventDeclarations = trace.getEventDeclarations(0L);
+        assertNotNull(eventDeclarations);
+        IEventDeclaration event = Iterables.getFirst(eventDeclarations, null);
+        assertNotNull(event);
+        assertNotNull(event.getFields());
+        final @Nullable IDeclaration field = event.getFields().getField("data");
+        assertNotNull(field);
+        if (field instanceof ISimpleDatatypeDeclaration) {
+            ISimpleDatatypeDeclaration declaration = (ISimpleDatatypeDeclaration) field;
+            assertEquals(fieldEndian, declaration.getByteOrder());
+        } else {
+            fail("data is not the right type");
+        }
     }
 
     /**

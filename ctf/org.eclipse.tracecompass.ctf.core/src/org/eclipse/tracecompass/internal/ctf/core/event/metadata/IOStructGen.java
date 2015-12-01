@@ -443,7 +443,7 @@ public class IOStructGen {
             final DeclarationScope parentScope, String name,
             IntegerDeclaration decl) throws ParseException {
 
-        if (decl.getByteOrder() != byteOrder) {
+        if (!decl.isByteOrderSet()) {
             IntegerDeclaration newI;
             newI = IntegerDeclaration.createDeclaration(decl.getLength(), decl.isSigned(),
                     decl.getBase(), byteOrder, decl.getEncoding(),
@@ -454,7 +454,7 @@ public class IOStructGen {
 
     private static void addByteOrder(ByteOrder byteOrder, DeclarationScope parentScope, String name, EnumDeclaration decl) throws ParseException {
         final IntegerDeclaration containerType = decl.getContainerType();
-        if (containerType.getByteOrder() != byteOrder) {
+        if (!decl.isByteOrderSet()) {
             EnumDeclaration newEnum = new EnumDeclaration(IntegerDeclaration.createDeclaration(containerType.getLength(), containerType.isSigned(),
                     containerType.getBase(), byteOrder, containerType.getEncoding(),
                     containerType.getClock(), containerType.getAlignment()));
@@ -467,7 +467,7 @@ public class IOStructGen {
     }
 
     private static void addByteOrder(ByteOrder byteOrder, DeclarationScope parentScope, String name, FloatDeclaration decl) throws ParseException {
-        if (decl.getByteOrder() != byteOrder) {
+        if (!decl.isByteOrderSet()) {
             FloatDeclaration newFloat = new FloatDeclaration(decl.getExponent(), decl.getMantissa(), byteOrder, decl.getAlignment());
             parentScope.replaceType(name, newFloat);
         }
