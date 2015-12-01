@@ -193,11 +193,15 @@ public class TmfTraceManagerTest {
      */
     @Test
     public void testTraceSetExperiment() {
-        TmfExperiment exp = createExperiment(trace1, trace2);
-        openTrace(trace1);
+        final ITmfTrace localTrace1 = trace1;
+        final ITmfTrace localTrace2 = trace2;
+        assertNotNull(localTrace1);
+        assertNotNull(localTrace2);
+        TmfExperiment exp = createExperiment(localTrace1, localTrace2);
+        openTrace(localTrace1);
         openTrace(exp);
 
-        Collection<ITmfTrace> expected = ImmutableSet.of(trace1, trace2);
+        Collection<ITmfTrace> expected = ImmutableSet.of(localTrace1, localTrace2);
         Collection<ITmfTrace> actual = tm.getActiveTraceSet();
 
         assertEquals(2, actual.size());
@@ -209,15 +213,20 @@ public class TmfTraceManagerTest {
      */
     @Test
     public void testTraceSetWithExperiment() {
+        final ITmfTrace localTrace1 = trace1;
+        final ITmfTrace localTrace2 = trace2;
+        assertNotNull(localTrace1);
+        assertNotNull(localTrace2);
         /* Test with a trace */
-        Collection<ITmfTrace> expected = Collections.singleton(trace1);
-        Collection<ITmfTrace> actual = TmfTraceManager.getTraceSetWithExperiment(trace1);
+        Collection<ITmfTrace> expected = Collections.singleton(localTrace1);
+        Collection<ITmfTrace> actual = TmfTraceManager.getTraceSetWithExperiment(localTrace1);
         assertEquals(1, actual.size());
         assertEquals(expected, actual);
 
         /* Test with an experiment */
-        TmfExperiment exp = createExperiment(trace1, trace2);
-        expected = ImmutableSet.of(trace1, trace2, exp);
+        TmfExperiment exp = createExperiment(localTrace1, localTrace2);
+        assertNotNull(exp);
+        expected = ImmutableSet.of(localTrace1, localTrace2, exp);
         actual = TmfTraceManager.getTraceSetWithExperiment(exp);
         assertEquals(3, actual.size());
         assertEquals(expected, actual);
@@ -228,15 +237,19 @@ public class TmfTraceManagerTest {
      */
     @Test
     public void testSupplementaryFileDir() {
-        String name1 = trace1.getName();
-        String name2 = trace2.getName();
+        final ITmfTrace localTrace1 = trace1;
+        final ITmfTrace localTrace2 = trace2;
+        assertNotNull(localTrace1);
+        assertNotNull(localTrace2);
+        String name1 = localTrace1.getName();
+        String name2 = localTrace2.getName();
         String basePath = TmfTraceManager.getTemporaryDirPath() + File.separator;
 
         String expected1 = basePath + name1 + File.separator;
         String expected2 = basePath + name2 + File.separator;
 
-        assertEquals(expected1, TmfTraceManager.getSupplementaryFileDir(trace1));
-        assertEquals(expected2, TmfTraceManager.getSupplementaryFileDir(trace2));
+        assertEquals(expected1, TmfTraceManager.getSupplementaryFileDir(localTrace1));
+        assertEquals(expected2, TmfTraceManager.getSupplementaryFileDir(localTrace2));
     }
 
     // ------------------------------------------------------------------------
