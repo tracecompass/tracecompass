@@ -21,7 +21,8 @@ import org.junit.runner.RunWith;
 @RunWith(DebugSuite.class)
 @DebugSuite.SuiteClasses({
     org.eclipse.tracecompass.analysis.os.linux.core.tests.cpuusage.AllTests.class,
-    org.eclipse.tracecompass.analysis.os.linux.core.tests.kernelanalysis.AllTests.class
+    org.eclipse.tracecompass.analysis.os.linux.core.tests.kernelanalysis.AllTests.class,
+    org.eclipse.tracecompass.analysis.os.linux.core.tests.latency.AllTests.class
 })
 public class AllTests {
 
