@@ -63,13 +63,13 @@ public class CTFStreamInputReaderTest {
         fixture = getStreamInputReader();
         fixture.setName(1);
         fixture.setCurrentEvent(new EventDefinition(new EventDeclaration(),
-                getStreamInputReader().getCPU(), 0, null, null, null,
+                fixture.getCPU(), 0, null, null, null,
                 new StructDefinition(
                         new StructDeclaration(0),
                         null,
                         "packet",
                         new Definition[] { new StringDefinition(StringDeclaration.getStringDeclaration(Encoding.UTF8), null, "field", "test") }),
-                null));
+                null, fixture.getCurrentPacketReader().getCurrentPacket()));
     }
 
     private static CTFStreamInputReader getStreamInputReader() throws CTFException {
@@ -218,11 +218,16 @@ public class CTFStreamInputReaderTest {
      * given the timestamp we want.
      *
      * @throws CTFException
+     *             error
+     * @throws IOException
+     *             file not there
      */
     @Test
-    public void testSeek_eventDefinition() throws CTFException {
-        EventDefinition eventDefinition = new EventDefinition(
-                new EventDeclaration(), getStreamInputReader().getCPU(), 1L, null, null, null, null, null);
-        fixture.setCurrentEvent(eventDefinition);
+    public void testSeek_eventDefinition() throws CTFException, IOException {
+        try (CTFStreamInputReader streamInputReader = getStreamInputReader()) {
+            EventDefinition eventDefinition = new EventDefinition(
+                    new EventDeclaration(), streamInputReader.getCPU(), 1L, null, null, null, null, null, streamInputReader.getCurrentPacketReader().getCurrentPacket());
+            fixture.setCurrentEvent(eventDefinition);
+        }
     }
 }

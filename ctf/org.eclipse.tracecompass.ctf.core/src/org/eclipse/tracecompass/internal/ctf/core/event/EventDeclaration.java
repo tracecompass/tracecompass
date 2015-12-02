@@ -126,7 +126,8 @@ public class EventDeclaration implements IEventDeclaration {
                 streamEventContext,
                 eventContext,
                 packetContext,
-                eventPayload);
+                eventPayload,
+                packetDescriptor);
     }
 
     private static long calculateTimestamp(@Nullable ICompositeDefinition eventHeaderDef, long prevTimestamp, StructDefinition eventPayload, StructDefinition eventContext) throws CTFIOException {
@@ -176,7 +177,8 @@ public class EventDeclaration implements IEventDeclaration {
                 streamEventContext,
                 eventContext,
                 packetContext,
-                eventPayload);
+                eventPayload,
+                streamInputReader.getCurrentPacketReader().getCurrentPacket());
     }
 
     // ------------------------------------------------------------------------

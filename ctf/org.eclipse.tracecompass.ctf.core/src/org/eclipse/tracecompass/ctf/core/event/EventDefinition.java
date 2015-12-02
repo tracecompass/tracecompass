@@ -13,9 +13,12 @@
 package org.eclipse.tracecompass.ctf.core.event;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 import org.eclipse.tracecompass.ctf.core.event.scope.LexicalScope;
@@ -24,6 +27,7 @@ import org.eclipse.tracecompass.ctf.core.event.types.ICompositeDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
+import org.eclipse.tracecompass.ctf.core.trace.ICTFPacketDescriptor;
 import org.eclipse.tracecompass.internal.ctf.core.event.EventDeclaration;
 
 /**
@@ -45,7 +49,7 @@ public final class EventDefinition implements IDefinitionScope {
     /**
      * A null event, can be used for testing or poison pilling
      */
-    public static final @NonNull EventDefinition NULL_EVENT = new EventDefinition(new EventDeclaration(), UNKNOWN_CPU, -1L, null, null, null, null, null);
+    public static final @NonNull EventDefinition NULL_EVENT = new EventDefinition(new EventDeclaration(), UNKNOWN_CPU, -1L, null, null, null, null, null, null);
 
     /**
      * The corresponding event declaration.
@@ -78,6 +82,8 @@ public final class EventDefinition implements IDefinitionScope {
      */
     private final int fCpu;
 
+    private final @NonNull Map<String, Object> fPacketAttributes;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -98,11 +104,14 @@ public final class EventDefinition implements IDefinitionScope {
      * @param eventContext
      *            The event context
      * @param packetContext
-     *            the packet context (the one with content size, not magic number)
+     *            the packet context (the one with content size, not magic
+     *            number)
      * @param streamContext
      *            the stream context
      * @param fields
      *            The event fields
+     * @param packetDescriptor
+     *            descriptor of the packet containing this event
      * @since 2.0
      */
     public EventDefinition(IEventDeclaration declaration,
@@ -112,7 +121,8 @@ public final class EventDefinition implements IDefinitionScope {
             ICompositeDefinition streamContext,
             ICompositeDefinition eventContext,
             ICompositeDefinition packetContext,
-            ICompositeDefinition fields) {
+            ICompositeDefinition fields,
+            @Nullable ICTFPacketDescriptor packetDescriptor) {
         fDeclaration = declaration;
         fEventHeaderDefinition = eventHeaderDefinition;
         fCpu = cpu;
@@ -121,6 +131,7 @@ public final class EventDefinition implements IDefinitionScope {
         fEventContext = eventContext;
         fPacketContext = packetContext;
         fStreamContext = streamContext;
+        fPacketAttributes = packetDescriptor != null ? packetDescriptor.getAttributes() : Collections.EMPTY_MAP;
     }
 
     // ------------------------------------------------------------------------
@@ -258,6 +269,15 @@ public final class EventDefinition implements IDefinitionScope {
         return fTimestamp;
     }
 
+    /**
+     * Get the packet attributes.
+     *
+     * @return the packet attributes, such as "device" and "timestamp_begin"
+     * @since 2.0
+     */
+    public @NonNull Map<String, Object> getPacketAttributes() {
+        return fPacketAttributes;
+    }
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

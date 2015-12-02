@@ -223,7 +223,8 @@ public final class CTFPacketReader implements IPacketReader, IDefinitionScope {
                 new StructDefinition(
                         lostFields,
                         this, "fields", //$NON-NLS-1$
-                        fields));
+                        fields),
+                fPacketContext);
     }
 
     @Override
