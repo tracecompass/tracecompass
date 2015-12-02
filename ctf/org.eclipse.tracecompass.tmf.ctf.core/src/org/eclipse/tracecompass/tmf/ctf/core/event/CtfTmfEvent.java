@@ -16,8 +16,10 @@ package org.eclipse.tracecompass.tmf.ctf.core.event;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -84,6 +86,7 @@ public class CtfTmfEvent extends TmfEvent
     private transient @Nullable CtfTmfEventType fEventType;
 
     private final @Nullable ICTFStream fStream;
+    private final Map<String, Object> fPacketAttributes;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -139,6 +142,7 @@ public class CtfTmfEvent extends TmfEvent
         fEvent = eventDefinition;
         fChannel = channel;
         fStream = fEvent.getDeclaration().getStream();
+        fPacketAttributes = eventDefinition.getPacketAttributes();
     }
 
     /**
@@ -164,6 +168,7 @@ public class CtfTmfEvent extends TmfEvent
         fEvent = EventDefinition.NULL_EVENT;
         fChannel = ""; //$NON-NLS-1$
         fStream = null;
+        fPacketAttributes = Collections.EMPTY_MAP;
     }
 
     /**
@@ -182,6 +187,7 @@ public class CtfTmfEvent extends TmfEvent
         fEvent = EventDefinition.NULL_EVENT;
         fChannel = ""; //$NON-NLS-1$
         fStream = null;
+        fPacketAttributes = Collections.EMPTY_MAP;
     }
 
     // ------------------------------------------------------------------------
@@ -331,6 +337,19 @@ public class CtfTmfEvent extends TmfEvent
     @Override
     public @Nullable String getModelUri() {
         return getCustomAttribute(CtfConstants.MODEL_URI_KEY);
+    }
+
+    /**
+     * Gets the packet attributes. The result is an instance of one of
+     * the following classes: <code>Entry<String, Long></code>, <code>Long</code>,
+     * <code>String</code> or <code>Double</code>. The map contains pairs of key and
+     * values where the key and value can never be null.
+     *
+     * @return gets the packet attributes
+     * @since 2.0
+     */
+    public Map<String, Object> getPacketAttributes() {
+        return fPacketAttributes;
     }
 
     // ------------------------------------------------------------------------
