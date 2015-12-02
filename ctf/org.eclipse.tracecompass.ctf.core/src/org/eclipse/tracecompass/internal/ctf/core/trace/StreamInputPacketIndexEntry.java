@@ -12,11 +12,13 @@
 
 package org.eclipse.tracecompass.internal.ctf.core.trace;
 
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.ctf.core.event.types.EnumDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.FloatDefinition;
@@ -101,7 +103,7 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
      * @param fileSizeBytes
      *            number of bytes in a file
      *
-     * TODO: Remove
+     *            TODO: Remove
      */
 
     public StreamInputPacketIndexEntry(long dataOffsetBits, long fileSizeBytes) {
@@ -129,7 +131,7 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
      * @param lostSoFar
      *            number of lost events so far
      *
-     * TODO: Remove
+     *            TODO: Remove
      */
     public StreamInputPacketIndexEntry(long dataOffsetBits, StructDefinition streamPacketContextDef, long fileSizeBytes, long lostSoFar) {
         this(dataOffsetBits, streamPacketContextDef, fileSizeBytes, lostSoFar, dataOffsetBits);
@@ -158,7 +160,10 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
             } else if (id instanceof FloatDefinition) {
                 fAttributes.put(field, ((FloatDefinition) id).getValue());
             } else if (id instanceof EnumDefinition) {
-                fAttributes.put(field, ((EnumDefinition) id).getValue());
+                final EnumDefinition enumDec = (EnumDefinition) id;
+                fAttributes.put(field, new AbstractMap.SimpleImmutableEntry<>(
+                        NonNullUtils.checkNotNull(enumDec.getStringValue()),
+                        NonNullUtils.checkNotNull(enumDec.getIntegerValue())));
             } else if (id instanceof StringDefinition) {
                 fAttributes.put(field, ((StringDefinition) id).getValue());
             }
