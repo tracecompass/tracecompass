@@ -14,7 +14,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <prerequisites>
-    <maven>3.3</maven>
+    <maven>${required-maven-version}</maven>
   </prerequisites>
 
   <groupId>org.eclipse.tracecompass</groupId>
@@ -38,6 +38,7 @@
   </licenses>
 
   <properties>
+    <required-maven-version>3.3</required-maven-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <testArgLine></testArgLine>
@@ -48,6 +49,7 @@
     <target-platform>tracecompass-e4.5</target-platform>
     <help-docs-eclipserun-repo>http://download.eclipse.org/eclipse/updates/4.5</help-docs-eclipserun-repo>
 
+    <rcptt-version>2.1.0-SNAPSHOT</rcptt-version>
     <!-- Disable GTK3 because it's not quite usable yet and it can make the tests hang (bug in IcedTea http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=1736) -->
     <SWT_GTK3>0</SWT_GTK3>
 
@@ -90,6 +92,16 @@
       <id>jboss-public-repository-group</id>
       <name>JBoss Public Repository Group</name>
       <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>rcptt-snapshots</id>
+      <name>RCPTT Maven Snapshots repository</name>
+      <url>https://repo.eclipse.org/content/repositories/rcptt-snapshots/</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>rcptt-releases</id>
+      <name>RCPTT Maven repository</name>
+      <url>https://repo.eclipse.org/content/repositories/rcptt-releases/</url>
     </pluginRepository>
   </pluginRepositories>
 
@@ -301,7 +313,7 @@
             <configuration>
               <rules>
                 <requireMavenVersion>
-                  <version>3.3</version>
+                  <version>${required-maven-version}</version>
                 </requireMavenVersion>
                 <requireJavaVersion>
                   <version>1.8</version>
@@ -526,6 +538,18 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-antrun-plugin</artifactId>
           <version>1.8</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.10</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.eclipse.rcptt</groupId>
+          <artifactId>rcptt-maven-plugin</artifactId>
+          <version>${rcptt-version}</version>
         </plugin>
 
         <plugin>

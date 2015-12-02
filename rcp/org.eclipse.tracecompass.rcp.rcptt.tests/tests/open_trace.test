@@ -1,0 +1,45 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _hJ3OQI7-EeWIk8i4YSH9dg,_P_dMII_MEeWoZ73dvYVv8A,_AAhGYI_QEeWoZ73dvYVv8A
+Element-Name: open_trace
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: __FHjoJ39EeWj1rJFbZoWLw
+Runtime-Version: 2.1.0.201512080016
+Save-Time: 12/8/15 5:50 PM
+Testcase-Type: ecl
+Verifications: _gJhZUI8DEeWIk8i4YSH9dg
+
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+/*******************************************************************************
+* Copyright (c) 2015 Efficios Inc.
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*******************************************************************************/
+
+Open a trace containig a dynamic kernel trace.
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "Tracing/Traces [0]" | get-menu "Import..." | click
+set-dialog-result Folder $data_path
+with [get-window "Trace Import"] {
+    get-button "Browse..." | click
+    with [get-tree] {
+        get-item "tracecompass-test-traces-ctf-jar/kernel_vm" | check
+        select "tracecompass-test-traces-ctf-jar/kernel_vm"
+    }
+    get-button Finish | click
+}
+get-view "Project Explorer" | get-tree | get-item "Tracing/Traces \\[1\\]" | get-property "getItemCount()" | equals 1 
+    | verify-true
+get-view "Project Explorer" | get-tree | select "Tracing/Traces [1]/kernel_vm" | double-click
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

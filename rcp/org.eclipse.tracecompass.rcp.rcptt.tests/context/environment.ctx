@@ -1,0 +1,29 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Context-Type: org.eclipse.rcptt.ctx.ecl
+Element-Name: environment
+Element-Type: context
+Element-Version: 2.0
+Id: _P_dMII_MEeWoZ73dvYVv8A
+Runtime-Version: 2.1.0.201511240016
+Save-Time: 12/2/15 3:06 PM
+
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+/*******************************************************************************
+* Copyright (c) 2015 Efficios Inc.
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*******************************************************************************/
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
+Content-Type: text/ecl
+Entry-Name: .ecl.context
+
+// Get and set the data path for the running test
+global [val data_path [substitute-variables "${system_property:dataPath}"]]
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--

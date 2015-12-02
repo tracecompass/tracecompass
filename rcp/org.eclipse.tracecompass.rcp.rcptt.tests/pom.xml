@@ -1,0 +1,108 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <!--
+  /*******************************************************************************
+  * Copyright (c) 2015 Efficios Inc.
+  * All rights reserved. This program and the accompanying materials
+  * are made available under the terms of the Eclipse Public License v1.0
+  * which accompanies this distribution, and is available at
+  * http://www.eclipse.org/legal/epl-v10.html
+  *******************************************************************************/
+  -->
+
+  <artifactId>org.eclipse.tracecompass.rcp.tests</artifactId>
+  <name>Trace Compass RCP Product Tests</name>
+
+  <parent>
+    <artifactId>org.eclipse.tracecompass.rcp-parent</artifactId>
+    <groupId>org.eclipse.tracecompass</groupId>
+    <version>2.0.0-SNAPSHOT</version>
+  </parent>
+
+  <packaging>rcpttTest</packaging>
+
+  <properties>
+    <dataPath>${project.build.directory}/dependency/tracecompass-test-traces-ctf-jar</dataPath>
+    <!-- Overridden by profile on Windows -->
+    <aut.extension>tar.gz</aut.extension>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.tracecompass.testtraces</groupId>
+      <artifactId>tracecompass-test-traces-ctf</artifactId>
+      <version>1.2.0</version>
+    </dependency>
+  </dependencies>
+  <repositories>
+    <repository>
+      <id>trace-compass-test-traces</id>
+      <name>Trace Compass Test Traces</name>
+      <url>http://archive.eclipse.org/tracecompass/tracecompass-test-traces/maven</url>
+    </repository>
+  </repositories>
+
+  <profiles>
+    <profile>
+      <id>windows-rcptt</id>
+      <activation>
+        <os>
+          <family>Windows</family>
+        </os>
+      </activation>
+      <properties>
+        <aut.extension>zip</aut.extension>
+      </properties>
+    </profile>
+  </profiles>
+
+  <build>
+    <plugins>
+      <!--  This copies and extracts the test traces jar to the target/dependency folder -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-dependencies</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <useSubDirectoryPerArtifact>true</useSubDirectoryPerArtifact>
+              <stripVersion>true</stripVersion>
+              <stripClassifier>true</stripClassifier>
+              <excludeTransitive>true</excludeTransitive>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.rcptt</groupId>
+        <artifactId>rcptt-maven-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <aut>
+            <groupId>org.eclipse.tracecompass</groupId>
+            <artifactId>org.eclipse.tracecompass.rcp.product</artifactId>
+            <extension>${aut.extension}</extension>
+
+            <vmArgs>
+              <vmArg>-Xmx1024m</vmArg>
+              <vmArg>-DdataPath=${dataPath}</vmArg>
+            </vmArgs>
+          </aut>
+          <runner>
+            <version>${rcptt-version}</version>
+          </runner>
+          <suites>
+            <suite>open_trace_suite</suite>
+          </suites>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

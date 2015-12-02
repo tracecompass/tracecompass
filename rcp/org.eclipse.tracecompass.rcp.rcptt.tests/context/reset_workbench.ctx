@@ -1,0 +1,34 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Context-Type: org.eclipse.rcptt.ctx.workbench
+Element-Name: reset_workbench
+Element-Type: context
+Element-Version: 2.0
+Id: _AAhGYI_QEeWoZ73dvYVv8A
+Runtime-Version: 2.1.0.201511240016
+Save-Time: 12/2/15 3:07 PM
+
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+/*******************************************************************************
+* Copyright (c) 2015 Efficios Inc.
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*******************************************************************************/
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
+------=_.q7.content-3d2e0690-ce48-3609-83e0-c704d49f1eaf
+Content-Type: q7/binary
+Entry-Name: .q7.content
+
+UEsDBBQACAgIAAAAIQAAAAAAAAAAAAAAAAAIAAkALmNvbnRlbnRVVAUAAQAAAAB1jrtuwzAMRfd8hcC9
+Uh9DAyNOYBRF4aFDl6bpYiQyYwuVREGiH59fpYCDLF3Jc+69m93srBgxJkO+hAd5DwK9ptb4roSBz3dr
+2G1XG4qdRG1NSCijDswyafTHaKjYU/w5Zad/Ic84s5idKa6Jj5fE3OFTke8l9MyhUGqaJkmukzlXfb3X
+C/J/zdVc3hfzD1GOWrRqAbNPEUH4o8MSIibkZlomgjBtCU1V9W+Huvl4xT19Pz+14+FzXFcgQl4dULMZ
+sc7c7Rpr/DAzkU2S3VkORt7AoLarX1BLBwjGZSHP1wAAAEoBAABQSwECFAAUAAgICAAAACEAxmUhz9cA
+AABKAQAACAAJAAAAAAAAAAAAAAAAAAAALmNvbnRlbnRVVAUAAQAAAABQSwUGAAAAAAEAAQA/AAAAFgEA
+AAAA
+------=_.q7.content-3d2e0690-ce48-3609-83e0-c704d49f1eaf--
