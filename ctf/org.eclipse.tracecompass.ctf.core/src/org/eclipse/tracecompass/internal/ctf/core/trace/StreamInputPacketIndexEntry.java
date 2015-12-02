@@ -13,11 +13,12 @@
 package org.eclipse.tracecompass.internal.ctf.core.trace;
 
 import java.util.AbstractMap;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.ctf.core.event.types.EnumDefinition;
@@ -29,6 +30,9 @@ import org.eclipse.tracecompass.ctf.core.event.types.StringDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
 import org.eclipse.tracecompass.ctf.core.trace.ICTFPacketDescriptor;
 import org.eclipse.tracecompass.ctf.core.trace.IPacketReader;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 
 /**
  * <b><u>StreamInputPacketIndexEntry</u></b>
@@ -87,7 +91,7 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
     /**
      * Attributes of this index entry
      */
-    private final Map<String, Object> fAttributes = new HashMap<>();
+    private final @NonNull Map<String, Object> fAttributes;
 
     private final long fEndPacketHeaderBits;
 
@@ -107,6 +111,7 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
      */
 
     public StreamInputPacketIndexEntry(long dataOffsetBits, long fileSizeBytes) {
+        fAttributes = Collections.EMPTY_MAP;
         fContentSizeBits = (fileSizeBytes * Byte.SIZE);
         fPacketSizeBits = (fileSizeBytes * Byte.SIZE);
         fOffsetBits = dataOffsetBits;
@@ -153,22 +158,7 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
      */
     public StreamInputPacketIndexEntry(long dataOffsetBits, StructDefinition streamPacketContextDef, long fileSizeBytes, long lostSoFar, long endPacketHeaderBits) {
         fEndPacketHeaderBits = endPacketHeaderBits;
-        for (String field : streamPacketContextDef.getDeclaration().getFieldsList()) {
-            IDefinition id = streamPacketContextDef.lookupDefinition(field);
-            if (id instanceof IntegerDefinition) {
-                fAttributes.put(field, ((IntegerDefinition) id).getValue());
-            } else if (id instanceof FloatDefinition) {
-                fAttributes.put(field, ((FloatDefinition) id).getValue());
-            } else if (id instanceof EnumDefinition) {
-                final EnumDefinition enumDec = (EnumDefinition) id;
-                fAttributes.put(field, new AbstractMap.SimpleImmutableEntry<>(
-                        NonNullUtils.checkNotNull(enumDec.getStringValue()),
-                        NonNullUtils.checkNotNull(enumDec.getIntegerValue())));
-            } else if (id instanceof StringDefinition) {
-                fAttributes.put(field, ((StringDefinition) id).getValue());
-            }
-        }
-
+        fAttributes = computeAttributeMap(streamPacketContextDef);
         fContentSizeBits = computeContentSize(fileSizeBytes);
         fPacketSizeBits = computePacketSize(fileSizeBytes);
         fTimestampBegin = computeTsBegin();
@@ -181,6 +171,26 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
         fTarget = target.string;
         fTargetID = target.number;
         fLostEvents = computeLostEvents(lostSoFar);
+    }
+
+    private @NonNull static ImmutableMap<String, Object> computeAttributeMap(StructDefinition streamPacketContextDef) {
+        Builder<String, Object> attributeBuilder = ImmutableMap.<String, Object> builder();
+        for (String field : streamPacketContextDef.getDeclaration().getFieldsList()) {
+            IDefinition id = streamPacketContextDef.lookupDefinition(field);
+            if (id instanceof IntegerDefinition) {
+                attributeBuilder.put(field, ((IntegerDefinition) id).getValue());
+            } else if (id instanceof FloatDefinition) {
+                attributeBuilder.put(field, ((FloatDefinition) id).getValue());
+            } else if (id instanceof EnumDefinition) {
+                final EnumDefinition enumDec = (EnumDefinition) id;
+                attributeBuilder.put(field, new AbstractMap.SimpleImmutableEntry<>(
+                        NonNullUtils.checkNotNull(enumDec.getStringValue()),
+                        NonNullUtils.checkNotNull(enumDec.getIntegerValue())));
+            } else if (id instanceof StringDefinition) {
+                attributeBuilder.put(field, ((StringDefinition) id).getValue());
+            }
+        }
+        return attributeBuilder.build();
     }
 
     private Long getPacketSize() {
@@ -331,21 +341,9 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
         return fLostEvents;
     }
 
-    /**
-     * Add an attribute to this index entry
-     *
-     * @param field
-     *            The name of the attribute
-     * @param value
-     *            The value to insert
-     */
-    public void addAttribute(String field, Object value) {
-        fAttributes.put(field, value);
-    }
-
     @Override
-    public Object lookupAttribute(String field) {
-        return fAttributes.get(field);
+    public Map<String, Object> getAttributes() {
+        return fAttributes;
     }
 
     @Override

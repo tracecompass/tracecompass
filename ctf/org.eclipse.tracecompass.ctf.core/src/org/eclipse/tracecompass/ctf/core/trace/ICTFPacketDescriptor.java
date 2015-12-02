@@ -11,12 +11,16 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.ctf.core.trace;
 
+import java.util.Map;
+
+import org.eclipse.jdt.annotation.NonNull;
+
 /**
  * CTF Packet descriptor, can come from a packet header or an index file, this
  * will show certain information about the packet such as the size and
  * timerange.
  *
- * @since 1.0
+ * @since 2.0
  */
 public interface ICTFPacketDescriptor {
 
@@ -38,30 +42,33 @@ public interface ICTFPacketDescriptor {
     long getOffsetBits();
 
     /**
-     * Gets the size of the packet in bits. If you have a 1mb packet that is 499kb
-     * used and the header is 1kb, this will return 1mb
+     * Gets the size of the packet in bits. If you have a 1mb packet that is
+     * 499kb used and the header is 1kb, this will return 1mb
      *
      * @return the packetSizeBits
      */
     long getPacketSizeBits();
 
     /**
-     * Get the content size of the packet in bits. If you have a 1mb packet that is 499kb
-     * used and the header is 1kb, this will return 500kb (used data + header
+     * Get the content size of the packet in bits. If you have a 1mb packet that
+     * is 499kb used and the header is 1kb, this will return 500kb (used data +
+     * header
      *
      * @return the contentSizeBits
      */
     long getContentSizeBits();
 
     /**
-     * Gets the beginning timestamp of the packet, all events within the packet will have timestamps after or at this time
+     * Gets the beginning timestamp of the packet, all events within the packet
+     * will have timestamps after or at this time
      *
      * @return the timestampBegin
      */
     long getTimestampBegin();
 
     /**
-     * Gets the ending timestamp of the packet, all events within the packet will have timestamps before or at this time
+     * Gets the ending timestamp of the packet, all events within the packet
+     * will have timestamps before or at this time
      *
      * @return the timestampEnd
      */
@@ -75,13 +82,13 @@ public interface ICTFPacketDescriptor {
     long getLostEvents();
 
     /**
-     * Retrieve the value of an existing attribute
+     * Retrieve the map of the packet attributes
      *
-     * @param field
-     *            The name of the attribute
-     * @return The value that was stored, or null if it wasn't found
+     * @return The map of attributes stored. Example keys are "device" or
+     *         "timestamp_begin"
+     * @since 2.0
      */
-    Object lookupAttribute(String field);
+    @NonNull Map<String, Object> getAttributes();
 
     /**
      * Get the target of the packet (what device generated this packet)
