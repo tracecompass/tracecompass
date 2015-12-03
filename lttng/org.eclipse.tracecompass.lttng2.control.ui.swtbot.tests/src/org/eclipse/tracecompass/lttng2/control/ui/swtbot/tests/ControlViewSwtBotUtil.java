@@ -23,12 +23,13 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers.SWTB
  */
 class ControlViewSwtBotUtil {
 
-
+    public static final String USER_HOME = System.getProperty("user.home");
     public static final String DEFAULT_CHANNEL_NAME = "channel0";
     public static final String KERNEL_DOMAIN_NAME = "Kernel";
     public static final String UST_DOMAIN_NAME = "UST global";
     public static final String SESSION_GROUP_NAME = "Sessions";
     public static final String ALL_EVENTS_NAME = "*";
+    public static final String PROFILE_SUFFIX = ".lttng";
 
     // Menu strings
     public static final String CONNECT_MENU_ITEM = "Connect";
@@ -40,6 +41,8 @@ class ControlViewSwtBotUtil {
     public static final String STOP_MENU_ITEM = "Stop";
     public static final String DESTROY_MENU_ITEM = "Destroy Session...";
     public static final String DISCONNECT_MENU_ITEM = "Disconnect";
+    public static final String SAVE_MENU_ITEM = "Save...";
+    public static final String LOAD_MENU_ITEM = "Load...";
 
     // Dialog strings
     public static final String CREATE_SESSION_DIALOG_TITLE = "Create Session";
@@ -59,7 +62,9 @@ class ControlViewSwtBotUtil {
     public static final String DESTROY_CONFIRM_DIALOG_TITLE = "Destroy Confirmation";
     public static final String CHANNEL_NAME_LABEL = "Channel Name";
 
-
+    public static final String SAVE_DIALOG_TITLE = "Save Sessions";
+    public static final String LOAD_DIALOG_TITLE = "Load Sessions";
+    public static final String REMOTE_RADIO_BUTTON_LABEL = "Remote";
 
     private ControlViewSwtBotUtil() { }
 
@@ -114,16 +119,16 @@ class ControlViewSwtBotUtil {
      *            session name to find
      * @return the session component or null
      */
-  public static TraceSessionComponent getSessionComponent(TargetNodeComponent target, String sessionName) {
-      final TraceSessionComponent[] sessions = target.getSessions();
-      if (sessions != null) {
-          for (int i = 0; i < sessions.length; i++) {
-              if (sessionName.equals(sessions[i].getName())) {
-                  return sessions[i];
-              }
-          }
+    public static TraceSessionComponent getSessionComponent(TargetNodeComponent target, String sessionName) {
+        final TraceSessionComponent[] sessions = target.getSessions();
+        if (sessions != null) {
+            for (int i = 0; i < sessions.length; i++) {
+                if (sessionName.equals(sessions[i].getName())) {
+                    return sessions[i];
+                }
+            }
+        }
+        return null;
     }
-    return null;
-  }
 
 }

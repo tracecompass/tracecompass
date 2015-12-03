@@ -17,7 +17,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    ControlViewTest.class
+    ControlViewTest.class,
+    ControlViewProfileTest.class,
 })
 public class AllTests {
 

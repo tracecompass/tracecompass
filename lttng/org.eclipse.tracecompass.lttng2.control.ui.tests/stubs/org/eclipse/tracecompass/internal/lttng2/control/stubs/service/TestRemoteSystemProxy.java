@@ -71,6 +71,18 @@ public class TestRemoteSystemProxy extends RemoteSystemProxy {
         }
     }
 
+    public void setProfileName(String profileName) {
+        if (fShell != null) {
+            fShell.setProfileName(profileName);
+        }
+    }
+
+    public void deleteProfileFile() {
+        if (fShell != null) {
+            fShell.deleteProfileFile();
+        }
+    }
+
     @Override
     public boolean isConnected() {
         return true;
