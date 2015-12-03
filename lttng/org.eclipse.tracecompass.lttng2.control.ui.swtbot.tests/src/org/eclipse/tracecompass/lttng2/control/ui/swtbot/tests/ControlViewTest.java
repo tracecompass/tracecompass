@@ -57,27 +57,40 @@ import org.osgi.framework.FrameworkUtil;
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class ControlViewTest {
 
-    /** The Log4j logger instance. */
-    private static final Logger fLogger = Logger.getRootLogger();
-    private static SWTWorkbenchBot fBot;
 
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
     private static final String TEST_STREAM = "CreateSessionTestLTTng2_7.cfg";
-    private static final String INIT_SCENARIO_NAME = "Initialize";
+    /** The initialize scenario name */
+    protected static final String INIT_SCENARIO_NAME = "Initialize";
     private static final String CREATE_SESSION_WITH_LTTNG_2_7_SCENARIO_NAME = "CreateSession_2.7";
 
     private static final String SESSION_NAME = "mysession";
     private static final String UST_CHANNEL_NAME = ControlViewSwtBotUtil.DEFAULT_CHANNEL_NAME;
-    private static final String NODE_NAME_GROUP_NAME = "myNode";
+    private static final String NODE_NAME = "myNode";
 
     // ------------------------------------------------------------------------
     // Test data
     // ------------------------------------------------------------------------
+
+    /** The Log4j logger instance. */
+    protected static final Logger fLogger = Logger.getRootLogger();
+    /** The workbench bot */
+    protected static SWTWorkbenchBot fBot;
     private IRemoteConnection fHost = TmfRemoteConnectionFactory.getLocalConnection();
-    private @NonNull TestRemoteSystemProxy fProxy = new TestRemoteSystemProxy(fHost);
-    private String fTestFile;
+    /** The test remote system proxy */
+    protected @NonNull TestRemoteSystemProxy fProxy = new TestRemoteSystemProxy(fHost);
+    /** The trace control tree */
+    protected SWTBotTree fTree;
+    /** The trace control root component */
+    protected ITraceControlComponent fRoot;
+    /** The target node component */
+    protected TargetNodeComponent fNode;
+
+
+    /** The test file */
+    protected String fTestFile;
 
     // ------------------------------------------------------------------------
     // Housekeeping
@@ -115,6 +128,18 @@ public class ControlViewTest {
         URL location = FileLocator.find(FrameworkUtil.getBundle(this.getClass()), new Path("testfiles" + File.separator + getTestStream()), null);
         File testfile = new File(FileLocator.toFileURL(location).toURI());
         fTestFile = testfile.getAbsolutePath();
+
+        // Create root component
+        SWTBotView viewBot = fBot.viewById(ControlView.ID);
+        viewBot.setFocus();
+        IViewPart part = viewBot.getViewReference().getView(true);
+        ControlView view = (ControlView) part;
+        fRoot = view.getTraceControlRoot();
+
+        // Create node component
+        fNode = new TargetNodeComponent(getNodeName(), fRoot, fProxy);
+        fRoot.addChild(fNode);
+        fTree = viewBot.bot().tree();
     }
 
     /**
@@ -123,6 +148,9 @@ public class ControlViewTest {
     @After
     public void tearDown() {
         fBot.closeAllEditors();
+        if (fRoot != null) {
+           fRoot.removeAllChildren();
+        }
     }
 
     /**
@@ -135,6 +163,24 @@ public class ControlViewTest {
     }
 
     /**
+     * Get the session name
+     *
+     * @return the session name for this test
+     */
+    protected String getSessionName() {
+        return SESSION_NAME;
+    }
+
+    /**
+     * Get the node name
+     *
+     * @return the node name for the test
+     */
+    protected String getNodeName() {
+        return NODE_NAME;
+    }
+
+    /**
      * Test basic trace session generation.
      */
     @Test
@@ -143,45 +189,25 @@ public class ControlViewTest {
         fProxy.setTestFile(fTestFile);
         fProxy.setScenario(INIT_SCENARIO_NAME);
 
-        SWTBotView viewBot = fBot.viewById(ControlView.ID);
-        viewBot.setFocus();
-
-        IViewPart part = viewBot.getViewReference().getView(true);
-
-        ControlView view = (ControlView) part;
-
-        ITraceControlComponent root = view.getTraceControlRoot();
-        TargetNodeComponent node = new TargetNodeComponent(NODE_NAME_GROUP_NAME, root, fProxy);
-        root.addChild(node);
-
-        SWTBotTree tree = viewBot.bot().tree();
-
-        testConnectToNode(tree, node);
+        testConnectToNode();
         // Set the scenario
         fProxy.setScenario(CREATE_SESSION_WITH_LTTNG_2_7_SCENARIO_NAME);
-        testCreateSession(tree);
-        testEnableKernelEvent(tree);
-        testEnableSyscalls(tree);
-        testEnableUstChannel(tree);
-        testEnableUstEvents(tree);
-        testStartStopTracing(tree, node, TraceSessionState.ACTIVE);
-        testStartStopTracing(tree, node, TraceSessionState.INACTIVE);
-        testDestroySession(tree);
-        testDisconnectFromNode(tree, node);
-
-        root.removeAllChildren();
+        testCreateSession();
+        testEnableKernelEvent();
+        testEnableSyscalls();
+        testEnableUstChannel();
+        testEnableUstEvents();
+        testStartStopTracing(TraceSessionState.ACTIVE);
+        testStartStopTracing(TraceSessionState.INACTIVE);
+        testDestroySession();
+        testDisconnectFromNode();
     }
 
     /**
      * Test connect to node
-     *
-     * @param tree
-     *            the control view tree
-     * @param node
-     *            the target node instance
      */
-    private static void testConnectToNode(SWTBotTree tree, TargetNodeComponent node) {
-        SWTBotTreeItem nodeItem = SWTBotUtils.getTreeItem(fBot, tree, NODE_NAME_GROUP_NAME);
+    protected void testConnectToNode() {
+        SWTBotTreeItem nodeItem = SWTBotUtils.getTreeItem(fBot, fTree, getNodeName());
         nodeItem.select();
         SWTBotMenu menuBot = nodeItem.contextMenu(ControlViewSwtBotUtil.CONNECT_MENU_ITEM);
         menuBot.click();
@@ -190,18 +216,15 @@ public class ControlViewTest {
         fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.SESSION_GROUP_NAME, nodeItem));
 
         // Verify that node is connected
-        fBot.waitUntil(ControlViewSwtBotUtil.isStateChanged(node, TargetNodeState.CONNECTED));
-        assertEquals(TargetNodeState.CONNECTED, node.getTargetNodeState());
+        fBot.waitUntil(ControlViewSwtBotUtil.isStateChanged(fNode, TargetNodeState.CONNECTED));
+        assertEquals(TargetNodeState.CONNECTED, fNode.getTargetNodeState());
     }
 
     /**
      * Test create session
-     *
-     * @param tree
-     *            the control view tree
      */
-    private static void  testCreateSession(SWTBotTree tree) {
-        SWTBotTreeItem nodeItem = SWTBotUtils.getTreeItem(fBot, tree, NODE_NAME_GROUP_NAME);
+    protected void testCreateSession() {
+        SWTBotTreeItem nodeItem = SWTBotUtils.getTreeItem(fBot, fTree, getNodeName());
 
         SWTBotTreeItem sessionGroupItem = nodeItem.getNode(ControlViewSwtBotUtil.SESSION_GROUP_NAME);
 
@@ -219,27 +242,24 @@ public class ControlViewTest {
 
         sessionGroupItem.expand();
 
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(SESSION_NAME, sessionGroupItem));
+        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(getSessionName(), sessionGroupItem));
         assertEquals(1, sessionGroupItem.getNodes().size());
 
-        SWTBotTreeItem sessionItem = SWTBotUtils.getTreeItem(fBot, tree,
-                NODE_NAME_GROUP_NAME,
+        SWTBotTreeItem sessionItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
                 ControlViewSwtBotUtil.SESSION_GROUP_NAME,
-                SESSION_NAME);
-        assertEquals(SESSION_NAME, sessionItem.getText());
+                getSessionName());
+        assertEquals(getSessionName(), sessionItem.getText());
     }
 
     /**
      * Test enable event (all kernel tracepoints) on session level
-
-     * @param tree
-     *            the control view tree
      */
-    private static void testEnableKernelEvent(SWTBotTree tree) {
-        SWTBotTreeItem sessionItem = SWTBotUtils.getTreeItem(fBot, tree,
-                NODE_NAME_GROUP_NAME,
+    protected void testEnableKernelEvent() {
+        SWTBotTreeItem sessionItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
                 ControlViewSwtBotUtil.SESSION_GROUP_NAME,
-                SESSION_NAME);
+                getSessionName());
 
         sessionItem.select();
         SWTBotMenu menuBot = sessionItem.contextMenu(ControlViewSwtBotUtil.ENABLE_EVENT_DEFAULT_CHANNEL_MENU_ITEM);
@@ -254,42 +274,39 @@ public class ControlViewTest {
 
         fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));
 
-        SWTBotTreeItem channelItem = SWTBotUtils.getTreeItem(fBot, tree,
-                NODE_NAME_GROUP_NAME,
+        SWTBotTreeItem channelItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
                 ControlViewSwtBotUtil.SESSION_GROUP_NAME,
-                SESSION_NAME,
+                getSessionName(),
                 ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME,
                 ControlViewSwtBotUtil.DEFAULT_CHANNEL_NAME);
         assertEquals(ControlViewSwtBotUtil.DEFAULT_CHANNEL_NAME, channelItem.getText());
 
-        SWTBotTreeItem eventItem = SWTBotUtils.getTreeItem(fBot, tree,
-                NODE_NAME_GROUP_NAME,
+        SWTBotTreeItem eventItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
                 ControlViewSwtBotUtil.SESSION_GROUP_NAME,
-                SESSION_NAME,
+                getSessionName(),
                 ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME,
                 ControlViewSwtBotUtil.DEFAULT_CHANNEL_NAME,
                 ControlViewSwtBotUtil.ALL_EVENTS_NAME);
         assertEquals(ControlViewSwtBotUtil.ALL_EVENTS_NAME, eventItem.getText());
 
-        SWTBotTreeItem kernelDomainItem = SWTBotUtils.getTreeItem(fBot, tree,
-                NODE_NAME_GROUP_NAME,
+        SWTBotTreeItem kernelDomainItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
                 ControlViewSwtBotUtil.SESSION_GROUP_NAME,
-                SESSION_NAME,
+                getSessionName(),
                 ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME);
         assertEquals(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, kernelDomainItem.getText());
     }
 
     /**
      * Test enable Event (syscall) on domain level
-     *
-     * @param tree
-     *            the control view tree
      */
-    private static void testEnableSyscalls(SWTBotTree tree) {
-        SWTBotTreeItem kernelDomainItem = SWTBotUtils.getTreeItem(fBot, tree,
-                NODE_NAME_GROUP_NAME,
+    protected void testEnableSyscalls() {
+        SWTBotTreeItem kernelDomainItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
                 ControlViewSwtBotUtil.SESSION_GROUP_NAME,
-                SESSION_NAME,
+                getSessionName(),
                 ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME);
         kernelDomainItem.select();
         SWTBotMenu menuBot = kernelDomainItem.contextMenu(ControlViewSwtBotUtil.ENABLE_EVENT_DEFAULT_CHANNEL_MENU_ITEM);
@@ -303,15 +320,12 @@ public class ControlViewTest {
 
     /**
      * Test enable UST channel on session level (default values)
-     *
-     * @param tree
-     *            the control view tree
      */
-    private static void testEnableUstChannel(SWTBotTree tree) {
-        SWTBotTreeItem sessionItem = SWTBotUtils.getTreeItem(fBot, tree,
-                NODE_NAME_GROUP_NAME,
+    protected void testEnableUstChannel() {
+        SWTBotTreeItem sessionItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
                 ControlViewSwtBotUtil.SESSION_GROUP_NAME,
-                SESSION_NAME);
+                getSessionName());
         sessionItem.select();
         SWTBotMenu menuBot = sessionItem.contextMenu(ControlViewSwtBotUtil.ENABLE_CHANNEL_MENU_ITEM);
         menuBot.click();
@@ -329,15 +343,12 @@ public class ControlViewTest {
 
     /**
      * Test enable event (all tracepoints) on channel level
-     *
-     * @param tree
-     *            the control view tree
      */
-    private static void testEnableUstEvents(SWTBotTree tree) {
-        SWTBotTreeItem channelItem = SWTBotUtils.getTreeItem(fBot, tree,
-                NODE_NAME_GROUP_NAME,
+    protected void testEnableUstEvents() {
+        SWTBotTreeItem channelItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
                 ControlViewSwtBotUtil.SESSION_GROUP_NAME,
-                SESSION_NAME, ControlViewSwtBotUtil.UST_DOMAIN_NAME,
+                getSessionName(), ControlViewSwtBotUtil.UST_DOMAIN_NAME,
                 UST_CHANNEL_NAME);
         assertEquals(UST_CHANNEL_NAME, channelItem.getText());
 
@@ -351,10 +362,10 @@ public class ControlViewTest {
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
         SWTBotUtils.waitForJobs();
 
-        SWTBotTreeItem eventItem = SWTBotUtils.getTreeItem(fBot, tree,
-                NODE_NAME_GROUP_NAME,
+        SWTBotTreeItem eventItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
                 ControlViewSwtBotUtil.SESSION_GROUP_NAME,
-                SESSION_NAME,
+                getSessionName(),
                 ControlViewSwtBotUtil.UST_DOMAIN_NAME,
                 UST_CHANNEL_NAME,
                 ControlViewSwtBotUtil.ALL_EVENTS_NAME);
@@ -364,18 +375,14 @@ public class ControlViewTest {
     /**
      * Test start or stop tracing
      *
-     * @param tree
-     *            the control view tree
-     * @param node
-     *            the target node instance
      * @param state
      *            the state to change to
      */
-    private static void testStartStopTracing(SWTBotTree tree, TargetNodeComponent node, TraceSessionState state) {
-        SWTBotTreeItem sessionItem = SWTBotUtils.getTreeItem(fBot, tree,
-                NODE_NAME_GROUP_NAME,
+    protected void testStartStopTracing(TraceSessionState state) {
+        SWTBotTreeItem sessionItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
                 ControlViewSwtBotUtil.SESSION_GROUP_NAME,
-                SESSION_NAME);
+                getSessionName());
         sessionItem.select();
 
         if (state == TraceSessionState.ACTIVE) {
@@ -387,7 +394,7 @@ public class ControlViewTest {
             menuBot.click();
             SWTBotUtils.waitForJobs();
         }
-        TraceSessionComponent sessionComp = ControlViewSwtBotUtil.getSessionComponent(node, SESSION_NAME);
+        TraceSessionComponent sessionComp = ControlViewSwtBotUtil.getSessionComponent(fNode, getSessionName());
         assertNotNull(sessionComp);
 
         fBot.waitUntil(ControlViewSwtBotUtil.isSessionStateChanged(sessionComp, state));
@@ -396,15 +403,12 @@ public class ControlViewTest {
 
     /**
      * Test destroy session
-     *
-     * @param tree
-     *            the control view tree
      */
-    private static void testDestroySession(SWTBotTree tree) {
-        SWTBotTreeItem sessionItem = SWTBotUtils.getTreeItem(fBot, tree,
-                NODE_NAME_GROUP_NAME,
+    protected void testDestroySession() {
+        SWTBotTreeItem sessionItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(),
                 ControlViewSwtBotUtil.SESSION_GROUP_NAME,
-                SESSION_NAME);
+                getSessionName());
 
         sessionItem.select();
         SWTBotMenu menuBot = sessionItem.contextMenu(ControlViewSwtBotUtil.DESTROY_MENU_ITEM);
@@ -414,8 +418,8 @@ public class ControlViewTest {
         shell.bot().button(ControlViewSwtBotUtil.CONFIRM_DIALOG_OK_BUTTON).click();
         SWTBotUtils.waitForJobs();
 
-        SWTBotTreeItem sessionGroupItem = SWTBotUtils.getTreeItem(fBot, tree,
-                NODE_NAME_GROUP_NAME, ControlViewSwtBotUtil.SESSION_GROUP_NAME);
+        SWTBotTreeItem sessionGroupItem = SWTBotUtils.getTreeItem(fBot, fTree,
+                getNodeName(), ControlViewSwtBotUtil.SESSION_GROUP_NAME);
 
         fBot.waitUntil(ConditionHelpers.isTreeChildNodeRemoved(0, sessionGroupItem));
         assertEquals(0, sessionGroupItem.getNodes().size());
@@ -423,14 +427,9 @@ public class ControlViewTest {
 
     /**
      * Test disconnect from node
-     *
-     * @param tree
-     *            the control view tree
-     * @param node
-     *            the target node instance
      */
-    private static void testDisconnectFromNode(SWTBotTree tree, TargetNodeComponent node) {
-        SWTBotTreeItem nodeItem = SWTBotUtils.getTreeItem(fBot, tree, NODE_NAME_GROUP_NAME);
+    protected void testDisconnectFromNode() {
+        SWTBotTreeItem nodeItem = SWTBotUtils.getTreeItem(fBot, fTree, getNodeName());
 
         nodeItem.select();
         SWTBotMenu menuBot = nodeItem.contextMenu(ControlViewSwtBotUtil.DISCONNECT_MENU_ITEM);
@@ -438,8 +437,8 @@ public class ControlViewTest {
         SWTBotUtils.waitForJobs();
 
         // Verify that node is connected
-        fBot.waitUntil(ControlViewSwtBotUtil.isStateChanged(node, TargetNodeState.DISCONNECTED));
-        assertEquals(TargetNodeState.DISCONNECTED, node.getTargetNodeState());
+        fBot.waitUntil(ControlViewSwtBotUtil.isStateChanged(fNode, TargetNodeState.DISCONNECTED));
+        assertEquals(TargetNodeState.DISCONNECTED, fNode.getTargetNodeState());
         assertEquals(0, nodeItem.getNodes().size());
     }
 }

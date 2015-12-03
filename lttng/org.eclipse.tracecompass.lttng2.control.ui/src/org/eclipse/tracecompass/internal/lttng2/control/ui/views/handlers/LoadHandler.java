@@ -97,7 +97,6 @@ public class LoadHandler extends BaseControlViewHandler {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
-
                     SubMonitor subMonitor = SubMonitor.convert(monitor, 3);
                     // create destination directory (if necessary)
                     IRemoteProcessService processService = connection.getService(IRemoteProcessService.class);
@@ -107,7 +106,6 @@ public class LoadHandler extends BaseControlViewHandler {
                         path = RemoteServicesUtils.posixPath(cwd);
                         path = path.append(LTTngControlServiceConstants.DEFAULT_PATH);
                     }
-
                     if (path == null) {
                         return Status.CANCEL_STATUS;
                     }
@@ -116,7 +114,6 @@ public class LoadHandler extends BaseControlViewHandler {
                     List<String> commands = new ArrayList<>();
                     commands.add("mkdir -p " + path.toString()); //$NON-NLS-1$
                     service.runCommands(subMonitor.newChild(1), commands);
-
                     // upload files
                     IRemoteFileService fileService = connection.getService(IRemoteFileService.class);
                     if (fileService == null) {
@@ -187,7 +184,7 @@ public class LoadHandler extends BaseControlViewHandler {
     }
 
     private static void loadRemoteProfile(final TraceSessionGroup sessionGroup, IProgressMonitor monitor, List<IFileStore> files, boolean isForce) throws ExecutionException, InterruptedException  {
-            SubMonitor subMonitor = SubMonitor.convert(monitor, files.size());
+        SubMonitor subMonitor = SubMonitor.convert(monitor, files.size());
             for (IFileStore file : files) {
                 // Check if operation was cancelled.
                 if (subMonitor.isCanceled()) {

@@ -16,9 +16,11 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,11 +61,21 @@ public class LTTngToolsFileShell extends TestCommandShell {
     private final static Pattern LTTNG_LIST_SESSION_MI_PATTERN = Pattern.compile("lttng\\s+--mi xml\\s+list\\s+(.+)");
     private final static String LTTNG_LIST_PROVIDER_MI_PATTERN = "lttng\\s+--mi xml\\s+list\\s+(-u|-k)";
 
+    private final static String LTTNG_USER_HOME_PATTERN = "\\$\\{userhome\\}";
+
+    private final static String USER_HOME = System.getProperty("user.home");
+
+    private final static Pattern LTTNG_SAVE_MI_PATTERN = Pattern.compile("lttng\\s+--mi xml\\s+save\\s+-f");
+
+    private final static String PROFILE_PATH_STRING = USER_HOME + '/' + ".lttng" + '/' + "sessions";
+
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
     private String fScenariofile;
     private String fScenario;
+    private String fProfileName = null;
+    private File fProfileFile = null;
 
     private final Map<String, Map<String, ICommandResult>> fScenarioMap = new HashMap<>();
     private final Map<String, Integer> fSessionNameMap = new HashMap<>();
@@ -175,10 +187,14 @@ public class LTTngToolsFileShell extends TestCommandShell {
                             // Read command
                             input = strLine;
 
+                            // Update
+                            input = input.replaceAll(LTTNG_USER_HOME_PATTERN, USER_HOME);
+
                             // Handle instances of 'lttng list
                             // <session"-command
                             Matcher matcher = LTTNG_LIST_SESSION_PATTERN.matcher(strLine);
                             Matcher miMatcher = LTTNG_LIST_SESSION_MI_PATTERN.matcher(strLine);
+
                             if (matcher.matches() && !input.matches(LTTNG_LIST_PROVIDER_PATTERN)) {
                                 String sessionName = matcher.group(1).trim();
                                 input += updateSessionMap(tmpSessionNameMap, input, sessionName);
@@ -279,6 +295,14 @@ public class LTTngToolsFileShell extends TestCommandShell {
         }
 
         if (commands.containsKey(fullCommand)) {
+            Matcher saveMatcher = LTTNG_SAVE_MI_PATTERN.matcher(fullCommand);
+            if (fProfileName != null && saveMatcher.matches()) {
+                try {
+                    createProfileFile();
+                } catch (IOException e) {
+                    throw new ExecutionException("Profile file can't be created", e);
+                }
+            }
             return checkNotNull(commands.get(fullCommand));
         }
 
@@ -298,4 +322,36 @@ public class LTTngToolsFileShell extends TestCommandShell {
         }
         return line.matches(COMMENT_KEY);
     }
+
+    private void createProfileFile() throws IOException {
+        if (fProfileName != null) {
+            File path = new File(PROFILE_PATH_STRING);
+            if (!path.exists()) {
+                if (!path.mkdirs()) {
+                    throw new RuntimeException();
+                }
+            }
+            File profileFile = new File(PROFILE_PATH_STRING + '/' + fProfileName + ".lttng");
+            if (!profileFile.exists()) {
+                try (PrintWriter writer = new PrintWriter(profileFile)) {
+                    writer.println("This file is created by JUnit test using " + LTTngToolsFileShell.class.getCanonicalName());
+                    writer.println("Can be deleted!");
+                    writer.close();
+                }
+            }
+            fProfileFile = profileFile;
+        }
+    }
+
+    public void setProfileName(String profileName) {
+        fProfileName = profileName;
+    }
+
+    public void deleteProfileFile() {
+        if (fProfileFile != null && fProfileFile.exists()) {
+            fProfileFile.delete();
+        }
+    }
+
+
 }
