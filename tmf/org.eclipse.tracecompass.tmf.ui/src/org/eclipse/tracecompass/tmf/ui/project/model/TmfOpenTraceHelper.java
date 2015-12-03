@@ -16,6 +16,7 @@
 package org.eclipse.tracecompass.tmf.ui.project.model;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -204,7 +205,12 @@ public class TmfOpenTraceHelper {
      */
     private static String getTraceName(String path, IFolder folder) {
         String name;
-        final File traceFile = new File(path);
+        File traceFile = new File(path);
+        try {
+            traceFile = traceFile.getCanonicalFile();
+        } catch (IOException e) {
+            /* just use original file path */
+        }
         name = traceFile.getName();
         for (int i = 2; isWrongMember(folder, name, traceFile); i++) {
             name = traceFile.getName() + '(' + i + ')';
