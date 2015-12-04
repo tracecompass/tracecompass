@@ -69,65 +69,65 @@ public class FilterTreeLabelProvider implements ILabelProvider {
 
     @Override
     public String getText(Object element) {
-        String label = null;
+        StringBuilder label = new StringBuilder();
 
         if (element instanceof TmfFilterNode) {
 
             TmfFilterNode node = (TmfFilterNode) element;
-            label = node.getNodeName() + ' ' + (node.getFilterName() != null &&
+            label.append(node.getNodeName()).append(' ').append(node.getFilterName() != null &&
                     !node.getFilterName().isEmpty() ? node.getFilterName() : Messages.FilterTreeLabelProvider_FilterNameHint);
 
         } else if (element instanceof TmfFilterTraceTypeNode) {
 
             TmfFilterTraceTypeNode node = (TmfFilterTraceTypeNode) element;
-            label = "WITH " + node.getNodeName() + ' ' + (node.getName() != null ? node.getName() : Messages.FilterTreeLabelProvider_TraceTypeHint); //$NON-NLS-1$
+            label.append("WITH ").append(node.getNodeName()).append(' ').append((node.getName() != null ? node.getName() : Messages.FilterTreeLabelProvider_TraceTypeHint)); //$NON-NLS-1$
 
         } else if (element instanceof TmfFilterAndNode) {
 
             TmfFilterAndNode node = (TmfFilterAndNode) element;
-            label = (node.isNot() ? NOT : EMPTY_STRING) + node.getNodeName();
+            label.append((node.isNot() ? NOT : EMPTY_STRING)).append(node.getNodeName());
 
         } else if (element instanceof TmfFilterOrNode) {
 
             TmfFilterOrNode node = (TmfFilterOrNode) element;
-            label = (node.isNot() ? NOT : EMPTY_STRING) + node.getNodeName();
+            label.append(node.isNot() ? NOT : EMPTY_STRING).append(node.getNodeName());
 
         } else if (element instanceof TmfFilterContainsNode) {
 
             TmfFilterContainsNode node = (TmfFilterContainsNode) element;
-            label = (node.isNot() ? NOT : EMPTY_STRING) +
-                    (node.getEventAspect() != null ? node.getAspectLabel(false) : Messages.FilterTreeLabelProvider_AspectHint) +
-                    ' ' + node.getNodeName() +
-                    (node.getValue() != null ? SPACE_QUOTE + node.getValue() + QUOTE : EMPTY_STRING);
+            label.append(node.isNot() ? NOT : EMPTY_STRING)
+            .append(node.getEventAspect() != null ? node.getAspectLabel(false) : Messages.FilterTreeLabelProvider_AspectHint)
+            .append(' ').append(node.getNodeName()).append(node.getValue() != null ?
+                    new StringBuilder().append(SPACE_QUOTE).append(node.getValue()).append(QUOTE).toString() : EMPTY_STRING);
 
         } else if (element instanceof TmfFilterEqualsNode) {
 
             TmfFilterEqualsNode node = (TmfFilterEqualsNode) element;
-            label = (node.isNot() ? NOT : EMPTY_STRING) +
-                    (node.getEventAspect() != null ? node.getAspectLabel(false) : Messages.FilterTreeLabelProvider_AspectHint) +
-                    ' ' + node.getNodeName() +
-                    (node.getValue() != null ? SPACE_QUOTE + node.getValue() + QUOTE : EMPTY_STRING);
+            label.append(node.isNot() ? NOT : EMPTY_STRING)
+            .append(node.getEventAspect() != null ? node.getAspectLabel(false) : Messages.FilterTreeLabelProvider_AspectHint)
+            .append(' ').append(node.getNodeName())
+            .append(node.getValue() != null ? new StringBuilder().append(SPACE_QUOTE).append(node.getValue()).append(QUOTE).toString() : EMPTY_STRING);
 
         } else if (element instanceof TmfFilterMatchesNode) {
 
             TmfFilterMatchesNode node = (TmfFilterMatchesNode) element;
-            label = (node.isNot() ? NOT : EMPTY_STRING) +
-                    (node.getEventAspect() != null ? node.getAspectLabel(false) : Messages.FilterTreeLabelProvider_AspectHint) +
-                    ' ' + node.getNodeName() +
-                    (node.getRegex() != null ? SPACE_QUOTE + node.getRegex() + QUOTE : EMPTY_STRING);
+            label.append(node.isNot() ? NOT : EMPTY_STRING)
+            .append(node.getEventAspect() != null ? node.getAspectLabel(false) : Messages.FilterTreeLabelProvider_AspectHint)
+            .append(' ').append(node.getNodeName())
+            .append(node.getRegex() != null ? new StringBuilder().append(SPACE_QUOTE).append(node.getRegex()).append(QUOTE).toString() : EMPTY_STRING);
 
         } else if (element instanceof TmfFilterCompareNode) {
 
             TmfFilterCompareNode node = (TmfFilterCompareNode) element;
-            label = (node.isNot() ? NOT : EMPTY_STRING) +
-                    (node.getEventAspect() != null ? node.getAspectLabel(false) : Messages.FilterTreeLabelProvider_AspectHint) +
-                    (node.getResult() < 0 ? " <" : (node.getResult() > 0 ? " >" : " =")) + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    (node.getType() == Type.ALPHA ? SPACE_QUOTE : node.getType() == Type.TIMESTAMP ? " [" : ' ') + //$NON-NLS-1$
-                    (node.hasValidValue() ? node.getValue() : Messages.FilterTreeLabelProvider_ValueHint) +
-                    (node.getType() == Type.ALPHA ? '\"' : node.getType() == Type.TIMESTAMP ? ']' : EMPTY_STRING);
+            label.append(node.isNot() ? NOT : EMPTY_STRING)
+            .append(node.getEventAspect() != null ? node.getAspectLabel(false) : Messages.FilterTreeLabelProvider_AspectHint)
+            .append(node.getResult() < 0 ? " <" : (node.getResult() > 0 ? " >" : " =")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            .append(node.getType() == Type.ALPHA ? SPACE_QUOTE : node.getType() == Type.TIMESTAMP ? " [" : ' ') //$NON-NLS-1$
+            .append(node.hasValidValue() ? node.getValue() : Messages.FilterTreeLabelProvider_ValueHint)
+            .append(node.getType() == Type.ALPHA ? '\"' : node.getType() == Type.TIMESTAMP ? ']' : EMPTY_STRING);
 
         }
-        return label;
+        return label.toString();
     }
 
 }
