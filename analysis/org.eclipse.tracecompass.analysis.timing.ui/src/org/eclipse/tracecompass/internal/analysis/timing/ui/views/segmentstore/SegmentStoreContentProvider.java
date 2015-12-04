@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNullContents;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -70,9 +71,9 @@ public class SegmentStoreContentProvider implements ISortingLazyContentProvider 
     @Override
     public void inputChanged(@Nullable Viewer viewer, @Nullable Object oldInput, @Nullable Object newInput) {
         fTableViewer = (TableViewer) viewer;
-        if (newInput instanceof ISegmentStore) {
+        if (newInput instanceof Collection<?> || newInput instanceof ISegmentStore) {
             @SuppressWarnings("unchecked")
-            ISegmentStore<ISegment> segmentStore = (ISegmentStore<ISegment>) newInput;
+            Collection<ISegment> segmentStore = (Collection<@NonNull ISegment>) newInput;
             ISegment[] array = Iterables.toArray(segmentStore, ISegment.class);
             @NonNull ISegment[] checkedArray = checkNotNullContents(array);
             if (fComparator != null) {
