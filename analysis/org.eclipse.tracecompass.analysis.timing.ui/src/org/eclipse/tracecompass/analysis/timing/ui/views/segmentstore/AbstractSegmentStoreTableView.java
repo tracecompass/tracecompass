@@ -32,7 +32,7 @@ public abstract class AbstractSegmentStoreTableView extends TmfView {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private @Nullable AbstractSegmentStoreTableViewer fTableViewer;
+    private @Nullable AbstractSegmentStoreTableViewer fSegmentStoreViewer;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -53,7 +53,7 @@ public abstract class AbstractSegmentStoreTableView extends TmfView {
     public void createPartControl(@Nullable Composite parent) {
         SashForm sf = new SashForm(parent, SWT.NONE);
         TableViewer tableViewer = new TableViewer(sf, SWT.FULL_SELECTION | SWT.VIRTUAL);
-        fTableViewer = getSegmentStoreViewer(tableViewer);
+        fSegmentStoreViewer = createSegmentStoreViewer(tableViewer);
         setInitialData();
     }
 
@@ -63,16 +63,16 @@ public abstract class AbstractSegmentStoreTableView extends TmfView {
 
     @Override
     public void setFocus() {
-        if (fTableViewer != null) {
-            fTableViewer.getTableViewer().getControl().setFocus();
+        if (fSegmentStoreViewer != null) {
+            fSegmentStoreViewer.getTableViewer().getControl().setFocus();
         }
     }
 
     @Override
     public void dispose() {
         super.dispose();
-        if (fTableViewer != null) {
-            fTableViewer.dispose();
+        if (fSegmentStoreViewer != null) {
+            fSegmentStoreViewer.dispose();
         }
     }
 
@@ -83,14 +83,24 @@ public abstract class AbstractSegmentStoreTableView extends TmfView {
      *            the table viewer to use
      * @return the latency analysis table viewer instance
      */
-    protected abstract AbstractSegmentStoreTableViewer getSegmentStoreViewer(TableViewer tableViewer);
+    protected abstract AbstractSegmentStoreTableViewer createSegmentStoreViewer(TableViewer tableViewer);
+
+    /**
+     * Get the table viewer
+     *
+     * @return the table viewer, useful for testing
+     */
+    @Nullable
+    public AbstractSegmentStoreTableViewer getSegmentStoreViewer() {
+        return fSegmentStoreViewer;
+    }
 
     /**
      * Set initial data into the viewer
      */
     private void setInitialData() {
-        if (fTableViewer != null) {
-            fTableViewer.setData(fTableViewer.getAnalysisModule());
+        if (fSegmentStoreViewer != null) {
+            fSegmentStoreViewer.setData(fSegmentStoreViewer.getAnalysisModule());
         }
     }
 }

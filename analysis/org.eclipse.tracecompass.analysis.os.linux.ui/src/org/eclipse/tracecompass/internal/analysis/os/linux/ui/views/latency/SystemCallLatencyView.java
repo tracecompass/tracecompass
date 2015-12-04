@@ -35,7 +35,7 @@ public class SystemCallLatencyView extends AbstractSegmentStoreTableView {
     // ------------------------------------------------------------------------
 
     @Override
-    protected AbstractSegmentStoreTableViewer getSegmentStoreViewer(TableViewer tableViewer) {
+    protected AbstractSegmentStoreTableViewer createSegmentStoreViewer(TableViewer tableViewer) {
         return new SystemCallLatencyTableViewer(tableViewer);
     }
 }
