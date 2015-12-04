@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.Random;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -37,6 +39,7 @@ import org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCall;
 import org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCall.InitialInfo;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.AbstractSegmentStoreTableViewer;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.SystemCallLatencyView;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.ui.IViewPart;
@@ -57,6 +60,8 @@ import org.junit.runner.RunWith;
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class SystemCallLatencyTableAnalysisTest {
 
+    private static final String TRACE_TYPE = "org.eclipse.linuxtools.lttng2.kernel.tracetype";
+    private static final String PROJECT_NAME = "test";
     private static final String VIEW_ID = SystemCallLatencyView.ID;
     private static final String TRACING_PERSPECTIVE_ID = "org.eclipse.linuxtools.tmf.ui.perspective";
 
@@ -276,4 +281,35 @@ public class SystemCallLatencyTableAnalysisTest {
         assertEquals("998001", tableBot.cell(0, 2));
     }
 
+    /**
+     * Test with an actual trace, this is more of an integration test than a
+     * unit test. This test is a slow one too. If some analyses are not well
+     * configured, this test will also generates null pointer exceptions. These
+     * are will be logged.
+     *
+     * @throws IOException
+     *             trace not found?
+     */
+    @Test
+    public void testWithTrace() throws IOException {
+        String tracePath;
+        tracePath = FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL()).getPath();
+        SWTWorkbenchBot bot = new SWTWorkbenchBot();
+        SWTBotView view = bot.viewById(VIEW_ID);
+        view.close();
+        bot.waitUntil(ConditionHelpers.ViewIsClosed(view));
+        SWTBotUtils.createProject(PROJECT_NAME);
+        SWTBotUtils.openTrace(PROJECT_NAME, tracePath, TRACE_TYPE);
+        SWTBotUtils.waitForJobs();
+        createTable();
+        SWTBotUtils.waitForJobs();
+        SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());
+        assertEquals("24100", tableBot.cell(0, 2));
+        tableBot.header("Duration").click();
+        assertEquals("1000", tableBot.cell(0, 2));
+        tableBot.header("Duration").click();
+        assertEquals("5904091700", tableBot.cell(0, 2));
+        bot.closeAllEditors();
+        SWTBotUtils.deleteProject(PROJECT_NAME, bot);
+    }
 }
