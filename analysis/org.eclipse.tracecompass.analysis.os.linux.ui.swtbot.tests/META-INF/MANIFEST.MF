@@ -23,5 +23,9 @@ Require-Bundle: org.apache.log4j,
  org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.ui.views,
- org.junit
+ org.junit,
+ org.eclipse.tracecompass.analysis.os.linux.ui,
+ org.eclipse.tracecompass.analysis.timing.ui,
+ org.eclipse.tracecompass.analysis.os.linux.core,
+ org.eclipse.tracecompass.segmentstore.core
 Import-Package: org.eclipse.tracecompass.testtraces.ctf
