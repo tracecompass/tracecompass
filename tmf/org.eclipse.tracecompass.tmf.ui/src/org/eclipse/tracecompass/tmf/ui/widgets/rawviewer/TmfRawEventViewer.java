@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.ui.widgets.rawviewer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -79,7 +80,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     private static final int SLIDER_MAX = 1000000;
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
     private static final String LF = "\n"; //$NON-NLS-1$
-    private static final String CR_LF = "\r?\n"; //$NON-NLS-1$
+    private static final @NonNull String CR_LF = "\r?\n"; //$NON-NLS-1$
 
     private ITmfTrace fTrace;
     private ITmfContext fBottomContext;

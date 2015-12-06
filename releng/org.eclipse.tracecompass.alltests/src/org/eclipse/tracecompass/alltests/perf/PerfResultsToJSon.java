@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.test.internal.performance.PerformanceTestPlugin;
 import org.eclipse.test.internal.performance.data.Dim;
 import org.eclipse.test.internal.performance.db.DB;
@@ -230,7 +231,7 @@ public class PerfResultsToJSon {
     private static final String CHART_FILE_NAME = "chart";
     private static final String CHART_FILE_NAME_EXTENSION = ".json";
     private static final String WILDCARD_PATTERN = "%";
-    private static final String COMPONENT_SEPARATOR = "#";
+    private static final @NonNull String COMPONENT_SEPARATOR = "#";
     private static final String META_DATA_JAVASCRIPT_START = "var MetaData = ";
 
     private static Pattern BUILD_DATE_PATTERN = Pattern.compile("(\\w+-\\w+)(-\\w+)?");

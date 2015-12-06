@@ -14,6 +14,12 @@ format
 intern
  ()Ljava/lang/String;
  ()L1java/lang/String;
+split
+ (Ljava/lang/String;)[Ljava/lang/String;
+ (L1java/lang/String;)[1L1java/lang/String;
+split
+ (Ljava/lang/String;I)[Ljava/lang/String;
+ (L1java/lang/String;I)[1L1java/lang/String;
 toString
  ()Ljava/lang/String;
  ()L1java/lang/String;

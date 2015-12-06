@@ -46,7 +46,7 @@ import org.xml.sax.SAXException;
 public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener {
 
     /** String separating data elements for the output properties */
-    public static final String DATA_SEPARATOR = ";;;"; //$NON-NLS-1$
+    public static final @NonNull String DATA_SEPARATOR = ";;;"; //$NON-NLS-1$
 
     /**
      * Enum to match the name of a view's XML element to its view ID.

@@ -96,7 +96,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
     private static final int[] fWeight = { 1, 2 };
 
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
-    private static final String SPLIT_STRING = "/"; //$NON-NLS-1$
+    private static final @NonNull String SPLIT_STRING = "/"; //$NON-NLS-1$
 
     private final @NonNull XmlViewInfo fViewInfo = new XmlViewInfo(ID);
     private final ITmfXmlModelFactory fFactory;
