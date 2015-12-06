@@ -58,9 +58,6 @@ public class TmfXmlLocation {
      */
     public TmfXmlLocation(ITmfXmlModelFactory modelFactory, Element location, IXmlStateSystemContainer container) {
         String id = location.getAttribute(TmfXmlStrings.ID);
-        if (id == null) {
-            throw new IllegalArgumentException();
-        }
         fId = id;
         fContainer = container;
 

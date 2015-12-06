@@ -63,9 +63,6 @@ public class TmfXmlEventHandler {
     public TmfXmlEventHandler(ITmfXmlModelFactory modelFactory, Element node, IXmlStateSystemContainer parent) {
         fParent = parent;
         String name = node.getAttribute(TmfXmlStrings.HANDLER_EVENT_NAME);
-        if (name == null) {
-            throw new IllegalArgumentException();
-        }
         fName = name;
 
         List<@NonNull Element> childElements = XmlUtils.getChildElements(node, TmfXmlStrings.STATE_CHANGE);

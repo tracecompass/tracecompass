@@ -152,9 +152,6 @@ public class TmfXmlCondition {
 
             if (childElements.size() == 1 && firstChild.getNodeName().equals(TmfXmlStrings.ELEMENT_FIELD)) {
                 String attribute = firstChild.getAttribute(TmfXmlStrings.NAME);
-                if (attribute == null) {
-                    throw new IllegalArgumentException();
-                }
                 fStateValue = modelFactory.createStateValue(stateValueElement, fContainer, attribute);
             } else {
                 List<ITmfXmlStateAttribute> attributes = new ArrayList<>();
