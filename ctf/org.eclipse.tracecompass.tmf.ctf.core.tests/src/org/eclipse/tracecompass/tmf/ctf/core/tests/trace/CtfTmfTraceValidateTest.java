@@ -23,7 +23,9 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTraceValidationStatus;
@@ -55,20 +57,22 @@ public class CtfTmfTraceValidateTest {
      * Gets a list of test case parameters.
      *
      * @return The list of CTF traces (directories) to test
+     * @throws Exception in case of error
      */
     @Parameters(name = "{index}: {0}")
-    public static Iterable<Object[]> getTracePaths() {
+    public static Iterable<Object[]> getTracePaths() throws Exception {
         final List<Object[]> dirs = new LinkedList<>();
         // text-only metadata, valid CTF trace (lttle-endian)
         addDirsFrom(dirs, CTF_SUITE_BASE_PATH.resolve(Paths.get("regression", "metadata", "pass", "literal-integers")), IStatus.OK, 10, false);
         // packet-based metadata, valid CTF trace (lttle-endian)
-        addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("kernel")), IStatus.OK, 10, false);
+        String tracePath = FileLocator.toFileURL(CtfTestTrace.KERNEL.getTraceURL()).getPath();
+        addDirsFrom(dirs, Paths.get(tracePath), IStatus.OK, 10, false);
         // text-only metadata, but invalid
         addDirsFrom(dirs, CTF_SUITE_BASE_PATH.resolve(Paths.get("regression", "metadata", "fail", "enum-empty")), IStatus.WARNING, 1, true);
         // packet-based metadata, but invalid
         addDirsFrom(dirs, CTF_SUITE_BASE_PATH.resolve(Paths.get("regression", "metadata", "fail", "lttng-modules-2.0-pre1")), IStatus.WARNING, 1, true);
         // pass file instead of directory
-        addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("trace2.tar.bz2")), IStatus.ERROR, 1, false);
+        addDirsFrom(dirs, BASE_PATH.resolve(Paths.get("synctraces.tar.gz")), IStatus.ERROR, 1, false);
 
         return dirs;
     }
