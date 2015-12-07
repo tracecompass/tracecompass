@@ -23,6 +23,7 @@ import org.junit.runners.Suite;
     KernelPerspectiveChecker.class,
     ImportAndReadKernelSmokeTest.class,
     ControlFlowViewTest.class,
+    ResourcesViewTest.class,
     OpenTraceStressTest.class
 })
 public class AllTests {
