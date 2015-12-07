@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- ***************************************************************************
+ * Copyright (c) 2016 École Polytechnique de Montréal and others
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *************************************************************************** -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	attributeFormDefault="unqualified" elementFormDefault="qualified">
+	<xs:complexType name="pattern">
+		<xs:annotation>
+			<xs:documentation>Declares a pattern provider which defines one or several sequences of trace data that one would want to locate within the trace. Each pattern provider defined in XML will become an analysis in Trace Compass.</xs:documentation></xs:annotation>
+		<xs:sequence maxOccurs="1" minOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="0" name="head" type="headPattern" >
+				<xs:annotation>
+					<xs:documentation>Provides meta-information on this pattern provider, like labels and applicable trace types.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="storedField" type="storedField" >
+				<xs:annotation>
+					<xs:documentation>Defines a data from the trace event that will be stored in the database with the specified name. It is a way to save and update the value of a field of the trace events each time it will be seen. For instance, it can be used to save the value of the field 'fd' each time it will be seen.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="definedValue" type="definedValue" >
+				<xs:annotation>
+					<xs:documentation>Defines a value that maps a string used in the pattern state provider to a numbered value.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="location" type="location" >
+				<xs:annotation>
+					<xs:documentation>Declares shortcuts to frequently used attribute/data locations. For instance, if a path to an often-used attribute is CPUs/{event.some_field}/Threads/Status, it may be a good idea to put this path in a location and then use the location name in the event handlers.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="1" minOccurs="1" name="patternHandler" type="patternHandler" >
+				<xs:annotation>
+					<xs:documentation>Describes the pattern behavior. It defines all the entities; i.e., all the transitions, actions and state machines that describe the pattern.</xs:documentation></xs:annotation></xs:element>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string" use="required" >
+			<xs:annotation>
+				<xs:documentation>The unique ID of this pattern provider. It will be used to identify the analysis that will be built from this pattern provider.</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="version" type="xs:integer" use="required" >
+			<xs:annotation>
+				<xs:documentation>The version ID of this pattern provider. Whenever the pattern provider changes so that the resulting state system is different from previous versions, this version number should be bumped.</xs:documentation></xs:annotation></xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="headPattern">
+		<xs:annotation>
+			<xs:documentation>Declares the meta-information that can be defined for an XML pattern provider.</xs:documentation></xs:annotation>
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="traceType">
+				<xs:annotation>
+					<xs:documentation>Indicates that the pattern provider applies to a given trace type.</xs:documentation></xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="id" use="required" >
+						<xs:annotation>
+							<xs:documentation>The ID of the trace type, as declared in a org.eclipse.linuxtools.tmf.core.tracetype extension point or a custom trace parser. For example: "org.eclipse.linuxtools.lttng2.kernel.tracetype" or "org.eclipse.linuxtools.lttng2.ust.tracetype" for respectively LTTng Kernel and LTTng UST traces.</xs:documentation></xs:annotation></xs:attribute>
+				</xs:complexType>
+			</xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" name="label">
+				<xs:annotation>
+					<xs:documentation>Adds a label to the pattern provider. If provided, this text will be the name of the analysis that the user will see in Trace Compass.</xs:documentation></xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="value" >
+						<xs:annotation>
+							<xs:documentation>The text to name this pattern provider (and the analysis it will generate).</xs:documentation></xs:annotation></xs:attribute>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="storedField">
+		<xs:annotation>
+			<xs:documentation>Declares an event data that will be saved in the database each time it will be seen. It is used to save fields that could appear often in the events stream. The data saved could be added to the pattern segment as fields when they will be generated.</xs:documentation></xs:annotation>
+		<xs:attribute name="id" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>The id of the data in the incoming events.</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="alias" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>The alias that the event data will have in the database.</xs:documentation></xs:annotation></xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="patternHandler">
+		<xs:annotation>
+			<xs:documentation>Declares the entities necessary to describe the pattern behavior.</xs:documentation></xs:annotation>
+		<xs:sequence maxOccurs="unbounded" minOccurs="1">
+			<xs:choice maxOccurs="unbounded" minOccurs="0">
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="test" type="test" >
+					<xs:annotation>
+						<xs:documentation>Defines a condition that could be used in the FSMs as transition to trigger state changes into them.</xs:documentation></xs:annotation></xs:element>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="action" type="action">
+					<xs:annotation>
+						<xs:documentation>Defines an action that could be executed when leaving a state of an FSM.</xs:documentation></xs:annotation></xs:element>
+			</xs:choice>
+			<xs:element maxOccurs="unbounded" minOccurs="1" name="fsm" type="state">
+				<xs:annotation>
+					<xs:documentation>Defines a finite state machine that will describe the behavior or a part of the behavior of a pattern. The FSM uses the transitions described to modify its behavior and can execute actions. Each pattern could have one or several FSMs to describe its behavior.</xs:documentation></xs:annotation></xs:element>
+		</xs:sequence>
+		<xs:attribute name="initial" type="xs:string" use="required">
+			<xs:annotation>
+					<xs:documentation>Lists the state machines (FSMs) that will start directly at the beginning of the analysis. For instance, if the pattern need to start with both FSM A and B, the value of this attribute will be "A:B"</xs:documentation></xs:annotation></xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="test">
+		<xs:annotation>
+					<xs:documentation>Defines a test condition that will be validated in a fsm.".</xs:documentation></xs:annotation>
+		<xs:sequence>
+			<xs:element maxOccurs="1" minOccurs="0" name="if" type="patternSingleCondition">
+				<xs:annotation>
+					<xs:documentation>Defines a condition element, in the form "if (some_path == value)".</xs:documentation></xs:annotation></xs:element>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>The id of this test. The id will be used as reference to this test.</xs:documentation></xs:annotation></xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="patternSingleCondition">
+		<xs:choice maxOccurs="1" minOccurs="1">
+			<xs:element name="condition" type="patternCondition">
+				<xs:annotation>
+					<xs:documentation>Defines a condition element to validate.</xs:documentation></xs:annotation></xs:element>
+			<xs:element name="not" type="patternSingleCondition" >
+				<xs:annotation>
+					<xs:documentation>Negates the result of the following condition, allowing statements of the form "if (!cond)".</xs:documentation></xs:annotation></xs:element>
+			<xs:element name="and" type="patternMultipleCondition" >
+				<xs:annotation>
+					<xs:documentation>ANDs 2 conditional statements, allowing statements of the form "if (condA AND condB)"</xs:documentation></xs:annotation></xs:element>
+			<xs:element name="or" type="patternMultipleCondition" >
+				<xs:annotation>
+					<xs:documentation>ORs 2 conditional statements, allowing statements of the form "if (condA OR condB)"</xs:documentation></xs:annotation></xs:element>
+		</xs:choice>
+	</xs:complexType>
+
+	<xs:complexType name="patternMultipleCondition">
+		<xs:annotation>
+			<xs:documentation>Allows the composition of more than one conditional statements.</xs:documentation></xs:annotation>
+		<xs:sequence maxOccurs="unbounded" minOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="0" name="condition" type="patternCondition">
+				<xs:annotation>
+					<xs:documentation>Defines a condition element.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" name="or" type="patternMultipleCondition" >
+				<xs:annotation>
+					<xs:documentation>ORs 2 conditional statements, allowing statements of the form "if (condA OR condB)"</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" name="and" type="patternMultipleCondition" >
+				<xs:annotation>
+					<xs:documentation>ANDs 2 conditional statements, allowing statements of the form "if (condA AND condB)"</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" name="not" type="patternSingleCondition" >
+				<xs:annotation>
+					<xs:documentation>Negates the result of the following condition, allowing statements of the form "if (!cond)".</xs:documentation></xs:annotation></xs:element>
+		</xs:sequence>
+		<xs:anyAttribute />
+	</xs:complexType>
+
+	<xs:complexType name="patternCondition">
+		<xs:choice maxOccurs="1" minOccurs="1">
+			<xs:sequence maxOccurs="1" minOccurs="1">
+				<xs:choice maxOccurs="1">
+					<xs:sequence>
+						<xs:choice maxOccurs="1" minOccurs="1">
+							<xs:element maxOccurs="unbounded" minOccurs="1" name="stateAttribute" type="stateAttribute" >
+								<xs:annotation>
+									<xs:documentation>Compares the current value of an attribute of the state system.</xs:documentation></xs:annotation></xs:element>
+							<xs:element maxOccurs="1" minOccurs="1" name="field" type="eventField" >
+								<xs:annotation>
+									<xs:documentation>Compares the value of an event field.</xs:documentation></xs:annotation></xs:element>
+						</xs:choice>
+						<xs:element maxOccurs="1" minOccurs="1" name="stateValue" type="stateValue" >
+							<xs:annotation>
+								<xs:documentation>Defines the value to compare to.</xs:documentation></xs:annotation></xs:element>
+					</xs:sequence>
+					<xs:sequence>
+						<xs:element maxOccurs="2" minOccurs="2" name="stateValue" type="stateValue"/>
+					</xs:sequence>
+				</xs:choice>
+			</xs:sequence>
+
+			<xs:sequence maxOccurs="1" minOccurs="1">
+				<xs:element maxOccurs="1" minOccurs="1" name="timerange">
+				<xs:annotation>
+					<xs:documentation>Defines a condition element, in a form like "if (x &lt; value &lt; y)".</xs:documentation></xs:annotation>
+					<xs:complexType>
+						<xs:choice>
+							<xs:element name="in" type="timeRangeSingleCondition">
+								<xs:annotation>
+									<xs:documentation>Defines a condition element, in the form "if (x &lt; value &lt; y)".</xs:documentation></xs:annotation></xs:element>
+							<xs:element name="out" type="timeRangeSingleCondition">
+								<xs:annotation>
+									<xs:documentation>Defines a condition element, in the form "if (value &lt; x || value &gt; y)".</xs:documentation></xs:annotation></xs:element>
+						</xs:choice>
+						<xs:attribute name="unit" default="ns">
+							<xs:annotation>
+								<xs:documentation>The unit of the timing values used for the condition.</xs:documentation></xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:enumeration value="ns">
+										<xs:annotation>
+											<xs:documentation>nanosecond</xs:documentation></xs:annotation></xs:enumeration>
+									<xs:enumeration value="us">
+										<xs:annotation>
+											<xs:documentation>microsecond</xs:documentation></xs:annotation></xs:enumeration>
+									<xs:enumeration value="ms">
+										<xs:annotation>
+											<xs:documentation>millisecond</xs:documentation></xs:annotation></xs:enumeration>
+									<xs:enumeration value="s">
+										<xs:annotation>
+											<xs:documentation>second</xs:documentation></xs:annotation></xs:enumeration>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+
+			<xs:sequence maxOccurs="1" minOccurs="1">
+				<xs:element maxOccurs="1" minOccurs="1" name="elapsedTime">
+					<xs:complexType>
+						<xs:choice>
+							<xs:element maxOccurs="1" minOccurs="1" name="less" type="elapsedTimeSingleCondition">
+								<xs:annotation>
+									<xs:documentation>Defines a condition element, in the form "if (value &lt; x)".</xs:documentation></xs:annotation></xs:element>
+							<xs:element maxOccurs="1" minOccurs="1" name="equal" type="elapsedTimeSingleCondition">
+								<xs:annotation>
+									<xs:documentation>Defines a condition element, in the form "if (value == x)".</xs:documentation></xs:annotation></xs:element>
+							<xs:element maxOccurs="1" minOccurs="1" name="more" type="elapsedTimeSingleCondition">
+								<xs:annotation>
+									<xs:documentation>Defines a condition element, in the form "if (value &gt; x)".</xs:documentation></xs:annotation></xs:element>
+						</xs:choice>
+						<xs:attribute name="unit" default="ns">
+							<xs:annotation>
+								<xs:documentation>The unit of the timing values used for the condition.</xs:documentation></xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:enumeration value="ns">
+										<xs:annotation>
+											<xs:documentation>nanosecond</xs:documentation></xs:annotation></xs:enumeration>
+									<xs:enumeration value="us">
+										<xs:annotation>
+											<xs:documentation>microsecond</xs:documentation></xs:annotation></xs:enumeration>
+									<xs:enumeration value="ms">
+										<xs:annotation>
+											<xs:documentation>millisecond</xs:documentation></xs:annotation></xs:enumeration>
+									<xs:enumeration value="s">
+										<xs:annotation>
+											<xs:documentation>second</xs:documentation></xs:annotation></xs:enumeration>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+
+		</xs:choice>
+	</xs:complexType>
+
+	<xs:complexType name="timeRangeSingleCondition">
+		<xs:annotation>
+			<xs:documentation>Defines a timerange condition.</xs:documentation></xs:annotation>
+		<xs:attribute name="begin" type="xs:long" use="required">
+			<xs:annotation>
+				<xs:documentation>The timestamp of the beginning of the range.</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="end" type="xs:long" use="required">
+			<xs:annotation>
+				<xs:documentation>The timestamp of the end of the range.</xs:documentation></xs:annotation></xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="elapsedTimeSingleCondition">
+		<xs:annotation>
+			<xs:documentation>Defines an elapsed time condition.</xs:documentation></xs:annotation>
+		<xs:attribute name="since" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>The starting point from where the condition will be evaluated.</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="value" type="xs:long" use="required">
+			<xs:annotation>
+				<xs:documentation>The value used for the comparison.</xs:documentation></xs:annotation></xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="action">
+		<xs:annotation>
+			<xs:documentation>Define an action that could be executed. Three kind of action are actually supported : state changes, generation of pattern segments and start of a new instance of an FSM.</xs:documentation></xs:annotation>
+		<xs:sequence maxOccurs="unbounded" minOccurs="1">
+			<xs:choice>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="stateChange" type="stateChange">
+					<xs:annotation>
+						<xs:documentation>Defines how the database is modified by the data provided by the event aspects and the values already stored in the database. A data may cause more than one state change.</xs:documentation></xs:annotation></xs:element>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="segment" type="segment">
+					<xs:annotation>
+						<xs:documentation>Defines a pattern segment that will be generated. The generated segment has content.</xs:documentation></xs:annotation></xs:element>
+				<xs:element maxOccurs="1" minOccurs="0" name="fsmScheduleAction" type="fsmScheduleAction">
+					<xs:annotation>
+						<xs:documentation>Declares an FSM that will be scheduled to start.</xs:documentation></xs:annotation></xs:element>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="action" type="action">
+					<xs:annotation>
+						<xs:documentation>Declares an action that will be executed. With this, an action could call another one using its ID.</xs:documentation></xs:annotation></xs:element>
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>The ID of the action. This ID is used to reference to this action when needed.</xs:documentation></xs:annotation></xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="fsmScheduleAction">
+		<xs:annotation>
+			<xs:documentation>Defines an action to start a new instance of an FSM.</xs:documentation></xs:annotation>
+		<xs:attribute name="id" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>The ID of the FSM to start.</xs:documentation></xs:annotation></xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="segment">
+		<xs:annotation>
+			<xs:documentation>Describes a pattern segment that could be generated by the pattern. A pattern segment is an output of the pattern. It is a segment that would be generated by an FSM in the pattern. Its start will be the start timestamp of the scenario and its end will be the timestamp of the current event. This type of segment has a name and it is possible to add fields.</xs:documentation></xs:annotation>
+		<xs:sequence maxOccurs="1" minOccurs="1">
+			<xs:element name="segType" >
+				<xs:annotation>
+						<xs:documentation>The XML description of the segment type.</xs:documentation></xs:annotation>
+				<xs:complexType>
+					<xs:sequence maxOccurs="1" minOccurs="0">
+						<xs:element maxOccurs="1" name="segName">
+							<xs:annotation>
+								<xs:documentation>Defines the name of the segment. This name could be a value queried from the database or from the event aspects or could be a constant.</xs:documentation></xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element maxOccurs="1" minOccurs="1" name="stateValue" type="stateValue">
+										<xs:annotation>
+											<xs:documentation>The value of the segment name.</xs:documentation></xs:annotation></xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="segName" type="xs:string" use="optional">
+						<xs:annotation>
+							<xs:documentation>The value of the segment name.</xs:documentation></xs:annotation></xs:attribute>
+				</xs:complexType>
+			</xs:element>
+			<xs:element minOccurs="0" name="segContent">
+				<xs:annotation>
+					<xs:documentation>Describes the content of the segment.</xs:documentation></xs:annotation>
+				<xs:complexType>
+					<xs:sequence maxOccurs="1" minOccurs="1">
+						<xs:element maxOccurs="unbounded" minOccurs="1" name="segField" type="segField">
+							<xs:annotation>
+								<xs:documentation>Defines a field for the segment.</xs:documentation></xs:annotation></xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="segField">
+		<xs:annotation>
+			<xs:documentation>Describes a field for a pattern segment. The value of the field could be a constant or the result of a query to the database or the value of an event aspect.</xs:documentation></xs:annotation>
+		<xs:sequence maxOccurs="1" minOccurs="0">
+			<xs:annotation>
+					<xs:documentation>Defines the value of the field, if it is a data from the ongoing event or if the value is stored in the database.</xs:documentation></xs:annotation>
+			<xs:element maxOccurs="1" minOccurs="0" name="stateValue" type="stateValue" />
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Declares the name of the field.</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="type" use="required">
+			<xs:annotation>
+				<xs:documentation>The type of this field value.</xs:documentation></xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="null" >
+						<xs:annotation>
+							<xs:documentation>The value is a null value.</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="int" >
+						<xs:annotation>
+							<xs:documentation>The value is a constant of type integer.</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="long" >
+						<xs:annotation>
+							<xs:documentation>The value is a constant of type long.</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="string" >
+						<xs:annotation>
+							<xs:documentation>The value is a constant of type string.</xs:documentation></xs:annotation></xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="value" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>Declares the value of the field, if the value is a constant.</xs:documentation></xs:annotation></xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="initialState">
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" minOccurs="1" name="transition" type="transition">
+				<xs:annotation>
+					<xs:documentation>Declares a transition for the state.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="precondition" type="transition">
+				<xs:annotation>
+					<xs:documentation>Declares a precondition for this fsm. At least one of the preconditions needs to be validated before being able to activate process the fsm. A precondition is a transition with no target or action. It should contains only conditions that needs to be validated.</xs:documentation></xs:annotation></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="finalState">
+		<xs:attribute name="id" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>The id of the state. This name is used to reference to this state when needed.</xs:documentation></xs:annotation></xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="state">
+		<xs:annotation>
+					<xs:documentation>Declares a state. Two types of states are actually supported : atomic state and complex state. An atomic state is state without sub-state and complex state is a full state with sub-state. An atomic state is a complex state but with less capacity.</xs:documentation></xs:annotation>
+		<xs:sequence maxOccurs="1">
+			<xs:element maxOccurs="1" minOccurs="0" name="onentry" type="handlers">
+				<xs:annotation>
+					<xs:documentation>Declares a list of actions to execute when entering the complex state.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" name="onexit" type="handlers">
+				<xs:annotation>
+					<xs:documentation>Declares a list of actions to execute when exiting the complex state.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" name="initial" type="initialState">
+				<xs:annotation>
+					<xs:documentation>Declares the default initial state of this complex state. Must not be specified for an atomic state</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="state" type="state">
+				<xs:annotation>
+					<xs:documentation>Declares an state as children of this declared state state.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" name="final" type="finalState">
+				<xs:annotation>
+					<xs:documentation>Declares the default final state of this complex state.</xs:documentation></xs:annotation></xs:element>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="transition" type="transition">
+				<xs:annotation>
+					<xs:documentation>Declares a transition for the state.</xs:documentation></xs:annotation></xs:element>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>The id of the state. This name is used to reference to this state when needed.</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="initial" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>The id of the initial state of the complex state. MUST NOT be specified in conjunction with the 'initial' element.</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="automatic" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>When reaching this state, this attribute specifies whether or not the state will use the ongoing event or will wait for the next event before starting to analyze its transitions. MUST NOT be specified if the complex state is an fsm.</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="multiple" type="xs:boolean" use="optional" default="true">
+			<xs:annotation>
+				<xs:documentation>ONLY USE for fsm. Specifies if this FSM allows multiple instance or only one instance. If not specified, this attribute will be set to 'true' by default.</xs:documentation></xs:annotation></xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="transition">
+		<xs:annotation>
+			<xs:documentation>Describes a transition of this state. The transition describes how the event data can change the state of the FSM and trigger an action.</xs:documentation></xs:annotation>
+		<xs:attribute name="event" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>The event name to be validated.</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="cond" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>The ID of the test to be validated.</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="target" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>The name of the state that the FSM will reach if the 'cond' condition is validated.</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="action" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>The list of IDs of the actions that would be executed if the conditions are validated. If action A and B need to be executed, the value will be 'A:B'.</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="saveStoredFields" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>The action that specifies that the defined fields need to be checked and saved into the database if they are found in the event data. If not specify, the value will be false by default. This action let the user decide when he wants to save the special fields.</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="clearStoredFields" type="xs:string" use="optional">
+			<xs:annotation>
+				<xs:documentation>The action that specifies that the defined fields need to be all cleared from the database. If not specify, the value will be false by default. This action let the user decide when he wants to clear the special fields.</xs:documentation></xs:annotation></xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="handlers">
+		<xs:attribute name="action" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>The list of IDs of the actions that would be executed. If action A and B need to be executed, the value should be 'A:B'.</xs:documentation></xs:annotation></xs:attribute>
+	</xs:complexType>
+</xs:schema>
