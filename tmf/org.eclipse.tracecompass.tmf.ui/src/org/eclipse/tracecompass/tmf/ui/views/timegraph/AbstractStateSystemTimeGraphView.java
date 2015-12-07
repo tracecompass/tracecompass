@@ -98,7 +98,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
         }
 
         @Override
-        public void run() {
+        public void doRun() {
             final List<ILinkEvent> links = new ArrayList<>();
             final List<IMarkerEvent> markers = new ArrayList<>();
             if (fClearZoomedLists) {

@@ -14,8 +14,6 @@ package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.List;
-
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -25,7 +23,6 @@ import org.eclipse.swtbot.swt.finder.keyboard.KeyboardFactory;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
-import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
@@ -35,8 +32,9 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfNanoTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
+import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
+import org.eclipse.ui.IWorkbenchPart;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -82,79 +80,10 @@ public class ControlFlowViewTest extends KernelTest {
      */
     @Test
     public void testKeyboardLeftRight() {
-        /* change window range to 10 ms */
-        TmfTimeRange range = new TmfTimeRange(START_TIME, START_TIME.normalize(10000000L, ITmfTimestamp.NANOSECOND_SCALE));
-        TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, range));
-        fBot.waitUntil(ConditionHelpers.windowRange(range));
-
-        /* set selection to trace start time */
-        TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, START_TIME));
-        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(START_TIME, START_TIME)));
-
-        /* select first item */
-        final SWTBotTree tree = fViewBot.bot().tree();
-        tree.pressShortcut(Keystrokes.HOME);
-
-        /* set focus on time graph */
-        final TimeGraphControl timegraph = fViewBot.bot().widget(WidgetOfType.widgetOfType(TimeGraphControl.class));
-        UIThreadRunnable.syncExec(new VoidResult() {
-            @Override
-            public void run() {
-                timegraph.setFocus();
-            }
-        });
-
-        /* press ARROW_RIGHT 3 times */
-        KEYBOARD.pressShortcut(Keystrokes.RIGHT);
-        KEYBOARD.pressShortcut(Keystrokes.RIGHT);
-        KEYBOARD.pressShortcut(Keystrokes.RIGHT);
-        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME3, TID1_TIME3)));
-        assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME3));
-
-        /* press Shift-ARROW_RIGHT 3 times */
-        KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.RIGHT);
-        KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.RIGHT);
-        KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.RIGHT);
-        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME3, TID1_TIME6)));
-        assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME6));
-
-        /* press Shift-ARROW_LEFT 4 times */
-        KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.LEFT);
-        KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.LEFT);
-        KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.LEFT);
-        KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.LEFT);
-        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME3, TID1_TIME2)));
-        assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME2));
-
-        /* press ARROW_RIGHT 2 times */
-        KEYBOARD.pressShortcut(Keystrokes.RIGHT);
-        KEYBOARD.pressShortcut(Keystrokes.RIGHT);
-        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME4, TID1_TIME4)));
-        assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME4));
-
-        /* press Shift-ARROW_LEFT 3 times */
-        KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.LEFT);
-        KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.LEFT);
-        KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.LEFT);
-        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME4, TID1_TIME1)));
-        assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME1));
-
-        /* press Shift-ARROW_RIGHT 4 times */
-        KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.RIGHT);
-        KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.RIGHT);
-        KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.RIGHT);
-        KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.RIGHT);
-        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME4, TID1_TIME5)));
-        assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME5));
-
-        /* press ARROW_LEFT 5 times */
-        KEYBOARD.pressShortcut(Keystrokes.LEFT);
-        KEYBOARD.pressShortcut(Keystrokes.LEFT);
-        KEYBOARD.pressShortcut(Keystrokes.LEFT);
-        KEYBOARD.pressShortcut(Keystrokes.LEFT);
-        KEYBOARD.pressShortcut(Keystrokes.LEFT);
-        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(START_TIME, START_TIME)));
-        assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(START_TIME));
+        testNextPreviousEvent(() -> KEYBOARD.pressShortcut(Keystrokes.RIGHT),
+                () -> KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.RIGHT),
+                () -> KEYBOARD.pressShortcut(Keystrokes.LEFT),
+                () -> KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.LEFT));
     }
 
     /**
@@ -162,6 +91,13 @@ public class ControlFlowViewTest extends KernelTest {
      */
     @Test
     public void testToolBarSelectNextPreviousEvent() {
+        testNextPreviousEvent(() -> fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(),
+                () -> fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT),
+                () -> fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(),
+                () -> fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT));
+    }
+
+    private void testNextPreviousEvent(Runnable selectNext, Runnable shiftSelectNext, Runnable selectPrevious, Runnable shiftSelectPrevious) {
         /* change window range to 10 ms */
         TmfTimeRange range = new TmfTimeRange(START_TIME, START_TIME.normalize(10000000L, ITmfTimestamp.NANOSECOND_SCALE));
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, range));
@@ -169,7 +105,7 @@ public class ControlFlowViewTest extends KernelTest {
 
         /* set selection to trace start time */
         TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, START_TIME));
-        fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(START_TIME, START_TIME)));
+        timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME));
 
         /* select first item */
         final SWTBotTree tree = fViewBot.bot().tree();
@@ -185,54 +121,78 @@ public class ControlFlowViewTest extends KernelTest {
         });
 
         /* click "Select Next Event" 3 times */
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click();
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click();
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click();
+        selectNext.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME1, TID1_TIME1));
+        selectNext.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME2, TID1_TIME2));
+        selectNext.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME3, TID1_TIME3));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME3, TID1_TIME3)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME3));
 
         /* shift-click "Select Next Event" 3 times */
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
+        shiftSelectNext.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME3, TID1_TIME4));
+        shiftSelectNext.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME3, TID1_TIME5));
+        shiftSelectNext.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME3, TID1_TIME6));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME3, TID1_TIME6)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME6));
 
         /* shift-click "Select Previous Event" 4 times */
-        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
-        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
-        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
-        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
+        shiftSelectPrevious.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME3, TID1_TIME5));
+        shiftSelectPrevious.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME3, TID1_TIME4));
+        shiftSelectPrevious.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME3, TID1_TIME3));
+        shiftSelectPrevious.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME3, TID1_TIME2));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME3, TID1_TIME2)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME2));
 
         /* click "Select Next Event" 2 times */
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click();
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click();
+        selectNext.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME3, TID1_TIME3));
+        selectNext.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME4, TID1_TIME4));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME4, TID1_TIME4)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME4));
 
         /* shift-click "Select Previous Event" 3 times */
-        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
-        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
-        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click(SWT.SHIFT);
+        shiftSelectPrevious.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME4, TID1_TIME3));
+        shiftSelectPrevious.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME4, TID1_TIME2));
+        shiftSelectPrevious.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME4, TID1_TIME1));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME4, TID1_TIME1)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME1));
 
         /* shift-click "Select Next Event" 4 times */
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
-        fViewBot.toolbarButton(SELECT_NEXT_EVENT).click(SWT.SHIFT);
+        shiftSelectNext.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME4, TID1_TIME2));
+        shiftSelectNext.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME4, TID1_TIME3));
+        shiftSelectNext.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME4, TID1_TIME4));
+        shiftSelectNext.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME4, TID1_TIME5));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID1_TIME4, TID1_TIME5)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME5));
 
         /* click "Select Previous Event" 5 times */
-        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click();
-        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click();
-        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click();
-        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click();
-        fViewBot.toolbarButton(SELECT_PREVIOUS_EVENT).click();
+        selectPrevious.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME4, TID1_TIME4));
+        selectPrevious.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME3, TID1_TIME3));
+        selectPrevious.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME2, TID1_TIME2));
+        selectPrevious.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME1, TID1_TIME1));
+        selectPrevious.run();
+        timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(START_TIME, START_TIME)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(START_TIME));
     }
@@ -264,78 +224,92 @@ public class ControlFlowViewTest extends KernelTest {
             }
         });
 
-        /* make sure arrows have been computed */
-        fBot.waitUntil(new DefaultCondition() {
-            @Override
-            public boolean test() throws Exception {
-                List<ILinkEvent> arrows = timegraph.getArrows();
-                return arrows.size() >= 3 &&
-                        arrows.get(0).getTime() == TID1_TIME1.getValue() &&
-                        arrows.get(1).getTime() == TID2_TIME2.getValue() &&
-                        arrows.get(2).getTime() == TID2_TIME4.getValue();
-            }
-            @Override
-            public String getFailureMessage() {
-                return "Arrows not found";
-            }
-        });
-
         /* click "Follow CPU Forward" 3 times */
+        timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME));
         fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME1, TID1_TIME1));
         fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME1, TID2_TIME1));
         fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME2));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME2, TID2_TIME2)));
         fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "2"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID2_TIME2));
 
         /* shift-click "Follow CPU Forward" 3 times */
         fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
+        timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME3));
         fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
+        timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME4));
         fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
+        timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME4));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME2, TID5_TIME1)));
         fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "5"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID5_TIME1));
 
         /* shift-click "Follow CPU Backward" 4 times */
         fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
+        timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME4));
         fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
+        timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME3));
         fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
+        timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME2));
         fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
+        timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME1));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME2, TID2_TIME1)));
         fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "2"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID2_TIME1));
 
         /* click "Follow CPU Forward" 2 times */
         fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME2));
         fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME3, TID2_TIME3));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME3, TID2_TIME3)));
         fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "2"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID2_TIME3));
 
         /* shift-click "Follow CPU Backward" 3 times */
         fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
+        timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME3, TID2_TIME2));
         fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
+        timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME3, TID2_TIME1));
         fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click(SWT.SHIFT);
+        timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME3, TID1_TIME1));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME3, TID1_TIME1)));
         fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "1"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID1_TIME1));
 
         /* shift-click "Follow CPU Forward" 4 times */
         fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
+        timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME3, TID2_TIME1));
         fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
+        timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME3, TID2_TIME2));
         fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
+        timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME3, TID2_TIME3));
         fViewBot.toolbarButton(FOLLOW_CPU_FORWARD).click(SWT.SHIFT);
+        timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME3, TID2_TIME4));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(TID2_TIME3, TID2_TIME4)));
         fBot.waitUntil(ConditionHelpers.treeSelectionContains(tree, 1, "2"));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(TID2_TIME4));
 
         /* click "Follow CPU Backward" 5 times */
         fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME3, TID2_TIME3));
         fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME2, TID2_TIME2));
         fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID2_TIME1, TID2_TIME1));
         fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
+        timeGraphIsReadyCondition(new TmfTimeRange(TID1_TIME1, TID1_TIME1));
         fViewBot.toolbarButton(FOLLOW_CPU_BACKWARD).click();
+        timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME));
         fBot.waitUntil(ConditionHelpers.selectionRange(new TmfTimeRange(START_TIME, START_TIME)));
         assertTrue(TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(START_TIME));
+    }
+
+    private void timeGraphIsReadyCondition(@NonNull TmfTimeRange selectionRange) {
+        IWorkbenchPart part = fViewBot.getViewReference().getPart(false);
+        fBot.waitUntil(ConditionHelpers.timeGraphIsReadyCondition((AbstractTimeGraphView) part, selectionRange, selectionRange.getEndTime()));
     }
 }

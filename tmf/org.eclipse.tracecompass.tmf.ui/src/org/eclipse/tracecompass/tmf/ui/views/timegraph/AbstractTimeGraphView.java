@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -133,6 +134,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     /** The timegraph wrapper */
     private ITimeGraphWrapper fTimeGraphWrapper;
+
+    private AtomicInteger fDirty = new AtomicInteger();
 
     /** The selected trace */
     private ITmfTrace fTrace;
@@ -647,6 +650,17 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         public void cancel() {
             fMonitor.setCanceled(true);
         }
+
+        @Override
+        public final void run() {
+            doRun();
+            fDirty.decrementAndGet();
+        }
+
+        /**
+         * Run the zoom operation.
+         */
+        public abstract void doRun();
     }
 
     private class ZoomThreadByEntry extends ZoomThread {
@@ -658,7 +672,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
 
         @Override
-        public void run() {
+        public void doRun() {
             for (TimeGraphEntry entry : fZoomEntryList) {
                 if (getMonitor().isCanceled()) {
                     return;
@@ -1714,7 +1728,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *            the zoom end time
      * @since 2.0
      */
-    protected void startZoomThread(long startTime, long endTime) {
+    protected final void startZoomThread(long startTime, long endTime) {
+        fDirty.incrementAndGet();
         boolean restart = false;
         if (fZoomThread != null) {
             fZoomThread.cancel();
@@ -1726,6 +1741,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         fZoomThread = createZoomThread(startTime, endTime, resolution, restart);
         if (fZoomThread != null) {
             fZoomThread.start();
+        } else {
+            fDirty.decrementAndGet();
         }
     }
 
@@ -1833,4 +1850,20 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             fTimeGraphWrapper.performAlign(offset, width);
         }
     }
+
+    /**
+     * Returns whether or not the time graph view is dirty. The time graph view
+     * is considered dirty if it has yet to completely update its model.
+     *
+     * @return true if the time graph view has yet to completely update its
+     *         model, false otherwise
+     * @since 2.0
+     */
+    public boolean isDirty() {
+        if (fZoomThread == null) {
+            return false;
+        }
+        return fDirty.get() != 0 || fZoomThread.getZoomStartTime() != fTimeGraphWrapper.getTimeGraphViewer().getTime0() || fZoomThread.getZoomEndTime() != fTimeGraphWrapper.getTimeGraphViewer().getTime1();
+    }
+
 }

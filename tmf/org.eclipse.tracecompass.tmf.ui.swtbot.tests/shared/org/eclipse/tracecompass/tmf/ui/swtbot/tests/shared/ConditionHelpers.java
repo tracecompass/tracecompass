@@ -18,6 +18,7 @@ import static org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory.wi
 
 import java.util.Arrays;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -36,9 +37,11 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
+import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.ui.IEditorReference;
 import org.hamcrest.Matcher;
 
@@ -449,5 +452,52 @@ public final class ConditionHelpers {
      */
     public static ICondition selectionInEventsTable(final SWTWorkbenchBot bot, long selectionTime) {
         return new EventsTableSelectionCondition(bot, selectionTime);
+    }
+
+    private static class TimeGraphIsReadyCondition extends DefaultCondition  {
+
+        private @NonNull TmfTimeRange fSelectionRange;
+        private @NonNull ITmfTimestamp fVisibleTime;
+        private AbstractTimeGraphView fView;
+
+        private TimeGraphIsReadyCondition(AbstractTimeGraphView view, @NonNull TmfTimeRange selectionRange, @NonNull ITmfTimestamp visibleTime) {
+            fView = view;
+            fSelectionRange = selectionRange;
+            fVisibleTime = visibleTime;
+        }
+
+        @Override
+        public boolean test() throws Exception {
+            if (!ConditionHelpers.selectionRange(fSelectionRange).test()) {
+                return false;
+            }
+            if (!TmfTraceManager.getInstance().getCurrentTraceContext().getWindowRange().contains(fVisibleTime)) {
+                return false;
+            }
+            return !fView.isDirty();
+        }
+
+        @Override
+        public String getFailureMessage() {
+            return "Time graph is not ready";
+        }
+    }
+
+    /**
+     *
+     * Wait until the Time Graph view is ready. The Time Graph view is
+     * considered ready if the selectionRange is selected, the visibleTime is
+     * visible and the view is not dirty (its model is done updating).
+     *
+     * @param view
+     *            the time graph view
+     * @param selectionRange
+     *            the selection that the time graph should have
+     * @param visibleTime
+     *            the visible time that the time graph should have
+     * @return ICondition for verification
+     */
+    public static ICondition timeGraphIsReadyCondition(AbstractTimeGraphView view, @NonNull TmfTimeRange selectionRange, @NonNull ITmfTimestamp visibleTime) {
+        return new TimeGraphIsReadyCondition(view, selectionRange, visibleTime);
     }
 }
