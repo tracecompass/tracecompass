@@ -79,6 +79,8 @@ public class KernelTest {
         }
         /* Switch perspectives */
         switchKernelPerspective();
+        /* Create the trace project */
+        SWTBotUtils.createProject(TRACE_PROJECT_NAME);
         /* Finish waiting for eclipse to load */
         SWTBotUtils.waitForJobs();
     }
@@ -88,6 +90,7 @@ public class KernelTest {
      */
     @AfterClass
     public static void afterClass() {
+        SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
         fLogger.removeAllAppenders();
     }
 
@@ -116,7 +119,6 @@ public class KernelTest {
      */
     @Before
     public void before() {
-        SWTBotUtils.createProject(TRACE_PROJECT_NAME);
         SWTBotUtils.openTrace(TRACE_PROJECT_NAME, LttngKernelTraceGenerator.getPath(), TRACE_TYPE);
         SWTBotUtils.activateEditor(fBot, LttngKernelTraceGenerator.getName());
     }
@@ -127,6 +129,5 @@ public class KernelTest {
     @After
     public void after() {
         fBot.closeAllEditors();
-        SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
     }
 }
