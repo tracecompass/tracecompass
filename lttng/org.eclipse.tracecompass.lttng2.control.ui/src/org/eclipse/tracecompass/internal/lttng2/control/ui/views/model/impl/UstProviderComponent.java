@@ -12,6 +12,9 @@
 
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IUstProviderInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.impl.UstProviderInfo;
@@ -70,11 +73,13 @@ public class UstProviderComponent extends TraceControlComponent {
     public void setUstProvider(IUstProviderInfo providerInfo) {
         fProviderInfo = providerInfo;
         IBaseEventInfo[] events = providerInfo.getEvents();
+        List<ITraceControlComponent> eventComponents = new ArrayList<>();
         for (int i = 0; i < events.length; i++) {
             BaseEventComponent component  = new BaseEventComponent(events[i].getName(), this);
             component.setEventInfo(events[i]);
-            addChild(component);
+            eventComponents.add(component);
         }
+        setChildren(eventComponents);
         setName(getName() + " [PID=" + fProviderInfo.getPid() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 

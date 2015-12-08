@@ -160,8 +160,8 @@ public class TraceControlComponent implements ITraceControlComponent {
         for (Iterator<ITraceControlComponent> iterator = children.iterator(); iterator.hasNext();) {
             ITraceControlComponent traceControlComponent = iterator.next();
             fChildren.add(traceControlComponent);
-            fireComponentChanged(this);
         }
+        fireComponentChanged(this);
     }
 
     @Override
@@ -274,7 +274,6 @@ public class TraceControlComponent implements ITraceControlComponent {
             fListeners.remove(listener);
         }
     }
-
     @Override
     public void fireComponentAdded(ITraceControlComponent parent, ITraceControlComponent component) {
         if (component == null) {
@@ -308,7 +307,6 @@ public class TraceControlComponent implements ITraceControlComponent {
             }
         }
     }
-
     @Override
     public void fireComponentChanged(ITraceControlComponent component) {
         if (component == null) {
