@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -63,12 +64,14 @@ public class KernelProviderComponent extends TraceControlComponent {
      * @param eventInfos - events information to set.
      */
     public void setEventInfo(List<IBaseEventInfo> eventInfos) {
+        List<ITraceControlComponent> eventComponents = new ArrayList<>();
         for (Iterator<IBaseEventInfo> iterator = eventInfos.iterator(); iterator.hasNext();) {
             IBaseEventInfo baseEventInfo = iterator.next();
             BaseEventComponent component = new BaseEventComponent(baseEventInfo.getName(), this);
             component.setEventInfo(baseEventInfo);
-            addChild(component);
+            eventComponents.add(component);
         }
+        setChildren(eventComponents);
     }
 
     @Override
