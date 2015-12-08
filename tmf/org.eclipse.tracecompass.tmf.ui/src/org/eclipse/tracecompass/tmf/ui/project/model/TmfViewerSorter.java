@@ -12,12 +12,12 @@
 
 package org.eclipse.tracecompass.tmf.ui.project.model;
 
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 
 /**
  * Viewer sorter for TMF project model elements
  */
-public class TmfViewerSorter extends ViewerSorter {
+public class TmfViewerSorter extends ViewerComparator {
 
     @Override
     public int category(Object element) {

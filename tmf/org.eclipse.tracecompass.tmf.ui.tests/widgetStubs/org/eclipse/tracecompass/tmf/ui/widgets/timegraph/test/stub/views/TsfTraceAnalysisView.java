@@ -32,7 +32,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.graphics.Image;
@@ -243,9 +243,6 @@ public class TsfTraceAnalysisView extends ViewPart implements
         }
     }
 
-    static class NameSorter extends ViewerSorter {
-    }
-
     // ========================================================================
     // Methods
     // ========================================================================
@@ -268,7 +265,7 @@ public class TsfTraceAnalysisView extends ViewPart implements
         drillDownAdapter = new DrillDownAdapter(viewer);
         viewer.setContentProvider(new ViewContentProvider());
         viewer.setLabelProvider(new ViewLabelProvider());
-        viewer.setSorter(new NameSorter());
+        viewer.setComparator(new ViewerComparator());
         viewer.setInput(getViewSite());
 
         sashForm.setWeights(new int[] { 5, 1 });

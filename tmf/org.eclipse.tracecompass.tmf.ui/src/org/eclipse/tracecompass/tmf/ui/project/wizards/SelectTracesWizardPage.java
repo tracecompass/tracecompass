@@ -42,7 +42,7 @@ import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -193,7 +193,7 @@ public class SelectTracesWizardPage extends WizardPage {
         fCheckboxTreeViewer.setContentProvider(fContentProvider);
         fLabelProvider = new TmfNavigatorLabelProvider();
         fCheckboxTreeViewer.setLabelProvider(fLabelProvider);
-        fCheckboxTreeViewer.setSorter(new ViewerSorter());
+        fCheckboxTreeViewer.setComparator(new ViewerComparator());
 
         final Tree tree = fCheckboxTreeViewer.getTree();
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);

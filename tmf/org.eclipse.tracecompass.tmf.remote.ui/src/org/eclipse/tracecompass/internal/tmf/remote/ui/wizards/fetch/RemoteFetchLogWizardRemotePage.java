@@ -32,7 +32,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -236,7 +236,7 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
                 return super.getImage(element);
             }
         });
-        elementViewer.setSorter(new ViewerSorter() {
+        elementViewer.setComparator(new ViewerComparator() {
             @Override
             public int category(Object element) {
                 if (element instanceof TracePackageTraceElement) {
