@@ -14,7 +14,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <prerequisites>
-    <maven>3.0</maven>
+    <maven>3.3</maven>
   </prerequisites>
 
   <groupId>org.eclipse.tracecompass</groupId>
@@ -168,6 +168,54 @@
         <base.ui.test.vmargs>-Dorg.eclipse.swt.browser.DefaultType=mozilla</base.ui.test.vmargs>
       </properties>
     </profile>
+
+    <!-- Automatic profile to define the settings for UI test plugins -->
+    <profile>
+      <id>ui-test-plugin</id>
+      <activation>
+        <file>
+          <exists>ui-test-plugin.properties</exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.tycho</groupId>
+            <artifactId>tycho-surefire-plugin</artifactId>
+            <configuration>
+              <useUIHarness>true</useUIHarness>
+              <useUIThread>true</useUIThread>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- Automatic profile to define the settings for SWTBot test plugins -->
+    <profile>
+      <id>swtbot-test-plugin</id>
+      <activation>
+        <file>
+          <exists>swtbot-test-plugin.properties</exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.tycho</groupId>
+            <artifactId>tycho-surefire-plugin</artifactId>
+            <configuration>
+              <useUIHarness>true</useUIHarness>
+              <useUIThread>false</useUIThread>
+              <environmentVariables>
+                <SWT_GTK3>${SWT_GTK3}</SWT_GTK3>
+                <LIBOVERLAY_SCROLLBAR>0</LIBOVERLAY_SCROLLBAR>
+              </environmentVariables>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
   <modules>
@@ -201,7 +249,7 @@
             <configuration>
               <rules>
                 <requireMavenVersion>
-                  <version>3.0</version>
+                  <version>3.3</version>
                 </requireMavenVersion>
                 <requireJavaVersion>
                   <version>1.8</version>
