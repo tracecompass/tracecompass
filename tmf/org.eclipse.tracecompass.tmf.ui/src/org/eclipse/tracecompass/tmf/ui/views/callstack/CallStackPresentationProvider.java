@@ -146,7 +146,7 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
                 String address = value.toString();
                 String name = fView.getFunctionName(address);
                 gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
-                Utils.drawText(gc, name, bounds.x, bounds.y - 2, bounds.width, true, true);
+                Utils.drawText(gc, name, bounds.x, bounds.y, bounds.width, bounds.height, true, true);
             }
         } catch (AttributeNotFoundException e) {
             Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$

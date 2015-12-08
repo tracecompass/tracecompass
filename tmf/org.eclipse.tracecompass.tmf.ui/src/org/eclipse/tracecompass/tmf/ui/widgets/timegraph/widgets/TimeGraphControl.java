@@ -57,6 +57,8 @@ import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.events.TypedEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -133,6 +135,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private boolean fIsInFocus = false;
     private boolean fMouseOverSplitLine = false;
     private int fGlobalItemHeight = CUSTOM_ITEM_HEIGHT;
+    private int fHeightAdjustment = 0;
+    private int fInitialFontHeight;
+    private Font fFont;
     private boolean fBlendSubPixelEvents = false;
     private int fMinimumItemWidth = 0;
     private int fTopIndex = 0;
@@ -198,6 +203,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
     public void dispose() {
         super.dispose();
         fResourceManager.dispose();
+        if (fFont != null) {
+            fFont.dispose();
+        }
     }
 
     /**
@@ -955,6 +963,58 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
 
         fTimeProvider.setStartFinishTimeNotify(time0, time1);
+    }
+
+    /**
+     * Zoom vertically.
+     *
+     * @param zoomIn
+     *            true to zoom in, false to zoom out
+     * @param adjustItems
+     *            true to adjust item heights, false to adjust font only
+     * @since 2.0
+     */
+    public void verticalZoom(boolean zoomIn, boolean adjustItems) {
+        if (zoomIn) {
+            fHeightAdjustment++;
+        } else {
+            fHeightAdjustment--;
+        }
+        FontData fontData = getFont().getFontData()[0];
+        if (fInitialFontHeight == 0) {
+            fInitialFontHeight = fontData.getHeight();
+        }
+        int height = Math.max(1, fInitialFontHeight + fHeightAdjustment);
+        fontData.setHeight(height);
+        if (fFont != null) {
+            fFont.dispose();
+        }
+        fFont = new Font(getDisplay(), fontData);
+        setFont(fFont);
+        if (adjustItems) {
+            fItemData.refreshData();
+        }
+        redraw();
+    }
+
+    /**
+     * Reset the vertical zoom to default.
+     *
+     * @param adjustItems
+     *            true to reset item heights, false to reset font only
+     * @since 2.0
+     */
+    public void resetVerticalZoom(boolean adjustItems) {
+        fHeightAdjustment = 0;
+        if (fFont != null) {
+            fFont.dispose();
+            fFont = null;
+        }
+        setFont(null);
+        if (adjustItems) {
+            fItemData.refreshData();
+        }
+        redraw();
     }
 
     /**
@@ -2151,6 +2211,12 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 }
             }
             idx = -1;
+        } else if ((e.character == '+' || e.character == '=') && ((e.stateMask & SWT.CTRL) != 0)) {
+            verticalZoom(true, true);
+        } else if (e.character == '-' && ((e.stateMask & SWT.CTRL) != 0)) {
+            verticalZoom(false, true);
+        } else if (e.character == '0' && ((e.stateMask & SWT.CTRL) != 0)) {
+            resetVerticalZoom(true);
         }
         if (idx >= 0) {
             selectItem(idx, false);
@@ -2850,6 +2916,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             } else {
                 item.fItemHeight = fGlobalItemHeight;
             }
+            item.fItemHeight = Math.max(1, item.fItemHeight + fHeightAdjustment);
             itemMap.put(entry, item);
             if (entry.hasChildren()) {
                 Item oldItem = fItemMap.get(entry);

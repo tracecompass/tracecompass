@@ -41,6 +41,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseWheelListener;
@@ -48,6 +50,8 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -71,6 +75,8 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.ITimeGraphEntry
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.ShowFilterDialogAction;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 
 import com.google.common.collect.Iterables;
 
@@ -133,9 +139,61 @@ public class TimeGraphCombo extends Composite {
 
     private final boolean fScrollBarsInTreeWorkaround;
 
+    private Font fTreeFont;
+
     // ------------------------------------------------------------------------
     // Classes
     // ------------------------------------------------------------------------
+
+    /**
+     * The TimeGraphViewerExtension is used to set appropriate values and to
+     * override methods that could be called directly by the user and that must
+     * be handled by the time graph combo.
+     */
+    private class TimeGraphViewerExtension extends TimeGraphViewer {
+
+        private TimeGraphViewerExtension(Composite parent, int style, Tree tree) {
+            super(parent, style);
+            setItemHeight(TimeGraphCombo.this.getItemHeight(tree, true));
+            setHeaderHeight(tree.getHeaderHeight());
+            setBorderWidth(tree.getBorderWidth());
+            setNameWidthPref(0);
+        }
+
+        @Override
+        public ShowFilterDialogAction getShowFilterDialogAction() {
+            return TimeGraphCombo.this.getShowFilterDialogAction();
+        }
+
+        @Override
+        protected TimeGraphControl createTimeGraphControl(Composite composite, TimeGraphColorScheme colors) {
+            return new TimeGraphControl(composite, colors) {
+                @Override
+                public void verticalZoom(boolean zoomIn, boolean adjustItems) {
+                    boolean changed = TimeGraphCombo.this.verticalZoom(zoomIn);
+                    if (changed) {
+                        /*
+                         * The time graph combo takes care of adjusting item
+                         * heights, only adjust the font in the time graph
+                         * control. Only do it if the time graph combo's tree
+                         * font has actually changed.
+                         */
+                        super.verticalZoom(zoomIn, false);
+                    }
+                }
+
+                @Override
+                public void resetVerticalZoom(boolean adjustItems) {
+                    TimeGraphCombo.this.resetVerticalZoom();
+                    /*
+                     * The time graph combo takes care of resetting item
+                     * heights, only reset the font in the time graph control.
+                     */
+                    super.resetVerticalZoom(false);
+                }
+            };
+        }
+    }
 
     /**
      * The TreeContentProviderWrapper is used to insert filler items after
@@ -358,11 +416,7 @@ public class TimeGraphCombo extends Composite {
         tree.setHeaderVisible(true);
         tree.setLinesVisible(true);
 
-        fTimeGraphViewer = new TimeGraphViewer(fSashForm, SWT.NONE);
-        fTimeGraphViewer.setItemHeight(getItemHeight(tree));
-        fTimeGraphViewer.setHeaderHeight(tree.getHeaderHeight());
-        fTimeGraphViewer.setBorderWidth(tree.getBorderWidth());
-        fTimeGraphViewer.setNameWidthPref(0);
+        fTimeGraphViewer = new TimeGraphViewerExtension(fSashForm, SWT.NONE, tree);
 
         if (fScrollBarsInTreeWorkaround) {
             // Feature in Windows. The tree vertical bar reappears when
@@ -393,6 +447,15 @@ public class TimeGraphCombo extends Composite {
                 if (headerHeight > 0) {
                     fTimeGraphViewer.setHeaderHeight(headerHeight);
                     tree.removePaintListener(this);
+                }
+            }
+        });
+
+        tree.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(DisposeEvent e) {
+                if (fTreeFont != null) {
+                    fTreeFont.dispose();
                 }
             }
         });
@@ -506,13 +569,21 @@ public class TimeGraphCombo extends Composite {
                     event.doit = false;
                 } else if (event.keyCode == SWT.PAGE_DOWN) {
                     int height = tree.getSize().y - tree.getHeaderHeight() - tree.getHorizontalBar().getSize().y;
-                    int countPerPage = height / getItemHeight(tree);
+                    int countPerPage = height / getItemHeight(tree, false);
                     int index = Math.min(fTimeGraphViewer.getSelectionIndex() + countPerPage - 1, treeItems.size() - 1);
                     fTimeGraphViewer.setSelection((ITimeGraphEntry) treeItems.get(index).getData());
                     event.doit = false;
                 } else if (event.keyCode == SWT.END) {
                     fTimeGraphViewer.setSelection((ITimeGraphEntry) treeItems.get(treeItems.size() - 1).getData());
                     event.doit = false;
+                } else if ((event.character == '+' || event.character == '=') && ((event.stateMask & SWT.CTRL) != 0)) {
+                    verticalZoom(true);
+                } else if (event.character == '-' && ((event.stateMask & SWT.CTRL) != 0)) {
+                    verticalZoom(false);
+                } else if (event.character == '0' && ((event.stateMask & SWT.CTRL) != 0)) {
+                    resetVerticalZoom();
+                } else {
+                    return;
                 }
                 if (fTimeGraphViewer.getSelectionIndex() >= 0) {
                     fTreeViewer.setSelection(new StructuredSelection(fTimeGraphViewer.getSelection()));
@@ -612,7 +683,7 @@ public class TimeGraphCombo extends Composite {
         // The filler rows are required to ensure alignment when the tree does not have a
         // visible horizontal scroll bar. The tree does not allow its top item to be set
         // to a value that would cause blank space to be drawn at the bottom of the tree.
-        fNumFillerRows = Display.getDefault().getBounds().height / getItemHeight(tree);
+        fNumFillerRows = Display.getDefault().getBounds().height / getItemHeight(tree, false);
 
         fSashForm.setWeights(weights);
 
@@ -641,6 +712,43 @@ public class TimeGraphCombo extends Composite {
                 }
             }
         });
+    }
+
+    private boolean verticalZoom(boolean zoomIn) {
+        Tree tree = fTreeViewer.getTree();
+        FontData fontData = tree.getFont().getFontData()[0];
+        int height = fontData.getHeight() + (zoomIn ? 1 : -1);
+        if (height <= 0) {
+            return false;
+        }
+        fontData.setHeight(height);
+        if (fTreeFont != null) {
+            fTreeFont.dispose();
+        }
+        fTreeFont = new Font(tree.getDisplay(), fontData);
+        tree.setFont(fTreeFont);
+        redraw();
+        update();
+        fTimeGraphViewer.setHeaderHeight(tree.getHeaderHeight());
+        fTimeGraphViewer.setItemHeight(getItemHeight(tree, true));
+        alignTreeItems(false);
+        redraw();
+        return true;
+    }
+
+    private void resetVerticalZoom() {
+        Tree tree = fTreeViewer.getTree();
+        if (fTreeFont != null) {
+            fTreeFont.dispose();
+            fTreeFont = null;
+        }
+        tree.setFont(null);
+        redraw();
+        update();
+        fTimeGraphViewer.setHeaderHeight(tree.getHeaderHeight());
+        fTimeGraphViewer.setItemHeight(getItemHeight(tree, true));
+        alignTreeItems(false);
+        redraw();
     }
 
     private void sendTimeViewAlignmentChanged() {
@@ -708,6 +816,12 @@ public class TimeGraphCombo extends Composite {
     public void redraw() {
         fTimeGraphViewer.getControl().redraw();
         super.redraw();
+    }
+
+    @Override
+    public void update() {
+        fTimeGraphViewer.getControl().update();
+        super.update();
     }
 
     // ------------------------------------------------------------------------
@@ -831,7 +945,7 @@ public class TimeGraphCombo extends Composite {
             fTreeViewer.getTree().getVerticalBar().setVisible(false);
         }
         fTimeGraphViewer.setInput(input);
-        fTimeGraphViewer.setItemHeight(getItemHeight(fTreeViewer.getTree()));
+        fTimeGraphViewer.setItemHeight(getItemHeight(fTreeViewer.getTree(), false));
         // queue the alignment update because in Linux the item bounds are not
         // set properly until the tree has been painted at least once
         fVisibleExpandedItems = null; // invalidate the cache
@@ -1077,12 +1191,12 @@ public class TimeGraphCombo extends Composite {
         }
     }
 
-    private int getItemHeight(final Tree tree) {
+    private int getItemHeight(final Tree tree, boolean force) {
         /*
          * Bug in Linux.  The method getItemHeight doesn't always return the correct value.
          */
         if (fLinuxItemHeight >= 0 && System.getProperty("os.name").contains("Linux")) { //$NON-NLS-1$ //$NON-NLS-2$
-            if (fLinuxItemHeight != 0) {
+            if (fLinuxItemHeight != 0 && !force) {
                 return fLinuxItemHeight;
             }
 
@@ -1126,29 +1240,63 @@ public class TimeGraphCombo extends Composite {
         TreeItem item = treeItems.get(topIndex);
         tree.setTopItem(item);
 
+        // get the first filler item so we can calculate the last item's height
+        TreeItem fillerItem = null;
+        for (TreeItem treeItem : fTreeViewer.getTree().getItems()) {
+            if (treeItem.getData() == FILLER) {
+                fillerItem = treeItem;
+                break;
+            }
+        }
+
         // ensure the time graph item heights are equal to the tree item heights
         int treeHeight = fTreeViewer.getTree().getBounds().height;
         int index = topIndex;
         Rectangle bounds = item.getBounds();
-        while (index < treeItems.size() - 1) {
+        while (index < treeItems.size()) {
             if (bounds.y > treeHeight) {
                 break;
             }
-            /*
-             * Bug in Linux. The method getBounds doesn't always return the correct height.
-             * Use the difference of y position between items to calculate the height.
-             */
-            TreeItem nextItem = treeItems.get(index + 1);
-            Rectangle nextBounds = nextItem.getBounds();
-            Integer itemHeight = nextBounds.y - bounds.y;
-            if (itemHeight > 0) {
-                ITimeGraphEntry entry = (ITimeGraphEntry) item.getData();
-                fTimeGraphViewer.getTimeGraphControl().setItemHeight(entry, itemHeight);
-            }
+            TreeItem nextItem = (index + 1 == treeItems.size()) ? fillerItem : treeItems.get(index + 1);
+            Rectangle nextBounds = alignTreeItem(item, bounds, nextItem);
             index++;
             item = nextItem;
             bounds = nextBounds;
         }
+
+        /*
+         * When an item's height in the time graph changes, it is possible that
+         * the time graph readjusts its top index to fill empty space at the
+         * bottom of the viewer. Calling method setTopIndex() triggers this
+         * adjustment, if needed. In that case, we need to make sure that the
+         * newly visible items at the top of the viewer are also aligned.
+         */
+        fTimeGraphViewer.setTopIndex(topIndex);
+        item = treeItems.get(topIndex);
+        tree.setTopItem(item);
+        while (fTimeGraphViewer.getTopIndex() < topIndex) {
+            TreeItem nextItem = item;
+            topIndex--;
+            item = treeItems.get(topIndex);
+            tree.setTopItem(item);
+            bounds = item.getBounds();
+            alignTreeItem(item, bounds, nextItem);
+            fTimeGraphViewer.setTopIndex(topIndex);
+        }
+    }
+
+    private Rectangle alignTreeItem(TreeItem item, Rectangle bounds, TreeItem nextItem) {
+        /*
+         * Bug in Linux. The method getBounds doesn't always return the correct height.
+         * Use the difference of y position between items to calculate the height.
+         */
+        Rectangle nextBounds = nextItem.getBounds();
+        Integer itemHeight = nextBounds.y - bounds.y;
+        if (itemHeight > 0) {
+            ITimeGraphEntry entry = (ITimeGraphEntry) item.getData();
+            fTimeGraphViewer.getTimeGraphControl().setItemHeight(entry, itemHeight);
+        }
+        return nextBounds;
     }
 
     /**

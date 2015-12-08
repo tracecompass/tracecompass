@@ -349,7 +349,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                                 if (!interval.getStateValue().isNull()) {
                                     value = interval.getStateValue();
                                     gc.setForeground(fColorWhite);
-                                    int drawn = Utils.drawText(gc, value.unboxStr().substring(beginIndex), x + 1, bounds.y - 2, width, true, true);
+                                    int drawn = Utils.drawText(gc, value.unboxStr().substring(beginIndex), x + 1, bounds.y, width, bounds.height, true, true);
                                     if (drawn > 0) {
                                         fLastThreadId = currentThreadId;
                                     }
