@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
+<!-- ***************************************************************************
+* Copyright (c) 2016 Ericsson
+*
+* All rights reserved. This program and the accompanying materials are
+* made available under the terms of the Eclipse Public License v1.0 which
+* accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*************************************************************************** -->
+<pattern version="0" id="xml syscall abstraction provider">
+	<head>
+		<traceType id="org.eclipse.linuxtools.lttng2.kernel.tracetype" />
+		<label value="xml syscall abstraction provider" />
+	</head>
+
+<!-- STORED FIELDS -->
+
+	<storedField id="filename"/>
+	<storedField id="fd"/>
+	<storedField id="ret" alias="ret"/>
+	<storedField id="flags" alias="flags"/>
+	<storedField id="offset" alias="offset"/>
+	<storedField id="fd_in" alias="fd_in"/>
+	<storedField id="fd_out" alias="fd_out"/>
+	<storedField id="uservaddr" alias="uservaddr"/>
+	<storedField id="upeer_sockaddr" alias="upeer_sockaddr"/>
+
+<!-- 		SHORTCUTS -->
+
+<!-- Shorcut for the current running thread attribute -->
+	<location id="CurrentThread">
+		<stateAttribute type="constant" value="Threads" />
+		<stateAttribute type="query">
+		<stateAttribute type="constant" value="CPUs" />
+		<stateAttribute type="eventField" value="cpu" />
+		<stateAttribute type="constant" value="Current_thread" />
+		</stateAttribute>
+	</location>
+<!-- Shorcut for the current CPU attribute -->
+	<location id="CurrentCPU">
+		<stateAttribute type="constant" value="CPUs" />
+		<stateAttribute type="eventField" value="cpu" />
+	</location>
+<!-- Shortcut for the current scenario -->
+	<location id="CurrentScenario">
+		<stateAttribute type="constant" value="pattern" />
+		<stateAttribute type="constant" value="scenarios" />
+		<stateAttribute type="constant" value="#scenarioName" />
+	</location>
+
+<!-- 	The attribute initial specifies the FSMs that will be instanciated at the beginning of the analysis -->
+	<patternHandler initial="sched_switch:syscall">
+
+<!-- 	CONDITIONS -->
+
+<!-- 	This condition check if the current running thread PID is 1311 -->
+		<test id="tid_8998">
+			<if>
+				<condition>
+					<stateValue type="query">
+						<stateAttribute type="location" value="CurrentCPU" />
+						<stateAttribute type="constant" value="Current_thread" />
+					</stateValue>
+					<stateValue type="long" value="8998" />
+				</condition>
+			</if>
+		</test>
+<!-- 	Test this : if ( !(1 ns < ts < 3 ns) || ((ts -state.syscall_entry_x.ts) < 3 ns) ) -->
+		<test id="time_condition">
+			<if>
+				<or>
+					<not>
+						<condition>
+							<timerange unit="ns">
+								<in begin="1" end="3" />
+							</timerange>
+						</condition>
+					</not>
+					<condition>
+						<elapsedTime unit="ns">
+							<less since="syscall_entry_x" value="3" />
+						</elapsedTime>
+					</condition>
+				</or>
+			</if>
+		</test>
+<!-- 	Test if the current running thread PID is equal to the current scenario thread -->
+		<test id="thread_thread">
+			<if>
+				<condition>
+					<stateValue type="query" >
+						<stateAttribute type="location" value="CurrentCPU" />
+						<stateAttribute type="constant" value="Current_thread" />
+					</stateValue>
+					<stateValue type="query">
+						<stateAttribute type="location" value="CurrentScenario" />
+						<stateAttribute type="constant" value="thread" />
+					</stateValue>
+				</condition>
+			</if>
+		</test>
+
+<!-- 		ACTIONS -->
+
+<!-- 	Generates three state changes in the state system -->
+		<action id="sys_x_founded">
+<!-- 		Save the name of the system call executed under the current scenario path-->
+			<stateChange>
+				<stateAttribute type="location" value="CurrentScenario" />
+				<stateAttribute type="constant" value="syscall" />
+				<stateAttribute type="constant" value="name" />
+				<stateValue type="eventName"/>
+			</stateChange>
+<!-- 		Save the value of the CPU under the current scenario path -->
+			<stateChange>
+				<stateAttribute type="location" value="CurrentScenario" />
+				<stateAttribute type="constant" value="cpu" />
+				<stateValue type="eventField" value="cpu"/>
+			</stateChange>
+<!-- 		Save the value of the current thread PID under the current scenario path -->
+			<stateChange>
+				<stateAttribute type="location" value="CurrentScenario" />
+				<stateAttribute type="constant" value="thread" />
+				<stateValue type="query">
+					<stateAttribute type="location" value="CurrentCPU" />
+					<stateAttribute type="constant" value="Current_thread" />
+				</stateValue>
+			</stateChange>
+		</action>
+
+<!-- 	Generate a pattern segment -->
+		<action id="exit_syscall_founded">
+<!-- 		Generate a pattern segment with the name of the system call  of the current scenario-->
+			<segment>
+				<segType>
+					<segName>
+						<stateValue type="query">
+							<stateAttribute type="location" value="CurrentScenario" />
+							<stateAttribute type="constant" value="syscall" />
+							<stateAttribute type="constant" value="name" />
+						</stateValue>
+					</segName>
+				</segType>
+			</segment>
+		</action>
+
+<!-- 		FSMs -->
+
+<!-- 	System call FSM
+		Declare an FSM to match all the system calls on thread 1311.
+		The FSM will generate pattern segments that will represent the system calls found
+-->
+		<fsm id="syscall" initial="wait_syscall_entry_x">
+<!-- 		Validate that PID == 1311 before going to the initial state -->
+			<initial>
+				<transition cond="tid_8998" target="wait_syscall_entry_x" />
+			</initial>
+			<state id="wait_syscall_entry_x">
+<!-- 				The state will stay here until we have a "syscall_entry_*" event -->
+				<transition event="syscall_entry_*" target="syscall_entry_x" action="sys_x_founded" saveStoredFields="true"/>
+			</state>
+			<state id="syscall_entry_x" >
+<!-- 				The state will stay here until we have a "syscall_exit_*" event -->
+				<transition event="syscall_exit_*" cond="thread_thread" target="syscall_exit_x" action="exit_syscall_founded" saveStoredFields="true" clearStoredFields="true"/>
+			</state>
+<!-- 				The state will stay here forever -->
+			<final id="syscall_exit_x"/>
+		</fsm>
+
+		<!-- 		SCHED_SWITCH FSM ACTIONS -->
+<!-- 	Update the value of the current running thread -->
+		<action id="update Current_thread">
+			<stateChange>
+				<stateAttribute type="location" value="CurrentCPU" />
+				<stateAttribute type="constant" value="Current_thread" />
+				<stateValue type="eventField" value="next_tid" />
+			</stateChange>
+		</action>
+<!-- 	sched_switch fsm
+		Declare an FSM to update the value of the current thread running.
+		The FSM will generate a state change to update the current thread, each time that it will meet a sched_switch event.
+-->
+		<fsm id="sched_switch" multiple="false">
+<!-- 		if event.name != sched_switch, no processing will be done -->
+			<initial>
+				<transition target="sched_switch"/>
+				<precondition event="sched_switch"/>
+			</initial>
+			<state id="sched_switch">
+<!-- 					The state will stay here forever and execute the action "update current thread" each time a sched_switch event will be meet-->
+				<transition target="sched_switch" action="update Current_thread" />
+			</state>
+		</fsm>
+	</patternHandler>
+</pattern>
+</tmfxml>

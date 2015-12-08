@@ -109,7 +109,6 @@ public class XmlUtilsTest {
             fail("XML test file does not exist");
         }
         assertFalse(XmlUtils.xmlValidate(testXmlFile).isOK());
-
     }
 
     /**
