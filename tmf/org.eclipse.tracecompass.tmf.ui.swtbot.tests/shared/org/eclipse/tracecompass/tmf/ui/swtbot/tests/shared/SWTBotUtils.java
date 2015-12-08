@@ -273,7 +273,7 @@ public final class SWTBotUtils {
     /**
      * If the test is running in the UI thread then fail
      */
-    private static void failIfUIThread() {
+    public static void failIfUIThread() {
         if (Display.getCurrent() != null && Display.getCurrent().getThread() == Thread.currentThread()) {
             fail("SWTBot test needs to run in a non-UI thread. Make sure that \"Run in UI thread\" is unchecked in your launch configuration or"
                     + " that useUIThread is set to false in the pom.xml");
