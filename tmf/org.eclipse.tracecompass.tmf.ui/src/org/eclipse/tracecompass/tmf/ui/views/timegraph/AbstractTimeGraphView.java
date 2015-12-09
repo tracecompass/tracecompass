@@ -659,6 +659,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         /**
          * Run the zoom operation.
+         * @since 2.0
          */
         public abstract void doRun();
     }
