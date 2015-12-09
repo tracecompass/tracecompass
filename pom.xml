@@ -37,128 +37,138 @@
     </license>
   </licenses>
 
-<properties>
-  <tycho-version>0.24.0</tycho-version>
-  <tycho-extras-version>0.24.0</tycho-extras-version>
-  <tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/tracecompass/org.eclipse.tracecompass.git</tycho.scmUrl>
-  <target-platform>tracecompass-e4.5</target-platform>
-  <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
-  <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-  <sonar.jacoco.reportPath>${project.basedir}/../../target/jacoco.exec</sonar.jacoco.reportPath>
-  <sonar.java.source>1.8</sonar.java.source>
-  <sonar.exclusions>**/tests/**,**/test/**,**/stubs/**,**/Messages*,**/alltests/**</sonar.exclusions>
-  <sonar.skippedModules>org.eclipse.tracecompass.ctf.parser,org.eclipse.tracecompass.examples</sonar.skippedModules>
-  <!-- Sonar rule exclusions -->
-  <sonar.issue.ignore.multicriteria>e1,e2,e3,e4,e5,e6</sonar.issue.ignore.multicriteria>
-  <sonar.issue.ignore.multicriteria.e1.ruleKey>findbugs:NP_STORE_INTO_NONNULL_FIELD</sonar.issue.ignore.multicriteria.e1.ruleKey>
-  <sonar.issue.ignore.multicriteria.e1.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e1.resourceKey>
-  <sonar.issue.ignore.multicriteria.e2.ruleKey>findbugs:RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE</sonar.issue.ignore.multicriteria.e2.ruleKey>
-  <sonar.issue.ignore.multicriteria.e2.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e2.resourceKey>
-  <sonar.issue.ignore.multicriteria.e3.ruleKey>findbugs:NP_NONNULL_PARAM_VIOLATION</sonar.issue.ignore.multicriteria.e3.ruleKey>
-  <sonar.issue.ignore.multicriteria.e3.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e3.resourceKey>
-  <sonar.issue.ignore.multicriteria.e4.ruleKey>findbugs:NP_NULL_PARAM_DEREF_NONVIRTUAL</sonar.issue.ignore.multicriteria.e4.ruleKey>
-  <sonar.issue.ignore.multicriteria.e4.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e4.resourceKey>
-  <sonar.issue.ignore.multicriteria.e5.ruleKey>findbugs:NP_NONNULL_RETURN_VIOLATION</sonar.issue.ignore.multicriteria.e5.ruleKey>
-  <sonar.issue.ignore.multicriteria.e5.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e5.resourceKey>
-  <sonar.issue.ignore.multicriteria.e6.ruleKey>findbugs:NP_NONNULL_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR</sonar.issue.ignore.multicriteria.e6.ruleKey>
-  <sonar.issue.ignore.multicriteria.e6.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e6.resourceKey>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  <help-docs-eclipserun-repo>http://download.eclipse.org/eclipse/updates/4.5</help-docs-eclipserun-repo>
-  <!-- Disable GTK3 because it's not quite usable yet and it can make the tests hang (bug in IcedTea http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=1736) -->
-  <SWT_GTK3>0</SWT_GTK3>
-</properties>
+    <tycho-version>0.24.0</tycho-version>
+    <tycho-extras-version>0.24.0</tycho-extras-version>
+    <tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/tracecompass/org.eclipse.tracecompass.git</tycho.scmUrl>
+    <target-platform>tracecompass-e4.5</target-platform>
+    <help-docs-eclipserun-repo>http://download.eclipse.org/eclipse/updates/4.5</help-docs-eclipserun-repo>
 
-<pluginRepositories>
-  <pluginRepository>
-    <id>repo.eclipse.org</id>
-    <url>https://repo.eclipse.org/content/groups/releases/</url>
-  </pluginRepository>
-  <pluginRepository>
-    <id>tycho-snapshots</id>
-    <url>https://repo.eclipse.org/content/repositories/tycho-snapshots/</url>
-  </pluginRepository>
-  <pluginRepository>
-    <id>jboss-public-repository-group</id>
-    <name>JBoss Public Repository Group</name>
-    <url>http://repository.jboss.org/nexus/content/groups/public/</url>
-  </pluginRepository>
-</pluginRepositories>
+    <!-- Disable GTK3 because it's not quite usable yet and it can make the tests hang (bug in IcedTea http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=1736) -->
+    <SWT_GTK3>0</SWT_GTK3>
 
-<profiles>
-  <profile>
-    <id>sign-update-site</id>
-    <build>
-      <plugins>
-        <plugin>
-          <groupId>org.eclipse.tycho.extras</groupId>
-          <artifactId>tycho-pack200a-plugin</artifactId>
-          <version>${tycho-extras-version}</version>
-          <executions>
-            <execution>
-              <id>pack200-normalize</id>
-              <goals>
-                <goal>normalize</goal>
-              </goals>
-              <phase>package</phase>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <groupId>org.eclipse.cbi.maven.plugins</groupId>
-          <artifactId>eclipse-jarsigner-plugin</artifactId>
-          <version>1.1.2</version>
-          <executions>
-            <execution>
-              <id>sign</id>
-              <phase>package</phase>
-              <goals>
-                <goal>sign</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <groupId>org.eclipse.tycho.extras</groupId>
-          <artifactId>tycho-pack200b-plugin</artifactId>
-          <version>${tycho-extras-version}</version>
-          <executions>
-            <execution>
-              <id>pack200-pack</id>
-              <goals>
-                <goal>pack</goal>
-              </goals>
-              <phase>package</phase>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </build>
-  </profile>
-  <profile>
-    <id>macosx</id>
-    <activation>
-      <os>
-        <family>mac</family>
-      </os>
-    </activation>
-    <properties>
-      <base.ui.test.vmargs>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts -Djava.awt.headless=false</base.ui.test.vmargs>
-    </properties>
-  </profile>
-  <profile>
-    <id>not-macosx</id>
-    <activation>
-      <os>
-        <family>!mac</family>
-      </os>
-    </activation>
-    <properties>
-      <!-- Disable webkit integration, especially unstable on Linux -->
-      <base.ui.test.vmargs>-Dorg.eclipse.swt.browser.DefaultType=mozilla</base.ui.test.vmargs>
-    </properties>
-  </profile>
-</profiles>
+    <!-- Sonar rule configuration -->
+    <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
+    <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+    <sonar.jacoco.reportPath>${project.basedir}/../../target/jacoco.exec</sonar.jacoco.reportPath>
+    <sonar.java.source>1.8</sonar.java.source>
+    <sonar.exclusions>**/tests/**,**/test/**,**/stubs/**,**/Messages*,**/alltests/**</sonar.exclusions>
+    <sonar.skippedModules>org.eclipse.tracecompass.ctf.parser,org.eclipse.tracecompass.examples</sonar.skippedModules>
+    <sonar.issue.ignore.multicriteria>e1,e2,e3,e4,e5,e6</sonar.issue.ignore.multicriteria>
+    <sonar.issue.ignore.multicriteria.e1.ruleKey>findbugs:NP_STORE_INTO_NONNULL_FIELD</sonar.issue.ignore.multicriteria.e1.ruleKey>
+    <sonar.issue.ignore.multicriteria.e1.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e1.resourceKey>
+    <sonar.issue.ignore.multicriteria.e2.ruleKey>findbugs:RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE</sonar.issue.ignore.multicriteria.e2.ruleKey>
+    <sonar.issue.ignore.multicriteria.e2.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e2.resourceKey>
+    <sonar.issue.ignore.multicriteria.e3.ruleKey>findbugs:NP_NONNULL_PARAM_VIOLATION</sonar.issue.ignore.multicriteria.e3.ruleKey>
+    <sonar.issue.ignore.multicriteria.e3.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e3.resourceKey>
+    <sonar.issue.ignore.multicriteria.e4.ruleKey>findbugs:NP_NULL_PARAM_DEREF_NONVIRTUAL</sonar.issue.ignore.multicriteria.e4.ruleKey>
+    <sonar.issue.ignore.multicriteria.e4.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e4.resourceKey>
+    <sonar.issue.ignore.multicriteria.e5.ruleKey>findbugs:NP_NONNULL_RETURN_VIOLATION</sonar.issue.ignore.multicriteria.e5.ruleKey>
+    <sonar.issue.ignore.multicriteria.e5.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e5.resourceKey>
+    <sonar.issue.ignore.multicriteria.e6.ruleKey>findbugs:NP_NONNULL_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR</sonar.issue.ignore.multicriteria.e6.ruleKey>
+    <sonar.issue.ignore.multicriteria.e6.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e6.resourceKey>
+  </properties>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>repo.eclipse.org</id>
+      <url>https://repo.eclipse.org/content/groups/releases/</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>tycho-snapshots</id>
+      <url>https://repo.eclipse.org/content/repositories/tycho-snapshots/</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>jboss-public-repository-group</id>
+      <name>JBoss Public Repository Group</name>
+      <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <profiles>
+    <!-- Manually-set profile to sign the generated update sites -->
+    <profile>
+      <id>sign-update-site</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.tycho.extras</groupId>
+            <artifactId>tycho-pack200a-plugin</artifactId>
+            <version>${tycho-extras-version}</version>
+            <executions>
+              <execution>
+                <id>pack200-normalize</id>
+                <goals>
+                  <goal>normalize</goal>
+                </goals>
+                <phase>package</phase>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.eclipse.cbi.maven.plugins</groupId>
+            <artifactId>eclipse-jarsigner-plugin</artifactId>
+            <version>1.1.2</version>
+            <executions>
+              <execution>
+                <id>sign</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.eclipse.tycho.extras</groupId>
+            <artifactId>tycho-pack200b-plugin</artifactId>
+            <version>${tycho-extras-version}</version>
+            <executions>
+              <execution>
+                <id>pack200-pack</id>
+                <goals>
+                  <goal>pack</goal>
+                </goals>
+                <phase>package</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- Automatic profile for Mac-specific settings -->
+    <profile>
+      <id>macosx</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <properties>
+        <base.ui.test.vmargs>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts -Djava.awt.headless=false</base.ui.test.vmargs>
+      </properties>
+    </profile>
+
+    <!-- Automatic profile for non-Mac platforms settings -->
+    <profile>
+      <id>not-macosx</id>
+      <activation>
+        <os>
+          <family>!mac</family>
+        </os>
+      </activation>
+      <properties>
+        <!-- Disable webkit integration, especially unstable on Linux -->
+        <base.ui.test.vmargs>-Dorg.eclipse.swt.browser.DefaultType=mozilla</base.ui.test.vmargs>
+      </properties>
+    </profile>
+  </profiles>
 
   <modules>
     <module>analysis</module>
@@ -202,115 +212,121 @@
           </execution>
         </executions>
       </plugin>
-            <plugin>
-                <groupId>org.eclipse.tycho</groupId>
-                <artifactId>target-platform-configuration</artifactId>
-                <configuration>
-                    <includePackedArtifacts>true</includePackedArtifacts>
-                    <environments>
-                        <environment>
-                            <os>win32</os>
-                            <ws>win32</ws>
-                            <arch>x86</arch>
-                        </environment>
-                        <environment>
-                            <os>win32</os>
-                            <ws>win32</ws>
-                            <arch>x86_64</arch>
-                        </environment>
-                        <environment>
-                            <os>macosx</os>
-                            <ws>cocoa</ws>
-                            <arch>x86_64</arch>
-                        </environment>
-                        <environment>
-                            <os>linux</os>
-                            <ws>gtk</ws>
-                            <arch>x86</arch>
-                        </environment>
-                        <environment>
-                            <os>linux</os>
-                            <ws>gtk</ws>
-                            <arch>x86_64</arch>
-                        </environment>
-                    </environments>
-                    <target>
-                      <artifact>
-                        <groupId>org.eclipse.tracecompass</groupId>
-                        <artifactId>org.eclipse.tracecompass.target</artifactId>
-                        <classifier>${target-platform}</classifier>
-                        <version>2.0.0</version>
-                      </artifact>
-                    </target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.eclipse.tycho</groupId>
-                <artifactId>tycho-maven-plugin</artifactId>
-                <version>${tycho-version}</version>
-                <extensions>true</extensions>
-            </plugin>
-        <plugin>
-          <groupId>org.eclipse.tycho</groupId>
-          <artifactId>tycho-source-plugin</artifactId>
-          <version>${tycho-version}</version>
-          <executions>
-            <execution>
-              <id>plugin-source</id>
-              <goals>
-                <goal>plugin-source</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <groupId>org.eclipse.tycho.extras</groupId>
-          <artifactId>tycho-source-feature-plugin</artifactId>
-          <version>${tycho-version}</version>
-          <configuration>
-            <includeBinaryFeature>false</includeBinaryFeature>
-          </configuration>
-          <executions>
-            <execution>
-              <id>source-feature</id>
-              <phase>package</phase>
-              <goals>
-                <goal>source-feature</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <groupId>org.jacoco</groupId>
-          <artifactId>jacoco-maven-plugin</artifactId>
-          <version>0.7.4.201502262128</version>
-          <executions>
-            <execution>
-             <id>pre-test</id>
-             <goals>
-               <goal>prepare-agent</goal>
-             </goals>
-             <configuration>
-                <!-- Where to put jacoco coverage report -->
-                <destFile>${sonar.jacoco.reportPath}</destFile>
-                <includes>
-                  <include>org.eclipse.tracecompass.*</include>
-                </includes>
-                <append>true</append>
-              </configuration>
-            </execution>
-            <execution>
-              <id>post-test</id>
-              <phase>post-integration-test</phase>
-              <goals>
-                <goal>report</goal>
-              </goals>
-              <configuration>
-                <dataFile>${sonar.jacoco.reportPath}</dataFile>
-              </configuration>
-            </execution>
-          </executions>
+
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>target-platform-configuration</artifactId>
+        <configuration>
+          <includePackedArtifacts>true</includePackedArtifacts>
+          <environments>
+            <environment>
+                <os>win32</os>
+                <ws>win32</ws>
+                <arch>x86</arch>
+            </environment>
+            <environment>
+                <os>win32</os>
+                <ws>win32</ws>
+                <arch>x86_64</arch>
+            </environment>
+            <environment>
+                <os>macosx</os>
+                <ws>cocoa</ws>
+                <arch>x86_64</arch>
+            </environment>
+            <environment>
+                <os>linux</os>
+                <ws>gtk</ws>
+                <arch>x86</arch>
+            </environment>
+            <environment>
+                <os>linux</os>
+                <ws>gtk</ws>
+                <arch>x86_64</arch>
+            </environment>
+          </environments>
+          <target>
+            <artifact>
+              <groupId>org.eclipse.tracecompass</groupId>
+              <artifactId>org.eclipse.tracecompass.target</artifactId>
+              <classifier>${target-platform}</classifier>
+              <version>2.0.0</version>
+            </artifact>
+          </target>
+        </configuration>
       </plugin>
+
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-maven-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <extensions>true</extensions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-source-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <executions>
+          <execution>
+            <id>plugin-source</id>
+            <goals>
+              <goal>plugin-source</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.eclipse.tycho.extras</groupId>
+        <artifactId>tycho-source-feature-plugin</artifactId>
+        <version>${tycho-extras-version}</version>
+        <configuration>
+          <includeBinaryFeature>false</includeBinaryFeature>
+        </configuration>
+        <executions>
+          <execution>
+            <id>source-feature</id>
+            <phase>package</phase>
+            <goals>
+              <goal>source-feature</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.7.4.201502262128</version>
+        <executions>
+          <execution>
+            <id>pre-test</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+            <configuration>
+              <!-- Where to put jacoco coverage report -->
+              <destFile>${sonar.jacoco.reportPath}</destFile>
+              <includes>
+                <include>org.eclipse.tracecompass.*</include>
+              </includes>
+              <append>true</append>
+            </configuration>
+          </execution>
+          <execution>
+            <id>post-test</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <configuration>
+              <dataFile>${sonar.jacoco.reportPath}</dataFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <groupId>org.eclipse.tycho.extras</groupId>
         <artifactId>tycho-pack200b-plugin</artifactId>
@@ -325,6 +341,7 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-p2-plugin</artifactId>
@@ -359,26 +376,31 @@
             </compilerArguments>
           </configuration>
         </plugin>
+
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>target-platform-configuration</artifactId>
           <version>${tycho-version}</version>
         </plugin>
+
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-p2-plugin</artifactId>
           <version>${tycho-version}</version>
         </plugin>
+
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-p2-publisher-plugin</artifactId>
           <version>${tycho-version}</version>
         </plugin>
+
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-p2-repository-plugin</artifactId>
           <version>${tycho-version}</version>
         </plugin>
+
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-surefire-plugin</artifactId>
@@ -398,11 +420,13 @@
             <argLine>${tycho.testArgLine} ${base.ui.test.vmargs} -Xms512m -Xmx1024m</argLine>
           </configuration>
         </plugin>
+
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-versions-plugin</artifactId>
           <version>${tycho-version}</version>
         </plugin>
+
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-packaging-plugin</artifactId>
@@ -420,6 +444,7 @@
             </dependency>
           </dependencies>
         </plugin>
+
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
@@ -428,36 +453,43 @@
             <encoding>UTF-8</encoding>
           </configuration>
         </plugin>
+
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-antrun-plugin</artifactId>
           <version>1.8</version>
         </plugin>
+
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
           <version>3.4</version>
         </plugin>
+
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clean-plugin</artifactId>
           <version>2.6.1</version>
         </plugin>
+
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
           <version>2.8.2</version>
         </plugin>
+
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-install-plugin</artifactId>
           <version>2.5.2</version>
         </plugin>
+
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>2.8</version>
         </plugin>
+
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
@@ -466,52 +498,55 @@
             <excludePackageNames>org.eclipse.tracecompass.internal.*:*.test*</excludePackageNames>
           </configuration>
         </plugin>
+
         <plugin>
           <groupId>org.jboss.tools.tycho-plugins</groupId>
           <artifactId>repository-utils</artifactId>
           <version>0.23.2</version>
         </plugin>
+
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>sonar-maven-plugin</artifactId>
           <version>2.6</version>
         </plugin>
+
         <plugin>
-                <groupId>org.eclipse.tycho.extras</groupId>
-                <artifactId>tycho-eclipserun-plugin</artifactId>
-                <version>${tycho-extras-version}</version>
-                <configuration>
-                        <dependencies>
-                                <dependency>
-                                        <artifactId>org.apache.ant</artifactId>
-                                        <type>eclipse-plugin</type>
-                                </dependency>
-                                <dependency>
-                                        <artifactId>org.eclipse.help.base</artifactId>
-                                        <type>eclipse-plugin</type>
-                                </dependency>
-                                <dependency>
-                                        <artifactId>org.eclipse.ant.core</artifactId>
-                                        <type>eclipse-plugin</type>
-                                </dependency>
-                        </dependencies>
-                        <!-- This needs to be explicitely set now, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=395281 -->
-                        <repositories>
-                                <repository>
-                                        <id>platform</id>
-                                        <layout>p2</layout>
-                                        <url>${help-docs-eclipserun-repo}</url>
-                                </repository>
-                        </repositories>
-                </configuration>
-                <executions>
-                        <execution>
-                                <goals>
-                                        <goal>eclipse-run</goal>
-                                </goals>
-                                <phase>compile</phase>
-                        </execution>
-                </executions>
+          <groupId>org.eclipse.tycho.extras</groupId>
+          <artifactId>tycho-eclipserun-plugin</artifactId>
+          <version>${tycho-extras-version}</version>
+          <configuration>
+            <dependencies>
+              <dependency>
+                <artifactId>org.apache.ant</artifactId>
+                <type>eclipse-plugin</type>
+              </dependency>
+              <dependency>
+                <artifactId>org.eclipse.help.base</artifactId>
+                <type>eclipse-plugin</type>
+              </dependency>
+              <dependency>
+                <artifactId>org.eclipse.ant.core</artifactId>
+                <type>eclipse-plugin</type>
+              </dependency>
+            </dependencies>
+            <!-- This needs to be explicitely set now, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=395281 -->
+            <repositories>
+              <repository>
+                <id>platform</id>
+                <layout>p2</layout>
+                <url>${help-docs-eclipserun-repo}</url>
+              </repository>
+            </repositories>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>eclipse-run</goal>
+              </goals>
+              <phase>compile</phase>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
