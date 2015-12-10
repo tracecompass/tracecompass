@@ -104,14 +104,11 @@ public class TmfXmlCondition {
             rootNode = firstElement;
             childElements = XmlUtils.getChildElements(rootNode);
         }
-        int size = rootNode.getElementsByTagName(TmfXmlStrings.STATE_VALUE).getLength();
-        fStateValues = new ArrayList<>(size);
-        if (size > 2 || size == 0) {
-            throw new IllegalArgumentException("TmfXmlCondition: a condition should have 1 or 2 state values at most"); //$NON-NLS-1$
-        }
 
         switch (rootNode.getNodeName()) {
         case TmfXmlStrings.CONDITION:
+            int size = rootNode.getElementsByTagName(TmfXmlStrings.STATE_VALUE).getLength();
+            fStateValues = new ArrayList<>(size);
             fOperator = LogicalOperator.NONE;
             if (size == 1) {
                 fConditionOperator = getConditionOperator(rootNode);
@@ -123,12 +120,14 @@ public class TmfXmlCondition {
             }
             break;
         case TmfXmlStrings.NOT:
+            fStateValues = new ArrayList<>();
             fOperator = LogicalOperator.NOT;
             fConditionOperator = ConditionOperator.NONE;
             Element element = firstElement;
             fConditions.add(modelFactory.createCondition(element, fContainer));
             break;
         case TmfXmlStrings.AND:
+            fStateValues = new ArrayList<>();
             fOperator = LogicalOperator.AND;
             fConditionOperator = ConditionOperator.NONE;
             for (Element condition : childElements) {
@@ -139,6 +138,7 @@ public class TmfXmlCondition {
             }
             break;
         case TmfXmlStrings.OR:
+            fStateValues = new ArrayList<>();
             fOperator = LogicalOperator.OR;
             fConditionOperator = ConditionOperator.NONE;
             for (Element condition : childElements) {

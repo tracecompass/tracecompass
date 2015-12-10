@@ -72,5 +72,33 @@
 				</else>
 			</stateChange>
 		</eventHandler>
+		<eventHandler eventName="*">
+			<stateChange>
+				<if>
+					<and>
+						<condition>
+							<stateAttribute type="constant" value="test" />
+							<stateValue type="long" value="0" />
+						</condition>
+						<condition>
+							<stateAttribute type="constant" value="test1" />
+							<stateValue type="long" value="0" />
+						</condition>
+						<condition>
+							<stateAttribute type="constant" value="checkpoint" />
+							<stateValue type="long" value="1" />
+						</condition>
+					</and>
+				</if>
+				<then>
+					<stateAttribute type="constant" value="or_three_operands" />
+					<stateValue type="long" value="0" />
+				</then>
+				<else>
+					<stateAttribute type="constant" value="or_three_operands" />
+					<stateValue type="long" value="1" />
+				</else>
+			</stateChange>
+		</eventHandler>
 	</stateProvider>
 </tmfxml>
