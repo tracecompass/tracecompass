@@ -99,10 +99,11 @@ public class TraceProviderGroup extends TraceControlComponent {
 
     /**
      * Returns if node supports filtering of events
+     * @param isKernel - <code>true</code> for kernel provider else <code>false</code>
      * @return <code>true</code> if node supports filtering else <code>false</code>
      */
-    public boolean isEventFilteringSupported() {
-        return ((TargetNodeComponent)getParent()).isEventFilteringSupported();
+    public boolean isEventFilteringSupported(boolean isKernel) {
+        return ((TargetNodeComponent)getParent()).isEventFilteringSupported(isKernel);
     }
 }
 

@@ -81,4 +81,8 @@ public interface IEnableKernelEvents {
      */
     String getFunction();
 
+    /**
+     * @return a filter expression
+     */
+    String getFilterExpression();
 }

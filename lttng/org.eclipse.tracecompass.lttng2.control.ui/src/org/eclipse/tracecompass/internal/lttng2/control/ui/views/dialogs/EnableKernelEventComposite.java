@@ -96,6 +96,10 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
      */
     private Text fFunctionText;
     /**
+     * The filter text
+     */
+    private Text fFilterText;
+    /**
      * The referenced trace provider group containing the kernel provider
      * component which contains a list of available tracepoints.
      */
@@ -140,6 +144,10 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
      * The dynamic function entry/return probe.
      */
     private String fFunctionString;
+    /**
+     * The filter expression
+     */
+    private String fFilterExpression;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -219,6 +227,11 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
         return fFunctionString;
     }
 
+    @Override
+    public String getFilterExpression() {
+        return fFilterExpression;
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -239,6 +252,9 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
 
         // Dynamic Function Probe Group
         createDynamicFunctionPropeGroup();
+
+        // Filter Group
+        createFilterGroup();
 
         // Set default enablements
         setKernelEnablements(KernelGroupEnum.TRACEPOINTS);
@@ -310,6 +326,16 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
             fFunctionEventName = functionTemp;
             // fFunctionString will be validated by lttng-tools
             fFunctionString = fFunctionText.getText();
+        }
+
+        // initialize filter with null
+        fFilterExpression = null;
+        if (fProviderGroup.isEventFilteringSupported(true)) {
+            String tempFilter = fFilterText.getText();
+
+            if(!tempFilter.isEmpty() && !tempFilter.matches("\\s*")) { //$NON-NLS-1$
+                fFilterExpression = tempFilter;
+            }
         }
 
         return true;
@@ -549,6 +575,22 @@ public class EnableKernelEventComposite extends Composite implements IEnableKern
         fFunctionActivateButton.setSelection(group == KernelGroupEnum.FUNCTION);
         fFunctionEventNameText.setEnabled(group == KernelGroupEnum.FUNCTION);
         fFunctionText.setEnabled(group == KernelGroupEnum.FUNCTION);
+    }
+
+    private void createFilterGroup() {
+        if (fProviderGroup.isEventFilteringSupported(true)) {
+            Group filterMainGroup = new Group(this, SWT.SHADOW_NONE);
+            filterMainGroup.setText(Messages.TraceControl_EnableEventsFilterGroupName);
+            GridLayout layout = new GridLayout(3, false);
+            filterMainGroup.setLayout(layout);
+            GridData data = new GridData(GridData.FILL_HORIZONTAL);
+            filterMainGroup.setLayoutData(data);
+
+            fFilterText = new Text(filterMainGroup, SWT.LEFT);
+            fFilterText.setToolTipText(Messages.TraceControl_EnableEventsFilterTooltip);
+            data = new GridData(GridData.FILL_HORIZONTAL);
+            fFilterText.setLayoutData(data);
+        }
     }
 
     // ------------------------------------------------------------------------

@@ -223,7 +223,7 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
         });
 
         // take first session to test whether events filtering is supported or not
-        if (fSessions[0].isEventFilteringSupported() && !fIsKernel) {
+        if (fSessions[0].isEventFilteringSupported(fIsKernel)) {
             Group filterMainGroup = new Group(dialogComposite, SWT.SHADOW_NONE);
             filterMainGroup.setText(Messages.TraceControl_EnableEventsFilterGroupName);
             layout = new GridLayout(2, false);
@@ -268,7 +268,7 @@ public class GetEventInfoDialog extends Dialog implements IGetEventInfoDialog {
 
         // initialize filter with null
         fFilterExpression = null;
-        if (fSessions[0].isEventFilteringSupported() && !fIsKernel) {
+        if (fSessions[0].isEventFilteringSupported(fIsKernel)) {
             String tempFilter = fFilterText.getText();
 
             if(!tempFilter.isEmpty() && !tempFilter.matches("\\s*")) { //$NON-NLS-1$

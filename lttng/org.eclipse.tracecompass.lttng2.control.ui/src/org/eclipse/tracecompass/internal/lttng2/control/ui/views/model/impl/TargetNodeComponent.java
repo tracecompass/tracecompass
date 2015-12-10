@@ -222,9 +222,13 @@ public class TargetNodeComponent extends TraceControlComponent implements IRemot
 
     /**
      * Returns if node supports filtering of events
+     * @param isKernel - <code>true</code> for kernel provider else <code>false</code>
      * @return <code>true</code> if node supports filtering else <code>false</code>
      */
-    public boolean isEventFilteringSupported() {
+    public boolean isEventFilteringSupported(boolean isKernel) {
+        if (isKernel) {
+            return getControlService().isVersionSupported("2.7.0"); //$NON-NLS-1$
+        }
         return getControlService().isVersionSupported("2.1.0"); //$NON-NLS-1$
     }
 

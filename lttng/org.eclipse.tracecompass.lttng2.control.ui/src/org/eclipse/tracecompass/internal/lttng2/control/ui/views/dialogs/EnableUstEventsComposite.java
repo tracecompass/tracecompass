@@ -342,7 +342,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
 
         // initialize filter with null
         fFilterExpression = null;
-        if (fProviderGroup.isEventFilteringSupported()) {
+        if (fProviderGroup.isEventFilteringSupported(false)) {
             String tempFilter = fFilterText.getText();
 
             if(!tempFilter.isEmpty() && !tempFilter.matches("\\s*")) { //$NON-NLS-1$
@@ -535,7 +535,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
     }
 
     void createFilterGroup() {
-        if (fProviderGroup.isEventFilteringSupported()) {
+        if (fProviderGroup.isEventFilteringSupported(false)) {
             Group filterMainGroup = new Group(this, SWT.SHADOW_NONE);
             filterMainGroup.setText(Messages.TraceControl_EnableEventsFilterGroupName);
             GridLayout layout = new GridLayout(3, false);
