@@ -20,8 +20,12 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -204,10 +208,7 @@ public class LttngKernelTraceGenerator {
         Path tracePath = Paths.get("..", "..", "ctf", "org.eclipse.tracecompass.ctf.core.tests", TRACES_DIRECTORY, TRACE_NAME);
         tracePath = tracePath.toAbsolutePath();
         File file = tracePath.toFile();
-
-        if (!file.exists()) {
-            generateLttngKernelTrace(file);
-        }
+        generateLttngKernelTrace(file);
         return file.getAbsolutePath();
     }
 
@@ -248,20 +249,10 @@ public class LttngKernelTraceGenerator {
      */
     public void writeTrace(File file) {
 
-        if (!file.exists()) {
-            file.mkdir();
-        } else {
-            if (file.isFile()) {
-                file.delete();
-                file.mkdir();
-            } else {
-                // the ctf parser doesn't recurse, so we don't need to.
-                final File[] listFiles = file.listFiles();
-                for (File child : listFiles) {
-                    child.delete();
-                }
-            }
+        if (file.exists()) {
+            deleteDirectory(file);
         }
+        file.mkdir();
 
         File metadataFile = new File(file.getPath() + File.separator + "metadata");
         File[] streams = new File[fNbChans];
@@ -368,6 +359,26 @@ public class LttngKernelTraceGenerator {
         try (FileOutputStream fos = new FileOutputStream(metadataFile);) {
             fos.write(metadata.getBytes());
         } catch (IOException e) {
+        }
+    }
+
+    private static void deleteDirectory(File directory) {
+        try {
+            Files.walkFileTree(directory.toPath(), new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Files.delete(file);
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    Files.delete(dir);
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
