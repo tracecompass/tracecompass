@@ -264,10 +264,10 @@ public class EnableEventsDialog extends Dialog implements IEnableEventsDialog  {
 
     @Override
     public String getFilterExpression() {
-        if (!fIsKernel) {
-            return fUstComposite.getFilterExpression();
+        if (fIsKernel) {
+            return fKernelComposite.getFilterExpression();
         }
-        return null;
+        return fUstComposite.getFilterExpression();
     }
 
     // ------------------------------------------------------------------------
