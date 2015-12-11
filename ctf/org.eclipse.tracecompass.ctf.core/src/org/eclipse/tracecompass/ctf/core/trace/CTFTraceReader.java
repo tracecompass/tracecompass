@@ -246,18 +246,17 @@ public class CTFTraceReader implements AutoCloseable {
             Set<CTFStreamInput> streamInputs = stream.getStreamInputs();
             for (CTFStreamInput streamInput : streamInputs) {
                 /*
-                 * Create a reader.
+                 * Create a reader to check if it already exists in the list. If it doesn't, add it.
                  */
-                CTFStreamInputReader streamInputReader = new CTFStreamInputReader(
-                        streamInput);
-
-                /*
-                 * Add it to the group.
-                 */
-                if (!fStreamInputReaders.contains(streamInputReader)) {
-                    streamInputReader.readNextEvent();
-                    fStreamInputReaders.add(streamInputReader);
-                    readers.add(streamInputReader);
+                try (CTFStreamInputReader streamInputReader = new CTFStreamInputReader(streamInput)) {
+                    if (!fStreamInputReaders.contains(streamInputReader)) {
+                        CTFStreamInputReader streamInputReaderToAdd = new CTFStreamInputReader(streamInput);
+                        streamInputReaderToAdd.readNextEvent();
+                        fStreamInputReaders.add(streamInputReaderToAdd);
+                        readers.add(streamInputReaderToAdd);
+                    }
+                } catch (IOException e) {
+                    Activator.logError(e.getMessage(), e);
                 }
             }
         }
