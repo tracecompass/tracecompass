@@ -17,6 +17,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -65,7 +66,7 @@ public class CtfTmfTraceValidateTest {
         // text-only metadata, valid CTF trace (lttle-endian)
         addDirsFrom(dirs, CTF_SUITE_BASE_PATH.resolve(Paths.get("regression", "metadata", "pass", "literal-integers")), IStatus.OK, 10, false);
         // packet-based metadata, valid CTF trace (lttle-endian)
-        String tracePath = FileLocator.toFileURL(CtfTestTrace.KERNEL.getTraceURL()).getPath();
+        URI tracePath = FileLocator.toFileURL(CtfTestTrace.KERNEL.getTraceURL()).toURI();
         addDirsFrom(dirs, Paths.get(tracePath), IStatus.OK, 10, false);
         // text-only metadata, but invalid
         addDirsFrom(dirs, CTF_SUITE_BASE_PATH.resolve(Paths.get("regression", "metadata", "fail", "enum-empty")), IStatus.WARNING, 1, true);
