@@ -2621,42 +2621,53 @@ public class TimeGraphControl extends TimeGraphBaseControl
         if (fDragState != DRAG_NONE) {
             return;
         }
-        boolean zoomScroll = false;
+        boolean horizontalZoom = false;
         boolean horizontalScroll = false;
+        boolean verticalZoom = false;
         Point p = getParent().toControl(getDisplay().getCursorLocation());
         Point parentSize = getParent().getSize();
         if (p.x >= 0 && p.x < parentSize.x && p.y >= 0 && p.y < parentSize.y) {
             // over the parent control
             if (e.x > getSize().x) {
                 // over the vertical scroll bar
-                zoomScroll = false;
+                if ((e.stateMask & SWT.MODIFIER_MASK) == (SWT.SHIFT | SWT.CTRL)) {
+                    verticalZoom = true;
+                }
             } else if (e.y < 0) {
                 // over the time scale
-                zoomScroll = true;
+                horizontalZoom = true;
             } else if (e.y >= getSize().y) {
                 // over the horizontal scroll bar
                 if ((e.stateMask & SWT.MODIFIER_MASK) == SWT.CTRL) {
-                    zoomScroll = true;
+                    horizontalZoom = true;
                 } else {
                     horizontalScroll = true;
                 }
             } else {
-                if (e.x < fTimeProvider.getNameSpace()) {
+                if ((e.stateMask & SWT.MODIFIER_MASK) == (SWT.SHIFT | SWT.CTRL)) {
+                    verticalZoom = true;
+                } else if (e.x < fTimeProvider.getNameSpace()) {
                     // over the name space
-                    zoomScroll = false;
+                    horizontalZoom = false;
                 } else {
                     // over the state area
                     if ((e.stateMask & SWT.MODIFIER_MASK) == SWT.CTRL) {
                         // over the state area, CTRL pressed
-                        zoomScroll = true;
+                        horizontalZoom = true;
                     } else {
                         // over the state area, CTRL not pressed
-                        zoomScroll = false;
+                        horizontalZoom = false;
                     }
                 }
             }
         }
-        if (zoomScroll && fTimeProvider.getTime0() != fTimeProvider.getTime1()) {
+        if (verticalZoom) {
+            if (e.count > 0) {
+                verticalZoom(true, true);
+            } else if (e.count < 0) {
+                verticalZoom(false, true);
+            }
+        } else if (horizontalZoom && fTimeProvider.getTime0() != fTimeProvider.getTime1()) {
             if (e.count > 0) {
                 zoom(true);
             } else if (e.count < 0) {
