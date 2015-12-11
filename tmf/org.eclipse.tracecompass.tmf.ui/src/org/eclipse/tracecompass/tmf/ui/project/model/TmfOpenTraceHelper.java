@@ -186,7 +186,12 @@ public class TmfOpenTraceHelper {
         final IResource candidate = folder.findMember(name);
         if (candidate != null) {
             final IPath rawLocation = candidate.getRawLocation();
-            final File file = rawLocation.toFile();
+            File file = rawLocation.toFile();
+            try {
+                file = traceFile.getCanonicalFile();
+            } catch (IOException e) {
+                /* just use original file path */
+            }
             return !file.equals(traceFile);
         }
         return false;
