@@ -1614,10 +1614,14 @@ When the current time indicator is changed (when clicking in the states flow), a
 ==== Using the keyboard ====
 
 The states flow is usable with the keyboard. The following actions are set:
-*'''arrow-right key''': selects the next state for the selected process.
-*'''arrow-left key''': selects the previous state for the selected process.
-*'''Shift + arrow-right key''': updates the selection end time of the current selection range by selecting the next state of the current process.
-*'''Shift + arrow-left key''': updates the selection end time of the current selection range by selecting the previous state of the current process.
+*'''arrow-right key''': selects the next state for the selected process
+*'''arrow-left key''': selects the previous state for the selected process
+*'''Shift + arrow-right key''': updates the selection end time of the current selection range by selecting the next state of the current process
+*'''Shift + arrow-left key''': updates the selection end time of the current selection range by selecting the previous state of the current process
+*'''.''': selects the next active marker
+*''',''': selects the previous active marker
+*'''Shift + .''': updates the selection end time of the current selection range by selecting the next active marker boundary
+*'''Shift + ,''': updates the selection end time of the current selection range by selecting the previous active marker boundary
 *'''arrow-down''': selects the next process
 *'''arrow-up''': selects the previous process
 *'''Page Down''': selects the process down one page
@@ -1625,6 +1629,11 @@ The states flow is usable with the keyboard. The following actions are set:
 *'''Home''': selects the first process
 *'''End''': selects the last process
 *'''Enter''': toggles the expansion state of the current process in the tree
+*'''+''': Zoom-in horizontally
+*'''-''': Zoom-out horizontally
+*'''Ctrl + +''': Zoom-in vertically
+*'''Ctrl + -''': Zoom-out vertically
+*'''Ctrl + 0''': Reset the vertical zoom
 
 When the selection indicators are changed, all the other views are '''synchronized'''. For example, the [[#LTTng Kernel Events Editor|Events Editor]] will show the event matching the current time indicator. The reverse behaviour is also implemented: selecting an event within the Events View will update the Control Flow View current time indicator.
 
@@ -1667,24 +1676,26 @@ The tooltip indicates:
 
 === Toolbar ===
 
+<!-- Keep in sync with ref:resource-view-toolbar -->
+
 The Control Flow View '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions:
 
 {|
 | [[Image:images/link.gif]]
 | Align Views
-| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in the this view will disable this feature across all the views because it's a workspace preference
+| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
 |-
 | [[Image:images/filter_items.gif]]
 | Show View Filter
-| Opens the process filter dialog
+| Opens the process filter dialog.
 |-
 | [[Image:images/show_legend.gif]]
 | Show Legend
-| Displays the states legend
+| Displays the states legend.
 |-
 | [[Image:images/home_nav.gif]]
 | Reset the Time Scale to Default
-| Resets the zoom window to the full range
+| Resets the zoom window to the full range.
 |-
 | [[Image:images/prev_event.gif]]
 | Select Previous Event
@@ -1694,25 +1705,41 @@ The Control Flow View '''toolbar''', located at the top right of the view, has s
 | Select Next Event
 | Selects the next state for the selected process. Pressing the '''Shift''' key at the same time will update the selection end time of the current selection range.
 |-
+| [[Image:images/add_bookmark.gif]]
+| Add Bookmark...
+| Adds a bookmark at the current selection range. A bookmark is a user-defined interval marker. The '''Add Bookmark''' dialog is opened where the user can enter a description and choose the highlighting color and alpha (transparency) value. This button is replaced by the '''Remove Bookmark''' button if the current selection range corresponds to an existing bookmark. The bookmarks can also be managed in the '''Bookmark View'''.
+|-
+| [[Image:images/remove_bookmark.gif]]
+| Remove Bookmark
+| Removes the bookmark at the current selection range. This button replaces the '''Add Bookmark''' when the current selection range corresponds to an existing bookmark.
+|-
+| [[Image:images/prev_bookmark.gif]]
+| Previous Marker
+| Selects the previous active marker. Pressing the '''Shift''' key at the same time will update the selection end time of the current selection range.
+|-
+| [[Image:images/next_bookmark.gif]]
+| Next Marker
+| Selects the next active marker. Pressing the '''Shift''' key at the same time will update the selection end time of the current selection range. Clicking the button drop-down arrow will open a menu where marker categories can be made active or inactive for navigation. To toggle the display of a marker category, use the '''View Menu''' instead.
+|-
 | [[Image:images/prev_menu.gif]]
 | Select Previous Process
-| Selects the previous process
+| Selects the previous process.
 |-
 | [[Image:images/next_menu.gif]]
 | Select Next Process
-| Selects the next process
+| Selects the next process.
 |-
 | [[Image:images/zoomin_nav.gif]]
 | Zoom In
-| Zooms in on the selection by 50%
+| Zooms in on the selection by 50%.
 |-
 | [[Image:images/zoomout_nav.gif]]
 | Zoom Out
-| Zooms out on the selection by 50%
+| Zooms out on the selection by 50%.
 |-
 | [[Image:images/hide_arrows.gif]]
 | Hide Arrows
-| Toggles the display of arrows on or off
+| Toggles the display of arrows on or off.
 |-
 | [[Image:images/follow_arrow_bwd.gif]]
 | Follow CPU Backward
@@ -1722,6 +1749,15 @@ The Control Flow View '''toolbar''', located at the top right of the view, has s
 | Follow CPU Forward
 | Selects the next state following CPU execution across processes. Pressing the '''Shift''' key at the same time will update the selection end time of the current selection range.
 |}
+
+View Menu
+
+{|
+|
+| Show Markers
+| A marker highlights a time interval. A marker can be used for instance to indicate a time range where lost event occurred or to bookmark an interesting interval for future reference. Selecting a category name will toggle the visibility of markers of that category.
+|}
+
 
 == Resources View ==
 
@@ -1762,20 +1798,26 @@ See Control Flow View's '''[[#Incomplete_regions | Incomplete regions]]'''.
 
 === Toolbar ===
 
+<!-- ref:resource-view-toolbar -->
+
 The Resources View '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions:
 
 {|
 | [[Image:images/link.gif]]
 | Align Views
-| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in the this view will disable this feature across all the views because it's a workspace preference
+| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
+|-
+| [[Image:images/filter_items.gif]]
+| Show View Filter
+| Opens the process filter dialog.
 |-
 | [[Image:images/show_legend.gif]]
 | Show Legend
-| Displays the states legend
+| Displays the states legend.
 |-
 | [[Image:images/home_nav.gif]]
 | Reset the Time Scale to Default
-| Resets the zoom window to the full range
+| Resets the zoom window to the full range.
 |-
 | [[Image:images/prev_event.gif]]
 | Select Previous Event
@@ -1784,6 +1826,22 @@ The Resources View '''toolbar''', located at the top right of the view, has shor
 | [[Image:images/next_event.gif]]
 | Select Next Event
 | Selects the next state for the selected resource. Pressing the '''Shift''' key at the same time will update the selection end time of the current selection range.
+|-
+| [[Image:images/add_bookmark.gif]]
+| Add Bookmark...
+| Adds a bookmark at the current selection range. A bookmark is a user-defined interval marker. The '''Add Bookmark''' dialog is opened where the user can enter a description and choose the highlighting color and alpha (transparency) value. This button is replaced by the '''Remove Bookmark''' button if the current selection range corresponds to an existing bookmark. The bookmarks can also be managed in the '''Bookmark View'''.
+|-
+| [[Image:images/remove_bookmark.gif]]
+| Remove Bookmark
+| Removes the bookmark at the current selection range. This button replaces the '''Add Bookmark''' when the current selection range corresponds to an existing bookmark.
+|-
+| [[Image:images/prev_bookmark.gif]]
+| Previous Marker
+| Selects the previous active marker. Pressing the '''Shift''' key at the same time will update the selection end time of the current selection range.
+|-
+| [[Image:images/next_bookmark.gif]]
+| Next Marker
+| Selects the next active marker. Pressing the '''Shift''' key at the same time will update the selection end time of the current selection range. Clicking the button drop-down arrow will open a menu where marker categories can be made active or inactive for navigation.
 |-
 | [[Image:images/prev_menu.gif]]
 | Select Previous Resource
@@ -1795,12 +1853,33 @@ The Resources View '''toolbar''', located at the top right of the view, has shor
 |-
 | [[Image:images/zoomin_nav.gif]]
 | Zoom In
-| Zooms in on the selection by 50%
+| Zooms in on the selection by 50%.
 |-
 | [[Image:images/zoomout_nav.gif]]
 | Zoom Out
-| Zooms out on the selection by 50%
+| Zooms out on the selection by 50%.
+|-
+| [[Image:images/hide_arrows.gif]]
+| Hide Arrows
+| Toggles the display of arrows on or off.
+|-
+| [[Image:images/follow_arrow_bwd.gif]]
+| Follow CPU Backward
+| Selects the previous state following CPU execution across processes. Pressing the '''Shift''' key at the same time will update the selection end time of the current selection range.
+|-
+| [[Image:images/follow_arrow_fwd.gif]]
+| Follow CPU Forward
+| Selects the next state following CPU execution across processes. Pressing the '''Shift''' key at the same time will update the selection end time of the current selection range.
 |}
+
+View Menu
+
+{|
+|
+| Show Markers
+| A marker highlights a time interval. A marker can be used for instance to indicate a time range where lost event occurred or to bookmark an interesting interval for future reference. Selecting a category name will toggle the visibility of markers of that category.
+|}
+
 
 == LTTng CPU Usage View ==
 
