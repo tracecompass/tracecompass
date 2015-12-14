@@ -20,11 +20,19 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.Result;
+import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -212,5 +220,65 @@ public final class ImageHelper {
 
     private static RGB getRgbFromRGBPixel(int pixel) {
         return new RGB(((pixel >> 16) & 0xff), ((pixel >> 8) & 0xff), ((pixel) & 0xff));
+    }
+
+    /**
+     * On Mac, RGB values that are captured with ImageHelper are affected by
+     * monitor color profiles. To account for this, we can draw the expected
+     * color in a simple shell and use that color as expected value instead.
+     *
+     * @param original
+     *            original color to adjust
+     * @return adjusted color
+     */
+    public static RGB adjustExpectedColor(final RGB original) {
+        if (!SWTUtils.isMac()) {
+            return original;
+        }
+
+        /* Create shell with desired color as background */
+        final boolean painted[] = new boolean[1];
+        final Shell shell = UIThreadRunnable.syncExec(new Result<Shell>() {
+            @Override
+            public Shell run() {
+                Shell s = new Shell(Display.getDefault());
+                s.setSize(100, 100);
+                Color color = new Color(Display.getDefault(), original);
+                s.setBackground(color);
+                s.addPaintListener(new PaintListener() {
+                    @Override
+                    public void paintControl(PaintEvent e) {
+                        painted[0] = true;
+                    }
+                });
+                s.open();
+                return s;
+            }
+        });
+
+        /* Make sure the shell has been painted before getting the color */
+        new SWTBot().waitUntil(new DefaultCondition() {
+
+            @Override
+            public boolean test() throws Exception {
+                return painted[0];
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return "Shell was not painted";
+            }
+        });
+
+        /* Get the color  */
+        return UIThreadRunnable.syncExec(new Result<RGB>() {
+            @Override
+            public RGB run() {
+                shell.update();
+                RGB rgb = ImageHelper.grabImage(shell.getBounds()).getPixel(50, 50);
+                shell.close();
+                return rgb;
+            }
+        });
     }
 }
