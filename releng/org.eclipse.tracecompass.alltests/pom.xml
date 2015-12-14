@@ -37,6 +37,8 @@
         <configuration>
           <!-- Default build will not find any tests, but the profiles below
                can define some. -->
+          <useUIHarness>false</useUIHarness>
+          <useUIThread>false</useUIThread>
           <failIfNoTests>false</failIfNoTests>
         </configuration>
       </plugin>
