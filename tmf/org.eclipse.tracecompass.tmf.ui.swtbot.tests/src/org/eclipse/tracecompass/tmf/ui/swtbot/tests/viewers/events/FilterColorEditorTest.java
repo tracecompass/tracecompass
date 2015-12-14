@@ -42,6 +42,7 @@ import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ImageHelper;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.ui.PlatformUI;
@@ -78,9 +79,11 @@ public class FilterColorEditorTest {
     private static final Logger fLogger = Logger.getRootLogger();
     private SWTBotTable fTableBot;
     private static final int ROW = 8;
+    /** Expected color values */
     private RGB fForeground;
     private RGB fBackground;
-    private RGB fHighlight;
+    private static RGB fHighlight;
+    private static RGB EXPECTED_GREEN;
 
     /**
      * Test Class setup
@@ -117,6 +120,10 @@ public class FilterColorEditorTest {
 
         /* Finish waiting for eclipse to load */
         SWTBotUtils.waitForJobs();
+
+        ColorRegistry colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
+        fHighlight = ImageHelper.adjustExpectedColor(colorRegistry.get(HIGHLIGHT_COLOR_DEFINITION_ID).getRGB());
+        EXPECTED_GREEN = ImageHelper.adjustExpectedColor(GREEN);
     }
 
     /**
@@ -141,8 +148,6 @@ public class FilterColorEditorTest {
         fTableBot = editorBot.bot().table();
         fBackground = fTableBot.backgroundColor().getRGB();
         fForeground = fTableBot.foregroundColor().getRGB();
-        ColorRegistry colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
-        fHighlight = colorRegistry.get(HIGHLIGHT_COLOR_DEFINITION_ID).getRGB();
 
         SWTBotUtils.maximizeTable(fTableBot);
     }
@@ -248,6 +253,9 @@ public class FilterColorEditorTest {
         ImageHelper after = ImageHelper.grabImage(cellBounds);
         // toggle filter mode
         fTableBot.click(0, 0);
+        fBot.waitUntil(ConditionHelpers.isTableCellFilled(fTableBot, "<filter>", 0, 1));
+        //TODO: We need a better way to make sure that the table is done updating
+        SWTBotUtils.delay(2000);
         ImageHelper afterFilter = ImageHelper.grabImage(cellBounds);
 
         List<RGB> beforeLine = before.getPixelRow(2);
@@ -295,18 +303,18 @@ public class FilterColorEditorTest {
         assertTrue(colorBefore.contains(fBackground));
         assertTrue(colorBefore.contains(fForeground));
         assertFalse(colorBefore.contains(fHighlight));
-        assertFalse(colorBefore.contains(GREEN));
+        assertFalse(colorBefore.contains(EXPECTED_GREEN));
 
         assertTrue(colorAfter.contains(fBackground));
         assertTrue(colorAfter.contains(fForeground));
         assertFalse(colorAfter.contains(fHighlight));
-        assertTrue(colorAfter.contains(GREEN));
+        assertTrue(colorAfter.contains(EXPECTED_GREEN));
 
         /*
          * Check that some background became green.
          */
         assertTrue(colorAfter.count(fBackground) < colorBefore.count(fBackground));
-        assertTrue(colorAfter.count(GREEN) > colorBefore.count(GREEN));
+        assertTrue(colorAfter.count(EXPECTED_GREEN) > colorBefore.count(EXPECTED_GREEN));
 
         // reset the highlight color preference
         colorRegistry.put(HIGHLIGHT_COLOR_DEFINITION_ID, fHighlight);
