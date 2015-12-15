@@ -99,7 +99,7 @@ public class CTFTraceWriter {
             }
 
             // Copy packets
-            for (CTFStream stream : trace.getStreams()) {
+            for (ICTFStream stream : trace.getStreams()) {
                 Set<CTFStreamInput> inputs = stream.getStreamInputs();
                 for (CTFStreamInput s : inputs) {
                     CTFStreamOutputWriter streamOutputwriter = new CTFStreamOutputWriter(checkNotNull(s), out);

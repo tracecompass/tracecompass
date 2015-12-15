@@ -19,8 +19,8 @@ import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
-import org.eclipse.tracecompass.ctf.core.trace.CTFStream;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInputReader;
+import org.eclipse.tracecompass.ctf.core.trace.ICTFStream;
 
 /**
  * A lost event definition
@@ -75,8 +75,11 @@ public class LostEventDeclaration implements IEventDeclaration {
         return LOST_EVENT_ID;
     }
 
+    /**
+     * @since 2.0
+     */
     @Override
-    public CTFStream getStream() {
+    public ICTFStream getStream() {
         return null;
     }
 

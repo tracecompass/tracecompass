@@ -10,7 +10,7 @@
  * Contributors: Simon Marchi - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.ctf.core.trace;
+package org.eclipse.tracecompass.internal.ctf.core.trace;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.ctf.core.CTFException;
@@ -27,6 +26,9 @@ import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IEventHeaderDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
+import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInput;
+import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
+import org.eclipse.tracecompass.ctf.core.trace.ICTFStream;
 import org.eclipse.tracecompass.internal.ctf.core.event.EventDeclaration;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.exceptions.ParseException;
 
@@ -35,7 +37,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.metadata.exceptions.Pars
  * <p>
  * Represents a stream in a trace.
  */
-public class CTFStream {
+public class CTFStream implements ICTFStream {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -100,45 +102,27 @@ public class CTFStream {
         fStreamIdSet = true;
     }
 
-    /**
-     * Gets the id of a stream
-     *
-     * @return id the id of a stream
-     * @since 1.0
-     */
+    @Override
     public long getId() {
         return fId;
     }
 
-    /**
-     * Is the id of a stream set
-     *
-     * @return If the ID is set or not
-     */
+    @Override
     public boolean isIdSet() {
         return fStreamIdSet;
     }
 
-    /**
-     *
-     * @return is the event header set (timestamp and stuff) (see Ctf Spec)
-     */
+    @Override
     public boolean isEventHeaderSet() {
         return fEventHeaderDecl != null;
     }
 
-    /**
-     *
-     * @return is the event context set (pid and stuff) (see Ctf Spec)
-     */
+    @Override
     public boolean isEventContextSet() {
         return fEventContextDecl != null;
     }
 
-    /**
-     *
-     * @return Is the packet context set (see Ctf Spec)
-     */
+    @Override
     public boolean isPacketContextSet() {
         return fPacketContextDecl != null;
     }
@@ -181,69 +165,41 @@ public class CTFStream {
         fPacketContextDecl = packetContext;
     }
 
-    /**
-     * Gets the event header declaration
-     *
-     * @return the event header declaration in declaration form
-     */
+    @Override
     public IDeclaration getEventHeaderDeclaration() {
         return fEventHeaderDecl;
     }
 
-    /**
-     *
-     * @return the event context declaration in structdeclaration form
-     */
+    @Override
     public StructDeclaration getEventContextDecl() {
         return fEventContextDecl;
     }
 
-    /**
-     *
-     * @return the packet context declaration in structdeclaration form
-     */
+    @Override
     public StructDeclaration getPacketContextDecl() {
         return fPacketContextDecl;
     }
 
-    /**
-     *
-     * @return the set of all stream inputs for this stream
-     */
+    @Override
     public Set<CTFStreamInput> getStreamInputs() {
         return fInputs;
     }
 
-    /**
-     *
-     * @return the parent trace
-     */
+    @Override
     public CTFTrace getTrace() {
         return fTrace;
     }
 
     /**
-     * Get all the event declarations in this stream.
-     *
-     * @return The event declarations for this stream
      * @since 2.0
      */
-    public @NonNull List<@Nullable IEventDeclaration> getEventDeclarations() {
+    @Override
+    public List<@Nullable IEventDeclaration> getEventDeclarations() {
         return NonNullUtils.checkNotNull(Collections.unmodifiableList(fEvents));
     }
 
-    /**
-     * Get the event declaration for a given ID.
-     *
-     * @param eventId
-     *            The ID, can be {@link EventDeclaration#UNSET_EVENT_ID}, or any
-     *            positive value
-     * @return The event declaration with the given ID for this stream, or
-     *         'null' if there are no declaration with this ID
-     * @throws IllegalArgumentException
-     *             If the passed ID is invalid
-     */
-    public @Nullable IEventDeclaration getEventDeclaration(int eventId) {
+    @Override
+    public IEventDeclaration getEventDeclaration(int eventId) {
         int eventIndex = (eventId == IEventDeclaration.UNSET_EVENT_ID) ? 0 : eventId;
         if (eventIndex < 0) {
             /* Any negative value other than UNSET_EVENT_ID is invalid */
@@ -274,6 +230,7 @@ public class CTFStream {
      * @throws ParseException
      *             If there was a problem reading the event or adding it to the
      *             stream
+     * @since 2.0
      */
     public void addEvent(IEventDeclaration event) throws ParseException {
         if (fEventUnsetId) {

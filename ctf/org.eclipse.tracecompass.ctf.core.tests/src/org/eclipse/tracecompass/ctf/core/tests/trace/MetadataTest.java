@@ -27,8 +27,8 @@ import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.ISimpleDatatypeDeclaration;
 import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTraceUtils;
-import org.eclipse.tracecompass.ctf.core.trace.CTFStream;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
+import org.eclipse.tracecompass.ctf.core.trace.ICTFStream;
 import org.eclipse.tracecompass.ctf.core.trace.Metadata;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.junit.Before;
@@ -251,12 +251,12 @@ public class MetadataTest {
     protected CTFTrace testSingleFragment() throws CTFException {
         fixture = new Metadata();
         CTFTrace trace = fixture.getTrace();
-        for (CTFStream s : trace.getStreams()) {
+        for (ICTFStream s : trace.getStreams()) {
             fail("This should be empty, has" + s.toString());
         }
         fixture.parseText(mdStart);
         int count = 0;
-        for (CTFStream s : trace.getStreams()) {
+        for (ICTFStream s : trace.getStreams()) {
             count++;
             assertNotNull(s);
         }

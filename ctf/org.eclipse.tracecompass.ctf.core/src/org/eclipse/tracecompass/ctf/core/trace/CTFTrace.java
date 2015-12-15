@@ -49,6 +49,7 @@ import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
 import org.eclipse.tracecompass.internal.ctf.core.SafeMappedByteBuffer;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.MetadataStrings;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.exceptions.ParseException;
+import org.eclipse.tracecompass.internal.ctf.core.trace.CTFStream;
 import org.eclipse.tracecompass.internal.ctf.core.trace.Utils;
 
 /**
@@ -119,7 +120,7 @@ public class CTFTrace implements IDefinitionScope {
     /**
      * Collection of streams contained in the trace.
      */
-    private final Map<Long, CTFStream> fStreams = new HashMap<>();
+    private final Map<Long, ICTFStream> fStreams = new HashMap<>();
 
     /**
      * Collection of environment variables set by the tracer
@@ -201,7 +202,7 @@ public class CTFTrace implements IDefinitionScope {
         }
 
         /* Create their index */
-        for (CTFStream stream : getStreams()) {
+        for (ICTFStream stream : getStreams()) {
             Set<CTFStreamInput> inputs = stream.getStreamInputs();
             for (CTFStreamInput s : inputs) {
                 addStream(s);
@@ -221,7 +222,7 @@ public class CTFTrace implements IDefinitionScope {
      * @return The list of event declarations
      */
     public Collection<IEventDeclaration> getEventDeclarations(Long streamId) {
-        CTFStream stream = fStreams.get(streamId);
+        ICTFStream stream = fStreams.get(streamId);
         if (stream == null) {
             return null;
         }
@@ -234,8 +235,9 @@ public class CTFTrace implements IDefinitionScope {
      * @param id
      *            Long the id of the stream
      * @return Stream the stream that we need
+     * @since 2.0
      */
-    public CTFStream getStream(Long id) {
+    public ICTFStream getStream(Long id) {
         if (id == null) {
             return fStreams.get(0L);
         }
@@ -405,7 +407,7 @@ public class CTFTrace implements IDefinitionScope {
      *
      * @return Iterable&lt;Stream&gt; an iterable over streams.
      */
-    public Iterable<CTFStream> getStreams() {
+    public Iterable<ICTFStream> getStreams() {
         return fStreams.values();
     }
 
@@ -428,7 +430,7 @@ public class CTFTrace implements IDefinitionScope {
         /*
          * add the stream
          */
-        CTFStream stream = s.getStream();
+        ICTFStream stream = s.getStream();
         fStreams.put(stream.getId(), stream);
 
         /*
@@ -449,10 +451,10 @@ public class CTFTrace implements IDefinitionScope {
      * @throws CTFException
      *             if there is a file error
      */
-    private CTFStream openStreamInput(File streamFile) throws CTFException {
+    private ICTFStream openStreamInput(File streamFile) throws CTFException {
         ByteBuffer byteBuffer;
         BitBuffer streamBitBuffer;
-        CTFStream stream;
+        ICTFStream stream;
 
         if (!streamFile.canRead()) {
             throw new CTFException("Unreadable file : " //$NON-NLS-1$
@@ -504,13 +506,16 @@ public class CTFTrace implements IDefinitionScope {
             throw new CTFException("Unexpected end of stream"); //$NON-NLS-1$
         }
 
+        if (!(stream instanceof CTFStream)) {
+            throw new CTFException("Stream is not a CTFStream, but rather a " + stream.getClass().getCanonicalName()); //$NON-NLS-1$
+        }
+        CTFStream ctfStream = (CTFStream) stream;
         /*
          * Create the stream input and add a reference to the streamInput in the
          * stream.
          */
-        stream.addInput(new CTFStreamInput(stream, streamFile));
-
-        return stream;
+        ctfStream.addInput(new CTFStreamInput(ctfStream, streamFile));
+        return ctfStream;
     }
 
     private void validateUUID(StructDefinition packetHeaderDef) throws CTFException {
@@ -586,8 +591,9 @@ public class CTFTrace implements IDefinitionScope {
      *            A stream object.
      * @throws ParseException
      *             If there was some problem reading the metadata
+     * @since 2.0
      */
-    public void addStream(CTFStream stream) throws ParseException {
+    public void addStream(ICTFStream stream) throws ParseException {
         /*
          * If there is already a stream without id (the null key), it must be
          * the only one
@@ -607,7 +613,7 @@ public class CTFTrace implements IDefinitionScope {
         /*
          * If a stream with the same ID already exists, it is not valid.
          */
-        CTFStream existingStream = fStreams.get(stream.getId());
+        ICTFStream existingStream = fStreams.get(stream.getId());
         if (existingStream != null) {
             throw new ParseException("Stream id already exists"); //$NON-NLS-1$
         }
@@ -709,7 +715,7 @@ public class CTFTrace implements IDefinitionScope {
      */
     public long getCurrentStartTime() {
         long currentStart = Long.MAX_VALUE;
-        for (CTFStream stream : fStreams.values()) {
+        for (ICTFStream stream : fStreams.values()) {
             for (CTFStreamInput si : stream.getStreamInputs()) {
                 currentStart = Math.min(currentStart, si.getIndex().getElement(0).getTimestampBegin());
             }
@@ -724,7 +730,7 @@ public class CTFTrace implements IDefinitionScope {
      */
     public long getCurrentEndTime() {
         long currentEnd = Long.MIN_VALUE;
-        for (CTFStream stream : fStreams.values()) {
+        for (ICTFStream stream : fStreams.values()) {
             for (CTFStreamInput si : stream.getStreamInputs()) {
                 currentEnd = Math.max(currentEnd, si.getTimestampEnd());
             }
@@ -807,12 +813,17 @@ public class CTFTrace implements IDefinitionScope {
         if (file == null) {
             throw new CTFException("cannot create a stream with no file"); //$NON-NLS-1$
         }
-        CTFStream stream = fStreams.get(id);
+        ICTFStream stream = fStreams.get(id);
         if (stream == null) {
             stream = new CTFStream(this);
             fStreams.put(id, stream);
         }
-        stream.addInput(new CTFStreamInput(stream, file));
+        if (stream instanceof CTFStream) {
+            CTFStream ctfStream = (CTFStream) stream;
+            ctfStream.addInput(new CTFStreamInput(stream, file));
+        } else {
+            throw new CTFException("Stream does not support adding input"); //$NON-NLS-1$
+        }
     }
 
     /**

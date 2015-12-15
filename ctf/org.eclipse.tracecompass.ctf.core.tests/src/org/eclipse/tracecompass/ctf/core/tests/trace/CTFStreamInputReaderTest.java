@@ -29,11 +29,12 @@ import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
 import org.eclipse.tracecompass.ctf.core.tests.shared.CtfTestTraceUtils;
 import org.eclipse.tracecompass.ctf.core.trace.CTFResponse;
-import org.eclipse.tracecompass.ctf.core.trace.CTFStream;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInput;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInputReader;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
+import org.eclipse.tracecompass.ctf.core.trace.ICTFStream;
 import org.eclipse.tracecompass.internal.ctf.core.event.EventDeclaration;
+import org.eclipse.tracecompass.internal.ctf.core.trace.CTFStream;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,13 +69,12 @@ public class CTFStreamInputReaderTest {
                         null,
                         "packet",
                         new Definition[] { new StringDefinition(StringDeclaration.getStringDeclaration(Encoding.UTF8), null, "field", "test") }),
-                null)
-                );
+                null));
     }
 
     private static CTFStreamInputReader getStreamInputReader() throws CTFException {
         CTFTrace trace = CtfTestTraceUtils.getTrace(testTrace);
-        CTFStream s = trace.getStream((long) 0);
+        ICTFStream s = trace.getStream((long) 0);
         Set<CTFStreamInput> streamInput = s.getStreamInputs();
         CTFStreamInputReader retVal = null;
         for (CTFStreamInput si : streamInput) {

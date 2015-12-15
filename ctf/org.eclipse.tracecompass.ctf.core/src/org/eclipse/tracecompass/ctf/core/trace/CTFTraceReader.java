@@ -201,7 +201,7 @@ public class CTFTraceReader implements AutoCloseable {
         /*
          * For each stream.
          */
-        for (CTFStream stream : fTrace.getStreams()) {
+        for (ICTFStream stream : fTrace.getStreams()) {
             Set<CTFStreamInput> streamInputs = stream.getStreamInputs();
 
             /*
@@ -240,7 +240,7 @@ public class CTFTraceReader implements AutoCloseable {
      */
     public void update() throws CTFException {
         Set<CTFStreamInputReader> readers = new HashSet<>();
-        for (CTFStream stream : fTrace.getStreams()) {
+        for (ICTFStream stream : fTrace.getStreams()) {
             Set<CTFStreamInput> streamInputs = stream.getStreamInputs();
             for (CTFStreamInput streamInput : streamInputs) {
                 /*

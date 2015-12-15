@@ -45,8 +45,8 @@ import org.eclipse.tracecompass.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StringDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.VariantDeclaration;
-import org.eclipse.tracecompass.ctf.core.trace.CTFStream;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
+import org.eclipse.tracecompass.ctf.core.trace.ICTFStream;
 import org.eclipse.tracecompass.ctf.parser.CTFParser;
 import org.eclipse.tracecompass.internal.ctf.core.Activator;
 import org.eclipse.tracecompass.internal.ctf.core.event.EventDeclaration;
@@ -56,6 +56,7 @@ import org.eclipse.tracecompass.internal.ctf.core.event.types.SequenceDeclaratio
 import org.eclipse.tracecompass.internal.ctf.core.event.types.StructDeclarationFlattener;
 import org.eclipse.tracecompass.internal.ctf.core.event.types.composite.EventHeaderCompactDeclaration;
 import org.eclipse.tracecompass.internal.ctf.core.event.types.composite.EventHeaderLargeDeclaration;
+import org.eclipse.tracecompass.internal.ctf.core.trace.CTFStream;
 
 import com.google.common.collect.Iterables;
 
@@ -458,8 +459,8 @@ public class IOStructGen {
             EnumDeclaration newEnum = new EnumDeclaration(IntegerDeclaration.createDeclaration(containerType.getLength(), containerType.isSigned(),
                     containerType.getBase(), byteOrder, containerType.getEncoding(),
                     containerType.getClock(), containerType.getAlignment()));
-            for( Entry<String, Pair> entry : decl.getEnumTable().entrySet()){
-               newEnum.add(entry.getValue().getFirst(), entry.getValue().getSecond(), entry.getKey());
+            for (Entry<String, Pair> entry : decl.getEnumTable().entrySet()) {
+                newEnum.add(entry.getValue().getFirst(), entry.getValue().getSecond(), entry.getKey());
             }
 
             parentScope.replaceType(name, newEnum);
@@ -724,10 +725,11 @@ public class IOStructGen {
              * could be possible to just get the only existing stream, whatever
              * is its id.
              */
-            CTFStream stream = fTrace.getStream(null);
+            ICTFStream iStream = fTrace.getStream(null);
+            if (iStream instanceof CTFStream) {
 
-            if (stream != null) {
-                event.setStream(stream);
+                CTFStream ctfStream = (CTFStream) iStream;
+                event.setStream(ctfStream);
             } else {
                 throw new ParseException("Event without stream_id, but there is no stream without id"); //$NON-NLS-1$
             }
@@ -739,6 +741,7 @@ public class IOStructGen {
         event.getStream().addEvent(event);
 
         popScope();
+
     }
 
     private void parseEventDeclaration(CommonTree eventDecl,
@@ -785,13 +788,15 @@ public class IOStructGen {
 
             long streamId = getStreamID(rightNode);
 
-            CTFStream stream = fTrace.getStream(streamId);
+            ICTFStream iStream = fTrace.getStream(streamId);
 
-            if (stream == null) {
+            if (iStream instanceof CTFStream) {
+                CTFStream stream = (CTFStream) iStream;
+                event.setStream(stream);
+            } else {
                 throw new ParseException("Stream " + streamId + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
-            event.setStream(stream);
         } else if (left.equals(MetadataStrings.CONTEXT)) {
             if (event.contextIsSet()) {
                 throw new ParseException("context already defined"); //$NON-NLS-1$

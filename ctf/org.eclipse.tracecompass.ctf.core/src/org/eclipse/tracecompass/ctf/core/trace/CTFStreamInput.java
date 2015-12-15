@@ -54,7 +54,7 @@ public class CTFStreamInput implements IDefinitionScope {
     /**
      * The associated Stream
      */
-    private final CTFStream fStream;
+    private final ICTFStream fStream;
 
     /**
      * Information on the file (used for debugging)
@@ -99,8 +99,9 @@ public class CTFStreamInput implements IDefinitionScope {
      *            The stream to which this StreamInput belongs to.
      * @param file
      *            Information about the trace file (for debugging purposes).
+     * @since 2.0
      */
-    public CTFStreamInput(CTFStream stream, File file) {
+    public CTFStreamInput(ICTFStream stream, File file) {
         fStream = stream;
         fFile = file;
         String name = fFile.getName();
@@ -135,8 +136,9 @@ public class CTFStreamInput implements IDefinitionScope {
      * Gets the stream the streamInput wrapper is wrapping
      *
      * @return the stream the streamInput wrapper is wrapping
+     * @since 2.0
      */
-    public CTFStream getStream() {
+    public ICTFStream getStream() {
         return fStream;
     }
 

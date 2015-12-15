@@ -17,8 +17,9 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
-import org.eclipse.tracecompass.ctf.core.trace.CTFStream;
 import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInputReader;
+import org.eclipse.tracecompass.ctf.core.trace.ICTFStream;
+import org.eclipse.tracecompass.internal.ctf.core.trace.CTFStream;
 
 /**
  * Representation of one type of event. A bit like "int" or "long" but for trace
@@ -83,8 +84,9 @@ public interface IEventDeclaration {
      * Gets the {@link CTFStream} of an event declaration
      *
      * @return the stream
+     * @since 2.0
      */
-    CTFStream getStream();
+    ICTFStream getStream();
 
     /**
      * What is the log level of this event?
