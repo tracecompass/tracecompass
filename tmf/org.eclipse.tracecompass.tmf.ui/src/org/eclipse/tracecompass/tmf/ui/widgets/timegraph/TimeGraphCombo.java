@@ -732,7 +732,6 @@ public class TimeGraphCombo extends Composite {
         fTimeGraphViewer.setHeaderHeight(tree.getHeaderHeight());
         fTimeGraphViewer.setItemHeight(getItemHeight(tree, true));
         alignTreeItems(false);
-        redraw();
         return true;
     }
 
@@ -748,7 +747,6 @@ public class TimeGraphCombo extends Composite {
         fTimeGraphViewer.setHeaderHeight(tree.getHeaderHeight());
         fTimeGraphViewer.setItemHeight(getItemHeight(tree, true));
         alignTreeItems(false);
-        redraw();
     }
 
     private void sendTimeViewAlignmentChanged() {
@@ -1240,6 +1238,31 @@ public class TimeGraphCombo extends Composite {
         TreeItem item = treeItems.get(topIndex);
         tree.setTopItem(item);
 
+        /*
+         * In GTK3, the bounds of the tree items are only sure to be correct
+         * after the tree has been painted.
+         */
+        tree.addPaintListener(new PaintListener() {
+            @Override
+            public void paintControl(PaintEvent e) {
+                tree.removePaintListener(this);
+                doAlignTreeItems();
+                redraw();
+            }
+        });
+        /* Make sure the paint event is triggered. */
+        tree.redraw();
+    }
+
+    private void doAlignTreeItems() {
+        Tree tree = fTreeViewer.getTree();
+        List<TreeItem> treeItems = getVisibleExpandedItems(tree, false);
+        int topIndex = fTimeGraphViewer.getTopIndex();
+        if (topIndex >= treeItems.size()) {
+            return;
+        }
+        TreeItem item = treeItems.get(topIndex);
+
         // get the first filler item so we can calculate the last item's height
         TreeItem fillerItem = null;
         for (TreeItem treeItem : fTreeViewer.getTree().getItems()) {
@@ -1272,16 +1295,8 @@ public class TimeGraphCombo extends Composite {
          * newly visible items at the top of the viewer are also aligned.
          */
         fTimeGraphViewer.setTopIndex(topIndex);
-        item = treeItems.get(topIndex);
-        tree.setTopItem(item);
-        while (fTimeGraphViewer.getTopIndex() < topIndex) {
-            TreeItem nextItem = item;
-            topIndex--;
-            item = treeItems.get(topIndex);
-            tree.setTopItem(item);
-            bounds = item.getBounds();
-            alignTreeItem(item, bounds, nextItem);
-            fTimeGraphViewer.setTopIndex(topIndex);
+        if (fTimeGraphViewer.getTopIndex() != topIndex) {
+            alignTreeItems(false);
         }
     }
 
