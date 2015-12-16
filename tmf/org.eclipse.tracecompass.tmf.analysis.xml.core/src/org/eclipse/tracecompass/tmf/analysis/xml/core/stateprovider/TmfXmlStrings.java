@@ -100,4 +100,32 @@ public interface TmfXmlStrings {
     String LE = "le";
     String LT = "lt";
 
+    /* XML pattern elements */
+    /**
+     * @since 2.0
+     */
+    String PATTERN = "pattern";
+
+    /* XML synthetic event elements */
+    /**
+     * @since 2.0
+     */
+    String SEGMENT_NAME = "segName";
+    /**
+     * @since 2.0
+     */
+    String SEGMENT = "segment";
+    /**
+     * @since 2.0
+     */
+    String SEGMENT_TYPE = "segType";
+    /**
+     * @since 2.0
+     */
+    String SEGMENT_CONTENT = "segContent";
+    /**
+     * @since 2.0
+     */
+    String SEGMENT_FIELD = "segField";
+
 }
