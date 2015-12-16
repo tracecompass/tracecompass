@@ -19,7 +19,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -34,6 +36,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlUtils;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.segment.TmfXmlPatternSegment;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.Activator;
@@ -287,6 +290,32 @@ public class XmlUtilsTest {
             long actualEnd = (i == expectedCount - 1) ? (expectedStarts[i + 1]) : (expectedStarts[i + 1]) - 1;
             assertEquals(testId + ": End time of interval " + i, actualEnd, interval.getEndTime());
             assertEquals(testId + ": Expected value of interval " + i, expectedValues[i], interval.getStateValue());
+        }
+    }
+
+    /**
+     * Test a pattern segment against what is expected
+     *
+     * @param expected
+     *            The expected pattern segment
+     * @param actual
+     *            The actual pattern segment
+     */
+    public static void testPatternSegmentData(TmfXmlPatternSegment expected, TmfXmlPatternSegment actual) {
+        assertEquals("getStart", expected.getStart(), actual.getStart());
+        assertEquals("getEnd", expected.getEnd(), actual.getEnd());
+        assertEquals("getScale", expected.getScale(), actual.getScale());
+        assertEquals("getName", expected.getName(), actual.getName());
+        assertNotNull("getContent", actual.getContent());
+
+        // Test the content of the pattern segment
+        assertEquals("content size", expected.getContent().size(), actual.getContent().size());
+        Iterator<Map.Entry<String, @NonNull ITmfStateValue>> it2 = expected.getContent().entrySet().iterator();
+        for (int i = 0; i < expected.getContent().size(); i++) {
+            Map.Entry<String, @NonNull ITmfStateValue> expectedContent = it2.next();
+            ITmfStateValue actualValue = actual.getContent().get(expectedContent.getKey());
+            assertNotNull("Content " + expectedContent.getKey() + " exists", actualValue);
+            assertEquals("Content value comparison " + i, 0, expectedContent.getValue().compareTo(actualValue));
         }
     }
 

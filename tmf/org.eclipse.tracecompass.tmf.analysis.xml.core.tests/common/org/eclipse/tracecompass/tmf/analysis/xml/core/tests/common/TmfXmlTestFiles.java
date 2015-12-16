@@ -42,7 +42,9 @@ public enum TmfXmlTestFiles {
     /** A valid file for conditions tests */
     CONDITION_FILE("test_xml_files/test_valid/test_conditions.xml"),
     /** A valid file for pattern tests */
-    VALID_PATTERN_FILE("test_xml_files/test_valid/test_valid_pattern.xml");
+    VALID_PATTERN_FILE("test_xml_files/test_valid/test_valid_pattern.xml"),
+    /** A valid pattern file to test the pattern segment **/
+    VALID_PATTERN_SEGMENT("test_xml_files/test_valid/test_pattern_segment.xml");
 
     private final String fPath;
 

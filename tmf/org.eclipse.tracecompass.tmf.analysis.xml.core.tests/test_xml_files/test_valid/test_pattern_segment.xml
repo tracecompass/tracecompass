@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
+<!-- ***************************************************************************
+* Copyright (c) 2015 Ericsson
+*
+* All rights reserved. This program and the accompanying materials are
+* made available under the terms of the Eclipse Public License v1.0 which
+* accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Jean-Christian Kouame - Initial API and implementation
+*************************************************************************** -->
+<pattern version="0" id="xml test pattern segment">
+	<head>
+		<traceType id="org.eclipse.linuxtools.lttng2.kernel.tracetype" />
+		<label value="xml test pattern segment" />
+	</head>
+
+<!-- 		the pattern handler specifies the FSM that will be instanciated at the beginning of the analysis -->
+	<patternHandler initial="test">
+
+<!-- 		CONDITIONS -->
+
+<!-- 		ACTIONS -->
+<!-- 		Generate two segments -->
+		<action id="pattern segment test 1">
+<!-- 			Generate a pattern segment with the name 'test1'-->
+			<segment>
+				<segType segName="test1" />
+			</segment>
+		</action>
+		<action id="pattern segment test 2">
+<!-- 			Generate a pattern segment with the name 'test2' and with three fields 'field1', 'field2' and 'field2'-->
+			<segment>
+				<segType segName="test2" />
+				<segContent>
+					<segField name="field1" type="long" value="5"/>
+					<segField name="field2" type="string" value="test"/>
+					<segField name="field3" type="int" value="1"/>
+				</segContent>
+			</segment>
+		</action>
+
+<!-- 		FSMs -->
+
+<!-- 	test fsm
+		Declare a test FSM that that will generate two segments for each event received
+-->
+		<fsm id="test" multiple="false" initial="state">
+			<state id="state">
+<!-- 					The state will stay here forever-->
+				<transition target="state" action="pattern segment test 1:pattern segment test 2" />
+			</state>
+		</fsm>
+	</patternHandler>
+</pattern>
+</tmfxml>
