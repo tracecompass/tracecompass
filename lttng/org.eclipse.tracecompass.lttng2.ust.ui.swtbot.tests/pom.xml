@@ -41,6 +41,7 @@
 <!-- Disable GTK3 with Luna because it makes the test hang (bug in IcedTea http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=1736) -->
           <environmentVariables>
             <SWT_GTK3>${SWT_GTK3}</SWT_GTK3>
+            <LIBOVERLAY_SCROLLBAR>0</LIBOVERLAY_SCROLLBAR>
           </environmentVariables>
         </configuration>
       </plugin>

@@ -39,6 +39,7 @@
           <product>org.eclipse.platform.ide</product>
           <environmentVariables>
             <SWT_GTK3>${SWT_GTK3}</SWT_GTK3>
+            <LIBOVERLAY_SCROLLBAR>0</LIBOVERLAY_SCROLLBAR>
           </environmentVariables>
         </configuration>
       </plugin>
