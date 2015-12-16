@@ -27,6 +27,7 @@ import org.eclipse.tracecompass.ctf.core.event.EventDefinition;
 import org.eclipse.tracecompass.ctf.core.event.IEventDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.ICompositeDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.IDefinition;
+import org.eclipse.tracecompass.ctf.core.trace.ICTFStream;
 import org.eclipse.tracecompass.tmf.core.event.ITmfCustomAttributes;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
@@ -71,7 +72,9 @@ public class CtfTmfEvent extends TmfEvent
     private final int fSourceCpu;
     private final String fChannel;
 
-    /** Field to override {@link TmfEvent#getName()}, to bypass the type-getting */
+    /**
+     * Field to override {@link TmfEvent#getName()}, to bypass the type-getting
+     */
     private final String fEventName;
 
     /** Lazy-loaded field containing the event's payload */
@@ -79,6 +82,8 @@ public class CtfTmfEvent extends TmfEvent
 
     /** Lazy-loaded field for the type, overriding TmfEvent's field */
     private transient @Nullable CtfTmfEventType fEventType;
+
+    private final @Nullable ICTFStream fStream;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -133,6 +138,7 @@ public class CtfTmfEvent extends TmfEvent
         fEventName = checkNotNull(declaration.getName());
         fEvent = eventDefinition;
         fChannel = channel;
+        fStream = fEvent.getDeclaration().getStream();
     }
 
     /**
@@ -157,6 +163,7 @@ public class CtfTmfEvent extends TmfEvent
         fEventDeclaration = null;
         fEvent = EventDefinition.NULL_EVENT;
         fChannel = ""; //$NON-NLS-1$
+        fStream = null;
     }
 
     /**
@@ -174,6 +181,7 @@ public class CtfTmfEvent extends TmfEvent
         fEventDeclaration = null;
         fEvent = EventDefinition.NULL_EVENT;
         fChannel = ""; //$NON-NLS-1$
+        fStream = null;
     }
 
     // ------------------------------------------------------------------------
@@ -208,6 +216,20 @@ public class CtfTmfEvent extends TmfEvent
     @Deprecated
     public String getReference() {
         return getChannel();
+    }
+
+    /**
+     * Get the stream Id
+     *
+     * @return the stream ID or -1 if the stream is null
+     * @since 2.0
+     */
+    public long getStreamId() {
+        ICTFStream stream = fStream;
+        if (stream == null) {
+            return -1;
+        }
+        return stream.getId();
     }
 
     // ------------------------------------------------------------------------
