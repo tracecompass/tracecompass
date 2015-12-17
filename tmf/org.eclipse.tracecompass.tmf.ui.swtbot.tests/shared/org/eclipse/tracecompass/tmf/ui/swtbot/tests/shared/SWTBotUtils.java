@@ -264,6 +264,10 @@ public final class SWTBotUtils {
         UIThreadRunnable.syncExec(new VoidResult() {
             @Override
             public void run() {
+                // There seems to be problems on some system where the main shell is
+                // not in focus initially. This was seen using Xvfb and Xephyr on some occasions.
+                focusMainWindow(bot.shells());
+
                 Shell shell = bot.activeShell().widget;
 
                 // Only adjust shell if it appears to be the top-most
