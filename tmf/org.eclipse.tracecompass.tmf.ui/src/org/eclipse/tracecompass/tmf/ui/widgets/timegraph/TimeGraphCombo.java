@@ -169,27 +169,13 @@ public class TimeGraphCombo extends Composite {
         protected TimeGraphControl createTimeGraphControl(Composite composite, TimeGraphColorScheme colors) {
             return new TimeGraphControl(composite, colors) {
                 @Override
-                public void verticalZoom(boolean zoomIn, boolean adjustItems) {
-                    boolean changed = TimeGraphCombo.this.verticalZoom(zoomIn);
-                    if (changed) {
-                        /*
-                         * The time graph combo takes care of adjusting item
-                         * heights, only adjust the font in the time graph
-                         * control. Only do it if the time graph combo's tree
-                         * font has actually changed.
-                         */
-                        super.verticalZoom(zoomIn, false);
-                    }
+                public void verticalZoom(boolean zoomIn) {
+                    TimeGraphCombo.this.verticalZoom(zoomIn);
                 }
 
                 @Override
-                public void resetVerticalZoom(boolean adjustItems) {
+                public void resetVerticalZoom() {
                     TimeGraphCombo.this.resetVerticalZoom();
-                    /*
-                     * The time graph combo takes care of resetting item
-                     * heights, only reset the font in the time graph control.
-                     */
-                    super.resetVerticalZoom(false);
                 }
             };
         }
@@ -714,12 +700,12 @@ public class TimeGraphCombo extends Composite {
         });
     }
 
-    private boolean verticalZoom(boolean zoomIn) {
+    private void verticalZoom(boolean zoomIn) {
         Tree tree = fTreeViewer.getTree();
         FontData fontData = tree.getFont().getFontData()[0];
         int height = fontData.getHeight() + (zoomIn ? 1 : -1);
         if (height <= 0) {
-            return false;
+            return;
         }
         fontData.setHeight(height);
         if (fTreeFont != null) {
@@ -732,7 +718,6 @@ public class TimeGraphCombo extends Composite {
         fTimeGraphViewer.setHeaderHeight(tree.getHeaderHeight());
         fTimeGraphViewer.setItemHeight(getItemHeight(tree, true));
         alignTreeItems(false);
-        return true;
     }
 
     private void resetVerticalZoom() {
