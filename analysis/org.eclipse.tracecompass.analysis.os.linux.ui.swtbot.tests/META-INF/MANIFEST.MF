@@ -7,7 +7,8 @@ Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests;singleton:=true
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Export-Package: org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests
+Export-Package: org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests,
+ org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests.latency
 Require-Bundle: org.apache.log4j,
  org.eclipse.core.resources,
  org.eclipse.core.runtime,

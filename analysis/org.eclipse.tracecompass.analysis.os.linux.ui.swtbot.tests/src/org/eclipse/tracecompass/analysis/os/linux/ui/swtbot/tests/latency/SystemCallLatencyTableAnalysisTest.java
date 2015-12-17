@@ -12,7 +12,6 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests.latency;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
@@ -29,6 +28,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.results.BoolResult;
@@ -168,11 +168,12 @@ public class SystemCallLatencyTableAnalysisTest {
         assertNotNull(fTable);
         fTable.updateModel(fixture);
         SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());
-        assertEquals("0", tableBot.cell(0, 2));
+        SWTBot bot = new SWTBot();
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
-        assertEquals("0", tableBot.cell(0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
-        assertEquals("99", tableBot.cell(0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "99", 0, 2));
     }
 
     /**
@@ -187,11 +188,12 @@ public class SystemCallLatencyTableAnalysisTest {
         assertNotNull(fTable);
         fTable.updateModel(fixture);
         SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());
-        assertEquals("100", tableBot.cell(0, 2));
+        SWTBot bot = new SWTBot();
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "100", 0, 2));
         tableBot.header("Duration").click();
-        assertEquals("0", tableBot.cell(0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
-        assertEquals("100", tableBot.cell(0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "100", 0, 2));
     }
 
     /**
@@ -206,11 +208,12 @@ public class SystemCallLatencyTableAnalysisTest {
         assertNotNull(fTable);
         fTable.updateModel(fixture);
         SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());
-        assertEquals("1", tableBot.cell(0, 2));
+        SWTBot bot = new SWTBot();
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1", 0, 2));
         tableBot.header("Duration").click();
-        assertEquals("0", tableBot.cell(0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
-        assertEquals("1", tableBot.cell(0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1", 0, 2));
     }
 
     /**
@@ -226,11 +229,12 @@ public class SystemCallLatencyTableAnalysisTest {
         assertNotNull(fTable);
         fTable.updateModel(fixture);
         SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());
-        assertEquals("0", tableBot.cell(0, 2));
+        SWTBot bot = new SWTBot();
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
-        assertEquals("0", tableBot.cell(0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
-        assertEquals("999999", tableBot.cell(0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "999999", 0, 2));
     }
 
     /**
@@ -250,11 +254,12 @@ public class SystemCallLatencyTableAnalysisTest {
         assertNotNull(fTable);
         fTable.updateModel(fixture);
         SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());
-        assertEquals("894633", tableBot.cell(0, 2));
+        SWTBot bot = new SWTBot();
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "894633", 0, 2));
         tableBot.header("Duration").click();
-        assertEquals("0", tableBot.cell(0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
-        assertEquals("999999", tableBot.cell(0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "999999", 0, 2));
     }
 
     /**
@@ -274,11 +279,12 @@ public class SystemCallLatencyTableAnalysisTest {
         assertNotNull(fTable);
         fTable.updateModel(fixture);
         SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());
-        assertEquals("400689", tableBot.cell(0, 2));
+        SWTBot bot = new SWTBot();
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "400689", 0, 2));
         tableBot.header("Duration").click();
-        assertEquals("0", tableBot.cell(0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
         tableBot.header("Duration").click();
-        assertEquals("998001", tableBot.cell(0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "998001", 0, 2));
     }
 
     /**
@@ -304,11 +310,11 @@ public class SystemCallLatencyTableAnalysisTest {
         createTable();
         SWTBotUtils.waitForJobs();
         SWTBotTable tableBot = new SWTBotTable(fTable.getTableViewer().getTable());
-        assertEquals("24100", tableBot.cell(0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "24100", 0, 2));
         tableBot.header("Duration").click();
-        assertEquals("1000", tableBot.cell(0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1000", 0, 2));
         tableBot.header("Duration").click();
-        assertEquals("5904091700", tableBot.cell(0, 2));
+        bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "5904091700", 0, 2));
         bot.closeAllEditors();
         SWTBotUtils.deleteProject(PROJECT_NAME, bot);
     }
