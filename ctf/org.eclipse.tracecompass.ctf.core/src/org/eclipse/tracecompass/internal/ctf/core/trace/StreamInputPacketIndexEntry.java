@@ -173,7 +173,7 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
         fLostEvents = computeLostEvents(lostSoFar);
     }
 
-    private static @NonNull ImmutableMap<String, Object> computeAttributeMap(StructDefinition streamPacketContextDef) {
+    private static @NonNull Map<String, Object> computeAttributeMap(StructDefinition streamPacketContextDef) {
         Builder<String, Object> attributeBuilder = ImmutableMap.<String, Object> builder();
         for (String field : streamPacketContextDef.getDeclaration().getFieldsList()) {
             IDefinition id = streamPacketContextDef.lookupDefinition(field);
