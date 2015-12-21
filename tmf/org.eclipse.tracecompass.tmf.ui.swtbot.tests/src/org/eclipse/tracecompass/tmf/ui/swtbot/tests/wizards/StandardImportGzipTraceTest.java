@@ -118,6 +118,7 @@ public class StandardImportGzipTraceTest {
         fBot = new SWTWorkbenchBot();
         /* Close welcome view */
         SWTBotUtils.closeView("Welcome", fBot);
+        SWTBotUtils.switchToTracingPerspective();
 
         SWTBotUtils.createProject(PROJECT_NAME);
     }
