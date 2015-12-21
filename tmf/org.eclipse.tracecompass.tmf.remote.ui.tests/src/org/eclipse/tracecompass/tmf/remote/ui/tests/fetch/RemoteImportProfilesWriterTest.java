@@ -36,6 +36,7 @@ public class RemoteImportProfilesWriterTest extends
         AbstractRemoteImportProfilesIOTest {
 
     private static final String ENCODING = "UTF-8"; //$NON-NLS-1$
+    private static final String LINE_SEPARATOR_PROPERTY = "line.separator";
 
     /**
      * Test writing a profiles file.
@@ -53,6 +54,12 @@ public class RemoteImportProfilesWriterTest extends
         File expectedFile = getProfilesFile(VALID_PROFILE_PATH);
         String expectedContent = new String(
                 Files.readAllBytes(Paths.get(expectedFile.toURI())), ENCODING);
+
+        // On windows, \r\n will be written to the XML. Replace them with \n for
+        // proper comparison.
+        String sysLineSeparator = System.getProperty(LINE_SEPARATOR_PROPERTY);
+        writtenXML = writtenXML.replace(sysLineSeparator, "\n");
+
         assertEquals(expectedContent, writtenXML);
     }
 
