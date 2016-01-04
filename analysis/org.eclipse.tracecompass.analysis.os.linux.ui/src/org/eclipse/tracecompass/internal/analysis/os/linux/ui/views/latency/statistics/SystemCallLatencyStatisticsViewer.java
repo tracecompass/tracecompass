@@ -13,7 +13,6 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.sta
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -86,9 +85,7 @@ public class SystemCallLatencyStatisticsViewer extends AbstractSegmentStoreStati
 
             Map<String, SegmentStoreStatistics> perSyscallStats = module.getPerSyscallStats();
             if (perSyscallStats != null) {
-                Iterator<Entry<String, SegmentStoreStatistics>> stats = perSyscallStats.entrySet().iterator();
-                while (stats.hasNext()) {
-                    Entry<String, SegmentStoreStatistics> statsEntry = stats.next();
+                for (Entry<String, SegmentStoreStatistics> statsEntry : perSyscallStats.entrySet()) {
                     syscalls.addChild(new SegmentStoreStatisticsEntry(statsEntry.getKey(), statsEntry.getValue()));
                 }
             }
