@@ -52,13 +52,13 @@ public class SystemCallLatencyStatisticsViewer extends AbstractSegmentStoreStati
      * @return the statistics analysis module
      */
     @Override
-    @Nullable protected TmfAbstractAnalysisModule createStatisticsAnalysiModule() {
+    protected @Nullable TmfAbstractAnalysisModule createStatisticsAnalysiModule() {
         SystemCallLatencyStatisticsAnalysisModule module = new SystemCallLatencyStatisticsAnalysisModule();
         return module;
     }
 
     @Override
-    @Nullable protected ITmfTreeViewerEntry updateElements(long start, long end, boolean isSelection) {
+    protected @Nullable ITmfTreeViewerEntry updateElements(long start, long end, boolean isSelection) {
         if (isSelection || (start == end)) {
             return null;
         }
@@ -73,23 +73,24 @@ public class SystemCallLatencyStatisticsViewer extends AbstractSegmentStoreStati
 
         module.waitForCompletion();
 
-        SegmentStoreStatistics entry = module.getTotalStats();
-
         TmfTreeViewerEntry root = new TmfTreeViewerEntry(""); //$NON-NLS-1$
-        List<ITmfTreeViewerEntry> entryList = root.getChildren();
+        final SegmentStoreStatistics entry = module.getTotalStats();
+        if (entry != null) {
 
-        TmfTreeViewerEntry child = new SegmentStoreStatisticsEntry(checkNotNull(Messages.LatencyStatistics_TotalLabel), checkNotNull(entry));
-        entryList.add(child);
+            List<ITmfTreeViewerEntry> entryList = root.getChildren();
 
-        HiddenTreeViewerEntry syscalls = new HiddenTreeViewerEntry(checkNotNull(SYSCALL_LEVEL));
-        child.addChild(syscalls);
+            TmfTreeViewerEntry child = new SegmentStoreStatisticsEntry(checkNotNull(Messages.LatencyStatistics_TotalLabel), entry);
+            entryList.add(child);
+            HiddenTreeViewerEntry syscalls = new HiddenTreeViewerEntry(SYSCALL_LEVEL);
+            child.addChild(syscalls);
 
-        Map<String, SegmentStoreStatistics> perSyscallStats = module.getPerSyscallStats();
-        if (perSyscallStats != null) {
-            Iterator<Entry<String, SegmentStoreStatistics>> stats = perSyscallStats.entrySet().iterator();
-            while (stats.hasNext()) {
-                Entry<String, SegmentStoreStatistics> statsEntry = stats.next();
-                syscalls.addChild(new SegmentStoreStatisticsEntry(statsEntry.getKey(), statsEntry.getValue()));
+            Map<String, SegmentStoreStatistics> perSyscallStats = module.getPerSyscallStats();
+            if (perSyscallStats != null) {
+                Iterator<Entry<String, SegmentStoreStatistics>> stats = perSyscallStats.entrySet().iterator();
+                while (stats.hasNext()) {
+                    Entry<String, SegmentStoreStatistics> statsEntry = stats.next();
+                    syscalls.addChild(new SegmentStoreStatisticsEntry(statsEntry.getKey(), statsEntry.getValue()));
+                }
             }
         }
         return root;
