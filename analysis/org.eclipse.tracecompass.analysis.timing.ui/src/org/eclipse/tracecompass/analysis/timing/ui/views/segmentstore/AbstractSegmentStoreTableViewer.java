@@ -363,6 +363,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------
+
     /*
      * Add the listener for SetData on the table
      */
@@ -370,14 +371,15 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         getControl().addListener(SWT.SetData, new Listener() {
             @Override
             public void handleEvent(@Nullable Event event) {
+                // Remove the listener before the pack
+                getControl().removeListener(SWT.SetData, this);
+
                 // Pack the column the first time data is set
                 TableViewer tableViewer = getTableViewer();
                 if (tableViewer != null) {
                     for (TableColumn col : tableViewer.getTable().getColumns()) {
                         col.pack();
                     }
-                    // Remove the listener after the pack
-                    getControl().removeListener(SWT.SetData, this);
                 }
             }
         });
