@@ -22,6 +22,7 @@
   <artifactId>org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests</artifactId>
   <packaging>eclipse-test-plugin</packaging>
   <version>1.0.0-SNAPSHOT</version>
+
   <name>Trace Compass Linux Kernel Analysis UI SWTBot Tests Plug-in</name>
 
   <build>
@@ -30,8 +31,6 @@
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-surefire-plugin</artifactId>
         <configuration>
-          <testSuite>org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests</testSuite>
-          <testClass>org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests.AllTests</testClass>
           <useUIHarness>true</useUIHarness>
           <useUIThread>false</useUIThread>
           <argLine>${tycho.testArgLine} ${base.ui.test.vmargs}</argLine>
