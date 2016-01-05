@@ -9,9 +9,12 @@
 
 package org.eclipse.tracecompass.lttng2.control.ui.swtbot.tests;
 
+import java.util.Arrays;
+
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TargetNodeState;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceSessionState;
+import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.ITraceControlComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TargetNodeComponent;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.model.impl.TraceSessionComponent;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers.SWTBotTestCondition;
@@ -28,7 +31,9 @@ class ControlViewSwtBotUtil {
     public static final String KERNEL_DOMAIN_NAME = "Kernel";
     public static final String UST_DOMAIN_NAME = "UST global";
     public static final String SESSION_GROUP_NAME = "Sessions";
+    public static final String PROVIDER_GROUP_NAME = "Provider";
     public static final String ALL_EVENTS_NAME = "*";
+    public static final String SCHED_SWITCH_EVENT_NAME = "sched_switch";
     public static final String PROFILE_SUFFIX = ".lttng";
 
     // Menu strings
@@ -58,6 +63,8 @@ class ControlViewSwtBotUtil {
     public static final String UST_GROUP_NAME = "UST";
     public static final String BUFFERTYPE_GROUP_NAME = "Buffer Type";
     public static final String BUFFERTYPE_PER_UID = "Per UID buffers";
+    public static final String FILTER_EXPRESSION_LABEL = "Filter Expression";
+    public static final String SESSION_LIST_GROUP_NAME = "Session List";
 
     public static final String DESTROY_CONFIRM_DIALOG_TITLE = "Destroy Confirmation";
     public static final String CHANNEL_NAME_LABEL = "Channel Name";
@@ -129,6 +136,29 @@ class ControlViewSwtBotUtil {
             }
         }
         return null;
+    }
+
+    /**
+     * Finds a {@link ITraceControlComponent} in a tree for given path.
+     *
+     * @param root
+     *            root component
+     * @param path
+     *            path to element
+     * @return the matched component or null
+     */
+    public static ITraceControlComponent getComponent(ITraceControlComponent root, String... path) {
+        ITraceControlComponent newRoot = root;
+        for (String segment : path) {
+            newRoot = Arrays.asList(newRoot.getChildren()).stream()
+            .filter(child -> (child.getName().equals(segment)))
+            .findFirst()
+            .orElse(null);
+            if (newRoot == null) {
+                return null;
+            }
+        }
+        return newRoot;
     }
 
 }
