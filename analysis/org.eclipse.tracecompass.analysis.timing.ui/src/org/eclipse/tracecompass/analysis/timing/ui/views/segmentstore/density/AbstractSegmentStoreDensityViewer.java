@@ -141,8 +141,9 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
             yOrigSeries[(int) xBox]++;
             minX = Math.min(minX, segment.getLength());
         }
+        double timeWidth = (double) maxLength / (double) width;
         for (int i = 0; i < width; i++) {
-            xOrigSeries[i] = i * maxLength / width;
+            xOrigSeries[i] = i * timeWidth;
         }
         double maxY = Double.MIN_VALUE;
         for (int i = 0; i < width; i++) {
@@ -203,7 +204,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
         return CompletableFuture.supplyAsync(() -> computeData(timeRange, durationRange));
     }
 
-    private @Nullable ArrayList<ISegment> computeData(final TmfTimeRange timeRange, final Range durationRange) {
+    private @Nullable List<ISegment> computeData(final TmfTimeRange timeRange, final Range durationRange) {
         final AbstractSegmentStoreAnalysisModule analysisModule = fAnalysisModule;
         if (analysisModule == null) {
             return null;
