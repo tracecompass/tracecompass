@@ -1240,7 +1240,9 @@ public class TimeGraphCombo extends Composite {
                 if (SWT.getPlatform().equals("gtk")) { //$NON-NLS-1$
                     TreeItem topItem = tree.getTopItem();
                     tree.getDisplay().asyncExec(() -> {
-                        tree.setTopItem(topItem);
+                        if (!tree.isDisposed() && !topItem.isDisposed()) {
+                            tree.setTopItem(topItem);
+                        }
                     });
                 }
             }
