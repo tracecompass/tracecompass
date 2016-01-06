@@ -97,7 +97,7 @@ public abstract class AbstractSegmentStoreDensityView extends TmfView {
      *            the parent composite
      * @return the table viewer
      */
-    abstract protected AbstractSegmentStoreTableViewer createSegmentStoreTableViewer(Composite parent);
+    protected abstract AbstractSegmentStoreTableViewer createSegmentStoreTableViewer(Composite parent);
 
     /**
      * Create a density viewer suitable for displaying the segment store
@@ -107,7 +107,7 @@ public abstract class AbstractSegmentStoreDensityView extends TmfView {
      *            the parent composite
      * @return the density viewer
      */
-    abstract protected AbstractSegmentStoreDensityViewer createSegmentStoreDensityViewer(Composite parent);
+    protected abstract AbstractSegmentStoreDensityViewer createSegmentStoreDensityViewer(Composite parent);
 
     @Override
     public void setFocus() {
