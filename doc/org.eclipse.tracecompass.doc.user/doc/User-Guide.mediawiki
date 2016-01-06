@@ -1457,10 +1457,57 @@ By default all traces are selected. A default project with the name '''Remote'''
 
 If one selects '''Rename All''', '''Overwrite All''' or '''Skip All''' the choice will be applied for all traces with a name conflict.
 
-
 === Importing Network Traces to a Tracing Project ===
 
 Since LTTng Tools v2.1.0 it is possible to store traces over the network. To import network traces, execute the '''Import''' action as described in chapter [[#Importing Session Traces to a Tracing Project | Importing Session Traces to a Tracing Project]]. For network traces the '''Import Trace Wizard''' will be displayed. Follow the instructions in chapter [[#Importing | Importing]] to import the network traces of the current session.
+
+=== Saving Tracing Sessions ===
+Since LTTng Tools v2.5.0 it is possible to save tracing sessions. The LTTng Tools command-line tool will save the sessions to XML files located by default in a subdirectory of the user's home directory. The Trace Compass '''Control''' view integration for this feature will also store this session profile file into the user's Trace Compass workspace. This will allow user's to re-use session profiles across remote nodes. To save one or more sessions, select the tree nodes of the relevant sessions and press the right mouse button. Then select the '''Save...''' entry of the context-sensitive menu.  
+
+[[Image:images/LTTng2SaveAction.png]]
+
+A new display will open for saving the sessions.
+
+[[Image:images/LTTng2SaveDialog.png]]
+
+By default the '''force''' button is selected that will overwrite any conflicting session profile files on the remote node. Click on '''Ok''' to save the session(s) otherwise click on '''Cancel'''. Upon successful operation, the session profile files will be saved on the remote node and then will be downloaded to the user's Trace Compass workspace. In the case that a session XML file already exists in the workspace the user will be prompted to skip or overwrite the existing profile file.
+
+=== Loading Tracing Sessions ===
+Since LTTng Tools v2.5.0 it is possible to load tracing sessions. The Trace Compass '''Control''' view integrations for this feature will allow to load session profiles that are located in the user's Trace Compass workspace, or alternatively, that are located on the remote node. In the first case the session profiles will be uploaded to the remote node before the load command is executed.
+
+To load one or more sessions, select the tree node '''Sessions''' and press the right mouse button. Then select the '''Load...''' entry of the context-sensitive menu.
+
+[[Image:images/LTTng2LoadAction.png]]
+
+A new display will open for loading session profiles.
+
+[[Image:images/LTTng2LoadDialog.png]]
+
+By default the '''Local''' button and '''force''' buttons are selected and session profile files of the user's workspace will be listed. Select one or more profiles, update the '''force''' button if needed and then click '''Ok'''. This will upload the session profile files to the remote node. If a session profile file already exist on the remote node, the user will be prompted to skip or overwrite the existing profile file. If skipped, the operation will be cancelled. If the '''force''' button is selected any existing session with a conflicting name will be destroyed and a new one will be created.
+
+Alternatively, one can select the '''Remote''' button to list all available session profile files on the remote node. To load one of the remote session profiles, select one or more profiles, update the '''force''' button if needed and then click '''Ok'''.
+
+[[Image:images/LTTng2LoadRemoteDialog.png]]
+
+Upon successful operation, the tracing sessions of the selected session profiles are created and added under the tree node '''Sessions'''  the '''Control''' view.
+
+=== Managing Tracing Session Profiles ===
+The '''LTTng Remote Profiles''' preference page is used to manage the list of LTTng session profiles that are stored in the user's Trace Compass workspace. To open the preference page, select the '''Manage...''' button of the '''Load Sessions''' dialog described in chapter [[#Loading Tracing Sessions |Loading Tracing Sessions]]. Alternatively, select '''Window -> Preferences''' from the top level menu and go to '''Tracing -> LTTng Remote Profiles'''. 
+
+[[Image:images/LTTng2ManageSessionConfig.png]]
+
+The following actions can be performed from this dialog:
+
+* Delete
+
+Select one or more LTTng session profiles from the list and click the '''Delete''' button to remove the profile from the Trace Compass workspace. The user will be prompted to confirm the deletion.
+
+* Import...
+
+Click the '''Import...''' button and select a file from the opened file dialog to import a session profile file. If the file name conflicts with an existing profile file, the user will be prompted to skip or overwrite the existing profile file.
+* Export...
+
+Select one or more session profile files from the list, click the '''Export...''' button and enter or select a directory in the opened directory dialog to export the profile files. If the file name conflicts with an existing profile file in the destination directory, the user will be prompted to skip or overwrite the existing profile file.
 
 == Properties View ==
 
@@ -1527,6 +1574,7 @@ To configure logging of trace control commands and the corresponding command res
 To configure the LTTng command execution timeout, select '''Tracing -> Remote Connection Preferences''' and enter a timeout value into the text field '''Command Timeout (in seconds)'''. Then press on button '''OK'''. To reset to the default value of 15 seconds, click on the button '''Restore Defaults'''.
 
 [[Image:images/LTTng2PreferencesTimeout.png]]
+
 
 = LTTng Kernel Analysis =
 
