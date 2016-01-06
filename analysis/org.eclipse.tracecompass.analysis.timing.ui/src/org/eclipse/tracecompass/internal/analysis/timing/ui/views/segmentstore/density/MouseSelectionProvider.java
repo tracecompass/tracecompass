@@ -52,14 +52,14 @@ public class MouseSelectionProvider extends BaseMouseProvider implements MouseLi
     }
 
     @Override
-    public void register() {
+    public final void register() {
         getChart().getPlotArea().addMouseListener(this);
         getChart().getPlotArea().addMouseMoveListener(this);
         ((IPlotArea) getChart().getPlotArea()).addCustomPaintListener(this);
     }
 
     @Override
-    public void deregister() {
+    public final void deregister() {
         if (!getChart().isDisposed()) {
             getChart().getPlotArea().removeMouseListener(this);
             getChart().getPlotArea().removeMouseMoveListener(this);

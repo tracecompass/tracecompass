@@ -44,12 +44,12 @@ public class SimpleTooltipProvider extends BaseMouseProvider implements MouseTra
     }
 
     @Override
-    public void register() {
+    public final void register() {
         getChart().getPlotArea().addMouseTrackListener(this);
     }
 
     @Override
-    public void deregister() {
+    public final void deregister() {
         if (!getChart().isDisposed()) {
             getChart().getPlotArea().removeMouseTrackListener(this);
         }
