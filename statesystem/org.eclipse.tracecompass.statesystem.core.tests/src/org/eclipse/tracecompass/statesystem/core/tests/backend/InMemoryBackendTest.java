@@ -12,11 +12,16 @@
 
 package org.eclipse.tracecompass.statesystem.core.tests.backend;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
@@ -35,8 +40,9 @@ import org.junit.Test;
  *
  * @author Matthew Khouzam
  */
-public class InMemoryBackendTest {
+public class InMemoryBackendTest extends StateHistoryBackendTestBase {
 
+    private static final @NonNull String SSID = "test-ss";
     private static final int NUMBER_OF_ATTRIBUTES = 10;
     private static IStateHistoryBackend fixture;
 
@@ -45,7 +51,7 @@ public class InMemoryBackendTest {
      */
     @BeforeClass
     public static void init() {
-        fixture = StateHistoryBackendFactory.createInMemoryBackend("test-ss", 0);
+        fixture = StateHistoryBackendFactory.createInMemoryBackend(SSID, 0);
         for (int attribute = 0; attribute < NUMBER_OF_ATTRIBUTES; attribute++) {
             for (int timeStart = 0; timeStart < 1000; timeStart++) {
                 try {
@@ -75,6 +81,10 @@ public class InMemoryBackendTest {
         }
     }
 
+    @Override
+    protected IStateHistoryBackend getBackendForBuilding(long startTime) {
+        return StateHistoryBackendFactory.createInMemoryBackend(SSID, startTime);
+    }
 
     /**
      * Test at start time
