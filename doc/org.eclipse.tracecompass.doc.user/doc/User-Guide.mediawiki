@@ -1344,13 +1344,13 @@ Select a session from the '''Session List''' drop-down menu, a channel from the 
 
 [[Image:images/LTTng2AssignedEvents.png]]
 
-=== Configuring Filter Expression On UST Event Fields ===
+=== Configuring Filter Expression When Enabling Events ===
 
-Since LTTng Tools v2.1.0 it is possible to configure a filter expression on UST event fields. To configure a filter expression on UST event fields, open the enable event dialog as described in chapters [[#Enabling UST Events On Session Level | Enabling UST Events On Session Level]], [[#Enabling Events On Domain Level | Enabling Events On Domain Level]] or [[#Enabling Events On Channel Level | Enabling Events On Channel Level]], select UST if needed, select the relevant '''Tracepoint''' event(s) and enter the filter expression in the '''Filter Expression''' text field.
+It is possible to provide a filter expression when enabling events for UST or Kernel. This feature has been available for UST since LTTng v2.1.0 and for Kernel since v2.7.0. To configure a filter expression, open the enable event dialog as described in previous chapters [[#Enabling UST Events On Session Level | Enabling UST Events On Session Level]], [[#Enabling Kernel Events On Session Level | Enabling Kernel Events On Session Level]], [[#Enabling Events On Domain Level | Enabling Events On Domain Level]] or [[#Enabling Events On Channel Level | Enabling Events On Channel Level]]. Then configure the relevant events and enter the filter expression in the '''Filter Expression''' text field.
 
-[[Image:images/LTTng2EnableEventWithFilter.png]]
+[[Image:images/LTTng2EnableEventWithFilter.png]] [[Image:images/LTTng2EnableEventWithKernelFilter.png]]
 
-Alternatively, open the dialog box for assigning events to a session and channel described in [[#Enabling Tracepoint Events From Provider | Enabling Tracepoint Events From Provider]] (for UST providers) and enter the filter expression in the '''Filter Expression''' text field.
+Alternatively, open the dialog box for assigning events to a session and channel described in [[#Enabling Tracepoint Events From Provider | Enabling Tracepoint Events From Provider]] and enter the filter expression in the '''Filter Expression''' text field.
 
 [[Image:images/LTTng2AssignEventDialogWithFilter.png]]
 
