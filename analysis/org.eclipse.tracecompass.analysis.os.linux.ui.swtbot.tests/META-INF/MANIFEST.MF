@@ -30,4 +30,5 @@ Require-Bundle: org.apache.log4j,
  org.eclipse.tracecompass.analysis.os.linux.core,
  org.eclipse.tracecompass.segmentstore.core,
  org.eclipse.tracecompass.lttng2.kernel.core
-Import-Package: org.eclipse.tracecompass.testtraces.ctf
+Import-Package: org.eclipse.tracecompass.testtraces.ctf,
+ org.swtchart

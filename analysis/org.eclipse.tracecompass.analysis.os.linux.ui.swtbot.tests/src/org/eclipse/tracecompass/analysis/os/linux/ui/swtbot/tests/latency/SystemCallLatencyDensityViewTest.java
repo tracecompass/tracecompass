@@ -12,8 +12,8 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests.latency;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.eclipse.swtbot.swt.finder.SWTBotAssert.assertVisible;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -24,10 +24,13 @@ import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
+import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBotControl;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.AbstractSegmentStoreTableViewer;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.AbstractSegmentStoreDensityView;
@@ -42,6 +45,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.swtchart.Chart;
+import org.swtchart.Range;
 
 /**
  * Tests of the density view
@@ -59,6 +64,7 @@ public class SystemCallLatencyDensityViewTest {
     private static final Logger fLogger = Logger.getRootLogger();
     private AbstractSegmentStoreDensityView fDensityView;
     private AbstractSegmentStoreTableViewer fDensityViewer;
+    private Chart fDensityChart;
 
     /**
      * Things to setup
@@ -126,6 +132,7 @@ public class SystemCallLatencyDensityViewTest {
         final Field field = AbstractSegmentStoreDensityView.class.getDeclaredField("fTableViewer");
         field.setAccessible(true);
         fDensityViewer = (AbstractSegmentStoreTableViewer) field.get(fDensityView);
+        fDensityChart = viewBot.bot().widget(WidgetOfType.widgetOfType(Chart.class));
         assertNotNull(fDensityViewer);
     }
 
@@ -179,7 +186,21 @@ public class SystemCallLatencyDensityViewTest {
         bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1600", 0, 2));
         tableBot.header("Duration").click();
         bot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "1001046400", 0, 2));
+        final Chart densityChart = fDensityChart;
+        assertNotNull(densityChart);
+        SWTBotChart chartBot = new SWTBotChart(densityChart);
+        assertVisible(chartBot);
+        assertEquals("", chartBot.getToolTipText());
+        final Range range = densityChart.getAxisSet().getXAxes()[0].getRange();
+        assertTrue(0 > range.lower);
+        assertTrue(1001046400 < range.upper);
         bot.closeAllEditors();
         SWTBotUtils.deleteProject(PROJECT_NAME, bot);
+    }
+
+    private static class SWTBotChart extends AbstractSWTBotControl<Chart> {
+        public SWTBotChart(Chart w) throws WidgetNotFoundException {
+            super(w);
+        }
     }
 }
