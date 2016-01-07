@@ -13,6 +13,7 @@
 
 package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter;
 
+import java.text.Format;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,10 +30,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmentStoreAnalysisModule;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.Activator;
-import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.scatter.SegmentStoreScatterGraphTooltipProvider;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.scatter.Messages;
+import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.scatter.SegmentStoreScatterGraphTooltipProvider;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
@@ -68,6 +70,8 @@ import org.swtchart.Range;
  * @since 2.0
  */
 public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXLineChartViewer {
+
+    private static final Format FORMAT = new SubSecondTimeWithUnitFormat();
 
     private final class CompactingSegmentStoreQuery extends Job {
         private static final long MAX_POINTS = 1000;
@@ -246,6 +250,7 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
         initializeModule(trace);
         getSwtChart().getLegend().setVisible(false);
+        getSwtChart().getAxisSet().getYAxis(0).getTick().setFormat(FORMAT);
     }
 
     private final void initializeModule(@Nullable ITmfTrace trace) {
