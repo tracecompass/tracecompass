@@ -13,15 +13,15 @@ package org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
-import java.text.NumberFormat;
+import java.text.Format;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.statistics.SegmentStoreStatistics;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
@@ -40,7 +40,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
  */
 public abstract class AbstractSegmentStoreStatisticsViewer extends AbstractTmfTreeViewer {
 
-    private static final NumberFormat FORMATTER = checkNotNull(NumberFormat.getNumberInstance(Locale.getDefault()));
+    private static final Format FORMATTER = new SubSecondTimeWithUnitFormat();
 
     @Nullable private TmfAbstractAnalysisModule fModule;
 
