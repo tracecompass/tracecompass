@@ -31,7 +31,6 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
  */
 public final class SubSecondTimeWithUnitFormat extends Format {
 
-
     private static final long serialVersionUID = -5147827135781459548L;
 
     private static final String SECONDS = "s"; //$NON-NLS-1$
@@ -43,7 +42,7 @@ public final class SubSecondTimeWithUnitFormat extends Format {
     private static final int NANOS_PER_MILLI = 1000000;
     private static final int NANOS_PER_MICRO = 1000;
 
-    private final DecimalFormat fDecimalFormat = new DecimalFormat("#.###"); //$NON-NLS-1$
+    private final DecimalFormat fDecimalFormat = new DecimalFormat("#.000"); //$NON-NLS-1$
 
     @Override
     public Object parseObject(@Nullable String source, @Nullable ParsePosition pos) {
@@ -55,6 +54,9 @@ public final class SubSecondTimeWithUnitFormat extends Format {
         final @Nullable StringBuffer appender = toAppendTo;
         if ((obj != null) && (obj instanceof Double || obj instanceof Long)) {
             double formattedTime = obj instanceof Long ? ((Long) obj).doubleValue() : ((Double) obj).doubleValue();
+            if (Double.isNaN(formattedTime)) {
+                return appender == null ? new StringBuffer() : NonNullUtils.checkNotNull(appender.append("---")); //$NON-NLS-1$
+            }
             String unit = NANOSECONDS;
             if (formattedTime > NANOS_PER_SEC) {
                 unit = SECONDS;
@@ -66,7 +68,7 @@ public final class SubSecondTimeWithUnitFormat extends Format {
                 unit = MICROSECONDS;
                 formattedTime /= NANOS_PER_MICRO;
             }
-            String timeString = fDecimalFormat.format(formattedTime);
+            String timeString = unit.equals(NANOSECONDS) ? Long.toString((long) formattedTime) : fDecimalFormat.format(formattedTime);
             return appender == null ? new StringBuffer() : NonNullUtils.checkNotNull(appender.append(timeString).append(' ').append(unit));
         }
         return new StringBuffer();

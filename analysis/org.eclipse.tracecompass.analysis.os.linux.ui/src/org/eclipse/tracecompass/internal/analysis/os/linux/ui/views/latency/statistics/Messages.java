@@ -23,7 +23,6 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.statistics.messages"; //$NON-NLS-1$
-
     /** Name of the system call level in statistics tree */
     public static String LatencyStatistics_SyscallLevelName;
     /** Name of Total statistics */
