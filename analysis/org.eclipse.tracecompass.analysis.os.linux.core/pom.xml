@@ -14,12 +14,12 @@
   <parent>
     <artifactId>org.eclipse.tracecompass.analysis-parent</artifactId>
     <groupId>org.eclipse.tracecompass</groupId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.2.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>org.eclipse.tracecompass.analysis.os.linux.core</artifactId>
   <groupId>org.eclipse.tracecompass</groupId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.1-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
 
   <name>Trace Compass Linux Kernel Analysis Core Plug-in</name>
