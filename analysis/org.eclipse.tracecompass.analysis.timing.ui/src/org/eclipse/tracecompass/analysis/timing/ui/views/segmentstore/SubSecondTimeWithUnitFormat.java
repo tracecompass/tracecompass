@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  **********************************************************************/
 
-package org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.density;
+package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore;
 
 import java.text.DecimalFormat;
 import java.text.FieldPosition;
@@ -18,12 +18,18 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 
 /**
- * Density format, it will take a time in NanoSeconds and convert it to a string
- * with 3 digits.
+ * Time format, it will take a time in nano seconds and convert it to a string
+ * with 3 decimals max.
  *
- * @author Matthew Khouzam
+ * examples:
+ * <ul>
+ * <li>100 -> "100 ns"</li>
+ * <li>1001 -> "1.001 us" (mu)</li>
+ * <li>314159264 -> "312.159 ms"</li>
+ * <li>10000002000000 -> "1000.002 s"</li>
+ * </ul>
  */
-public final class DensityTimeFormat extends Format {
+public final class SubSecondTimeWithUnitFormat extends Format {
 
 
     private static final long serialVersionUID = -5147827135781459548L;

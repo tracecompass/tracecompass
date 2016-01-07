@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
+import java.text.Format;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,8 +27,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmentStoreAnalysisModule;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
-import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.density.DensityTimeFormat;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.density.MouseDragZoomProvider;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.density.MouseSelectionProvider;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.density.SimpleTooltipProvider;
@@ -67,7 +68,7 @@ import com.google.common.collect.Lists;
  */
 public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer {
 
-    private static final DensityTimeFormat DENSITY_TIME_FORMATTER = new DensityTimeFormat();
+    private static final Format DENSITY_TIME_FORMATTER = new SubSecondTimeWithUnitFormat();
     private static final RGB BAR_COLOR = new RGB(0x42, 0x85, 0xf4);
     private final Chart fChart;
     private final MouseDragZoomProvider fDragZoomProvider;

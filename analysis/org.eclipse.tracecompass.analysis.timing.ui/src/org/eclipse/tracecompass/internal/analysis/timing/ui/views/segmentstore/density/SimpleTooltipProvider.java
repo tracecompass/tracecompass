@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,6 +15,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.AbstractSegmentStoreDensityViewer;
 import org.swtchart.IAxis;
 import org.swtchart.IBarSeries;
@@ -29,7 +30,7 @@ import org.swtchart.ISeries;
  */
 public class SimpleTooltipProvider extends BaseMouseProvider implements MouseTrackListener {
 
-    private static final Format FORMAT = new DensityTimeFormat();
+    private static final Format FORMAT = new SubSecondTimeWithUnitFormat();
 
     /**
      * Constructor for a tool tip provider.
