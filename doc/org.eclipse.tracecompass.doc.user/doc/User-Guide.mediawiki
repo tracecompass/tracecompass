@@ -1483,7 +1483,7 @@ A new display will open for loading session profiles.
 
 [[Image:images/LTTng2LoadDialog.png]]
 
-By default the '''Local''' button and '''force''' buttons are selected and session profile files of the user's workspace will be listed. Select one or more profiles, update the '''force''' button if needed and then click '''Ok'''. This will upload the session profile files to the remote node. If a session profile file already exist on the remote node, the user will be prompted to skip or overwrite the existing profile file. If skipped, the operation will be cancelled. If the '''force''' button is selected any existing session with a conflicting name will be destroyed and a new one will be created.
+By default the '''Local''' button and '''force''' buttons are selected and session profile files of the user's workspace will be listed. Select one or more profiles, update the '''force''' button if needed and then click '''Ok'''. This will upload the session profile files to the remote node. If a session profile file with the same name already exist on the remote node, it will be overwritten. If the '''force''' button is selected any existing session with a conflicting name will be destroyed and a new one will be created.
 
 Alternatively, one can select the '''Remote''' button to list all available session profile files on the remote node. To load one of the remote session profiles, select one or more profiles, update the '''force''' button if needed and then click '''Ok'''.
 
