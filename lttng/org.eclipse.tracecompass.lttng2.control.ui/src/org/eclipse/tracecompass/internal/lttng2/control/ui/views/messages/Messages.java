@@ -343,6 +343,8 @@ public final class Messages extends NLS {
     public static String TraceControl_DeleteProfileTitle;
     public static String TraceControl_DeleteQuery;
 
+    public static String TraceControl_DefaultEventFilterString;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

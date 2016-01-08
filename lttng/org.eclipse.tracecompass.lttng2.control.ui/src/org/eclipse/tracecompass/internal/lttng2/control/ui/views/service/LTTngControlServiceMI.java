@@ -841,7 +841,9 @@ public class LTTngControlServiceMI extends LTTngControlService {
                         // LTTng
                         // For now we emulate the non-mi behavior and simply put
                         // "with filter"
-                        eventInfo.setFilterExpression("with filter"); //$NON-NLS-1$
+                        if (Boolean.TRUE.toString().equals(infoNode.getTextContent())) {
+                            eventInfo.setFilterExpression(Messages.TraceControl_DefaultEventFilterString);
+                        }
                         break;
                     case MIStrings.EXCLUSION:
                         // TODO: Currently not supported by tmf
