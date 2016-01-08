@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ericsson, École Polytechnique de Montréal, and others
+ * Copyright (c) 2010, 2016 Ericsson, École Polytechnique de Montréal, and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -579,7 +579,7 @@ public class HistoryTree {
         // Create new coreNode
         for (int i = 1; i < depth; i++) {
             CoreNode prevNode = (CoreNode) fLatestBranch.get(i - 1);
-            CoreNode newNode = initNewCoreNode(prevNode.getParentSequenceNumber(),
+            CoreNode newNode = initNewCoreNode(prevNode.getSequenceNumber(),
                     splitTime + 1);
             prevNode.linkNewChild(newNode);
             fLatestBranch.add(newNode);
@@ -587,7 +587,7 @@ public class HistoryTree {
 
         // Create the new leafNode
         CoreNode prevNode = (CoreNode) fLatestBranch.get(depth - 1);
-        LeafNode newNode = initNewLeafNode(prevNode.getParentSequenceNumber(), splitTime + 1);
+        LeafNode newNode = initNewLeafNode(prevNode.getSequenceNumber(), splitTime + 1);
         prevNode.linkNewChild(newNode);
         fLatestBranch.add(newNode);
     }

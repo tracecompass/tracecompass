@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ericsson, École Polytechnique de Montréal, and others
+ * Copyright (c) 2010, 2016 Ericsson, École Polytechnique de Montréal, and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -620,18 +620,14 @@ public abstract class HTNode {
     @Override
     public String toString() {
         /* Only used for debugging, shouldn't be externalized */
-        StringBuffer buf = new StringBuffer("Node #" + fSequenceNumber + ", ");
-        buf.append(toStringSpecific());
-        buf.append(fIntervals.size() + " intervals (" + getNodeUsagePercent()
-                + "% used), ");
-
-        buf.append("[" + fNodeStart + " - ");
-        if (fIsOnDisk) {
-            buf = buf.append("" + fNodeEnd + "]");
-        } else {
-            buf = buf.append("...]");
-        }
-        return buf.toString();
+        return String.format("Node #%d, %s, %s, %d intervals (%d%% used), [%d - %s]",
+                fSequenceNumber,
+                (fParentSequenceNumber == -1) ? "Root" : "Parent #" + fParentSequenceNumber,
+                toStringSpecific(),
+                fIntervals.size(),
+                getNodeUsagePercent(),
+                fNodeStart,
+                (fIsOnDisk || fNodeEnd != 0) ? fNodeEnd : "...");
     }
 
     /**
