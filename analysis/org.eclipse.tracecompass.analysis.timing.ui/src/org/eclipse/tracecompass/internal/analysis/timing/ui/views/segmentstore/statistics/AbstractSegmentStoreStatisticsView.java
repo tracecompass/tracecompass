@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -9,7 +9,7 @@
  * Contributors:
  *     Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.statistics;
+package org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.statistics;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;

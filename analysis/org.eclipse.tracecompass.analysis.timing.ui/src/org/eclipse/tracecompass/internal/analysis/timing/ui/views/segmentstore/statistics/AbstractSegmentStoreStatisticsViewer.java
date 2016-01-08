@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -9,7 +9,7 @@
  * Contributors:
  *     Bernd Hufmann - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.statistics;
+package org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.statistics;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
@@ -22,8 +22,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.statistics.SegmentStoreStatistics;
-import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
+import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.statistics.SegmentStoreStatistics;
+import org.eclipse.tracecompass.internal.analysis.timing.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;

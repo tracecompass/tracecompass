@@ -14,6 +14,8 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.sta
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentStoreStatisticsView;
+import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentStoreStatisticsViewer;
 
 /**
  * View to display latency statistics.

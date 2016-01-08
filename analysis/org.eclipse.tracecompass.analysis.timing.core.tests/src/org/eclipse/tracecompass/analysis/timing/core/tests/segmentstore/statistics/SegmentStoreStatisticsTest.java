@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.os.linux.core.tests.latency;
+package org.eclipse.tracecompass.analysis.timing.core.tests.segmentstore.statistics;
 
 import static org.junit.Assert.assertEquals;
 
@@ -19,7 +19,7 @@ import java.util.Random;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCall;
 import org.eclipse.tracecompass.analysis.os.linux.core.latency.SystemCall.InitialInfo;
-import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.statistics.SegmentStoreStatistics;
+import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.statistics.SegmentStoreStatistics;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.junit.Test;
 
