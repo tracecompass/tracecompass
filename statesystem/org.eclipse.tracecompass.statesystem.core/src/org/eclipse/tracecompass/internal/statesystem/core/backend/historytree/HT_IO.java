@@ -39,13 +39,17 @@ class HT_IO {
     private final HTConfig fConfig;
 
     /* Fields related to the file I/O */
-    private final FileInputStream fis;
-    private final FileOutputStream fos;
-    private final FileChannel fcIn;
-    private final FileChannel fcOut;
+    private final FileInputStream fFileInputStream;
+    private final FileOutputStream fFileOutputStream;
+    private final FileChannel fFileChannelIn;
+    private final FileChannel fFileChannelOut;
 
     // TODO test/benchmark optimal cache size
+    /**
+     * Cache size, must be a power of 2
+     */
     private static final int CACHE_SIZE = 256;
+    private static final int CACHE_MASK = CACHE_SIZE - 1;
     private final HTNode fNodeCache[] = new HTNode[CACHE_SIZE];
 
     /**
@@ -75,18 +79,18 @@ class HT_IO {
                 throw new IOException("Cannot create new file at " + //$NON-NLS-1$
                         historyTreeFile.getName());
             }
-            fis = new FileInputStream(historyTreeFile);
-            fos = new FileOutputStream(historyTreeFile, false);
+            fFileInputStream = new FileInputStream(historyTreeFile);
+            fFileOutputStream = new FileOutputStream(historyTreeFile, false);
         } else {
             /*
              * We want to open an existing file, make sure we don't squash the
              * existing content when opening the fos!
              */
-            this.fis = new FileInputStream(historyTreeFile);
-            this.fos = new FileOutputStream(historyTreeFile, true);
+            fFileInputStream = new FileInputStream(historyTreeFile);
+            fFileOutputStream = new FileOutputStream(historyTreeFile, true);
         }
-        this.fcIn = fis.getChannel();
-        this.fcOut = fos.getChannel();
+        fFileChannelIn = fFileInputStream.getChannel();
+        fFileChannelOut = fFileOutputStream.getChannel();
     }
 
     /**
@@ -102,7 +106,7 @@ class HT_IO {
      */
     public synchronized @NonNull HTNode readNode(int seqNumber) throws ClosedChannelException {
         /* Do a cache lookup */
-        int offset = seqNumber & (CACHE_SIZE - 1);
+        int offset = seqNumber & CACHE_MASK;
         HTNode readNode = fNodeCache[offset];
         if (readNode != null && readNode.getSequenceNumber() == seqNumber) {
             return readNode;
@@ -110,8 +114,8 @@ class HT_IO {
 
         /* Lookup on disk */
         try {
-            seekFCToNodePos(fcIn, seqNumber);
-            readNode = HTNode.readNode(fConfig, fcIn);
+            seekFCToNodePos(fFileChannelIn, seqNumber);
+            readNode = HTNode.readNode(fConfig, fFileChannelIn);
 
             /* Put the node in the cache. */
             fNodeCache[offset] = readNode;
@@ -130,12 +134,12 @@ class HT_IO {
         try {
             /* Insert the node into the cache. */
             int seqNumber = node.getSequenceNumber();
-            int offset = seqNumber & (CACHE_SIZE - 1);
+            int offset = seqNumber & CACHE_MASK;
             fNodeCache[offset] = node;
 
             /* Position ourselves at the start of the node and write it */
-            seekFCToNodePos(fcOut, seqNumber);
-            node.writeSelf(fcOut);
+            seekFCToNodePos(fFileChannelOut, seqNumber);
+            node.writeSelf(fFileChannelOut);
         } catch (IOException e) {
             /* If we were able to open the file, we should be fine now... */
             Activator.getDefault().logError(e.getMessage(), e);
@@ -143,7 +147,7 @@ class HT_IO {
     }
 
     public FileChannel getFcOut() {
-        return this.fcOut;
+        return fFileChannelOut;
     }
 
     public FileInputStream supplyATReader(int nodeOffset) {
@@ -152,17 +156,17 @@ class HT_IO {
              * Position ourselves at the start of the Mapping section in the
              * file (which is right after the Blocks)
              */
-            seekFCToNodePos(fcIn, nodeOffset);
+            seekFCToNodePos(fFileChannelIn, nodeOffset);
         } catch (IOException e) {
             Activator.getDefault().logError(e.getMessage(), e);
         }
-        return fis;
+        return fFileInputStream;
     }
 
     public synchronized void closeFile() {
         try {
-            fis.close();
-            fos.close();
+            fFileInputStream.close();
+            fFileOutputStream.close();
         } catch (IOException e) {
             Activator.getDefault().logError(e.getMessage(), e);
         }
