@@ -298,8 +298,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
             }
 
             String temp = fLogLevelEventNameText.getText();
-            if (temp.isEmpty() ||
-                temp.matches("\\s*") || //$NON-NLS-1$
+            if (temp.trim().isEmpty() ||
                 (!temp.matches("^[\\s]{0,}$") && !temp.matches("^[a-zA-Z0-9\\-\\_]{1,}$"))) { //$NON-NLS-1$ //$NON-NLS-2$
                 MessageDialog.openError(getShell(),
                         Messages.TraceControl_EnableEventsDialogTitle,
@@ -327,8 +326,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
         fWildcard = null;
         if (fIsWildcard) {
             String tempWildcard = fWildcardText.getText();
-            if (tempWildcard.isEmpty() ||
-                tempWildcard.matches("\\s*") || //$NON-NLS-1$
+            if (tempWildcard.trim().isEmpty() ||
                 (!tempWildcard.matches("^[\\s]{0,}$") && !tempWildcard.matches("^[a-zA-Z0-9\\-\\_\\*\\\\\\']{1,}$"))) { //$NON-NLS-1$ //$NON-NLS-2$
                 MessageDialog.openError(getShell(),
                         Messages.TraceControl_EnableEventsDialogTitle,
@@ -345,7 +343,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
         if (fProviderGroup.isEventFilteringSupported(false)) {
             String tempFilter = fFilterText.getText();
 
-            if(!tempFilter.isEmpty() && !tempFilter.matches("\\s*")) { //$NON-NLS-1$
+            if(!tempFilter.trim().isEmpty()) {
                 fFilterExpression = tempFilter;
             }
         }
