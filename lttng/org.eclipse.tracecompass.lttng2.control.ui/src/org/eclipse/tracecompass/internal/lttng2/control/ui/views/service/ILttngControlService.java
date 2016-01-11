@@ -363,19 +363,6 @@ public interface ILttngControlService {
             IProgressMonitor monitor) throws ExecutionException;
 
     /**
-     * Executes calibrate command to quantify LTTng overhead.
-     *
-     * @param isKernel
-     *            - a flag for indicating kernel or UST.
-     * @param monitor
-     *            - a progress monitor
-     * @throws ExecutionException
-     *             If the command fails
-     */
-    void calibrate(boolean isKernel, IProgressMonitor monitor)
-            throws ExecutionException;
-
-    /**
      * Records a snapshot.
      *
      * @param sessionName

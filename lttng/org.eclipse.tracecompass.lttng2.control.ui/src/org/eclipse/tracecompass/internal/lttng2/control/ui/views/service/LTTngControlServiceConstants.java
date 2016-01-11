@@ -122,10 +122,6 @@ public interface LTTngControlServiceConstants {
      */
     String COMMAND_ADD_CONTEXT = "add-context"; //$NON-NLS-1$
     /**
-     * Command to execute calibrate command to quantify LTTng overhead
-     */
-    String COMMAND_CALIBRATE = "calibrate"; //$NON-NLS-1$
-    /**
      * Command to execute sub-command snapshot
      */
     String COMMAND_SNAPSHOT = "snapshot"; //$NON-NLS-1$

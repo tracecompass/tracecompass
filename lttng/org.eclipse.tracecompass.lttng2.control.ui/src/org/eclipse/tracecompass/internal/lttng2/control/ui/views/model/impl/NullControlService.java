@@ -133,10 +133,6 @@ class NullControlService implements ILttngControlService {
     }
 
     @Override
-    public void calibrate(boolean isKernel, IProgressMonitor monitor) throws ExecutionException {
-    }
-
-    @Override
     public void recordSnapshot(String sessionName, IProgressMonitor monitor) throws ExecutionException {
     }
 

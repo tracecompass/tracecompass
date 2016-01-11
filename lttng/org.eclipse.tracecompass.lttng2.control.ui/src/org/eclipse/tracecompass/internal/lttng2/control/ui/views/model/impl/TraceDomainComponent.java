@@ -285,15 +285,4 @@ public class TraceDomainComponent extends TraceControlComponent {
                 isKernel(), contexts, monitor);
     }
 
-    /**
-     * Executes calibrate command to quantify LTTng overhead.
-     *
-     * @param monitor
-     *            - a progress monitor
-     * @throws ExecutionException
-     *             If the command fails
-     */
-    public void calibrate(IProgressMonitor monitor) throws ExecutionException {
-        getControlService().calibrate(isKernel(), monitor);
-    }
 }

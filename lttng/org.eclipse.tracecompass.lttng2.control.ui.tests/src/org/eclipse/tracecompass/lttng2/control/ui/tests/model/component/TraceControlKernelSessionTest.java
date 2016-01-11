@@ -751,18 +751,6 @@ public class TraceControlKernelSessionTest {
         // However, the execution of the command make sure that the correct service command line is build and executed.
 
         // ------------------------------------------------------------------------
-        // Calibrate
-        // ------------------------------------------------------------------------
-        // Get Kernel domain component instance
-        domains = session.getChildren();
-        assertNotNull(domains);
-        assertEquals(1, domains.length);
-
-        fFacility.executeCommand(domains[0], "calibrate");
-        // There is nothing to verify here.
-        // However, the execution of the command make sure that the correct service command line is build and executed.
-
-        // ------------------------------------------------------------------------
         // refresh
         // ------------------------------------------------------------------------
         fFacility.executeCommand(node, "refresh");
