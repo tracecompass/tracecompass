@@ -150,7 +150,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private final Map<ITmfTrace, List<TimeGraphEntry>> fEntryListMap = new HashMap<>();
 
     /** The trace to filters hash map */
-    private final Map<ITmfTrace, ViewerFilter[]> fFiltersMap = new HashMap<>();
+    private final Map<ITmfTrace, @NonNull ViewerFilter[]> fFiltersMap = new HashMap<>();
 
     /** The trace to marker event sources hash map */
     private final Map<ITmfTrace, List<IMarkerEventSource>> fMarkerEventSourcesMap = new HashMap<>();
