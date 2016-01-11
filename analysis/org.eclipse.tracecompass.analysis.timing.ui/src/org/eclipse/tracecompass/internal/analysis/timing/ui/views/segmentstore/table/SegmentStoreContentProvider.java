@@ -11,7 +11,7 @@
  *   Bernd Hufmann - MOve abstract class to TMF
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore;
+package org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.table;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNullContents;
 

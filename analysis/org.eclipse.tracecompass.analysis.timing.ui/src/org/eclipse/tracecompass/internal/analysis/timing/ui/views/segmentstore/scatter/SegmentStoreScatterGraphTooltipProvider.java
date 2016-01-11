@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,12 +9,12 @@
  * Contributors:
  *   Bernd Hufmann - Initial API and implementation
  **********************************************************************/
-package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore;
+package org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.scatter;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.Messages;
+import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.scatter.Messages;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.ITmfChartTimeProvider;

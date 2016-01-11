@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -11,7 +11,7 @@
  *   Bernd Hufmann - Extracted abstract class from LatencyScatterGraphViewer
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore;
+package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,7 +31,8 @@ import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmen
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.Activator;
-import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.Messages;
+import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.scatter.SegmentStoreScatterGraphTooltipProvider;
+import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.scatter.Messages;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;

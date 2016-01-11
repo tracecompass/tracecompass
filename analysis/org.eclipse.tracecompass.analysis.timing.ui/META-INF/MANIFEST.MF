@@ -19,7 +19,10 @@ Require-Bundle: org.eclipse.ui,
  org.swtchart
 Export-Package: org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore,
  org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density,
+ org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter,
+ org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table,
  org.eclipse.tracecompass.internal.analysis.timing.ui,
- org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore,
  org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.density,
- org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.statistics;x-friends:="org.eclipse.tracecompass.analysis.os.linux.ui"
+ org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.scatter,
+ org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.statistics;x-friends:="org.eclipse.tracecompass.analysis.os.linux.ui",
+ org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.table

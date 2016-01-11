@@ -10,7 +10,7 @@
  *   France Lapointe Nguyen - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore;
+package org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.table;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.osgi.util.NLS;
@@ -21,7 +21,7 @@ import org.eclipse.osgi.util.NLS;
  */
 @NonNullByDefault({})
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.table.messages"; //$NON-NLS-1$
 
     /**
      * Name of the duration column
@@ -47,30 +47,6 @@ public class Messages extends NLS {
      * Title of action to goto end event
      */
     public static String SegmentStoreTableViewer_goToEndEvent;
-    /**
-     * Title of the scatter graph
-     */
-    public static String SegmentStoreScatterGraphViewer_title;
-
-    /**
-     * Title of the x axis of the scatter graph
-     */
-    public static String SegmentStoreScatterGraphViewer_xAxis;
-
-    /**
-     * Title of the y axis of the scatter graph
-     */
-    public static String SegmentStoreScatterGraphViewer_yAxis;
-
-    /**
-     * Legend
-     */
-    public static String SegmentStoreScatterGraphViewer_legend;
-
-    /**
-     * Name of the compacting job
-     */
-    public static String SegmentStoreScatterGraphViewer_compactTitle;
 
     static {
         // initialize resource bundle
