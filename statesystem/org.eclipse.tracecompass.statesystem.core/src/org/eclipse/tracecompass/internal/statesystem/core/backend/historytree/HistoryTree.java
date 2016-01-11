@@ -605,11 +605,6 @@ public class HistoryTree {
         CoreNode newNode = new CoreNode(fConfig, fNodeCount, parentSeqNumber,
                 startTime);
         fNodeCount++;
-
-        /* Update the treeEnd if needed */
-        if (startTime >= fTreeEnd) {
-            fTreeEnd = startTime + 1;
-        }
         return newNode;
     }
 
@@ -626,11 +621,6 @@ public class HistoryTree {
         LeafNode newNode = new LeafNode(fConfig, fNodeCount, parentSeqNumber,
                 startTime);
         fNodeCount++;
-
-        /* Update the treeEnd if needed */
-        if (startTime >= fTreeEnd) {
-            fTreeEnd = startTime + 1;
-        }
         return newNode;
     }
 

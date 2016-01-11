@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Ericsson
+ * Copyright (c) 2012, 2016 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
  *
@@ -24,11 +24,6 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.statesystem.core.Activator;
-import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.CoreNode;
-import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTConfig;
-import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTInterval;
-import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTNode;
-import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HistoryTree;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -260,10 +255,11 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     }
 
     private void checkValidTime(long t) {
-        long treeStart = fSht.getTreeStart();
-        long treeEnd = fSht.getTreeEnd();
-        if (t < treeStart || t > treeEnd) {
-            throw new TimeRangeException(fSsid + " Time:" + t + ", Start:" + treeStart + ", End:" + treeEnd); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        long startTime = getStartTime();
+        long endTime = getEndTime();
+        if (t < startTime || t > endTime) {
+            throw new TimeRangeException(String.format("%s Time:%d, Start:%d, End:%d", //$NON-NLS-1$
+                    fSsid, t, startTime, endTime));
         }
     }
 
